@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build:
@@ -33,4 +33,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: luisca343/boffmedia-server:latest
+          tags: luisca343/boffmedia-web:latest
