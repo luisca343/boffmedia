@@ -10,7 +10,19 @@ const nextConfig = {
     reactStrictMode: true,
     output: "standalone",
     images: {
-        domains: ['i.lizardon.es', 'i.ytimg.com'],
+        //domains: ['i.lizardon.es', 'i.ytimg.com'],
+        remotePatterns:[
+            {
+                protocol: 'https',
+                hostname: '**.lizardon.es',
+                port: ''
+            },
+            {
+                protocol: 'https',
+                hostname: 'i.ytimg.com',
+                port: ''
+            }
+        ]
     },
 };
 

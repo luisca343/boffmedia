@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react";
+import { set } from "react-hook-form";
 
 export function Hora({className= ''}: {className?: string}) {
     const getTime = (separator = ':') => {
@@ -9,11 +10,13 @@ export function Hora({className= ''}: {className?: string}) {
         return `${hours}${separator}${minutes}`;
     };
 
-    const [time, setTime] = useState(getTime());
+    const [time, setTime] = useState(null) as any;
 
     useEffect(() => {
+        setTime(getTime());
         const interval = setInterval(() => {
-            const separator = new Date().getSeconds() % 2 === 0 ? ':' : ' ';
+            //const separator = new Date().getSeconds() % 2 === 0 ? ':' : ' ';
+            const separator = ':';
             setTime(getTime(separator));
         }, 1000);
         return () => clearInterval(interval);

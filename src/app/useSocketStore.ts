@@ -11,7 +11,7 @@ const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
   connect: async () => {
     if (get().socket) return;
-    let socket = io('http://localhost:34304');
+    let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string);
     socket.on('connect', () => set({ socket }));
     socket.on('disconnect', () => set({ socket: null }));
   },

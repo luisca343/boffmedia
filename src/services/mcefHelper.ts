@@ -31,7 +31,7 @@ export async function mcefQuery(query: string, data: Object = {}){
                 }
             });
         } catch (error) {
-            console.error('Error sending mcefQuery: ' + error);
+            
         }
     });
 }

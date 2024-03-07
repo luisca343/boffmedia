@@ -9,6 +9,7 @@ const handler = NextAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
         })
     ],
+    secret: process.env.SECRET,
     events: {
         signIn: async ({user, account, profile}: {user: User, account: Account | null, profile?: Profile} ) => {
             console.log('User signed in:', user);

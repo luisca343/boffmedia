@@ -8,10 +8,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-
+type Invitacion = {
+    id: number;
+    username: string;
+    uuid: string;
+  }
+  
   
 
-export default function InvitacionForm({invitacion}) {
+export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) {
     const formSchema = z.object({
         username: z.string().min(1),
         mc_username: z.string().min(1),

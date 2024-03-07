@@ -1,6 +1,37 @@
 import axios from 'axios'
 
+type options = {
+  method: string,
+  headers: {
+    'Content-Type': string
+  },
+  body?: string,
+  next: {
+    revalidate: number
+  }
+}
+
+
 export async function request(method: string, url: string, data: any) {
+  const options = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    next: {
+      revalidate: 1
+    }
+  } as options;
+
+  if (method !== 'GET') {
+    options.body = JSON.stringify(data);
+  }
+
+  const res = await fetch(url, options);
+  return res.json();
+}
+
+export async function request2(method: string, url: string, data: any) {
   return axios.request({
     method,
     url,
@@ -9,7 +40,7 @@ export async function request(method: string, url: string, data: any) {
 }
 
 export async function GET(url: string) {
-  return (await request('GET', url, null)).data
+  return (await request('GET', url, null))
   
 }
 
