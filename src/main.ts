@@ -1,0 +1,45 @@
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { Server } from 'socket.io';
+import { ConfigService } from '@nestjs/config';
+import { DuplicateEntryExceptionFilter } from './filters/DuplicateEntryExceptionFilter';
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+  app.enableCors({ origin: 'http://localhost:3000' }); // Enable CORS for the specified origin
+
+  const httpServer = app.getHttpServer();
+  const configService = app.get(ConfigService);
+  app.useGlobalFilters(new DuplicateEntryExceptionFilter());
+
+  console.log("EL PUERTO ES: "+ configService.get('PORT'));
+
+  const io = new Server(httpServer, {
+    cors: {
+      origin: 'http://localhost:3000',
+      methods: ['GET', 'POST'],
+    },
+  });
+
+  io.on('connection', (socket) => {
+    console.log(`Client connected: ${socket.id}`);
+    socket.emit('connection', null);
+
+    socket.on('patata', () => {
+      console.log('Patata');
+      socket.emit('patata', null);
+    });
+  });
+
+  io.on('disconnect', (socket) => {
+    console.log('Client disconnected');
+  });
+
+  await app.listen(34301);
+  console.log('Server open');
+
+  io.listen(34304);
+  console.log('Socket open');
+}
+
+bootstrap();
