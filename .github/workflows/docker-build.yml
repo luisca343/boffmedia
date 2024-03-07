@@ -27,13 +27,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+
       - name: Set secrets
         run: |
-          echo $GOOGLE_CLIENT_ID >> .env.production.local
-          echo $GOOGLE_CLIENT_SECRET >> .env.production.local
-          echo $NEXT_PUBLIC_API >> .env.production.local
-          echo $NEXT_PUBLIC_SOCKET_URL >> .env.production.local
+          echo "GOOGLE_CLIENT_ID=${{secrets.GOOGLE_CLIENT_ID}}" >> .env.production.local
+          echo "GOOGLE_CLIENT_SECRET=${{secrets.GOOGLE_CLIENT_SECRET}}" >> .env.production.local
+          echo "NEXT_PUBLIC_API=${{secrets.NEXT_PUBLIC_API}}" >> .env.production.local
+          echo "NEXT_PUBLIC_SOCKET_URL=${{secrets.NEXT_PUBLIC_SOCKET_URL}}" >> .env.production.local
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
