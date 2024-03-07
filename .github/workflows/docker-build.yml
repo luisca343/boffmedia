@@ -28,4 +28,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: luisca343/boffmedia-server:latest
+          tags: luisca343/boffmedia-web:latest
