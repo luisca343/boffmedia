@@ -4,26 +4,21 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Load variables
-        run: |
-          echo "NEXT_PUBLIC_API=${{ secrets.NEXT_PUBLIC_API }}" >> $GITHUB_ENV
-          echo "NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}" >> $GITHUB_ENV
-          echo "SECRET=${{ secrets.SECRET }}" >> $GITHUB_ENV
-          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
-        env:
-          NEXT_PUBLIC_API: ${{ secrets.NEXT_PUBLIC_API }}
-          NEXT_PUBLIC_SOCKET_URL: ${{ secrets.NEXT_PUBLIC_SOCKET_URL }}
-          SECRET: ${{ secrets.SECRET }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+    - name: Setup .env
+      run: |
+        echo NEXT_PUBLIC_API=${{ secrets.NEXT_PUBLIC_API }} >> .env
+        echo NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }} >> .env
+        echo SECRET=${{ secrets.SECRET }} >> .env
+        echo GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} >> .env
+        echo GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} >> .env
+        
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -41,4 +36,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: luisca343/boffmedia-web:latest
+          tags: luisca343/boffmedia-server:latest
