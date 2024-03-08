@@ -1,4 +1,4 @@
-export class CreateUserDto {
+export class CreateSmartrotomUserDto {
     uuid: string;
     username: string;
     world?: string;

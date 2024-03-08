@@ -9,7 +9,7 @@ export class SmartrotomUser {
     @Unique(['username'])
     username: string;
 
-    @Column()
+    @Column({nullable: true})
     world: string;
 
 }

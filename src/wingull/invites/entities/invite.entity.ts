@@ -8,8 +8,6 @@ export class Invite {
 
     @Column()
     @Unique(['uuid'])
-    @JoinColumn({ name: 'uuid' })
-    @OneToOne(() => SmartrotomUser)
     uuid: string;
 
     @Column()

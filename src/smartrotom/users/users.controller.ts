@@ -1,16 +1,16 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { SmartRotomUsersService } from './users.service';
+import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SmartrotomUser } from './entities/user.entity';
 import { Response } from 'express';
 
 @Controller('/smartrotom/users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: SmartRotomUsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateSmartrotomUserDto) {
     return this.usersService.create(createUserDto);
   }
 

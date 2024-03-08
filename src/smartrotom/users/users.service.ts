@@ -1,20 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SmartrotomUser } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class UsersService {
+export class SmartRotomUsersService {
   constructor(
     @InjectRepository(SmartrotomUser)
-    private appsRepository: Repository<SmartrotomUser>,
+    private smartRotomUsersRepository: Repository<SmartrotomUser>,
   ) {}
   
-  create(createUserDto: CreateUserDto) {
-    const user = this.appsRepository.create(createUserDto);
-    return this.appsRepository.save(user);
+  async create(user: CreateSmartrotomUserDto) {
+    let existingUser = await this.smartRotomUsersRepository.findOne({ where: { uuid: user.uuid } });
+    if (existingUser) {
+      console.log('El usuario ya existe');
+      console.log(existingUser);
+      return { error: 'El usuario ya existe' };
+    }
+
+    let res = await this.smartRotomUsersRepository.save(user)
+    console.log(`Se ha creado el usuario de SmartRotom ${res.username}`)
+    return res
   }
 
   findAll() {
@@ -22,7 +30,7 @@ export class UsersService {
   }
 
   findOne(uuid: string) {
-    return this.appsRepository.findOne({ where: { uuid } });
+    return this.smartRotomUsersRepository.findOne({ where: { uuid } });
 }
 
   update(id: number, updateUserDto: UpdateUserDto) {

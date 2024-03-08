@@ -4,6 +4,7 @@ import { CreateInviteDto } from './dto/create-invite.dto';
 import { UpdateInviteDto } from './dto/update-invite.dto';
 
 import { Response } from 'express';
+import { RegisterDataDto } from './dto/register-data.dto';
 
 @Controller('wingull/invites')
 export class InvitesController {
@@ -32,6 +33,11 @@ export class InvitesController {
         "message": "Invite not found"
       }
     );
+  }
+
+  @Post(':id/register')
+  register(@Body('values') registerData: RegisterDataDto, @Body('id') id: string){
+    return this.invitesService.register(id, registerData);
   }
 
   @Patch(':id')
