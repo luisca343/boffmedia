@@ -40,4 +40,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: luisca343/boffmedia-web:latest
+          tags: |
+            luisca343/boffmedia-web:latest
+            luisca343/boffmedia-web:${{ github.run_number }}
