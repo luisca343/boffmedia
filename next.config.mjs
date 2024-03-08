@@ -13,8 +13,8 @@ const nextConfig = {
         //domains: ['i.lizardon.es', 'i.ytimg.com'],
         remotePatterns:[
             {
-                protocol: 'http',
-                hostname: '**.lizardon.es',
+                protocol: 'https',
+                hostname: '**.boffmedia.es',
                 port: ''
             },
             {
