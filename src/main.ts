@@ -6,7 +6,8 @@ import { DuplicateEntryExceptionFilter } from './filters/DuplicateEntryException
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({ origin: 'http://localhost:3000' }); // Enable CORS for the specified origin
+  let origin = ['http://localhost:3000', 'http://148.251.3.244:34333', 'http://lizardon.es']
+  app.enableCors({ origin }); // Enable CORS for the specified origin
 
   const httpServer = app.getHttpServer();
   const configService = app.get(ConfigService);
@@ -16,7 +17,7 @@ async function bootstrap() {
 
   const io = new Server(httpServer, {
     cors: {
-      origin: 'http://localhost:3000',
+      origin,
       methods: ['GET', 'POST'],
     },
   });

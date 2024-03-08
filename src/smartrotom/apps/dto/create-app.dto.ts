@@ -1,7 +1,6 @@
 export class CreateAppDto {
-    nombre: string;
-    descripcion: string;
+    name: string;
+    description: string;
     url?: string;
-    icono?: string;
-    color?: string;
+    icon?: string;
 }
