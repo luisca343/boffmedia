@@ -1,12 +1,13 @@
 "use client"
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { rotomGET, wingullGET } from "@/services/boffAPI"
+import { rotomGET, wingullGET, wingullPOST } from "@/services/boffAPI"
 import { useForm } from "react-hook-form";
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
 
 type Invitacion = {
     id: number;
@@ -17,6 +18,7 @@ type Invitacion = {
   
 
 export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) {
+    const router = useRouter();
     const formSchema = z.object({
         username: z.string().min(1),
         mc_username: z.string().min(1),
@@ -35,10 +37,12 @@ export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) 
         }
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        alert(Object.values(values).join("\n"))
+    async function onSubmit(values: z.infer<typeof formSchema>) {
+        let res = await wingullPOST(`/invites/${invitacion.id}/register`, {values, id: invitacion.id})
+        let data = await res.data;
+
+        if(data.error) alert(data.error);
+        else router.back();
       }
 
     return (
@@ -59,7 +63,7 @@ export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) 
                         <FormItem>
                             <FormLabel>MC Username</FormLabel>
                             <FormControl>
-                                <Input placeholder="MC Username" {...field} />
+                                <Input placeholder="MC Username" {...field} readOnly/>
                             </FormControl>
                             <FormDescription>Tu nombre de usuario de Minecraft</FormDescription>
                             <FormMessage />

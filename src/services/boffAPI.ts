@@ -65,3 +65,7 @@ export async function wingullGET(url: string) {
 export async function rotomPOST(url: string, data: any) {
   return await POST(`${process.env.NEXT_PUBLIC_API}/smartrotom${url}`, data)
 }
+
+export async function wingullPOST(url: string, data: any) {
+  return await POST(`${process.env.NEXT_PUBLIC_API}/wingull${url}`, data)
+}
