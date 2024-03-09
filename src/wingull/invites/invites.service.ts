@@ -11,6 +11,7 @@ import { CreateSmartrotomUserDto } from 'src/smartrotom/users/dto/create-user.dt
 import { User } from 'src/boffmedia/users/entities/user.entity';
 import { shortToLongUUID } from 'src/utils/stringUtils';
 import { SmartRotomUsersService } from 'src/smartrotom/users/users.service';
+import { SmartrotomUser } from 'src/smartrotom/users/entities/user.entity';
 
 @Injectable()
 export class InvitesService {
@@ -60,23 +61,25 @@ export class InvitesService {
       mc_uuid: uuid,
     } as CreateUserDto;
 
-    let boff = await this.usersService.create(boffMediaUser);
-    if ('error' in boff) {
-      console.log("Error creating user in BoffMedia");
-      return boff;
-    }
-    
     let smartRotomUser = {
       uuid,
       username: createInviteDto.username,
-    } as CreateSmartrotomUserDto
+    } as SmartrotomUser
 
+    
     let smart = await this.smartRotomUsersService.create(smartRotomUser);
     if ('error' in smart) {
       console.log("Error creating user in SmartRotom");
       return smart;
     }
+
+    let boff = await this.usersService.create(boffMediaUser, smart);
+    if ('error' in boff) {
+      console.log("Error creating user in BoffMedia");
+      return boff;
+    }
     
+
     invite.usedAt = new Date();
     return await this.invitesRepository.save(invite);
   }

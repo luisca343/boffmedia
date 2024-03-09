@@ -15,8 +15,6 @@ export class SmartRotomUsersService {
   async create(user: CreateSmartrotomUserDto) {
     let existingUser = await this.smartRotomUsersRepository.findOne({ where: { uuid: user.uuid } });
     if (existingUser) {
-      console.log('El usuario ya existe');
-      console.log(existingUser);
       return { error: 'El usuario ya existe' };
     }
 

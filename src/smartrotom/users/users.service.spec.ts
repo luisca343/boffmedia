@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UsersService } from './users.service';
+import { SmartRotomUsersService } from './users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { SmartrotomUser } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
 describe('UsersService', () => {
-  let service: UsersService;
+  let service: SmartRotomUsersService;
   let repo: Repository<SmartrotomUser>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UsersService,
+        SmartRotomUsersService,
         {
           provide: getRepositoryToken(SmartrotomUser),
           useValue: {},
@@ -19,7 +19,7 @@ describe('UsersService', () => {
       ],
     }).compile();
 
-    service = module.get<UsersService>(UsersService);
+    service = module.get<SmartRotomUsersService>(SmartRotomUsersService);
     repo = module.get<Repository<SmartrotomUser>>(getRepositoryToken(SmartrotomUser));
   });
 

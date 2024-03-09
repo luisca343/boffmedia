@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { SmartrotomUser } from "src/smartrotom/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity({name: 'boffmedia_users'})
 export class User {
@@ -9,9 +10,9 @@ export class User {
     @Unique(['username'])
     username: string;
 
-    @Column({ type: 'char', length: 36, nullable: true})
-    @Unique(['mc_uuid'])
-    mc_uuid: string;
+    @OneToOne(() => SmartrotomUser, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: "mc_uuid", referencedColumnName: "uuid", })
+    smartRotomUser: SmartrotomUser;
 
     @Column()
     password: string;
