@@ -28,7 +28,7 @@ describe('AppsController', () => {
 
   describe('create', () => {
     it('should create an app', async () => {
-      const app = { id: 1, nombre: 'Test App', descripcion: 'Test Description' };
+      const app = { id: 1, name: 'Test App', description: 'Test Description' };
       jest.spyOn(repo, 'save').mockResolvedValue(app);
 
       expect(await service.create(app)).toEqual(app);
@@ -37,7 +37,7 @@ describe('AppsController', () => {
 
   describe('findAll', () => {
     it('should return an array of apps', async () => {
-      const apps = [{ id: 1, nombre: 'Test App', descripcion: 'Test Description' }];
+      const apps = [{ id: 1, name: 'Test App', description: 'Test Description' }];
       jest.spyOn(repo, 'find').mockResolvedValue(apps);
 
       expect(await service.findAll()).toEqual(apps);
@@ -46,7 +46,7 @@ describe('AppsController', () => {
 
   describe('findOne', () => {
     it('should return an app', async () => {
-      const result = { id: 1, nombre: 'Test App', descripcion: 'Test Description' };
+      const result = { id: 1, name: 'Test App', description: 'Test Description' };
       jest.spyOn(repo, 'findOneBy').mockImplementation(() => Promise.resolve(result));
 
       expect(await service.findOne(1)).toBe(result);
@@ -56,7 +56,7 @@ describe('AppsController', () => {
 
   describe('update', () => {
     it('should update an app', async () => {
-      const updateAppDto = { nombre: 'Updated App', descripcion: 'Updated Description' };
+      const updateAppDto = { id: 1, name: 'Test App', description: 'Test Description' };
       const result = { id: 1, ...updateAppDto, raw: [], generatedMaps: []};
       jest.spyOn(repo, 'update').mockImplementation(() => Promise.resolve(result));
 

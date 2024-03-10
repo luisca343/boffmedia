@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
 import { SmartRotomUsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { SmartrotomUser } from './entities/user.entity';
+import { MySQL2Service } from '@/MySQL2Service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SmartrotomUser])],
+  imports: [],
   controllers: [UsersController],
-  providers: [SmartRotomUsersService],
+  providers: [SmartRotomUsersService, MySQL2Service],
   exports: [SmartRotomUsersService],
 })
 export class SmartRotomUsersModule {}

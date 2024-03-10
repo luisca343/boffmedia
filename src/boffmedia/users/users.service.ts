@@ -1,84 +1,105 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { In, Repository, getConnection } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { CreateSmartrotomUserDto } from 'src/smartrotom/users/dto/create-user.dto';
-import { SmartrotomUser } from 'src/smartrotom/users/entities/user.entity';
-import { SmartRotomUsersService } from 'src/smartrotom/users/users.service';
+import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
+import { MySQL2Service } from '@/MySQL2Service';
+
+
+type FullUser = {
+  boff_name: string,
+  email: string,
+  uuid: string,
+  mc_name: string,
+  world: string
+}
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-    private smartRotomUsersService: SmartRotomUsersService,
+    private db: MySQL2Service,
   ) {}
 
-  async create(createUserDto: CreateUserDto, smartrotomUser: SmartrotomUser) {
-    let user = new User();
-    user.email = createUserDto.email;
-    user.username = createUserDto.username;
-    const hash = await bcrypt.hash(createUserDto.password, 12);
-    user.password = hash;
-    user.smartRotomUser = smartrotomUser;
-    //user.mc_uuid = createUserDto.mc_uuid;
 
-    
-    let existingUser = await this.usersRepository.findOne({ where: { username: user.username } });
-    if (existingUser) {
+  async create(createUserDto: CreateUserDto, smartrotomUser: SmartrotomUser) {
+    const hash = await bcrypt.hash(createUserDto.password, 12);
+
+    const user = {
+      email: createUserDto.email,
+      username: createUserDto.username,
+      password: hash,
+      smartRotomUser: smartrotomUser,
+    };
+
+    const [result] = await this.db.getConnection().execute('SELECT * FROM users WHERE username = ?', [user.username]);
+    if (Array.isArray(result) && result.length > 0) {
       return { error: 'El usuario ya existe' };
     }
+    await this.db.getConnection().execute('INSERT INTO users SET ?', [user]);
+    const [newUser] = await this.db.query<User>('SELECT * FROM users WHERE username = ?', [user.username]);
 
-    console.log(existingUser)
-    
-    console.log(createUserDto)
-    
-    let alreadyLinked = await this.usersRepository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.smartRotomUser', 'smartRotomUser')
-      .where('smartRotomUser.uuid = :uuid', { uuid: createUserDto.mc_uuid })
-      .getOne();
-
-    if (alreadyLinked) {
-      return { error: 'El usuario de Minecraft ya está vinculado a una cuenta' };
-    }
-
-
-    
-    let res = await this.usersRepository.save(user)
-    console.log(`Se ha creado el usuario de BoffMedia ${res.username} con el usuario de SmartRotom ${res.smartRotomUser.username}`)
-    return res
-
-    return { error: 'El usuario ya existe' };
+    console.log(`Se ha creado el usuario de BoffMedia ${newUser.username} con el usuario de SmartRotom ${newUser.smartRotomUser.username}`)
+    return newUser;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    const [rows] = await this.db.getConnection().query('SELECT * FROM users');
+    return <User[]>rows;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM users WHERE id = ?', [id]);
+    return rows[0];
   }
 
-  findFromUserName(username: string) {
-    return this.usersRepository.findOne({ where: { username: username } });
-  }
-
-  async findWithSmartRotom(username: string) {
-    return await this.usersRepository.createQueryBuilder('user')
-    .leftJoinAndSelect('user.smartRotomUser', 'smartRotomUser')
-    .where('user.username = :username', { username })
-    .getOne();
+  async findFromUserName(username: string) {
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM users WHERE username = ?', [username]);
+    return rows[0];
   }
   
-  async findWithUUID(uuid: string) {
+  async findFullUserWithName(username: string) {
+    const [rows] = await this.db.getConnection().execute(`
+      SELECT user.*, smartRotomUser.username as mc_name, smartRotomUser.uuid
+      FROM boffmedia_users user
+      LEFT JOIN smartrotom_users smartRotomUser ON user.mc_uuid = smartRotomUser.uuid
+      WHERE user.username = ?
+    `, [username]);
+
+    return rows[0];
+  }
+
+  async validateUser(username: string, password: string): Promise<User | null> {
+    const user = await this.findFullUserWithName(username);
+    if (!user) {
+      return null;
+    }
+  
+    const match = await bcrypt.compare(password, user.password);
+
+    console.log(user);
+    let userToReturn = {
+      username: user.username,
+      email: user.email,
+      smartRotomUser: {
+        username: user?.mc_name,
+        uuid: user?.uuid
+      }
+    } as User;
+
+    console.log(userToReturn);
+    return match ? userToReturn : null;
+  }
+
+  
+  async findFullUserWithUUID(uuid: string) {
     console.log(uuid)
-    const result = await this.usersRepository.query(`SELECT bu.username as boff_name, bu.email, su.uuid, su.username as mc_name, su.world as world  FROM smartrotom_users su
+    const [result] = await this.db.query<FullUser>(`SELECT bu.username as boff_name, bu.email, su.uuid, su.username as mc_name, su.world as world  FROM smartrotom_users su
     LEFT JOIN boffmedia_users bu ON su.uuid = bu.mc_uuid
     WHERE uuid = '${uuid}'`);
+
 
     let res = result[0];
     let user = new User();
@@ -89,16 +110,17 @@ export class UsersService {
     user.smartRotomUser.uuid = res.uuid;
     user.smartRotomUser.world = res.world;
 
-
     return user;
 
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const [rows] = await this.db.getConnection().execute('UPDATE users SET ? WHERE id = ?', [updateUserDto, id]);
+    return rows;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const [rows] = await this.db.getConnection().execute('DELETE FROM users WHERE id = ?', [id]);
+    return rows;
   }
 }

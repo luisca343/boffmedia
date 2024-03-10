@@ -1,41 +1,46 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { SmartrotomUser } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { MySQL2Service } from '../../MySQL2Service';
+import { RowDataPacket } from 'mysql2';
 
 @Injectable()
 export class SmartRotomUsersService {
   constructor(
-    @InjectRepository(SmartrotomUser)
-    private smartRotomUsersRepository: Repository<SmartrotomUser>,
+    private db: MySQL2Service,
   ) {}
-  
+
   async create(user: CreateSmartrotomUserDto) {
-    let existingUser = await this.smartRotomUsersRepository.findOne({ where: { uuid: user.uuid } });
+    const [existingUser] = await this.db.getConnection().execute('SELECT * FROM smartrotom_users WHERE uuid = ?', [user.uuid]);
     if (existingUser) {
       return { error: 'El usuario ya existe' };
     }
 
-    let res = await this.smartRotomUsersRepository.save(user)
-    console.log(`Se ha creado el usuario de SmartRotom ${res.username}`)
-    return res
+    await this.db.getConnection().execute('INSERT INTO smartrotom_users SET ?', [user]);
+    const [newUser] = await this.db.query<SmartrotomUser>('SELECT * FROM smartrotom_users WHERE uuid = ?', [user.uuid]);
+      
+    console.log(`Se ha creado el usuario de SmartRotom ${newUser.username}`)
+    return newUser;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<SmartrotomUser[]> {
+    const [rows] = await this.db.getConnection().query('SELECT * FROM smartrotom_users');
+    return <SmartrotomUser[]>rows;
   }
 
-  findOne(uuid: string) {
-    return this.smartRotomUsersRepository.findOne({ where: { uuid } });
-}
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async findOne(uuid: string) {
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM smartrotom_users WHERE uuid = ?', [uuid]);
+    return rows[0];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    const [rows] = await this.db.getConnection().execute('UPDATE smartrotom_users SET ? WHERE id = ?', [updateUserDto, id]);
+    return rows;
+  }
+
+  async remove(id: number) {
+    const [rows] = await this.db.getConnection().execute('DELETE FROM smartrotom_users WHERE id = ?', [id]);
+    return rows;
   }
 }

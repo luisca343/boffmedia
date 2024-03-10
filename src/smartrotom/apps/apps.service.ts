@@ -1,34 +1,42 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
-import { Repository, UpdateResult } from 'typeorm';
 import { App } from './entities/app.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { MySQL2Service } from '../../MySQL2Service';
 
 @Injectable()
 export class AppsService {
   constructor(
-    @InjectRepository(App)
-    private appsRepository: Repository<App>,
+    private db: MySQL2Service,
   ) {}
 
-  create(createAppDto: CreateAppDto) {
-    return this.appsRepository.save(createAppDto);
+  async test(){
+    let test = await this.db.insertAndReturn<App>('smartrotom_apps', 'INSERT INTO smartrotom_apps SET ?', {name: 'test'}) 
+    return test;
   }
 
-  findAll(): Promise<App[]> {
-    return this.appsRepository.find();
+  async create(createAppDto: CreateAppDto) {
+    const [rows] = await this.db.getConnection().execute('INSERT INTO smartrotom_apps SET ?', [createAppDto]);
+    return rows;
   }
 
-  findOne(id: number) {
-    return this.appsRepository.findOneBy({id});
+  async findAll(): Promise<App[]> {
+    const [rows] = await this.db.getConnection().query('SELECT * FROM smartrotom_apps');
+    return <App[]>rows;
   }
 
-  update(id: number, updateAppDto: UpdateAppDto): Promise<UpdateResult> {
-    return this.appsRepository.update(id, updateAppDto);
+  async findOne(id: number) {
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM smartrotom_apps WHERE id = ?', [id]);
+    return rows[0];
   }
 
-  async remove(id: number): Promise<UpdateResult>  {
-    return await this.appsRepository.softDelete(id);
+  async update(id: number, updateAppDto: UpdateAppDto) {
+    const [rows] = await this.db.getConnection().execute('UPDATE smartrotom_apps SET ? WHERE id = ?', [updateAppDto, id]);
+    return rows;
+  }
+
+  async remove(id: number) {
+    const [rows] = await this.db.getConnection().execute('DELETE FROM smartrotom_apps WHERE id = ?', [id]);
+    return rows;
   }
 }

@@ -7,7 +7,9 @@ import { Response } from 'express';
 
 @Controller('/smartrotom/users')
 export class UsersController {
-  constructor(private readonly usersService: SmartRotomUsersService) {}
+  constructor(
+    private usersService: SmartRotomUsersService,
+  ) {}
 
   @Post()
   create(@Body() createUserDto: CreateSmartrotomUserDto) {

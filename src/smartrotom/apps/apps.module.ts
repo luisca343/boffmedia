@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppsService } from './apps.service';
 import { AppsController } from './apps.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { App } from './entities/app.entity';
+import { MySQL2Service } from '@/MySQL2Service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([App])],
+  imports: [],
   controllers: [AppsController],
-  providers: [AppsService],
+  providers: [AppsService, MySQL2Service],
 })
 export class SmartRotomAppsModule {}

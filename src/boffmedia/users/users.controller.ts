@@ -10,48 +10,24 @@ export class UsersController {
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
-
+    // TODO: CREATE STANDALONE BOFFMEDIA USER
   }
 
 
   @Post("login")
   async login(@Body() createUserDto: CreateUserDto) {
-    let user = await this.usersService.findWithSmartRotom(createUserDto.username);
-
-    console.log(user);
-    
-    
-    if(!user) {
-      return { error: 'Usuario o contraseña incorrectos' };
-    }
-
-    let password = createUserDto.password;
-    let bd_password = user.password;
-
-    let match = await bcrypt.compare(password, bd_password);
-    if (!match) {
-      return { error: 'Usuario o contraseña incorrectos' };
-    }
-    return {
-      username: user.username,
-      email: user.email,
-      smartRotomUser: {
-        username: user.smartRotomUser.username,
-        uuid: user.smartRotomUser.uuid
-      }
-    }
+    const user = await this.usersService.validateUser(createUserDto.username, createUserDto.password);
+    if (!user) return { error: 'Usuario o contraseña incorrectos' };
+    return user;
   }
 
 
-  
   @Post("loginmc")
   async loginMC(@Body() loginMC: {username: string, uuid: string}) {
-    let usuario = await this.usersService.findWithUUID(loginMC.uuid);
-    if(!usuario) {
-      console.log('Usuario no encontrado');
-      return { error: 'Usuario no encontrado' };
-    }
-
+    console.log(loginMC);
+    let usuario = await this.usersService.findFullUserWithUUID(loginMC.uuid);
+    if(!usuario) return { error: 'Usuario no encontrado' };
+    console.log(usuario);
     return usuario;
   }
 

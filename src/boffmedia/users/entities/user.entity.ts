@@ -1,4 +1,4 @@
-import { SmartrotomUser } from "src/smartrotom/users/entities/user.entity";
+import { SmartrotomUser } from "../../../smartrotom/users/entities/user.entity"
 import { Column, Entity, JoinColumn, ManyToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 @Entity({name: 'boffmedia_users'})

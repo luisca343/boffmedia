@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { InvitesService } from './invites.service';
 import { InvitesController } from './invites.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Invite } from './entities/invite.entity';
-import { UsersModule } from 'src/boffmedia/users/users.module';
-import { SmartRotomUsersModule } from 'src/smartrotom/users/users.module';
+import { UsersModule } from '../../boffmedia/users/users.module';
+import { SmartRotomUsersModule } from '../../smartrotom/users/users.module';
+import { MySQL2Service } from '@/MySQL2Service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Invite]), UsersModule, SmartRotomUsersModule],
+  imports: [UsersModule, SmartRotomUsersModule],
   controllers: [InvitesController],
-  providers: [InvitesService],
+  providers: [InvitesService, MySQL2Service],
 })
 export class InvitesModule {}

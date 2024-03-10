@@ -5,46 +5,47 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Invite } from './entities/invite.entity';
 import { Repository } from 'typeorm';
 import { RegisterDataDto } from './dto/register-data.dto';
-import { UsersService } from 'src/boffmedia/users/users.service';
-import { CreateUserDto } from 'src/boffmedia/users/dto/create-user.dto';
-import { CreateSmartrotomUserDto } from 'src/smartrotom/users/dto/create-user.dto';
-import { User } from 'src/boffmedia/users/entities/user.entity';
-import { shortToLongUUID } from 'src/utils/stringUtils';
-import { SmartRotomUsersService } from 'src/smartrotom/users/users.service';
-import { SmartrotomUser } from 'src/smartrotom/users/entities/user.entity';
+import { UsersService } from '../../boffmedia/users/users.service';
+import { CreateUserDto } from '../../boffmedia/users/dto/create-user.dto';
+import { shortToLongUUID } from '../../utils/stringUtils';
+import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
+import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
+import { MySQL2Service } from '@/MySQL2Service';
 
 @Injectable()
 export class InvitesService {
   constructor(
-    @InjectRepository(Invite)
-    private invitesRepository: Repository<Invite>,
-    private usersService: UsersService,
-    private smartRotomUsersService: SmartRotomUsersService,
-  ) {
-    
-  }
-  create(createInviteDto: CreateInviteDto) {
-    return 'This action adds a new invite';
+    private db: MySQL2Service,
+  ) {}
+
+  async create(createInviteDto: CreateInviteDto) {
+    await this.db.getConnection().execute('INSERT INTO invites SET ?', [createInviteDto]);
+    const [newInvite] = await this.db.query<Invite>('SELECT * FROM invites WHERE id = LAST_INSERT_ID()');
+    return newInvite;
   }
 
-  findAll() {
-    return this.invitesRepository.find();
+  async findAll() {
+    const [rows] = await this.db.getConnection().query('SELECT * FROM invites');
+    return <Invite[]>rows;
   }
 
-  findOne(id: string) {
-    return this.invitesRepository.findOneBy({id});
+  async findOne(id: string) {
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM invites WHERE id = ?', [id]);
+    return rows[0];
   }
 
-  update(id: number, updateInviteDto: UpdateInviteDto) {
-    return `This action updates a #${id} invite`;
+  async update(id: number, updateInviteDto: UpdateInviteDto) {
+    const [rows] = await this.db.getConnection().execute('UPDATE invites SET ? WHERE id = ?', [updateInviteDto, id]);
+    return rows;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} invite`;
+  async remove(id: number) {
+    const [rows] = await this.db.getConnection().execute('DELETE FROM invites WHERE id = ?', [id]);
+    return rows;
   }
   
   async register(id: string, createInviteDto: RegisterDataDto) {
-    let invite = await this.invitesRepository.findOneBy({id});
+    let [invite] = await this.db.query<Invite>('SELECT * FROM invites WHERE id = ?', [id]) 
 
 
     let test = await (await fetch(`https://api.mojang.com/users/profiles/minecraft/${createInviteDto.mc_username}`)).json()
@@ -66,21 +67,22 @@ export class InvitesService {
       username: createInviteDto.username,
     } as SmartrotomUser
 
-    
-    let smart = await this.smartRotomUsersService.create(smartRotomUser);
-    if ('error' in smart) {
+    const [smart] = await this.db.getConnection().execute('INSERT INTO smartrotom_users SET ?', smartRotomUser);
+
+    if (Array.isArray(smart) && smart.length > 0) {
       console.log("Error creating user in SmartRotom");
       return smart;
     }
 
-    let boff = await this.usersService.create(boffMediaUser, smart);
+    const [boff] = await this.db.getConnection().execute('INSERT INTO users SET ?', boffMediaUser);
     if ('error' in boff) {
       console.log("Error creating user in BoffMedia");
       return boff;
     }
     
-
-    invite.usedAt = new Date();
-    return await this.invitesRepository.save(invite);
+    let ret = this.db.getConnection().execute('UPDATE invites SET usedAt = ? WHERE id = ?', [new Date(), id]);
+    console.log("User created successfully");
+    console.log(ret)
+    return ret;
   }
 }

@@ -2,39 +2,40 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, ConflictException } 
 import { AppsService } from './apps.service';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { App } from './entities/app.entity';
 
 @Controller('/smartrotom/apps')
 export class AppsController {
   constructor(
-    @InjectRepository(App)
-    private appsRepository: Repository<App>,
-    ) {}
+    private appsService: AppsService,
+  ) {}
+
+  @Get('/test')
+  async test(){
+    return await this.appsService.test();
+  }
 
   @Post()
   async create(@Body() createAppDto: CreateAppDto) {
-    return this.appsRepository.save(createAppDto);
+    return this.appsService.create(createAppDto);
   }
 
   @Get()
   findAll() {
-    return this.appsRepository.find();
+    return this.appsService.findAll() ?? {error: 'No se encontraron aplicaciones'};
   }
 
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.appsRepository.findOneBy({id});
+    return this.appsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: number, @Body() updateAppDto: UpdateAppDto) {
-    return this.appsRepository.update(+id, updateAppDto);
+    return this.appsService.update(id, updateAppDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: number) {
-    return this.appsRepository.softDelete(id);
+    return this.appsService.remove(id);
   }
 }
