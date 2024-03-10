@@ -40,8 +40,13 @@ export async function request2(method: string, url: string, data: any) {
 }
 
 export async function GET(url: string) {
-  return (await request('GET', url, null))
-  
+  try {
+    return await request('GET', url, null);
+  } catch (error) {
+    console.error('URL:', url);
+    console.error('Fetch failed:', error);
+    throw error;
+  }
 }
 
 export async function POST(url: string, data: any) {
@@ -68,4 +73,8 @@ export async function rotomPOST(url: string, data: any) {
 
 export async function wingullPOST(url: string, data: any) {
   return await POST(`${process.env.NEXT_PUBLIC_API}/wingull${url}`, data)
+}
+
+export async function boffPOST(url: string, data: any) {
+  return await POST(`${process.env.NEXT_PUBLIC_API}${url}`, data)
 }

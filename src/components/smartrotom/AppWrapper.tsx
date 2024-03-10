@@ -3,26 +3,47 @@ import { useSession } from "next-auth/react";
 import RotomNav from "../nav/RotomNav";
 
 import { signIn } from "next-auth/react";
-import { getDatosUsuario, isMinecraft } from "@/services/mcefHelper";
+import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
+import AuthForm from "@/app/auth/AuthForm";
 
-import { rotomPOST } from "@/services/boffAPI";
-import { AxiosResponse } from "axios";
+export type Session = {
+    user: {
+        username: string | null;
+        email: string | null;
+        smartRotomUser: {
+          username: string;
+          uuid: string;
+        }
+    }
+}
 
 export default function AppWrapper({children} : {children: React.ReactNode}) {
-    const { data: session, status } = useSession()
+    const { data: session, status } = useSession() as {data: Session | null, status: string};
     const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
 
     useEffect(() => {
       const fetchDatosUsuario = async () => {
         if (typeof window !== 'undefined') {
-            const data = await getDatosUsuario() as Object;
+            const data = await getDatosUsuarioMC() as {username: string, uuid: string, world: string};
+
+            const response = await signIn('minecraft', {
+              redirect: false,
+              username: data.username,
+              uuid: data.uuid,
+            });
+            
+
             setDatosUsuario(data);
+        } else {
+            console.log('No window')
+            setDatosUsuario(null);
         }
       };
       fetchDatosUsuario();
     }, []);
     
+    /*
     useEffect(() => {
         if (status === "unauthenticated" && isMinecraft() && datosUsuario) {
           rotomPOST('/users/findUser', datosUsuario).then((res: AxiosResponse) => {
@@ -38,9 +59,9 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
 
           });
         }
-      }, [status, datosUsuario]);
+      }, [status, datosUsuario]);*/
 
-      /*
+      
       if (status === "loading") {
         return <p>Loading...</p>
       }
@@ -52,9 +73,24 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       }
       
       if (status === "unauthenticated" && !isMinecraft()) {
-        return <LoginForm />
-      }*/
+        return <AuthForm url="boffmedia" redirect="/smartrotom"/>
+      }
 
+      function boffMediaLinked() {
+        return session?.user.username;
+      }
+
+      function smartRotomLinked() {
+        return session?.user.smartRotomUser.uuid;
+      }
+
+      if(status === "authenticated" && !smartRotomLinked()) {
+        return <RotomError error="Usuario de SmartRotom no vinculado"/>
+      }
+
+      if(status === "authenticated" && !boffMediaLinked()) {
+        //return <RotomError error="Usuario de BoffMedia no vinculado"/>
+      }
 
     return (
         <section className={`roboto flex flex-col h-screen overflow-hidden `}>
@@ -63,6 +99,15 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
                 {children}
             </div>
         </section>
+    )
+}
+
+function RotomError({error}: {error: string}) {
+    return (
+        <div className="flex flex-col items-center justify-center h-full bg-rotom-400 text-rotom-950 font-bold">
+            <h1>Error</h1>
+            <p>{error}</p>
+        </div>
     )
 }
 

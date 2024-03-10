@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import RotomNav from './RotomNav'
+import { signIn, signOut } from "next-auth/react";
 
 export function FicusNav() {
   const pathname = usePathname()
@@ -11,6 +12,8 @@ export function FicusNav() {
   return (
     <nav className="bg-blue-500 p-4">
       <div className="container mx-auto flex justify-between items-center">
+        <button className="text-white mx-1" onClick={() => signIn('google')}>Sign in</button>
+        <button className="text-white mx-1" onClick={() => signOut()}>Sign out</button>
         <Link href="/" className="text-white text-lg font-bold">
           Logo
         </Link>

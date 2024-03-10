@@ -2,7 +2,7 @@ export function isMinecraft() {
     return 'mcefQuery' in window && typeof window.mcefQuery === 'function';
 }
 
-export async function getDatosUsuario(){
+export async function getDatosUsuarioMC(){
     const response = await mcefQuery('getUserData');
     return response;
 }

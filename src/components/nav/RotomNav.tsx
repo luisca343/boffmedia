@@ -9,18 +9,20 @@ import { use, useEffect } from "react";
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Socket } from "socket.io-client";
 
-import { signIn, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 
 
 export default function RotomNav(){
     const { socket, connect } = useSocketStore();
+    const pathname = usePathname()
     useEffect(() => {
         if(!socket) {
           connect();
           return
         }
-        
+
         socket.on('patata', () => console.log('Patata'));
         socket.on('connection', () => console.log('Connected'));
         socket.emit('patata', null);
@@ -29,8 +31,7 @@ export default function RotomNav(){
 
     return (
         <nav className="h-12 bg-zinc-900 flex items-center">
-        <button className="text-white mx-1" onClick={() => signIn('google')}>Sign in</button>
-        <button className="text-white mx-1" onClick={() => signOut()}>Sign out</button>
+            <Link href="https://codesandbox.io/p/sandbox/custom-cursor-with-framer-motion-n6i55?file=%2Fsrc%2Findex.js%3A16%2C20" className="text-white">Link</Link>
             <BotonPrev />
             <BotonNext />
             <BotonReload />

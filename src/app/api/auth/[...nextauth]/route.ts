@@ -1,36 +1,67 @@
 import NextAuth from 'next-auth';
-import GooogleProvider from 'next-auth/providers/google';
+import CredentialsProvider from "next-auth/providers/credentials";
 import { User, Account, Profile } from 'next-auth';
+import { boffPOST } from '@/services/boffAPI';
 
 const handler = NextAuth({
-    providers:[
-        GooogleProvider({
-            clientId: process.env.GOOGLE_CLIENT_ID as string,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string
-        })
-    ],
-    secret: process.env.SECRET,
-    events: {
-        signIn: async ({user, account, profile}: {user: User, account: Account | null, profile?: Profile} ) => {
-            console.log('User signed in:', user);
-            console.log('Account:', account);
-            console.log("Provider:", account?.provider);
-    
-            if (account && account.provider === 'google') {
-                console.log('User signed in with Google:', user);
-                try {
-                    await fetch('YOUR_REST_API_ENDPOINT', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error:', error);
-                }
+    pages: {
+        signIn: '',
+    },
+    providers: [
+        CredentialsProvider({
+            id: "boffmedia",
+          name: "BoffMedia",
+          credentials: {
+            username: { label: "Username", type: "text", placeholder: "jsmith" },
+            password: { label: "Password", type: "password" }
+          },
+          async authorize(credentials, req) {
+            const res = await boffPOST(`/users/login`, credentials)
+            const user = await res.data
+
+            if (user) {
+              return Promise.resolve(user)
+            } else {
+              return Promise.resolve(null)
             }
-        }
-    }
+          
+          }
+        }),
+        
+        CredentialsProvider({
+            id: "minecraft",
+            name: "Minecraft",
+            credentials: {
+              username: { label: "Username", type: "text", placeholder: "jsmith" },
+              uuid: { label: "UUID", type: "text", placeholder: "" }
+            },
+        
+            async authorize(credentials, req) {
+              const res = await boffPOST(`/users/loginmc`, credentials)
+              const user = await res.data
+  
+              if (user) {
+                return Promise.resolve(user)
+              } else {
+                return Promise.resolve(null)
+              }
+            
+            }
+          })
+      ],
+        secret: process.env.SECRET,
+        callbacks: {
+            async jwt({token, user}) {
+            if (user) {
+                return { ...token, ...user };
+            }
+            return token;
+            },
+            async session({session, token}) {
+            return { ...session, user: { ...token } };
+            },
+        },
 })
+
 
 export {handler as GET, handler as POST}
