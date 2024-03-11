@@ -12,6 +12,8 @@ import { MySQL2Service } from './MySQL2Service';
 import { ChatController } from './smartrotom/chat/chat.controller';
 import { ChatService } from './smartrotom/chat/chat.service';
 import { ChatModule } from './smartrotom/chat/chat.module';
+import { PokemonController } from './smartrotom/pokemon/pokemon.controller';
+import { PokemonModule } from './smartrotom/pokemon/pokemon.module';
 
 @Module({
   imports: [
@@ -31,9 +33,10 @@ import { ChatModule } from './smartrotom/chat/chat.module';
     SmartRotomUsersModule,
     UsersModule,
     InvitesModule,
-    ChatModule
+    ChatModule,
+    PokemonModule
   ],
-  controllers: [AppController, ChatController],
+  controllers: [AppController, ChatController, PokemonController],
   providers: [AppService, MySQL2Service, ChatService],
 })
 export class AppModule {}
