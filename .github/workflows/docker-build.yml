@@ -35,7 +35,7 @@ jobs:
           echo "GOOGLE_CLIENT_SECRET=${{secrets.GOOGLE_CLIENT_SECRET}}" >> .env.production.local
           echo "NEXT_PUBLIC_API=${{secrets.NEXT_PUBLIC_API}}" >> .env.production.local
           echo "NEXT_PUBLIC_SOCKET_URL=${{secrets.NEXT_PUBLIC_SOCKET_URL}}" >> .env.production.local
-          ECHO "SECRET=${{secrets.SECRET}}" >> .env.production.local
+          echo "SECRET=${{secrets.SECRET}}" >> .env.production.local
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
