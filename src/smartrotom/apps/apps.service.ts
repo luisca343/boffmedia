@@ -20,8 +20,33 @@ export class AppsService {
     return rows;
   }
 
-  async findAll(): Promise<App[]> {
-    const [rows] = await this.db.getConnection().query('SELECT * FROM smartrotom_apps');
+  async order(order: {id: number, order: number}[], uuid: string) {
+    let test  = await this.db.getConnection().query('DELETE FROM smartrotom_apps_order WHERE uuid = ?', [uuid]);
+    let insert = await this.db.getConnection().query('INSERT INTO smartrotom_apps_order (uuid, app_id, `order`) VALUES ?', [order.map((app) => [uuid, app.id, app.order])]);
+
+    return {insert}
+  }
+
+  async findAll() {
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM smartrotom_apps');
+    return rows;
+  }
+
+  async getForPlayer(uuid: string): Promise<App[]> {
+    const [rows] = await this.db.getConnection().query(`
+    (SELECT sa.id, sa.url,  sa.name, sa.icon, sao.order as orden FROM smartrotom_apps sa
+      LEFT JOIN smartrotom_apps_order sao ON sa.id = sao.app_id
+      WHERE sao.uuid = '${uuid}')
+      UNION ALL
+      (SELECT sa.id, sa.url,  sa.name, sa.icon, sa.order as orden FROM smartrotom_apps sa
+        WHERE NOT EXISTS (
+          SELECT 1 FROM smartrotom_apps_order sao
+          WHERE sao.uuid = '${uuid}'
+        )
+      )
+      ORDER  BY orden ASC`
+    );
+
     return <App[]>rows;
   }
 

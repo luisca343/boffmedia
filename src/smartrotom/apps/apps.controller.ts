@@ -13,10 +13,21 @@ export class AppsController {
   async test(){
     return await this.appsService.test();
   }
+  
 
   @Post()
   async create(@Body() createAppDto: CreateAppDto) {
     return this.appsService.create(createAppDto);
+  }
+
+  @Post('order')
+  async order(@Body() order: {newOrder: {id: number, order: number}[], uuid: string}) {
+    return this.appsService.order(order.newOrder, order.uuid);
+  }
+
+  @Post('player')
+  getForPlayer(@Body() {uuid}: {uuid: string}){
+    return this.appsService.getForPlayer(uuid) ?? {error: 'No se encontraron aplicaciones'};
   }
 
   @Get()
