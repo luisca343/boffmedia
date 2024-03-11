@@ -19,7 +19,7 @@ export async function request(method: string, url: string, data: any) {
       'Content-Type': 'application/json',
     },
     next: {
-      revalidate: 1
+      revalidate: 0
     }
   } as options;
 
@@ -43,19 +43,17 @@ export async function GET(url: string) {
   try {
     return await request('GET', url, null);
   } catch (error) {
-    console.error('URL:', url);
-    console.error('Fetch failed:', error);
     throw error;
   }
 }
 
 export async function POST(url: string, data: any) {
-  return await axios.post(url, data)
-      .then(res => res)
-      .catch(err => {
-          console.error(err);
-          throw err;
-      });
+  try {
+    return await request('POST', url, data);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 }
 
 export async function rotomGET(url: string) {

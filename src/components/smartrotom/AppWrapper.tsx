@@ -21,6 +21,7 @@ export type Session = {
 export default function AppWrapper({children} : {children: React.ReactNode}) {
     const { data: session, status } = useSession() as {data: Session | null, status: string};
     const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
+    const [tema, setTema] = useState('');
 
     useEffect(() => {
       const fetchDatosUsuario = async () => {
@@ -31,6 +32,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
               redirect: false,
               username: data.username,
               uuid: data.uuid,
+              world: data.world
             });
             
 
@@ -81,7 +83,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       }
 
       function smartRotomLinked() {
-        return session?.user.smartRotomUser.uuid;
+        return session?.user.smartRotomUser?.uuid;
       }
 
       if(status === "authenticated" && !smartRotomLinked()) {
@@ -93,8 +95,8 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       }
 
     return (
-        <section className={`roboto flex flex-col h-screen overflow-hidden `}>
-            <RotomNav />
+        <section className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
+            <RotomNav setTema={setTema}/>
             <div className="overflow-auto border-solid no-scrollbar flex-1">
                 {children}
             </div>
