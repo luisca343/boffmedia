@@ -13,12 +13,11 @@ type App = {
 
 
 export default async function SmartrotomHome() {
-  const datos = await rotomGET('/apps') as App[];
 
   return (
     <main className="h-full w-full bg-wingull bg-center bg-no-repeat bg-cover bg-fixed flex flex-col">
       <Hora className="p-5 text-white text-7xl lg:text-8xl col-span-6 text-center text-shadow-gray-border3" />
-          <AppList apps={datos} />
+          <AppList />
     </main>
   );
 }
