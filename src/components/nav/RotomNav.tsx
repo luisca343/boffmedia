@@ -5,16 +5,18 @@ import {BellAlertIcon} from '@heroicons/react/24/solid'
 import BreadcrumbNav from "./BreadbrumbNav";
 import { BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
 import useSocketStore from "@/app/useSocketStore";
-import { use, useEffect } from "react";
+import { use, useEffect, useState } from "react";
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Socket } from "socket.io-client";
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { Popover, PopoverTrigger } from "../ui/popover";
+import { PopoverContent } from "@radix-ui/react-popover";
 
 
 
-export default function RotomNav(){
+export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     const { socket, connect } = useSocketStore();
     const pathname = usePathname()
     useEffect(() => {
@@ -30,8 +32,16 @@ export default function RotomNav(){
 
 
     return (
-        <nav className="h-12 bg-zinc-900 flex items-center">
-            <Link href="https://codesandbox.io/p/sandbox/custom-cursor-with-framer-motion-n6i55?file=%2Fsrc%2Findex.js%3A16%2C20" className="text-white">Link</Link>
+        <nav className={`h-12 bg-zinc-900 flex items-center`}>
+            <Popover>
+                <PopoverTrigger >Temas</PopoverTrigger>
+                <PopoverContent>
+                    <div className="flex flex-col p-2 bg-rotom-950 text-white">
+                        <button onClick={() => setTema('')}  className="block w-full text-left">Tema 1</button>
+                        <button onClick={() => setTema('theme-dark')} className="block w-full text-left">Tema 2</button>
+                    </div>
+                </PopoverContent>
+            </Popover>
             <BotonPrev />
             <BotonNext />
             <BotonReload />

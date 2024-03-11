@@ -7,7 +7,7 @@ export function RotomNotFound(){
         <main className={`roboto flex flex-col h-screen overflow-hidden  bg-rotom bg-center bg-no-repeat bg-cover bg-fixed`}>
             <GlobalProviders>
                 <TooltipProvider>
-                <RotomNav />
+                <RotomNav setTema={() => null}/>
                     <div className="flex flex-col items-center justify-center overflow-auto border-solid no-scrollbar flex-1">
                         <h1 className="text-5xl font-bold text-black">404</h1>
                         <p className="text-b">Pagina no encontrada.</p>
