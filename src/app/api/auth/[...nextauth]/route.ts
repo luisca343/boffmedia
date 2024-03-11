@@ -5,7 +5,6 @@ import { boffPOST } from '@/services/boffAPI';
 
 const handler = NextAuth({
     pages: {
-        signIn: '',
     },
     providers: [
         CredentialsProvider({
@@ -18,6 +17,8 @@ const handler = NextAuth({
           async authorize(credentials, req) {
             const res = await boffPOST(`/users/login`, credentials)
             const user = await res.data
+
+            
 
             if (user) {
               return Promise.resolve(user)
@@ -33,14 +34,15 @@ const handler = NextAuth({
             name: "Minecraft",
             credentials: {
               username: { label: "Username", type: "text", placeholder: "jsmith" },
-              uuid: { label: "UUID", type: "text", placeholder: "" }
+              uuid: { label: "UUID", type: "text", placeholder: "" },
+              world: { label: "World", type: "text", placeholder: "" }
             },
         
             async authorize(credentials, req) {
               const res = await boffPOST(`/users/loginmc`, credentials)
               const user = await res.data
-  
-              if (user) {
+
+              if (user && !user.error) {
                 return Promise.resolve(user)
               } else {
                 return Promise.resolve(null)
