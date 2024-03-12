@@ -36,7 +36,6 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
             });
             
 
-            setDatosUsuario(data);
         } else {
             console.log('No window')
             setDatosUsuario(null);

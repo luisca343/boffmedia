@@ -16,7 +16,7 @@ const handler = NextAuth({
           },
           async authorize(credentials, req) {
             const res = await boffPOST(`/users/login`, credentials)
-            const user = await res.data
+            const user = await res
 
             
 
@@ -40,7 +40,9 @@ const handler = NextAuth({
         
             async authorize(credentials, req) {
               const res = await boffPOST(`/users/loginmc`, credentials)
-              const user = await res.data
+              const user = await res
+
+              console.log(user)
 
               if (user && !user.error) {
                 return Promise.resolve(user)
