@@ -33,19 +33,19 @@ export class AppsService {
   }
 
   async getForPlayer(uuid: string): Promise<App[]> {
-    const [rows] = await this.db.getConnection().query(`
+    const [rows] = await this.db.getConnection().execute(`
     (SELECT sa.id, sa.url,  sa.name, sa.icon, sao.order as orden FROM smartrotom_apps sa
       LEFT JOIN smartrotom_apps_order sao ON sa.id = sao.app_id
-      WHERE sao.uuid = '${uuid}')
+      WHERE sao.uuid = ?)
       UNION ALL
       (SELECT sa.id, sa.url,  sa.name, sa.icon, sa.order as orden FROM smartrotom_apps sa
-        WHERE NOT EXISTS (
-          SELECT 1 FROM smartrotom_apps_order sao
-          WHERE sao.uuid = '${uuid}'
+        WHERE id NOT IN (
+          SELECT app_id FROM smartrotom_apps_order sao
+          WHERE sao.uuid = ?
         )
       )
-      ORDER  BY orden ASC`
-    );
+      ORDER  BY orden ASC`, [uuid, uuid]
+  );
 
     return <App[]>rows;
   }
