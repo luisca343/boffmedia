@@ -8,4 +8,8 @@ export class AppService {
   getDBPort(): number {
     return this.configService.get<number>('DB_PORT');
   }
+
+  uploadFile(file: Express.Multer.File) {
+    console.log(file);
+  }
 }
