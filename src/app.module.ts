@@ -14,10 +14,15 @@ import { ChatService } from './smartrotom/chat/chat.service';
 import { ChatModule } from './smartrotom/chat/chat.module';
 import { PokemonController } from './smartrotom/pokemon/pokemon.controller';
 import { PokemonModule } from './smartrotom/pokemon/pokemon.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
     //TypeOrmModule.forRoot({
       //type: 'mysql',
       //host: process.env.DB_HOST,
