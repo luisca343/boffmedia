@@ -94,9 +94,9 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       }
 
     return (
-        <section className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
+        <section id="smartrotom" className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
             <RotomNav setTema={setTema}/>
-            <div className="overflow-auto border-solid no-scrollbar flex-1">
+            <div className="overflow-auto border-solid no-scrollbar flex-1 [&>*]:h-full">
                 {children}
             </div>
         </section>

@@ -1,10 +1,10 @@
 "use client"
-import { ArrowPathIcon, BellAlertIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, BellAlertIcon, ChevronLeftIcon, ChevronRightIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 
 export function BotonNav({Icono, strokeWidth = 4, onClick = null, label} : {onClick?:any,strokeWidth?: number, Icono: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>>, label: string}){
     return (
-        <button aria-label={label} className="rounded-lg border-0 h-8 w-8 mx-2 bg-white flex items-center justify-center group" onClick={onClick}>
+        <button aria-label={label} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group" onClick={onClick}>
             <Icono strokeWidth={strokeWidth} height={28} width={28} className="text-rotom-500 group-hover:text-rotom-800"/>
         </button>
     )
@@ -27,4 +27,10 @@ export function BotonReload(){
 
 export function BotonNotification(){
     return <BotonNav Icono={BellAlertIcon} label="Notifications" strokeWidth={3} />
+}
+
+export function BotonAjustes(){
+    return <span aria-label={"Ajustes"} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group">
+        <Cog6ToothIcon strokeWidth={3} height={28} width={28} className="text-rotom-500 group-hover:text-rotom-800"/>
+    </span>
 }

@@ -3,7 +3,7 @@ import { Hora } from "../Hora";
 import { ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import {BellAlertIcon} from '@heroicons/react/24/solid'
 import BreadcrumbNav from "./BreadbrumbNav";
-import { BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
+import { BotonAjustes, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
 import useSocketStore from "@/app/useSocketStore";
 import { use, useEffect, useState } from "react";
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -14,6 +14,15 @@ import Link from "next/link";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 
+
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
@@ -32,22 +41,29 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
 
 
     return (
-        <nav className={`h-12 bg-zinc-900 flex items-center`}>
-            <Popover>
-                <PopoverTrigger >Temas</PopoverTrigger>
-                <PopoverContent>
-                    <div className="flex flex-col p-2 bg-rotom-950 text-white">
-                        <button onClick={() => setTema('')}  className="block w-full text-left">Tema 1</button>
-                        <button onClick={() => setTema('theme-dark')} className="block w-full text-left">Tema 2</button>
-                    </div>
-                </PopoverContent>
-            </Popover>
+        <nav className={`h-12 bg-zinc-900 flex items-center px-2`}>
             <BotonPrev />
             <BotonNext />
             <BotonReload />
-            <BreadcrumbNav className="flex-1"/>
+            <BreadcrumbNav className="flex-1 mx-1"/>
             <BotonNotification />
-            <Hora className="text-white text-3xl mr-2" />
+            <Sheet>
+                <SheetTrigger>
+                    <BotonAjustes />
+                </SheetTrigger>
+                <SheetContent side="top" className="bg-zinc-900 text-white border-none" parentId="smartrotom">
+                    <SheetHeader>
+                        <SheetTitle className="text-white">Ajustes</SheetTitle>
+                        <SheetDescription>
+                            <div className="flex flex-col p-2 bg-rotom-500 text-white ">
+                                <button onClick={() => setTema('')}  className="block w-full text-left">Tema 1</button>
+                                <button onClick={() => setTema('theme-dark')} className="block w-full text-left">Tema 2</button>
+                            </div>
+                        </SheetDescription>
+                     </SheetHeader>
+                    </SheetContent>
+                </Sheet>
+            <Hora className="text-white text-3xl mx-1" />
             <SocketStatus socket={socket}/>
            
         </nav>
