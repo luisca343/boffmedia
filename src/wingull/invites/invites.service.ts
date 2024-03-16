@@ -11,11 +11,14 @@ import { shortToLongUUID } from '../../utils/stringUtils';
 import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
 import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
 import { MySQL2Service } from '@/MySQL2Service';
+import { CreateSmartrotomUserDto } from '@/smartrotom/users/dto/create-user.dto';
 
 @Injectable()
 export class InvitesService {
   constructor(
     private db: MySQL2Service,
+    private usersService: UsersService,
+    private smartRotomUsersService: SmartRotomUsersService
   ) {}
 
   async create(createInviteDto: CreateInviteDto) {
@@ -54,6 +57,7 @@ export class InvitesService {
     let shortUUID = test.id;
     let uuid = shortToLongUUID(shortUUID);
 
+    console.log("UUID is: ", uuid);
     
     let boffMediaUser = {
       email: createInviteDto.email,
@@ -61,28 +65,28 @@ export class InvitesService {
       username: createInviteDto.username,
       mc_uuid: uuid,
     } as CreateUserDto;
+    
 
     let smartRotomUser = {
       uuid,
       username: createInviteDto.username,
-    } as SmartrotomUser
+    } as CreateSmartrotomUserDto
 
-    const [smart] = await this.db.getConnection().execute('INSERT INTO smartrotom_users SET ?', smartRotomUser);
+    const smart = await this.smartRotomUsersService.create(smartRotomUser);
+    console.log(smart);
+      if ('error' in smart) {
+        console.log("Error creating user in SmartRotom");
+        return smart;
+      }
 
-    if (Array.isArray(smart) && smart.length > 0) {
-      console.log("Error creating user in SmartRotom");
-      return smart;
-    }
-
-    const [boff] = await this.db.getConnection().execute('INSERT INTO users SET ?', boffMediaUser);
+    const boff = await this.usersService.create(boffMediaUser, smart);
     if ('error' in boff) {
       console.log("Error creating user in BoffMedia");
       return boff;
     }
     
-    let ret = this.db.getConnection().execute('UPDATE wingull_invites SET usedAt = ? WHERE id = ?', [new Date(), id]);
+    let ret = await this.db.getConnection().execute('UPDATE wingull_invites SET usedAt = ? WHERE id = ?', [new Date(), id]);
     console.log("User created successfully");
-    console.log(ret)
     return ret;
   }
 }

@@ -34,29 +34,33 @@ export class UsersService {
       smartRotomUser: smartrotomUser,
     };
 
-    const [result] = await this.db.getConnection().execute('SELECT * FROM users WHERE username = ?', [user.username]);
+    const [result] = await this.db.getConnection().execute('SELECT * FROM boffmedia_users WHERE username = ?', [user.username]);
     if (Array.isArray(result) && result.length > 0) {
       return { error: 'El usuario ya existe' };
     }
-    await this.db.getConnection().execute('INSERT INTO users SET ?', [user]);
-    const [newUser] = await this.db.query<User>('SELECT * FROM users WHERE username = ?', [user.username]);
+    await this.db.getConnection().execute(
+      'INSERT INTO boffmedia_users (email, username, password, mc_uuid) VALUES (?, ?, ?, ?)', 
+      [user.email, user.username, user.password, user.smartRotomUser[0].uuid]
+    );
+    const [newUser] = await this.db.query<User>('SELECT * FROM boffmedia_users WHERE username = ?', [user.username]);
+    
 
-    console.log(`Se ha creado el usuario de BoffMedia ${newUser.username} con el usuario de SmartRotom ${newUser.smartRotomUser.username}`)
+    console.log(`Se ha creado el usuario de BoffMedia ${newUser[0].username} con el usuario de SmartRotom ${user.smartRotomUser.username}`)
     return newUser;
   }
 
   async findAll() {
-    const [rows] = await this.db.getConnection().query('SELECT * FROM users');
+    const [rows] = await this.db.getConnection().query('SELECT * FROM boffmedia_users');
     return <User[]>rows;
   }
 
   async findOne(id: number) {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM users WHERE id = ?', [id]);
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM boffmedia_users WHERE id = ?', [id]);
     return rows[0];
   }
 
   async findFromUserName(username: string) {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM users WHERE username = ?', [username]);
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM boffmedia_users WHERE username = ?', [username]);
     return rows[0];
   }
   
@@ -115,12 +119,12 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const [rows] = await this.db.getConnection().execute('UPDATE users SET ? WHERE id = ?', [updateUserDto, id]);
+    const [rows] = await this.db.getConnection().execute('UPDATE boffmedia_users SET ? WHERE id = ?', [updateUserDto, id]);
     return rows;
   }
 
   async remove(id: number) {
-    const [rows] = await this.db.getConnection().execute('DELETE FROM users WHERE id = ?', [id]);
+    const [rows] = await this.db.getConnection().execute('DELETE FROM boffmedia_users WHERE id = ?', [id]);
     return rows;
   }
 }

@@ -13,11 +13,17 @@ export class SmartRotomUsersService {
 
   async create(user: CreateSmartrotomUserDto) {
     const [existingUser] = await this.db.getConnection().execute('SELECT * FROM smartrotom_users WHERE uuid = ?', [user.uuid]);
-    if (existingUser) {
+    if (Array.isArray(existingUser) && existingUser.length > 0) {
       return { error: 'El usuario ya existe' };
     }
 
-    await this.db.getConnection().execute('INSERT INTO smartrotom_users SET ?', [user]);
+    const keys = Object.keys(user).join(', ');
+    const values = Object.values(user);
+    const placeholders = values.map(() => '?').join(', ');
+    
+    const query = `INSERT INTO smartrotom_users (${keys}) VALUES (${placeholders})`;
+    
+    await this.db.getConnection().execute(query, values);
     const [newUser] = await this.db.query<SmartrotomUser>('SELECT * FROM smartrotom_users WHERE uuid = ?', [user.uuid]);
       
     console.log(`Se ha creado el usuario de SmartRotom ${newUser.username}`)
