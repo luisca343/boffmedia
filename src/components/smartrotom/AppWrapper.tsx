@@ -6,6 +6,7 @@ import { signIn } from "next-auth/react";
 import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
 import AuthForm from "@/app/auth/AuthForm";
+import { Loading } from "./Loading";
 
 export type Session = {
     user: {
@@ -64,11 +65,11 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
 
       
       if (status === "loading") {
-        return <p>Loading...</p>
+        return <Loading />
       }
       
       if (status === "unauthenticated" && isMinecraft()) {
-        if(!datosUsuario) return <p>Loading...</p>
+        if(!datosUsuario) return <Loading />
         
         return <p>{Object.values(datosUsuario)}</p>
       }

@@ -11,8 +11,6 @@ const SocketStatus = () => {
       connect();
       return
     }
-    console.log('Socket connected');
-    console.log(socket);
     socket.on('patata', () => console.log('Patata'));
     socket.on('connection', () => console.log('Connected'));
     socket.emit('patata', null);

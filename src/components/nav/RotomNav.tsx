@@ -55,7 +55,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                     <SheetHeader>
                         <SheetTitle className="text-white">Ajustes</SheetTitle>
                         <SheetDescription>
-                            <div className="flex flex-col p-2 bg-rotom-500 text-white ">
+                            <div className="flex flex-col p-2 bg-rotom-800 text-white ">
                                 <button onClick={() => setTema('')}  className="block w-full text-left">Tema 1</button>
                                 <button onClick={() => setTema('theme-dark')} className="block w-full text-left">Tema 2</button>
                             </div>

@@ -36,11 +36,8 @@ export function SortableGrid({className, apps, setApps}  : {className?: string, 
   });
 
   const sensors = useSensors(mouseSensor);
-
-
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const {active, over} = event;
-
     if (over && active.id !== over.id) {
       const apps2 = arrayMove(apps, apps.indexOf(apps.find(app => app.id === active.id) as App), apps.indexOf(apps.find(app => app.id === over.id) as App));
       const newOrder = apps2.map(app => ({id: app.id, order: apps2.indexOf(app)}));
@@ -71,6 +68,7 @@ export function SortableItem({app} : {app: App}) {
     transform,
     transition,
     active,
+    isDragging,
     
   } = useSortable({id: app.id});
 
@@ -79,19 +77,20 @@ export function SortableItem({app} : {app: App}) {
     transition,
   };
 
+  let estilos = `w-24 h-24 sm:w-36 sm:h-36 ${isDragging ? 'opacity-50' : ''}`
+
   return (
     <li ref={setNodeRef} style={style} {...attributes} {...listeners} className="m-auto hover:cursor-pointer">
-      {active ? <div >
-                    <div className="w-24 h-24 sm:w-36 sm:h-36"><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>
-                      <p className="text-white text-center text:2xl lg:text-2xl text-shadow-gray-border2">{app.name}</p>
-                  </div> : 
-       <motion.div
-              whileHover={{ scale: 1.1 }}
-               key={app.id} className=" m-auto hover:cursor-pointer">
+      {active ? 
+        <motion.div  whileHover={{ scale: 1 }} key={app.id} className=" m-auto hover:cursor-pointer">
+          <div className={estilos}><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>
+          <p className="text-white text-center text:2xl lg:text-2xl text-shadow-gray-border2">{app.name}</p>
+        </motion.div> : 
+      <motion.div  whileHover={{ scale: 1.1 }} key={app.id} className=" m-auto hover:cursor-pointer">
         <Link href={`/smartrotom/${app.url}`}>
-              <div className="w-24 h-24 sm:w-36 sm:h-36"><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>
-                <p className="text-white text-center text:2xl lg:text-2xl text-shadow-gray-border2">{app.name}</p>
-            </Link>
+          <div className={estilos}><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>
+          <p className="text-white text-center text:2xl lg:text-2xl text-shadow-gray-border2">{app.name}</p>
+        </Link>
       </motion.div>
       }
     </li>
