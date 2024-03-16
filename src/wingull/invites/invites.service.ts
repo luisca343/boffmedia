@@ -19,33 +19,33 @@ export class InvitesService {
   ) {}
 
   async create(createInviteDto: CreateInviteDto) {
-    await this.db.getConnection().execute('INSERT INTO invites SET ?', [createInviteDto]);
-    const [newInvite] = await this.db.query<Invite>('SELECT * FROM invites WHERE id = LAST_INSERT_ID()');
+    await this.db.getConnection().execute('INSERT INTO wingull_invites SET ?', [createInviteDto]);
+    const [newInvite] = await this.db.query<Invite>('SELECT * FROM wingull_invites WHERE id = LAST_INSERT_ID()');
     return newInvite;
   }
 
   async findAll() {
-    const [rows] = await this.db.getConnection().query('SELECT * FROM invites');
+    const [rows] = await this.db.getConnection().query('SELECT * FROM wingull_invites');
     return <Invite[]>rows;
   }
 
   async findOne(id: string) {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM invites WHERE id = ?', [id]);
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM wingull_invites WHERE id = ?', [id]);
     return rows[0];
   }
 
   async update(id: number, updateInviteDto: UpdateInviteDto) {
-    const [rows] = await this.db.getConnection().execute('UPDATE invites SET ? WHERE id = ?', [updateInviteDto, id]);
+    const [rows] = await this.db.getConnection().execute('UPDATE wingull_invites SET ? WHERE id = ?', [updateInviteDto, id]);
     return rows;
   }
 
   async remove(id: number) {
-    const [rows] = await this.db.getConnection().execute('DELETE FROM invites WHERE id = ?', [id]);
+    const [rows] = await this.db.getConnection().execute('DELETE FROM wingull_invites WHERE id = ?', [id]);
     return rows;
   }
   
   async register(id: string, createInviteDto: RegisterDataDto) {
-    let [invite] = await this.db.query<Invite>('SELECT * FROM invites WHERE id = ?', [id]) 
+    let [invite] = await this.db.query<Invite>('SELECT * FROM wingull_invites WHERE id = ?', [id]) 
 
 
     let test = await (await fetch(`https://api.mojang.com/users/profiles/minecraft/${createInviteDto.mc_username}`)).json()
@@ -80,7 +80,7 @@ export class InvitesService {
       return boff;
     }
     
-    let ret = this.db.getConnection().execute('UPDATE invites SET usedAt = ? WHERE id = ?', [new Date(), id]);
+    let ret = this.db.getConnection().execute('UPDATE wingull_invites SET usedAt = ? WHERE id = ?', [new Date(), id]);
     console.log("User created successfully");
     console.log(ret)
     return ret;
