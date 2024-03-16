@@ -40,8 +40,7 @@ export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         let res = await wingullPOST(`/invites/${invitacion.id}/register`, {values, id: invitacion.id})
         let data = await res.data;
-
-        if(data.error) alert(data.error);
+        if(res.error) alert(res.error);
         else router.back();
       }
 
