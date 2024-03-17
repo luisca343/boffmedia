@@ -7,10 +7,10 @@ import { Repository } from 'typeorm';
 import { RegisterDataDto } from './dto/register-data.dto';
 import { UsersService } from '../../boffmedia/users/users.service';
 import { CreateUserDto } from '../../boffmedia/users/dto/create-user.dto';
-import { shortToLongUUID } from '../../utils/stringUtils';
+import { shortToLongUUID } from '../../_utils/stringUtils';
 import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
 import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
-import { MySQL2Service } from '@/MySQL2Service';
+import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { CreateSmartrotomUserDto } from '@/smartrotom/users/dto/create-user.dto';
 
 @Injectable()

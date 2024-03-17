@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { SmartrotomUser } from './entities/user.entity';
-import { MySQL2Service } from '../../MySQL2Service';
+import { MySQL2Service } from '../../_utils/MySQL2Service';
 import { RowDataPacket } from 'mysql2';
 
 @Injectable()

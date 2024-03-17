@@ -26,7 +26,7 @@ export class UsersController {
   @Post("loginmc")
   async loginMC(@Body() loginMC: {username: string, uuid: string, world: string}) {
     if(loginMC.world !== process.env.MC_WORLD) return {error: 'Este login no funciona'};
-    
+    console.log(loginMC);
     let usuario = await this.usersService.findFullUserWithUUID(loginMC.uuid);
     if(!usuario) return { error: 'Usuario no encontrado' };
     console.log(usuario);

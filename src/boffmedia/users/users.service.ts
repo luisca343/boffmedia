@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
-import { MySQL2Service } from '@/MySQL2Service';
+import { MySQL2Service } from '@/_utils/MySQL2Service';
 
 
 type FullUser = {

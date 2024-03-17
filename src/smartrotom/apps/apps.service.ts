@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { App } from './entities/app.entity';
-import { MySQL2Service } from '../../MySQL2Service';
+import { MySQL2Service } from '../../_utils/MySQL2Service';
 
 @Injectable()
 export class AppsService {

@@ -8,7 +8,7 @@ import { SmartRotomAppsModule } from './smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from './smartrotom/users/users.module';
 import { InvitesModule } from './wingull/invites/invites.module';
 import { UsersModule } from './boffmedia/users/users.module';
-import { MySQL2Service } from './MySQL2Service';
+import { MySQL2Service } from './_utils/MySQL2Service';
 import { ChatController } from './smartrotom/chat/chat.controller';
 import { ChatService } from './smartrotom/chat/chat.service';
 import { ChatModule } from './smartrotom/chat/chat.module';

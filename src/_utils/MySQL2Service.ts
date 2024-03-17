@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
+import { migrate } from 'drizzle-orm/mysql2/migrator';
 
 @Injectable()
 export class MySQL2Service {
   private connection: mysql.Connection;
+  private db: MySql2Database<Record<string, never>>;
 
   constructor() {
     this.connect();
@@ -17,10 +20,27 @@ export class MySQL2Service {
       database: process.env.DB_NAME,
       port: parseInt(process.env.DB_PORT),
     });
+
+    this.db = drizzle(this.connection);
   }
 
   getConnection(): mysql.Connection {
     return this.connection;
+  }
+
+  
+  getDrizzle(): MySql2Database<Record<string, never>> {
+    return this.db;
+  }
+
+  async migrar() {
+    await this.connect();
+    migrate(this.db, { migrationsFolder: './_db/migrations' }).then(() => {
+      console.log("Base de datos migrada");
+    }).catch((error) => {
+      console.error("Error al migrar base de datos: ", error.message);
+      throw error;
+    });
   }
 
   async query<T = unknown>(sql: string, values?: any): Promise<[T, mysql.FieldPacket[]]> {

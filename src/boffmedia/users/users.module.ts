@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { MySQL2Service } from '@/MySQL2Service';
+import { MySQL2Service } from '@/_utils/MySQL2Service';
 
 @Module({
   imports: [],
