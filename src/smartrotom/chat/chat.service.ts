@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import OpenAI from "openai";
 import { PokemonService } from '../pokemon/pokemon.service';
+import Fuse from 'fuse.js'
 
 let openai: OpenAI;
 
@@ -45,6 +46,19 @@ export class ChatService {
                 {
                     name: "countPokemon",
                     description: "Cantidad de Pokémon de la región de Teras.",
+                },
+                {
+                    name: "getStats",
+                    description: "Estadísticas de un Pokémon de la región de Teras.",
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            "pokemon": {
+                                type:"string",
+                                description: "Nombre del Pokémon del que se quieren las estadísticas."
+                            }
+                        }
+                    }
                 }
             ],
             function_call: "auto"
@@ -53,9 +67,10 @@ export class ChatService {
           const completionResponse = completion.choices[0].message;
           if(!completionResponse.content){
             const functionCallName = completionResponse.function_call.name;
+            console.log(functionCallName);
             
             if(functionCallName === "getPokemon"){
-                let pkm = this.pokemonService.getPokemon();
+                let pkm = this.pokemonService.getPokemonNames();
                 let args = JSON.parse(completion.choices[0].message.function_call.arguments) as {cantidad?: number, tipoLista?: string};
                 console.log(args);
 
@@ -94,23 +109,45 @@ export class ChatService {
 
                   const response = "Claro, aquí tienes la lista de Pokémon:\n"+pokemonList.join("\n")+"\n¿Hay algo más en lo que pueda ayudarte?";
 
-                  return response;
+                  return {sender:"bot", parts:[{type: "text", content: response}]};
 
             } else if(functionCallName === "countPokemon"){
-                let pkm = this.pokemonService.getPokemon().length;
-               
+                let pkm = this.pokemonService.countPokemon();
+                return {sender:"bot", parts:[
+                    {type: "text", content: `Hasta hoy se conocen ${pkm} especies Pokémon en la región de Teras.`},
+                    {type: "text", content: "¿Hay algo más en lo que pueda ayudarte?"}
 
-                  return `Hay ${pkm} Pokémon en la región de Teras.`;
+                ]};
+
+            } else if(functionCallName === "getStats"){
+                let args = JSON.parse(completion.choices[0].message.function_call.arguments) as {pokemon: string};
+                console.log(args);
+                
+            
+                //let pokemon = this.pokemonService.getPokemonByName(args.pokemon)[0] as any;
+                let stats = this.pokemonService.getStatsByName(args.pokemon);
+
+     
+                
+                if(stats){
+                    return {sender:"bot", parts:[
+                        {type: "text", content: `Aquí tienes las estadísticas base de ${args.pokemon}:`}, 
+                        {type: "pokemonStats", content: stats},
+                        {type: "text", content: "¿Hay algo más en lo que pueda ayudarte?"}
+                    ]};
+                } else {
+                    return {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]};
+                }
             }
+        
 
             
 
 
-            return "No puedo contestar por culpa de SrKamina";
+            return {sender:"bot", parts:[{type: "text", content: "No puedo contestar por culpa de SrKamina"}]};
         }
 
-          console.log(JSON.stringify(completion, null, 2));
-        return completion.choices[0].message.content;
+        return {sender:"bot", parts:[{type: "text", content: completionResponse.content}]};
     }
 
 }
