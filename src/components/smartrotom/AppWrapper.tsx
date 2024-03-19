@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import AuthForm from "@/app/auth/AuthForm";
 import { Loading } from "./Loading";
 
-export type Session = {
+export type BoffSession = {
     user: {
         username: string | null;
         email: string | null;
@@ -20,7 +20,7 @@ export type Session = {
 }
 
 export default function AppWrapper({children} : {children: React.ReactNode}) {
-    const { data: session, status } = useSession() as {data: Session | null, status: string};
+    const { data: session, status } = useSession() as {data: BoffSession | null, status: string};
     const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
     const [tema, setTema] = useState('');
 
