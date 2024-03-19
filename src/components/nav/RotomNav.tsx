@@ -3,7 +3,7 @@ import { Hora } from "../Hora";
 import { ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
 import {BellAlertIcon} from '@heroicons/react/24/solid'
 import BreadcrumbNav from "./BreadbrumbNav";
-import { BotonAjustes, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
+import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
 import useSocketStore from "@/app/useSocketStore";
 import { use, useEffect, useState } from "react";
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -23,6 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import FicusAI from "../smartrotom/FicusAI";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
@@ -55,14 +56,28 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                     <SheetHeader>
                         <SheetTitle className="text-white">Ajustes</SheetTitle>
                         <SheetDescription>
-                            <div className="flex flex-col p-2 bg-rotom-800 text-white ">
+                            <div className="flex flex-col p-2 bg-rotom-500 text-white ">
                                 <button onClick={() => setTema('')}  className="block w-full text-left">Tema 1</button>
                                 <button onClick={() => setTema('theme-dark')} className="block w-full text-left">Tema 2</button>
                             </div>
                         </SheetDescription>
                      </SheetHeader>
                     </SheetContent>
-                </Sheet>
+            </Sheet>
+
+            <Sheet>
+                <SheetTrigger>
+                    <BotonIA />
+                </SheetTrigger>
+                <SheetContent side="right" className="bg-zinc-900 text-white border-none flex flex-col w-max" parentId="smartrotom">
+                    <SheetHeader>
+                        <SheetTitle className="text-white text-2xl font-bold">FicusAI</SheetTitle>
+                    </SheetHeader>
+                        <SheetDescription className="h-full overflow-hidden">
+                            <FicusAI />
+                        </SheetDescription>
+                    </SheetContent>
+            </Sheet>
             <Hora className="text-white text-3xl mx-1" />
             <SocketStatus socket={socket}/>
            
