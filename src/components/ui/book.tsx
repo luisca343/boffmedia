@@ -14,7 +14,8 @@ type PageFlip = {
 export function Book({children} : {children: React.ReactNode}){
   const [page, setPage] = useState(0);
   const [pageFlip, setPageFlip] = useState<PageFlip>({getPageCount: () => 0})
-  const pages = React.Children.toArray(children).map((content, index) => ({ content, index }));
+  const pages = React.Children.toArray(children).map((content, index) => { 
+    return { content, index }});
 
   if(pages.length % 2 !== 0){
       pages.splice(pages.length - 1, 0, {content: <Page>ESTO ES DE RELLENO POR FAVOR ES RELLENO</Page>, index: pages.length});
@@ -29,7 +30,7 @@ let style = page == 0
 
 return (
   <motion.div 
-    className="m-auto w-[70%] aspect-[9/5] mt-2" 
+    className="m-auto h-[95%]  w-auto aspect-[9/5] " 
     initial={{transform: 'rotateY(0deg) translateX(-25%)'}}
     animate={style}
     transition={{
@@ -46,7 +47,7 @@ return (
       onFlip={(e) => onFlip(e.data)} onInit={(e) => cargar(e)}
     >
       {pages.map((page, index) => (
-        <div key={index} className={`${page.index % 2 === 0 ? '' : ''}`}>
+        <div key={index} className={`${page.index % 2 === 0 ? 'page-right' : 'page-left'}`} >
           {page.content}
         </div>
       ))}
@@ -54,12 +55,15 @@ return (
   </motion.div>
 );
 
+function getStyle(index: number){
+  return {backgroundColor: 'red'}
+}
+
   function cargar(data: {data:number, object:PageFlip}){
       if(!pageFlip) setPageFlip(data.object)
     }
 
     function onFlip(data: number){
-        console.log(data)
         setPage(data)
     }
 
@@ -71,9 +75,9 @@ interface PageCoverProps {
 }
 
 
-export function Page({children, dataDensity = "soft",  className = 'bg-[#FDF6E3]'}: {children: React.ReactNode, dataDensity?: "hard" | "soft", className?: string})  {
+export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style}: {children: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties})  {
     return (
-        <div className={`border-s border border-black border-solid h-full w-full  drop-shadow-2xl rounded-xl p-2 ${className}`} data-density={dataDensity}>
+        <div style={style} className={`pagina h-full w-full  drop-shadow-2xl p-2 ${className}`} data-density={dataDensity}>
              {children}
         </div>
     );
