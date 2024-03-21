@@ -3,13 +3,26 @@ import { Injectable } from '@nestjs/common';
 import OpenAI from "openai";
 import { PokemonService } from '../pokemon/pokemon.service';
 import Fuse from 'fuse.js'
+import { firstLetterToUpperCase } from '@/_utils/stringUtils';
+import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { ficusMensajes } from '@/_db/schema/FicusAI';
+import { eq, desc, asc } from 'drizzle-orm';
 
 let openai: OpenAI;
 
+
+    export type FicusMessage = {
+        sender: string;
+        parts: {
+            type: string;
+            content: string;
+        }[];
+    }
 @Injectable()
 export class ChatService {
     constructor(
       private pokemonService: PokemonService,
+      private db: MySQL2Service
     ) {}
     async start() {
         if(!openai){
@@ -17,28 +30,56 @@ export class ChatService {
         }
     }
 
-    async send(mensaje: string) {
+    async first(uuid: string) {
+        return this.sendMsg(uuid, {sender:"bot", parts:[{type: "text", content: "Hola, soy Profesor Ficus, tu asistente virtual. ¿En qué puedo ayudarte?"}]});
+    }
+
+    async getMessages(uuid: string) {
+        let res = await this.db.getDrizzle().select({content: ficusMensajes.content}).from(ficusMensajes).where(eq(ficusMensajes.uuid, uuid)).orderBy(desc(ficusMensajes.id)).limit(20).execute();
+        console.log(res);
+        
+        let mensajes = []
+        res.map((msg: any) => {
+            msg.content = JSON.parse(msg.content);
+            mensajes.unshift(msg.content);
+        });
+        return mensajes;
+    }
+
+    async storeMessage(uuid:string, mensaje: FicusMessage) {
+        this.db.getDrizzle().insert(ficusMensajes).values({uuid, content:mensaje}).execute();
+    }
+
+    async sendMsg(uuid: string, mensaje: FicusMessage) {
+        this.storeMessage(uuid, mensaje);
+        return mensaje;
+    }
+
+    async send(uuid:string, mensaje: FicusMessage) {
+        if(mensaje.sender === "user") this.sendMsg(uuid, mensaje);
         this.start();
+        
+        const texto = mensaje.parts[0].content;
+        console.log("Enviando mensaje a OpenAI");
+        console.log(mensaje);
+        console.log(texto);
+
         const completion = await openai.chat.completions.create({
             messages: [
-                { role: "system", content: "Eres Profesor Ficus, un asistente creado por el científico del mismo nombre para ayudar a los entrenadores Pokémon de la región de Teras dándoles información sobre la región y sus Pokémon. Responde solo en base a tu contexto, si no tienes la información necesaria, di que no puedes contestar por culpa de SrKamina." },
-                { role: "user", content: mensaje },
+                { role: "system", content: "Eres Profesor Ficus, un asistente creado por el científico del mismo nombre para ayudar a los entrenadores Pokémon de la región de Teras. Tienes errores de programación graves, a veces te volverás loco y contestarás cosas aleatorias. Si no tienes la información necesaria, di que no te han programado para eso." },
+                { role: "user", content: texto },
             ],
             model: "gpt-3.5-turbo-0125",
             functions: [
                 {
                     name: "getPokemon",
-                    description: "Lista de Pokémon de la región de Teras.",
+                    description: "Lista de Pokémon de Teras.",
                     parameters: {
                         type: "object",
                         properties: {
                             "cantidad": {
                                 type:"number",
-                                description: "Cantidad de Pokémon a listar. No es obligatorio. Si no se especifica, se mostrarán todos los Pokémon."
-                            },
-                            "tipoLista": {
-                                type: "string",
-                                description: "Tipo de lista a mostrar. Puede ser 'NUMERADA' o 'PUNTOS'. Por defecto es 'NUMERADA'."
+                                description: "Cantidad de Pokémon a listar."
                             }
                         }
                     }
@@ -48,14 +89,26 @@ export class ChatService {
                     description: "Cantidad de Pokémon de la región de Teras.",
                 },
                 {
-                    name: "getStats",
-                    description: "Estadísticas de un Pokémon de la región de Teras.",
+                    name: "getDatos",
+                    description: "Datos de un Pokémon.",
                     parameters: {
                         type: "object",
                         properties: {
                             "pokemon": {
                                 type:"string",
-                                description: "Nombre del Pokémon del que se quieren las estadísticas."
+                                description: "Nombre del Pokémon."
+                            },
+                            "dato": {
+                                type:"string",
+                                description: "Dato a obtener. Puede ser 'tipo', 'habitat', 'stats', 'evoluciones', 'movimientos', 'habilidades'."
+                            },
+                            "tipoMovimientos": {
+                                type:"array",
+                                items: {
+                                    type: "string",
+                                    enum: ["level", "tutor", "egg", "all", "tm", "tr"]
+                                },
+                                description: "Tipo de movimientos a obtener."
                             }
                         }
                     }
@@ -64,10 +117,14 @@ export class ChatService {
             function_call: "auto"
           });
 
+          console.log(`OpenAI credits used in prompt: ${completion.usage.prompt_tokens}`);
+          console.log(`OpenAI credits used in response: ${completion.usage.completion_tokens}`);
+
           const completionResponse = completion.choices[0].message;
           if(!completionResponse.content){
             const functionCallName = completionResponse.function_call.name;
             console.log(functionCallName);
+            console.log(completionResponse.function_call.arguments);
             
             if(functionCallName === "getPokemon"){
                 let pkm = this.pokemonService.getPokemonNames();
@@ -109,45 +166,106 @@ export class ChatService {
 
                   const response = "Claro, aquí tienes la lista de Pokémon:\n"+pokemonList.join("\n")+"\n¿Hay algo más en lo que pueda ayudarte?";
 
-                  return {sender:"bot", parts:[{type: "text", content: response}]};
+                  return this.sendMsg(uuid, {sender:"bot", parts:[{type: "text", content: response}]})
 
             } else if(functionCallName === "countPokemon"){
                 let pkm = this.pokemonService.countPokemon();
-                return {sender:"bot", parts:[
+                return this.sendMsg(uuid, {sender:"bot", parts:[
                     {type: "text", content: `Hasta hoy se conocen ${pkm} especies Pokémon en la región de Teras.`},
                     {type: "text", content: "¿Hay algo más en lo que pueda ayudarte?"}
 
-                ]};
+                ]});
 
-            } else if(functionCallName === "getStats"){
-                let args = JSON.parse(completion.choices[0].message.function_call.arguments) as {pokemon: string};
-                console.log(args);
-                
-            
-                //let pokemon = this.pokemonService.getPokemonByName(args.pokemon)[0] as any;
-                let stats = this.pokemonService.getStatsByName(args.pokemon);
-
-     
-                
-                if(stats){
-                    return {sender:"bot", parts:[
-                        {type: "text", content: `Aquí tienes las estadísticas base de ${args.pokemon}:`}, 
-                        {type: "pokemonStats", content: stats},
-                        {type: "text", content: "¿Hay algo más en lo que pueda ayudarte?"}
-                    ]};
-                } else {
-                    return {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]};
-                }
+            } else if(functionCallName === "getDatos"){
+                let args = JSON.parse(completion.choices[0].message.function_call.arguments) as {pokemon: string, dato: string};
+                let pkmName = args.pokemon;
+                let dato = args.dato;
+                if(dato === "stats") return this.sendStats(uuid, pkmName);
+                if(dato === "tipo") return this.sendTipo(uuid, pkmName);
+                if(dato === "movimientos") return this.sendMovimientos(uuid, args);
             }
         
 
             
 
 
-            return {sender:"bot", parts:[{type: "text", content: "No puedo contestar por culpa de SrKamina"}]};
+            return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No puedo contestar por culpa de SrKamina"}]});
         }
 
-        return {sender:"bot", parts:[{type: "text", content: completionResponse.content}]};
+        return this.sendMsg(uuid, {sender:"bot", parts:[{type: "text", content: completionResponse.content}]});
+    }
+
+
+    sendStats(uuid, pkmName){
+        let lista = this.pokemonService.getPokemonByName(pkmName) as any;
+        let pokemon = lista[0].item;
+        let stats = pokemon.forms[0].battleStats
+        if(stats){
+            return this.sendMsg(uuid,  {sender:"bot", parts:[
+                {type: "text", content: `Aquí tienes las estadísticas base de ${firstLetterToUpperCase(pokemon.name)}:`}, 
+                {type: "pokemonStats", content: stats},
+                {type: "text", content: "\n¿Hay algo más en lo que pueda ayudarte?"}
+            ]});
+            } else {
+            return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]});
+        }
+    }
+
+    sendTipo(uuid, pkmName){
+        let lista = this.pokemonService.getPokemonByName(pkmName) as any;
+        let pokemon = lista[0].item;
+        let tipos = pokemon.forms[0].types;
+        if(tipos){
+            return this.sendMsg(uuid,  {sender:"bot", parts:[
+                {type: "text", content: `${firstLetterToUpperCase(pokemon.name)} es un Pokémon de tipo ${tipos.join(" / ")}.`},
+                {type: "text", content: "\n¿Hay algo más en lo que pueda ayudarte?"}
+            ]});
+            } else {
+            return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]});
+        }
+    }
+
+    sendMovimientos(uuid, args){
+        let pkmName = args.pokemon;
+        let tipoMovimientos = args.tipoMovimientos as string[];
+
+        let lista = this.pokemonService.getPokemonByName(pkmName) as any;
+        let pokemon = lista[0].item;
+        let movimientos = pokemon.forms[0].moves;
+
+        const keyMapping = {
+            'levelUpMoves': 'level',
+            'tutorMoves': 'tutor',
+            'eggMoves': 'egg',
+            'tmMoves8': 'tm',
+            'tmMoves7': 'tm',
+            'tmMoves6': 'tm',
+            'tmMoves5': 'tm',
+            'tmMoves4': 'tm',
+            'tmMoves3': 'tm',
+            'tmMoves2': 'tm',
+            'tmMoves1': 'tm',
+            'trMoves': 'tr',
+            'hmMoves': 'hm'
+        };
+
+        Object.keys(movimientos).forEach((key) => {
+            if(!tipoMovimientos.includes(keyMapping[key])){
+                delete movimientos[key];
+            }
+        });
+
+
+
+        if(movimientos){
+            return this.sendMsg(uuid,  {sender:"bot", parts:[
+                {type: "text", content: `Aquí tienes la lista de movimientos de ${firstLetterToUpperCase(pokemon.name)}:`}, 
+                {type: "pokemonMoves", content: movimientos},
+                {type: "text", content: "\n¿Hay algo más en lo que pueda ayudarte?"}
+            ]});
+            } else {
+            return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]});
+        }
     }
 
 }

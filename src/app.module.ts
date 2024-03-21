@@ -16,6 +16,8 @@ import { PokemonController } from './smartrotom/pokemon/pokemon.controller';
 import { PokemonModule } from './smartrotom/pokemon/pokemon.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MinaService } from './smartrotom/mina/mina.service';
+import { MinaController } from './smartrotom/mina/mina.controller';
 
 @Module({
   imports: [
@@ -41,7 +43,7 @@ import { join } from 'path';
     ChatModule,
     PokemonModule
   ],
-  controllers: [AppController, ChatController, PokemonController],
-  providers: [AppService, MySQL2Service, ChatService],
+  controllers: [AppController, ChatController, PokemonController, MinaController],
+  providers: [AppService, MySQL2Service, ChatService, MinaService],
 })
 export class AppModule {}
