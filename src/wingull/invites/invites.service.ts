@@ -12,6 +12,8 @@ import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
 import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { CreateSmartrotomUserDto } from '@/smartrotom/users/dto/create-user.dto';
+import { BoffMediaUser } from '@/_db/schema/BoffMedia';
+import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 
 @Injectable()
 export class InvitesService {
@@ -20,6 +22,7 @@ export class InvitesService {
     private usersService: UsersService,
     private smartRotomUsersService: SmartRotomUsersService
   ) {}
+  
 
   async create(createInviteDto: CreateInviteDto) {
     await this.db.getConnection().execute('INSERT INTO wingull_invites SET ?', [createInviteDto]);
@@ -50,30 +53,27 @@ export class InvitesService {
   async register(id: string, createInviteDto: RegisterDataDto) {
     let [invite] = await this.db.query<Invite>('SELECT * FROM wingull_invites WHERE id = ?', [id]) 
 
-
     let test = await (await fetch(`https://api.mojang.com/users/profiles/minecraft/${createInviteDto.mc_username}`)).json()
     if(!test.id) return {error: "Invalid username"};
 
     let shortUUID = test.id;
     let uuid = shortToLongUUID(shortUUID);
 
-    console.log("UUID is: ", uuid);
     
     let boffMediaUser = {
       email: createInviteDto.email,
       password: createInviteDto.password,
       username: createInviteDto.username,
-      mc_uuid: uuid,
-    } as CreateUserDto;
+      uuid: uuid,
+    } as BoffMediaUser;
     
 
     let smartRotomUser = {
       uuid,
       username: createInviteDto.username,
-    } as CreateSmartrotomUserDto
+    } as SmartRotomUser
 
     const smart = await this.smartRotomUsersService.create(smartRotomUser);
-    console.log(smart);
       if ('error' in smart) {
         console.log("Error creating user in SmartRotom");
         return smart;

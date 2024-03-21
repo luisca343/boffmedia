@@ -3,6 +3,8 @@ import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { App } from './entities/app.entity';
 import { MySQL2Service } from '../../_utils/MySQL2Service';
+import { smartrotomApps, smartrotomUserApps } from '@/_db/schema/SmartRotom';
+import { eq, sql } from 'drizzle-orm';
 
 @Injectable()
 export class AppsService {
@@ -21,8 +23,12 @@ export class AppsService {
   }
 
   async order(order: {id: number, order: number}[], uuid: string) {
-    let test  = await this.db.getConnection().query('DELETE FROM smartrotom_apps_order WHERE uuid = ?', [uuid]);
-    let insert = await this.db.getConnection().query('INSERT INTO smartrotom_apps_order (uuid, app_id, `order`) VALUES ?', [order.map((app) => [uuid, app.id, app.order])]);
+    const dlt =  await this.db.getDrizzle().delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
+
+    const values = order.map((app) => ({uuid, appId: app.id, order: app.order}));
+
+    const insert = await this.db.getDrizzle().insert(smartrotomUserApps).values(values);
+
 
     return {insert}
   }
@@ -32,26 +38,26 @@ export class AppsService {
     return rows;
   }
 
-  async getForPlayer(uuid: string): Promise<App[]> {
-    const [rows] = await this.db.getConnection().execute(`
-    (SELECT sa.id, sa.url,  sa.name, sa.icon, sao.order as orden FROM smartrotom_apps sa
-      LEFT JOIN smartrotom_apps_order sao ON sa.id = sao.app_id
-      WHERE sao.uuid = ?)
-      UNION ALL
-      (SELECT sa.id, sa.url,  sa.name, sa.icon, sa.order as orden FROM smartrotom_apps sa
-        WHERE id NOT IN (
-          SELECT app_id FROM smartrotom_apps_order sao
-          WHERE sao.uuid = ?
-        )
-      )
-      ORDER  BY orden ASC`, [uuid, uuid]
-  );
+  async getForPlayer(uuid: string) {
+    const result = await this.db.getDrizzle().execute(sql`
+        (SELECT sa.id, sa.url,  sa.name, sao.order as orden FROM smartrotom_apps sa
+          LEFT JOIN smartrotom_user_apps sao ON sa.id = sao.app_id
+          WHERE sao.uuid = ${uuid})
+          UNION ALL
+          (SELECT sa.id, sa.url,  sa.name, 999 as orden FROM smartrotom_apps sa
+            WHERE id NOT IN (
+              SELECT app_id FROM smartrotom_user_apps sao
+              WHERE sao.uuid = ${uuid}
+            )
+          )
+          ORDER  BY orden ASC`);
 
-    return <App[]>rows;
+    const apps = result[0] as unknown as App[];
+    return apps;
   }
 
   async findOne(id: number) {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM smartrotom_apps WHERE id = ?', [id]);
+    const rows = await this.db.query
     return rows[0];
   }
 

@@ -41,12 +41,12 @@ export class PokemonService {
     }
 
     getPokemonByName(name: string) {
-        const options: Fuse.IFuseOptions<string> = {
+        const options: Fuse.IFuseOptions<any> = {
             includeScore: true,
             includeMatches: true,
-            keys: ['name']
+            keys: ['name', 'nickname']
         }
-        const fuse = new Fuse<string>(this.pokemonList, options);
+        const fuse = new Fuse<any>(this.especies, options);
         const result = fuse.search(name);
         return result;
     }
@@ -55,7 +55,7 @@ export class PokemonService {
         const options: Fuse.IFuseOptions<string> = {
             includeScore: true,
             includeMatches: true,
-            keys: ['name']
+            keys: ['name', 'nickname']
         }
         const fuse = new Fuse<any>(this.especies, options);
         const result = fuse.search(name);

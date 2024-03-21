@@ -4,10 +4,16 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { error } from 'console';
+import { SmartRotomUsersService } from '@/smartrotom/users/users.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly smartrotomUsersService: SmartRotomUsersService
+  
+  ) {}
+
 
   @Post()
   async create(@Body() createUserDto: CreateUserDto) {
@@ -26,10 +32,13 @@ export class UsersController {
   @Post("loginmc")
   async loginMC(@Body() loginMC: {username: string, uuid: string, world: string}) {
     if(loginMC.world !== process.env.MC_WORLD) return {error: 'Este login no funciona'};
-    console.log(loginMC);
     let usuario = await this.usersService.findFullUserWithUUID(loginMC.uuid);
-    if(!usuario) return { error: 'Usuario no encontrado' };
-    console.log(usuario);
+    if(!usuario) {
+      let usuario = await this.smartrotomUsersService.create(loginMC);
+      return {error: 'Usuario creado en SmartRotom'};
+    }
+    
+    
     return usuario;
   }
 

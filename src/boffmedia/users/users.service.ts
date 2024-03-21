@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { In, Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
-import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
+import {  smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { eq, or } from 'drizzle-orm';
+import { BoffMediaUser, boffMediaUsers } from '@/_db/schema/BoffMedia';
+import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { error } from 'console';
+
 
 
 type FullUser = {
@@ -24,28 +27,22 @@ export class UsersService {
   ) {}
 
 
-  async create(createUserDto: CreateUserDto, smartrotomUser: SmartrotomUser) {
-    const hash = await bcrypt.hash(createUserDto.password, 12);
-
+  async create(boffMediaUser: BoffMediaUser, smartrotomUser: SmartRotomUser) {
+    console.log('Creando usuario en BoffMedia', boffMediaUser);
+    const hash = await bcrypt.hash(boffMediaUser.password, 12);
     const user = {
-      email: createUserDto.email,
-      username: createUserDto.username,
-      password: hash,
-      smartRotomUser: smartrotomUser,
+      email: boffMediaUser.email,
+      username: boffMediaUser.username,
+      password: hash
     };
+    const existe = await this.db.getDrizzle().select().from(boffMediaUsers).where(or(eq(boffMediaUsers.uuid, boffMediaUser.uuid), eq(boffMediaUsers.username, boffMediaUser.username)));
+    console.log(existe);
 
-    const [result] = await this.db.getConnection().execute('SELECT * FROM boffmedia_users WHERE username = ?', [user.username]);
-    if (Array.isArray(result) && result.length > 0) {
-      return { error: 'El usuario ya existe' };
-    }
-    await this.db.getConnection().execute(
-      'INSERT INTO boffmedia_users (email, username, password, mc_uuid) VALUES (?, ?, ?, ?)', 
-      [user.email, user.username, user.password, user.smartRotomUser[0].uuid]
-    );
-    const [newUser] = await this.db.query<User>('SELECT * FROM boffmedia_users WHERE username = ?', [user.username]);
+    if(existe.length > 0) return {error: "El usuario ya existe"} 
+    console.log('El usuario BOFF no existe, creando...'); 
     
-
-    console.log(`Se ha creado el usuario de BoffMedia ${newUser[0].username} con el usuario de SmartRotom ${user.smartRotomUser.username}`)
+    const boffInsert = await this.db.getDrizzle().insert(boffMediaUsers).values({...user, uuid: smartrotomUser.uuid});
+    const newUser = await this.findFullUserWithName(boffMediaUser.username);
     return newUser;
   }
 
@@ -65,54 +62,37 @@ export class UsersService {
   }
   
   async findFullUserWithName(username: string) {
-    const [rows] = await this.db.getConnection().execute(`
-      SELECT user.*, smartRotomUser.username as mc_name, smartRotomUser.uuid
-      FROM boffmedia_users user
-      LEFT JOIN smartrotom_users smartRotomUser ON user.mc_uuid = smartRotomUser.uuid
-      WHERE user.username = ?
-    `, [username]);
-
-    return rows[0];
+    const users = await this.db.getDrizzle().select().from(boffMediaUsers)
+      .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+      .where(eq(boffMediaUsers.username, username));
+    
+    return users[0];
   }
 
-  async validateUser(username: string, password: string): Promise<User | null> {
+  async validateUser(username: string, password: string): Promise<SessionUser | null> {
     const user = await this.findFullUserWithName(username);
     if (!user) {
       return null;
     }
   
-    const match = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.boffmedia_users.password);
 
     console.log(user);
-    let userToReturn = {
-      username: user.username,
-      email: user.email,
-      smartRotomUser: {
-        username: user?.mc_name,
-        uuid: user?.uuid
-      }
-    } as User;
+    let userToReturn = this.getSessionUser(user);
 
-    console.log(userToReturn);
     return match ? userToReturn : null;
   }
 
   
   async findFullUserWithUUID(uuid: string) {
-    console.log(uuid)
-    const [result] = await this.db.query<FullUser>(`SELECT bu.username as boff_name, bu.email, su.uuid, su.username as mc_name, su.world as world  FROM smartrotom_users su
-    LEFT JOIN boffmedia_users bu ON su.uuid = bu.mc_uuid
-    WHERE uuid = '${uuid}'`);
+    let test = await this.db.getDrizzle().select().from(smartrotomUsers)
+    .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+    .where(eq(smartrotomUsers.uuid, uuid))
 
+    if(test.length === 0) return null;
 
-    let res = result[0];
-    let user = new User();
-    user.username = res.boff_name;
-    user.email = res.email;
-    user.smartRotomUser = new SmartrotomUser();
-    user.smartRotomUser.username = res.mc_name;
-    user.smartRotomUser.uuid = res.uuid;
-    user.smartRotomUser.world = res.world;
+    let res = test[0];
+    let user = this.getSessionUser(res);
 
     return user;
 
@@ -126,5 +106,30 @@ export class UsersService {
   async remove(id: number) {
     const [rows] = await this.db.getConnection().execute('DELETE FROM boffmedia_users WHERE id = ?', [id]);
     return rows;
+  }
+
+
+  getSessionUser({boffmedia_users, smartrotom_users}: {boffmedia_users: BoffMediaUser, smartrotom_users: SmartRotomUser}){
+    return {
+      username: boffmedia_users.username,
+      email: boffmedia_users.email,
+      smartRotomUser: {
+        username: smartrotom_users.username,
+        uuid: smartrotom_users.uuid,
+        world: smartrotom_users.world
+      }
+    } as SessionUser;
+  }
+
+}
+
+
+type SessionUser = {
+  username: string,
+  email: string,
+  smartRotomUser: {
+    username: string,
+    uuid: string,
+    world: string
   }
 }

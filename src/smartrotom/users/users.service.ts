@@ -4,6 +4,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { SmartrotomUser } from './entities/user.entity';
 import { MySQL2Service } from '../../_utils/MySQL2Service';
 import { RowDataPacket } from 'mysql2';
+import { smartrotomUsers } from '@/_db/schema/SmartRotom';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class SmartRotomUsersService {
@@ -12,6 +14,14 @@ export class SmartRotomUsersService {
   ) {}
 
   async create(user: CreateSmartrotomUserDto) {
+    console.log('Creando usuario en SmartRotom', user);
+    const existe = await this.findOne(user.uuid);
+    if(existe) return existe;
+    console.log('El usuario no existe, creando...');
+    const insert = await this.db.getDrizzle().insert(smartrotomUsers).values({uuid: user.uuid, username: user.username});
+    const usuario = await this.findOne(user.uuid);
+    console.log('Usuario creado en SmartRotom', usuario);
+    /*
     const [existingUser] = await this.db.getConnection().execute('SELECT * FROM smartrotom_users WHERE uuid = ?', [user.uuid]);
     if (Array.isArray(existingUser) && existingUser.length > 0) {
       return { error: 'El usuario ya existe' };
@@ -27,7 +37,8 @@ export class SmartRotomUsersService {
     const [newUser] = await this.db.query<SmartrotomUser>('SELECT * FROM smartrotom_users WHERE uuid = ?', [user.uuid]);
       
     console.log(`Se ha creado el usuario de SmartRotom ${newUser.username}`)
-    return newUser;
+    return newUser;*/
+    return usuario
   }
 
   async findAll(): Promise<SmartrotomUser[]> {
