@@ -36,6 +36,10 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
               world: data.world
             });
             
+            if(response.error) {
+              setDatosUsuario(null);
+              return
+            }
 
         } else {
             console.log('No window')
@@ -86,8 +90,9 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
         return session?.user.smartRotomUser?.uuid;
       }
 
-      if(status === "authenticated" && !smartRotomLinked()) {
-        return <RotomError error="Usuario de SmartRotom no vinculado"/>
+      if(status === "authenticated" && !smartRotomLinked() ) {
+        if(!isMinecraft())return <RotomError error="Usuario de SmartRotom no vinculado"/>
+        return <AuthForm url="smartrotom" redirect="/smartrotom"/>
       }
 
       if(status === "authenticated" && !boffMediaLinked()) {
