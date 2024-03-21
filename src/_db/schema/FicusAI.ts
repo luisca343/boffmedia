@@ -1,0 +1,15 @@
+import { sql } from "drizzle-orm";
+import { char, datetime, int, json, mysqlSchema, mysqlTable, text, varchar } from "drizzle-orm/mysql-core";
+import { smartrotomUsers } from "./SmartRotom";
+
+
+export const ficusMensajes = mysqlTable("ficus_mensajes", {
+    uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    id: int("id").primaryKey().autoincrement(),
+    content: json("content"),
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
+    updatedAt: datetime("updated_at").default(sql`CURRENT_TIMESTAMP()`),
+    deletedAt: datetime("deleted_at")
+});
+
+export type FicusMensaje = typeof ficusMensajes.$inferSelect;

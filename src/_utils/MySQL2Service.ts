@@ -3,6 +3,8 @@ import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
 
+import * as SmartRotomSchema from '../_db/schema/SmartRotom';
+
 @Injectable()
 export class MySQL2Service {
   private connection: mysql.Connection;
@@ -24,18 +26,21 @@ export class MySQL2Service {
     this.db = drizzle(this.connection);
   }
 
+  smartRotom(){
+    return drizzle(this.connection, {schema: SmartRotomSchema, mode: 'default'});
+  }
+
   getConnection(): mysql.Connection {
     return this.connection;
   }
 
-  
   getDrizzle(): MySql2Database<Record<string, never>> {
     return this.db;
   }
 
   async migrar() {
     await this.connect();
-    migrate(this.db, { migrationsFolder: './_db/migrations' }).then(() => {
+    migrate(this.db, { migrationsFolder: './drizzle/migrations' }).then(() => {
       console.log("Base de datos migrada");
     }).catch((error) => {
       console.error("Error al migrar base de datos: ", error.message);
