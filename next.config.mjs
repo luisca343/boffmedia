@@ -7,7 +7,7 @@ const bundleAnalyzer = withBundleAnalyzer({
   });
 
 const nextConfig = {
-    reactStrictMode: true,
+    reactStrictMode: false,
     output: "standalone",
     images: {
         //domains: ['i.lizardon.es', 'i.ytimg.com'],

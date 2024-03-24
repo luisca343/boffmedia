@@ -28,7 +28,7 @@ export async function request(method: string, url: string, data: any) {
   }
 
   const res = await fetch(url, options);
-  return res.json();
+  return await res.json();
 }
 
 export async function request2(method: string, url: string, data: any) {
