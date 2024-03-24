@@ -5,8 +5,8 @@ export const smartrotomUsers = mysqlTable("smartrotom_users", {
     uuid: char("uuid", { length: 36 }).notNull().primaryKey(),
     username: varchar("username", { length: 32 }).notNull(),
     world: varchar("world", { length: 8 }),
-    energia: int("energia").default(10),
-    ultimaRecarga: timestamp("ultima_recarga").default(sql`CURRENT_TIMESTAMP()`),
+    energy: int("energy").default(10),
+    lastCharge: timestamp("last_charge").default(sql`CURRENT_TIMESTAMP()`),
 });
 
 export type SmartRotomUser = typeof smartrotomUsers.$inferSelect;

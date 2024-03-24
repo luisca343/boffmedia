@@ -3,7 +3,7 @@ import { char, datetime, int, json, mysqlSchema, mysqlTable, text, varchar } fro
 import { smartrotomUsers } from "./SmartRotom";
 
 
-export const ficusMensajes = mysqlTable("ficus_mensajes", {
+export const ficusMessages = mysqlTable("ficus_messages", {
     uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
     id: int("id").primaryKey().autoincrement(),
     content: json("content"),
@@ -12,4 +12,4 @@ export const ficusMensajes = mysqlTable("ficus_mensajes", {
     deletedAt: datetime("deleted_at")
 });
 
-export type FicusMensaje = typeof ficusMensajes.$inferSelect;
+export type FicusMensaje = typeof ficusMessages.$inferSelect;
