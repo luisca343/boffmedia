@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1710876264758,
-      "tag": "0000_fresh_cobalt_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1711007599128,
-      "tag": "0001_skinny_exiles",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1711021612100,
-      "tag": "0002_known_demogoblin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1711022307036,
-      "tag": "0003_past_kang",
+      "when": 1711303808282,
+      "tag": "0000_wild_red_skull",
       "breakpoints": true
     }
   ]

@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "51bd9df4-bbb4-43d2-8d4c-eea44499f774",
+  "id": "da34f421-0985-4cfe-bbf5-18d825cc2ee4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "boffmedia_users": {
@@ -55,8 +55,8 @@
           "columnsTo": [
             "uuid"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -67,10 +67,17 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "boffmedia_users_username_unique": {
+          "name": "boffmedia_users_username_unique",
+          "columns": [
+            "username"
+          ]
+        }
+      }
     },
-    "ficus_mensajes": {
-      "name": "ficus_mensajes",
+    "ficus_messages": {
+      "name": "ficus_messages",
       "columns": {
         "uuid": {
           "name": "uuid",
@@ -119,9 +126,9 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "ficus_mensajes_uuid_smartrotom_users_uuid_fk": {
-          "name": "ficus_mensajes_uuid_smartrotom_users_uuid_fk",
-          "tableFrom": "ficus_mensajes",
+        "ficus_messages_uuid_smartrotom_users_uuid_fk": {
+          "name": "ficus_messages_uuid_smartrotom_users_uuid_fk",
+          "tableFrom": "ficus_messages",
           "tableTo": "smartrotom_users",
           "columnsFrom": [
             "uuid"
@@ -129,13 +136,168 @@
           "columnsTo": [
             "uuid"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {
-        "ficus_mensajes_id": {
-          "name": "ficus_mensajes_id",
+        "ficus_messages_id": {
+          "name": "ficus_messages_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "mine_games": {
+      "name": "mine_games",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "mine_games_id": {
+          "name": "mine_games_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "mine_games_detail": {
+      "name": "mine_games_detail",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "game_id": {
+          "name": "game_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reward_id": {
+          "name": "reward_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claimed": {
+          "name": "claimed",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "mine_games_detail_id": {
+          "name": "mine_games_detail_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "mine_rewards": {
+      "name": "mine_rewards",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "value": {
+          "name": "value",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "width": {
+          "name": "width",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "heigth": {
+          "name": "heigth",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "mine_rewards_id": {
+          "name": "mine_rewards_id",
           "columns": [
             "id"
           ]
@@ -205,8 +367,8 @@
           "notNull": true,
           "autoincrement": false
         },
-        "active": {
-          "name": "active",
+        "order": {
+          "name": "order",
           "type": "int",
           "primaryKey": false,
           "notNull": false,
@@ -226,8 +388,8 @@
           "columnsTo": [
             "uuid"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -256,6 +418,22 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "energy": {
+          "name": "energy",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 10
+        },
+        "last_charge": {
+          "name": "last_charge",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP()"
         }
       },
       "indexes": {},

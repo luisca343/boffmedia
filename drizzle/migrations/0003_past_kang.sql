@@ -1,1 +1,0 @@
-ALTER TABLE `smartrotom_users` ADD `ultima_recarga` timestamp DEFAULT CURRENT_TIMESTAMP();
