@@ -1,0 +1,83 @@
+CREATE TABLE `boffmedia_users` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`username` varchar(32) NOT NULL,
+	`password` varchar(255) NOT NULL,
+	`email` varchar(255) NOT NULL,
+	`uuid` char(36),
+	CONSTRAINT `boffmedia_users_id` PRIMARY KEY(`id`),
+	CONSTRAINT `boffmedia_users_username_unique` UNIQUE(`username`)
+);
+--> statement-breakpoint
+CREATE TABLE `ficus_messages` (
+	`uuid` char(36),
+	`id` int AUTO_INCREMENT NOT NULL,
+	`content` json,
+	`created_at` datetime DEFAULT CURRENT_TIMESTAMP(),
+	`updated_at` datetime DEFAULT CURRENT_TIMESTAMP(),
+	`deleted_at` datetime,
+	CONSTRAINT `ficus_messages_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `mine_games` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`uuid` char(36) NOT NULL,
+	`created_at` datetime DEFAULT CURRENT_TIMESTAMP(),
+	CONSTRAINT `mine_games_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `mine_games_detail` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`game_id` int NOT NULL,
+	`reward_id` int NOT NULL,
+	`value` int NOT NULL,
+	`claimed` int NOT NULL DEFAULT 0,
+	CONSTRAINT `mine_games_detail_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `mine_rewards` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`value` int NOT NULL,
+	`name` varchar(32) NOT NULL,
+	`type` varchar(32) NOT NULL,
+	`item_id` varchar(32) NOT NULL,
+	`width` int NOT NULL,
+	`heigth` int NOT NULL,
+	CONSTRAINT `mine_rewards_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `smartrotom_apps` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name` varchar(32) NOT NULL,
+	`url` varchar(255),
+	`active` int DEFAULT 1,
+	CONSTRAINT `smartrotom_apps_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `smartrotom_user_apps` (
+	`uuid` char(36),
+	`app_id` int NOT NULL,
+	`order` int DEFAULT 999
+);
+--> statement-breakpoint
+CREATE TABLE `smartrotom_users` (
+	`uuid` char(36) NOT NULL,
+	`username` varchar(32) NOT NULL,
+	`world` varchar(8),
+	`energy` int DEFAULT 10,
+	`last_charge` timestamp DEFAULT CURRENT_TIMESTAMP(),
+	CONSTRAINT `smartrotom_users_uuid` PRIMARY KEY(`uuid`)
+);
+--> statement-breakpoint
+CREATE TABLE `wingull_invites` (
+	`id` varchar(6) NOT NULL,
+	`uuid` varchar(36) NOT NULL,
+	`username` varchar(32) NOT NULL,
+	`created_at` datetime DEFAULT CURRENT_TIMESTAMP(),
+	`used_at` datetime DEFAULT CURRENT_TIMESTAMP(),
+	`deleted_at` datetime,
+	CONSTRAINT `wingull_invites_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+ALTER TABLE `boffmedia_users` ADD CONSTRAINT `boffmedia_users_uuid_smartrotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `smartrotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `ficus_messages` ADD CONSTRAINT `ficus_messages_uuid_smartrotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `smartrotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `smartrotom_user_apps` ADD CONSTRAINT `smartrotom_user_apps_uuid_smartrotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `smartrotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;
