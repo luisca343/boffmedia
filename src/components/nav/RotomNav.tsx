@@ -25,30 +25,44 @@ import {
 } from "@/components/ui/sheet"
 import FicusAI from "../smartrotom/FicusAI";
 import Ajustes from "@/app/smartrotom/settings/page";
+import { Toaster } from "../ui/sonner";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     const { socket, connect } = useSocketStore();
+    const [notifications, setNotifications] = useState(["Test"])
     const pathname = usePathname()
+    
     useEffect(() => {
         if(!socket) {
           connect();
           return
-        }
-
+        }/*
         socket.on('patata', () => console.log('Patata'));
         socket.on('connection', () => console.log('Connected'));
-        socket.emit('patata', null);
+        socket.emit('patata', null);*/
       }, [socket, connect]);
-
 
     return (
         <nav className={`h-12 bg-zinc-900 flex items-center px-2`}>
+            <Toaster className="bg-slate-800" />
             <BotonPrev />
             <BotonNext />
             <BotonReload />
-            <BreadcrumbNav className="flex-1 mx-1"/>
-            <BotonNotification />
+            <BreadcrumbNav className="flex-1 mx-1 invisible w-0 sm:w-auto sm:visible"/>
+            <Sheet>
+                <SheetTrigger>
+                    <BotonNotification />
+                </SheetTrigger>
+                <SheetContent side="top" className="bg-zinc-900 text-white border-none" parentId="smartrotom">
+                    <SheetHeader>
+                        <SheetTitle className="text-white">Notificaciones</SheetTitle>
+                        <SheetDescription>
+                            {notifications.map((notif, i) => <div key={i} className="text-white">{notif}</div>)}
+                        </SheetDescription>
+                     </SheetHeader>
+                    </SheetContent>
+            </Sheet>
             <Sheet>
                 <SheetTrigger>
                     <BotonAjustes />

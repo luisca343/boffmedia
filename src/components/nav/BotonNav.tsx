@@ -26,7 +26,9 @@ export function BotonReload(){
 }
 
 export function BotonNotification(){
-    return <BotonNav Icono={BellAlertIcon} label="Notifications" strokeWidth={3} />
+    return <span aria-label={"Notificaciones"} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group">
+        <BellAlertIcon strokeWidth={3} height={28} width={28} className="text-rotom-500 group-hover:text-rotom-800"/>
+    </span>
 }
 
 export function BotonAjustes(){
