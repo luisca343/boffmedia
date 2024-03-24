@@ -2,15 +2,12 @@ import { Injectable } from '@nestjs/common';
 
 import OpenAI from "openai";
 import { PokemonService } from '../pokemon/pokemon.service';
-import Fuse from 'fuse.js'
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { ficusMensajes } from '@/_db/schema/FicusAI';
+import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';
 
 let openai: OpenAI;
-
-
     export type FicusMessage = {
         sender: string;
         parts: {
@@ -18,6 +15,7 @@ let openai: OpenAI;
             content: string;
         }[];
     }
+
 @Injectable()
 export class ChatService {
     constructor(
@@ -35,7 +33,7 @@ export class ChatService {
     }
 
     async getMessages(uuid: string) {
-        let res = await this.db.getDrizzle().select({content: ficusMensajes.content}).from(ficusMensajes).where(eq(ficusMensajes.uuid, uuid)).orderBy(desc(ficusMensajes.id)).limit(20).execute();
+        let res = await this.db.getDrizzle().select({content: ficusMessages.content}).from(ficusMessages).where(eq(ficusMessages.uuid, uuid)).orderBy(desc(ficusMessages.id)).limit(20).execute();
         console.log(res);
         
         let mensajes = []
@@ -47,7 +45,7 @@ export class ChatService {
     }
 
     async storeMessage(uuid:string, mensaje: FicusMessage) {
-        this.db.getDrizzle().insert(ficusMensajes).values({uuid, content:mensaje}).execute();
+        this.db.getDrizzle().insert(ficusMessages).values({uuid, content:mensaje}).execute();
     }
 
     async sendMsg(uuid: string, mensaje: FicusMessage) {
@@ -66,7 +64,7 @@ export class ChatService {
 
         const completion = await openai.chat.completions.create({
             messages: [
-                { role: "system", content: "Eres Profesor Ficus, un asistente creado por el científico del mismo nombre para ayudar a los entrenadores Pokémon de la región de Teras. Tienes errores de programación graves, a veces te volverás loco y contestarás cosas aleatorias. Si no tienes la información necesaria, di que no te han programado para eso." },
+                { role: "system", content: "Eres Profesor Ficus, un asistente creado por el científico del mismo nombre para ayudar a los entrenadores Pokémon de la región de Teras. Si no tienes la información necesaria, di que no te han programado para eso." },// Tienes errores de programación graves, a veces te volverás loco y contestarás cosas aleatorias.
                 { role: "user", content: texto },
             ],
             model: "gpt-3.5-turbo-0125",
@@ -183,7 +181,10 @@ export class ChatService {
                 if(dato === "stats") return this.sendStats(uuid, pkmName);
                 if(dato === "tipo") return this.sendTipo(uuid, pkmName);
                 if(dato === "movimientos") return this.sendMovimientos(uuid, args);
-            }
+                if(dato === "habitat") {
+                    return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre el hábitat de los Pokémon."}]});
+                }
+            } 
         
 
             
