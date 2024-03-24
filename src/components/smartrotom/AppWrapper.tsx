@@ -36,7 +36,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
               world: data.world
             });
             
-            if(response.error) {
+            if(response?.error) {
               setDatosUsuario(null);
               return
             }
@@ -102,7 +102,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
     return (
         <section id="smartrotom" className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
             <RotomNav setTema={setTema}/>
-            <div className="overflow-auto border-solid no-scrollbar flex-1 [&>*]:h-full">
+            <div className="overflow-hidden border-solid no-scrollbar flex-1  [&>*]:h-full [&>*]:overflow-auto">
                 {children}
             </div>
         </section>
