@@ -159,8 +159,8 @@ export default function Jugar(){
     async function gameOver() {
         if(open) return
         setOpen(true)
-        let obtained = obtainedRewards.map(reward => ({id: reward.reward.id, valor: reward.reward.value}))
-        await rotomPOST('/mine/endgame', {uuid: session?.user.smartRotomUser.uuid, obtained})
+        let obtained = obtainedRewards.map(reward => ({id: reward.reward.id, value: reward.reward.value}))
+        await rotomPOST('/mine/endgame', {uuid: session?.user.smartRotomUser.uuid, rewards: obtained})
         await setIndex(index + 1)
     }
 

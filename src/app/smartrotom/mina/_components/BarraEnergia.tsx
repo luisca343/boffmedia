@@ -20,6 +20,10 @@ export function BarraEnergia() {
     
 
     useEffect(() => {
+        getEnergy()
+    }, [session])
+
+    function getEnergy() {
         if(session){
             rotomGET(`/mine/energy/${session.user?.smartRotomUser.uuid}`).then((res:Energy) => {
                 setMaxEnergy(res.maxEnergy)
@@ -31,16 +35,14 @@ export function BarraEnergia() {
                 const diff = date?.getTime() - new Date().getTime() + 3600000;
                 setDiff(diff)
             })
-        }
-    }, [session])
+    }}
 
     useEffect(() => {
         const interval = setInterval(() => {
             let dif = diff - 1000;
             setDiff(diff - 1000)
             if(dif <= 0 && energy < maxEnergy) {
-                setEnergy(energy+1)
-                setDiff(3600000)
+                getEnergy()
             }
         }, 1000)
 
