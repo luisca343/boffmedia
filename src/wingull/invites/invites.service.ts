@@ -1,17 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateInviteDto } from './dto/create-invite.dto';
 import { UpdateInviteDto } from './dto/update-invite.dto';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Invite } from './entities/invite.entity';
-import { Repository } from 'typeorm';
 import { RegisterDataDto } from './dto/register-data.dto';
 import { UsersService } from '../../boffmedia/users/users.service';
-import { CreateUserDto } from '../../boffmedia/users/dto/create-user.dto';
 import { shortToLongUUID } from '../../_utils/stringUtils';
 import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
-import { SmartrotomUser } from '../../smartrotom/users/entities/user.entity';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { CreateSmartrotomUserDto } from '@/smartrotom/users/dto/create-user.dto';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 

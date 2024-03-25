@@ -18,8 +18,9 @@ export class MinaController {
     }
 
     @Post('endgame')
-    endGame(@Body() body: {uuid: string, recompensas: {valor:number, id: number}[]}) {
-      return this.minaService.endGame(body.uuid, body.recompensas);
+    endGame(@Body() body: {uuid: string, rewards: {value:number, id: number}[]}) {
+      console.log(body)
+      return this.minaService.endGame(body.uuid, body.rewards);
     }
 
     @Get('rewards')

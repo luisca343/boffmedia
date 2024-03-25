@@ -76,14 +76,15 @@ export class MinaService {
         return await this.db.getDrizzle().select().from(mineRewards);
     }
 
-    async endGame(uuid: string, recompensas: {valor:number, id: number}[] ) {
+    async endGame(uuid: string, rewards: {value:number, id: number}[] ) {
       const ultimaPartida = await this.db.getDrizzle().select({id: mineGames.id}).from(mineGames).where(eq(mineGames.uuid, uuid)).orderBy(desc(mineGames.id)).limit(1);
       const id = ultimaPartida[0].id;
       const res = await this.db.getDrizzle().select({valor: max(mineRewards.value)}).from(mineRewards);
       const valorMax = res[0].valor;
+
       
-      return this.db.getDrizzle().insert(mineGamesDetail).values(recompensas.map(recompensa => {
-          return {gameId: id, rewardId: recompensa.id, value:  valorMax / recompensa.valor, claimed: 0}
+      return this.db.getDrizzle().insert(mineGamesDetail).values(rewards.map(reward => {
+          return {gameId: id, rewardId: reward.id, value:  valorMax / reward.value, claimed: 0}
       }));
     }
 
@@ -114,7 +115,7 @@ export class MinaService {
 
     async getRanking() {
         return await this.db.getDrizzle()
-            .select({username: smartrotomUsers.username, valor: sum(mineGamesDetail.value)})
+            .select({username: smartrotomUsers.username, value: sum(mineGamesDetail.value)})
             .from(mineGames)
             .leftJoin(smartrotomUsers, eq(smartrotomUsers.uuid, mineGames.uuid))
             .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
