@@ -104,7 +104,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
     return (
         <section id="smartrotom" className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
             <RotomNav setTema={setTema}/>
-            <ToastContainer />
+            <ToastContainer position="bottom-right" theme="dark"/>
             <div className="overflow-hidden border-solid no-scrollbar flex-1  [&>*]:h-full [&>*]:overflow-auto">
                 {children}
             </div>

@@ -44,7 +44,7 @@ export default function Reclamar(){
                 return (
                     <div key={i} className="relative inline-block">
                         <Image width={64} height={64} src={`/smartrotom/img/mina/recompensas/${key.split(':')[1]}.png`} alt="Reward" className="w-32 h-32 object-cover relative" />
-                        <span className="absolute bottom-0 right-0 bg-primary-500 text-white text-sm rounded-full h-6 w-6 flex items-center justify-center">
+                        <span className="absolute bottom-0 right-0 bg-primary-400 text-white text-md rounded-full h-8 w-8 flex items-center justify-center">
                             {unclaimed[key]}
                         </span>
                     </div>
@@ -52,7 +52,7 @@ export default function Reclamar(){
             })
             : <h2>Nada para reclamar</h2>
         }
-        <button onClick={() => claimReward()} className="bg-primary-500 text-white rounded-md p-2 mt-4">Reclamar</button>
+        <button onClick={() => claimReward()} className="bg-primary-400 text-white rounded-md p-2 mt-4">Reclamar</button>
         </div>
     </MenuWrapper>
     )

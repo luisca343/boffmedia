@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 export function BotonNav({Icono, strokeWidth = 4, onClick = null, label} : {onClick?:any,strokeWidth?: number, Icono: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>>, label: string}){
     return (
         <button aria-label={label} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group" onClick={onClick}>
-            <Icono strokeWidth={strokeWidth} height={28} width={28} className="text-primary-500 group-hover:text-primary-800"/>
+            <Icono strokeWidth={strokeWidth} height={28} width={28} className="text-primary-400 group-hover:text-primary-600"/>
         </button>
     )
 }
@@ -27,18 +27,18 @@ export function BotonReload(){
 
 export function BotonNotification(){
     return <span aria-label={"Notificaciones"} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group">
-        <BellAlertIcon strokeWidth={3} height={28} width={28} className="text-primary-500 group-hover:text-primary-800"/>
+        <BellAlertIcon strokeWidth={3} height={28} width={28} className="text-primary-400 group-hover:text-primary-600"/>
     </span>
 }
 
 export function BotonAjustes(){
     return <span aria-label={"Ajustes"} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group">
-        <Cog6ToothIcon strokeWidth={3} height={28} width={28} className="text-primary-500 group-hover:text-primary-800"/>
+        <Cog6ToothIcon strokeWidth={3} height={28} width={28} className="text-primary-400 group-hover:text-primary-600"/>
     </span>
 }
 
 export function BotonIA(){
     return <span aria-label={"IA"} className="rounded-lg border-0 h-8 w-8 mx-1 bg-white flex items-center justify-center group">
-        <CpuChipIcon strokeWidth={2} height={28} width={28} className="text-primary-500 group-hover:text-primary-800"/>
+        <CpuChipIcon strokeWidth={2} height={28} width={28} className="text-primary-400 group-hover:text-primary-600"/>
     </span>
 }

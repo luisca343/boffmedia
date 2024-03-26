@@ -27,6 +27,7 @@ import FicusAI from "../smartrotom/FicusAI";
 import Ajustes from "@/app/smartrotom/settings/page";
 import { Toaster } from "../ui/sonner";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
+import { Badge } from "../ui/badge";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
@@ -52,26 +53,32 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
         socket.emit('patata', null);*/
       }, [socket, connect]);
 
+
+      
+    function Notifications(){
+        return(
+            <div className="flex flex-col  bg-gray-300 w-[33vw] rounded-md">
+                <header className="flex justify-between items-center bg-gray-800 p-4">
+                    <h2 className="text-white">Notificaciones</h2>
+                    <button onClick={clear} className="text-white">Limpiar</button>
+                    <button onClick={markAllAsRead} className="text-white">Marcar todas como leídas</button>
+                    <span className="text-white">{unreadCount}</span>
+                </header>
+                <div className="flex flex-col bg-gray-300 p-4">
+                    {notifications.map((notif, i) => <div key={i} className="text-white bg-gray-500 p-2 m-2">{notif.content?.toString()}</div>)}
+                </div>
+
+        </div>
+        )
+    }
+
     return (
         <nav className={`h-12 bg-zinc-900 flex items-center px-2`}>
             <Toaster className="bg-slate-800" />
             <BotonPrev />
             <BotonNext />
             <BotonReload />
-            <BreadcrumbNav className="flex-1 mx-1 invisible w-0 sm:w-auto sm:visible"/>
-            <Sheet>
-                <SheetTrigger>
-                    <BotonNotification />
-                </SheetTrigger>
-                <SheetContent side="top" className="bg-zinc-900 text-white border-none" parentId="smartrotom">
-                    <SheetHeader>
-                        <SheetTitle className="text-white">Notificaciones</SheetTitle>
-                        <SheetDescription>
-                            {notifications.map((notif, i) => <div key={i} className="text-white">{notif.content?.toString()}</div>)}
-                        </SheetDescription>
-                     </SheetHeader>
-                    </SheetContent>
-            </Sheet>
+            <BreadcrumbNav className="flex-1 mx-1 invisible w-0 sm:w-auto sm:visible "/>
             <Sheet>
                 <SheetTrigger>
                     <BotonAjustes />
@@ -99,6 +106,17 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                         </SheetDescription>
                     </SheetContent>
             </Sheet>
+            <Popover>
+                <PopoverTrigger className="relative">
+                    <BotonNotification />
+                    {
+                        notifications.length > 0 && <Badge className="z-10 px-2 -bottom-2 -right-2 absolute bg-primary-400 text-black hover:bg-primary-400">{unreadCount}</Badge>
+                    }
+                </PopoverTrigger>
+                <PopoverContent className="z-10">
+                    <Notifications />
+                </PopoverContent>
+            </Popover>
             <Hora className="text-white text-3xl mx-1" />
             <SocketStatus socket={socket}/>
            

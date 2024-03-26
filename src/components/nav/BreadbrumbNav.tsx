@@ -32,7 +32,7 @@ function Breadcrumb({nombre, index}: {nombre: string, index: number}){
     const texto = nombre == 'smartrotom' ? <HomeIcon height={20} width={20} strokeWidth={2.5}/> : nombre
 
     return (
-        <Badge onClick={() => navegar(router, nombre, index)} className="text-sm bg-primary-500 hover:bg-primary-600 hover:cursor-pointer text-white hover:text-primary-800  border-black border-2" key={index} >
+        <Badge onClick={() => navegar(router, nombre, index)} className="text-sm bg-primary-400 hover:bg-primary-600 hover:cursor-pointer text-black hover:text-white  border-black border shadow-sm shadow-black" key={index} >
             {texto}
         </Badge>
     )
