@@ -37,5 +37,10 @@ export class MinaController {
     async getRanking() {
       return await this.minaService.getRanking();
     }
+
+    @Get('unclaimed/:uuid')
+    async getUnclaimed(@Param('uuid') uuid: string) {
+      return await this.minaService.getUnclaimed(uuid);
+    }
   
 }

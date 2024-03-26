@@ -2,7 +2,7 @@ import {mineGamesDetail, mineGames, mineRewards } from '@/_db/schema/Mine';
 import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
-import { desc, eq, max, sum } from 'drizzle-orm';
+import { and, desc, eq, max, sum } from 'drizzle-orm';
 import { ResultSetHeader } from 'mysql2';
 
 @Injectable()
@@ -121,6 +121,25 @@ export class MinaService {
             .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
             .groupBy(smartrotomUsers.uuid)
             .orderBy(desc(sum(mineGamesDetail.value)));
+    }
+
+    async getUnclaimed(uuid: string) {
+        const res = await this.db.getDrizzle().select({itemId: mineRewards.itemId})
+            .from(mineGames)
+            .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
+            .leftJoin(mineRewards, eq(mineRewards.id, mineGamesDetail.rewardId))
+            .where(and(eq(mineGames.uuid, uuid), eq(mineGamesDetail.claimed, 0)));
+
+        // Group by item
+        let arr =  res.reduce((acc, curr) => {
+            if(!acc[curr.itemId]) {
+                acc[curr.itemId] = 0;
+            }
+            acc[curr.itemId]++;
+            return acc;
+        }, {} as {[key: string]: number});
+        
+        return arr;
     }
 
 }
