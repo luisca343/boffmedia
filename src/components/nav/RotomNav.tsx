@@ -26,11 +26,20 @@ import {
 import FicusAI from "../smartrotom/FicusAI";
 import Ajustes from "@/app/smartrotom/settings/page";
 import { Toaster } from "../ui/sonner";
+import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     const { socket, connect } = useSocketStore();
-    const [notifications, setNotifications] = useState(["Test"])
+    const {
+      notifications,
+      clear,
+      markAllAsRead,
+      markAsRead,
+      remove,
+      unreadCount
+    } = useNotificationCenter();
+  
     const pathname = usePathname()
     
     useEffect(() => {
@@ -58,7 +67,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                     <SheetHeader>
                         <SheetTitle className="text-white">Notificaciones</SheetTitle>
                         <SheetDescription>
-                            {notifications.map((notif, i) => <div key={i} className="text-white">{notif}</div>)}
+                            {notifications.map((notif, i) => <div key={i} className="text-white">{notif.content?.toString()}</div>)}
                         </SheetDescription>
                      </SheetHeader>
                     </SheetContent>
@@ -100,7 +109,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
 function BotonNav({Icono, strokeWidth = 5, onClick = null} : {onClick?:any,strokeWidth?: number, Icono: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>>}){
     return (
         <button className="rounded-lg border-0 h-8 w-8 mx-2 bg-white flex items-center justify-center" onClick={onClick}>
-            <Icono strokeWidth={strokeWidth} height={28} width={28} className="text-rotom-500"/>
+            <Icono strokeWidth={strokeWidth} height={28} width={28} className="text-primary-500"/>
         </button>
     )
 }

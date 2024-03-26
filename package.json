@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.2.1",
+    "@ckeditor/ckeditor5-react": "^6.2.0",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@heroicons/react": "^2.1.1",
@@ -34,6 +36,7 @@
     "react-dom": "^18",
     "react-hook-form": "^7.51.0",
     "react-pageflip": "^2.0.3",
+    "react-toastify": "^10.0.5",
     "sharp": "^0.33.2",
     "simplex-noise": "^4.0.1",
     "skinview3d": "^3.0.1",
