@@ -17,7 +17,7 @@ export default function BreadcrumbNav({className} : {className?: string}){
                 const href = '/' + parts.slice(0, index + 1).join('/')
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
-                        <span className="text-3xl font-bold m-1 text-rotom">/</span>
+                        <span className="text-3xl font-bold m-1 text-primary">/</span>
                         <Breadcrumb nombre={part} index={index} key={index} />
                     </React.Fragment>
                 )
@@ -32,7 +32,7 @@ function Breadcrumb({nombre, index}: {nombre: string, index: number}){
     const texto = nombre == 'smartrotom' ? <HomeIcon height={20} width={20} strokeWidth={2.5}/> : nombre
 
     return (
-        <Badge onClick={() => navegar(router, nombre, index)} className="text-sm bg-rotom-500 hover:bg-rotom-600 hover:cursor-pointer text-white hover:text-rotom-800  border-black border-2" key={index} >
+        <Badge onClick={() => navegar(router, nombre, index)} className="text-sm bg-primary-500 hover:bg-primary-600 hover:cursor-pointer text-white hover:text-primary-800  border-black border-2" key={index} >
             {texto}
         </Badge>
     )

@@ -14,8 +14,6 @@ type Invitacion = {
     username: string;
     uuid: string;
   }
-  
-  
 
 export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) {
     const router = useRouter();

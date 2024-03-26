@@ -11,13 +11,8 @@ const formSchema = z.object({
   password: z.string(),
 });
 
-
-
-
 export default async function Invitacion({params}: {params: {id: string}}){
     const invitacion = await wingullGET(`/invites/${params.id}`)
-
-
     if(!invitacion?.id) return(<h1>Invitacion no encontrada {params.id}</h1>)
     if(invitacion.usedAt) return(<h1>Invitacion ya usada {params.id}</h1>)
 

@@ -7,6 +7,8 @@ import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
 import AuthForm from "@/app/auth/AuthForm";
 import { Loading } from "./Loading";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export type BoffSession = {
     user: {
@@ -102,6 +104,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
     return (
         <section id="smartrotom" className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
             <RotomNav setTema={setTema}/>
+            <ToastContainer />
             <div className="overflow-hidden border-solid no-scrollbar flex-1  [&>*]:h-full [&>*]:overflow-auto">
                 {children}
             </div>
@@ -111,7 +114,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
 
 function RotomError({error}: {error: string}) {
     return (
-        <div className="flex flex-col items-center justify-center h-full bg-rotom-400 text-rotom-950 font-bold">
+        <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-bold">
             <h1>Error</h1>
             <p>{error}</p>
         </div>
