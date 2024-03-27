@@ -41,7 +41,7 @@ CREATE TABLE `mine_rewards` (
 	`type` varchar(32) NOT NULL,
 	`item_id` varchar(32) NOT NULL,
 	`width` int NOT NULL,
-	`heigth` int NOT NULL,
+	`height` int NOT NULL,
 	CONSTRAINT `mine_rewards_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -66,6 +66,32 @@ CREATE TABLE `smartrotom_users` (
 	`energy` int DEFAULT 10,
 	`last_charge` timestamp DEFAULT CURRENT_TIMESTAMP(),
 	CONSTRAINT `smartrotom_users_uuid` PRIMARY KEY(`uuid`)
+);
+--> statement-breakpoint
+CREATE TABLE `starbank_accounts` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`name` varchar(32) NOT NULL,
+	`balance` int DEFAULT 0,
+	`type` varchar(32) NOT NULL,
+	CONSTRAINT `starbank_accounts_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `starbank_transactions` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`from` int NOT NULL,
+	`to` int NOT NULL,
+	`amount` int NOT NULL,
+	`from_balance` int NOT NULL,
+	`to_balance` int NOT NULL,
+	`concept` varchar(255) NOT NULL,
+	`type` varchar(32) NOT NULL,
+	`date` varchar(32) NOT NULL,
+	CONSTRAINT `starbank_transactions_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `starbank_users_accounts` (
+	`uuid` varchar(36) NOT NULL,
+	`account_id` int NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `wingull_invites` (

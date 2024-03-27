@@ -18,6 +18,9 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MinaService } from './smartrotom/mine/mine.service';
 import { MinaController } from './smartrotom/mine/mine.controller';
+import { StarbankController } from './smartrotom/starbank/starbank.controller';
+import { StarbankService } from './smartrotom/starbank/starbank.service';
+import { StarbankModule } from './smartrotom/starbank/starbank.module';
 
 @Module({
   imports: [
@@ -41,9 +44,10 @@ import { MinaController } from './smartrotom/mine/mine.controller';
     UsersModule,
     InvitesModule,
     ChatModule,
-    PokemonModule
+    PokemonModule,
+    StarbankModule
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService],
 })
 export class AppModule {}

@@ -124,7 +124,7 @@ export class MinaService {
     }
 
     async getUnclaimed(uuid: string) {
-        const res = await this.db.getDrizzle().select({itemId: mineRewards.itemId})
+        const res = await this.db.getDrizzle().select({itemId: mineRewards.itemId, name: mineRewards.name})
             .from(mineGames)
             .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
             .leftJoin(mineRewards, eq(mineRewards.id, mineGamesDetail.rewardId))
@@ -135,7 +135,7 @@ export class MinaService {
             if(!acc[curr.itemId]) {
                 acc[curr.itemId] = 0;
             }
-            acc[curr.itemId]++;
+            acc[curr.itemId] += 1;
             return acc;
         }, {} as {[key: string]: number});
         
