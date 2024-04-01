@@ -1,5 +1,6 @@
-export function isMinecraft() {
-    return 'mcefQuery' in window && typeof window.mcefQuery === 'function';
+export async function isMinecraft() {
+    const usuario = await getDatosUsuarioMC();
+    return usuario?.username ? true : false;
 }
 
 export async function getDatosUsuarioMC(){
@@ -31,7 +32,8 @@ export async function mcefQuery(query: string, data: Object = {}){
                 }
             });
         } catch (error) {
-            
+            resolve({error});
+            console.warn('Error calling mcefQuery: ' + error);
         }
     });
 }
