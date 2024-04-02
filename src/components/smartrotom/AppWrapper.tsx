@@ -37,7 +37,6 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
               uuid: data.uuid,
               world: data.world
             });
-            
             if(response?.error) {
               setDatosUsuario(null);
               return
