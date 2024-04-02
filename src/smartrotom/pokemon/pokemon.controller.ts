@@ -16,12 +16,16 @@ export class PokemonController {
     countPokemon() {
         return this.pokemonService.countPokemon();
     }
-    @Get(':name')
+    @Get('species/:name')
     getPokemonByName(@Param('name') name: string){
         return this.pokemonService.getPokemonByName(name);
     }
     @Get('stats/:name')
     getStatsByName(@Param('name') name: string){
         return this.pokemonService.getStatsByName(name);
+    }
+    @Get('sheet')
+    getSheet(){
+        return this.pokemonService.getFromGoogleSheets();
     }
 }
