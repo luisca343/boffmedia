@@ -34,7 +34,10 @@ export class UsersController {
 
     // Check if user has a main account, if not, create it
     let accounts = await this.starbankService.getAccounts(data.uuid);
-    if(accounts.length === 0) await this.starbankService.createMainAccount(data.uuid);
+    if(accounts.length === 0) {
+      console.log(`User doesn't have accounts: ${accounts}`)
+      await this.starbankService.createMainAccount(data.uuid, data.username);
+    }
     accounts = await this.starbankService.getAccounts(data.uuid);
 
     console.log(`User has accounts: ${accounts}`)
