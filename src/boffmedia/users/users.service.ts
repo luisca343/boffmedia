@@ -111,12 +111,12 @@ export class UsersService {
 
   getSessionUser({boffmedia_users, smartrotom_users}: {boffmedia_users: BoffMediaUser, smartrotom_users: SmartRotomUser}){
     return {
-      username: boffmedia_users.username,
-      email: boffmedia_users.email,
+      username: boffmedia_users?.username,
+      email: boffmedia_users?.email,
       smartRotomUser: {
-        username: smartrotom_users.username,
-        uuid: smartrotom_users.uuid,
-        world: smartrotom_users.world
+        username: smartrotom_users?.username,
+        uuid: smartrotom_users?.uuid,
+        world: smartrotom_users?.world
       }
     } as SessionUser;
   }
