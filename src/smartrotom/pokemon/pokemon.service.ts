@@ -66,7 +66,7 @@ export class PokemonService {
         const pkm = result[0].item;
         return pkm.forms[0].battleStats
     }
-    async getFromGoogleSheets() {
+    async getFromGoogleSheets(name : string) {
         //AIzaSyCxjks7gBH5U1FtDd_Y1QOvOciSlr1XtQE
         const auth = new google.auth.GoogleAuth({
             keyFile: 'boffmedia-a39cdd7a63c7.json',
@@ -79,7 +79,7 @@ export class PokemonService {
         const sheets = google.sheets({ version: 'v4', auth: client }) as sheets_v4.Sheets;
      
            const spreadsheetId = '1ypFa113-jMFGb26e2ZsGzas2_8Vvnv3mAE4cQXat2co';
-        const range = 'Pokemonchos!A:A';
+        const range = `Pokemonchos!${name}:${name}`;
     
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,

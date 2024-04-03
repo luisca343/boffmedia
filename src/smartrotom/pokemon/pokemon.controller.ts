@@ -24,8 +24,8 @@ export class PokemonController {
     getStatsByName(@Param('name') name: string){
         return this.pokemonService.getStatsByName(name);
     }
-    @Get('sheet')
-    getSheet(){
-        return this.pokemonService.getFromGoogleSheets();
+    @Get('sheet/:name')
+    getSheet(@Param('name') name: string){
+        return this.pokemonService.getFromGoogleSheets(name);
     }
 }
