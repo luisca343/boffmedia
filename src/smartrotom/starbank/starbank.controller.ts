@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { StarbankService } from './starbank.service';
 
 @Controller('smartrotom/starbank')
@@ -14,13 +14,13 @@ export class StarbankController {
         return this.starbankService.getAccounts(uuid);
     }
 
-    @Get("create/:uuid/:name")
-    createAccount(@Param("uuid") uuid: string, @Param("name") name: string){
-        return this.starbankService.createAccount(uuid, name);
+    @Post("shop")
+    shop(@Body() body: {uuid: string, npcName: string, itemName: string, operation: string, unitPrice: number, count: number}){
+        return this.starbankService.shop(body);
     }
 
-    @Get("createMain/:uuid")
-    createMainAccount(@Param("uuid") uuid: string){
-        return this.starbankService.createMainAccount(uuid);
+    @Get("transactions/:uuid")
+    getTransactions(@Param("uuid") uuid: string){
+        return this.starbankService.getTransactions(uuid);
     }
 }
