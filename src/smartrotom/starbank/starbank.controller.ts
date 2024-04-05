@@ -23,4 +23,9 @@ export class StarbankController {
     getTransactions(@Param("uuid") uuid: string){
         return this.starbankService.getTransactions(uuid);
     }
+
+    @Get("transfers/:uuid")
+    getTransfers(@Param("uuid") uuid: string){
+        return this.starbankService.getTransfers(uuid);
+    }
 }

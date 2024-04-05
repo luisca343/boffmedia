@@ -128,6 +128,33 @@ export class StarbankService {
             .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
             .innerJoin(starBankUsersAccounts, or(eq(toJoin.id, starBankUsersAccounts.accountId), eq(fromJoin.id, starBankUsersAccounts.accountId)))
             .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
+            .limit(10)
+            .orderBy(desc(starBankTransactions.date))
+
+            console.log(res)
+
+        return res
+    }
+
+    async getTransfers(uuid: string) {
+        const toJoin = alias(starBankAccounts, "to");
+        const fromJoin = alias(starBankAccounts, "from");
+        
+        const res = await this.db.getDrizzle().select(
+            {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
+                reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
+                toBalance: starBankTransactions.toBalance, type: starBankTransactions.type, 
+                toName: toJoin.name, fromName: fromJoin.name, toType: toJoin.type, fromType: fromJoin.type,
+                date: starBankTransactions.date
+            }
+            
+            ).from(starBankTransactions)
+            .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
+            .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+            .innerJoin(starBankUsersAccounts, or(eq(toJoin.id, starBankUsersAccounts.accountId), eq(fromJoin.id, starBankUsersAccounts.accountId)))
+            .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
+            .where(eq(starBankTransactions.type, "TRANSFERENCIA"))
+            .limit(10)
             .orderBy(desc(starBankTransactions.date))
 
             console.log(res)
