@@ -20,7 +20,7 @@ const handler = NextAuth({
 
             
 
-            if (user) {
+            if (user && !user.error) {
               return Promise.resolve(user)
             } else {
               return Promise.resolve(null)
