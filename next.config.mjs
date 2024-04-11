@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import nextTranslate from 'next-translate-plugin';
 
 const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
@@ -31,4 +32,7 @@ const nextConfig = {
     },
 };
 
-export default bundleAnalyzer(nextConfig);
+
+
+
+export default bundleAnalyzer(nextTranslate(nextConfig));
