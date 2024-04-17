@@ -21,6 +21,12 @@ export class PokemonController {
     getPokemonNames() {
         return this.pokemonService.getPokemonNames();
     }
+    @Get('nameforms')
+    getSpeciesByNameWithForm() {
+        return this.pokemonService.getSpeciesByNameWithForm();
+    }
+
+
     @Get('forms')
     getForms() {
         return this.pokemonService.getPokemonByForm();
@@ -45,7 +51,11 @@ export class PokemonController {
     countPokemon() {
         return this.pokemonService.countPokemon();
     }
-    @Get('species/:name')
+    @Get('nextprev/:id')
+    getNextPrev(@Param('id') id: string) {
+        return this.pokemonService.getNextPrev(parseInt(id));
+    }
+    @Get('search/species/:name')
     getPokemonByName(@Param('name') name: string){
         return this.pokemonService.getPokemonByName(name);
     }
@@ -56,5 +66,10 @@ export class PokemonController {
     @Get('sheet/:name')
     getSheet(@Param('name') name: string){
         return this.pokemonService.getFromGoogleSheets(name);
+    }
+
+    @Get('evotree/:id')
+    getEvoTree(@Param('id') id: string){
+        return this.pokemonService.getEvoTree(parseInt(id));
     }
 }
