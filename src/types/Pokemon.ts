@@ -134,6 +134,7 @@ export interface Evolution {
     conditions: any[];
     evoType: string;
     moves?: string[];
+    level?: number;
 }
 
 export interface Item {
