@@ -11,7 +11,10 @@ export class PokemonService {
     pokemonList = [];
     species = [];
 
+    highestDex = 0;
     speciesByDex = {}
+    speciesByName = {}
+    speciesByNameWithForm = {}
     speciesByForm = {}
     speciesByPalette = {}
     speciesByType = {}
@@ -19,17 +22,37 @@ export class PokemonService {
     speciesByAbility = {}
 
     async loadData() {
-        console.log("Loading pokemon data");
-        const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/data/species');
+        const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_datapack/data/pixelmon/species');
+        const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/datapack/data/pixelmon/species');
+
+        const defaultDir = await fsPromises.readdir(defaultDirDef);
         const dir = await fsPromises.readdir(publicDir);
-        for (const file of dir) {
+        
+        const fullDir = [...new Set([...defaultDir, ...dir])];
+        
+        let defaultCounter = 0;
+        let terasCounter = 0;
+
+        for (const file of fullDir) {
             if (!file || !file.includes(".json")) continue;
-            const fileName = path.join(publicDir, file);
-            const data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Pokemon;
+            let fileName = path.join(publicDir, file);
+            let data;
+            if(fs.existsSync(fileName)) {
+                data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Pokemon;
+                terasCounter++;
+            } else {
+                fileName = path.join(defaultDirDef, file);
+                data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Pokemon;
+                defaultCounter++;
+            }
     
             this.pokemonList.push(file.split(".")[0].split("_")[1]);
             this.species.push(data);
             this.speciesByDex[data.dex] = data;
+            this.speciesByName[data.name] = data;
+            if (data.dex > this.highestDex) {
+                this.highestDex = data.dex;
+            }
     
             data.forms?.forEach((form) => {
                 if(!form) return;
@@ -37,6 +60,10 @@ export class PokemonService {
                     this.speciesByForm[form.name] = [];
                 }
 
+                const nameWithForm = `${data.name}_${form.name}`;
+      
+                this.speciesByNameWithForm[nameWithForm] = form
+            
                 form.pkmDex = data.dex;
                 form.pkmName = data.name;
                 form.pkmGeneration = data.generation;
@@ -100,6 +127,7 @@ export class PokemonService {
         });
     
         console.log(`Cargadas ${this.species.length} especies y ${Object.keys(this.speciesByForm).length} formas diferentes, para un total de ${totalForms} Pokémon`);
+        console.log(`Cargados ${defaultCounter} archivos predeterminados y ${terasCounter} archivos modificados`);
     }
     
 
@@ -119,6 +147,9 @@ export class PokemonService {
         return dex.map((d) => this.speciesByDex[d]);
     }
     
+    getSpeciesByNameWithForm() {
+        return this.speciesByNameWithForm;
+    }
 
     getPokemon() {
         return this.species;
@@ -157,7 +188,17 @@ export class PokemonService {
         }
         const fuse = new Fuse<any>(this.species, options);
         const result = fuse.search(name);
-        return result;
+        return result.slice(0, 5)
+    }
+
+    getNextPrev(id: number) {
+        const currIndex = Object.keys(this.speciesByDex).findIndex((dex) => parseInt(dex) === id);
+
+        const next = currIndex < Object.keys(this.speciesByDex).length - 1 ? this.speciesByDex[Object.keys(this.speciesByDex)[currIndex + 1]] : this.speciesByDex[1];
+        const prev = currIndex > 1 ? this.speciesByDex[Object.keys(this.speciesByDex)[currIndex - 1]] : this.speciesByDex[this.highestDex];
+        
+
+        return { prev, next }
     }
 
 
@@ -199,8 +240,155 @@ export class PokemonService {
             if(parseInt(cell[0]) > max) max = parseInt(cell[0]);
         });
    
-        console.log(max); 
         return max;
     }
+
+    getEvoTree(id: number) {
+        const pkm = this.speciesByDex[id] as Pokemon;
+        let preEvo = pkm
+        while(preEvo.forms[0].preEvolutions?.length > 0){
+            const preEvoName = preEvo.forms[0].preEvolutions[0]
+            preEvo = this.speciesByName[preEvoName]
+        }
+        const evoTree = this.getEvos(preEvo, 'all')
+        return evoTree
+
+        
+    }
+
+    getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
+        if(currentForm === '') currentForm = 'base'
+        let index = 0
+        for(const form of pokemon.forms){
+            const formName = form.name || 'base'
+            const pkmId = `${pokemon.name}_${formName}`
+            let currentPokemon = evos[pkmId]
+            if((currentForm !='all' || formName.includes('gmax')) && formName !== currentForm )  continue;
+            
+
+            if(Object.keys(evos).length === 0 || ! evos.pkm){
+                evos[pkmId] = {pkm: pokemon.name, evos: {}, dex: pokemon.dex}
+                currentPokemon = evos[pkmId]
+            } else {
+                currentPokemon = evos
+            }
+
+            if(!form.evolutions) {
+                continue;
+            }
+
+            for (const evo of form.evolutions){
+                const [evoPokemonName, evoFormName] = this.getFormName(evo.to)
+                const evoId = `${evoPokemonName}_${evoFormName}`
+                if(!currentPokemon.evos) currentPokemon.evos = {}
+                const evoArray = currentPokemon.evos
+                if(!evoArray[evoId]){
+                    evoArray[evoId] = {pkm: evoPokemonName, evos: {}, dex: this.speciesByName[evoPokemonName].dex}
+                }
+                
+                const thisEvo = evoArray[evoId]
+                if(! evoArray[evoId].methods){
+                    evoArray[evoId].methods = []
+                }
+                evoArray[evoId].methods.push(evo)
+
+                const evoPkm = this.speciesByName[evoPokemonName]
+                let evoEvo = this.getEvos(evoPkm, evoFormName, evoArray[evoId]) as any
+                /*
+                if (formName === currentForm || currentForm === 'all'){
+                    const evoPkm = this.speciesByName[evoPokemonName]
+                    let evoEvo = this.getEvos(evoPkm, evoFormName) as any
+                    if(!evoEvo.methods){
+                        evoEvo.methods = []
+                    }
+                    evoEvo.methods.push(evo)
+                    
+                    if (Object.keys(evoEvo).length === 0){
+                        evoEvo = this.getEvos(evoPkm, 'all')
+                        evos[pkmId].evos.push(evoEvo)
+                        break;
+                    }
+
+                    evos[pkmId].evos.push(evoEvo)
+                }*/
+            }
+            index++
+        }
+        return {tree:evos, depth: this.getEvoTreeDepth(evos)}
+    }
+
+    getEvoTreeDepth(evos: any, depth = 0){
+        let maxDepth = depth
+        for(const evo in evos){
+            const evoDepth = this.getEvoTreeDepth(evos[evo].evos, depth + 1)
+            if(evoDepth > maxDepth) maxDepth = evoDepth
+        }
+        return maxDepth
+    }
+
+    getEvos2(pokemon: Pokemon, currentForm: string, evos = {}){
+        if(currentForm === '') currentForm = 'base'
+        let index = 0
+        for(const form of pokemon.forms){
+            const formName = form.name || 'base'
+            const pkmId = `${pokemon.name}_${formName}`
+            if((currentForm !='all' || formName.includes('gmax')) && formName !== currentForm )  continue;
+            evos[pkmId] = {pkm: pokemon.name, evos: {}}
+
+            if(!form.evolutions) {
+                continue;
+            }
+
+            for (const evo of form.evolutions){
+                const [evoPokemonName, evoFormName] = this.getFormName(evo.to)
+                const evoId = `${evoPokemonName}_${evoFormName}`
+                if(!evos[pkmId].evos) evos[pkmId].evos = {}
+                const evoArray = evos[pkmId].evos
+                if(!evoArray[evoId]){
+                    evoArray[evoId] = {pkm: evoPokemonName, evos: {}}
+                }
+                const thisEvo = evoArray[evoId]
+                if(! evoArray[evoId].methods){
+                    evoArray[evoId].methods = []
+                }
+                evoArray[evoId].methods.push(evo)
+
+                /*
+                if (formName === currentForm || currentForm === 'all'){
+                    const evoPkm = this.speciesByName[evoPokemonName]
+                    let evoEvo = this.getEvos(evoPkm, evoFormName) as any
+                    if(!evoEvo.methods){
+                        evoEvo.methods = []
+                    }
+                    evoEvo.methods.push(evo)
+                    
+                    if (Object.keys(evoEvo).length === 0){
+                        evoEvo = this.getEvos(evoPkm, 'all')
+                        evos[pkmId].evos.push(evoEvo)
+                        break;
+                    }
+
+                    evos[pkmId].evos.push(evoEvo)
+                }*/
+            }
+            index++
+        }
+        return evos
+    }
+    
+    getFormName(nombre:string){
+        let [nombrePkm, forma] = [nombre, 'base']
+        if(nombre.includes(' form:')){
+            [nombrePkm, forma] = nombre.split(' form:')
+        }
+        if(nombre.includes(' f:')){
+            [nombrePkm, forma] = nombre.split(' f:')
+        }
+        if(nombre.includes(' palette:')){
+            [nombrePkm, forma] = nombre.split(' palette:')
+        }
+      
+        return [nombrePkm, forma]
+      }
 
 }
