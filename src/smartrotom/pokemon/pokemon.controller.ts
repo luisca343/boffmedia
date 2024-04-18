@@ -8,6 +8,18 @@ export class PokemonController {
     getPokemon() {
         return this.pokemonService.getPokemon();
     }
+    @Get('defensivescoreranking')
+    getDefensiveScoreRanking() {
+        return this.pokemonService.getDefensiveScoreRanking();
+    }
+    @Get('offensivescoreranking')
+    getOffensiveScoreRanking() {
+        return this.pokemonService.getOffensiveScoreRanking();
+    }
+    @Get('overallscoreranking')
+    getOverallScoreRanking() {
+        return this.pokemonService.getOverallRanking();
+    }
     @Get('dex/:dex')
     getPokemonByDex(@Param('dex') dex: number) {
         return this.pokemonService.getPokemonByDex(dex);
@@ -25,7 +37,6 @@ export class PokemonController {
     getSpeciesByNameWithForm() {
         return this.pokemonService.getSpeciesByNameWithForm();
     }
-
 
     @Get('forms')
     getForms() {

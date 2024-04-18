@@ -5,6 +5,7 @@ import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
 import { promises as fsPromises } from 'fs';
 import { Pokemon } from '@/types/pokemon';
+import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking } from './utils/types';
 
 @Injectable()
 export class PokemonService {
@@ -20,6 +21,7 @@ export class PokemonService {
     speciesByType = {}
     speciesByEggGroup = {}
     speciesByAbility = {}
+    finalForms = {}
 
     async loadData() {
         const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_datapack/data/pixelmon/species');
@@ -33,10 +35,12 @@ export class PokemonService {
         let defaultCounter = 0;
         let terasCounter = 0;
 
+        const startingTime = Date.now();
+
         for (const file of fullDir) {
             if (!file || !file.includes(".json")) continue;
             let fileName = path.join(publicDir, file);
-            let data;
+            let data: Pokemon;
             if(fs.existsSync(fileName)) {
                 data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Pokemon;
                 terasCounter++;
@@ -72,6 +76,11 @@ export class PokemonService {
     
                 const genderProperties = form?.genderProperties && form.genderProperties.length > 0 ? form.genderProperties[0] : undefined;
                 const palettes = genderProperties?.palettes;
+
+                if(!form.evolutions || form.evolutions.length === 0){
+                    this.finalForms[data.name] = form;
+                }
+                
     
                 if(palettes){
                     palettes.forEach((palette) => {
@@ -126,8 +135,14 @@ export class PokemonService {
             totalForms += forms.length;
         });
     
+
+
+
         console.log(`Cargadas ${this.species.length} especies y ${Object.keys(this.speciesByForm).length} formas diferentes, para un total de ${totalForms} Pokémon`);
+        console.log(`Cargadas ${Object.keys(this.finalForms).length} formas evolutivas finales`);
         console.log(`Cargados ${defaultCounter} archivos predeterminados y ${terasCounter} archivos modificados`);
+        const endTime = Date.now();
+        console.log(`Tiempo de carga: ${endTime - startingTime}ms`);
     }
     
 
@@ -390,5 +405,20 @@ export class PokemonService {
       
         return [nombrePkm, forma]
       }
+
+      getDefensiveScore(type1: string, type2: string) {
+        return getDeffensiveScore(type1, type2)
+    }
+    getDefensiveScoreRanking() {
+        return getDeffensiveScoreRanking()
+    }
+
+    getOffensiveScoreRanking() {
+        return getOffensiveScoreRanking()
+    }
+
+    getOverallRanking() {
+        return getOverallScoreRanking()
+    }
 
 }
