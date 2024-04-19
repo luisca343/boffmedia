@@ -13,7 +13,7 @@ export async function EvoTree({params}: {params: {id: string}}){
     const { t } = useTranslation("smartrotom/pokedex/common")
 
     function renderTree2(tree: any){
-        return <div className=" h-full flex-col justify-center items-center bg-zinc-800 rounded-lg m-2" >
+        return <div className=" h-full flex-col justify-center items-center  rounded-lg m-2" >
           {Object.keys(tree).map((key) => {
             const [pkmName, form] = key.split('_')
             const subTree = tree[key]
@@ -41,7 +41,7 @@ export async function EvoTree({params}: {params: {id: string}}){
 
 
     function renderTree(tree: any){
-        return <div className=" h-full flex-col justify-center items-center bg-zinc-800 rounded-lg m-2" >
+        return <div className=" h-full flex-col justify-center items-center  rounded-lg m-2" >
           {Object.keys(tree).map((key) => {
             const [pkmName, form] = key.split('_')
             const subTree = tree[key]
@@ -76,7 +76,7 @@ export async function EvoTree({params}: {params: {id: string}}){
     }
 
     return <div>
-        <div className=" bg-zinc-800 text-white flex justify-center ">
+        <div className="  text-white text-shadow-border1 flex justify-center ">
             {depth > 1 ? renderTree(tree) : <div className=" h-full flex-col justify-center items-center bg-zinc-800 rounded-lg m-2" >
                     Este Pokémon no tiene evoluciones
             </div>}
@@ -86,6 +86,20 @@ export async function EvoTree({params}: {params: {id: string}}){
 
     function getEvolutionMethod(evolution: Evolution){
         const conditions = [] as string[]
+
+        switch(evolution.evoType){
+            case "interact":
+                const [modId, itemId] = evolution.item?.itemID.split(':')
+                conditions.push(t(`evolution_interact`, {item: t(`item_${itemId}`)}))
+                break
+            case "leveling":
+                if(evolution.level) conditions.push(t(`evolution_level`, {level: evolution.level}))
+                else conditions.push(t(`evolution_leveling`))
+                break
+            default:
+                conditions.push(evolution.evoType)
+        }
+
         if(evolution.conditions?.length > 0) {
             evolution.conditions.forEach((condition) => {
                 //console.log(condition)
@@ -126,21 +140,11 @@ export async function EvoTree({params}: {params: {id: string}}){
             })
         }
 
-        switch(evolution.evoType){
-            case "interact":
-                const [modId, itemId] = evolution.item?.itemID.split(':')
-                conditions.push(t(`evolution_interact`, {item: t(`item_${itemId}`)}))
-                break
-            case "leveling":
-                conditions.push(t(`evolution_level`, {level: evolution.level}))
-                break
-        }
-
 
         return   <div
                     className="flex flex-col text-center  w-[300px] h-[100px] justify-center"
                     style={{
-                    backgroundImage: 'url(https://cdn.pixabay.com/photo/2012/04/11/10/22/arrow-27316_1280.png)',
+                    backgroundImage: 'url(/smartrotom/img/apps/pokedex/arrow.webp)',
                     backgroundSize: 'contain',
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
