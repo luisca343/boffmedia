@@ -1,17 +1,19 @@
 
 "use client"
 
-import { Pokemon } from "@/types/Pokemon";
+import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
 
 export function PokemonSprite ({name, dex, form, shiny, width, height}: {name:string, dex:number, form: string, shiny: boolean, width?: number, height?: number}){
     const [imageUrl, setImageUrl] = useState(getPokemonSprite(name, form, shiny));
+    const [loaded, setLoaded] = useState(false)
   
 
     useEffect(() => {
         const image = new Image();
         image.src = imageUrl;
         image.onerror = () => setImageUrl(getFallbackSprite(name));
+        image.onload = () => setLoaded(true);
       }, [imageUrl]);
 
 
@@ -28,5 +30,6 @@ export function PokemonSprite ({name, dex, form, shiny, width, height}: {name:st
         return `/smartrotom/packs/resourcepack/assets/pixelmon/textures/pokemon/${numStr}_${name.toLowerCase()}/all/${form}/none/sprite.png`
     }
     
+    if(!loaded) return <div style={{width: width || 100, height: height || 100}}></div>
     return <img width={width || 100} height={height || 100} src={imageUrl} alt={name} style={{imageRendering:'pixelated'}}/>;
 }
