@@ -142,5 +142,11 @@ export interface Item {
 }
 
 export interface EvYields {
-    speed: number;
+    speed?: number;
+    specialDefense?: number;
+    specialAttack?: number;
+    defense?: number;
+    attack?: number;
+    hp?: number;
+
 }
