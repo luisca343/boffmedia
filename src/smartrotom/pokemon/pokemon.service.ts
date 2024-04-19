@@ -60,11 +60,13 @@ export class PokemonService {
     
             data.forms?.forEach((form) => {
                 if(!form) return;
-                if (!this.speciesByForm[form.name]) {
-                    this.speciesByForm[form.name] = [];
+                let formName = form.name || 'base';
+                if (!this.speciesByForm[formName]) {
+                    this.speciesByForm[formName] = [];
                 }
 
-                const nameWithForm = `${data.name}_${form.name}`;
+                const nameWithForm = `${data.name}_${formName}`;
+
       
                 this.speciesByNameWithForm[nameWithForm] = form
             
@@ -72,7 +74,7 @@ export class PokemonService {
                 form.pkmName = data.name;
                 form.pkmGeneration = data.generation;
 
-                this.speciesByForm[form.name].push(form);
+                this.speciesByForm[formName].push(form);
     
                 const genderProperties = form?.genderProperties && form.genderProperties.length > 0 ? form.genderProperties[0] : undefined;
                 const palettes = genderProperties?.palettes;
@@ -203,7 +205,21 @@ export class PokemonService {
         }
         const fuse = new Fuse<any>(this.species, options);
         const result = fuse.search(name);
-        return result.slice(0, 5)
+        return result.slice(0, 10)
+    }
+
+    getPokemonByName2(name: string) {
+        // @ts-ignore
+        const options: Fuse.IFuseOptions<any> = {
+            includeScore: true,
+            includeMatches: true
+        }
+
+        const fuse = new Fuse<any>(Object.keys(this.speciesByNameWithForm), options);
+        const result = fuse.search(name);
+        return result.slice(0, 5).map((res) => {
+            return res.item.toLowerCase()
+        })
     }
 
     getNextPrev(id: number) {
@@ -329,7 +345,7 @@ export class PokemonService {
             }
             index++
         }
-        return {tree:evos, depth: this.getEvoTreeDepth(evos)}
+        return {depth: this.getEvoTreeDepth(evos), tree:evos }
     }
 
     getEvoTreeDepth(evos: any, depth = 0){
