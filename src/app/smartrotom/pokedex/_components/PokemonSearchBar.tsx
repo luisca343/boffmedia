@@ -13,7 +13,6 @@ export default function PokemonSearchBar(){
         setText(value)
         if(value.length > 2) {
             const res = await rotomGET(`/pokemon/search/species/${value}`)
-            console.log(res)
             setPokemon(res)
         }
         if(value.length === 0) setPokemon([])
