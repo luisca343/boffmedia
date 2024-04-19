@@ -73,7 +73,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     }
 
     return (
-        <nav className={`h-12 bg-zinc-900 flex items-center px-2`}>
+        <nav className={`h-12 bg-zinc-950 flex items-center px-2`}>
             <Toaster className="bg-slate-800" />
             <BotonPrev />
             <BotonNext />
@@ -83,7 +83,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <SheetTrigger>
                     <BotonAjustes />
                 </SheetTrigger>
-                <SheetContent side="top" className="bg-zinc-900 text-white border-none" parentId="smartrotom">
+                <SheetContent side="top" className="bg-zinc-950 text-white border-none" parentId="smartrotom">
                     <SheetHeader>
                         <SheetTitle className="text-white">Ajustes</SheetTitle>
                         <SheetDescription>
