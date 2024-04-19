@@ -14,11 +14,12 @@ export default function BreadcrumbNav({className} : {className?: string}){
     return (
         <div className={`${className} flex bg-white rounded-sm h-8 items-center ps-4`}>
             {parts.map((part, index) => {
+
                 const href = '/' + parts.slice(0, index + 1).join('/')
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
                         <span className="text-3xl font-bold m-1 text-primary">/</span>
-                        <Breadcrumb nombre={part} index={index} key={index} />
+                        <Breadcrumb index={index} key={index} parts={parts} />
                     </React.Fragment>
                 )
              }
@@ -27,18 +28,38 @@ export default function BreadcrumbNav({className} : {className?: string}){
     )
 }
 
-function Breadcrumb({nombre, index}: {nombre: string, index: number}){
+
+
+function Breadcrumb({index, parts}: {index: number, parts: string[]}){
+    const nombre = rewrite(parts, index)
     const router = useRouter();
     const texto = nombre == 'smartrotom' ? <HomeIcon height={20} width={20} strokeWidth={2.5}/> : nombre
 
     return (
-        <Badge onClick={() => navegar(router, nombre, index)} className="text-sm bg-primary-400 hover:bg-primary-600 hover:cursor-pointer text-black hover:text-white  border-black border shadow-sm shadow-black" key={index} >
+        <Badge onClick={() => navegar(router, parts, index, isNavigable(nombre))} className="text-sm bg-primary-400 hover:bg-primary-600 hover:cursor-pointer text-black hover:text-white  border-black border shadow-sm shadow-black" key={index} >
             {texto}
         </Badge>
     )
 }
 
-function navegar(router: AppRouterInstance, nombre: string, index: number){
-    if(nombre == 'smartrotom') router.push('/smartrotom')
-    else router.push('/smartrotom/' + nombre)
+function isNavigable(nombre: string){
+    return !['smartrotom', 'entrada'].includes(nombre)
+}
+
+function rewrite(parts: string[], index: number){
+    if(index == 0) return 'smartrotom'
+    if(parts[index-1] == 'entrada') {
+        const num = parseInt(parts[index])
+    }
+
+    return parts[index]
+}
+
+function navegar(router: AppRouterInstance, parts: string[], index: number, navigable: boolean){
+    if(!navigable) return
+    if(index == 0) router.push('/smartrotom')
+    else {
+        const path = '/' + parts.slice(0, index + 1).join('/')
+        router.push(path)
+    }
 }
