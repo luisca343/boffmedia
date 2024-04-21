@@ -5,195 +5,139 @@ import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
 import { promises as fsPromises } from 'fs';
 import { Pokemon } from '@/types/pokemon';
-import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking } from './utils/types';
+import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
+import { PokemonData } from './utils/pokemonData';
+import { MoveData } from './utils/MoveData';
+import { SpawnData } from './utils/SpawnData';
 
 @Injectable()
 export class PokemonService {
-    pokemonList = [];
-    species = [];
+    pokemonData: PokemonData;
+    moveData: MoveData;
+    spawnData: SpawnData;
 
-    highestDex = 0;
-    speciesByDex = {}
-    speciesByName = {}
-    speciesByNameWithForm = {}
-    speciesByForm = {}
-    speciesByPalette = {}
-    speciesByType = {}
-    speciesByEggGroup = {}
-    speciesByAbility = {}
-    finalForms = {}
+    async loadData(){
+        this.pokemonData = new PokemonData();
+        await this.pokemonData.loadPokemonDataAsync();
 
-    async loadData() {
-        const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_datapack/data/pixelmon/species');
-        const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/datapack/data/pixelmon/species');
+        this.moveData = new MoveData();
+        this.spawnData = new SpawnData(this.pokemonData);
 
-        const defaultDir = await fsPromises.readdir(defaultDirDef);
-        const dir = await fsPromises.readdir(publicDir);
         
-        const fullDir = [...new Set([...defaultDir, ...dir])];
-        
-        let defaultCounter = 0;
-        let terasCounter = 0;
-
-        const startingTime = Date.now();
-
-        for (const file of fullDir) {
-            if (!file || !file.includes(".json")) continue;
-            let fileName = path.join(publicDir, file);
-            let data: Pokemon;
-            if(fs.existsSync(fileName)) {
-                data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Pokemon;
-                terasCounter++;
-            } else {
-                fileName = path.join(defaultDirDef, file);
-                data = JSON.parse(await fsPromises.readFile(fileName, 'utf8')) as Pokemon;
-                defaultCounter++;
-            }
-    
-            this.pokemonList.push(file.split(".")[0].split("_")[1]);
-            this.species.push(data);
-            this.speciesByDex[data.dex] = data;
-            this.speciesByName[data.name] = data;
-            if (data.dex > this.highestDex) {
-                this.highestDex = data.dex;
-            }
-    
-            data.forms?.forEach((form) => {
-                if(!form) return;
-                let formName = form.name || 'base';
-                if (!this.speciesByForm[formName]) {
-                    this.speciesByForm[formName] = [];
-                }
-
-                const nameWithForm = `${data.name}_${formName}`;
-
-      
-                this.speciesByNameWithForm[nameWithForm] = form
-            
-                form.pkmDex = data.dex;
-                form.pkmName = data.name;
-                form.pkmGeneration = data.generation;
-
-                this.speciesByForm[formName].push(form);
-    
-                const genderProperties = form?.genderProperties && form.genderProperties.length > 0 ? form.genderProperties[0] : undefined;
-                const palettes = genderProperties?.palettes;
-
-                if(!form.evolutions || form.evolutions.length === 0){
-                    this.finalForms[data.name] = form;
-                }
-                
-    
-                if(palettes){
-                    palettes.forEach((palette) => {
-                        if (!this.speciesByPalette[palette.name]) {
-                            this.speciesByPalette[palette.name] = [];
-                        }
-                        this.speciesByPalette[palette.name].push(form);
-                    });
-                }
-
-                const types = form?.types;
-                if(types){
-                    types.forEach((type) => {
-                        if (!this.speciesByType[type]) {
-                            this.speciesByType[type] = [];
-                        }
-                        this.speciesByType[type].push(form);
-                    });
-                }
-
-                const eggGroups = form?.eggGroups;
-                if(eggGroups){
-                    eggGroups.forEach((eggGroup) => {
-                        if (!this.speciesByEggGroup[eggGroup]) {
-                            this.speciesByEggGroup[eggGroup] = [];
-                        }
-                        this.speciesByEggGroup[eggGroup].push(form);
-                    });
-                }
-
-                const abilities = form?.abilities;
-                if(abilities){
-                    abilities.abilities.forEach((ability) => {
-                        if (!this.speciesByAbility[ability]) {
-                            this.speciesByAbility[ability] = [];
-                        }
-                        this.speciesByAbility[ability].push(form);
-                    });
-
-                    abilities.hiddenAbilities?.forEach((ability) => {
-                        if (!this.speciesByAbility[ability]) {
-                            this.speciesByAbility[ability] = [];
-                        }
-                        this.speciesByAbility[ability].push(form);
-                    });
-                }
-            });
-        }
-    
-        let totalForms = 0;
-        Object.values(this.speciesByForm).forEach((forms: any[]) => {
-            totalForms += forms.length;
-        });
-    
-
-
-
-        console.log(`Cargadas ${this.species.length} especies y ${Object.keys(this.speciesByForm).length} formas diferentes, para un total de ${totalForms} Pokémon`);
-        console.log(`Cargadas ${Object.keys(this.finalForms).length} formas evolutivas finales`);
-        console.log(`Cargados ${defaultCounter} archivos predeterminados y ${terasCounter} archivos modificados`);
-        const endTime = Date.now();
-        console.log(`Tiempo de carga: ${endTime - startingTime}ms`);
     }
-    
+
+    getMoves(id:number, formIndex: number){
+        const pkm = this.pokemonData.speciesByDex[id] as Pokemon;
+        const moves = pkm.forms[formIndex].moves || pkm.forms[0].moves
+
+        const moveDataSet = {}
+        
+        
+        Object.keys(moves).forEach((key) => {
+            if(key === 'levelUpMoves'){
+                const levelUpMoves = moves[key]
+                levelUpMoves.forEach((levelUpMove) => {
+                    levelUpMove.attacks.forEach((attack) => {
+                        const moveData = this.moveData.movesByName[attack]
+                        const moveDataShort  = {
+                            name: moveData.attackName, type: moveData.attackType, 
+                            category: moveData.attackCategory, power: moveData.basePower, 
+                            pp: `${moveData.ppBase} - ${moveData.ppMax}`, accuracy: moveData.accuracy
+                        }
+                        
+                        if(!moveDataSet[attack]) moveDataSet[attack] = moveDataShort
+                    })
+                })
+            } else {
+                const movesArray = moves[key]
+                movesArray.forEach((move) => {
+                    const moveData = this.moveData.movesByName[move]
+                    if(!moveData) {
+                        console.log(`Move ${move} not found`)
+                        return
+                    }
+                    const moveDataShort  = {
+                        name: moveData.attackName, type: moveData.attackType, 
+                        category: moveData.attackCategory, power: moveData.basePower, 
+                        pp: `${moveData.ppBase} - ${moveData.ppMax}`, accuracy: moveData.accuracy
+                    }
+                    if(!moveDataSet[move]) moveDataSet[move] = moveDataShort
+                })
+            }
+        })
+        
+        return moveDataSet 
+
+    }
+
+    getImage({pokemonId= 1, formId = 1, paletteName = 'none'} : {pokemonId?: number, formId?: number, paletteName?: string}){
+        const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
+        const form = pokemon.forms[formId-1]
+        const sprite = form.genderProperties[0].palettes.find((palette) => palette.name === paletteName)?.sprite
+        if(!sprite) return {url: 'assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png'}
+        const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`
+        const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
+        const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
+
+        if(fs.existsSync(defaultDirDef))  return {url: defaultDirDef}
+        return {url: publicDir}
+    }
+
+    getAllSpawns(){
+        return this.spawnData.spawnByPokemonAndForm
+    }
+
+    getSpawns(name: string){
+        console.log(name)
+        return this.spawnData.spawnByPokemonAndForm[name] || this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+    }
 
     getPokemonNames() {
-        return this.pokemonList;
+        return this.pokemonData.pokemonList;
     }
 
     getAllPokemonByDex() {
-        return this.speciesByDex;
+        return this.pokemonData.speciesByDex;
     }
 
     getPokemonByDex(dex: number) {
-        return this.speciesByDex[dex];
+        return this.pokemonData.speciesByDex[dex];
     }
 
     getManyPokemonByDex(dex: number[]) {
-        return dex.map((d) => this.speciesByDex[d]);
+        return dex.map((d) => this.pokemonData.speciesByDex[d]);
     }
     
     getSpeciesByNameWithForm() {
-        return this.speciesByNameWithForm;
+        return this.pokemonData.speciesByNameWithForm;
     }
 
     getPokemon() {
-        return this.species;
+        return this.pokemonData.species;
     }
 
     getPokemonByForm() {
-        return this.speciesByForm;
+        return this.pokemonData.speciesByForm;
     }
 
     getPokemonByPalette() {
-        return this.speciesByPalette;
+        return this.pokemonData.speciesByPalette;
     }
 
     getPokemonByType() {
-        return this.speciesByType;
+        return this.pokemonData.speciesByType;
     }
 
     getPokemonByEggGroup() {
-        return this.speciesByEggGroup;
+        return this.pokemonData.speciesByEggGroup;
     }
 
     getPokemonByAbility() {
-        return this.speciesByAbility;
+        return this.pokemonData.speciesByAbility;
     }
 
     countPokemon() {
-        return this.species.length;
+        return this.pokemonData.species.length;
     }
 
     getPokemonByName(name: string) {
@@ -203,7 +147,7 @@ export class PokemonService {
             includeMatches: true,
             keys: ['name', 'nickname']
         }
-        const fuse = new Fuse<any>(this.species, options);
+        const fuse = new Fuse<any>(this.pokemonData.species, options);
         const result = fuse.search(name);
         return result.slice(0, 10)
     }
@@ -215,7 +159,7 @@ export class PokemonService {
             includeMatches: true
         }
 
-        const fuse = new Fuse<any>(Object.keys(this.speciesByNameWithForm), options);
+        const fuse = new Fuse<any>(Object.keys(this.pokemonData.speciesByNameWithForm), options);
         const result = fuse.search(name);
         return result.slice(0, 5).map((res) => {
             return res.item.toLowerCase()
@@ -223,10 +167,10 @@ export class PokemonService {
     }
 
     getNextPrev(id: number) {
-        const currIndex = Object.keys(this.speciesByDex).findIndex((dex) => parseInt(dex) === id);
+        const currIndex = Object.keys(this.pokemonData.speciesByDex).findIndex((dex) => parseInt(dex) === id);
 
-        const next = currIndex < Object.keys(this.speciesByDex).length - 1 ? this.speciesByDex[Object.keys(this.speciesByDex)[currIndex + 1]] : this.speciesByDex[1];
-        const prev = currIndex > 1 ? this.speciesByDex[Object.keys(this.speciesByDex)[currIndex - 1]] : this.speciesByDex[this.highestDex];
+        const next = currIndex < Object.keys(this.pokemonData.speciesByDex).length - 1 ? this.pokemonData.speciesByDex[Object.keys(this.pokemonData.speciesByDex)[currIndex + 1]] : this.pokemonData.speciesByDex[1];
+        const prev = currIndex > 1 ? this.pokemonData.speciesByDex[Object.keys(this.pokemonData.speciesByDex)[currIndex - 1]] : this.pokemonData.speciesByDex[this.pokemonData.highestDex];
         
 
         return { prev, next }
@@ -240,7 +184,7 @@ export class PokemonService {
             includeMatches: true,
             keys: ['name', 'nickname']
         }
-        const fuse = new Fuse<any>(this.species, options);
+        const fuse = new Fuse<any>(this.pokemonData.species, options);
         const result = fuse.search(name);
         const pkm = result[0].item;
         return pkm.forms[0].battleStats
@@ -275,11 +219,11 @@ export class PokemonService {
     }
 
     getEvoTree(id: number) {
-        const pkm = this.speciesByDex[id] as Pokemon;
+        const pkm = this.pokemonData.speciesByDex[id] as Pokemon;
         let preEvo = pkm
         while(preEvo.forms[0].preEvolutions?.length > 0){
-            const preEvoName = preEvo.forms[0].preEvolutions[0]
-            preEvo = this.speciesByName[preEvoName]
+            const preEvoName = preEvo.forms[0].preEvolutions[0].toLowerCase()
+            preEvo = this.pokemonData.speciesByName[preEvoName]
         }
         const evoTree = this.getEvos(preEvo, 'all')
         return evoTree
@@ -298,7 +242,7 @@ export class PokemonService {
             
 
             if(Object.keys(evos).length === 0 || ! evos.pkm){
-                evos[pkmId] = {pkm: pokemon.name, evos: {}, dex: pokemon.dex}
+                evos[pkmId] = {pkm: pokemon.name, evos: {}, dex: pokemon.dex, index: form.index + 1}
                 currentPokemon = evos[pkmId]
             } else {
                 currentPokemon = evos
@@ -313,8 +257,9 @@ export class PokemonService {
                 const evoId = `${evoPokemonName}_${evoFormName}`
                 if(!currentPokemon.evos) currentPokemon.evos = {}
                 const evoArray = currentPokemon.evos
+                const evoFormIndex = this.pokemonData.speciesByName[evoPokemonName].forms?.findIndex((f) => f.name === evoFormName) > -1 ? this.pokemonData.speciesByName[evoPokemonName].forms?.findIndex((f) => f.name === evoFormName) : 0
                 if(!evoArray[evoId]){
-                    evoArray[evoId] = {pkm: evoPokemonName, evos: {}, dex: this.speciesByName[evoPokemonName].dex}
+                    evoArray[evoId] = {pkm: evoPokemonName, evos: {}, dex: this.pokemonData.speciesByName[evoPokemonName].dex, index: evoFormIndex + 1}
                 }
                 
                 const thisEvo = evoArray[evoId]
@@ -323,25 +268,8 @@ export class PokemonService {
                 }
                 evoArray[evoId].methods.push(evo)
 
-                const evoPkm = this.speciesByName[evoPokemonName]
+                const evoPkm = this.pokemonData.speciesByName[evoPokemonName]
                 let evoEvo = this.getEvos(evoPkm, evoFormName, evoArray[evoId]) as any
-                /*
-                if (formName === currentForm || currentForm === 'all'){
-                    const evoPkm = this.speciesByName[evoPokemonName]
-                    let evoEvo = this.getEvos(evoPkm, evoFormName) as any
-                    if(!evoEvo.methods){
-                        evoEvo.methods = []
-                    }
-                    evoEvo.methods.push(evo)
-                    
-                    if (Object.keys(evoEvo).length === 0){
-                        evoEvo = this.getEvos(evoPkm, 'all')
-                        evos[pkmId].evos.push(evoEvo)
-                        break;
-                    }
-
-                    evos[pkmId].evos.push(evoEvo)
-                }*/
             }
             index++
         }
@@ -408,6 +336,7 @@ export class PokemonService {
     }
     
     getFormName(nombre:string){
+        nombre = nombre.toLowerCase()
         let [nombrePkm, forma] = [nombre, 'base']
         if(nombre.includes(' form:')){
             [nombrePkm, forma] = nombre.split(' form:')
