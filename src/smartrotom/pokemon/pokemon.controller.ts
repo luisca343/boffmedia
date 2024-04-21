@@ -83,4 +83,20 @@ export class PokemonController {
     getEvoTree(@Param('id') id: string){
         return this.pokemonService.getEvoTree(parseInt(id));
     }
+
+    @Get('moves/:id/:form')
+    getMoves(@Param('id') id: number, @Param('form') form: number){
+        return this.pokemonService.getMoves(id, form);
+    }
+
+    @Get('spawns/:name/')
+    getSpawns(@Param('name') name: string){
+        return this.pokemonService.getSpawns(name);
+    }
+
+    @Get('image/:id/:form/:palette')
+    getImage(@Param('id') pokemonId: number, @Param('form') formId: number, @Param('palette') paletteName: string){
+        return this.pokemonService.getImage({pokemonId, formId, paletteName});
+    }
+
 }
