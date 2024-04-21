@@ -75,7 +75,7 @@ const offTypeFrequency = {
 
 
 const defaultDirDef = path.join(__dirname, '../../../../', 'public/smartrotom/packs/wolfeyRanking.json');
-const wolfeyTypeRanking = JSON.parse(fs.readFileSync(defaultDirDef, 'utf8')) as {[key: string]: number}
+export const wolfeyTypeRanking: {ranking: number, type1: string, type2: string, tier: string}[] = JSON.parse(fs.readFileSync(defaultDirDef, 'utf8'));
 
 function factorFrequency(score: number, type: string, deffensive: boolean){
     let realScore = 0
