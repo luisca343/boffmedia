@@ -9,6 +9,9 @@ export interface Pokemon {
 export interface Form {
     pkmName?: string;
     pkmDex?: number;
+    rank: {ranking: number, type1: string, type2: string, tier: string};
+    index: number;
+
     pkmGeneration?: number;
     name: string;
     experienceGroup?: string;
