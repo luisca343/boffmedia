@@ -70,17 +70,53 @@ export class PokemonService {
 
     }
 
-    getImage({pokemonId= 1, formId = 1, paletteName = 'none'} : {pokemonId?: number, formId?: number, paletteName?: string}){
+    getImage({pokemonId= 1, formName = "base", paletteName = 'none', type='img'} : {pokemonId?: number, formName: string, paletteName?: string, type?: string}){
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
-        const form = pokemon.forms[formId-1]
-        const sprite = form.genderProperties[0].palettes.find((palette) => palette.name === paletteName)?.sprite
-        if(!sprite) return {url: 'assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png'}
+        const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
+       
+        
+        if(type === 'img') {
+            const imageFolder = paletteName === 'shiny' ? 'Front Shiny' : paletteName === 'none' ? 'Front' : ''
+            const pokemonImageName = formName == "base" ? pokemon.name.toUpperCase() : `${pokemon.name.toUpperCase()}_${form.name.toUpperCase()}`
+    
+            const image = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
+            if(fs.existsSync(image)) return {url: path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`), type:'image'}
+        }
+
+        let palette;
+        Object.values(form.genderProperties).forEach((genderProperty) => {
+            genderProperty.palettes.forEach((p) => {
+                console.log(p.name, paletteName, p.name === paletteName)
+                if(p.name === paletteName) palette = p
+                return
+            })
+        })
+        
+        if(!palette) {
+            palette = form.genderProperties[0].palettes[0]
+        }
+
+        const sprite = palette?.sprite
+        
+        if(!sprite) {
+            console.log(`Sprite not found for ${pokemon.name} ${formName} ${paletteName}`)
+            return {url: 'assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png'}
+        }
         const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`
         const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
         const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
+        
+        if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite'}
+        return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite'}
+    }
 
-        if(fs.existsSync(defaultDirDef))  return {url: defaultDirDef}
-        return {url: publicDir}
+    getItemSprite(name: string){
+        const itemFileName = name.replaceAll('_', '').toUpperCase()
+        //console.log( path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png'))
+        const sprite = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png');
+
+        if(fs.existsSync(sprite)) return {url: path.join('/smartrotom/img/sprites/items', itemFileName + '.png')}
+        return {url: '/smartrotom/img/sprites/items/000.png'}
     }
 
     getAllSpawns(){
@@ -88,7 +124,6 @@ export class PokemonService {
     }
 
     getSpawns(name: string){
-        console.log(name)
         return this.spawnData.spawnByPokemonAndForm[name] || this.spawnData.spawnByPokemon[name.split('_')[0]] || []
     }
 

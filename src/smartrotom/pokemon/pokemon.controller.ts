@@ -95,8 +95,18 @@ export class PokemonController {
     }
 
     @Get('image/:id/:form/:palette')
-    getImage(@Param('id') pokemonId: number, @Param('form') formId: number, @Param('palette') paletteName: string){
-        return this.pokemonService.getImage({pokemonId, formId, paletteName});
+    getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName});
+    }
+
+    @Get('sprite/:id/:form/:palette')
+    getSprite(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, type: 'sprite'});
+    }
+
+    @Get('item/sprite/:name')
+    getItemSprite(@Param('name') name: string){
+        return this.pokemonService.getItemSprite(name);
     }
 
 }
