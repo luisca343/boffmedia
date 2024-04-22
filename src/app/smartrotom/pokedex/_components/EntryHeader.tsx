@@ -2,27 +2,32 @@ import Link from "next/link";
 import { PokemonSprite } from "./PokemonSprite";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getPokemonNameAndForm } from "../dexUtils";
+import { Pokemon } from "@/types/Pokemon";
 
-export function EntryHeader({pokemon, formName, prev, next, t} : {pokemon: {dex: number, name: string}, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}, t: any}) {
-    return <header className="flex flex-col bg-zinc-950 text-white h-fit z-10 p-2">
+export function EntryHeader({pokemon, formName, prev, next, t} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}, t: any}) {
+    return <header className="flex flex-col bg-zinc-900 text-white h-fit z-10 p-2 text-xl 2xl:text-lg" >
         <div className="w-full flex  justify-between items-center">
             <Link className="flex flex-row items-center hover:text-primary-400" href={`/smartrotom/pokedex/entrada/${prev.dex}`}>
-                <PokemonSprite name={prev.name} dex={prev.dex} form="base" shiny={false} width={50} height={50}/>
+                <PokemonSprite id={prev.dex} form="base" palette='none' width={50} height={50}/>
                 <ChevronLeftIcon className="w-6"/>#{prev.dex} - {prev.name}
             </Link>
-            <div className="text-2xl flex items-center">
+            <div className="flex items-center justify-center text-4xl 2xl:text-2xl">
                 #{pokemon.dex} - {getPokemonNameAndForm(pokemon.name, formName, t)}
-                <PokemonSprite name={pokemon.name} dex={pokemon.dex} form="base" shiny={false} width={50} height={50}/>
+                <PokemonSprite id={pokemon.dex} form={formName} palette='none' width={50} height={50}/>
             </div>
             <Link className="flex flex-row items-center hover:text-primary-400" href={`/smartrotom/pokedex/entrada/${next.dex}`}>#{next.dex} - {next.name}
                 <ChevronRightIcon className="w-6"/>
-                <PokemonSprite name={next.name} dex={next.dex} form="base" shiny={false} width={50} height={50}/>
+                <PokemonSprite id={next.dex} form="base" palette='none' width={50} height={50}/>
             </Link>
         </div>
         <div className="w-full flex justify-evenly items-center scroll-smooth">
-            <Link scroll={true} className=" hover:text-primary-400" href={`#evotree`}>Árbol evolutivo</Link>
+            <Link className=" hover:text-primary-400" href={`#info`}>Info</Link>
+            <Link className=" hover:text-primary-400" href={`#evotree`}>Árbol evolutivo</Link>
+            {pokemon.forms.length > 1 && <Link className=" hover:text-primary-400" href={`#forms`}>Formas</Link>}
             <Link className=" hover:text-primary-400" href={`#typedata`}>Fortalezas y debilidades</Link>
             <Link className=" hover:text-primary-400" href={`#stats`}>Estadísticas</Link>
+            <Link className=" hover:text-primary-400" href={`#spawns`}>Localizaciones</Link>
+            <Link className=" hover:text-primary-400" href={`#moves`}>Movimientos</Link>
         </div>
     </header>
 }
