@@ -4,7 +4,7 @@ import useTranslation from 'next-translate/useTranslation'
 export default function PokedexMenu(){
     const { t } = useTranslation("smartrotom/pokedex/common")
     return (
-        <div>
+        <div className="bg-slate-800 p-4">
             <h1>Pokedex</h1>
             <PokemonSearchBar />
             {t('search')}
