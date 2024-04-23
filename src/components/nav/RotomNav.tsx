@@ -32,6 +32,7 @@ import { Badge } from "../ui/badge";
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     const { socket, connect } = useSocketStore();
+    const [color, setColor] = useState('zinc' as string)
     const {
       notifications,
       clear,
@@ -53,11 +54,14 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
         socket.emit('patata', null);*/
       }, [socket, connect]);
 
+      useEffect(() => {
+
+      }, [pathname])
 
       
     function Notifications(){
         return(
-            <div className="flex flex-col  bg-gray-300 w-[33vw] rounded-md">
+            <div className="flex flex-col bg-gray-300 w-[33vw] rounded-md z-50">
                 <header className="flex justify-between items-center bg-gray-800 p-4">
                     <h2 className="text-white">Notificaciones</h2>
                     <button onClick={clear} className="text-white">Limpiar</button>
@@ -73,7 +77,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     }
 
     return (
-        <nav className={`h-12 bg-zinc-950 flex items-center px-2`}>
+        <nav className={`h-12  flex items-center px-2 ${pathname.includes('pokedex') ? 'bg-slate-950' : 'bg-zinc-900'}`}>
             <Toaster className="bg-slate-800" />
             <BotonPrev />
             <BotonNext />
@@ -83,7 +87,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <SheetTrigger>
                     <BotonAjustes />
                 </SheetTrigger>
-                <SheetContent side="top" className="bg-zinc-950 text-white border-none" parentId="smartrotom">
+                <SheetContent side="top" className="bg-zinc-900 text-white border-none" parentId="smartrotom">
                     <SheetHeader>
                         <SheetTitle className="text-white">Ajustes</SheetTitle>
                         <SheetDescription>
@@ -110,10 +114,10 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <PopoverTrigger className="relative">
                     <BotonNotification />
                     {
-                        notifications.length > 0 && <Badge className="z-10 px-2 -bottom-2 -right-2 absolute bg-primary-400 text-black hover:bg-primary-400">{unreadCount}</Badge>
+                        notifications.length > 0 && <Badge className="z-50 px-2 -bottom-2 -right-2 absolute bg-primary-400 text-black hover:bg-primary-400">{unreadCount}</Badge>
                     }
                 </PopoverTrigger>
-                <PopoverContent className="z-10">
+                <PopoverContent className="z-50">
                     <Notifications />
                 </PopoverContent>
             </Popover>
