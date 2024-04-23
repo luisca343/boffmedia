@@ -43,7 +43,7 @@ function Breadcrumb({index, parts}: {index: number, parts: string[]}){
 }
 
 function isNavigable(nombre: string){
-    return !['smartrotom', 'entrada'].includes(nombre)
+    return !['entrada'].includes(nombre)
 }
 
 function rewrite(parts: string[], index: number){
