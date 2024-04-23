@@ -5,7 +5,7 @@ import { getPokemonNameAndForm } from "../dexUtils";
 import { Pokemon } from "@/types/Pokemon";
 
 export function EntryHeader({pokemon, formName, prev, next, t} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}, t: any}) {
-    return <header className="flex flex-col bg-zinc-900 text-white h-fit z-10 p-2 text-xl 2xl:text-lg" >
+    return <header className="flex flex-col bg-slate-950 text-white h-fit z-10 p-2 text-xl 2xl:text-lg" >
         <div className="w-full flex  justify-between items-center">
             <Link className="flex flex-row items-center hover:text-primary-400" href={`/smartrotom/pokedex/entrada/${prev.dex}`}>
                 <PokemonSprite id={prev.dex} form="base" palette='none' width={50} height={50}/>
@@ -28,6 +28,7 @@ export function EntryHeader({pokemon, formName, prev, next, t} : {pokemon: Pokem
             <Link className=" hover:text-primary-400" href={`#stats`}>Estadísticas</Link>
             <Link className=" hover:text-primary-400" href={`#spawns`}>Localizaciones</Link>
             <Link className=" hover:text-primary-400" href={`#moves`}>Movimientos</Link>
+            <Link className=" hover:text-primary-400" href={`#palettes`}>Variantes</Link>
         </div>
     </header>
 }

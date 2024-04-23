@@ -20,7 +20,7 @@ export function TypeTable({list, title, id, className=''}: {list: {[key: string]
                         if(!Object.values(list).includes(effectivity)) return null
                         return (
                         <PokedexRow key={effectivity} >
-                            <PokedexCell className="font-bold text-white w-24 bg-zinc-900 ">x{effectivity}</PokedexCell>
+                            <PokedexCell className="font-bold text-white w-24 bg-gray-900 ">x{effectivity}</PokedexCell>
                             <PokedexCell>
                             <div className="flex flex-row flex-wrap w-full " >
                                 {Object.entries(list)

@@ -7,7 +7,7 @@ import { PokemonSprite } from "./PokemonSprite";
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
     const { t } = useTranslation("smartrotom/pokedex/spawns")
     if(spawns.length == 0) return <div className="  text-white text-shadow-border1 flex justify-center ">
-    <div className=" h-full flex-col justify-center items-center bg-zinc-800 rounded-lg m-2" >
+    <div className=" h-full flex-col justify-center items-center bg-slate-800 rounded-lg m-2" >
         Este Pokémon no spawnea
     </div>
 </div>
@@ -56,7 +56,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
             <PokedexHeader>
                 <PokedexRow>
                     <PokedexHead> </PokedexHead>
-                    <PokedexHead> Forma </PokedexHead>
+                    <PokedexHead> Variante </PokedexHead>
                     <PokedexHead> Tipo </PokedexHead>
                     <PokedexHead> Biomas </PokedexHead>
                     <PokedexHead> Niveles </PokedexHead>

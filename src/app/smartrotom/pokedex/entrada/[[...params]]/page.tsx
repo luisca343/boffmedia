@@ -52,7 +52,7 @@ export default async function EntradaPokedex({params}: any){
     return (
         <section className="flex flex-col overflow-hidden text-white">
             <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} t={formsTranslation}/>
-            <section className="flex flex-col  bg-zinc-800 overflow-auto ">
+            <section className="flex flex-col  bg-gray-800 overflow-auto pt-4">
                 <PokedexSection id='info' title="Información">
                     <BasicInfo formName={formName}/>
                 </PokedexSection>
@@ -116,8 +116,8 @@ export default async function EntradaPokedex({params}: any){
     )
 
     function PokedexSection({title, children, id, className=''}: {title: string, children: any, id?: string, className?: string}){
-        return <section className={`flex flex-col justify-center w-[90%] m-auto ${className} `} id={id}>
-            <div className="text-2xl border-b border-white  mb-4 mt-2">{title}</div>
+        return <section className={`flex flex-col justify-center w-[95%] 2xl:w-[90%] m-auto ${className} `} id={id}>
+            <div className="text-2xl border-b-2 2xl:border-b border-white  mb-4 mt-2">{title}</div>
             {children}
         </section>
     }

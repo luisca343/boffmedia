@@ -55,7 +55,7 @@ export async function EvoTree({params}: {params: {id: string}}){
             if(Object.keys(subTree).length == 0) return <h1>TET</h1>
             if(!subTree.pkm) return <h1>NO PKM</h1>
                 return <div key={key} className='w-full flex flex-row items-center ' style={{height:`${100/Object.keys(tree).length}%`}}>
-                    <Link href={`/smartrotom/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-zinc-700 rounded-md">
+                    <Link href={`/smartrotom/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-slate-700 rounded-md">
                         <PokemonSprite id={subTree.dex} form={form} palette='none' width={100} height={100}/>
                         <span className="text-center">{t(`form`, {pokemon: getPokemonName(pkmName, t), form: `${t(`form_${form}`)}`})}</span>
                     </Link>
@@ -82,7 +82,7 @@ export async function EvoTree({params}: {params: {id: string}}){
     }
 
     return <div className="  text-white text-shadow-border1 flex justify-center ">
-            {depth > 1 ? renderTree(tree) : <div className=" h-full flex-col justify-center items-center bg-zinc-800 rounded-lg m-2" >
+            {depth > 1 ? renderTree(tree) : <div className=" h-full flex-col justify-center items-center bg-slate-800 rounded-lg m-2" >
                     Este Pokémon no tiene evoluciones
             </div>}
         </div>
@@ -143,7 +143,7 @@ export async function EvoTree({params}: {params: {id: string}}){
                     })
                     conditions.push(<HoverCard>
                         <HoverCardTrigger className='underline hover:cursor-pointer'>En Biomas</HoverCardTrigger>
-                        <HoverCardContent className="w-96 bg-zinc-800 text-white">{biomes.join(', ')}</HoverCardContent>
+                        <HoverCardContent className="w-96 bg-slate-800 text-white">{biomes.join(', ')}</HoverCardContent>
                     </HoverCard>)
                 }
                 else if(conditionType == "evolutionRock") {
