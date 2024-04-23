@@ -109,4 +109,9 @@ export class PokemonController {
         return this.pokemonService.getItemSprite(name);
     }
 
+    @Get('pokemonnamepalette')
+    getPokemonNamePalette(){
+        return this.pokemonService.getPokemonNamePalette();
+    }
+
 }

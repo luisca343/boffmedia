@@ -20,6 +20,7 @@ export class PokemonData {
     speciesByDex = {}
     speciesByName = {}
     speciesByNameWithForm = {} as [key:string, value: Pokemon]
+    speciesByNameFormPalette = {} as [key:string, value: Pokemon]
     speciesByForm = {}
     speciesByPalette = {}
     speciesByType = {}
@@ -106,7 +107,11 @@ export class PokemonData {
                             this.speciesByPalette[palette.name] = [];
                         }
                         this.speciesByPalette[palette.name].push(form);
+                        if(nameWithForm.includes('mega') || nameWithForm.includes('gmax')) return;
+                        this.speciesByNameFormPalette[`${nameWithForm}_${palette.name}`] = {name: palette.name, sprite: palette.sprite}
                     });
+                } else {
+                    this.speciesByNameFormPalette[`${nameWithForm}_none`] = {name: 'none', sprite: 'none'}
                 }
 
                 const types = form?.types;

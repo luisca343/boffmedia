@@ -86,7 +86,6 @@ export class PokemonService {
         let palette;
         Object.values(form.genderProperties).forEach((genderProperty) => {
             genderProperty.palettes.forEach((p) => {
-                console.log(p.name, paletteName, p.name === paletteName)
                 if(p.name === paletteName) palette = p
                 return
             })
@@ -401,4 +400,7 @@ export class PokemonService {
         return getOverallScoreRanking()
     }
 
+    getPokemonNamePalette(){
+        return this.pokemonData.speciesByNameFormPalette
+    }
 }
