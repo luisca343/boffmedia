@@ -39,6 +39,10 @@ export class PokemonService {
                 levelUpMoves.forEach((levelUpMove) => {
                     levelUpMove.attacks.forEach((attack) => {
                         const moveData = this.moveData.movesByName[attack]
+                        if(!moveData) {
+                            console.log(`Move ${attack} not found`)
+                            return
+                        }
                         const moveDataShort  = {
                             name: moveData.attackName, type: moveData.attackType, 
                             category: moveData.attackCategory, power: moveData.basePower, 
@@ -95,7 +99,7 @@ export class PokemonService {
             palette = form.genderProperties[0].palettes[0]
         }
 
-        const sprite = palette?.sprite
+        const sprite = this.getSpriteURL(palette)
         
         if(!sprite) {
             console.log(`Sprite not found for ${pokemon.name} ${formName} ${paletteName}`)
@@ -107,6 +111,10 @@ export class PokemonService {
         
         if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite'}
         return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite'}
+    }
+
+    getSpriteURL(palette){
+        return palette?.sprite?.resource ? palette.sprite.resource : palette.sprite
     }
 
     getItemSprite(name: string){

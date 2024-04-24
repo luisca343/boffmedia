@@ -90,7 +90,13 @@ export class PokemonData {
                 form.rank = rank
                 form.index = index;
                 data.forms[index].rank = rank
-                data.forms[index].gender = form?.genderProperties && form?.genderProperties[0].palettes[0].texture.split('/')[2] 
+                const tex = form?.genderProperties && form?.genderProperties[0].palettes[0].texture as any
+
+                if(tex && tex.resource){
+                    data.forms[index].gender = tex.resource.split('/')[2]
+                } else {
+                    data.forms[index].gender = form?.genderProperties && form?.genderProperties[0].palettes[0].texture.split('/')[2] 
+                }
 
                 this.speciesByForm[formName].push(form)
     
