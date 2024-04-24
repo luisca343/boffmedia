@@ -43,7 +43,7 @@ export default async function EntradaPokedex({params}: any){
 
     const palettes = pokemon.forms[formIndex].genderProperties?.map((gender) => {
         return gender.palettes.map((palette) => {
-            const sprite = palette.sprite?.split(':')[1]
+            const sprite = palette.sprite.resource ? palette.sprite.resource.split(':')[1] : palette.sprite?.split(':')[1]
             return {
                 name: palette.name,
                 sprite
