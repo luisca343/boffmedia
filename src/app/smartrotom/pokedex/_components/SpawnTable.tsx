@@ -7,31 +7,37 @@ import { PokemonSprite } from "./PokemonSprite";
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
     const { t } = useTranslation("smartrotom/pokedex/spawns")
     if(spawns.length == 0) return <div className="  text-white text-shadow-border1 flex justify-center ">
-    <div className=" h-full flex-col justify-center items-center bg-slate-800 rounded-lg m-2" >
+    <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
         Este Pokémon no spawnea
     </div>
 </div>
 
     function getRarity(rarity: number){
+        if(rarity < 1){
+            return t('extremely_rare')
+        }
         if(rarity <= 10){
-        return t('ultra_rare')
+            return t('ultra_rare')
         }
 
         if(rarity <= 100){
-        return t('rare')
+            return t('rare')
         }
 
         if(rarity <= 200){
-        return t('uncommon')
+            return t('uncommon')
         }
         
         if(rarity <= 300){
-        return t('common')
+            return t('common')
         }
-        return rarity.toString()
+            return rarity.toString()
     }
 
     function getRarityColor(rarity: number){
+        if(rarity < 1){
+            return 'bg-pink-800'
+        }
         if(rarity <= 10){
         return 'bg-purple-600'
         }

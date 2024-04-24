@@ -24,7 +24,7 @@ export default function PokemonSearchBar(){
             <Input type="text" placeholder="Search for a Pokemon" value={text} onChange={(e) => type(e.target.value)} />
             <div className="overflow-auto max-h-48">
                 {pokemon?.map(p => (
-                    <Link href={`/smartrotom/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex border p-2">
+                    <Link href={`/smartrotom/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex p-2 hover:bg-gray-600 text-white">
                         <img width={50} src={`http://api.boffmedia.es/smartrotom/img/sprites/Front/${p.item.name.toUpperCase()}.png`} alt={p.item.name} />
                         <p>{p.item.name}</p>
                     </Link>
