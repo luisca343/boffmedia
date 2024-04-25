@@ -5,9 +5,9 @@ import { getPokemonNameAndForm } from "../dexUtils";
 import { Pokemon } from "@/types/Pokemon";
 
 export function EntryHeader({pokemon, formName, prev, next, t} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}, t: any}) {
-    return <header className="flex flex-col bg-slate-950 text-white h-fit z-10 p-2 text-xl 2xl:text-lg" >
-        <div className="w-full flex  justify-between items-center">
-            <Link className="flex flex-row items-center hover:text-primary-400" href={`/smartrotom/pokedex/entrada/${prev.dex}`}>
+    return <header className="flex flex-col bg-slate-950 text-white h-24 z-10 p-2 text-xl 2xl:text-lg" >
+        <div className="w-full flex flex-1 justify-between items-center">
+            <Link className="flex flex-row  items-center hover:text-primary-400" href={`/smartrotom/pokedex/entrada/${prev.dex}`}>
                 <PokemonSprite id={prev.dex} form="base" palette='none' width={50} height={50}/>
                 <ChevronLeftIcon className="w-6"/>#{prev.dex} - {prev.name}
             </Link>
