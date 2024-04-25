@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PokemonService } from './pokemon.service';
+import { uuid } from 'drizzle-orm/pg-core';
 
 @Controller('smartrotom/pokemon')
 export class PokemonController {
@@ -7,14 +8,6 @@ export class PokemonController {
     @Get()
     getPokemon() {
         return this.pokemonService.getPokemon();
-    }
-    @Get('defensivescoreranking')
-    getDefensiveScoreRanking() {
-        return this.pokemonService.getDefensiveScoreRanking();
-    }
-    @Get('offensivescoreranking')
-    getOffensiveScoreRanking() {
-        return this.pokemonService.getOffensiveScoreRanking();
     }
     @Get('overallscoreranking')
     getOverallScoreRanking() {
@@ -112,6 +105,11 @@ export class PokemonController {
     @Get('pokemonnamepalette')
     getPokemonNamePalette(){
         return this.pokemonService.getPokemonNamePalette();
+    }
+
+    @Post('registry')
+    registerPokemon(@Body() body: {uuid: string, pokemonId: number, form: string, palette: string, status: number}){
+        return this.pokemonService.registerPokemon(body.uuid, body.pokemonId, body.form, body.palette, body.status);
     }
 
 }

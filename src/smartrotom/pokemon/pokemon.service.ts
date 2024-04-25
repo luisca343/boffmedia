@@ -4,14 +4,22 @@ import *  as  path from 'path';
 import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
 import { promises as fsPromises } from 'fs';
-import { Pokemon } from '@/types/pokemon';
+import { GenderProperties, Pokemon } from '@/types/pokemon';
 import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
 import { PokemonData } from './utils/pokemonData';
 import { MoveData } from './utils/MoveData';
 import { SpawnData } from './utils/SpawnData';
+import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/Pokedex';
+import { and, eq } from 'drizzle-orm';
+import e from 'express';
+import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 
 @Injectable()
 export class PokemonService {
+    constructor(
+        private db: MySQL2Service,
+    ) {}
     pokemonData: PokemonData;
     moveData: MoveData;
     spawnData: SpawnData;
@@ -138,9 +146,6 @@ export class PokemonService {
         return this.pokemonData.pokemonList;
     }
 
-    getAllPokemonByDex() {
-        return this.pokemonData.speciesByDex;
-    }
 
     getPokemonByDex(dex: number) {
         return this.pokemonData.speciesByDex[dex];
@@ -354,23 +359,6 @@ export class PokemonService {
                 }
                 evoArray[evoId].methods.push(evo)
 
-                /*
-                if (formName === currentForm || currentForm === 'all'){
-                    const evoPkm = this.speciesByName[evoPokemonName]
-                    let evoEvo = this.getEvos(evoPkm, evoFormName) as any
-                    if(!evoEvo.methods){
-                        evoEvo.methods = []
-                    }
-                    evoEvo.methods.push(evo)
-                    
-                    if (Object.keys(evoEvo).length === 0){
-                        evoEvo = this.getEvos(evoPkm, 'all')
-                        evos[pkmId].evos.push(evoEvo)
-                        break;
-                    }
-
-                    evos[pkmId].evos.push(evoEvo)
-                }*/
             }
             index++
         }
@@ -393,22 +381,68 @@ export class PokemonService {
         return [nombrePkm, forma]
       }
 
-      getDefensiveScore(type1: string, type2: string) {
-        return getDeffensiveScore(type1, type2)
-    }
-    getDefensiveScoreRanking() {
-        return getDeffensiveScoreRanking()
-    }
-
-    getOffensiveScoreRanking() {
-        return getOffensiveScoreRanking()
-    }
-
     getOverallRanking() {
         return getOverallScoreRanking()
     }
 
     getPokemonNamePalette(){
         return this.pokemonData.speciesByNameFormPalette
+    }
+
+    getFormId(pokemonId: number, form: string){
+        return this.pokemonData.speciesByDex[pokemonId].forms.find((f) => f.name === form).index
+    }
+
+    getPaletteId(pokemonId: number, form: string, palette: string){
+        const formGenderProperties = this.pokemonData.speciesByDex[pokemonId].forms.find((f) => f.name === form).genderProperties as GenderProperties[]
+        return formGenderProperties.find((g) => g.palettes.find((p) => p.name === palette)).palettes.findIndex((p) => p.name === palette)
+    }
+
+    getPokemonNameByDex(dex: number){
+        return this.pokemonData.speciesByDex[dex].name
+    }
+
+    async registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: number){
+        const formId = this.getFormId(pokemonId, form)
+        const paletteId = this.getPaletteId(pokemonId, form, palette)
+        
+        const res = await this.db.getDrizzle()
+            .select({seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
+            .from(pokedexRegistry)
+            .where(and(
+                eq(pokedexRegistry.uuid, uuid),
+                eq(pokedexRegistry.pokemonId, pokemonId),
+                eq(pokedexRegistry.formId, formId),
+                eq(pokedexRegistry.paletteId, paletteId)
+            )).execute()
+        
+            if(res.length === 0){
+                let caughtAt = status === 1 ? new Date() : null
+                const result = await this.db.getDrizzle()
+                .insert(pokedexRegistry)
+                .values({uuid, pokemonId, formId, paletteId, seenAt: new Date(), caughtAt})
+                .execute() as MySqlRawQueryResult
+                if(result[0].affectedRows === 1) {
+                    const pokemonName = this.getPokemonNameByDex(pokemonId)
+                    return  {success: true, type:'pokedex_event', uuid, pokemonName, form, palette, status}
+                }
+            } 
+
+            if(status === 1){
+                const registry = res[0] as PokedexRegistry
+                if(registry.caughtAt !== null) return {success: false, message: 'Pokemon already caught'}
+                const result = await this.db.getDrizzle().update(pokedexRegistry).set({caughtAt: new Date()})
+                    .where(and(
+                        eq(pokedexRegistry.uuid, uuid),
+                        eq(pokedexRegistry.pokemonId, pokemonId),
+                        eq(pokedexRegistry.formId, formId),
+                        eq(pokedexRegistry.paletteId, paletteId)
+                    )).execute() as MySqlRawQueryResult
+
+                if(result[0].affectedRows === 1) {
+                    const pokemonName = this.getPokemonNameByDex(pokemonId)
+                    return  {success: true, type:'pokedex_event', uuid, pokemonName, form, palette, status}
+                }
+            }
     }
 }
