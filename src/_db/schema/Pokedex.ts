@@ -1,0 +1,13 @@
+import { sql } from "drizzle-orm";
+import { char, datetime, int, mysqlTable } from "drizzle-orm/mysql-core";
+
+export const pokedexRegistry = mysqlTable("pokedex", {
+    uuid: char("uuid", { length: 36 }).notNull(),
+    pokemonId: int("pokemon_id").notNull(),
+    formId: int("form_id").notNull(),
+    paletteId: int("palette_id").notNull(),
+    seenAt: datetime("seen_at").default(sql`CURRENT_TIMESTAMP()`),
+    caughtAt: datetime("caught_at"),
+});
+
+export type PokedexRegistry = typeof pokedexRegistry.$inferSelect;
