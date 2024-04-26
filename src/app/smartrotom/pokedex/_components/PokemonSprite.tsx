@@ -5,6 +5,8 @@ import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
 import { getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
+import { useSession } from "next-auth/react";
+import { getSmartRotomUser } from "@/lib/utils";
 /*
 export function PokemonSpriteOld ({name, dex, form, shiny=false, width=100, height=100}: {name:string, dex:number, form: string, shiny?: boolean, width?: number, height?: number}){
     const [imageUrl, setImageUrl] = useState(getPokemonSprite(name, form, shiny));
@@ -108,16 +110,18 @@ export function PokemonSpriteWithURL ({url, width, height}: {url:string, width?:
 export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true}: {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean}) {
     const [imageUrl, setImageUrl] = useState() as any;
     const [loaded, setLoaded] = useState(false)
+    const {data: session} = useSession()  as any
+
 
     useEffect(() => {
         if(pixelated) {
-            getPokemonSprite(id, form, palette).then((img) => {
+            getPokemonSprite(id, form, palette, getSmartRotomUser(session).uuid).then((img) => {
                     setImageUrl(img)
                     setLoaded(true)
                 }
             )
         } else {
-            getPokemonImage(id, form, palette).then((img) => {
+            getPokemonImage(id, form, palette, getSmartRotomUser(session).uuid).then((img) => {
                     setImageUrl(img)
                     setLoaded(true)
                 }
@@ -127,7 +131,7 @@ export function PokemonSprite({id, form, palette, width=100, height=100, pixelat
 
     if(!loaded) return <Loading width={width} height={height}/>
     return <img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
-        className={`${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}/>
+        className={`${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''} ${imageUrl.status === 1 ? '' : 'brightness-0'}`}/>
 }
 
 
