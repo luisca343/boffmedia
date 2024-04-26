@@ -82,17 +82,37 @@ export class PokemonService {
 
     }
 
-    getImage({pokemonId= 1, formName = "base", paletteName = 'none', type='img'} : {pokemonId?: number, formName: string, paletteName?: string, type?: string}){
+    async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img'} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string}){
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
-       
+
+  
+        let status = 1
+
+        if(["teras", "omnitrix"].includes(formName)){
+            status = 0
+        }
+
+
+        if(pokemonId > 3000) {
+            const pokemonStatus = await this.db.getDrizzle()
+                .select().from(pokedexRegistry)
+                .where(and(
+                    eq(pokedexRegistry.uuid, uuid),
+                    eq(pokedexRegistry.pokemonId, pokemonId),
+                    eq(pokedexRegistry.formId, form.index),
+                    eq(pokedexRegistry.paletteId, form.genderProperties[0].palettes.findIndex((p) => p.name === paletteName))
+                )).execute()
+
+            status = pokemonStatus.length > 0 ? 1 : 0
+        }
         
         if(type === 'img') {
             const imageFolder = paletteName === 'shiny' ? 'Front Shiny' : paletteName === 'none' ? 'Front' : ''
             const pokemonImageName = formName == "base" ? pokemon.name.toUpperCase() : `${pokemon.name.toUpperCase()}_${form.name.toUpperCase()}`
     
             const image = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
-            if(fs.existsSync(image)) return {url: path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`), type:'image'}
+            if(fs.existsSync(image)) return {url: path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`), type:'image', status}
         }
 
         let palette;
@@ -111,14 +131,14 @@ export class PokemonService {
         
         if(!sprite) {
             console.log(`Sprite not found for ${pokemon.name} ${formName} ${paletteName}`)
-            return {url: 'assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png'}
+            return {url: 'assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png', status}
         }
         const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`
         const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
         const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
         
-        if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite'}
-        return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite'}
+        if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite', status}
+        return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite', status}
     }
 
     getSpriteURL(palette){
@@ -130,7 +150,7 @@ export class PokemonService {
         //console.log( path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png'))
         const sprite = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png');
 
-        if(fs.existsSync(sprite)) return {url: path.join('/smartrotom/img/sprites/items', itemFileName + '.png')}
+        if(fs.existsSync(sprite)) return {url: path.join('/smartrotom/img/sprites/items', itemFileName + '.png'),}
         return {url: '/smartrotom/img/sprites/items/000.png'}
     }
 
@@ -444,5 +464,21 @@ export class PokemonService {
                     return  {success: true, type:'pokedex_event', uuid, pokemonName, form, palette, status}
                 }
             }
+    }
+
+    async getPokedex(uuid: string){
+        const dex = await this.db.getDrizzle()
+            .selectDistinct({pokemonId: pokedexRegistry.pokemonId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
+            .from(pokedexRegistry)
+            .where(eq(pokedexRegistry.uuid, uuid))
+            .execute()
+
+        const caughtPokemon = dex.filter((p) => p.caughtAt !== null).length
+        const seenPokemon = dex.filter((p) => p.caughtAt === null).length
+        const totalPokemon = this.pokemonData.species.length
+        const missingPokemon = totalPokemon - seenPokemon
+        const missingCaugthPokemon = totalPokemon - caughtPokemon
+
+        return {seenPokemon, caughtPokemon, totalPokemon, missingPokemon, missingCaugthPokemon}
     }
 }

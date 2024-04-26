@@ -87,14 +87,14 @@ export class PokemonController {
         return this.pokemonService.getSpawns(name);
     }
 
-    @Get('image/:id/:form/:palette')
-    getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string){
-        return this.pokemonService.getImage({pokemonId, formName, paletteName});
+    @Get('image/:id/:form/:palette/:uuid')
+    getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid});
     }
 
-    @Get('sprite/:id/:form/:palette')
-    getSprite(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string){
-        return this.pokemonService.getImage({pokemonId, formName, paletteName, type: 'sprite'});
+    @Get('sprite/:id/:form/:palette/:uuid')
+    getSprite(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid, type: 'sprite'});
     }
 
     @Get('item/sprite/:name')
@@ -110,6 +110,11 @@ export class PokemonController {
     @Post('registry')
     registerPokemon(@Body() body: {uuid: string, pokemonId: number, form: string, palette: string, status: number}){
         return this.pokemonService.registerPokemon(body.uuid, body.pokemonId, body.form, body.palette, body.status);
+    }
+
+    @Get('pokedex/:uuid')
+    getPokedexRegistry(@Param('uuid') uuid: string){
+        return this.pokemonService.getPokedex(uuid);
     }
 
 }
