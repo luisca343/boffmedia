@@ -16,7 +16,7 @@ export function BankSectionContent({ children }: { children: any }) {
 
 export function BankSectionFooter({ children }: { children?: ReactNode }) {
     return (
-        <div className="p-1 text-sm text-right text-blue-950 hover:cursor-pointer  hover:text-blue-700 ">
+        <div className="p-1 text-sm text-right text-blue-950 hover:cursor-pointer">
             {children}
         </div>
     );
