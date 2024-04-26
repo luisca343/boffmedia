@@ -43,7 +43,7 @@ export default function Reclamar(){
             Object.keys(unclaimed).map((key, i) => {
                 return (
                     <div key={i} className="relative inline-block">
-                        <Image width={64} height={64} src={`/smartrotom/img/mina/recompensas/${key.split(':')[1]}.png`} alt="Reward" className="w-32 h-32 object-cover relative" />
+                        <Image width={64} height={64} src={`/smartrotom/img/apps/mina/recompensas/${key.split(':')[1]}.png`} alt="Reward" className="w-32 h-32 object-cover relative" />
                         <span className="absolute bottom-0 right-0 bg-primary-400 text-white text-md rounded-full h-8 w-8 flex items-center justify-center">
                             {unclaimed[key]}
                         </span>

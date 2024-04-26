@@ -165,7 +165,7 @@ export default function Jugar(){
     }
 
     return (
-        <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: 'url(/smartrotom/img/mina/gui/fondo.png)'}}>
+        <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: 'url(/smartrotom/img/apps/mina/gui/fondo.png)'}}>
             <AlertDialog open={open}>
                 <AlertDialogContent className='bg-gray-900 border-gray-950'>
                     {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-white text-center text-2xl">Recompensas obtenidas</div>}
@@ -173,7 +173,7 @@ export default function Jugar(){
                     {obtainedRewards.map((reward, i) => {
                         return (
                             <div key={i} className="flex flex-col flex-wrap w-ful justify-center items-center m-2">
-                                <img src={`/smartrotom/img/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" className="w-12 h-12"/>
+                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" className="w-12 h-12"/>
                                 <div className="text-white">{reward.reward.name}</div>
                             </div>
                     )})}
@@ -202,7 +202,7 @@ export default function Jugar(){
 
             <div className="h-full flex-1 flex flex-col ">
                 <div className="bg-red-400 h-[10vh]" >
-                    <img className="h-full w-full m-auto" src={`/smartrotom/img/mina/barra/barra${damage}.png`} alt="" />
+                    <img className="h-full w-full m-auto" src={`/smartrotom/img/apps/mina/barra/barra${damage}.png`} alt="" />
                 </div>
                 <div className="relative w-full h-full flex-col overflow-auto">
                 <div id="rewards" className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
@@ -215,7 +215,7 @@ export default function Jugar(){
                                 width: `${reward.reward.width * 100 / colNum}%`, 
                                 height: `${reward.reward.height * 100 / rowNum}%`
                             }}>
-                                <img src={`/smartrotom/img/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" className="w-full h-full z-0"/>
+                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" className="w-full h-full z-0"/>
                             </motion.div>
                         )
                     })}
@@ -234,7 +234,7 @@ export default function Jugar(){
                                             shake()
                                         }}
                                         >
-                                        <img className="hover:brightness-110 h-full w-full z-10 select-none no-drag " src={`/smartrotom/img/mina/gui/muro${cell.estado}.png`} alt="" />
+                                        <img className="hover:brightness-110 h-full w-full z-10 select-none no-drag " src={`/smartrotom/img/apps/mina/gui/muro${cell.estado}.png`} alt="" />
                                         </motion.div>
                                     )
                                 })}
@@ -244,9 +244,9 @@ export default function Jugar(){
                 </div>
                 </div >
             </div>
-            <div className="bg-blue-400 h-full w-[15%] flex flex-col items-center justify-end pt-72  bg-no-repeat bg-cover" style={{backgroundImage:`url(/smartrotom/img/mina/gui/barraHerramientas.png)`}}>
-                <img onClick={() => setTool(Tool.PICKAXE)} className="m-auto w-full  p-2lg:p-6" src={`/smartrotom/img/mina/gui/btn_azul${tool === Tool.PICKAXE ? '1': '0'}.png`} alt="" />
-                <img onClick={() => setTool(Tool.HAMMER)} className="m-auto  w-full p-2 lg:p-6" src={`/smartrotom/img/mina/gui/btn_rojo${tool === Tool.HAMMER ? '1': '0'}.png`} alt="" />
+            <div className="bg-blue-400 h-full w-[15%] flex flex-col items-center justify-end pt-72  bg-no-repeat bg-cover" style={{backgroundImage:`url(/smartrotom/img/apps/mina/gui/barraHerramientas.png)`}}>
+                <img onClick={() => setTool(Tool.PICKAXE)} className="m-auto w-full  p-2lg:p-6" src={`/smartrotom/img/apps/mina/gui/btn_azul${tool === Tool.PICKAXE ? '1': '0'}.png`} alt="" />
+                <img onClick={() => setTool(Tool.HAMMER)} className="m-auto  w-full p-2 lg:p-6" src={`/smartrotom/img/apps/mina/gui/btn_rojo${tool === Tool.HAMMER ? '1': '0'}.png`} alt="" />
             </div>
         </motion.div>
         </div>
