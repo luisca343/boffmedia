@@ -71,13 +71,13 @@ const menuIconVariants = {
 const MenuItem = ({ isOpened, i, item: { text, Icon } }: { isOpened: boolean, i: number, item: { text: string, Icon: any } }) => {
   return (
     <motion.div 
-      className="flex items-center text-blue-100  hover:text-blue-300 cursor-pointer" 
+      className="flex items-center text-blue-100  hover:text-blue-300 cursor-pointer " 
       variants={menuIconVariants}
       custom={i}
       whileHover={{ scale: 1.1 }}
       transition={{ duration: .5 }}
     >
-    <Icon strokeWidth={2} height={32} width={32} className=" m-2 ml-4"/>
+    <Icon strokeWidth={2} height={32} width={32} className="my-4 ml-4"/>
       <AnimatePresence>
         {isOpened && (
           <motion.div 

@@ -49,8 +49,8 @@ export default function StarBank(){
     function GraficaYTal(){
         return(
             
-            <div className="flex m-auto h-full">
-                <TestChart data={getData()} className="h-full "/>
+            <div className="flex m-auto w-full">
+                <TestChart data={getData()} className="w-full "/>
             </div>
         )
     }
@@ -76,51 +76,49 @@ export default function StarBank(){
     */
     
     return (
-        <div className="h-full w-full flex p-8  bg-cover bg-center bg-no-repeat bg-fixed text-blue-900" >
-            <div className="h-full flex flex-col justify-start w-1/3 mx-2">
-                <BankSection className="h-1/3">
+        <div className="w-full h-full flex flex-col p-8  bg-cover bg-center bg-no-repeat bg-fixed" >
+            <div className="w-full flex  justify-evenly">
+                <BankSection className="w-2/3">
                     <BankSectionHeader >Datos de cuenta </BankSectionHeader>
                     <BankSectionContent>
                     <div className="text-3xl font-bold text-center">Balance</div>
-                    <div className="text-6xl font-bold  text-center ">{Number(activeAccount.balance).toLocaleString('de-DE')} &#165;</div>
+                    <div className="text-7xl font-bold text-blue-900 text-center ">{Number(activeAccount.balance).toLocaleString('de-DE')} &#165;</div>
+
+                    <div className="flex text-xl font-bold mt-8 items-center"><span className="mr-4">Cambiar de Cuenta:</span><SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/></div>
+                    
+                    
                 </BankSectionContent>
-                    <BankSectionFooter>        
-                        <div className="flex flex-row justify-between items-center">
-                            <div className="flex text-xl font-bold items-center just">
-                                <span className="mr-4">Cambiar de Cuenta:</span>
-                                <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
-                            </div>
-                            <BankSectionButton onClick={() => {console.log("click")}}>Ver todas</BankSectionButton>
-                        </div>
-                    </BankSectionFooter>
-                </BankSection>
-                <BankSection className="overflow-auto">
-                    <BankSectionHeader> Transacciones </BankSectionHeader>
-                    <BankSectionContent >
-                        <Transactions transactions={transactions} activeAccount={activeAccount} />
-                    </BankSectionContent>
                     <BankSectionFooter>
-                        <BankSectionButton onClick={() => {console.log("click")}}>Ir a Transacciones</BankSectionButton>
+                        <BankSectionButton onClick={() => {console.log("click")}}>Ver todas</BankSectionButton>
                     </BankSectionFooter>
                 </BankSection>
-            </div>
-            <div className="h-full flex flex-col justify-start w-2/3 mx-2">
-                <BankSection className="h-4/5">
+                <BankSection className="w-1/3">
                     <BankSectionHeader> Grafica </BankSectionHeader>
                     <BankSectionContent><GraficaYTal /></BankSectionContent>
                     <BankSectionFooter>
                         <BankSectionButton onClick={() => {console.log("click")}}>Ir a Gráficas</BankSectionButton>
                     </BankSectionFooter>
                 </BankSection>
-                <BankSection className="h-1/5">
-                    <BankSectionHeader> Transferencias </BankSectionHeader>
-                    <BankSectionContent>
-                        <Transactions transactions={transfers} activeAccount={activeAccount} />
-                    </BankSectionContent>
-                    <BankSectionFooter>
-                        <BankSectionButton onClick={() => {console.log("click")}}>Ir a Transferencias</BankSectionButton>
-                    </BankSectionFooter>
-                </BankSection>
+            </div>
+            <div className="w-full overflow-hidden flex flex-1 my-2 justify-evenly">
+            <BankSection  className="w-3/5">
+                <BankSectionHeader> Transacciones </BankSectionHeader>
+                <BankSectionContent>
+                    <Transactions transactions={transactions} activeAccount={activeAccount} />
+                </BankSectionContent>
+                <BankSectionFooter>
+                    <BankSectionButton onClick={() => {console.log("click")}}>Ir a Transacciones</BankSectionButton>
+                </BankSectionFooter>
+            </BankSection>
+            <BankSection  className="w-2/5">
+                <BankSectionHeader> Transferencias </BankSectionHeader>
+                <BankSectionContent>
+                    <Transactions transactions={transfers} activeAccount={activeAccount} />
+                </BankSectionContent>
+                <BankSectionFooter>
+                    <BankSectionButton onClick={() => {console.log("click")}}>Ir a Transferencias</BankSectionButton>
+                </BankSectionFooter>
+            </BankSection>
             </div>
         </div>
 
@@ -159,7 +157,7 @@ export function Transactions({transactions, activeAccount, className}: {transact
     }
     return(
 
-            <div className="flex flex-col overflow-auto h-full p-2">
+            <div className="overflow-auto h-full p-2">
             {transactions.map((transaction: any) => {
                 const transactionType = transaction.from === activeAccount.id ? "out" : "in";
                 const amount = transactionType === "out" ? -transaction.amount : transaction.amount;

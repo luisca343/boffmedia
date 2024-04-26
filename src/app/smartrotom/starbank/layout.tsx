@@ -15,7 +15,7 @@ export default function RootLayout({
          backgroundRepeat:'no-repeat', backgroundSize:'cover'}}
          >
         <SideMenu />
-    {children}
+      {children}
     </div>
     
   );
