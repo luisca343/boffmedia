@@ -10,6 +10,7 @@ type PokedexRegistries = {
     totalPokemon: number;
     missingPokemon: number;
     missingCaughtPokemon: number;
+    shinyPokemon: number;
 }
 
 export default function MenuHeader(){
@@ -30,22 +31,29 @@ export default function MenuHeader(){
 
     return(
         
-        <header className="flex bg-slate-950  justify-evenly text-white h-12 z-10 p-2 text-xl 2xl:text-lg" >
-            <div className="flex">
-                <img src={`/smartrotom/img/apps/pokedex/avistado.webp`} />
-                <span className="ml-2">Vistos</span>
-                <span className="ml-2">{pokedexRegistries.seenPokemon}</span>
-            </div>
-            <div className="flex ml-2">
-                <img src={`/smartrotom/img/apps/pokedex/capturado.webp`} />
-                <span className="ml-2">Capturados</span>
-                <span className="ml-2">{pokedexRegistries.caughtPokemon}</span>
-            </div>
-            <div className="flex ml-2">
-                <img src={`/smartrotom/img/apps/pokedex/desconocido.webp`} />
-                <span className="ml-2">Desconocidos</span>
-                <span className="ml-2">{pokedexRegistries.missingPokemon}</span>
-            </div>
+        <header className="flex bg-slate-950 items-center justify-evenly text-white h-12 z-10 p-2 text-xl 2xl:text-lg" >
+                <div className="flex mr-2 items-center">
+                    <img height={32} width={32} src={`/smartrotom/img/apps/pokedex/avistado.webp`} />
+                    <span className="ml-1">Vistos</span>
+                    <span className="ml-1">{pokedexRegistries.seenPokemon}</span>
+                </div>
+                <div className="flex mr-4 items-center">
+                    <img height={32} width={32} src={`/smartrotom/img/apps/pokedex/capturado.webp`} />
+                    <span className="ml-1">Capturados</span>
+                    <span className="ml-1">{pokedexRegistries.caughtPokemon}</span>
+                </div>
+                <div className="flex mr-4 items-center">
+                    <img height={32} width={32} src={`/smartrotom/img/apps/pokedex/shiny.webp`} />
+                    <span className="ml-1">Shiny</span>
+                    <span className="ml-1">{pokedexRegistries.shinyPokemon}</span>
+                </div>
+                <div className="flex mr-4 items-center">
+                    <img height={32} width={32} src={`/smartrotom/img/apps/pokedex/desconocido.webp`} />
+                    <span className="ml-1">Desconocidos</span>
+                    <span className="ml-1">{pokedexRegistries.missingPokemon}</span>
+                </div>
+
+
         </header>
     )
 }

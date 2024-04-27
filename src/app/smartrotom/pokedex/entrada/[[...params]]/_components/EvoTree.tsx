@@ -1,10 +1,10 @@
 import { rotomGET } from "@/services/boffAPI"
 import { ArrowRightCircleIcon } from "lucide-react"
-import getPokemonSprite, { getItemSprite, getPokemonName } from "../dexUtils"
+import getPokemonSprite, { getItemSprite, getPokemonName } from "../../../dexUtils"
 import useTranslation from 'next-translate/useTranslation'
 import Image from "next/image"
 import { Evolution } from "@/types/Pokemon"
-import { ItemSprite, PokemonSprite } from "./PokemonSprite"
+import { ItemSprite, PokemonSprite } from "../../../_components/PokemonSprite"
 import Link from "next/link"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import React from "react"

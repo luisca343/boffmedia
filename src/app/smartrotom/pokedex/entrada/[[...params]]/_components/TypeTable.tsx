@@ -1,5 +1,5 @@
 
-import PokedexTable, { PokedexCell, PokedexHeader, PokedexRow } from "./PokedexTable"
+import PokedexTable, { PokedexCell, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable"
 import TypeBadge from "./TypeBadge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 

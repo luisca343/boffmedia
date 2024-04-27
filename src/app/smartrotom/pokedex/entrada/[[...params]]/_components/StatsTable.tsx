@@ -2,7 +2,7 @@
 import useTranslation from 'next-translate/useTranslation'
 import { Table, TableRow, TableHeader, TableCell, TableBody, TableHead, TableFooter } from "@/components/ui/table"
 import { BattleStats, EvYields, Pokemon } from '@/types/Pokemon'
-import PokedexTable, { PokedexCell, PokedexHeader,PokedexRow } from './PokedexTable'
+import PokedexTable, { PokedexCell, PokedexHeader,PokedexRow } from '../../../_components/PokedexTable'
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number }){
     const { t } = useTranslation("smartrotom/pokedex/common")

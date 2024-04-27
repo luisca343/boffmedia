@@ -1,6 +1,6 @@
 import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
 import { LevelUpMove, Moves, Pokemon } from "@/types/Pokemon";
-import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "./PokedexTable";
+import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 
 import useTranslation from 'next-translate/useTranslation'
 import TypeBadge from "./TypeBadge";

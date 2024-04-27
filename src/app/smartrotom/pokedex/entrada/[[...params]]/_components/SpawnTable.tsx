@@ -1,8 +1,8 @@
 import { TableBody } from "@/components/ui/table";
-import { SpawnInfo } from "../_types/spawnInfo";
+import { SpawnInfo } from "../../../_types/spawnInfo";
 import useTranslation from 'next-translate/useTranslation'
-import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "./PokedexTable";
-import { PokemonSprite } from "./PokemonSprite";
+import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
+import { PokemonSprite } from "../../../_components/PokemonSprite";
 
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
     const { t } = useTranslation("smartrotom/pokedex/spawns")
