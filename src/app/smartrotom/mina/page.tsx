@@ -36,7 +36,7 @@ export default function Mina(){
     return (
             <MenuWrapper>
                 <div className={`p-4 h-full w-full lg:w-3/5 ml-auto mr-5 flex flex-col`}>
-                <div className={`text-6xl md:text-8xl font-custom margin-2 text-right text-gray-100 text-shadow-border3 `}>Mina 2.0</div>
+                <div className={`text-2xl xl:text-8xl font-custom margin-2 text-right text-gray-100 text-shadow-border3 `}>Mina 2.0</div>
                 <LinkMina className='mt-12' href='/smartrotom/mina/jugar'>Jugar</LinkMina>
                 <LinkMina href='/smartrotom/mina/historial'>Historial</LinkMina>
                 <LinkMina href='/smartrotom/mina/ranking'>Ranking</LinkMina>
@@ -52,7 +52,7 @@ export default function Mina(){
 
 function LinkMina({href, children, className} : {href: string, children: any, className?: string}){
     return (
-        <Link className={`text-4xl lg:text-6xl ml-auto text-gray-100 text-shadow-border3 my-2 ${className}`} href={href}>
+        <Link className={`text-xl xl:text-6xl ml-auto text-gray-100 text-shadow-border3 my-2 ${className}`} href={href}>
             <motion.div
                 whileHover={{scale: 1.1}}
                 whileTap={{scale: 0.9}}>

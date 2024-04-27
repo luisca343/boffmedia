@@ -27,7 +27,7 @@ export default function History(){
                             {game.map((reward: any, index: number) => {
                                 return (
                                     <div key={reward.id+ "-" +index} className="flex flex-col m-2 justify-between items-center pb-2 h-full">
-                                        <Image alt={reward.itemId} width={64} height={64} src={`/smartrotom/img/mina/recompensas/${reward.itemId?.split(':')[1]}.png`}/>
+                                        <Image alt={reward.itemId} width={64} height={64} src={`/smartrotom/img/apps/mina/recompensas/${reward.itemId?.split(':')[1]}.png`}/>
                                         <p className="text-gray-400">{reward.objeto}</p>
                                     </div>
                                 )

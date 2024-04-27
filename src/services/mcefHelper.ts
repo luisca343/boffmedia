@@ -4,7 +4,7 @@ export async function isMinecraft() {
 }
 
 export async function getDatosUsuarioMC(){
-    const response = await mcefQuery('getUserData');
+    const response = await mcefQuery('getUserData') as {username: string, uuid: string, world: string};
     return response;
 }
 

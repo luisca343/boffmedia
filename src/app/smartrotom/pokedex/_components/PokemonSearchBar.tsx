@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { rotomGET } from "@/services/boffAPI"
 import Link from "next/link"
 import { useState } from "react"
+import { PokemonSprite } from "./PokemonSprite"
 
 export default function PokemonSearchBar(){
     const [text, setText] = useState("")
@@ -20,13 +21,13 @@ export default function PokemonSearchBar(){
     }
 
     return (
-        <div>
-            <Input type="text" placeholder="Search for a Pokemon" value={text} onChange={(e) => type(e.target.value)} />
+        <div className="w-[90%] m-auto">
+            <Input type="text" placeholder="Buscar un Pokémon" value={text} onChange={(e) => type(e.target.value)} />
             <div className="overflow-auto max-h-48">
                 {pokemon?.map(p => (
-                    <Link href={`/smartrotom/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex border p-2">
-                        <img width={50} src={`http://api.boffmedia.es/smartrotom/img/sprites/Front/${p.item.name.toUpperCase()}.png`} alt={p.item.name} />
-                        <p>{p.item.name}</p>
+                    <Link href={`/smartrotom/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex p-2 hover:bg-gray-600 text-white items-center">
+                        <PokemonSprite width={40} id={p.item.dex} form={"base"} palette={"none"}/>
+                        <span className='ml-2'>{p.item.name}</span>
                     </Link>
                 ))}
             </div>

@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
 import AuthForm from "@/app/auth/AuthForm";
-import { Loading } from "./Loading";
+import { Loading, LoadingScreen } from "./Loading";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -24,9 +24,15 @@ export type BoffSession = {
 export default function AppWrapper({children} : {children: React.ReactNode}) {
     const { data: session, status } = useSession() as {data: BoffSession | null, status: string};
     const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
+    const [isMC, setIsMC] = useState(false);
+
     const [tema, setTema] = useState('');
 
     useEffect(() => {
+      isMinecraft().then((res) => {
+        setIsMC(res);
+      });
+
       const fetchDatosUsuario = async () => {
         if (typeof window !== 'undefined') {
             const data = await getDatosUsuarioMC() as {username: string, uuid: string, world: string};
@@ -70,16 +76,16 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
 
       
       if (status === "loading") {
-        return <Loading />
+        return <LoadingScreen />
       }
       
-      if (status === "unauthenticated" && isMinecraft()) {
-        if(!datosUsuario) return <Loading />
+      if (status === "unauthenticated" && isMC) {
+        if(!datosUsuario) return <LoadingScreen />
         
         return <p>{Object.values(datosUsuario)}</p>
       }
       
-      if (status === "unauthenticated" && !isMinecraft()) {
+      if (status === "unauthenticated" && !isMC) {
         return <AuthForm url="boffmedia" redirect="/smartrotom"/>
       }
 
@@ -120,6 +126,7 @@ function RotomError({error}: {error: string}) {
     )
 }
 
+/*
 function LoginForm(){
     return (
         <div className="flex flex-col items-center justify-center h-full"
@@ -131,4 +138,4 @@ function LoginForm(){
             >Sign in with Google</button>
         </div>
     )
-}
+}*/

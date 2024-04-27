@@ -1,22 +1,49 @@
+import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { Pokemon } from "@/types/Pokemon"
 
-export default function getPokemonSprite(name: string, form: string, shiny: boolean){
+export default function getPokemonSpriteOld(name: string, form: string, shiny: boolean){
     const formString = form && form != 'base' ? `_${form.toUpperCase()}` : ''
     const folderString = shiny ? 'Front Shiny' : 'Front'
     return `/smartrotom/img/sprites/${folderString}/${name.toUpperCase()}${formString}.png`
 }
 
+export async function getPokemonImage(id: number, form: string, palette: string, uuid = ''){
+    const img = await rotomGET(`/pokemon/image/${id}/${form}/${palette}/${uuid}`)
+    return img
+}
+
+export async function getPokemonSprite(id: number, form: string, palette: string, uuid = ''){
+    const img = await rotomGET(`/pokemon/sprite/${id}/${form}/${palette}/${uuid}`)
+    return img
+}
+
+export async function getItemSprite(name: string){
+    const img = await rotomGET(`/pokemon/item/sprite/${name}`)
+    return img
+}
+
 export function getPokemonName(name: string, t: any){
-    return t(`pixelmon_${name.toLocaleLowerCase()}`)
+    return t(`pixelmon_${name.toLocaleLowerCase().replace(' ', '_')}`)
+}
+
+export function getPokemonId(name: string, form: string){
+    if (typeof name !== 'string' || typeof form !== 'string') {
+        throw new Error('Both name and form must be strings');
+    }
+
+    return `${name.toLowerCase()}_${form.toLowerCase()}`;
 }
 
 export function getPokemonNameAndForm(name: string, form: string, t: any){
-    console.log(name, form)
     return t(`form`, {pokemon: getPokemonName(name, t), form: `${t(`form_${form}`)}`})
 }
 
 export function getForm(form: string, t: any){
     return t(`form_${form || 'base'}`)
+}
+
+export function getFormIndex(pokemon: Pokemon, formName: string){
+    return pokemon.forms.findIndex(form => form.name == formName)
 }
 
 // Damage dealt by a move of a certain type to a pokemon of a certain type

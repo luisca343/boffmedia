@@ -11,6 +11,8 @@ export interface Form {
     pkmDex?: number;
     rank: {ranking: number, type1: string, type2: string, tier: string};
     index: number;
+    gender: string;
+
 
     pkmGeneration?: number;
     name: string;
@@ -114,16 +116,11 @@ export interface GenderProperties {
 export interface Palette {
     name: string;
     texture: string;
-    sprite: string | SpriteWithFallback;
+    sprite: string;
     particle: string;
     modelLocator?: ModelLocator;
     sounds?: string[];
     emissive?: string;
-}
-
-export interface SpriteWithFallback {
-    resource: string;
-    fallback: string;
 }
 
 export interface ModelLocator {
@@ -142,7 +139,6 @@ export interface Evolution {
     conditions: any[];
     evoType: string;
     moves?: string[];
-    level?: number;
 }
 
 export interface Item {
@@ -150,21 +146,5 @@ export interface Item {
 }
 
 export interface EvYields {
-    speed?: number;
-    specialDefense?: number;
-    specialAttack?: number;
-    defense?: number;
-    attack?: number;
-    hp?: number;
-
+    speed: number;
 }
-
-export type PokedexRegistry = {
-    id: number;
-    uuid: string;
-    pokemonId: number;
-    formId: string;
-    paletteId: string;
-    seenAt: Date | string; 
-    caughtAt?: Date | string | null;
-};
