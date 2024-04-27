@@ -117,4 +117,10 @@ export class PokemonController {
         return this.pokemonService.getPokedex(uuid);
     }
 
+    @Get('registries/:uuid')
+    getPokedexRegistries(@Param('uuid') uuid: string){
+        console.log(uuid);
+        return this.pokemonService.getRegistries(uuid);
+    }
+
 }

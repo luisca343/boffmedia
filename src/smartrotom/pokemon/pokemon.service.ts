@@ -11,7 +11,7 @@ import { MoveData } from './utils/MoveData';
 import { SpawnData } from './utils/SpawnData';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/Pokedex';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import e from 'express';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 
@@ -100,8 +100,8 @@ export class PokemonService {
                 .where(and(
                     eq(pokedexRegistry.uuid, uuid),
                     eq(pokedexRegistry.pokemonId, pokemonId),
-                    eq(pokedexRegistry.formId, form.index),
-                    eq(pokedexRegistry.paletteId, form.genderProperties[0].palettes.findIndex((p) => p.name === paletteName))
+                    eq(pokedexRegistry.formId, formName || 'base'),
+                    eq(pokedexRegistry.paletteId, paletteName || 'none')
                 )).execute()
 
             status = pokemonStatus.length > 0 ? 1 : 0
@@ -128,17 +128,14 @@ export class PokemonService {
         }
 
         const sprite = this.getSpriteURL(palette)
-        
-        if(!sprite) {
-            console.log(`Sprite not found for ${pokemon.name} ${formName} ${paletteName}`)
-            return {url: 'assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png', status}
-        }
+         
         const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`
         const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
         const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
         
         if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite', status}
-        return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite', status}
+        if(fs.existsSync(publicDir)) return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite', status}
+        return {url: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png', status}
     }
 
     getSpriteURL(palette){
@@ -423,8 +420,8 @@ export class PokemonService {
     }
 
     async registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: number){
-        const formId = this.getFormId(pokemonId, form)
-        const paletteId = this.getPaletteId(pokemonId, form, palette)
+        const formId = form || 'base'
+        const paletteId = palette || 'none'
         
         const res = await this.db.getDrizzle()
             .select({seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
@@ -432,8 +429,8 @@ export class PokemonService {
             .where(and(
                 eq(pokedexRegistry.uuid, uuid),
                 eq(pokedexRegistry.pokemonId, pokemonId),
-                eq(pokedexRegistry.formId, formId),
-                eq(pokedexRegistry.paletteId, paletteId)
+                eq(pokedexRegistry.formId, formId || 'base'),
+                eq(pokedexRegistry.paletteId, paletteId || 'none')
             )).execute()
         
             if(res.length === 0){
@@ -468,17 +465,35 @@ export class PokemonService {
 
     async getPokedex(uuid: string){
         const dex = await this.db.getDrizzle()
-            .selectDistinct({pokemonId: pokedexRegistry.pokemonId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
+            .selectDistinct({pokemonId: pokedexRegistry.pokemonId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt, paletteId: pokedexRegistry.paletteId})
             .from(pokedexRegistry)
             .where(eq(pokedexRegistry.uuid, uuid))
             .execute()
 
-        const caughtPokemon = dex.filter((p) => p.caughtAt !== null).length
-        const seenPokemon = dex.filter((p) => p.caughtAt === null).length
+        const seenUniquePokemonIds = new Set(dex.filter((p) => p.caughtAt === null).map((p) => p.pokemonId));    
+        const caughtUniquePokemonIds = new Set(dex.filter((p) => p.caughtAt !== null).map((p) => p.pokemonId));
+
+     
+
+        const seenPokemon = seenUniquePokemonIds.size;
+        const caughtPokemon = caughtUniquePokemonIds.size;
+
+        const shinyPokemon = dex.filter((p) => p.paletteId === 'shiny' && p.caughtAt !== null).length 
         const totalPokemon = this.pokemonData.species.length
         const missingPokemon = totalPokemon - seenPokemon
         const missingCaugthPokemon = totalPokemon - caughtPokemon
 
-        return {seenPokemon, caughtPokemon, totalPokemon, missingPokemon, missingCaugthPokemon}
+        return {seenPokemon, caughtPokemon, totalPokemon, missingPokemon, missingCaugthPokemon, shinyPokemon}
+    }
+
+    async getRegistries(uuid: string){
+        const dex = await this.db.getDrizzle()
+            .select({pokemonId: pokedexRegistry.pokemonId, formId: pokedexRegistry.formId, paletteId: pokedexRegistry.paletteId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
+            .from(pokedexRegistry)
+            .where(eq(pokedexRegistry.uuid, uuid))
+            .orderBy(desc(pokedexRegistry.caughtAt), desc(pokedexRegistry.seenAt))
+            .execute()
+            console.log(dex)
+        return dex
     }
 }
