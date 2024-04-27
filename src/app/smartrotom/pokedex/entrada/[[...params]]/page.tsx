@@ -2,32 +2,42 @@ import { rotomGET } from "@/services/boffAPI"
 import { Movement, Pokemon } from "../../_types/pokemon"
 import Link from "next/link"
 import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemonId, getPokemonNameAndForm } from "../../dexUtils"
-import { EvoTree } from "../../_components/EvoTree"
+import { EvoTree } from "./_components/EvoTree"
 import { PokemonSprite } from "../../_components/PokemonSprite"
-import { TypeTable } from "../../_components/TypeTable"
+import { TypeTable } from "./_components/TypeTable"
 import useTranslation from 'next-translate/useTranslation'
-import TypeBadge from "../../_components/TypeBadge"
-import { StatsTable } from "../../_components/StatsTable"
-import { EntryHeader } from "../../_components/EntryHeader"
-import { LevelMovesTable, MovesTable, OtherMovesTable } from "../../_components/MovesTable"
+import TypeBadge from "./_components/TypeBadge"
+import { StatsTable } from "./_components/StatsTable"
+import { EntryHeader } from "./_components/EntryHeader"
+import { LevelMovesTable, MovesTable, OtherMovesTable } from "./_components/MovesTable"
 import { SpawnInfo } from "../../_types/spawnInfo"
-import { SpawnTable } from "../../_components/SpawnTable"
+import { SpawnTable } from "./_components/SpawnTable"
+import { GenderProperties } from "@/types/Pokemon"
+import { PokedexSection } from "../../_components/PokedexSection"
 
 
 export default async function EntradaPokedex({params}: any){
-    const { t } = useTranslation("smartrotom/pokedex/common")
     const { t: formsTranslation } = useTranslation("smartrotom/pokedex/forms")
-    let [pokemonIndex, formIndex] = params.params as [number, number]
+    
+    let [pokemonIndex, formIndex] = params.params as [number, number | string]
+
+    const pokemon = await rotomGET(`/pokemon/dex/${pokemonIndex}`) as Pokemon
+
     if (pokemonIndex === undefined) {
         pokemonIndex = 0;
     }
-    if (formIndex === undefined) {
+    if (formIndex === undefined ) {
         formIndex = 0;
+    } else if(!parseInt(formIndex+"")) {
+        formIndex = pokemon.forms.findIndex((form) => form.name === formIndex) 
+        formIndex = formIndex === -1 ? 0 : formIndex
     } else {
-        formIndex = formIndex - 1;
+        formIndex = parseInt(formIndex+"") - 1;
     }
+   
+       
+    
 
-    const pokemon = await rotomGET(`/pokemon/dex/${pokemonIndex}`) as Pokemon
     const {next, prev} = await rotomGET(`/pokemon/nextprev/${pokemonIndex}`) as {next: Pokemon, prev: Pokemon}
     const moves = await rotomGET(`/pokemon/moves/${pokemonIndex}/${formIndex}`) as Movement[]
 
@@ -41,9 +51,10 @@ export default async function EntradaPokedex({params}: any){
     const type1 = pokemon.forms[formIndex]?.types?.[0] ?? pokemon.forms[0]?.types?.[0] as string
     const type2 = pokemon.forms[formIndex]?.types?.[1] ?? pokemon.forms[0]?.types?.[1] as string
 
-    const palettes = pokemon.forms[formIndex].genderProperties?.map((gender) => {
+    const genderProperties = pokemon.forms[formIndex].genderProperties as GenderProperties[]
+    const palettes = genderProperties?.map((gender) => {
         return gender.palettes.map((palette) => {
-            const sprite = palette.sprite.resource ? palette.sprite.resource.split(':')[1] : palette.sprite?.split(':')[1]
+            const sprite = typeof palette.sprite === 'object' ? palette.sprite.resource?.split(':')[1] : palette.sprite?.split(':')[1]
             return {
                 name: palette.name,
                 sprite
@@ -115,13 +126,6 @@ export default async function EntradaPokedex({params}: any){
         </section>
     )
 
-    function PokedexSection({title, children, id, className=''}: {title: string, children: any, id?: string, className?: string}){
-        return <section className={`flex flex-col justify-center w-[95%] 2xl:w-[90%] m-auto ${className} `} id={id}>
-            <div className="text-2xl border-b-2 2xl:border-b border-white  mb-4 mt-2">{title}</div>
-            {children}
-        </section>
-    }
-
     function BasicInfo({formName}: {formName: string}){
         const types = pokemon.forms[formIndex].types ? pokemon.forms[formIndex].types : pokemon.forms[0].types as any
         const description = formsTranslation(`pixelmon_${pokemon.name.toLowerCase()}_description`).split('_').join('.')
@@ -131,7 +135,7 @@ export default async function EntradaPokedex({params}: any){
             <div className="flex " style={{width:200, height:200}}>
                 <PokemonSprite id={pokemonIndex} form={formName} palette='none' width={200} height={200} pixelated={false}/>
             </div> 
-            <span className=" text-xl">{description}  </span> 
+            <span className=" text-xl text-center">{description}  </span> 
             <div className="flex justify-center items-center">
                 {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
             </div>
