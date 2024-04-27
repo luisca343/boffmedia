@@ -4,6 +4,7 @@ import './pasaporte.css'
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { CabezaJugador } from "@/components/smartrotom/CabezaMC";
+import { Loading, LoadingScreen } from "@/components/smartrotom/Loading";
 
 export default function Pasaporte(){
   const {data: session} = useSession() as {data: BoffSession | null, status: string};
@@ -31,7 +32,7 @@ export default function Pasaporte(){
             <Page>Page 4</Page>
             <Page>Page 5</Page>
             <Page>Page 6</Page>
-            <Page className="bg-blue-600">Page 7</Page>
+            <Page style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>Page 7</Page>
           </Book>
       </section>
     )
