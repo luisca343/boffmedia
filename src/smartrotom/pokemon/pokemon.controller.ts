@@ -1,5 +1,6 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PokemonService } from './pokemon.service';
+import { uuid } from 'drizzle-orm/pg-core';
 
 @Controller('smartrotom/pokemon')
 export class PokemonController {
@@ -7,14 +8,6 @@ export class PokemonController {
     @Get()
     getPokemon() {
         return this.pokemonService.getPokemon();
-    }
-    @Get('defensivescoreranking')
-    getDefensiveScoreRanking() {
-        return this.pokemonService.getDefensiveScoreRanking();
-    }
-    @Get('offensivescoreranking')
-    getOffensiveScoreRanking() {
-        return this.pokemonService.getOffensiveScoreRanking();
     }
     @Get('overallscoreranking')
     getOverallScoreRanking() {
@@ -83,4 +76,51 @@ export class PokemonController {
     getEvoTree(@Param('id') id: string){
         return this.pokemonService.getEvoTree(parseInt(id));
     }
+
+    @Get('moves/:id/:form')
+    getMoves(@Param('id') id: number, @Param('form') form: number){
+        return this.pokemonService.getMoves(id, form);
+    }
+
+    @Get('spawns/:name/')
+    getSpawns(@Param('name') name: string){
+        return this.pokemonService.getSpawns(name);
+    }
+
+    @Get('image/:id/:form/:palette/:uuid')
+    getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid});
+    }
+
+    @Get('sprite/:id/:form/:palette/:uuid')
+    getSprite(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid, type: 'sprite'});
+    }
+
+    @Get('item/sprite/:name')
+    getItemSprite(@Param('name') name: string){
+        return this.pokemonService.getItemSprite(name);
+    }
+
+    @Get('pokemonnamepalette')
+    getPokemonNamePalette(){
+        return this.pokemonService.getPokemonNamePalette();
+    }
+
+    @Post('registry')
+    registerPokemon(@Body() body: {uuid: string, pokemonId: number, form: string, palette: string, status: number}){
+        return this.pokemonService.registerPokemon(body.uuid, body.pokemonId, body.form, body.palette, body.status);
+    }
+
+    @Get('pokedex/:uuid')
+    getPokedexRegistry(@Param('uuid') uuid: string){
+        return this.pokemonService.getPokedex(uuid);
+    }
+
+    @Get('registries/:uuid')
+    getPokedexRegistries(@Param('uuid') uuid: string){
+        console.log(uuid);
+        return this.pokemonService.getRegistries(uuid);
+    }
+
 }

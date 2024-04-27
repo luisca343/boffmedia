@@ -1,4 +1,7 @@
 import { off } from "process";
+import * as fs from 'fs';
+import *  as  path from 'path';
+import { promises as fsPromises } from 'fs';
 
 const typeChart = {
     normal : { ghost: 0, rock: 0.5, steel: 0.5 },
@@ -24,26 +27,26 @@ const typeChart = {
 // We add a multiplier to the types depending on how common they are in the metagame. This will make the ranking more accurate.
 // We will multiply the score by the type frequency. The type frequency is a number between 0 and 1 that represents the percentage of pokemons that have that type.
 const deffTypeFrequency = {
-    steel: 1,
-    fairy: 1,
+    steel: 100,
+    fairy: 100,
 
-    flying: 1,
-    water: 1,
+    flying: 70,
+    water: 80,
 
-    ground: 1,
-    fire: 1,
-    dragon: 1,
-    dark: 1,
-    ghost: 1,
-    fighting: 1,
-    grass: 1,
-    psychic: 1,
-    poison: 1,
-    electric: 1,
-    normal: 1,
-    ice: 1,
-    rock: 1,
-    bug: 1
+    ground: 70,
+    fire: 70,
+    dragon: 70,
+    dark: 70,
+    ghost: 60,
+    fighting: 60,
+    grass: 50,
+    psychic: 40,
+    poison: 30,
+    electric: 30,
+    normal: 20,
+    ice: 15,
+    rock: 15,
+    bug: 10
 
 } as {[key: string]: number}
 
@@ -71,17 +74,21 @@ const offTypeFrequency = {
 } as {[key: string]: number}
 
 
+const defaultDirDef = path.join(__dirname, '../../../../', 'public/smartrotom/packs/wolfeyRanking.json');
+export const wolfeyTypeRanking: {ranking: number, type1: string, type2: string, tier: string}[] = JSON.parse(fs.readFileSync(defaultDirDef, 'utf8'));
+
 function factorFrequency(score: number, type: string, deffensive: boolean){
     let realScore = 0
-    if(score === 0) realScore = 0
+    if(score === 0) realScore = deffensive ? -5 : 0
     if(score === 0.25) realScore = 5
     if(score === 0.5) realScore = 10
     if(score === 1) realScore = 25
     if(score === 2) realScore = 50
     if(score === 4) realScore = 100
-    if(deffensive) return score >25 ? realScore / offTypeFrequency[type] : realScore * offTypeFrequency[type]
+    
+    if(deffensive) return realScore >= 25 || realScore < 0  ? realScore * offTypeFrequency[type] : realScore / offTypeFrequency[type]
     //return score > 25 ? realScore * deffTypeFrequency[type] : realScore / deffTypeFrequency[type]
-    return score > 25 ? realScore / deffTypeFrequency[type] : realScore * deffTypeFrequency[type]
+    return realScore >= 25 ? realScore * deffTypeFrequency[type] : realScore / deffTypeFrequency[type]
 }
 
 
@@ -91,12 +98,12 @@ export function getDeffensiveScore(type1: string, type2?: string) {
     for(let type in typeChart){
         let type1Effectiveness = typeChart[type][type1.toLowerCase()] ?? 1;
         if(type2 && type2 !== type1){
+        
             const type2Effectiveness = typeChart[type][type2.toLowerCase()] ?? 1;
             let result = type1Effectiveness * type2Effectiveness
-            if(result === 0) result = - 1.5
             total += factorFrequency(result, type, true)
+            console.log(`${type1} ${type2} ${type} ${factorFrequency(result, type, true)} ${total}`)
         } else {
-            if(type1Effectiveness === 0) type1Effectiveness = -1
             total += factorFrequency(type1Effectiveness, type, true)
         }
     } 
@@ -211,8 +218,15 @@ export function getDeffensiveScoreRanking(){
     
 }
 
+export function findInRanking(type1: string, type2: string){
+    const result = Array.isArray(wolfeyTypeRanking) ? wolfeyTypeRanking.find((item: any) => {
+        return (item.type1 === type1 && item.type2 === type2) || (item.type1 === type2 && item.type2 === type1)
+    }) : undefined;
+}
+
 
 export function getOverallScoreRanking(){
+    return wolfeyTypeRanking
     
     const offensiveRanking = getOffensiveScoreRanking()
     const defensiveRanking = getDeffensiveScoreRanking()

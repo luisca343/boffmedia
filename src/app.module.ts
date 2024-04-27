@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -21,6 +21,9 @@ import { MinaController } from './smartrotom/mine/mine.controller';
 import { StarbankController } from './smartrotom/starbank/starbank.controller';
 import { StarbankService } from './smartrotom/starbank/starbank.service';
 import { StarbankModule } from './smartrotom/starbank/starbank.module';
+import { NetfluisService } from './smartrotom/netfluis/netfluis.service';
+import { NetfluisModule } from './smartrotom/netfluis/netfluis.module';
+import { MinecraftMiddleware } from './minecraft.middleware';
 
 @Module({
   imports: [
@@ -45,9 +48,16 @@ import { StarbankModule } from './smartrotom/starbank/starbank.module';
     InvitesModule,
     ChatModule,
     PokemonModule,
-    StarbankModule
+    StarbankModule,
+    NetfluisModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService],
 })
-export class AppModule {}
+export class AppModule implements NestModule{
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(MinecraftMiddleware)
+      .forRoutes('/smartrotom/');
+  }
+}

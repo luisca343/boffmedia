@@ -1,0 +1,1 @@
+ALTER TABLE `pokedex` RENAME COLUMN `registered_at` TO `seen_at`;
