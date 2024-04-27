@@ -114,11 +114,16 @@ export interface GenderProperties {
 export interface Palette {
     name: string;
     texture: string;
-    sprite: string;
+    sprite: string | SpriteWithFallback;
     particle: string;
     modelLocator?: ModelLocator;
     sounds?: string[];
     emissive?: string;
+}
+
+export interface SpriteWithFallback {
+    resource: string;
+    fallback: string;
 }
 
 export interface ModelLocator {
@@ -153,3 +158,13 @@ export interface EvYields {
     hp?: number;
 
 }
+
+export type PokedexRegistry = {
+    id: number;
+    uuid: string;
+    pokemonId: number;
+    formId: string;
+    paletteId: string;
+    seenAt: Date | string; 
+    caughtAt?: Date | string | null;
+};
