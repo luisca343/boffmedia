@@ -76,21 +76,18 @@ export default function StarBank(){
     */
     
     return (
-        <div className="h-full w-full flex p-8  bg-cover bg-center bg-no-repeat bg-fixed text-blue-900" >
+        <div className="h-full w-full flex p-8  bg-cover bg-center bg-no-repeat bg-fixed text-blue-950" >
             <div className="h-full flex flex-col justify-start w-1/3 mx-2">
                 <BankSection className="h-1/3">
                     <BankSectionHeader >Datos de cuenta </BankSectionHeader>
                     <BankSectionContent>
                     <div className="text-3xl font-bold text-center">Balance</div>
-                    <div className="text-6xl font-bold  text-center ">{Number(activeAccount.balance).toLocaleString('de-DE')} &#165;</div>
+                    <div className="text-4xl 2xl:text-6xl font-bold text-blue-900 text-center ">{Number(activeAccount.balance).toLocaleString('de-DE')} &#165;</div>
                 </BankSectionContent>
                     <BankSectionFooter>        
-                        <div className="flex flex-row justify-between items-center">
-                            <div className="flex text-xl font-bold items-center just">
-                                <span className="mr-4">Cambiar de Cuenta:</span>
-                                <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
-                            </div>
-                            <BankSectionButton onClick={() => {console.log("click")}}>Ver todas</BankSectionButton>
+                        <div className="flex flex-row w-full justify-center items-center">
+                            <span className="mr-4 text-xs 2xl:text-xl font-bold">Cambiar de Cuenta</span>
+                            <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
                         </div>
                     </BankSectionFooter>
                 </BankSection>
@@ -153,7 +150,7 @@ export function Transactions({transactions, activeAccount, className}: {transact
     if(transactions.length === 0){
         return (
             <div className="h-full p-2">
-                <div className="text-center text-2xl font-bold">No hay transacciones</div>
+                <div className="text-center 2xl:text-2xl font-bold">No hay transacciones</div>
             </div>
         )
     }
