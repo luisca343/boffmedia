@@ -9,9 +9,9 @@ export enum Status {
 
 export function StatusIcon({palette, seenAt, caughtAt}: {palette: string, seenAt: Date | string, caughtAt: Date | string | undefined | null}){
     if(caughtAt) {
-        if(palette === 'shiny') return <Image height={32} width={32} src={`/smartrotom/img/apps/pokedex/shiny.webp`} alt="Shiny"/>
-        return <Image height={32} width={32} src={`/smartrotom/img/apps/pokedex/capturado.webp`} alt="Capturado"/>
+        if(palette === 'shiny') return <Image height={24} width={24} src={`/smartrotom/img/apps/pokedex/shiny.webp`} alt="Shiny"/>
+        return <Image height={24} width={24} src={`/smartrotom/img/apps/pokedex/capturado.webp`} alt="Capturado"/>
     }
-    if(seenAt) return <Image height={32} width={32} src={`/smartrotom/img/apps/pokedex/avistado.webp`} alt="Avistado"/>
-    return <Image height={32} width={32} src={`/smartrotom/img/apps/pokedex/desconocido.webp`} alt="Desconocido"/>
+    if(seenAt) return <Image height={24} width={24} src={`/smartrotom/img/apps/pokedex/avistado.webp`} alt="Avistado"/>
+    return <Image height={24} width={24} src={`/smartrotom/img/apps/pokedex/desconocido.webp`} alt="Desconocido"/>
 }
