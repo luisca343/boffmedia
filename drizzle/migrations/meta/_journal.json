@@ -29,6 +29,20 @@
       "when": 1714076162378,
       "tag": "0003_stormy_sasquatch",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1714154343800,
+      "tag": "0004_wonderful_havok",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1714154489320,
+      "tag": "0005_even_brother_voodoo",
+      "breakpoints": true
     }
   ]
 }
