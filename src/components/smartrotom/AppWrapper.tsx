@@ -6,7 +6,7 @@ import { signIn } from "next-auth/react";
 import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
 import AuthForm from "@/app/auth/AuthForm";
-import { Loading, LoadingScreen } from "./Loading";
+import {  LoadingScreen } from "./Loading";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

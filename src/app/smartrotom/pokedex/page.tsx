@@ -7,7 +7,6 @@ import { PossibleSpawns } from "./_components/PossibleSpawns";
 import Link from "next/link";
 
 export default function PokedexMenu(){
-    const { t } = useTranslation("smartrotom/pokedex/common")
     return (
         <div className="bg-gray-800  ">
             <MenuHeader />

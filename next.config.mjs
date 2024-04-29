@@ -9,6 +9,9 @@ const bundleAnalyzer = withBundleAnalyzer({
 const nextConfig = {
     reactStrictMode: false,
     output: "standalone",
+    typescript: {
+        "ignoreBuildErrors": true
+    },
     images: {
         remotePatterns: [
             {

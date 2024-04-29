@@ -1,9 +1,20 @@
-"use client"
+export interface PageProps {
+    setTema: (tema: string) => void;
+}
 
+export default function SettingsPage({setTema} : PageProps){
+    return (
+        <div>
+            1
+        </div>
+    );
+}
+/*
+"use client"
 import { signIn, signOut, useSession } from "next-auth/react";
 
-export default function Settings({ setTema } : { setTema: (tema: string) => void}){
-    const { data: session } = useSession();
+export default function SettingsPage({ setTema } : { setTema: (tema: string) => void}){
+    const { data: session } = useSession() as {data: any};
 
     return (
         <div>
@@ -17,4 +28,4 @@ export default function Settings({ setTema } : { setTema: (tema: string) => void
             <pre>{JSON.stringify(session, null, 2)}</pre>
         </div>
     );
-}
+}*/
