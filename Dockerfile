@@ -7,6 +7,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
+RUN npm install file:./src/ckeditor5
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
@@ -15,6 +16,10 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+<<<<<<< Updated upstream
+=======
+# Install CKEditor from a local path
+>>>>>>> Stashed changes
 
 # Rebuild the source code only when needed
 FROM base AS builder
