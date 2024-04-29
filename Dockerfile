@@ -6,6 +6,7 @@ COPY package*.json ./
 # ---- Dependencies ----
 FROM base AS dependencies
 RUN npm install --only=production
+RUN npm i -D drizzle-kit
 RUN cp -R node_modules prod_node_modules
 RUN npm install
 
