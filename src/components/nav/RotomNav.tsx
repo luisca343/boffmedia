@@ -24,7 +24,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import FicusAI from "../smartrotom/FicusAI";
-import Ajustes from "@/app/smartrotom/settings/page";
+import SettingsPage from "@/app/smartrotom/settings/page";
 import { Toaster } from "../ui/sonner";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { Badge } from "../ui/badge";
@@ -93,7 +93,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                     <SheetHeader>
                         <SheetTitle className="text-white">Ajustes</SheetTitle>
                         <SheetDescription>
-                            <Ajustes setTema={setTema} />
+                            <SettingsPage setTema={setTema} />
                         </SheetDescription>
                      </SheetHeader>
                     </SheetContent>
