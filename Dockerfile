@@ -17,6 +17,7 @@ RUN npm run build
 # ---- Release ----
 FROM base AS release
 COPY --from=dependencies /app/prod_node_modules ./node_modules
+COPY drizzle ./drizzle
 COPY --from=build /app/dist ./dist
 EXPOSE 3000
 
