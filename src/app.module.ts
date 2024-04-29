@@ -54,7 +54,7 @@ import { LoggingUtil } from './_utils/LoggingUtils';
     
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, LoggingUtil],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
