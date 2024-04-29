@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from 'react';
 import { CKEditor } from "@ckeditor/ckeditor5-react";
-import Editor from "ckeditor5-custom-build";
+import Editor from "./ckeditor.js"
 import './styles.css'
 
 import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/outline';
@@ -88,7 +88,7 @@ function CustomEditor( props ) {
                     newButton.innerHTML = '💾';
                     newButton.classList.add( 'ck-button' );
                     newButton.onclick = () => {
-                        sendToast( `Guiardando cambios en ${ props.documentId }...`);
+                        sendToast( `Guardando cambios en ${ props.documentId }...`);
                     };
                     editorBarElement?.prepend( newButton );
                 
