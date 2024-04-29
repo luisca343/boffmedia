@@ -6,7 +6,7 @@ import { google, sheets_v4 } from 'googleapis';
 import { promises as fsPromises } from 'fs';
 import { GenderProperties, Pokemon } from '@/types/pokemon';
 import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
-import { PokemonData } from './utils/pokemonData';
+import { PokemonData } from './utils/PokemonData';
 import { MoveData } from './utils/MoveData';
 import { SpawnData } from './utils/SpawnData';
 import { MySQL2Service } from '@/_utils/MySQL2Service';

@@ -3,7 +3,7 @@ import *  as  path from 'path';
 import { promises as fsPromises } from 'fs';
 import { SpawnInfo, SpawnInfos } from '@/types/spawnInfo';
 import { MoveData } from './MoveData';
-import { PokemonData } from './pokemonData';
+import { PokemonData } from './PokemonData';
 
 export class SpawnData {
     pokemonData: PokemonData;
