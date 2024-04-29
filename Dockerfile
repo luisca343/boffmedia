@@ -20,6 +20,7 @@ COPY --from=dependencies /app/prod_node_modules ./node_modules
 COPY --from=build /app/dist ./dist
 EXPOSE 3000
 
+RUN npm i drizzle-kit
 RUN npm run drizzle-kit generate:mysql
 
 CMD ["npm", "run", "start:prod"]
