@@ -1,12 +1,25 @@
 export class LoggingUtil {
-    logging
-    constructor() {
-        this.logging = false
+    private static instance: LoggingUtil;
+    private logging: boolean;
+
+    private constructor() {
+        this.logging = false;
     }
 
-    toggleLogging() {
-        this.logging = !this.logging
-        console.log(`Logging is now ${this.logging}`)
-        return this.logging
+    static getInstance(): LoggingUtil {
+        if (!LoggingUtil.instance) {
+            LoggingUtil.instance = new LoggingUtil();
+        }
+        return LoggingUtil.instance;
+    }
+
+    toggleLogging(): boolean {
+        this.logging = !this.logging;
+        console.log(`Logging is now ${this.logging}`);
+        return this.logging;
+    }
+
+    getLogging(): boolean {
+        return this.logging;
     }
 }

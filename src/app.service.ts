@@ -10,7 +10,6 @@ export class AppService {
     private configService: ConfigService,
     private db: MySQL2Service,
     private pokemonService: PokemonService,
-    private loggingUtil: LoggingUtil
   ) {
     db.migrar();
     pokemonService.loadData();
@@ -25,6 +24,6 @@ export class AppService {
   }
 
   toggleLogging() {
-    return this.loggingUtil.toggleLogging();
+    return LoggingUtil.getInstance().toggleLogging();
   }
 }
