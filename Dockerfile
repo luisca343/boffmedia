@@ -7,6 +7,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # Install dependencies based on the preferred package manager
+RUN npm install file:./src/ckeditor5
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
 RUN \
   if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
@@ -16,8 +17,8 @@ RUN \
   fi
 
 # Install CKEditor from a local path
-
 RUN npm install file:./src/ckeditor5
+
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -29,6 +30,7 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
+
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
