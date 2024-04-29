@@ -87,39 +87,23 @@ export class PokemonService {
     async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img'} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string}){
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
+        let status
 
-  
-        let status = 1
-
-        if(["teras", "omnitrix"].includes(formName)){
-            status = 0
-        }
-
+        ["teras", "omnitrix"].includes(formName) ? status = 0 : status = 1
 
         if(pokemonId > 0) {
-            if(!this.dexCache[uuid]){
+            if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000){
                 const pokemonStatus = await this.db.getDrizzle()
                 .select().from(pokedexRegistry)
                 .where(and(
                     eq(pokedexRegistry.uuid, uuid),
                 )).execute()
                 this.dexCache[uuid] = {date: new Date(), data: pokemonStatus}
-            } else {
-                const pokemonStatus = this.dexCache[uuid].data
-                if(new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000) {
-                    const pokemonStatus = await this.db.getDrizzle()
-                    .select().from(pokedexRegistry)
-                    .where(and(
-                        eq(pokedexRegistry.uuid, uuid),
-                    )).execute()
-                    this.dexCache[uuid] = {date: new Date(), data: pokemonStatus}
-                }
-            }
-
+            } 
             const pokemonStatus = this.dexCache[uuid].data
             const pokemonStatusFiltered = pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName && p.paletteId === paletteName)
             status = pokemonStatusFiltered.length > 0 ? 1 : 0
-            
+
             /*
             const pokemonStatus = await this.db.getDrizzle()
                 .select().from(pokedexRegistry)
@@ -517,9 +501,9 @@ export class PokemonService {
             .select({pokemonId: pokedexRegistry.pokemonId, formId: pokedexRegistry.formId, paletteId: pokedexRegistry.paletteId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
             .from(pokedexRegistry)
             .where(eq(pokedexRegistry.uuid, uuid))
-            .orderBy(desc(pokedexRegistry.caughtAt), desc(pokedexRegistry.seenAt))
+            .orderBy(desc(pokedexRegistry.id))
+            .limit(20)
             .execute()
-            console.log(dex)
         return dex
     }
 }
