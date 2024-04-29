@@ -1,5 +1,4 @@
 "use client"
-import RotomNav from "@/components/nav/RotomNav"
 import { RotomNotFound } from "@/components/smartrotom/404"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { usePathname } from "next/navigation"
