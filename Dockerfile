@@ -16,6 +16,7 @@ RUN \
   fi
 
 # Install CKEditor from a local path
+
 RUN npm install file:./src/ckeditor5
 
 # Rebuild the source code only when needed
