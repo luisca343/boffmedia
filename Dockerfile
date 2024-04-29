@@ -16,10 +16,9 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
-<<<<<<< Updated upstream
-=======
 # Install CKEditor from a local path
->>>>>>> Stashed changes
+RUN npm install file:./src/ckeditor5
+
 
 # Rebuild the source code only when needed
 FROM base AS builder
