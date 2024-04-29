@@ -29,11 +29,11 @@ export function LastRegistries(){
 
     if(!registries) return <div>Loading...</div>
     return (
-            <div className="flex justify-center ">
+            <div className="flex justify-center flex-wrap">
                 {registries.map((reg) => (
-                    <Link key={`${reg.pokemonId}-${reg.formId}-${reg.paletteId}-${reg.seenAt}`} className="relative border m-2 rounded-md hover:bg-gray-400" href={`/smartrotom/pokedex/entrada/${reg.pokemonId}/${reg.formId}`}>
-                        <PokemonSprite id={reg.pokemonId} form={reg.formId} palette={reg.paletteId} />
-                        <div className="absolute top-0 left-0">
+                    <Link key={`${reg.pokemonId}-${reg.formId}-${reg.paletteId}-${reg.seenAt}`} className="relative  m-2 rounded-md hover:bg-gray-400" href={`/smartrotom/pokedex/entrada/${reg.pokemonId}/${reg.formId}`}>
+                        <PokemonSprite width={60} height={50} id={reg.pokemonId} form={reg.formId} palette={reg.paletteId} />
+                        <div className="absolute top-1 right-1">
                             <StatusIcon caughtAt={reg.caughtAt} seenAt={reg.seenAt} palette={reg.paletteId} />
                          </div>
                     </Link>

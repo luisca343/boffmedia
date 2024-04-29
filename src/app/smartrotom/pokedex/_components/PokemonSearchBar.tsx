@@ -21,11 +21,11 @@ export default function PokemonSearchBar(){
     }
 
     return (
-        <div className="w-[90%] m-auto">
+        <div className="w-full m-auto">
             <Input type="text" placeholder="Buscar un Pokémon" value={text} onChange={(e) => type(e.target.value)} />
-            <div className="overflow-auto max-h-48">
+            <div className="overflow-auto h-48 flex flex-wrap justify-center">
                 {pokemon?.map(p => (
-                    <Link href={`/smartrotom/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex p-2 hover:bg-gray-600 text-white items-center">
+                    <Link href={`/smartrotom/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex justify-center hover:bg-gray-600 text-white items-center w-48 m-1 rounded-md">
                         <PokemonSprite width={40} id={p.item.dex} form={"base"} palette={"none"}/>
                         <span className='ml-2'>{p.item.name}</span>
                     </Link>

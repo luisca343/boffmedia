@@ -28,9 +28,11 @@ import Ajustes from "@/app/smartrotom/settings/page";
 import { Toaster } from "../ui/sonner";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { Badge } from "../ui/badge";
+import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
+
     const { socket, connect } = useSocketStore();
     const [color, setColor] = useState('zinc' as string)
     const {
@@ -123,7 +125,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
             </Popover>
             <Hora className="text-white text-3xl mx-1" />
             <SocketStatus socket={socket}/>
-           
+            <MinecraftFunctions />
         </nav>
     )
 }

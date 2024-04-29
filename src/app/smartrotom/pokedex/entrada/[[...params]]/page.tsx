@@ -22,10 +22,12 @@ export default async function EntradaPokedex({params}: any){
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
 
     const pokemon = await rotomGET(`/pokemon/dex/${pokemonIndex}`) as Pokemon
+    
 
     if (pokemonIndex === undefined) {
         pokemonIndex = 0;
     }
+    
     if (formIndex === undefined ) {
         formIndex = 0;
     } else if(!parseInt(formIndex+"")) {
@@ -61,7 +63,7 @@ export default async function EntradaPokedex({params}: any){
             }
     })})
     return (
-        <section className="flex flex-col overflow-hidden text-white">
+        <section className="flex flex-col overflow-hidden text-white bg-gray-800 ">
             <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} t={formsTranslation}/>
             <section className="flex flex-col  bg-gray-800 overflow-auto pt-4">
                 <PokedexSection id='info' title="Información">
