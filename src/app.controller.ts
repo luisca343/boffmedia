@@ -13,6 +13,11 @@ export class AppController {
     return this.appService.getDBPort();
   }
 
+  @Get("togglelogging")
+  toggleLogging() {
+    return {logging: this.appService.toggleLogging()}
+  }
+
   @Post("jcef/:sha")
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Param('sha') sha: string) {
