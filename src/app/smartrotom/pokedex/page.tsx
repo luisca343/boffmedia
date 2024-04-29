@@ -19,11 +19,9 @@ export default function PokedexMenu(){
                 <PokedexSection title="Últimos Registros">
                     <LastRegistries />
                 </PokedexSection>
-                <div >
-                    <PokedexSection title="Posibles Spawns" btn={<Link href={'/smartrotom/pokedex/spawns'}>Ver más</Link>}>
-                        <PossibleSpawns />
-                    </PokedexSection>
-                </div>
+                <PokedexSection title="Posibles Spawns" btn={<Link href={'/smartrotom/pokedex/spawns'}>Ver más</Link>}>
+                    <PossibleSpawns />
+                </PokedexSection>
             </div>
         </div>
     )
