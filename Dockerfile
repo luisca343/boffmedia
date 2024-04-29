@@ -15,6 +15,8 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+# Install CKEditor from a local path
+RUN npm install file:./src/ckeditor5
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -26,7 +28,6 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
-
 
 RUN \
   if [ -f yarn.lock ]; then yarn run build; \
