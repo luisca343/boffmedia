@@ -12,7 +12,6 @@ import { SpawnData } from './utils/SpawnData';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/Pokedex';
 import { and, desc, eq } from 'drizzle-orm';
-import e from 'express';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 
 @Injectable()
