@@ -24,17 +24,16 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import FicusAI from "../smartrotom/FicusAI";
-import SettingsPage from "@/app/smartrotom/settings/page";
 import { Toaster } from "../ui/sonner";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { Badge } from "../ui/badge";
 import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
+import { SettingsPage } from "../smartrotom/Settings";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
 
     const { socket, connect } = useSocketStore();
-    const [color, setColor] = useState('zinc' as string)
     const {
       notifications,
       clear,
