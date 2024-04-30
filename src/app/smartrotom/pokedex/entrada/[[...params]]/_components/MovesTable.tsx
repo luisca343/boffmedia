@@ -50,14 +50,14 @@ export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?
     return <PokedexTable>
             <PokedexHeader>
                 <TableRow>
-                    <PokedexCell> </PokedexCell>
-                    <PokedexCell>Nombre</PokedexCell>
-                    <PokedexCell>Tipo</PokedexCell>
-                    <PokedexCell>Categoría</PokedexCell>
-                    <PokedexCell>Potencia</PokedexCell>
-                    <PokedexCell>Precisión</PokedexCell>
-                    <PokedexCell>PP</PokedexCell>
-                    <PokedexCell>Método</PokedexCell>
+                    <PokedexHead> </PokedexHead>
+                    <PokedexHead>Nombre</PokedexHead>
+                    <PokedexHead>Tipo</PokedexHead>
+                    <PokedexHead>Categoría</PokedexHead>
+                    <PokedexHead>Potencia</PokedexHead>
+                    <PokedexHead>Precisión</PokedexHead>
+                    <PokedexHead>PP</PokedexHead>
+                    <PokedexHead>Método</PokedexHead>
                 </TableRow>
             </PokedexHeader>
             <TableBody >

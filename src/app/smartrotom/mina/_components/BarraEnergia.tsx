@@ -66,7 +66,7 @@ export function BarraEnergia() {
             <></> : 
             <div className='mx-auto '>Siguiente recarga en: {getHour()}</div>
         }
-        <motion.div className=" ml-auto px-1 w-full flex  rounded-lg border-2 border-gray-900 bg-gray-900 flex-wrap items-start justify-start">
+        <motion.div className=" ml-auto px-1 w-full flex  rounded-lg border-2 border-gray-900 bg-main-900 flex-wrap items-start justify-start">
             <AnimatePresence>
                 {[...Array(maxEnergy)].map((_, i) => {
                     let color;

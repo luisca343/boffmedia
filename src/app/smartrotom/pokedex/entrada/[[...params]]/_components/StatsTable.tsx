@@ -2,7 +2,7 @@
 import useTranslation from 'next-translate/useTranslation'
 import { Table, TableRow, TableHeader, TableCell, TableBody, TableHead, TableFooter } from "@/components/ui/table"
 import { BattleStats, EvYields, Pokemon } from '@/types/Pokemon'
-import PokedexTable, { PokedexCell, PokedexHeader,PokedexRow } from '../../../_components/PokedexTable'
+import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader,PokedexRow } from '../../../_components/PokedexTable'
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number }){
     const { t } = useTranslation("smartrotom/pokedex/common")
@@ -71,11 +71,11 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
             <PokedexTable>
                 <PokedexHeader>
                     <TableRow className='hover:bg-zinc-900  font-bold'>
-                        <PokedexCell className='w-40'> </PokedexCell>
-                        <PokedexCell >Estadística base</PokedexCell>
-                        <PokedexCell  colSpan={2}>Nivel 50</PokedexCell>
-                        <PokedexCell  colSpan={2} >Nivel 100</PokedexCell>
-                        <PokedexCell >PE</PokedexCell>
+                        <PokedexHead className='w-40'> </PokedexHead>
+                        <PokedexHead >Estadística base</PokedexHead>
+                        <PokedexHead  colSpan={2}>Nivel 50</PokedexHead>
+                        <PokedexHead  colSpan={2} >Nivel 100</PokedexHead>
+                        <PokedexHead >PE</PokedexHead>
                     </TableRow>
                 </PokedexHeader>
                 <TableBody>
@@ -83,8 +83,8 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                         const statValue = stats[stat as keyof BattleStats]
                         const statColor = statValue > 100 ? 'text-green-400' : 'text-red-400'
                         return <PokedexRow key={stat}>
-                            <PokedexCell className=" bg-zinc-900 border border-zinc-950 text-zinc-200 font-bold">{t(`stat_${stat.toLowerCase()}`)}</PokedexCell>
-                            <PokedexCell className="relative border border-zinc-900 border-collapse">
+                            <PokedexHead className=" border  font-bold">{t(`stat_${stat.toLowerCase()}`)}</PokedexHead>
+                            <PokedexCell className="relative border  border-collapse">
                                 <div className="absolute inset-0  rounded px-2 text-start pl-2 bold text-sm flex justify-start items-center" style={{width: `${((statValue + 5)  / (maxStat + 5)) * 100}%`, backgroundColor: getColorStat(statValue)}}>
                                   <div className='text-white text-lg font-bold text-shadow-border1'>{statValue}</div>
                                 </div>
@@ -99,13 +99,13 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                 </TableBody>
                 <PokedexHeader>
                     <TableRow className='hover:bg-zinc-900 font-bold'>
-                        <PokedexCell >Total</PokedexCell>
-                        <PokedexCell >{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexCell>
-                        <PokedexCell >Min</PokedexCell>
-                        <PokedexCell >Max</PokedexCell>
-                        <PokedexCell >Min</PokedexCell>
-                        <PokedexCell >Max</PokedexCell>
-                        <PokedexCell> </PokedexCell>
+                        <PokedexHead >Total</PokedexHead>
+                        <PokedexHead >{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexHead>
+                        <PokedexHead >Min</PokedexHead>
+                        <PokedexHead >Max</PokedexHead>
+                        <PokedexHead >Min</PokedexHead>
+                        <PokedexHead >Max</PokedexHead>
+                        <PokedexHead> </PokedexHead>
                     </TableRow>
                 </PokedexHeader>
             </PokedexTable>

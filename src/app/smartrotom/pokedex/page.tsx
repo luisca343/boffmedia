@@ -8,7 +8,7 @@ import Link from "next/link";
 
 export default function PokedexMenu(){
     return (
-        <div className="bg-gray-800  ">
+        <div className="bg-main-800  ">
             <MenuHeader />
             <div className="mt-4">
                 <PokedexSection title="Búsqueda">

@@ -19,10 +19,10 @@ export default function History(){
     }, [session]);
 
     return(
-        <MenuWrapper className={` bg-gray-900 text-white flex flex-wrap items-start justify-evenly`}>
+        <MenuWrapper className={` bg-main-900 text-white flex flex-wrap items-start justify-evenly`}>
             {Object.values(history).reverse()?.map((game: any, i: number) => {
                 return (
-                    <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-gray-900 bg-opacity-80">
+                    <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-main-900 bg-opacity-80">
                         <div className=" flex flex-row">
                             {game.map((reward: any, index: number) => {
                                 return (
