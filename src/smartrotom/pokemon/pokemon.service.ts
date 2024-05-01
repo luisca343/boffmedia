@@ -25,12 +25,16 @@ export class PokemonService {
     dexCache = {} as {date: Date, data: any}
 
     async loadData(){
+        const startingTime = Date.now();
         this.pokemonData = new PokemonData();
-        await this.pokemonData.loadPokemonDataAsync();
-
         this.moveData = new MoveData();
         this.spawnData = new SpawnData(this.pokemonData);
 
+        await this.pokemonData.loadPokemonData();
+        await this.moveData.loadMoveData();
+        await this.spawnData.loadSpawnData();
+
+        console.log(`Se han cacheado los datos de la Pokédex en ${Date.now() - startingTime}ms`);
         
     }
 

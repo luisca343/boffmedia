@@ -9,7 +9,6 @@ export class SpawnData {
     pokemonData: PokemonData;
     constructor(PokemonData: PokemonData) {
         this.pokemonData = PokemonData;
-        this.loadSpawnData();
     }
 
     spawnList = [];

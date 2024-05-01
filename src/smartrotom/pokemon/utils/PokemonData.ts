@@ -8,11 +8,6 @@ export class PokemonData {
     constructor() {
     }
     
-    async loadPokemonDataAsync() {
-        await this.loadPokemonData();
-    }
-    
-
     pokemonList = [];
     species = [];
 
