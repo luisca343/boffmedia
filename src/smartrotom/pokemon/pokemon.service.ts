@@ -87,14 +87,17 @@ export class PokemonService {
     }
 
 
-    async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img'} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string}){
+    async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img', hide} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string, hide?: number}) {
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
+        
         let status
+        
 
         ["teras", "omnitrix"].includes(formName) ? status = 0 : status = 1
 
         if(pokemonId > 0) {
+            
             if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000){
                 const pokemonStatus = await this.db.getDrizzle()
                 .select().from(pokedexRegistry)
@@ -104,7 +107,9 @@ export class PokemonService {
                 this.dexCache[uuid] = {date: new Date(), data: pokemonStatus}
             } 
             const pokemonStatus = this.dexCache[uuid].data
-            const pokemonStatusFiltered = pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName && p.paletteId === paletteName)
+            const pokemonStatusFiltered = hide == 1 
+                ? pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName && p.paletteId === paletteName) 
+                : pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName)
             status = pokemonStatusFiltered.length > 0 ? 1 : 0
 
             /*

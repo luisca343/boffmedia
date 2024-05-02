@@ -87,14 +87,14 @@ export class PokemonController {
         return this.pokemonService.getSpawns(name);
     }
 
-    @Get('image/:id/:form/:palette/:uuid')
-    getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string){
-        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid});
+    @Get('image/:id/:form/:palette/:uuid/:hide')
+    getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string, @Param('hide') hide: number){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid, hide});
     }
 
-    @Get('sprite/:id/:form/:palette/:uuid')
-    getSprite(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string){
-        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid, type: 'sprite'});
+    @Get('sprite/:id/:form/:palette/:uuid/:hide')
+    getSprite(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string, @Param('hide') hide: number){
+        return this.pokemonService.getImage({pokemonId, formName, paletteName, uuid, type: 'sprite', hide});
     }
 
     @Get('item/sprite/:name')
