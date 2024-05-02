@@ -43,6 +43,20 @@
       "when": 1714154489320,
       "tag": "0005_even_brother_voodoo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1714645033278,
+      "tag": "0006_minor_freak",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1714662523520,
+      "tag": "0007_fixed_stature",
+      "breakpoints": true
     }
   ]
 }
