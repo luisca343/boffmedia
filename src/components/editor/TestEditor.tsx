@@ -3,9 +3,8 @@ import React, { useEffect } from 'react';
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import Editor from "./ckeditor.js"
 import './styles.css'
-
-import { ArchiveBoxArrowDownIcon } from '@heroicons/react/24/outline';
 import { sendToast } from '@/lib/toast';
+import { rotomPOST } from '@/services/boffAPI';
 
 const editorConfiguration = {
     toolbar: {
@@ -88,7 +87,11 @@ function CustomEditor( props ) {
                     newButton.innerHTML = '💾';
                     newButton.classList.add( 'ck-button' );
                     newButton.onclick = () => {
-                        sendToast( `Guardando cambios en ${ props.documentId }...`);
+                        const data = editor.getData();
+                        const h1 = data.match( /<h1>(.*?)<\/h1>/ );
+                        let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
+                        sendToast( `Guardando cambios en ${ title }...`);
+                        rotomPOST( `/documents/save/${ props.documentId }`, { title, content: data, documentType: props.documentType} )
                     };
                     editorBarElement?.prepend( newButton );
                 
