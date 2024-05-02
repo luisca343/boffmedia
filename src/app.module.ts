@@ -25,6 +25,7 @@ import { NetfluisService } from './smartrotom/netfluis/netfluis.service';
 import { NetfluisModule } from './smartrotom/netfluis/netfluis.module';
 import { MinecraftMiddleware } from './minecraft.middleware';
 import { LoggingUtil } from './_utils/LoggingUtils';
+import { DocumentsModule } from './smartrotom/documents/documents.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { LoggingUtil } from './_utils/LoggingUtils';
     PokemonModule,
     StarbankModule,
     NetfluisModule,
+    DocumentsModule,
     
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController],
