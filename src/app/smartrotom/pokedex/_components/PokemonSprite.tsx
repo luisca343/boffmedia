@@ -107,7 +107,7 @@ export function PokemonSpriteWithURL ({url, width, height}: {url:string, width?:
 
 
 
-export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true}: {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean}) {
+export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true}: {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean}) {
     console.log(id, form, palette, pixelated)
     const [imageUrl, setImageUrl] = useState() as any;
     const [loaded, setLoaded] = useState(false)
@@ -116,13 +116,13 @@ export function PokemonSprite({id, form, palette, width=100, height=100, pixelat
 
     useEffect(() => {
         if(pixelated) {
-            getPokemonSprite(id, form, palette, getSmartRotomUser(session).uuid).then((img) => {
+            getPokemonSprite(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
                     setImageUrl(img)
                     setLoaded(true)
                 }
             )
         } else {
-            getPokemonImage(id, form, palette, getSmartRotomUser(session).uuid).then((img) => {
+            getPokemonImage(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
                     setImageUrl(img)
                     setLoaded(true)
                 }

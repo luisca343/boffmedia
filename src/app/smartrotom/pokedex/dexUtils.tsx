@@ -7,13 +7,13 @@ export default function getPokemonSpriteOld(name: string, form: string, shiny: b
     return `/smartrotom/img/sprites/${folderString}/${name.toUpperCase()}${formString}.png`
 }
 
-export async function getPokemonImage(id: number, form: string, palette: string, uuid = ''){
-    const img = await rotomGET(`/pokemon/image/${id}/${form}/${palette}/${uuid}`)
+export async function getPokemonImage(id: number, form: string, palette: string, uuid = '', hide: boolean){
+    const img = await rotomGET(`/pokemon/image/${id}/${form}/${palette}/${uuid}/${hide ? 1 : 0}`)
     return img
 }
 
-export async function getPokemonSprite(id: number, form: string, palette: string, uuid = ''){
-    const img = await rotomGET(`/pokemon/sprite/${id}/${form}/${palette}/${uuid}`)
+export async function getPokemonSprite(id: number, form: string, palette: string, uuid = '', hide: boolean){
+    const img = await rotomGET(`/pokemon/sprite/${id}/${form}/${palette}/${uuid}/${hide ? 1 : 0}`)
     return img
 }
 
