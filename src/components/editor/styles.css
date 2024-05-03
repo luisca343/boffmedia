@@ -28,9 +28,19 @@ main .ck-editor[role='application'] .ck.ck-content,
 	font-size: 1em;
 	line-height: 1.6em;
 	
-	min-height: var(--ck-sample-editor-min-height);
+	height: 100%;
 	padding: 1.5em 2em;
 }
+
+
+.ck.ck-editor{
+	height: 95%;
+}
+
+.ck.ck-editor__main{
+	height: 100%;
+}
+
 
 .ck.ck-editor__editable {
 	background: #fff;

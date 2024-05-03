@@ -33,9 +33,9 @@ export function DocumentsList() {
     return (
         <div className="bg-main-800  ">
             <div className="flex flex-wrap justify-start">
-                                 <button onClick={() => createNote()} className="text-white bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center flex flex-col justify-center items-center">
-                                    <h2>Crear</h2>
-                                </button>
+                    <button onClick={() => createNote()} className="text-white bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center flex flex-col justify-center items-center">
+                        <h2>Crear</h2>
+                    </button>
                     {documents.length > 0 ? 
                     documents.map((doc: any) => {
                         return (
