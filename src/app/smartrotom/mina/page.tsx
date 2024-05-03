@@ -1,23 +1,25 @@
-"use client"
+//"use client"
 import './mina.css'
 import Link from "next/link";
-import { useEffect, useState } from "react";
+/*import { useEffect, useState } from "react";
 import { useSession } from 'next-auth/react';
 import { rotomGET, rotomPOST } from '@/services/boffAPI';
 import { BoffSession } from '@/components/smartrotom/AppWrapper';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';*/
 import { BarraEnergia } from './_components/BarraEnergia';
-import { motion } from 'framer-motion';
 import MenuWrapper from './_components/MenuWrapper';
+import { LinkMina } from './_components/LinkMina';
 
 export default function Mina(){
+    /*
     const {data: session} = useSession() as {data: BoffSession | null}
+    
     const [energia, setEnergia] = useState(0)
     const [energiaMax, setEnergiaMax] = useState(0)
     const [ultimaRecarga, setUltimaRecarga] = useState<Date>(new Date())
     const [iniciar, setIniciar] = useState(false)
-    const router = useRouter()
-
+*/
+    /*
     useEffect(() => {
         if(session){
             rotomGET(`/mine/energy/${session.user?.smartRotomUser.uuid}`).then(res => {
@@ -29,7 +31,7 @@ export default function Mina(){
                 setUltimaRecarga(date)
             })
         }
-    }, [session, iniciar])
+    }, [session, iniciar])*/
     
 
 
@@ -44,21 +46,8 @@ export default function Mina(){
                 <LinkMina href='/smartrotom/mina/reclamar'>Reclamar</LinkMina>
                 <LinkMina href='/smartrotom'>Salir</LinkMina>
                 <div className=' w-1/2 ml-auto mt-auto'><BarraEnergia /></div>
-                
             </div>
         </MenuWrapper>
     )
 }
-
-function LinkMina({href, children, className} : {href: string, children: any, className?: string}){
-    return (
-        <Link className={`text-xl xl:text-6xl ml-auto text-gray-100 text-shadow-border3 my-2 ${className}`} href={href}>
-            <motion.div
-                whileHover={{scale: 1.1}}
-                whileTap={{scale: 0.9}}>
-                {children}
-            </motion.div>
-        
-    </Link>
-)}
 
