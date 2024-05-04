@@ -1,4 +1,4 @@
-import {mineGamesDetail, mineGames, mineRewards } from '@/_db/schema/Mine';
+import {mineGamesDetail, mineGames, mineRewards } from '@/_db/schema/SmartRotomMine';
 import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';

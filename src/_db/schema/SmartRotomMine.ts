@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { char, datetime, int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
 
-export const mineGames = mysqlTable("mine_games", {
+export const mineGames = mysqlTable("rotom_mine_games", {
     id: int("id").primaryKey().autoincrement().primaryKey(),
     uuid: char("uuid", { length: 36 }).notNull(),
     createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
@@ -9,7 +9,7 @@ export const mineGames = mysqlTable("mine_games", {
 
 export type PartidaMina = typeof mineGames.$inferSelect;
 
-export const mineRewards = mysqlTable("mine_rewards", {
+export const mineRewards = mysqlTable("rotom_mine_rewards", {
     id: int("id").primaryKey().autoincrement().primaryKey(),
     value: int("value").notNull(),
     name: varchar("name", { length: 32 }).notNull(),
@@ -21,7 +21,7 @@ export const mineRewards = mysqlTable("mine_rewards", {
 
 export type RecompensaMina = typeof mineRewards.$inferSelect;
 
-export const mineGamesDetail = mysqlTable("mine_games_detail", {
+export const mineGamesDetail = mysqlTable("rotom_mine_games_detail", {
     id: int("id").primaryKey().autoincrement().primaryKey(),
     gameId: int("game_id").notNull(),
     rewardId: int("reward_id").notNull(),

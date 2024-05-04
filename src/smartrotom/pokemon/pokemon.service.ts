@@ -10,7 +10,7 @@ import { PokemonData } from './utils/PokemonData';
 import { MoveData } from './utils/MoveData';
 import { SpawnData } from './utils/SpawnData';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/Pokedex';
+import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { and, desc, eq } from 'drizzle-orm';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 
@@ -90,13 +90,13 @@ export class PokemonService {
     async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img', hide} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string, hide?: number}) {
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
-        
         let status
+        
         
 
         ["teras", "omnitrix"].includes(formName) ? status = 0 : status = 1
 
-        if(pokemonId > 0) {
+        if(pokemonId > 99999) {
             
             if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000){
                 const pokemonStatus = await this.db.getDrizzle()

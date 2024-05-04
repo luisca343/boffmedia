@@ -13,12 +13,12 @@ export class AppsService {
   ) {}
 
   async test(){
-    let test = await this.db.insertAndReturn<App>('smartrotom_apps', 'INSERT INTO smartrotom_apps SET ?', {name: 'test'}) 
+    let test = await this.db.insertAndReturn<App>('rotom_apps', 'INSERT INTO rotom_apps SET ?', {name: 'test'}) 
     return test;
   }
 
   async create(createAppDto: CreateAppDto) {
-    const [rows] = await this.db.getConnection().execute('INSERT INTO smartrotom_apps SET ?', [createAppDto]);
+    const [rows] = await this.db.getConnection().execute('INSERT INTO rotom_apps SET ?', [createAppDto]);
     return rows;
   }
 
@@ -34,19 +34,19 @@ export class AppsService {
   }
 
   async findAll() {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM smartrotom_apps');
+    const [rows] = await this.db.getConnection().execute('SELECT * FROM rotom_apps');
     return rows;
   }
 
   async getForPlayer(uuid: string) {
     const result = await this.db.getDrizzle().execute(sql`
-        (SELECT sa.id, sa.url,  sa.name, sao.order as orden FROM smartrotom_apps sa
-          LEFT JOIN smartrotom_user_apps sao ON sa.id = sao.app_id
+        (SELECT sa.id, sa.url,  sa.name, sao.order as orden FROM rotom_apps sa
+          LEFT JOIN rotom_user_apps sao ON sa.id = sao.app_id
           WHERE sao.uuid = ${uuid})
           UNION ALL
-          (SELECT sa.id, sa.url,  sa.name, 999 as orden FROM smartrotom_apps sa
+          (SELECT sa.id, sa.url,  sa.name, 999 as orden FROM rotom_apps sa
             WHERE id NOT IN (
-              SELECT app_id FROM smartrotom_user_apps sao
+              SELECT app_id FROM rotom_user_apps sao
               WHERE sao.uuid = ${uuid}
             )
           )
@@ -62,12 +62,12 @@ export class AppsService {
   }
 
   async update(id: number, updateAppDto: UpdateAppDto) {
-    const [rows] = await this.db.getConnection().execute('UPDATE smartrotom_apps SET ? WHERE id = ?', [updateAppDto, id]);
+    const [rows] = await this.db.getConnection().execute('UPDATE rotom_apps SET ? WHERE id = ?', [updateAppDto, id]);
     return rows;
   }
 
   async remove(id: number) {
-    const [rows] = await this.db.getConnection().execute('DELETE FROM smartrotom_apps WHERE id = ?', [id]);
+    const [rows] = await this.db.getConnection().execute('DELETE FROM rotom_apps WHERE id = ?', [id]);
     return rows;
   }
 }

@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1711489174531,
-      "tag": "0000_grey_wallflower",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1713988419716,
-      "tag": "0001_early_russian",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1713988737415,
-      "tag": "0002_jittery_jazinda",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1714076162378,
-      "tag": "0003_stormy_sasquatch",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1714154343800,
-      "tag": "0004_wonderful_havok",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1714154489320,
-      "tag": "0005_even_brother_voodoo",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1714645033278,
-      "tag": "0006_minor_freak",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1714662523520,
-      "tag": "0007_fixed_stature",
+      "when": 1714833727932,
+      "tag": "0000_wealthy_night_thrasher",
       "breakpoints": true
     }
   ]

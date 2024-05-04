@@ -1,7 +1,7 @@
 import exp from "constants";
 import { int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
 
-export const starBankAccounts = mysqlTable("starbank_accounts", {
+export const starBankAccounts = mysqlTable("rotom_starbank_accounts", {
     id: int("id").primaryKey().autoincrement(),
     name: varchar("name", { length: 32 }).notNull(),
     balance: int("balance").default(0),
@@ -10,7 +10,7 @@ export const starBankAccounts = mysqlTable("starbank_accounts", {
 
 export type StarBankAccount = typeof starBankAccounts.$inferSelect;
 
-export const starBankTransactions = mysqlTable("starbank_transactions", {
+export const starBankTransactions = mysqlTable("rotom_starbank_transactions", {
     id: int("id").primaryKey().autoincrement(),
     from: int("from").notNull(),
     to: int("to").notNull(),
@@ -24,7 +24,7 @@ export const starBankTransactions = mysqlTable("starbank_transactions", {
 
 export type StarBankTransaction = typeof starBankTransactions.$inferSelect;
 
-export const  starBankUsersAccounts = mysqlTable("starbank_users_accounts", {
+export const  starBankUsersAccounts = mysqlTable("rotom_starbank_users_accounts", {
     uuid: varchar("uuid", { length: 36 }).notNull(),
     accountId: int("account_id").notNull(),
 });
