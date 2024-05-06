@@ -8,6 +8,20 @@
       "when": 1714833727932,
       "tag": "0000_wealthy_night_thrasher",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1714988631010,
+      "tag": "0001_windy_magus",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1714989141493,
+      "tag": "0002_chubby_quasimodo",
+      "breakpoints": true
     }
   ]
 }
