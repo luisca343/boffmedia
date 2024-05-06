@@ -26,6 +26,9 @@ import { NetfluisModule } from './smartrotom/netfluis/netfluis.module';
 import { MinecraftMiddleware } from './minecraft.middleware';
 import { LoggingUtil } from './_utils/LoggingUtils';
 import { DocumentsModule } from './smartrotom/documents/documents.module';
+import { ChatappController } from './smartrotom/chatapp/chatapp.controller';
+import { ChatappService } from './smartrotom/chatapp/chatapp.service';
+import { ChatappModule } from './smartrotom/chatapp/chatapp.module';
 
 @Module({
   imports: [
@@ -53,10 +56,11 @@ import { DocumentsModule } from './smartrotom/documents/documents.module';
     StarbankModule,
     NetfluisModule,
     DocumentsModule,
+    ChatappModule,
     
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
