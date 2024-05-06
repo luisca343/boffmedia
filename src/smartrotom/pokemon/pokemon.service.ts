@@ -86,15 +86,17 @@ export class PokemonService {
 
     }
 
+    excludedForms = ['teras', 'terasmega', 'omnitrix']
 
     async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img', hide} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string, hide?: number}) {
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
         let status
         
+        console.log(pokemonId, formName, paletteName)
         
 
-        ["teras", "omnitrix"].includes(formName) ? status = 0 : status = 1
+        this.excludedForms.includes(formName) ? status = 0 : status = 1
 
         if(pokemonId > 99999) {
             
@@ -165,6 +167,7 @@ export class PokemonService {
         //console.log( path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png'))
         const sprite = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png');
 
+        console.log(sprite)
         if(fs.existsSync(sprite)) return {url: path.join('/smartrotom/img/sprites/items', itemFileName + '.png'),}
         return {url: '/smartrotom/img/sprites/items/000.png'}
     }
