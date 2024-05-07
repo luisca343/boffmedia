@@ -29,6 +29,7 @@ import { DocumentsModule } from './smartrotom/documents/documents.module';
 import { ChatappController } from './smartrotom/chatapp/chatapp.controller';
 import { ChatappService } from './smartrotom/chatapp/chatapp.service';
 import { ChatappModule } from './smartrotom/chatapp/chatapp.module';
+import { SocketsModule } from './smartrotom/sockets/sockets.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ChatappModule } from './smartrotom/chatapp/chatapp.module';
     NetfluisModule,
     DocumentsModule,
     ChatappModule,
+    SocketsModule,
     
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController],
