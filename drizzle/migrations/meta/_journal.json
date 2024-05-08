@@ -22,6 +22,27 @@
       "when": 1714989141493,
       "tag": "0002_chubby_quasimodo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1715186417599,
+      "tag": "0003_safe_lady_deathstrike",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1715186556525,
+      "tag": "0004_new_yellowjacket",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1715195476498,
+      "tag": "0005_sturdy_mattie_franklin",
+      "breakpoints": true
     }
   ]
 }

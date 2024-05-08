@@ -1,0 +1,1 @@
+ALTER TABLE `rotom_chats` MODIFY COLUMN `image` varchar(255);

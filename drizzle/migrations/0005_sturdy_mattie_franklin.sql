@@ -1,0 +1,1 @@
+ALTER TABLE `rotom_chat_messages` MODIFY COLUMN `content` text NOT NULL;
