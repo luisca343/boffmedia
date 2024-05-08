@@ -29,11 +29,14 @@ import { useNotificationCenter } from "react-toastify/addons/use-notification-ce
 import { Badge } from "../ui/badge";
 import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
 import { SettingsPage } from "../smartrotom/Settings";
+import { useSession } from "next-auth/react";
+import { getSmartRotomUser } from "@/lib/utils";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
 
     const { socket, connect } = useSocketStore();
+    const {data: session} = useSession()
     const {
       notifications,
       clear,
@@ -47,7 +50,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     
     useEffect(() => {
         if(!socket) {
-          connect();
+          connect(getSmartRotomUser(session));
           return
         }/*
         socket.on('patata', () => console.log('Patata'));
