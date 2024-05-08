@@ -15,10 +15,11 @@ import {
   export class SocketsGateway {
     @WebSocketServer()
     server: Server;
-    users: any[] = [];
+    users: {uuid: string, socketId: string}[] = [];
     
     @SubscribeMessage('connection')
     handleConnection(@ConnectedSocket() client: Socket): boolean{
+        console.log(`Client with ID ${client.id} connected`);
         return client.emit('connection', null);
         
     }
@@ -26,12 +27,12 @@ import {
     handleSmartRotomConnection(@ConnectedSocket() client: Socket, @MessageBody() smartRotomUser: any): boolean{
         const sockets = this.server.sockets.sockets;
         const user = {...smartRotomUser, socketId: client.id};
-        /*
+
         const userIndex = this.users.findIndex(user => user.uuid === smartRotomUser.uuid);
         if(userIndex !== -1){
             this.users[userIndex].socketId = client.id;
             return client.emit('smartrotom:connection', smartRotomUser);
-        }*/
+        }
         
         this.users.push(user);
         return client.emit('smartrotom:connection', smartRotomUser);

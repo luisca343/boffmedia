@@ -16,4 +16,8 @@ export class ChatappController {
     async createMessage(@Param("chatId") chatId: number, @Body() body: {mensaje: string, uuid: string}){
         return this.chatAppService.createMessage(chatId, body.mensaje, body.uuid);
     }
+    @Post("chat")
+    async createChat(@Body() body: {uuid1: string, uuid2: string}){
+        return this.chatAppService.createChat(body.uuid1, body.uuid2);
+    }
 }
