@@ -75,6 +75,8 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       }, [status, datosUsuario]);*/
 
       
+
+      
       if (status === "loading") {
         return <LoadingScreen />
       }
