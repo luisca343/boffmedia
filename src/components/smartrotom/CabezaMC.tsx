@@ -5,7 +5,7 @@ import { useEffect } from "react"
 
 export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, zoom = 1, width= 150, height= 150, ...props} : {uuid: string, nombreNPC: string, autoRotate?: boolean, tag?: boolean, zoom?: number, width?: number, height?: number}) {
     useEffect(() => {
-        const canvas = document.getElementById('skin_container') as HTMLCanvasElement
+        const canvas = document.getElementById(`skin_container_${uuid}`) as HTMLCanvasElement
         if (!canvas) return
         const skinViewer = new SkinViewer(
             {
@@ -27,7 +27,7 @@ export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, 
   
     return (
       <div style={{width, height}}>
-          <canvas id="skin_container" />
+          <canvas id={`skin_container_${uuid}`} />
       </div>
       )
   }
