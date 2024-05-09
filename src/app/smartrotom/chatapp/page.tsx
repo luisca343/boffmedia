@@ -12,12 +12,17 @@ import useSocketStore from "@/app/useSocketStore";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { CabezaJugador } from "@/components/smartrotom/CabezaMC";
+import { Message } from "./_components/Message";
+import { Chat } from "./_components/Chat";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { CreateGroup } from "./_components/CreateGroup";
 
 type Chat = {
     id: number;
     name: string;
     type: number;
-    lastMessage: {id: number, content: string, createdAt: string};
+    messages: Message[];
     unread: number;
     image: string;
 
@@ -25,11 +30,11 @@ type Chat = {
 
 type Message = {
     id: number;
-    text: string;
-    date: Date;
+    content: string;
+    createdAt: string;
     uuid: string;
+    chatId: number;
 }
-
 
 export default function ChatApp() {
     const {data: session} = useSession();
@@ -43,15 +48,25 @@ export default function ChatApp() {
         if(socket){
             socket.on('chat:message', (message: Message) => {
                 setChats((prev) => {
-                    const chat = prev.find((chat) => chat.id == message.id);
+                    const chat = prev.find((chat) => chat.id == message.chatId);
                     if(!chat) return prev;
-                    chat.lastMessage = {id: message.id, content: message.text, createdAt: message.date.toString()};
+                    //chat.lastMessage = {id: message.id, content: message.text, createdAt: message.date.toString()};
+                    chat.messages.unshift({id: message.id, chatId:message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid});
+
+
                     chat.unread++;
-                    return [...prev].sort((a, b) => new Date(b.lastMessage.createdAt).getTime() - new Date(a.lastMessage.createdAt).getTime());
-                })})
+                    return [...prev].sort((a, b) => {
+                        return new Date(b.messages[0].createdAt).getTime() - new Date(a.messages[0].createdAt).getTime();
+                    })
+                })
+            
+                if(activeChat !== message.id) return;
+                
+                
+                
+            })
         }
     } , [session])
-
 
     /*
     useEffect(() => {
@@ -79,56 +94,20 @@ export default function ChatApp() {
     }
 
 
-    function openNewChat(open: boolean){
-        if(open) {
-            console.log('Abriendo')
-            rotomGET('/users')
-            .then((res) => {
-                setUsers(res);
-            })
-        } else {
-            console.log('Cerrando')
-            setUsers([]);
-        }
-    }
-
-    function createChat(user: any){
-        console.log('Creando chat con ' + user.uuid)
-        console.log('Usuario actual ' + getSmartRotomUser(session).uuid)
-
-        rotomPOST('/chatapp/chat', {uuid1: getSmartRotomUser(session).uuid, uuid2: user.uuid})
-            .then((res) => {
-                setActiveChat(res);
-            })
-    }
 
     return (
-        <div className="w-full h-full overflow-hidden flex">
-            <div className="flex flex-col h-full overflow-hidden w-1/4  bg-zinc-800  border-r border-zinc-900">
-                <div className="h-16 p-2 text-xl w-full flex items-center text-white" > 
+        <div className="w-full h-full flex">
+            <div className="flex flex-col h-full w-1/4  bg-zinc-800  border-r border-zinc-900 ">
+                <div className="h-16 p-2 text-xl w-full flex items-center text-white " > 
                     <div>Chats</div>
-                    <Popover onOpenChange={(open) => openNewChat(open)}>
-                        <PopoverTrigger className="ml-auto bg-primary-400 text-black h-8 w-8 rounded-full">+</PopoverTrigger>
-                        <PopoverContent className="bg-zinc-800 text-white">
-                            <div className="flex flex-col">
-                                {users.map((user) => {
-                                    return (
-                                        <button onClick={() => createChat(user)} className="flex items-center" key={user.uuid}>
-                                            <CabezaJugador width={50} height={50} uuid={user.uuid} nombreNPC={user.username} autoRotate={false} tag={false} zoom={1} />
-                                            <div className="ml-2">{user.username}</div>
-                                        </button>
-                                    )
-                                })}
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                    <CreateGroup setActiveChat={setActiveChat} />
                 </div>
-                <div className="flex flex-col  overflow-auto bg-zinc-800">
+                <div className="flex flex-col h-full  overflow-auto bg-zinc-800">
                     {chats.map((chat) => <Contact {...chat} key={chat.id} />)}
                 </div>
             </div>
-            <div className="flex flex-col w-3/4  bg-zinc-700  overflow-auto bg-center bg-cover bg-no-repeat  border-zinc-900">
-                {activeChat ? <Chat chat={getCurrentChat()} 
+            <div className="flex flex-col w-3/4 h-full bg-zinc-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-zinc-900">
+                {activeChat ? <Chat chats={chats} activeChat={activeChat}
                     /> : <div className="h-full flex items-center justify-center text-white">Selecciona un chat</div>}
             </div>
         </div>
@@ -138,69 +117,17 @@ export default function ChatApp() {
     
         function Contact(chat: Chat){
             return (
-                <div className={`${activeChat === chat.id ? 'bg-zinc-700' : 'bg-zinc-800'} hover:bg-zinc-700 h-24 flex items-center w-full `} onClick={()  => setActiveChat(chat.id)}>
-                    <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px'/>
-                    <div className="h-1/2  ml-4 text-white  flex flex-col justify-between items-start ">
-                        <p className="text-sm font-bold">{chat.name}</p>
-                        <p className="text-sm">{(chat?.lastMessage?.content.substring(0, 32) || 'No hay mensajes') + (chat?.lastMessage?.content.length > 32 ? '...' : '')}</p>
-                    </div>
-                    <div className="h-1/2  ml-auto mr-4 text-white flex flex-col justify-between items-end ">
-                        <p className="text-sm">{strToDate(chat.lastMessage?.createdAt)}</p>
-                        {chat.unread > 0 && <p className="flex items-center justify-center text-sm bg-primary-400  rounded-md w-6 h-6">{chat.unread}</p> }
-                    </div>
-                </div>
-            );
-        }
-
-        function Chat({chat}: {chat: Chat}){
-            const [messages, setMessages] = useState([] as Message[]);
-            const [message, setMessage] = useState('' as string);
-            const { socket, connect } = useSocketStore();
-            
-            
-            useEffect(() => {
-                rotomGET(`/chatapp/messages/${chat.id}`)
-                    .then((res) => {
-                        setMessages(res);
-                    })
-
-                if(socket){
-                    console.log('Conectando socket')
-                    console.log(socket.id)
-                    socket.on('chat:message', (message: Message) => {
-                        setMessages((prev) => [...prev, message])
-                    })
-                }
-                    
-
-            } , [session])
-
-            function sendMessage(){
-                rotomPOST(`/chatapp/messages/${chat.id}`, {mensaje: message, uuid: getSmartRotomUser(session).uuid})
-                    .then((res) => {
-                        setMessage('');
-                    })
-            }
-            
-
-            return (
-                <div className="flex flex-col w-full h-full " style={{ backgroundImage: "url('/smartrotom/img/fondoChat2.avif')" }}>
-                    <div className="h-16 p-2 text-xl w-full bg-zinc-800 flex items-center text-white border-b border-zinc-900" > 
+                <div>
+                    <div className={`${activeChat === chat.id ? 'bg-zinc-700' : 'bg-zinc-800'} hover:bg-zinc-700 h-[100px] flex items-center w-full`} onClick={()  => setActiveChat(chat.id)}>
                         <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px'/>
-                        <div className="ml-2">{chat.name}</div>
-                    </div>
-                    <div className="w-full flex flex-col overflow-auto items-start flex-1 justify-end">
-                        {messages.map((message) => {
-                            return (
-                                <div className={`m-2 bg-primary-400 p-2 max-w-[50%] ${message.uuid === getSmartRotomUser(session).uuid ? 'self-end' :null}`} key={message.id}>
-                                    <p>{message.text}</p>
-                                </div>
-                            )
-                        })}
-                    </div>
-                    <div className="flex w-full h-16 bg-zinc-800 border-t border-b border-zinc-900" >
-                        <Input onChange={(e) => setMessage(e.target.value)} type="text" placeholder="Escribe un mensaje" className="h-full bg-zinc-800 text-white border-none rounded-none "/>
-                        <button onClick={sendMessage} className="bg-primary-400 text-black h-full w-16">Enviar</button>
+                        <div className="h-1/2  ml-4 text-white  flex flex-col justify-between items-start ">
+                            <p className="text-sm font-bold">{chat.name}</p>
+                            <p className="text-sm">{(chat?.messages[0]?.content.substring(0, 32) || 'No hay mensajes') + (chat?.messages[0]?.content.length > 32 ? '...' : '')}</p>
+                        </div>
+                        <div className="h-1/2  ml-auto mr-4 text-white flex flex-col justify-between items-end ">
+                            <p className="text-sm">{strToDate(chat.messages[0]?.createdAt)}</p>
+                            {chat.unread > 0 && <p className="flex items-center justify-center text-sm bg-primary-400  rounded-md w-6 h-6">{chat.unread}</p> }
+                        </div>
                     </div>
                 </div>
             );
