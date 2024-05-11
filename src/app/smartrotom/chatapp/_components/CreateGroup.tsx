@@ -3,9 +3,9 @@ import { CabezaJugador } from "@/components/smartrotom/CabezaMC"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getSmartRotomUser } from "@/lib/utils"
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
-import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { useSession } from "next-auth/react"
 import { useState, useMemo, use, useEffect } from "react"
 import { toast } from "sonner"
@@ -34,8 +34,9 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
 
     function createChat(){
         const player = getSmartRotomUser(session).uuid;
+        toast.info('Creando chat con ' + selectedUsers.map((user) => user.uuid).join(', '));
         if(selectedUsers.length == 0) {
-            rotomPOST('/chatapp/chat', {player, users: [player], name: 'Mensajes Guardados'}).then((res) => {
+            rotomPOST('/chatapp/chat', {player, users: [], name: 'Mensajes Guardados'}).then((res) => {
                 setActiveChat(res);
             });
         } else if(groupName == '' && selectedUsers.length > 1) {
@@ -72,8 +73,8 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
 
     return (
         <Popover onOpenChange={(open) => openNewChat(open)}>
-            <PopoverTrigger className="ml-auto bg-primary-400 text-black h-8 w-8 rounded-full">+</PopoverTrigger>
-            <PopoverContent className="bg-zinc-800 text-white w-[300px] p-4">
+            <PopoverTrigger className="ml-auto bg-primary-400 text-black h-8 w-8 rounded-full ">+</PopoverTrigger>
+            <PopoverContent className="bg-zinc-800 text-white w-[300px] p-4 border border-zinc-900">
                 <div className="flex flex-col">
                     <div>Crear nuevo chat</div>
                     {memoizedUsers}
