@@ -13,20 +13,12 @@ import { Popover, PopoverContent } from "@/components/ui/popover";
 import { PopoverTrigger } from "@radix-ui/react-popover";
 import { CabezaJugador } from "@/components/smartrotom/CabezaMC";
 import { Message } from "./_components/Message";
-import { Chat } from "./_components/Chat";
+import { Chat, ChatData } from "./_components/Chat";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { CreateGroup } from "./_components/CreateGroup";
+import { get } from "http";
 
-type Chat = {
-    id: number;
-    name: string;
-    type: number;
-    messages: Message[];
-    unread: number;
-    image: string;
-
-}
 
 type Message = {
     id: number;
@@ -38,7 +30,7 @@ type Message = {
 
 export default function ChatApp() {
     const {data: session} = useSession();
-    const [chats, setChats] = useState([] as Chat[]); 
+    const [chats, setChats] = useState([] as ChatData[]); 
     const [activeChat, setActiveChat] = useState(0);
 
     const [users, setUsers] = useState([] as any[]); // [ {uuid: string, name: string, image: string}
@@ -56,7 +48,10 @@ export default function ChatApp() {
 
                     chat.unread++;
                     return [...prev].sort((a, b) => {
-                        return new Date(b.messages[0].createdAt).getTime() - new Date(a.messages[0].createdAt).getTime();
+                        const aDate = new Date(a.messages[0]?.createdAt) || new Date();
+                        const bDate = new Date(b.messages[0]?.createdAt) || new Date();
+
+                        return bDate.getTime() - aDate.getTime();
                     })
                 })
             
@@ -83,14 +78,18 @@ export default function ChatApp() {
     }, []);*/
 
     useEffect(() => {
+        getChats();
+    } , [session])
+
+    async function getChats(){
         rotomGET(`/chatapp/chats/${getSmartRotomUser(session).uuid}`)
             .then((res) => {
                 setChats(res);
             })
-    } , [session])
+    }
 
     function getCurrentChat(){
-        return chats.find((chat) => chat.id === activeChat) as Chat
+        return chats.find((chat) => chat.id === activeChat) as ChatData
     }
 
 
@@ -100,22 +99,31 @@ export default function ChatApp() {
             <div className="flex flex-col h-full w-1/4  bg-zinc-800  border-r border-zinc-900 ">
                 <div className="h-16 p-2 text-xl w-full flex items-center text-white " > 
                     <div>Chats</div>
-                    <CreateGroup setActiveChat={setActiveChat} />
+                    <CreateGroup setActiveChat={setChat} />
                 </div>
                 <div className="flex flex-col h-full  overflow-auto bg-zinc-800">
                     {chats.map((chat) => <Contact {...chat} key={chat.id} />)}
                 </div>
             </div>
             <div className="flex flex-col w-3/4 h-full bg-zinc-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-zinc-900">
-                {activeChat ? <Chat chats={chats} activeChat={activeChat}
+                {activeChat ? <Chat chats={chats} activeChat={activeChat} setActiveChat={setActiveChat}
                     /> : <div className="h-full flex items-center justify-center text-white">Selecciona un chat</div>}
             </div>
         </div>
     );
 
+    async function setChat(id:number){
+
+        const chat = chats.find((chat) => chat.id === id);
+        if(!chat) {
+            await getChats();
+        }
+
+        setActiveChat(id);
+    }
 
     
-        function Contact(chat: Chat){
+        function Contact(chat: ChatData){
             return (
                 <div>
                     <div className={`${activeChat === chat.id ? 'bg-zinc-700' : 'bg-zinc-800'} hover:bg-zinc-700 h-[100px] flex items-center w-full`} onClick={()  => setActiveChat(chat.id)}>
