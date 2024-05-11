@@ -9,22 +9,15 @@ type Message = {
 }
 
 
-export function Message({message, session, img=false} : {message: Message, session: any, img?: boolean}) {
+export function Message({message, session, img=false, prev} : {message: Message, session: any, img?: boolean, prev: string}){
     const isSender = message.uuid === getSmartRotomUser(session).uuid;
-    if(!isSender && img) return (
-
-            <div className={`mx-8 my-1 bg-primary-400 pt-4 p-2 max-w-[50%] ${isSender ? 'self-end' :null} relative rounded-sm`} key={message.id}>
-            <img src='https://db.pokemongohub.net/_next/image?url=%2Fimages%2Fofficial%2Ffull%2F363.webp&w=640&q=75' alt='profile picture' className='w-8 h-8 rounded-full' className='w-16 h-16 rounded-full absolute -top-12 -left-8 bg-primary-400'/>
-            <div >{message.content}</div>
-            <div  className="pl-8 text-end text-[10px]">{strToTime(message.createdAt)}</div>
-    </div>
-)
-
     return(
-        <div className={`mx-4 my-1 bg-primary-400 p-2 pr-4 max-w-[50%] ${isSender ? 'self-end' :null} rounded-sm`} key={message.id}>
-            <div className="pr-8">{message.content}</div>
-            <div  className="text-end text-[10px]">{strToTime(message.createdAt)}</div>
-        </div>
+    <div className={`border-2 font-bold border-black mx-6 my-1 bg-primary-400 text-black p-1 pt-3  max-w-[50%] ${isSender ? 'self-end' : 'self-start'} relative rounded-lg`} key={message.id}>
+        {!isSender && img && prev !== message.uuid ? <img src={`https://crafatar.com/avatars/${message.uuid}`} 
+        alt={`profile picture for ${message.uuid}`} className='border-2 border-black w-10 h-10 rounded-full absolute -top-6 -left-4 bg-primary-400'/> : null}
+        <div>{message.content}</div>
+        <div className="pl-8 text-end text-[10px] font-normal">{strToTime(message.createdAt)}</div>
+    </div>
     )
 }
 
