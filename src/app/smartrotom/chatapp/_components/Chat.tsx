@@ -2,14 +2,14 @@
 
 import useSocketStore from "@/app/useSocketStore";
 import { getSmartRotomUser } from "@/lib/utils";
-import { rotomGET, rotomPOST } from "@/services/boffAPI";
+import { rotomPOST } from "@/services/boffAPI";
 import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Message } from "./Message";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PhoneIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { toast } from "sonner";
+import { toast } from 'react-toastify';
 
 type Message = {
     id: number;
@@ -26,6 +26,7 @@ export type ChatData = {
     messages: Message[];
     unread: number;
     image: string;
+    members: string[];
 
 }
 
@@ -71,10 +72,19 @@ export function Chat({chats, activeChat, setActiveChat}: {chats: ChatData[], act
     }
     
     function call(){
+        /*
+        mcefQuery('startCall', {uuid: getSmartRotomUser(session).uuid, members: chat.members.join(',')})
+            .then((res: any) => {
+                if(res.error) return toast.error(res.error)
+            })
+            .finally(() => {
+                setActiveChat(0)
+            })*/
+        
         rotomPOST(`/chatapp/call/${chat.id}`, {uuid: getSmartRotomUser(session).uuid})
             .then((res) => {
                 if(res.error) return toast.error(res.error)
-            })
+        })
     }
 
     return (

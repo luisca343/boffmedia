@@ -8,7 +8,7 @@ import { getSmartRotomUser } from "@/lib/utils"
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useSession } from "next-auth/react"
 import { useState, useMemo, use, useEffect } from "react"
-import { toast } from "sonner"
+import { toast } from 'react-toastify'
 
 export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => void}) {
     const {data: session} = useSession();
