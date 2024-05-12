@@ -10,8 +10,8 @@ declare global {
 
 export function MinecraftFunctions(){
     const router = useRouter()
-    window.openDex = (pokemon: string, form:string) => openDex(pokemon, form);
-    window.refresh = refresh;
+    window.openDex = (species: string, form:string) => openDex(species, form);
+    window.refresh = () => refresh();
 
 
     function refresh() {

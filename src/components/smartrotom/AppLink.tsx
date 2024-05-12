@@ -50,7 +50,7 @@ export function SortableGrid({className, apps, setApps}  : {className?: string, 
   return (
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter} sensors={sensors}>
       <SortableContext items={apps} strategy={rectSortingStrategy} >
-        <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 content-between gap-y-1 pb-4 overflow-auto flex-1">
+        <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 content-between gap-y-1 pb-4 overflow-auto">
             {apps.map((app, index) => (
             <SortableItem key={`app-${index}`} app={app}/>
             ))}
@@ -77,10 +77,10 @@ export function SortableItem({app} : {app: App}) {
     transition,
   };
 
-  let estilos = `w-24 h-24 sm:w-36 sm:h-36 ${isDragging ? 'opacity-50' : ''}`
+  let estilos = `w-24 h-24  sm:w-36 sm:h-36 ${isDragging ? 'opacity-50' : ''}`
 
   return (
-    <li ref={setNodeRef} style={style} {...attributes} {...listeners} className="m-auto hover:cursor-pointer">
+    <li ref={setNodeRef} style={style} {...attributes} {...listeners} className="m-auto hover:cursor-pointer mb-2">
       {active ? 
         <motion.div  whileHover={{ scale: 1 }} key={app.id} className=" m-auto hover:cursor-pointer">
           <div className={estilos}><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>

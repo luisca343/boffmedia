@@ -197,7 +197,7 @@ function esPagador(transaction: any, activeAccount: any){
 
 function getImageURL(account: {type: string, name: string}){
     if(account.type === "EMPRESA"){
-        return `/smartrotom/img/starbank/cuentas/${account.name.toLowerCase()}.png`
+        return `/smartrotom/img/apps/starbank/cuentas/${account.name.toLowerCase()}.png`
     } else {
         return `https://minotar.net/avatar/${account.name}/80.png`
     }

@@ -167,7 +167,7 @@ export default function Jugar(){
     return (
         <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: 'url(/smartrotom/img/apps/mina/gui/fondo.png)'}}>
             <AlertDialog open={open}>
-                <AlertDialogContent className='bg-gray-900 border-gray-950'>
+                <AlertDialogContent className='bg-main-900 border-gray-950'>
                     {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-white text-center text-2xl">Recompensas obtenidas</div>}
                     <div className="flex flex-row justify-center items-center">
                     {obtainedRewards.map((reward, i) => {
@@ -181,14 +181,14 @@ export default function Jugar(){
                     <BarraEnergia/>
                     <div className="flex justify-evenly">
                         <Button 
-                            className="text-white border border-white hover:bg-gray-600"
+                            className="text-white border border-white hover:bg-main-600"
                             onClick={async () => {
                                 jugar(session, router, "/smartrotom/mina")
                                 setOpen(false)
                                 generateMap()
                             }}>
                             {index === 0 ? 'Jugar' : 'Volver a Jugar'}</Button>
-                        <Button className="text-white border border-white hover:bg-gray-600" onClick={() => router.replace('/smartrotom/mina')}>Cerrar</Button>
+                        <Button className="text-white border border-white hover:bg-main-600" onClick={() => router.replace('/smartrotom/mina')}>Cerrar</Button>
                     </div>
                 </AlertDialogContent>
             </AlertDialog>
@@ -196,9 +196,9 @@ export default function Jugar(){
         <motion.div className="flex w-full h-full"
         
         >
-            <audio id='pick' src='/smartrotom/audio/mina/pick.ogg'></audio>
-            <audio id='hammer' src='/smartrotom/audio/mina/hammer.mp3'></audio>
-            <audio id='item' src='/smartrotom/audio/mina/item.mp3'></audio>
+            <audio id='pick' src='/smartrotom/audio/apps/mina/pick.ogg'></audio>
+            <audio id='hammer' src='/smartrotom/audio/apps/mina/hammer.mp3'></audio>
+            <audio id='item' src='/smartrotom/audio/apps/mina/item.mp3'></audio>
 
             <div className="h-full flex-1 flex flex-col ">
                 <div className="bg-red-400 h-[10vh]" >

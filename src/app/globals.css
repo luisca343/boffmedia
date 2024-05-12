@@ -107,9 +107,21 @@
     --primary-800: #8e341e;
     --primary-900: #722e1c;
     --primary-950: #3e140c;
+
+    --main-50: #f9fafb;
+    --main-100: #f3f4f6;
+    --main-200: #e5e7eb;
+    --main-300: #d1d5db;
+    --main-400: #9ca3af;
+    --main-500: #6b7280;
+    --main-600: #4b5563;
+    --main-700: #374151;
+    --main-800: #1f2937;
+    --main-900: #111827;
+    --main-950: #030712;
   }
 
-  .theme-dark {
+  .theme-light {
     --primary-50: #f2f8e9;
     --primary-100: #e5f2d0;
     --primary-200: #c9e1a5;
@@ -121,6 +133,18 @@
     --primary-800: #357f00;
     --primary-900: #235800;
     --primary-950: #113000;
+
+    --main-50: #030712;
+    --main-100: #111827;
+    --main-200: #1f2937;
+    --main-300: #374151;
+    --main-400: #4b5563;
+    --main-500: #6b7280;
+    --main-600: #9ca3af;
+    --main-700: #d1d5db;
+    --main-800: #e5e7eb;
+    --main-900: #f3f4f6;
+    --main-950: #f9fafb;
   }
   
   * {

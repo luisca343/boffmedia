@@ -25,3 +25,11 @@ export interface SmartRotomUser {
     user: User;
     expires: string; // ISO date string format
   }
+
+
+  export interface SmartRotomResponse {
+    status: number;
+    message?: string;
+    error?: string;
+    data?: string;
+}

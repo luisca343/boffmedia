@@ -8,7 +8,7 @@ export default async function Ranking(){
             <div>
                 {ranking?.map((user: any, i: number) => {
                     return (
-                        <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-gray-900 bg-opacity-80">
+                        <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-main-900 bg-opacity-80">
                             <p className="text-gray-400">{user.username}</p>
                             <p className="text-gray-400">{user.value}</p>
                         </div>

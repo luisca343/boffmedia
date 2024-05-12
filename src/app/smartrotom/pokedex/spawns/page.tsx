@@ -3,7 +3,7 @@ import { PossibleSpawns } from "../_components/PossibleSpawns";
 
 export default function Spawns(){
     return(
-        <div className="bg-gray-800  ">
+        <div className="bg-main-800  ">
             <PossibleSpawns />
         </div>
     )

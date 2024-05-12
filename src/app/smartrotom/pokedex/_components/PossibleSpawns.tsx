@@ -65,7 +65,7 @@ export function PossibleSpawns(){
     return(
         <div className="flex  flex-wrap justify-center">
             {spawns?.map((spawn) => (
-                <Link key={spawn.species} className="flex flex-col items-center  hover:bg-gray-400  rounded-sm text-center w-24 2xl:w-20   text-white" href={`/smartrotom/pokedex/entrada/${spawn.dex}/${spawn.form}`}>
+                <Link key={spawn.species} className="flex flex-col items-center  hover:bg-main-400  rounded-sm text-center w-24 2xl:w-20   text-white" href={`/smartrotom/pokedex/entrada/${spawn.dex}/${spawn.form}`}>
                     <PokemonSprite id={spawn.dex} form={spawn.form} palette={spawn.palette} width={80} />
                     <div className="text-xs hidden 2xl:block">{getDisplayName(spawn.species, spawn.form, spawn.palette)}</div>
                     <div className=' font-bold text-xl 2xl:text-base'>{spawn.percentage.toFixed(4)} %</div>

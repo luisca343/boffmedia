@@ -111,7 +111,7 @@ export const SideMenu = () => {
         onMouseOut={() => !isOpened && controls.start({ left: 'calc(100% - 6rem)' })} 
       >
         <div className="h-full w-full bg-blue-950 flex flex-col  relative z-10">
-          <div className="w-full bg-gray-900 h-24  text-blue-100 font-bold italic pointer-events-none flex items-center justify-center rounded-b-xl">
+          <div className="w-full bg-main-900 h-24  text-blue-100 font-bold italic pointer-events-none flex items-center justify-center rounded-b-xl">
             <div className="bg-white min-w-16 h-16 rounded-full text-center text-9xl flex items-center mx-2">
               <img src="/smartrotom/img/apps/starbank.webp" alt="logo" className="h-16 w-16" />
             </div>
