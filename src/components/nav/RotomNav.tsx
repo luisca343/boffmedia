@@ -1,19 +1,14 @@
 "use client"
 import { Hora } from "../Hora";
-import { ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline'
-import {BellAlertIcon} from '@heroicons/react/24/solid'
 import BreadcrumbNav from "./BreadbrumbNav";
 import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
 import useSocketStore from "@/app/useSocketStore";
-import { use, useEffect, useState } from "react";
-import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Socket } from "socket.io-client";
-
 import { usePathname } from "next/navigation";
-import Link from "next/link";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
-
 
 import {
   Sheet,
@@ -24,7 +19,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import FicusAI from "../smartrotom/FicusAI";
-import { Toaster } from "../ui/sonner";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { Badge } from "../ui/badge";
 import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
@@ -34,9 +28,10 @@ import { getSmartRotomUser } from "@/lib/utils";
 
 
 export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
-
     const { socket, connect } = useSocketStore();
     const {data: session} = useSession()
+
+
     const {
       notifications,
       clear,
@@ -49,18 +44,34 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     const pathname = usePathname()
     
     useEffect(() => {
-        if(!socket) {
+        console.log('RotomNav');
+        if(!socket && session) {
           connect(getSmartRotomUser(session));
           return
-        }/*
+        }
+        
+        /*
         socket.on('patata', () => console.log('Patata'));
         socket.on('connection', () => console.log('Connected'));
         socket.emit('patata', null);*/
-      }, [socket, connect]);
+      }, [socket, connect, session]);
 
       useEffect(() => {
 
       }, [pathname])
+
+    
+    useEffect(() => {
+        /*
+        const handleKeyDown = (event: KeyboardEvent) => {
+            toast('Tecla pulsada: ' + event.key);
+        };
+    
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };*/
+    }, []);
 
       
     function Notifications(){
@@ -82,7 +93,6 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
 
     return (
         <nav className={`h-12  flex items-center px-2 ${pathname.includes('pokedex') ? 'bg-slate-950' : 'bg-zinc-900'}`}>
-            <Toaster className="bg-slate-800" />
             <BotonPrev />
             <BotonNext />
             <BotonReload />
@@ -100,7 +110,6 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                      </SheetHeader>
                     </SheetContent>
             </Sheet>
-
             <Sheet>
                 <SheetTrigger>
                     <BotonIA />
@@ -131,6 +140,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
         </nav>
     )
 }
+
 
 function BotonNav({Icono, strokeWidth = 5, onClick = null} : {onClick?:any,strokeWidth?: number, Icono: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>>}){
     return (

@@ -9,6 +9,7 @@ import AuthForm from "@/app/auth/AuthForm";
 import {  LoadingScreen } from "./Loading";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { CallStatus } from "./CallStatus";
 
 export type BoffSession = {
     user: {
@@ -55,28 +56,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       };
       fetchDatosUsuario();
     }, []);
-    
-    /*
-    useEffect(() => {
-        if (status === "unauthenticated" && isMinecraft() && datosUsuario) {
-          rotomPOST('/users/findUser', datosUsuario).then((res: AxiosResponse) => {
-                if(res.status === 200) {
-                    alert(status)
-                }
-                if(res.status === 201) {
-                    alert('Usuario creado')
-                }
-                if(res.status === 500) {
-                    alert('Error')
-                }
 
-          });
-        }
-      }, [status, datosUsuario]);*/
-
-      
-
-      
       if (status === "loading") {
         return <LoadingScreen />
       }
@@ -112,9 +92,11 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
         <section id="smartrotom" className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>
             <RotomNav setTema={setTema}/>
             <ToastContainer position="bottom-right" theme="dark"/>
-            <div className="overflow-hidden border-solid no-scrollbar flex-1  [&>*]:h-full [&>*]:overflow-auto">
-                {children}
-            </div>
+            <main className="relative overflow-hidden border-solid no-scrollbar flex-1">
+              
+                <CallStatus />
+                <div className="h-full w-full [&>*]:h-full [&>*]:overflow-auto">{children}</div>
+            </main>
         </section>
     )
 }
@@ -127,17 +109,3 @@ function RotomError({error}: {error: string}) {
         </div>
     )
 }
-
-/*
-function LoginForm(){
-    return (
-        <div className="flex flex-col items-center justify-center h-full"
-        >
-
-            {isMinecraft() && <h1>MINECRAFT</h1>}
-            <button  onClick={() => signIn('google')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            >Sign in with Google</button>
-        </div>
-    )
-}*/
