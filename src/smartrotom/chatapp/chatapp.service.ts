@@ -188,6 +188,25 @@ export class ChatappService {
         
         if(users.length == 0) return {error: 'No users in chat'}
 
+        console.log('Calling users', users)
+
+        const userSocket = this.socketGateway.users.find((user: {uuid: string}) => user.uuid === uuid)
+        if(!userSocket) return {error: 'User not connected'}
+
+        const callUsers = users.map((user: {uuid: string}) => ({uuid: user.uuid, active: false}));
+        callUsers.push({uuid, active: true})
+
+        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId,caller: uuid, users: callUsers})
+        
+
+        this.socketGateway.users.forEach((user: {uuid: string, socketId: string}) => {
+            if(users.find((u: {uuid: string}) => u.uuid === user.uuid)){
+                this.socketGateway.server.to(user.socketId).emit('chat:call', {chatId, caller: uuid, users: callUsers})
+            } else { 
+                console.log(`User ${user.uuid} not in chat`)
+            }
+        })
+
         return 1
     }
     

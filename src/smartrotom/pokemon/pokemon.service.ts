@@ -441,6 +441,8 @@ export class PokemonService {
     }
 
     async registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: number){
+        // Al evolucionar solo se está regisstrando como capturado
+        
         const formId = form || 'base'
         const paletteId = palette || 'none'
         

@@ -20,4 +20,8 @@ export class ChatappController {
     async createChat(@Body() body: {player: string, users: string[], name: string}){
         return this.chatAppService.createChat(body.player, body.users, body.name);
     }
+    @Post("call/:chatId")
+    async call(@Param("chatId") chatId: number, @Body() body: {uuid: string}){
+        return this.chatAppService.call(chatId, body.uuid);
+    }
 }
