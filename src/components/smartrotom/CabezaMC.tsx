@@ -3,7 +3,7 @@ import { IdleAnimation, NameTagObject, SkinViewer } from "skinview3d"
 import { useEffect } from "react"
 
 
-export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, zoom = 1, width= 150, height= 150, ...props} : {uuid: string, nombreNPC: string, autoRotate?: boolean, tag?: boolean, zoom?: number, width?: number, height?: number}) {
+export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, zoom = 1, width= 150, height= 150, className='', ...props} : {uuid: string, nombreNPC: string, autoRotate?: boolean, tag?: boolean, zoom?: number, width?: number, height?: number, className?: string}) {
     useEffect(() => {
         const canvas = document.getElementById(`skin_container_${uuid}`) as HTMLCanvasElement
         if (!canvas) return
@@ -26,7 +26,7 @@ export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, 
     }, [props])
   
     return (
-      <div style={{width, height}}>
+      <div style={{width, height}} className={className}>
           <canvas id={`skin_container_${uuid}`} />
       </div>
       )
