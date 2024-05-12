@@ -1,7 +1,7 @@
 import { sql } from "drizzle-orm";
 import { char, datetime, int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
 
-export const pokedexRegistry = mysqlTable("pokedex", {
+export const pokedexRegistry = mysqlTable("rotom_pokedex", {
     id: int("id").primaryKey().autoincrement(),
     uuid: char("uuid", { length: 36 }).notNull(),
     pokemonId: int("pokemon_id").notNull(),

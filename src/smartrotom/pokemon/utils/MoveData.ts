@@ -5,9 +5,7 @@ import { wolfeyTypeRanking } from './types';
 import { Attack } from '@/types/move';
 
 export class MoveData {
-    constructor() {
-        this.loadMoveData();
-    }
+    constructor() {}
     
     moveList = [];
     movesByName = {}

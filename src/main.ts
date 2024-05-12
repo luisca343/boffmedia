@@ -6,15 +6,17 @@ import { DuplicateEntryExceptionFilter } from './filters/DuplicateEntryException
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  let origin = ['http://localhost:3000', 'http://148.251.3.244:34333', 'https://lizardon.es', 'https://boffmedia.es']
+  let origin = ['http://localhost:3000', 'http://148.251.3.244:34333', 'https://lizardon.es', 'https://boffmedia.es', 'https://local.boffmedia.es']
   app.enableCors({ origin }); // Enable CORS for the specified origin
 
-  const httpServer = app.getHttpServer();
+
   const configService = app.get(ConfigService);
   app.useGlobalFilters(new DuplicateEntryExceptionFilter());
 
   console.log("EL PUERTO ES: "+ configService.get('PORT'));
 
+  /*  
+  const httpServer = app.getHttpServer();
   const io = new Server(httpServer, {
     cors: {
       origin,
@@ -36,11 +38,12 @@ async function bootstrap() {
     console.log('Client disconnected');
   });
 
+  io.listen(34304);
+  console.log('Socket open');
+*/
   await app.listen(34301);
   console.log('Server open');
 
-  io.listen(34304);
-  console.log('Socket open');
 }
 
 bootstrap();

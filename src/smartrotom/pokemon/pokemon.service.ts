@@ -10,9 +10,8 @@ import { PokemonData } from './utils/PokemonData';
 import { MoveData } from './utils/MoveData';
 import { SpawnData } from './utils/SpawnData';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/Pokedex';
+import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { and, desc, eq } from 'drizzle-orm';
-import e from 'express';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 
 @Injectable()
@@ -26,12 +25,16 @@ export class PokemonService {
     dexCache = {} as {date: Date, data: any}
 
     async loadData(){
+        const startingTime = Date.now();
         this.pokemonData = new PokemonData();
-        await this.pokemonData.loadPokemonDataAsync();
-
         this.moveData = new MoveData();
         this.spawnData = new SpawnData(this.pokemonData);
 
+        await this.pokemonData.loadPokemonData();
+        await this.moveData.loadMoveData();
+        await this.spawnData.loadSpawnData();
+
+        console.log(`Se han cacheado los datos de la Pokédex en ${Date.now() - startingTime}ms`);
         
     }
 
@@ -83,15 +86,20 @@ export class PokemonService {
 
     }
 
+    excludedForms = ['teras', 'terasmega', 'omnitrix']
 
-    async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img'} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string}){
+    async getImage({pokemonId= 1, formName = "base", paletteName = 'none', uuid, type='img', hide} : {pokemonId?: number, formName: string, paletteName?: string,uuid:string, type?: string, hide?: number}) {
         const pokemon = this.pokemonData.speciesByDex[pokemonId] as Pokemon
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
         let status
+        
+        console.log(pokemonId, formName, paletteName)
+        
 
-        ["teras", "omnitrix"].includes(formName) ? status = 0 : status = 1
+        this.excludedForms.includes(formName) ? status = 0 : status = 1
 
-        if(pokemonId > 0) {
+        if(pokemonId > 99999) {
+            
             if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000){
                 const pokemonStatus = await this.db.getDrizzle()
                 .select().from(pokedexRegistry)
@@ -101,7 +109,9 @@ export class PokemonService {
                 this.dexCache[uuid] = {date: new Date(), data: pokemonStatus}
             } 
             const pokemonStatus = this.dexCache[uuid].data
-            const pokemonStatusFiltered = pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName && p.paletteId === paletteName)
+            const pokemonStatusFiltered = hide == 1 
+                ? pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName && p.paletteId === paletteName) 
+                : pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName)
             status = pokemonStatusFiltered.length > 0 ? 1 : 0
 
             /*
@@ -157,6 +167,7 @@ export class PokemonService {
         //console.log( path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png'))
         const sprite = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png');
 
+        console.log(sprite)
         if(fs.existsSync(sprite)) return {url: path.join('/smartrotom/img/sprites/items', itemFileName + '.png'),}
         return {url: '/smartrotom/img/sprites/items/000.png'}
     }
@@ -430,6 +441,8 @@ export class PokemonService {
     }
 
     async registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: number){
+        // Al evolucionar solo se está regisstrando como capturado
+        
         const formId = form || 'base'
         const paletteId = palette || 'none'
         

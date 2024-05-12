@@ -1,5 +1,5 @@
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
-import { starBankAccounts, starBankTransactions, starBankUsersAccounts } from '@/_db/schema/StarBank';
+import { starBankAccounts, starBankTransactions, starBankUsersAccounts } from '@/_db/schema/SmartRotomStarBank';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { desc, eq, or } from 'drizzle-orm';

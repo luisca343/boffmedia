@@ -37,6 +37,8 @@ export class UsersService {
     };
     const existe = await this.db.getDrizzle().select().from(boffMediaUsers).where(or(eq(boffMediaUsers.uuid, boffMediaUser.uuid), eq(boffMediaUsers.username, boffMediaUser.username)));
     console.log(existe);
+    
+    
 
     if(existe.length > 0) return {error: "El usuario ya existe"} 
     console.log('El usuario BOFF no existe, creando...'); 
@@ -109,14 +111,14 @@ export class UsersService {
   }
 
 
-  getSessionUser({boffmedia_users, smartrotom_users}: {boffmedia_users: BoffMediaUser, smartrotom_users: SmartRotomUser}){
+  getSessionUser({boffmedia_users, rotom_users}: {boffmedia_users: BoffMediaUser, rotom_users: SmartRotomUser}){
     return {
       username: boffmedia_users?.username,
       email: boffmedia_users?.email,
       smartRotomUser: {
-        username: smartrotom_users?.username,
-        uuid: smartrotom_users?.uuid,
-        world: smartrotom_users?.world
+        username: rotom_users?.username,
+        uuid: rotom_users?.uuid,
+        world: rotom_users?.world
       }
     } as SessionUser;
   }
