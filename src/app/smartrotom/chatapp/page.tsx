@@ -7,15 +7,9 @@ import { useSession } from "next-auth/react";
 import { rotomGET, rotomPOST } from "@/services/boffAPI";
 import { getDatosUsuarioMC } from "@/services/mcefHelper";
 import { getSmartRotomUser, strToDate } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
 import useSocketStore from "@/app/useSocketStore";
-import { Popover, PopoverContent } from "@/components/ui/popover";
-import { PopoverTrigger } from "@radix-ui/react-popover";
-import { CabezaJugador } from "@/components/smartrotom/CabezaMC";
 import { Message } from "./_components/Message";
 import { Chat, ChatData } from "./_components/Chat";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { CreateGroup } from "./_components/CreateGroup";
 import { get } from "http";
 

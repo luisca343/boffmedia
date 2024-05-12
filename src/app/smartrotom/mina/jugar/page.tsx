@@ -196,9 +196,9 @@ export default function Jugar(){
         <motion.div className="flex w-full h-full"
         
         >
-            <audio id='pick' src='/smartrotom/audio/mina/pick.ogg'></audio>
-            <audio id='hammer' src='/smartrotom/audio/mina/hammer.mp3'></audio>
-            <audio id='item' src='/smartrotom/audio/mina/item.mp3'></audio>
+            <audio id='pick' src='/smartrotom/audio/apps/mina/pick.ogg'></audio>
+            <audio id='hammer' src='/smartrotom/audio/apps/mina/hammer.mp3'></audio>
+            <audio id='item' src='/smartrotom/audio/apps/mina/item.mp3'></audio>
 
             <div className="h-full flex-1 flex flex-col ">
                 <div className="bg-red-400 h-[10vh]" >
