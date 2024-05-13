@@ -25,6 +25,7 @@ export const rotomChatMessages = mysqlTable("rotom_chat_messages", {
     chatId: int("chat_id").notNull(),
     senderUUID: varchar("sender_uuid", { length: 36 }).notNull(),
     content: text("content").notNull(),
+    type: varchar("type", { length: 255 }).default("text"),
     createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP()`),
 });
 
