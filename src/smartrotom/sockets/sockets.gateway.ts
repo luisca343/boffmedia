@@ -6,6 +6,8 @@ import {
     WebSocketServer,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
+import { ChatappService } from '../chatapp/chatapp.service';
+import { Inject, forwardRef } from '@nestjs/common';
   
   @WebSocketGateway(34304, {
     cors: {
@@ -16,6 +18,10 @@ import {
     @WebSocketServer()
     server: Server;
     users: {uuid: string, socketId: string}[] = [];
+    constructor(
+        @Inject(forwardRef(() => ChatappService))
+        private chatAppService: ChatappService
+    ) {}
     
     @SubscribeMessage('connection')
     handleConnection(@ConnectedSocket() client: Socket): boolean{
@@ -51,11 +57,18 @@ import {
     
     /* ChatApp */
     @SubscribeMessage('chat:exitcall')
-    handleChatExit(@ConnectedSocket() client: Socket, @MessageBody() data: {call: {users: {uuid:string, status:string}[], caller: string}, user: any}): void{
+    handleChatExit(@ConnectedSocket() client: Socket, 
+        @MessageBody() data: {call: {chatId: number, users: { uuid:string, status:string}[], caller: string}, user: any, startTime: number}): void{
        // Remove the user from the call
        console.log(`Exit call signal sent by ${data.user.uuid}`);
        data.call.users = data.call.users.filter(user => user.uuid !== data.user.uuid);
        const sockets = this.server.sockets.sockets;
+       const currentUsers = data.call.users.filter(user => user.status === 'IN_CALL');
+       if(currentUsers.length === 0){
+            this.chatAppService.endCall(data.call.chatId, data.startTime);
+            return;
+       }
+       
 
         data.call.users.forEach(user => {
             const userSocket = this.users.find(u => u.uuid === user.uuid);
