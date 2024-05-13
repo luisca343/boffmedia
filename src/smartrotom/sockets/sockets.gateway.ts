@@ -48,13 +48,14 @@ import {
         console.log(`Client with ID ${client.id} disconnected`);
     }
     
+    
     /* ChatApp */
     @SubscribeMessage('chat:exitcall')
-    handleChatExit(@ConnectedSocket() client: Socket, @MessageBody() data: {call: {users: {uuid:string, active:boolean}[], caller: string}, user: any}): void{
+    handleChatExit(@ConnectedSocket() client: Socket, @MessageBody() data: {call: {users: {uuid:string, status:string}[], caller: string}, user: any}): void{
        // Remove the user from the call
        console.log(`Exit call signal sent by ${data.user.uuid}`);
        data.call.users = data.call.users.filter(user => user.uuid !== data.user.uuid);
-        const sockets = this.server.sockets.sockets;
+       const sockets = this.server.sockets.sockets;
 
         data.call.users.forEach(user => {
             const userSocket = this.users.find(u => u.uuid === user.uuid);
@@ -64,9 +65,14 @@ import {
         });
     }
     @SubscribeMessage('chat:joincall')
-    handleChatJoin(@ConnectedSocket() client: Socket, @MessageBody() data: {call: {users: {uuid:string, active:boolean}[], caller: string}, user: any}): void{
+    handleChatJoin(@ConnectedSocket() client: Socket, @MessageBody() data: {call: {users: {uuid:string, status:string}[], caller: string}, user: any}): void{
         console.log(`Join call signal sent by ${data.user.uuid}`);
         const sockets = this.server.sockets.sockets;
+        const users = data.call.users.map(user => user.uuid);
+        const connectedUsers = this.users.map(user => user.uuid);
+
+        console.log('Users: ', users);
+        console.log('Connected users: ', connectedUsers);
 
         data.call.users.forEach(user => {
             const userSocket = this.users.find(u => u.uuid === user.uuid);
