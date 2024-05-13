@@ -7,8 +7,6 @@ import { toast } from "react-toastify";
 import { CabezaJugador } from "./CabezaMC";
 import { mcefQuery } from "@/services/mcefHelper";
 import { SmartRotomResponse } from "@/types";
-import { set } from "react-hook-form";
-
 
 
 enum UserStatus {
@@ -25,13 +23,13 @@ interface UserData {
 interface CallData {
     users: UserData[];
     caller: string;
-    callId: string;
+    chatId: string;
 }
 
 export function CallStatus(){
     const { socket } = useSocketStore();
     const { data: session } = useSession();
-    const [activeCall, setActiveCall] = useState<CallData>({ users: [], caller: '', callId: '' });
+    const [activeCall, setActiveCall] = useState<CallData>({ users: [], caller: '', chatId: '' });
     const [isExpanded, setIsExpanded] = useState(false);
     const [callStartTime, setCallStartTime] = useState<number>(0);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -84,7 +82,7 @@ export function CallStatus(){
 
     const clearCall = useCallback(() => {
         console.log('Clearing call');
-        setActiveCall({ users: [], caller: '', callId: '' });
+        setActiveCall({ users: [], caller: '', chatId: '' });
     }, []);
 
     
@@ -168,7 +166,7 @@ export function CallStatus(){
     function exitCall(){
         console.log('Exiting call');
         if(!socket) return clearCall();
-        socket.emit('chat:exitcall', {call: activeCall, user: getSmartRotomUser(session)});
+        socket.emit('chat:exitcall', {call: activeCall, user: getSmartRotomUser(session), startTime: callStartTime});
         clearCall();
         
         
