@@ -188,20 +188,19 @@ export class ChatappService {
         
         if(users.length == 0) return {error: 'No users in chat'}
 
-        console.log('Calling users', users)
-
         const userSocket = this.socketGateway.users.find((user: {uuid: string}) => user.uuid === uuid)
         if(!userSocket) return {error: 'User not connected'}
 
-        const callUsers = users.map((user: {uuid: string}) => ({uuid: user.uuid, active: false}));
-        callUsers.push({uuid, active: true})
+        const callUsers = users.map((user: {uuid: string}) => ({uuid: user.uuid, status: 'RINGING'}));
+        const connectedUsers = callUsers.filter((user: {uuid: string}) => this.socketGateway.users.find((u: {uuid: string}) => u.uuid === user.uuid))
 
-        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId,caller: uuid, users: callUsers})
+        connectedUsers.push({uuid, status: 'IN_CALL'})
+
+        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId,caller: uuid, users: connectedUsers})
         
-
         this.socketGateway.users.forEach((user: {uuid: string, socketId: string}) => {
             if(users.find((u: {uuid: string}) => u.uuid === user.uuid)){
-                this.socketGateway.server.to(user.socketId).emit('chat:call', {chatId, caller: uuid, users: callUsers})
+                this.socketGateway.server.to(user.socketId).emit('chat:call', {chatId, caller: uuid, users: connectedUsers})
             } else { 
                 console.log(`User ${user.uuid} not in chat`)
             }
