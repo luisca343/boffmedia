@@ -91,7 +91,7 @@ export default function StarBank(){
                         </div>
                     </BankSectionFooter>
                 </BankSection>
-                <BankSection className="overflow-auto">
+                <BankSection className="h-full overflow-auto">
                     <BankSectionHeader> Transacciones </BankSectionHeader>
                     <BankSectionContent >
                         <Transactions transactions={transactions} activeAccount={activeAccount} />
