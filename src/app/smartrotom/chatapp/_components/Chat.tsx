@@ -17,6 +17,7 @@ type Message = {
     createdAt: string;
     uuid: string;
     chatId: number;
+    type: string;
 }
 
 export type ChatData = {
