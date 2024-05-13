@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ChatappService } from './chatapp.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { ChatappController } from './chatapp.controller';
@@ -9,6 +9,6 @@ import { SocketsModule } from '../sockets/sockets.module';
     providers: [ChatappService, MySQL2Service],
     controllers: [ChatappController],
     exports: [ChatappService],
-    imports: [SocketsModule]
+    imports: [forwardRef(() => SocketsModule)]
   })
 export class ChatappModule {}
