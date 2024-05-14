@@ -32,8 +32,14 @@ export class StarbankService {
         return {balance: res[0].balance}
     }
 
+    async getAllAccounts() {
+        return await this.db.getDrizzle()
+            .selectDistinct({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name, type: starBankAccounts.type})
+            .from(starBankAccounts)
+    }
+
     async getAccounts(uuid: string) {
-        const res = await this.db.getDrizzle().select({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name}).from(starBankAccounts)
+        const res = await this.db.getDrizzle().selectDistinct({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name, type: starBankAccounts.type}).from(starBankAccounts)
             .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
             .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
         if(res.length === 0)  return []
@@ -114,7 +120,7 @@ export class StarbankService {
     async getTransactions(uuid: string) {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
-        
+
         const res = await this.db.getDrizzle().selectDistinct(
             {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
                 reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
@@ -126,7 +132,7 @@ export class StarbankService {
             .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
             .leftJoin(starBankUsersAccounts, or(eq(toJoin.id, starBankUsersAccounts.accountId), eq(fromJoin.id, starBankUsersAccounts.accountId)))
             .leftJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
-            .limit(10)
+            .limit(20)
             .orderBy(desc(starBankTransactions.date))
 
         return res

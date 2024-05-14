@@ -9,6 +9,10 @@ export class StarbankController {
         return this.starbankService.getBalance(uuid);
     }
 
+    @Get("accounts")
+    getAllAccounts(@Param("uuid") uuid: string){
+        return this.starbankService.getAllAccounts();
+    }
     @Get("accounts/:uuid")
     getAccounts(@Param("uuid") uuid: string){
         return this.starbankService.getAccounts(uuid);
