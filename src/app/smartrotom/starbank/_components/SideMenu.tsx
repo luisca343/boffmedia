@@ -1,34 +1,42 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { BanknotesIcon, CalendarIcon, ChartBarIcon, ChevronRightIcon, ChevronUpIcon, CreditCardIcon, CurrencyYenIcon, HomeIcon, PresentationChartLineIcon, TicketIcon } from '@heroicons/react/24/outline';
+import Link from 'next/link';
 const items = [
   {
     text: 'General',
-    icon: HomeIcon
+    icon: HomeIcon,
+    url: '/smartrotom/starbank/'
   },
   {
     text: 'Cuentas',
-    icon: CreditCardIcon
+    icon: CreditCardIcon,
+    url: '/smartrotom/starbank/cuentas'
   },
   {
     text: 'Transacciones',
-    icon: CurrencyYenIcon
+    icon: CurrencyYenIcon,
+    url: '/smartrotom/starbank/transacciones'
   },
   {
     text: 'Enviar Dinero',
-    icon: BanknotesIcon
+    icon: BanknotesIcon,
+    url: '/smartrotom/starbank/enviar'
   },
   {
     text: 'Facturas',
-    icon: TicketIcon
+    icon: TicketIcon,
+    url: '/smartrotom/starbank/facturas'
   },
   {
     text: 'Gráficas',
-    icon: PresentationChartLineIcon
+    icon: PresentationChartLineIcon,
+    url: '/smartrotom/starbank/graficas'
   },
   {
     text: 'Calendario de Pagos',
-    icon: CalendarIcon
+    icon: CalendarIcon,
+    url: '/smartrotom/starbank/calendario'
   }
 ]
 const containerVariants = {
@@ -68,28 +76,30 @@ const menuIconVariants = {
     x: [0, -i*2.4, 0],
   })
 }
-const MenuItem = ({ isOpened, i, item: { text, Icon } }: { isOpened: boolean, i: number, item: { text: string, Icon: any } }) => {
+const MenuItem = ({ isOpened, i, item: { text, Icon, url } }: { isOpened: boolean, i: number, item: { text: string, Icon: any, url:string } }) => {
   return (
-    <motion.div 
-      className="flex items-center text-blue-100  hover:text-blue-300 cursor-pointer " 
-      variants={menuIconVariants}
-      custom={i}
-      whileHover={{ scale: 1.1 }}
-      transition={{ duration: .5 }}
-    >
-    <Icon strokeWidth={2} height={32} width={32} className="my-4 ml-4"/>
-      <AnimatePresence>
-        {isOpened && (
-          <motion.div 
-            initial="initial"
-            variants={menuItemVariants}
-            className='text-2xl font-bold ml-4'
-          >
-            {text}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.div>        
+    <Link href={url}>
+      <motion.div 
+        className="flex items-center text-blue-100  hover:text-blue-300 cursor-pointer " 
+        variants={menuIconVariants}
+        custom={i}
+        whileHover={{ scale: 1.1 }}
+        transition={{ duration: .5 }}
+      >
+      <Icon strokeWidth={2} height={32} width={32} className="my-4 ml-4"/>
+        <AnimatePresence>
+          {isOpened && (
+            <motion.div 
+              initial="initial"
+              variants={menuItemVariants}
+              className='text-2xl font-bold ml-4'
+            >
+              {text}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </Link>    
   );
 }
 export const SideMenu = () => {
@@ -146,7 +156,7 @@ export const SideMenu = () => {
             return (
               <MenuItem 
                 isOpened={isOpened} 
-                item={{ text: item.text.toString(), Icon: item.icon }} 
+                item={{ text: item.text.toString(), Icon: item.icon, url: item.url}} 
                 i={i+1}
                 key={i} 
               />
