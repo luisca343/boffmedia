@@ -42,6 +42,10 @@ export default function StarBank(){
         }
     }, [accounts]);
 
+
+    function changeAccount(account: number){
+        setActiveAccount(accounts.find((acc: any) => acc.id === account));
+    }
     
     function GraficaYTal(){
         return(
@@ -84,7 +88,7 @@ export default function StarBank(){
                     <BankSectionFooter>        
                         <div className="flex flex-row w-full justify-center items-center">
                             <span className="mr-4 text-xs 2xl:text-xl font-bold">Cambiar de Cuenta</span>
-                            <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
+                            <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={changeAccount}/>
                         </div>
                     </BankSectionFooter>
                 </BankSection>
@@ -127,15 +131,14 @@ export default function StarBank(){
 
 
 export function SelectCuenta({accounts, activeAccount, setActiveAccount}: {accounts: any, activeAccount: any, setActiveAccount: any}){
-
     return(
-        <Select>
+        <Select onValueChange={(e) => setActiveAccount(e)}>
         <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={activeAccount.name} />
         </SelectTrigger>
         <SelectContent>
             {accounts.map((account: any) => (
-                <SelectItem key={account.id} value={account.name} onSelect={() => setActiveAccount(account)}>
+                <SelectItem key={account.id} value={account.id}>
                         <div className="flex w-full">
                             <AccountImage width={20} height={20} type={account.type} name={account.name}/>
                             <span className=" ml-2">{account.name}</span>
