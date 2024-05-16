@@ -72,21 +72,45 @@ export function SendMoney(){
     }
     
     return(
-        <div className="h-full flex flex-col justify-evenly items-center">
-            <section className="flex flex-col justify-between items-center w-full">
-            <span>Desde:</span>
-            <SelectCuenta accounts={myAccounts} activeAccount={myActiveAccount} setActiveAccount={setMyActiveAccount}/>
-            <div className="text-xl">
-               {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance}
+            <div className="h-full flex flex-col justify-evenly items-center">
+                <section className="flex justify-between items-start w-full">
+                    <div className="flex flex-col items-start mx-2 flex-1">
+                        <label htmlFor="fromAccount">Desde</label>
+                        <SelectCuenta id="fromAccount" accounts={myAccounts} activeAccount={myActiveAccount} setActiveAccount={setMyActiveAccount}/>
+                    </div>
+                    <div className="flex flex-col items-start mx-2 flex-1">
+                        <label htmlFor="toAccount">Hacia</label>
+                        <SelectCuenta id="toAccount" accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
+                    </div>
+                </section>
+                {myActiveAccount ? 
+                <section className="flex justify-center items-center w-full border  border-blue-100 m-2 p-2 rounded-md">
+                        <div className="flex justify-around w-full">
+                            <div>
+                                <label htmlFor="currentBalance">Saldo actual</label>
+                                <div id="currentBalance" className="text-xl text-center">
+                                    {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance}
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="newBalance">Saldo Nuevo</label>
+                                <div id="newBalance" className="text-xl text-center">
+                                    {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance - (amount || 0)}
+                                </div>
+                            </div>
+                        </div> 
+                </section> : null}
+                <section className="flex flex-col justify-between items-start w-full">
+                    <div className="flex flex-col items-start mx-2 w-full">
+                        <label htmlFor="amount">Cantidad</label>
+                        <Input id="amount" type="number" placeholder="Cantidad" onChange={(e) => setAmount(parseInt(e.target.value))} value={amount}/>
+                    </div>
+                    <div className="flex flex-col items-start mx-2  w-full">
+                        <label htmlFor="concept">Concepto</label>
+                        <Input id="concept" type="text" placeholder="Concepto" onChange={(e) => setConcept(e.target.value)} value={concept}/>
+                    </div>
+                </section>
+                <Button onClick={() => sendMoney()} className="bg-blue-900 hover:bg-blue-700 text-white ">Enviar</Button>
             </div>
-                <span>Hacia:</span>
-                <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
-            </section>
-            <section className="flex flex-col justify-between items-center w-full">
-                <Input type="number" placeholder="Cantidad" onChange={(e) => setAmount(parseInt(e.target.value))} value={amount}/>
-                <Input type="text" placeholder="Concepto" onChange={(e) => setConcept(e.target.value)} value={concept}/>
-            </section>
-            <Button onClick={() => sendMoney()} className="bg-blue-900 hover:bg-blue-700 text-white ">Enviar</Button>
-        </div>
     )
 }
