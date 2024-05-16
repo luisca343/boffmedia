@@ -97,21 +97,14 @@ export class StarbankService {
             .catch(error => {
                 console.log(error);
         });
-      
     }
 
     async trainerDefeat(amount: number, uuid: string) {
         const account = await this.getMainAccount(uuid);
-
-        console.log(`Petición a wingull: ${process.env.WINGULL_API}/getCurrentBalance`)
         const test = await axios.post(`${process.env.WINGULL_API}/getCurrentBalance`, {uuid, amount})
         const money = test.data as number
-    
         const prevBalance = account.balance;
-        
         const diff = money - prevBalance;
-
-        console.log(`Dinero actual: ${money}, Dinero anterior: ${prevBalance}, Diferencia: ${diff}`)
 
         if(diff !== 0) return this.transaction(0, account.id, diff, "Derrota de entrenador", "ENTRENADOR");
         return {success: true}
@@ -170,7 +163,7 @@ export class StarbankService {
         return {success: true}
     }
 
-    async getTransactions(uuid: string) {
+    async getTransactions(uuid: string, limit: number = 0) {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
 
@@ -185,7 +178,7 @@ export class StarbankService {
             .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
             .leftJoin(starBankUsersAccounts, or(eq(toJoin.id, starBankUsersAccounts.accountId), eq(fromJoin.id, starBankUsersAccounts.accountId)))
             .leftJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
-            .limit(20)
+            .limit(limit)
             .orderBy(desc(starBankTransactions.date))
 
         return res
