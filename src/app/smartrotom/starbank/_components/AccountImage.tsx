@@ -1,5 +1,5 @@
 
-export function AccountImage({type, name, width=64, height=64}: {type: string, name: string, width?: number, height?: number}){
+export function AccountImage({type, name, width=48, height=48}: {type: string, name: string, width?: number, height?: number}){
     return(
         <img width={width} height={width} src={getImageURL(type,name)} alt={name} className=" rounded-full"/>
     )
