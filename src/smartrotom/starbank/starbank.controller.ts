@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { StarbankService } from './starbank.service';
 
 @Controller('smartrotom/starbank')
@@ -34,8 +34,8 @@ export class StarbankController {
     }
 
     @Get("transactions/:uuid")
-    getTransactions(@Param("uuid") uuid: string){
-        return this.starbankService.getTransactions(uuid);
+    getTransactions(@Param("uuid") uuid: string, @Query("limit") limit: string){
+        return this.starbankService.getTransactions(uuid, parseInt(limit));
     }
 
     @Get("transfers/:uuid")
