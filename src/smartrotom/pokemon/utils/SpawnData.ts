@@ -19,6 +19,8 @@ export class SpawnData {
     spawnByPalette = {}
     spawnByPokemonAndForm = {}
 
+    spawnByBiome = {}
+
     async loadSpawnData() {
         const startingTime = Date.now();
         
@@ -53,6 +55,11 @@ export class SpawnData {
                     await data.spawnInfos.forEach((spawnInfo: SpawnInfo) => {
                         if(spawnInfo.typeID !== 'pokemon') return
                         const species = spawnInfo.spec.split('species:')[1].toLowerCase()
+                        const biomes = spawnInfo.condition?.stringBiomes
+
+                
+
+
                         
                         /*
                             The species can be a pokemon name, line 'Weezing'. A Pokémon name with a form, like 'Weezing form:galarian', 
@@ -73,6 +80,12 @@ export class SpawnData {
                         spawnInfo.pokemonPalette = palette
                         spawnInfo.gender = this.pokemonData.speciesByNameWithForm[pokemonID]?.gender
                         spawnInfo.pokemonDex = this.pokemonData.speciesByName[speciesName]?.dex || 0
+
+                        biomes?.forEach(biome => {
+                            if(!this.spawnByBiome[biome]) this.spawnByBiome[biome] = []
+                            this.spawnByBiome[biome].push(pokemonID)
+                        })
+
 
                         /*
                         if(!this.pokemonData.speciesByName[speciesName]?.dex ){
