@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import *  as  path from 'path';
 import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
-import { promises as fsPromises } from 'fs';
 import { GenderProperties, Pokemon } from '@/types/pokemon';
 import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
 import { PokemonData } from './utils/PokemonData';
@@ -518,5 +517,49 @@ export class PokemonService {
             .limit(20)
             .execute()
         return dex
+    }
+
+    async getBiomesByPokemonName(name: string){
+        // @ts-ignore
+        const options: Fuse.IFuseOptions<any> = {
+            includeScore: false,
+            includeMatches: false,
+            keys: ['name', 'nickname']
+        }
+        const fuse = new Fuse<any>(Object.keys(this.spawnData.spawnByPokemonAndForm), options);
+        const result = fuse.search(name);
+        const pkmName = result[0].item
+        
+        const biomes = []
+
+        this.spawnData.spawnByPokemonAndForm[pkmName].forEach((spawn) => {
+            spawn.condition?.stringBiomes?.forEach((biome) => {
+                if(!biomes.includes(biome)) biomes.push(biome)
+            })
+        })
+
+        return biomes
+    }
+
+    async test(){
+        // @ts-ignore
+        const options: Fuse.IFuseOptions<any> = {
+            includeScore: false,
+            includeMatches: false,
+            keys: ['name', 'nickname']
+        }
+        const fuse = new Fuse<any>(Object.keys(this.spawnData.spawnByPokemonAndForm), options);
+        const result = fuse.search("rattata");
+        const pkmName = result[0].item
+        
+        const biomes = []
+
+        this.spawnData.spawnByPokemonAndForm[pkmName].forEach((spawn) => {
+            spawn.condition?.stringBiomes.forEach((biome) => {
+                if(!biomes.includes(biome)) biomes.push(biome)
+            })
+        })
+
+        return biomes
     }
 }
