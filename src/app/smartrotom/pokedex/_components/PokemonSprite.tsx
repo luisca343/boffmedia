@@ -7,6 +7,7 @@ import { set } from "react-hook-form";
 import { getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
 import { useSession } from "next-auth/react";
 import { getSmartRotomUser } from "@/lib/utils";
+import { StatusIcon, StatusIconv2 } from "./StatusIcon";
 /*
 export function PokemonSpriteOld ({name, dex, form, shiny=false, width=100, height=100}: {name:string, dex:number, form: string, shiny?: boolean, width?: number, height?: number}){
     const [imageUrl, setImageUrl] = useState(getPokemonSprite(name, form, shiny));
@@ -107,7 +108,8 @@ export function PokemonSpriteWithURL ({url, width, height}: {url:string, width?:
 
 
 
-export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true}: {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean}) {
+export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true, showStatus= true}: 
+    {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean}) {
     console.log(id, form, palette, pixelated)
     const [imageUrl, setImageUrl] = useState() as any;
     const [loaded, setLoaded] = useState(false)
@@ -131,8 +133,13 @@ export function PokemonSprite({id, form, palette, width=100, height=100, pixelat
       }, []);
 
     if(!loaded) return <Loading width={width} height={height}/>
-    return <img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
-        className={`${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''} ${imageUrl.status === 1 ? '' : 'brightness-0'}`}/>
+    return <div style={{width, maxHeight:height}} className={` relative ${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}><img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
+        className={` ${imageUrl.showImg ? '' : 'brightness-0'}`}/>
+           {showStatus && 
+           <div className="absolute top-1 right-1">
+                <StatusIconv2 status={imageUrl.status}  palette={palette} width={width} height={height}/>
+           </div>}
+        </div>
 }
 
 

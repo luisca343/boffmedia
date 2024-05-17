@@ -1,7 +1,7 @@
 "use client"
 import { Input } from "@/components/ui/input";
 import { rotomGET, rotomPOST } from "@/services/boffAPI";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Progress } from "@/components/ui/progress";
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
@@ -24,7 +24,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 
 export default function FicusAI() {
     const {data: session} = useSession() as {data: BoffSession | null, status: string};
-    const uuid = session?.user.smartRotomUser.uuid;
+    const uuid = useMemo(() => session?.user.smartRotomUser.uuid, [session]);
     const [text, setText] = useState('');
     const [mensajes, setMensajes] = useState<Mensaje[]>([{sender:"bot", parts:[{type: "text", content: "Hola, soy Profesor Ficus, tu asistente virtual. ¿En qué puedo ayudarte?"}]}]);
     const [typing, setTyping] = useState(false);
@@ -105,11 +105,10 @@ processParts();
 
 
   
-
+/*
   useEffect(() => {
-    // Clear the current message when the user types a new message
     setTyping(false);
-  }, [text]);
+  }, [text]);*/
 
   return (
     <div className="max-w-xl mx-auto flex flex-col p-4 h-full text-lg">
@@ -122,7 +121,7 @@ processParts();
         <div ref={messagesEndRef} />
       </ul>
       <div className="flex items-center mt-4">
-        <Input defaultValue={""} type="text" onChange={e => setText(e.target.value)} className="mr-2" />
+        <Input defaultValue={""} type="text" value={text} onChange={e => setText(e.target.value)} className="mr-2" />
         <button onClick={enviarMensaje} className="bg-blue-800 text-white px-4 py-2 rounded">Enviar</button>
       </div>
     </div>
@@ -175,6 +174,18 @@ function MensajeChat({ mensaje, sender }: { mensaje: Mensaje; sender: 'user' | '
                     </section>
                   )
                 })}
+              </div>
+            )
+          } else if(msg.type === "biomeList"){
+            console.log(msg);
+            let biomes = msg.content as any;
+            return (
+              <div key='biomes'>
+                <ul>
+                  {biomes.map((biome: string) => {
+                    return <li key={biome}>{biome}</li>
+                  })}
+                </ul>
               </div>
             )
           }
