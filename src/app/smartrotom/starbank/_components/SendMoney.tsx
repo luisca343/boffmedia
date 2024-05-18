@@ -2,18 +2,19 @@ import { useEffect, useState } from "react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { useSession } from "next-auth/react";
 import { rotomGET, rotomPOST } from "@/services/boffAPI";
-import { SelectCuenta } from "../page";
+import { AccountSelect } from "./AccountSelect";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
+import { formatMoney, getValidAccountId } from "../bankUtils";
 
 export function SendMoney(){
     const { data: session } = useSession() as {data: BoffSession | null}
     const [myAccounts, setMyAccounts] = useState([] as any)
-    const [myActiveAccount, setMyActiveAccount] = useState(0)
+    const [myActiveAccount, setMyActiveAccount] = useState(-1)
 
     const [accounts, setAccounts] = useState([])
-    const [activeAccount, setActiveAccount] = useState(0)
+    const [activeAccount, setActiveAccount] = useState(-1)
 
     const [amount, setAmount] = useState(0)
     const [concept, setConcept] = useState("")
@@ -32,12 +33,18 @@ export function SendMoney(){
     }, [session]);
 
     useEffect(() => {
-        console.log(activeAccount)
-    }, [activeAccount]);
-
+        if (myAccounts.length === 0) return
+        setMyActiveAccount(getValidAccountId(myAccounts))
+        
+    }, [myAccounts, accounts]);
+    /*
+    useEffect(() => {
+        if (accounts.length === 0) return
+        setActiveAccount(accounts[0].id)
+    }, [accounts]);*/
 
     function sendMoney(){
-        if (activeAccount === 0 || myActiveAccount === 0) {
+        if (activeAccount === -1 || myActiveAccount === -1) {
             toast.error('Selecciona una cuenta')
             return
         }
@@ -76,26 +83,26 @@ export function SendMoney(){
                 <section className="flex justify-between items-start w-full">
                     <div className="flex flex-col items-start mx-2 flex-1">
                         <label htmlFor="fromAccount" className="font-bold">Desde</label>
-                        <SelectCuenta id="fromAccount" accounts={myAccounts} activeAccount={myActiveAccount} setActiveAccount={setMyActiveAccount}/>
+                        <AccountSelect id="fromAccount" accounts={myAccounts} activeAccount={myActiveAccount} setActiveAccount={setMyActiveAccount}/>
                     </div>
                     <div className="flex flex-col items-start mx-2 flex-1">
                         <label htmlFor="toAccount" className="font-bold">Hacia</label>
-                        <SelectCuenta id="toAccount" accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
+                        <AccountSelect id="toAccount" accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
                     </div>
                 </section>
-                {myActiveAccount ? 
+                {myActiveAccount != -1 ? 
                 <section className="flex justify-center items-center w-full  m-2 p-2 rounded-md">
                         <div className="flex justify-around w-full">
                             <div>
                                 <label htmlFor="currentBalance" className="font-bold">Saldo actual</label>
                                 <div id="currentBalance" className="text-xl text-center">
-                                    {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance}
+                                    {formatMoney(myAccounts.find((account: any) => account.id === myActiveAccount)?.balance) }
                                 </div>
                             </div>
                             <div>
                                 <label htmlFor="newBalance" className="font-bold">Saldo Nuevo</label>
                                 <div id="newBalance" className="text-xl text-center">
-                                    {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance - (amount || 0)}
+                                    {formatMoney(myAccounts.find((account: any) => account.id === myActiveAccount)?.balance - (amount || 0))}
                                 </div>
                             </div>
                         </div> 

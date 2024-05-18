@@ -7,15 +7,20 @@ import { BankSection, BankSectionContent, BankSectionFooter, BankSectionHeader }
 import { AccountImage } from "../_components/AccountImage";
 import { Ban } from "lucide-react";
 import { toast } from "react-toastify";
+import { Button } from "@/components/ui/button";
+import { getValidAccountId, changeActiveAccount } from "../bankUtils";
 
 export default function Cuentas(){
     const { data: session } = useSession() as {data: BoffSession | null}
     const [accounts, setAccounts] = useState([])
+    const [activeAccount, setActiveAccount] = useState(-1)
+
     useEffect(() => {
         if (session?.user) {
             rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid)
                 .then((res) => {
                     setAccounts(res);
+                    setActiveAccount(getValidAccountId(res));
                 });
         }
     }, [session]);
@@ -28,12 +33,13 @@ export default function Cuentas(){
                 <BankSectionContent>
                     <div className="flex flex-col">
                         {accounts.map((account: any) => (
-                            <div key={account.id} className="flex flex-row justify-between p-2 items-center ">
+                            <div key={account.id} className={`flex flex-row justify-between p-2 items-center ${account.id == activeAccount && 'bg-blue-300'}`}>
                                 <div className="flex items-center">
                                     <AccountImage type={account.type} name={account.name}/>
                                     <div className="pl-2 text-xl">{account.name}</div>
                                 </div>
                                 <div className="text-xl text-green-600">{Number(account.balance).toLocaleString('de-DE')} &#165;</div>
+                                <Button onClick={() => setActiveAccount(changeActiveAccount(account.id))} className="bg-blue-900 hover:bg-blue-700 text-white p-2 rounded-md">Seleccionar</Button>
                             </div>
                         ))}
                     </div>
