@@ -56,7 +56,6 @@ export class StarbankService {
 
     async createMainAccount(uuid: string, username: string) {
        const res = await this.getMainAccount(uuid);
-       console.log(res)
         if(res) {
             return {success: false}
         }
@@ -112,10 +111,8 @@ export class StarbankService {
     }
 
     async shop(body: {uuid: string, npcName: string, itemName: string, operation: string, unitPrice: number, count: number}) {
-        console.log(body)
         const account = await this.getMainAccount(body.uuid);
         const currentBalance = account.balance;
-        console.log(account)
         const total = body.unitPrice * body.count;
         if(body.operation === "COMPRA") {
             if(currentBalance < total) {
@@ -142,13 +139,12 @@ export class StarbankService {
         }
 
 
+        
         await this.db.getDrizzle().update(starBankAccounts).set({balance: fromAccount[0].balance - amount}).where(eq(starBankAccounts.id, from)).execute();
         await this.db.getDrizzle().update(starBankAccounts).set({balance: toAccount[0].balance + amount}).where(eq(starBankAccounts.id, to)).execute();
         
         const fromBalance = from === 0 ? 0 : fromAccount[0].balance - amount;
         const toBalance = to === 0 ? 0 : toAccount[0].balance + amount;
-
-        console.log(fromBalance, toBalance)
 
         await this.db.getDrizzle().insert(starBankTransactions).values({
             from,
@@ -163,7 +159,28 @@ export class StarbankService {
         return {success: true}
     }
 
-    async getTransactions(uuid: string, limit: number = 0) {
+    async getTransactions(account: number, limit: number = 0) {
+        const toJoin = alias(starBankAccounts, "to");
+        const fromJoin = alias(starBankAccounts, "from");
+
+        const res = await this.db.getDrizzle().selectDistinct(
+            {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
+                reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
+                toBalance: starBankTransactions.toBalance, type: starBankTransactions.type, 
+                toName: toJoin.name, fromName: fromJoin.name, toType: toJoin.type, fromType: fromJoin.type,
+                date: starBankTransactions.date
+            }).from(starBankTransactions)
+            .innerJoin(toJoin, eq(starBankTransactions.to, toJoin.id))
+            .innerJoin(fromJoin, eq(starBankTransactions.from, fromJoin.id))
+            .leftJoin(starBankUsersAccounts, or(eq(toJoin.id, starBankUsersAccounts.accountId), eq(fromJoin.id, starBankUsersAccounts.accountId)))
+            .where(or(eq(starBankTransactions.from, account), eq(starBankTransactions.to, account)))
+            .limit(limit)
+            .orderBy(desc(starBankTransactions.date))
+
+        return res
+    }
+
+    async getTransactionsByUUID(uuid: string, limit: number = 0) {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
 
@@ -204,8 +221,6 @@ export class StarbankService {
             .where(eq(starBankTransactions.type, "TRANSFERENCIA"))
             .limit(10)
             .orderBy(desc(starBankTransactions.date))
-
-            console.log(res)
 
         return res
     }

@@ -33,9 +33,10 @@ export class StarbankController {
         return this.starbankService.transfer(body.from, body.to, body.amount, body.concept);
     }
 
-    @Get("transactions/:uuid")
-    getTransactions(@Param("uuid") uuid: string, @Query("limit") limit: string){
-        return this.starbankService.getTransactions(uuid, parseInt(limit));
+    @Get("transactions/:account")
+    getTransactions(@Param("account") account: number, @Query("limit") limit: string){
+        console.log(`Getting transactions for account ${account} with limit ${limit}`)
+        return this.starbankService.getTransactions(account, parseInt(limit));
     }
 
     @Get("transfers/:uuid")
