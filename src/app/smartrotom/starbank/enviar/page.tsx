@@ -12,7 +12,7 @@ export default function EnviarDinero(){
 
     return(
         <div className="flex flex-col w-full h-full p-2 justify-center items-center">
-            <BankSection className=" self-center align-middle w-[70%] h-[70%] ">
+            <BankSection className=" self-center align-middle w-[50%] h-[50%] ">
                 <BankSectionHeader >Enviar Dinero </BankSectionHeader>
                 <BankSectionContent>
                     <SendMoney />
