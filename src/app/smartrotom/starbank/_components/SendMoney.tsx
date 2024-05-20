@@ -90,6 +90,16 @@ export function SendMoney(){
                         <AccountSelect id="toAccount" accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
                     </div>
                 </section>
+                <section className="flex flex-col justify-between items-start w-full mt-2 ">
+                    <div className="flex flex-col items-start mx-2 w-full">
+                        <label htmlFor="amount" className="font-bold">Cantidad</label>
+                        <Input min={1} max= {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance} id="amount" type="number" placeholder="Cantidad" onChange={(e) => setAmount(parseInt(e.target.value))} value={amount}/>
+                    </div>
+                    <div className="flex flex-col items-start mx-2  w-full">
+                        <label htmlFor="concept" className="font-bold">Concepto</label>
+                        <Input id="concept" type="text" placeholder="Concepto" onChange={(e) => setConcept(e.target.value)} value={concept}/>
+                    </div>
+                </section>
                 {myActiveAccount != -1 ? 
                 <section className="flex justify-center items-center w-full  m-2 p-2 rounded-md">
                         <div className="flex justify-around w-full">
@@ -107,16 +117,6 @@ export function SendMoney(){
                             </div>
                         </div> 
                 </section> : null}
-                <section className="flex flex-col justify-between items-start w-full mt-2 ">
-                    <div className="flex flex-col items-start mx-2 w-full">
-                        <label htmlFor="amount" className="font-bold">Cantidad</label>
-                        <Input min={1} max= {myAccounts.find((account: any) => account.id === myActiveAccount)?.balance} id="amount" type="number" placeholder="Cantidad" onChange={(e) => setAmount(parseInt(e.target.value))} value={amount}/>
-                    </div>
-                    <div className="flex flex-col items-start mx-2  w-full">
-                        <label htmlFor="concept" className="font-bold">Concepto</label>
-                        <Input id="concept" type="text" placeholder="Concepto" onChange={(e) => setConcept(e.target.value)} value={concept}/>
-                    </div>
-                </section>
                 <Button onClick={() => sendMoney()} className="mt-2 bg-blue-900 hover:bg-blue-700 text-white ">Enviar</Button>
             </div>
     )
