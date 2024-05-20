@@ -39,8 +39,13 @@ export class StarbankController {
         return this.starbankService.getTransactions(account, parseInt(limit));
     }
 
+    @Get("transfers/:account")
+    getTransfers(@Param("uuid") account: number){
+        return this.starbankService.getTransfers(account);
+    }
+    /*
     @Get("transfers/:uuid")
     getTransfers(@Param("uuid") uuid: string){
         return this.starbankService.getTransfers(uuid);
-    }
+    }*/
 }
