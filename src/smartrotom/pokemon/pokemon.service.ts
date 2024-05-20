@@ -96,7 +96,7 @@ export class PokemonService {
         //this.excludedForms.includes(formName) ? status = 0 : status = 1
 
         if(pokemonId > 0) {
-            if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000){
+            if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 1000){
                 const pokemonStatus = await this.db.getDrizzle()
                 .select().from(pokedexRegistry)
                 .where(and(
