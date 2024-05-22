@@ -32,7 +32,6 @@ export default function FicusAI() {
 
     useEffect(() => {
       if(!uuid) return;
-      console.log(uuid);
       const fetchMessages = async () => {
         if(uuid){
           let msgs = await rotomGET(`/chat/${uuid}`);
@@ -177,7 +176,7 @@ function MensajeChat({ mensaje, sender }: { mensaje: Mensaje; sender: 'user' | '
               </div>
             )
           } else if(msg.type === "biomeList"){
-            console.log(msg);
+            console.log(msg.content );
             let biomes = msg.content as any;
             return (
               <div key='biomes'>
