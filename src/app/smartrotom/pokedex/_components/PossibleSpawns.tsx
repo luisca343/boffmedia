@@ -47,9 +47,9 @@ export function PossibleSpawns(){
                         {dex: 17, species: 'Pidgeotto', form: 'base', palette: 'none', rarity: 0, percentage: 5},
                         {dex: 18, species: 'Pidgeot', form: 'base', palette: 'none', rarity: 0, percentage: 5},
                         {dex: 19, species: 'Rattata', form: 'alolan', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 20, species: 'Raticate', form: 'alolan', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 21, species: 'Spearow', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 22, species: 'Fearow', form: 'base', palette: 'none', rarity: 0, percentage: 5},
+                        {dex: 10012, species: 'Cococute', form: 'base', palette: 'none', rarity: 0, percentage: 5},
+                        {dex: 10013, species: 'Cocoareca', form: 'base', palette: 'none', rarity: 0, percentage: 5},
+                        {dex: 10014, species: 'Cocolada', form: 'base', palette: 'none', rarity: 0, percentage: 5},
 
                     ]);
                 });

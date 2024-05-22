@@ -1,9 +1,8 @@
 "use client"
-
-
 import React, { ForwardedRef, useState } from "react";
 import HTMLFlipBook from "react-pageflip";
 import { motion, AnimatePresence } from "framer-motion";
+import './book.css'
 
 
 type PageFlip = {
@@ -11,7 +10,7 @@ type PageFlip = {
     
 };
 
-export function Book({children} : {children: React.ReactNode}){
+export function Book({children, pageColor= ''} : {children: React.ReactNode, pageColor?: string}) {
   const [page, setPage] = useState(0);
   const [pageFlip, setPageFlip] = useState<PageFlip>({getPageCount: () => 0})
   const pages = React.Children.toArray(children).map((content, index) => { 
@@ -47,7 +46,7 @@ return (
       onFlip={(e) => onFlip(e.data)} onInit={(e) => cargar(e)}
     >
       {pages.map((page, index) => (
-        <div key={index} className={`${page.index % 2 === 0 ? 'page-right' : 'page-left'}`} >
+        <div key={index} className={`${page.index % 2 === 0 ? `page-right${pageColor}` : `page-left${pageColor}`}`} >
           {page.content}
         </div>
       ))}
@@ -77,7 +76,7 @@ interface PageCoverProps {
 
 export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style}: {children: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties})  {
     return (
-        <div style={style} className={`pagina h-full w-full  drop-shadow-2xl p-2 ${className}`} data-density={dataDensity}>
+        <div style={style} className={`h-full w-full page drop-shadow-2xl p-2 ${className}`} data-density={dataDensity}>
              {children}
         </div>
     );

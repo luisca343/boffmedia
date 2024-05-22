@@ -2,21 +2,22 @@
 
 import { BoffSession } from "@/components/smartrotom/AppWrapper"
 import { strToDate } from "@/lib/utils"
-import { rotomGET, rotomPOST } from "@/services/boffAPI"
+import { rotomGET } from "@/services/boffAPI"
 import { useSession } from "next-auth/react"
-import Image from "next/image"
-import { use, useEffect, useState } from "react"
-import { SideMenu } from "./_components/SideMenu"
-import Chart from 'chart.js/auto';
+import { useEffect, useState } from "react"
 import TestChart from "./_components/chart"
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
 import { BankSection, BankSectionButton, BankSectionContent, BankSectionFooter, BankSectionHeader } from "./_components/BankSection"
+import { AccountImage } from "./_components/AccountImage"
+import { formatMoney, getActiveAccountBalance } from "./bankUtils"
+import { useRouter } from 'next/navigation'
+import { AccountSelect } from "./_components/AccountSelect"
+import { set } from "react-hook-form"
 
 export default function StarBank(){
+    const router = useRouter()
     const { data: session } = useSession() as {data: BoffSession | null}
-    const [accounts, setAccounts] = useState([])
-    const [activeAccount, setActiveAccount] = useState({} as any)
+    const [accounts, setAccounts] = useState([] as any[])
+    const [activeAccount, setActiveAccount] = useState(-1)
     const [transactions, setTransactions] = useState([]);
     const [transfers, setTransfers] = useState([]);
 
@@ -26,25 +27,41 @@ export default function StarBank(){
                 .then((res) => {
                     setAccounts(res);
                 });
-
-            rotomGET("/starbank/transactions/" + session.user.smartRotomUser.uuid)
-                .then((res) => {
-                    setTransactions(res);
-                });
-
-            rotomGET("/starbank/transfers/" + session.user.smartRotomUser.uuid)
-                .then((res) => {
-                    setTransfers(res);
-                });
         }
     }, [session]);
 
     useEffect(() => {
         if(accounts.length > 0) {
-            setActiveAccount(accounts[0]);
+            const storedAccount = localStorage.getItem("activeAccount") as string;
+            if(storedAccount) {
+                changeAccount(accounts.find((acc: any) => acc.id === parseInt(storedAccount)).id >= 0 ? parseInt(storedAccount) : accounts[0].id);
+            } else {
+                setActiveAccount(accounts[0].id);
+                localStorage.setItem("activeAccount", accounts[0].id);
+            }
         }
     }, [accounts]);
 
+
+    useEffect(() => {
+        if(activeAccount === -1) return
+        rotomGET("/starbank/transactions/" + activeAccount +"?limit=100")
+        .then((res) => {
+            setTransactions(res);
+        });
+
+        rotomGET("/starbank/transfers/" + activeAccount)
+            .then((res) => {
+                setTransfers(res);
+            });
+
+    }, [activeAccount])
+
+    function changeAccount(account: number){
+        setActiveAccount(account);
+        localStorage.setItem("activeAccount", account.toString());
+    }
+    
     
     function GraficaYTal(){
         return(
@@ -57,7 +74,7 @@ export default function StarBank(){
 
     function getData(){
         const data = transactions.slice().reverse().reduce((acc: any, transaction: any) => {
-            const transactionType = transaction.from === activeAccount.id ? "out" : "in";
+            const transactionType = transaction.from === activeAccount ? "out" : "in";
             const currentBalance = transactionType === "out" ? transaction.fromBalance : transaction.toBalance;
     
             //acc.labels.push(strToDate(transaction.date));
@@ -66,7 +83,6 @@ export default function StarBank(){
             return acc;
         }, {labels: [], datasets: [{data: [], label: "Balance", borderColor: "#3e95cd"}]});
     
-        console.log(data);
         return data;
     }
 
@@ -77,48 +93,48 @@ export default function StarBank(){
     
     return (
         <div className="h-full w-full flex p-8  bg-cover bg-center bg-no-repeat bg-fixed text-blue-950" >
-            <div className="h-full flex flex-col justify-start w-1/3 mx-2">
+            <section className="h-full flex flex-col justify-start w-1/3 mx-2">
                 <BankSection className="h-1/3">
                     <BankSectionHeader >Datos de cuenta </BankSectionHeader>
                     <BankSectionContent>
                     <div className="text-3xl font-bold text-center">Balance</div>
-                    <div className="text-4xl 2xl:text-6xl font-bold text-blue-900 text-center ">{Number(activeAccount.balance).toLocaleString('de-DE')} &#165;</div>
+                    <div className="text-4xl 2xl:text-6xl font-bold text-blue-900 text-center ">{formatMoney(getActiveAccountBalance(accounts, activeAccount))}</div>
                 </BankSectionContent>
                     <BankSectionFooter>        
                         <div className="flex flex-row w-full justify-center items-center">
                             <span className="mr-4 text-xs 2xl:text-xl font-bold">Cambiar de Cuenta</span>
-                            <SelectCuenta accounts={accounts} activeAccount={activeAccount} setActiveAccount={setActiveAccount}/>
+                            <AccountSelect accounts={accounts} activeAccount={activeAccount} setActiveAccount={changeAccount}/>
                         </div>
                     </BankSectionFooter>
                 </BankSection>
-                <BankSection className="overflow-auto">
+                <BankSection className="h-full overflow-auto">
                     <BankSectionHeader> Transacciones </BankSectionHeader>
                     <BankSectionContent >
-                        <Transactions transactions={transactions} activeAccount={activeAccount} />
+                        <Transactions trans={transactions} activeAccount={activeAccount} fecth={false}/>
                     </BankSectionContent>
                     <BankSectionFooter>
-                        <BankSectionButton onClick={() => {console.log("click")}}>Ir a Transacciones</BankSectionButton>
+                        <BankSectionButton onClick={() => {router.push('/smartrotom/starbank/transacciones')}}>Ir a Transacciones</BankSectionButton>
                     </BankSectionFooter>
                 </BankSection>
-            </div>
-            <div className="h-full flex flex-col justify-start w-2/3 mx-2">
+            </section>
+            <section className="h-full flex flex-col justify-start w-2/3 mx-2">
                 <BankSection className="h-4/5">
                     <BankSectionHeader> Grafica </BankSectionHeader>
                     <BankSectionContent><GraficaYTal /></BankSectionContent>
                     <BankSectionFooter>
-                        <BankSectionButton onClick={() => {console.log("click")}}>Ir a Gráficas</BankSectionButton>
+                        <BankSectionButton onClick={() => {router.push('/smartrotom/starbank/graficas')}}>Ir a Graficas</BankSectionButton>
                     </BankSectionFooter>
                 </BankSection>
                 <BankSection className="h-1/5">
                     <BankSectionHeader> Transferencias </BankSectionHeader>
                     <BankSectionContent>
-                        <Transactions transactions={transfers} activeAccount={activeAccount} />
+                        <TransfersShort transfers={transfers} activeAccount={activeAccount} />
                     </BankSectionContent>
                     <BankSectionFooter>
-                        <BankSectionButton onClick={() => {console.log("click")}}>Ir a Transferencias</BankSectionButton>
+                    <BankSectionButton onClick={() => {router.push('/smartrotom/starbank/transferencias')}}>Ir a Transferencias</BankSectionButton>
                     </BankSectionFooter>
                 </BankSection>
-            </div>
+            </section>
         </div>
 
     )
@@ -129,54 +145,72 @@ export default function StarBank(){
 
 
 
-export function SelectCuenta({accounts, activeAccount, setActiveAccount}: {accounts: any, activeAccount: any, setActiveAccount: any}){
 
+
+export function TransfersShort({transfers, activeAccount}: {transfers: any, activeAccount: any}){
     return(
-        <Select>
-        <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={activeAccount.name} />
-        </SelectTrigger>
-        <SelectContent>
-            {accounts.map((account: any) => (
-                <SelectItem key={account.id} value={account.name} onSelect={() => setActiveAccount(account)}>{account.name}</SelectItem>
-            ))}
-        </SelectContent>
-        </Select>
+        <div className="flex justify-evenly flex-wrap ">
+            {transfers.map((transfer: any) => {
+                
+                const transactionType = transfer.from === activeAccount.id ? "out" : "in";
+                const amount = transactionType === "out" ? -transfer.amount : transfer.amount;
+                const currentBalance = transactionType === "out" ? transfer.fromBalance : transfer.toBalance;
+                const name = transactionType === "out" ? transfer.toName : transfer.fromName;
+                const type = transactionType === "out" ? transfer.toType : transfer.fromType;
+
+                return (
+                    <div className="flex flex-col justify-center items-center" key={transfer.date} >
+                        <div className="flex hover:bg-opacity-50 items-center my-1">
+                            <AccountImage width={32} type={type} name={name}/>
+                            <div className={`text-right my-auto mx-2 ${esPagador(transfer, activeAccount) ? 'text-red-800' : 'text-green-700'}`}>
+                                <div className="font-bold text-lg text-shadow-border05">{formatMoney(amount)}</div>
+                            </div>
+                        </div>
+                        <div className="flex text-xs text-center">{strToDate(transfer.date)} - {name}</div>
+                    </div>
+                )
+            })}
+        </div>
     )
 }
 
+export function Transactions({ trans, activeAccount, className, fecth= true}: {trans: any, activeAccount: number, className?: string, fecth?: boolean}){
+    const [transactions, setTransactions] = useState([]);
+    useEffect(() => {
+        if(!fecth) return setTransactions(trans)
+        if(activeAccount === -1) return
+        rotomGET("/starbank/transactions/" + activeAccount +"?limit=100")
+            .then((res) => {
+                setTransactions(res);
+        });
+    }, [trans, activeAccount])
 
-export function Transactions({transactions, activeAccount, className}: {transactions: any, activeAccount: any, className?: string}){
     if(transactions.length === 0){
         return (
-            <div className="h-full p-2">
+            <div className="h-full p-2 overflow-auto">
                 <div className="text-center 2xl:text-2xl font-bold">No hay transacciones</div>
             </div>
         )
     }
     return(
-
-            <div className="flex flex-col overflow-auto h-full p-2">
+            <div className={`flex flex-col overflow-auto h-full p-2 ${className}`}>
             {transactions.map((transaction: any) => {
-                const transactionType = transaction.from === activeAccount.id ? "out" : "in";
+                const transactionType = transaction.from == activeAccount ? "out" : "in";
                 const amount = transactionType === "out" ? -transaction.amount : transaction.amount;
                 const currentBalance = transactionType === "out" ? transaction.fromBalance : transaction.toBalance;
                 const name = transactionType === "out" ? transaction.toName : transaction.fromName;
-                const url = getImageURL(transactionType === "out" ? 
-                    {type:transaction.toType, name: transaction.toName} : 
-                    {type:transaction.fromType, name: transaction.fromName}
-                );
+                const type = transactionType === "out" ? transaction.toType : transaction.fromType;
 
                 return (
-                <div key={transaction.date} className="flex  hover:bg-opacity-50 items-center">
-                    <Image width={48} height={48} className="w-12 " src={url} alt={`Image of ${name}`} />
+                <div key={transaction.date} className="flex  hover:bg-opacity-50 items-center my-1">
+                    <AccountImage type={type} name={name}/>
                     <div className="min-h-9 my-auto mx-4 flex flex-col flex-1">
                         <div className="text-lg font-bold break-all">{transaction.reason}</div>
                         <div className="text-sm ">{strToDate(transaction.date)} - {name}</div>
                     </div>
-                    <div className={`text-right my-auto ${esPagador(transaction, activeAccount) ? 'text-red-700' : 'text-green-700'}`}>
-                        <div className="font-bold text-xl text-shadow-border05">{amount} &#165;</div>
-                        <div className="text-md">{currentBalance} &#165;</div>
+                    <div className={`text-right my-auto ${esPagador(transaction, activeAccount) ? 'text-red-800' : 'text-green-700'}`}>
+                        <div className="font-bold text-xl text-shadow-border05">{formatMoney(amount)}</div>
+                        <div className="text-md">{formatMoney(currentBalance)}</div>
                     </div>
                 </div>
                 )
@@ -189,16 +223,6 @@ export function Transactions({transactions, activeAccount, className}: {transact
 
 }
 
-
-
 function esPagador(transaction: any, activeAccount: any){
-    return transaction.from === activeAccount.id;
-}
-
-function getImageURL(account: {type: string, name: string}){
-    if(account.type === "EMPRESA"){
-        return `/smartrotom/img/apps/starbank/cuentas/${account.name.toLowerCase()}.png`
-    } else {
-        return `https://minotar.net/avatar/${account.name}/80.png`
-    }
+    return transaction.from == activeAccount;
 }

@@ -116,7 +116,7 @@ export default async function EntradaPokedex({params}: any){
                         return <div key={index} className="flex flex-wrap justify-center">
                             {palette.map((palette, index) => {
                                 return <div key={index} className="flex flex-col p-2 justify-center items-center">
-                                    <PokemonSprite width={80} height={80} id={pokemonIndex} form={formName} palette={palette.name} hide={false}/>
+                                    <PokemonSprite width={80} height={80} id={pokemonIndex} form={formName} palette={palette.name} hide={false} showStatus={false}/>
                                     <span>{formsTranslation(`palette_${palette.name}`)}</span>
                                 </div>
                             })}
@@ -135,7 +135,7 @@ export default async function EntradaPokedex({params}: any){
         return <section className="flex justify-center items-center">
         <div className="flex flex-col items-center">
             <div className="flex " style={{width:200, height:200}}>
-                <PokemonSprite id={pokemonIndex} form={formName} palette='none' width={200} height={200} pixelated={false}/>
+                <PokemonSprite id={pokemonIndex} form={formName} palette='none' width={200} height={200} pixelated={false}  showStatus={false}/>
             </div> 
             <span className=" text-xl text-center">{description}  </span> 
             <div className="flex justify-center items-center">

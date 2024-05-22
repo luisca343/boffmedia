@@ -7,6 +7,18 @@ declare global {
     }
 }
 
+function sound(name: string) {
+    const audio = document.getElementById(name)?.cloneNode() as HTMLAudioElement;
+    if (audio) {
+        if (!audio.paused) {
+            audio.pause();
+            audio.currentTime = 0;
+        } else {
+            audio.play();
+        }
+    }
+}
+
 
 export function MinecraftFunctions(){
     const router = useRouter()
@@ -18,11 +30,14 @@ export function MinecraftFunctions(){
         alert("refresh")
     }
     
-    function openDex(species: string, form: string) {
-       router.push(`/smartrotom/pokedex/entrada/${species}/${form}`)
+    async function openDex(species: string, form: string) {
+        sound('dexOpen')
+        router.push(`/smartrotom/pokedex/registro/${species}/${form}`)
     }
     
 
-    return <></>
+    return <>
+        <audio id='dexOpen' src='/smartrotom/audio/apps/pokedex/openDex.mp3'></audio>
+    </>
 }
 

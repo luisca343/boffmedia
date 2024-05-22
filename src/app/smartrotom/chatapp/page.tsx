@@ -1,17 +1,14 @@
 "use client"
-import { Loading } from "@/components/smartrotom/Loading";
 import './test.css'
-import Image from "next/image";
-import { use, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { rotomGET, rotomPOST } from "@/services/boffAPI";
-import { getDatosUsuarioMC } from "@/services/mcefHelper";
 import { getSmartRotomUser, strToDate } from "@/lib/utils";
 import useSocketStore from "@/app/useSocketStore";
 import { Message } from "./_components/Message";
 import { Chat, ChatData } from "./_components/Chat";
 import { CreateGroup } from "./_components/CreateGroup";
-import { get } from "http";
+import { PhoneIcon, ArrowUpRightIcon, ArrowDownLeftIcon, PhotoIcon, VideoCameraIcon, SpeakerWaveIcon} from '@heroicons/react/24/outline'
 
 
 type Message = {
@@ -20,6 +17,7 @@ type Message = {
     createdAt: string;
     uuid: string;
     chatId: number;
+    type: string;
 }
 
 export default function ChatApp() {
@@ -37,7 +35,7 @@ export default function ChatApp() {
                     const chat = prev.find((chat) => chat.id == message.chatId);
                     if(!chat) return prev;
                     //chat.lastMessage = {id: message.id, content: message.text, createdAt: message.date.toString()};
-                    chat.messages.unshift({id: message.id, chatId:message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid});
+                    chat.messages.unshift({id: message.id, chatId:message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type});
 
 
                     chat.unread++;
@@ -116,6 +114,49 @@ export default function ChatApp() {
         setActiveChat(id);
     }
 
+        function LastMessage(chat: ChatData){
+            let msg = chat?.messages[0] || null;
+            if(!msg) return <p className="text-sm">No hay mensajes</p>
+            if(msg.type === 'text') return (
+                <p className="text-sm flex items-center">
+                {msg.uuid === getSmartRotomUser(session).uuid 
+                    ? <ArrowUpRightIcon className="mr-2 text-green-500" height={20} width={20} strokeWidth={2} /> 
+                    : <ArrowDownLeftIcon className="mr-2 text-red-500" height={20} width={20} strokeWidth={2} />
+                }
+
+                <span>{chat?.messages[0]?.content.substring(0, 32) + (chat?.messages[0]?.content.length > 32 ? '...' : '')}</span> 
+                </p>
+            );
+
+            if(msg.type === 'image') return (
+                <p className="text-sm flex items-center">
+                    <PhotoIcon className="mr-2 text-white" height={20} width={20} strokeWidth={2} />
+                    <span>Imagen</span>
+                </p>
+            );
+
+            if(msg.type === 'video') return (
+                <p className="text-sm flex items-center">
+                    <VideoCameraIcon className="mr-2 text-white" height={20} width={20} strokeWidth={2} />
+                    <span>Video</span>
+                </p>
+            );
+
+            if(msg.type === 'audio') return (
+                <p className="text-sm flex items-center">
+                    <SpeakerWaveIcon className="mr-2 text-white" height={20} width={20} strokeWidth={2} />
+                    <span>Audio</span>
+                </p>
+            );
+
+            if(msg.type === 'call') return (
+                <p className="text-sm flex items-center">
+                <PhoneIcon className="mr-2 text-white" height={20} width={20} strokeWidth={2} />
+                    <span>Llamada de {msg.content} segundos</span>
+                </p>
+            );
+            
+        }
     
         function Contact(chat: ChatData){
             return (
@@ -124,7 +165,7 @@ export default function ChatApp() {
                         <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px'/>
                         <div className="h-1/2  ml-4 text-white  flex flex-col justify-between items-start ">
                             <p className="text-sm font-bold">{chat.name}</p>
-                            <p className="text-sm">{(chat?.messages[0]?.content.substring(0, 32) || 'No hay mensajes') + (chat?.messages[0]?.content.length > 32 ? '...' : '')}</p>
+                            {LastMessage(chat)}
                         </div>
                         <div className="h-1/2  ml-auto mr-4 text-white flex flex-col justify-between items-end ">
                             <p className="text-sm">{strToDate(chat.messages[0]?.createdAt)}</p>
