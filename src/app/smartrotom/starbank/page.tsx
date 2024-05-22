@@ -149,7 +149,7 @@ export default function StarBank(){
 
 export function TransfersShort({transfers, activeAccount}: {transfers: any, activeAccount: any}){
     return(
-        <div className="flex justify-evenly ">
+        <div className="flex justify-evenly flex-wrap ">
             {transfers.map((transfer: any) => {
                 
                 const transactionType = transfer.from === activeAccount.id ? "out" : "in";
@@ -163,10 +163,10 @@ export function TransfersShort({transfers, activeAccount}: {transfers: any, acti
                         <div className="flex hover:bg-opacity-50 items-center my-1">
                             <AccountImage width={32} type={type} name={name}/>
                             <div className={`text-right my-auto mx-2 ${esPagador(transfer, activeAccount) ? 'text-red-800' : 'text-green-700'}`}>
-                                <div className="font-bold text-xl text-shadow-border05">{amount} &#165;</div>
+                                <div className="font-bold text-lg text-shadow-border05">{formatMoney(amount)}</div>
                             </div>
                         </div>
-                        <div className="flex text-sm text-center">{strToDate(transfer.date)} - {name}</div>
+                        <div className="flex text-xs text-center">{strToDate(transfer.date)} - {name}</div>
                     </div>
                 )
             })}
@@ -209,8 +209,8 @@ export function Transactions({ trans, activeAccount, className, fecth= true}: {t
                         <div className="text-sm ">{strToDate(transaction.date)} - {name}</div>
                     </div>
                     <div className={`text-right my-auto ${esPagador(transaction, activeAccount) ? 'text-red-800' : 'text-green-700'}`}>
-                        <div className="font-bold text-xl text-shadow-border05">{amount} &#165;</div>
-                        <div className="text-md">{currentBalance} &#165;</div>
+                        <div className="font-bold text-xl text-shadow-border05">{formatMoney(amount)}</div>
+                        <div className="text-md">{formatMoney(currentBalance)}</div>
                     </div>
                 </div>
                 )
