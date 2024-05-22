@@ -4,7 +4,7 @@
 import NoiseMap from 'noise-map'
 import { rotomGET, rotomPOST } from '@/services/boffAPI';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { toast } from 'sonner';
+import { toast } from 'react-toastify';
 
 export type Reward = {
     id: number;
