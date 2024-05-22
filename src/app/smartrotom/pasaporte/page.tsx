@@ -1,10 +1,9 @@
 'use client'
-import { Book, Page } from "@/components/ui/book";
+import { Book, Page } from "@/components/ui/book/book";
 import './pasaporte.css'
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { CabezaJugador } from "@/components/smartrotom/CabezaMC";
-import { Loading, LoadingScreen } from "@/components/smartrotom/Loading";
 
 export default function Pasaporte(){
   const {data: session} = useSession() as {data: BoffSession | null, status: string};
@@ -13,7 +12,7 @@ export default function Pasaporte(){
 
   let page  = 0;
     return(
-      <section className=" bg-yellow-200 flex">
+      <section className=" bg-yellow-200 flex font-vinque bg-center bg-no-repeat bg-fixed bg-cover">
           <Book >
             <Page className="bg-blue-600 flex  flex-col " style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>PASAPORTE</div>
