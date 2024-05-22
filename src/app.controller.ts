@@ -1,8 +1,10 @@
-import { Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
+
+import axios from 'axios';
 
 @Controller()
 export class AppController {
@@ -16,6 +18,19 @@ export class AppController {
   @Get("togglelogging")
   toggleLogging() {
     return {logging: this.appService.toggleLogging()}
+  }
+  
+  @Post("smartrotom/patata")
+  async test(@Body() body: {uuid: string}) {
+    try{
+      const patata = await axios.post('http://148.251.3.244:34370/quests', body)
+      console.log(patata.data)
+      return patata.data
+    } catch (e) {
+      console.error(e)
+    }
+
+    return {error: "error"}
   }
 
   @Post("jcef/:sha")
