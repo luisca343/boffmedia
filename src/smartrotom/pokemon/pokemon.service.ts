@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import *  as  path from 'path';
 import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
-import { promises as fsPromises } from 'fs';
 import { GenderProperties, Pokemon } from '@/types/pokemon';
 import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
 import { PokemonData } from './utils/PokemonData';
@@ -93,14 +92,11 @@ export class PokemonService {
         const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0]
         let status
         
-        console.log(pokemonId, formName, paletteName)
-        
+        status = 0
+        //this.excludedForms.includes(formName) ? status = 0 : status = 1
 
-        this.excludedForms.includes(formName) ? status = 0 : status = 1
-
-        if(pokemonId > 99999) {
-            
-            if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 10000){
+        if(pokemonId > 0) {
+            if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 1000){
                 const pokemonStatus = await this.db.getDrizzle()
                 .select().from(pokedexRegistry)
                 .where(and(
@@ -112,7 +108,11 @@ export class PokemonService {
             const pokemonStatusFiltered = hide == 1 
                 ? pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName && p.paletteId === paletteName) 
                 : pokemonStatus.filter((p) => p.pokemonId == pokemonId && p.formId === formName)
-            status = pokemonStatusFiltered.length > 0 ? 1 : 0
+
+            if(pokemonStatusFiltered.length > 0) {
+                status = pokemonStatusFiltered[0].caughtAt ? 2 : pokemonStatusFiltered[0].seenAt ? 1 : 0
+            }
+
 
             /*
             const pokemonStatus = await this.db.getDrizzle()
@@ -127,12 +127,15 @@ export class PokemonService {
             //status = pokemonStatus.length > 0 ? 1 : 0
         }
         
+        let showImg = status !== 0
+        //!this.excludedForms.includes(formName) && pokemonId < 2000 ? showImg = true : null
+
         if(type === 'img') {
             const imageFolder = paletteName === 'shiny' ? 'Front Shiny' : paletteName === 'none' ? 'Front' : ''
             const pokemonImageName = formName == "base" ? pokemon.name.toUpperCase() : `${pokemon.name.toUpperCase()}_${form.name.toUpperCase()}`
     
             const image = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
-            if(fs.existsSync(image)) return {url: path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`), type:'image', status}
+            if(fs.existsSync(image)) return {url: path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`), type:'image', status, showImg}
         }
 
         let palette;
@@ -153,9 +156,9 @@ export class PokemonService {
         const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
         const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
         
-        if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite', status}
-        if(fs.existsSync(publicDir)) return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite', status}
-        return {url: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png', status}
+        if(fs.existsSync(defaultDirDef))  return {url: path.join('/smartrotom/packs/default_resourcepack', url), type:'sprite', status, showImg}
+        if(fs.existsSync(publicDir)) return {url: path.join('/smartrotom/packs/resourcepack', url), type:'sprite', status, showImg}
+        return {url: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png', status, showImg}
     }
 
     getSpriteURL(palette){
@@ -225,7 +228,7 @@ export class PokemonService {
         return this.pokemonData.species.length;
     }
 
-    getPokemonByName(name: string) {
+    getPokemonByName(name: string, amount = 16) {
         // @ts-ignore
         const options: Fuse.IFuseOptions<any> = {
             includeScore: false,
@@ -234,7 +237,7 @@ export class PokemonService {
         }
         const fuse = new Fuse<any>(this.pokemonData.species, options);
         const result = fuse.search(name);
-        return result.slice(0, 16)
+        return result.slice(0, amount)
     }
 
     getPokemonByName2(name: string) {
@@ -442,6 +445,8 @@ export class PokemonService {
 
     async registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: number){
         // Al evolucionar solo se está regisstrando como capturado
+        console.log('REGISTERING POKEMON')
+        console.log(uuid, pokemonId, form, palette, status)
         
         const formId = form || 'base'
         const paletteId = palette || 'none'
@@ -456,7 +461,9 @@ export class PokemonService {
                 eq(pokedexRegistry.paletteId, paletteId || 'none')
             )).execute()
         
+            console.log(res.length)
             if(res.length === 0){
+                console.log('INSERTING')
                 let caughtAt = status === 1 ? new Date() : null
                 const result = await this.db.getDrizzle()
                 .insert(pokedexRegistry)
@@ -469,6 +476,7 @@ export class PokemonService {
             } 
 
             if(status === 1){
+                console.log('INSERTING 2')
                 const registry = res[0] as PokedexRegistry
                 if(registry.caughtAt !== null) return {success: false, message: 'Pokemon already caught'}
                 const result = await this.db.getDrizzle().update(pokedexRegistry).set({caughtAt: new Date()})
@@ -493,7 +501,7 @@ export class PokemonService {
             .where(eq(pokedexRegistry.uuid, uuid))
             .execute()
 
-        const seenUniquePokemonIds = new Set(dex.filter((p) => p.caughtAt === null).map((p) => p.pokemonId));    
+        const seenUniquePokemonIds = new Set(dex.filter((p) => p.seenAt !== null).map((p) => p.pokemonId));    
         const caughtUniquePokemonIds = new Set(dex.filter((p) => p.caughtAt !== null).map((p) => p.pokemonId));
 
      
@@ -518,5 +526,52 @@ export class PokemonService {
             .limit(20)
             .execute()
         return dex
+    }
+
+    async getBiomesByPokemonName(name: string){
+        // @ts-ignore
+        const options: Fuse.IFuseOptions<any> = {
+            includeScore: false,
+            includeMatches: false,
+            keys: ['name', 'nickname']
+        }
+        const pkmName = await this.getPokemonByName(name, 1)[0].item.name
+        const fuse = new Fuse<any>(Object.keys(this.spawnData.spawnByPokemonAndForm), options);
+        const result = fuse.search(pkmName);
+        const resName = result[0].item
+        
+        const biomes = []
+
+        this.spawnData.spawnByPokemonAndForm[resName].forEach((spawn) => {
+            spawn.condition?.stringBiomes?.forEach((biome) => {
+                if(!biomes.includes(biome)) biomes.push(biome)
+            })
+        })
+
+        return {biomes, name: pkmName}
+    }
+
+    async test(){
+        // @ts-ignore
+        const options: Fuse.IFuseOptions<any> = {
+            includeScore: false,
+            includeMatches: false,
+            keys: ['name', 'nickname']
+        }
+        const pkmName = await this.getPokemonByName("Garganacl", 1)[0].item.name
+        console.log(pkmName)
+        const fuse = new Fuse<any>(Object.keys(this.spawnData.spawnByPokemonAndForm), options);
+        const result = fuse.search(pkmName);
+        const resName = result[0].item
+        
+        const biomes = []
+
+        this.spawnData.spawnByPokemonAndForm[resName].forEach((spawn) => {
+            spawn.condition?.stringBiomes?.forEach((biome) => {
+                if(!biomes.includes(biome)) biomes.push(biome)
+            })
+        })
+
+        return biomes
     }
 }

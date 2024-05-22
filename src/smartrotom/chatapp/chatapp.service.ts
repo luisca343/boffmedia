@@ -1,6 +1,6 @@
 import { rotomChatMessageReads, rotomChatMessages, rotomChatUsers, rotomChats } from '@/_db/schema/SmartRotomChat';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { asc, desc, eq, max, min } from 'drizzle-orm';
 import { last } from 'rxjs';
 import { SocketsGateway } from '../sockets/sockets.gateway';
@@ -13,6 +13,7 @@ import { uuid } from 'drizzle-orm/pg-core';
 export class ChatappService {
     constructor(
         private db: MySQL2Service,
+        @Inject(forwardRef(() => SocketsGateway))
         private socketGateway: SocketsGateway
     ) {}
 
@@ -30,7 +31,7 @@ export class ChatappService {
        const groups = await Promise.all(userGroups.map(async (group: {id: number, name: string, type: number, description: string, 
             image: string, createdAt: Date, updatedAt: Date, messages: {id: number, content: string, createdAt: Date}[], unread: number, members: {uuid: string}[]}) => {
             const messages = (await this.db.getDrizzle()
-                .select({id: rotomChatMessages.id, content: rotomChatMessages.content, createdAt: rotomChatMessages.createdAt, uuid: rotomChatMessages.senderUUID})
+                .select({id: rotomChatMessages.id, content: rotomChatMessages.content, createdAt: rotomChatMessages.createdAt, uuid: rotomChatMessages.senderUUID, type: rotomChatMessages.type})
                 .from(rotomChatMessages)
                 .where(eq(rotomChatMessages.chatId, group.id))
                 .orderBy(desc(rotomChatMessages.createdAt))
@@ -94,11 +95,11 @@ export class ChatappService {
     }
 
 
-    async createMessage(chatId: number, message: string, uuid: string){
+    async createMessage(chatId: number, message: string, uuid: string, type: string = 'text'){
         console.log('CREATING MESSAGE')
         
         const insert = await this.db.getDrizzle().insert(rotomChatMessages)
-            .values({chatId, content: message, senderUUID: uuid}) as ResultSetHeader[]
+            .values({chatId, content: message, senderUUID: uuid, type}) as ResultSetHeader[]
         
         const insertId = insert[0].insertId
 
@@ -188,26 +189,36 @@ export class ChatappService {
         
         if(users.length == 0) return {error: 'No users in chat'}
 
-        console.log('Calling users', users)
-
         const userSocket = this.socketGateway.users.find((user: {uuid: string}) => user.uuid === uuid)
         if(!userSocket) return {error: 'User not connected'}
 
-        const callUsers = users.map((user: {uuid: string}) => ({uuid: user.uuid, active: false}));
-        callUsers.push({uuid, active: true})
+        const callUsers = users.map((user: {uuid: string}) => ({uuid: user.uuid, status: 'RINGING'}));
+        const connectedUsers = callUsers.filter((user: {uuid: string}) => this.socketGateway.users.find((u: {uuid: string}) => u.uuid === user.uuid))
 
-        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId,caller: uuid, users: callUsers})
+        if(connectedUsers.length == 0) return {error: 'No users connected'}
+
+        connectedUsers.push({uuid, status: 'IN_CALL'})
+
+        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId,caller: uuid, users: connectedUsers})
         
-
         this.socketGateway.users.forEach((user: {uuid: string, socketId: string}) => {
             if(users.find((u: {uuid: string}) => u.uuid === user.uuid)){
-                this.socketGateway.server.to(user.socketId).emit('chat:call', {chatId, caller: uuid, users: callUsers})
+                this.socketGateway.server.to(user.socketId).emit('chat:call', {chatId, caller: uuid, users: connectedUsers})
             } else { 
                 console.log(`User ${user.uuid} not in chat`)
             }
         })
 
         return 1
+    }
+
+    endCall(chatId: number, startTime: number){
+        const endTime = new Date().getTime()
+        const callDuration = Math.floor((endTime - startTime) / 1000)
+
+
+
+        return this.createMessage(chatId, `${callDuration}`, 'system', 'call') 
     }
     
 }

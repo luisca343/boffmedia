@@ -12,7 +12,7 @@ let openai: OpenAI;
         sender: string;
         parts: {
             type: string;
-            content: string;
+            content: any;
         }[];
     }
 
@@ -181,9 +181,7 @@ export class ChatService {
                 if(dato === "stats") return this.sendStats(uuid, pkmName);
                 if(dato === "tipo") return this.sendTipo(uuid, pkmName);
                 if(dato === "movimientos") return this.sendMovimientos(uuid, args);
-                if(dato === "habitat") {
-                    return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre el hábitat de los Pokémon."}]});
-                }
+                if(dato === "habitat") return this.sendHabitat(uuid, pkmName);
             } 
         
 
@@ -250,6 +248,7 @@ export class ChatService {
             'hmMoves': 'hm'
         };
 
+
         Object.keys(movimientos).forEach((key) => {
             if(!tipoMovimientos.includes(keyMapping[key])){
                 delete movimientos[key];
@@ -267,6 +266,19 @@ export class ChatService {
             } else {
             return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]});
         }
-    }
+    };
+
+    async sendHabitat(uuid, pkmName){
+        let {biomes, name} = await this.pokemonService.getBiomesByPokemonName(pkmName);
+        if(biomes && biomes.length > 0){
+            return this.sendMsg(uuid,  {sender:"bot", parts:[
+                {type: "text", content: `Los Pokémon de la especie ${name} habitan en los siguientes biomas:`}, 
+                {type: "biomeList", content: biomes},
+                {type: "text", content: "\n¿Hay algo más en lo que pueda ayudarte?"}
+            ]});
+            } else {
+            return this.sendMsg(uuid,  {sender:"bot", parts:[{type: "text", content: "No tengo información sobre ese Pokémon."}]});
+        }
+    };
 
 }
