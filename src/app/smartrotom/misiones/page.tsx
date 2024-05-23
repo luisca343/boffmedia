@@ -5,9 +5,10 @@ import { getSmartRotomUser } from "@/lib/utils";
 import { GET, POST, rotomGET, rotomPOST } from "@/services/boffAPI"
 import { stat } from "fs";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ItemSprite } from "../pokedex/_components/PokemonSprite";
 import { Item } from "@radix-ui/react-select";
+const NpcSkin = React.lazy(() => import("@/components/smartrotom/MinecraftSkin"));
 
 
 enum QuestStatus {
@@ -74,13 +75,61 @@ const testData ={
                     "total": 8
                 }
             ],
-            "rewards": []
+            "rewards": [
+                {
+                    "item": "pixelmon:master_ball",
+                    "count": 1
+                }
+            ]
         },
         3: {
             "id": 3,
-            "name": "Arceus",
-            "logText": "Ah pues vale",
-            "completeText": "Hola,  esto es otra misión, tal y cual y eso y lo otro",
+            "name": "¿Pedro?",
+            "logText": `Passeggio tutta sola per le strade
+            Guardando attentamente i monumenti
+            La classica straniera con un'aria strana
+            Che gira stanca tutta la città
+            A un certo punto della passeggiata
+            Mi chiama da una parte un ragazzino
+            Sembrava a prima vista tanto perbenino
+            Si offre a far da guida per la città
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Praticamente il meglio di Santa Fè
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Fidati di me
+            Altro che ragazzino, che per benino
+            Sapeva molte cose più di me
+            Mi ha portato tante volte a veder le stelle
+            Ma non ho visto niente di Santa Fè
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Praticamente il meglio di Santa Fè
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Fidati di me`,
+            "completeText": `
+            Mi sono innamorata seduta stante
+            Di Pedro, Pedro, Pedro di Santa Fè
+            Mi ha sconvolto le vacanze, mi ha stregata
+            Non faccio che pensare a Pedro, Pe
+            Pedro, Pedro, Pedro, Pedro, Pedro, Pe
+            Travolta di passione a Santa Fè
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Tornerò da te
+            Come ballava bene sotto le stelle
+            Praticamente il meglio di Santa Fè
+            Le ragazze lo mangiavano con lo sguardo
+            Ma lui si concentrava solo con me
+            Pedro, Pedro, Pedro, Pedro, Pedro, Pe
+            Bellissima avventura di Santa Fè
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Soli io e te
+            Mi sono innamorata seduta stante
+            Di Pedro, Pedro, Pedro di Santa Fè
+            Mi ha sconvolto le vacanze, mi ha stregata
+            Non faccio che pensare a Pedro Pe
+            Pedro, Pedro, Pedro, Pedro, Pedro, Pe
+            Praticamente il meglio di Santa Fè
+            Pedro, Pedro, Pedro, Pedro, Pe
+            Tornerò da te`,
             "repeatable": false,
             "type": 5,
             "nextQuest": -1,
@@ -163,11 +212,8 @@ export default function Misiones(){
 
     useEffect(() => {
         if(!session) return
-        console.log(getSmartRotomUser(session).uuid)
         rotomPOST("/patata", { uuid: getSmartRotomUser(session).uuid })
         .then((response) => {
-            
-            console.log(response)
             
             if(!response.quests) {
                 setMisiones(testDataAsObject.quests)
@@ -199,9 +245,9 @@ export default function Misiones(){
     }
 
     if(!quests) return <div>Cargando...</div>
-    const skins = ['abascal', 'sanchez', 'perrosanxe', 'rajoy']
+    const skins = ['abascal', 'perrosanxe', 'sanchez', 'rajoy']
     return(
-        <section className=" bg-yellow-200 flex font-vinque">
+        <section className=" bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
           <Book pageColor="-purple">
             <Page className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>Misiones</div>
@@ -210,50 +256,7 @@ export default function Misiones(){
             </Page>
 
             {Object.values(quests).map((mision, index) => {
-                return <Page key={mision.id} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
-                    <div className="text-xl font-bold w-[60%] border-b-2 border-black">{mision.name}</div>
-                    <div className="w-full text-justify p-2">
-                        <div className="float-left">
-                            <NPCHead width={150} npcName={skins[index]} autoRotate={false} tag={false} zoom={1} />
-                        </div>
-                        
-                        {mision.status !== QuestStatus.LOCKED ? <div className="mt-4">
-                            <p className="font-bold  w-[40%] border-b border-black overflow-hidden">Log Text</p>
-                            <p>{mision.logText}</p> </div> : <p className="font-bold">Locked</p>
-                        }
-
-                    </div>
-                    
-                    {mision.status === QuestStatus.COMPLETED && <>
-                            <p className="font-bold w-[40%] border-b border-black overflow-hidden">Complete Text</p>
-                            <p>{mision.completeText}</p> </>
-                        }
-                        
-                        {(mision.status !== QuestStatus.LOCKED  && mision.objectives.length > 0) && <>
-                        <p className="font-bold w-[40%] border-b border-black overflow-hidden">Objectives</p>
-                            <ul  className=" flex justify-center text-center">
-                                {mision.objectives.map((objective:IQuestObjective) => (
-                                    <li key={objective.name} className="mx-2">
-                                        <p>{objective.name}</p>
-                                        <p>{objective.progress} / {objective.total}</p>
-                                        <ItemSprite name={objective.name.split(":")[0].toLowerCase().replace(" ", "_")} />
-                                    </li>
-                                ))}
-                            </ul>
-                        </>}
-                        
-                        {(mision.status !== QuestStatus.LOCKED && mision.rewards.length > 0) && <>
-                            <p className="font-bold w-[40%] border-b border-black overflow-hidden">Rewards</p>
-                            <ul>
-                                {mision.rewards.map((reward:IQuestReward) => (
-                                    <li key={reward.item}>
-                                        <p>{reward.count} - {reward.item}</p>
-                                        <ItemSprite name={reward.item.split(":")[1]} />
-                                    </li>
-                                ))}
-                            </ul>
-                        </>}
-                </Page>
+                return <RenderPage key={mision.id} mision={mision} index={index} />
             })}
             
             
@@ -261,4 +264,60 @@ export default function Misiones(){
           </Book>
         </section>
     )
+    
+    function RenderPage({mision, index}: {mision: QuestData, index: number}){
+        const randomId = Math.random().toString(36).substring(7)
+        return <Page key={randomId} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
+        <div className="flex text-xl font-bold w-[60%] border-b-2 border-black">{mision.name} <StatusBadge status={mision.status}>{mision.status}</StatusBadge></div>
+        <div className="w-full text-justify p-2">
+            <div className="float-left">
+            <React.Suspense fallback={<div>Loading...</div>}>
+                <NpcSkin npcName={skins[index % skins.length]} />
+            </React.Suspense>
+            </div>
+            
+            {mision.status !== QuestStatus.LOCKED ? <div className="mt-4">
+                <p className="font-bold  w-[40%] border-b border-black overflow-hidden">Log Text</p>
+                <p>{mision.logText}</p> </div> : <p className="font-bold">Locked</p>
+            }
+    
+        </div>
+        
+        {mision.status === QuestStatus.COMPLETED && <>
+                <p className="font-bold w-[40%] border-b border-black overflow-hidden">Complete Text</p>
+                <p>{mision.completeText}</p> </>
+            }
+            
+            {(mision.status !== QuestStatus.LOCKED  && mision.objectives.length > 0) && <>
+            <p className="font-bold w-[40%] border-b border-black overflow-hidden">Objectives</p>
+                <ul  className=" flex justify-center text-center">
+                    {mision.objectives.map((objective:IQuestObjective) => (
+                        <li key={objective.name + randomId} className="mx-2 flex flex-col justify-center items-center">
+                            <ItemSprite name={objective.name.split(":")[0].toLowerCase().replace(" ", "_")} />
+                            <p>{objective.name}</p>
+                            <p>{objective.progress} / {objective.total}</p>
+                        </li>
+                    ))}
+                </ul>
+            </>}
+            
+            {(mision.status !== QuestStatus.LOCKED && mision.rewards.length > 0) && <>
+                <p className="font-bold w-[40%] border-b border-black overflow-hidden">Rewards</p>
+                <ul>
+                    {mision.rewards.map((reward:IQuestReward) => (
+                        <li key={reward.item + randomId} className="mx-2 flex flex-col justify-center items-center">
+                            <ItemSprite name={reward.item.split(":")[1]} />
+                            <p>{reward.count} - {reward.item.split(":")[1].split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</p>
+                        </li>
+                    ))}
+                </ul>
+            </>}
+    </Page>
+    }
+
+    function StatusBadge({status, children}: {status: QuestStatus, children: React.ReactNode}){
+        return <div className={`flex items-center font-thin px-1 text-xs ml-2 my-1  rounded-lg ${getStatusStyles(status)}`}>{children}</div>
+    }
+    
 }
+
