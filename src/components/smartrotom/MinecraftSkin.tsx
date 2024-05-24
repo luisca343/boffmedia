@@ -12,9 +12,18 @@ export default async function NpcSkin({npcName, width= 150, height= 150} : {npcN
                 enableControls: false,
             })
         
+            /*
             skinViewer.width = 200
             skinViewer.height = 200
-            skinViewer.camera.setViewOffset(200,400, 0, 0, 200, 200)
+            skinViewer.camera.setViewOffset(200,400, 0, 0, 200, 200)*/
+            
+            skinViewer.camera.rotation.x = -0.620;
+            skinViewer.camera.rotation.y = 0.534;
+            skinViewer.camera.rotation.z = 0.348;
+            skinViewer.camera.position.x = -30.5;
+            skinViewer.camera.position.y = 22.0;
+            skinViewer.camera.position.z = 42.0;
+            
 
 
             await skinViewer.loadSkin(`https://api.boffmedia.es/smartrotom/img/customNPC/${npcName}.png`)
