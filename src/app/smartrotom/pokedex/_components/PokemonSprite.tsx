@@ -110,7 +110,6 @@ export function PokemonSpriteWithURL ({url, width, height}: {url:string, width?:
 
 export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true, showStatus= true}: 
     {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean}) {
-    console.log(id, form, palette, pixelated)
     const [imageUrl, setImageUrl] = useState() as any;
     const [loaded, setLoaded] = useState(false)
     const {data: session} = useSession()  as any
@@ -148,7 +147,6 @@ export function ItemSprite({name, width=100, height=100}: {name:string, width?: 
     const [loaded, setLoaded] = useState(false)
 
     useEffect(() => {
-        console.log('getting item sprite')
         getItemSprite(name).then((img) => {
                 setImageUrl(img)
                 setLoaded(true)
