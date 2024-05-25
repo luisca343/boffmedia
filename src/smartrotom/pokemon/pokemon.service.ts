@@ -171,9 +171,6 @@ export class PokemonService {
         //console.log( path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName + '.png'))
         const sprite = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName1 + '.png');
         const sprite2 = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items/other', itemFileName2 + '.png');
-
-        console.log(sprite)
-        console.log(sprite2)
         if(fs.existsSync(sprite)) return {url: path.join('/smartrotom/img/sprites/items', itemFileName1 + '.png')}
         if(fs.existsSync(sprite2)) return {url: path.join('/smartrotom/img/sprites/items/other', itemFileName2 + '.png')}
         return {url: '/smartrotom/img/sprites/items/000.png'}
