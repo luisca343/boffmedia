@@ -79,6 +79,7 @@ export type QuestData = {
     status: QuestStatus;
     objectives: IQuestObjective[];
     requirements: IQuestRequirements;
+    dialogId: number;
     
     rewards: IQuestReward[];
 }
@@ -111,6 +112,7 @@ export default function Misiones(){
         if(!session) return
         rotomPOST("/misiones", { uuid: getSmartRotomUser(session).uuid })
         .then((response) => {
+            console.log(response)
             setMisiones(response.quests)
             setCategories(response.categories)
             setDialogs(response.dialogs)
@@ -205,7 +207,8 @@ export default function Misiones(){
                 <NpcSkin npcName={skins[index % skins.length]} />
             </React.Suspense>
             </div>
-            <p>{mision.logText}</p>
+            <p>DIALOGO: {dialogs.find(d => d.id === mision.dialogId)?.text}</p>
+            <p>LOG:{mision.logText}</p>
         </BookSection>
         }
             {mision.status === QuestStatus.COMPLETED && 
