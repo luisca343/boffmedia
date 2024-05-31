@@ -20,3 +20,17 @@ export function strToTime(date: string) {
 export function getSmartRotomUser(session: any) {
   return session?.user?.smartRotomUser as SmartRotomUser
 }
+
+export function  secondsToTime (segundos : number) {
+  // Obtener a partir de los segundos, los minutos, horas y días
+  const dias = Math.floor(segundos / (3600 * 24))
+  const horas = Math.floor(segundos / 3600) % 24
+  const minutos = Math.floor(segundos / 60) % 60
+  let segundosRestantes = segundos % 60
+
+  segundosRestantes = parseInt(segundosRestantes.toFixed(2))
+
+
+  // Formatear los resultados
+  return `${dias > 0 ? dias + 'd ' : ''}${horas > 0 ? horas + 'h ' : ''}${minutos > 0 ? minutos + 'm ' : ''}${segundosRestantes > 0 ? segundosRestantes + 's ' : ''}`
+}
