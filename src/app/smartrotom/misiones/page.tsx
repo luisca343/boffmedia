@@ -100,6 +100,7 @@ export default function Misiones(){
     const [quests, setMisiones] = useState([] as QuestData[])
     const [categories, setCategories] = useState({} as {[key: string]: IQuestCategory})
     const [dialogs, setDialogs] = useState([] as IDialogue[])
+    const [npcs, setNpcs] = useState([] as any[])
 
     const [book, setBook] = useState(null) as any
 
@@ -112,10 +113,10 @@ export default function Misiones(){
         if(!session) return
         rotomPOST("/misiones", { uuid: getSmartRotomUser(session).uuid })
         .then((response) => {
-            console.log(response)
             setMisiones(response.quests)
             setCategories(response.categories)
             setDialogs(response.dialogs)
+            setNpcs(response.npcs)
         })
     }, [])
 
@@ -135,8 +136,15 @@ export default function Misiones(){
         }
     }
 
+    function getSkin(dialogId: number){
+        return npcs[dialogId] ? npcs[dialogId].skin.split(".png")[0] : "steve"
+    }
+
+    function getNPCName(dialogId: number){
+        return npcs[dialogId] ? npcs[dialogId].name : "Steve"
+    }
+
     if(!quests) return <div>Cargando...</div>
-    const skins = ['abascal', 'perrosanxe', 'sanchez', 'rajoy']
     return(
         <section className=" bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
           <Book pageColor="-purple" setBook={(e) => setBook(e)}>
@@ -152,13 +160,13 @@ export default function Misiones(){
                 <ul>
                     {quests.map((quest) => {
                         if(!quest) return null
-                        return <Button key={quest.id} onClick={() => book.flip(questPages[quest.id])}>{quest.name}</Button>
+                        return <BookLink dialogId={quest.id} key={quest.id} type='quest'/>
                     })}
                 </ul>
                 <h3>Dialogos</h3>
                 <ul>
                     {Object.values(dialogs).map((dialog) => {
-                        return <Button key={dialog.id} onClick={() => book.flip(dialogPages[dialog.id])}>{dialog.name}</Button>
+                        return <BookLink dialogId={dialog.id} key={dialog.id}/>
                     })}
                 </ul>
             </Page>
@@ -184,7 +192,7 @@ export default function Misiones(){
         <BookSection className="w-full text-justify p-2" title="Texto" size={2}>
             <div className="float-left">
             <React.Suspense fallback={<div>Loading...</div>}>
-                <NpcSkin npcName={skins[index % skins.length]} />
+                <NpcSkin npcName={getSkin(dialog.id)} />
             </React.Suspense>
             </div>
             <p>{dialog.text}</p>
@@ -194,7 +202,6 @@ export default function Misiones(){
     
     function RenderQuestPage({mision, index, number}: {mision: QuestData, index: number, number: number}){
         questPages[mision.id] = number
-        console.log(questPages)
         const randomId = Math.random().toString(36).substring(7)
         return <Page  number={number} key={randomId} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
         <div className="flex text-xl font-bold w-[60%] border-b-2 border-black">{mision.name} 
@@ -204,11 +211,12 @@ export default function Misiones(){
         {mision.status !== QuestStatus.LOCKED && <BookSection className="w-full text-justify p-2" title="Description" size={2}>
             <div className="float-left">
             <React.Suspense fallback={<div>Loading...</div>}>
-                <NpcSkin npcName={skins[index % skins.length]} />
+                <NpcSkin npcName={getSkin(mision.dialogId)} />
             </React.Suspense>
             </div>
-            <p>DIALOGO: {dialogs.find(d => d.id === mision.dialogId)?.text}</p>
-            <p>LOG:{mision.logText}</p>
+            <p><span className="font-bold">{getNPCName(mision.dialogId)}: </span> {dialogs.find(d => d.id === mision.dialogId)?.text}</p>
+            <br/>
+            <p>Log: {mision.logText}</p>
         </BookSection>
         }
             {mision.status === QuestStatus.COMPLETED && 
@@ -253,7 +261,6 @@ export default function Misiones(){
     function Requirements({quest}: {quest: QuestData}){
         const requirements = quest?.requirements
 
-        console.log(requirements)
         return <div className="flex flex-col">
             {requirements.requiredQuests?.length > 0 && <div className="flex flex-col">
                 <p className="font-bold">Misiones Necesarias:</p>
@@ -266,9 +273,7 @@ export default function Misiones(){
                 <p className="font-bold">Dialogos Necesarios:</p>
                 <ul>
                     {requirements.requiredDialogs.map((dialogId) => {
-                        console.log(dialogId)
-                        console.log(dialogs)
-                        return <Button onClick={() => book.flip(dialogPages[dialogId])} key={dialogId}>{dialogs.find(d => d.id === dialogId)?.name}</Button>
+                        return <BookLink dialogId={dialogId} key={dialogId}/>
                     }
                     )}
                 </ul>
@@ -315,5 +320,11 @@ export default function Misiones(){
         return <div className={`flex items-center font-thin px-1 text-xs ml-2 my-1  rounded-lg ${getStatusStyles(status)}`}>{children}</div>
     }
     
+
+    function BookLink({dialogId, type='dialog'}: {dialogId: number, type?: string}){
+        const classes = "text-blue-500 hover:text-blue-800 px-2 hover:cursor-pointer"
+        if(type === 'quest') return <button className={classes}    onClick={() => book.flip(questPages[dialogId])} key={dialogId}>{quests.find(d => d.id === dialogId)?.name}</button>
+        return <button className={classes}  onClick={() => book.flip(dialogPages[dialogId])} key={dialogId}>{dialogs.find(d => d.id === dialogId)?.name}</button>
+    }
 }
 
