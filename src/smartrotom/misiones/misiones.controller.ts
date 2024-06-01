@@ -2,6 +2,7 @@ import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 
 import axios from 'axios';
 import { MisionesService } from './misiones.service';
+import e from 'express';
 
 enum QuestStatus {
   ACTIVE= "ACTIVE",
@@ -77,35 +78,52 @@ export type QuestData = {
 
 @Controller('/smartrotom/misiones')
 export class MisionesController {
-  
     constructor(private readonly misionesService: MisionesService) {}
 
-    private customNpcsData = null as {quests: QuestData[], dialogs: {[key: number]: IDialogue}, categories: {[key: string]: IQuestCategory}}
+    private quests = null as QuestData[]
+    private dialogs = null as IDialogue[]
+    private categories = null as IQuestCategory[]
+    private npcs = null as {name: string, dialogId: number, skin: string}[]
+    
     private lastUpdate = 0
 
     
 
     @Get()
     async getAllQuests(@Query('force') force: number) {
-      if(!this.customNpcsData && !force) return this.getAllQuests(1)
-      if(this.customNpcsData && Date.now() - this.lastUpdate < 4 * 60 * 60 * 1000 && !force) {
-        return this.customNpcsData
-      }
-      try{
-        const patata = await axios.get('http://148.251.3.244:34370/quests')
-        this.customNpcsData = patata.data 
-        this.lastUpdate = Date.now()
-        return patata.data
-      } catch (e) {
-        
-      }
+        if(!this.npcs){
+          const newNPCs = await axios.get('http://148.251.3.244:34370/updateNPCs')
+          this.npcs = newNPCs.data.npcs
+        } 
+        if(!this.quests && !force) return this.getAllQuests(1)
+        if(this.quests && Date.now() - this.lastUpdate < 4 * 60 * 60 * 1000 && !force) {
+            return {quests: this.quests, dialogs: this.dialogs, categories: this.categories, npcs: this.npcs}
+        }
+        try{
+            const patata = await axios.get('http://148.251.3.244:34370/quests')
+            const data = patata.data
+            this.quests = data.quests
+            this.dialogs = data.dialogs
+            this.categories = data.categories
+
+            this.lastUpdate = Date.now()
+            return patata.data
+        } catch (e) {
+            
+        }
   
-      return {error: "error"}
+        return {error: "error"}
+    }
+
+    @Post("npcs")
+    async updateNPCs(@Body() body: {npcs: any}) {
+        this.npcs = body.npcs
+
+      return {status: "ok"}
     }
 
     @Post()
     async getQuestsForUser(@Body() body: {uuid: string}) {
-      console.log("Fetching quests for user")
       const currentData = await this.getAllQuests(0)
       try{
         const userQuestData = await axios.post('http://148.251.3.244:34370/quests', body)
@@ -135,7 +153,13 @@ export class MisionesController {
           return savedQuest
         })
 
-        return {quests: questsData, dialogs: dialogsToLoad.map(dialogId => currentData.dialogs[dialogId]), categories: currentData.categories}
+        return {
+            quests: questsData, 
+            dialogs: dialogsToLoad.map(dialogId => currentData.dialogs[dialogId]), 
+            categories: currentData.categories,
+            npcs: this.npcs
+        
+        }
         /*
         const questsData = this.customNpcsData.quests.map(quest => {
           console.log("IN")
