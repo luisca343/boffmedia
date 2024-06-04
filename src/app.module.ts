@@ -30,6 +30,9 @@ import { ChatappController } from './smartrotom/chatapp/chatapp.controller';
 import { ChatappService } from './smartrotom/chatapp/chatapp.service';
 import { ChatappModule } from './smartrotom/chatapp/chatapp.module';
 import { SocketsModule } from './smartrotom/sockets/sockets.module';
+import { MisionesModule } from './smartrotom/misiones/misiones.module';
+import { SmartrotomController } from './smartrotom/smartrotom.controller';
+import { SmartrotomModule } from './smartrotom/smartrotom.module';
 
 @Module({
   imports: [
@@ -59,9 +62,11 @@ import { SocketsModule } from './smartrotom/sockets/sockets.module';
     DocumentsModule,
     ChatappModule,
     SocketsModule,
+    MisionesModule,
+    SmartrotomModule,
     
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController],
   providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService],
 })
 export class AppModule implements NestModule{
