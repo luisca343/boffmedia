@@ -5,9 +5,12 @@ import { getSmartRotomUser } from "@/lib/utils";
 import { GET, POST, rotomGET, rotomPOST } from "@/services/boffAPI"
 import { stat } from "fs";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ItemSprite } from "../pokedex/_components/PokemonSprite";
 import { Item } from "@radix-ui/react-select";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+const NpcSkin = React.lazy(() => import("@/components/smartrotom/MinecraftSkin"));
 
 
 enum QuestStatus {
@@ -16,6 +19,18 @@ enum QuestStatus {
     FAILED = "FAILED",
     AVAILABLE = "AVAILABLE",
     LOCKED = "LOCKED",
+}
+
+interface IDialogue {
+    id: number;
+    name: string;
+    text: string;
+    questId: number;
+    requirements: IQuestRequirements;
+}
+
+interface IQuestCategory {
+    quests: number[];
 }
 
 interface IQuestObjective {
@@ -29,6 +44,29 @@ interface IQuestReward {
     count: number;
 }
 
+interface ScoreboardRequirements {
+    scoreboardObjective: string;
+    scoreboardType: string;
+    scoreboardValue: number;
+    
+}
+
+interface FactionRequirements {
+    factionId: number;
+    factionAvailable: string;
+    factionStance: string;
+}
+
+interface IQuestRequirements {
+    available: boolean;
+    requiredQuests: number[];
+    requiredDialogs: number[];
+    requiredLevel: number;
+    requiredTime: number;
+    factionRequirements: FactionRequirements[];
+    scoreboardRequirements: ScoreboardRequirements[];
+}
+
 export type QuestData = {
     id: number;
     name: string;
@@ -40,145 +78,45 @@ export type QuestData = {
     category: string;
     status: QuestStatus;
     objectives: IQuestObjective[];
+    requirements: IQuestRequirements;
+    dialogId: number;
     
     rewards: IQuestReward[];
 }
 
-
-const testData ={
-    "quests": {
-        2: {
-            "id": 2,
-            "name": "Mision 1",
-            "logText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-            "completeText": "Completada la Misión 1",
-            "repeatable": false,
-            "type": 0,
-            "nextQuest": -1,
-            "category": "Test #1",
-            "status": "ACTIVE",
-            "objectives": [
-                {
-                    "name": "Gold Ingot: 0/64",
-                    "progress": 0,
-                    "total": 64
-                },
-                {
-                    "name": "Bone: 0/2",
-                    "progress": 0,
-                    "total": 2
-                },
-                {
-                    "name": "Rare Candy: 1/8",
-                    "progress": 1,
-                    "total": 8
-                }
-            ],
-            "rewards": []
-        },
-        3: {
-            "id": 3,
-            "name": "Arceus",
-            "logText": "Ah pues vale",
-            "completeText": "Hola,  esto es otra misión, tal y cual y eso y lo otro",
-            "repeatable": false,
-            "type": 5,
-            "nextQuest": -1,
-            "category": "Test #1",
-            "status": "COMPLETED",
-            "objectives": [],
-            "rewards": [
-                {
-                    "item": "pixelmon:poke_ball",
-                    "count": 1
-                }
-            ]
-        },
-        5: {
-            "id": 5,
-            "name": "La región de Teras",
-            "logText": "¡Bienvenido a la región de Teras! En esta región encontrarás cosas maravillosas, como Luiscaína, comunismo y a veces incluso Pokémon.",
-            "completeText": "*música de victoria de final fantasy por la puta cara*",
-            "repeatable": false,
-            "type": 0,
-            "nextQuest": 6,
-            "category": "Historia",
-            "status": "AVAILABLE",
-            "objectives": [],
-            "rewards": [
-                {
-                    "item": "minecraft:dirt",
-                    "count": 1
-                }
-            ]
-        },
-        6: {
-            "id": 6,
-            "name": "Mi primer compañero",
-            "logText": "He recibido una carta del Profesor Ficus que me indicaba que fuera a su laboratorio para recoger a mi primer Pokémon... Espero que no sea una maldita pera...",
-            "completeText": "Era una puta pera...",
-            "repeatable": false,
-            "type": 5,
-            "nextQuest": -1,
-            "category": "Historia",
-            "status": "LOCKED",
-            "objectives": [],
-            "rewards": []
-        }
-    },
-    "categories": {
-        "2": "Test #1",
-        "3": "Test #1",
-        "5": "Historia",
-        "6": "Historia"
-    }
-} as any
-
 function parseTestData(jsonString: string) {
     const testData = JSON.parse(jsonString);
-
+    
     const testDataAsObject = {
         quests: testData.quests,
         categories: testData.categories
     };
-
+    
     return testDataAsObject;
 }
 
-const testDataAsMap = {
-    quests: new Map(Object.entries(testData.quests)),
-    categories: new Map(Object.entries(testData.categories))
-} as unknown as {quests: Map<number, QuestData>, categories: Map<number, string>}
-
-const testDataAsObject = {
-    quests: Object.fromEntries(testDataAsMap.quests),
-    categories: Object.fromEntries(testDataAsMap.categories)
-} as {quests: {[key: number]: QuestData}, categories: {[key: number]: string}}
-
 export default function Misiones(){
     const { data: session} = useSession()
-    const [quests, setMisiones] = useState({} as {[key: number]: QuestData})
-    const [categories, setCategories] = useState({} as {[key: number]: string})
-    const [pages, setPages] = useState(0)
+    const [quests, setMisiones] = useState([] as QuestData[])
+    const [categories, setCategories] = useState({} as {[key: string]: IQuestCategory})
+    const [dialogs, setDialogs] = useState([] as IDialogue[])
+    const [npcs, setNpcs] = useState([] as any[])
+
+    const [book, setBook] = useState(null) as any
+
+
+    let pageNum = 0;
+    const questPages = {} as {[key: number]: number} // {questId: page}
+    const dialogPages = {} as {[key: number]: number} // {dialogId: page}
 
     useEffect(() => {
         if(!session) return
-        console.log(getSmartRotomUser(session).uuid)
-        rotomPOST("/patata", { uuid: getSmartRotomUser(session).uuid })
+        rotomPOST("/misiones", { uuid: getSmartRotomUser(session).uuid })
         .then((response) => {
-            
-            console.log(response)
-            
-            if(!response.quests) {
-                setMisiones(testDataAsObject.quests)
-                setCategories(testDataAsObject.categories)
-                return
-            }
             setMisiones(response.quests)
             setCategories(response.categories)
-        }).catch((error) => {
-            setMisiones(testDataAsObject.quests)
-            setCategories(testDataAsObject.categories)
+            setDialogs(response.dialogs)
+            setNpcs(response.npcs)
         })
     }, [])
 
@@ -198,67 +136,195 @@ export default function Misiones(){
         }
     }
 
+    function getSkin(dialogId: number){
+        return npcs[dialogId] ? npcs[dialogId].skin.split(".png")[0] : "steve"
+    }
+
+    function getNPCName(dialogId: number){
+        return npcs[dialogId] ? npcs[dialogId].name : "Steve"
+    }
+
     if(!quests) return <div>Cargando...</div>
-    const skins = ['abascal', 'sanchez', 'perrosanxe', 'rajoy']
     return(
-        <section className=" bg-yellow-200 flex font-vinque">
-          <Book pageColor="-purple">
-            <Page className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
+        <section className=" bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
+          <Book pageColor="-purple" setBook={(e) => setBook(e)}>
+            <Page number={pageNum++} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>Misiones</div>
               <img className="h-0 flex-1  opacity-80" src="/smartrotom/img/logo.webp" alt="description" style={{ mixBlendMode: 'normal' }} />
               <div className="mb-4 text-center text-4xl  text-yellow-200 font-bold  opacity-80" style={{ mixBlendMode: 'normal' }}>Región de Teras</div>
             </Page>
 
-            {Object.values(quests).map((mision, index) => {
-                return <Page key={mision.id} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
-                    <div className="text-xl font-bold w-[60%] border-b-2 border-black">{mision.name}</div>
-                    <div className="w-full text-justify p-2">
-                        <div className="float-left">
-                            <NPCHead width={150} npcName={skins[index]} autoRotate={false} tag={false} zoom={1} />
-                        </div>
-                        
-                        {mision.status !== QuestStatus.LOCKED ? <div className="mt-4">
-                            <p className="font-bold  w-[40%] border-b border-black overflow-hidden">Log Text</p>
-                            <p>{mision.logText}</p> </div> : <p className="font-bold">Locked</p>
-                        }
+            <Page number={pageNum++}>
+                <h1>Indice</h1>
+                <h3>Misiones</h3>
+                <ul>
+                    {quests.map((quest) => {
+                        if(!quest) return null
+                        return <BookLink dialogId={quest.id} key={quest.id} type='quest'/>
+                    })}
+                </ul>
+                <h3>Dialogos</h3>
+                <ul>
+                    {Object.values(dialogs).map((dialog) => {
+                        return <BookLink dialogId={dialog.id} key={dialog.id}/>
+                    })}
+                </ul>
+            </Page>
 
-                    </div>
-                    
-                    {mision.status === QuestStatus.COMPLETED && <>
-                            <p className="font-bold w-[40%] border-b border-black overflow-hidden">Complete Text</p>
-                            <p>{mision.completeText}</p> </>
-                        }
-                        
-                        {(mision.status !== QuestStatus.LOCKED  && mision.objectives.length > 0) && <>
-                        <p className="font-bold w-[40%] border-b border-black overflow-hidden">Objectives</p>
-                            <ul  className=" flex justify-center text-center">
-                                {mision.objectives.map((objective:IQuestObjective) => (
-                                    <li key={objective.name} className="mx-2">
-                                        <p>{objective.name}</p>
-                                        <p>{objective.progress} / {objective.total}</p>
-                                        <ItemSprite name={objective.name.split(":")[0].toLowerCase().replace(" ", "_")} />
-                                    </li>
-                                ))}
-                            </ul>
-                        </>}
-                        
-                        {(mision.status !== QuestStatus.LOCKED && mision.rewards.length > 0) && <>
-                            <p className="font-bold w-[40%] border-b border-black overflow-hidden">Rewards</p>
-                            <ul>
-                                {mision.rewards.map((reward:IQuestReward) => (
-                                    <li key={reward.item}>
-                                        <p>{reward.count} - {reward.item}</p>
-                                        <ItemSprite name={reward.item.split(":")[1]} />
-                                    </li>
-                                ))}
-                            </ul>
-                        </>}
-                </Page>
+            {Object.values(quests).map((mision, index) => {
+                return <RenderQuestPage key={mision.id} mision={mision} index={index}  number={pageNum++}/>
             })}
             
+            {Object.values(dialogs).map((dialog, index) => {
+                return <RenderDialogPage key={dialog.id} dialog={dialog} index={index}  number={pageNum++}/>
+            })}
+
             
-            <Page style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>Page 7</Page>
+            <Page  number={pageNum++} style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>Page 7</Page>
           </Book>
         </section>
     )
+
+    function RenderDialogPage({dialog, index, number}: {dialog: IDialogue, index: number, number: number}){
+        dialogPages[dialog.id] = number
+        return <Page  number={number} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" >
+        <div className="flex text-xl font-bold w-[60%] border-b-2 border-black">{dialog.name}</div>
+        <BookSection className="w-full text-justify p-2" title="Texto" size={2}>
+            <div className="float-left">
+            <React.Suspense fallback={<div>Loading...</div>}>
+                <NpcSkin npcName={getSkin(dialog.id)} />
+            </React.Suspense>
+            </div>
+            <p>{dialog.text}</p>
+        </BookSection>
+    </Page>
+    }
+    
+    function RenderQuestPage({mision, index, number}: {mision: QuestData, index: number, number: number}){
+        questPages[mision.id] = number
+        const randomId = Math.random().toString(36).substring(7)
+        return <Page  number={number} key={randomId} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
+        <div className="flex text-xl font-bold w-[60%] border-b-2 border-black">{mision.name} 
+        <StatusBadge status={mision.status}>{mision.status}</StatusBadge>
+        {mision.repeatable && <StatusBadge status={QuestStatus.AVAILABLE}>REPETIBLE</StatusBadge>}
+        </div>
+        {mision.status !== QuestStatus.LOCKED && <BookSection className="w-full text-justify p-2" title="Description" size={2}>
+            <div className="float-left">
+            <React.Suspense fallback={<div>Loading...</div>}>
+                <NpcSkin npcName={getSkin(mision.dialogId)} />
+            </React.Suspense>
+            </div>
+            <p><span className="font-bold">{getNPCName(mision.dialogId)}: </span> {dialogs.find(d => d.id === mision.dialogId)?.text}</p>
+            <br/>
+            <p>Log: {mision.logText}</p>
+        </BookSection>
+        }
+            {mision.status === QuestStatus.COMPLETED && 
+                <BookSection title="Complete Text" size={2}>
+                    <div className="flex-1 overflow-auto">{mision.completeText}</div>  
+                </BookSection>
+            }
+       
+            {(mision.status !== QuestStatus.LOCKED  && mision.objectives?.length > 0) && <BookSection title="Objectives">
+                <ul  className=" flex justify-center text-center">
+                    {mision.objectives.map((objective:IQuestObjective) => (
+                        <li key={objective.name + randomId} className="mx-2 flex flex-col justify-center items-center">
+                            <ItemSprite name={objective.name.split(":")[0].toLowerCase().replace(" ", "_")} />
+                            <p>{objective.name}</p>
+                            <p>{objective.progress} / {objective.total}</p>
+                        </li>
+                    ))}
+                </ul>
+            </BookSection>
+            }
+            
+            {(mision.status !== QuestStatus.LOCKED && mision.rewards?.length > 0) && <BookSection title="Rewards">
+                <ul  className=" flex justify-center text-center">
+                    {mision.rewards.map((reward:IQuestReward) => (
+                        <li key={reward.item + randomId} className="mx-2 flex flex-col justify-center items-center">
+                            <ItemSprite name={reward.item.split(":")[1]} />
+                            <p>{reward.count} - {reward.item.split(":")[1].split("_").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")}</p>
+                        </li>
+                    ))}
+                </ul>
+            </BookSection>
+            }
+
+            {mision.status === QuestStatus.LOCKED && <BookSection title="Locked" size={2}>
+                <Requirements quest={mision} />
+            </BookSection>
+            }
+            
+    </Page>
+    }
+
+    function Requirements({quest}: {quest: QuestData}){
+        const requirements = quest?.requirements
+
+        return <div className="flex flex-col">
+            {requirements.requiredQuests?.length > 0 && <div className="flex flex-col">
+                <p className="font-bold">Misiones Necesarias:</p>
+                <ul>
+                    {requirements.requiredQuests.map((questId) => <li key={questId}>{quests.find(q => q.id === questId)?.name}</li>)}
+                </ul>
+            </div>}
+
+            {requirements.requiredDialogs?.length > 0 && <div className="flex flex-col">
+                <p className="font-bold">Dialogos Necesarios:</p>
+                <ul>
+                    {requirements.requiredDialogs.map((dialogId) => {
+                        return <BookLink dialogId={dialogId} key={dialogId}/>
+                    }
+                    )}
+                </ul>
+            </div>}
+
+            {requirements.requiredLevel > 0 && <div className="flex flex-col">
+                <p className="font-bold">Nivel Necesario:</p>
+                <p>{requirements.requiredLevel}</p>
+            </div>}
+
+            {requirements.requiredTime > 0 && <div className="flex flex-col">
+                <p className="font-bold">Tiempo Necesario:</p>
+                <p>{requirements.requiredTime}</p>
+            </div>}
+
+            {requirements.factionRequirements.length > 0 && <div className="flex flex-col">
+                <p className="font-bold">Requisitos de Facción:</p>
+                <ul>
+                    {requirements.factionRequirements.map((faction) => <li key={faction.factionId}>{faction.factionId}: {faction.factionAvailable} - {faction.factionStance}</li>)}
+                </ul>
+            </div>}
+
+            {requirements.scoreboardRequirements.length > 0 && <div className="flex flex-col">
+                <p className="font-bold">Requisitos de Scoreboard:</p>
+                <ul>
+                    {requirements.scoreboardRequirements.map((scoreboard) => <li key={scoreboard.scoreboardObjective}>{scoreboard.scoreboardObjective}: {scoreboard.scoreboardValue}</li>)}
+                </ul>
+            </div>}
+
+
+        </div>
+    }
+
+    function BookSection({children, title, className='', size= 1, ...props}: {children: React.ReactNode, props?: React.HTMLProps<HTMLDivElement>, className?: string, title?: string, size?: number}){
+        return <section className={`h-fit max-h-[33%] flex flex-col  overflow-hidden my-2`} >
+        <p className="font-bold  w-[40%] border-b border-black overflow-hidden">{title}</p>
+            <div className="h-full  overflow-auto" >
+                {children} 
+            </div>
+        </section>
+    }
+
+    function StatusBadge({status, children}: {status: QuestStatus, children: React.ReactNode}){
+        return <div className={`flex items-center font-thin px-1 text-xs ml-2 my-1  rounded-lg ${getStatusStyles(status)}`}>{children}</div>
+    }
+    
+
+    function BookLink({dialogId, type='dialog'}: {dialogId: number, type?: string}){
+        const classes = "text-blue-500 hover:text-blue-800 px-2 hover:cursor-pointer"
+        if(type === 'quest') return <button className={classes}    onClick={() => book.flip(questPages[dialogId])} key={dialogId}>{quests.find(d => d.id === dialogId)?.name}</button>
+        return <button className={classes}  onClick={() => book.flip(dialogPages[dialogId])} key={dialogId}>{dialogs.find(d => d.id === dialogId)?.name}</button>
+    }
 }
+

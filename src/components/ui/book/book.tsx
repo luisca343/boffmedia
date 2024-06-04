@@ -10,14 +10,15 @@ type PageFlip = {
     
 };
 
-export function Book({children, pageColor= ''} : {children: React.ReactNode, pageColor?: string}) {
+export function Book({children, pageColor= '', setBook}: {children: React.ReactNode, pageColor?: string, setBook: (book: PageFlip) => void}) {
   const [page, setPage] = useState(0);
   const [pageFlip, setPageFlip] = useState<PageFlip>({getPageCount: () => 0})
   const pages = React.Children.toArray(children).map((content, index) => { 
     return { content, index }});
 
+    
   if(pages.length % 2 !== 0){
-      pages.splice(pages.length - 1, 0, {content: <Page>ESTO ES DE RELLENO POR FAVOR ES RELLENO</Page>, index: pages.length});
+      pages.splice(pages.length - 1, 0, {content: <Page>Relleno</Page>, index: pages.length});
   }
   
 
@@ -42,7 +43,7 @@ return (
       width={450} height={500} showCover={true} size="stretch" className={``}
       style = {{}} startPage={0} minWidth={0} maxWidth={0} minHeight={0} maxHeight={0} drawShadow={true} flippingTime={1000}
       usePortrait={true} startZIndex={0} autoSize={true} maxShadowOpacity={0} mobileScrollSupport={true}
-      clickEventForward={true} useMouseEvents={true} swipeDistance={50} showPageCorners={true} disableFlipByClick={false}
+      clickEventForward={true} useMouseEvents={true} swipeDistance={50} showPageCorners={false} disableFlipByClick={false}
       onFlip={(e) => onFlip(e.data)} onInit={(e) => cargar(e)}
     >
       {pages.map((page, index) => (
@@ -60,6 +61,7 @@ function getStyle(index: number){
 
   function cargar(data: {data:number, object:PageFlip}){
       if(!pageFlip) setPageFlip(data.object)
+      setBook(data.object)
     }
 
     function onFlip(data: number){
@@ -74,7 +76,7 @@ interface PageCoverProps {
 }
 
 
-export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style}: {children: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties})  {
+export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0}: {children: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number}) {
     return (
         <div style={style} className={`h-full w-full page drop-shadow-2xl p-2 ${className}`} data-density={dataDensity}>
              {children}
