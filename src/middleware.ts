@@ -15,13 +15,12 @@ export async function middleware(req: NextRequest) {
 
   const host = req.headers.get('host');
   const subdomain = getValidSubdomain(host);
+
   if (subdomain) {
     // Subdomain available, rewriting
-    console.log(`>>> Rewriting: ${url.pathname} to /${subdomain}${url.pathname}`);
+    if(!url.pathname.includes("api"))
     url.pathname = `/${subdomain}${url.pathname}`;
-  } else {
-    console.log(`>>> No subdomain available for ${host}`);
-  }
+  } 
 
   return NextResponse.rewrite(url);
 }
