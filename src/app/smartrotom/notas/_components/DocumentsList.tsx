@@ -1,5 +1,6 @@
 "use client"
 
+import { InternalLink } from "@/components/nav/Link"
 import { strToDate } from "@/lib/utils"
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useSession } from "next-auth/react"
@@ -39,12 +40,12 @@ export function DocumentsList() {
                     {documents.length > 0 ? 
                     documents.map((doc: any) => {
                         return (
-                            <Link key={doc.uuid} href={`/smartrotom/notas/${doc.id}`}>
+                            <InternalLink key={doc.uuid} href={`/notas/${doc.id}`}>
                                 <div className="text-white bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center">
                                     <h2>{doc.title}</h2>
                                     <div>{strToDate(doc.updatedAt)}</div>
                                 </div>
-                            </Link>
+                            </InternalLink>
                         )
                     }) : <p className="text-white">No documents found</p>    
                 }

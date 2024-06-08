@@ -39,12 +39,12 @@ export default function Mina(){
             <MenuWrapper>
                 <div className={`p-4 h-full w-full lg:w-3/5 ml-auto mr-5 flex flex-col`}>
                 <div className={`text-2xl xl:text-8xl font-custom margin-2 text-right text-gray-100 text-shadow-border3 `}>Mina 2.0</div>
-                <LinkMina className='mt-12' href='/smartrotom/mina/jugar'>Jugar</LinkMina>
-                <LinkMina href='/smartrotom/mina/historial'>Historial</LinkMina>
-                <LinkMina href='/smartrotom/mina/ranking'>Ranking</LinkMina>
-                <LinkMina href='/smartrotom/mina/drops'>Drops</LinkMina>
-                <LinkMina href='/smartrotom/mina/reclamar'>Reclamar</LinkMina>
-                <LinkMina href='/smartrotom'>Salir</LinkMina>
+                <LinkMina className='mt-12' href='/mina/jugar'>Jugar</LinkMina>
+                <LinkMina href='/mina/historial'>Historial</LinkMina>
+                <LinkMina href='/mina/ranking'>Ranking</LinkMina>
+                <LinkMina href='/mina/drops'>Drops</LinkMina>
+                <LinkMina href='/mina/reclamar'>Reclamar</LinkMina>
+                <LinkMina href='/'>Salir</LinkMina>
                 <div className=' w-1/2 ml-auto mt-auto'><BarraEnergia /></div>
             </div>
         </MenuWrapper>

@@ -14,6 +14,7 @@ import { SpawnInfo } from "../../_types/spawnInfo"
 import { SpawnTable } from "./_components/SpawnTable"
 import { GenderProperties } from "@/types/Pokemon"
 import { PokedexSection } from "../../_components/PokedexSection"
+import { InternalLink } from "@/components/nav/Link"
 
 
 export default async function EntradaPokedex({params}: any){
@@ -78,12 +79,13 @@ export default async function EntradaPokedex({params}: any){
                 <PokedexSection id='forms' title="Formas Alternativas">
                     <div className="flex flex-wrap justify-center">
                         {pokemon.forms.map((form, index) => {
-                            return <Link key={form.name} href={`/smartrotom/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}>
+                            return <InternalLink key={form.name} 
+                            href={`/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}>
                                 <div className="flex flex-col p-2 justify-center items-center">
                                     <PokemonSprite width={100} height={100} id={pokemonIndex} form={form.name || 'base'} palette='none'/>
                                     {getForm(form.name, formsTranslation) || 'base'}
                                 </div>
-                            </Link>
+                            </InternalLink>
         })}
                     </div>
                 </PokedexSection>}
