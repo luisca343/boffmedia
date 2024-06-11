@@ -33,6 +33,9 @@ import { SocketsModule } from './smartrotom/sockets/sockets.module';
 import { MisionesModule } from './smartrotom/misiones/misiones.module';
 import { SmartrotomController } from './smartrotom/smartrotom.controller';
 import { SmartrotomModule } from './smartrotom/smartrotom.module';
+import { BattleService } from './battlesimulator/battle/battle.service';
+import { BattleController } from './battlesimulator/battle/battle.controller';
+import { BattleModule } from './battlesimulator/battle/battle.module';
 
 @Module({
   imports: [
@@ -64,10 +67,11 @@ import { SmartrotomModule } from './smartrotom/smartrotom.module';
     SocketsModule,
     MisionesModule,
     SmartrotomModule,
+    BattleModule,
     
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
