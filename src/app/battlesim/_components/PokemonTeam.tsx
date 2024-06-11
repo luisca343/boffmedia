@@ -4,34 +4,30 @@ import {
     GraphicsGen, Icons, Sprites
   } from '@pkmn/img';
 import Image from "next/image";
-  export function PokemonTeam({team}: {team: Pokemon[]}){
+export function PokemonTeam({team}: {team: Pokemon[]}){
+    const teamSize = team.length > 6 ? team.length : 6;
+    const halfTeamSize = Math.ceil(teamSize / 2);
+
     return (
         <div>
-            {team.length > 3 ? (
-                <>
-                    <div>
-                        {team.slice(0, team.length / 2).map(pokemon => (
-                            <PokemonSprite key={pokemon.name} pokemon={pokemon} />
-                        ))}
-                    </div>
-                    <div>
-                        {team.slice(team.length / 2).map(pokemon => (
-                            <PokemonSprite key={pokemon.name} pokemon={pokemon} />
-                        ))}
-                    </div>
-                </>
-            ) : (
+            <>
                 <div>
-                    {team.map(pokemon => (
-                        <PokemonSprite key={pokemon.name} pokemon={pokemon} />
+                    {Array.from({length: halfTeamSize}, (_, i) => team[i]).map(pokemon => (
+                        <PokemonSprite key={pokemon?.name} pokemon={pokemon} />
                     ))}
                 </div>
-            )}
+                <div>
+                    {Array.from({length: teamSize - halfTeamSize}, (_, i) => team[i + halfTeamSize]).map(pokemon => (
+                        <PokemonSprite key={pokemon?.name} pokemon={pokemon} />
+                    ))}
+                </div>
+            </>
         </div>
     )
 }
 
 function PokemonSprite({pokemon}: {pokemon: Pokemon}){
+    if(!pokemon) return <div className=" w-fit inline-block  " style={{width:40, height:30}}><img className="m-auto"  src='/smartrotom/test/pokeball.png' /></div>
     const icon = Icons.getPokemon(pokemon.speciesForme, {
         side: 'p1',
         gender: pokemon.gender || undefined,
@@ -55,7 +51,7 @@ export function PokemonImage({id, shiny = false, side = 'p2'}: {id: string, shin
         pixelated = true
     }
     return (
-        <div className='w-48 h-48 flex items-center justify-center'>
+        <div className='w-full h-full flex items-end justify-center'>
             <img src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={id}/>
         </div>
     );
