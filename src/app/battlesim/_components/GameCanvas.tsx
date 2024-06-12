@@ -9,50 +9,24 @@ export default function GameCanvas({pokemon}: {pokemon: {[key: string]: any}}){
     <div id="game" className="w-full flex flex-col relative">
       
       {team1.length === 3 ? <>
-        <div className="w-48 h-48 border border-red-500 absolute bottom-0 left-[10%]" id="p1a">
-          <PokemonSprite pokemon={pokemon["p1a"]} />
-        </div>
-      
-        <div className="w-48 h-48 border border-red-500 absolute bottom-0 left-[30%]" id="p1b">
-          <PokemonSprite pokemon={pokemon["p1b"]} />
-        </div>
-      
-        <div className="w-48 h-48 border border-red-500 absolute bottom-0 left-[50%]" id="p1c">
-          <PokemonSprite pokemon={pokemon["p1c"]} />
-        </div>
-        
+          <PokemonSprite pokemon={pokemon["p1a"]} id="p1a" className='bottom-0 left-[10%]'/>
+          <PokemonSprite pokemon={pokemon["p1b"]} id="p1b" className='bottom-0 left-[30%]'/>
+          <PokemonSprite pokemon={pokemon["p1c"]} id="p1c" className='bottom-0 left-[50%]'/>
         </> : <>
-          <div className="w-48 h-48 border border-red-500 absolute bottom-0 left-[30%]" id="p1a">
-          <PokemonSprite pokemon={pokemon["p1a"]} />
-            </div>
-        
-          <div className="w-48 h-48 border border-red-500 absolute bottom-0 left-[50%]" id="p1b">
-            <PokemonSprite pokemon={pokemon["p1b"]} />
-          </div>
+          <PokemonSprite pokemon={pokemon["p1a"]} id="p1a" className='bottom-0 left-[30%]'/>
+          <PokemonSprite pokemon={pokemon["p1b"]} id="p1b" className='bottom-0 left-[50%]'/>
         </>
       }
  
     {team2.length === 3 ? <>
-        <div className="w-48 h-48 border border-red-500 absolute top-0 left-[60%]" id="p2a">
-          <PokemonSprite pokemon={pokemon["p2a"]} />
-        </div>
-      
-        <div className="w-48 h-48 border border-red-500 absolute top-0 left-[40%]" id="p2b">
-          <PokemonSprite pokemon={pokemon["p2b"]} />
-        </div>
-      
-        <div className="w-48 h-48 border border-red-500 absolute top-0 left-[20%]" id="p2c">
-          <PokemonSprite pokemon={pokemon["p2c"]} />
-        </div>
+          <PokemonSprite pokemon={pokemon["p2a"]} id="p2a" className='top-0 left-[60%]'/>
+          <PokemonSprite pokemon={pokemon["p2b"]} id="p2b" className='top-0 left-[40%]'/>
+          <PokemonSprite pokemon={pokemon["p2c"]} id="p2c" className='top-0 left-[20%]'/>
+
         
         </> : <>
-          <div className="w-48 h-48 border border-red-500 absolute top-0 left-[60%]" id="p2a">
-          <PokemonSprite pokemon={pokemon["p2a"]} />
-            </div>
-        
-          <div className="w-48 h-48 border border-red-500 absolute top-0 left-[40%]" id="p2b">
-            <PokemonSprite pokemon={pokemon["p2b"]} />
-          </div>
+          <PokemonSprite pokemon={pokemon["p2a"]} id="p2a" className='top-0 left-[60%]'/>
+          <PokemonSprite pokemon={pokemon["p2b"]} id="p2b" className='top-0 left-[40%]'/>
         </>
       }
     

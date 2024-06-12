@@ -5,120 +5,14 @@ import { Battle, Pokemon, Side } from "@pkmn/client"
 import { DetailedPokemon, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol"
 import { useEffect, useRef, useState } from "react";
 import { Dex } from '@pkmn/sim';
-import { GenerationNum, Generations } from '@pkmn/data';
-import { time } from "console";
-import PokemonSprite from "./_components/PokemonSprite";
+import { Generations } from '@pkmn/data';
 import GameCanvas from "./_components/GameCanvas";
+import { Scene } from "./_components/battle_animations";
 
 let battle = new Battle(new Generations(Dex as any))
 
-const BattleEffects: {[k: string]: any} = {
-  pokeball: {
-    url: '/smartrotom/test/pokeball.png',
-    w: 100, h: 100,
-  },
-};
 
 
-export interface ScenePos {
-	/** - left, + right */
-	x?: number;
-	/** - down, + up */
-	y?: number;
-	/** - player, + opponent */
-	z?: number;
-	scale?: number;
-	xscale?: number;
-	yscale?: number;
-	opacity?: number;
-	time?: number;
-	display?: string;
-}
-
-export class Scene {
-  battle: Battle;
-  gameElement: HTMLElement;
-  acceleration = 1;
-  
-
-  constructor(battle: Battle, gameElement: HTMLElement) {
-    this.battle = battle
-    this.gameElement = gameElement
-
-    console.log(battle)
-  }
-
-  getPosition(id: string) {
-    const element = this.gameElement.querySelector(`#${id}`);
-    if (!element) return null;
-  
-    const rect = element.getBoundingClientRect();
-    const parentRect = this.gameElement.getBoundingClientRect();
-  
-    const relativeRect = {
-      x: rect.left - parentRect.left + rect.width / 2,
-      y: rect.top - parentRect.top + rect.height / 2,
-      width: rect.width,
-      height: rect.height
-    };
-  
-    console.log(`Element: ${id} - ${relativeRect.x}, ${relativeRect.y}, ${relativeRect.width}, ${relativeRect.height}`);
-    return relativeRect;
-  }
-
-  playAnimation(animation: string, position: string) {
-    const element = this.gameElement.querySelector(`#${position}`);
-    if (!element) return null;
-
-    console.log(`Playing animation ${animation} on ${position}`);
-  }
-
-  showEffect(effect:string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void){
-    const effectData = BattleEffects[effect];
-    if (!effectData) return;
-
-    start.x = start.x || 0;
-    start.y = start.y || 0;
-
-
-    const element = document.createElement('img');
-    element.src = effectData.url;
-    element.style.position = 'absolute';
-    element.style.width = `50px`;
-    element.style.height = `50px`;
-    const halfWidth = parseInt(element.style.width) / 2;
-    const halfHeight = parseInt(element.style.height) / 2;
-    element.style.left = `${start.x - halfWidth}px`;
-    element.style.top = `${start.y - halfHeight}px`;
-    element.style.zIndex = `${start.z}`;
-    element.style.opacity = `${start.opacity || 1}`;
-    element.style.transition = `all ${start.time || 0}ms`;
-    element.style.display = start.display || 'block';
-    element.style.transform = `scale(${start.scale || 1})`;
-
-    if (additionalCss) {
-      element.style.cssText += additionalCss;
-    }
-
-    this.gameElement.appendChild(element);
-
-    setTimeout(() => {
-      end.x = end.x || 0;
-      end.y = end.y || 0;
-
-      element.style.left = `${end.x - halfWidth}px`;
-      element.style.top = `${end.y - halfHeight}px`;
-      element.style.zIndex = `${end.z}`;
-      element.style.opacity = `${end.opacity || 0}`;
-      element.style.transform = `scale(${end.scale || 1})`;
-      
-    }, 0);
-
-    setTimeout(() => {
-      element.remove();
-      if (callback) callback();
-    }, start.time || 0);
-}
 
 
 /*
@@ -341,11 +235,11 @@ export default function Test() {
     console.log('==================== END UPDATE ====================')
     console.log(battle)*/
     battle.update();
-    setTurn(turn + 1);
+    //setTurn(turn + 1);
   }
 
   function test2(battle: Battle) {
-    scene.getPosition('p1a');
+    scene.playBattleAnim('contactattack','p1a' as PokemonIdent, 'p2b' as PokemonIdent);
   }
 
 
@@ -367,6 +261,7 @@ export default function Test() {
     </div>
   </div>
   <button onClick={() => testAttack(battle)}>Start</button>
+  <button onClick={() => test2(battle)}>Test</button>
   <div className="h-[30%] overflow-auto" ref={logRef}>
       <div>{log.map((line, index) => (
         <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
