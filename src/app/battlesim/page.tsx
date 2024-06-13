@@ -122,6 +122,11 @@ export default function Test() {
     }
 
     for (let index = 0; index < partida.log[turn].events.length; index++) {
+      // check if scene is paused
+      while(scene.paused) {
+        console.log('paused')
+        await delay(100);
+      }
       //console.log(`----- EVENT ${index} -----`)
       let timeout = 0
       const event = partida.log[turn].events[index];
@@ -140,8 +145,25 @@ export default function Test() {
         const move = battle.get("moves", args[2]);
         const poke2 = battle.getPokemon(args[3]);
 
-      
         
+        const attack = Dex.moves.get(move.id);
+        if(args[3] === ""){
+          args[3] = args[1].includes('p1') ? 'p2a' : 'p1a';
+        }
+
+        await scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, args[3].split(':')[0] as PokemonIdent)
+        //await scene.playBattleAnim('flamethrower', args[1].split(':')[0] as PokemonIdent, args[3].split(':')[0] as PokemonIdent)
+        /*
+        switch(attack.category) {
+          case 'Physical':
+            await scene.playBattleAnim('contactattack', args[1].split(':')[0] as PokemonIdent, args[3].split(':')[0] as PokemonIdent)
+            break;
+          default:
+            await scene.playBattleAnim('attack', args[1].split(':')[0] as PokemonIdent, args[3].split(':')[0] as PokemonIdent)
+            break;
+        }*/
+
+      
         //console.log(poke, move, poke2)
       }
     
@@ -158,35 +180,11 @@ export default function Test() {
         
         const detailedPokemon = Protocol.parseDetails(name, positionIdent, pokemonDetails);
     
-        console.log('pokemon', pokemon)
-
-         const element = scene.getPosition(pos);
-         if(element){
-          const startY = pos.includes('p1') ? element.y + 40 : element.y - 40;
-
-          const startX = pos.includes('p1') ? element.x -150 : element.x + 150;
-
-          
-          scene.showEffect('pokeball', {
-            opacity: 1,
-            x: startX,
-            y: startY,
-            scale: .7,
-            time: 300 / scene.acceleration,
-          }, {
-            opacity: 0,
-            x: element.x,
-            y: element.y,
-            time: 700 / scene.acceleration,
-          }, 'ballistic2', '', '', () => {
-            setPokemon(prevPokemon => {
-              return {...prevPokemon, [pos]: pokemon};
-            });
-          });  
-
-
-
-         }
+        scene.playEffect('pokeball', positionIdent, () => {
+          setPokemon(prevPokemon => {
+            return {...prevPokemon, [pos]: pokemon};
+          });
+        });
 
     
          /*

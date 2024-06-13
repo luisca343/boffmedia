@@ -3,6 +3,7 @@ import { Pokemon } from "@pkmn/client";
 import {
     GraphicsGen, Icons, Sprites
   } from '@pkmn/img';
+import { DetailedPokemon } from "@pkmn/protocol";
 import Image from "next/image";
 export function PokemonTeam({team}: {team: Pokemon[]}){
     const teamSize = team.length > 6 ? team.length : 6;
@@ -44,15 +45,15 @@ function PokemonSprite({pokemon}: {pokemon: Pokemon}){
 }
 
 
-export function PokemonImage({id, shiny = false, side = 'p2'}: {id: string, shiny: boolean, side?: 'p1' | 'p2'}){
-    let {url, w, h, pixelated} = Sprites.getPokemon(id, {gen: 'ani', shiny, side});
+export function PokemonImage({id, pokemon, side = 'p2'}: {id: string, pokemon: DetailedPokemon, side?: 'p1' | 'p2'}){
+    let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     if(url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
-        url = `http://boffmedia.es/smartrotom/img/sprites/Front/${id.toUpperCase()}.png`
+        url = `http://boffmedia.es/smartrotom/img/sprites/Front/${pokemon.speciesForme.toUpperCase()}.png`
         pixelated = true
     }
     return (
-        <div className='w-full h-full flex items-end justify-center'>
-            <img src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={id}/>
+        <div className='w-full h-full flex items-end justify-center' id={id}>
+            <img src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={pokemon.speciesForme}/>
         </div>
     );
 }   
