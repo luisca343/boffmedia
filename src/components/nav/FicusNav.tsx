@@ -5,16 +5,24 @@ import RotomNav from './RotomNav'
 import { signIn, signOut } from "next-auth/react";
 import { getValidSubdomain } from '@/lib/subdomain';
 import { headers } from 'next/headers'
+import { useEffect, useState } from 'react';
 
 
 const hide = ['smartrotom', 'battlesim', 'wingull']
 export function FicusNav() {
   const pathname = usePathname()
-  let app = pathname.split('/')[1].split('/')[0]
+  const [app, setApp] = useState('');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setApp(pathname.split('/')[1].split('/')[0]);
+    }
+  }, [pathname]);
 
   for(let h of hide){
-      if(typeof window === 'undefined' || window.location.hostname.includes(h) || h == app) return null
+      if(h == app) return null
   }
+
   //if (hide.includes(app)) return null
   return (
     <nav className="bg-blue-500 p-4">
