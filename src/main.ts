@@ -2,11 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Server } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
-import { DuplicateEntryExceptionFilter } from './filters/DuplicateEntryExceptionFilter';
+import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  let origin = ['http://localhost:3000', 'http://148.251.3.244:34333', 'https://lizardon.es', 'https://boffmedia.es', 'https://local.boffmedia.es']
+  let origin = [
+  'http://localhost:3000', 'http://148.251.3.244:34333', 'https://lizardon.es', 
+  'https://boffmedia.es', 'http://local.boffmedia.es', 'http://smartrotom.local.boffmedia.es'
+]
   app.enableCors({ origin }); // Enable CORS for the specified origin
 
 

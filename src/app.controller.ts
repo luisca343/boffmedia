@@ -4,7 +4,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
 
-import axios from 'axios';
 
 @Controller()
 export class AppController {
@@ -19,20 +18,21 @@ export class AppController {
   toggleLogging() {
     return {logging: this.appService.toggleLogging()}
   }
-  
-  @Post("smartrotom/patata")
-  async test(@Body() body: {uuid: string}) {
-    try{
-      const patata = await axios.post('http://148.251.3.244:34370/quests', body)
-      console.log(patata.data)
-      return patata.data
-    } catch (e) {
-      console.error(e)
+
+  @Get("smartrotom/patata")
+  async test2() {
+    const result = [];
+    for (let i = 1; i <= 75; i++) {
+      const prazas = i;
+      const prazas_a = Math.floor(Math.random() * (prazas * 0.05) + prazas * 0.7);
+      const prazas_a_disc = prazas - prazas_a
+      const prazas_deportista = 0;
+      result.push(`INSERT INTO prazas_cupo_adultos (COD_ASISTENCIA, PRAZAS, PRAZAS_A, PRAZAS_A_DISC, PRAZAS_DEPORTISTA) VALUES (1, ${prazas}, ${prazas_a}, ${prazas_a_disc}, ${prazas_deportista})`)
+      result.push(`INSERT INTO prazas_cupo_adultos (COD_ASISTENCIA, PRAZAS, PRAZAS_A, PRAZAS_A_DISC, PRAZAS_DEPORTISTA) VALUES (2, ${prazas}, ${prazas_a}, ${prazas_a_disc}, ${prazas_deportista})`)
     }
-
-    return {error: "error"}
+    return result
   }
-
+  
   @Post("jcef/:sha")
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File, @Param('sha') sha: string) {
