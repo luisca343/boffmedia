@@ -8,6 +8,7 @@ import { ItemSprite, PokemonSprite } from "../../../_components/PokemonSprite"
 import Link from "next/link"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import React from "react"
+import { InternalLink } from "@/components/nav/Link"
 
 
 
@@ -55,10 +56,10 @@ export async function EvoTree({params}: {params: {id: string}}){
             if(Object.keys(subTree).length == 0) return <h1>TET</h1>
             if(!subTree.pkm) return <h1>NO PKM</h1>
                 return <div key={key} className='w-full flex flex-row items-center ' style={{height:`${100/Object.keys(tree).length}%`}}>
-                    <Link href={`/smartrotom/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-zinc-700 rounded-md">
+                    <InternalLink href={`/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-zinc-700 rounded-md">
                         <PokemonSprite id={subTree.dex} form={form} palette='none' width={100} height={100}/>
                         <span className="text-center">{t(`form`, {pokemon: getPokemonName(pkmName, t), form: `${t(`form_${form}`)}`})}</span>
-                    </Link>
+                    </InternalLink>
                     <div className="flex flex-col ">
                         {Object.keys(evos)?.length > 0 && Object.keys(evos).map((evo: any, index: number) => {
                             const opacity = index % 2 == 0 ? 0.5 : 1

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { PokemonSprite } from "./PokemonSprite"
 import useTranslation from 'next-translate/useTranslation'
 import Link from "next/link"
+import { InternalLink } from "@/components/nav/Link"
 
 type PossibleSpawn = {
     dex: number;
@@ -65,11 +66,12 @@ export function PossibleSpawns(){
     return(
         <div className="flex  flex-wrap justify-center">
             {spawns?.map((spawn) => (
-                <Link key={spawn.species} className="flex flex-col items-center  hover:bg-main-400  rounded-sm text-center w-24 2xl:w-20   text-white" href={`/smartrotom/pokedex/entrada/${spawn.dex}/${spawn.form}`}>
+                <InternalLink key={spawn.species} className="flex flex-col items-center  hover:bg-main-400  rounded-sm text-center w-24 2xl:w-20   text-white"
+                 href={`/pokedex/entrada/${spawn.dex}/${spawn.form}`}>
                     <PokemonSprite id={spawn.dex} form={spawn.form} palette={spawn.palette} width={80} />
                     <div className="text-xs hidden 2xl:block">{getDisplayName(spawn.species, spawn.form, spawn.palette)}</div>
                     <div className=' font-bold text-xl 2xl:text-base'>{spawn.percentage.toFixed(4)} %</div>
-                </Link>
+                </InternalLink>
             ))    
             }
         </div>

@@ -56,6 +56,10 @@ export async function POST(url: string, data: any) {
   }
 }
 
+export async function apiGET(url: string) {
+  return await GET(`${process.env.NEXT_PUBLIC_API}${url}`)
+}
+
 export async function rotomGET(url: string) {
   return await GET(`${process.env.NEXT_PUBLIC_API}/smartrotom${url}`)
 }

@@ -5,6 +5,7 @@ import PokemonSearchBar from "./_components/PokemonSearchBar";
 import useTranslation from 'next-translate/useTranslation'
 import { PossibleSpawns } from "./_components/PossibleSpawns";
 import Link from "next/link";
+import { InternalLink } from "@/components/nav/Link";
 
 export default function PokedexMenu(){
     return (
@@ -18,7 +19,7 @@ export default function PokedexMenu(){
                 <PokedexSection title="Últimos Registros">
                     <LastRegistries />
                 </PokedexSection>
-                <PokedexSection title="Posibles Spawns" btn={<Link href={'/smartrotom/pokedex/spawns'}>Ver más</Link>}>
+                <PokedexSection title="Posibles Spawns" btn={<InternalLink href={'/pokedex/spawns'}>Ver más</InternalLink>}>
                     <PossibleSpawns />
                 </PokedexSection>
             </div>

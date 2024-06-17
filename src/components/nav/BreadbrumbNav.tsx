@@ -57,9 +57,22 @@ function rewrite(parts: string[], index: number){
 
 function navegar(router: AppRouterInstance, parts: string[], index: number, navigable: boolean){
     if(!navigable) return
-    if(index == 0) router.push('/smartrotom')
+    /*if(index == 0) router.push('/smartrotom')
     else {
         const path = '/' + parts.slice(0, index + 1).join('/')
         router.push(path)
-    }
+    }*/
+    const path = getHref('smartrotom', parts.slice(1, index + 1).join('/'))
+    router.push(path)
 }
+
+
+
+function getHref(subdomain: string, url: string) {
+    if (window.location.hostname.includes(subdomain)) {
+      return `/${url}`;
+    } else {
+      return `/${subdomain}/${url}`;
+    }
+  }
+  

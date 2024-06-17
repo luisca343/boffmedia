@@ -1,4 +1,5 @@
 "use client"
+import { InternalLink } from "@/components/nav/Link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import  Axios  from "axios"
@@ -47,17 +48,19 @@ export function Results({videos} : {videos: Video[]}) {
     
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                 {videos.map((video: Video) => {
-                  if(video.id.kind == 'youtube#video') return <Link key={video.id.videoId} className="flex flex-col items-center bg-slate-100 p-5 rounded-lg shadow-md" href={`youtube/${video.id.videoId}`}>
+                  if(video.id.kind == 'youtube#video') return <InternalLink key={video.id.videoId} className="flex flex-col items-center bg-slate-100 p-5 rounded-lg shadow-md" 
+                  href={`/youtube/${video.id.videoId}`}>
                     <img width={450} height={250} alt={video.snippet.title} className='w-full h-auto' src={`${video.snippet.thumbnails.high.url}`} />
                     <div className='text-lg font-bold mt-2'>{video.snippet.title}</div>
                     <div className='text-sm text-gray-800'>{video.snippet.channelTitle}</div>
-                  </Link>
+                  </InternalLink>
         
-                  return <Link key={video.id.videoId} className="flex flex-col items-center bg-slate-500 p-5 rounded-lg shadow-md" href={`youtube/playlist/${video.id.videoId}`}>
+                  return <InternalLink key={video.id.videoId} className="flex flex-col items-center bg-slate-500 p-5 rounded-lg shadow-md"
+                   href={`/youtube/playlist/${video.id.videoId}`}>
                     <img width={450} height={250} alt={video.snippet.title} className='w-full h-auto' src={`${video.snippet.thumbnails.high.url}`} />
                     <div className='text-lg font-bold mt-2'>{video.snippet.title}</div>
                     <div className='text-sm text-gray-800'>{video.snippet.channelTitle}</div>
-                  </Link>
+                  </InternalLink>
             })}
               </div>
     )

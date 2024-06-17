@@ -2,41 +2,42 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { BanknotesIcon, CalendarIcon, ChartBarIcon, ChevronRightIcon, ChevronUpIcon, CreditCardIcon, CurrencyYenIcon, HomeIcon, PresentationChartLineIcon, TicketIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { InternalLink } from '@/components/nav/Link';
 const items = [
   {
     text: 'General',
     icon: HomeIcon,
-    url: '/smartrotom/starbank/'
+    url: '/starbank/'
   },
   {
     text: 'Cuentas',
     icon: CreditCardIcon,
-    url: '/smartrotom/starbank/cuentas'
+    url: '/starbank/cuentas'
   },
   {
     text: 'Transacciones',
     icon: CurrencyYenIcon,
-    url: '/smartrotom/starbank/transacciones'
+    url: '/starbank/transacciones'
   },
   {
     text: 'Enviar Dinero',
     icon: BanknotesIcon,
-    url: '/smartrotom/starbank/enviar'
+    url: '/starbank/enviar'
   },
   {
     text: 'Facturas',
     icon: TicketIcon,
-    url: '/smartrotom/starbank/facturas'
+    url: '/starbank/facturas'
   },
   {
     text: 'Gráficas',
     icon: PresentationChartLineIcon,
-    url: '/smartrotom/starbank/graficas'
+    url: '/starbank/graficas'
   },
   {
     text: 'Calendario de Pagos',
     icon: CalendarIcon,
-    url: '/smartrotom/starbank/calendario'
+    url: '/starbank/calendario'
   }
 ]
 const containerVariants = {
@@ -78,7 +79,7 @@ const menuIconVariants = {
 }
 const MenuItem = ({ isOpened, i, item: { text, Icon, url } }: { isOpened: boolean, i: number, item: { text: string, Icon: any, url:string } }) => {
   return (
-    <Link href={url}>
+    <InternalLink href={url}>
       <motion.div 
         className="flex items-center text-blue-100  hover:text-blue-300 cursor-pointer " 
         variants={menuIconVariants}
@@ -99,7 +100,7 @@ const MenuItem = ({ isOpened, i, item: { text, Icon, url } }: { isOpened: boolea
           )}
         </AnimatePresence>
       </motion.div>
-    </Link>    
+    </InternalLink>    
   );
 }
 export const SideMenu = () => {

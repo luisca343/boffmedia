@@ -1,3 +1,5 @@
+const pages = ["battlesim", "smartrotom"]
+
 export const getValidSubdomain = (host?: string | null) => {
     let subdomain: string | null = null;
     if (!host && typeof window !== 'undefined') {
