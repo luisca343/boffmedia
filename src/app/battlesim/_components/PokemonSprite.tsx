@@ -1,6 +1,5 @@
 import { DetailedPokemon, Protocol } from "@pkmn/protocol";
 import { PokemonImage } from "./PokemonTeam";
-import { Pokemon } from "@pkmn/client";
 
 export default function PokemonSprite({pokemon, id, className}: {pokemon: DetailedPokemon | null, id: string, className?: string}) {
     if(!pokemon) return <div className={`w-48 h-48 absolute ${className}`} id={id} style={{width:200, height:200}}></div>
