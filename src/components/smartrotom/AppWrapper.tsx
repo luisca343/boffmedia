@@ -5,7 +5,7 @@ import RotomNav from "../nav/RotomNav";
 import { signIn } from "next-auth/react";
 import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
-import AuthForm from "@/app/auth/AuthForm";
+import AuthForm, { FormCenteredInPage } from "@/app/auth/AuthForm";
 import {  LoadingScreen } from "./Loading";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -68,7 +68,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       }
       
       if (status === "unauthenticated" && !isMC) {
-        return <AuthForm url="boffmedia" redirect="/smartrotom"/>
+        return <FormCenteredInPage url="boffmedia" redirect="/smartrotom"/>
       }
 
       function boffMediaLinked() {

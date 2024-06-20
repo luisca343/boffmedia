@@ -29,14 +29,16 @@ export default  function YoutubeResults({}) {
   const [videos, setVideos] = useState([] as Video[]);
 
   return (
-    <section className="flex flex-col items-center justify-center  bg-slate-800">
-      <Input value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+    <section className="flex flex-col items-center   bg-slate-800">
+      <Input value={busqueda} onChange={(e) => setBusqueda(e.target.value)}  className="self-start"/>
       <Button onClick={() => {
         Axios.get(`https://www.googleapis.com/youtube/v3/search?key=AIzaSyAZ2J63sHYEtl_kRmL69Wka0isKJG4mj2g&part=snippet&q=${busqueda}&maxResults=25`).then((res) => {
           setVideos(res.data.items);
         })
       }}>Buscar</Button>
-      {videos.length > 0 && <Results videos={videos} />}
+      <div className="flex flex-col items-center">
+        {videos.length > 0 && <Results videos={videos} />}
+      </div>
       
   </section>
   )
