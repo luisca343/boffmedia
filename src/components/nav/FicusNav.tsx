@@ -25,13 +25,8 @@ export function FicusNav() {
 
   //if (hide.includes(app)) return null
   return (
-    <nav className="bg-blue-500 p-4">
+    <nav className="bg-main-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <button className="text-white mx-1" onClick={() => signIn('google')}>Sign in</button>
-        <button className="text-white mx-1" onClick={() => signOut()}>Sign out</button>
-        <Link href="/" className="text-white text-lg font-bold">
-          Logo
-        </Link>
         <div>
           <Link href="/wingull" className="text-white mx-2">
             Pixelmon Wingull

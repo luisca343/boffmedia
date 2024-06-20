@@ -4,7 +4,7 @@ import { GlobalProviders } from "@/app/GlobalProviders"
 
 export function RotomNotFound(){ 
     return (
-        <main className={`roboto flex flex-col h-screen overflow-hidden  bg-rotom bg-center bg-no-repeat bg-cover bg-fixed`}>
+        <main className={`roboto flex flex-col h-screen overflow-hidden  bg-primary-400 bg-center bg-no-repeat bg-cover bg-fixed`}>
             <GlobalProviders>
                 <TooltipProvider>
                 <RotomNav setTema={() => null}/>

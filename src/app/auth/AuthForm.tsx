@@ -54,14 +54,13 @@ export default function AuthForm({redirect = '/', url='boffmedia'} : {url?: stri
 
     return (
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white w-96 p-10">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white w-1/2 p-10">
                     <FormField control={form.control} name="username" render={({field}) => (
                         <FormItem>
                             <FormLabel>Username</FormLabel>
                             <FormControl>
                                 <Input placeholder="Username" {...field} />
                             </FormControl>
-                            <FormDescription>El nombre de usuario que quieres usar</FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}/>
@@ -72,7 +71,6 @@ export default function AuthForm({redirect = '/', url='boffmedia'} : {url?: stri
                             <FormControl>
                                 <Input placeholder="Email" {...field} />
                             </FormControl>
-                            <FormDescription>El email que quieres usar</FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}/>
@@ -84,14 +82,22 @@ export default function AuthForm({redirect = '/', url='boffmedia'} : {url?: stri
                             <FormControl>
                                 <Input placeholder="Password" type="password" {...field} />
                             </FormControl>
-                            <FormDescription>La contraseña que quieres usar</FormDescription>
                             <FormMessage />
                         </FormItem>
                     )}/>
 
-
+                    
                     <Button type="submit">Enviar</Button>
                 </form>
             </Form>
+    )
+}
+
+
+export function FormCenteredInPage({redirect = '/', url='boffmedia'} : {url?: string, redirect?: string}) {
+    return (
+        <div className="flex h-full items-center justify-center bg-main-700 p-24">
+            <AuthForm redirect={redirect} url={url}/>
+        </div>
     )
 }
