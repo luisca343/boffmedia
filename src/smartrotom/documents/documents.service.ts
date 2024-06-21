@@ -9,6 +9,10 @@ export class DocumentsService {
         private db: MySQL2Service,
     ) {}
 
+    async getNews(){
+        return await this.db.getDrizzle().select().from(rotomDocuments).where(eq(rotomDocuments.type, 1)).orderBy(desc(rotomDocuments.updatedAt))
+    }
+
     async getNotes(uuid: string) {
         return (await this.db.getDrizzle().select({id: rotomDocuments.id, title: rotomDocuments.title, type: rotomDocuments.type, public: rotomDocuments.public, createdAt: rotomDocuments.createdAt, updatedAt: rotomDocuments.updatedAt}).from(rotomDocuments)
             .innerJoin(rotomDocumentsUsers, eq(rotomDocuments.id, rotomDocumentsUsers.documentId))
@@ -34,7 +38,7 @@ export class DocumentsService {
             .execute();
         } else {
             result = await this.db.getDrizzle().update(rotomDocuments)
-            .set({title, content, updatedAt: new Date()})
+            .set({title, content, type: documentType, updatedAt: new Date()})
             .where(eq(rotomDocuments.id, id))
             .execute();
         }
