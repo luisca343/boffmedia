@@ -13,7 +13,7 @@ export default function Note({params} : {params: {id: string}}){
   const [data, setData] = React.useState<any>(null);
 
   useEffect(() => {
-    const data = rotomGET(`/documents/${id}`)
+    rotomGET(`/documents/${id}`)
     .then((res) => {
       setData(res.content);
       //rewrite url
