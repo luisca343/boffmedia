@@ -12,7 +12,7 @@ async function bootstrap() {
   'https://boffmedia.es', 'http://local.boffmedia.es', 'http://smartrotom.local.boffmedia.es'
 ]
   app.enableCors({ origin }); // Enable CORS for the specified origin
-  app.use(bodyParser.json({ limit: '50mb' })); // Adjust the '50mb' as needed
+  app.use(bodyParser.json({ limit: '50mb' })); 
 
 
   const configService = app.get(ConfigService);

@@ -36,6 +36,7 @@ import { SmartrotomModule } from './smartrotom/smartrotom.module';
 import { BattleService } from './battlesimulator/battle/battle.service';
 import { BattleController } from './battlesimulator/battle/battle.controller';
 import { BattleModule } from './battlesimulator/battle/battle.module';
+import { SharexModule } from './sharex/sharex/sharex.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { BattleModule } from './battlesimulator/battle/battle.module';
     MisionesModule,
     SmartrotomModule,
     BattleModule,
+    SharexModule,
     
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController],
