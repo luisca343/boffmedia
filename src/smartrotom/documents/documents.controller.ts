@@ -6,9 +6,24 @@ export class DocumentsController {
     constructor(
         private documentsService: DocumentsService,
     ) {}
+    @Get('activeNews')
+    async getActiveNews(){
+        return await this.documentsService.getActiveNews()
+    }
+
+    @Post('activeNews')
+    async updateActiveNews(@Body() body: {id:number, newsId: number, newsData: {subtitle: string, image: string}}){
+        return await this.documentsService.updateActiveNews(body)
+    }
+
     @Get('news')
     async getNews(){
         return await this.documentsService.getNews()
+    }
+
+    @Get('news/:newsId')
+    async getNewsById(@Param('newsId') newsId: number){
+        return await this.documentsService.getNewsById(newsId)
     }
 
     @Get("all/:uuid")
