@@ -4,7 +4,6 @@ import {
     GraphicsGen, Icons, Sprites
   } from '@pkmn/img';
 import { DetailedPokemon } from "@pkmn/protocol";
-import Image from "next/image";
 export function PokemonTeam({team}: {team: Pokemon[]}){
     const teamSize = team.length > 6 ? team.length : 6;
     const halfTeamSize = Math.ceil(teamSize / 2);

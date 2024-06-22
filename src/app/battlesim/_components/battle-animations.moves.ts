@@ -51,13 +51,13 @@ export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: Pokemon
 		anim(scene, [attacker, defender]) {
 			attacker.anim({
 				x: defender.x(),
-				y: defender.y() - 40,
+				y: defender.y() + 80,
 				z: defender.behind(-30),
 				time: 400,
 			}, 'ballistic');
 			attacker.anim({
 				x: defender.x(),
-				y: defender.y() - 5,
+				y: defender.y() + 5,
 				z: defender.z(),
 				time: 100,
 			});
