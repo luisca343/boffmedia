@@ -4,7 +4,7 @@ import { smartrotomUsers } from "./SmartRotom";
 
 
 export const ficusMessages = mysqlTable("ficus_messages", {
-    uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    uuid: char("uuid", { length: 36 }),
     id: int("id").primaryKey().autoincrement(),
     content: json("content"),
     createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
