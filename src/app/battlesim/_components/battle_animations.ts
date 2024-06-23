@@ -276,6 +276,19 @@ const BattleEffects: {[k: string]: any} = {
       time?: number;
       display?: string;
   }
+  export class BG {
+	scene: Scene;
+	constructor(scene: Scene) {
+	  this.scene = scene;
+	}
+	showEffect(effect: string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void) {
+	  this.scene.showEffect(effect, start, end, transition, after, additionalCss, callback);
+	}
+  
+	animate(time: number, opacity: number) {
+		return this
+	}
+  }
   
 export class Scene {
     battle: Battle;
@@ -283,10 +296,12 @@ export class Scene {
     acceleration = 1;
     animating = false;
 	currentAnimations: any[] = [];
+	$bg: any;
     
     constructor(battle: Battle, gameElement: HTMLElement) {
       this.battle = battle
       this.gameElement = gameElement
+	  this.$bg = new BG(this);
     }
 
   getPokemonSpriteElement(id: string) {
@@ -566,6 +581,7 @@ export class PokemonSprite {
         element.style.display = tDisplay;
         element.style.transform = `scale(${tScale})`;
 
+		
 
         setTimeout(() => {
             element.style.left = `${tX - halfWidth}px`;
@@ -573,6 +589,7 @@ export class PokemonSprite {
             element.style.zIndex = `${tZ}`;
             element.style.opacity = `${tOpacity}`;
             element.style.transform = `scale(${tScale})`;
+
         }, 0);
         
 

@@ -22,12 +22,20 @@ export default function Pasaporte(){
               <div className="mb-4 text-center text-4xl  text-yellow-200 font-bold  opacity-80" style={{ mixBlendMode: 'normal' }}>Región de Teras</div>
             </Page>
             <Page>
+              Indice
+            </Page>
+            <Page>
               <div className="flex flex-col">
-                <div className="text-xl font-bold">Nombre: {username}</div>
-                <div className="text-xl font-bold">UUID: {uuid}</div>
+                <div className="flex">
+                  <div style={{width:'150px'}}>
+                    <img src={`https://crafatar.com/renders/body/${uuid}?overlay`} alt="description" />
+                  </div>
+                  <span className="text-xl font-bold">{username}</span>
+                  
+                </div>
+               
               </div>
             </Page>
-            <Page>Page 2</Page>
             <Page>Page 3</Page>
             <Page>Page 4</Page>
             <Page>Page 5</Page>

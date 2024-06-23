@@ -22,12 +22,14 @@ export default function Note({params} : {params: {id: string}}){
   }, [id]);
 
   return (
-  <div className='h-full border'>
-    <CustomEditor
-      initialData={data}
-      documentId={id}
-      documentType={0}
-    />
+    <div className='w-full h-full bg-main-800'>
+        <div className='h-full w-[70%] m-auto'>
+        <CustomEditor
+            initialData={data}
+            documentId={id}
+            documentType={1}
+        />
+    </div>
   </div>
   );
 }

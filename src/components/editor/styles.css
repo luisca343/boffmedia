@@ -29,9 +29,14 @@ main .ck-editor[role='application'] .ck.ck-content,
 	line-height: 1.6em;
 	
 	height: 100%;
-	padding: 1.5em 2em;
+	padding: .5em 2em;
 }
 
+.ck > h1 {
+	font-weight: bold;
+	text-decoration: underline;
+	margin-bottom: 1em;
+}
 
 .ck.ck-editor{
 	height: 95%;

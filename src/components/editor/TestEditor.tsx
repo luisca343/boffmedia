@@ -80,9 +80,14 @@ function CustomEditor( props ) {
                 editor={ Editor.Editor }
                 config={ editorConfiguration }
                 data={ props.initialData }
+                
                 onReady={ editor => {
                     console.log( 'Editor is ready to use!', editor );
                     const editorBarElement = document.querySelector( '.ck-toolbar__items' );
+                    if( props.readonly ){
+                        editor.enableReadOnlyMode("sdfsedgd");
+                        document.querySelector( '.ck-editor__top' )?.classList.add( 'hidden' );
+                    }
                     const newButton = document.createElement( 'button' );
                     newButton.innerHTML = '💾';
                     newButton.classList.add( 'ck-button' );
@@ -94,6 +99,7 @@ function CustomEditor( props ) {
                         rotomPOST( `/documents/save/${ props.documentId }`, { title, content: data, documentType: props.documentType} )
                     };
                     editorBarElement?.prepend( newButton );
+
                 
                 }}
                 onChange={ (event, editor ) => {
