@@ -22,11 +22,15 @@ export class SharexController {
 
         const app = fileName.split(".")[0].slice(0, -11);
         const extension = fileName.split('.').pop();
-        const newName = randomString(10)
+        let newName = randomString(10)
 
         const key = body.key;
 
         this.sharexService.createImage(app, newName, extension, key);
+
+        while(fs.existsSync(path.join(__dirname, '../../../../', 'public/smartrotom/img/sharex/' + newName + '.' + extension))) {
+            newName = randomString(10);
+        }
 
         
         const dir = path.join(__dirname, '../../../../', 'public/smartrotom/img/sharex');
