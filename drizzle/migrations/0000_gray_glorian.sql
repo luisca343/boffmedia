@@ -18,6 +18,16 @@ CREATE TABLE `ficus_messages` (
 	CONSTRAINT `ficus_messages_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `sharex_images` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`app` varchar(32) NOT NULL,
+	`name` char(10) NOT NULL,
+	`extension` varchar(4) NOT NULL,
+	`key` char(32) NOT NULL,
+	`created_at` timestamp DEFAULT CURRENT_TIMESTAMP(),
+	CONSTRAINT `sharex_images_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `rotom_apps` (
 	`id` int AUTO_INCREMENT NOT NULL,
 	`name` varchar(32) NOT NULL,
@@ -33,12 +43,45 @@ CREATE TABLE `rotom_user_apps` (
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_users` (
+	`id` int AUTO_INCREMENT NOT NULL,
 	`uuid` char(36) NOT NULL,
 	`username` varchar(32) NOT NULL,
 	`world` varchar(8),
 	`energy` int DEFAULT 10,
 	`last_charge` timestamp DEFAULT CURRENT_TIMESTAMP(),
-	CONSTRAINT `rotom_users_uuid` PRIMARY KEY(`uuid`)
+	CONSTRAINT `rotom_users_id` PRIMARY KEY(`id`),
+	CONSTRAINT `rotom_users_uuid_unique` UNIQUE(`uuid`)
+);
+--> statement-breakpoint
+CREATE TABLE `rotom_chat_message_reads` (
+	`message_id` int NOT NULL,
+	`uuid` varchar(36) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `rotom_chat_messages` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`chat_id` int NOT NULL,
+	`sender_uuid` varchar(36) NOT NULL,
+	`content` text NOT NULL,
+	`type` varchar(255) DEFAULT 'text',
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	CONSTRAINT `rotom_chat_messages_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `rotom_chat_users` (
+	`chat_id` int NOT NULL,
+	`uuid` varchar(36) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE `rotom_chats` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`type` int NOT NULL,
+	`name` varchar(255) NOT NULL,
+	`description` varchar(255) NOT NULL,
+	`image` varchar(255),
+	`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	`updated_at` timestamp,
+	CONSTRAINT `rotom_chats_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_documents` (
@@ -130,7 +173,3 @@ CREATE TABLE `wingull_invites` (
 	`deleted_at` datetime,
 	CONSTRAINT `wingull_invites_id` PRIMARY KEY(`id`)
 );
---> statement-breakpoint
-ALTER TABLE `boffmedia_users` ADD CONSTRAINT `boffmedia_users_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `ficus_messages` ADD CONSTRAINT `ficus_messages_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `rotom_user_apps` ADD CONSTRAINT `rotom_user_apps_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;

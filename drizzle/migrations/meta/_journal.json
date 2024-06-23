@@ -5,57 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1714833727932,
-      "tag": "0000_wealthy_night_thrasher",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1714988631010,
-      "tag": "0001_windy_magus",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1714989141493,
-      "tag": "0002_chubby_quasimodo",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1715186417599,
-      "tag": "0003_safe_lady_deathstrike",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1715186556525,
-      "tag": "0004_new_yellowjacket",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1715195476498,
-      "tag": "0005_sturdy_mattie_franklin",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1715590144608,
-      "tag": "0006_flashy_reptil",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1719076975139,
-      "tag": "0007_orange_bromley",
+      "when": 1719137734338,
+      "tag": "0000_gray_glorian",
       "breakpoints": true
     }
   ]

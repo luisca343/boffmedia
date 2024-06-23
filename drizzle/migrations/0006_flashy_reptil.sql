@@ -1,1 +1,0 @@
-ALTER TABLE `rotom_chat_messages` ADD `type` varchar(255) DEFAULT 'text';
