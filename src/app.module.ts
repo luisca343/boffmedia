@@ -31,11 +31,16 @@ import { ChatappService } from './smartrotom/chatapp/chatapp.service';
 import { ChatappModule } from './smartrotom/chatapp/chatapp.module';
 import { SocketsModule } from './smartrotom/sockets/sockets.module';
 import { MisionesModule } from './smartrotom/misiones/misiones.module';
-import { SmartrotomController } from './smartrotom/smartrotom.controller';
-import { SmartrotomModule } from './smartrotom/smartrotom.module';
+import { SmartrotomController } from './smartrotom/_main/smartrotom.controller';
+import { SmartrotomModule } from './smartrotom/_main/smartrotom.module';
 import { BattleService } from './battlesimulator/battle/battle.service';
 import { BattleController } from './battlesimulator/battle/battle.controller';
 import { BattleModule } from './battlesimulator/battle/battle.module';
+import { SharexModule } from './sharex/sharex/sharex.module';
+import { ArcadeModule } from './smartrotom/arcade/arcade.module';
+import { ArcadeController } from './smartrotom/arcade/arcade.controller';
+import { ArcadeService } from './smartrotom/arcade/arcade.service';
+import { PokemonService } from './smartrotom/pokemon/pokemon.service';
 
 @Module({
   imports: [
@@ -68,10 +73,11 @@ import { BattleModule } from './battlesimulator/battle/battle.module';
     MisionesModule,
     SmartrotomModule,
     BattleModule,
-    
+    SharexModule,
+    ArcadeModule,
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

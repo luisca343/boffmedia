@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { Server } from 'socket.io';
 import { ConfigService } from '@nestjs/config';
 import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
+const bodyParser = require('body-parser');
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,7 @@ async function bootstrap() {
   'https://boffmedia.es', 'http://local.boffmedia.es', 'http://smartrotom.local.boffmedia.es'
 ]
   app.enableCors({ origin }); // Enable CORS for the specified origin
+  app.use(bodyParser.json({ limit: '50mb' })); 
 
 
   const configService = app.get(ConfigService);

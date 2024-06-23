@@ -2,7 +2,8 @@ import { sql } from "drizzle-orm";
 import { char, int, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 export const smartrotomUsers = mysqlTable("rotom_users", {
-    uuid: char("uuid", { length: 36 }).notNull().primaryKey(),
+    id: int("id").primaryKey().autoincrement(),
+    uuid: char("uuid", { length: 36 }).notNull().unique(),
     username: varchar("username", { length: 32 }).notNull(),
     world: varchar("world", { length: 8 }),
     energy: int("energy").default(10),
@@ -21,7 +22,7 @@ export const smartrotomApps = mysqlTable("rotom_apps", {
 export type SmartRotomApp = typeof smartrotomApps.$inferSelect;
 
 export const smartrotomUserApps = mysqlTable("rotom_user_apps", {
-    uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    uuid: char("uuid", { length: 36 }),
     appId: int("app_id").notNull(),
     order: int("order").default(999),
 });
