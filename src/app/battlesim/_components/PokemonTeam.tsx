@@ -37,8 +37,9 @@ function PokemonSprite({pokemon}: {pokemon: Pokemon}){
 
     return (
         <div 
+        
             key={pokemon.name}
-            style={icon.css}
+            style={{...icon.css, width: 30, height: 30}}
         />
     )
 }
