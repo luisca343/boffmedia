@@ -51,7 +51,7 @@ export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: Pokemon
 		anim(scene, [attacker, defender]) {
 			attacker.anim({
 				x: defender.x(),
-				y: defender.y() + 80,
+				y: defender.y() - 80,
 				z: defender.behind(-30),
 				time: 400,
 			}, 'ballistic');
@@ -1046,10 +1046,10 @@ export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: Pokemon
 		},
 	},
 	dance: {
-		anim(scene, [attacker]) {
-			attacker.anim({x: attacker.x() - 10});
-			attacker.anim({x: attacker.x() + 10});
-			attacker.anim({x: attacker.x()});
+		async anim(scene, [attacker]) {
+			await attacker.anim({x: attacker.x() - 20});
+			await attacker.anim({x: attacker.x() + 20});
+			await attacker.anim({x: attacker.x()});
 		},
 	},
 	consume: {
