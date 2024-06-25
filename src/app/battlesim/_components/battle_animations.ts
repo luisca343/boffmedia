@@ -328,15 +328,17 @@ export class Scene {
 	}
 
 	async  playBattleAnim(anim: string, attacker: PokemonIdent, defender: PokemonIdent) {
-		if(this.animating) {
-			return;
-		}
-
 		this.animating = true;
 		
 		//const animFunc = BattleMoveAnims['contactattack'] || BattleOtherAnims['contactattack'];
 		const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
-		if (!animFunc) await this.playBattleAnim('contactattack', attacker, defender);
+		if(anim === 'faint'){
+			console.log('faint')
+		}
+		if (animFunc === undefined) {
+			await this.playBattleAnim('contactattack', attacker, defender);
+			return;
+		}
 
 		const attackerSprite = new PokemonSprite(this, attacker);
 		const defenderSprite = new PokemonSprite(this, defender);
@@ -349,9 +351,11 @@ export class Scene {
 		// Use Promise.all to wait for all animations to complete
 		return await Promise.all(this.currentAnimations).then(() => {
 			this.currentAnimations = [];
-			console.log('All animations completed, playing the go back animation');
-			console.log(attackerSprite)
 		
+			if(anim === 'faint') {
+				console.log('Faint animation completed');
+				return;
+			}
 			return new Promise<void>((resolve) => {
 				attackerSprite.anim({
 					x: attackerPos.x,
@@ -450,6 +454,7 @@ export class Scene {
 	async showEffect(effect: string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void) {
 		const effectData = BattleEffects[effect];
 		if (!effectData) return;
+
 	
 		const element = document.createElement('img');
 		element.src = effectData.url;
@@ -493,6 +498,8 @@ export class Scene {
 		// Wait for the animation to complete before executing the callback
 		const prom = new Promise<void>(resolve => setTimeout(() => {
 			resolve();
+
+			
 		}, animationTime + 300));
 	
 		this.currentAnimations.push(prom);
@@ -513,12 +520,12 @@ export class Scene {
 					x: startX,
 					y: startY,
 					scale: .7,
-					time: 300 / this.acceleration,
+					time: 500 / this.acceleration,
 				  }, {
 					opacity: 0,
 					x: element.x,
 					y: element.y,
-					time: 700 / this.acceleration,
+					time: 1000 / this.acceleration,
 				  }, 'ballistic2', '', '', callback); 
 			}
 		} 
@@ -544,7 +551,6 @@ export class PokemonSprite {
         if(!this.element) return;
     }
 	anim(transition: ScenePos, type?: string, callback?: () => void){
-		console.log(this.animationQueue.length)
 		if(this.animationQueue.length > 0) {
 			this.animationQueue.push({transition, type, callback});
 			return;
@@ -556,12 +562,9 @@ export class PokemonSprite {
 	}
 
 	async animOld(transition: ScenePos, type?: string, callback?: () => void) {
-		console.log('anim called');
-		console.log(transition);
 		this.scene.animating = true;
 	
 		const element = document.getElementById(this.position);
-		console.log(element);
 		if (!element) return;
 		const animationTime = transition.time || 500;
 	
@@ -570,6 +573,8 @@ export class PokemonSprite {
 		const x1 = transition.x || startingPosition.x as number;
 		const y1 = transition.y || startingPosition.y as number;
 		const z1 = transition.z || startingPosition.z as number;
+
+		const opacity = transition.opacity !== undefined ? transition.opacity : 1;
 	
 		const halfWidth = parseInt(element.style.width) / 2;
 		const halfHeight = parseInt(element.style.height) / 2;
@@ -580,7 +585,7 @@ export class PokemonSprite {
 		element.style.left = `${x1 - halfWidth}px`;
 		element.style.top = `${y1 - halfHeight}px`;
 		element.style.zIndex = `${z1}`;
-		element.style.opacity = `${transition.opacity || 1}`;
+		element.style.opacity = `${opacity}`;
 		element.style.transform = `scale(${transition.scale || 1})`;
 
 		const animId = Math.random().toString(36).substring(7);

@@ -16,6 +16,15 @@ import { PokemonSprite, Scene} from './battle_animations';
 
 
 export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: PokemonSprite[]) => void}} = {
+	faint:{
+		anim(scene, [attacker]) {
+			attacker.anim({
+				opacity: 0,
+				scale: 0.5,
+				time: 500,
+			}, 'linear');
+		},
+	},
 	hitmark: {
 		anim(scene, [attacker]) {
 			scene.showEffect('hitmark', {
