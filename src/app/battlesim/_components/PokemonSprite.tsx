@@ -3,24 +3,45 @@ import { PokemonImage } from "./PokemonTeam";
 import { Pokemon } from "@pkmn/client";
 import './test.css'; // Assuming your CSS is in this file
 
-export function HpBar({pokemon, className}: {pokemon: DetailedPokemon, className?: string}) {
+export function HpBar({pokemon, className}: {pokemon: Pokemon, className?: string}) {
+    if(!pokemon) return <div className={`w-full border border-black rounded-md overflow-hidden text-xs ${className}`} style={{height: 16, width: "100%", backgroundColor: "gray"}}></div>
+
     const hpPercent = Math.floor((pokemon.hp / pokemon.maxhp) * 100);
+    
 
     // Function to calculate color based on hpPercent
     const getHpColor = (percent: number) => {
-        if (percent > 50) return `rgb(${255 - ((percent - 50) * 5.1)}, 204, 0)`; // Green to Yellow
-        return `rgb(255, ${204 * (percent / 50)}, 0)`; // Yellow to Red
+        if (percent > 50) return `rgb(${255 - ((percent - 50) * 5.1)}, 255, 77)`; // Green to Yellow
+        return `rgb(255, ${percent * 5.1}, 77)`; // Yellow to Red
     };
 
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex w-full border border-black rounded-md overflow-hidden text-xs ${className}`} style={{height: 16, width: "100%", backgroundColor: "gray"}}>
-            <div className="h-full hp-bar" style={{width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}>
-                <span className="text-black">{pokemon.hp}/{pokemon.maxhp}</span>
+        <div className={`flex justify-between w-full  rounded-md overflow-hidden text-xs  bg-slate-800 ${className}`} style={{height: 16, width: "100%"}}>
+            <div className="hp-bar rounded-r-xl" style={{height: 16,width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
+           
+            <div className="w-[20%]  text-white text-end" style={{fontSize:'9px'}}>
+                {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}% 
             </div>
         </div>
     );
+}
+
+export function PokemonStatusBadge({status}: {status: string}){
+    const statusColors = {
+        'slp': {backgroundColor: 'purple', textColor: 'white'},
+        'brn': {backgroundColor: 'red', textColor: 'white'},
+        'par': {backgroundColor: 'yellow', textColor: 'white'},
+        'frz': {backgroundColor: 'blue', textColor: 'white'},
+        'psn': {backgroundColor: 'purple', textColor: 'white'},
+        'tox': {backgroundColor: 'purple', textColor: 'white'},
+    } as {[key: string]: {backgroundColor: string, textColor: string}}
+    const color = statusColors[status];
+    return <span className={`border-2 font-bold text-xs text-white bg-${status} pl-1 pr-1 rounded text-shadow-border1`} 
+        style={{backgroundColor: color.backgroundColor, color: color.textColor}}>
+            {status}
+    </span>
 }
 
 export default function PokemonSprite({pokemon, id, className}: {pokemon: Pokemon | null, id: string, className?: string}) {
@@ -39,7 +60,7 @@ export default function PokemonSprite({pokemon, id, className}: {pokemon: Pokemo
                 <HpBar pokemon={pokemon} />
             </div>
             <div className="flex flex-wrap py-1">
-                {pokemon.status && <span className="border-2 text-white border-black bg-black mx-1 rounded-md text-xs">{pokemon.status}</span>}
+                {pokemon.status && <PokemonStatusBadge status={pokemon.status} />}
                 {Object.entries(pokemon.boosts).map(([key, value]) => {
                     const multiplier = getBoostMultiplier(value)
                     if(multiplier === 1) return null;
