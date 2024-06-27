@@ -48,7 +48,7 @@ export function PokemonTeamList({team}: {team: Pokemon[]}) {
                          <br/>
                          <div>HP: {pokemon.hp > 0 ? pokemon.hp / pokemon.maxhp * 100 : 0}%</div>
                          <span className="flex">Possible abilities: {pokemon.species.abilities[0]} {pokemon.species.abilities[1] && pokemon.species.abilities[1]} {pokemon.species.abilities.H && pokemon.species.abilities.S}</span>
-                        <span className="flex">Speed: {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, .9, 0,0 )} - {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, 1.1, 31, 252)} </span>
+                        <span className="flex">Speed: {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, .9, 0,0 )} - {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, 1.1, 31, 252)} </span>   
                         {pokemon.movesUsedWhileActive.map(move => <div key={move}>{move}</div>)}
                         {pokemon.teraType && <div className="flex">Tera Type: {pokemon.teraType}</div>}
                     </HoverCardContent>

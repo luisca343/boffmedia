@@ -1,320 +1,396 @@
 // @ts-nocheck
 "use client"
-import { apiGET } from "@/services/boffAPI";
-import { PokemonImage, PokemonTeam, PokemonTeamList } from "../_components/PokemonTeam";
-import { Battle, Pokemon, Side } from "@pkmn/client"
-import { DetailedPokemon, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol"
-import { useEffect, useRef, useState } from "react";
+import { Battle } from "@pkmn/client"
+import { Protocol } from "@pkmn/protocol"
 import { Dex } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
-import GameCanvas from "../_components/GameCanvas";
-import { PokemonSprite, Scene } from "../_components/battle_animations";
-import { Input } from "@/components/ui/input";
-import { time } from "console";
+import PokemonSprite from "../_components/PokemonSprite";
+import { PokemonTeamList } from "../_components/PokemonTeam";
 
 let battle = new Battle(new Generations(Dex as any))
 
-
-
-
-
-/*
-
-		this.scene.showEffect('pokeball', {
-			opacity: 1,
-			x: this.x,
-			y: this.y - 40,
-			z: this.z,
-			scale: .7,
-			time: 300 / this.scene.acceleration,
-		}, {
-			opacity: 0,
-			x: this.x,
-			y: this.y,
-			z: this.behind(50),
-			time: 700 / this.scene.acceleration,
-		}, 'ballistic2');
-
-*/
-
-
 export default function Test() {
-  // position is the side + the position in the team
-  const [pokemon, setPokemon]  = useState({} as { [position: string]: Pokemon | null })
-  const [pokemonUpdates, setPokemonUpdates] = useState([]);
-  const [activeMessages, setActiveMessages] = useState([]);
-  const [turnInput, setTurnInput] = useState(0);
+  const replay = `|j|☆Rougewings
+|j|☆Luisca343
+|t:|1719248338
+|gametype|doubles
+|player|p1|Rougewings|170|1047
+|player|p2|Luisca343|266|1069
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|[Gen 9] Random Doubles Battle
+|rated|
+|rule|Species Clause: Limit one of each Pokémon
+|rule|HP Percentage Mod: HP is shown in percentages
+|rule|Illusion Level Mod: Illusion disguises the Pokémon's true level
+|rule|Sleep Clause Mod: Limit one foe put to sleep
+|
+|t:|1719248338
+|start
+|switch|p1a: Flamigo|Flamigo, L84, M|275\/275
+|switch|p1b: Shaymin|Shaymin-Sky, L77|281\/281
+|switch|p2a: Breloom|Breloom, L84, M|238\/238
+|switch|p2b: Ampharos|Ampharos, L87, M|298\/298
+|turn|1
+|
+|t:|1719248375
+|move|p1b: Shaymin|Protect|p1b: Shaymin
+|-singleturn|p1b: Shaymin|Protect
+|move|p2a: Breloom|Protect|p2a: Breloom
+|-singleturn|p2a: Breloom|Protect
+|move|p1a: Flamigo|U-turn|p2a: Breloom
+|-activate|p2a: Breloom|move: Protect
+|move|p2b: Ampharos|Thunder Wave|p1b: Shaymin
+|-activate|p1b: Shaymin|move: Protect
+|
+|upkeep
+|turn|2
+|
+|t:|1719248399
+|switch|p2a: Dondozo|Dondozo, L85, F|394\/394
+|move|p1b: Shaymin|Air Slash|p2a: Dondozo
+|-damage|p2a: Dondozo|311\/394
+|-damage|p1b: Shaymin|253\/281|[from] item: Life Orb
+|move|p1a: Flamigo|U-turn|p2a: Dondozo
+|-damage|p2a: Dondozo|243\/394
+|inactive|Battle timer is ON: inactive players will automatically lose when time's up. (requested by Rougewings)
+|
+|t:|1719248429
+|switch|p1a: Arceus|Arceus-Grass, L74|300\/300|[from] U-turn
+|move|p2b: Ampharos|Thunder Wave|p1b: Shaymin
+|-status|p1b: Shaymin|par
+|
+|upkeep
+|turn|3
+|
+|t:|1719248448
+|switch|p2a: Breloom|Breloom, L84, M|238\/238
+|move|p1a: Arceus|Judgment|p2a: Breloom
+|-resisted|p2a: Breloom
+|-damage|p2a: Breloom|167\/238
+|move|p2b: Ampharos|Thunderbolt|p1b: Shaymin
+|-damage|p1b: Shaymin|108\/281 par
+|move|p1b: Shaymin|Tailwind|p1b: Shaymin
+|-sidestart|p1: Rougewings|move: Tailwind
+|
+|upkeep
+|turn|4
+|
+|t:|1719248468
+|move|p1b: Shaymin|Protect|p1b: Shaymin
+|-singleturn|p1b: Shaymin|Protect
+|move|p2a: Breloom|Protect|p2a: Breloom
+|-singleturn|p2a: Breloom|Protect
+|move|p1a: Arceus|Judgment|p2b: Ampharos
+|-damage|p2b: Ampharos|178\/298
+|move|p2b: Ampharos|Thunderbolt|p1b: Shaymin
+|-activate|p1b: Shaymin|move: Protect
+|
+|upkeep
+|turn|5
+|
+|t:|1719248489
+|switch|p2a: Forretress|Forretress, L90, M|281\/281
+|move|p1a: Arceus|Judgment|p2b: Ampharos
+|-damage|p2b: Ampharos|73\/298
+|-enditem|p2b: Ampharos|Sitrus Berry|[eat]
+|-heal|p2b: Ampharos|147\/298|[from] item: Sitrus Berry
+|move|p1b: Shaymin|Air Slash|p2a: Forretress
+|-damage|p2a: Forretress|160\/281
+|-damage|p1b: Shaymin|80\/281 par|[from] item: Life Orb
+|move|p2b: Ampharos|Thunderbolt|p1b: Shaymin
+|-damage|p1b: Shaymin|0 fnt
+|faint|p1b: Shaymin
+|
+|-heal|p2a: Forretress|177\/281|[from] item: Leftovers
+|upkeep
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248509
+|switch|p1b: Umbreon|Umbreon, L86, F|304\/304
+|turn|6
+|
+|t:|1719248522
+|move|p1a: Arceus|Judgment|p2b: Ampharos
+|-damage|p2b: Ampharos|30\/298
+|move|p1b: Umbreon|Snarl|p2b: Ampharos|[spread] p2a,p2b
+|-damage|p2a: Forretress|135\/281
+|-damage|p2b: Ampharos|0 fnt
+|-unboost|p2a: Forretress|spa|1
+|faint|p2b: Ampharos
+|move|p2a: Forretress|Body Press|p1b: Umbreon
+|-supereffective|p1b: Umbreon
+|-damage|p1b: Umbreon|146\/304
+|-enditem|p1b: Umbreon|Sitrus Berry|[eat]
+|-heal|p1b: Umbreon|222\/304|[from] item: Sitrus Berry
+|
+|-heal|p2a: Forretress|152\/281|[from] item: Leftovers
+|-sideend|p1: Rougewings|move: Tailwind
+|upkeep
+|inactive|Luisca343 has 120 seconds left.
+|
+|t:|1719248554
+|switch|p2b: Tornadus|Tornadus-Therian, L78, M|251\/251
+|turn|7
+|
+|t:|1719248569
+|move|p2b: Tornadus|Bleakwind Storm|p1a: Arceus|[spread] p1a,p1b
+|-supereffective|p1a: Arceus
+|-damage|p1a: Arceus|100\/300
+|-damage|p1b: Umbreon|138\/304
+|-unboost|p1a: Arceus|spe|1
+|move|p1b: Umbreon|Thunder Wave|p2b: Tornadus
+|-status|p2b: Tornadus|par
+|move|p1a: Arceus|Will-O-Wisp|p2a: Forretress
+|-status|p2a: Forretress|brn
+|move|p2a: Forretress|Body Press|p1b: Umbreon
+|-supereffective|p1b: Umbreon
+|-damage|p1b: Umbreon|67\/304
+|
+|-heal|p2a: Forretress|169\/281 brn|[from] item: Leftovers
+|-damage|p2a: Forretress|152\/281 brn|[from] brn
+|upkeep
+|turn|8
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248604
+|move|p1b: Umbreon|Foul Play|p2b: Tornadus
+|-damage|p2b: Tornadus|128\/251 par
+|move|p1a: Arceus|Tailwind|p1a: Arceus
+|-sidestart|p1: Rougewings|move: Tailwind
+|move|p2a: Forretress|Iron Defense|p2a: Forretress
+|-boost|p2a: Forretress|def|2
+|move|p2b: Tornadus|Bleakwind Storm|p1b: Umbreon|[spread] p1a,p1b
+|-supereffective|p1a: Arceus
+|-damage|p1a: Arceus|0 fnt
+|-damage|p1b: Umbreon|0 fnt
+|faint|p1a: Arceus
+|faint|p1b: Umbreon
+|
+|-heal|p2a: Forretress|169\/281 brn|[from] item: Leftovers
+|-damage|p2a: Forretress|152\/281 brn|[from] brn
+|upkeep
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248620
+|switch|p1a: Azelf|Azelf, L83|260\/260
+|switch|p1b: Flamigo|Flamigo, L84, M|275\/275
+|turn|9
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248649
+|switch|p2b: Breloom|Breloom, L84, M|167\/238
+|move|p1a: Azelf|Psychic|p2b: Breloom
+|-supereffective|p2b: Breloom
+|-damage|p2b: Breloom|0 fnt
+|faint|p2b: Breloom
+|-damage|p1a: Azelf|234\/260|[from] item: Life Orb
+|move|p1b: Flamigo|Close Combat|p2a: Forretress
+|-damage|p2a: Forretress|86\/281 brn
+|-unboost|p1b: Flamigo|def|1
+|-unboost|p1b: Flamigo|spd|1
+|move|p2a: Forretress|Thunder Wave|p1b: Flamigo
+|-status|p1b: Flamigo|par
+|
+|-heal|p2a: Forretress|103\/281 brn|[from] item: Leftovers
+|-damage|p2a: Forretress|86\/281 brn|[from] brn
+|upkeep
+|inactive|Luisca343 has 120 seconds left.
+|
+|t:|1719248666
+|switch|p2b: Tornadus|Tornadus-Therian, L78, M|211\/251 par
+|turn|10
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248690
+|-terastallize|p2b: Tornadus|Flying
+|move|p1a: Azelf|Protect|p1a: Azelf
+|-singleturn|p1a: Azelf|Protect
+|move|p1b: Flamigo|Close Combat|p2a: Forretress
+|-damage|p2a: Forretress|19\/281 brn
+|-unboost|p1b: Flamigo|def|1
+|-unboost|p1b: Flamigo|spd|1
+|move|p2a: Forretress|Thunder Wave|p1a: Azelf
+|-activate|p1a: Azelf|move: Protect
+|move|p2b: Tornadus|Bleakwind Storm|p1a: Azelf|[spread] p1b
+|-activate|p1a: Azelf|move: Protect
+|-supereffective|p1b: Flamigo
+|-damage|p1b: Flamigo|0 fnt
+|faint|p1b: Flamigo
+|
+|-heal|p2a: Forretress|36\/281 brn|[from] item: Leftovers
+|-damage|p2a: Forretress|19\/281 brn|[from] brn
+|upkeep
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248707
+|switch|p1b: Persian|Persian, L93, M|272\/272
+|turn|11
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248727
+|move|p1b: Persian|Knock Off|p2a: Forretress
+|-damage|p2a: Forretress|0 fnt
+|-enditem|p2a: Forretress|Leftovers|[from] move: Knock Off|[of] p1b: Persian
+|faint|p2a: Forretress
+|move|p1a: Azelf|Psychic|p2b: Tornadus
+|-damage|p2b: Tornadus|55\/251 par
+|-damage|p1a: Azelf|208\/260|[from] item: Life Orb
+|move|p2b: Tornadus|Bleakwind Storm|p1b: Persian|[spread] p1b
+|-miss|p2b: Tornadus|p1a: Azelf
+|-damage|p1b: Persian|88\/272
+|
+|-sideend|p1: Rougewings|move: Tailwind
+|upkeep
+|
+|t:|1719248745
+|switch|p2a: Dondozo|Dondozo, L85, F|243\/394
+|turn|12
+|inactive|Rougewings has 120 seconds left.
+|
+|t:|1719248779
+|switch|p2b: Eiscue|Eiscue, L89, M|278\/278
+|-terastallize|p1b: Persian|Normal
+|move|p1b: Persian|Double-Edge|p2a: Dondozo
+|-damage|p2a: Dondozo|91\/394
+|-damage|p1b: Persian|38\/272|[from] Recoil
+|move|p1a: Azelf|Psychic|p2b: Eiscue
+|-damage|p2b: Eiscue|129\/278
+|-enditem|p2b: Eiscue|Sitrus Berry|[eat]
+|-heal|p2b: Eiscue|198\/278|[from] item: Sitrus Berry
+|-damage|p1a: Azelf|182\/260|[from] item: Life Orb
+|move|p2a: Dondozo|Wave Crash|p1a: Azelf
+|-damage|p1a: Azelf|32\/260
+|-damage|p2a: Dondozo|41\/394|[from] Recoil
+|
+|upkeep
+|turn|13
+|
+|t:|1719248809
+|move|p2b: Eiscue|Protect|p2b: Eiscue
+|-singleturn|p2b: Eiscue|Protect
+|move|p1b: Persian|Knock Off|p2b: Eiscue
+|-activate|p2b: Eiscue|move: Protect
+|move|p1a: Azelf|Dazzling Gleam|p2a: Dondozo|[spread] p2a
+|-activate|p2b: Eiscue|move: Protect
+|-damage|p2a: Dondozo|0 fnt
+|faint|p2a: Dondozo
+|-damage|p1a: Azelf|6\/260|[from] item: Life Orb
+|
+|upkeep
+|inactive|Luisca343 has 120 seconds left.
+|
+|t:|1719248819
+|switch|p2a: Tornadus|Tornadus-Therian, L78, M, tera:Flying|138\/251 par
+|turn|14
+|
+|t:|1719248836
+|move|p1b: Persian|Knock Off|p2a: Tornadus
+|-crit|p2a: Tornadus
+|-damage|p2a: Tornadus|28\/251 par
+|-enditem|p2a: Tornadus|Choice Specs|[from] move: Knock Off|[of] p1b: Persian
+|move|p1a: Azelf|Dazzling Gleam|p2a: Tornadus|[spread] p2a,p2b
+|-damage|p2a: Tornadus|0 fnt
+|-damage|p2b: Eiscue|138\/278
+|faint|p2a: Tornadus
+|-damage|p1a: Azelf|0 fnt|[from] item: Life Orb
+|faint|p1a: Azelf
+|move|p2b: Eiscue|Ice Spinner|p1b: Persian
+|-damage|p1b: Persian|0 fnt
+|faint|p1b: Persian
+|
+|win|Luisca343
+|raw|Rougewings's rating: 1047 &rarr; <strong>1031<\/strong><br \/>(-16 for losing)
+|raw|Luisca343's rating: 1069 &rarr; <strong>1097<\/strong><br \/>(+28 for winning)`
+
+
+  const battle = new Battle(new Generations(Dex as any))
+  //Separate replay into lines
+  const lines = replay.split('\n')
+  const line0 = lines[0]
   
-
-
-  const [log, setLog] = useState([] as any[])
-  const [scene, setScene] = useState({} as Scene)
-
-  const [attack, setAttack] = useState('contactattack') as string
-  
-  const logRef = useRef(null);
-
-  useEffect(() => {
-    if (logRef.current) {
-      logRef.current.scrollTop = logRef.current.scrollHeight;
+  for(const line of lines) {
+    const {args, kwArgs} = Protocol.parseBattleLine( line)
+    console.log(args, kwArgs)
+    battle.add(args, kwArgs)
+    if(args[0] === 'turn' && args[1] === '3') {
+      break
     }
-  }, [log]);
+  }
 
-  useEffect(() => {
-    if (pokemonUpdates.length > 0) {
-      const [firstUpdate, ...remainingUpdates] = pokemonUpdates;
-      setPokemon(firstUpdate);
-      setPokemonUpdates(remainingUpdates);
-    }
-  }, [pokemonUpdates]);
-  
-
-
-  const [partida, setPartida] = useState({} as {team1: Pokemon[], team2: Pokemon[], 
-    
-    log: {
-      [turn: number]: { 
-        events: { args: string[]; kwArgs: { [k: string]: any; }, text: string, line: string }[]; 
-        t1: { gen: number; w: number; h: number; url: string; pixelated: boolean; }; 
-        t2: { gen: number; w: number; h: number; url: string; pixelated: boolean; }; 
+  /*
+  lines.map((line) => {
+    const {args, kwArgs} = Protocol.parseBattleLine( line)
+      //console.log(args, kwArgs)
+      battle.add(args, kwArgs)
+      if(args[0] === 'turn') {
+        return
       }
-    }
-  
-  }
-  )
-  const [turn, setTurn] = useState(0)
-  const [teamSize, setTeamSize] = useState(1)
-
-  useEffect(() => {
-    apiGET('/battlesimulator/battle').then(data => {
-      setPartida(data)
-    })
-
-    const gens = new Generations(Dex as any);
-    
-  }, [])
-
-  useEffect(() => {
-    if(turn === 0) return
-    
-    testAttack();
-  }, [turn])
-
-  useEffect(() => {
-    if(!partida.log) return
-    
-    const gameElement = document.querySelector('#game') as HTMLElement;
-    const battleScene = new Scene(battle, gameElement);
-    setScene(battleScene);
-  }, [partida])
-
-  if(!partida.log) return <div>loading...</div>
-
-  function updateMessage(message: string, replace?: boolean) {
-    // If keep is true, append the message to the log, then we set a 1000ms timeout to remove it.
-    if(!replace) {
-      setActiveMessages(activeMessages => [...activeMessages, message]);
-    } else {
-      setActiveMessages([message]);
-    }
-  }
-
-  async function testAttack() {
-  
-  
-    /*
-    console.log(`==================== TURN ${turn} ====================`)
-    console.log(partida.log[turn].events.length)
-    console.log(partida.log[turn].events)*/
-
-    if(!partida.log[turn]) {
-      setLog(prevLog => [...prevLog, 'End of battle']);
-      return
-    }
-
-    for (let index = 0; index < partida.log[turn].events.length; index++) {
-      await performAction(index);
-    }
-    
-
-    /*
-    console.log('==================== END TURN ====================')
-    console.log(battle)
-    console.log('==================== END UPDATE ====================')
-    console.log(battle)*/
-    
-    if(turn < 2) {
-      setTurn(turn + 1);
-    }
-    //setTurn(turn + 1);
-  }
-
-  function test2(battle: Battle) {
-    console.log(attack)
-    scene.playBattleAnim(attack,'p1a' as PokemonIdent, 'p2b' as PokemonIdent);
-  }
-
-  function playAudio(url) {
-    return new Promise((resolve, reject) => {
-      const audio = new Audio(url);
-      audio.volume = 0.5;
-      audio.play().then(() => {
-        audio.onended = () => {
-          resolve();
-        };
-      }).catch((error) => {
-        console.error('Error playing audio:', error);
-        reject(error);
-      });
-    });
-  }
-
-  async function performAction(index: number = 0) {
-        const delay = ms => new Promise(res => setTimeout(res, ms));
-        let replaceMessages = false;
-
-          // check if scene is paused
-          while(scene.paused) {
-            console.log('paused')
-            await delay(50);
-          }
-          //console.log(`----- EVENT ${index} -----`)
-          let timeout = 0
-          const event = partida.log[turn].events[index];
-          const {args, kwArgs, text, line} = event;
-          console.log(args, kwArgs, text)
-          
-          if(text !=='') {
-            timeout = 200;
-            setLog(prevLog => [...prevLog, text]);
-          }
-          if(args[0] === 'move'){
-            const poke = battle.getPokemon(args[1]);
-            const move = battle.get("moves", args[2]);
-            const poke2 = battle.getPokemon(args[3]);
-            const attack = Dex.moves.get(move.id);
-            if(args[3] === ""){
-              args[3] = args[1].includes('p1') ? 'p2a' : 'p1a';
-            }
-    
-            await scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, args[3].split(':')[0] as PokemonIdent)
-            timeout = 500 / scene.acceleration;
-            replaceMessages = true;
-            
-          }
-          if(args[0] === 'boost'){
-            console.log('boost', args)
-            return
-          }
-          battle.add(line);
-          if(args[0] === 'switch') {
-            replaceMessages = true;
-            timeout = 1500 / scene.acceleration;
-            const [, positionIdent, pokemonDetails, hpstatus] = args as [string, PokemonIdent, PokemonDetails, PokemonHPStatus]
-            const pos = positionIdent.split(':')[0];
-            const name = pokemonDetails.split(',')[0];
-    
-            const pokemon = battle.getPokemon(positionIdent);
-            
-            
-            const detailedPokemon = Protocol.parseDetails(name, positionIdent, pokemonDetails);
-        
-            await scene.playEffect('pokeball', positionIdent, async() => {
-              setPokemon(prevPokemon => {
-                return {...prevPokemon, [pos]: pokemon};
-              });
-              const audio = new Audio('/battlesim/audio/cries/mewtwo.mp3');
-              // After setting the Pokemon, play the audio
-              console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.id.toLowerCase()}.mp3`)
-              return await playAudio(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.id.toLowerCase()}.mp3`);
-            });
-          }
-    
-          if(args[0] === 'faint'){+
-            replaceMessages = true;
-            const [, positionIdent] = args as [string, PokemonIdent]
-            const pokemon = battle.getPokemon(positionIdent);
-            const pos = positionIdent.split(':')[0];
-            const element = scene.getPosition(pos);
-    
-            if(element){
-              const startY = pos.includes('p1') ? element.y + 40 : element.y - 40;
-              const startX = pos.includes('p1') ? element.x -150 : element.x + 150;
-
-              await scene.playBattleAnim('faint', pos as PokemonIdent, pos.includes('p1') ? 'p2a' : 'p1a');
-
-
-    
-              await scene.playEffect('pokeball', pos, () => {
-                setPokemon(prevPokemon => {
-                  return {...prevPokemon, [pos]: null};
-                });
-              });
-            }
-          }
-          if(args[0] === '-damage') {
-            timeout = 500 / scene.acceleration;
-          }
-
-          updateMessage(text, replaceMessages);
-          battle.currentWeather();
-          battle.update();
-
-          await delay(timeout);
-  }
-
-
-  function changeView() {
-    
-  }
-
-  function changeTurn() {
-    setTurn(turnInput);
-  }
-
-  return ( <section className="flex flex-col  w-full h-full">
-    <div className="flex relative">
-      <div className='flex  justify-evenly aspect-[16/4] relative'
-      //background-image:url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-darkmeadow.jpg);display:block;opacity:0.8
-      style={{backgroundImage: `url(https://i.imgur.com/qnB4MXd.png)`, backgroundSize: 'cover', width:' 900px', height: '450px', zIndex:'0'}}
-      >
-        <div className="w-[30%] flex flex-col  bg-slate-800 justify-end bg-opacity-60 p-2 text-center">
-        <PokemonTeamList team={battle.sides[0].team} />
-            <div className="text-shadow-border1 text-white">{battle.sides[0].name}</div>
-            <img className="mx-auto" style={{height:'100px', width:'45px'}} src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4" />
-            
-        </div>
-        <GameCanvas pokemon={pokemon} battle={battle}/>
-        <div className="w-[30%] flex flex-col bg-slate-800  bg-opacity-60 p-2 text-center">
-        <div className="text-shadow-border1 text-white">{battle.sides[1].name}</div>
-        <img className="mx-auto" style={{height:'100px', width:'45px', transform: 'scaleX(-1)'}} src="https://crafatar.com/renders/body/e4f3e314-ea7f-4ef6-aa5b-06162c5bf7f6" />
-          
-        <PokemonTeamList team={battle.sides[1].team} />
-        </div>
-      </div>
-
-        <div className="w-[400px] h-[450px] overflow-auto  bg-slate-800 text-slate-100" ref={logRef}>
-          <div>{log.map((line, index) => {
-            if(line.includes('Turn')) return <div key={index} className="font-bold text-2xl  bg-slate-500 text-slate-200"><div key={index} dangerouslySetInnerHTML={{ __html: line }} /></div>
-            return <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
-          })}</div>
-        </div>
-
-        <div className="absolute bottom-2 left-[182px] bg-slate-800 text-slate-100 p-2 bg-opacity-60 rounded-md">
-          {activeMessages.length > 0 && activeMessages.map((message, index) => <div key={index} dangerouslySetInnerHTML={{ __html: message }} />)}
-        </div>
-  </div>
-  <button onClick={() => testAttack(battle)}>Start</button>
-  <button onClick={() => test2(battle)}>Test</button>
-  <button onClick={() => changeView()}>Change View</button>
-  <button onClick={() => changeTurn()}>Change Turn</button>
-
-  <Input value={turnInput} onChange={(e) => setTurnInput(e.target.value)} />
-  <Input value={attack} onChange={(e) => setAttack(e.target.value)} />
-  
+  })*/
+  return ( <section className="flex flex-col  w-[900px] h-[450px]">
+    <Game battle={battle} />
 </section>
   );
 
 
 }
 
+
+export function PlayerDataBar({team, reverse} : {team: Pokemon[], reverse?: boolean}){
+  console.log("TEAM PLAYER DATA BAR")
+console.log(team)
+  
+  return (
+    <div className="w-[20%] h-full">
+      <PokemonTeamList team={team} />
+      <div className="text-shadow-border1 text-white">{battle.sides[0].name}</div>
+      <img className="mx-auto" style={{height:'100px', width:'45px', transform: reverse && 'scaleX(-1)'}} src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4" />
+    </div>
+  )
+}
+
+export function Game({battle} : {battle: Battle}) {
+const team1 = Object.values(battle.p1.team)
+const team2 = Object.values(battle.p2.team)
+
+console.log("TEAM 1")
+console.log(team1)
+
+console.log("TEAM 2")
+console.log(team2)
+
+const active1 = battle.sides[0].active
+const active2 = battle.sides[1].active
+
+  return (
+  <div className="w-full h-full flex bg-slate-700">
+    <PlayerDataBar team={team1}/>
+    <div id="game" className="w-full h-full flex flex-col relative">
+      <div className="absolute top-1 right-1 bg-slate-800 py-1 px-2 rounded-md text-slate-200 border border-slate-200">Turn {battle.turn}</div>
+      {active1.length === 3 ? <>
+          <PokemonSprite pokemon={active1[0]} id="p1a" className='bottom-[16%] left-[5%]'/>
+          <PokemonSprite pokemon={active1[1]} id="p1b" className='bottom-[8%] left-[33%]'/>
+          <PokemonSprite pokemon={active1[2]} id="p1c" className='bottom-[0%] left-[62%]'/>
+        </> : <>
+          <PokemonSprite pokemon={active1[0]} id="p1a" className='bottom-[8%] left-[5%]'/>
+          <PokemonSprite pokemon={active1[1]} id="p1b" className='bottom-[0%] left-[33%]'/>
+        </>
+      }
+ 
+    {active2.length === 3 ? <>
+          <PokemonSprite pokemon={active2[0]} id="p2a" className='top-[16%] right-[5%]'/>
+          <PokemonSprite pokemon={active2[1]} id="p2b" className='top-[8%] right-[33%]'/>
+          <PokemonSprite pokemon={active2[2]} id="p2c" className='top-0 right-[62%]'/>
+
+        
+        </> : <>
+          <PokemonSprite pokemon={active2[0]} id="p2a" className='top-[8%] right-[5%]'/>
+          <PokemonSprite pokemon={active2[1]} id="p2b" className='top-0 right-[33%]'/>
+        </>
+      }
+    </div>
+    <PlayerDataBar team={team2} reverse={true}/>
+  </div>
+  )
+}
