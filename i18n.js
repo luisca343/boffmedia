@@ -3,6 +3,7 @@ module.exports = {
   defaultLocale: "es",
   pages: {
     "/smartrotom/pokedex/entrada/[[...params]]": ["smartrotom/pokedex/common", "smartrotom/pokedex/moves", "smartrotom/pokedex/spawns", "smartrotom/pokedex/forms"],
+    "/battlesim/replay": ["smartrotom/pokedex/common"],
     "*": ["common"]
   },
   loadLocaleFrom: (lang, ns) =>

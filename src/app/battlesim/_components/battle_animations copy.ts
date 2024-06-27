@@ -304,18 +304,180 @@ export class Scene {
 	  this.$bg = new BG(this);
     }
 
+	isAnimating() {
+		return this.currentAnimations.length > 0;
+	}
+
+  getPokemonSpriteElement(id: string) {
+      if(id === '') {
+        return null;
+      }
+      const wrapper = this.gameElement.querySelector(`#${id}`);
+      if (!wrapper) return null;
+  
+      const element = wrapper.querySelector('img')
+      if (!element) return null;
+
+      return element;
+  }
+  
+    getPosition(id: string) {
+    if(id === '') {
+        return {x: 0, y: 0, z:0, width: 0, height: 0};
+    }
+
+      const element = this.gameElement.querySelector(`#${id}`);
+	  
+      if (!element) return {x: 0, y: 0, z:0, width: 0, height: 0};
+    
+      const rect = element.getBoundingClientRect();
+      const parentRect = this.gameElement.getBoundingClientRect();
+    
+      const relativeRect = {
+        x: rect.left - parentRect.left + rect.width / 2,
+        y: rect.top - parentRect.top + rect.height / 2,
+        width: rect.width,
+        height: rect.height
+      };
+
+      if(!relativeRect.x || !relativeRect.y) return {x: 0, y: 0, z:0, width: 0, height: 0}
+    
+      return relativeRect;
+    }
+  
+    playAnimation(animation: string, position: string) {
+      const element = this.gameElement.querySelector(`#${position}`);
+      if (!element) return null;
+  
+    }
+  
+    async showEffect(effect:string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void){
+		
+        let startTime = start.time || 0;
+        let endTime = end.time || startTime + 500;
+    
+        const effectData = BattleEffects[effect];
+        if (!effectData) return;
+    
+        start.x = start.x || 0;
+        start.y = start.y || 0;
+    
+        const element = document.createElement('img');
+        element.src = effectData.url;
+        element.style.position = 'absolute';
+        element.style.width = `50px`;
+        element.style.height = `50px`;
+        const halfWidth = parseInt(element.style.width) / 2;
+        const halfHeight = parseInt(element.style.height) / 2;
+        element.style.left = `${start.x - halfWidth}px`;
+        element.style.top = `${start.y - halfHeight}px`;
+        element.style.zIndex = `${start.z}`;
+        element.style.opacity = `${start.opacity || 1}`;
+        element.style.transition = `all ${start.time || 0}ms`;
+        element.style.display = start.display || 'block';
+        element.style.transform = `scale(${start.scale || 1})`;
+		
+    
+        if (additionalCss) {
+            element.style.cssText += additionalCss;
+        }
+    
+    
+        // Wait for start.time before starting the animation
+        const prom = new Promise<void>(resolve => {
+			setTimeout(() => {
+				resolve();
+			}, endTime);
+		}).then(() => {
+			element.remove();
+			this.currentAnimations = this.currentAnimations.filter(p => p !== prom);
+			if (callback) callback();
+		});
+		this.currentAnimations.push(prom);
+
+        // Start the animation
+			this.gameElement.appendChild(element);
+		setTimeout(() => {
+			// Start the animation
+			end.x = end.x || 0;
+			end.y = end.y || 0;
 	
+			element.style.left = `${end.x - halfWidth}px`;
+			element.style.top = `${end.y - halfHeight}px`;
+			element.style.zIndex = `${end.z}`;
+			element.style.opacity = `${end.opacity || 0}`;
+			element.style.transform = `scale(${end.scale || 1})`;
+		}, startTime || 0);
+    
+        if (additionalCss) {
+            element.style.cssText += additionalCss;
+        }
+    
+
+		if (after === 'explode') {
+			if (end.scale) end.scale *= 3;
+			if (end.xscale) end.xscale *= 3;
+			if (end.yscale) end.yscale *= 3;
+			end.opacity = 0;
+
+            element.style.transform = `scale(${end.scale || 1})`;
+            element.style.transform = `scaleX(${end.xscale || 1})`;
+            element.style.transform = `scaleY(${end.yscale || 1})`;
+            element.style.opacity = `${end.opacity || 0}`;
+            element.style.transition = `all ${endTime || 0}ms`;
+            
+            
+			
+		}
+        
+    }
+
+  wait(time: number) {
+    this.animating = true;
+    return new Promise<void>((resolve) => {
+        setTimeout(() => {
+            this.unpause();
+            resolve();
+        }, time);
+    });
+	}
+
+animsTest: {[k: string]: { anim: (startX: any, startY: any, element: any, callback: (() => void) | undefined) => void }} = {
+	pokeball:{
+		anim: (startX: any, startY: any, element:any,callback: (() => void) | undefined) => {
+			this.showEffect('pokeball', {
+				opacity: 1,
+				x: startX,
+				y: startY,
+				scale: .7,
+				time: 300 / this.acceleration,
+			  }, {
+				opacity: 0,
+				x: element.x,
+				y: element.y,
+				time: 700 / this.acceleration,
+			  }, 'ballistic2', '', '', callback); 
+		}
+	} 
+}
+
 
 	async playEffect(effect: string, position: PokemonIdent, callback: () => void) {
+		console.log('playEffect', effect, position);
         const pos = position.split(':')[0];
 		const element = this.getPosition(pos);
 		if(!element) return;
+		console.log('element', element);
 
 		const effectData = this.animsTest[effect];
 		if (!effectData) return;
+		console.log('effectData', effectData);
 
 		const startY = pos.includes('p1') ? element.y + 40 : element.y - 40;
 		const startX = pos.includes('p1') ? element.x -150 : element.x + 150;
+
+		console.log('startX', startX, 'startY', startY);
+		console.log('element', element);
 
 		effectData.anim(startX, startY, element, callback);
 
@@ -328,108 +490,30 @@ export class Scene {
 	}
 
 	async  playBattleAnim(anim: string, attacker: PokemonIdent, defender: PokemonIdent) {
-		this.animating = true;
-		
-		//const animFunc = BattleMoveAnims['contactattack'] || BattleOtherAnims['contactattack'];
-		const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
-		if(anim === 'faint'){
-			console.log('faint')
-		}
-		if (animFunc === undefined) {
-			await this.playBattleAnim('contactattack', attacker, defender);
+		if(this.isAnimating()) {
 			return;
 		}
 
-		const attackerSprite = new PokemonSprite(this, attacker);
-		const defenderSprite = new PokemonSprite(this, defender);
-
-		const attackerPos = this.getPosition(attacker);
-		const defenderPos = this.getPosition(defender);
+		this.animating = true;
 		
-		animFunc.anim(this, [attackerSprite, defenderSprite]);
+		console.log('playBattleAnim', anim, attacker, defender);
+		const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
+		if (!animFunc) await this.playBattleAnim('contactattack', attacker, defender);
+		
+		animFunc.anim(this, [new PokemonSprite(this, attacker), new PokemonSprite(this, defender)]);
 		
 		// Use Promise.all to wait for all animations to complete
-		return await Promise.all(this.currentAnimations).then(() => {
+		Promise.all(this.currentAnimations).then(() => {
 			this.currentAnimations = [];
-		
-			if(anim === 'faint') {
-				console.log('Faint animation completed');
-				return;
-			}
-			return new Promise<void>((resolve) => {
-				attackerSprite.anim({
-					x: attackerPos.x,
-					y: attackerPos.y,
-					z: 1,
-					opacity: 1,
-					scale: 1,
-					time: 200,
-				}, 'back', () => {
-					console.log('Attacker animation completed');
-					resolve();
-				});
-			});
+			console.log('All animations completed');
+			this.animating = false;
 		});
 
-
-
 	}
-
-	isAnimating() {
-		return this.currentAnimations.length > 0;
-	}
-	
-
-	getPokemonSpriteElement(id: string) {
-		if(id === '') {
-		  return null;
-		}
-		const wrapper = this.gameElement.querySelector(`#${id}`);
-		if (!wrapper) return null;
-	
-		const element = wrapper.querySelector('img')
-		if (!element) return null;
-  
-		return element;
-	}
-	
-	  getPosition(id: string) {
-	  if(id === '') {
-		  return {x: 0, y: 0, z:0, width: 0, height: 0};
-	  }
-  
-		const element = this.gameElement.querySelector(`#${id}`);
-		
-		if (!element) return {x: 0, y: 0, z:0, width: 0, height: 0};
-	  
-		const rect = element.getBoundingClientRect();
-		const parentRect = this.gameElement.getBoundingClientRect();
-	  
-		const relativeRect = {
-		  x: rect.left - parentRect.left + rect.width / 2,
-		  y: rect.top - parentRect.top + rect.height / 2,
-		  width: rect.width,
-		  height: rect.height
-		};
-  
-		if(!relativeRect.x || !relativeRect.y) return {x: 0, y: 0, z:0, width: 0, height: 0}
-	  
-		return relativeRect;
-	  }
 
     unpause() {
         this.animating = false;
     }
-
-	wait(time: number) {
-	  this.animating = true;
-	  return new Promise<void>((resolve) => {
-		  setTimeout(() => {
-			  this.unpause();
-			  resolve();
-		  }, time);
-	  });
-	  }
 
     //
     // TO DO: Implement this function
@@ -443,93 +527,13 @@ export class Scene {
             this.gameElement.style.opacity = `${opacity}`;
         }, 0);
 
-		// Then remove
-		setTimeout(() => {
-			this.gameElement.style.backgroundImage = '';
-			this.gameElement.style.backgroundColor = '';
-			this.gameElement.style.opacity = '1';
-		}, time);
+        setTimeout(() => {
+            url.includes('#') ? this.gameElement.style.backgroundColor = url : this.gameElement.style.backgroundImage = `url(${url})`;
+            this.gameElement.style.transition = `background-image ${time}ms`;
+            this.gameElement.style.opacity = `1`;
+        }, time);
     }
 
-	async showEffect(effect: string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void) {
-		const effectData = BattleEffects[effect];
-		if (!effectData) return;
-
-	
-		const element = document.createElement('img');
-		element.src = effectData.url;
-		element.style.position = 'absolute';
-		element.style.left = `${start.x}px`;
-		element.style.top = `${start.y}px`;
-		element.style.width = `${effectData.w}px`;
-		element.style.height = `${effectData.h}px`;
-		element.style.opacity = `${start.opacity || 1}`;
-	
-		if (additionalCss) {
-			element.style.cssText += additionalCss;
-		}
-	
-		this.gameElement.appendChild(element);
-	
-		// Force reflow/repaint to ensure the initial state is rendered
-		element.offsetHeight;
-	
-		const animationTime = start.time || 500;
-	
-		element.style.transition = `all ${animationTime}ms`;
-
-		const endX = end.x !== undefined ? end.x : start.x;
-		const endY = end.y !== undefined ? end.y : start.y;
-		const endOpacity = end.opacity !== undefined ? end.opacity : start.opacity;
-		const endScale = end.scale !== undefined ? end.scale : start.scale;
-		const endZ = end.z !== undefined ? end.z : start.z;
-
-
-	
-		// Start the animation after a slight delay to ensure the browser has rendered the initial state
-		setTimeout(() => {
-			element.style.left = `${endX}px`;
-			element.style.top = `${endY}px`;
-			element.style.opacity = `${endOpacity}`;
-			element.style.transform = `scale(${endScale})`;
-			element.style.zIndex = `${endZ}`;
-		}, 10); // A slight delay
-	
-		// Wait for the animation to complete before executing the callback
-		const prom = new Promise<void>(resolve => setTimeout(() => {
-			resolve();
-
-			
-		}, animationTime + 300));
-	
-		this.currentAnimations.push(prom);
-	
-		prom.then(() => {
-			// Remove the element from the DOM after the animation
-			element.remove();
-			if (callback) callback();
-		});
-	}
-
-
-	animsTest: {[k: string]: { anim: (startX: any, startY: any, element: any, callback: (() => void) | undefined) => void }} = {
-		pokeball:{
-			anim: (startX: any, startY: any, element:any,callback: (() => void) | undefined) => {
-				this.showEffect('pokeball', {
-					opacity: 1,
-					x: startX,
-					y: startY,
-					scale: .7,
-					time: 500 / this.acceleration,
-				  }, {
-					opacity: 0,
-					x: element.x,
-					y: element.y,
-					time: 1000 / this.acceleration,
-				  }, 'ballistic2', '', '', callback); 
-			}
-		} 
-	}
 
   }
 
@@ -539,8 +543,6 @@ export class PokemonSprite {
     position: PokemonIdent;
     element: HTMLImageElement | null;
     startingPosition: ScenePos
-
-	animationQueue: any[] = [];
    
     constructor(scene: Scene, position: PokemonIdent){
         this.scene = scene;
@@ -550,82 +552,110 @@ export class PokemonSprite {
 
         if(!this.element) return;
     }
-	anim(transition: ScenePos, type?: string, callback?: () => void){
-		if(this.animationQueue.length > 0) {
-			this.animationQueue.push({transition, type, callback});
-			return;
-		}
 
-		this.animationQueue.push({transition, type, callback});
-		this.animOld(transition, type, callback);
+	/*
+	  export interface ScenePos {
+      x?: number;
+      y?: number;
+      z?: number;
+      scale?: number;
+      xscale?: number;
+      yscale?: number;
+      opacity?: number;
+      time?: number;
+      display?: string;
+  }
+	*/
 
-	}
+	async anim(transition: ScenePos, type?: string) {
+		// Hacer function para volver a la posición original, calculándola matemáticamente y tal
 
-	async animOld(transition: ScenePos, type?: string, callback?: () => void) {
-		this.scene.animating = true;
-	
 		const element = document.getElementById(this.position);
 		if (!element) return;
 		const animationTime = transition.time || 500;
-	
+		
 		const startingPosition = this.startingPosition;
-	
-		const x1 = transition.x || startingPosition.x as number;
-		const y1 = transition.y || startingPosition.y as number;
-		const z1 = transition.z || startingPosition.z as number;
 
-		const opacity = transition.opacity !== undefined ? transition.opacity : 1;
+		const x1 = transition.x ||  startingPosition.x as number
+		const y1 = transition.y || startingPosition.y as number
+		const z1 = transition.z || startingPosition.z as number
 	
 		const halfWidth = parseInt(element.style.width) / 2;
 		const halfHeight = parseInt(element.style.height) / 2;
 	
 		element.style.transition = `all ${animationTime}ms`;
-
-		// Apply CSS changes immediately to start the animation
-		element.style.left = `${x1 - halfWidth}px`;
-		element.style.top = `${y1 - halfHeight}px`;
-		element.style.zIndex = `${z1}`;
-		element.style.opacity = `${opacity}`;
-		element.style.transform = `scale(${transition.scale || 1})`;
-
-		const animId = Math.random().toString(36).substring(7);
 	
-		// Wait for the animation to complete using the transitionend event
-		/*
-		await new Promise<void>((resolve) => {
-			const onTransitionEnd = () => {
-				console.log('TRANSITION ENDED')
-				element.removeEventListener('transitionend', onTransitionEnd);
-				this.scene.currentAnimations = this.scene.currentAnimations.filter((id) => id !== animId);
-				resolve();
-			};
-			console.log('TRANSITION STARTED')
-			element.addEventListener('transitionend', onTransitionEnd);
-			this.scene.currentAnimations.push(animId)
-		});*/
+		console.log('ANTES');
+	
+		// Wrap the setTimeout in a promise and await it
+		const prom = new Promise<void>(resolve => setTimeout(() => {
+			element.style.left = `${x1 - halfWidth}px`;
+			element.style.top = `${y1 - halfHeight}px`;
+			element.style.zIndex = `${z1}`;
+			element.style.opacity = `${transition.opacity || 1}`;
+			element.style.transform = `scale(${transition.scale || 1})`;
+			resolve();
+		}, animationTime));
+		this.scene.currentAnimations.push(prom);
+	}
 
-		// Wait for the animation to complete, instead of event listener, we use setTimeout
-		await new Promise<void>((resolve) => {
-			setTimeout(() => {
-				resolve();
-			}, animationTime);
-		});
+    animOld(transition: ScenePos, type?: string) {
+        const element = document.getElementById(this.position);
+
+        if(!element) return;
+    
+        let tX = transition.x || this.startingPosition.x || 0;
+        let tY = transition.y || this.startingPosition.y || 0;
+        let tZ = transition.z || 0;
+        let tScale = transition.scale || 1;
+        let tTime = transition.time || 0;
+        let tDisplay = transition.display || 'block';
+        let tOpacity = transition.opacity || 1;
+
+      
+        const prom = new Promise(resolve => setTimeout(resolve, tTime + 100));
+		this.scene.currentAnimations.push(prom);
+
+        
+      element.style.position = 'absolute';
+      const halfWidth = parseInt(element.style.width) / 2;
+      const halfHeight = parseInt(element.style.height) / 2;
+      element.style.left = `${tX - halfWidth}px`;
+      element.style.top = `${tY - halfHeight}px`;
+      element.style.zIndex = `${tZ}`;
+        element.style.opacity = `${tOpacity}`;
+        element.style.transition = `all ${tTime}ms`;
+        element.style.display = tDisplay;
+        element.style.transform = `scale(${tScale})`;
+
 		
 
+        setTimeout(() => {
+            element.style.left = `${tX - halfWidth}px`;
+            element.style.top = `${tY - halfHeight}px`;
+            element.style.zIndex = `${tZ}`;
+            element.style.opacity = `${tOpacity}`;
+            element.style.transform = `scale(${tScale})`;
 
+        }, 0);
+        
 
-		if (callback) callback();
-	
-		this.startingPosition = this.scene.getPosition(this.position);
-		this.animationQueue.shift();
-		if (this.animationQueue.length > 0) {
-			const next = this.animationQueue[0];
-			this.animOld(next.transition, next.type, next.callback);
-		} else {
-			this.scene.animating = false;
-		}
-	
-	}
+        setTimeout(() => {
+            element.style.display = tDisplay;
+            element.style.transition = `all ${tTime}ms`;
+            element.style.zIndex = `${tZ}`;
+            element.style.opacity = `${tOpacity}`;
+            element.style.transform = `scale(${tScale})`;
+            element.style.left = `${tX - halfWidth}px`;
+            element.style.top = `${tY - halfHeight}px`;
+            
+
+        }, tTime);
+        
+        
+    
+
+    }
 
     delay(time: number) {
         this.scene.wait(time);
