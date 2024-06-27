@@ -10,6 +10,7 @@ import { Generations } from '@pkmn/data';
 import GameCanvas from "../_components/GameCanvas";
 import { PokemonSprite, Scene } from "../_components/battle_animations";
 import { Input } from "@/components/ui/input";
+import { time } from "console";
 
 let battle = new Battle(new Generations(Dex as any))
 
@@ -41,7 +42,7 @@ export default function Test() {
   // position is the side + the position in the team
   const [pokemon, setPokemon]  = useState({} as { [position: string]: Pokemon | null })
   const [pokemonUpdates, setPokemonUpdates] = useState([]);
-  const [activeMessage, setActiveMessage] = useState('');
+  const [activeMessages, setActiveMessages] = useState([]);
   const [turnInput, setTurnInput] = useState(0);
   
 
@@ -109,9 +110,13 @@ export default function Test() {
 
   if(!partida.log) return <div>loading...</div>
 
-  function playMessage(message: string) {
-    setActiveMessage(message);
-    setTimeout(() => setActiveMessage(''), 1000);
+  function updateMessage(message: string, replace?: boolean) {
+    // If keep is true, append the message to the log, then we set a 1000ms timeout to remove it.
+    if(!replace) {
+      setActiveMessages(activeMessages => [...activeMessages, message]);
+    } else {
+      setActiveMessages([message]);
+    }
   }
 
   async function testAttack() {
@@ -166,6 +171,8 @@ export default function Test() {
 
   async function performAction(index: number = 0) {
         const delay = ms => new Promise(res => setTimeout(res, ms));
+        let replaceMessages = false;
+
           // check if scene is paused
           while(scene.paused) {
             console.log('paused')
@@ -176,12 +183,9 @@ export default function Test() {
           const event = partida.log[turn].events[index];
           const {args, kwArgs, text, line} = event;
           console.log(args, kwArgs, text)
-          if(text){
-            playMessage(text);
-          }
           
           if(text !=='') {
-            timeout = 100;
+            timeout = 200;
             setLog(prevLog => [...prevLog, text]);
           }
           if(args[0] === 'move'){
@@ -194,6 +198,8 @@ export default function Test() {
             }
     
             await scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, args[3].split(':')[0] as PokemonIdent)
+            timeout = 500 / scene.acceleration;
+            replaceMessages = true;
             
           }
           if(args[0] === 'boost'){
@@ -202,7 +208,8 @@ export default function Test() {
           }
           battle.add(line);
           if(args[0] === 'switch') {
-            timeout = 1000 / scene.acceleration;
+            replaceMessages = true;
+            timeout = 1500 / scene.acceleration;
             const [, positionIdent, pokemonDetails, hpstatus] = args as [string, PokemonIdent, PokemonDetails, PokemonHPStatus]
             const pos = positionIdent.split(':')[0];
             const name = pokemonDetails.split(',')[0];
@@ -223,7 +230,8 @@ export default function Test() {
             });
           }
     
-          if(args[0] === 'faint'){
+          if(args[0] === 'faint'){+
+            replaceMessages = true;
             const [, positionIdent] = args as [string, PokemonIdent]
             const pokemon = battle.getPokemon(positionIdent);
             const pos = positionIdent.split(':')[0];
@@ -245,12 +253,13 @@ export default function Test() {
             }
           }
           if(args[0] === '-damage') {
-            timeout = 1000 / scene.acceleration;
+            timeout = 500 / scene.acceleration;
           }
-        
+
+          updateMessage(text, replaceMessages);
           battle.currentWeather();
-      
           battle.update();
+
           await delay(timeout);
   }
 
@@ -264,7 +273,7 @@ export default function Test() {
   }
 
   return ( <section className="flex flex-col  w-full h-full">
-    <div className="flex">
+    <div className="flex relative">
       <div className='flex  justify-evenly aspect-[16/4] relative'
       //background-image:url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-darkmeadow.jpg);display:block;opacity:0.8
       style={{backgroundImage: `url(https://i.imgur.com/qnB4MXd.png)`, backgroundSize: 'cover', width:' 900px', height: '450px', zIndex:'0'}}
@@ -289,6 +298,10 @@ export default function Test() {
             if(line.includes('Turn')) return <div key={index} className="font-bold text-2xl  bg-slate-500 text-slate-200"><div key={index} dangerouslySetInnerHTML={{ __html: line }} /></div>
             return <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
           })}</div>
+        </div>
+
+        <div className="absolute bottom-2 left-[182px] bg-slate-800 text-slate-100 p-2 bg-opacity-60 rounded-md">
+          {activeMessages.length > 0 && activeMessages.map((message, index) => <div key={index} dangerouslySetInnerHTML={{ __html: message }} />)}
         </div>
   </div>
   <button onClick={() => testAttack(battle)}>Start</button>
