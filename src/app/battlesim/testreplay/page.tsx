@@ -1,6 +1,5 @@
-// @ts-nocheck
-"use client"
-import { Battle } from "@pkmn/client"
+
+import { Battle, Pokemon } from "@pkmn/client"
 import { Protocol } from "@pkmn/protocol"
 import { Dex } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
@@ -319,15 +318,15 @@ export default function Test() {
     }
   }
 
-  /*
-  lines.map((line) => {
-    const {args, kwArgs} = Protocol.parseBattleLine( line)
+  
+  //lines.map((line) => {
+  //  const {args, kwArgs} = Protocol.parseBattleLine( line)
       //console.log(args, kwArgs)
-      battle.add(args, kwArgs)
-      if(args[0] === 'turn') {
-        return
-      }
-  })*/
+  //    battle.add(args, kwArgs)
+  //    if(args[0] === 'turn') {
+   //     return
+   //   }
+  //})
   return ( <section className="flex flex-col  w-[900px] h-[450px]">
     <Game battle={battle} />
 </section>

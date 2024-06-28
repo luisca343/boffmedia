@@ -230,8 +230,8 @@ export default function Test() {
             });
           }
     
-          if(args[0] === 'faint'){+
-            replaceMessages = true;
+          if(args[0] === 'faint'){
+            replaceMessages = true
             const [, positionIdent] = args as [string, PokemonIdent]
             const pokemon = battle.getPokemon(positionIdent);
             const pos = positionIdent.split(':')[0];
