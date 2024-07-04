@@ -4,6 +4,8 @@ module.exports = {
   pages: {
     "/smartrotom/pokedex/entrada/[[...params]]": ["smartrotom/pokedex/common", "smartrotom/pokedex/moves", "smartrotom/pokedex/spawns", "smartrotom/pokedex/forms"],
     "/battlesim/replay": ["smartrotom/pokedex/common"],
+    "/smartrotom/pokedex": ["smartrotom/pokedex/forms"],
+    "/smartrotom/pokedex/spawns": ["smartrotom/pokedex/forms"],
     "*": ["common"]
   },
   loadLocaleFrom: (lang, ns) =>
