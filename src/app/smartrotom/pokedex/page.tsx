@@ -20,7 +20,7 @@ export default function PokedexMenu(){
                     <LastRegistries />
                 </PokedexSection>
                 <PokedexSection title="Posibles Spawns" btn={<InternalLink href={'/pokedex/spawns'}>Ver más</InternalLink>}>
-                    <PossibleSpawns />
+                    <PossibleSpawns spawns={[]}/>
                 </PokedexSection>
             </div>
         </div>
