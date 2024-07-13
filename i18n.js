@@ -7,6 +7,7 @@ module.exports = {
     "/smartrotom/pokedex": ["smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/spawns": ["smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/localizacion/[id]": ["smartrotom/pokedex/spawns","smartrotom/pokedex/forms"],
+    "/smartrotom/pokedex/localizacion": ["smartrotom/pokedex/spawns"],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`/locales/${lang}/${ns}.json`).then((m) => m.default),

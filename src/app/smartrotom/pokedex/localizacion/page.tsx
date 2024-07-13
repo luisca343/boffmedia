@@ -1,8 +1,23 @@
-export default function Localizacion(){
-    
+import { InternalLink } from "@/components/nav/Link"
+import { rotomGET } from "@/services/boffAPI"
+import useTranslation from 'next-translate/useTranslation'
+
+export default async function Biomas(){
+    const {t: spawnsTranslation} = useTranslation("smartrotom/pokedex/spawns")
+    const biomes = await rotomGET('/pokemon/biomes') as Record<string, number>
+    //<h3>{biome.name} - {biome.amount}</h3>
     return(
-        <div>
-            <h1>Esto es la página base</h1>
+    <div className="bg-main-800  flex flex-wrap text-main-100 w-full justify-between p-2">
+        {     
+        Object.entries(biomes).map(([biome, amount]: [string, number], index: number) => {
+            if(biome.includes("biomesoplenty")) return null
+            return <InternalLink href={`pokedex/localizacion/${biome}`} key={index}>
+                <div className=" flex flex-col p-2 items-center justify-center hover:text-main-800 hover:bg-main-400 w-64 h-32 border rounded-lg my-1">
+                    <span>{spawnsTranslation(biome.replace(":","_").replace(" ","_"))}</span>  
+                    <span>{amount}</span>
+                </div>
+            </InternalLink>
+})}
         </div>
     )
 }
