@@ -4,6 +4,8 @@ import { PokedexSection } from "../_components/PokedexSection";
 import { PossibleSpawns } from "../_components/PossibleSpawns";
 import { useEffect, useState } from "react";
 import { mcefQuery } from "@/services/mcefHelper";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 
 type PossibleSpawn = {
     dex: number;
@@ -16,56 +18,18 @@ type PossibleSpawn = {
 
 
 export default function Spawns(){
-    const [spawns, setSpawns] = useState<PossibleSpawn []>()
-    useEffect(() => {
-        const fetchSpawns = () => {
-            mcefQuery('getSpawns')
-                .then((response) => {
-                    const res = response as PossibleSpawn[];
-                    res.sort((a, b) => b.rarity - a.rarity);
-                    setSpawns(res);
-                })
-                .catch((error) => {
-                    setSpawns([
-                        {dex: 1, species: 'Bulbasaur', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 2, species: 'Ivysaur', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 3, species: 'Venusaur', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 4, species: 'Charmander', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 5, species: 'Charmeleon', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 6, species: 'Charizard', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 7, species: 'Squirtle', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 8, species: 'Wartortle', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 9, species: 'Blastoise', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 10, species: 'Caterpie', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 11, species: 'Metapod', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 12, species: 'Butterfree', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 13, species: 'Weedle', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 14, species: 'Kakuna', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 15, species: 'Beedrill', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 16, species: 'Pidgey', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 17, species: 'Pidgeotto', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 18, species: 'Pidgeot', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 19, species: 'Rattata', form: 'alolan', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 10012, species: 'Cococute', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 10013, species: 'Cocoareca', form: 'base', palette: 'none', rarity: 0, percentage: 5},
-                        {dex: 10014, species: 'Cocolada', form: 'base', palette: 'none', rarity: 0, percentage: 5},
+    const [hideCaught, setHideCaught] = useState(false)
+    const [hideSeen, setHideSeen] = useState(false)
 
-                    ]);
-                });
-        };
-    
-        fetchSpawns(); 
-        
-        const intervalId = setInterval(fetchSpawns, 30000); 
-    
-        return () => clearInterval(intervalId);
-    }, []);
-
-
-    if(!spawns) return <div>Loading...</div>
     return(
         <div className="bg-main-800  ">
-            <PossibleSpawns spawns={spawns}/>
+        <Label className="text-white text-2xl">Mostrar Avistados</Label>
+        <Checkbox id="seen" onClick={() => setHideSeen(!hideSeen)} className="bg-main-400 text-white p-2 rounded-xl m-2">Mostrar Avistados</Checkbox>
+            <div className="hidden 2xl:flex justify-center">
+                <Label className="text-white text-2xl">Mostrar Atrapados</Label>
+                <Checkbox id="caught" onClick={() => setHideCaught(!hideCaught)} className="bg-main-400 text-white p-2 rounded-xl m-2">Mostrar Atrapados</Checkbox>
+            </div>
+            <PossibleSpawns hideCaught={hideCaught} hideSeen={hideSeen}/>
         </div>
     )
 }
