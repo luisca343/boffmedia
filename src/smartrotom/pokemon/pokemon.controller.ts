@@ -127,4 +127,9 @@ export class PokemonController {
         return this.pokemonService.getPokemonByBiome(name);
     }
 
+    @Get('biomes')
+    getBiomes(){
+        return this.pokemonService.getBiomes();
+    }
+
 }

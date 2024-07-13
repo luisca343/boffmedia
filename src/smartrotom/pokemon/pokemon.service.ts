@@ -597,12 +597,9 @@ export class PokemonService {
         for (const spawn of biomeData) {
             const id = `${spawn.spawnType}_${spawn.pokemonName}${spawn.pokemonForm}${spawn.pokemonPalette}`;
             if (!spawns[spawn.spawnType]) spawns[spawn.spawnType] = [] as any;
-            console.log('Checking', id);
             if (!pokemonAcc[id]) {
-                console.log('Not found', id);
                 pokemonAcc[id] = await this.getPokemonSprite(spawn, totals[spawn.spawnType]);
             } else {
-                console.log('Found', id);
                 pokemonAcc[id].rarity += spawn.rarity;
                 pokemonAcc[id].percentage = (pokemonAcc[id].rarity / totals[spawn.spawnType]) * 100;
             }
@@ -628,6 +625,32 @@ export class PokemonService {
 
         
         return sortedSpawnsObj
+    }
+
+    // Get all the biomes, and the amount of pokemon that spawn in each biome, sorted by amount of pokemon
+    async getBiomes(){
+        const biomes = {} as {[key: string]: number}
+        const biomeData = this.spawnData.spawnByBiome
+        for(const key in biomeData){
+            const pokemonInBiome = await this.getPokemonByBiome(key) as any
+
+            let count = 0
+
+            Object.entries(pokemonInBiome).forEach(([key, value]) => {
+                count += Object.values(value).length
+            })
+
+
+            biomes[key] = count
+        }
+
+        const sortedBiomes = Object.keys(biomes).sort((a, b) => biomes[b] - biomes[a])
+        const sortedBiomesObj = {} as {[key: string]: number}
+        sortedBiomes.forEach((key) => {
+            sortedBiomesObj[key] = biomes[key]
+        })
+
+        return sortedBiomesObj
     }
 
     async test(){
