@@ -3,6 +3,7 @@ import { SpawnInfo } from "../../../_types/spawnInfo";
 import useTranslation from 'next-translate/useTranslation'
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 import { PokemonSprite } from "../../../_components/PokemonSprite";
+import { InternalLink } from "@/components/nav/Link";
 
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
     const { t } = useTranslation("smartrotom/pokedex/spawns")
@@ -79,7 +80,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                     const biomas = spawn.condition?.stringBiomes?.filter(biome =>
                          !biome.includes('biomesoplenty') && !biome.includes('terraforged')
                     ).map((biome) => {
-                        return t(`${biome.replace(" ", "_").replace(':','_')}`)
+                        return {biome, translated:t(`${biome.replace(" ", "_").replace(':','_')}`)}
                     })
                     const stringLocationTypes = spawn.stringLocationTypes?.map((location) => {
                         return t(`${location.replace(" ", "_").replace(':','_').toLowerCase()}`)
@@ -104,7 +105,14 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                         </PokedexHead>
                         <PokedexCell>{spawn.pokemonPalette || 'Base'}</PokedexCell>
                         <PokedexCell>{t(spawn.spawnType)}</PokedexCell>
-                        <PokedexCell>{biomas?.join(', ') || 'Cualquiera'}</PokedexCell>
+                        <PokedexCell>
+                        {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
+                            <span key={biome.biome} className="hover:text-primary-400">
+                            <InternalLink href={`/pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
+                            {index < biomas.length - 1 ? ', ' : ''}
+                            </span>
+                        )) : 'Cualquiera'}
+                        </PokedexCell>
                         <PokedexCell>{`${spawn.minLevel} - ${spawn.maxLevel}`}</PokedexCell>
                         <PokedexCell>{stringLocationTypes.join(', ')}</PokedexCell>
                         <PokedexCell>{times.join(', ')}</PokedexCell>
