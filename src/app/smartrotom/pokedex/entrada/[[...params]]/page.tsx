@@ -12,7 +12,7 @@ import { EntryHeader } from "./_components/EntryHeader"
 import { LevelMovesTable, MovesTable, OtherMovesTable } from "./_components/MovesTable"
 import { SpawnInfo } from "../../_types/spawnInfo"
 import { SpawnTable } from "./_components/SpawnTable"
-import { GenderProperties } from "@/types/Pokemon"
+import { Abilities, GenderProperties } from "@/types/Pokemon"
 import { PokedexSection } from "../../_components/PokedexSection"
 import { InternalLink } from "@/components/nav/Link"
 
@@ -131,9 +131,12 @@ export default async function EntradaPokedex({params}: any){
     )
 
     function BasicInfo({formName}: {formName: string}){
-        const types = pokemon.forms[formIndex].types ? pokemon.forms[formIndex].types : pokemon.forms[0].types as any
+        const types = pokemon.forms[formIndex as number].types ? pokemon.forms[formIndex as number].types : pokemon.forms[0].types as any
         const description = formsTranslation(`pixelmon_${pokemon.name.toLowerCase()}_description`).split('_').join('.')
-        const rank = pokemon.forms[formIndex].rank ? pokemon.forms[formIndex].rank : pokemon.forms[0].rank as {ranking: number, type1: string, type2: string, tier: string}
+        const rank = pokemon.forms[formIndex as number].rank ? pokemon.forms[formIndex as number].rank : pokemon.forms[0].rank as {ranking: number, type1: string, type2: string, tier: string}
+        
+        const abilities = pokemon.forms[formIndex as number].abilities ? pokemon.forms[formIndex as number].abilities : pokemon.forms[0].abilities as Abilities
+        
         return <section className="flex justify-center items-center">
         <div className="flex flex-col items-center">
             <div className="flex " style={{width:200, height:200}}>
@@ -144,7 +147,19 @@ export default async function EntradaPokedex({params}: any){
                 {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
             </div>
             {rank && <div className="text-center">{`Rango ${rank?.tier}`}</div>}
+                <div>
+                    <span className="font-bold">Habilidades:</span>
+                    {abilities?.abilities.map((ability) => <span className="mx-1" key={ability}>{ability}</span>)}
+                </div>
+                
+                {abilities?.hiddenAbilities && 
+                    <div>
+                        <span className="font-bold">Habilidad Oculta:</span>
+                        {abilities?.hiddenAbilities.map((ability) => <span className="mx-1" key={ability}>{ability}</span>)}
+                    </div>
+                }
             </div>
+
         </section>
     }
 
