@@ -6,6 +6,7 @@ module.exports = {
     "/battlesim/replay": ["smartrotom/pokedex/common"],
     "/smartrotom/pokedex": ["smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/spawns": ["smartrotom/pokedex/forms"],
+    "/smartrotom/pokedex/localizacion/[id]": ["smartrotom/pokedex/spawns","smartrotom/pokedex/forms"],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`/locales/${lang}/${ns}.json`).then((m) => m.default),
