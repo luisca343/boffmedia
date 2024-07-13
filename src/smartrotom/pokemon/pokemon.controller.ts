@@ -122,4 +122,9 @@ export class PokemonController {
         return this.pokemonService.getRegistries(uuid);
     }
 
+    @Get('biome/:name')
+    getPokemonByBiome(@Param('name') name: string){
+        return this.pokemonService.getPokemonByBiome(name);
+    }
+
 }

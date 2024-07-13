@@ -83,7 +83,7 @@ export class SpawnData {
 
                         biomes?.forEach(biome => {
                             if(!this.spawnByBiome[biome]) this.spawnByBiome[biome] = []
-                            this.spawnByBiome[biome].push(pokemonID)
+                            this.spawnByBiome[biome].push(spawnInfo)
                         })
 
 
