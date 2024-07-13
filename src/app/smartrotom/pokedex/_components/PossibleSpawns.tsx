@@ -2,7 +2,7 @@
 
 import { mcefQuery } from "@/services/mcefHelper"
 import { useEffect, useState } from "react"
-import { PokemonSprite } from "./PokemonSprite"
+import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
 import useTranslation from 'next-translate/useTranslation'
 import Link from "next/link"
 import { InternalLink } from "@/components/nav/Link"
@@ -16,10 +16,14 @@ type PossibleSpawn = {
     percentage: number;
 }
 
-export function PossibleSpawns(){
-    const [spawns, setSpawns] = useState<PossibleSpawn []>()
+export function PossibleSpawns({pokemonSpawns, hideCaught= true, hideSeen = true}: {pokemonSpawns?: PossibleSpawn [], hideCaught?: boolean, hideSeen?: boolean}) {
     const {t} = useTranslation("smartrotom/pokedex/forms")
+    const [spawns, setSpawns] = useState<PossibleSpawn []>()
     useEffect(() => {
+        if(pokemonSpawns && pokemonSpawns.length > 0) {
+            setSpawns(pokemonSpawns)
+            return
+        }
         const fetchSpawns = () => {
             mcefQuery('getSpawns')
                 .then((response) => {
@@ -63,25 +67,33 @@ export function PossibleSpawns(){
         return () => clearInterval(intervalId);
     }, []);
 
+
     return(
         <div className="flex  flex-wrap justify-center">
             {spawns?.map((spawn) => (
-                <InternalLink key={spawn.species} className="flex flex-col items-center  hover:bg-main-400  rounded-sm text-center w-24 2xl:w-20   text-white"
-                 href={`/pokedex/entrada/${spawn.dex}/${spawn.form}`}>
-                    <PokemonSprite id={spawn.dex} form={spawn.form} palette={spawn.palette} width={80} />
+                <PokemonSpriteLink hideCaught={hideCaught} hideSeen={hideSeen} key={spawn.species} id={spawn.dex} form={spawn.form} palette={spawn.palette} text={getDisplayName(spawn.species, spawn.form, spawn.palette)}>
                     <div className="text-xs hidden 2xl:block">{getDisplayName(spawn.species, spawn.form, spawn.palette)}</div>
-                    <div className=' font-bold text-xl 2xl:text-base'>{spawn.percentage.toFixed(4)} %</div>
-                </InternalLink>
+                    <div className='font-bold text-xl 2xl:text-base'>{formatPercentage(spawn.percentage)} %</div>
+                </PokemonSpriteLink>
             ))    
             }
         </div>
     )
+
+    function formatPercentage(percentage: number) {
+        if (percentage <= 0.0009) {
+          return percentage.toFixed(4);
+        } else if (percentage <= 0.009) {
+          return percentage.toFixed(3);
+        } else {
+          return percentage.toFixed(2);
+        }
+      }
 
     function getDisplayName(species: string, form: string, palette: string) {
         //if (form.includes('segment')) form = 'base';
         const formDisplay = form !== 'base' ? t(`form_${form}`) : '';
         const paletteDisplay = palette !== 'none' ? t(`palette_${palette}`) : '';
         return `${species}${formDisplay ? ` ${formDisplay}` : ''}${paletteDisplay ? ` ${paletteDisplay}` : ''}`;
-        return species
     }
 }
