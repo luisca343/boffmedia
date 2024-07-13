@@ -4,109 +4,55 @@
 import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
-import { getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
+import { getDisplayName, getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
 import { useSession } from "next-auth/react";
 import { getSmartRotomUser } from "@/lib/utils";
 import { StatusIcon, StatusIconv2 } from "./StatusIcon";
-/*
-export function PokemonSpriteOld ({name, dex, form, shiny=false, width=100, height=100}: {name:string, dex:number, form: string, shiny?: boolean, width?: number, height?: number}){
-    const [imageUrl, setImageUrl] = useState(getPokemonSprite(name, form, shiny));
-    const [loaded, setLoaded] = useState(false)
-    const [fallback, setFallback] = useState(false)
-  
-
-    useEffect(() => {
-        const image = new Image();
-        image.src = imageUrl;
-        image.onerror = () => setImageUrl(getFallbackSprite(name));
-        image.onload = () => setLoaded(true);
-      }, [imageUrl]);
+import Link from "next/link";
+import { InternalLink } from "@/components/nav/Link";
+import useTranslation from 'next-translate/useTranslation'
 
 
-    function getPokemonSprite(name: string, form: string, shiny: boolean){
-        const formString = form && form != 'base' ? `_${form.toUpperCase()}` : ''
-        const folderString = shiny ? 'Front Shiny' : 'Front'
-        return `/smartrotom/img/sprites/${folderString}/${name.toUpperCase()}${formString}.png`
-    }
 
-    let numStr = dex.toString().padStart(3, '0')
-    if(!form) form = 'base'
-
-    function getFallbackSprite(name: string){
-        setFallback(true)
-        return `/smartrotom/packs/resourcepack/assets/pixelmon/textures/pokemon/${numStr}_${name.toLowerCase()}/all/${form}/none/sprite.png`
-    }
+export function PokemonSpriteLink({children, id, form, palette, width=80, height=80, pixelated = true, hide=false, showStatus= true, link=true, hideCaught= false, hideSeen= false}:
+    {text:string, id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, link?: boolean, children?: any, hideCaught?: boolean, hideSeen?: boolean}) {
+        const [imageUrl, setImageUrl] = useState() as any;
+        const [loaded, setLoaded] = useState(false)
+        const {data: session} = useSession()  as any
     
-    if(!loaded) return <Loading width={width} height={height}/>
-    return <img className={fallback ? 'mb-2 mt-[-0.5rem]' : ''} width={width || 100} height={height || 100} src={imageUrl} alt={name} style={{imageRendering:'pixelated'}}/>;
+    
+        useEffect(() => {
+            if(pixelated) {
+                getPokemonSprite(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
+                        setImageUrl(img)
+                        setLoaded(true)
+                    }
+                )
+            } else {
+                getPokemonImage(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
+                        setImageUrl(img)
+                        setLoaded(true)
+                    }
+                )
+            }
+          }, []);
+
+
+        if(!loaded) return <Loading width={width} height={height}/>
+        if(hideCaught && imageUrl.status === 2) return null
+        if(hideSeen && imageUrl.status === 1) return null
+        
+        return <InternalLink  className="flex flex-col items-center  hover:bg-main-400  rounded-sm text-center w-24 2xl:w-20   text-white" href={`/pokedex/entrada/${id}`}>
+            <div style={{width, maxHeight:height}} className={` relative ${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}><img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
+              className={` ${imageUrl.showImg ? '' : 'brightness-0'}`}/>
+                 {showStatus && 
+                 <div className="absolute top-1 right-1">
+                      <StatusIconv2 status={imageUrl.status}  palette={palette} width={width} height={height}/>
+                 </div>}
+              </div>
+            {children && <div className="text-xs hidden 2xl:block">{children}</div>}
+        </InternalLink>
 }
-
-
-
-
-
-export function PokemonMiniSprite ({name, dex, form, palette='none', width=100, height=100, gender='all'}: {name:string, dex:number, form: string, palette?: string, width?: number, height?: number, gender?: string}){
-    const [imageUrl, setImageUrl] = useState(getPokemonSprite(name, form, palette));
-    const [loaded, setLoaded] = useState(false)
-    const [fallback, setFallback] = useState(false)
-
-  
-    function getNumStr(dex: number){
-        let numStr = dex.toString().padStart(3, '0')
-        if(!form) form = 'base'
-        return numStr
-    }
-
-    useEffect(() => {
-        const image = new Image();
-        image.src = imageUrl;
-        image.onerror = () => setImageUrl(getFallbackSprite(name));
-        image.onload = () => setLoaded(true);
-      }, [imageUrl]);
-
-
-    function getPokemonSprite(name: string, form: string, palette: string){
-        const formString = form && form != 'base' ? `_${form.toUpperCase()}` : ''
-        const folderString = palette === 'shiny' ? 'Front Shiny' : 'Front'
-        return `/smartrotom/packs/resourcepack/assets/pixelmon/textures/pokemon/${getNumStr(dex)}_${name.toLowerCase()}/${gender}/${form}/${palette}/sprite.png`
-    }
-
-
-    function getFallbackSprite(name: string){
-        setFallback(true)
-        return `/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/${getNumStr(dex)}_${name.toLowerCase()}/${gender}/${form}/${palette}/sprite.png`
-    }
-    
-    if(!loaded)  return <Loading width={width} height={height}/>
-    return <img className={fallback ? 'mb-2 mt-[-0.5rem]' : ''} width={width || 100} height={height || 100} src={imageUrl} alt={name} style={{imageRendering:'pixelated'}}/>;
-}
-
-
-export function PokemonSpriteWithURL ({url, width, height}: {url:string, width?: number, height?: number}) {
-    const [imageUrl, setImageUrl] = useState(`/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/${url}`);
-    const [loaded, setLoaded] = useState(false)
-    const [fallback, setFallback] = useState(false)
-
-  
-
-
-    useEffect(() => {
-        const image = new Image();
-        image.src = imageUrl;
-        image.onerror = () => setImageUrl(getFallbackSprite());
-        image.onload = () => setLoaded(true);
-      }, [imageUrl]);
-
-    function getFallbackSprite(){
-        setFallback(true)
-        return `/smartrotom/packs/resourcepack/assets/pixelmon/textures/${url}`
-    }
-    
-    if(!loaded)  return <Loading width={width} height={height}/>
-    return <img className={fallback ? 'mb-2 mt-[-0.5rem]' : ''} width={width || 100} height={height || 100} src={imageUrl} alt={url} style={{imageRendering:'pixelated'}}/>;
-}*/
-
-
 
 export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true, showStatus= true}: 
     {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean}) {
@@ -157,3 +103,4 @@ export function ItemSprite({name, width=100, height=100}: {name:string, width?: 
     if(!loaded) return <Loading width={width} height={height}/>
     return <img width={width} height={height} src={imageUrl?.url} alt="item" style={{imageRendering:'pixelated'}}/>
 }
+
