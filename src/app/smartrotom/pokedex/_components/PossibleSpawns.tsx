@@ -16,7 +16,32 @@ type PossibleSpawn = {
     percentage: number;
 }
 
-export function PossibleSpawns({pokemonSpawns, hideCaught= true, hideSeen = true}: {pokemonSpawns?: PossibleSpawn [], hideCaught?: boolean, hideSeen?: boolean}) {
+export function PossibleSpawnsSection({pokemonSpawns, hideCaught= true, hideSeen = true, title}: {pokemonSpawns?: PossibleSpawn [], hideCaught?: boolean, hideSeen?: boolean, title: string}) {
+    const [show, setShow] = useState(true)
+    const [loaded, setLoaded] = useState(false) // Step 1: Initialize loaded state
+    const [count, setCount] = useState(pokemonSpawns?.length)
+
+
+
+    useEffect(() => {
+        const titleEl = document.getElementById(title)
+        
+        if(titleEl) {
+            const children = titleEl.getElementsByTagName('a') as HTMLCollectionOf<HTMLAnchorElement>
+            setCount(children.length)
+            setShow(children.length > 0) // Corrected logic to set 'show'
+        }
+        setLoaded(true) // Step 2: Set loaded to true after operations
+    }, [hideSeen, hideCaught, title])
+    
+    if(!loaded) return null // Step 3: Use loaded state in rendering logic
+    return <div className="flex flex-col  mb-4 rounded-xl p-2 w-[95%] m-auto" style={{display:  show ? 'block' : 'none'}}>
+        <h1 className="text-4xl text-center text-main-100 font-bold">{title} - {count}</h1>
+        <PossibleSpawns id={title} pokemonSpawns={pokemonSpawns} hideCaught={hideCaught} hideSeen={hideSeen}/>
+    </div>
+}
+
+export function PossibleSpawns({pokemonSpawns, hideCaught= true, hideSeen = true, id}: {pokemonSpawns?: PossibleSpawn [], hideCaught?: boolean, hideSeen?: boolean, id?: string}) {
     const {t} = useTranslation("smartrotom/pokedex/forms")
     const [spawns, setSpawns] = useState<PossibleSpawn []>()
     useEffect(() => {
@@ -69,7 +94,7 @@ export function PossibleSpawns({pokemonSpawns, hideCaught= true, hideSeen = true
 
 
     return(
-        <div className="flex  flex-wrap justify-center">
+        <div className="flex  flex-wrap justify-center" id={id}>
             {spawns?.map((spawn) => (
                 <PokemonSpriteLink hideCaught={hideCaught} hideSeen={hideSeen} key={spawn.species} id={spawn.dex} form={spawn.form} palette={spawn.palette} text={getDisplayName(spawn.species, spawn.form, spawn.palette)}>
                     <div className="text-xs hidden 2xl:block">{getDisplayName(spawn.species, spawn.form, spawn.palette)}</div>
