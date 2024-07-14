@@ -83,7 +83,7 @@ export default async function EntradaPokedex({params}: any){
                             href={`/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}>
                                 <div className="flex flex-col p-2 justify-center items-center">
                                     <PokemonSprite width={100} height={100} id={pokemonIndex} form={form.name || 'base'} palette='none'/>
-                                    {getForm(form.name, formsTranslation) || 'base'}
+                                    {getForm(form.name, formsTranslation) || 'Base'}
                                 </div>
                             </InternalLink>
         })}
@@ -113,7 +113,7 @@ export default async function EntradaPokedex({params}: any){
 
 
                 
-                <PokedexSection id='palettes' title="Paletas">
+                <PokedexSection id='palettes' title="Variantes">
                     {palettes && palettes.map((palette, index) => {
                         return <div key={index} className="flex flex-wrap justify-center">
                             {palette.map((palette, index) => {
