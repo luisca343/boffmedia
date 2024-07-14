@@ -144,7 +144,7 @@ export async function EvoTree({params}: {params: {id: string}}){
                     })
                     conditions.push(<HoverCard>
                         <HoverCardTrigger className='underline hover:cursor-pointer'>En Biomas</HoverCardTrigger>
-                        <HoverCardContent className="w-96 bg-zinc-800 text-white">{biomes.join(', ')}</HoverCardContent>
+                        <HoverCardContent className="w-96 bg-zinc-800 text-white">{biomes.map(biome => biomeTrans(biome)).join(', ')}</HoverCardContent>
                     </HoverCard>)
                 }
                 else if(conditionType == "evolutionRock") {
