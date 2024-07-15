@@ -15,6 +15,7 @@ import { SpawnTable } from "./_components/SpawnTable"
 import { Abilities, GenderProperties } from "@/types/Pokemon"
 import { PokedexSection } from "../../_components/PokedexSection"
 import { InternalLink } from "@/components/nav/Link"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 
 export default async function EntradaPokedex({params}: any){
@@ -143,10 +144,16 @@ export default async function EntradaPokedex({params}: any){
                 <PokemonSprite id={pokemonIndex} form={formName} palette='none' width={200} height={200} pixelated={false}  showStatus={false}/>
             </div> 
             <span className=" text-xl text-center">{description}  </span> 
-            <div className="flex justify-center items-center">
-                {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
-            </div>
-            {rank && <div className="text-center">{`Rango ${rank?.tier}`}</div>}
+            <HoverCard>
+                <HoverCardTrigger>
+                    <div className="flex justify-center items-center hover:cursor-help">
+                        {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
+                    </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128">
+                    {rank && <div className="text-center">{`Ficus Rank: ${rank.ranking > 0 ? "#"+rank.ranking : ""}  Tier ${rank?.tier} `}</div>}
+                </HoverCardContent>
+            </HoverCard>
                 <div>
                     <span className="font-bold">Habilidades:</span>
                     {abilities?.abilities.map((ability) => <span className="mx-1" key={ability}>{ability}</span>)}
