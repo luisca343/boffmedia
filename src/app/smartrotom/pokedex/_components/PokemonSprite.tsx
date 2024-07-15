@@ -54,8 +54,8 @@ export function PokemonSpriteLink({children, id, form, palette, width=80, height
         </InternalLink>
 }
 
-export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true, showStatus= true}: 
-    {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean}) {
+export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true, showStatus= true, forceBlack=false}: 
+    {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, forceBlack?: boolean}) {
     const [imageUrl, setImageUrl] = useState() as any;
     const [loaded, setLoaded] = useState(false)
     const {data: session} = useSession()  as any
@@ -79,7 +79,7 @@ export function PokemonSprite({id, form, palette, width=100, height=100, pixelat
 
     if(!loaded) return <Loading width={width} height={height}/>
     return <div style={{width, maxHeight:height}} className={` relative ${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}><img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
-        className={` ${imageUrl.showImg ? '' : 'brightness-0'}`}/>
+        className={` ${imageUrl.showImg && !forceBlack ? '' : 'brightness-0'}`}/>
            {showStatus && 
            <div className="absolute top-1 right-1">
                 <StatusIconv2 status={imageUrl.status}  palette={palette} width={width} height={height}/>
