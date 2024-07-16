@@ -104,7 +104,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                         <PokedexHead className="h-50 w-12">
                         <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50}/>
                         </PokedexHead>
-                        <PokedexCell>{spawn.pokemonPalette ?  formsTrans(`palette_${spawn.pokemonPalette}`) : 'Base'}</PokedexCell>
+                        <PokedexCell>{getFormPalette(spawn)}</PokedexCell>
                         <PokedexCell>{t(spawn.spawnType)}</PokedexCell>
                         <PokedexCell>
                         {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
@@ -124,4 +124,15 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
             </TableBody>
         </PokedexTable>
     )
+
+    function getFormPalette(spawn: SpawnInfo){
+        const form = spawn.pokemonForm === 'base' ? '' : formsTrans(`form_${spawn.pokemonForm}`)
+        const palette = spawn.pokemonPalette ? formsTrans(`palette_${spawn.pokemonPalette}`) : ''
+
+        return <div>
+            <span>{palette || form ? form : 'Base'}</span>
+            <span>{palette}</span>
+        </div>
+    }
 }
+
