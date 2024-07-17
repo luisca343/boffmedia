@@ -24,4 +24,16 @@ export class SmartrotomController {
         if(!exists) return {error: "No existe la imagen"}
         return {status: "OK"}
     }
+
+    @Post('stats')
+    async getStats(@Body() {uuid}: {uuid: string}){
+        return this.smartrotomService.getStats(uuid)
+    }
+
+    @Post('team')
+    async getTeam(@Body() {uuid}: {uuid: string}){
+        const team = await this.smartrotomService.getTeam(uuid)
+        console.log('team',team)
+        return team
+    }
 }
