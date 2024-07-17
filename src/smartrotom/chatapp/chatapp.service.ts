@@ -135,13 +135,13 @@ export class ChatappService {
         let chatType = 1
 
         if(uuids.length == 1){
-            /*
+            
             const exists = await this.db.getDrizzle().select({id: rotomChats.id}).from(rotomChats)
                 .where(eq(rotomChats.name, chatName))
     
             if(exists.length > 0){
                 return exists[0].id
-            } */
+            }
 
             chatType = 1
 
