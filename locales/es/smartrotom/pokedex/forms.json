@@ -280,6 +280,9 @@
     "palette_yellow": "Amarillo",
     "palette_white": "Blanco",
     "palette_blue": "Azul",
+    "palette_green": "Verde",
+    "palette_indigo": "Índigo",
+    "palette_violet": "Violeta",
 
     "palette_phony": "Falsificado",
     "palette_authentic": "Genuino",
