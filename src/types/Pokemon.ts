@@ -168,3 +168,23 @@ export type PokedexRegistry = {
     seenAt: Date | string; 
     caughtAt?: Date | string | null;
 };
+
+
+
+export type ActiveTeam =  ActivePokemon[];
+
+export type ActivePokemon = {
+    dex: number;
+    nature: string;
+    species: string;
+    form: string;
+    palette: string;
+    name: string;
+    level: number;
+    item: string;
+    ability: string;
+    moves: string[];
+    ivs: string[];
+    evs: string[];
+    stats: string[];
+};
