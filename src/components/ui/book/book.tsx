@@ -10,7 +10,7 @@ type PageFlip = {
     
 };
 
-export function Book({children, pageColor= '', setBook}: {children: React.ReactNode, pageColor?: string, setBook: (book: PageFlip) => void}) {
+export function Book({children, pageColor= '', setBook}: {children?: React.ReactNode, pageColor?: string, setBook: (book: PageFlip) => void}) {
   const [page, setPage] = useState(0);
   const [pageFlip, setPageFlip] = useState<PageFlip>({getPageCount: () => 0})
   const pages = React.Children.toArray(children).map((content, index) => { 
@@ -18,7 +18,7 @@ export function Book({children, pageColor= '', setBook}: {children: React.ReactN
 
     
   if(pages.length % 2 !== 0){
-      pages.splice(pages.length - 1, 0, {content: <Page>Relleno</Page>, index: pages.length});
+      pages.splice(pages.length - 1, 0, {content: <Page>Relleno</Page>, index: -2});
   }
   
 
@@ -46,11 +46,16 @@ return (
       clickEventForward={true} useMouseEvents={true} swipeDistance={50} showPageCorners={false} disableFlipByClick={false}
       onFlip={(e) => onFlip(e.data)} onInit={(e) => cargar(e)}
     >
-      {pages.map((page, index) => (
-        <div key={index} className={`${page.index % 2 === 0 ? `page-right${pageColor}` : `page-left${pageColor}`}`} >
+      {pages.map((page, index) => {
+        console.log('index', index)
+        console.log('pageindex', page.index)
+        console.log('len',pages.length)
+        console.log('page',page)
+        console.log('test',page.index % 2 === 0 || index === pages.length-1)
+        return<div key={index} className={`${(page.index % 2 === 0 && index !== pages.length-1) ? `page-${index} page-right${pageColor}` : `page-left${pageColor}`}`} >
           {page.content}
         </div>
-      ))}
+})}
     </HTMLFlipBook>
   </motion.div>
 );
@@ -76,9 +81,9 @@ interface PageCoverProps {
 }
 
 
-export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0}: {children: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number}) {
+export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0}: {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number}) {
     return (
-        <div style={style} className={`h-full w-full page drop-shadow-2xl p-2 ${className}`} data-density={dataDensity}>
+        <div style={style} className={`h-full w-full page drop-shadow-2xl p-2 overflow-hidden ${className}`} data-density={dataDensity}>
              {children}
         </div>
     );
