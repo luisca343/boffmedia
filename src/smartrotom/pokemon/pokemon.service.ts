@@ -130,7 +130,7 @@ export class PokemonService {
         
         let showImg = status !== 0
         
-        //showImg = true
+        showImg = true
         //!this.excludedForms.includes(formName) && pokemonId < 2000 ? showImg = true : null
 
         if(type === 'img') {
@@ -186,7 +186,12 @@ export class PokemonService {
     }
 
     getSpawns(name: string){
-        return this.spawnData.spawnByPokemonAndForm[name] || this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+        return this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+        //return this.spawnData.spawnByPokemonAndForm[name] || this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+    }
+
+    getAllSpawnsByPokemon(pokemon: string){
+        return this.spawnData.spawnByPokemonAndForm[pokemon] || this.spawnData.spawnByPokemon[pokemon.split('_')[0]] || []
     }
 
     getPokemonNames() {
