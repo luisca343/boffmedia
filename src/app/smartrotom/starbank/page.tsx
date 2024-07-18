@@ -98,7 +98,7 @@ export default function StarBank(){
                     <BankSectionHeader >Datos de cuenta </BankSectionHeader>
                     <BankSectionContent>
                     <div className="text-3xl font-bold text-center">Balance</div>
-                    <div className="text-4xl 2xl:text-6xl font-bold text-blue-900 text-center ">{formatMoney(getActiveAccountBalance(accounts, activeAccount))}</div>
+                    <div className="text-4xl 2xl:text-5xl font-bold text-blue-900 text-center ">{formatMoney(getActiveAccountBalance(accounts, activeAccount))}</div>
                 </BankSectionContent>
                     <BankSectionFooter>        
                         <div className="flex flex-row w-full justify-center items-center">

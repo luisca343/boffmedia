@@ -11,7 +11,7 @@ import { useEffect, useState } from 'react';
 const hide = ['smartrotom', 'battlesim', 'wingull']
 export function FicusNav() {
   const pathname = usePathname()
-  const [app, setApp] = useState('');
+  const [app, setApp] = useState('noApp');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -23,6 +23,7 @@ export function FicusNav() {
       if(h == app) return null
   }
 
+  if(app === 'noApp') return null
   //if (hide.includes(app)) return null
   return (
     <nav className="bg-main-800 p-4">

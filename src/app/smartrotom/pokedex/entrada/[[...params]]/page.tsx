@@ -12,9 +12,10 @@ import { EntryHeader } from "./_components/EntryHeader"
 import { LevelMovesTable, MovesTable, OtherMovesTable } from "./_components/MovesTable"
 import { SpawnInfo } from "../../_types/spawnInfo"
 import { SpawnTable } from "./_components/SpawnTable"
-import { GenderProperties } from "@/types/Pokemon"
+import { Abilities, GenderProperties } from "@/types/Pokemon"
 import { PokedexSection } from "../../_components/PokedexSection"
 import { InternalLink } from "@/components/nav/Link"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 
 
 export default async function EntradaPokedex({params}: any){
@@ -83,7 +84,7 @@ export default async function EntradaPokedex({params}: any){
                             href={`/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}>
                                 <div className="flex flex-col p-2 justify-center items-center">
                                     <PokemonSprite width={100} height={100} id={pokemonIndex} form={form.name || 'base'} palette='none'/>
-                                    {getForm(form.name, formsTranslation) || 'base'}
+                                    {getForm(form.name, formsTranslation) || 'Base'}
                                 </div>
                             </InternalLink>
         })}
@@ -113,7 +114,7 @@ export default async function EntradaPokedex({params}: any){
 
 
                 
-                <PokedexSection id='palettes' title="Paletas">
+                <PokedexSection id='palettes' title="Variantes">
                     {palettes && palettes.map((palette, index) => {
                         return <div key={index} className="flex flex-wrap justify-center">
                             {palette.map((palette, index) => {
@@ -131,20 +132,41 @@ export default async function EntradaPokedex({params}: any){
     )
 
     function BasicInfo({formName}: {formName: string}){
-        const types = pokemon.forms[formIndex].types ? pokemon.forms[formIndex].types : pokemon.forms[0].types as any
+        const types = pokemon.forms[formIndex as number].types ? pokemon.forms[formIndex as number].types : pokemon.forms[0].types as any
         const description = formsTranslation(`pixelmon_${pokemon.name.toLowerCase()}_description`).split('_').join('.')
-        const rank = pokemon.forms[formIndex].rank ? pokemon.forms[formIndex].rank : pokemon.forms[0].rank as {ranking: number, type1: string, type2: string, tier: string}
+        const rank = pokemon.forms[formIndex as number].rank ? pokemon.forms[formIndex as number].rank : pokemon.forms[0].rank as {ranking: number, type1: string, type2: string, tier: string}
+        
+        const abilities = pokemon.forms[formIndex as number].abilities ? pokemon.forms[formIndex as number].abilities : pokemon.forms[0].abilities as Abilities
+        
         return <section className="flex justify-center items-center">
         <div className="flex flex-col items-center">
             <div className="flex " style={{width:200, height:200}}>
                 <PokemonSprite id={pokemonIndex} form={formName} palette='none' width={200} height={200} pixelated={false}  showStatus={false}/>
             </div> 
             <span className=" text-xl text-center">{description}  </span> 
-            <div className="flex justify-center items-center">
-                {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
+            <HoverCard>
+                <HoverCardTrigger>
+                    <div className="flex justify-center items-center hover:cursor-help">
+                        {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
+                    </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128">
+                    {rank && <div className="text-center">{`Ficus Rank: ${rank.ranking > 0 ? "#"+rank.ranking : ""}  Tier ${rank?.tier} `}</div>}
+                </HoverCardContent>
+            </HoverCard>
+                <div>
+                    <span className="font-bold">Habilidades:</span>
+                    {abilities?.abilities.map((ability) => <span className="mx-1" key={ability}>{ability}</span>)}
+                </div>
+                
+                {abilities?.hiddenAbilities && 
+                    <div>
+                        <span className="font-bold">Habilidad Oculta:</span>
+                        {abilities?.hiddenAbilities.map((ability) => <span className="mx-1" key={ability}>{ability}</span>)}
+                    </div>
+                }
             </div>
-            {rank && <div className="text-center">{`Rango ${rank?.tier}`}</div>}
-            </div>
+
         </section>
     }
 

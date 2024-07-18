@@ -22,6 +22,7 @@
     "@pkmn/login": "^0.2.0",
     "@pkmn/protocol": "^0.6.24",
     "@pkmn/sim": "^0.9.5",
+    "@pkmn/view": "^0.6.25",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-collapsible": "^1.0.3",

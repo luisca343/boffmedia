@@ -99,3 +99,11 @@ export function getPokemonCoverage(type1: string, type2 ='') {
 export function getFormName(pokemon: Pokemon, formIndex: number){
     return pokemon.forms[formIndex].name || 'base'
 }
+
+
+export function getDisplayName(species: string, form: string, palette: string, t: any) {
+    //if (form.includes('segment')) form = 'base';
+    const formDisplay = form !== 'base' ? t(`form_${form}`) : '';
+    const paletteDisplay = palette !== 'none' ? t(`palette_${palette}`) : '';
+    return `${species}${formDisplay ? ` ${formDisplay}` : ''}${paletteDisplay ? ` ${paletteDisplay}` : ''}`;
+}
