@@ -15,6 +15,13 @@
       "when": 1720687787021,
       "tag": "0001_long_carmella_unuscione",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1721252276411,
+      "tag": "0002_green_blur",
+      "breakpoints": true
     }
   ]
 }

@@ -28,3 +28,25 @@ export const smartrotomUserApps = mysqlTable("rotom_user_apps", {
 });
 
 export type SmartRotomUserApp = typeof smartrotomUserApps.$inferSelect;
+
+export const smartRotomAchievements = mysqlTable("rotom_achievements", {
+    id: int("id").notNull().primaryKey(),
+    name: varchar("name", { length: 64 }).notNull(),
+    description: varchar("description", { length: 255 }).notNull(),
+    icon: varchar("icon", { length: 255 }),
+    category: varchar("category", { length: 32 }).notNull(),
+    subcatecory: varchar("subcategory", { length: 32 }),
+    target: int("target").default(1),
+});
+
+export type SmartRotomAchievement = typeof smartRotomAchievements.$inferSelect;
+
+export const smartRotomUserAchievements = mysqlTable("rotom_user_achievements", {
+    uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    id: int("id").notNull().references(() => smartRotomAchievements.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    progress: int("progress").default(0),
+    completed: int("completed").default(0),
+    completedAt: timestamp("completed_at"),
+});
+
+export type SmartRotomUserAchievement = typeof smartRotomUserAchievements.$inferSelect;
