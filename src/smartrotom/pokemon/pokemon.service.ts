@@ -12,6 +12,7 @@ import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { and, desc, eq } from 'drizzle-orm';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
+import { spawn } from 'child_process';
 
 @Injectable()
 export class PokemonService {
@@ -128,6 +129,8 @@ export class PokemonService {
         }
         
         let showImg = status !== 0
+        
+        showImg = true
         //!this.excludedForms.includes(formName) && pokemonId < 2000 ? showImg = true : null
 
         if(type === 'img') {
@@ -149,8 +152,9 @@ export class PokemonService {
         if(!palette) {
             palette = form.genderProperties[0].palettes[0]
         }
+        
 
-        const sprite = this.getSpriteURL(palette)
+        const sprite = this.getSpriteURL(palette, pokemonId)
          
         const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`
         const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
@@ -161,7 +165,8 @@ export class PokemonService {
         return {url: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png', status, showImg}
     }
 
-    getSpriteURL(palette){
+    getSpriteURL(palette, pokemonId?: number){
+        if(pokemonId == 774) return 'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png'
         return palette?.sprite?.resource ? palette.sprite.resource : palette.sprite
     }
 
@@ -181,7 +186,12 @@ export class PokemonService {
     }
 
     getSpawns(name: string){
-        return this.spawnData.spawnByPokemonAndForm[name] || this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+        return this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+        //return this.spawnData.spawnByPokemonAndForm[name] || this.spawnData.spawnByPokemon[name.split('_')[0]] || []
+    }
+
+    getAllSpawnsByPokemon(pokemon: string){
+        return this.spawnData.spawnByPokemonAndForm[pokemon] || this.spawnData.spawnByPokemon[pokemon.split('_')[0]] || []
     }
 
     getPokemonNames() {
@@ -548,8 +558,104 @@ export class PokemonService {
                 if(!biomes.includes(biome)) biomes.push(biome)
             })
         })
+        
 
         return {biomes, name: pkmName}
+    }
+
+    async getPokemonSprite(spawn: any, total: number){
+        const pkmName = spawn.pokemonName
+        const pkmForm = spawn.pokemonForm
+        const pkmPalette = spawn.pokemonPalette || 'none'
+        const pkm = this.pokemonData.speciesByName[pkmName] as Pokemon
+
+        return { dex: pkm.dex, species: pkm.name, form: pkmForm, palette: pkmPalette, rarity: spawn.rarity, percentage: (spawn.rarity / total) * 100}
+    }
+    
+    async getPokemonByBiome(name: string){
+        const biomeData = this.spawnData.spawnByBiome[name]
+        const spawns = {}as {[key: string]: [{
+            dex: number;
+            species: string;
+            form: string;
+            palette: string;
+            rarity: number;
+            percentage: number;
+        }]}
+
+        const totals = {} as {[key: string]: number}
+        const pokemonAcc = {} as {[key: string]: {
+            dex: number;
+            species: string;
+            form: string;
+            palette: string;
+            rarity: number;
+            percentage: number;
+        }}
+
+        biomeData.forEach(async (spawn) => {
+            if(!totals[spawn.spawnType]) totals[spawn.spawnType] = 0
+            totals[spawn.spawnType]+= spawn.rarity
+        })
+        
+
+        for (const spawn of biomeData) {
+            const id = `${spawn.spawnType}_${spawn.pokemonName}${spawn.pokemonForm}${spawn.pokemonPalette}`;
+            if (!spawns[spawn.spawnType]) spawns[spawn.spawnType] = [] as any;
+            if (!pokemonAcc[id]) {
+                pokemonAcc[id] = await this.getPokemonSprite(spawn, totals[spawn.spawnType]);
+            } else {
+                pokemonAcc[id].rarity += spawn.rarity;
+                pokemonAcc[id].percentage = (pokemonAcc[id].rarity / totals[spawn.spawnType]) * 100;
+            }
+        }
+
+        // For each pokemonAcc, we need to add it to the spawns object
+        for(const key in await pokemonAcc){
+            spawns[key.split('_')[0]].push(pokemonAcc[key])
+        }
+        
+
+        // Before returning the data, we need to sort it by rarity
+        for(const key in await spawns){
+            spawns[key] = spawns[key].sort((a, b) => b.rarity - a.rarity)
+        }
+
+        // Sort the spawn types by amount of pokemon
+        const sortedSpawns = Object.keys(spawns).sort((a, b) => spawns[b].length - spawns[a].length)
+        const sortedSpawnsObj = {} as {[key: string]: any}
+        sortedSpawns.forEach((key) => {
+            sortedSpawnsObj[key] = spawns[key]
+        })
+
+        
+        return sortedSpawnsObj
+    }
+
+    // Get all the biomes, and the amount of pokemon that spawn in each biome, sorted by amount of pokemon
+    async getBiomes(){
+        const biomes = {} as {[key: string]: number}
+        const biomeData = this.spawnData.spawnByBiome
+        for(const key in biomeData){
+            const pokemonInBiome = await this.getPokemonByBiome(key) as any
+
+            let count = 0
+
+            Object.entries(pokemonInBiome).forEach(([key, value]) => {
+                count += Object.values(value).length
+            })
+
+
+            biomes[key] = count
+        }
+
+        const sortedBiomes = Object.keys(biomes).sort((a, b) => biomes[b] - biomes[a])
+        const sortedBiomesObj = {} as {[key: string]: number}
+        sortedBiomes.forEach((key) => {
+            sortedBiomesObj[key] = biomes[key]
+        })
+
+        return sortedBiomesObj
     }
 
     async test(){
@@ -560,7 +666,6 @@ export class PokemonService {
             keys: ['name', 'nickname']
         }
         const pkmName = await this.getPokemonByName("Garganacl", 1)[0].item.name
-        console.log(pkmName)
         const fuse = new Fuse<any>(Object.keys(this.spawnData.spawnByPokemonAndForm), options);
         const result = fuse.search(pkmName);
         const resName = result[0].item

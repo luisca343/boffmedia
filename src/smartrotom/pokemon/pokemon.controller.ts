@@ -86,6 +86,10 @@ export class PokemonController {
     getSpawns(@Param('name') name: string){
         return this.pokemonService.getSpawns(name);
     }
+    @Get('allspawns/:name/')
+    getAllSpawns(@Param('name') name: string){
+        return this.pokemonService.getAllSpawnsByPokemon(name);
+    }
 
     @Get('image/:id/:form/:palette/:uuid/:hide')
     getImage(@Param('id') pokemonId: number, @Param('form') formName: string, @Param('palette') paletteName: string, @Param('uuid') uuid: string, @Param('hide') hide: number){
@@ -120,6 +124,16 @@ export class PokemonController {
     @Get('registries/:uuid')
     getPokedexRegistries(@Param('uuid') uuid: string){
         return this.pokemonService.getRegistries(uuid);
+    }
+
+    @Get('biome/:name')
+    getPokemonByBiome(@Param('name') name: string){
+        return this.pokemonService.getPokemonByBiome(name);
+    }
+
+    @Get('biomes')
+    getBiomes(){
+        return this.pokemonService.getBiomes();
     }
 
 }
