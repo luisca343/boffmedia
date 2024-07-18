@@ -6,6 +6,7 @@ import useTranslation from 'next-translate/useTranslation'
 export default function ActiveTeam({team}: {team: ActiveTeamType}){
     const { t: movesTrans } = useTranslation("smartrotom/pokedex/moves")
     const { t: formsTranslation } = useTranslation("smartrotom/pokedex/forms")
+    const { t: abilitiesTrans } = useTranslation("smartrotom/pokedex/abilities")
 
     return(
         <div className="flex flex-col justify-between  h-[90%] w-full">
@@ -17,7 +18,7 @@ export default function ActiveTeam({team}: {team: ActiveTeamType}){
                         <span className="text-center text-xs">{p.name} Nv. {p.level}</span>
                     </div>
                     <div className="flex flex-col justify-center items-center w-[20%] border-dashed border-l  text-center border-black">
-                        <span>{p.ability}</span>
+                        <span>{abilitiesTrans(`ability_${p.ability.replace(" ", "")}`)}</span>
                         <span>{p.item != 'item.minecraft.air' && p.item}</span>
                     </div>
                     <div className="flex flex-col justify-center items-center w-[25%] border-dashed border-l  text-center border-black">
