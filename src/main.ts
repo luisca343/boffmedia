@@ -9,7 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   let origin = [
   'http://localhost:3000', 'http://148.251.3.244:34333', 'https://lizardon.es', 
-  'https://boffmedia.es', 'http://local.boffmedia.es', 'http://smartrotom.local.boffmedia.es'
+  'https://boffmedia.es', 'http://local.boffmedia.es', 'http://smartrotom.local.boffmedia.es', 'https://blog.ficuslab.es'
 ]
   app.enableCors({ origin }); // Enable CORS for the specified origin
   app.use(bodyParser.json({ limit: '50mb' })); 

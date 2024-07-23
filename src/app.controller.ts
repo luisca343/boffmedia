@@ -3,6 +3,7 @@ import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
+import axios from 'axios';
 
 
 @Controller()
@@ -40,5 +41,17 @@ export class AppController {
     const writeStream = createWriteStream(`public/jcef/${sha}/${file.originalname}`);
     writeStream.write(file.buffer);
     return this.appService.uploadFile(file);
+  }
+
+  @Post("googlemaps")
+  async googlemap(@Body() body: {url: string}) {
+    const data = await axios.get(body.url);
+    console.log(data.data);
+    return data.data;
+  }
+
+  @Get("blogicons")
+  async blogicons() {
+    return await this.appService.blogicons();
   }
 }
