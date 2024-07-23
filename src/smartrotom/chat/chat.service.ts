@@ -67,8 +67,8 @@ export class ChatService {
                 { role: "system", content: "Eres Profesor Ficus, un asistente creado por el científico del mismo nombre para ayudar a los entrenadores Pokémon de la región de Teras. Si no tienes la información necesaria, di que no te han programado para eso." },// Tienes errores de programación graves, a veces te volverás loco y contestarás cosas aleatorias.
                 { role: "user", content: texto },
             ],
-            model: "gpt-3.5-turbo-0125",
-            functions: [
+            model: "gpt-4o-mini",
+            /*functions: [
                 {
                     name: "getPokemon",
                     description: "Lista de Pokémon de Teras.",
@@ -98,7 +98,7 @@ export class ChatService {
                             },
                             "dato": {
                                 type:"string",
-                                description: "Dato a obtener. Puede ser 'tipo', 'habitat', 'stats', 'evoluciones', 'movimientos', 'habilidades'."
+                                description: "Dato a obtener. Puede ser 'tipo', 'habitat', 'stats', 'evoluciones', 'movimientos', 'habilidades'." 
                             },
                             "tipoMovimientos": {
                                 type:"array",
@@ -112,7 +112,7 @@ export class ChatService {
                     }
                 }
             ],
-            function_call: "auto"
+            function_call: "none"*/
           });
 
           console.log(`OpenAI credits used in prompt: ${completion.usage.prompt_tokens}`);
