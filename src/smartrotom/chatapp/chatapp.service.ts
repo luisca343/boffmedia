@@ -1,4 +1,4 @@
-import { rotomChatMessageReads, rotomChatMessages, rotomChatUsers, rotomChats } from '@/_db/schema/SmartRotomChat';
+import { RotomChatMessage, rotomChatMessageReads, rotomChatMessages, rotomChatUsers, rotomChats } from '@/_db/schema/SmartRotomChat';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { asc, desc, eq, max, min } from 'drizzle-orm';
@@ -99,7 +99,7 @@ export class ChatappService {
         console.log('CREATING MESSAGE')
         
         const insert = await this.db.getDrizzle().insert(rotomChatMessages)
-            .values({chatId, content: message, senderUUID: uuid, type}) as ResultSetHeader[]
+            .values({chatId, content: message, senderUUID: uuid, type} as RotomChatMessage) as ResultSetHeader[]
         
         const insertId = insert[0].insertId
 

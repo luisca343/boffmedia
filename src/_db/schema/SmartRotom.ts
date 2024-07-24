@@ -22,15 +22,15 @@ export const smartrotomApps = mysqlTable("rotom_apps", {
 export type SmartRotomApp = typeof smartrotomApps.$inferSelect;
 
 export const smartrotomUserApps = mysqlTable("rotom_user_apps", {
-    uuid: char("uuid", { length: 36 }),
-    appId: int("app_id").notNull(),
+    uuid: char("uuid", { length: 36 }).notNull().references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    appId: int("app_id").notNull().references(() => smartrotomApps.id, {onDelete: "cascade", onUpdate: "cascade"}),
     order: int("order").default(999),
 });
 
 export type SmartRotomUserApp = typeof smartrotomUserApps.$inferSelect;
 
 export const smartRotomAchievements = mysqlTable("rotom_achievements", {
-    id: int("id").notNull().primaryKey(),
+    id: varchar("id", { length: 32 }).primaryKey(),
     name: varchar("name", { length: 64 }).notNull(),
     description: varchar("description", { length: 255 }).notNull(),
     icon: varchar("icon", { length: 255 }),
@@ -42,8 +42,8 @@ export const smartRotomAchievements = mysqlTable("rotom_achievements", {
 export type SmartRotomAchievement = typeof smartRotomAchievements.$inferSelect;
 
 export const smartRotomUserAchievements = mysqlTable("rotom_user_achievements", {
+    achievementId: varchar("achievement_id", { length: 32 }).references(() => smartRotomAchievements.id, {onDelete: "cascade", onUpdate: "cascade"}),
     uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
-    id: int("id").notNull().references(() => smartRotomAchievements.id, {onDelete: "cascade", onUpdate: "cascade"}),
     progress: int("progress").default(0),
     completed: int("completed").default(0),
     completedAt: timestamp("completed_at"),

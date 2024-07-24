@@ -34,7 +34,7 @@ export class MinaService {
 
     if(newEnergy > energy.energy) {
         const newTime = lastCharge.getTime() +  hoursToCharge * 60 * 60 * 1000;
-        const test = await this.db.getDrizzle().update(smartrotomUsers).set({energy: newEnergy, lastCharge: new Date(newTime)}).where(eq(smartrotomUsers.uuid, uuid));
+        const test = await this.db.getDrizzle().update(smartrotomUsers).set({energy: newEnergy, lastCharge: new Date(newTime)} as SmartRotomUser).where(eq(smartrotomUsers.uuid, uuid));
     }
 
     return {energy: newEnergy, maxEnergy, lastCharge};
@@ -61,7 +61,7 @@ export class MinaService {
             return {error: "No tienes suficiente energía para jugar."};
         }
 
-        let update = {energy: energy.energy - 1};
+        let update = {energy: energy.energy - 1} as SmartRotomUser;
         if(energy.energy >= energy.maxEnergy) {
             update = {energy: energy.energy - 1, lastCharge: new Date()} as SmartRotomUser
         }

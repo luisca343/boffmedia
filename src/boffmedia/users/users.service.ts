@@ -43,7 +43,7 @@ export class UsersService {
     if(existe.length > 0) return {error: "El usuario ya existe"} 
     console.log('El usuario BOFF no existe, creando...'); 
     
-    const boffInsert = await this.db.getDrizzle().insert(boffMediaUsers).values({...user, uuid: smartrotomUser.uuid});
+    const boffInsert = await this.db.getDrizzle().insert(boffMediaUsers).values({...user, uuid: boffMediaUser.uuid} as BoffMediaUser).execute();
     const newUser = await this.findFullUserWithName(boffMediaUser.username);
     return newUser;
   }
