@@ -37,13 +37,14 @@ export const smartRotomAchievements = mysqlTable("rotom_achievements", {
     category: varchar("category", { length: 32 }).notNull(),
     subcatecory: varchar("subcategory", { length: 32 }),
     target: int("target").default(1),
+    order: int("order").default(0),
 });
 
 export type SmartRotomAchievement = typeof smartRotomAchievements.$inferSelect;
 
 export const smartRotomUserAchievements = mysqlTable("rotom_user_achievements", {
-    achievementId: varchar("achievement_id", { length: 32 }).references(() => smartRotomAchievements.id, {onDelete: "cascade", onUpdate: "cascade"}),
-    uuid: char("uuid", { length: 36 }).references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    achievementId: varchar("achievement_id", { length: 32 }).notNull().references(() => smartRotomAchievements.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    uuid: char("uuid", { length: 36 }).notNull().references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
     progress: int("progress").default(0),
     completed: int("completed").default(0),
     completedAt: timestamp("completed_at"),

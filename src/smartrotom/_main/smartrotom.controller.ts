@@ -36,4 +36,9 @@ export class SmartrotomController {
         console.log('team',team)
         return team
     }
+
+    @Post('achievements')
+    async getAchievements(@Body() {uuid}: {uuid: string}){
+        return this.smartrotomService.getAchievements(uuid)
+    }
 }
