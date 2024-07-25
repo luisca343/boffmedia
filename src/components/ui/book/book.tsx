@@ -81,10 +81,31 @@ interface PageCoverProps {
 }
 
 
-export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0}: {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number}) {
+export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0, book}: 
+  {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number, book?: PageFlip}) {
     return (
-        <div style={style} className={`h-full w-full page drop-shadow-2xl p-2 overflow-hidden ${className}`} data-density={dataDensity}>
+        <div style={{...style, position: 'relative'}} className={`h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}>
              {children}
+             <span 
+                className={`absolute bottom-2 ${number%2 ? 'left' : 'right'}-2`}
+                onClick={(e) => turnPage(book, 1, e)}
+             >
+                {number}
+             </span>
+             <button 
+                className={`absolute bottom-2 ${number%2 ? 'right' : 'left'}-2`}
+                onClick={(e) => turnPage(book, 1, e)}
+             >
+                Índice
+             </button>
         </div>
     );
 };
+
+
+
+export function turnPage(book: any, page: number, e: any){
+  book.flip(page)
+  e.preventDefault()
+  e.stopPropagation()
+}
