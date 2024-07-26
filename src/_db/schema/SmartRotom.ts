@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { char, int, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { char, int, mysqlTable, primaryKey, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 export const smartrotomUsers = mysqlTable("rotom_users", {
     id: int("id").primaryKey().autoincrement(),
@@ -48,6 +48,12 @@ export const smartRotomUserAchievements = mysqlTable("rotom_user_achievements", 
     progress: int("progress").default(0),
     completed: int("completed").default(0),
     completedAt: timestamp("completed_at"),
-});
+    data: text("data").default(null),
+}, (table) => {
+    return {
+        pk: primaryKey({columns: [table.achievementId, table.uuid]}),
+    }
+}
+);
 
 export type SmartRotomUserAchievement = typeof smartRotomUserAchievements.$inferSelect;

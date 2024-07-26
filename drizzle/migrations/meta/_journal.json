@@ -15,6 +15,20 @@
       "when": 1721917249108,
       "tag": "0001_broad_jane_foster",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1721994382168,
+      "tag": "0002_thankful_vanisher",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1722010512602,
+      "tag": "0003_nosy_moira_mactaggert",
+      "breakpoints": true
     }
   ]
 }
