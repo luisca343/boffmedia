@@ -1,5 +1,5 @@
 'use client'
-import { Book, BookLink, Page, PageFlip, turnPage } from "@/components/ui/book/book";
+import { Book, BookLink, Page, turnPage } from "@/components/ui/book/book";
 import './pasaporte.css'
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
@@ -9,9 +9,11 @@ import { rotomPOST } from "@/services/boffAPI";
 import ActiveTeam from "./_components/ActiveTeam";
 import useTranslation from 'next-translate/useTranslation'
 import Badges from "./_components/Badges";
+import { SmartRotomAchievement, parseAchievementData } from "./types";
+import { parseDate } from "@/lib/utils";
 
 export default function Pasaporte(){
-  const [book, setBook] = useState(null as unknown as PageFlip) as [PageFlip, any]
+  const [book, setBook] = useState(null) as any
   const {data: session} = useSession() as {data: BoffSession | null, status: string};
   const uuid = session?.user.smartRotomUser.uuid as string
   const username = session?.user.smartRotomUser.username as string
@@ -19,7 +21,7 @@ export default function Pasaporte(){
 
   const [stats, setStats] = useState(null) as any
   const [team,setTeam] = useState(null) as any
-  const [ achievements, setAchievements] = useState(null) as any
+  const [ achievements, setAchievements] = useState([] as SmartRotomAchievement[])
 
   useEffect(()=>{
     console.log('uuid',uuid)
@@ -40,21 +42,33 @@ export default function Pasaporte(){
     return(
       <section className=" bg-yellow-200 flex bg-center bg-no-repeat bg-fixed bg-cover">
           <Book setBook={setBook}>
-            <Page book={book} number={0} className="font-vinque bg-blue-600 flex  flex-col " style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
+            <Page dataDensity="hard" book={book} number={page++} className="font-vinque bg-blue-600 flex  flex-col " style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>PASAPORTE</div>
               <img className="h-0 flex-1  opacity-80" src="/smartrotom/img/logo.webp" alt="description" style={{ mixBlendMode: 'normal' }} />
               <div className="mb-4 text-center text-4xl  text-yellow-200 font-bold  opacity-80" style={{ mixBlendMode: 'normal' }}>Región de Teras</div>
             </Page>
-            <Page book={book} number={1} >
+            <Page book={book} number={page++} >
               <PageTitle title="Indice"/>
               <div className="flex flex-col justify-start items-start w-full p-8">
                 <BookLink book={book} page={2}  className="text-2xl font-bold">2. Datos Jugador</BookLink>
                 <BookLink book={book} page={3}  className="text-2xl font-bold">3. Equipo Actual</BookLink>
                 <BookLink book={book} page={4}  className="text-2xl font-bold">4. Medallas</BookLink>
+                <div className="ml-6 flex">
+                {
+                  achievements && achievements.map((achievement: any, index)=>{
+                    if(achievement.completed === 1 && achievement.category === 'Gimnasios'){
+                      const page  = 4 + index
+                      return <BookLink className="mr-2 font-bold" key={achievement.name} book={book} page={page}>{page}. {achievement.name}</BookLink>
+                    }
+                  }
+                  )
+                }
+
+                </div>
 
               </div>
             </Page>
-            <Page book={book} number={2} >
+            <Page book={book} number={page++} >
               <div className="flex flex-col">
                 <PageTitle title="Datos Jugador"/>
                 <div className="flex">
@@ -67,24 +81,44 @@ export default function Pasaporte(){
                
               </div>
             </Page>
-            <Page book={book} number={3} >
+            <Page book={book} number={page++} >
               <PageTitle title="Equipo Actual"/>
               {team && <ActiveTeam team={team} />}
             </Page>
-            <Page book={book} number={4} >
+            <Page book={book} number={page++} >
               <PageTitle title="Medallas"/>
               <Badges achievementData={achievements}></Badges>
             </Page>
-            <Page book={book} number={5} >Page 5</Page>
-            <Page book={book} number={6} >Page 6</Page>
-            <Page book={book} number={7}  style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
+            {
+              achievements && achievements.map((achievement: SmartRotomAchievement)=>{
+                if(achievement.completed && achievement.category === 'Gimnasios'){
+                  const data = parseAchievementData(achievement.data)
+                  const team = data.team
+                  return <Page key={achievement.name} book={book} number={page++} >
+                    <BadgePageTitle title={achievement.name} achievement={achievement} />
+                    <div className="flex-1"><ActiveTeam team={team} className="h-[95%]"/></div>
+                  </Page>
+                }
+              })
+            }
+            <Page dataDensity="hard" book={book} number={page++}  style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
             </Page>
           </Book>
       </section>
     )
 
 
-    function PageTitle({title}: {title: string}){
+    function PageTitle({title, children}: {title: string, children?: React.ReactNode}){
       return <div className="text-2xl 2xl:text-4xl font-bold 2xl:m-2 font-vinque underline">{title}</div>
+    }
+
+    function BadgePageTitle({title, achievement}: {title: string, achievement : SmartRotomAchievement}){
+      return <div className="flex font-bold 2xl:m-2 font-vinque  justify-between items-end">
+        <div className="flex">
+          <img className="w-8 2xl:w-12 mr-2" src={`https://api.boffmedia.es/smartrotom/img/logros/${achievement.icon}.webp`} alt={achievement.icon} />
+          <span className="underline text-2xl 2xl:text-4xl ">{title}</span>
+        </div>
+        <span className="right-0 text-xl 2xl:text-2xl">Obtenida: {parseDate(achievement.completedAt)}</span>
+      </div>
     }
 }
