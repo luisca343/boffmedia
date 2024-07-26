@@ -1,5 +1,5 @@
 'use client'
-import { Book, Page, PageFlip, turnPage } from "@/components/ui/book/book";
+import { Book, BookLink, Page, PageFlip, turnPage } from "@/components/ui/book/book";
 import './pasaporte.css'
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
@@ -47,10 +47,10 @@ export default function Pasaporte(){
             </Page>
             <Page book={book} number={1} >
               <PageTitle title="Indice"/>
-              <div className="flex flex-col">
-                <button onClick={(e) => turnPage(book, 2, e)} className="text-2xl font-bold">1. Datos Jugador</button>
-                <button onClick={(e) => turnPage(book, 3, e)} className="text-2xl font-bold">2. Equipo Actual</button>
-                <button onClick={(e) => turnPage(book, 4, e)} className="text-2xl font-bold">3. Medallas</button>
+              <div className="flex flex-col justify-start items-start w-full p-8">
+                <BookLink book={book} page={2}  className="text-2xl font-bold">2. Datos Jugador</BookLink>
+                <BookLink book={book} page={3}  className="text-2xl font-bold">3. Equipo Actual</BookLink>
+                <BookLink book={book} page={4}  className="text-2xl font-bold">4. Medallas</BookLink>
 
               </div>
             </Page>
