@@ -41,4 +41,45 @@ export class SmartrotomController {
     async getAchievements(@Body() {uuid}: {uuid: string}){
         return this.smartrotomService.getAchievements(uuid)
     }
+
+    @Get('achievement/:uuid/:achievementId')
+    async getAchievementForPlayer(@Param('uuid') uuid: string, @Param('achievementId') achievementId: string){
+        return this.smartrotomService.getAchievementForPlayer(uuid, achievementId)
+    }
+    
+
+    @Post('achievements/battle')
+    async addBattleAchievement(@Body() battleAchievement:  LogroCombate){
+        return  await this.smartrotomService.addBattleAchievement(battleAchievement)
+    }
 }
+
+interface SmartRotomPost {
+    server: string;
+    uuid: string;
+}
+
+
+interface PokemonData {
+    dex: number;
+    nature: string;
+    species: string;
+    form: string;
+    palette: string;
+    name: string;
+    level: number;
+    item: string;
+    ability: string;
+    moves: string[];
+    ivs: number[];
+    evs: number[];
+    stats: number[];
+}
+
+export interface LogroCombate extends SmartRotomPost {
+    npc: string;
+    victoria: boolean;
+    logro: string;
+    equipo: PokemonData[];
+    replay: string;
+  }
