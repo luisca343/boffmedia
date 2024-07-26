@@ -23,6 +23,8 @@ export default function Pasaporte(){
   const [team,setTeam] = useState(null) as any
   const [ achievements, setAchievements] = useState([] as SmartRotomAchievement[])
 
+  const obtainedBadges = achievements.filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
+
   useEffect(()=>{
     console.log('uuid',uuid)
     rotomPOST('/stats',{uuid}).then((res)=>{
@@ -49,7 +51,8 @@ export default function Pasaporte(){
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Indice"/>
-              <div className="flex flex-col justify-start items-start w-full p-8">
+              <div className="flex flex-col justify-start items-start w-full py-4 px-8">
+                <BookLink book={book} page={1}  className="text-2xl font-bold">1. Índice</BookLink>
                 <BookLink book={book} page={2}  className="text-2xl font-bold">2. Datos Jugador</BookLink>
                 <BookLink book={book} page={3}  className="text-2xl font-bold">3. Equipo Actual</BookLink>
                 <BookLink book={book} page={4}  className="text-2xl font-bold">4. Medallas</BookLink>
@@ -63,8 +66,8 @@ export default function Pasaporte(){
                   }
                   )
                 }
-
                 </div>
+                <BookLink book={book} page={5 + obtainedBadges}  className="text-2xl font-bold">{5 + obtainedBadges}. Logros</BookLink>
 
               </div>
             </Page>
