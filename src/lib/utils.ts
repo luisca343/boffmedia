@@ -34,3 +34,8 @@ export function  secondsToTime (segundos : number) {
   // Formatear los resultados
   return `${dias > 0 ? dias + 'd ' : ''}${horas > 0 ? horas + 'h ' : ''}${minutos > 0 ? minutos + 'm ' : ''}${segundosRestantes > 0 ? segundosRestantes + 's ' : ''}`
 }
+
+export function parseDate (date: string | Date) {
+  const dateObj = new Date(date)
+  return dateObj.toLocaleDateString() + " " + dateObj.toLocaleTimeString()
+}
