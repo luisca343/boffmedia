@@ -33,3 +33,8 @@ export interface SmartRotomUser {
     error?: string;
     data?: string;
 }
+
+export interface SmartRotomPost {
+  server: string;
+  uuid: string;
+}
