@@ -66,7 +66,7 @@ function Badge({data}: {data: SmartRotomAchievement}){
                         className={`h-12 w-12 ${data.completed ? '' : 'filter brightness-0'}`}
                     />
             </HoverCardTrigger>
-            <HoverCardContent align="start" className="absolute z-50">
+            <HoverCardContent variant="paper" align="start" className="absolute z-50">
                 <div className="flex flex-col">
                     <span className="font-bold text-xl">{data.name}</span>
                     <span>{data.description}</span>
