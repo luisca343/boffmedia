@@ -1,14 +1,14 @@
 // @ts-nocheck
 "use client"
 import { apiGET } from "@/services/boffAPI";
-import { PokemonImage, PokemonTeam, PokemonTeamList } from "../_components/PokemonTeam";
+import { PokemonImage, PokemonTeam, PokemonTeamList } from "../_components_old/PokemonTeam";
 import { Battle, Pokemon, Side } from "@pkmn/client"
 import { DetailedPokemon, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol"
 import { useEffect, useRef, useState } from "react";
 import { Dex } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
-import GameCanvas from "../_components/GameCanvas";
-import { PokemonSprite, Scene } from "../_components/battle_animations";
+import GameCanvas from "../_components_old/GameCanvas";
+import { PokemonSprite, Scene } from "../_components_old/battle_animations";
 import { Input } from "@/components/ui/input";
 import { time } from "console";
 
@@ -87,6 +87,7 @@ export default function Test() {
 
   useEffect(() => {
     apiGET('/battlesimulator/battle').then(data => {
+      console.log(data)
       setPartida(data)
     })
 
