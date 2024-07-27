@@ -1,0 +1,240 @@
+"use client"
+import { useEffect, useState } from "react";
+import { Battle } from "@pkmn/client";
+import { Generations } from '@pkmn/data';
+import { Dex } from '@pkmn/sim';
+import { create } from "zustand";
+import { PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { LogFormatter } from '@pkmn/view';
+import { PlayerDataBar } from "../../_components/BattleSideBar";
+import { BattleCanvas } from "../../_components/BattleCanvas";
+import { time } from "console";
+import { Scene } from "../../_components/battle_animations";
+import { set } from "react-hook-form";
+
+export function Game() {
+  const [battleLog, setBattleLog] = useState<string | null>(null);
+  const [actionQueue, setActionQueue] = useState<string[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [scene, setScene] = useState<Scene | null>(null);
+
+  const [pov, setPov] = useState<'p1' | 'p2'>('p1');
+  const battle = useBattle() as Battle;
+  const setBattle = useSetBattle();
+
+  useEffect(() => {
+    fetch("https://api.boffmedia.es/smartrotom/combates/battle.txt")
+      .then(response => response.text())
+      .then(text => {
+        setBattleLog(text);
+        
+        const gameElement = document.querySelector('#game') as HTMLElement;
+        //console.log('gameElement', gameElement)
+        const battleScene = new Scene(battle, gameElement);
+        setScene(battleScene);
+      })
+      .catch(error => console.error("Error fetching battle log:", error));
+  }, []);
+
+
+  useEffect(() => {
+    if(!isPlaying && actionQueue.length > 0){
+      setIsPlaying(true);
+      const action = actionQueue[0];
+
+      if(action.startsWith('AUDIO:')){
+        console.log('Playing audio:', action.split('AUDIO:')[1]);
+        const audio = new Audio(action.split('AUDIO:')[1]);
+        audio.play();
+        setActionQueue(actionQueue.slice(2));
+        // small 200ms delay to allow audio to play
+        setTimeout(() => setIsPlaying(false), 500);
+        return;
+      }
+
+      performAction(copyBattle(battle), action);
+      setActionQueue(actionQueue.slice(1));
+    }
+  }, [isPlaying, actionQueue, battle]);
+  
+  function readTurn(localBattle: Battle, log: string, targetTurn: number) {
+    if(targetTurn < 0) targetTurn = 0;
+
+    if(!localBattle || targetTurn === 0 || localBattle.turn > targetTurn) {
+      localBattle = new Battle(new Generations(Dex as any));
+    }
+
+    //console.log('CURRENT BATTLE TURN:', localBattle.turn);
+    let turnQueue: string[] = [];
+    return new Promise<void>((resolve, reject) => {
+      try {
+        const formatter = new LogFormatter('p1', localBattle);
+        const lines = log.split("\n");
+        let logTurn = 0;
+        for (const line of lines) {
+          const { args, kwArgs } = Protocol.parseBattleLine(line);
+  
+          if (args[0] === 'turn') {
+            const turnNum = parseInt(args[1]);
+            logTurn = turnNum;
+            localBattle.setTurn(targetTurn);
+          } else if (args[0] === 'win') {
+            // Handle win condition
+          }
+
+          if(localBattle.turn > logTurn){
+            // Skip turn
+            //console.log('Skipping turn:', logTurn);
+            continue;
+          }
+
+          if (logTurn > targetTurn) {
+            //console.log('Breaking at turn:', logTurn);
+            break;
+          }
+          
+          // Add all lines up to the specified turn
+          if (logTurn <= targetTurn) {
+            if(logTurn === targetTurn){
+              turnQueue.push(line);
+            } else {
+              localBattle.add(args, kwArgs);
+            }
+
+            //console.log('Adding line:', logTurn);
+          }
+        }
+        setBattle(localBattle);
+        setActionQueue(turnQueue);
+        setIsPlaying(false);
+
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  let timeout = 0
+
+  async function performAction(localBattle: Battle, line: string) {
+    if(!scene) return;
+    const {args, kwArgs} = Protocol.parseBattleLine(line);
+    timeout = 0;
+    
+    if(args[0] === 'switch') {
+      timeout = 1000 / scene.acceleration;
+      const [, positionIdent, pokemonDetails, hpstatus] = args as [string, PokemonIdent, PokemonDetails, PokemonHPStatus]
+      const pos = positionIdent.split(':')[0];
+      const name = pokemonDetails.split(',')[0];
+      
+      //console.log('switching', pos, name)
+      const switchedInPokemon = localBattle.getSwitchedPokemon(positionIdent, pokemonDetails);
+      const switchedOutPokemon = localBattle.getSwitchedOutPokemon(positionIdent, pokemonDetails);
+
+      if(!switchedOutPokemon){
+        await scene.playEffect('pokeball', positionIdent, async() => {
+          setBattle(localBattle);
+          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${switchedInPokemon?.species.id.toLowerCase()}.mp3`
+          setActionQueue([audioUrl, ...actionQueue]);
+          
+
+        });
+      } else {
+        await scene.playEffect('switch', positionIdent, async() => {
+          setBattle(localBattle);
+          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${switchedInPokemon?.species.id.toLowerCase()}.mp3`
+          setActionQueue([audioUrl, ...actionQueue]);
+        });
+      }
+
+
+
+    }
+
+    if(args[0] === 'move') {
+      //console.log('Moving:', args[1]);
+      timeout = 1000;
+    }
+    
+    await delay(timeout).then(() => {
+      localBattle.add(args, kwArgs);
+      setBattle(localBattle);
+      setIsPlaying(false);
+    });
+  }
+
+  const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms));
+
+  useEffect(() => {
+    //console.log('Reading Log');
+    if (battleLog) {
+      readTurn(copyBattle(battle), battleLog, 0).then(() => {
+        
+      }).catch((error) => {
+        console.error('Error reading log:', error);
+      });
+    }
+  }, [battleLog]);
+
+  /*
+  useEffect(() => {
+    console.log('Reading Log');
+    if (battleLog) {
+      readLog(battleLog).then(() => {
+        
+      }).catch((error) => {
+        console.error('Error reading log:', error);
+      });
+    }
+  }, [battleLog]);*/
+
+  useEffect(() => {
+    console.log(battle);
+  }, [battle]);
+
+  return (
+    <div>
+      <div className="flex">
+        <PlayerDataBar battle={battle} side="p1" pov={pov}/>
+        <BattleCanvas battle={battle}/>
+        <PlayerDataBar battle={battle} side="p2" pov={pov}/>
+      </div>
+      <button onClick={() => playTurn(battle.turn - 1)}>Previous turn</button>
+      <button onClick={() => playTurn(battle.turn + 1)}>Next turn</button>
+    </div>
+  );
+
+  function playTurn(turn?: number) {
+    if( isPlaying ) return;
+
+    if(turn === undefined){
+      turn = battle.turn;
+    }
+    readTurn(copyBattle(battle), battleLog as string, turn).then(() => {
+    }).catch((error) => {
+      console.error('Error reading log:', error);
+    });
+  }
+
+}
+
+function copyBattle(battle: Battle) {
+  const newBattle = new Battle(new Generations(Dex as any));
+  Object.assign(newBattle, battle);
+  return newBattle;
+}
+
+
+const useBattleStore = create((set) => ({
+  battle: new Battle(new Generations(Dex as any)),
+  setBattle: (battle: Battle) => set({ battle }),
+}));
+
+export function useBattle() {
+  return useBattleStore((state: any) => state.battle);
+}
+
+export function useSetBattle() {
+  return useBattleStore((state: any) => state.setBattle);
+}

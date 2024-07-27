@@ -29,6 +29,22 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
 
     const [tema, setTema] = useState('');
 
+    /*
+    if ('speechSynthesis' in window) {
+      var msg = new SpeechSynthesisUtterance();
+      var voices = window.speechSynthesis.getVoices();
+      msg.voice = voices[10]; 
+      msg.volume = 1; // From 0 to 1
+      msg.rate = 1; // From 0.1 to 10
+      msg.pitch = 2; // From 0 to 2
+      msg.text = "Como estas Joel";
+      msg.lang = 'es';
+      speechSynthesis.speak(msg);
+     }else{
+       // Speech Synthesis Not Supported 😣
+       alert("Sorry, your browser doesn't support text to speech!");
+     }*/
+
     useEffect(() => {
       isMinecraft().then((res) => {
         setIsMC(res);
@@ -87,6 +103,7 @@ export default function AppWrapper({children} : {children: React.ReactNode}) {
       if(status === "authenticated" && !boffMediaLinked()) {
         //return <RotomError error="Usuario de BoffMedia no vinculado"/>
       }
+      
 
     return (
         <section id="smartrotom" className={`roboto flex flex-col h-screen overflow-hidden ${tema}`}>

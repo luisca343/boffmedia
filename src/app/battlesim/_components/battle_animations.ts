@@ -398,6 +398,8 @@ export class Scene {
 		  return {x: 0, y: 0, z:0, width: 0, height: 0};
 	  }
   
+	  console.log("LA ID ES "+id)
+	  console.log(this.gameElement)
 		const element = this.gameElement.querySelector(`#${id}`);
 		
 		if (!element) return {x: 0, y: 0, z:0, width: 0, height: 0};
@@ -528,7 +530,35 @@ export class Scene {
 					time: 1000 / this.acceleration,
 				  }, 'ballistic2', '', '', callback); 
 			}
-		} 
+		},
+		switch: {
+			anim: (startX: any, startY: any, element:any,callback: (() => void) | undefined) => {
+				this.showEffect('pokeball', {
+					x: element.x,
+					y: element.y,
+					scale: 1,
+					opacity: 0,
+					time: 200 / this.acceleration,
+				  }, {
+					x: startX,
+					y: startY,
+					opacity: 1,
+					time: 200 / this.acceleration,
+				  }, 'ballistic2', '', '');
+				this.showEffect('pokeball', {
+					opacity: 1,
+					x: startX,
+					y: startY,
+					scale: .7,
+					time: 500 / this.acceleration,
+				  }, {
+					opacity: 0,
+					x: element.x,
+					y: element.y,
+					time: 500 / this.acceleration,
+				  }, 'ballistic2', '', '', callback); 
+			}
+		}
 	}
 
   }
