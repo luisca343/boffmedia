@@ -4,13 +4,12 @@ import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { create } from "zustand";
-import { PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgType, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
 import { PlayerDataBar } from "../../_components/BattleSideBar";
 import { BattleCanvas } from "../../_components/BattleCanvas";
-import { time } from "console";
-import { Scene } from "../../_components/battle_animations";
-import { set } from "react-hook-form";
+import { Scene } from "../../_components/Scene";
+import { Button } from "@/components/ui/button";
 
 export function Game() {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -47,7 +46,6 @@ export function Game() {
         const audio = new Audio(action.split('AUDIO:')[1]);
         audio.play();
         setActionQueue(actionQueue.slice(2));
-        // small 200ms delay to allow audio to play
         setTimeout(() => setIsPlaying(false), 500);
         return;
       }
@@ -122,6 +120,7 @@ export function Game() {
     const {args, kwArgs} = Protocol.parseBattleLine(line);
     timeout = 0;
     
+    /*
     if(args[0] === 'switch') {
       timeout = 1000 / scene.acceleration;
       const [, positionIdent, pokemonDetails, hpstatus] = args as [string, PokemonIdent, PokemonDetails, PokemonHPStatus]
@@ -147,21 +146,50 @@ export function Game() {
           setActionQueue([audioUrl, ...actionQueue]);
         });
       }
+    }
 
+    if(args[0] === 'faint'){
+      const [, positionIdent] = args as [string, PokemonIdent];
+      timeout = 1000 / scene.acceleration;
+      //console.log('fainting', positionIdent)
 
+      const pokemon = localBattle.getPokemon(positionIdent);
+      if(pokemon){
+        console.log('fainting', pokemon.species.id)
+        await scene.playBattleAnim('faint', args[1].split(':')[0] as PokemonIdent, args[1].split(':')[0] as PokemonIdent, async() => {
+          console.log('fainted', pokemon.species.id)
+          setBattle(localBattle);
+          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${pokemon.species.id.toLowerCase()}.mp3`
+          setActionQueue([audioUrl, ...actionQueue]);
+        });
+      }
+
+      
 
     }
 
-    if(args[0] === 'move') {
-      //console.log('Moving:', args[1]);
-      timeout = 1000;
-    }
+    if(args[0] === 'move'){
+      const move = localBattle.get("moves", args[2]);
+
+      let arg3 = args[3] === "" ? args[1].includes('p1') ? 'p2a' : 'p1a' : args[3] as string
+
+      scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, arg3.split(':')[0] as PokemonIdent)
+        .then(() => {
+          endAction(args, kwArgs, localBattle);
+        });
+      timeout = -1
+      
+    }*/
     
-    await delay(timeout).then(() => {
-      localBattle.add(args, kwArgs);
-      setBattle(localBattle);
-      setIsPlaying(false);
+    if(timeout >= 0) await delay(timeout).then(() => {
+      endAction(args, kwArgs, localBattle);
     });
+  }
+
+  function endAction(args: ArgType, kwArgs: BattleArgsKWArgType, localBattle: Battle) {
+    localBattle.add(args, kwArgs);
+    setBattle(localBattle);
+    setIsPlaying(false);
   }
 
   const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms));
@@ -193,6 +221,21 @@ export function Game() {
     console.log(battle);
   }, [battle]);
 
+  
+  async function simulateFaint() {
+    if(!scene) return;
+    await scene.playBattleAnim('faint', 'p1a' as PokemonIdent, 'p2a' as PokemonIdent, async() => {
+        console.log('fainted')
+    });
+  }
+
+  async function simulateOtherAttack() {
+    if(!scene) return;
+    await scene.playBattleAnim('faint', 'p2b' as PokemonIdent, 'p1b' as PokemonIdent, async() => {
+      console.log('attacked')
+    });
+  }
+
   return (
     <div>
       <div className="flex">
@@ -200,10 +243,13 @@ export function Game() {
         <BattleCanvas battle={battle}/>
         <PlayerDataBar battle={battle} side="p2" pov={pov}/>
       </div>
-      <button onClick={() => playTurn(battle.turn - 1)}>Previous turn</button>
-      <button onClick={() => playTurn(battle.turn + 1)}>Next turn</button>
+      <Button onClick={() => playTurn(battle.turn - 1)}>Previous turn</Button>
+      <Button onClick={() => playTurn(battle.turn + 1)}>Next turn</Button>
+      <Button onClick={() => simulateFaint()}>Simulate faint</Button>
+      <Button onClick={() => simulateOtherAttack()}>Simulate attack other side</Button>
     </div>
   );
+
 
   function playTurn(turn?: number) {
     if( isPlaying ) return;
