@@ -266,10 +266,9 @@ const height = 175;
 export const offsets: Readonly<Record<string, { top: number; left: number }>> = Object.freeze({
   p1a: { top: 150, left: 10, x: 10 + width / 2, y: 150 + width / 2 },
   p1b: { top: 190, left: 150, x: 150 + width / 2, y: 190 + width / 2 },
-  p1c: { top: 230, left: 10, x: 10 + width / 2, y: 230 + width / 2 },
-  p2a: { top: 0, left: 140, x: 140 + width / 2, y: 0 + width / 2 },
-  p2b: { top: 40, left: 250, x: 250 + width / 2, y: 40 + width / 2 },
-  p2c: { top: 80, left: 250, x: 250 + width / 2, y: 80 + width / 2 },
+
+  p2b: { top: 0, left: 140, x: 140 + width / 2, y: 0 + width / 2 },
+  p2a: { top: 40, left: 250, x: 250 + width / 2, y: 40 + width / 2 },
 });
 
 export class Scene {

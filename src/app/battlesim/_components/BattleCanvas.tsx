@@ -23,8 +23,8 @@ export function BattleCanvas({battle}: {battle: Battle}){
             <PokemonElement pokemon={pokemon["p1a"]} id="p1a" className={`top-[${offsets.p1a.top}px] left-[${offsets.p1a.left}px]`}/>
             <PokemonElement pokemon={pokemon["p1b"]} id="p1b" className={`top-[${offsets.p1b.top}px] left-[${offsets.p1b.left}px]`}/>
 
-            <PokemonElement pokemon={pokemon["p2a"]} id="p2a" className={`top-[${offsets.p2a.top}px] left-[${offsets.p2a.left}px]`}/>
             <PokemonElement pokemon={pokemon["p2b"]} id="p2b" className={`top-[${offsets.p2b.top}px] left-[${offsets.p2b.left}px]`}/>
+            <PokemonElement pokemon={pokemon["p2a"]} id="p2a" className={`top-[${offsets.p2a.top}px] left-[${offsets.p2a.left}px]`}/>
         </div>
     )
 }
