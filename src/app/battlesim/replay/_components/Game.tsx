@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
@@ -16,10 +16,21 @@ export function Game() {
   const [actionQueue, setActionQueue] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [scene, setScene] = useState<Scene | null>(null);
+  const [htmlLog, setLog] = useState<string[]>( []);  
+  
+  const logRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (logRef.current) {
+      logRef.current.scrollTop = logRef.current.scrollHeight;
+    }
+  }, [htmlLog]);
 
   const [pov, setPov] = useState<'p1' | 'p2'>('p1');
   const battle = useBattle() as Battle;
   const setBattle = useSetBattle();
+
+  const formatter = new LogFormatter('p1', battle);
 
   useEffect(() => {
     fetch("https://api.boffmedia.es/smartrotom/combates/battle.txt")
@@ -41,9 +52,16 @@ export function Game() {
       setIsPlaying(true);
       const action = actionQueue[0];
 
-      if(action.startsWith('AUDIO:')){
-        console.log('Playing audio:', action.split('AUDIO:')[1]);
-        const audio = new Audio(action.split('AUDIO:')[1]);
+      if(action.startsWith('AUDIO:') || action.startsWith('AUDIO_FAINT:')) {
+        let audio
+        if(action.startsWith('AUDIO_FAINT:')) {
+          // If faint, lower the pitch
+          audio = new Audio(action.split('AUDIO_FAINT:')[1]);
+          audio.playbackRate = 0.7;
+        } else {
+          audio = new Audio(action.split('AUDIO:')[1]);
+        }
+          
         audio.play();
         setActionQueue(actionQueue.slice(2));
         setTimeout(() => setIsPlaying(false), 500);
@@ -66,7 +84,6 @@ export function Game() {
     let turnQueue: string[] = [];
     return new Promise<void>((resolve, reject) => {
       try {
-        const formatter = new LogFormatter('p1', localBattle);
         const lines = log.split("\n");
         let logTurn = 0;
         for (const line of lines) {
@@ -113,16 +130,32 @@ export function Game() {
     });
   }
 
-  let timeout = 0
+  let timeout = {start: 0, end: 0};
+  const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms));
+
+  function resetTimeout() {
+    timeout = {start: 0, end: 0};
+  }
+  
 
   async function performAction(localBattle: Battle, line: string) {
     if(!scene) return;
     const {args, kwArgs} = Protocol.parseBattleLine(line);
-    timeout = 0;
+
+
+    if(timeout.start > 0){
+      await delay(timeout.start).then(() => {
+        resetTimeout();
+        performAction(localBattle, line);
+      });
+
+      return;
+    }
+
     
-    /*
+    
     if(args[0] === 'switch') {
-      timeout = 1000 / scene.acceleration;
+      timeout.end = 1000 / scene.acceleration;
       const [, positionIdent, pokemonDetails, hpstatus] = args as [string, PokemonIdent, PokemonDetails, PokemonHPStatus]
       const pos = positionIdent.split(':')[0];
       const name = pokemonDetails.split(',')[0];
@@ -150,16 +183,14 @@ export function Game() {
 
     if(args[0] === 'faint'){
       const [, positionIdent] = args as [string, PokemonIdent];
-      timeout = 1000 / scene.acceleration;
+      timeout.end = 1000 / scene.acceleration;
       //console.log('fainting', positionIdent)
 
       const pokemon = localBattle.getPokemon(positionIdent);
       if(pokemon){
-        console.log('fainting', pokemon.species.id)
         await scene.playBattleAnim('faint', args[1].split(':')[0] as PokemonIdent, args[1].split(':')[0] as PokemonIdent, async() => {
-          console.log('fainted', pokemon.species.id)
           setBattle(localBattle);
-          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${pokemon.species.id.toLowerCase()}.mp3`
+          const audioUrl = `AUDIO_FAINT:https://play.pokemonshowdown.com/audio/cries/${pokemon.species.id.toLowerCase()}.mp3`
           setActionQueue([audioUrl, ...actionQueue]);
         });
       }
@@ -173,15 +204,17 @@ export function Game() {
 
       let arg3 = args[3] === "" ? args[1].includes('p1') ? 'p2a' : 'p1a' : args[3] as string
 
-      scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, arg3.split(':')[0] as PokemonIdent)
-        .then(() => {
-          endAction(args, kwArgs, localBattle);
-        });
-      timeout = -1
+      scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, arg3.split(':')[0] as PokemonIdent, async() => {
+        endAction(args, kwArgs, localBattle);
+      });
+      timeout.start = 1000 / scene.acceleration;
+      timeout.end = -1
       
-    }*/
+    }
     
-    if(timeout >= 0) await delay(timeout).then(() => {
+    const logLine = formatter.formatHTML(args, kwArgs);
+    setLog([...htmlLog, logLine]);
+    if(timeout.end >= 0) await delay(timeout.end).then(() => {
       endAction(args, kwArgs, localBattle);
     });
   }
@@ -190,12 +223,11 @@ export function Game() {
     localBattle.add(args, kwArgs);
     setBattle(localBattle);
     setIsPlaying(false);
+
   }
 
-  const delay = (ms: number | undefined) => new Promise(res => setTimeout(res, ms));
 
   useEffect(() => {
-    //console.log('Reading Log');
     if (battleLog) {
       readTurn(copyBattle(battle), battleLog, 0).then(() => {
         
@@ -218,7 +250,7 @@ export function Game() {
   }, [battleLog]);*/
 
   useEffect(() => {
-    console.log(battle);
+    //console.log(battle);
   }, [battle]);
 
   
@@ -238,10 +270,15 @@ export function Game() {
 
   return (
     <div>
-      <div className="flex">
+      <div className="flex h-[360px] overflow-hidden">
         <PlayerDataBar battle={battle} side="p1" pov={pov}/>
         <BattleCanvas battle={battle}/>
         <PlayerDataBar battle={battle} side="p2" pov={pov}/>
+        <div ref={logRef} className="w-1/4 h-[360px] overflow-auto">
+          {htmlLog.map((line, index) => (
+            <div key={index} dangerouslySetInnerHTML={{ __html: line }}></div>
+          ))}
+        </div>
       </div>
       <Button onClick={() => playTurn(battle.turn - 1)}>Previous turn</Button>
       <Button onClick={() => playTurn(battle.turn + 1)}>Next turn</Button>
