@@ -1,5 +1,6 @@
 import { Battle } from "@pkmn/client";
 import { PokemonIdent } from "@pkmn/protocol";
+import { BattleMoveAnims } from "../_components_old/battle-animations.moves";
 
 const BattleEffects: {[k: string]: any} = {
 	wisp: {
@@ -286,6 +287,9 @@ export class Scene {
         return new Promise(resolve => setTimeout(resolve, time));
     }
 
+	backgroundEffect(background:string, duration: number, opacity: number) {
+	}
+
     async playEffect(effect: string, position: PokemonIdent, callback: () => void) {
       const pos = position.split(':')[0];
       const element = offsets[pos];
@@ -339,11 +343,6 @@ export class Scene {
       const endScale = end.scale !== undefined ? end.scale : start.scale;
       const endZ = end.z !== undefined ? end.z : start.z;
   
-      console.log('startX', start.x);
-      console.log('startY', start.y)
-      console.log('endX', endX);
-      console.log('endY', endY);
-    
       // Start the animation after a slight delay to ensure the browser has rendered the initial state
       setTimeout(() => {
         element.style.left = `${endX}px`;
@@ -403,7 +402,7 @@ export class Scene {
   }
 
   async playBattleAnim(anim: string, attacker: PokemonIdent, defender: PokemonIdent, callback?: () => void) {
-		const animFunc = BattleOtherAnims['contactattack'];
+	const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
 		//const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
 		if (animFunc === undefined) {
 			await this.playBattleAnim('contactattack', attacker, defender);
@@ -476,6 +475,10 @@ export class PokemonSprite {
   startingOffsetTop: number = 0;
 
   animationQueue: any[] = [];
+
+  leftof(offset: number) {
+	return this.x() - offset;
+  }
 
   constructor(scene: Scene, position: PokemonIdent){
       this.scene = scene;
@@ -581,7 +584,7 @@ export class PokemonSprite {
   }
 
   behind(amount: number) {
-    return this.z() - amount;
+    return this.z() - amount > 0 ? this.z() - amount : 0;
   }
 
   
