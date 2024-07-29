@@ -270,10 +270,12 @@ export function Game() {
 
   return (
     <div>
-      <div className="flex h-[360px] overflow-hidden">
-        <PlayerDataBar battle={battle} side="p1" pov={pov}/>
-        <BattleCanvas battle={battle}/>
-        <PlayerDataBar battle={battle} side="p2" pov={pov}/>
+      <div className="flex">
+        <div className="flex h-[360px] w-fit overflow-hidden" style={{backgroundImage: 'url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-icecave.jpg)', backgroundSize: 'cover'}}>
+          <PlayerDataBar battle={battle} side="p1" pov={pov}/>
+          <BattleCanvas battle={battle}/>
+          <PlayerDataBar battle={battle} side="p2" pov={pov}/>
+        </div>
         <div ref={logRef} className="w-1/4 h-[360px] overflow-auto">
           {htmlLog.map((line, index) => (
             <div key={index} dangerouslySetInnerHTML={{ __html: line }}></div>

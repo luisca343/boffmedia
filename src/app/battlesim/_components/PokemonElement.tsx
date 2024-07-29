@@ -44,8 +44,8 @@ export function PokemonStatusBadge({status}: {status: string}){
     </span>
 }
 
-export default function PokemonElement({pokemon, id, className, viewPoint = 0}: {pokemon: Pokemon | null, id: string, className?: string, viewPoint?: number}) {
-    if(!pokemon) return <div className={`w-48 h-48 absolute ${className}`} id={id} style={{width:175, height:175}}></div>
+export default function PokemonElement({pokemon, id, className, viewPoint = 0, style}: {pokemon: Pokemon | null, id: string, className?: string, viewPoint?: number, style?: React.CSSProperties}) {
+    if(!pokemon) return <div className={`w-48 h-48 absolute ${className}`} id={id} style={{width:175, height:175, ...style}}></div>
     const {player, position, name } = Protocol.parsePokemonIdent(pokemon.ident)
     
     let side = player === "p1" || player === "p2" ? player : undefined;
@@ -55,7 +55,7 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0}: 
     const hpColor = hpPercent > 50 ? "bg-green-400" : hpPercent > 20 ? "bg-yellow-400" : "bg-red-400"
     
     return ( <>
-    <div className={`w-48 h-48 absolute ${className} z-[100] -mb-4`} style={{width:175, height:175}}>
+    <div className={` w-48 h-48 absolute ${className} z-[100] -mb-4`} style={{width:175, height:175, ...style}}>
             <div>
                 <span className="text-shadow-border1 flex text-white items-center ">{name} {(pokemon.gender !== 'N') && <img className="mx-1" style={{width:'9px', height:'13px'}} src={`https://play.pokemonshowdown.com/fx/gender-${pokemon.gender.toLowerCase()}.png`}/>} L{pokemon.level}</span>
                 <HpBar pokemon={pokemon} />
@@ -72,7 +72,7 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0}: 
             </div>
     </div>
     
-    <div className={`w-48 h-48 absolute flex flex-col justify-end -mt-4 ${className} `} id={id} style={{width:175, height:175}}>
+    <div className={`w-48 h-48 absolute flex flex-col justify-end -mt-4   ${className} `} id={id} style={{width:175, height:175, ...style}}>
         <PokemonImage id={`${id}-pkm`} side={side} pokemon={pokemon} />
     </div></>
     )

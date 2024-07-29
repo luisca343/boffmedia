@@ -18,7 +18,7 @@ import { PokemonSprite } from "./PokemonSprite";
     //console.log(player.team)
 
     return (
-      <div className="border border-black w-24">
+      <div className="border border-black w-32">
         <div>{player.name}</div>
         {
             avatarId != 0 ? <img src={avatar} alt="avatar"/>
@@ -42,19 +42,17 @@ function PokemonTeam({team}: {team: Pokemon[]}){
 
 
     return (
-        <div  className="mx-auto flex flex-wrap">
-            <>
-                <div className="flex flex-col justify-between">
-                    {Array.from({length: halfTeamSize}, (_, i) => team[i]).map(pokemon => (
-                        <PokemonSprite key={pokemon?.name} pokemon={pokemon} />
-                    ))}
-                </div>
-                <div className="flex flex-col justify-between">
-                    {Array.from({length: teamSize - halfTeamSize}, (_, i) => team[i + halfTeamSize]).map(pokemon => (
-                        <PokemonSprite key={pokemon?.name} pokemon={pokemon} />
-                    ))}
-                </div>
-            </>
+        <div>
+          <div className="flex flex-row justify-around">
+            {Array.from({ length: halfTeamSize }, (_, i) => team[i]).map(pokemon => (
+              <PokemonSprite key={crypto.randomUUID()} pokemon={pokemon} />
+            ))}
+          </div>
+          <div className="flex flex-row justify-around">
+            {Array.from({ length: teamSize - halfTeamSize }, (_, i) => team[i + halfTeamSize]).map(pokemon => (
+              <PokemonSprite key={crypto.randomUUID()} pokemon={pokemon} />
+            ))}
+          </div>
         </div>
-    )
+      );
 }
