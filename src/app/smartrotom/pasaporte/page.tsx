@@ -31,7 +31,6 @@ export default function Pasaporte(){
       setStats(res)
     })
     rotomPOST('/team',{uuid}).then((res)=>{
-      console.log('team',res)
       setTeam(res)
     })
     rotomPOST('/achievements',{uuid}).then((res)=>{
@@ -41,6 +40,7 @@ export default function Pasaporte(){
   },[])
 
   let page  = 0;
+  let badgePage = 4
     return(
       <section className=" bg-yellow-200 flex bg-center bg-no-repeat bg-fixed bg-cover">
           <Book setBook={setBook}>
@@ -55,12 +55,12 @@ export default function Pasaporte(){
                 <BookLink book={book} page={1}  className="text-2xl font-bold">1. Índice</BookLink>
                 <BookLink book={book} page={2}  className="text-2xl font-bold">2. Datos Jugador</BookLink>
                 <BookLink book={book} page={3}  className="text-2xl font-bold">3. Equipo Actual</BookLink>
-                <BookLink book={book} page={4}  className="text-2xl font-bold">4. Medallas</BookLink>
+                <BookLink book={book} page={badgePage}  className="text-2xl font-bold">4. Medallas</BookLink>
                 <div className="ml-6 flex">
                 {
                   achievements && achievements.map((achievement: any, index)=>{
                     if(achievement.completed === 1 && achievement.category === 'Gimnasios'){
-                      const page  = 4 + index
+                      const page  = ++badgePage
                       return <BookLink className="mr-2 font-bold" key={achievement.name} book={book} page={page}>{page}. {achievement.name}</BookLink>
                     }
                   }
