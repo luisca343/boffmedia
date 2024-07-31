@@ -148,13 +148,13 @@ export default function Misiones(){
     return(
         <section className=" bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
           <Book pageColor="-purple" setBook={(e) => setBook(e)}>
-            <Page number={pageNum++} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
+            <Page book={book} number={pageNum++} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>Misiones</div>
               <img className="h-0 flex-1  opacity-80" src="/smartrotom/img/logo.webp" alt="description" style={{ mixBlendMode: 'normal' }} />
               <div className="mb-4 text-center text-4xl  text-yellow-200 font-bold  opacity-80" style={{ mixBlendMode: 'normal' }}>Región de Teras</div>
             </Page>
 
-            <Page number={pageNum++}>
+            <Page book={book} number={pageNum++}>
                 <h1>Indice</h1>
                 <h3>Misiones</h3>
                 <ul>
@@ -180,7 +180,7 @@ export default function Misiones(){
             })}
 
             
-            <Page  number={pageNum++} style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>Page 7</Page>
+            <Page  book={book} number={pageNum++} style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>Page 7</Page>
           </Book>
         </section>
     )
@@ -203,7 +203,7 @@ export default function Misiones(){
     function RenderQuestPage({mision, index, number}: {mision: QuestData, index: number, number: number}){
         questPages[mision.id] = number
         const randomId = Math.random().toString(36).substring(7)
-        return <Page  number={number} key={randomId} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
+        return <Page  book={book} number={number} key={randomId} className={`p-4 bg-blue-600 flex  flex-col  bg-center bg-no-repeat bg-fixed bg-cover ${getStatusStyles(mision.status)}`}>
         <div className="flex text-xl font-bold w-[60%] border-b-2 border-black">{mision.name} 
         <StatusBadge status={mision.status}>{mision.status}</StatusBadge>
         {mision.repeatable && <StatusBadge status={QuestStatus.AVAILABLE}>REPETIBLE</StatusBadge>}
