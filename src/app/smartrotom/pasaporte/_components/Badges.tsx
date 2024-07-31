@@ -1,10 +1,19 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { parseDate } from "@/lib/utils";
 import { SmartRotomAchievement } from "../types";
+import { BookLink } from "@/components/ui/book/book";
 
 
-export default function Badges({achievementData}: {achievementData: SmartRotomAchievement[]}){
+export default function Badges({achievementData, book}: {achievementData: SmartRotomAchievement[], book: any}){
     if(!achievementData) return null
+
+    const badges: { id: string; }[] = []
+    achievementData.forEach((achievement)=>{
+        if(achievement.category === 'Gimnasios'){
+            badges.push(achievement)
+        }
+    })
+
     const principiantes = achievementData.filter((a)=>a.subcategory === 'Principiantes-N' || a.subcategory === 'Principiantes-F')
     const fukitsuGansolia = achievementData.filter((a)=>a.subcategory === 'Fukitsu-Gansolia')
     const narukamiAkina = achievementData.filter((a)=>a.subcategory === 'Narukami-Akina')
@@ -52,17 +61,22 @@ export default function Badges({achievementData}: {achievementData: SmartRotomAc
             
         </div>
     )
-}
+
 
 // If not obtained use filter: brightness(0)
 function Badge({data}: {data: SmartRotomAchievement}){
     return(
         <HoverCard >
-            <HoverCardTrigger className="flex flex-row w-full justify-around">
-                <img src={`https://api.boffmedia.es/smartrotom/img/logros/${data.icon}.webp`} alt={data.name} 
-                        className={`w-12 h-12 2xl:h-16 2xl:w-16 ${data.completed ? '' : 'filter brightness-0'}`}
+            <BookLink book={book} page={data.completed ? 5 + getBadgeIndex(data) : 4} className={`flex flex-row w-full justify-around hover:cursor-pointer hover:scale-110 `}>
+                <HoverCardTrigger>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img 
+                    src={`https://api.boffmedia.es/smartrotom/img/logros/${data.icon}.webp`} 
+                    alt={data.name} 
+                    className={`w-12 h-12 2xl:h-16 2xl:w-16 ${data.completed ? '' : 'filter brightness-0'} pointer-events-none`}
                     />
-            </HoverCardTrigger>
+                </HoverCardTrigger>
+            </BookLink>
             <HoverCardContent variant="paper" align="start" className="absolute z-50">
                 <div className="flex flex-col">
                     <span className="font-bold text-xl">{data.name}</span>
@@ -72,4 +86,13 @@ function Badge({data}: {data: SmartRotomAchievement}){
             </HoverCardContent>
         </HoverCard>
     )
+}
+
+function getBadgeIndex(badge: SmartRotomAchievement){
+    for(let i = 0; i < badges.length; i++){
+        if(badges[i].id === badge.id) return i
+    }
+    return -1
+}
+
 }
