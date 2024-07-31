@@ -4,6 +4,8 @@ import {
     GraphicsGen, Icons, Sprites
   } from '@pkmn/img';
 import { PokemonSprite } from "./PokemonSprite";
+import React from "react";
+import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 
 
 
@@ -13,27 +15,33 @@ import { PokemonSprite } from "./PokemonSprite";
     const player = battle[side];
   
     const avatarId = player?.avatar || 'unknown';
+    const uuid = player.avatar.includes('-') ? player.avatar : null;
     const avatar = Sprites.getAvatar(avatarId)
     
-    //console.log(player.team)
-    console.log(player)
-    console.log('avatarId', avatarId)
-    console.log('avatar', avatar)
-    
+    if(!avatarId) return <></>
     return (
-      <div className="border border-black w-32">
-        <div>{player.name}</div>
-        {
-            avatarId != 'unknown' ? <img src={avatar} alt="avatar"/>
-            : <img className="mx-auto" alt="avatar"
-            style={{
-                height:'100px', width:'45px', 
-                transform: side === 'p2' ? 'scaleX(-1)' : undefined}
-            } 
-            src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4"  
-            />
-        }
-        <PokemonTeam team={player.team}/>
+      <div className={` ${side === 'p1' ? 'self-end' : 'self-start'}`}>
+        <div className="text-center font-bold ">{player.name.charAt(0).toUpperCase() + player.name.slice(1)}</div>
+        <div className="h-32">
+          {
+            uuid !== null ? (
+              <img className="mx-auto" alt="avatar"
+                style={{
+                  height: '100px', width: '45px',
+                  transform: side === 'p2' ? 'scaleX(-1)' : undefined
+                }}
+                src={`https://crafatar.com/renders/body/${uuid}`}
+              />
+            ) : (
+              typeof avatarId === 'number' ? (
+                <img src={avatar} alt="avatar" />
+              ) : (
+                <NpcSkin npcName={avatarId} height={75} width={75} style={{transform: 'scaleX(-1)', margin:'auto', marginTop:'-1.5em'}}/>
+              )
+            )
+          }
+        </div>
+        <PokemonTeam team={player.team} />
       </div>
     );
   }
