@@ -1,4 +1,4 @@
-import { smartRotomAchievements, smartRotomUserAchievements } from '@/_db/schema/SmartRotom';
+import { SmartRotomReplay, SmartRotomUserAchievement, SmartRotomUserReplay, smartRotomAchievements, smartRotomReplays, smartRotomUserAchievements, smartRotomUserReplays } from '@/_db/schema/SmartRotom';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
@@ -32,7 +32,7 @@ export class SmartrotomService {
                 completed: smartRotomUserAchievements.completed,
                 completedAt: smartRotomUserAchievements.completedAt,
                 uuid: smartRotomUserAchievements.uuid,
-                data: smartRotomUserAchievements.data
+                data: smartRotomUserAchievements.dataId
             })
             .from(smartRotomAchievements)
             .leftJoin(
@@ -65,7 +65,8 @@ export class SmartrotomService {
             progress: smartRotomUserAchievements.progress,
             completed: smartRotomUserAchievements.completed,
             completedAt: smartRotomUserAchievements.completedAt,
-            uuid: smartRotomUserAchievements.uuid
+            uuid: smartRotomUserAchievements.uuid,
+            data: smartRotomUserAchievements.dataId
         })
         .from(smartRotomAchievements)
         .leftJoin(
@@ -75,6 +76,9 @@ export class SmartrotomService {
             eq(smartRotomUserAchievements.uuid, uuid),
         )
         ).where(eq(smartRotomAchievements.id, achievementId))
+
+        
+
 
         return data
     }
@@ -93,6 +97,8 @@ export class SmartrotomService {
         )
         ).where(eq(smartRotomAchievements.id, achievementId))
 
+        console.log('data', data)
+
         if(data.length === 0) return {error: "Achievement not found"}
         const logro = data[0]
         return {completed: logro.completed}
@@ -100,24 +106,42 @@ export class SmartrotomService {
 
     async addBattleAchievement(battleAchievement: LogroCombate) {
         const hasAchievement = await this.playerHasAchievement(battleAchievement.uuid, battleAchievement.logro)
+
+        const insert = await this.db.getDrizzle().insert(smartRotomReplays).values({
+            side1: battleAchievement.uuid,
+            side2: battleAchievement.npc,
+            team1: JSON.stringify(battleAchievement.equipo),
+            replay: battleAchievement.replay,
+            winner: battleAchievement.victoria ? 1 : 2
+        } as SmartRotomReplay).execute()
+        
+        const insertId = insert[0].insertId
+
+        const insertRelation = await this.db.getDrizzle().insert(smartRotomUserReplays).values({
+            replayId: insertId,
+            uuid: battleAchievement.uuid,
+            side: 1
+        } as SmartRotomUserReplay).execute()
+
+        const relationId = insertRelation[0].insertId
+        
+
         if(hasAchievement.error) return hasAchievement
         if(hasAchievement.completed) return {error: "Achievement already completed"}
 
-        const battleData = {
-            team: battleAchievement.equipo,
-            replay: battleAchievement.replay,
-        }
+        
+  
 
         return this.db.getDrizzle().insert(smartRotomUserAchievements)
         .values(
             {
-            // @ts-ignore
-            data: JSON.stringify(battleData),
+            dataId: insertId,
             uuid: battleAchievement.uuid, 
             achievementId: battleAchievement.logro, 
             progress: 1, 
             completed: 1, 
-            completedAt: new Date()}).execute()
-    }
+            completedAt: new Date()
+        } as SmartRotomUserAchievement).execute()
+    } 
 
 }

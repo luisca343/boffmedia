@@ -48,12 +48,36 @@ export const smartRotomUserAchievements = mysqlTable("rotom_user_achievements", 
     progress: int("progress").default(0),
     completed: int("completed").default(0),
     completedAt: timestamp("completed_at"),
-    data: text("data").default(null),
+    dataId: int("data_id").default(0),
 }, (table) => {
     return {
         pk: primaryKey({columns: [table.achievementId, table.uuid]}),
     }
-}
-);
+});
 
 export type SmartRotomUserAchievement = typeof smartRotomUserAchievements.$inferSelect;
+
+export const smartRotomReplays = mysqlTable("rotom_replays", {
+    id: int("id").primaryKey().autoincrement(),
+    side1: varchar("side1", { length: 36 }).notNull(),
+    side2: varchar("side2", { length: 36 }).notNull(),
+    team1: text("team1"),
+    team2: text("team2"),
+    replay: text("replay").notNull(),
+    winner: int("winner").default(0),
+    createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP()`),
+});
+
+export type SmartRotomReplay = typeof smartRotomReplays.$inferSelect;
+
+export const smartRotomUserReplays = mysqlTable("rotom_user_replays", {
+    uuid: char("uuid", { length: 36 }).notNull().references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    replayId: int("replay_id").notNull().references(() => smartRotomReplays.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    side: int("side").default(1),
+}, (table) => {
+    return {
+        pk: primaryKey({columns: [table.uuid, table.replayId]}),
+    }
+});
+
+export type SmartRotomUserReplay = typeof smartRotomUserReplays.$inferSelect;
