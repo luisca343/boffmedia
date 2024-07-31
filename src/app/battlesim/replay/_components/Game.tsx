@@ -10,6 +10,7 @@ import { PlayerDataBar } from "../../_components/BattleSideBar";
 import { BattleCanvas } from "../../_components/BattleCanvas";
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
+import { rotomGET } from "@/services/boffAPI";
 
 export function Game() {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -31,8 +32,25 @@ export function Game() {
   const setBattle = useSetBattle();
 
   const formatter = new LogFormatter('p1', battle);
+  
 
   useEffect(() => {
+    
+    rotomGET('/achievement/67d9b543-5ac9-41e1-a8a5-20d7689e24a4/ez')
+      .then((res) => {
+        const data = JSON.parse(res[0].data);
+        const replay = data.replay;
+        console.log(replay);
+
+        setBattleLog(data.replay);
+        const gameElement = document.querySelector('#game') as HTMLElement;
+        //console.log('gameElement', gameElement)
+        const battleScene = new Scene(battle, gameElement);
+        setScene(battleScene);
+    })
+      .catch(console.error);
+
+    /*
     fetch("https://api.boffmedia.es/smartrotom/combates/battle.txt")
       .then(response => response.text())
       .then(text => {
@@ -43,7 +61,7 @@ export function Game() {
         const battleScene = new Scene(battle, gameElement);
         setScene(battleScene);
       })
-      .catch(error => console.error("Error fetching battle log:", error));
+      .catch(error => console.error("Error fetching battle log:", error));*/
   }, []);
 
 
@@ -256,14 +274,14 @@ export function Game() {
   
   async function simulateFaint() {
     if(!scene) return;
-    await scene.playBattleAnim('faint', 'p1a' as PokemonIdent, 'p2a' as PokemonIdent, async() => {
+    await scene.playBattleAnim('flamethrower', 'p1a' as PokemonIdent, 'p2a' as PokemonIdent, async() => {
         console.log('fainted')
     });
   }
 
   async function simulateOtherAttack() {
     if(!scene) return;
-    await scene.playBattleAnim('faint', 'p2b' as PokemonIdent, 'p1b' as PokemonIdent, async() => {
+    await scene.playBattleAnim('flamethrower', 'p2a' as PokemonIdent, 'p1a' as PokemonIdent, async() => {
       console.log('attacked')
     });
   }
