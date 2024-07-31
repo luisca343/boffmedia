@@ -5,12 +5,11 @@ import useTranslation from 'next-translate/useTranslation'
 
 export default function ActiveTeam({team, className}: {team: ActiveTeamType, className?: string}){
     const { t: movesTrans } = useTranslation("smartrotom/pokedex/moves")
-    const { t: formsTranslation } = useTranslation("smartrotom/pokedex/forms")
     const { t: abilitiesTrans } = useTranslation("smartrotom/pokedex/abilities")
-
+    
     return(
         <div className={`font-vinque flex flex-col justify-between  h-[90%] w-full ${className}`}>
-            {team.map((p, index)=>{
+            {team?.map((p, index)=>{
                 if(!p) return <div className="w-32" key={index}></div>
                 return <div key={index} className="flex flex-row  text-sm 2xl:text-base h-[1/6] w-full">
                     <div className="flex flex-col justify-center items-center w-[15%] text-center">
