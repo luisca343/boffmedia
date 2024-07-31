@@ -315,13 +315,18 @@ export class Scene {
     async showEffect(effect: string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void) {
       const effectData = BattleEffects[effect];
       if (!effectData) return;
+	  
+	  const halfWidth = 175 / 2;
+
+	  const startX = start.x || 0;
+	  const startY = start.y || 0;
   
     
       const element = document.createElement('img');
       element.src = effectData.url;
       element.style.position = 'absolute';
-      element.style.left = `${start.x}px`;
-      element.style.top = `${start.y}px`;
+      element.style.left = `${startX  + halfWidth}px`;
+      element.style.top = `${startY  + halfWidth}px`;
       element.style.width = `${effectData.w}px`;
       element.style.height = `${effectData.h}px`;
       element.style.opacity = `${start.opacity || 1}`;
@@ -337,16 +342,16 @@ export class Scene {
     
       element.style.transition = `all ${animationTime}ms`;
   
-      const endX = end.x !== undefined ? end.x : start.x;
-      const endY = end.y !== undefined ? end.y : start.y;
+      const endX = end.x !== undefined ? end.x : start.x  || 0
+      const endY = end.y !== undefined ? end.y : start.y  ||0
       const endOpacity = end.opacity !== undefined ? end.opacity : start.opacity;
       const endScale = end.scale !== undefined ? end.scale : start.scale;
       const endZ = end.z !== undefined ? end.z : start.z;
   
       // Start the animation after a slight delay to ensure the browser has rendered the initial state
       setTimeout(() => {
-        element.style.left = `${endX}px`;
-        element.style.top = `${endY}px`;
+        element.style.left = `${endX + halfWidth}px`;
+        element.style.top = `${endY + halfWidth}px`;
         element.style.opacity = `${endOpacity}`;
         element.style.transform = `scale(${endScale})`;
         element.style.zIndex = `${endZ}`;
