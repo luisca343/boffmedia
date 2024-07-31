@@ -47,11 +47,6 @@ return (
       onFlip={(e) => onFlip(e.data)} onInit={(e) => cargar(e)}
     >
       {pages.map((page, index) => {
-        console.log('index', index)
-        console.log('pageindex', page.index)
-        console.log('len',pages.length)
-        console.log('page',page)
-        console.log('test',page.index % 2 === 0 || index === pages.length-1)
         return<div key={index} className={`${(page.index % 2 === 0 && index !== pages.length-1) ? `page-${index} page-right${pageColor}` : `page-left${pageColor}`}`} >
           {page.content}
         </div>
@@ -85,8 +80,6 @@ export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]
   {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number, book?: PageFlip}) {
 
     if(!book) return <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}></div>
-    console.log('TEST')
-    console.log(book.getPageCount())
     return (
     <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}>
         {children}
