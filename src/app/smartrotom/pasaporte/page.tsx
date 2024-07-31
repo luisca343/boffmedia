@@ -1,9 +1,8 @@
 'use client'
-import { Book, BookLink, Page, turnPage } from "@/components/ui/book/book";
+import { Book, BookLink, Page, PageTitle, turnPage } from "@/components/ui/book/book";
 import './pasaporte.css'
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
-import { CabezaJugador } from "@/components/smartrotom/CabezaMC";
 import { useEffect, useState } from "react";
 import { rotomPOST } from "@/services/boffAPI";
 import ActiveTeam from "./_components/ActiveTeam";
@@ -90,7 +89,7 @@ export default function Pasaporte(){
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Medallas"/>
-              <Badges achievementData={achievements}></Badges>
+              <Badges book={book} achievementData={achievements}></Badges>
             </Page>
             {
               achievements && achievements.map((achievement: SmartRotomAchievement)=>{
@@ -111,9 +110,7 @@ export default function Pasaporte(){
     )
 
 
-    function PageTitle({title, children}: {title: string, children?: React.ReactNode}){
-      return <div className="text-2xl 2xl:text-4xl font-bold 2xl:m-2 font-vinque underline">{title}</div>
-    }
+ 
 
     function BadgePageTitle({title, achievement}: {title: string, achievement : SmartRotomAchievement}){
       return <div className="flex font-bold 2xl:m-2 font-vinque  justify-between items-end">

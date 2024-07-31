@@ -32,8 +32,9 @@ export interface LogroCombate extends SmartRotomPost {
 
 export function parseAchievementData(data: string): AchievementData {
     try {
-        console.log("PARSING ACHIEVEMENT DATA", JSON.parse(data));
-        return JSON.parse(data);
+        const parsed = JSON.parse(data)
+        console.log(parsed)
+        return parsed as AchievementData;
     } catch (e) {
         console.error('Error parsing achievement data', e);
         return {} as AchievementData;
