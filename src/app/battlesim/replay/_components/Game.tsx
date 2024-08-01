@@ -12,7 +12,7 @@ import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { rotomGET } from "@/services/boffAPI";
 
-export function Game() {
+export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
   const [actionQueue, setActionQueue] = useState<string[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -36,13 +36,12 @@ export function Game() {
 
   useEffect(() => {
     
-    rotomGET('/achievement/67d9b543-5ac9-41e1-a8a5-20d7689e24a4/ez')
+    rotomGET(`/achievement/67d9b543-5ac9-41e1-a8a5-20d7689e24a4/${battleName}`)
       .then((res) => {
-        const data = JSON.parse(res[0].data);
-        const replay = data.replay;
+        const replay = res.replay;
         console.log(replay);
 
-        setBattleLog(data.replay);
+        setBattleLog(replay);
         const gameElement = document.querySelector('#game') as HTMLElement;
         //console.log('gameElement', gameElement)
         const battleScene = new Scene(battle, gameElement);

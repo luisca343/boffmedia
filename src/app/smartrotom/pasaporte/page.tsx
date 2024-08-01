@@ -10,6 +10,10 @@ import useTranslation from 'next-translate/useTranslation'
 import Badges from "./_components/Badges";
 import { SmartRotomAchievement, parseAchievementData } from "./types";
 import { parseDate } from "@/lib/utils";
+import Link from "next/link";
+import { InternalLink } from "@/components/nav/Link";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Game } from "@/app/battlesim/replay/_components/Game";
 
 export default function Pasaporte(){
   const [book, setBook] = useState(null) as any
@@ -24,8 +28,8 @@ export default function Pasaporte(){
 
   const obtainedBadges = achievements.filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 
+
   useEffect(()=>{
-    console.log('uuid',uuid)
     rotomPOST('/stats',{uuid}).then((res)=>{
       setStats(res)
     })
@@ -36,7 +40,7 @@ export default function Pasaporte(){
       console.log('achievements',res)
       setAchievements(res)
     })
-  },[])
+  }, [])
 
   let page  = 0;
   let badgePage = 4
@@ -94,8 +98,9 @@ export default function Pasaporte(){
             {
               achievements && achievements.map((achievement: SmartRotomAchievement)=>{
                 if(achievement.completed && achievement.category === 'Gimnasios'){
-                  const data = parseAchievementData(achievement.data)
-                  const team = data.team
+                  const team = achievement.team ? JSON.parse(achievement.team) : null
+                  
+
                   return <Page key={achievement.name} book={book} number={page++} >
                     <BadgePageTitle title={achievement.name} achievement={achievement} />
                     <div className="flex-1"><ActiveTeam team={team} className="h-[95%]"/></div>
@@ -112,13 +117,25 @@ export default function Pasaporte(){
 
  
 
-    function BadgePageTitle({title, achievement}: {title: string, achievement : SmartRotomAchievement}){
-      return <div className="flex font-bold 2xl:m-2 font-vinque  justify-between items-end">
-        <div className="flex">
-          <img className="w-8 2xl:w-12 mr-2" src={`https://api.boffmedia.es/smartrotom/img/logros/${achievement.icon}.webp`} alt={achievement.icon} />
-          <span className="underline text-2xl 2xl:text-4xl ">{title}</span>
+    function BadgePageTitle({title, achievement}: {title: string, achievement : SmartRotomAchievement}) {
+      return (
+        <div className="flex font-bold 2xl:m-2 font-vinque justify-between items-end">
+          <div className="flex items-center">
+            <img className="w-8 2xl:w-12 mr-2" src={`https://api.boffmedia.es/smartrotom/img/logros/${achievement.icon}.webp`} alt={achievement.icon} />
+            <span className="underline text-2xl 2xl:text-4xl">{title}</span>
+          </div>
+          <div className="flex items-center">
+            <span className="right-0 text-sm 2xl:text-base ">Obtenida: {parseDate(achievement.completedAt)}</span>
+            {achievement.replay && (
+              <Popover>
+                <PopoverTrigger className="text-base self-end ml-2 hover:text-blue-500">Ver Reptición</PopoverTrigger>
+                <PopoverContent className="ml-12 w-[1000px] h-[500px]">
+                  <Game battleName={achievement.id}/>
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
         </div>
-        <span className="right-0 text-xl 2xl:text-2xl">Obtenida: {parseDate(achievement.completedAt)}</span>
-      </div>
+      );
     }
 }

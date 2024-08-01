@@ -27,7 +27,8 @@ export interface LogroCombate extends SmartRotomPost {
     completed: boolean;
     completedAt: Date;
     uuid: string;
-    data: string;
+    team: string;
+    replay: string;
 }
 
 export function parseAchievementData(data: string): AchievementData {

@@ -7,7 +7,7 @@ import {
 
 
 export function PokemonSprite({pokemon, className, ...props}: {pokemon: Pokemon, className?: string, props?: any}){
-    if(!pokemon) return <div 
+    if(!pokemon) return <div  
     {...props}
     style={{width:40, height:30}}>
         <img className="m-auto"  src='/smartrotom/test/pokeball.png' />
