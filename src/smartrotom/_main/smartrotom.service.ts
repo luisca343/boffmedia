@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { and, desc, eq, asc, sql } from 'drizzle-orm';
 import { LogroCombate } from './smartrotom.controller';
+import { repl } from '@nestjs/core';
 
 @Injectable()
 export class SmartrotomService {
@@ -32,7 +33,8 @@ export class SmartrotomService {
                 completed: smartRotomUserAchievements.completed,
                 completedAt: smartRotomUserAchievements.completedAt,
                 uuid: smartRotomUserAchievements.uuid,
-                data: smartRotomUserAchievements.dataId
+                team: smartRotomReplays.team1,
+                replay: smartRotomReplays.replay
             })
             .from(smartRotomAchievements)
             .leftJoin(
@@ -41,6 +43,15 @@ export class SmartrotomService {
                     eq(smartRotomAchievements.id, smartRotomUserAchievements.achievementId),
                     eq(smartRotomUserAchievements.uuid, uuid)
                 )
+            ).leftJoin(
+                smartRotomUserReplays,
+                and(
+                    eq(smartRotomUserReplays.uuid, uuid),
+                    eq(smartRotomUserReplays.replayId, smartRotomUserAchievements.dataId)
+                )
+            ).leftJoin(
+                smartRotomReplays,
+                eq(smartRotomReplays.id, smartRotomUserReplays.replayId)
             )
             .orderBy(
                 asc(
@@ -66,7 +77,7 @@ export class SmartrotomService {
             completed: smartRotomUserAchievements.completed,
             completedAt: smartRotomUserAchievements.completedAt,
             uuid: smartRotomUserAchievements.uuid,
-            data: smartRotomUserAchievements.dataId
+            replay: smartRotomReplays.replay
         })
         .from(smartRotomAchievements)
         .leftJoin(
@@ -75,12 +86,22 @@ export class SmartrotomService {
             eq(smartRotomAchievements.id, smartRotomUserAchievements.achievementId),
             eq(smartRotomUserAchievements.uuid, uuid),
         )
-        ).where(eq(smartRotomAchievements.id, achievementId))
+        ).leftJoin(
+            smartRotomUserReplays,
+            and(
+                eq(smartRotomUserReplays.uuid, uuid),
+                eq(smartRotomUserReplays.replayId, smartRotomUserAchievements.dataId)
+            )
+        ).leftJoin(
+            smartRotomReplays,
+            eq(smartRotomReplays.id, smartRotomUserReplays.replayId)
+        )
+        .where(eq(smartRotomAchievements.id, achievementId))
 
         
+        console.log('data', data)
 
-
-        return data
+        return data[0]
     }
 
     async playerHasAchievement(uuid: string, achievementId: string) {
