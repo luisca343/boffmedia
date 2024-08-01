@@ -184,7 +184,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       if(!switchedOutPokemon){
         await scene.playEffect('pokeball', positionIdent, async() => {
           setBattle(localBattle);
-          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${switchedInPokemon?.species.id.toLowerCase()}.mp3`
+          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${switchedInPokemon?.species?.id.toLowerCase()}.mp3`
           setActionQueue([audioUrl, ...actionQueue]);
           
 
@@ -192,7 +192,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       } else {
         await scene.playEffect('switch', positionIdent, async() => {
           setBattle(localBattle);
-          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${switchedInPokemon?.species.id.toLowerCase()}.mp3`
+          const audioUrl = `AUDIO:https://play.pokemonshowdown.com/audio/cries/${switchedInPokemon?.species?.id.toLowerCase()}.mp3`
           setActionQueue([audioUrl, ...actionQueue]);
         });
       }
