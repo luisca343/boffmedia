@@ -59,7 +59,7 @@ export default function Pasaporte(){
                 <BookLink book={book} page={2}  className="text-2xl font-bold">2. Datos Jugador</BookLink>
                 <BookLink book={book} page={3}  className="text-2xl font-bold">3. Equipo Actual</BookLink>
                 <BookLink book={book} page={badgePage}  className="text-2xl font-bold">4. Medallas</BookLink>
-                <div className="ml-6 flex">
+                <div className="ml-6 flex flex-wrap">
                 {
                   achievements && achievements.map((achievement: any, index)=>{
                     if(achievement.completed === 1 && achievement.category === 'Gimnasios'){
