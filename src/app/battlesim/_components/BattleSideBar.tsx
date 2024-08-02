@@ -18,6 +18,9 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
     const uuid = player.avatar.includes('-') ? player.avatar : null;
     const avatar = Sprites.getAvatar(avatarId)
     
+    const avatarNmber = parseInt(avatarId)
+
+    
     if(!avatarId) return <></>
     return (
       <div className={` ${side === 'p1' ? 'self-end' : 'self-start'}`}>
@@ -33,8 +36,8 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
                 src={`https://crafatar.com/renders/body/${uuid}`}
               />
             ) : (
-              typeof avatarId === 'number' ? (
-                <img src={avatar} alt="avatar" />
+              avatarNmber >= 0 ? (
+                <img className="mx-auto" src={avatar} alt="avatar" />
               ) : (
                 <NpcSkin npcName={avatarId} height={75} width={75} style={{transform: 'scaleX(-1)', margin:'auto', marginTop:'-1.5em'}}/>
               )
@@ -51,7 +54,6 @@ function PokemonTeam({team}: {team: Pokemon[]}){
     const teamSize = team.length > 6 ? team.length : 6;
     const halfTeamSize = Math.ceil(teamSize / 2);
 
-    console.log(team)
     // Remove duplicates, don't know why they are there.
     const team1 = team.filter((pokemon, index, self) =>
         index === self.findIndex((t) => (
