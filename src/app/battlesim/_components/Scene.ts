@@ -316,7 +316,15 @@ export class Scene {
       const effectData = BattleEffects[effect];
       if (!effectData) return;
 	  
-	  const halfWidth = 175 / 2;
+	  console.log(effectData);
+
+	  let halfWidth = 175 / 2 - effectData.w / 2;
+	  let halfHeight = 175 / 2 - effectData.h / 2;
+
+	  if(effect === 'pokeball'){
+		halfWidth = 0
+		halfHeight = 0
+	  }
 
 	  const startX = start.x || 0;
 	  const startY = start.y || 0;
@@ -326,7 +334,7 @@ export class Scene {
       element.src = effectData.url;
       element.style.position = 'absolute';
       element.style.left = `${startX  + halfWidth}px`;
-      element.style.top = `${startY  + halfWidth}px`;
+      element.style.top = `${startY  + halfHeight}px`;
       element.style.width = `${effectData.w}px`;
       element.style.height = `${effectData.h}px`;
       element.style.opacity = `${start.opacity || 1}`;
@@ -351,7 +359,7 @@ export class Scene {
       // Start the animation after a slight delay to ensure the browser has rendered the initial state
       setTimeout(() => {
         element.style.left = `${endX + halfWidth}px`;
-        element.style.top = `${endY + halfWidth}px`;
+        element.style.top = `${endY + halfHeight}px`;
         element.style.opacity = `${endOpacity}`;
         element.style.transform = `scale(${endScale})`;
         element.style.zIndex = `${endZ}`;
@@ -540,9 +548,6 @@ export class PokemonSprite {
       
         element.style.transition = `all ${animationTime}ms`;
         
-
-        const halfWidth = position.includes('p1') ? parseInt(element.style.width) / 4 : -parseInt(element.style.width) / 4;
-        const halfHeight = position.includes('p1') ? -parseInt(element.style.width) / 4 : parseInt(element.style.height) / 4;
 
 
         // Apply CSS changes immediately to start the animation
