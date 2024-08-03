@@ -8,7 +8,7 @@ export default function ActiveTeam({team, className}: {team: ActiveTeamType, cla
     const { t: abilitiesTrans } = useTranslation("smartrotom/pokedex/abilities")
     
     return(
-        <div className={`font-vinque flex flex-col justify-between  h-[90%] w-full ${className}`}>
+        <div className={`font-vinque flex flex-col justify-around  h-[90%] w-full ${className}`}>
             {team?.map((p, index)=>{
                 if(!p) return <div className="w-32" key={index}></div>
                 return <div key={index} className="flex flex-row  text-sm 2xl:text-base h-[1/6] w-full">
