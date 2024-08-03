@@ -11,6 +11,7 @@ import { BattleCanvas } from "../../_components/BattleCanvas";
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { rotomGET } from "@/services/boffAPI";
+import { time } from "console";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   useEffect(() => {
     
-    rotomGET(`/achievement/67d9b543-5ac9-41e1-a8a5-20d7689e24a4/${battleName}`)
+    /*rotomGET(`/achievement/67d9b543-5ac9-41e1-a8a5-20d7689e24a4/${battleName}`)
       .then((res) => {
         const replay = res.replay;
         console.log(replay);
@@ -47,10 +48,10 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
         const battleScene = new Scene(battle, gameElement);
         setScene(battleScene);
     })
-      .catch(console.error);
+      .catch(console.error);*/
 
-    /*
-    fetch("https://api.boffmedia.es/smartrotom/combates/battle.txt")
+    
+    fetch(`https://api.boffmedia.es/smartrotom/combates/test.txt`)
       .then(response => response.text())
       .then(text => {
         setBattleLog(text);
@@ -60,7 +61,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
         const battleScene = new Scene(battle, gameElement);
         setScene(battleScene);
       })
-      .catch(error => console.error("Error fetching battle log:", error));*/
+      .catch(error => console.error("Error fetching battle log:", error));
   }, []);
 
 
@@ -202,7 +203,6 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       const [, positionIdent] = args as [string, PokemonIdent];
       timeout.end = 1000 / scene.acceleration;
       //console.log('fainting', positionIdent)
-
       const pokemon = localBattle.getPokemon(positionIdent);
       if(pokemon){
         await scene.playBattleAnim('faint', args[1].split(':')[0] as PokemonIdent, args[1].split(':')[0] as PokemonIdent, async() => {
@@ -217,16 +217,21 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     }
 
     if(args[0] === 'move'){
-      const move = localBattle.get("moves", args[2]);
+      if(!line.includes('[still]')){
+        const move = localBattle.get("moves", args[2]);
+        
+        let arg3 = args[3] === "" ? args[1].includes('p1') ? 'p2a' : 'p1a' : args[3] as string
 
-      let arg3 = args[3] === "" ? args[1].includes('p1') ? 'p2a' : 'p1a' : args[3] as string
-
-      scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, arg3.split(':')[0] as PokemonIdent, async() => {
+        scene.playBattleAnim(move.id, args[1].split(':')[0] as PokemonIdent, arg3.split(':')[0] as PokemonIdent, async() => {
+          endAction(args, kwArgs, localBattle);
+        });
+        timeout.start = 10000 / scene.acceleration;
+        timeout.end = -1
+      } else {
+        timeout.end = 1000 / scene.acceleration;
+        
         endAction(args, kwArgs, localBattle);
-      });
-      timeout.start = 1000 / scene.acceleration;
-      timeout.end = -1
-      
+      }
     }
     
     const logLine = formatter.formatHTML(args, kwArgs);
@@ -280,7 +285,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   async function simulateOtherAttack() {
     if(!scene) return;
-    await scene.playBattleAnim('flamethrower', 'p2a' as PokemonIdent, 'p1a' as PokemonIdent, async() => {
+    await scene.playBattleAnim('flamethrower', 'p2b' as PokemonIdent, 'p1b' as PokemonIdent, async() => {
       console.log('attacked')
     });
   }
@@ -288,11 +293,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   return (
     <div>
       <div className="flex">
-        <div className="flex h-[360px] w-fit overflow-hidden" style={{backgroundImage: 'url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-icecave.jpg)', backgroundSize: 'cover'}}>
-          <PlayerDataBar battle={battle} side="p1" pov={pov}/>
-          <BattleCanvas battle={battle}/>
-          <PlayerDataBar battle={battle} side="p2" pov={pov}/>
-        </div>
+      <BattleCanvas battle={battle} pov={pov}/>
         <div ref={logRef} className="w-1/4 h-[360px] overflow-auto">
           {htmlLog.map((line, index) => (
             <div key={index} dangerouslySetInnerHTML={{ __html: line }}></div>

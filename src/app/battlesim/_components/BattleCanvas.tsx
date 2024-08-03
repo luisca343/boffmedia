@@ -3,8 +3,9 @@ import PokemonSprite from "../_components_old/PokemonSprite";
 import PokemonElement from "./PokemonElement";
 import { offsets } from "./Scene";
 import Image from "next/image";
+import { PlayerDataBar } from "./BattleSideBar";
 
-export function BattleCanvas({battle}: {battle: Battle}){
+export function BattleCanvas({battle, pov}: {battle: Battle, pov: 'p1' | 'p2'}) {
     const p1 = battle.p1;
     const p2 = battle.p2;
 
@@ -20,25 +21,32 @@ export function BattleCanvas({battle}: {battle: Battle}){
     console.log(battle.p1.sideConditions)
     
     return (
-        <div id="game"  className="w-[440px] h-[360px] relative">
-            <div className={`weather w-[100%] h-[100%] absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
+        <div className="flex h-[360px] w-fit overflow-hidden relative" style={{backgroundImage: 'url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-icecave.jpg)', backgroundSize: 'cover'}}>          
+
+            <PlayerDataBar battle={battle} side="p1" pov={pov}/>
+            <div id="game"  className="w-[440px] h-[360px] relative" >
+                
+                <div className="absolute top-1 left-1 bg-slate-900 py-1 px-2 rounded-md text-slate-200 ">Turn {battle.turn}</div>
             
-            <div className="absolute top-1 left-1 bg-slate-800 py-1 px-2 rounded-md text-slate-200 ">Turn {battle.turn}</div>
-        
-            <PokemonElement pokemon={pokemon["p1a"]} id="p1a" style={{top: offsets.p1a.top, left: offsets.p1a.left}}/>
-            <PokemonElement pokemon={pokemon["p1b"]} id="p1b" style={{top: offsets.p1b.top, left: offsets.p1b.left}}/>
-            {Object.entries(battle.p1.sideConditions).map((entry) => {
-                return <Hazard key={entry[0]} hazard={entry} side="p1"/>
-            })}
+                <PokemonElement pokemon={pokemon["p1a"]} id="p1a" style={{top: offsets.p1a.top, left: offsets.p1a.left}}/>
+                <PokemonElement pokemon={pokemon["p1b"]} id="p1b" style={{top: offsets.p1b.top, left: offsets.p1b.left}}/>
+                {Object.entries(battle.p1.sideConditions).map((entry) => {
+                    return <Hazard key={entry[0]} hazard={entry} side="p1"/>
+                })}
 
-            <PokemonElement pokemon={pokemon["p2b"]} id="p2b" style={{top: offsets.p2b.top, left: offsets.p2b.left}}/>
-            <PokemonElement pokemon={pokemon["p2a"]} id="p2a" style={{top: offsets.p2a.top, left: offsets.p2a.left}}/>
+                <PokemonElement pokemon={pokemon["p2b"]} id="p2b" style={{top: offsets.p2b.top, left: offsets.p2b.left}}/>
+                <PokemonElement pokemon={pokemon["p2a"]} id="p2a" style={{top: offsets.p2a.top, left: offsets.p2a.left}}/>
 
-            {Object.entries(battle.p2.sideConditions).map((entry) => {
-                    const [name, value] = entry;
-                    return <Hazard key={entry[0]} hazard={entry} side="p2"/>
-                })
-            }
+                {Object.entries(battle.p2.sideConditions).map((entry) => {
+                        const [name, value] = entry;
+                        return <Hazard key={entry[0]} hazard={entry} side="p2"/>
+                    })
+                }
+            </div>
+            <PlayerDataBar battle={battle} side="p2" pov={pov}/>
+            <div className="absolute w-full h-full">
+                <div className={`weather w-full h-full absolute top-0 left-0  ${battle.field.terrainState.id}`}></div>
+            </div>
         </div>
     )
 }
@@ -85,7 +93,7 @@ function Hazard({hazard, side}: {hazard: [string, {name: string, level: number, 
                         alt={name}
                         width={offset.width}
                         height={offset.width}
-                        className="absolute z-0 opacity-50"
+                        className="absolute z-[5] opacity-50"
                         style={{ top: offset.top, left: offset.left }}
                     />
                 );

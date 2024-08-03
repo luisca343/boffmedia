@@ -53,9 +53,11 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0, s
 
     const hpPercent = Math.floor((pokemon.hp / pokemon.maxhp) * 100)
     const hpColor = hpPercent > 50 ? "bg-green-400" : hpPercent > 20 ? "bg-yellow-400" : "bg-red-400"
+
+    
     
     return ( <>
-    <div className={` w-48 h-48 absolute ${className} z-[100] -mb-4`} style={{width:175, height:175, ...style}}>
+    <div className={` w-48 h-48 absolute ${className} -mb-4 z-10`} style={{width:175, height:175, ...style}}>
             <div>
                 <span className="text-shadow-border1 flex text-white items-center ">{name} {(pokemon.gender !== 'N') && <img className="mx-1" style={{width:'9px', height:'13px'}} src={`https://play.pokemonshowdown.com/fx/gender-${pokemon.gender.toLowerCase()}.png`}/>} L{pokemon.level}</span>
                 <HpBar pokemon={pokemon} />
@@ -72,9 +74,13 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0, s
             </div>
     </div>
     
-    <div className={`w-48 h-48 absolute flex flex-col justify-end -mt-4 z-10  ${className} `} id={id} style={{width:175, height:175, ...style}}>
-        <PokemonImage id={`${id}-pkm`} side={side} pokemon={pokemon} />
-    </div></>
+    <div className={`w-48 h-48 absolute flex flex-col justify-end -mt-4 z-10 ${className} `} id={id} style={{width:175, height:175, ...style}}>
+        {Object.keys(pokemon.volatiles).includes("protect") &&
+            <div className={`h-[75px] w-[100px] bg-purple-400 opacity-30 self-center mt-auto absolute ${side === 'p1' ? 'z-0' : 'z-50'}`} />
+        }
+        <PokemonImage id={`${id}-pkm`} side={side} pokemon={pokemon} className="z-10"/>
+    </div>
+    </>
     )
 }
 

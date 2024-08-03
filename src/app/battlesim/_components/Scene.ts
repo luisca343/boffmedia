@@ -398,7 +398,22 @@ export class Scene {
             time: 1000 / this.acceleration,
             }, 'ballistic2', '', '', callback); 
         }
-      } 
+      }, switch:{
+		anim: (startX: any, startY: any, element:any,callback: (() => void) | undefined) => {
+		  this.showEffect('pokeball', {
+			opacity: 1,
+			x: startX,
+			y: startY,
+			scale: .7,
+			time: 500 / this.acceleration,
+			}, {
+			opacity: 0,
+			x: element.x,
+			y: element.y,
+			time: 1000 / this.acceleration,
+			}, 'ballistic2', '', '', callback); 
+		}
+	  },
     }
     
   getPokemonSpriteElement(id: string) {

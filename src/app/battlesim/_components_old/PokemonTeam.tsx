@@ -103,15 +103,15 @@ function PokemonSprite({pokemon, className}: {pokemon: Pokemon, className?: stri
 }
 
 
-export function PokemonImage({id, pokemon, side = 'p2'}: {id: string, pokemon: DetailedPokemon, side?: 'p1' | 'p2'}){
+export function PokemonImage({id, pokemon, side = 'p2', className}: {id: string, pokemon: DetailedPokemon, side?: 'p1' | 'p2', className?: string}) {
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     if(url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
         url = `http://boffmedia.es/smartrotom/img/sprites/Front/${pokemon.speciesForme.toUpperCase()}.png`
         pixelated = true
     }
     return (
-        <div className='w-full h-full flex items-end justify-center' id={id}>
-            <img src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={pokemon.speciesForme}/>
+        <div className={`w-full h-full flex items-end justify-center ${className}`} id={id}>
+            <img  className={className} src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={pokemon.speciesForme}/>
         </div>
     );
 }   
