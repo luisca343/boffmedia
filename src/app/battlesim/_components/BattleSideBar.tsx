@@ -25,7 +25,7 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
     return (
       <div className={` ${side === 'p1' ? 'self-end' : 'self-start'}`}>
         <div className="text-center font-bold ">{player.name.charAt(0).toUpperCase() + player.name.slice(1)}</div>
-        <div className="h-32">
+        <div className="h-fit">
           {
             uuid !== null ? (
               <img className="mx-auto" alt="avatar"
