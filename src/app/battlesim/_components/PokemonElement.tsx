@@ -72,7 +72,7 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0, s
             </div>
     </div>
     
-    <div className={`w-48 h-48 absolute flex flex-col justify-end -mt-4   ${className} `} id={id} style={{width:175, height:175, ...style}}>
+    <div className={`w-48 h-48 absolute flex flex-col justify-end -mt-4 z-10  ${className} `} id={id} style={{width:175, height:175, ...style}}>
         <PokemonImage id={`${id}-pkm`} side={side} pokemon={pokemon} />
     </div></>
     )

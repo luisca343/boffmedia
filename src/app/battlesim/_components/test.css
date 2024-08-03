@@ -3,3 +3,99 @@
     height: 20px;
     width: 100%; /* Initial width, will be overridden by inline styles */
   }
+
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  
+  .electric {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-electricterrain.png") no-repeat center;
+  }
+
+  .misty {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-mistyterrain.png") no-repeat center;
+  }
+
+  .psychic {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-psychicterrain.png") no-repeat center;
+  }
+
+  .grassy {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-grassyterrain.png") no-repeat center;
+  }
+
+  
+
+  .rain {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-raindance.png") no-repeat center;
+  }
+
+  .sand {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-sandstorm.png") no-repeat center;
+  }
+
+  .sun {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-sunnyday.png") no-repeat center;
+  }
+
+  .hail {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-hail.png") no-repeat center;
+  }
+
+  .strongwind {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-strongwind.png") no-repeat center;
+  }
+
+  .trickroom {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-trickroom.png") no-repeat center;
+  }
+
+  .wonderroom {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-wonderroom.png") no-repeat center;
+  }
+
+  .magicroom {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-magicroom.png") no-repeat center;
+  }
+
+  .gravity {
+    animation: slideUp .5s ease-out;
+    position: relative;
+    background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-gravity.png") no-repeat center;
+  }
+
+
+  

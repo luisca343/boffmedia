@@ -2,6 +2,7 @@ import { Battle } from "@pkmn/client";
 import PokemonSprite from "../_components_old/PokemonSprite";
 import PokemonElement from "./PokemonElement";
 import { offsets } from "./Scene";
+import Image from "next/image";
 
 export function BattleCanvas({battle}: {battle: Battle}){
     const p1 = battle.p1;
@@ -15,16 +16,80 @@ export function BattleCanvas({battle}: {battle: Battle}){
         p2b: p2.active[1],
         p2c: p2.active[2]
     }
+
+    console.log(battle.p1.sideConditions)
     
     return (
         <div id="game"  className="w-[440px] h-[360px] relative">
+            <div className={`weather w-[100%] h-[100%] absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
+            
             <div className="absolute top-1 left-1 bg-slate-800 py-1 px-2 rounded-md text-slate-200 ">Turn {battle.turn}</div>
         
             <PokemonElement pokemon={pokemon["p1a"]} id="p1a" style={{top: offsets.p1a.top, left: offsets.p1a.left}}/>
             <PokemonElement pokemon={pokemon["p1b"]} id="p1b" style={{top: offsets.p1b.top, left: offsets.p1b.left}}/>
+            {Object.entries(battle.p1.sideConditions).map((entry) => {
+                return <Hazard key={entry[0]} hazard={entry} side="p1"/>
+            })}
 
             <PokemonElement pokemon={pokemon["p2b"]} id="p2b" style={{top: offsets.p2b.top, left: offsets.p2b.left}}/>
             <PokemonElement pokemon={pokemon["p2a"]} id="p2a" style={{top: offsets.p2a.top, left: offsets.p2a.left}}/>
+
+            {Object.entries(battle.p2.sideConditions).map((entry) => {
+                    const [name, value] = entry;
+                    return <Hazard key={entry[0]} hazard={entry} side="p2"/>
+                })
+            }
         </div>
     )
+}
+
+/*
+export const offsets: Readonly<Record<string, { top: number; left: number }>> = Object.freeze({
+  p1a: { top: 150, left: 10, x: 10 + width / 2, y: 150 + width / 2 },
+  p1b: { top: 190, left: 150, x: 150 + width / 2, y: 190 + width / 2 },
+
+  p2b: { top: 0, left: 140, x: 140 + width / 2, y: 0 + width / 2 },
+  p2a: { top: 40, left: 250, x: 250 + width / 2, y: 40 + width / 2 },
+});
+
+*/
+
+const hazardOffsets: {[key: string]: {[key: string]: {top: number; left: number, width: number}}} = {
+    p1: {
+        stickyweb1: {top: 230, left: 110, width: 100},
+        default: {top: offsets.p1a.top, left: offsets.p1a.left, width: 50}
+    },
+    p2: {
+        stickyweb1: {top: 100, left: 140, width: 100},
+        toxicspikes1: {top: 160, left: 260, width: 30},
+        toxicspikes2: {top: 140, left: 220, width: 30},
+        default: {top: offsets.p2a.top, left: offsets.p2a.left, width: 50}
+    }
+}
+
+function Hazard({hazard, side}: {hazard: [string, {name: string, level: number, minDuration: number, maxDuration: number, remove?: boolean}], side: string}) {
+    const [name, value] = hazard;
+
+    // Create an array of levels from the current level down to 1
+    const levels = Array.from({ length: value.level }, (_, i) => value.level - i);
+
+    return (
+        <>
+            {levels.map(level => {
+                const hazardName = name + level;
+                const offset = hazardOffsets[side][hazardName] || hazardOffsets[side].default;
+                return (
+                    <Image
+                        key={level}
+                        src={`/battlesim/fx/${name}.png`}
+                        alt={name}
+                        width={offset.width}
+                        height={offset.width}
+                        className="absolute z-0 opacity-50"
+                        style={{ top: offset.top, left: offset.left }}
+                    />
+                );
+            })}
+        </>
+    );
 }
