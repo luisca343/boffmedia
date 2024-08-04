@@ -41,8 +41,6 @@
     background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-grassyterrain.png") no-repeat center;
   }
 
-  
-
   .rain {
     animation: slideUp .5s ease-out;
     position: relative;

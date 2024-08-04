@@ -4,6 +4,7 @@ import PokemonElement from "./PokemonElement";
 import { offsets } from "./Scene";
 import Image from "next/image";
 import { PlayerDataBar } from "./BattleSideBar";
+import { Loading } from "@/components/smartrotom/Loading";
 
 export function BattleCanvas({battle, pov}: {battle: Battle, pov: 'p1' | 'p2'}) {
     const p1 = battle.p1;
@@ -17,15 +18,13 @@ export function BattleCanvas({battle, pov}: {battle: Battle, pov: 'p1' | 'p2'}) 
         p2b: p2.active[1],
         p2c: p2.active[2]
     }
-
-    console.log(battle.p1.sideConditions)
     
+    if(!battle.pokemonControlled) return <Loading/>
     return (
         <div className="flex h-[360px] w-fit overflow-hidden relative" style={{backgroundImage: 'url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-icecave.jpg)', backgroundSize: 'cover'}}>          
 
             <PlayerDataBar battle={battle} side="p1" pov={pov}/>
             <div id="game"  className="w-[440px] h-[360px] relative" >
-                
                 <div className="absolute top-1 left-1 bg-slate-900 py-1 px-2 rounded-md text-slate-200 ">Turn {battle.turn}</div>
             
                 <PokemonElement pokemon={pokemon["p1a"]} id="p1a" style={{top: offsets.p1a.top, left: offsets.p1a.left}}/>
@@ -51,17 +50,6 @@ export function BattleCanvas({battle, pov}: {battle: Battle, pov: 'p1' | 'p2'}) 
     )
 }
 
-/*
-export const offsets: Readonly<Record<string, { top: number; left: number }>> = Object.freeze({
-  p1a: { top: 150, left: 10, x: 10 + width / 2, y: 150 + width / 2 },
-  p1b: { top: 190, left: 150, x: 150 + width / 2, y: 190 + width / 2 },
-
-  p2b: { top: 0, left: 140, x: 140 + width / 2, y: 0 + width / 2 },
-  p2a: { top: 40, left: 250, x: 250 + width / 2, y: 40 + width / 2 },
-});
-
-*/
-
 const hazardOffsets: {[key: string]: {[key: string]: {top: number; left: number, width: number}}} = {
     p1: {
         stickyweb1: {top: 230, left: 110, width: 100},
@@ -71,6 +59,10 @@ const hazardOffsets: {[key: string]: {[key: string]: {top: number; left: number,
         stickyweb1: {top: 100, left: 140, width: 100},
         toxicspikes1: {top: 160, left: 260, width: 30},
         toxicspikes2: {top: 140, left: 220, width: 30},
+        spikes1: {top: 160, left: 260, width: 30},
+        spikes2: {top: 140, left: 220, width: 30},
+        spikes3: {top: 120, left: 180, width: 30},
+        stealthrock1: {top: 160, left: 260, width: 30},
         default: {top: offsets.p2a.top, left: offsets.p2a.left, width: 50}
     }
 }
