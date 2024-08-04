@@ -103,7 +103,9 @@ export default function Pasaporte(){
 
                   return <Page key={achievement.name} book={book} number={page++} >
                     <BadgePageTitle title={achievement.name} achievement={achievement} />
-                    <div className="flex-1"><ActiveTeam team={team} className="h-[95%]"/></div>
+                    <div className="flex-1">
+                      <ActiveTeam team={team} className="h-[95%]"/>
+                    </div>
                   </Page>
                 }
               })
