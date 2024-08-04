@@ -296,8 +296,6 @@ export class Scene {
       if(!element) return;
 
       const effectData = this.animsTest[effect];
-      console.log(effect);
-      console.log(effectData);
       if (!effectData) return;
 
       const startY = pos.includes('p1') ? element.top + 40 : element.top;
@@ -307,7 +305,6 @@ export class Scene {
 
       Promise.all(this.currentAnimations).then(() => {
         this.currentAnimations = [];
-        console.log('All animations completed');
         //this.animating = false;
       });
     }
@@ -315,8 +312,6 @@ export class Scene {
     async showEffect(effect: string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void) {
       const effectData = BattleEffects[effect];
       if (!effectData) return;
-	  
-	  console.log(effectData);
 
 	  let halfWidth = 175 / 2 - effectData.w / 2;
 	  let halfHeight = 175 / 2 - effectData.h / 2;
@@ -443,8 +438,8 @@ export class Scene {
 		animFunc.anim(this, [attackerSprite, defenderSprite]);
 
     
-		return await Promise.all(this.currentAnimations).then(() => {
-			this.currentAnimations = [];
+	return await Promise.all(this.currentAnimations).then(() => {
+		this.currentAnimations = [];
 
       const attackElemnt = document.getElementById(attackerSprite.position);
       const defendElement = document.getElementById(defenderSprite.position);
@@ -461,12 +456,8 @@ export class Scene {
         defendElement.style.left = offsets[defenderSprite.position].left + 'px';
         defenderSprite.animationQueue = [];
       }
-		
-			if(anim === 'faint') {
-				console.log('Faint animation completed');
-			}
-      
-			return new Promise<void>((resolve) => {
+
+	return new Promise<void>((resolve) => {
         if(callback) {
           //wait 500ms before calling callback
           setTimeout(() => {
@@ -648,6 +639,15 @@ export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: Pokemon
 				time: 300,
 			}, 'swing');
 			scene.wait(500);
+		}, 
+  }, faint: {
+		anim(scene, [attacker]) {
+			attacker.anim({
+				time: 1000,
+				opacity: 0,
+				y: attacker.y() + 100,
+			}, 'fade');
+			scene.wait(1000);
 		},
-  },
+  }
 }
