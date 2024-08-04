@@ -107,10 +107,7 @@ useEffect(() => {
 }, [isPlaying, dataLoaded]);*/
 
 useEffect(() => {
-  console.log('Current action', currentAction);
-  console.log('Is playing', isPlaying);
   if( currentAction === -1){
-    console.log('Setting turn');
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
     let newTurn = turnInput;
@@ -150,7 +147,9 @@ useEffect(() => {
   }
 }, [currentAction, isPlaying]);
 
-function setCurrentTurn() {
+function setCurrentTurn(turn?: number) {
+  if(!turn) turn = turnInput;
+  setTurnInput(turn);
   if(isPlaying) {
     setSettingTurn(true);
   } else {
@@ -213,9 +212,15 @@ function setCurrentTurn() {
           ))}
         </div>
       </div>
-      <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
-      <Input type="number" value={turnInput} onChange={(e) => setTurnInput(parseInt(e.target.value))}/>
-      <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
+      <div className="flex">
+        <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
+        <Button onClick={() => setCurrentTurn(0)}>Reset</Button>
+        <Button onClick={() => setCurrentTurn(turnInput - 1)}>Prev</Button>
+        <Button onClick={() => setCurrentTurn(turnInput + 1)}>Next</Button>
+
+        <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
+        <Input  className="w-24 border border-slate-900" type="number" value={turnInput} onChange={(e) => setTurnInput(parseInt(e.target.value))}/>
+      </div>
       <span className="text-black">{dataLoaded ? 'Yes' : 'Nope'}</span>
     </div>
   );
@@ -226,7 +231,6 @@ function copyBattle(battle: Battle) {
   Object.assign(newBattle, battle);
   return newBattle;
 }
-
 
 const useBattleStore = create((set) => ({
   battle: new Battle(new Generations(Dex as any)),
