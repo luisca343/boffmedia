@@ -4,13 +4,15 @@ import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { create } from "zustand";
-import { ArgType, BattleArgsKWArgType, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgType, Num, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
 import { BattleCanvas } from "../../_components/BattleCanvas";
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { set } from "react-hook-form";
+import { rotomGET } from "@/services/boffAPI";
+import { switchAction, turnAction, moveAction } from "../../_components/battleActions";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -22,6 +24,8 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [turnInput, setTurnInput] = useState<number>(0);
+  const [newTurn, setNewTurn] = useState<number>(0);
+
   const [settingTurn, setSettingTurn] = useState(false);
   const [lastTurn, setLastTurn] = useState<number>(0);
 
@@ -46,9 +50,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       .then((res) => {
         const replay = res.replay;
         setBattleLog(replay);
-        const gameElement = document.querySelector('#game') as HTMLElement;
-        const battleScene = new Scene(battle, gameElement);
-        setScene(battleScene);
+        loadScene();
     })
       .catch(console.error);*/
 
@@ -57,11 +59,12 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       .then(response => response.text())
       .then(text => {
         setBattleLog(text);
+        loadScene();
       })
       .catch(error => console.error("Error fetching battle log:", error));
   }, []);
 
-  function loadGameData(){
+  function loadGameData(battle: Battle) {
     const lines = battleLog ? battleLog.split('\n') : [];
     let started = false;
     let finalTurn = 0;
@@ -73,17 +76,30 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     }
 
     setLastTurn(finalTurn);
-
-    const gameElement = document.querySelector('#game') as HTMLElement;
-    const battleScene = new Scene(battle, gameElement);
-
-    setScene(battleScene);
-    setCurrentAction(0);
   }
+
+  const loadScene = () => {
+    const observer = new MutationObserver((mutations, obs) => {
+      const gameElement = document.getElementById('game') as HTMLElement;
+      if (gameElement) {
+        console.log('Game element:', gameElement);
+        const battleScene = new Scene(battle, gameElement);
+        console.log('Battle scene:', battleScene);
+        setScene(battleScene);
+        obs.disconnect(); // Stop observing once the element is found
+      }
+    });
+
+    // Start observing the document for changes
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  };
 
   useEffect(() => {
     if(!dataLoaded && battleLog){
-      loadGameData();
+      loadGameData(battle);
     }
 
   }, [battleLog]);
@@ -110,26 +126,33 @@ useEffect(() => {
   if( currentAction === -1){
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
-    let newTurn = turnInput;
 
-    if(turnInput === 0) newTurn = 1;
-    if(turnInput > lastTurn) newTurn = lastTurn;
-    setTurnInput(newTurn);
+    let changeTurn = newTurn;
+    if(changeTurn < 0) changeTurn = 0;
+    if(changeTurn > lastTurn) changeTurn = lastTurn;
 
+    if(changeTurn === 0){
+      setLog([]);
+      loadGameData(currBattle);
+      setBattle(currBattle);
+      return
+    }
+    
     setLog([]);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const {args, kwArgs} = Protocol.parseBattleLine(line);
+      currBattle.add(line);
       if (args[0] === 'turn') {
         const currentTurn = parseInt(args[1]);
-        if (currentTurn === newTurn) {
+        if (currentTurn === changeTurn) {
+          currBattle.setTurn(changeTurn);
           setBattle(copyBattle(currBattle));
           setCurrentAction(i);
           setSettingTurn(false);
           break;
         }
       }
-      currBattle.add(line);
       setLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
     }
     return;
@@ -137,6 +160,7 @@ useEffect(() => {
 
 
   if(isPlaying) {
+    console.log('Playing action:', currentAction);
     const lines = battleLog ? battleLog.split('\n') : [];
     if(lines.length === 0 || currentAction >= lines.length) {
       setIsPlaying(false);
@@ -149,7 +173,7 @@ useEffect(() => {
 
 function setCurrentTurn(turn?: number) {
   if(!turn) turn = turnInput;
-  setTurnInput(turn);
+  setNewTurn(turn);
   if(isPlaying) {
     setSettingTurn(true);
   } else {
@@ -159,25 +183,35 @@ function setCurrentTurn(turn?: number) {
 
   async function playAction(line: string) {
     const { args, kwArgs } = Protocol.parseBattleLine(line);
-    console.log(args, kwArgs);
+    const currentBattle = copyBattle(battle);
   
     // We wait for the animation to finish
     return new Promise<void>(async (resolve) => {
         const html = formatter.formatHTML(args, kwArgs);
         setLog((prev) => [...prev, html]);
 
-        await performAction(args, kwArgs);
+        await performAction(args, kwArgs, currentBattle);
   
-        battle.add(line);
-        setBattle(copyBattle(battle));
+        currentBattle.add(args, kwArgs);
+
+        setBattle(currentBattle);
         resolve();
     });
   }
 
-  async function performAction(args: ArgType | BattleArgsKWArgType[], kwArgs: BattleArgsKWArgType) {
+  async function performAction(args: ArgType | BattleArgsKWArgType[], kwArgs: BattleArgsKWArgType, currentBattle: Battle) {
     switch (args[0]) {
+      case 'turn':
+        await turnAction(currentBattle, args[1] as Num);
+        break;
       case 'switch':
-        await switchPokemon(args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+        await switchAction(args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+        break;
+      case 'move':
+        console.log('Move action:', args);
+        await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
+        break;
+      default:
         break;
     }
     let timeout = 500
@@ -190,21 +224,9 @@ function setCurrentTurn(turn?: number) {
     })
   }
 
-  async function switchPokemon(ident: PokemonIdent, details: PokemonDetails, hpstatus: PokemonHPStatus) {
-    console.log('Switching', ident, details, hpstatus);
-    
-    return await new Promise<void>((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1000);
-    });
-  }
-  
-
   return (
     <div>
       <div className="flex">
-        
       <BattleCanvas battle={battle} pov={pov}/>
         <div ref={logRef} className="w-1/4 h-[360px] overflow-auto">
           {htmlLog.map((line, index) => (
@@ -215,11 +237,14 @@ function setCurrentTurn(turn?: number) {
       <div className="flex">
         <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
         <Button onClick={() => setCurrentTurn(0)}>Reset</Button>
-        <Button onClick={() => setCurrentTurn(turnInput - 1)}>Prev</Button>
-        <Button onClick={() => setCurrentTurn(turnInput + 1)}>Next</Button>
+        <Button onClick={() => setCurrentTurn(battle.turn - 1)}>Prev</Button>
+        <Button onClick={() => setCurrentTurn(battle.turn + 1)}>Next</Button>
 
         <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
-        <Input  className="w-24 border border-slate-900" type="number" value={turnInput} onChange={(e) => setTurnInput(parseInt(e.target.value))}/>
+        <Input  className="w-24 border border-slate-900" type="number" value={turnInput} 
+          onChange={(e) => setTurnInput(parseInt(e.target.value))}
+          min={1} max={lastTurn}
+        />
       </div>
       <span className="text-black">{dataLoaded ? 'Yes' : 'Nope'}</span>
     </div>
