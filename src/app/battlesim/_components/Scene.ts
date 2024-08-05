@@ -7,11 +7,11 @@ const width = 175;
 const height = 175;
 
 export const offsets: Readonly<Record<string, { top: number; left: number }>> = Object.freeze({
-  p1a: { top: 150, left: 10, x: 10 + width / 2, y: 150 + width / 2 },
-  p1b: { top: 190, left: 150, x: 150 + width / 2, y: 190 + width / 2 },
+  p1a: { top: 150, left: 10, x: 10 + width / 2, y: 150 + height / 2 },
+  p1b: { top: 190, left: 150, x: 150 + width / 2, y: 190 + height / 2 },
 
-  p2b: { top: 0, left: 140, x: 140 + width / 2, y: 0 + width / 2 },
-  p2a: { top: 40, left: 250, x: 250 + width / 2, y: 40 + width / 2 },
+  p2b: { top: 0, left: 140, x: 140 + width / 2, y: 0 + height / 2 },
+  p2a: { top: 40, left: 250, x: 250 + width / 2, y: 40 + height / 2 },
 });
 
 export class Scene {
@@ -23,10 +23,6 @@ export class Scene {
     constructor(battle: Battle, gameElement: HTMLElement) {
         this.battle = battle
         this.gameElement = gameElement
-
-		console.log('Scene created');
-		console.log(battle);
-		console.log(gameElement);
       }
 
     wait(time: number) {
@@ -59,8 +55,8 @@ export class Scene {
       const effectData = BattleEffects[effect];
       if (!effectData) return;
 
-	  let halfWidth = 175 / 2 - effectData.w / 2;
-	  let halfHeight = 175 / 2 - effectData.h / 2;
+	  let halfWidth = width / 2 - effectData.w / 2;
+	  let halfHeight = height / 2 - effectData.h / 2;
 
 	  if(effect === 'pokeball'){
 		halfWidth = 0
