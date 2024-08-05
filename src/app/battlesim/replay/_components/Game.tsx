@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { set } from "react-hook-form";
 import { rotomGET } from "@/services/boffAPI";
-import { switchAction, turnAction, moveAction } from "../../_components/battleActions";
+import { switchAction, turnAction, moveAction, damageAction } from "../../_components/battleActions";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -82,9 +82,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     const observer = new MutationObserver((mutations, obs) => {
       const gameElement = document.getElementById('game') as HTMLElement;
       if (gameElement) {
-        console.log('Game element:', gameElement);
         const battleScene = new Scene(battle, gameElement);
-        console.log('Battle scene:', battleScene);
         setScene(battleScene);
         obs.disconnect(); // Stop observing once the element is found
       }
@@ -160,7 +158,6 @@ useEffect(() => {
 
 
   if(isPlaying) {
-    console.log('Playing action:', currentAction);
     const lines = battleLog ? battleLog.split('\n') : [];
     if(lines.length === 0 || currentAction >= lines.length) {
       setIsPlaying(false);
@@ -200,6 +197,7 @@ function setCurrentTurn(turn?: number) {
   }
 
   async function performAction(args: ArgType | BattleArgsKWArgType[], kwArgs: BattleArgsKWArgType, currentBattle: Battle) {
+    console.log('Performing action:', args);
     switch (args[0]) {
       case 'turn':
         await turnAction(currentBattle, args[1] as Num);
@@ -208,10 +206,13 @@ function setCurrentTurn(turn?: number) {
         await switchAction(args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
         break;
       case 'move':
-        console.log('Move action:', args);
         await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
         break;
+      case '-damage':
+        await damageAction(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
+        break;
       default:
+        console.log('Unknown action:', args[0]);
         break;
     }
     let timeout = 500
