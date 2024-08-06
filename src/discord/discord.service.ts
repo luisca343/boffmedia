@@ -8,24 +8,26 @@ import * as path from 'path';
 @Injectable()
 export class DiscordService {
     private client: Client;
-
-    /*
-    foldersPath = path.join(process.cwd(), 'src/discord/commands');
-    commandFolders = fs.readdirSync(this.foldersPath);
-    commands = [];
-    commandModules = new Map();*/
-
+    private foldersPath: string;
+    private commandFolders: string[];
+    private commands: any[] = [];
+    private commandModules: Map<string, any> = new Map();
 
     constructor(private readonly config: ConfigService) {
-        console.log('Discord service initialized');
-        console.log('Discord key: ', process.env.DISCORD_KEY);
+        const nodeEnv = process.env.NODE_ENV;
+        const basePath = nodeEnv === 'production' ? 'dist' : 'src';
+        this.foldersPath = path.join(process.cwd(), `${basePath}/discord/commands`);
+    
+        try {
+            this.commandFolders = fs.readdirSync(this.foldersPath);
+        } catch (error) {
+            console.error('Error reading command folders:', error);
+            return;
+        }
+    
         this.connect();
-
-        //this.deleteCommands();
         this.registerCommands();
-        //this.setupInteractionListener();
     }
-
     connect(): Client {
         if (!this.client) {
             this.client = new Client(
@@ -50,10 +52,10 @@ export class DiscordService {
 
 
     registerCommands() {
-        /*
+        
         const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
         for (const folder of this.commandFolders) {
-            const commandFiles = fs.readdirSync(`${this.foldersPath}/${folder}`).filter(file => file.endsWith('.js'));
+            const commandFiles = fs.readdirSync(`${this.foldersPath}/${folder}`).filter(file => file.endsWith('.cjs'));
             for (const file of commandFiles) {
                 const commandModule = require(`${this.foldersPath}/${folder}/${file}`);
                 this.commands.push(commandModule.data.toJSON());
@@ -64,10 +66,10 @@ export class DiscordService {
         console.log('Commands: ', this.commands);
         rest.put(Routes.applicationCommands(process.env.DISCORD_ID), { body: this.commands })
         .then(() => console.log('Successfully registered commands.'))
-        .catch(console.error);*/
+        .catch(console.error);
     }
 
-    /*
+    
     setupInteractionListener() {
         this.client.on('interactionCreate', async interaction => {
             if (!interaction.isCommand()) return;
@@ -88,7 +90,7 @@ export class DiscordService {
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
         });
-    }*/
+    }
 
     deleteCommands() {
         const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
