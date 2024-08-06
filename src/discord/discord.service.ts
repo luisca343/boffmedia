@@ -49,6 +49,7 @@ export class DiscordService {
 
 
     registerCommands() {
+        /*
         const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
         for (const folder of this.commandFolders) {
             const commandFiles = fs.readdirSync(`${this.foldersPath}/${folder}`).filter(file => file.endsWith('.js'));
@@ -62,7 +63,7 @@ export class DiscordService {
         console.log('Commands: ', this.commands);
         rest.put(Routes.applicationCommands(process.env.DISCORD_ID), { body: this.commands })
         .then(() => console.log('Successfully registered commands.'))
-        .catch(console.error);
+        .catch(console.error);*/
     }
 
     
