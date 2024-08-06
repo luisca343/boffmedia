@@ -9,10 +9,11 @@ import * as path from 'path';
 export class DiscordService {
     private client: Client;
 
+    /*
     foldersPath = path.join(process.cwd(), 'src/discord/commands');
     commandFolders = fs.readdirSync(this.foldersPath);
     commands = [];
-    commandModules = new Map();
+    commandModules = new Map();*/
 
 
     constructor(private readonly config: ConfigService) {
@@ -22,7 +23,7 @@ export class DiscordService {
 
         //this.deleteCommands();
         this.registerCommands();
-        this.setupInteractionListener();
+        //this.setupInteractionListener();
     }
 
     connect(): Client {
@@ -66,7 +67,7 @@ export class DiscordService {
         .catch(console.error);*/
     }
 
-    
+    /*
     setupInteractionListener() {
         this.client.on('interactionCreate', async interaction => {
             if (!interaction.isCommand()) return;
@@ -87,7 +88,7 @@ export class DiscordService {
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
         });
-    }
+    }*/
 
     deleteCommands() {
         const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
