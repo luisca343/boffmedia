@@ -52,10 +52,9 @@ export class DiscordService {
 
 
     registerCommands() {
-        
         const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
         for (const folder of this.commandFolders) {
-            const commandFiles = fs.readdirSync(`${this.foldersPath}/${folder}`).filter(file => file.endsWith('.cjs'));
+            const commandFiles = fs.readdirSync(`${this.foldersPath}/${folder}`).filter(file => file.endsWith('js'));
             for (const file of commandFiles) {
                 const commandModule = require(`${this.foldersPath}/${folder}/${file}`);
                 this.commands.push(commandModule.data.toJSON());
