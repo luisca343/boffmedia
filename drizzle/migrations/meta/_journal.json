@@ -50,6 +50,20 @@
       "when": 1722440541376,
       "tag": "0006_daily_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1722963346261,
+      "tag": "0007_burly_expediter",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1722967064273,
+      "tag": "0008_smart_sir_ram",
+      "breakpoints": true
     }
   ]
 }
