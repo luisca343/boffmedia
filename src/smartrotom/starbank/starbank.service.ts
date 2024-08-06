@@ -1,5 +1,5 @@
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
-import { starBankAccounts, starBankTransactions, starBankUsersAccounts } from '@/_db/schema/SmartRotomStarBank';
+import { StarBankAccount, starBankAccounts, starBankTransactions, starBankUsersAccounts } from '@/_db/schema/SmartRotomStarBank';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { desc, eq, or } from 'drizzle-orm';
@@ -59,7 +59,7 @@ export class StarbankService {
         if(res) {
             return {success: false}
         }
-        const res2 = await this.db.getDrizzle().insert(starBankAccounts).values({name: username, balance: 0, type: "MAIN"}).execute() as RowDataPacket[];
+        const res2 = await this.db.getDrizzle().insert(starBankAccounts).values({name: username, balance: 0, type: "MAIN"} as StarBankAccount).execute() as RowDataPacket[];
         const insert = res2[0];
         const res3 = await this.db.getDrizzle().insert(starBankUsersAccounts).values({uuid, accountId: insert.insertId}).execute();
         return {success: true}
@@ -140,8 +140,8 @@ export class StarbankService {
 
 
         
-        await this.db.getDrizzle().update(starBankAccounts).set({balance: fromAccount[0].balance - amount}).where(eq(starBankAccounts.id, from)).execute();
-        await this.db.getDrizzle().update(starBankAccounts).set({balance: toAccount[0].balance + amount}).where(eq(starBankAccounts.id, to)).execute();
+        await this.db.getDrizzle().update(starBankAccounts).set({balance: fromAccount[0].balance - amount} as StarBankAccount).where(eq(starBankAccounts.id, from)).execute();
+        await this.db.getDrizzle().update(starBankAccounts).set({balance: toAccount[0].balance + amount} as StarBankAccount).where(eq(starBankAccounts.id, to)).execute();
         
         const fromBalance = from === 0 ? 0 : fromAccount[0].balance - amount;
         const toBalance = to === 0 ? 0 : toAccount[0].balance + amount;

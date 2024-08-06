@@ -19,7 +19,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "generate": "drizzle-kit generate:mysql"
+    "generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -40,8 +40,9 @@
     "@pkmn/view": "^0.6.25",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
-    "drizzle-kit": "^0.20.14",
-    "drizzle-orm": "^0.30.10",
+    "discord.js": "^14.15.3",
+    "drizzle-kit": "^0.23.0",
+    "drizzle-orm": "^0.32.1",
     "fuse.js": "^7.0.0",
     "googleapis": "^134.0.0",
     "mysql2": "^3.9.2",

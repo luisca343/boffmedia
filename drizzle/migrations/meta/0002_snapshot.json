@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d428db02-f360-4b61-b8e3-4f9719af3bd8",
-  "prevId": "d7090bac-f451-464d-a28e-72df2519cef1",
+  "id": "107a2e19-d1ad-4553-ba05-109bc2d280b9",
+  "prevId": "9de03baa-d231-4a55-9f45-45374f79c9b0",
   "tables": {
     "boffmedia_users": {
       "name": "boffmedia_users",
@@ -44,7 +44,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "boffmedia_users_uuid_rotom_users_uuid_fk": {
+          "name": "boffmedia_users_uuid_rotom_users_uuid_fk",
+          "tableFrom": "boffmedia_users",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
         "boffmedia_users_id": {
           "name": "boffmedia_users_id",
@@ -72,19 +86,19 @@
           "notNull": false,
           "autoincrement": false
         },
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
         "content": {
           "name": "content",
           "type": "json",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
         },
         "created_at": {
           "name": "created_at",
@@ -186,7 +200,7 @@
       "columns": {
         "id": {
           "name": "id",
-          "type": "int",
+          "type": "varchar(32)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -233,6 +247,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": 1
+        },
+        "order": {
+          "name": "order",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -250,16 +272,16 @@
     "rotom_user_achievements": {
       "name": "rotom_user_achievements",
       "columns": {
+        "achievement_id": {
+          "name": "achievement_id",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "uuid": {
           "name": "uuid",
           "type": "char(36)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "id": {
-          "name": "id",
-          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -271,6 +293,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": 0
+        },
+        "data": {
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(null)"
         },
         "completed": {
           "name": "completed",
@@ -290,6 +320,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "rotom_user_achievements_achievement_id_rotom_achievements_id_fk": {
+          "name": "rotom_user_achievements_achievement_id_rotom_achievements_id_fk",
+          "tableFrom": "rotom_user_achievements",
+          "tableTo": "rotom_achievements",
+          "columnsFrom": [
+            "achievement_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
         "rotom_user_achievements_uuid_rotom_users_uuid_fk": {
           "name": "rotom_user_achievements_uuid_rotom_users_uuid_fk",
           "tableFrom": "rotom_user_achievements",
@@ -299,19 +342,6 @@
           ],
           "columnsTo": [
             "uuid"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "rotom_user_achievements_id_rotom_achievements_id_fk": {
-          "name": "rotom_user_achievements_id_rotom_achievements_id_fk",
-          "tableFrom": "rotom_user_achievements",
-          "tableTo": "rotom_achievements",
-          "columnsFrom": [
-            "id"
-          ],
-          "columnsTo": [
-            "id"
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
@@ -372,7 +402,7 @@
           "name": "uuid",
           "type": "char(36)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "app_id": {
@@ -392,7 +422,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_user_apps_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_user_apps_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_user_apps",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_user_apps_app_id_rotom_apps_id_fk": {
+          "name": "rotom_user_apps_app_id_rotom_apps_id_fk",
+          "tableFrom": "rotom_user_apps",
+          "tableTo": "rotom_apps",
+          "columnsFrom": [
+            "app_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -482,7 +539,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_chat_message_reads_message_id_rotom_chat_messages_id_fk": {
+          "name": "rotom_chat_message_reads_message_id_rotom_chat_messages_id_fk",
+          "tableFrom": "rotom_chat_message_reads",
+          "tableTo": "rotom_chat_messages",
+          "columnsFrom": [
+            "message_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_chat_message_reads_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_chat_message_reads_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_chat_message_reads",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -535,7 +619,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_chat_messages_chat_id_rotom_chats_id_fk": {
+          "name": "rotom_chat_messages_chat_id_rotom_chats_id_fk",
+          "tableFrom": "rotom_chat_messages",
+          "tableTo": "rotom_chats",
+          "columnsFrom": [
+            "chat_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_chat_messages_sender_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_chat_messages_sender_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_chat_messages",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "sender_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
         "rotom_chat_messages_id": {
           "name": "rotom_chat_messages_id",
@@ -565,7 +676,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_chat_users_chat_id_rotom_chats_id_fk": {
+          "name": "rotom_chat_users_chat_id_rotom_chats_id_fk",
+          "tableFrom": "rotom_chat_users",
+          "tableTo": "rotom_chats",
+          "columnsFrom": [
+            "chat_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_chat_users_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_chat_users_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_chat_users",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -719,7 +857,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_documents_users_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_documents_users_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_documents_users",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_documents_users_document_id_rotom_documents_id_fk": {
+          "name": "rotom_documents_users_document_id_rotom_documents_id_fk",
+          "tableFrom": "rotom_documents_users",
+          "tableTo": "rotom_documents",
+          "columnsFrom": [
+            "document_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -750,7 +915,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_mine_games_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_mine_games_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_mine_games",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
         "rotom_mine_games_id": {
           "name": "rotom_mine_games_id",
@@ -802,7 +981,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_mine_games_detail_game_id_rotom_mine_games_id_fk": {
+          "name": "rotom_mine_games_detail_game_id_rotom_mine_games_id_fk",
+          "tableFrom": "rotom_mine_games_detail",
+          "tableTo": "rotom_mine_games",
+          "columnsFrom": [
+            "game_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_mine_games_detail_reward_id_rotom_mine_rewards_id_fk": {
+          "name": "rotom_mine_games_detail_reward_id_rotom_mine_rewards_id_fk",
+          "tableFrom": "rotom_mine_games_detail",
+          "tableTo": "rotom_mine_rewards",
+          "columnsFrom": [
+            "reward_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
         "rotom_mine_games_detail_id": {
           "name": "rotom_mine_games_detail_id",
@@ -933,7 +1139,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_pokedex_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_pokedex_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_pokedex",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
         "rotom_pokedex_id": {
           "name": "rotom_pokedex_id",
@@ -944,8 +1164,8 @@
       },
       "uniqueConstraints": {}
     },
-    "rotom_starbank_accounts": {
-      "name": "rotom_starbank_accounts",
+    "rotom_bank_accounts": {
+      "name": "rotom_bank_accounts",
       "columns": {
         "id": {
           "name": "id",
@@ -980,8 +1200,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "rotom_starbank_accounts_id": {
-          "name": "rotom_starbank_accounts_id",
+        "rotom_bank_accounts_id": {
+          "name": "rotom_bank_accounts_id",
           "columns": [
             "id"
           ]
@@ -989,8 +1209,8 @@
       },
       "uniqueConstraints": {}
     },
-    "rotom_starbank_transactions": {
-      "name": "rotom_starbank_transactions",
+    "rotom_bank_transactions": {
+      "name": "rotom_bank_transactions",
       "columns": {
         "id": {
           "name": "id",
@@ -1057,10 +1277,37 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_bank_transactions_from_rotom_bank_accounts_id_fk": {
+          "name": "rotom_bank_transactions_from_rotom_bank_accounts_id_fk",
+          "tableFrom": "rotom_bank_transactions",
+          "tableTo": "rotom_bank_accounts",
+          "columnsFrom": [
+            "from"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_bank_transactions_to_rotom_bank_accounts_id_fk": {
+          "name": "rotom_bank_transactions_to_rotom_bank_accounts_id_fk",
+          "tableFrom": "rotom_bank_transactions",
+          "tableTo": "rotom_bank_accounts",
+          "columnsFrom": [
+            "to"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
-        "rotom_starbank_transactions_id": {
-          "name": "rotom_starbank_transactions_id",
+        "rotom_bank_transactions_id": {
+          "name": "rotom_bank_transactions_id",
           "columns": [
             "id"
           ]
@@ -1068,8 +1315,8 @@
       },
       "uniqueConstraints": {}
     },
-    "rotom_starbank_users_accounts": {
-      "name": "rotom_starbank_users_accounts",
+    "rotom_bank_users_accounts": {
+      "name": "rotom_bank_users_accounts",
       "columns": {
         "uuid": {
           "name": "uuid",
@@ -1087,7 +1334,34 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "rotom_bank_users_accounts_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_bank_users_accounts_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_bank_users_accounts",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_bank_users_accounts_account_id_rotom_bank_accounts_id_fk": {
+          "name": "rotom_bank_users_accounts_account_id_rotom_bank_accounts_id_fk",
+          "tableFrom": "rotom_bank_users_accounts",
+          "tableTo": "rotom_bank_accounts",
+          "columnsFrom": [
+            "account_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -1152,10 +1426,13 @@
       "uniqueConstraints": {}
     }
   },
-  "schemas": {},
   "_meta": {
     "schemas": {},
     "tables": {},
     "columns": {}
+  },
+  "internal": {
+    "tables": {},
+    "indexes": {}
   }
 }

@@ -1,4 +1,4 @@
-import { rotomDocuments, rotomDocumentsUsers } from '@/_db/schema/SmartRotomDocuments';
+import { RotomDocument, rotomDocuments, rotomDocumentsUsers } from '@/_db/schema/SmartRotomDocuments';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { and, desc, eq } from 'drizzle-orm';
@@ -40,7 +40,7 @@ export class DocumentsService {
             result = await this.db.getDrizzle().insert(rotomDocuments)
             .values({
                     title, type: documentType, public:0, content, id: id, createdAt: new Date(), updatedAt: new Date()
-                })
+                } as RotomDocument)
             .execute();
         } else {
             result = await this.db.getDrizzle().update(rotomDocuments)

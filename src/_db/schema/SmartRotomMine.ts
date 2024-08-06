@@ -1,9 +1,10 @@
 import { sql } from "drizzle-orm";
 import { char, datetime, int, mysqlTable, varchar } from "drizzle-orm/mysql-core";
+import { smartrotomUsers } from "./SmartRotom";
 
 export const mineGames = mysqlTable("rotom_mine_games", {
     id: int("id").primaryKey().autoincrement().primaryKey(),
-    uuid: char("uuid", { length: 36 }).notNull(),
+    uuid: char("uuid", { length: 36 }).notNull().references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
     createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
 });
 
@@ -23,8 +24,8 @@ export type RecompensaMina = typeof mineRewards.$inferSelect;
 
 export const mineGamesDetail = mysqlTable("rotom_mine_games_detail", {
     id: int("id").primaryKey().autoincrement().primaryKey(),
-    gameId: int("game_id").notNull(),
-    rewardId: int("reward_id").notNull(),
+    gameId: int("game_id").notNull().references(() => mineGames.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    rewardId: int("reward_id").notNull().references(() => mineRewards.id, {onDelete: "cascade", onUpdate: "cascade"}),
     value: int("value").notNull(),
     claimed: int("claimed").notNull().default(0),
 });

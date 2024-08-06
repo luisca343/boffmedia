@@ -478,7 +478,7 @@ export class PokemonService {
                 let caughtAt = status === 1 ? new Date() : null
                 const result = await this.db.getDrizzle()
                 .insert(pokedexRegistry)
-                .values({uuid, pokemonId, formId, paletteId, seenAt: new Date(), caughtAt})
+                .values({uuid, pokemonId, formId, paletteId, seenAt: new Date(), caughtAt} as PokedexRegistry)
                 .execute() as MySqlRawQueryResult
                 if(result[0].affectedRows === 1) {
                     const pokemonName = this.getPokemonNameByDex(pokemonId)
@@ -490,7 +490,7 @@ export class PokemonService {
                 console.log('INSERTING 2')
                 const registry = res[0] as PokedexRegistry
                 if(registry.caughtAt !== null) return {success: false, message: 'Pokemon already caught'}
-                const result = await this.db.getDrizzle().update(pokedexRegistry).set({caughtAt: new Date()})
+                const result = await this.db.getDrizzle().update(pokedexRegistry).set({caughtAt: new Date()} as PokedexRegistry)
                     .where(and(
                         eq(pokedexRegistry.uuid, uuid),
                         eq(pokedexRegistry.pokemonId, pokemonId),

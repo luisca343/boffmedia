@@ -41,6 +41,8 @@ import { ArcadeModule } from './smartrotom/arcade/arcade.module';
 import { ArcadeController } from './smartrotom/arcade/arcade.controller';
 import { ArcadeService } from './smartrotom/arcade/arcade.service';
 import { PokemonService } from './smartrotom/pokemon/pokemon.service';
+import { DiscordService } from './discord/discord.service';
+import { DiscordModule } from './discord/discord.module';
 
 @Module({
   imports: [
@@ -75,9 +77,10 @@ import { PokemonService } from './smartrotom/pokemon/pokemon.service';
     BattleModule,
     SharexModule,
     ArcadeModule,
+    DiscordModule,
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService],
+  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

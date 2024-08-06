@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d1cddfa3-caaf-4e2f-984e-581ad49d81ca",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "2e09cf81-e11a-48d2-a5be-9c46416c7819",
+  "prevId": "7e616f5e-3f63-41c4-8d3b-f7fda40c358c",
   "tables": {
     "boffmedia_users": {
       "name": "boffmedia_users",
@@ -247,6 +247,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": 1
+        },
+        "order": {
+          "name": "order",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -261,6 +269,80 @@
       },
       "uniqueConstraints": {}
     },
+    "rotom_replays": {
+      "name": "rotom_replays",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "side1": {
+          "name": "side1",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "side2": {
+          "name": "side2",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "team1": {
+          "name": "team1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "team2": {
+          "name": "team2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "replay": {
+          "name": "replay",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "winner": {
+          "name": "winner",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "rotom_replays_id": {
+          "name": "rotom_replays_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
     "rotom_user_achievements": {
       "name": "rotom_user_achievements",
       "columns": {
@@ -268,14 +350,14 @@
           "name": "achievement_id",
           "type": "varchar(32)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "uuid": {
           "name": "uuid",
           "type": "char(36)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "progress": {
@@ -300,6 +382,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "data_id": {
+          "name": "data_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -331,7 +421,81 @@
           "onUpdate": "cascade"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "rotom_user_achievements_achievement_id_uuid_pk": {
+          "name": "rotom_user_achievements_achievement_id_uuid_pk",
+          "columns": [
+            "achievement_id",
+            "uuid"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
+    },
+    "rotom_user_replays": {
+      "name": "rotom_user_replays",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "replay_id": {
+          "name": "replay_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "side": {
+          "name": "side",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "rotom_user_replays_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_user_replays_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_user_replays",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "rotom_user_replays_replay_id_rotom_replays_id_fk": {
+          "name": "rotom_user_replays_replay_id_rotom_replays_id_fk",
+          "tableFrom": "rotom_user_replays",
+          "tableTo": "rotom_replays",
+          "columnsFrom": [
+            "replay_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "rotom_user_replays_uuid_replay_id_pk": {
+          "name": "rotom_user_replays_uuid_replay_id_pk",
+          "columns": [
+            "uuid",
+            "replay_id"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "rotom_apps": {

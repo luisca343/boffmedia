@@ -5,8 +5,8 @@ import { smartrotomUsers } from "./SmartRotom";
 
 export const ficusMessages = mysqlTable("ficus_messages", {
     uuid: char("uuid", { length: 36 }),
-    id: int("id").primaryKey().autoincrement(),
     content: json("content"),
+    id: int("id").primaryKey().autoincrement(),
     createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
     updatedAt: datetime("updated_at").default(sql`CURRENT_TIMESTAMP()`),
     deletedAt: datetime("deleted_at")

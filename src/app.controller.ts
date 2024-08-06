@@ -54,4 +54,10 @@ export class AppController {
   async blogicons() {
     return await this.appService.blogicons();
   }
+
+  @Post("netfluis")
+  async netfluis(@Body() body: {url: string}) {
+    console.log(body);
+    return {url: ""};
+  }
 }

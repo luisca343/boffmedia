@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d1cddfa3-caaf-4e2f-984e-581ad49d81ca",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1a104ab7-5ea3-4db2-a5bf-5e9a239facda",
+  "prevId": "107a2e19-d1ad-4553-ba05-109bc2d280b9",
   "tables": {
     "boffmedia_users": {
       "name": "boffmedia_users",
@@ -247,6 +247,14 @@
           "notNull": false,
           "autoincrement": false,
           "default": 1
+        },
+        "order": {
+          "name": "order",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": 0
         }
       },
       "indexes": {},
@@ -268,14 +276,14 @@
           "name": "achievement_id",
           "type": "varchar(32)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "uuid": {
           "name": "uuid",
           "type": "char(36)",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "progress": {
@@ -300,6 +308,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "data": {
+          "name": "data",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(null)"
         }
       },
       "indexes": {},
@@ -331,7 +347,15 @@
           "onUpdate": "cascade"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "rotom_user_achievements_achievement_id_uuid_pk": {
+          "name": "rotom_user_achievements_achievement_id_uuid_pk",
+          "columns": [
+            "achievement_id",
+            "uuid"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "rotom_apps": {
