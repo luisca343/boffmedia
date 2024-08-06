@@ -18,10 +18,11 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
+    "allowJs": true,
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules, public"]
 }
