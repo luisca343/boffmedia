@@ -40,6 +40,7 @@
     "@pkmn/view": "^0.6.25",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
+    "discord.js": "^14.15.3",
     "drizzle-kit": "^0.23.0",
     "drizzle-orm": "^0.32.1",
     "fuse.js": "^7.0.0",
