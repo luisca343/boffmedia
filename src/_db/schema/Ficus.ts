@@ -19,6 +19,7 @@ export const discordUsers = mysqlTable("discord_users", {
     username: varchar("username", { length: 32 }).notNull(),
     avatar: varchar("avatar", { length: 255 }),
     color: varchar("color", { length: 6 }),
+    ttsVoice: varchar("tts_voice", { length: 32 }).default("Enrique"),
     createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP()`),
     updatedAt: datetime("updated_at"),
 });
