@@ -1,10 +1,11 @@
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable, Logger } from '@nestjs/common';
-import { Client, IntentsBitField, GatewayIntentBits, REST, Routes, ButtonInteraction } from 'discord.js';
+import { Client, IntentsBitField, GatewayIntentBits, REST, Routes, ButtonInteraction, Events, ChannelType } from 'discord.js';
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { CommandsService } from '../_commands/commands.service';
+import { playAudio } from '../_util/audio';
 
 @Injectable()
 export class DiscordService {
@@ -87,7 +88,7 @@ export class DiscordService {
 
     
     setupInteractionListener() {
-        this.client.on('interactionCreate', async interaction => {
+        this.client.on(Events.InteractionCreate, async interaction => {
             if(interaction.isCommand()) {
                 const commandModule = this.commandModules.get(interaction.commandName);
                 try {
@@ -111,6 +112,19 @@ export class DiscordService {
             }
             
         });
+
+
+        this.client.on(Events.MessageCreate, async message => {
+                if (message.author.bot) return;
+                if(message.channel.type === ChannelType.DM) return;
+                console.log('Message received:', message.content);
+                
+                playAudio(message, this.service);
+                
+                
+
+            }
+        )
     }
 
     async handleButton(interaction: ButtonInteraction) {
