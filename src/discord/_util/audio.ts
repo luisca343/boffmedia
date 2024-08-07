@@ -77,8 +77,6 @@ export async function getVoices(){
         let voz = { id: id++, value: id++, name: nombre}
         voices.push(voz)
     });
-
-    console.log(voices);
     return voices;
 }
 
