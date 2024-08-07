@@ -64,6 +64,13 @@
       "when": 1722967064273,
       "tag": "0008_smart_sir_ram",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1723057297157,
+      "tag": "0009_pretty_demogoblin",
+      "breakpoints": true
     }
   ]
 }

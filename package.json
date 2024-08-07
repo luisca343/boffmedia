@@ -22,6 +22,7 @@
     "generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@discordjs/voice": "^0.17.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
     "@nestjs/core": "^10.0.0",
@@ -45,6 +46,7 @@
     "drizzle-orm": "^0.32.1",
     "fuse.js": "^7.0.0",
     "googleapis": "^134.0.0",
+    "libsodium-wrappers": "^0.7.14",
     "mysql2": "^3.9.2",
     "nestjs-i18n": "^10.4.5",
     "openai": "^4.28.4",
