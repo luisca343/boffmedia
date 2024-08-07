@@ -1,6 +1,5 @@
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger } from '@nestjs/common';
 import { Client, IntentsBitField, GatewayIntentBits, REST, Routes, ButtonInteraction } from 'discord.js';
 
 import * as fs from 'fs';
@@ -9,13 +8,16 @@ import { CommandsService } from '../_commands/commands.service';
 
 @Injectable()
 export class DiscordService {
+    private readonly logger = new Logger(DiscordService.name);
+  
     private client: Client;
     private foldersPath: string;
     private commandFolders: string[];
     private commands: any[] = [];
     private commandModules: Map<string, any> = new Map();
 
-    constructor(private readonly config: ConfigService, private service: CommandsService) {
+    constructor(private service: CommandsService) {
+        this.logger.log('DiscordService instantiated');
         const nodeEnv = process.env.NODE_ENV;
         const basePath = nodeEnv === 'production' ? 'dist' : 'src';
         this.foldersPath = path.join(process.cwd(), `${basePath}/discord/commands`);
@@ -39,6 +41,8 @@ export class DiscordService {
         }
     
         this.connect();
+        //this.resetCommands();
+        
         this.registerCommands();
         this.setupInteractionListener();
     }
@@ -84,19 +88,17 @@ export class DiscordService {
     
     setupInteractionListener() {
         this.client.on('interactionCreate', async interaction => {
-            //if (!interaction.isCommand()) return;
             if(interaction.isCommand()) {
                 const commandModule = this.commandModules.get(interaction.commandName);
                 try {
+                    console.log('Executing command:', interaction.commandName);
                     await commandModule.execute(interaction, this.service);
                 } catch (error) {
                     console.error(`Error executing ${interaction.commandName}`);
                     console.error(error);
                     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
                 }
-            }
-            
-            if (interaction.isAutocomplete()) {
+            } else if (interaction.isAutocomplete()) {
                 const commandModule = this.commandModules.get(interaction.commandName);
                 try {
                     await commandModule.autocomplete(interaction, this.service);
@@ -104,8 +106,7 @@ export class DiscordService {
                     console.error(error);
                 }
             }
-
-            if( interaction.isButton()) {
+            else if( interaction.isButton()) {
                 this.handleButton(interaction);
             }
             
@@ -129,11 +130,15 @@ export class DiscordService {
         }
     }
 
-    deleteCommands() {
+    resetCommands() {
         const rest = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
         rest.put(Routes.applicationCommands(process.env.DISCORD_ID), { body: [] })
-        .then(() => console.log('Successfully deleted commands.'))
+        .then(() => {
+            console.log('Successfully deleted commands.')
+        })
         .catch(console.error);
+
+        return 'Resetting commands...';
 
         /*
         const rest2 = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
