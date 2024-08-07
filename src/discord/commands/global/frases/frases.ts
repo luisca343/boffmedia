@@ -13,38 +13,33 @@ const data = new SlashCommandBuilder()
 .addUserOption(option => option.setName('usuario').setDescription('Usuario a buscar'))
 .addIntegerOption(option => option.setName('page').setDescription('Página a mostrar'));
 
-async function autocomplete(interaction, db= null){
-    const guildId = interaction.guildId;
-    const users = await db.getDrizzle().selectDistinct({userID: ficusFrases.discordId})
-    .from(ficusFrases)
-    .where(or(
-        eq(ficusFrases.serverID, guildId),
-        eq(guildId, '516237304101339156')
-    ))
-    
-    const ids = users.map(user => user.userID);
-}
 
 async function execute(interaction, service: CommandsService) {
-    const user =  interaction.options.getUser('usuario') || null
+    if (!interaction.isCommand()) return;
+  
+    const user = interaction.options.getUser('usuario') || null;
     const page = interaction.options.getInteger('page') || 1;
-    
     const guildId = interaction.guildId;
-    const {embed, row} = await createEmbed(service, guildId, user?.id, page);
-    
-    await interaction.reply({embeds: [embed], components: [row] });
-}
-
+  
+    const { embed, row } = await createEmbed(service, guildId, user?.id, page);
+  
+    try {
+      await interaction.reply({ embeds: [embed], components: [row] });
+    } catch (error) {
+      console.error('Error replying to interaction:', error);
+    }
+  }
+  
 const MAX_QUOTES = 10
 async function createEmbed(service: CommandsService, guildId, userId, page){
     const {totalPages, frases} = await service.getFrases(guildId, userId, page, MAX_QUOTES);
     let fields = [];
     frases.forEach((frase, index) => {
-        let fraseValue = `${frase.quote}${userId == null ? ` - ${frase.discordName}` : ""}`
-        fields.push({name: ("#"+(frase.id)), value: `${fraseValue} - ${formatDate(frase.createdAt)}`})
+        fields.push({name: (`**"${frase.quote}" **`), value: `*${frase.discordName} - ${formatDate(frase.createdAt)}*`})
     });
     
     const params = frases[0];
+
     
     const embed = new EmbedBuilder()
     .setColor(`#${params?.color || '0099ff'}`)
@@ -83,7 +78,7 @@ async function createEmbed(service: CommandsService, guildId, userId, page){
     .setEmoji('1179812309338701835')
     
     const row = new ActionRowBuilder()
-    .addComponents(btnFirst, btnPrev, btnNext, btnLast);
+        .addComponents(btnFirst, btnPrev, btnNext, btnLast);
     
     return {embed, row};
 }
@@ -105,7 +100,6 @@ async function handleButton(interaction: ButtonInteraction, service: CommandsSer
 
 module.exports = {
     data,
-    autocomplete,
     execute,
     handleButton
 };
