@@ -3,6 +3,7 @@ import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { User } from 'discord.js';
 import { and, eq, or, sql } from 'drizzle-orm';
+import { getVoiceName } from '../_util/audio';
 
 @Injectable()
 export class CommandsService {
@@ -134,7 +135,7 @@ export class CommandsService {
                     color: discordUsers.color,
                     createdAt: ficusFrases.createdAt,
                     avatar: discordUsers.avatar
-                }
+                } 
             )
             .from(ficusFrases)
             .leftJoin(discordUsers, 
@@ -154,6 +155,22 @@ export class CommandsService {
             .limit(1);
             
             return query[0];
+        }
+
+        async getTTSVoice(userId: string) {
+            const data = await this.db.getDrizzle().select({voice: discordUsers.ttsVoice})
+            .from(discordUsers)
+            .where(eq(discordUsers.userId, userId))
+            .limit(1)
+
+            return data[0].voice;
+        }
+
+        async setTTSVoice(userId: string, voice: number) {
+            const voiceName = await getVoiceName(voice);
+            await this.db.getDrizzle().update(discordUsers)
+            .set({ttsVoice: voiceName} as DiscordUser)
+            .where(eq(discordUsers.userId, userId));
         }
     }
     
