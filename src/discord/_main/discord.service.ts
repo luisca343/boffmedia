@@ -117,12 +117,11 @@ export class DiscordService {
         this.client.on(Events.MessageCreate, async message => {
                 if (message.author.bot) return;
                 if(message.channel.type === ChannelType.DM) return;
-                console.log('Message received:', message.content);
-                
-                playAudio(message, this.service);
-                
-                
 
+                if(message.guild.members.me.voice.channel && message.guild.members.me.voice.channel.id === message.channel.id) {
+                    playAudio(message, this.service);
+                }
+            
             }
         )
     }
