@@ -1,6 +1,5 @@
-import { FicusFrase, ficusFrases } from "@/_db/schema/Ficus";
-import { MySQL2Service } from "@/_utils/MySQL2Service";
-import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
+import { ficusFrases } from "@/_db/schema/Ficus";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, EmbedBuilder } from "discord.js";
 import { eq, or} from 'drizzle-orm';
 
 import { SlashCommandBuilder } from '@discordjs/builders';
@@ -24,7 +23,6 @@ async function autocomplete(interaction, db= null){
     ))
     
     const ids = users.map(user => user.userID);
-    console.log(ids);
 }
 
 async function execute(interaction, service: CommandsService) {
@@ -32,58 +30,55 @@ async function execute(interaction, service: CommandsService) {
     const page = interaction.options.getInteger('page') || 1;
     
     const guildId = interaction.guildId;
-    const {embed, row} = await createEmbed(service, guildId, user, page);
+    const {embed, row} = await createEmbed(service, guildId, user?.id, page);
     
     await interaction.reply({embeds: [embed], components: [row] });
 }
 
 const MAX_QUOTES = 10
-async function createEmbed(service: CommandsService, guildId, user, page){
-    const frases = await service.getFrases(guildId, user?.id, page, MAX_QUOTES);
-    
+async function createEmbed(service: CommandsService, guildId, userId, page){
+    const {totalPages, frases} = await service.getFrases(guildId, userId, page, MAX_QUOTES);
     let fields = [];
     frases.forEach((frase, index) => {
-        let fraseValue = `${frase.quote}${user == null ? ` - ${frase.discordName}` : ""}`
-        if(index >= (page - 1) * MAX_QUOTES && index < page * MAX_QUOTES){
-            fields.push({name: ("#"+(frase.id)), value: `${fraseValue} - ${formatDate(frase.createdAt)}`})
-        }
+        let fraseValue = `${frase.quote}${userId == null ? ` - ${frase.discordName}` : ""}`
+        fields.push({name: ("#"+(frase.id)), value: `${fraseValue} - ${formatDate(frase.createdAt)}`})
     });
     
     const params = frases[0];
     
     const embed = new EmbedBuilder()
-    .setColor(`#${params.color || '#0099ff'}`)
-    .setAuthor({name: `${user ? params.discordName : 'Ficus Quotes'}`, iconURL: `${user ? params.avatar : "https://cdn.discordapp.com/avatars/1170322183646629900/2eed87d0ae9928401f02ddcd10c2e590.webp?size=32"}`})
+    .setColor(`#${params?.color || '0099ff'}`)
+    .setAuthor({name: `${userId ? params?.discordName : 'Ficus Quotes'}`, iconURL: `${"https://cdn.discordapp.com/avatars/1170322183646629900/2eed87d0ae9928401f02ddcd10c2e590.webp?size=32"}`})
     .setTimestamp()
     .addFields(fields)
     
-    if(user){
-        embed.setTitle(`Frases de ${params.discordName}`)
+    if(userId){
+        embed.setTitle(`Frases de ${params?.discordName}`)
     }
     
     let time = new Date().getTime();
     
     const btnFirst = new ButtonBuilder()
     .setStyle(2)
-    .setCustomId(`frases_pagina:${user?.id}:1:${time}a`)
+    .setCustomId(`frases_pagina:${userId}:1:${time}a`)
     .setDisabled(page == 1)
     .setEmoji('1179812310534062090')
     
     const btnPrev = new ButtonBuilder()
     .setStyle(2)
-    .setCustomId(`frases_pagina:${user?.id}:${page-1}:${time}b`)
+    .setCustomId(`frases_pagina:${userId}:${parseInt(page)-1}:${time}b`)
     .setDisabled(page == 1)
     .setEmoji('1179812305530277909')
     
     const btnNext = new ButtonBuilder()
     .setStyle(2)
-    .setCustomId(`frases_pagina:${user?.id}:${page+1}:${time}c`)
+    .setCustomId(`frases_pagina:${userId}:${parseInt(page)+1}:${time}c`)
     .setDisabled(frases.length < MAX_QUOTES)
     .setEmoji('1179812307073773568')
     
     const btnLast = new ButtonBuilder()
     .setStyle(2)
-    .setCustomId(`frases_pagina:${user?.id}:${Math.ceil(frases.length/MAX_QUOTES)}:${time}d`)
+    .setCustomId(`frases_pagina:${userId}:${totalPages}:${time}d`)
     .setDisabled(frases.length < MAX_QUOTES)
     .setEmoji('1179812309338701835')
     
@@ -93,10 +88,26 @@ async function createEmbed(service: CommandsService, guildId, user, page){
     return {embed, row};
 }
 
+async function handleButton(interaction: ButtonInteraction, service: CommandsService){
+    let userId = interaction.customId.split(':')[1];
+    if(userId == "undefined") userId = undefined;
+    let page = interaction.customId.split(':')[2];
+
+    const {embed, row} = await createEmbed(service, interaction.guildId, userId, page);
+
+    // @ts-ignore
+    await interaction.update({embeds: [embed], components: [row]});
+
+
+    return true;
+}
+
+
 module.exports = {
     data,
     autocomplete,
     execute,
+    handleButton
 };
 
 

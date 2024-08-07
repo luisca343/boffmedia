@@ -1,7 +1,7 @@
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Client, IntentsBitField, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, IntentsBitField, GatewayIntentBits, REST, Routes, ButtonInteraction } from 'discord.js';
 
 import * as fs from 'fs';
 import * as path from 'path';
@@ -104,8 +104,29 @@ export class DiscordService {
                     console.error(error);
                 }
             }
+
+            if( interaction.isButton()) {
+                this.handleButton(interaction);
+            }
             
         });
+    }
+
+    async handleButton(interaction: ButtonInteraction) {
+        const commandModule = this.commandModules.get(interaction.message.interaction.commandName);
+        if (!commandModule) {
+            console.error(`No command module found for ${interaction.customId}`);
+            await interaction.reply({ content: 'Command not found!', ephemeral: true });
+            return;
+        }
+    
+        try {
+            await commandModule.handleButton(interaction, this.service);
+        } catch (error) {
+            console.error(`Error executing ${interaction.customId}`);
+            console.error(error);
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
     }
 
     deleteCommands() {

@@ -1,30 +1,36 @@
-import { discordUsers, ficusFrases } from '@/_db/schema/Ficus';
+import { DiscordUser, FicusFrase, discordUsers, ficusFrases } from '@/_db/schema/Ficus';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
-import { and, eq, or } from 'drizzle-orm';
+import { User } from 'discord.js';
+import { and, eq, or, sql } from 'drizzle-orm';
 
 @Injectable()
 export class CommandsService {
     constructor(private db: MySQL2Service) {}
+    private testServerGUID = '516237304101339156';
 
     async getFrases(guildID: string, userID?: string, page = 1, maxQuotes = 10) {
-        console.log('Getting frases');
-        console.log('GuildID:', guildID);
-        console.log('UserID:', userID);
-        console.log('Page:', page);
-        console.log('MaxQuotes:', maxQuotes);
-        const hardcodedGuildID = '516237304101339156';
-
         let condition;
-        if (guildID !== hardcodedGuildID) {
+        if (guildID !== this.testServerGUID) {
             condition = eq(ficusFrases.serverID, guildID);
         }
-
+    
         const finalCondition = userID ?
             and(condition, eq(ficusFrases.discordId, userID)) :
             condition;
-
-        const query = this.db.getDrizzle().select(
+    
+        // Count the total number of quotes
+        const totalCountQuery = await this.db.getDrizzle().select({
+            count: sql`COUNT(*)`
+        })
+        .from(ficusFrases)
+        .where(finalCondition);
+    
+        const totalCount = totalCountQuery[0].count as number;
+        const totalPages = Math.ceil(totalCount / maxQuotes);
+    
+        // Fetch the quotes with pagination
+        const query = await this.db.getDrizzle().select(
             {
                 id: ficusFrases.id,
                 quote: ficusFrases.quote,
@@ -43,8 +49,43 @@ export class CommandsService {
         )
         .where(finalCondition)
         .limit(maxQuotes)
-        .offset((page - 1) * maxQuotes)
+        .offset((page - 1) * maxQuotes);
+    
+        return {
+            frases: query,
+            totalPages: totalPages
+        };
+    }
 
-        return await query;
+    async addQuote(guildID: string, user: User, quote: string, comment?: string) {
+        // Check if user exists
+        const userExists = await this.db.getDrizzle().select()
+            .from(discordUsers)
+            .where(eq(discordUsers.userId, user.id))
+            .limit(1);
+
+        if (userExists.length === 0) {
+            await this.db.getDrizzle()
+                .insert(discordUsers)
+                .values({
+                    userId: user.id,
+                    username: user.username,
+                    avatar: user.avatar,
+                    color: user.hexAccentColor
+                } as DiscordUser);
+        }
+
+        // Insert quote
+        await this.db.getDrizzle()
+            .insert(ficusFrases)
+            .values({
+                discordId: user.id,
+                serverID: guildID,
+                quote: quote,
+                comment: comment
+            } as FicusFrase);
+
+        return { content: 'Frase añadida correctamente', ephemeral: true };
+
     }
 }
