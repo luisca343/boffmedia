@@ -1,9 +1,11 @@
+import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Client, IntentsBitField, GatewayIntentBits, REST, Routes } from 'discord.js';
+import { Client, IntentsBitField, GatewayIntentBits, REST, Routes, ButtonInteraction } from 'discord.js';
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { CommandsService } from '../_commands/commands.service';
 
 @Injectable()
 export class DiscordService {
@@ -13,13 +15,24 @@ export class DiscordService {
     private commands: any[] = [];
     private commandModules: Map<string, any> = new Map();
 
-    constructor(private readonly config: ConfigService) {
+    constructor(private readonly config: ConfigService, private service: CommandsService) {
         const nodeEnv = process.env.NODE_ENV;
         const basePath = nodeEnv === 'production' ? 'dist' : 'src';
         this.foldersPath = path.join(process.cwd(), `${basePath}/discord/commands`);
+
     
         try {
             this.commandFolders = fs.readdirSync(this.foldersPath);
+            // Recursively read all subfolders
+            for (const folder of this.commandFolders) {
+                const subFolders = fs.readdirSync(`${this.foldersPath}/${folder}`)
+                    .filter(file => fs.lstatSync(`${this.foldersPath}/${folder}/${file}`).isDirectory());
+                for (const subFolder of subFolders) {
+                    this.commandFolders.push(`${folder}/${subFolder}`);
+                }
+            }
+
+            console.log('Command folders:', this.commandFolders);
         } catch (error) {
             console.error('Error reading command folders:', error);
             return;
@@ -27,6 +40,7 @@ export class DiscordService {
     
         this.connect();
         this.registerCommands();
+        this.setupInteractionListener();
     }
     connect(): Client {
         if (!this.client) {
@@ -62,7 +76,6 @@ export class DiscordService {
                 console.log('Command registered: ', commandModule.data.name);
             }
         }
-        console.log('Commands: ', this.commands);
         rest.put(Routes.applicationCommands(process.env.DISCORD_ID), { body: this.commands })
         .then(() => console.log('Successfully registered commands.'))
         .catch(console.error);
@@ -71,24 +84,49 @@ export class DiscordService {
     
     setupInteractionListener() {
         this.client.on('interactionCreate', async interaction => {
-            if (!interaction.isCommand()) return;
-
-            const commandModule = this.commandModules.get(interaction.commandName);
-            console.log('Command Module: ', commandModule);
-
-            if (!commandModule) {
-                console.error(`No command matching ${interaction.commandName} was found.`);
-                return;
+            //if (!interaction.isCommand()) return;
+            if(interaction.isCommand()) {
+                const commandModule = this.commandModules.get(interaction.commandName);
+                try {
+                    await commandModule.execute(interaction, this.service);
+                } catch (error) {
+                    console.error(`Error executing ${interaction.commandName}`);
+                    console.error(error);
+                    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                }
+            }
+            
+            if (interaction.isAutocomplete()) {
+                const commandModule = this.commandModules.get(interaction.commandName);
+                try {
+                    await commandModule.autocomplete(interaction, this.service);
+                } catch (error) {
+                    console.error(error);
+                }
             }
 
-            try {
-                await commandModule.execute(interaction);
-            } catch (error) {
-                console.error(`Error executing ${interaction.commandName}`);
-                console.error(error);
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            if( interaction.isButton()) {
+                this.handleButton(interaction);
             }
+            
         });
+    }
+
+    async handleButton(interaction: ButtonInteraction) {
+        const commandModule = this.commandModules.get(interaction.message.interaction.commandName);
+        if (!commandModule) {
+            console.error(`No command module found for ${interaction.customId}`);
+            await interaction.reply({ content: 'Command not found!', ephemeral: true });
+            return;
+        }
+    
+        try {
+            await commandModule.handleButton(interaction, this.service);
+        } catch (error) {
+            console.error(`Error executing ${interaction.customId}`);
+            console.error(error);
+            await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+        }
     }
 
     deleteCommands() {

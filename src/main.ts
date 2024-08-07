@@ -19,6 +19,7 @@ async function bootstrap() {
   app.useGlobalFilters(new DuplicateEntryExceptionFilter());
 
   console.log("EL PUERTO ES: "+ configService.get('PORT'));
+  
 
   /*  
   const httpServer = app.getHttpServer();
