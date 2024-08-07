@@ -1,5 +1,6 @@
 # ---- Base Node ----
 FROM node:18-alpine AS base
+RUN apt-get update && apt-get install -y ffmpeg
 WORKDIR /app
 COPY package*.json ./
 
