@@ -1,9 +1,7 @@
 import { createAudioPlayer, createAudioResource, joinVoiceChannel } from "@discordjs/voice";
 import { Client, Message } from "discord.js";
-import { createReadStream } from "fs";
-import { join } from "path";
+import { PassThrough } from "stream";
 import axios from "axios";
-import fs from "fs";
 import { CommandsService } from "../_commands/commands.service";
 import { AudioPlayerStatus } from "@discordjs/voice";
 
@@ -18,8 +16,8 @@ export async function playAudio(message: Message, service: CommandsService) {
     }
 
     const voice = await getVoice(service, message.author.id) || 'Enrique';
-    const url = await downloadAudio(voice, message.content.replace('#','almohadilla'));
-    if (!url) {
+    const audioStream = await downloadAudio(voice, message.content.replace('#','almohadilla'));
+    if (!audioStream) {
         return message.channel.send('There was an error downloading the audio');
     }
 
@@ -29,17 +27,15 @@ export async function playAudio(message: Message, service: CommandsService) {
         adapterCreator: voiceChannel.guild.voiceAdapterCreator,
     });
 
-
-
-    audioQueue.push(url);
+    audioQueue.push(audioStream);
 
     if(audioQueue.length === 1) {
-        playAudioElement(connection, url);
+        playAudioElement(connection, audioStream);
     }
 }
 
-function playAudioElement(connection, url) {
-    const resource = createAudioResource(createReadStream(url));
+function playAudioElement(connection, audioStream) {
+    const resource = createAudioResource(audioStream);
     const player = createAudioPlayer();
 
     player.on('stateChange', (oldState, newState) => {
@@ -48,7 +44,6 @@ function playAudioElement(connection, url) {
             if(audioQueue.length > 0) {
                 playAudioElement(connection, audioQueue[0]);
             }
-            fs.unlinkSync(url);
         }
     });
 
@@ -57,23 +52,19 @@ function playAudioElement(connection, url) {
 }
 
 export async function downloadAudio(voice: string, text: string) {
-    const id = Math.random().toString(36).substring(7)
-    const url = `http://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${text}&key=MAN0PnTqdziKrbwALxsBxciP3TxBsYAH4QDgNF8kI9lFH_Al`
-    const audioFolder = join('public', 'audio')
-    const filename = `${id}.mp3`
-    const filePath = join(audioFolder, filename)
+    const url = `http://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${text}&key=MAN0PnTqdziKrbwALxsBxciP3TxBsYAH4QDgNF8kI9lFH_Al`;
 
     try {
-        const { data } = await axios.get(url, { responseType: 'arraybuffer' });
-        fs.writeFileSync(filePath, data);
-        return filePath;
+        const { data } = await axios.get(url, { responseType: 'stream' });
+        const audioStream = new PassThrough();
+        data.pipe(audioStream);
+        return audioStream;
     } catch (error) {
-        console.error(`an error ocurred while downloading ${url}`, error);
+        console.error(`An error occurred while downloading ${url}`, error);
     }
 
     return null;
 }
-
 
 export async function getVoices(){
     let url = "https://api.streamelements.com/kappa/v2/speech/voices";
@@ -87,11 +78,9 @@ export async function getVoices(){
         voices.push(voz)
     });
 
-
     console.log(voices);
     return voices;
 }
-
 
 export async function getVoiceName(value: number) {
     let url = "https://api.streamelements.com/kappa/v2/speech/voices";
@@ -104,11 +93,9 @@ export async function getVoiceName(value: number) {
         voices.push(voz)
     });
 
-
     const voice = voices.find(voice => voice.value === value);
     return voice ? voice.name : null;
 }
-
 
 export async function setVoice(service: CommandsService, userId: string, voice: number) {
     await service.setTTSVoice(userId , voice);
