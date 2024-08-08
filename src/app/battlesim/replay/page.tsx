@@ -10,7 +10,7 @@ const battle = new Battle(new Generations(Dex as any)); // Use const if battle i
 export default function Test(): JSX.Element { // Explicitly type the return value
 
   return (
-    <section className="flex flex-col w-[900px] h-[450px]">
+    <section className="flex flex-col">
       <Game/>
     </section>
   );

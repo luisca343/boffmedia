@@ -21,6 +21,7 @@
     animation: slideUp .5s ease-out;
     position: relative;
     background: #eeea url("https://api.boffmedia.es/battlesim/fx/weather-electricterrain.png") no-repeat center;
+    background-size: cover;
   }
 
   .misty {

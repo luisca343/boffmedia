@@ -29,6 +29,8 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [settingTurn, setSettingTurn] = useState(false);
   const [lastTurn, setLastTurn] = useState<number>(0);
 
+  const [messageBar, setMessageBar] = useState<string[]>([]);
+
   
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -55,7 +57,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       .catch(console.error);*/
 
     
-    fetch(`https://api.boffmedia.es/smartrotom/combates/test.txt`)
+    fetch(`https://api.boffmedia.es/smartrotom/combates/sustitutos.txt`)
       .then(response => response.text())
       .then(text => {
         setBattleLog(text);
@@ -178,6 +180,8 @@ function setCurrentTurn(turn?: number) {
   }
 }
 
+  const clearActions = ['switch', 'move', 'turn'];
+
   async function playAction(line: string) {
     const { args, kwArgs } = Protocol.parseBattleLine(line);
     const currentBattle = copyBattle(battle);
@@ -187,17 +191,23 @@ function setCurrentTurn(turn?: number) {
         const html = formatter.formatHTML(args, kwArgs);
         setLog((prev) => [...prev, html]);
 
-        await performAction(args, kwArgs, currentBattle);
-  
         currentBattle.add(args, kwArgs);
-
         setBattle(currentBattle);
+
+        if(clearActions.includes(args[0])){ 
+          setMessageBar([html]);
+        } else{ 
+          setMessageBar((prev) => [...prev, html]);
+        }
+
+        await performAction(args, kwArgs, html, currentBattle);
+  
         resolve();
     });
   }
 
-  async function performAction(args: ArgType | BattleArgsKWArgType[], kwArgs: BattleArgsKWArgType, currentBattle: Battle) {
-    console.log('Performing action:', args);
+  async function performAction(args: ArgType, kwArgs: BattleArgsKWArgType, html:string, currentBattle: Battle) {
+    let timeout = 500;
     switch (args[0]) {
       case 'turn':
         await turnAction(currentBattle, args[1] as Num);
@@ -206,30 +216,32 @@ function setCurrentTurn(turn?: number) {
         await switchAction(args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
         break;
       case 'move':
+        timeout = 500
         await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
         break;
       case '-damage':
-        await damageAction(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
+        timeout = 1000
+        damageAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as PokemonHPStatus);
         break;
       default:
-        console.log('Unknown action:', args[0]);
         break;
     }
-    let timeout = 500
     return await new Promise<void>((resolve) => {
       setTimeout(() => {
         let nextAction = settingTurn ? -1 : currentAction + 1
         setCurrentAction(nextAction);
+        
+
         resolve();
       }, timeout);
     })
   }
 
   return (
-    <div>
-      <div className="flex">
-      <BattleCanvas battle={battle} pov={pov}/>
-        <div ref={logRef} className="w-1/4 h-[360px] overflow-auto">
+    <>
+      <div className="flex w-full">
+      <BattleCanvas battle={battle} pov={pov} messageBar={messageBar}/>
+        <div ref={logRef} className="h-[540px] overflow-auto">
           {htmlLog.map((line, index) => (
             <div key={index} dangerouslySetInnerHTML={{ __html: line }}></div>
           ))}
@@ -248,7 +260,7 @@ function setCurrentTurn(turn?: number) {
         />
       </div>
       <span className="text-black">{dataLoaded ? 'Yes' : 'Nope'}</span>
-    </div>
+    </>
   );
 }
 
