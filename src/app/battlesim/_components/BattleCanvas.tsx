@@ -1,6 +1,5 @@
 "use client"
-import { Battle, Pokemon } from "@pkmn/client";
-import PokemonSprite from "../_components_old/PokemonSprite";
+import { Battle, Pokemon, Side } from "@pkmn/client";
 import PokemonElement from "./PokemonElement";
 import Image from "next/image";
 import { PlayerDataBar } from "./BattleSideBar";
@@ -11,6 +10,7 @@ import { DetailedPokemon } from "@pkmn/protocol";
 import { getImageSize, getOffset } from "../_utils/viewUtils";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 import { PokemonStatus } from "./PokemonStatus";
+import { PokemonSprite } from "./PokemonSprite";
 
 
 
@@ -198,6 +198,17 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
             </div>
         );
     }
+
+    function PokemonTeam({side}: {side: Side}) {
+        const total = side.totalPokemon;
+
+        return <div className="flex flex-wrap  justify-center items-center text-center w-14 bg-slate-800 bg-opacity-90 r rounded-md">
+            {Array.from({length: total}, (_, i) => side.team[i]).map((pokemon, index) => {
+                if(!pokemon) return <div className="w-1/2 flex justify-center "><PokemonSprite key={crypto.randomUUID()} pokemon={pokemon} /></div>
+                return <div className="w-1/2 flex justify-center "><PokemonSprite className="w-1/2 -ml-1" key={crypto.randomUUID()} pokemon={pokemon} /></div>
+            })}
+        </div>
+    }
     
     if(!battle.pokemonControlled) return <Loading/>
     return (
@@ -208,6 +219,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 <div className="h-[15%] w-full absolute top-0 flex justify-between">
                     <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
                     <div className="m-1 w-2/3 flex flex-row-reverse">
+                        <PokemonTeam side={battle.p2}/>
                         <PokemonStatus pokemon={pokemon["p2a"]} className="w-1/2"/>
                         <PokemonStatus pokemon={pokemon["p2b"]} className="w-1/2"/>
                     </div>
@@ -216,6 +228,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 
                 <div className="h-[15%] w-full absolute bottom-0 flex">
                     <div className="m-1 max-w-2/3 flex flex-row">
+                        <PokemonTeam side={battle.p1}/>
                         <PokemonStatus pokemon={pokemon["p1a"]} className="w-1/2"/>
                         <PokemonStatus pokemon={pokemon["p1b"]} className="w-1/2"/> 
                     </div>
