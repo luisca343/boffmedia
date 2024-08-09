@@ -1,7 +1,7 @@
 import { Battle } from "@pkmn/client";
 import { PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
-import { BattleMoveAnims, BattleOtherAnims } from "./battle-animations-moves";
-import { BattleEffects } from "./battle_animations";
+import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
+import { BattleEffects } from "../_utils/battle_animations";
 import { getImageSize, getOffset, getViewportWidth } from "../_utils/viewUtils";
 
 
@@ -17,14 +17,13 @@ export class Scene {
 	}
 
 	wait(time: number) {
-		console.log('WIDTH:', getViewportWidth())
 		return new Promise(resolve => setTimeout(resolve, time));
 	}
 	
 	backgroundEffect(background:string, duration: number, opacity: number) {
 	}
 	
-	async showPopup(position: PokemonIdent, text: string, duration: number = 500) {
+	async showPopup(position: PokemonIdent, text: string, duration: number = 1000) {
 		const element = document.createElement('div');
 		
 		const popupWidth = 50;
@@ -43,7 +42,7 @@ export class Scene {
 		element.style.transition = `all ${duration}ms`;
 		setTimeout(() => {
 			element.style.top = `${getOffset(position).top}px`;
-			element.style.opacity = '0';
+			element.style.visibility = 'hidden';
 		}, 0);
 		
 		setTimeout(() => {
