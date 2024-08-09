@@ -11,6 +11,7 @@ import { getImageSize, getOffset } from "../_utils/viewUtils";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 import { PokemonStatus } from "./PokemonStatus";
 import { PokemonSprite } from "./PokemonSprite";
+import PokemonDetail from "./PokemonDetail";
 
 
 
@@ -42,10 +43,10 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         p2a: p2.active[0],
         p2b: p2.active[1],
         p2c: p2.active[2]
-    }
+    } as {[key: string]: Pokemon};
+    
 
     // We calculate the width of the canvas based on the width of the viewport
-    console.log(viewportWidth);
     const canvasWidth = viewportWidth > 960 ? 960 : viewportWidth;
     const canvasHeight = canvasWidth * 0.5625;
 
@@ -102,7 +103,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         viewportWidth < 960 ? w = w * viewportWidth / 960 : w = w;
         viewportWidth < 960 ? h = h * viewportWidth / 960 : h = h;
         if (url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
-            url = `http://boffmedia.es/smartrotom/img/sprites/Front/${pokemon.speciesForme.toUpperCase()}.png`;
+            url = `http://boffmedia.es/smartrotom/img/sprites/Front/${pokemon?.speciesForme?.toUpperCase()}.png`;
             pixelated = true;
         }
         return (
@@ -165,14 +166,13 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         };
     
         const avatarStyles: React.CSSProperties = {
-            transform: side === 'p1' ? 'scale(2)' : undefined,
-            top: '200px',
+            transform: side === 'p1' ? 'scale(2) scaleX(-1)' : undefined,
             imageRendering: 'pixelated',
-            zIndex: side === 'p1' ? 100 : 0
+            zIndex: side === 'p1' ? 100 : 0,
         };
     
         return (
-            <div className="w-[100px] flex items-center justify-center" style={style}>
+            <div className="w-[100px] flex items-center justify-center pointer-events-none" style={style}>
                 {uuid !== null ? (
                     <img
                         className="mx-auto"
@@ -204,12 +204,56 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
 
         return <div className="flex flex-wrap  justify-center items-center text-center w-14 bg-slate-800 bg-opacity-90 r rounded-md">
             {Array.from({length: total}, (_, i) => side.team[i]).map((pokemon, index) => {
-                if(!pokemon) return <div className="w-1/2 flex justify-center "><PokemonSprite key={crypto.randomUUID()} pokemon={pokemon} /></div>
-                return <div className="w-1/2 flex justify-center "><PokemonSprite className="w-1/2 -ml-1" key={crypto.randomUUID()} pokemon={pokemon} /></div>
+                if(!pokemon) return <div className="w-1/2 flex justify-center " key={crypto.randomUUID()}><PokemonSprite pokemon={pokemon} /></div>
+                return <PokemonDetail pokemon={pokemon} 
+                        className={`w-1/2 flex justify-center z-40`} 
+                        key={crypto.randomUUID()}>
+                    <PokemonSprite className="w-1/2 -ml-1"  pokemon={pokemon} />
+                </PokemonDetail>
             })}
         </div>
     }
     
+
+    
+    function PokemonElement({side, position}: {position: string,  side: Side}) {
+        const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
+        const active = side.active.length
+
+        /*
+        let positionIndex:string = `$center${side.n+1}`
+
+        if(position === "p1a" && active === 1) positionIndex = 'center1'
+        if(position === "p1a" && active === 2) positionIndex = 'left1'
+        if(position === "p1a" && active === 3) positionIndex = 'left1'
+
+        if(position === "p1b" && active === 2) positionIndex = 'center1'
+        if(position === "p1b" && active === 3) positionIndex = 'center1'
+
+        if(position === "p1c" && active === 3) positionIndex = 'right1'
+
+        if(position === "p2a" && active === 1) positionIndex = 'center2'
+        if(position === "p2a" && active === 2) positionIndex = 'right2'
+        if(position === "p2a" && active === 3) positionIndex = 'right2'
+        
+        if(position === "p2b" && active === 2) positionIndex = 'center2'
+        if(position === "p2b" && active === 3) positionIndex = 'center2'
+
+        if(position === "p2c" && active === 3) positionIndex = 'left2'
+        */
+
+
+        return(
+        <div id={position} className="absolute " style={{top: getOffset(position).top, left: getOffset(position).left, width:getImageSize(), height:getImageSize()}}>
+            <PokemonDetail pokemon={pokemon[position]} className="z-50">
+                <div className="w-full h-full">
+                    <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon[position]}/>
+                </div>
+            </PokemonDetail>
+        </div>
+        )
+    }
+
     if(!battle.pokemonControlled) return <Loading/>
     return (
         <div  id="game" className="flex overflow-hidden relative" style={{
@@ -220,8 +264,9 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                     <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
                     <div className="m-1 w-2/3 flex flex-row-reverse">
                         <PokemonTeam side={battle.p2}/>
-                        <PokemonStatus pokemon={pokemon["p2a"]} className="w-1/2"/>
-                        <PokemonStatus pokemon={pokemon["p2b"]} className="w-1/2"/>
+                        <PokemonStatus pokemon={pokemon["p2a"]} className="w-44"/>
+                        <PokemonStatus pokemon={pokemon["p2b"]} className="w-44"/>
+                        <PokemonStatus pokemon={pokemon["p2c"]} className="w-44"/>
                     </div>
                 </div>
 
@@ -229,14 +274,17 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 <div className="h-[15%] w-full absolute bottom-0 flex">
                     <div className="m-1 max-w-2/3 flex flex-row">
                         <PokemonTeam side={battle.p1}/>
-                        <PokemonStatus pokemon={pokemon["p1a"]} className="w-1/2"/>
-                        <PokemonStatus pokemon={pokemon["p1b"]} className="w-1/2"/> 
+                        <PokemonStatus pokemon={pokemon["p1a"]} className="w-44"/>
+                        <PokemonStatus pokemon={pokemon["p1b"]} className="w-44"/> 
+                        <PokemonStatus pokemon={pokemon["p1c"]} className="w-44"/>
                     </div>
-                    <div className="w-1/3 h-fit m-1 flex-1 bg-slate-800 bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50 absolute right-0 bottom-0">
-                        {messageBar.map((message, index) => (
-                            <div key={index} dangerouslySetInnerHTML={{ __html: message }}></div>
-                        ))}
-                    </div>
+                    {
+                        messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-slate-800 bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50 absolute right-0 bottom-0">
+                            {messageBar.map((message, index) => (
+                                <div key={index} dangerouslySetInnerHTML={{ __html: message }}></div>
+                            ))}
+                        </div>
+                    }
                 </div>
                 <Avatar battle={battle} side="p1" pov={pov} style={{
                     position:'absolute',
@@ -250,20 +298,13 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                     left: canvasWidth * .625,
                 }}/>
             
-                <div id="p1a" className="absolute" style={{top: getOffset("p1a").top, left: getOffset("p1a").left, width:getImageSize(), height:getImageSize()}}>
-                    <PokemonImage id={`p1a-pkm`} side={`p1`} pokemon={pokemon["p1a"]} id="p1a"  className="z-10"/>
-                </div>
-                <div id="p1b" className=" absolute" style={{top: getOffset("p1b").top, left: getOffset("p1b").left, width:getImageSize(), height:getImageSize()}}>
-                    <PokemonImage id={`p1b-pkm`} side={`p1`} pokemon={pokemon["p1b"]} id="p1b"  className="z-10"/>
-                </div>
+                <PokemonElement side={battle.p1} position="p1a"/>
+                <PokemonElement side={battle.p1} position="p1b"/>
+                <PokemonElement side={battle.p1} position="p1c"/>
 
-                <div id="p2a" className="absolute" style={{top: getOffset("p2a").top, left: getOffset("p2a").left, width:getImageSize(), height:getImageSize()}}>
-                    <PokemonImage id={`p2a-pkm`} side={`p2`} pokemon={pokemon["p2a"]} id="p2a"  className="z-10"/>
-                </div>
-                <div id="p2b" className="absolute" style={{top: getOffset("p2b").top, left: getOffset("p2b").left, width:getImageSize(), height:getImageSize()}}>
-                    <PokemonImage id={`p2b-pkm`} side={`p2`} pokemon={pokemon["p2b"]} id="p2b"  className="z-10"/>
-                </div>
-
+                <PokemonElement side={battle.p2} position="p2a"/>
+                <PokemonElement side={battle.p2} position="p2b"/>
+                <PokemonElement side={battle.p2} position="p2c"/>
 
             <div className="absolute w-full h-full">
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
@@ -271,6 +312,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         </div>
     )
 }
+
 
 
 
