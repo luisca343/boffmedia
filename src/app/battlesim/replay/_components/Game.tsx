@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { set } from "react-hook-form";
 import { rotomGET } from "@/services/boffAPI";
-import { switchAction, turnAction, moveAction, damageAction } from "../../_components/battleActions";
+import { switchAction, turnAction, moveAction, damageAction } from "../../_utils/battleActions";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -191,6 +191,7 @@ function setCurrentTurn(turn?: number) {
         const html = formatter.formatHTML(args, kwArgs);
         setLog((prev) => [...prev, html]);
 
+        const params = getParams(args, kwArgs);
         currentBattle.add(args, kwArgs);
         setBattle(currentBattle);
 
@@ -200,13 +201,24 @@ function setCurrentTurn(turn?: number) {
           setMessageBar((prev) => [...prev, html]);
         }
 
-        await performAction(args, kwArgs, html, currentBattle);
+        await performAction(params, html, currentBattle);
   
         resolve();
     });
   }
 
-  async function performAction(args: ArgType, kwArgs: BattleArgsKWArgType, html:string, currentBattle: Battle) {
+  function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): { args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any } {
+    switch (args[0]) {
+        case '-damage':
+            const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
+            return { args, kwArgs, data:{ damage } };
+        default:
+            return { args, kwArgs };
+    }
+}
+
+  async function performAction(params: {args: ArgType, kwArgs: BattleArgsKWArgType, data?: any}, html: string, currentBattle: Battle) {
+    const { args, kwArgs, data } = params
     let timeout = 500;
     switch (args[0]) {
       case 'turn':
@@ -220,10 +232,16 @@ function setCurrentTurn(turn?: number) {
         await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
         break;
       case '-damage':
-        timeout = 1000
-        damageAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as PokemonHPStatus);
+        timeout = 500
+        damageAction(currentBattle, scene, args[1] as PokemonIdent, data.damage as string);
         break;
+        case 'inactive':
+        case 't:':
+        case '-resisted':
+            timeout = 0;
+            break;
       default:
+        console.log('Unknown action:', args[0]);
         break;
     }
     return await new Promise<void>((resolve) => {
