@@ -2,7 +2,7 @@ import { Pokemon } from "@pkmn/client";
 import './test.css'; // Assuming your CSS is in this file
 
 export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, className?: string}) {
-    if(!pokemon) return <div className={`mx-2 p-1 w-[250px] ${className}`} />
+    if(!pokemon) return <div className={`mx-2 p-1  ${className}`} />
 
     const hpPercent = Math.floor((pokemon.hp / pokemon.maxhp) * 100);
     
@@ -16,8 +16,8 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex flex-col mx-2 p-1 justify-around w-[250px] rounded-md overflow-hidden text-xs bg-slate-800  bg-opacity-90 ${className}`}>
-            <span className="text-white font-bold">{pokemon.name} L{pokemon.level}</span>
+        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden text-xs bg-slate-800  bg-opacity-90 ${className}`}>
+            <span className="px-1 text-white font-bold">{pokemon.name} L{pokemon.level}</span>
             <div className="relative border border-white rounded-xl overflow-hidden">
                 <div className="hp-bar" style={{height: 16, width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
                 <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px'}}>
@@ -30,9 +30,9 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
                     const multiplier = getBoostMultiplier(value);
                     if (multiplier === 1) return null;
                     const spanClass = multiplier > 1 
-                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mx-1 rounded-md h-[12px] text-[7pt] py-[2px] px-[4px] mb-[1px]" 
-                        : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mx-1 rounded-md h-[12px] text-[7pt] py-[2px] px-[4px] mb-[1px]";
-                    return <span key={key} className={spanClass}>{multiplier}x {key}</span>
+                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mr-1 rounded-md h-[11px] text-[6pt] px-[3px] mb-[1px]" 
+                        : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mr-1 rounded-md h-[11px] text-[6pt] px-[3px] mb-[1px]";
+                    return <span key={key} className={spanClass}>x{multiplier} {key.slice(0,3)}</span>
                 })}
             </div>
         </div>
