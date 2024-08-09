@@ -5,26 +5,40 @@ export function getViewportWidth() {
 
 export function getOffset(position: string) {
     const canvasWidth = getViewportWidth() > 960 ? 960 : getViewportWidth();
+    const canvasHeight = canvasWidth * 0.625;
+
     switch(position) {
         case "p1a": return {
-            top: canvasWidth * .18,
-            left: canvasWidth * .22,
+            top: canvasHeight * .25 + getImageSize() * .1,
+            left: canvasWidth * .15,
         }
 
         case "p1b": return {
-            top: canvasWidth * .18  + getImageSize() * .15 ,
-            left: canvasWidth * .22 + getImageSize() * .75
+            top: canvasHeight * .25  + getImageSize() * .3 ,
+            left: canvasWidth * .15 + getImageSize() * .75
+        }
+
+        case "p1c": return {
+            top: canvasHeight * .25 + getImageSize() * .45,
+            left: canvasWidth * .15 + getImageSize() * 1.50
+        }
+
+
+        case "p2c": return {
+            top: canvasHeight * .075 + getImageSize() * .075,
+            left: canvasWidth * .42 + getImageSize() * .1
         }
 
         case "p2b": return {
-            top: canvasWidth * .05,
-            left: canvasWidth * .45,
+            top: canvasHeight * .075 + getImageSize() * .075,
+            left: canvasWidth * .42 + getImageSize() * .50,
         }
 
         case "p2a": return {
-            top: canvasWidth * .05 + getImageSize() * .15,
-            left: canvasWidth * .05 + getImageSize() * 2.75,
+            top: canvasHeight * .075 + getImageSize() * .15,
+            left: canvasWidth * .42 + getImageSize() * 1,
         }
+
 
         default: return {
             top: 0,

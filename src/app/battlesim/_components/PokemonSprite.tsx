@@ -23,16 +23,13 @@ import { transform } from "next/dist/build/swc";
         fainted: pokemon.fainted,
         domain: 'pkmn.cc',
     });
-    
-    console.log(icon.url);
-    console
 
     return (
-        <div style={{width: 28, height: 28}}>
+        <div style={{width: 32, height: 24}}>
             <div 
                 className={className}
                 key={pokemon.name}
-                style={{...icon.css, transform: 'scale(.75)'}}
+                style={{...icon.css, transform: 'scale(.7)'}}
             />
         </div>
     );
