@@ -42,7 +42,7 @@ export function PokemonTeamList({team}: {team: Pokemon[]}) {
                     <HoverCardTrigger>
                         <PokemonTeamListElement key={pokemon.name} pokemon={pokemon} />
                     </HoverCardTrigger>
-                    <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128" side="right">
+                    <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128" side="right" >
                          <span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}
                          <div className="flex">{pokemon.types.map(type => <TypeBadgeSmall key={type} type={type} />)}</div>
                          <br/>

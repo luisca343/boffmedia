@@ -2,13 +2,14 @@ import { TypeBadgeSmall } from "@/app/smartrotom/pokedex/entrada/[[...params]]/_
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Pokemon } from "@pkmn/client";
 
-export default function PokemonDetail({pokemon, children, className, key}: {pokemon: Pokemon, children: any, className?: string, key?: string}) {
+export default function PokemonDetail({pokemon, children, className, key, offset = 20}: 
+    {pokemon: Pokemon, children: any, className?: string, key?: string, offset?: number}) {
     if(!pokemon) return null;
     return <HoverCard key={pokemon.name} openDelay={0} closeDelay={0}>
     <HoverCardTrigger  className={className} key={key}>
         {children}
     </HoverCardTrigger>
-    <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128" side="right" sideOffset={20}  style={{zIndex:'999'}}>
+    <HoverCardContent className="z-[200] bg-slate-800 bg-opacity-90 text-slate-100 w-128" side="right" sideOffset={offset}  style={{zIndex:'999'}}>
          <span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}
          <div className="flex">{pokemon.types.map(type => <TypeBadgeSmall key={type} type={type} />)}</div>
          <br/>

@@ -202,7 +202,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     function PokemonTeam({side}: {side: Side}) {
         const total = side.totalPokemon;
 
-        return <div className="flex flex-wrap  justify-center items-center text-center w-14 bg-slate-800 bg-opacity-90 r rounded-md">
+        return <div className="flex flex-wrap  justify-center items-center text-center w-14 bg-slate-800 bg-opacity-80 r rounded-md">
             {Array.from({length: total}, (_, i) => side.team[i]).map((pokemon, index) => {
                 if(!pokemon) return <div className="w-1/2 flex justify-center " key={crypto.randomUUID()}><PokemonSprite pokemon={pokemon} /></div>
                 return <PokemonDetail pokemon={pokemon} 
@@ -245,7 +245,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
 
         return(
         <div id={position} className="absolute " style={{top: getOffset(position).top, left: getOffset(position).left, width:getImageSize(), height:getImageSize()}}>
-            <PokemonDetail pokemon={pokemon[position]} className="z-50">
+            <PokemonDetail pokemon={pokemon[position]} className="z-50" offset={-50}>
                 <div className="w-full h-full">
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon[position]}/>
                 </div>
