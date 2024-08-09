@@ -1,6 +1,6 @@
 import { Battle } from "@pkmn/client";
 import { Num, PokemonDetails, PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
-import { Scene } from "./Scene";
+import { Scene } from "../_components/Scene";
 
 
 export async function turnAction(currentBattle: Battle, turn: Num) {
@@ -26,10 +26,11 @@ export async function moveAction(battle :Battle, scene: Scene | null, attacker: 
   return await scene.playBattleAnim(move.id, getPokemonIdentCode(attacker) as PokemonIdent, getPokemonIdentCode(defender) as PokemonIdent);
 }
 
-export async function damageAction(battle :Battle,scene: Scene | null, ident: PokemonIdent, hpstatus: PokemonHPStatus) {
+export async function damageAction(battle :Battle,scene: Scene | null, ident: PokemonIdent, damageStr: string) {
   if(!scene) return;
+  const damage = damageStr.includes('||') ? damageStr.split('||')[2] : damageStr;
 
-  return scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, hpstatus.split('/')[0]+'%' as PokemonHPStatus);
+  return scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, damage as PokemonHPStatus);
 }
 
 
