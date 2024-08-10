@@ -102,7 +102,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         if (!pokemon) return <div></div>;
         let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
 
-        let multiplier = side === 'p1' ? 1 : .7;
+        let multiplier = side === 'p1' ? 1.2 : .7;
 
 
         viewportWidth < 960 ? w = w * viewportWidth / 960 * multiplier : w = w * multiplier;
@@ -118,34 +118,34 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 {pokemon && Object.keys(pokemon.volatiles).includes("protect") &&
                     <div className={`h-[75px] w-[100px] bg-purple-400 opacity-30 self-center bottom-8 absolute ${side === 'p1' ? 'z-0' : 'z-50'}`} />
                 }
-                <img
-                    className={className}
-                    src={url}
-                    width={w}
-                    height={h}
-                    style={{
-                        imageRendering: pixelated ? 'pixelated' : 'auto',
-                        position: 'absolute',
-                        bottom: '0px', // Position at the bottom
-                        filter: 'brightness(0)  blur(5px)', // Black color and blur for shadow effect
-                        zIndex: 0,
-                        transform: `translateY(${(getImageSize() / 3 )}px) scaleY(-.9)`, 
-                        opacity: 0.3 // Adjust opacity for a more realistic shadow
-                    }}
-                    alt={`${pokemon.speciesForme} shadow`}
-                />
-                <img
-                    className={className}
-                    src={url}
-                    width={w}
-                    height={h}
-                    style={{
-                        imageRendering: pixelated ? 'pixelated' : 'auto',
-                        position: 'relative',
-                        zIndex: 1
-                    }}
-                    alt={pokemon.speciesForme}
-                />
+                <div className="shadow-container" style={{
+                    position: 'absolute',
+                    bottom: '0px', // Position at the bottom
+                    filter: 'brightness(0) blur(5px)', // Black color and blur for shadow effect
+                    zIndex: 0,
+                    transform: `translateY(${(getImageSize() / 3)}px) scaleY(-.9)`,
+                    opacity: 0.3 // Adjust opacity for a more realistic shadow
+                }}>
+                    <img
+                        className={className} src={url} width={w} height={h}
+                        style={{
+                            imageRendering: pixelated ? 'pixelated' : 'auto',
+                        }}
+                        alt={`${pokemon.speciesForme} shadow`}
+                    />
+                </div>
+                <div className="pokemon-container" style={{
+                    position: 'absolute',
+                    zIndex: 1
+                }}>
+                    <img
+                        className={className} src={url} width={w} height={h}
+                        style={{
+                            imageRendering: pixelated ? 'pixelated' : 'auto',
+                        }}
+                        alt={pokemon.speciesForme}
+                    />
+                </div>
             </div>
         );
     }
@@ -259,7 +259,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         return(
         <div id={position} className="absolute " style={{top: getOffset(position).top, left: getOffset(position).left, width:getImageSize(), height:getImageSize()}}>
             <PokemonDetail pokemon={pkm} className="z-50" offset={-50}>
-                <div className="w-full h-full">
+                <div className="w-full h-full relative">
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pkm}/>
                 </div>
             </PokemonDetail>

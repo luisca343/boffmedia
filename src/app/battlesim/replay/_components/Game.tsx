@@ -280,6 +280,10 @@ function setCurrentTurn(turn?: number) {
     })
   }
 
+  async function simulateAttack() {
+    await moveAction(battle, scene, "p1a" as PokemonIdent, "lunge" as string, "p2a" as PokemonIdent);
+  }
+
   return (
     <>
       <div className="flex w-full">
@@ -292,6 +296,9 @@ function setCurrentTurn(turn?: number) {
         <Button onClick={() => setCurrentTurn(battle.turn + 1)}>Next</Button>
 
         <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
+
+        <Button onClick={() => setPov(pov === 'p1' ? 'p2' : 'p1')}>Switch POV</Button>
+        <Button onClick={() => simulateAttack()}>Simulate Attack</Button>
         <Input  className="w-24 border border-slate-900" type="number" value={turnInput} 
           onChange={(e) => setTurnInput(parseInt(e.target.value))}
           min={1} max={lastTurn}
