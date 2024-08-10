@@ -30,7 +30,15 @@ export async function damageAction(battle :Battle,scene: Scene | null, ident: Po
   if(!scene) return;
   const damage = damageStr.includes('||') ? damageStr.split('||')[2] : damageStr;
 
-  return scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, damage as PokemonHPStatus);
+  return scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, `-${damage}` as PokemonHPStatus);
+}
+
+export async function healAction(battle :Battle, scene: Scene | null, ident: PokemonIdent, heal: number[]) {
+  if(!scene) return;
+
+  console.log('heal', heal);
+
+  return scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, `+${heal[0]}%` as PokemonHPStatus);
 }
 
 
