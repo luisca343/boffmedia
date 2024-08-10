@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { set } from "react-hook-form";
 import { rotomGET } from "@/services/boffAPI";
-import { switchAction, turnAction, moveAction, damageAction } from "../../_utils/battleActions";
+import { switchAction, turnAction, moveAction, damageAction, healAction } from "../../_utils/battleActions";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -52,6 +52,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       .then((res) => {
         const replay = res.replay;
         setBattleLog(replay);
+        console.log('Battle log:', replay);
         loadScene();
     })
       .catch(console.error);*/
@@ -60,6 +61,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     fetch(`https://api.boffmedia.es/smartrotom/combates/sustitutos.txt`)
       .then(response => response.text())
       .then(text => {
+        console.log('Battle log:', text);
         setBattleLog(text);
         loadScene();
       })
@@ -74,6 +76,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       if(line.includes('|start')) started = true;
       if(!started) battle.add(line);
       if(line.includes('|turn|')) finalTurn++;
+
 
     }
 
@@ -123,16 +126,19 @@ useEffect(() => {
 }, [isPlaying, dataLoaded]);*/
 
 useEffect(() => {
-  if( currentAction === -1){
+  if( currentAction === -1 || newTurn === 0){
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
 
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
-    if(changeTurn > lastTurn) changeTurn = lastTurn;
+    if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
 
     if(changeTurn === 0){
+      currBattle.setTurn(changeTurn);
       setLog([]);
+      setIsPlaying(false);
+      setCurrentAction(0);
       loadGameData(currBattle);
       setBattle(currBattle);
       return
@@ -155,6 +161,13 @@ useEffect(() => {
       }
       setLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
     }
+    
+    if(changeTurn === lastTurn + 1) {
+      currBattle.setTurn(changeTurn );
+      setBattle(currBattle);
+      setCurrentAction(0);
+      setSettingTurn(false);
+    }
     return;
   }
 
@@ -171,7 +184,8 @@ useEffect(() => {
 }, [currentAction, isPlaying]);
 
 function setCurrentTurn(turn?: number) {
-  if(!turn) turn = turnInput;
+  console.log('Setting turn:', turn);
+  if(turn === undefined) turn = turnInput;
   setNewTurn(turn);
   if(isPlaying) {
     setSettingTurn(true);
@@ -212,6 +226,13 @@ function setCurrentTurn(turn?: number) {
         case '-damage':
             const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
             return { args, kwArgs, data:{ damage } };
+        case '-heal':
+          const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
+          const revival = fromEffect?.id === 'revivalblessing';
+          const poke = battle.getPokemon(args[1], revival)!;
+          const health = poke.healthParse(args[2]);
+
+          return { args, kwArgs, data: { health } };
         default:
             return { args, kwArgs };
     }
@@ -235,11 +256,15 @@ function setCurrentTurn(turn?: number) {
         timeout = 500
         damageAction(currentBattle, scene, args[1] as PokemonIdent, data.damage as string);
         break;
-        case 'inactive':
-        case 't:':
-        case '-resisted':
-            timeout = 0;
-            break;
+      case '-heal':
+        timeout = 500
+        healAction(currentBattle, scene, args[1] as PokemonIdent, data.health as number[]);
+        break;
+      case 'inactive':
+      case 't:':
+      case '-resisted':
+        timeout = 0;
+        break;
       default:
         console.log('Unknown action:', args[0]);
         break;
@@ -259,11 +284,6 @@ function setCurrentTurn(turn?: number) {
     <>
       <div className="flex w-full">
       <BattleCanvas battle={battle} pov={pov} messageBar={messageBar}/>
-        <div ref={logRef} className="h-[540px] overflow-auto">
-          {htmlLog.map((line, index) => (
-            <div key={index} dangerouslySetInnerHTML={{ __html: line }}></div>
-          ))}
-        </div>
       </div>
       <div className="flex">
         <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
