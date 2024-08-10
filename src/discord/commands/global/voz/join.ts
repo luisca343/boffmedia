@@ -39,12 +39,7 @@ async function execute(interaction) {
     }).then(({ data }) => {
         const filename = "mp3"
         fs.writeFileSync(url, data)
-        console.log(`downloaded ${url} to ${filename}`)
-
-        
-        
         let resource = createAudioResource(createReadStream(url));
-        
         
         const player = createAudioPlayer();
         connection.subscribe(player)

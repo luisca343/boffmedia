@@ -70,14 +70,14 @@ export class CommandsService {
             .insert(discordUsers)
             .values({
                 userId: user.id,
-                username: user.username,
+                username: user.globalName,
                 avatar: user.avatar,
                 color: user.hexAccentColor
             } as DiscordUser);
         }
         
         // Insert quote
-        await this.db.getDrizzle()
+        const quoteInsert = await this.db.getDrizzle()
         .insert(ficusFrases)
         .values({
             discordId: user.id,
@@ -86,11 +86,10 @@ export class CommandsService {
             comment: comment
         } as FicusFrase);
         
-        return { content: 'Frase añadida correctamente', ephemeral: true };
+        return { content: 'Frase añadida correctamente', ephemeral: false };
         
     }
     async getQuote(guildID: string, userId: string, quoteNum: number = 0, global = false) {
-        console.log('Getting quote', guildID, userId, quoteNum, global);
         if (quoteNum === 0) {
             console.log('Getting random quote');
             // Get a random quote
@@ -156,16 +155,16 @@ export class CommandsService {
             
             return query[0];
         }
-
+        
         async getTTSVoice(userId: string) {
             const data = await this.db.getDrizzle().select({voice: discordUsers.ttsVoice})
             .from(discordUsers)
             .where(eq(discordUsers.userId, userId))
             .limit(1)
-
+            
             return data[0].voice;
         }
-
+        
         async setTTSVoice(userId: string, voice: number) {
             const voiceName = await getVoiceName(voice);
             await this.db.getDrizzle().update(discordUsers)

@@ -44,6 +44,7 @@ export class DiscordService {
         this.connect();
         //this.resetCommands();
         
+        
         this.registerCommands();
         this.setupInteractionListener();
     }
@@ -151,16 +152,17 @@ export class DiscordService {
         })
         .catch(console.error);
 
-        return 'Resetting commands...';
-
-        /*
+        const guilds = ['516237304101339156',  '1013854725696929912'];
+        
         const rest2 = new REST({ version: '9' }).setToken(process.env.DISCORD_KEY);
         for (const guild of guilds) {
             rest2.put(Routes.applicationGuildCommands(process.env.DISCORD_ID, guild), { body: [] })
             .then(() => console.log('Successfully deleted guild commands.'))
             .catch(console.error);
-        }*/
+        }
+
+        return 'Resetting commands...';
     }
     
 }
-//const guilds = ['516237304101339156', '973678603264983050', '1013854725696929912']
+//const guilds = ['516237304101339156',  '1013854725696929912']
