@@ -157,10 +157,15 @@ export class CommandsService {
         }
         
         async getTTSVoice(userId: string) {
+            
             const data = await this.db.getDrizzle().select({voice: discordUsers.ttsVoice})
             .from(discordUsers)
             .where(eq(discordUsers.userId, userId))
             .limit(1)
+
+            if (data.length === 0) {
+                return "Enrique"
+            }
             
             return data[0].voice;
         }
