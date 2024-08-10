@@ -34,7 +34,12 @@ export class Scene {
 		element.style.top = `${getOffset(position).top + getImageSize() / 2}px`;
 		element.style.textAlign = 'center';
 		element.style.borderRadius = '5px';
-		element.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+		element.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+		if(text.includes('+')) {
+			element.style.color = 'green';
+		} else {
+			element.style.color = 'red';
+		}
 		element.style.zIndex = '100';
 		element.textContent = text;
 		this.gameElement.appendChild(element);
