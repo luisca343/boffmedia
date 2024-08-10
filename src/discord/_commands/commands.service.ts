@@ -86,7 +86,7 @@ export class CommandsService {
             comment: comment
         } as FicusFrase);
         
-        return { content: 'Frase añadida correctamente', ephemeral: false };
+        return { content: `Frase añadida correctamente "${quote}" - ${user.globalName}`, ephemeral: false };
         
     }
     async getQuote(guildID: string, userId: string, quoteNum: number = 0, global = false) {
