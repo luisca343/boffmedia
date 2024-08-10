@@ -19,6 +19,7 @@ async function execute(interaction, service: CommandsService) {
     
     const response = await service.addQuote(interaction.guildId, user, quote, comment);
     
+    
     await interaction.reply(response);
 }
 
