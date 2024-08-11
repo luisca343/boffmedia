@@ -56,7 +56,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     const hazardOffsets: {[key: string]: {[key: string]: {top: number; left: number, width: number}}} = {
         p1: {
             stickyweb1: {top: 230, left: 110, width: 100},
-            default: {top: getOffset("p1a").top, left: getOffset("p1a").left, width: 50}
+            default: {top: getOffset(battle, "p1a").top, left: getOffset(battle, "p1a").left, width: 50}
         },
         p2: {
             stickyweb1: {top: 100, left: 140, width: 100},
@@ -66,7 +66,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
             spikes2: {top: 140, left: 220, width: 30},
             spikes3: {top: 120, left: 180, width: 30},
             stealthrock1: {top: 160, left: 260, width: 30},
-            default: {top: getOffset("p2a").top, left: getOffset("p2a").left, width: 50}
+            default: {top: getOffset(battle, "p2a").top, left: getOffset(battle, "p2a").left, width: 50}
         }
     }
     
@@ -102,7 +102,15 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         if (!pokemon) return <div></div>;
         let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
 
-        let multiplier = side === 'p1' ? 1.2 : .7;
+        //const battleType = battle.gameType;
+        const battleType = 'horde'
+
+        let multiplier;
+        if (side === 'p2' && battleType === 'raid') {
+            multiplier = 3;
+        } else {
+            multiplier = side === 'p2' ? .7 : 1.3;
+        }
 
 
         viewportWidth < 960 ? w = w * viewportWidth / 960 * multiplier : w = w * multiplier;
@@ -123,8 +131,11 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                     bottom: '0px', // Position at the bottom
                     filter: 'brightness(0) blur(5px)', // Black color and blur for shadow effect
                     zIndex: 0,
-                    transform: `translateY(${(getImageSize() / 3)}px) scaleY(-.9)`,
-                    opacity: 0.3 // Adjust opacity for a more realistic shadow
+                    transform: `
+                            scaleY(-1) scaleX(-1)
+                            ${side === 'p1' ? `translateY(-${(getImageSize() / 2.7)}px)` : `translateY(-${(getImageSize() / 4)}px)`}
+                            `,
+                    opacity: .5 
                 }}>
                     <img
                         className={className} src={url} width={w} height={h}
@@ -141,7 +152,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                     <img
                         className={className} src={url} width={w} height={h}
                         style={{
-                            imageRendering: pixelated ? 'pixelated' : 'auto',
+                            imageRendering: 'pixelated',
                         }}
                         alt={pokemon.speciesForme}
                     />
@@ -168,7 +179,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         };
         
         const npcStyles: React.CSSProperties = {
-            transform: `scaleX(${side === 'p2' ? -1 : 2}) scaleY(${side === 'p2' ? 1 : 2})`,
+            transform: `scaleX(${side === 'p2' ? -.8 : 2}) scaleY(${side === 'p2' ? .8 : 2})`,
             margin: 'auto',
             marginTop: '-1.5em',
             imageRendering: 'pixelated',
@@ -230,34 +241,9 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     function PokemonElement({side, position}: {position: string,  side: Side}) {
         const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
         const active = side.active.length
-        const pkm = pokemon[position]
-        
-
-        /*
-        let positionIndex:string = `$center${side.n+1}`
-
-        if(position === "p1a" && active === 1) positionIndex = 'center1'
-        if(position === "p1a" && active === 2) positionIndex = 'left1'
-        if(position === "p1a" && active === 3) positionIndex = 'left1'
-
-        if(position === "p1b" && active === 2) positionIndex = 'center1'
-        if(position === "p1b" && active === 3) positionIndex = 'center1'
-
-        if(position === "p1c" && active === 3) positionIndex = 'right1'
-
-        if(position === "p2a" && active === 1) positionIndex = 'center2'
-        if(position === "p2a" && active === 2) positionIndex = 'right2'
-        if(position === "p2a" && active === 3) positionIndex = 'right2'
-        
-        if(position === "p2b" && active === 2) positionIndex = 'center2'
-        if(position === "p2b" && active === 3) positionIndex = 'center2'
-
-        if(position === "p2c" && active === 3) positionIndex = 'left2'
-        */
-
-        //const pkmData = Object.keys(pokemon[position]);
+        const pkm = pokemon['p1a'];
         return(
-        <div id={position} className="absolute " style={{top: getOffset(position).top, left: getOffset(position).left, width:getImageSize(), height:getImageSize()}}>
+        <div id={position} className="absolute " style={{top: getOffset(battle,position).top, left: getOffset(battle,position).left, width:getImageSize(), height:getImageSize()}}>
             <PokemonDetail pokemon={pkm} className="z-50" offset={-50}>
                 <div className="w-full h-full relative">
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pkm}/>
@@ -270,10 +256,11 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     if(!battle.pokemonControlled) return <Loading/>
     return (
         <div  id="game" className="flex overflow-hidden relative" style={{
-            backgroundImage: 'url(https://i.imgur.com/NYp02H3.png)', 
-            backgroundSize: '100% 100%'
-            
-            , width: canvasWidth, height: canvasHeight}}>          
+            backgroundImage: 'url(/battlesim/fx/bg/aaa.png)', 
+            backgroundSize: '100% 100%', width: canvasWidth, height: canvasHeight
+        
+        }}
+            >          
 
                 <div className="h-[15%] w-full absolute top-0 flex justify-between">
                     <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
@@ -316,10 +303,14 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 <PokemonElement side={battle.p1} position="p1a"/>
                 <PokemonElement side={battle.p1} position="p1b"/>
                 <PokemonElement side={battle.p1} position="p1c"/>
+                <PokemonElement side={battle.p1} position="p1d"/>
+                <PokemonElement side={battle.p1} position="p1e"/>
 
                 <PokemonElement side={battle.p2} position="p2a"/>
                 <PokemonElement side={battle.p2} position="p2b"/>
                 <PokemonElement side={battle.p2} position="p2c"/>
+                <PokemonElement side={battle.p2} position="p2d"/>
+                <PokemonElement side={battle.p2} position="p2e"/>
 
             <div className="absolute w-full h-full">
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
