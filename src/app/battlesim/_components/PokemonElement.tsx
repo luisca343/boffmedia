@@ -8,8 +8,6 @@ export function HpBar({pokemon, className}: {pokemon: Pokemon, className?: strin
 
     const hpPercent = Math.floor((pokemon.hp / pokemon.maxhp) * 100);
     
-
-    // Function to calculate color based on hpPercent
     const getHpColor = (percent: number) => {
         if (percent > 50) return `rgb(${255 - ((percent - 50) * 5.1)}, 255, 77)`; // Green to Yellow
         return `rgb(255, ${percent * 5.1}, 77)`; // Yellow to Red
@@ -20,7 +18,6 @@ export function HpBar({pokemon, className}: {pokemon: Pokemon, className?: strin
     return (
         <div className={`flex justify-between w-full  rounded-md overflow-hidden text-xs  bg-slate-800 ${className}`} style={{height: 16, width: "100%"}}>
             <div className="hp-bar rounded-r-xl" style={{height: 16,width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
-           
             <div className="w-[20%]  text-white text-end" style={{fontSize:'9px'}}>
                 {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}% 
             </div>
@@ -38,7 +35,7 @@ export function PokemonStatusBadge({status}: {status: string}){
         'tox': {backgroundColor: 'purple', textColor: 'white'},
     } as {[key: string]: {backgroundColor: string, textColor: string}}
     const color = statusColors[status];
-    return <span className={`border-2 font-bold text-xs text-white bg-${status} pl-1 pr-1 rounded text-shadow-border1`} 
+    return <span className={`border font-bold text-xs text-white bg-${status} pl-1 pr-1 rounded text-shadow-border1`} 
         style={{backgroundColor: color?.backgroundColor, color: color?.textColor}}>
             {status}
     </span>
@@ -54,8 +51,6 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0, s
     const hpPercent = Math.floor((pokemon.hp / pokemon.maxhp) * 100)
     const hpColor = hpPercent > 50 ? "bg-green-400" : hpPercent > 20 ? "bg-yellow-400" : "bg-red-400"
 
-    
-    
     return ( <>
     <div className={` w-48 h-48 absolute ${className} -mb-4 z-10`} style={{width:175, height:175, ...style}}>
             <div>
@@ -67,9 +62,8 @@ export default function PokemonElement({pokemon, id, className, viewPoint = 0, s
                 {Object.entries(pokemon.boosts).map(([key, value]) => {
                     const multiplier = getBoostMultiplier(value)
                     if(multiplier === 1) return null;
-                    if(multiplier > 1) return <span key={key} className="border-2 text-green-900 border-green-900 bg-green-200 mx-1 rounded-md text-xs">{multiplier}x {key}</span>
-                    return <span key={key} className="border-2 text-red-900 border-red-900 bg-red-200 mx-1 rounded-md text-xs">{multiplier}x {key}</span>
-                
+                    if(multiplier > 1) return <span key={key} className="border text-green-900 border-green-900 bg-green-200 mx-1 rounded-md text-xs">{multiplier}x {key}</span>
+                    return <span key={key} className="border text-red-900 border-red-900 bg-red-200 mx-1 rounded-md text-xs">{multiplier}x {key}</span>
                 })}
             </div>
     </div>
