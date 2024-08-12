@@ -7,7 +7,7 @@ import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
 import { Sprites } from "@pkmn/img";
 import { DetailedPokemon } from "@pkmn/protocol";
-import { getImageSize, getOffset } from "../_utils/viewUtils";
+import { CURRENT_WIDTH, SCALE_WIDTH, getImageSize, getOffset } from "../_utils/viewUtils";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 import { PokemonStatus } from "./PokemonStatus";
 import { PokemonSprite } from "./PokemonSprite";
@@ -45,29 +45,54 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         p2c: p2.active[2]
     } as {[key: string]: Pokemon};
     
-    const targetWidth = 960;
+    const targetWidth = CURRENT_WIDTH;
     const aspectRatio = 0.5625;
     const targetHeight = targetWidth * aspectRatio;
 
     const canvasWidth = viewportWidth > targetWidth ? targetWidth : viewportWidth;
     const canvasHeight = canvasWidth * aspectRatio;
 
+    const scaleMultiplier = canvasWidth / SCALE_WIDTH;
+
+    /*
+    function Hazards({battle}: {battle: Battle}) {
+        const sideId = battle.p1.n % 2 === 0 ? 'p1' : 'p2';
+        return (
+            <>
+                    {Object.entries(hazardOffsets).map(([side, value]) => (
+                          hazards.map(hazard => (
+                            <Hazard key={hazard} hazard={[hazard, {name: hazard, level: 3, minDuration: 0, maxDuration: 0}]} side={side}/>
+                        ))
+                    ))}
+            </>
+        );
+    }*/
 
 
-    const hazardOffsets: {[key: string]: {[key: string]: {top: number; left: number, width: number}}} = {
+    const hazards = ["stickyweb", "toxicspikes", "spikes", "stealthrock"];
+
+    const hazardOffsets: {[key: string]: {[key: string]: {top: number; left: number, width: number, z?: number}}} = {
         p1: {
-            stickyweb1: {top: 230, left: 110, width: 100},
-            default: {top: getOffset(battle, "p1a").top, left: getOffset(battle, "p1a").left, width: 50}
+            stickyweb1: {top: 250 * scaleMultiplier, left: 420 * scaleMultiplier, width: 100},
+            toxicspikes1: {top: 250 * scaleMultiplier, left: 420 * scaleMultiplier, width: 50},
+            toxicspikes2: {top: 270 * scaleMultiplier, left: 520 * scaleMultiplier, width: 50},
+            spikes1: {top: 300 * scaleMultiplier, left: 470 * scaleMultiplier, width: 50},
+            spikes2: {top: 280 * scaleMultiplier, left: 400 * scaleMultiplier, width: 50},
+            spikes3: {top: 250 * scaleMultiplier, left: 480 * scaleMultiplier, width: 50},
+            stealthrock1: {top: 280 * scaleMultiplier, left: 350 * scaleMultiplier, width: 50},
+            stealthrock2: {top: 295 * scaleMultiplier, left: 520 * scaleMultiplier, width: 50},
+            default: {top: 0, left: 0, width: 50}
         },
         p2: {
-            stickyweb1: {top: 100, left: 140, width: 100},
-            toxicspikes1: {top: 160, left: 260, width: 30},
-            toxicspikes2: {top: 140, left: 220, width: 30},
-            spikes1: {top: 160, left: 260, width: 30},
-            spikes2: {top: 140, left: 220, width: 30},
-            spikes3: {top: 120, left: 180, width: 30},
-            stealthrock1: {top: 160, left: 260, width: 30},
-            default: {top: getOffset(battle, "p2a").top, left: getOffset(battle, "p2a").left, width: 50}
+            stickyweb1: {top: 110 * scaleMultiplier, left: 560 * scaleMultiplier, width: 75  * scaleMultiplier},
+            toxicspikes1: {top: 150 * scaleMultiplier, left: 520 * scaleMultiplier, width: 30  * scaleMultiplier},
+            toxicspikes2: {top: 160 * scaleMultiplier, left: 620 * scaleMultiplier, width: 30  * scaleMultiplier},
+            stealthrock1: {top: 160, left: 600, width: 30},
+            stealthrock2: {top: 140, left: 540, width: 30},
+            spikes1: {top: 160, left: 570, width: 30},
+            spikes2: {top: 160, left: 540, width: 30},
+            spikes3: {top: 140, left: 620, width: 30},
+            default: {top: 0, left: 0, width: 50, z: 1}
         }
     }
     
@@ -76,12 +101,19 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     
         // Create an array of levels from the current level down to 1
         const levels = Array.from({ length: value.level }, (_, i) => value.level - i);
+
+        console.log("HAZAARD", side, name, value, levels)
+        console.log("hazardOffsets", hazardOffsets[side][name])
+
+        if(name === 'default') return <></>
+
     
         return (
             <>
                 {levels.map(level => {
                     const hazardName = name + level;
                     const offset = hazardOffsets[side][hazardName] || hazardOffsets[side].default;
+                    console.log("OFFSET", hazardName, offset, name)
                     return (
                         <Image
                             key={level}
@@ -89,8 +121,8 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                             alt={name}
                             width={offset.width}
                             height={offset.width}
-                            className="absolute z-[5] opacity-50"
-                            style={{ top: offset.top, left: offset.left }}
+                            className={`z-[${1 + (offset.z || 0)}] opacity-80`}
+                            style={{ top: offset.top, left: offset.left, position: 'absolute'}}
                         />
                     );
                 })}
@@ -154,6 +186,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                         className={className} src={url} width={w} height={h}
                         style={{
                             imageRendering: 'pixelated',
+                            zIndex: 500
                         }}
                         alt={pokemon.speciesForme}
                     />
@@ -171,7 +204,6 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         const avatar = Sprites.getAvatar(avatarId);
         const avatarNumber = parseInt(avatarId);
 
-        const scaleMultiplier = canvasWidth / targetWidth;
     
         const baseStyles: React.CSSProperties = {
             position: 'absolute',
@@ -199,10 +231,10 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     
         const avatarStyles: React.CSSProperties = {
             position:'absolute',
-            top: `${side === 'p1' ? 230 * scaleMultiplier : 70 * scaleMultiplier}px`,
-            left: `${side === 'p1' ? 90 * scaleMultiplier : 620 * scaleMultiplier}px`,
-            width: `${scaleMultiplier * (side === 'p1' ? 175 : 75)}px`,
-            height: `${scaleMultiplier * (side === 'p1' ? 175 : 75)}px`,
+            top: `${side === 'p1' ? 230 * scaleMultiplier : 94 * scaleMultiplier}px`,
+            left: `${side === 'p1' ? 90 * scaleMultiplier : 630 * scaleMultiplier}px`,
+            width: `${scaleMultiplier * (side === 'p1' ? 175 : 50)}px`,
+            height: `${scaleMultiplier * (side === 'p1' ? 175 : 50)}px`,
             transform: side === 'p1' ? 'scale(1) scaleX(-1)' : undefined,
             imageRendering: 'pixelated',
             zIndex: side === 'p1' ? 100 : 0,
@@ -312,9 +344,21 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                     pokemon[position] && <PokemonElement key={position} side={battle.p1} position={position} />
                 ))}
 
+                {Object.entries(battle.p1.sideConditions).map((entry) => {
+                    return <Hazard key={entry[0]} hazard={entry} side="p1"/>
+                })}
+
+
                 {positionsP2.map(position => (
                     pokemon[position] && <PokemonElement key={position} side={battle.p2} position={position} />
                 ))}
+
+                {Object.entries(battle.p2.sideConditions).map((entry) => {
+                        const [name, value] = entry;
+                        return <Hazard key={entry[0]} hazard={entry} side="p2"/>
+                    })
+                }
+
 
             <div className="absolute w-full h-full">
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>

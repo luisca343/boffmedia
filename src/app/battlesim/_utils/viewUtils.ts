@@ -1,5 +1,10 @@
 import { Battle } from "@pkmn/client";
 
+// Las medidas están hechas en base a 960px de ancho, por lo que se necesita saber el ancho de la ventana para ajustar las medidas.
+// NO CAMBIAR
+export const SCALE_WIDTH = 960;
+export const CURRENT_WIDTH = 960;
+
 export function getViewportWidth() {
     if (typeof window === 'undefined') return 0;
     return window.innerWidth;
@@ -13,7 +18,7 @@ type Position = {
 };
 
 export function getOffset(battle: Battle, position: string) {
-    const canvasWidth = getViewportWidth() > 960 ? 960 : getViewportWidth();
+    const canvasWidth = getViewportWidth() > CURRENT_WIDTH ? CURRENT_WIDTH : getViewportWidth();
     const canvasHeight = canvasWidth * 0.625;
 
     //const gameType = battle.gameType.toString().trim().toLowerCase();
@@ -69,6 +74,12 @@ export function getOffset(battle: Battle, position: string) {
     return positions[gameType]?.[position] || { top: 0, left: 0, x: 0, y: 0 };
 }
 
+
+
 export function getImageSize() {
-    return getViewportWidth() >= 960 ? 175 : getViewportWidth() / 960 * 175;
+    return getCanvasWidth() / SCALE_WIDTH * 175;
+}
+
+export function getCanvasWidth() {
+    return getViewportWidth() > CURRENT_WIDTH ? CURRENT_WIDTH : getViewportWidth();
 }
