@@ -47,11 +47,6 @@ return (
       onFlip={(e) => onFlip(e.data)} onInit={(e) => cargar(e)}
     >
       {pages.map((page, index) => {
-        console.log('index', index)
-        console.log('pageindex', page.index)
-        console.log('len',pages.length)
-        console.log('page',page)
-        console.log('test',page.index % 2 === 0 || index === pages.length-1)
         return<div key={index} className={`${(page.index % 2 === 0 && index !== pages.length-1) ? `page-${index} page-right${pageColor}` : `page-left${pageColor}`}`} >
           {page.content}
         </div>
@@ -81,10 +76,47 @@ interface PageCoverProps {
 }
 
 
-export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0}: {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number}) {
+export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0, book}: 
+  {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number, book?: PageFlip}) {
+
+    if(!book) return <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}></div>
     return (
-        <div style={style} className={`h-full w-full page drop-shadow-2xl p-2 overflow-hidden ${className}`} data-density={dataDensity}>
-             {children}
-        </div>
+    <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}>
+        {children}
+        {dataDensity === 'soft' && <>
+          <span className={`absolute bottom-2 ${number % 2 ? 'left-4' : 'right-4'}`}>
+              {number}
+          </span>
+          <BookLink 
+              className={`absolute bottom-2 ${number % 2 ? 'right-4' : 'left-4'}`}
+              book={book}
+              page={1}
+          >
+              Índice
+          </BookLink>
+        </>
+        }
+    </div>
     );
 };
+
+
+export function BookLink({children, book, page, className}: {children: React.ReactNode, book: any, page: number, className?: string}){
+    return (
+        <button className={`hover:cursor-pointer hover:underline hover:text-blue-500 ${className}`} onClick={(e) => turnPage(book, page, e)}>
+            {children}
+        </button>
+    )
+}
+
+
+export function turnPage(book: any, page: number, e: any){
+  book.flip(page)
+  e.preventDefault()
+  e.stopPropagation()
+}
+
+
+export function PageTitle({title, children}: {title: string, children?: React.ReactNode}){
+  return <div className="text-2xl 2xl:text-4xl font-bold 2xl:m-2 font-vinque underline">{title}</div>
+}

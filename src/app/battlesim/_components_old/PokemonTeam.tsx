@@ -42,7 +42,7 @@ export function PokemonTeamList({team}: {team: Pokemon[]}) {
                     <HoverCardTrigger>
                         <PokemonTeamListElement key={pokemon.name} pokemon={pokemon} />
                     </HoverCardTrigger>
-                    <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128" side="right">
+                    <HoverCardContent className="z-[200] bg-slate-800 text-slate-100 w-128" side="right" >
                          <span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}
                          <div className="flex">{pokemon.types.map(type => <TypeBadgeSmall key={type} type={type} />)}</div>
                          <br/>
@@ -64,14 +64,14 @@ export function PokemonTeam({team}: {team: Pokemon[]}){
     const halfTeamSize = Math.ceil(teamSize / 2);
 
     return (
-        <div  className="mx-auto flex flex-wrap justify-center">
+        <div  className="mx-auto flex flex-wrap">
             <>
-                <div>
+                <div className="flex flex-col justify-between">
                     {Array.from({length: halfTeamSize}, (_, i) => team[i]).map(pokemon => (
                         <PokemonSprite key={pokemon?.name} pokemon={pokemon} />
                     ))}
                 </div>
-                <div>
+                <div className="flex flex-col justify-between">
                     {Array.from({length: teamSize - halfTeamSize}, (_, i) => team[i + halfTeamSize]).map(pokemon => (
                         <PokemonSprite key={pokemon?.name} pokemon={pokemon} />
                     ))}
@@ -103,15 +103,15 @@ function PokemonSprite({pokemon, className}: {pokemon: Pokemon, className?: stri
 }
 
 
-export function PokemonImage({id, pokemon, side = 'p2'}: {id: string, pokemon: DetailedPokemon, side?: 'p1' | 'p2'}){
+export function PokemonImage({id, pokemon, side = 'p2', className}: {id: string, pokemon: DetailedPokemon, side?: 'p1' | 'p2', className?: string}) {
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     if(url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
         url = `http://boffmedia.es/smartrotom/img/sprites/Front/${pokemon.speciesForme.toUpperCase()}.png`
         pixelated = true
     }
     return (
-        <div className='w-full h-full flex items-end justify-center' id={id}>
-            <img src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={pokemon.speciesForme}/>
+        <div className={`w-full h-full flex items-end justify-center ${className}`} id={id}>
+            <img  className={className} src={url} width={w} height={h} style={{imageRendering: pixelated ? 'pixelated' : 'auto'}} alt={pokemon.speciesForme}/>
         </div>
     );
 }   

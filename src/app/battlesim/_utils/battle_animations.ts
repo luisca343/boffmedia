@@ -1,9 +1,9 @@
 import { Battle } from "@pkmn/client";
 import { PokemonIdent } from "@pkmn/protocol";
-import { BattleMoveAnims, BattleOtherAnims } from "./battle-animations.moves";
+import { BattleMoveAnims, BattleOtherAnims } from "./battle-animations-moves";
 
 
-const BattleEffects: {[k: string]: any} = {
+export const BattleEffects: {[k: string]: any} = {
 	wisp: {
 		url:'/smartrotom/test/fx/wisp.png',
 		w: 100, h: 100,
@@ -398,6 +398,8 @@ export class Scene {
 		  return {x: 0, y: 0, z:0, width: 0, height: 0};
 	  }
   
+	  //console.log("LA ID ES "+id)
+	  //console.log(this.gameElement)
 		const element = this.gameElement.querySelector(`#${id}`);
 		
 		if (!element) return {x: 0, y: 0, z:0, width: 0, height: 0};
