@@ -37,6 +37,9 @@ export default function PokemonDetail({pokemon, children, className, offset = 20
 }
 
 function calculateSpeed(base: number, level: number, natureModifier: number, IV: number, EV: number) {
-    const speed = Math.floor((0.01 * (2 * base + IV + Math.floor(0.25 * EV)) * level) + 5) * natureModifier;
-    return speed;
+    return Math.floor(
+        Math.floor(
+            ( 2 * base + IV + Math.floor(EV / 4)) * level / 100 + 5
+        ) * natureModifier
+    );
 }
