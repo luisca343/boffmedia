@@ -17,7 +17,7 @@ export function getOffset(battle: Battle, position: string) {
     const canvasHeight = canvasWidth * 0.625;
 
     //const gameType = battle.gameType.toString().trim().toLowerCase();
-    const gameType = 'horde'
+    const gameType = 'doubles';
 
     const positions: { [key: string]: { [key: string]: Position } } = {
         singles: {
@@ -63,7 +63,7 @@ export function getOffset(battle: Battle, position: string) {
             p2b: { top: getImageSize() * .05, left: canvasWidth * .38 + getImageSize() * .5 },
             p2c: { top: getImageSize() * .2, left: canvasWidth * .42 + getImageSize() * .5 },
             p2d: { top: getImageSize() * .12, left: canvasWidth * .5 + getImageSize() * .5 },
-            p2e: { top: getImageSize() * .25, left: canvasWidth * .55 + getImageSize() * .5 },
+            p2e: { top: getImageSize() * .25, left: canvasWidth * .58 + getImageSize() * .5 },
         }
     };
     return positions[gameType]?.[position] || { top: 0, left: 0, x: 0, y: 0 };
