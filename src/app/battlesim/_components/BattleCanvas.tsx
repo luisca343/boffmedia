@@ -7,7 +7,7 @@ import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
 import { Sprites } from "@pkmn/img";
 import { DetailedPokemon } from "@pkmn/protocol";
-import { CURRENT_WIDTH, SCALE_WIDTH, getImageSize, getOffset } from "../_utils/viewUtils";
+import { ASPECT_RATIO, CURRENT_WIDTH, SCALE_WIDTH, getImageSize, getOffset } from "../_utils/viewUtils";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 import { PokemonStatus } from "./PokemonStatus";
 import { PokemonSprite } from "./PokemonSprite";
@@ -46,11 +46,10 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     } as {[key: string]: Pokemon};
     
     const targetWidth = CURRENT_WIDTH;
-    const aspectRatio = 0.5625;
-    const targetHeight = targetWidth * aspectRatio;
+    const targetHeight = targetWidth * ASPECT_RATIO;
 
     const canvasWidth = viewportWidth > targetWidth ? targetWidth : viewportWidth;
-    const canvasHeight = canvasWidth * aspectRatio;
+    const canvasHeight = canvasWidth * ASPECT_RATIO;
 
     const scaleMultiplier = canvasWidth / SCALE_WIDTH;
 

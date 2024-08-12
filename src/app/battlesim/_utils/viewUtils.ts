@@ -4,6 +4,7 @@ import { Battle } from "@pkmn/client";
 // NO CAMBIAR
 export const SCALE_WIDTH = 960;
 export const CURRENT_WIDTH = 960;
+export const ASPECT_RATIO = 0.5625;
 
 export function getViewportWidth() {
     if (typeof window === 'undefined') return 0;
