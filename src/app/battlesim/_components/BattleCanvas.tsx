@@ -45,11 +45,12 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         p2c: p2.active[2]
     } as {[key: string]: Pokemon};
     
-    
+    const targetWidth = 960;
+    const aspectRatio = 0.5625;
+    const targetHeight = targetWidth * aspectRatio;
 
-    // We calculate the width of the canvas based on the width of the viewport
-    const canvasWidth = viewportWidth > 960 ? 960 : viewportWidth;
-    const canvasHeight = canvasWidth * 0.5625;
+    const canvasWidth = viewportWidth > targetWidth ? targetWidth : viewportWidth;
+    const canvasHeight = canvasWidth * aspectRatio;
 
 
 
@@ -103,7 +104,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
 
         //const battleType = battle.gameType;
-        const battleType = 'horde'
+        const battleType = 'doubles'
 
         let multiplier;
         if (side === 'p2' && battleType === 'raid') {
@@ -113,8 +114,8 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         }
 
 
-        viewportWidth < 960 ? w = w * viewportWidth / 960 * multiplier : w = w * multiplier;
-        viewportWidth < 960 ? h = h * viewportWidth / 960 * multiplier : h = h * multiplier;
+        viewportWidth < targetWidth ? w = w * viewportWidth / targetWidth * multiplier : w = w * multiplier;
+        viewportWidth < targetWidth ? h = h * viewportWidth / targetWidth * multiplier : h = h * multiplier;
 
 
         if (url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
@@ -169,31 +170,46 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
         const uuid = player.avatar.includes('-') ? player.avatar : null;
         const avatar = Sprites.getAvatar(avatarId);
         const avatarNumber = parseInt(avatarId);
+
+        const scaleMultiplier = canvasWidth / targetWidth;
     
         const baseStyles: React.CSSProperties = {
-            height: '100px',
-            width: '45px',
-            transform: `scaleX(${side === 'p2' ? -1 : 1.5}) scaleY(${side === 'p2' ? 1 : 1.5})`,
+            position: 'absolute',
+            top: `${307 * scaleMultiplier}px`,
+            left: `${172 * scaleMultiplier}px`,
+            width: `${scaleMultiplier * 45}px`,
+            height: `${scaleMultiplier * 100}px`,
+            transform: `scaleX(${side === 'p2' ? -1 : 1.2}) scaleY(${side === 'p2' ? 1 : 1.2})`,
             imageRendering: 'pixelated',
-            zIndex: side === 'p1' ? 100 : 0
+            zIndex: side === 'p1' ? 100 : 0,
         };
         
         const npcStyles: React.CSSProperties = {
-            transform: `scaleX(${side === 'p2' ? -.8 : 2}) scaleY(${side === 'p2' ? .8 : 2})`,
+            position:'absolute',
+            top: `${105 * scaleMultiplier}px`,
+            left: `${645 * scaleMultiplier}px`,
+            width: `${scaleMultiplier * 25}px`,
+            height: `${scaleMultiplier * 50}px`,
+            transform: `scaleX(${side === 'p2' ? -1 : 1}) scaleY(${side === 'p2' ? 1 : 1})`,
             margin: 'auto',
-            marginTop: '-1.5em',
             imageRendering: 'pixelated',
-            zIndex: side === 'p1' ? 100 : 0
+            zIndex: side === 'p1' ? 100 : 0,
+            
         };
     
         const avatarStyles: React.CSSProperties = {
-            transform: side === 'p1' ? 'scale(2) scaleX(-1)' : undefined,
+            position:'absolute',
+            top: `${side === 'p1' ? 230 * scaleMultiplier : 70 * scaleMultiplier}px`,
+            left: `${side === 'p1' ? 90 * scaleMultiplier : 620 * scaleMultiplier}px`,
+            width: `${scaleMultiplier * (side === 'p1' ? 175 : 75)}px`,
+            height: `${scaleMultiplier * (side === 'p1' ? 175 : 75)}px`,
+            transform: side === 'p1' ? 'scale(1) scaleX(-1)' : undefined,
             imageRendering: 'pixelated',
             zIndex: side === 'p1' ? 100 : 0,
         };
     
         return (
-            <div className="w-[100px] flex items-center justify-center pointer-events-none" style={style}>
+            <>
                 {uuid !== null ? (
                     <img
                         className="mx-auto"
@@ -216,7 +232,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                         style={npcStyles}
                     />
                 )}
-            </div>
+            </>
         );
     }
 
@@ -241,7 +257,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     function PokemonElement({side, position}: {position: string,  side: Side}) {
         const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
         const active = side.active.length
-        const pkm = pokemon['p1a'];
+        const pkm = pokemon[position];
         return(
         <div id={position} className="absolute " style={{top: getOffset(battle,position).top, left: getOffset(battle,position).left, width:getImageSize(), height:getImageSize()}}>
             <PokemonDetail pokemon={pkm} className="z-50" offset={-50}>
@@ -256,8 +272,9 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     if(!battle.pokemonControlled) return <Loading/>
     return (
         <div  id="game" className="flex overflow-hidden relative" style={{
-            backgroundImage: 'url(/battlesim/fx/bg/aaa.png)', 
-            backgroundSize: '100% 100%', width: canvasWidth, height: canvasHeight
+            backgroundImage: 'url(/battlesim/fx/bg/tulipan.gif)', 
+            backgroundSize: `100% 100%`,
+            width: canvasWidth, height: canvasHeight,
         
         }}
             >          
@@ -288,29 +305,16 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                         </div>
                     }
                 </div>
-                <Avatar battle={battle} side="p1" pov={pov} style={{
-                    position:'absolute',
-                    top: canvasWidth * .35,
-                    left: canvasWidth * .15
-                }}/>
-
-                <Avatar battle={battle} side="p2" pov={pov} style={{
-                    position:'absolute',
-                    top: canvasWidth * .12,
-                    left: canvasWidth * .625,
-                }}/>
+                <Avatar battle={battle} side="p1" pov={pov}/>
+                <Avatar battle={battle} side="p2" pov={pov}/>
             
-                <PokemonElement side={battle.p1} position="p1a"/>
-                <PokemonElement side={battle.p1} position="p1b"/>
-                <PokemonElement side={battle.p1} position="p1c"/>
-                <PokemonElement side={battle.p1} position="p1d"/>
-                <PokemonElement side={battle.p1} position="p1e"/>
+                {positionsP1.map(position => (
+                    pokemon[position] && <PokemonElement key={position} side={battle.p1} position={position} />
+                ))}
 
-                <PokemonElement side={battle.p2} position="p2a"/>
-                <PokemonElement side={battle.p2} position="p2b"/>
-                <PokemonElement side={battle.p2} position="p2c"/>
-                <PokemonElement side={battle.p2} position="p2d"/>
-                <PokemonElement side={battle.p2} position="p2e"/>
+                {positionsP2.map(position => (
+                    pokemon[position] && <PokemonElement key={position} side={battle.p2} position={position} />
+                ))}
 
             <div className="absolute w-full h-full">
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
@@ -319,10 +323,13 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
     )
 }
 
-
+const positionsP1 = ["p1a", "p1b", "p1c", "p1d", "p1e"];
+const positionsP2 = ["p2a", "p2b", "p2c", "p2d", "p2e"];
 
 
 /*
             <PlayerDataBar battle={battle} side="p1" pov={pov}/>
             <PlayerDataBar battle={battle} side="p2" pov={pov}/>
+
+            
 */
