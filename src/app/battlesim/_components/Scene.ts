@@ -107,7 +107,13 @@ export class Scene {
 		this.gameElement.appendChild(element);
 		
 		
-		const animationTime = start.time || 500;
+		const startTime = start.time || 0;
+		const endTime = end.time || 500;
+		const animationTime = endTime - startTime;
+
+		// Wait the start time before starting the animation
+
+		await this.wait(startTime);
 		
 		element.style.transition = `all ${animationTime}ms`;
 		
