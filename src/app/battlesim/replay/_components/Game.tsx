@@ -31,6 +31,8 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   const [messageBar, setMessageBar] = useState<string[]>([]);
 
+  const [simulatedAttack, setSimulatedAttack] = useState<string>('dragondarts');
+
   
   const logRef = useRef<HTMLDivElement>(null);
 
@@ -126,6 +128,18 @@ useEffect(() => {
 }, [isPlaying, dataLoaded]);*/
 
 useEffect(() => {
+
+
+  if(isPlaying) {
+    const lines = battleLog ? battleLog.split('\n') : [];
+    if(lines.length === 0 || currentAction >= lines.length) {
+      setIsPlaying(false);
+      return;
+    }
+    const action = lines[currentAction];
+    playAction(action);
+    return;
+  }
   if( currentAction === -1 || newTurn === 0){
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
@@ -169,17 +183,6 @@ useEffect(() => {
       setSettingTurn(false);
     }
     return;
-  }
-
-
-  if(isPlaying) {
-    const lines = battleLog ? battleLog.split('\n') : [];
-    if(lines.length === 0 || currentAction >= lines.length) {
-      setIsPlaying(false);
-      return;
-    }
-    const action = lines[currentAction];
-    playAction(action);
   }
 }, [currentAction, isPlaying]);
 
@@ -240,7 +243,7 @@ function setCurrentTurn(turn?: number) {
 
   async function performAction(params: {args: ArgType, kwArgs: BattleArgsKWArgType, data?: any}, html: string, currentBattle: Battle) {
     const { args, kwArgs, data } = params
-    let timeout = 500;
+    let timeout = 1;
     switch (args[0]) {
       case 'turn':
         await turnAction(currentBattle, args[1] as Num);
@@ -281,7 +284,7 @@ function setCurrentTurn(turn?: number) {
   }
 
   async function simulateAttack() {
-    await moveAction(battle, scene, "p1a" as PokemonIdent, "lunge" as string, "p2a" as PokemonIdent);
+    await moveAction(battle, scene, "p1a" as PokemonIdent, simulatedAttack as string, "p2a" as PokemonIdent);
   }
 
   return (
@@ -295,10 +298,16 @@ function setCurrentTurn(turn?: number) {
         <Button onClick={() => setCurrentTurn(battle.turn - 1)}>Prev</Button>
         <Button onClick={() => setCurrentTurn(battle.turn + 1)}>Next</Button>
 
-        <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
 
         <Button onClick={() => setPov(pov === 'p1' ? 'p2' : 'p1')}>Switch POV</Button>
         <Button onClick={() => simulateAttack()}>Simulate Attack</Button>
+        <Input  className="w-24 border border-slate-900" type="string" value={simulatedAttack} 
+          onChange={(e) => setSimulatedAttack(e.target.value)}
+          min={1} max={lastTurn}
+        />
+
+
+        <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
         <Input  className="w-24 border border-slate-900" type="number" value={turnInput} 
           onChange={(e) => setTurnInput(parseInt(e.target.value))}
           min={1} max={lastTurn}
