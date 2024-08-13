@@ -269,8 +269,6 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
 
     function PokemonTeam({side}: {side: Side}) {
         const total = side.totalPokemon;
-        
-        console.log(battle.p2.team[0])
 
         return <div className="flex flex-wrap  justify-center items-center text-center w-16 bg-slate-800 bg-opacity-80 r rounded-md">
             {Array.from({length: total}, (_, i) => side.team[i]).map((pokemon, index) => {
