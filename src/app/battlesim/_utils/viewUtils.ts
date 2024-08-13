@@ -1,15 +1,10 @@
-import { Battle } from "@pkmn/client";
-
 // Las medidas están hechas en base a 960px de ancho, por lo que se necesita saber el ancho de la ventana para ajustar las medidas.
 // NO CAMBIAR
 export const SCALE_WIDTH = 960;
+import { Battle } from "@pkmn/client";
+
 export const CURRENT_WIDTH = 960;
 export const ASPECT_RATIO = 0.5625;
-
-export function getViewportWidth() {
-    if (typeof window === 'undefined') return 0;
-    return window.innerWidth;
-}
 
 type Position = {
     top: number;
@@ -17,6 +12,11 @@ type Position = {
     x?: number;
     y?: number;
 };
+
+export function getViewportWidth() {
+    if (typeof window === 'undefined') return 0;
+    return window.innerWidth;
+}
 
 export function getOffset(battle: Battle, position: string) {
     const canvasWidth = getViewportWidth() > CURRENT_WIDTH ? CURRENT_WIDTH : getViewportWidth();
