@@ -2,14 +2,20 @@ import { Battle } from "@pkmn/client";
 import { PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
 import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
 import { BattleEffects } from "../_utils/battle_animations";
-import { getImageSize, getOffset, getViewportWidth } from "../_utils/viewUtils";
+import { getImageSize, getOffset} from "../_utils/viewUtils";
 
+export class BG {
+	animate(test:any) {
+		return this;
+	}
+}
 
 export class Scene {
 	battle: Battle;
 	gameElement: HTMLElement;
 	currentAnimations: any[] = [];
 	acceleration: number = 1;
+	$bg = new BG();
 	
 	constructor(battle: Battle, gameElement: HTMLElement) {
 		this.battle = battle
@@ -26,7 +32,6 @@ export class Scene {
 	
 	async showPopup(position: PokemonIdent, text: string, duration: number = 1000) {
 		const element = document.createElement('div');
-		
 		const popupWidth = 50;
 		
 		element.style.position = 'absolute';
@@ -79,8 +84,8 @@ export class Scene {
 		const effectData = BattleEffects[effect];
 		if (!effectData) return;
 		
-		let halfWidth = getImageSize() / 2 - effectData.w / 2;
-		let halfHeight = getImageSize() / 2 - effectData.h / 2;
+		let halfWidth = getImageSize() / 2 //- effectData.w / 2;
+		let halfHeight = getImageSize() / 2 //- effectData.h / 2;
 		
 		if(effect === 'pokeball'){
 			halfWidth = 0
@@ -267,6 +272,7 @@ export class PokemonSprite {
 		return this.x() - offset;
 	}
 	
+	
 	constructor(scene: Scene, position: PokemonIdent){
 		this.scene = scene;
 		this.position = position;
@@ -286,7 +292,8 @@ export class PokemonSprite {
 	}
 	
 	delay(time: number) {
-		return this.scene.wait(time);
+		this.scene.wait(time);
+		return this;
 	}
 	
 	playNextAnim() {
