@@ -15,7 +15,7 @@ import PokemonDetail from "./PokemonDetail";
 
 
 
-export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1' | 'p2', messageBar: string[]}) {
+export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 | 1, messageBar: string[]}) {
     const [viewportWidth, setViewportWidth] = useState(0);
 
     useEffect(() => {
@@ -33,8 +33,8 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
 
 
 
-    const p1 = battle.p1;
-    const p2 = battle.p2;
+    const p1 = pov === 0 ? battle.p1 : battle.p2;
+    const p2 = pov === 0 ? battle.p2 : battle.p1;
 
     const pokemon = {
         p1a: p1.active[0],
@@ -196,7 +196,9 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
 
 
 
-    function Avatar({ battle, side, pov, style } : { battle: Battle, side: 'p1' | 'p2', pov: 'p1' | 'p2' , style?: React.CSSProperties}) {
+    function Avatar({ battle, side, pov, style } : { battle: Battle, side: 'p1' | 'p2', pov: 0 | 1 , style?: React.CSSProperties}) {
+        const povCentered = side === 'p1' && pov === 0 || side === 'p2' && pov === 1;
+
         const player = battle[side];
         const avatarId = player?.avatar || 'unknown';
         const uuid = player.avatar.includes('-') ? player.avatar : null;
@@ -210,9 +212,9 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
             left: `${172 * scaleMultiplier}px`,
             width: `${scaleMultiplier * 45}px`,
             height: `${scaleMultiplier * 100}px`,
-            transform: `scaleX(${side === 'p2' ? -1 : 1.2}) scaleY(${side === 'p2' ? 1 : 1.2})`,
+            transform: `scaleX(${povCentered ? 1.2 : -1}) scaleY(${povCentered ? 12 : 1})`,
             imageRendering: 'pixelated',
-            zIndex: side === 'p1' ? 100 : 0,
+            zIndex: povCentered ? 100 : 0,
         };
         
         const npcStyles: React.CSSProperties = {
@@ -221,22 +223,22 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
             left: `${645 * scaleMultiplier}px`,
             width: `${scaleMultiplier * 25}px`,
             height: `${scaleMultiplier * 50}px`,
-            transform: `scaleX(${side === 'p2' ? -1 : 1}) scaleY(${side === 'p2' ? 1 : 1})`,
+            transform: `scaleX(${povCentered ? 1 : -1}) scaleY(${povCentered ? 1 : 1})`,
             margin: 'auto',
             imageRendering: 'pixelated',
-            zIndex: side === 'p1' ? 100 : 0,
+            zIndex: povCentered ? 100 : 0,
             
         };
     
         const avatarStyles: React.CSSProperties = {
             position:'absolute',
-            top: `${side === 'p1' ? 230 * scaleMultiplier : 94 * scaleMultiplier}px`,
-            left: `${side === 'p1' ? 90 * scaleMultiplier : 630 * scaleMultiplier}px`,
-            width: `${scaleMultiplier * (side === 'p1' ? 175 : 50)}px`,
-            height: `${scaleMultiplier * (side === 'p1' ? 175 : 50)}px`,
-            transform: side === 'p1' ? 'scale(1) scaleX(-1)' : undefined,
+            top: `${povCentered ? 230 * scaleMultiplier : 94 * scaleMultiplier}px`,
+            left: `${povCentered ? 90 * scaleMultiplier : 630 * scaleMultiplier}px`,
+            width: `${scaleMultiplier * (povCentered ? 175 : 50)}px`,
+            height: `${scaleMultiplier * (povCentered ? 175 : 50)}px`,
+            transform: povCentered ? 'scale(1) scaleX(-1)' : undefined,
             imageRendering: 'pixelated',
-            zIndex: side === 'p1' ? 100 : 0,
+            zIndex: povCentered ? 100 : 0,
         };
     
         return (
@@ -311,7 +313,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 <div className="h-[15%] w-full absolute top-0 flex justify-between">
                     <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
                     <div className="m-1 w-2/3 flex flex-row-reverse">
-                        <PokemonTeam side={battle.p2}/>
+                        <PokemonTeam side={p2}/>
                         <PokemonStatus pokemon={pokemon["p2a"]} className="w-44"/>
                         <PokemonStatus pokemon={pokemon["p2b"]} className="w-44"/>
                         <PokemonStatus pokemon={pokemon["p2c"]} className="w-44"/>
@@ -321,7 +323,7 @@ export function BattleCanvas({battle, pov,messageBar}: {battle: Battle, pov: 'p1
                 
                 <div className="h-[15%] w-full absolute bottom-0 flex">
                     <div className="m-1 max-w-2/3 flex flex-row">
-                        <PokemonTeam side={battle.p1}/>
+                        <PokemonTeam side={p1}/>
                         <PokemonStatus pokemon={pokemon["p1a"]} className="w-44"/>
                         <PokemonStatus pokemon={pokemon["p1b"]} className="w-44"/> 
                         <PokemonStatus pokemon={pokemon["p1c"]} className="w-44"/>

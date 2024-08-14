@@ -8,7 +8,6 @@ export default function PokemonDetail({pokemon, children, className, offset = 20
     try {
         types = pokemon.types;
     } catch (error) {
-        console.error('Error accessing pokemon.types:', error);
         return <HoverCard openDelay={0} closeDelay={0}>
         <HoverCardTrigger  className={className}>
             {children}
