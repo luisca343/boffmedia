@@ -42,7 +42,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     }
   }, [htmlLog]);
 
-  const [pov, setPov] = useState<'p1' | 'p2'>('p1');
+  const [pov, setPov] = useState<0 | 1>(0);
   
   const battle = useBattle() as Battle;
   const setBattle = useSetBattle();
@@ -63,7 +63,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     fetch(`https://api.boffmedia.es/smartrotom/combates/sustitutos.txt`)
       .then(response => response.text())
       .then(text => {
-        console.log('Battle log:', text);
+        //console.log('Battle log:', text);
         setBattleLog(text);
         loadScene();
       })
@@ -299,7 +299,7 @@ function setCurrentTurn(turn?: number) {
         <Button onClick={() => setCurrentTurn(battle.turn + 1)}>Next</Button>
 
 
-        <Button onClick={() => setPov(pov === 'p1' ? 'p2' : 'p1')}>Switch POV</Button>
+        <Button onClick={() => setPov(pov === 0 ? 1 : 0)}>Switch POV</Button>
         <Button onClick={() => simulateAttack()}>Simulate Attack</Button>
         <Input  className="w-24 border border-slate-900" type="string" value={simulatedAttack} 
           onChange={(e) => setSimulatedAttack(e.target.value)}
