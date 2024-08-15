@@ -2,7 +2,7 @@ import { Battle } from "@pkmn/client";
 import { PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
 import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
 import { BattleEffects } from "../_utils/battle_animations";
-import { getImageSize, getOffset} from "../_utils/viewUtils";
+import { CURRENT_WIDTH, SCALE_WIDTH, getImageSize, getOffset} from "../_utils/viewUtils";
 
 export class BG {
 	animate(test:any) {
@@ -22,6 +22,17 @@ export class Scene {
 		this.gameElement = gameElement
 	}
 	
+	getCanvasWidth() {
+		if (typeof window === 'undefined') return 0;
+		const viewportWidth = window.innerWidth;
+		
+		const canvasWidth = viewportWidth > CURRENT_WIDTH ? CURRENT_WIDTH : viewportWidth;
+		return canvasWidth;
+	}
+
+	getScaleMulti() {
+		return this.getCanvasWidth() / SCALE_WIDTH;
+	}
 
 	wait(time: number) {
 		return new Promise(resolve => setTimeout(resolve, time));
@@ -33,11 +44,16 @@ export class Scene {
 	async showPopup(position: PokemonIdent, text: string, duration: number = 1000) {
 		const element = document.createElement('div');
 		const popupWidth = 50;
+
+		const left = getOffset(this.battle, position, this.getScaleMulti()).left + getImageSize() / 2 - popupWidth / 2;
+		const top = getOffset(this.battle, position, this.getScaleMulti()).top + getImageSize() / 2;
+
+		console.log('left', left, 'top', top);
 		
 		element.style.position = 'absolute';
 		element.style.width = `${popupWidth}px`;
-		element.style.left = `${getOffset(this.battle, position).left + getImageSize() / 2 - popupWidth / 2}px`;
-		element.style.top = `${getOffset(this.battle,position).top + getImageSize() / 2}px`;
+		element.style.left = `${left}px`;
+		element.style.top = `${top}px`;
 		element.style.textAlign = 'center';
 		element.style.borderRadius = '5px';
 		element.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
@@ -51,8 +67,10 @@ export class Scene {
 		this.gameElement.appendChild(element);
 		
 		element.style.transition = `all ${duration}ms`;
+
+		
 		setTimeout(() => {
-			element.style.top = `${getOffset(this.battle, position).top}px`;
+			element.style.top = `${top - getImageSize() * this.getScaleMulti() / 2}px`;
 			element.style.visibility = 'hidden';
 		}, 0);
 		
@@ -63,7 +81,7 @@ export class Scene {
 	
 	async playEffect(effect: string, position: PokemonIdent, callback: () => void) {
 		const pos = position.split(':')[0];
-		const element = getOffset(this.battle, position);
+		const element = getOffset(this.battle, position, this.getScaleMulti());
 		if(!element) return;
 		
 		const effectData = this.animsTest[effect];
@@ -223,14 +241,14 @@ export class Scene {
 			
 			
 			if(attackElemnt) {
-				attackElemnt.style.top = getOffset(this.battle,attackerSprite.position).top + 'px';
-				attackElemnt.style.left = getOffset(this.battle,attackerSprite.position).left + 'px';
+				attackElemnt.style.top = getOffset(this.battle,attackerSprite.position, this.getScaleMulti()).top + 'px';
+				attackElemnt.style.left = getOffset(this.battle,attackerSprite.position, this.getScaleMulti()).left + 'px';
 				attackerSprite.animationQueue = [];
 			}
 			
 			if(defendElement) {
-				defendElement.style.top = getOffset(this.battle,defenderSprite.position).top + 'px';
-				defendElement.style.left = getOffset(this.battle,defenderSprite.position).left + 'px';
+				defendElement.style.top = getOffset(this.battle,defenderSprite.position, this.getScaleMulti()).top + 'px';
+				defendElement.style.left = getOffset(this.battle,defenderSprite.position, this.getScaleMulti()).left + 'px';
 				defenderSprite.animationQueue = [];
 			}
 			
@@ -282,8 +300,8 @@ export class PokemonSprite {
 		this.startingOffsetTop = this.y();
 		
 		if (this.element) {
-			this.element.style.left = `${getOffset(this.battle,position).left}px`;
-			this.element.style.top = `${getOffset(this.battle,position).top}px`;
+			this.element.style.left = `${getOffset(this.battle,position, this.scene.getScaleMulti()).left}px`;
+			this.element.style.top = `${getOffset(this.battle,position, this.scene.getScaleMulti()).top}px`;
 			this.element.style.right = 'auto';
 			this.element.style.bottom = 'auto';
 		}
@@ -363,11 +381,11 @@ export class PokemonSprite {
 	}
 	
 	x() {
-		return getOffset(this.battle,this.position).left;
+		return getOffset(this.battle,this.position, this.scene.getScaleMulti()).left;
 	}
 	
 	y() {
-		return getOffset(this.battle,this.position).top;
+		return getOffset(this.battle,this.position, this.scene.getScaleMulti()).top;
 	}
 	
 	z():number {
