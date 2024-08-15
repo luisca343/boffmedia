@@ -12,12 +12,22 @@ export async function turnAction(currentBattle: Battle, turn: Num) {
   });
 }
 
-export  async function switchAction(ident: PokemonIdent, details: PokemonDetails, hpstatus: PokemonHPStatus) {
-  return await new Promise<void>((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 1000);
-  });
+export type Position = {
+  top: number;
+  left: number;
+  x?: number;
+  y?: number;
+};
+
+/*
+  top: `${povCentered ? 230 * scaleMultiplier : 94 * scaleMultiplier}px`,
+  left: `${povCentered ? 90 * scaleMultiplier : 630 * scaleMultiplier}px`,
+*/
+
+export  async function switchAction(scene: Scene | null,ident: PokemonIdent, details: PokemonDetails, hpstatus: PokemonHPStatus) {
+  if(!scene) return;
+  const startingPosition = ident.includes('p1') ? {top: 275, left: 180}  : {top: 90, left: 630};
+  return await scene.playEffect('pokeball', ident, startingPosition);
 }
 
 export async function moveAction(battle :Battle, scene: Scene | null, attacker: PokemonIdent, moveName: string, defender: PokemonIdent) {
