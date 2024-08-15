@@ -3,6 +3,7 @@ import { PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
 import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
 import { BattleEffects } from "../_utils/battle_animations";
 import { CURRENT_WIDTH, SCALE_WIDTH, getImageSize, getOffset} from "../_utils/viewUtils";
+import { Position } from "../_utils/battleActions";
 
 export class BG {
 	animate(test:any) {
@@ -48,8 +49,6 @@ export class Scene {
 		const left = getOffset(this.battle, position, this.getScaleMulti()).left + getImageSize() / 2 - popupWidth / 2;
 		const top = getOffset(this.battle, position, this.getScaleMulti()).top + getImageSize() / 2;
 
-		console.log('left', left, 'top', top);
-		
 		element.style.position = 'absolute';
 		element.style.width = `${popupWidth}px`;
 		element.style.left = `${left}px`;
@@ -79,22 +78,30 @@ export class Scene {
 		}, duration);
 	}
 	
-	async playEffect(effect: string, position: PokemonIdent, callback: () => void) {
+	
+	async playEffect(effect: string, position: PokemonIdent, startingPosition: Position, callback?: () => void) {
 		const pos = position.split(':')[0];
-		const element = getOffset(this.battle, position, this.getScaleMulti());
+		const element = getOffset(this.battle, pos, this.getScaleMulti());
 		if(!element) return;
 		
 		const effectData = this.animsTest[effect];
 		if (!effectData) return;
+
 		
 		const startY = pos.includes('p1') ? element.top + 40 : element.top;
 		const startX = pos.includes('p1') ? element.left -200 : element.left + 200;
+
 		
-		effectData.anim(startX, startY , element, callback);
+		effectData.anim(startingPosition.left, startingPosition.top , element, callback);
 		
-		Promise.all(this.currentAnimations).then(() => {
+		return await Promise.all(this.currentAnimations).then(() => {
 			this.currentAnimations = [];
-			//this.animating = false;
+			
+			return new Promise<void>((resolve) => {
+				setTimeout(() => {
+					resolve();
+				}, 500);
+			});
 		});
 	}
 	
@@ -122,7 +129,11 @@ export class Scene {
 		element.style.width = `${effectData.w}px`;
 		element.style.height = `${effectData.h}px`;
 		element.style.opacity = `${start.opacity || 1}`;
-		
+
+		if(effect === 'pokeball'){
+			halfWidth = getImageSize() / 2
+			halfHeight = getImageSize()
+		}
 		if (additionalCss) {
 			element.style.cssText += additionalCss;
 		}
@@ -165,7 +176,6 @@ export class Scene {
 		this.currentAnimations.push(prom);
 		
 		prom.then(() => {
-			// Remove the element from the DOM after the animation
 			element.remove();
 			if (callback) callback();
 		});
@@ -183,8 +193,8 @@ export class Scene {
 					time: 500 / this.acceleration,
 				}, {
 					opacity: 0,
-					x: element.x,
-					y: element.y,
+					x: element.left,
+					y: element.top,
 					time: 1000 / this.acceleration,
 				}, 'ballistic2', '', '', callback); 
 			}
