@@ -208,7 +208,7 @@ function setCurrentTurn(turn?: number) {
         const html = formatter.formatHTML(args, kwArgs);
         setLog((prev) => [...prev, html]);
 
-        const params = getParams(args, kwArgs);
+        const params = await getParams(args, kwArgs);
         currentBattle.add(args, kwArgs);
         setBattle(currentBattle);
 
@@ -224,8 +224,11 @@ function setCurrentTurn(turn?: number) {
     });
   }
 
-  function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): { args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any } {
+  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any }> {
     switch (args[0]) {
+        case 'switch':
+          await switchAction(scene, args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+          return { args, kwArgs };
         case '-damage':
             const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
             return { args, kwArgs, data:{ damage } };
@@ -247,9 +250,6 @@ function setCurrentTurn(turn?: number) {
     switch (args[0]) {
       case 'turn':
         await turnAction(currentBattle, args[1] as Num);
-        break;
-      case 'switch':
-        await switchAction(args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
         break;
       case 'move':
         timeout = 500
