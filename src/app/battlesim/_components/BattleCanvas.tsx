@@ -100,10 +100,6 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
     
         // Create an array of levels from the current level down to 1
         const levels = Array.from({ length: value.level }, (_, i) => value.level - i);
-
-        console.log("HAZAARD", side, name, value, levels)
-        console.log("hazardOffsets", hazardOffsets[side][name])
-
         if(name === 'default') return <></>
 
     
@@ -112,7 +108,6 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
                 {levels.map(level => {
                     const hazardName = name + level;
                     const offset = hazardOffsets[side][hazardName] || hazardOffsets[side].default;
-                    console.log("OFFSET", hazardName, offset, name)
                     return (
                         <Image
                             key={level}
@@ -135,11 +130,12 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
         let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
 
         //const battleType = battle.gameType;
-        const battleType = 'doubles'
+        const battleType = 'horde'
+        const z = side === 'p1' ? 500 : 400;
 
         let multiplier;
         if (side === 'p2' && battleType === 'raid') {
-            multiplier = 3;
+            multiplier = 2.5;
         } else {
             multiplier = side === 'p2' ? .7 : 1.3;
         }
@@ -147,6 +143,9 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
 
         viewportWidth < targetWidth ? w = w * viewportWidth / targetWidth * multiplier : w = w * multiplier;
         viewportWidth < targetWidth ? h = h * viewportWidth / targetWidth * multiplier : h = h * multiplier;
+
+        w = w * scaleMultiplier;
+        h = h * scaleMultiplier;
 
 
         if (url === "https://play.pokemonshowdown.com/sprites/gen5/0.png") {
@@ -164,8 +163,8 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
                     filter: 'brightness(0) blur(5px)', // Black color and blur for shadow effect
                     zIndex: 0,
                     transform: `
-                            scaleY(-1) scaleX(-1)
-                            ${side === 'p1' ? `translateY(-${(getImageSize() / 2.7)}px)` : `translateY(-${(getImageSize() / 4)}px)`}
+                            scaleY(-.75)
+                            translateY(-${h * .75}px)
                             `,
                     opacity: .5 
                 }}>
@@ -185,7 +184,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
                         className={className} src={url} width={w} height={h}
                         style={{
                             imageRendering: 'pixelated',
-                            zIndex: 500
+                            zIndex: z
                         }}
                         alt={pokemon.speciesForme}
                     />
@@ -290,7 +289,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
         const active = side.active.length
         const pkm = pokemon[position];
         return(
-        <div id={position} className="absolute " style={{top: getOffset(battle,position).top, left: getOffset(battle,position).left, width:getImageSize(), height:getImageSize()}}>
+        <div id={position} className="absolute " style={{top: getOffset(battle, position, scaleMultiplier).top, left: getOffset(battle, position, scaleMultiplier).left, width:getImageSize(), height:getImageSize()}}>
             <PokemonDetail pokemon={pkm} className="z-50" offset={-50}>
                 <div className="w-full h-full relative">
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pkm}/>
