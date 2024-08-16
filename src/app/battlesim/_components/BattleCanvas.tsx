@@ -213,7 +213,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
             height: `${scaleMultiplier * 100}px`,
             transform: `scaleX(${povCentered ? 1.2 : -1}) scaleY(${povCentered ? 12 : 1})`,
             imageRendering: 'pixelated',
-            zIndex: povCentered ? 100 : 0,
+            zIndex: povCentered ? 100 : 5,
         };
         
         const npcStyles: React.CSSProperties = {
@@ -225,7 +225,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
             transform: `scaleX(${povCentered ? 1 : -1}) scaleY(${povCentered ? 1 : 1})`,
             margin: 'auto',
             imageRendering: 'pixelated',
-            zIndex: povCentered ? 100 : 0,
+            zIndex: povCentered ? 100 : 5,
             
         };
     
@@ -237,7 +237,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
             height: `${scaleMultiplier * (povCentered ? 175 : 50)}px`,
             transform: povCentered ? 'scale(1) scaleX(-1)' : undefined,
             imageRendering: 'pixelated',
-            zIndex: povCentered ? 100 : 0,
+            zIndex: povCentered ? 100 : 5,
         };
     
         return (
@@ -271,7 +271,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
     function PokemonTeam({side}: {side: Side}) {
         const total = side.totalPokemon;
 
-        return <div className="flex flex-wrap  justify-center items-center text-center w-16 bg-slate-800 bg-opacity-80 r rounded-md">
+        return <div className="flex flex-wrap  justify-center items-center text-center w-16 bg-slate-800 bg-opacity-80 r rounded-md z-50">
             {Array.from({length: total}, (_, i) => side.team[i]).map((pokemon, index) => {
                 return <PokemonDetail pokemon={pokemon} 
                         className={`w-6 flex justify-center z-40`} 
@@ -289,7 +289,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
         const active = side.active.length
         const pkm = pokemon[position];
         return(
-        <div id={position} className="absolute " style={{top: getOffset(battle, position, scaleMultiplier).top, left: getOffset(battle, position, scaleMultiplier).left, width:getImageSize(), height:getImageSize()}}>
+        <div id={position} className="absolute z-50" style={{top: getOffset(battle, position, scaleMultiplier).top, left: getOffset(battle, position, scaleMultiplier).left, width:getImageSize(), height:getImageSize()}}>
             <PokemonDetail pokemon={pkm} className="z-50" offset={-50}>
                 <div className="w-full h-full relative">
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pkm}/>
@@ -302,7 +302,7 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
     if(!battle.pokemonControlled) return <Loading/>
     return (
         <div  id="game" className="flex overflow-hidden relative" style={{
-            backgroundImage: 'url(/battlesim/fx/bg/tulipan.gif)', 
+            backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
             backgroundSize: `100% 100%`,
             width: canvasWidth, height: canvasHeight,
         
@@ -361,6 +361,24 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
             <div className="absolute w-full h-full">
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
             </div>
+
+            
+            <div className="absolute w-full h-full">
+                <div className={`weather w-full h-full absolute top-0 left-0 `} style={{
+                    backgroundImage: 'url(/battlesim/fx/wonderroom.png)',
+                    backgroundSize: '100% 100%',
+                    opacity: 0.6,
+                }}></div>
+            </div>
+
+            <div className="absolute w-full h-full">
+                <div className={`weather w-full h-full absolute top-0 left-0 `} style={{
+                    backgroundImage: 'url(/battlesim/fx/bg/hagane_overlay.png)',
+                    backgroundSize: '100% 100%',
+                    zIndex: 1,
+                }}></div>
+            </div>
+
         </div>
     )
 }
@@ -372,6 +390,5 @@ const positionsP2 = ["p2a", "p2b", "p2c", "p2d", "p2e"];
 /*
             <PlayerDataBar battle={battle} side="p1" pov={pov}/>
             <PlayerDataBar battle={battle} side="p2" pov={pov}/>
-
             
 */
