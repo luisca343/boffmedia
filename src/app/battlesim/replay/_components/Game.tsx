@@ -140,7 +140,7 @@ useEffect(() => {
     playAction(action);
     return;
   }
-  if( currentAction === -1 || newTurn === 0){
+  if( currentAction === -1 || newTurn === -1){
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
 
@@ -248,19 +248,23 @@ function setCurrentTurn(turn?: number) {
     const { args, kwArgs, data } = params
     let timeout = 1;
     switch (args[0]) {
+      case 'switch':
+        timeout = 1000
+        break;
       case 'turn':
+        timeout = 1000
         await turnAction(currentBattle, args[1] as Num);
         break;
       case 'move':
-        timeout = 500
+        timeout = 1000
         await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
         break;
       case '-damage':
-        timeout = 500
+        timeout = 1000
         damageAction(currentBattle, scene, args[1] as PokemonIdent, data.damage as string);
         break;
       case '-heal':
-        timeout = 500
+        timeout = 1000
         healAction(currentBattle, scene, args[1] as PokemonIdent, data.health as number[]);
         break;
       case 'inactive':
