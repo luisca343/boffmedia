@@ -120,12 +120,15 @@ export class Scene {
 		const startX = start.x || 0;
 		const startY = start.y || 0;
 		
+		const left = (startX  + halfWidth) * this.getScaleMulti();
+		const top = (startY  + halfHeight) * this.getScaleMulti();
+
 		
 		const element = document.createElement('img');
 		element.src = effectData.url;
 		element.style.position = 'absolute';
-		element.style.left = `${startX  + halfWidth}px`;
-		element.style.top = `${startY  + halfHeight}px`;
+		element.style.left = `${left}px`;
+		element.style.top = `${top}px`;
 		element.style.width = `${effectData.w}px`;
 		element.style.height = `${effectData.h}px`;
 		element.style.opacity = `${start.opacity || 1}`;
@@ -310,8 +313,8 @@ export class PokemonSprite {
 		this.startingOffsetTop = this.y();
 		
 		if (this.element) {
-			this.element.style.left = `${getOffset(this.battle,position, this.scene.getScaleMulti()).left}px`;
-			this.element.style.top = `${getOffset(this.battle,position, this.scene.getScaleMulti()).top}px`;
+			this.element.style.left = `${getOffset(this.scene.battle,position, this.scene.getScaleMulti()).left}px`;
+			this.element.style.top = `${getOffset(this.scene.battle,position, this.scene.getScaleMulti()).top}px`;
 			this.element.style.right = 'auto';
 			this.element.style.bottom = 'auto';
 		}
@@ -391,11 +394,11 @@ export class PokemonSprite {
 	}
 	
 	x() {
-		return getOffset(this.battle,this.position, this.scene.getScaleMulti()).left;
+		return getOffset(this.scene.battle,this.position, this.scene.getScaleMulti()).left;
 	}
 	
 	y() {
-		return getOffset(this.battle,this.position, this.scene.getScaleMulti()).top;
+		return getOffset(this.scene.battle,this.position, this.scene.getScaleMulti()).top;
 	}
 	
 	z():number {
