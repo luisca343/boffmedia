@@ -208,17 +208,17 @@ export function BattleCanvas({battle, pov, messageBar}: {battle: Battle, pov: 0 
         const baseStyles: React.CSSProperties = {
             position: 'absolute',
             top: `${307 * scaleMultiplier}px`,
-            left: `${172 * scaleMultiplier}px`,
+            left: `${150 * scaleMultiplier}px`,
             width: `${scaleMultiplier * 45}px`,
             height: `${scaleMultiplier * 100}px`,
-            transform: `scaleX(${povCentered ? 1.2 : -1}) scaleY(${povCentered ? 12 : 1})`,
+            transform: `scaleX(${povCentered ? 1.2 : -1}) scaleY(${povCentered ? 1.2 : 1})`,
             imageRendering: 'pixelated',
             zIndex: povCentered ? 100 : 5,
         };
         
         const npcStyles: React.CSSProperties = {
             position:'absolute',
-            top: `${105 * scaleMultiplier}px`,
+            top: `${102 * scaleMultiplier}px`,
             left: `${645 * scaleMultiplier}px`,
             width: `${scaleMultiplier * 25}px`,
             height: `${scaleMultiplier * 50}px`,
