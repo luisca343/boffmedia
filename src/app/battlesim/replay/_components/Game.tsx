@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { set } from "react-hook-form";
 import { rotomGET } from "@/services/boffAPI";
-import { switchAction, turnAction, moveAction, damageAction, healAction } from "../../_utils/battleActions";
+import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction } from "../../_utils/battleActions";
+import { BattleMoveAnims, BattleOtherAnims } from "../../_utils/battle-animations-moves";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -31,7 +32,18 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   const [messageBar, setMessageBar] = useState<string[]>([]);
 
-  const [simulatedAttack, setSimulatedAttack] = useState<string>('dragondarts');
+  const [simulatedAttack, setSimulatedAttack] = useState<string>('contactattack');
+
+  type BattleCanvasRefProps = {
+    bounceAll: () => void;
+    animateMove: (
+      attacker: PokemonIdent,
+      moveName: string,
+      defender: PokemonIdent
+    ) => void;
+  };
+
+  const battleCanvasRef = useRef<BattleCanvasRefProps>(null);
 
   
   const logRef = useRef<HTMLDivElement>(null);
@@ -212,6 +224,7 @@ function setCurrentTurn(turn?: number) {
         currentBattle.add(args, kwArgs);
         setBattle(currentBattle);
 
+
         if(clearActions.includes(args[0])){ 
           setMessageBar([html]);
         } else{ 
@@ -237,10 +250,12 @@ function setCurrentTurn(turn?: number) {
           const revival = fromEffect?.id === 'revivalblessing';
           const poke = battle.getPokemon(args[1], revival)!;
           const health = poke.healthParse(args[2]);
-
           return { args, kwArgs, data: { health } };
+        case 'faint':
+          await faintAction(battle, scene, args[1] as PokemonIdent);
+          return { args, kwArgs };
         default:
-            return { args, kwArgs };
+          return { args, kwArgs };
     }
 }
 
@@ -250,14 +265,18 @@ function setCurrentTurn(turn?: number) {
     switch (args[0]) {
       case 'switch':
         timeout = 1000
+        const pokemon = battle.getPokemon(args[1] as PokemonIdent);
+        await scene?.clearPokemonElement(args[1].split(':')[0] as PokemonIdent);
+        
+
+        const audio = new Audio('/battlesim/audio/cries/mewtwo.mp3');
+        //console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.id.toLowerCase()}.mp3`)
+        audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.id.toLowerCase()}.mp3`;
+        audio.play();
         break;
       case 'turn':
         timeout = 1000
         await turnAction(currentBattle, args[1] as Num);
-        break;
-      case 'move':
-        timeout = 1000
-        await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
         break;
       case '-damage':
         timeout = 1000
@@ -267,17 +286,23 @@ function setCurrentTurn(turn?: number) {
         timeout = 1000
         healAction(currentBattle, scene, args[1] as PokemonIdent, data.health as number[]);
         break;
+      case 'move':
+        timeout = 1000
+        await moveAction(battle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
+        
+        break;
       case 'inactive':
       case 't:':
       case '-resisted':
         timeout = 0;
         break;
       default:
-        console.log('Unknown action:', args[0]);
+        //console.log('Unknown action:', args[0]);
         break;
     }
     return await new Promise<void>((resolve) => {
       setTimeout(() => {
+        //console.log('Action END:', args[0]);
         let nextAction = settingTurn ? -1 : currentAction + 1
         setCurrentAction(nextAction);
         
@@ -288,13 +313,13 @@ function setCurrentTurn(turn?: number) {
   }
 
   async function simulateAttack() {
-    await moveAction(battle, scene, "p1a" as PokemonIdent, simulatedAttack as string, "p2a" as PokemonIdent);
+    battleCanvasRef.current?.animateMove('p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
   }
 
   return (
     <>
       <div className="flex w-full">
-      <BattleCanvas battle={battle} pov={pov} messageBar={messageBar}/>
+      <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
       </div>
       <div className="flex">
         <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
@@ -305,11 +330,16 @@ function setCurrentTurn(turn?: number) {
 
         <Button onClick={() => setPov(pov === 0 ? 1 : 0)}>Switch POV</Button>
         <Button onClick={() => simulateAttack()}>Simulate Attack</Button>
+
+        <Button onClick={() => battleCanvasRef.current && battleCanvasRef.current.bounceAll()}>battleCanvasRef</Button>
+
+
         <Input  className="w-24 border border-slate-900" type="string" value={simulatedAttack} 
           onChange={(e) => setSimulatedAttack(e.target.value)}
           min={1} max={lastTurn}
         />
 
+      
 
         <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
         <Input  className="w-24 border border-slate-900" type="number" value={turnInput} 

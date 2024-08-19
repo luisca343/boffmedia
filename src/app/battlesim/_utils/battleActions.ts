@@ -27,13 +27,15 @@ export type Position = {
 export  async function switchAction(scene: Scene | null,ident: PokemonIdent, details: PokemonDetails, hpstatus: PokemonHPStatus) {
   if(!scene) return;
   const startingPosition = ident.includes('p1') ? {top: 275, left: 180}  : {top: 90, left: 630};
-  return await scene.playEffect('pokeball', ident, startingPosition);
+  return await scene.playEffect('switch', ident, startingPosition);
 }
 
 export async function moveAction(battle :Battle, scene: Scene | null, attacker: PokemonIdent, moveName: string, defender: PokemonIdent) {
   const move = battle.get("moves", moveName);
   if(!scene) return;
   return await scene.playBattleAnim(move.id, getPokemonIdentCode(attacker) as PokemonIdent, getPokemonIdentCode(defender) as PokemonIdent);
+  
+  //return await scene.playBattleAnim('contactattack', getPokemonIdentCode(attacker) as PokemonIdent, getPokemonIdentCode(defender) as PokemonIdent);
 }
 
 export async function damageAction(battle :Battle,scene: Scene | null, ident: PokemonIdent, damageStr: string) {
@@ -45,10 +47,12 @@ export async function damageAction(battle :Battle,scene: Scene | null, ident: Po
 
 export async function healAction(battle :Battle, scene: Scene | null, ident: PokemonIdent, heal: number[]) {
   if(!scene) return;
-
-  console.log('heal', heal);
-
   return scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, `+${heal[0]}%` as PokemonHPStatus);
+}
+
+export async function faintAction(battle :Battle, scene: Scene | null, ident: PokemonIdent) {
+  if(!scene) return;
+  return await scene.playBattleAnim('faint', getPokemonIdentCode(ident) as PokemonIdent, getPokemonIdentCode(ident) as PokemonIdent);
 }
 
 

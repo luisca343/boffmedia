@@ -10,20 +10,57 @@
  */
 
 import { PokemonSprite, Scene} from '../_components/Scene'
+import { getImageSize, getScaleMultiplier } from './viewUtils';
 
 
 
 
 
-export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: PokemonSprite[]) => void}} = {
+export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
 	faint:{
-		anim(scene, [attacker]) {
+		anim(scene, [attacker], data) {
 			attacker.anim({
 				opacity: 0,
 				scale: 0.5,
-				time: 500,
+				time: 600,
 			}, 'linear');
+			console.log(data)
+			scene.showEffect('pokeball', {
+				opacity: 0,
+				x: attacker.x() + getImageSize() / 2,
+				y: attacker.y() + getImageSize(),
+				scale: 0.7,
+				time: 0 / scene.acceleration,
+			}, {
+				opacity: 0,
+				x: data.startingPosition.left * getScaleMultiplier(),
+				y: data.startingPosition.top * getScaleMultiplier(),
+				time: 500 / scene.acceleration,
+			}, 'ballistic2', '', '');
 		},
+	},
+	switch: {
+		anim(scene, [attacker, defender], data) {
+			// Start small and grow
+			attacker.anim({
+				opacity: 0,
+				scale: 0.1,
+				time: 500, // Start immediately
+			}, 'linear');
+	
+			scene.showEffect('pokeball', {
+				opacity: 0,
+				x: data.startingPosition.left * getScaleMultiplier(),
+				y: data.startingPosition.top * getScaleMultiplier(),
+				scale: 0.7,
+				time: 500 / scene.acceleration,
+			}, {
+				opacity: 0,
+				x: attacker.x(),
+				y: attacker.y(),
+				time: 1000 / scene.acceleration,
+			}, 'ballistic2', '', '');
+		}
 	},
 	hitmark: {
 		anim(scene, [attacker]) {
@@ -2957,32 +2994,7 @@ export const BattleStatusAnims: {[k: string]: {anim: (scene: Scene, args: Pokemo
 };
 BattleStatusAnims['focuspunch'] = {anim: BattleStatusAnims['flinch'].anim};
 export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
-	switch:{
-		anim(scene, [attacker, defender], data) {
-			attacker.anim({
-				opacity: 1,
-				scale: 1.5,
-				time: 1500,
-			}, 'linear');
 
-			scene.showEffect('pokeball', {
-				opacity: 0,
-				x: data.startingPosition.left  * scene.getScaleMulti(),
-				y: data.startingPosition.top  * scene.getScaleMulti(),
-				scale: .7,
-				time: 500 / scene.acceleration,
-			}, {
-				opacity: 0,
-				x: attacker.x(),
-				y: attacker.y(),
-				time: 1000 / scene.acceleration,
-			}, 'ballistic2', '', ''); 
-
-			
-		}
-
-		
-	},
 	taunt: {
 		anim(scene, [attacker, defender], data) {
 			BattleOtherAnims.dance.anim(scene, [attacker, defender]);

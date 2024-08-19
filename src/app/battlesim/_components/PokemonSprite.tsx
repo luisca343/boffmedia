@@ -13,7 +13,7 @@ import { transform } from "next/dist/build/swc";
             {...props}
             style={{width: 15, height: 15}}
         >
-            <img className="m-auto" src='/smartrotom/test/pokeball.png' />
+            <img className="m-auto" src='/battlesim/pokeball.png' />
         </div>
     );
 

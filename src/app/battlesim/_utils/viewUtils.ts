@@ -3,7 +3,7 @@
 export const SCALE_WIDTH = 960;
 import { Battle } from "@pkmn/client";
 
-export const CURRENT_WIDTH = 960;
+export const TARGET_WIDTH = 960;
 export const ASPECT_RATIO = 0.5625;
 
 type Position = {
@@ -19,11 +19,11 @@ export function getViewportWidth() {
 }
 
 export function getOffset(battle: Battle, position: string, scaleMulti:number = 1) {
-    const canvasWidth = getViewportWidth() > CURRENT_WIDTH ? CURRENT_WIDTH : getViewportWidth();
+    const canvasWidth = getViewportWidth() > TARGET_WIDTH ? TARGET_WIDTH : getViewportWidth();
     const canvasHeight = canvasWidth * 0.625;
 
-    //const gameType = battle.gameType.toString().trim().toLowerCase();
-    const gameType = 'doubles';
+    const gameType = battle.gameType.toString().trim().toLowerCase() || 'singles';
+    //const gameType = 'doubles';
 
     const positions: { [key: string]: { [key: string]: Position } } = {
         singles: {
@@ -80,5 +80,30 @@ export function getImageSize() {
 }
 
 export function getCanvasWidth() {
-    return getViewportWidth() > CURRENT_WIDTH ? CURRENT_WIDTH : getViewportWidth();
+    if (typeof window === 'undefined') return 0;
+    const viewportWidth = window.innerWidth;
+    
+    const canvasWidth = viewportWidth > TARGET_WIDTH ? TARGET_WIDTH : viewportWidth;
+    return canvasWidth;
 }
+
+export function getScaleMultiplier() {
+    return getCanvasWidth() / SCALE_WIDTH;
+}
+
+
+
+/*
+	getCanvasWidth() {
+		if (typeof window === 'undefined') return 0;
+		const viewportWidth = window.innerWidth;
+		
+		const canvasWidth = viewportWidth > CURRENT_WIDTH ? CURRENT_WIDTH : viewportWidth;
+		return canvasWidth;
+	}
+
+	getScaleMulti() {
+		return this.getCanvasWidth() / SCALE_WIDTH;
+	}
+
+*/
