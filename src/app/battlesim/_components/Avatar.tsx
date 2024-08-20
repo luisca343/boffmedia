@@ -1,40 +1,34 @@
 import { Sprites } from "@pkmn/img";
 import { getScaleMultiplier } from "../_utils/viewUtils";
-import { Battle } from "@pkmn/client";
+import {  Side } from "@pkmn/client";
 import NpcSkin from "@/components/smartrotom/MinecraftSkin";
 
-
-
-
-
-export function Avatar({ battle, side, pov, style } : { battle: Battle, side: 'p1' | 'p2', pov: 0 | 1 , style?: React.CSSProperties}) {
-    const povCentered = side === 'p1' && pov === 0 || side === 'p2' && pov === 1;
-
-    const player = battle[side];
+export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
+    const povCentered = pov === side.n
+    const player = side
     const avatarId = player?.avatar || 'unknown';
     const uuid = player.avatar.includes('-') ? player.avatar : null;
     const avatar = Sprites.getAvatar(avatarId);
     const avatarNumber = parseInt(avatarId);
 
-
     const baseStyles: React.CSSProperties = {
         position: 'absolute',
-        top: `${307 * getScaleMultiplier()}px`,
-        left: `${150 * getScaleMultiplier()}px`,
-        width: `${getScaleMultiplier() * 45}px`,
-        height: `${getScaleMultiplier() * 100}px`,
-        transform: `scaleX(${povCentered ? 1.2 : -1}) scaleY(${povCentered ? 1.2 : 1})`,
+        top: `${povCentered ? 307 * getScaleMultiplier() : 98 * getScaleMultiplier()}px`,
+        left: `${povCentered ? 150 * getScaleMultiplier() : 645 * getScaleMultiplier()}px`,
+        width: `${povCentered ? getScaleMultiplier() * 45 : getScaleMultiplier() * 25}px`,
+        height: `${povCentered ? getScaleMultiplier() * 100 : getScaleMultiplier() * 50}px`,
+        transform: `scaleX(${povCentered ? 1.2 : -.8}) scaleY(${povCentered ? 1.2 : .8})`,
         imageRendering: 'pixelated',
         zIndex: povCentered ? 100 : 5,
     };
     
     const npcStyles: React.CSSProperties = {
         position:'absolute',
-        top: `${102 * getScaleMultiplier()}px`,
-        left: `${645 * getScaleMultiplier()}px`,
-        width: `${getScaleMultiplier() * 25}px`,
-        height: `${getScaleMultiplier() * 50}px`,
-        transform: `scaleX(${povCentered ? 1 : -1}) scaleY(${povCentered ? 1 : 1})`,
+        top: `${povCentered ? 307 * getScaleMultiplier() : 102 * getScaleMultiplier()}px`,
+        left: `${povCentered ? 150 * getScaleMultiplier() : 645 * getScaleMultiplier()}px`,
+        width: `${povCentered ? getScaleMultiplier() * 45 : getScaleMultiplier() * 25}px`,
+        height: `${povCentered ? getScaleMultiplier() * 100 : getScaleMultiplier() * 50}px`,
+        transform: `scaleX(${povCentered ? 2 : -1}) scaleY(${povCentered ? 2 : 1})`,
         margin: 'auto',
         imageRendering: 'pixelated',
         zIndex: povCentered ? 100 : 5,
@@ -79,3 +73,4 @@ export function Avatar({ battle, side, pov, style } : { battle: Battle, side: 'p
         </>
     );
 }
+
