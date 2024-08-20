@@ -6,6 +6,9 @@ import { Battle } from "@pkmn/client";
 export const TARGET_WIDTH = 960;
 export const ASPECT_RATIO = 0.5625;
 
+export const positionsP1 = ["p1a", "p1b", "p1c", "p1d", "p1e"];
+export const positionsP2 = ["p2a", "p2b", "p2c", "p2d", "p2e"];
+
 type Position = {
     top: number;
     left: number;
@@ -85,6 +88,10 @@ export function getCanvasWidth() {
     
     const canvasWidth = viewportWidth > TARGET_WIDTH ? TARGET_WIDTH : viewportWidth;
     return canvasWidth;
+}
+
+export function getCanvasHeight() {
+    return getCanvasWidth() * ASPECT_RATIO;
 }
 
 export function getScaleMultiplier() {
