@@ -43,7 +43,7 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
         height: `${getScaleMultiplier() * (povCentered ? 175 : 50)}px`,
         transform: povCentered ? 'scale(1) scaleX(-1)' : undefined,
         imageRendering: 'pixelated',
-        zIndex: povCentered ? 100 : 5,
+        zIndex: povCentered ? 10 : 5,
     };
 
     return (

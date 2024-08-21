@@ -16,11 +16,11 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden text-xs bg-slate-800  bg-opacity-90 z-50 ${className}`}>
+        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden text-xs bg-slate-800  bg-opacity-90  ${className}`}>
             <span className="px-1 text-white font-bold">{pokemon.name} L{pokemon.level}</span>
             <div className="relative border border-white rounded-xl overflow-hidden">
                 <div className="hp-bar" style={{height: 16, width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
-                <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px'}}>
+                <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px', zIndex: 50}}>
                     {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}%
                 </div>
             </div>

@@ -8,21 +8,14 @@ export default function PokemonDetail({pokemon, children, className, offset = 20
     try {
         types = pokemon.types;
     } catch (error) {
-        return <HoverCard openDelay={0} closeDelay={0}>
-        <HoverCardTrigger  className={className}>
-            {children}
-        </HoverCardTrigger>
-        <HoverCardContent className="z-[200] bg-slate-800 bg-opacity-90 text-slate-100 w-128" side="top"   style={{zIndex:'999'}}>
-        <div>Failed to load</div>
-        </HoverCardContent>
-    </HoverCard>
+        return <>{children}</>
     }
     if (!pokemon || !types) return <></>;
     return <HoverCard key={pokemon.name} openDelay={0} closeDelay={0}>
     <HoverCardTrigger  className={className}>
         {children}
     </HoverCardTrigger>
-    <HoverCardContent className="z-[200] bg-slate-800 bg-opacity-90 text-slate-100 w-128" side="top"   style={{zIndex:'999'}}>
+    <HoverCardContent className=" bg-slate-800 bg-opacity-90 text-slate-100 w-128" side="top"   style={{zIndex:'500'}}>
          <span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}
          <div className="flex">{types.map(type => <TypeBadgeSmall key={type} type={type} />)}</div>
          <br/>
