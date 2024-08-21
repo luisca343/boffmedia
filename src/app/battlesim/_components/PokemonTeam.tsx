@@ -10,8 +10,8 @@ export function PokemonTeam({side}: {side: Side}) {
         {Array.from({length: total}, (_, i) => side.team[i]).map((pokemon, index) => {
             return <PokemonDetail pokemon={pokemon} 
                     className={`w-6 flex justify-center z-40`} 
-                    key={crypto.randomUUID()}>
-                <PokemonSprite className="w-6 -ml-1"  pokemon={pokemon} />
+                    key={`pkm-${side.n}-${index}`}>
+                <PokemonSprite pokemon={pokemon} />
             </PokemonDetail>
         })}
     </div>
