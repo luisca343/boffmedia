@@ -1,14 +1,15 @@
 "use client"
 import { Battle, Pokemon, Side } from "@pkmn/client";
 import { Loading } from "@/components/smartrotom/Loading";
-import { forwardRef,  useImperativeHandle, useRef } from "react";
-import { getCanvasWidth, getCanvasHeight, positionsP1, positionsP2 } from "../_utils/viewUtils";
+import { forwardRef, useRef } from "react";
+import { positionsP1, positionsP2, ASPECT_RATIO, getScaleMultiplier } from "../_utils/viewUtils";
 import { PokemonStatus } from "./PokemonStatus";
 import { PokemonElement, PokemonRefType } from "./PokemonElement";
 import { Avatar } from "./Avatar";
 import { PokemonTeam } from "./PokemonTeam";
 import { Hazard } from "./Hazard";
 import { PokemonIdent } from "@pkmn/protocol";
+import useViewportWidth from "@/services/useViewPortWidth";
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -21,25 +22,7 @@ export type BattleCanvasRefProps = {
 
 export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: Battle, pov: 0 | 1, messageBar: string[] }, ref) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
-
-    
-    useImperativeHandle(ref, () => ({
-        bounceAll() {
-            Object.values(pokemonRefs.current).forEach(element => {
-                element?.bounce()
-            })
-        },
-        animateMove(attackerIdent: PokemonIdent, moveName: string, defenderIdent: PokemonIdent) { 
-            const attacker = attackerIdent.split(":")[0];
-            const defender = defenderIdent.split(":")[0];
-
-            console.log("ANIMATING MOVE", attacker, moveName, defender);
-
-            const move = battle.get("moves", moveName);
-            const attackerRef = pokemonRefs.current[attacker];
-            const defenderRef = pokemonRefs.current[defender];}
-    }));
-
+    const [, canvasWidth] = useViewportWidth();
 
     const p1 = pov === 0 ? battle.p1 : battle.p2;
     const p2 = pov === 0 ? battle.p2 : battle.p1;
@@ -49,12 +32,11 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
         p2a: p2.active[0], p2b: p2.active[1], p2c: p2.active[2], p2d: p2.active[3], p2e: p2.active[4]
     } as {[key: string]: Pokemon};
     
-
     if(!battle.pokemonControlled) return <Loading/>
     return (
         <div  id="game" className="flex overflow-hidden relative" style={{
             backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
-            backgroundSize: `100% 100%`, width: getCanvasWidth(), height: getCanvasHeight()}}>          
+            backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
             <div className="h-[15%] w-full absolute top-0 flex justify-between">
                 <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
                 <div className="m-1 w-2/3 flex flex-row-reverse">
@@ -81,8 +63,8 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                     </div>
                 }
             </div>
-            <Avatar battle={battle} side={p1} pov={pov}/>
-            <Avatar battle={battle} side={p2} pov={pov}/>
+            <Avatar side={p1} pov={pov}/>
+            <Avatar side={p2} pov={pov}/>
             
             {positionsP1.map((position, index) => (
             <PokemonElement
