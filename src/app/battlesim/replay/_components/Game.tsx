@@ -6,14 +6,11 @@ import { Dex } from '@pkmn/sim';
 import { create } from "zustand";
 import { ArgType, BattleArgsKWArgType, Num, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
-import { BattleCanvas } from "../../_components/BattleCanvas";
+import { BattleCanvas, BattleCanvasRefProps } from "../../_components/BattleCanvas";
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { set } from "react-hook-form";
-import { rotomGET } from "@/services/boffAPI";
 import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction } from "../../_utils/battleActions";
-import { BattleMoveAnims, BattleOtherAnims } from "../../_utils/battle-animations-moves";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -31,21 +28,9 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [lastTurn, setLastTurn] = useState<number>(0);
 
   const [messageBar, setMessageBar] = useState<string[]>([]);
-
   const [simulatedAttack, setSimulatedAttack] = useState<string>('contactattack');
 
-  type BattleCanvasRefProps = {
-    bounceAll: () => void;
-    animateMove: (
-      attacker: PokemonIdent,
-      moveName: string,
-      defender: PokemonIdent
-    ) => void;
-  };
-
   const battleCanvasRef = useRef<BattleCanvasRefProps>(null);
-
-  
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
