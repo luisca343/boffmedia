@@ -26,8 +26,7 @@ export type Position = {
 
 export  async function switchAction(scene: Scene | null,ident: PokemonIdent, details: PokemonDetails, hpstatus: PokemonHPStatus) {
   if(!scene) return;
-  const startingPosition = ident.includes('p1') ? {top: 275, left: 180}  : {top: 90, left: 630};
-  return await scene.playEffect('switch', ident, startingPosition);
+  return await scene.playEffect('switch', ident);
 }
 
 export async function moveAction(battle :Battle, scene: Scene | null, attacker: PokemonIdent, moveName: string, defender: PokemonIdent) {
