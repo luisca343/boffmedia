@@ -22,9 +22,6 @@ export function getViewportWidth() {
 }
 
 export function getOffset(battle: Battle, position: string, scaleMulti:number = 1) {
-    const canvasWidth = getViewportWidth() > TARGET_WIDTH ? TARGET_WIDTH : getViewportWidth();
-    const canvasHeight = canvasWidth * 0.625;
-
     const gameType = battle.gameType.toString().trim().toLowerCase() || 'singles';
     //const gameType = 'doubles';
 
@@ -46,14 +43,6 @@ export function getOffset(battle: Battle, position: string, scaleMulti:number = 
             p2a: { top: 85 * scaleMulti - getImageSize() / 2, left: 480 * scaleMulti + getImageSize() / 2 },
             p2b: { top: 100 * scaleMulti - getImageSize() / 2, left: 400 * scaleMulti + getImageSize() / 2 },
             p2c: { top: 75 * scaleMulti - getImageSize() / 2, left: 350 * scaleMulti + getImageSize() / 2 },
-        },
-        triplesold: {
-            p1a: { top: canvasHeight * .2 + getImageSize() * .1, left: canvasWidth * .2 },
-            p1b: { top: canvasHeight * .25 + getImageSize() * .3, left: canvasWidth * .125 + getImageSize() * .75 },
-            p1c: { top: canvasHeight * .2 + getImageSize() * .45, left: canvasWidth * .1 + getImageSize() * 1.50 },
-            p2a: { top: getImageSize() * .4, left: canvasWidth * .4 + getImageSize() * .9 },
-            p2b: { top: getImageSize() * .2, left: canvasWidth * .4 + getImageSize() * .66 },
-            p2c: { top: getImageSize() * .25, left: canvasWidth * .4 + getImageSize() * .1 }
         },
         raid: {
             // 4v1
