@@ -34,7 +34,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
     
     if(!battle.pokemonControlled) return <Loading/>
     return (
-        <div  id="game" className="flex overflow-hidden relative" style={{
+        <div  id="game" className="flex overflow-hidden relative select-none" style={{
             backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
             <div className="h-[15%] w-full absolute top-0 flex justify-between">
