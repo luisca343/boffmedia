@@ -1,3 +1,4 @@
+import { TARGET_WIDTH } from '@/app/battlesim/_utils/viewUtils';
 import { useState, useEffect } from 'react';
 
 const useViewportWidth = () => {
@@ -16,7 +17,9 @@ const useViewportWidth = () => {
         };
     }, []);
 
-    return viewportWidth;
+    const canvasWidth = viewportWidth > TARGET_WIDTH ? TARGET_WIDTH : viewportWidth;
+
+    return [viewportWidth, canvasWidth];
 };
 
 export default useViewportWidth;
