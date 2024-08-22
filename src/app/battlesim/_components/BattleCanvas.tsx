@@ -37,7 +37,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
         <div  id="game" className="flex overflow-hidden relative select-none" style={{
             backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
-            <div className="h-[15%] w-full absolute top-0 flex justify-between">
+            <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between">
                 <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
                 <div className="m-1 w-2/3 flex flex-row-reverse">
                     <PokemonTeam side={p2}/>
@@ -48,7 +48,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
             </div>
 
                 
-            <div className="h-[15%] w-full absolute bottom-0 flex">
+            <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute bottom-0 flex">
                 <div className="m-1 max-w-2/3 flex flex-row">
                     <PokemonTeam side={p1}/>
                     <PokemonStatus pokemon={pokemon["p1a"]} className="w-44"/>
