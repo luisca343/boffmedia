@@ -48,7 +48,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
             </div>
 
                 
-            <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute bottom-0 flex">
+            <div className="h-[20%] lg:h-[15%]  w-full absolute bottom-0 flex">
                 <div className="m-1 w-2/3 flex flex-row">
                     <PokemonTeam side={p1}/>
                     {positionsP1.map((position, index) => (
