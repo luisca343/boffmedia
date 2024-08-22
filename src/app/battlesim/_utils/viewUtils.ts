@@ -3,7 +3,7 @@
 export const SCALE_WIDTH = 960;
 import { Battle } from "@pkmn/client";
 
-export const TARGET_WIDTH = 960;
+export const TARGET_WIDTH = 1080;
 export const ASPECT_RATIO = 0.5625;
 
 export const positionsP1 = ["p1a", "p1b", "p1c", "p1d", "p1e"];

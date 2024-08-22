@@ -205,7 +205,7 @@ function setCurrentTurn(turn?: number) {
   async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any }> {
     switch (args[0]) {
         case 'switch':
-          await switchAction(scene, args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+          await switchAction(scene, getRelativeIdent(args[1]), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
           return { args, kwArgs };
         case '-damage':
             const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
@@ -217,7 +217,7 @@ function setCurrentTurn(turn?: number) {
           const health = poke.healthParse(args[2]);
           return { args, kwArgs, data: { health } };
         case 'faint':
-          await faintAction(battle, scene, args[1] as PokemonIdent);
+          await faintAction(battle, scene, getRelativeIdent(args[1]));
           return { args, kwArgs };
         default:
           return { args, kwArgs };
@@ -245,15 +245,16 @@ function setCurrentTurn(turn?: number) {
         break;
       case '-damage':
         timeout = 1000
-        damageAction(currentBattle, scene, args[1] as PokemonIdent, data.damage as string);
+        damageAction(currentBattle, scene, getRelativeIdent(args[1]), data.damage as string);
         break;
       case '-heal':
         timeout = 1000
-        healAction(currentBattle, scene, args[1] as PokemonIdent, data.health as number[]);
+        healAction(currentBattle, scene, getRelativeIdent(args[1]), data.health as number[]);
         break;
       case 'move':
         timeout = 1000
-        await moveAction(battle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
+        const deffender = args[3] as PokemonIdent || args[1] as PokemonIdent;
+        await moveAction(battle, scene, getRelativeIdent(args[1]), args[2] as string, getRelativeIdent(deffender));
         
         break;
       case 'inactive':
@@ -275,6 +276,14 @@ function setCurrentTurn(turn?: number) {
         resolve();
       }, timeout);
     })
+  }
+
+  function getRelativeIdent(PokemonIdent: PokemonIdent): PokemonIdent {
+    const identCode = PokemonIdent.split(':')[0];
+    if(pov === 0) return identCode as PokemonIdent;
+    // Change 1 to 2 and viceversa
+    if(identCode.includes('1')) return identCode.replace('1', '2') as PokemonIdent;
+     return identCode.replace('2', '1') as PokemonIdent;
   }
 
   async function simulateAttack() {

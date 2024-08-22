@@ -1,5 +1,6 @@
 import { Pokemon } from "@pkmn/client";
 import './test.css';
+import { getScaleMultiplier } from "../_utils/viewUtils";
 
 export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, className?: string}) {
     if(!pokemon) return <div className={`mx-2 p-1  ${className}`} />
@@ -14,11 +15,16 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden text-2xs xl:text-xs  bg-slate-800  bg-opacity-90 h-18  ${className}`}>
+        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden bg-slate-800  bg-opacity-90 h-18  ${className}`}
+            style={{
+                fontSize: `${ 11 *getScaleMultiplier()}px`,
+                zIndex: 50
+            }}
+        >
             <span className="px-1 text-white font-bold">{pokemon.name} L{pokemon.level}</span>
             <div className="relative border border-white rounded-xl overflow-hidden h-3 sm:h-4 md:h-6 xl:h-7 2xl:h-8">
                 <div className="hp-bar h-full" style={{ width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
-                <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px', zIndex: 50}}>
+                <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px'}}>
                     {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}%
                 </div>
             </div>
@@ -28,9 +34,15 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
                     const multiplier = getBoostMultiplier(value);
                     if (multiplier === 1) return null;
                     const spanClass = multiplier > 1 
-                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mr-1 rounded-md h-[11px] text-[6pt] px-[3px] mb-[1px]" 
-                        : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mr-1 rounded-md h-[11px] text-[6pt] px-[3px] mb-[1px]";
-                    return <span key={key} className={spanClass}>x{multiplier} {key.slice(0,3)}</span>
+                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mr-1 rounded-sm px-[3px] mb-[1px]" 
+                        : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mr-1 rounded-sm px-[3px] mb-[1px]";
+                    return <span key={key} className={spanClass} 
+                        style={{
+                            fontWeight: 'bold',
+                            fontSize: `${9 * getScaleMultiplier()}pt`,
+                            height: `${12 * getScaleMultiplier()}px`,
+                        }}
+                    >x{multiplier} {key.slice(0,3)}</span>
                 })}
             </div>
         </div>
@@ -48,8 +60,15 @@ export function PokemonStatusBadge({status}: {status: string}) {
         'tox': {backgroundColor: 'purple', textColor: 'white'},
     } as {[key: string]: {backgroundColor: string, textColor: string}};
     const color = statusColors[status];
-    return <span className={`flex items-center justify-center font-bold text-xs text-white bg-${status} mx-1 text-shadow-border1  rounded-md h-[12px] text-[7pt] py-[2px] px-[4px] mb-[1px]`} 
-        style={{backgroundColor: color?.backgroundColor, color: color?.textColor}}>
+    return <span className={`flex items-center justify-center font-bold text-xs text-white bg-${status} mx-1 text-shadow-border1  rounded-md py-[2px] px-[4px] mb-[1px]`} 
+        style={
+            {
+                backgroundColor: color?.backgroundColor, 
+                color: color?.textColor,
+                fontSize: `${9 * getScaleMultiplier()}pt`,
+                height: `${12 * getScaleMultiplier() }px`,
+
+            }}>
             {status}
     </span>;
 }

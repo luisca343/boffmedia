@@ -15,13 +15,18 @@ export default function PokemonDetail({pokemon, children, className, offset = 20
     <HoverCardTrigger  className={className}>
         {children}
     </HoverCardTrigger>
-    <HoverCardContent className=" bg-slate-800 bg-opacity-90 text-slate-100 w-128 " align="end"    style={{zIndex:'999'}}>
-         <span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}
-         <div className="flex">{types.map(type => <TypeBadgeSmall key={type} type={type} />)}</div>
-         <br/>
-         <div>HP: {pokemon.hp > 0 ? pokemon.hp / pokemon.maxhp * 100 : 0}%</div>
-         <span className="flex">Possible abilities: {pokemon.species.abilities[0]} {pokemon.species.abilities[1] && pokemon.species.abilities[1]} {pokemon.species.abilities.H && pokemon.species.abilities.S}</span>
+    <HoverCardContent className=" bg-slate-800 bg-opacity-90 text-slate-100 w-128 p-2 " align="end"    style={{zIndex:'999'}}>
+        <div className="flex flex-col border-b-2 border-white pb-2">
+            <div><span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}</div>
+            <div className="flex">
+                {types.map(type => <TypeBadgeSmall key={type} type={type} />)}
+            </div>
+        </div>
+        <div className="flex flex-col border-b-2 border-white pb-2">
+        <div>HP: {pokemon.hp > 0 ? pokemon.hp / pokemon.maxhp * 100 : 0}%</div>
+        <span className="flex">Possible abilities: {pokemon.species.abilities[0]} {pokemon.species.abilities[1] && pokemon.species.abilities[1]} {pokemon.species.abilities.H && pokemon.species.abilities.S}</span>
         <span className="flex">Speed: {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, .9, 0,0 )} - {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, 1.1, 31, 252)} </span>   
+        </div>
         {pokemon.movesUsedWhileActive.map(move => <div key={move}>{move}</div>)}
         {pokemon.teraType && <div className="flex">Tera Type: {pokemon.teraType}</div>}
     </HoverCardContent>

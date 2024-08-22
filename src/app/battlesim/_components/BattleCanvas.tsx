@@ -41,19 +41,19 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 <div className="m-1 w-fit h-fit bg-slate-800  bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50">Turn {battle.turn}</div>
                 <div className="m-1 w-2/3 flex flex-row-reverse">
                     <PokemonTeam side={p2}/>
-                    <PokemonStatus pokemon={pokemon["p2a"]} className="w-44"/>
-                    <PokemonStatus pokemon={pokemon["p2b"]} className="w-44"/>
-                    <PokemonStatus pokemon={pokemon["p2c"]} className="w-44"/>
+                    {positionsP2.map((position, index) => (
+                        pokemon[position] && <PokemonStatus key={position} pokemon={pokemon[position]} className="flex-1  max-w-[33%]"/>
+                    ))}
                 </div>
             </div>
 
                 
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute bottom-0 flex">
-                <div className="m-1 max-w-2/3 flex flex-row">
+                <div className="m-1 w-2/3 flex flex-row">
                     <PokemonTeam side={p1}/>
-                    <PokemonStatus pokemon={pokemon["p1a"]} className="w-44"/>
-                    <PokemonStatus pokemon={pokemon["p1b"]} className="w-44"/> 
-                    <PokemonStatus pokemon={pokemon["p1c"]} className="w-44"/>
+                    {positionsP1.map((position, index) => (
+                        pokemon[position] && <PokemonStatus key={position} pokemon={pokemon[position]} className="flex-1 max-w-[33%]"/>
+                    ))}
                 </div>
                 {
                     messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-slate-800 bg-opacity-90 py-1 px-2 rounded-md text-slate-200 z-50 absolute right-0 bottom-0">

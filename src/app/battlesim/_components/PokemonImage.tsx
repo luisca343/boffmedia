@@ -10,6 +10,7 @@ type PokemonImageProps = {
     className?: string;
     viewportWidth: number;
     battle: any;
+    
 };
 
 
@@ -17,6 +18,9 @@ export function PokemonImage(
     {id, pokemon, side = 'p2', className, viewportWidth, battle}:  PokemonImageProps) {
     if (!pokemon) return <div></div>;
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
+
+
+
 
     //const battleType = battle.gameType;
     const battleType = 'horde'
@@ -26,7 +30,7 @@ export function PokemonImage(
     if (side === 'p2' && battleType === 'raid') {
         multiplier = 2.5;
     } else {
-        multiplier = side === 'p2' ? .7 : 1.3;
+        multiplier = side === 'p2' ? .6 : 1.3;
     }
 
 
