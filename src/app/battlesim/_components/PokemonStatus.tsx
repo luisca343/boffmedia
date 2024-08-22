@@ -22,7 +22,7 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
             }}
         >
             <span className="px-1 text-white font-bold">{pokemon.name} L{pokemon.level}</span>
-            <div className="relative border border-white rounded-xl overflow-hidden h-3 sm:h-4 md:h-6 xl:h-7 2xl:h-8">
+            <div className="relative border border-white rounded-xl overflow-hidden h-3 sm:h-4 md:h-6">
                 <div className="hp-bar h-full" style={{ width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
                 <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px'}}>
                     {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}%
@@ -34,8 +34,8 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
                     const multiplier = getBoostMultiplier(value);
                     if (multiplier === 1) return null;
                     const spanClass = multiplier > 1 
-                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mr-1 rounded-sm px-[3px] mb-[1px]" 
-                        : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mr-1 rounded-sm px-[3px] mb-[1px]";
+                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mr-1 rounded-sm px-[3px] mt-[2px]" 
+                        : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mr-1 rounded-sm px-[3px] mt-[2px]";
                     return <span key={key} className={spanClass} 
                         style={{
                             fontWeight: 'bold',
@@ -60,7 +60,7 @@ export function PokemonStatusBadge({status}: {status: string}) {
         'tox': {backgroundColor: 'purple', textColor: 'white'},
     } as {[key: string]: {backgroundColor: string, textColor: string}};
     const color = statusColors[status];
-    return <span className={`flex items-center justify-center font-bold text-xs text-white bg-${status} mx-1 text-shadow-border1  rounded-md py-[2px] px-[4px] mb-[1px]`} 
+    return <span className={`flex items-center justify-center font-bold text-xs text-white bg-${status} mx-1 text-shadow-border1  rounded-md py-[2px] px-[4px] mt-[2px]`} 
         style={
             {
                 backgroundColor: color?.backgroundColor, 
