@@ -37,10 +37,10 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
 
     const avatarStyles: React.CSSProperties = {
         position:'absolute',
-        top: `${povCentered ? 230 * getScaleMultiplier() : 94 * getScaleMultiplier()}px`,
-        left: `${povCentered ? 90 * getScaleMultiplier() : 630 * getScaleMultiplier()}px`,
-        width: `${getScaleMultiplier() * (povCentered ? 175 : 50)}px`,
-        height: `${getScaleMultiplier() * (povCentered ? 175 : 50)}px`,
+        top: `${povCentered ? 240 * getScaleMultiplier() : 102 * getScaleMultiplier()}px`,
+        left: `${povCentered ? 75 * getScaleMultiplier() : 640 * getScaleMultiplier()}px`,
+        width: `${getScaleMultiplier() * (povCentered ? 175 : 40)}px`,
+        height: `${getScaleMultiplier() * (povCentered ? 175 : 40)}px`,
         transform: povCentered ? 'scale(1) scaleX(-1)' : undefined,
         imageRendering: 'pixelated',
         zIndex: povCentered ? 10 : 5,
