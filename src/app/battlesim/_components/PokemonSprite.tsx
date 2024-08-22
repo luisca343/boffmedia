@@ -1,36 +1,27 @@
-import { Battle, Pokemon } from "@pkmn/client";
-import {
-    GraphicsGen, Icons, Sprites
-  } from '@pkmn/img';
-import { transform } from "next/dist/build/swc";
+import { getPokemonSprite } from "@/app/smartrotom/pokedex/dexUtils";
+import { Pokemon } from "@pkmn/client";
+import { useEffect, useState } from "react";
+import { getScaleMultiplier } from "../_utils/viewUtils";
 
+export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, className?: string, props?: any }) {
+    const [url, setUrl] = useState<string>('/battlesim/pokeball.png');
 
+    useEffect(() => {
+        const speciesNum = pokemon?.species.num;
+        if (speciesNum) {
+            getPokemonSprite(speciesNum, "base", 'none', 'admin', false).then((res) => {
+                setUrl(res.url ?? '/battlesim/pokeball.png');
+            });
+        } else {
+            setUrl('/battlesim/pokeball.png');
+        }
+    }, [pokemon?.species.num]);
 
-
-  export function PokemonSprite({pokemon, className, ...props}: {pokemon: Pokemon, className?: string, props?: any}) {
-    if (!pokemon) return (
-        <div  
-            {...props}
-            style={{width: 15, height: 15}}
-        >
-            <img className="m-auto" src='/smartrotom/test/pokeball.png' />
-        </div>
-    );
-
-    const icon = Icons.getPokemon(pokemon.speciesForme, {
-        side: 'p1',
-        gender: pokemon.gender || undefined,
-        fainted: pokemon.fainted,
-        domain: 'pkmn.cc',
-    });
+    const size = url === '/battlesim/pokeball.png' ? 12 : 24;
 
     return (
-        <div style={{width: 32, height: 24}}>
-            <div 
-                className={className}
-                key={pokemon.name}
-                style={{...icon.css, transform: 'scale(.7)'}}
-            />
+        <div className="flex justify-center items-center" style={{ width: 24 , height: 24 }}>
+            <img src={url} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
         </div>
     );
 }

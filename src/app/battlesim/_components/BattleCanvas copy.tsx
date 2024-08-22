@@ -1,6 +1,6 @@
 import { Battle } from "@pkmn/client";
 import PokemonSprite from "../_components_old/PokemonSprite";
-import PokemonElement from "./PokemonElement";
+import PokemonElement from "../_components_old/PokemonElement";
 import { offsets } from "./Scene";
 import Image from "next/image";
 import { PlayerDataBar } from "./BattleSideBar";

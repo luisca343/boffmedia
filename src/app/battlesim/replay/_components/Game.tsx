@@ -6,13 +6,11 @@ import { Dex } from '@pkmn/sim';
 import { create } from "zustand";
 import { ArgType, BattleArgsKWArgType, Num, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
-import { BattleCanvas } from "../../_components/BattleCanvas";
+import { BattleCanvas, BattleCanvasRefProps } from "../../_components/BattleCanvas";
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { set } from "react-hook-form";
-import { rotomGET } from "@/services/boffAPI";
-import { switchAction, turnAction, moveAction, damageAction, healAction } from "../../_utils/battleActions";
+import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction } from "../../_utils/battleActions";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -30,8 +28,9 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [lastTurn, setLastTurn] = useState<number>(0);
 
   const [messageBar, setMessageBar] = useState<string[]>([]);
+  const [simulatedAttack, setSimulatedAttack] = useState<string>('contactattack');
 
-  
+  const battleCanvasRef = useRef<BattleCanvasRefProps>(null);
   const logRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,7 +39,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     }
   }, [htmlLog]);
 
-  const [pov, setPov] = useState<'p1' | 'p2'>('p1');
+  const [pov, setPov] = useState<0 | 1>(0);
   
   const battle = useBattle() as Battle;
   const setBattle = useSetBattle();
@@ -61,7 +60,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     fetch(`https://api.boffmedia.es/smartrotom/combates/sustitutos.txt`)
       .then(response => response.text())
       .then(text => {
-        console.log('Battle log:', text);
+        //console.log('Battle log:', text);
         setBattleLog(text);
         loadScene();
       })
@@ -76,8 +75,6 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       if(line.includes('|start')) started = true;
       if(!started) battle.add(line);
       if(line.includes('|turn|')) finalTurn++;
-
-
     }
 
     setLastTurn(finalTurn);
@@ -107,26 +104,20 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   }, [battleLog]);
 
-  /*
+
 useEffect(() => {
-  if (isPlaying && dataLoaded) {
+  if(isPlaying && currentAction !== -1) {
     const lines = battleLog ? battleLog.split('\n') : [];
-    const actions = lines.slice(battle.turn);
-    let startFound = false;
-
-    const playActionsSequentially = async () => {
-      for (const line of actions) {
-        if (line.includes('|start')) startFound = true;
-        await playAction(line);
-      }
-    };
-
-    playActionsSequentially();
+    if(lines.length === 0 || currentAction >= lines.length) {
+      setIsPlaying(false);
+      return;
+    }
+    const action = lines[currentAction];
+    playAction(action);
+    return;
   }
-}, [isPlaying, dataLoaded]);*/
-
-useEffect(() => {
-  if( currentAction === -1 || newTurn === 0){
+  
+  if( currentAction === -1 || newTurn === -1){
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
 
@@ -156,6 +147,7 @@ useEffect(() => {
           setBattle(copyBattle(currBattle));
           setCurrentAction(i);
           setSettingTurn(false);
+          setMessageBar([]);
           break;
         }
       }
@@ -170,21 +162,9 @@ useEffect(() => {
     }
     return;
   }
-
-
-  if(isPlaying) {
-    const lines = battleLog ? battleLog.split('\n') : [];
-    if(lines.length === 0 || currentAction >= lines.length) {
-      setIsPlaying(false);
-      return;
-    }
-    const action = lines[currentAction];
-    playAction(action);
-  }
 }, [currentAction, isPlaying]);
 
 function setCurrentTurn(turn?: number) {
-  console.log('Setting turn:', turn);
   if(turn === undefined) turn = turnInput;
   setNewTurn(turn);
   if(isPlaying) {
@@ -197,6 +177,7 @@ function setCurrentTurn(turn?: number) {
   const clearActions = ['switch', 'move', 'turn'];
 
   async function playAction(line: string) {
+    console.log('Action START:', line);
     const { args, kwArgs } = Protocol.parseBattleLine(line);
     const currentBattle = copyBattle(battle);
   
@@ -205,7 +186,7 @@ function setCurrentTurn(turn?: number) {
         const html = formatter.formatHTML(args, kwArgs);
         setLog((prev) => [...prev, html]);
 
-        const params = getParams(args, kwArgs);
+        const params = await getParams(args, kwArgs);
         currentBattle.add(args, kwArgs);
         setBattle(currentBattle);
 
@@ -221,8 +202,11 @@ function setCurrentTurn(turn?: number) {
     });
   }
 
-  function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): { args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any } {
+  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any }> {
     switch (args[0]) {
+        case 'switch':
+          await switchAction(scene, getRelativeIdent(args[1]), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+          return { args, kwArgs };
         case '-damage':
             const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
             return { args, kwArgs, data:{ damage } };
@@ -231,34 +215,47 @@ function setCurrentTurn(turn?: number) {
           const revival = fromEffect?.id === 'revivalblessing';
           const poke = battle.getPokemon(args[1], revival)!;
           const health = poke.healthParse(args[2]);
-
           return { args, kwArgs, data: { health } };
+        case 'faint':
+          await faintAction(battle, scene, getRelativeIdent(args[1]));
+          return { args, kwArgs };
         default:
-            return { args, kwArgs };
+          return { args, kwArgs };
     }
 }
 
   async function performAction(params: {args: ArgType, kwArgs: BattleArgsKWArgType, data?: any}, html: string, currentBattle: Battle) {
     const { args, kwArgs, data } = params
-    let timeout = 500;
+    let timeout = 1;
     switch (args[0]) {
+      case 'switch':
+        timeout = 1000
+        const pokemon = battle.getPokemon(args[1] as PokemonIdent);
+        await scene?.clearPokemonElement(args[1].split(':')[0] as PokemonIdent);
+        
+
+        const audio = new Audio('/battlesim/audio/cries/mewtwo.mp3');
+        console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`)
+        audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`;
+        audio.play();
+        break;
       case 'turn':
+        timeout = 1000
         await turnAction(currentBattle, args[1] as Num);
         break;
-      case 'switch':
-        await switchAction(args[1] as PokemonIdent, args[2] as PokemonDetails, args[3] as PokemonHPStatus);
-        break;
-      case 'move':
-        timeout = 500
-        await moveAction(currentBattle, scene, args[1] as PokemonIdent, args[2] as string, args[3] as PokemonIdent);
-        break;
       case '-damage':
-        timeout = 500
-        damageAction(currentBattle, scene, args[1] as PokemonIdent, data.damage as string);
+        timeout = 1000
+        damageAction(currentBattle, scene, getRelativeIdent(args[1]), data.damage as string);
         break;
       case '-heal':
-        timeout = 500
-        healAction(currentBattle, scene, args[1] as PokemonIdent, data.health as number[]);
+        timeout = 1000
+        healAction(currentBattle, scene, getRelativeIdent(args[1]), data.health as number[]);
+        break;
+      case 'move':
+        timeout = 1000
+        const deffender = args[3] as PokemonIdent || args[1] as PokemonIdent;
+        await moveAction(battle, scene, getRelativeIdent(args[1]), args[2] as string, getRelativeIdent(deffender));
+        
         break;
       case 'inactive':
       case 't:':
@@ -266,11 +263,12 @@ function setCurrentTurn(turn?: number) {
         timeout = 0;
         break;
       default:
-        console.log('Unknown action:', args[0]);
+        //console.log('Unknown action:', args[0]);
         break;
     }
     return await new Promise<void>((resolve) => {
       setTimeout(() => {
+        //console.log('Action END:', args[0]);
         let nextAction = settingTurn ? -1 : currentAction + 1
         setCurrentAction(nextAction);
         
@@ -280,14 +278,22 @@ function setCurrentTurn(turn?: number) {
     })
   }
 
+  function getRelativeIdent(PokemonIdent: PokemonIdent): PokemonIdent {
+    const identCode = PokemonIdent.split(':')[0];
+    if(pov === 0) return identCode as PokemonIdent;
+    // Change 1 to 2 and viceversa
+    if(identCode.includes('1')) return identCode.replace('1', '2') as PokemonIdent;
+     return identCode.replace('2', '1') as PokemonIdent;
+  }
+
   async function simulateAttack() {
-    await moveAction(battle, scene, "p1a" as PokemonIdent, "lunge" as string, "p2a" as PokemonIdent);
+    await moveAction(battle, scene, 'p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
   }
 
   return (
     <>
       <div className="flex w-full">
-      <BattleCanvas battle={battle} pov={pov} messageBar={messageBar}/>
+      <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
       </div>
       <div className="flex">
         <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
@@ -295,10 +301,21 @@ function setCurrentTurn(turn?: number) {
         <Button onClick={() => setCurrentTurn(battle.turn - 1)}>Prev</Button>
         <Button onClick={() => setCurrentTurn(battle.turn + 1)}>Next</Button>
 
-        <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
 
-        <Button onClick={() => setPov(pov === 'p1' ? 'p2' : 'p1')}>Switch POV</Button>
+        <Button onClick={() => setPov(pov === 0 ? 1 : 0)}>Switch POV</Button>
         <Button onClick={() => simulateAttack()}>Simulate Attack</Button>
+
+        <Button onClick={() => battleCanvasRef.current && battleCanvasRef.current.bounceAll()}>battleCanvasRef</Button>
+
+
+        <Input  className="w-24 border border-slate-900" type="string" value={simulatedAttack} 
+          onChange={(e) => setSimulatedAttack(e.target.value)}
+          min={1} max={lastTurn}
+        />
+
+      
+
+        <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
         <Input  className="w-24 border border-slate-900" type="number" value={turnInput} 
           onChange={(e) => setTurnInput(parseInt(e.target.value))}
           min={1} max={lastTurn}

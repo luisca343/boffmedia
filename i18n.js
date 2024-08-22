@@ -8,7 +8,8 @@ module.exports = {
     "/smartrotom/pokedex/spawns": ["smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/localizacion/[id]": ["smartrotom/pokedex/spawns","smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/localizacion": ["smartrotom/pokedex/spawns"],
-    "/smartrotom/pasaporte": ["smartrotom/pokedex/moves", "smartrotom/pokedex/forms", "smartrotom/pokedex/abilities"],
+    "/smartrotom/pasaporte": ["smartrotom/pokedex/moves", "smartrotom/pokedex/forms", "smartrotom/pokedex/abilities", "smartrotom/pokedex/common"],
+    "/battlesim/replay/[name]": ["smartrotom/pokedex/common"],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`/locales/${lang}/${ns}.json`).then((m) => m.default),

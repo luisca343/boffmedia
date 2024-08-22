@@ -1,5 +1,0 @@
-.hp-bar {
-    transition: width 0.5s ease-out; /* Adjust time and easing function as needed */
-    height: 20px;
-    width: 100%; /* Initial width, will be overridden by inline styles */
-  }

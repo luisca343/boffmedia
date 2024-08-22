@@ -5,235 +5,235 @@ import { BattleMoveAnims, BattleOtherAnims } from "./battle-animations-moves";
 
 export const BattleEffects: {[k: string]: any} = {
 	wisp: {
-		url:'/smartrotom/test/fx/wisp.png',
+		url:'/battlesim/fx/wisp.png',
 		w: 100, h: 100,
 	},
 	poisonwisp: {
-		url:'/smartrotom/test/fx/poisonwisp.png',
+		url:'/battlesim/fx/poisonwisp.png',
 		w: 100, h: 100,
 	},
 	waterwisp: {
-		url:'/smartrotom/test/fx/waterwisp.png',
+		url:'/battlesim/fx/waterwisp.png',
 		w: 100, h: 100,
 	},
 	mudwisp: {
-		url:'/smartrotom/test/fx/mudwisp.png',
+		url:'/battlesim/fx/mudwisp.png',
 		w: 100, h: 100,
 	},
 	blackwisp: {
-		url:'/smartrotom/test/fx/blackwisp.png',
+		url:'/battlesim/fx/blackwisp.png',
 		w: 100, h: 100,
 	},
 	fireball: {
-		url:'/smartrotom/test/fx/fireball.png',
+		url:'/battlesim/fx/fireball.png',
 		w: 64, h: 64,
 	},
 	bluefireball: {
-		url:'/smartrotom/test/fx/bluefireball.png',
+		url:'/battlesim/fx/bluefireball.png',
 		w: 64, h: 64,
 	},
 	icicle: {
-		url:'/smartrotom/test/fx/icicle.png', // http://opengameart.org/content/icicle-spell
+		url:'/battlesim/fx/icicle.png', // http://opengameart.org/content/icicle-spell
 		w: 80, h: 60,
 	},
 	pinkicicle: {
-		url:'/smartrotom/test/fx/icicle-pink.png', // http://opengameart.org/content/icicle-spell, recolored by Kalalokki
+		url:'/battlesim/fx/icicle-pink.png', // http://opengameart.org/content/icicle-spell, recolored by Kalalokki
 		w: 80, h: 60,
 	},
 	lightning: {
-		url:'/smartrotom/test/fx/lightning.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/lightning.png', // by Pokemon Showdown user SailorCosmos
 		w: 41, h: 229,
 	},
 	rocks: {
-		url:'/smartrotom/test/fx/rocks.png', // Pokemon Online - Gilad
+		url:'/battlesim/fx/rocks.png', // Pokemon Online - Gilad
 		w: 100, h: 100,
 	},
 	rock1: {
-		url:'/smartrotom/test/fx/rock1.png', // Pokemon Online - Gilad
+		url:'/battlesim/fx/rock1.png', // Pokemon Online - Gilad
 		w: 64, h: 80,
 	},
 	rock2: {
-		url:'/smartrotom/test/fx/rock2.png', // Pokemon Online - Gilad
+		url:'/battlesim/fx/rock2.png', // Pokemon Online - Gilad
 		w: 66, h: 72,
 	},
 	rock3: {
-		url:'/smartrotom/test/fx/rock3.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/rock3.png', // by Pokemon Showdown user SailorCosmos
 		w: 66, h: 72,
 	},
 	leaf1: {
-		url:'/smartrotom/test/fx/leaf1.png',
+		url:'/battlesim/fx/leaf1.png',
 		w: 32, h: 26,
 	},
 	leaf2: {
-		url:'/smartrotom/test/fx/leaf2.png',
+		url:'/battlesim/fx/leaf2.png',
 		w: 40, h: 26,
 	},
 	bone: {
-		url:'/smartrotom/test/fx/bone.png',
+		url:'/battlesim/fx/bone.png',
 		w: 29, h: 29,
 	},
 	caltrop: {
-		url:'/smartrotom/test/fx/caltrop.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/caltrop.png', // by Pokemon Showdown user SailorCosmos
 		w: 80, h: 80,
 	},
 	greenmetal1: {
-		url:'/smartrotom/test/fx/greenmetal1.png', // by Pokemon Showdown user Kalalokki
+		url:'/battlesim/fx/greenmetal1.png', // by Pokemon Showdown user Kalalokki
 		w: 45, h: 45,
 	},
 	greenmetal2: {
-		url:'/smartrotom/test/fx/greenmetal2.png', // by Pokemon Showdown user Kalalokki
+		url:'/battlesim/fx/greenmetal2.png', // by Pokemon Showdown user Kalalokki
 		w: 45, h: 45,
 	},
 	poisoncaltrop: {
-		url:'/smartrotom/test/fx/poisoncaltrop.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/poisoncaltrop.png', // by Pokemon Showdown user SailorCosmos
 		w: 80, h: 80,
 	},
 	shadowball: {
-		url:'/smartrotom/test/fx/shadowball.png',
+		url:'/battlesim/fx/shadowball.png',
 		w: 100, h: 100,
 	},
 	energyball: {
-		url:'/smartrotom/test/fx/energyball.png',
+		url:'/battlesim/fx/energyball.png',
 		w: 100, h: 100,
 	},
 	electroball: {
-		url:'/smartrotom/test/fx/electroball.png',
+		url:'/battlesim/fx/electroball.png',
 		w: 100, h: 100,
 	},
 	mistball: {
-		url:'/smartrotom/test/fx/mistball.png',
+		url:'/battlesim/fx/mistball.png',
 		w: 100, h: 100,
 	},
 	iceball: {
-		url:'/smartrotom/test/fx/iceball.png',
+		url:'/battlesim/fx/iceball.png',
 		w: 100, h: 100,
 	},
 	flareball: {
-		url:'/smartrotom/test/fx/flareball.png',
+		url:'/battlesim/fx/flareball.png',
 		w: 100, h: 100,
 	},
 	moon: {
-		url:'/smartrotom/test/fx/moon.png', // by Kalalokki
+		url:'/battlesim/fx/moon.png', // by Kalalokki
 		w: 100, h: 100,
 	},
 	pokeball: {
-		url:'/smartrotom/test/fx/pokeball.png',
+		url:'/battlesim/fx/pokeball.png',
 		w: 24, h: 24,
 	},
 	fist: {
-		url:'/smartrotom/test/fx/fist.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/fist.png', // by Pokemon Showdown user SailorCosmos
 		w: 55, h: 49,
 	},
 	fist1: {
-		url:'/smartrotom/test/fx/fist1.png',
+		url:'/battlesim/fx/fist1.png',
 		w: 49, h: 55,
 	},
 	foot: {
-		url:'/smartrotom/test/fx/foot.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/foot.png', // by Pokemon Showdown user SailorCosmos
 		w: 50, h: 75,
 	},
 	topbite: {
-		url:'/smartrotom/test/fx/topbite.png',
+		url:'/battlesim/fx/topbite.png',
 		w: 108, h: 64,
 	},
 	bottombite: {
-		url:'/smartrotom/test/fx/bottombite.png',
+		url:'/battlesim/fx/bottombite.png',
 		w: 108, h: 64,
 	},
 	web: {
-		url:'/smartrotom/test/fx/web.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/web.png', // by Pokemon Showdown user SailorCosmos
 		w: 120, h: 122,
 	},
 	leftclaw: {
-		url:'/smartrotom/test/fx/leftclaw.png',
+		url:'/battlesim/fx/leftclaw.png',
 		w: 44, h: 60,
 	},
 	rightclaw: {
-		url:'/smartrotom/test/fx/rightclaw.png',
+		url:'/battlesim/fx/rightclaw.png',
 		w: 44, h: 60,
 	},
 	leftslash: {
-		url:'/smartrotom/test/fx/leftslash.png', // by Pokemon Showdown user Modeling Clay
+		url:'/battlesim/fx/leftslash.png', // by Pokemon Showdown user Modeling Clay
 		w: 57, h: 56,
 	},
 	rightslash: {
-		url:'/smartrotom/test/fx/rightslash.png', // by Pokemon Showdown user Modeling Clay
+		url:'/battlesim/fx/rightslash.png', // by Pokemon Showdown user Modeling Clay
 		w: 57, h: 56,
 	},
 	leftchop: {
-		url:'/smartrotom/test/fx/leftchop.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/leftchop.png', // by Pokemon Showdown user SailorCosmos
 		w: 100, h: 130,
 	},
 	rightchop: {
-		url:'/smartrotom/test/fx/rightchop.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/rightchop.png', // by Pokemon Showdown user SailorCosmos
 		w: 100, h: 130,
 	},
 	angry: {
-		url:'/smartrotom/test/fx/angry.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/angry.png', // by Pokemon Showdown user SailorCosmos
 		w: 30, h: 30,
 	},
 	heart: {
-		url:'/smartrotom/test/fx/heart.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/heart.png', // by Pokemon Showdown user SailorCosmos
 		w: 30, h: 30,
 	},
 	pointer: {
-		url:'/smartrotom/test/fx/pointer.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/pointer.png', // by Pokemon Showdown user SailorCosmos
 		w: 100, h: 100,
 	},
 	sword: {
-		url:'/smartrotom/test/fx/sword.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/sword.png', // by Pokemon Showdown user SailorCosmos
 		w: 48, h: 100,
 	},
 	impact: {
-		url:'/smartrotom/test/fx/impact.png', // by Pokemon Showdown user SailorCosmos
+		url:'/battlesim/fx/impact.png', // by Pokemon Showdown user SailorCosmos
 		w: 127, h: 119,
 	},
 	stare: {
-		url:'/smartrotom/test/fx/stare.png',
+		url:'/battlesim/fx/stare.png',
 		w: 100, h: 35,
 	},
 	shine: {
-		url:'/smartrotom/test/fx/shine.png', // by Smogon user Jajoken
+		url:'/battlesim/fx/shine.png', // by Smogon user Jajoken
 		w: 127, h: 119,
 	},
 	feather: {
-		url:'/smartrotom/test/fx/feather.png', // Ripped from http://www.clker.com/clipart-black-and-white-feather.html
+		url:'/battlesim/fx/feather.png', // Ripped from http://www.clker.com/clipart-black-and-white-feather.html
 		w: 100, h: 38,
 	},
 	shell: {
-		url:'/smartrotom/test/fx/shell.png', // by Smogon user Jajoken
+		url:'/battlesim/fx/shell.png', // by Smogon user Jajoken
 		w: 100, h: 91.5,
 	},
 	petal: {
-		url:'/smartrotom/test/fx/petal.png', // by Smogon user Jajoken
+		url:'/battlesim/fx/petal.png', // by Smogon user Jajoken
 		w: 60, h: 60,
 	},
 	gear: {
-		url:'/smartrotom/test/fx/gear.png', // by Smogon user Jajoken
+		url:'/battlesim/fx/gear.png', // by Smogon user Jajoken
 		w: 100, h: 100,
 	},
 	alpha: {
-		url:'/smartrotom/test/fx/alpha.png', // Ripped from Pokemon Global Link
+		url:'/battlesim/fx/alpha.png', // Ripped from Pokemon Global Link
 		w: 80, h: 80,
 	},
 	omega: {
-		url:'/smartrotom/test/fx/omega.png', // Ripped from Pokemon Global Link
+		url:'/battlesim/fx/omega.png', // Ripped from Pokemon Global Link
 		w: 80, h: 80,
 	},
 	rainbow: {
-		url:'/smartrotom/test/fx/rainbow.png',
+		url:'/battlesim/fx/rainbow.png',
 		w: 128, h: 128,
 	},
 	zsymbol: {
-		url:'/smartrotom/test/fx/z-symbol.png', // From http://froggybutt.deviantart.com/art/Pokemon-Z-Move-symbol-633125033
+		url:'/battlesim/fx/z-symbol.png', // From http://froggybutt.deviantart.com/art/Pokemon-Z-Move-symbol-633125033
 		w: 150, h: 100,
 	},
 	ultra: {
-		url:'/smartrotom/test/fx/ultra.png', // by Pokemon Showdown user Modeling Clay
+		url:'/battlesim/fx/ultra.png', // by Pokemon Showdown user Modeling Clay
 		w: 113, h: 165,
 	},
 	hitmark: {
-		url:'/smartrotom/test/fx/hitmarker.png', // by Pokemon Showdown user Ridaz
+		url:'/battlesim/fx/hitmarker.png', // by Pokemon Showdown user Ridaz
 		w: 100, h: 100,
 	},
 	protect: {
