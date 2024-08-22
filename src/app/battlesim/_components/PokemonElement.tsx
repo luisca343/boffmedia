@@ -28,15 +28,16 @@ export type PokemonRefType = {
         return (
             <animated.div
                 id={position}
-                className="absolute z-50"
+                className="absolute"
                 style={{
                     left:  getOffset(battle, position, getScaleMultiplier()).left,
                     top: getOffset(battle, position, getScaleMultiplier()).top,
                     width: getImageSize(),
-                    height: getImageSize()
+                    height: getImageSize(),
+                    zIndex: 20,
                 }}
             >
-                <PokemonDetail pokemon={pokemon} className="z-50" offset={-50}>
+                <PokemonDetail pokemon={pokemon} >
                     <div className="w-full h-full relative">
                         <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon} />
                     </div>

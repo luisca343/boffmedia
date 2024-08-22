@@ -20,7 +20,7 @@ export function PokemonImage(
 
     //const battleType = battle.gameType;
     const battleType = 'horde'
-    const z = side === 'p1' ? 500 : 400;
+    const z = side === 'p1' ? 150 : 125;
 
     let multiplier;
     if (side === 'p2' && battleType === 'raid') {
