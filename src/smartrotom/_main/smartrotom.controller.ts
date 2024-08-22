@@ -50,7 +50,7 @@ export class SmartrotomController {
 
     @Post('battle')
     async addBattleAchievement(@Body() battleAchievement:  LogroCombate){
-        return  await this.smartrotomService.addBattleAchievement(battleAchievement)
+        return await this.smartrotomService.addBattleAchievement(battleAchievement)
     }
 }
 
