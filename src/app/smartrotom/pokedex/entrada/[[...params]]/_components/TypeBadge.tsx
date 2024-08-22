@@ -39,7 +39,7 @@ export function TypeBadgeSmall({type}: {type: string}){
     const { t } = useTranslation("smartrotom/pokedex/common")
     const typeColors = colors[type.toLowerCase()];
     return <div className={` m-1 h-6 font-bold text-xs min-w-16 flex flex-row items-center  text-white bg-${type.toLowerCase()} pl-1 pr-1 rounded text-shadow-border1`} 
-        style={{backgroundColor: typeColors.backgroundColor, color: 'white'}}>
+        style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>
             <img src={`/smartrotom/img/types/${type.toLowerCase()}.png`} className="w-4 h-4 "/>
             <div>{t(`type_${type.toLowerCase()}`)}</div>
     </div>
