@@ -24,7 +24,6 @@ export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: Pokemon
 				scale: 0.5,
 				time: 600,
 			}, 'linear');
-			console.log(data)
 			scene.showEffect('pokeball', {
 				opacity: 0,
 				x: attacker.x() + getImageSize() / 2,

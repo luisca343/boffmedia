@@ -34,7 +34,7 @@ export type PokemonRefType = {
                     top: getOffset(battle, position, getScaleMultiplier()).top,
                     width: getImageSize(),
                     height: getImageSize(),
-                    zIndex: 20,
+                    zIndex: 45,
                 }}
             >
                 <PokemonDetail pokemon={pokemon} >

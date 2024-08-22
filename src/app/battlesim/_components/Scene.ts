@@ -68,7 +68,6 @@ export class Scene {
 	
 	
 	async playBattleAnim(anim: string, attacker: PokemonIdent, defender: PokemonIdent, callback?: () => void) {
-		console.log('playBattleAnim', anim, attacker, defender);
 		const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
 		//const animFunc = BattleMoveAnims[anim] || BattleOtherAnims[anim];
 		if (animFunc === undefined) {
