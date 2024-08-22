@@ -75,8 +75,6 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       if(line.includes('|start')) started = true;
       if(!started) battle.add(line);
       if(line.includes('|turn|')) finalTurn++;
-
-
     }
 
     setLastTurn(finalTurn);
@@ -106,28 +104,9 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   }, [battleLog]);
 
-  /*
-useEffect(() => {
-  if (isPlaying && dataLoaded) {
-    const lines = battleLog ? battleLog.split('\n') : [];
-    const actions = lines.slice(battle.turn);
-    let startFound = false;
-
-    const playActionsSequentially = async () => {
-      for (const line of actions) {
-        if (line.includes('|start')) startFound = true;
-        await playAction(line);
-      }
-    };
-
-    playActionsSequentially();
-  }
-}, [isPlaying, dataLoaded]);*/
 
 useEffect(() => {
-
-
-  if(isPlaying) {
+  if(isPlaying && currentAction !== -1) {
     const lines = battleLog ? battleLog.split('\n') : [];
     if(lines.length === 0 || currentAction >= lines.length) {
       setIsPlaying(false);
@@ -137,6 +116,7 @@ useEffect(() => {
     playAction(action);
     return;
   }
+  
   if( currentAction === -1 || newTurn === -1){
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
@@ -167,6 +147,7 @@ useEffect(() => {
           setBattle(copyBattle(currBattle));
           setCurrentAction(i);
           setSettingTurn(false);
+          setMessageBar([]);
           break;
         }
       }
@@ -184,7 +165,6 @@ useEffect(() => {
 }, [currentAction, isPlaying]);
 
 function setCurrentTurn(turn?: number) {
-  console.log('Setting turn:', turn);
   if(turn === undefined) turn = turnInput;
   setNewTurn(turn);
   if(isPlaying) {
@@ -197,6 +177,7 @@ function setCurrentTurn(turn?: number) {
   const clearActions = ['switch', 'move', 'turn'];
 
   async function playAction(line: string) {
+    console.log('Action START:', line);
     const { args, kwArgs } = Protocol.parseBattleLine(line);
     const currentBattle = copyBattle(battle);
   
@@ -208,7 +189,6 @@ function setCurrentTurn(turn?: number) {
         const params = await getParams(args, kwArgs);
         currentBattle.add(args, kwArgs);
         setBattle(currentBattle);
-
 
         if(clearActions.includes(args[0])){ 
           setMessageBar([html]);
@@ -255,8 +235,8 @@ function setCurrentTurn(turn?: number) {
         
 
         const audio = new Audio('/battlesim/audio/cries/mewtwo.mp3');
-        //console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.id.toLowerCase()}.mp3`)
-        audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.id.toLowerCase()}.mp3`;
+        console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`)
+        audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`;
         audio.play();
         break;
       case 'turn':
@@ -298,7 +278,7 @@ function setCurrentTurn(turn?: number) {
   }
 
   async function simulateAttack() {
-    battleCanvasRef.current?.animateMove('p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
+    await moveAction(battle, scene, 'p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
   }
 
   return (
