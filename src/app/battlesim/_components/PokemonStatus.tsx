@@ -1,13 +1,11 @@
 import { Pokemon } from "@pkmn/client";
-import './test.css'; // Assuming your CSS is in this file
+import './test.css';
 
 export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, className?: string}) {
     if(!pokemon) return <div className={`mx-2 p-1  ${className}`} />
 
     const hpPercent = Math.floor((pokemon.hp / pokemon.maxhp) * 100);
     
-
-    // Function to calculate color based on hpPercent
     const getHpColor = (percent: number) => {
         if (percent > 50) return `rgb(${255 - ((percent - 50) * 5.1)}, 255, 77)`; // Green to Yellow
         return `rgb(255, ${percent * 5.1}, 77)`; // Yellow to Red
@@ -16,10 +14,10 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden text-xs bg-slate-800  bg-opacity-90  ${className}`}>
+        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden text-2xs xl:text-xs  bg-slate-800  bg-opacity-90 h-18  ${className}`}>
             <span className="px-1 text-white font-bold">{pokemon.name} L{pokemon.level}</span>
-            <div className="relative border border-white rounded-xl overflow-hidden">
-                <div className="hp-bar" style={{height: 16, width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
+            <div className="relative border border-white rounded-xl overflow-hidden h-3 sm:h-4 md:h-6 xl:h-7 2xl:h-8">
+                <div className="hp-bar h-full" style={{ width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
                 <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px', zIndex: 50}}>
                     {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}%
                 </div>
