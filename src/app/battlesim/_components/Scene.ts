@@ -297,7 +297,6 @@ export class PokemonSprite {
 		}
 	
 		this.element = element as HTMLElement;
-		console.log('ELEMENT', this.element);
 		
 		if (!this.element) return;
 	}
@@ -357,8 +356,6 @@ export class PokemonSprite {
 
 		element.offsetHeight;
 
-		console.log("POST", this.position, element.style.left, element.style.top);
-	
 		prom.then(() => {
 			//this.clearElement(element);
 			if (callback) {
