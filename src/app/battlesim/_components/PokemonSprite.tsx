@@ -17,10 +17,10 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
         }
     }, [pokemon?.species.num]);
 
-    const size = url === '/battlesim/pokeball.png' ? 16 : 24;
+    const size = url === '/battlesim/pokeball.png' ? 12 : 24;
 
     return (
-        <div className="flex justify-center items-center" style={{ width: 24 * getScaleMultiplier(), height: 24 * getScaleMultiplier() }}>
+        <div className="flex justify-center items-center" style={{ width: 24 , height: 24 }}>
             <img src={url} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
         </div>
     );
