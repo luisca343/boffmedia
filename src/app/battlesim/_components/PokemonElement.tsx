@@ -37,11 +37,11 @@ export type PokemonRefType = {
                     zIndex: 45,
                 }}
             >
+            <div className="w-full h-full relative">
                 <PokemonDetail pokemon={pokemon} >
-                    <div className="w-full h-full relative">
-                        <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon} />
-                    </div>
+                    <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon} />
                 </PokemonDetail>
+            </div>
             </animated.div>
         );
     });
