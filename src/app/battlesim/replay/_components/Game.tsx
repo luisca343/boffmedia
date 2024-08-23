@@ -10,7 +10,7 @@ import { BattleCanvas, BattleCanvasRefProps } from "../../_components/BattleCanv
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction } from "../../_utils/battleActions";
+import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction, missAction } from "../../_utils/battleActions";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       .catch(console.error);*/
 
     
-    fetch(`https://api.boffmedia.es/smartrotom/combates/sustitutos.txt`)
+    fetch(`https://api.boffmedia.es/smartrotom/combates/hisui.txt`)
       .then(response => response.text())
       .then(text => {
         //console.log('Battle log:', text);
@@ -177,7 +177,6 @@ function setCurrentTurn(turn?: number) {
   const clearActions = ['switch', 'move', 'turn'];
 
   async function playAction(line: string) {
-    console.log('Action START:', line);
     const { args, kwArgs } = Protocol.parseBattleLine(line);
     const currentBattle = copyBattle(battle);
   
@@ -225,45 +224,47 @@ function setCurrentTurn(turn?: number) {
 }
 
   async function performAction(params: {args: ArgType, kwArgs: BattleArgsKWArgType, data?: any}, html: string, currentBattle: Battle) {
+    if(!scene) return;
     const { args, kwArgs, data } = params
-    let timeout = 1;
+    let timeout = 500 / scene.acceleration;
     switch (args[0]) {
       case 'switch':
-        timeout = 1000
+        timeout = 1000 / scene.acceleration;
         const pokemon = battle.getPokemon(args[1] as PokemonIdent);
-        await scene?.clearPokemonElement(args[1].split(':')[0] as PokemonIdent);
-        
-
+        await scene.clearPokemonElement(args[1].split(':')[0] as PokemonIdent);
         const audio = new Audio('/battlesim/audio/cries/mewtwo.mp3');
-        console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`)
+        //console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`)
         audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`;
         audio.play();
         break;
       case 'turn':
-        timeout = 1000
+        timeout = 1000 / scene.acceleration;
         await turnAction(currentBattle, args[1] as Num);
         break;
       case '-damage':
-        timeout = 1000
+        timeout = 1000 / scene.acceleration;
         damageAction(currentBattle, scene, getRelativeIdent(args[1]), data.damage as string);
         break;
       case '-heal':
-        timeout = 1000
+        timeout = 1000 / scene.acceleration;
         healAction(currentBattle, scene, getRelativeIdent(args[1]), data.health as number[]);
         break;
       case 'move':
-        timeout = 1000
+        timeout = 500 / scene.acceleration;
         const deffender = args[3] as PokemonIdent || args[1] as PokemonIdent;
         await moveAction(battle, scene, getRelativeIdent(args[1]), args[2] as string, getRelativeIdent(deffender));
-        
         break;
-      case 'inactive':
-      case 't:':
-      case '-resisted':
+      case '-miss': 
+        timeout = 500 / scene.acceleration;
+        await missAction(battle, scene, getRelativeIdent(args[1]));
+        break;
+      case 'inactive': case 't:': case '-resisted': case '':
+      case 'join': case 'gametype': case 'player': case 'teamsize': case 'gen': case 'tier':
+      case 'rated': case 'rule': case 'clearpoke': case 'poke': case 'rule': case 'start':
         timeout = 0;
         break;
       default:
-        //console.log('Unknown action:', args[0]);
+        console.log('Unknown action:', args[0]);
         break;
     }
     return await new Promise<void>((resolve) => {
