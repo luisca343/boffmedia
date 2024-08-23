@@ -8,8 +8,14 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
 
     useEffect(() => {
         const speciesNum = pokemon?.species.num;
+        const form = getFormName(pokemon?.species.forme);
+
+        console.log('speciesNum', speciesNum);
+        console.log('forme', pokemon?.species.forme);
+        console.log('form', form);
+        
         if (speciesNum) {
-            getPokemonSprite(speciesNum, "base", 'none', 'admin', false).then((res) => {
+            getPokemonSprite(speciesNum, form, 'none', 'admin', false).then((res) => {
                 setUrl(res.url ?? '/battlesim/pokeball.png');
             });
         } else {
@@ -26,4 +32,20 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
             <img src={url} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
         </div>
     );
+}
+
+
+function getFormName(form: string) {
+    if(!form) return 'base';
+
+    switch (form.toLowerCase()) {
+        case 'alola': return 'alolan';
+        case 'galar': return 'galarian';
+        case 'hisui': return 'hisuian';
+        case 'mega': return 'mega';
+        case 'gmax': return 'gmax';
+
+
+        default: return "base";
+    }
 }
