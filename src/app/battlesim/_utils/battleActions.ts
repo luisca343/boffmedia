@@ -54,6 +54,10 @@ export async function faintAction(battle :Battle, scene: Scene | null, ident: Po
   return await scene.playBattleAnim('faint', getPokemonIdentCode(ident) as PokemonIdent, getPokemonIdentCode(ident) as PokemonIdent);
 }
 
+export async function missAction(battle :Battle, scene: Scene | null, ident: PokemonIdent) {
+  if(!scene) return;
+  return await scene.showPopup(getPokemonIdentCode(ident) as PokemonIdent, 'Miss' as PokemonHPStatus);
+}
 
 
 function getPokemonIdentCode(ident: PokemonIdent) {
