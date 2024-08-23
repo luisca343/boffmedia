@@ -15,15 +15,15 @@ export default function PokemonDetail({pokemon, children, className, offset = 20
     <HoverCardTrigger  className={className}>
         {children}
     </HoverCardTrigger>
-    <HoverCardContent className=" bg-slate-800 bg-opacity-90 text-slate-100 w-128 p-2 z-50" side="bottom" align="end">
-        <div className="flex flex-col border-b-2 border-white pb-2">
-            <div><span className="font-bold">{pokemon.name}</span> {pokemon.speciesForme} L{pokemon.level}</div>
+    <HoverCardContent className=" bg-slate-800 bg-opacity-90 text-slate-100 w-128 px-2 py-1 z-50  text-start" side="bottom" align="end">
+        <div className="flex flex-col border-b-2 border-white py-1">
+            <div><span className="font-bold text-lg">{pokemon.name}</span><span className="ml-2 text-sm">{pokemon.speciesForme} L{pokemon.level}</span></div>
             <div className="flex">
                 {types.map(type => <TypeBadgeSmall key={type} type={type} />)}
             </div>
         </div>
-        <div className="flex flex-col border-b-2 border-white pb-2">
-        <div>HP: {pokemon.hp > 0 ? pokemon.hp / pokemon.maxhp * 100 : 0}%</div>
+        <div className="flex flex-col py-1">
+        <div>HP: {pokemon.hp > 0 ? (pokemon.hp / pokemon.maxhp * 100).toFixed(2) : 0}%</div>
         <span className="flex">Possible abilities: {pokemon.species.abilities[0]} {pokemon.species.abilities[1] && pokemon.species.abilities[1]} {pokemon.species.abilities.H && pokemon.species.abilities.S}</span>
         <span className="flex">Speed: {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, .9, 0,0 )} - {calculateSpeed(pokemon.species.baseStats.spe, pokemon.level, 1.1, 31, 252)} </span>   
         </div>
