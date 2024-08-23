@@ -1,6 +1,7 @@
 import { Pokemon } from "@pkmn/client";
 import './test.css';
 import { getScaleMultiplier } from "../_utils/viewUtils";
+import { PokemonSprite } from "./PokemonSprite";
 
 export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, className?: string}) {
     if(!pokemon) return <div className={`mx-2 p-1  ${className}`} />
@@ -15,16 +16,21 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex flex-col mx-2 p-1 justify-around  rounded-md overflow-hidden bg-slate-800  bg-opacity-90 h-18  ${className}`}
+        <div className={`flex flex-col mx-2 px-1 justify-around  rounded-md overflow-hidden bg-slate-800  bg-opacity-90 h-18  ${className}`}
             style={{
                 fontSize: `${ 11 *getScaleMultiplier()}px`,
                 zIndex: 40
             }}
         >
-            <span className="px-1 text-white font-bold">{pokemon.name} L{pokemon.level}</span>
-            <div className="relative border border-white rounded-xl overflow-hidden h-3 sm:h-4 md:h-6">
+            <div className="flex items-center">
+                <PokemonSprite pokemon={pokemon} className="h-6 w-6 " />
+                <span className="px-1 text-white font-bold">
+                    {pokemon.name} L{pokemon.level}
+                </span>
+            </div>
+            <div className="relative border border-white rounded-xl overflow-hidden h-3 sm:h-4 md:h-6 text-shadow-border1">
                 <div className="hp-bar h-full" style={{ width: `${hpPercent}%`, backgroundColor: hpColor, transition: 'width 0.5s ease-out, background-color 0.5s ease-out'}}/>
-                <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: '9px'}}>
+                <div className="absolute right-0 top-0 h-full flex items-center text-white pr-2" style={{fontSize: `${12 * getScaleMultiplier()}px`}}>
                     {(pokemon.hp / pokemon.maxhp * 100).toFixed(0)}%
                 </div>
             </div>
