@@ -18,12 +18,13 @@ export function PokemonImage(
     {id, pokemon, side = 'p2', className, viewportWidth, battle}:  PokemonImageProps) {
     if (!pokemon) return <div></div>;
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
+    
+    
 
 
 
-
-    //const battleType = battle.gameType;
-    const battleType = 'horde'
+    const battleType = battle?.gameType || 'singles';
+    //const battleType = 'horde'
     const z = side === 'p1' ? 150 : 125;
 
     let multiplier;
