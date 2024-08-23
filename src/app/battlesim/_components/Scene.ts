@@ -2,9 +2,7 @@ import { Battle } from "@pkmn/client";
 import { PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
 import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-moves";
 import { BattleEffects } from "../_utils/battle_animations";
-import { SCALE_WIDTH, getImageSize, getOffset, getScaleMultiplier, TARGET_WIDTH} from "../_utils/viewUtils";
-import { Position } from "../_utils/battleActions";
-
+import { getImageSize, getOffset, getScaleMultiplier, TARGET_WIDTH} from "../_utils/viewUtils";
 export class BG {
 	animate(test:any) {
 		return this;
@@ -15,12 +13,18 @@ export class Scene {
 	battle: Battle;
 	gameElement: HTMLElement;
 	currentAnimations: any[] = [];
-	acceleration: number = 1;
+	acceleration: number;
 	$bg = new BG();
+	
 	
 	constructor(battle: Battle, gameElement: HTMLElement) {
 		this.battle = battle
 		this.gameElement = gameElement
+		this.acceleration = 1;
+	}
+
+	setAcceleration(acceleration: number) {
+		this.acceleration = acceleration;
 	}
 	
 	wait(time: number) {
