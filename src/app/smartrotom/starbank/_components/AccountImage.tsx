@@ -1,15 +1,29 @@
+import React, { useState, useEffect } from 'react';
 
-export function AccountImage({type, name, width=48, height=48}: {type: string, name: string, width?: number, height?: number}){
-    return(
-        <img width={width} height={width} src={getImageURL(type,name)} alt={name} className=" rounded-full"/>
-    )
+export function AccountImage({type, name, width=48, height=48}: {type: string, name: string, width?: number, height?: number}) {
+    const [imageExists, setImageExists] = useState(false);
+    const src = getImageURL(type, name);
+
+    useEffect(() => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => setImageExists(true);
+        img.onerror = () => setImageExists(false);
+    }, [src]);
+
+    if (!imageExists) {
+        return <img width={width} height={height} src="/smartrotom/img/apps/starbank/cuentas/teras.png" alt={name} className="rounded-full" />;
+    }
+
+    return (
+        <img width={width} height={height} src={src} alt={name} className="rounded-full" />
+    );
 }
 
-
-function getImageURL(type: string, name: string){
-    if(type === "EMPRESA"){
-        return `/smartrotom/img/apps/starbank/cuentas/${name.toLowerCase()}.png`
+function getImageURL(type: string, name: string) {
+    if (type === "SECONDARY") {
+        return `/smartrotom/img/apps/starbank/cuentas/${name.toLowerCase()}.png`;
     } else {
-        return `https://minotar.net/avatar/${name}/80.png`
+        return `https://minotar.net/avatar/${name}/80.png`;
     }
 }
