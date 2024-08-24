@@ -11,7 +11,7 @@ import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction, missAction } from "../../_utils/battleActions";
-
+import { ReplayControls } from "./ReplayControls";
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -57,7 +57,7 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
       .catch(console.error);*/
 
     
-    fetch(`https://api.boffmedia.es/smartrotom/combates/hisui.txt`)
+    fetch(`https://api.boffmedia.es/smartrotom/combates/booststera.txt`)
       .then(response => response.text())
       .then(text => {
         //console.log('Battle log:', text);
@@ -183,11 +183,13 @@ function setCurrentTurn(turn?: number) {
     // We wait for the animation to finish
     return new Promise<void>(async (resolve) => {
         const html = formatter.formatHTML(args, kwArgs);
-        setLog((prev) => [...prev, html]);
 
         const params = await getParams(args, kwArgs);
         currentBattle.add(args, kwArgs);
+
+        setLog((prev) => [...prev, html]);
         setBattle(currentBattle);
+        
 
         if(clearActions.includes(args[0])){ 
           setMessageBar([html]);
@@ -203,23 +205,27 @@ function setCurrentTurn(turn?: number) {
 
   async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any }> {
     switch (args[0]) {
-        case 'switch':
-          await switchAction(scene, getRelativeIdent(args[1]), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
-          return { args, kwArgs };
-        case '-damage':
+        case 'switch': {
+            await switchAction(scene, getRelativeIdent(args[1]), args[2] as PokemonDetails, args[3] as PokemonHPStatus);
+            return { args, kwArgs };
+        }
+        case '-damage': {
             const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
-            return { args, kwArgs, data:{ damage } };
-        case '-heal':
-          const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
-          const revival = fromEffect?.id === 'revivalblessing';
-          const poke = battle.getPokemon(args[1], revival)!;
-          const health = poke.healthParse(args[2]);
-          return { args, kwArgs, data: { health } };
-        case 'faint':
-          await faintAction(battle, scene, getRelativeIdent(args[1]));
-          return { args, kwArgs };
+            return { args, kwArgs, data: { damage } };
+        }
+        case '-heal': {
+            const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
+            const revival = fromEffect?.id === 'revivalblessing';
+            const poke = battle.getPokemon(args[1], revival)!;
+            const health = poke.healthParse(args[2]);
+            return { args, kwArgs, data: { health } };
+        }
+        case 'faint': {
+            await faintAction(battle, scene, getRelativeIdent(args[1]));
+            return { args, kwArgs };
+        }
         default:
-          return { args, kwArgs };
+            return { args, kwArgs };
     }
 }
 
@@ -238,6 +244,7 @@ function setCurrentTurn(turn?: number) {
         audio.play();
         break;
       case 'turn':
+        currentBattle.setTurn(parseInt(args[1] as string));
         timeout = 1000 / scene.acceleration;
         await turnAction(currentBattle, args[1] as Num);
         break;
@@ -252,15 +259,16 @@ function setCurrentTurn(turn?: number) {
       case 'move':
         timeout = 500 / scene.acceleration;
         const deffender = args[3] as PokemonIdent || args[1] as PokemonIdent;
-        await moveAction(battle, scene, getRelativeIdent(args[1]), args[2] as string, getRelativeIdent(deffender));
+        await moveAction(currentBattle, scene, getRelativeIdent(args[1]), args[2] as string, getRelativeIdent(deffender));
         break;
       case '-miss': 
         timeout = 500 / scene.acceleration;
-        await missAction(battle, scene, getRelativeIdent(args[1]));
+        await missAction(currentBattle, scene, getRelativeIdent(args[1]));
         break;
       case 'inactive': case 't:': case '-resisted': case '':
       case 'join': case 'gametype': case 'player': case 'teamsize': case 'gen': case 'tier':
-      case 'rated': case 'rule': case 'clearpoke': case 'poke': case 'rule': case 'start':
+      case 'rated': case 'rule': case 'clearpoke': case 'poke': case 'rule': case 'start': 
+      case 'faint':
         timeout = 0;
         break;
       default:
@@ -294,34 +302,22 @@ function setCurrentTurn(turn?: number) {
   return (
     <>
       <div className="flex w-full">
-      <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
+        <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
       </div>
-      <div className="flex">
-        <Button onClick={() => setIsPlaying(!isPlaying)}>{isPlaying ? 'Pause' : 'Play'}</Button>
-        <Button onClick={() => setCurrentTurn(0)}>Reset</Button>
-        <Button onClick={() => setCurrentTurn(battle.turn - 1)}>Prev</Button>
-        <Button onClick={() => setCurrentTurn(battle.turn + 1)}>Next</Button>
-
-
-        <Button onClick={() => setPov(pov === 0 ? 1 : 0)}>Switch POV</Button>
-        <Button onClick={() => simulateAttack()}>Simulate Attack</Button>
-
-        <Button onClick={() => battleCanvasRef.current && battleCanvasRef.current.bounceAll()}>battleCanvasRef</Button>
-
-
-        <Input  className="w-24 border border-slate-900" type="string" value={simulatedAttack} 
-          onChange={(e) => setSimulatedAttack(e.target.value)}
-          min={1} max={lastTurn}
-        />
-
-      
-
-        <Button onClick={() => setCurrentTurn()}>Go to turn</Button>
-        <Input  className="w-24 border border-slate-900" type="number" value={turnInput} 
-          onChange={(e) => setTurnInput(parseInt(e.target.value))}
-          min={1} max={lastTurn}
-        />
-      </div>
+      <ReplayControls
+        battle={battle}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        setCurrentTurn={setCurrentTurn}
+        pov={pov}
+        setPov={(pov: number) => setPov(pov as 0 | 1)}
+        simulateAttack={simulateAttack}
+        simulatedAttack={simulatedAttack}
+        setSimulatedAttack={setSimulatedAttack}
+        turnInput={turnInput}
+        setTurnInput={setTurnInput}
+        lastTurn={lastTurn}
+      />
       <span className="text-black">{dataLoaded ? 'Yes' : 'Nope'}</span>
     </>
   );
