@@ -9,11 +9,6 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
     useEffect(() => {
         const speciesNum = pokemon?.species.num;
         const form = getFormName(pokemon?.species.forme);
-
-        console.log('speciesNum', speciesNum);
-        console.log('forme', pokemon?.species.forme);
-        console.log('form', form);
-        
         if (speciesNum) {
             getPokemonSprite(speciesNum, form, 'none', 'admin', false).then((res) => {
                 setUrl(res.url ?? '/battlesim/pokeball.png');
@@ -27,7 +22,7 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
 
     return (
         <div className="flex justify-center items-center" style={{ 
-            width: 24 , height: 24, opacity: `${pokemon?.hp === 0 ? 0.5 : 1}`, filter: `${pokemon?.hp === 0 ? 'brightness(0.2)' : 'brightness(1)'}`
+            width: 24 , height: 24, opacity: `${pokemon?.fainted ? 0.5 : 1}`, filter: `${pokemon?.fainted ? 'brightness(0.2)' : 'brightness(1)'}`
             }}>
             <img src={url} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
         </div>
