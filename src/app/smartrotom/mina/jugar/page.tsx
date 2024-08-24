@@ -173,7 +173,11 @@ export default function Jugar(){
                     {obtainedRewards.map((reward, i) => {
                         return (
                             <div key={i} className="flex flex-col flex-wrap w-ful justify-center items-center m-2">
-                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" className="w-12 h-12"/>
+                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" 
+                                    className="w-12 h-12"
+                                    style={{imageRendering: "pixelated"}}
+                                    
+                                    />
                                 <div className="text-white">{reward.reward.name}</div>
                             </div>
                     )})}
@@ -215,7 +219,12 @@ export default function Jugar(){
                                 width: `${reward.reward.width * 100 / colNum}%`, 
                                 height: `${reward.reward.height * 100 / rowNum}%`
                             }}>
-                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} alt="" className="w-full h-full z-0"/>
+                                <img src={`/smartrotom/img/apps/mina/recompensas/${reward.reward.itemId.split(':')[1]}.png`} 
+                                alt="" 
+                                className="w-full h-full z-0"
+                                style={{imageRendering: "pixelated"}}
+                                
+                                />
                             </motion.div>
                         )
                     })}
