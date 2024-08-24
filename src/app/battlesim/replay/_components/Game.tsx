@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { switchAction, turnAction, moveAction, damageAction, healAction, faintAction, missAction } from "../../_utils/battleActions";
 import { ReplayControls } from "./ReplayControls";
+import useViewportWidth from "@/services/useViewPortWidth";
+import { ASPECT_RATIO } from "../../_utils/viewUtils";
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -32,6 +34,10 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
 
   const battleCanvasRef = useRef<BattleCanvasRefProps>(null);
   const logRef = useRef<HTMLDivElement>(null);
+
+  const [, canvasWidth] = useViewportWidth();
+
+  const [logVisible, setLogVisible] = useState(false);
 
   useEffect(() => {
     if (logRef.current) {
@@ -303,6 +309,11 @@ function setCurrentTurn(turn?: number) {
     <>
       <div className="flex w-full">
         <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
+        {logVisible &&<div className="w-1/4  bg-slate-800 p-2 overflow-y-auto text-white" ref={logRef} style={{height:`${canvasWidth * ASPECT_RATIO}px`}}>
+          {htmlLog.map((line, index) => (
+            <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
+          ))}
+        </div>}
       </div>
       <ReplayControls
         battle={battle}
@@ -317,8 +328,9 @@ function setCurrentTurn(turn?: number) {
         turnInput={turnInput}
         setTurnInput={setTurnInput}
         lastTurn={lastTurn}
+        setLogVisible={setLogVisible}
+        logVisible={logVisible}
       />
-      <span className="text-black">{dataLoaded ? 'Yes' : 'Nope'}</span>
     </>
   );
 }

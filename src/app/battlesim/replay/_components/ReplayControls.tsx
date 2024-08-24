@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { PlayIcon, PauseIcon, ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon, ArrowsRightLeftIcon, BoltIcon, ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { getCanvasWidth } from "../../_utils/viewUtils";
 import ReplayControlsButton from './ReplayControlsButton';
+import useViewportWidth from "@/services/useViewPortWidth";
 
 export type ReplayControlsProps = {
     battle: any;
@@ -16,12 +17,20 @@ export type ReplayControlsProps = {
     turnInput: number;
     setTurnInput: (turnInput: number) => void;
     lastTurn: number;
+    logVisible: boolean;
+    setLogVisible: (logVisible: boolean) => void;
 }
 
-export function ReplayControls({battle, isPlaying, setIsPlaying, setCurrentTurn, pov, setPov, simulateAttack, simulatedAttack, setSimulatedAttack, turnInput, setTurnInput, lastTurn} : ReplayControlsProps){
+export function ReplayControls({
+    battle, isPlaying, setIsPlaying, setCurrentTurn, pov, setPov, 
+    simulateAttack, simulatedAttack, setSimulatedAttack, turnInput, 
+    setTurnInput, lastTurn, logVisible, setLogVisible}: ReplayControlsProps) {
+    const [, canvasWidth] = useViewportWidth()
+
+    if(canvasWidth === 0) return null;
 
     return(
-        <div className="flex justify-between p-2 bg-slate-800 space-x-2" style={{ width: `${getCanvasWidth()}px` }}>
+        <div className="flex justify-between p-2 bg-slate-800 space-x-2" style={{ width: `${canvasWidth}px` }}>
             <div className="flex space-x-2">
                 <ReplayControlsButton onClick={() => setIsPlaying(!isPlaying)} label={isPlaying ? "Pause" : "Play"}>
                     {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
@@ -41,6 +50,9 @@ export function ReplayControls({battle, isPlaying, setIsPlaying, setCurrentTurn,
             <div className="flex space-x-2">
                 <ReplayControlsButton onClick={() => setPov(pov === 0 ? 1 : 0)} label="Switch POV">
                     <ArrowsRightLeftIcon className="h-5 w-5" />
+                </ReplayControlsButton>
+                <ReplayControlsButton onClick={() => setLogVisible(!logVisible)} label="Toggle Log">
+                    <PlusIcon className="h-5 w-5" />
                 </ReplayControlsButton>
                 <ReplayControlsButton onClick={() => simulateAttack()} label="Simulate Attack">
                     <BoltIcon className="h-5 w-5" />
