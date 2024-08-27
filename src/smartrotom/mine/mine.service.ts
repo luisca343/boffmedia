@@ -75,6 +75,27 @@ export class MinaService {
     async getRewards() {
         return await this.db.getDrizzle().select().from(mineRewards);
     }
+    async getRewardsByType() {
+        const rewards = await this.db.getDrizzle().select().from(mineRewards);
+        let arr = rewards.reduce((acc, curr) => {
+            if (!acc[curr.type]) {
+                acc[curr.type] = { items: [], totalValue: 0 };
+            }
+            acc[curr.type].items.push(curr);
+            acc[curr.type].totalValue += curr.value;
+            return acc;
+        }, {} as { [key: string]: { items: any[], totalValue: number } });
+    
+        let arrEntries = Object.entries(arr);
+    
+        arrEntries.sort((a, b) => b[1].totalValue - a[1].totalValue);
+    
+        arr = Object.fromEntries(arrEntries);
+    
+        const totalValue = Object.values(arr).reduce((sum, type) => sum + type.totalValue, 0);
+    
+        return { drops: arr, totalValue };
+    }
 
     async endGame(uuid: string, rewards: {value:number, id: number}[] ) {
       const ultimaPartida = await this.db.getDrizzle().select({id: mineGames.id}).from(mineGames).where(eq(mineGames.uuid, uuid)).orderBy(desc(mineGames.id)).limit(1);

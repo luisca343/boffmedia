@@ -28,6 +28,11 @@ export class MinaController {
         return this.minaService.getRewards();
     }
 
+    @Get('rewardsbytype')
+    getRewardsByType() {
+        return this.minaService.getRewardsByType();
+    }
+
     @Get('history/:uuid')
     getHistory(@Param('uuid') uuid: string) {
         return this.minaService.getHistory(uuid);
