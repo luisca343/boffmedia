@@ -16,7 +16,7 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
     const hpColor = getHpColor(hpPercent);
 
     return (
-        <div className={`flex flex-col mx-2 px-1 justify-around  rounded-md overflow-hidden bg-slate-800  bg-opacity-90 h-18  ${className}`}
+        <div className={`flex flex-col mx-2 px-1 justify-around  rounded-md overflow-hidden bg-main-800  bg-opacity-90 h-18  ${className}`}
             style={{
                 fontSize: `${ 11 *getScaleMultiplier()}px`,
                 zIndex: 40

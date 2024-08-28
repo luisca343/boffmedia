@@ -23,7 +23,7 @@ import NpcSkin from "@/components/smartrotom/MinecraftSkin";
     
     if(!avatarId) return <></>
     return (
-      <div className={` ${side === 'p1' ? 'content-end' : 'content-start'} bg-slate-900 h-full bg-opacity-30 z-10`}>
+      <div className={` ${side === 'p1' ? 'content-end' : 'content-start'} bg-main-900 h-full bg-opacity-30 z-10`}>
         <div className="text-center font-bold text-white">{player.name.charAt(0).toUpperCase() + player.name.slice(1)}</div>
         <div className="h-fit">
           {

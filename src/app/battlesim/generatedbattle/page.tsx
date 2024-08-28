@@ -279,14 +279,14 @@ export default function Test() {
       //background-image:url(https://play.pokemonshowdown.com/sprites/gen6bgs/bg-darkmeadow.jpg);display:block;opacity:0.8
       style={{backgroundImage: `url(https://i.imgur.com/qnB4MXd.png)`, backgroundSize: 'cover', width:' 900px', height: '450px', zIndex:'0'}}
       >
-        <div className="w-[30%] flex flex-col  bg-slate-800 justify-end bg-opacity-60 p-2 text-center">
+        <div className="w-[30%] flex flex-col  bg-main-800 justify-end bg-opacity-60 p-2 text-center">
         <PokemonTeamList team={battle.sides[0].team} />
             <div className="text-shadow-border1 text-white">{battle.sides[0].name}</div>
             <img className="mx-auto" style={{height:'100px', width:'45px'}} src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4" />
             
         </div>
         <GameCanvas pokemon={pokemon} battle={battle}/>
-        <div className="w-[30%] flex flex-col bg-slate-800  bg-opacity-60 p-2 text-center">
+        <div className="w-[30%] flex flex-col bg-main-800  bg-opacity-60 p-2 text-center">
         <div className="text-shadow-border1 text-white">{battle.sides[1].name}</div>
         <img className="mx-auto" style={{height:'100px', width:'45px', transform: 'scaleX(-1)'}} src="https://crafatar.com/renders/body/e4f3e314-ea7f-4ef6-aa5b-06162c5bf7f6" />
           
@@ -294,14 +294,14 @@ export default function Test() {
         </div>
       </div>
 
-        <div className="w-[400px] h-[450px] overflow-auto  bg-slate-800 text-slate-100" ref={logRef}>
+        <div className="w-[400px] h-[450px] overflow-auto  bg-main-800 text-main-100" ref={logRef}>
           <div>{log.map((line, index) => {
-            if(line.includes('Turn')) return <div key={index} className="font-bold text-2xl  bg-slate-500 text-slate-200"><div key={index} dangerouslySetInnerHTML={{ __html: line }} /></div>
+            if(line.includes('Turn')) return <div key={index} className="font-bold text-2xl  bg-main-500 text-main-200"><div key={index} dangerouslySetInnerHTML={{ __html: line }} /></div>
             return <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
           })}</div>
         </div>
 
-        <div className="absolute bottom-2 left-[182px] bg-slate-800 text-slate-100 p-2 bg-opacity-60 rounded-md">
+        <div className="absolute bottom-2 left-[182px] bg-main-800 text-main-100 p-2 bg-opacity-60 rounded-md">
           {activeMessages.length > 0 && activeMessages.map((message, index) => <div key={index} dangerouslySetInnerHTML={{ __html: message }} />)}
         </div>
   </div>

@@ -92,7 +92,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     }
 
     return (
-        <nav className={`h-12  flex items-center px-2 ${pathname.includes('pokedex') ? 'bg-slate-950' : 'bg-zinc-900'}`}>
+        <nav className={`h-12  flex items-center px-2 ${pathname.includes('pokedex') ? 'bg-main-950' : 'bg-zinc-900'}`}>
             <BotonPrev />
             <BotonNext />
             <BotonReload />

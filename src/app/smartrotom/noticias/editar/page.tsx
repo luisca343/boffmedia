@@ -38,7 +38,7 @@ export default  function EditarNoticia(){
                     <h2>Crear</h2>
                 </button>
                 {news.map((n: any) => (
-                    <InternalLink key={n.id} href={`/noticias/editar/${n.id}`} className="flex flex-col w-36 items-center border border-black hover:text-slate-500">
+                    <InternalLink key={n.id} href={`/noticias/editar/${n.id}`} className="flex flex-col w-36 items-center border border-black hover:text-main-500">
                         <img src={`https://t3.ftcdn.net/jpg/04/60/01/36/360_F_460013622_6xF8uN6ubMvLx0tAJECBHfKPoNOR5cRa.jpg` } alt="imagen de noticia" />
                         <h2>{n.title}</h2>
                     </InternalLink>

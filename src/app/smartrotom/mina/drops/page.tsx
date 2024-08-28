@@ -26,13 +26,13 @@ export default async function Drops() {
             <div>
                 {Object.keys(drops).map((type: string) => (
                     <Collapsible key={type}>
-                        <CollapsibleTrigger className="mx-auto text-2xl p-4 border rounded shadow flex flex-col items-center m-2 bg-slate-900 bg-opacity-95 w-[90%] text-gray-400">
+                        <CollapsibleTrigger className="mx-auto text-2xl p-4 border rounded shadow flex flex-col items-center m-2 bg-main-900 bg-opacity-95 w-[90%] text-gray-400">
                             {type} - {getPercentage(drops[type].totalValue, totalValue)}%
                         </CollapsibleTrigger>
                         <CollapsibleContent>
                             <div className="flex flex-wrap justify-center mx-auto w-4/5">
                                 {drops[type].items.map((drop: Drop) => (
-                                    <div key={drop.id} className="text-lg w-1/6 p-4 border rounded shadow flex flex-col items-center m-2 bg-slate-900 bg-opacity-85">
+                                    <div key={drop.id} className="text-lg w-1/6 p-4 border rounded shadow flex flex-col items-center m-2 bg-main-900 bg-opacity-85">
                                         <img src={`/smartrotom/img/apps/mina/recompensas/${drop.itemId.split(':')[1]}.png`}
                                             alt={drop.name} 
                                             className="w-16 h-16 mb-2"

@@ -353,10 +353,10 @@ const replay = `|j|☆Rougewings
 
 return (
   <div>
-<div className="w-full h-full flex bg-slate-700" id="fullgame">
+<div className="w-full h-full flex bg-main-700" id="fullgame">
   <PlayerDataBar battle={battle} side={0} viewPoint={viewPoint} activePokemon={activePokemon}/>
   <div id="game" className="w-full h-full flex flex-col relative z-0">
-    <div className="absolute top-1 right-1 bg-slate-800 py-1 px-2 rounded-md text-slate-200 border border-slate-200">Turn {battle.turn}</div>
+    <div className="absolute top-1 right-1 bg-main-800 py-1 px-2 rounded-md text-main-200 border border-main-200">Turn {battle.turn}</div>
     {active1.length === 3 ? <>
         <PokemonSprite viewPoint={viewPoint[0]} pokemon={getActiveTeam(0, activePokemon)[0]} id="p1a" className='bottom-[16%] left-[5%]'/>
         <PokemonSprite viewPoint={viewPoint[0]} pokemon={getActiveTeam(0, activePokemon)[1]} id="p1b" className='bottom-[8%] left-[33%]'/>

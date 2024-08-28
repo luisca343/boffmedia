@@ -80,7 +80,7 @@ export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?
                                     <HoverCardTrigger onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${key}`} className="hover:cursor-pointer hover:text-primary-400">
                                         {t(`attack_${key.toLowerCase().replace(" ", "_")}`)}
                                     </HoverCardTrigger>
-                                    <HoverCardContent  className="bg-slate-700 text-white w-[400px] border-slate-950 border font-normal">
+                                    <HoverCardContent  className="bg-main-700 text-white w-[400px] border-main-950 border font-normal">
                                         <MoveDataElement id={key}/>
                                     </HoverCardContent>
 
