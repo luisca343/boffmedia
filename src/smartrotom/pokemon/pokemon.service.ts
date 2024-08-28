@@ -12,7 +12,6 @@ import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { and, desc, eq } from 'drizzle-orm';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
-import { spawn } from 'child_process';
 
 @Injectable()
 export class PokemonService {
@@ -26,8 +25,8 @@ export class PokemonService {
 
     async loadData(){
         const startingTime = Date.now();
-        this.pokemonData = new PokemonData();
         this.moveData = new MoveData();
+        this.pokemonData = new PokemonData(this.moveData);
         this.spawnData = new SpawnData(this.pokemonData);
 
         await this.pokemonData.loadPokemonData();
@@ -84,6 +83,20 @@ export class PokemonService {
         
         return moveDataSet 
 
+    }
+
+    async getMove(name: string){
+        const moveData = this.moveData.movesByName[name]
+        console.log(this.moveData.movesByName[name])
+        if(!moveData) return {error: 'Move not found'}
+        return moveData
+    }
+
+    async getPokemonByMove(name: string){
+        const pkm = this.pokemonData.speciesByMove[name]
+        console.log(pkm)
+        if(!pkm) return {error: 'Pokemon not found'}
+        return pkm
     }
 
     excludedForms = ['teras', 'terasmega', 'omnitrix']

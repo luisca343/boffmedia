@@ -91,11 +91,12 @@ export class MisionesController {
 
     @Get()
     async getAllQuests(@Query('force') force: number) {
+        /*
         if(!this.npcs){
           const newNPCs = await axios.get('http://148.251.3.244:34370/updateNPCs')
           this.npcs = newNPCs.data.npcs
           this.npcs[0] = {name: "Rotom", dialogId: 0, skin: "rotom"}
-        } 
+        } */
         if(!this.quests && !force) return this.getAllQuests(1)
         if(this.quests && Date.now() - this.lastUpdate < 4 * 60 * 60 * 1000 && !force) {
             return {quests: this.quests, dialogs: this.dialogs, categories: this.categories, npcs: this.npcs}

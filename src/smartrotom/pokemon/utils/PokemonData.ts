@@ -3,9 +3,13 @@ import *  as  path from 'path';
 import { promises as fsPromises } from 'fs';
 import { Pokemon } from '@/types/pokemon';
 import { wolfeyTypeRanking } from './types';
+import { MoveData } from './MoveData';
 
 export class PokemonData {
-    constructor() {
+    moveData: MoveData;
+
+    constructor(moveData: MoveData) {
+        this.moveData = moveData;
     }
     
     pokemonList = [];
@@ -22,6 +26,8 @@ export class PokemonData {
     speciesByEggGroup = {}
     speciesByAbility = {}
     finalForms = {}
+
+    speciesByMove = {}
 
     async loadPokemonData() {
         const startingTime = Date.now();
@@ -151,8 +157,54 @@ export class PokemonData {
                         this.speciesByAbility[ability].push(form);
                     });
                 }
+
+                const moves = form?.moves;
+                if(moves){
+                    Object.values(moves).forEach((moveList) => {
+                        moveList.forEach((move) => {
+                            if(move.attacks) {
+                                const attacks = move.attacks;
+                                attacks.forEach((attack) => {
+                                    if (!this.speciesByMove[attack]) {
+                                        this.speciesByMove[attack] = [];
+                                    }
+                                    if(!this.speciesByMove[attack].find((s) => s.speciesID === data.dex && s.form === formName)){
+                                        this.speciesByMove[attack].push({speciesID: data.dex, form: formName});
+                                    }
+                                });
+                            } else {
+                                if (!this.speciesByMove[move]) {
+                                    this.speciesByMove[move] = [];
+                                }
+                                if(!this.speciesByMove[move].find((s) => s.speciesID === data.dex && s.form === formName)){
+                                    this.speciesByMove[move].push({speciesID: data.dex, form: formName});
+                                }
+                            }
+                        });
+                    });
+                }
             });
         }
+
+        const countMoves = []
+
+        Object.entries(this.speciesByMove).forEach(([move, species]) => {
+            countMoves[move] = this.speciesByMove[move].length
+        });
+
+        // Sort moves by count
+        const sortedMoves = Object.keys(countMoves).sort((a, b) => countMoves[b] - countMoves[a]);
+        const sortedMovesCopy = {} as {[key: string]: any[]}
+        sortedMoves.forEach((key) => {
+            sortedMovesCopy[key] = this.speciesByMove[key]
+        });
+
+        this.speciesByMove = sortedMovesCopy;
+        
+        console.log(`Moves sorted by count: ${sortedMoves.map((m) => `${m} (${countMoves[m]})`).join(', ')}`);
+        
+
+        
     
         let totalForms = 0;
         Object.values(this.speciesByForm).forEach((forms: any[]) => {

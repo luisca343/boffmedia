@@ -11,7 +11,6 @@ export class MoveData {
     movesByName = {}
     movesByType = {}
     movesByCategory = {}
-    
 
     async loadMoveData() {
         const startingTime = Date.now();
