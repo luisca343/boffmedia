@@ -13,6 +13,12 @@ export class StarbankController {
     getAllAccounts(@Param("uuid") uuid: string){
         return this.starbankService.getAllAccounts();
     }
+
+    @Post("accounts")
+    createAccount(@Body() body: {uuid: string, name: string}){
+        return this.starbankService.createAccount(body.uuid, body.name);
+    }
+
     @Get("accounts/:uuid")
     getAccounts(@Param("uuid") uuid: string){
         return this.starbankService.getAccounts(uuid);

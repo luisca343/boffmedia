@@ -47,12 +47,18 @@ export class StarbankService {
         return res
     }
 
-    async createAccount(uuid: string, name: string) {
+    async createAccount(uuid: string, name: string, image?: string) {
         if(name.length === 0) {
-            this.createMainAccount(uuid, name);
+            return this.createMainAccount(uuid, name);
         }
+        
+        const res = await this.db.getDrizzle().insert(starBankAccounts).values({name, balance: 0, type: "SECONDARY"} as StarBankAccount).execute() as RowDataPacket[];
+        const insert = res[0];
+        const res2 = await this.db.getDrizzle().insert(starBankUsersAccounts).values({uuid, accountId: insert.insertId}).execute();
+        
         return {success: true}
     }
+    
 
     async createMainAccount(uuid: string, username: string) {
        const res = await this.getMainAccount(uuid);
