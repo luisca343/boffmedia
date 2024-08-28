@@ -67,10 +67,10 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
     
 
     return (
-        <div className="flex flex-col justify-center items-center text-zinc-200 w-full ">
+        <div className="flex flex-col justify-center items-center text-main-200 w-full ">
             <PokedexTable>
                 <PokedexHeader>
-                    <TableRow className='hover:bg-zinc-900  font-bold'>
+                    <TableRow className='hover:bg-main-900  font-bold'>
                         <PokedexHead className='w-40'> </PokedexHead>
                         <PokedexHead >Estadística base</PokedexHead>
                         <PokedexHead  colSpan={2}>Nivel 50</PokedexHead>
@@ -98,7 +98,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                     })}
                 </TableBody>
                 <PokedexHeader>
-                    <TableRow className='hover:bg-zinc-900 font-bold'>
+                    <TableRow className='hover:bg-main-900 font-bold'>
                         <PokedexHead >Total</PokedexHead>
                         <PokedexHead >{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexHead>
                         <PokedexHead >Min</PokedexHead>

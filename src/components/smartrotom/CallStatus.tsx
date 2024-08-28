@@ -184,7 +184,7 @@ export function CallStatus(){
     
     
     return (
-        <nav className={`flex flex-col items-center justify-center absolute ${isExpanded ? 'right-0 w-full h-full' : 'left-0 w-60 h-12'} bg-zinc-900 text-main-50 font-bold z-20 ${activeCall || isExpanded ? '' : 'hidden'}`}>
+        <nav className={`flex flex-col items-center justify-center absolute ${isExpanded ? 'right-0 w-full h-full' : 'left-0 w-60 h-12'} bg-main-900 text-main-50 font-bold z-20 ${activeCall || isExpanded ? '' : 'hidden'}`}>
         <audio ref={audioRef} src='/smartrotom/audio/chatapp/denden.mp3' preload="auto"></audio>
         <div className="flex justify-evenly">
         {activeCall.caller !== getSmartRotomUser(session).uuid && 

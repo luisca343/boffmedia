@@ -92,7 +92,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
     }
 
     return (
-        <nav className={`h-12  flex items-center px-2 ${pathname.includes('pokedex') ? 'bg-main-950' : 'bg-zinc-900'}`}>
+        <nav className={`h-12  flex items-center px-2 ${pathname.includes('pokedex') ? 'bg-main-950' : 'bg-main-900'}`}>
             <BotonPrev />
             <BotonNext />
             <BotonReload />
@@ -101,7 +101,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <SheetTrigger>
                     <BotonAjustes />
                 </SheetTrigger>
-                <SheetContent side="top" className="bg-zinc-900 text-main-50 border-none" parentId="smartrotom">
+                <SheetContent side="top" className="bg-main-900 text-main-50 border-none" parentId="smartrotom">
                     <SheetHeader>
                         <SheetTitle className="text-main-50">Ajustes</SheetTitle>
                         <SheetDescription>
@@ -114,7 +114,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <SheetTrigger>
                     <BotonIA />
                 </SheetTrigger>
-                <SheetContent side="right" className="bg-zinc-900 text-main-50 border-none flex flex-col w-max" parentId="smartrotom">
+                <SheetContent side="right" className="bg-main-900 text-main-50 border-none flex flex-col w-max" parentId="smartrotom">
                     <SheetHeader>
                         <SheetTitle className="text-main-50 text-2xl font-bold">FicusAI</SheetTitle>
                     </SheetHeader>

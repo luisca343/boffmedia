@@ -134,7 +134,7 @@ function MensajeChat({ mensaje, sender }: { mensaje: Mensaje; sender: 'user' | '
 
   return (
     <li
-      className={`border border-zinc-950 rounded p-3 m-2 max-w-full ${messageClass} whitespace-pre-wrap`}
+      className={`border border-main-950 rounded p-3 m-2 max-w-full ${messageClass} whitespace-pre-wrap`}
       style={{ maxWidth: '90%' }} // Adjust the maximum width as needed
     >
        {

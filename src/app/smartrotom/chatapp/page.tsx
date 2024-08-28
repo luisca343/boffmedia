@@ -88,16 +88,16 @@ export default function ChatApp() {
 
     return (
         <div className="w-full h-full flex">
-            <div className="flex flex-col h-full w-1/4  bg-zinc-800  border-r border-zinc-900 ">
+            <div className="flex flex-col h-full w-1/4  bg-main-800  border-r border-main-900 ">
                 <div className="h-16 p-2 text-xl w-full flex items-center text-main-50 " > 
                     <div>Chats</div>
                     <CreateGroup setActiveChat={setChat} />
                 </div>
-                <div className="flex flex-col h-full  overflow-auto bg-zinc-800">
+                <div className="flex flex-col h-full  overflow-auto bg-main-800">
                     {chats.map((chat) => <Contact {...chat} key={chat.id} />)}
                 </div>
             </div>
-            <div className="flex flex-col w-3/4 h-full bg-zinc-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-zinc-900">
+            <div className="flex flex-col w-3/4 h-full bg-main-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-main-900">
                 {activeChat ? <Chat chats={chats} activeChat={activeChat} setActiveChat={setActiveChat}
                     /> : <div className="h-full flex items-center justify-center text-main-50">Selecciona un chat</div>}
             </div>
@@ -161,7 +161,7 @@ export default function ChatApp() {
         function Contact(chat: ChatData){
             return (
                 <div>
-                    <div className={`${activeChat === chat.id ? 'bg-zinc-700' : 'bg-zinc-800'} hover:bg-zinc-700 h-[100px] flex items-center w-full`} onClick={()  => setActiveChat(chat.id)}>
+                    <div className={`${activeChat === chat.id ? 'bg-main-700' : 'bg-main-800'} hover:bg-main-700 h-[100px] flex items-center w-full`} onClick={()  => setActiveChat(chat.id)}>
                         <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px'/>
                         <div className="h-1/2  ml-4 text-main-50  flex flex-col justify-between items-start ">
                             <p className="text-sm font-bold">{chat.name}</p>

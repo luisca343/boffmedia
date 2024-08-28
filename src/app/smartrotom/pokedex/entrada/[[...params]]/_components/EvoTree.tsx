@@ -56,7 +56,7 @@ export async function EvoTree({params}: {params: {id: string}}){
             if(Object.keys(subTree).length == 0) return <h1>TET</h1>
             if(!subTree.pkm) return <h1>NO PKM</h1>
                 return <div key={key} className='w-full flex flex-row items-center ' style={{height:`${100/Object.keys(tree).length}%`}}>
-                    <InternalLink href={`/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-zinc-700 rounded-md">
+                    <InternalLink href={`/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-main-700 rounded-md">
                         <PokemonSprite id={subTree.dex} form={form} palette='none' width={100} height={100}/>
                         <span className="text-center">{t(`form`, {pokemon: getPokemonName(pkmName, t), form: `${t(`form_${form}`)}`})}</span>
                     </InternalLink>
@@ -144,7 +144,7 @@ export async function EvoTree({params}: {params: {id: string}}){
                     })
                     conditions.push(<HoverCard>
                         <HoverCardTrigger className='underline hover:cursor-pointer'>En Biomas</HoverCardTrigger>
-                        <HoverCardContent className="w-96 bg-zinc-800 text-main-50">{biomes.map(biome => biomeTrans(biome)).join(', ')}</HoverCardContent>
+                        <HoverCardContent className="w-96 bg-main-800 text-main-50">{biomes.map(biome => biomeTrans(biome)).join(', ')}</HoverCardContent>
                     </HoverCard>)
                 }
                 else if(conditionType == "evolutionRock") {
