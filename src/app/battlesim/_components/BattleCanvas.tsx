@@ -101,6 +101,13 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 />
             ))}
             <div id='overlay' className="absolute w-full h-full pointer-events-none">
+                <div className="absolute top-16 left-0 text-white text-shadow-border1 z-20 ml-2">
+                    {battle.sides.map((side) => {
+                        return Object.values(side.sideConditions).map((value) => {
+                            return <div key={`condition-${side.name}-${value.name}`}>{side.name}: {value.name} {value.minDuration} {value.maxDuration > 0 && `- ${value.maxDuration}`} turns</div>
+                        })
+                    })}
+                </div>
                 <div className={`weather w-full h-full absolute top-0 left-0 ${battle.field.terrainState.id}`}></div>
 
                 <div className={`weather w-full h-full absolute top-0 left-0 `} style={{
