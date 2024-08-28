@@ -22,26 +22,27 @@ export default function MoveDataElement({id} : {id: string}){
     return(
         <div>
         <div className="text-center mb-4">
-                        <span className="text-3xl font-bold">{movesTrans(`attack_${move.attackName.toLowerCase().replaceAll(" ","_")}`)}</span>
+                    <span className="text-3xl font-bold">{movesTrans(`attack_${move.attackName.toLowerCase().replaceAll(" ","_")}`)}</span>
                     </div>
                     <div className="flex justify-center space-x-4 mb-4">
                         <TypeBadge type={move.attackType.toLowerCase()} />
                         <TypeBadge type={move.attackCategory.toLowerCase()} />
                     </div>
                     <div className="text-center space-y-2 mb-4">
+                    {/*<span className="block">{movesTrans(`attack_${move.attackName.toLowerCase().replaceAll(" ","_")}_description`)}</span>*/}
                         <div className="flex justify-center">
-                            {move.basePower > 0 &&<span className="block text-lg px-2">Poder Base: {move.basePower}</span>}
-                            {move.accuracy > 0 && <span className="block text-lg px-2">Precisión: {move.accuracy}</span>}
+                            {move.basePower > 0 &&<span className="block px-2">Poder Base: {move.basePower}</span>}
+                            {move.accuracy > 0 && <span className="block px-2">Precisión: {move.accuracy}</span>}
                         </div>
-                        <span className="block text-lg">PP: {move.ppBase} ({move.ppMax})</span>
-                        <span className="block text-lg">{move.makesContact}</span>
+                        <span className="block">PP: {move.ppBase} ({move.ppMax})</span>
+                        <span className="block">{move.makesContact}</span>
                     </div>
-                    <MoveTargets targetInfo={move.targetingInfo} />
-                    <div className="flex flex-col text-center space-y-2 mb-4">
+                    <div className="flex flex-col text-center space-y-2 my-4 text-xs">
                         {move.effects.map((effect) => (
                             <MoveEffect key={effect.effectTypeID + effect.type} effect={effect} />
                         ))}
                     </div>
+                    <MoveTargets targetInfo={move.targetingInfo} />
         </div>
     )
 

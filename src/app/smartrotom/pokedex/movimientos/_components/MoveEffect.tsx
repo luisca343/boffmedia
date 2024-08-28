@@ -56,8 +56,8 @@ export function MoveEffect({effect} : {effect: Effect}){
         case 'StatsEffect':
             return (
                 <div>{effect.amount > 0 ?
-                    <span>+{effect.amount} {effect.type}</span> :
-                    <span>{effect.amount} {effect.type}</span>
+                    <span>Aumenta {effect.amount} niveles de {effect.type}</span> :
+                    <span>Reduce {effect.amount} niveles de {effect.type}</span>
                 }</div>
             )
         case 'AlwaysHit':
@@ -338,7 +338,77 @@ export function MoveEffect({effect} : {effect: Effect}){
             </div>
         case 'MeanLook':
             return <span>Impide al objetivo huir o ser cambiado de posición</span>
-        
+        case "Round":
+            return <span>Este movimiento aumenta su potencia si otros Pokémon del equipo lo han usado en el mismo turno</span>
+        case 'Incinerate':
+            return <span>Este movimiento quema las bayas del objetivo</span>        
+        case 'Celebrate':
+            return <span>Felicidades Luisca</span>
+        case 'Flee':
+            return <span>Hace que el objetivo huya del combate</span>
+        case 'FuryCutter':
+            return <span>Este movimiento aumenta su poder con cada uso consecutivo</span>
+        case 'SecretPower':
+            return <span>Este movimiento tiene un efecto adicional dependiendo del terreno</span>
+        case 'BrickBreak':
+            return <span>Este movimiento elimina las pantallas de defensa del objetivo</span>
+        case 'Rest':
+            return <span>El usuario se duerme durante 2 turnos y recupera toda su vida</span>
+        case 'NaturalGift':
+            return <span>Este movimiento tiene un efecto adicional dependiendo del objeto que lleve equipado el usuario</span>
+        case 'EchoedVoice':
+            return <span>Este movimiento aumenta su potencia si otros Pokémon del equipo lo han usado en turnos consecutivos</span>
+        case 'FalseSwipe':
+            return <span>Este movimiento deja al objetivo con al menos 1 de vida</span>
+        case 'OHKO':
+            return <span>Este movimiento derrota al objetivo si es de un nivel inferior al usuario</span>
+        case 'Frustration':
+            return <span>Este movimiento aumenta su poder cuanto menos afecto tenga el usuario</span>
+        case 'Rage':
+            return <span>Este movimiento aumenta su poder con cada uso consecutivo</span>
+        case 'DoSetDamage':
+            return <span>Este movimiento inflige {effect.damage} PS de daño</span>
+        case 'HeavySlam':
+            return <span>Este movimiento aumenta su poder cuanto más pesado sea el objetivo</span>
+        case 'Facade':
+            return <span>Este movimiento aumenta su poder si el usuario está envenenado, paralizado o quemado</span>
+        case 'Fling':
+            return <span>Este movimiento lanza el objeto equipado por el usuario</span>
+        case 'Curse':
+            return <span>Si es tipo fantasma: el usuario pierde la mitad de su vida y el objetivo recibe el doble de daño
+                Si no: el usuario aumenta su ataque y defensa a cambio de perder velocidad</span>
+        case 'HoldHands':
+            return <span>No hace nada</span>
+        case 'Mimic':
+            return <span>El usuario copia el último movimiento usado por el objetivo</span>
+        case 'BeatUp':
+            return <span>Este movimiento golpea 1 vez por cada Pokémon del equipo</span>
+        case 'FlameBurst':
+            return <span>Este movimiento daña a los Pokémon adyacentes al objetivo</span>
+        case 'RapidSpin':
+            return <span>Este movimiento elimina los obstáculos del campo y aumenta la velocidad del usuario</span>
+        case 'HiddenPower':
+            return <span>Este movimiento tiene un tipo y una potencia variable</span>
+        case 'ScaleShot':
+            return <span>Aumenta la velocidad del usuario en un nivel, y reduce su defensa en un nivel</span>
+        case 'Snore':
+            return <span>Este movimiento solo puede ser usado si el usuario está dormido</span>
+        case 'SleepTalk':
+            return <span>Este movimiento solo puede ser usado si el usuario está dormido</span>
+        case 'Substitute':
+            return <span>El usuario crea un sustituto que recibe el daño de los movimientos en su lugar</span>
+        case 'BellyDrum':
+            return <span>El usuario pierde la mitad de su vida para aumentar su ataque al máximo</span>
+        case 'Bide':
+            return <span>El usuario recibe daño durante 2 turnos y contraataca en el tercero</span>
+        case 'Pledge':
+            return <span>Este movimiento tiene un efecto adicional si se usa junto con otro movimiento de la misma categoría</span>
+        case 'TerrainPulse':
+            return <span>Este movimiento tiene un efecto adicional dependiendo del terreno</span>
+        case 'Return':
+            return <span>Este movimiento aumenta su poder cuanto más afecto tenga el usuario</span>
+        case 'FakeOut':
+            return <span>Solo puede ser usado en el primer turno después de salir al campo</span>
             
         
         default:
