@@ -45,7 +45,7 @@ export default function Cuentas(){
                                 </div>
                                 <div className="text-xl text-green-600 w-1/5">{Number(account.balance).toLocaleString('de-DE')} &#165;</div>
                                 <div className="text-xl">
-                                    <Button onClick={() => setActiveAccount(changeActiveAccount(account.id))} className="bg-blue-900 hover:bg-blue-700 text-white p-2 rounded-md">Seleccionar</Button>
+                                    <Button onClick={() => setActiveAccount(changeActiveAccount(account.id))} className="bg-blue-900 hover:bg-blue-700 text-main-50 p-2 rounded-md">Seleccionar</Button>
                                 </div>
                                 
                             </div>
@@ -72,13 +72,13 @@ export default function Cuentas(){
         return(
             <Dialog>
             <DialogTrigger>
-                 <span onClick={() => toast.info('Creando cuenta')} className="bg-blue-900 hover:bg-blue-700 text-white p-2 rounded-md">Crear cuenta</span>
+                 <span onClick={() => toast.info('Creando cuenta')} className="bg-blue-900 hover:bg-blue-700 text-main-50 p-2 rounded-md">Crear cuenta</span>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>Crear cuenta</DialogHeader>
                 <DialogDescription>
                     <Input type="text" placeholder="Nombre de la cuenta"  value={accountName} onChange={(e) => setAccountName(e.target.value)}/>
-                    <Button className="bg-blue-900 hover:bg-blue-700 text-white mt-2 p-2 rounded-md"
+                    <Button className="bg-blue-900 hover:bg-blue-700 text-main-50 mt-2 p-2 rounded-md"
                         onClick={() => createAccount(accountName)}>Crear</Button>
                 </DialogDescription>
             </DialogContent>

@@ -12,7 +12,7 @@ export default function BreadcrumbNav({className} : {className?: string}){
     const parts = path.split('/').filter(Boolean)
 
     return (
-        <div className={`${className} flex bg-white rounded-sm h-8 items-center ps-4`}>
+        <div className={`${className} flex bg-main-50 rounded-sm h-8 items-center ps-4`}>
             {parts.map((part, index) => {
 
                 const href = '/' + parts.slice(0, index + 1).join('/')
@@ -36,7 +36,7 @@ function Breadcrumb({index, parts}: {index: number, parts: string[]}){
     const texto = nombre == 'smartrotom' ? <HomeIcon height={20} width={20} strokeWidth={2.5}/> : nombre
 
     return (
-        <Badge onClick={() => navegar(router, parts, index, isNavigable(nombre))} className="text-sm bg-primary-400 hover:bg-primary-600 hover:cursor-pointer text-black hover:text-white  border-black border shadow-sm shadow-black" key={index} >
+        <Badge onClick={() => navegar(router, parts, index, isNavigable(nombre))} className="text-sm bg-primary-400 hover:bg-primary-600 hover:cursor-pointer text-black hover:text-main-50  border-black border shadow-sm shadow-black" key={index} >
             {texto}
         </Badge>
     )

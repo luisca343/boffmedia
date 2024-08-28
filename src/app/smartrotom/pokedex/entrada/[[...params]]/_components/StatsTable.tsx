@@ -86,7 +86,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                             <PokedexHead className=" border  font-bold">{t(`stat_${stat.toLowerCase()}`)}</PokedexHead>
                             <PokedexCell className="relative border  border-collapse">
                                 <div className="absolute inset-0  rounded px-2 text-start pl-2 bold text-sm flex justify-start items-center" style={{width: `${((statValue + 5)  / (maxStat + 5)) * 100}%`, backgroundColor: getColorStat(statValue)}}>
-                                  <div className='text-white text-lg font-bold text-shadow-border1'>{statValue}</div>
+                                  <div className='text-main-50 text-lg font-bold text-shadow-border1'>{statValue}</div>
                                 </div>
                             </PokedexCell>
                             <PokedexCell >{calculateStat(stat, statValue, 50, 0, 0, 0.9)}</PokedexCell>

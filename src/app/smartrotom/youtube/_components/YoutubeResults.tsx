@@ -54,14 +54,14 @@ export function Results({videos} : {videos: Video[]}) {
                   href={`/youtube/${video.id.videoId}`}>
                     <img width={450} height={250} alt={video.snippet.title} className='w-full h-auto' src={`${video.snippet.thumbnails.high.url}`} />
                     <div className='text-lg font-bold mt-2'>{video.snippet.title}</div>
-                    <div className='text-sm text-gray-800'>{video.snippet.channelTitle}</div>
+                    <div className='text-sm text-main-800'>{video.snippet.channelTitle}</div>
                   </InternalLink>
         
                   return <InternalLink key={video.id.videoId} className="flex flex-col items-center bg-main-500 p-5 rounded-lg shadow-md"
                    href={`/youtube/playlist/${video.id.videoId}`}>
                     <img width={450} height={250} alt={video.snippet.title} className='w-full h-auto' src={`${video.snippet.thumbnails.high.url}`} />
                     <div className='text-lg font-bold mt-2'>{video.snippet.title}</div>
-                    <div className='text-sm text-gray-800'>{video.snippet.channelTitle}</div>
+                    <div className='text-sm text-main-800'>{video.snippet.channelTitle}</div>
                   </InternalLink>
             })}
               </div>

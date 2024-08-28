@@ -82,7 +82,7 @@ export async function EvoTree({params}: {params: {id: string}}){
         </div>
     }
 
-    return <div className="  text-white text-shadow-border1 flex justify-center ">
+    return <div className="  text-main-50 text-shadow-border1 flex justify-center ">
             {depth > 1 ? renderTree(tree) : <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
                     Este Pokémon no tiene evoluciones
             </div>}
@@ -144,7 +144,7 @@ export async function EvoTree({params}: {params: {id: string}}){
                     })
                     conditions.push(<HoverCard>
                         <HoverCardTrigger className='underline hover:cursor-pointer'>En Biomas</HoverCardTrigger>
-                        <HoverCardContent className="w-96 bg-zinc-800 text-white">{biomes.map(biome => biomeTrans(biome)).join(', ')}</HoverCardContent>
+                        <HoverCardContent className="w-96 bg-zinc-800 text-main-50">{biomes.map(biome => biomeTrans(biome)).join(', ')}</HoverCardContent>
                     </HoverCard>)
                 }
                 else if(conditionType == "evolutionRock") {

@@ -25,7 +25,7 @@ export function PokedexCell({children='', className= '', colSpan= 1}: {children:
 }
 
 export function PokedexHead({children, className, colSpan= 1}: {children: React.ReactNode, className?: string, colSpan?: number}){
-    return <PokedexCell className={`bg-gray-900 text-white ${className}`} colSpan={colSpan}>
+    return <PokedexCell className={`bg-main-900 text-main-50 ${className}`} colSpan={colSpan}>
         {children}
     </PokedexCell>
 }

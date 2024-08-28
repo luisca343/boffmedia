@@ -44,7 +44,7 @@ export default function InvitacionForm({invitacion} : {invitacion: Invitacion}) 
 
     return (
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="bg-white w-96 p-10">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="bg-main-50 w-96 p-10">
                     <FormField control={form.control} name="username" render={({field}) => (
                         <FormItem>
                             <FormLabel>Username</FormLabel>

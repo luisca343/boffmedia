@@ -30,10 +30,10 @@ export default function Localizacion({params} : {params: {id: string}}){
     return(
         <div className="bg-main-800  ">
             <div className="hidden 2xl:flex justify-center">
-                <Label className="text-white text-2xl">Mostrar Avistados</Label>
-                <Checkbox id="seen" onClick={() => setHideSeen(!hideSeen)} className="bg-main-400 text-white p-2 rounded-xl m-2">Mostrar Avistados</Checkbox>
-                <Label className="text-white text-2xl">Mostrar Atrapados</Label>
-                <Checkbox id="caught" onClick={() => setHideCaught(!hideCaught)} className="bg-main-400 text-white p-2 rounded-xl m-2">Mostrar Atrapados</Checkbox>
+                <Label className="text-main-50 text-2xl">Mostrar Avistados</Label>
+                <Checkbox id="seen" onClick={() => setHideSeen(!hideSeen)} className="bg-main-400 text-main-50 p-2 rounded-xl m-2">Mostrar Avistados</Checkbox>
+                <Label className="text-main-50 text-2xl">Mostrar Atrapados</Label>
+                <Checkbox id="caught" onClick={() => setHideCaught(!hideCaught)} className="bg-main-400 text-main-50 p-2 rounded-xl m-2">Mostrar Atrapados</Checkbox>
             </div>
             <div className="flex  flex-wrap justify-center items-start">
                 {Object.entries(pokemon).map(([biome, spawn]) => (

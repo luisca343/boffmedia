@@ -74,12 +74,12 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
     return (
         <Popover onOpenChange={(open) => openNewChat(open)}>
             <PopoverTrigger className="ml-auto bg-primary-400 text-black h-8 w-8 rounded-full ">+</PopoverTrigger>
-            <PopoverContent className="bg-zinc-800 text-white w-[300px] p-4 border border-zinc-900">
+            <PopoverContent className="bg-zinc-800 text-main-50 w-[300px] p-4 border border-zinc-900">
                 <div className="flex flex-col">
                     <div>Crear nuevo chat</div>
                     {memoizedUsers}
                     <div className="flex items-center border border-zinc-900 mt-2 rounded-md">
-                        <Input value={groupName} onChange={(e) => setGroupName(e.target.value)} type="text" placeholder={placeholderText} className="h-8 bg-zinc-800 text-white border-none rounded-none" disabled={selectedUsers.length < 2} />
+                        <Input value={groupName} onChange={(e) => setGroupName(e.target.value)} type="text" placeholder={placeholderText} className="h-8 bg-zinc-800 text-main-50 border-none rounded-none" disabled={selectedUsers.length < 2} />
                         <Button className="bg-zinc-900 hover:bg-zinc-600" onClick={() => createChat()}>Crear</Button>
                     </div>
                 </div>

@@ -19,7 +19,7 @@ export default function History(){
     }, [session]);
 
     return(
-        <MenuWrapper className={` bg-main-900 text-white flex flex-wrap items-start justify-evenly`}>
+        <MenuWrapper className={` bg-main-900 text-main-50 flex flex-wrap items-start justify-evenly`}>
             {Object.values(history).reverse()?.map((game: any, i: number) => {
                 return (
                     <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-main-900 bg-opacity-80">
@@ -31,12 +31,12 @@ export default function History(){
                                             src={`/smartrotom/img/apps/mina/recompensas/${reward.itemId?.split(':')[1]}.png`}
                                             style={{imageRendering: "pixelated"}}
                                         />
-                                        <p className="text-gray-400">{reward.objeto}</p>
+                                        <p className="text-main-400">{reward.objeto}</p>
                                     </div>
                                 )
                             })}
                         </div>
-                            <p className="text-gray-400">{new Date(game[0].date).toLocaleString()}</p>
+                            <p className="text-main-400">{new Date(game[0].date).toLocaleString()}</p>
                     </div>
                 )
             })}

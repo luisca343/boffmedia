@@ -281,13 +281,13 @@ export default function Test() {
       >
         <div className="w-[30%] flex flex-col  bg-main-800 justify-end bg-opacity-60 p-2 text-center">
         <PokemonTeamList team={battle.sides[0].team} />
-            <div className="text-shadow-border1 text-white">{battle.sides[0].name}</div>
+            <div className="text-shadow-border1 text-main-50">{battle.sides[0].name}</div>
             <img className="mx-auto" style={{height:'100px', width:'45px'}} src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4" />
             
         </div>
         <GameCanvas pokemon={pokemon} battle={battle}/>
         <div className="w-[30%] flex flex-col bg-main-800  bg-opacity-60 p-2 text-center">
-        <div className="text-shadow-border1 text-white">{battle.sides[1].name}</div>
+        <div className="text-shadow-border1 text-main-50">{battle.sides[1].name}</div>
         <img className="mx-auto" style={{height:'100px', width:'45px', transform: 'scaleX(-1)'}} src="https://crafatar.com/renders/body/e4f3e314-ea7f-4ef6-aa5b-06162c5bf7f6" />
           
         <PokemonTeamList team={battle.sides[1].team} />

@@ -123,19 +123,19 @@ export const SideMenu = () => {
       >
         <div className="h-full w-full bg-blue-950 flex flex-col  relative z-10">
           <div className="w-full bg-main-900 h-24  text-blue-100 font-bold italic pointer-events-none flex items-center justify-center rounded-b-xl">
-            <div className="bg-white min-w-16 h-16 rounded-full text-center text-9xl flex items-center mx-2">
+            <div className="bg-main-50 min-w-16 h-16 rounded-full text-center text-9xl flex items-center mx-2">
               <img src="/smartrotom/img/apps/starbank.webp" alt="logo" className="h-16 w-16" />
             </div>
             <AnimatePresence>
               {isOpened && (
                 <motion.div variants={menuItemVariants}>
-                  <div className="text-white text-4xl font-bold">StarBank</div>
+                  <div className="text-main-50 text-4xl font-bold">StarBank</div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           <motion.div 
-            className="mt-6 ml-4 mr-4 py-4 min-w-32 text-gray-800 text-6xl grid place-items-center grid-cols-32 auto-cols-min rounded-lg"
+            className="mt-6 ml-4 mr-4 py-4 min-w-32 text-main-800 text-6xl grid place-items-center grid-cols-32 auto-cols-min rounded-lg"
             transition={{ duration: .6 }}
             whileHover={{ 
               transition: { duration: .2 } 

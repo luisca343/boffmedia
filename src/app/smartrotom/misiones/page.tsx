@@ -132,7 +132,7 @@ export default function Misiones(){
             case QuestStatus.AVAILABLE:
                 return "bg-yellow-300"
             case QuestStatus.LOCKED:
-                return "bg-gray-300"
+                return "bg-main-300"
         }
     }
 

@@ -79,7 +79,7 @@ export default function Movimiento({params} : {params: {id: string}}){
 
 
     return (
-        <div className="bg-main-800 text-white min-h-screen flex items-center justify-center">
+        <div className="bg-main-800 text-main-50 min-h-screen flex items-center justify-center">
             <div className="flex flex-col w-full h-full mx-auto p-6 bg-main-700 rounded-lg shadow-lg">
                 <MoveDataElement id={id} />
                 <span className="text-2xl font-semibold my-4 text-center">Pokémon que pueden aprender este movimiento ({pokemon?.length})</span>

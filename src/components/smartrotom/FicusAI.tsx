@@ -121,7 +121,7 @@ processParts();
       </ul>
       <div className="flex items-center mt-4">
         <Input defaultValue={""} type="text" value={text} onChange={e => setText(e.target.value)} className="mr-2" />
-        <button onClick={enviarMensaje} className="bg-blue-800 text-white px-4 py-2 rounded">Enviar</button>
+        <button onClick={enviarMensaje} className="bg-blue-800 text-main-50 px-4 py-2 rounded">Enviar</button>
       </div>
     </div>
   );
@@ -130,7 +130,7 @@ processParts();
 
 
 function MensajeChat({ mensaje, sender }: { mensaje: Mensaje; sender: 'user' | 'bot' }) {
-  const messageClass = sender === 'user' ? 'bg-blue-800 text-white self-end' : 'bg-green-800 text-white self-start';
+  const messageClass = sender === 'user' ? 'bg-blue-800 text-main-50 self-end' : 'bg-green-800 text-main-50 self-start';
 
   return (
     <li

@@ -26,7 +26,7 @@ export default async function Drops() {
             <div>
                 {Object.keys(drops).map((type: string) => (
                     <Collapsible key={type}>
-                        <CollapsibleTrigger className="mx-auto text-2xl p-4 border rounded shadow flex flex-col items-center m-2 bg-main-900 bg-opacity-95 w-[90%] text-gray-400">
+                        <CollapsibleTrigger className="mx-auto text-2xl p-4 border rounded shadow flex flex-col items-center m-2 bg-main-900 bg-opacity-95 w-[90%] text-main-400">
                             {type} - {getPercentage(drops[type].totalValue, totalValue)}%
                         </CollapsibleTrigger>
                         <CollapsibleContent>
@@ -38,8 +38,8 @@ export default async function Drops() {
                                             className="w-16 h-16 mb-2"
                                             style={{imageRendering: "pixelated"}}
                                         />
-                                        <p className="text-gray-400">{drop.name}</p>
-                                        <p className="text-gray-400">{getPercentage(drop.value, totalValue)}%</p>
+                                        <p className="text-main-400">{drop.name}</p>
+                                        <p className="text-main-400">{getPercentage(drop.value, totalValue)}%</p>
                                     </div>
                                 ))}
                             </div>

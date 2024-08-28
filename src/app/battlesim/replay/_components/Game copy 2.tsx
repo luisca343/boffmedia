@@ -506,7 +506,7 @@ return (
           return (
             <div className={`w-[20%] h-full flex justify-center ${viewPoint[viewPoint[side]] === 0 ? 'flex-col' : 'flex-col-reverse'}`}>
               <PokemonTeamList team={currTeam} />
-              <div className="text-shadow-border1 text-white text-center">{player?.name}</div>
+              <div className="text-shadow-border1 text-main-50 text-center">{player?.name}</div>
               
               {
                 avatarId !=0 ? <img className="mx-auto"  src={avatar} />

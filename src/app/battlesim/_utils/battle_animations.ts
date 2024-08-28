@@ -197,7 +197,7 @@ export const BattleEffects: {[k: string]: any} = {
 		w: 127, h: 119,
 	},
 	feather: {
-		url:'/battlesim/fx/feather.png', // Ripped from http://www.clker.com/clipart-black-and-white-feather.html
+		url:'/battlesim/fx/feather.png', // Ripped from http://www.clker.com/clipart-black-and-main-50-feather.html
 		w: 100, h: 38,
 	},
 	shell: {

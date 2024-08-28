@@ -117,7 +117,7 @@ export function SendMoney(){
                             </div>
                         </div> 
                 </section> : null}
-                <Button onClick={() => sendMoney()} className="mt-2 bg-blue-900 hover:bg-blue-700 text-white ">Enviar</Button>
+                <Button onClick={() => sendMoney()} className="mt-2 bg-blue-900 hover:bg-blue-700 text-main-50 ">Enviar</Button>
             </div>
     )
 }

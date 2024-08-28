@@ -61,12 +61,12 @@ export function BarraEnergia() {
     }
 
     return (
-        <div className='flex flex-col w-full ml-auto mt-auto text-gray-100 text-shadow-border1 tex-lg  xl:text-xl '>
+        <div className='flex flex-col w-full ml-auto mt-auto text-main-100 text-shadow-border1 tex-lg  xl:text-xl '>
         {energy >= maxEnergy ? 
             <></> : 
             <div className='mx-auto '>Siguiente recarga en: {getHour()}</div>
         }
-        <motion.div className=" ml-auto px-1 w-full flex  rounded-lg border-2 border-gray-900 bg-main-900 flex-wrap items-start justify-start">
+        <motion.div className=" ml-auto px-1 w-full flex  rounded-lg border-2 border-main-900 bg-main-900 flex-wrap items-start justify-start">
             <AnimatePresence>
                 {[...Array(maxEnergy)].map((_, i) => {
                     let color;
@@ -82,7 +82,7 @@ export function BarraEnergia() {
                     return <motion.div
                         key={i}
                         style={{ width: `${100 / 10 }%` }}
-                        className={` rounded-lg h-12 xl:h-20 border-y-4 border-x-2 border-gray-900 text-center flex items-center justify-center`}
+                        className={` rounded-lg h-12 xl:h-20 border-y-4 border-x-2 border-main-900 text-center flex items-center justify-center`}
                         initial={{ backgroundColor: 'rgb(75 85 99)', scaleY: 1 }}
                         animate={{ backgroundColor: color, scaleY: 1 }}
                         transition={{ delay: i * 0.1 }}

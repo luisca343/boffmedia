@@ -48,7 +48,7 @@ export default function Transacciones(){
                 <BankSectionFooter>
                     <Dialog>
                         <DialogTrigger>
-                            <div className="bg-blue-900 hover:bg-blue-700 text-white p-2 rounded-md">Enviar dinero</div>
+                            <div className="bg-blue-900 hover:bg-blue-700 text-main-50 p-2 rounded-md">Enviar dinero</div>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>Enviar dinero</DialogHeader>

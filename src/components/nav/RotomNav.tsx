@@ -76,15 +76,15 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
       
     function Notifications(){
         return(
-            <div className="flex flex-col bg-gray-300 w-[33vw] rounded-md z-50">
-                <header className="flex justify-between items-center bg-gray-800 p-4">
-                    <h2 className="text-white">Notificaciones</h2>
-                    <button onClick={clear} className="text-white">Limpiar</button>
-                    <button onClick={markAllAsRead} className="text-white">Marcar todas como leídas</button>
-                    <span className="text-white">{unreadCount}</span>
+            <div className="flex flex-col bg-main-300 w-[33vw] rounded-md z-50">
+                <header className="flex justify-between items-center bg-main-800 p-4">
+                    <h2 className="text-main-50">Notificaciones</h2>
+                    <button onClick={clear} className="text-main-50">Limpiar</button>
+                    <button onClick={markAllAsRead} className="text-main-50">Marcar todas como leídas</button>
+                    <span className="text-main-50">{unreadCount}</span>
                 </header>
-                <div className="flex flex-col bg-gray-300 p-4">
-                    {notifications.map((notif, i) => <div key={i} className="text-white bg-gray-500 p-2 m-2">{notif.content?.toString()}</div>)}
+                <div className="flex flex-col bg-main-300 p-4">
+                    {notifications.map((notif, i) => <div key={i} className="text-main-50 bg-main-500 p-2 m-2">{notif.content?.toString()}</div>)}
                 </div>
 
         </div>
@@ -101,9 +101,9 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <SheetTrigger>
                     <BotonAjustes />
                 </SheetTrigger>
-                <SheetContent side="top" className="bg-zinc-900 text-white border-none" parentId="smartrotom">
+                <SheetContent side="top" className="bg-zinc-900 text-main-50 border-none" parentId="smartrotom">
                     <SheetHeader>
-                        <SheetTitle className="text-white">Ajustes</SheetTitle>
+                        <SheetTitle className="text-main-50">Ajustes</SheetTitle>
                         <SheetDescription>
                             <SettingsPage setTema={setTema} />
                         </SheetDescription>
@@ -114,9 +114,9 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                 <SheetTrigger>
                     <BotonIA />
                 </SheetTrigger>
-                <SheetContent side="right" className="bg-zinc-900 text-white border-none flex flex-col w-max" parentId="smartrotom">
+                <SheetContent side="right" className="bg-zinc-900 text-main-50 border-none flex flex-col w-max" parentId="smartrotom">
                     <SheetHeader>
-                        <SheetTitle className="text-white text-2xl font-bold">FicusAI</SheetTitle>
+                        <SheetTitle className="text-main-50 text-2xl font-bold">FicusAI</SheetTitle>
                     </SheetHeader>
                         <SheetDescription className="h-full overflow-hidden">
                             <FicusAI />
@@ -134,7 +134,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
                     <Notifications />
                 </PopoverContent>
             </Popover>
-            <Hora className="text-white text-3xl mx-1" />
+            <Hora className="text-main-50 text-3xl mx-1" />
             <SocketStatus socket={socket}/>
             <MinecraftFunctions />
         </nav>
@@ -144,7 +144,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
 
 function BotonNav({Icono, strokeWidth = 5, onClick = null} : {onClick?:any,strokeWidth?: number, Icono: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>>}){
     return (
-        <button className="rounded-lg border-0 h-8 w-8 mx-2 bg-white flex items-center justify-center" onClick={onClick}>
+        <button className="rounded-lg border-0 h-8 w-8 mx-2 bg-main-50 flex items-center justify-center" onClick={onClick}>
             <Icono strokeWidth={strokeWidth} height={28} width={28} className="text-primary-500"/>
         </button>
     )
@@ -155,7 +155,7 @@ function SocketStatus ({socket}: {socket: Socket | null}){
     return (
         <Tooltip>
             <TooltipTrigger>
-                <div className='cursor-pointer text-white h-10 text-xl flex items-center'>
+                <div className='cursor-pointer text-main-50 h-10 text-xl flex items-center'>
                     <span >{socket && socket.connected ? '🟢' : '🔴'}</span>
                 </div>
             </TooltipTrigger>

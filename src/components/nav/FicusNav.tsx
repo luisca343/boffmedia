@@ -29,10 +29,10 @@ export function FicusNav() {
     <nav className="bg-main-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div>
-          <Link href="/wingull" className="text-white mx-2">
+          <Link href="/wingull" className="text-main-50 mx-2">
             Pixelmon Wingull
           </Link>
-          <Link href="/smartrotom" className="text-white mx-2">
+          <Link href="/smartrotom" className="text-main-50 mx-2">
             SmartRotom
           </Link>
         </div>

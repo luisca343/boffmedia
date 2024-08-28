@@ -345,7 +345,7 @@ console.log(team)
   return (
     <div className="w-[20%] h-full">
       <PokemonTeamList team={team} />
-      <div className="text-shadow-border1 text-white">{battle.sides[0].name}</div>
+      <div className="text-shadow-border1 text-main-50">{battle.sides[0].name}</div>
       <img className="mx-auto" style={{height:'100px', width:'45px', transform: reverse && 'scaleX(-1)'}} src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4" />
     </div>
   )

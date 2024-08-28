@@ -42,7 +42,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                     <div className="w-fit h-8 bg-main-800 bg-opacity-90 py-1 px-2 rounded-md text-main-200 z-50">
                         Turno {battle.turn}
                     </div>
-                    <span className="text-white font-bold text-shadow-border1 ml-2">
+                    <span className="text-main-50 font-bold text-shadow-border1 ml-2">
                         {p1.name} vs {p2.name}
                     </span>
                     </div>
@@ -101,7 +101,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 />
             ))}
             <div id='overlay' className="absolute w-full h-full pointer-events-none">
-                <div className="absolute top-16 left-0 text-white text-shadow-border1 z-20 ml-2">
+                <div className="absolute top-16 left-0 text-main-50 text-shadow-border1 z-20 ml-2">
                     {battle.sides.map((side) => {
                         return Object.values(side.sideConditions).map((value) => {
                             return <div key={`condition-${side.name}-${value.name}`}>{side.name}: {value.name} {value.minDuration} {value.maxDuration > 0 && `- ${value.maxDuration}`} turns</div>

@@ -66,7 +66,7 @@ export default function MoveDataElement({id} : {id: string}){
                         <HoverCardTrigger>
                             <InformationCircleIcon className="w-5 h-5 mr-1" />
                         </HoverCardTrigger>
-                        <HoverCardContent className="bg-main-800 text-white w-72">
+                        <HoverCardContent className="bg-main-800 text-main-50 w-72">
                             <div className="flex items-center mb-2">
                                 <div className="w-4 h-4 bg-main-600 border border-main-600 mr-2"></div>
                                 <span>No alcanza al objetivo</span>

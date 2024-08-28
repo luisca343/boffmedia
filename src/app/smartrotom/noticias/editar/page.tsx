@@ -34,7 +34,7 @@ export default  function EditarNoticia(){
             <h1>Editar Noticia</h1>
             <p>Selecciona una noticia para editar</p>
             <div className="flex flex-wrap">
-                <button onClick={() => createNote()} className="text-white bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center flex flex-col justify-center items-center">
+                <button onClick={() => createNote()} className="text-main-50 bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center flex flex-col justify-center items-center">
                     <h2>Crear</h2>
                 </button>
                 {news.map((n: any) => (
