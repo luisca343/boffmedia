@@ -82,6 +82,11 @@ export class PokemonController {
         return this.pokemonService.getMoves(id, form);
     }
 
+    @Get('moves')
+    getAllMoves(){
+        return this.pokemonService.getAllMoves();
+    }
+
     @Get('move/:name')
     getMove(@Param('name') name: string){
         console.log('name', name)

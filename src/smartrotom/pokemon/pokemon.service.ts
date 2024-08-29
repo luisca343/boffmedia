@@ -85,16 +85,20 @@ export class PokemonService {
 
     }
 
+    async getAllMoves(){
+        return Object.entries(this.pokemonData.speciesByMove).map((entry:any) => {
+           return {name: entry[0], count: entry[1].length}
+        })
+    }
+
     async getMove(name: string){
         const moveData = this.moveData.movesByName[name]
-        console.log(this.moveData.movesByName[name])
         if(!moveData) return {error: 'Move not found'}
         return moveData
     }
 
     async getPokemonByMove(name: string){
         const pkm = this.pokemonData.speciesByMove[name]
-        console.log(pkm)
         if(!pkm) return {error: 'Pokemon not found'}
         return pkm
     }
