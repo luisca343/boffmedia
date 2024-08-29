@@ -201,7 +201,7 @@ export class PokemonData {
 
         this.speciesByMove = sortedMovesCopy;
         
-        console.log(`Moves sorted by count: ${sortedMoves.map((m) => `${m} (${countMoves[m]})`).join(', ')}`);
+        //console.log(`Moves sorted by count: ${sortedMoves.map((m) => `${m} (${countMoves[m]})`).join(', ')}`);
         
 
         
