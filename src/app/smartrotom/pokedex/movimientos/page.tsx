@@ -1,0 +1,42 @@
+"use client"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { rotomGET } from "@/services/boffAPI";
+import MoveDataElement from "./_components/MoveData";
+import useTranslation from 'next-translate/useTranslation'
+import { useEffect, useState } from "react";
+
+interface Move {
+    name: string;
+    count: number;
+}
+
+export default function Movimientos() {
+    const [moves, setMoves] = useState<Move[] | null>(null);
+    const { t } = useTranslation("smartrotom/pokedex/moves");
+
+    useEffect(() => {
+        rotomGET('/pokemon/moves').then((res) => {
+            setMoves(res);
+        });
+    }, []);
+
+    if (!moves) return <div>loading...</div>;
+    return (
+        <div className="bg-main-800 flex flex-wrap text-main-100 w-full justify-between p-2">
+            {moves.map((move: Move) => (
+                <HoverCard key={move.name}>
+                    <HoverCardTrigger 
+                        onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${move.name}`} 
+                        className="flex flex-col p-2 text-center items-center justify-center hover:text-main-800 hover:bg-main-400 w-64 h-32 border rounded-lg my-1"
+                    >
+                        <span className="text-lg font-medium">{t(`attack_${move.name.toLowerCase().replace(" ", "_")}`)}</span>
+                        <span className="text-sm">{move.count}</span>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="bg-main-700 text-main-50 w-[400px] border-main-950 border font-normal p-4 rounded-lg">
+                        <MoveDataElement id={move.name} />
+                    </HoverCardContent>
+                </HoverCard>
+            ))}
+        </div>
+    );
+}
