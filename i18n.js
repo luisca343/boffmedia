@@ -8,6 +8,7 @@ module.exports = {
     "/smartrotom/pokedex/spawns": ["smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/localizacion/[id]": ["smartrotom/pokedex/spawns","smartrotom/pokedex/forms"],
     "/smartrotom/pokedex/movimientos/[id]": ["smartrotom/pokedex/common", "smartrotom/pokedex/moves"],
+    "/smartrotom/pokedex/movimientos": ["smartrotom/pokedex/common", "smartrotom/pokedex/moves"],
     "/smartrotom/pokedex/localizacion": ["smartrotom/pokedex/spawns"],
     "/smartrotom/pasaporte": ["smartrotom/pokedex/moves", "smartrotom/pokedex/forms", "smartrotom/pokedex/abilities", "smartrotom/pokedex/common"],
     "/battlesim/replay/[name]": ["smartrotom/pokedex/common"],
