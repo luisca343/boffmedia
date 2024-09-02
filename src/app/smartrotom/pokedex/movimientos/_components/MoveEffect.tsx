@@ -61,7 +61,7 @@ export function MoveEffect({effect} : {effect: Effect}){
                 }</div>
             )
         case 'AlwaysHit':
-            return <div>Siempre acierta en {effect.weather}</div>
+            return <div>Siempre acierta {effect.weather && `en ${effect.weather}`}</div>
         case 'Burn': 
             return <div>
                 {effect.modifiers.length > 0 
@@ -409,7 +409,52 @@ export function MoveEffect({effect} : {effect: Effect}){
             return <span>Este movimiento aumenta su poder cuanto más afecto tenga el usuario</span>
         case 'FakeOut':
             return <span>Solo puede ser usado en el primer turno después de salir al campo</span>
-            
+        case 'TopsyTurvy':
+            return <span>Invierte los cambios de estadísticas del objetivo</span>
+        case 'ExpandingForce':
+            return <span>Si se usa en terreno psíquico, aumenta su potencia a 120 y golpeará a ambos oponentes</span>
+        case 'Payback':
+            return <span>Este movimiento aumenta su poder si el objetivo ha atacado antes</span>
+        case 'PoisonBadly':
+            return <span>Envenena gravemente al objetivo</span>
+        case 'Telekinesis':
+            return <span>Hace que el objetivo levite durante 3 turnos</span>
+        case 'Snatch':
+            return <span>El usuario roba los cambios de estado del objetivo</span>
+        case 'Retaliate':
+            return <span>Este movimiento aumenta su poder si un Pokémon del equipo ha sido derrotado en el turno anterior</span>
+        case 'Spite':
+            return <span>Reduce los PP del último movimiento usado por el objetivo</span>
+        case 'BatonPass':
+            return <span>El usuario pasa sus cambios de estadísticas al siguiente Pokémon del equipo</span>
+        case 'Psywave':
+            return <span>Este movimiento inflige un daño variable</span>
+        case 'StoredPower':
+            return <span>Este movimiento aumenta su poder con cada cambio de estadísticas del usuario</span>
+        case 'HappyHour':
+            return <span>Duplica las ganancias de dinero al final del combate</span>
+        case 'Taunt':
+            return <span>Impide al objetivo usar movimientos de estado durante 3 turnos</span>
+        case 'DestinyBond':
+            return <span>Si el usuario es derrotado, el objetivo también lo será</span>
+        case 'PsychUp':
+            return <span>El usuario copia los cambios de estadísticas del objetivo</span>
+        case 'FoulPlay':
+            return <span>Este movimiento usa el ataque del objetivo para calcular su poder</span>
+        case 'PowerSplit':
+            return <span>El usuario y el objetivo comparten su poder de ataque</span>
+        case 'GuardSplit':
+            return <span>El usuario y el objetivo comparten su poder de defensa</span>
+        case 'LashOut':
+            return <span>Este movimiento aumenta su poder si el usuario ha sufrido cambios de estadísticas negativos durante el turno</span>
+        case 'AllySwitch':
+            return <span>Intercambia la posición del usuario con la de un Pokémon aliado</span>
+        case 'Acupressure':
+            return <span>El usuario aumenta una estadística aleatoria en 2 niveles</span>
+        case 'MagicCoat':
+            return <span>Refleja los movimientos de estado del objetivo</span>
+        case 'StompingTantrum':
+            return <span>Este movimiento aumenta su poder si el último movimiento del usuario falló</span>
         
         default:
             return (
