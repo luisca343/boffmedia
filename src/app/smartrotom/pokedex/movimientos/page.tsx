@@ -29,7 +29,7 @@ export default function Movimientos() {
                         onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${move.name}`} 
                         className="flex flex-col p-2 text-center items-center justify-center hover:text-main-800 hover:bg-main-400 w-64 h-32 border rounded-lg my-1"
                     >
-                        <span className="text-lg font-medium">{t(`attack_${move.name.toLowerCase().replace(" ", "_")}`)}</span>
+                        <span className="text-lg font-medium">{t(`attack_${move.name.toLowerCase().replaceAll(" ", "_")}`)}</span>
                         <span className="text-sm">{move.count}</span>
                     </HoverCardTrigger>
                     <HoverCardContent className="bg-main-700 text-main-50 w-[400px] border-main-950 border font-normal p-4 rounded-lg">
