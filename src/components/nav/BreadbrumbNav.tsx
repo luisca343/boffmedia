@@ -18,8 +18,8 @@ export default function BreadcrumbNav({className} : {className?: string}){
                 const href = '/' + parts.slice(0, index + 1).join('/')
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
+                        {index > 0 && <span className="text-3xl font-bold m-1 text-primary">/</span>}
                         <Breadcrumb index={index} key={index} parts={parts} />
-                        <span className="text-3xl font-bold m-1 text-primary">/</span>
                     </React.Fragment>
                 )
              }
