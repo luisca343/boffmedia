@@ -1720,6 +1720,16 @@
   "attack_triple_dive_description": "Ejecuta una inmersión triple en perfecta sincronía que golpea al objetivo con salpicaduras de agua tres veces seguidas.",
   "attack_twin_beam": "Láser Doble",
   "attack_twin_beam_description": "Ataca emitiendo dos misteriosos haces lumínicos por los ojos que infligen daño dos veces seguidas.", 
+  "attack_syrup_bomb": "Bomba Caramelo",
+  "attack_syrup_bomb_description": "Lanza una bomba de caramelo que explota al impactar. El objetivo queda pegajoso reducirá su Velocidad al final de cada turno por 3 turnos.",
+  "attack_matcha_gotcha": "Cañón Batidor",
+  "attack_matcha_gotcha_description": "Dispara un chorro de té matcha que puede quemar al objetivo. El usuario recupera la mitad de los PS del daño que produce.",
+  "attack_ivy_cudgel": "Garrote Liana",
+  "attack_ivy_cudgel_description": "Ataca al objetivo con una liana que se enrosca en él y lo golpea con fuerza. Este movimiento tiene una alta probabilidad de ser crítico.",
+  "attack_blood_moon": "Luna Roja",
+  "attack_blood_moon_description": "Este movimiento no puede usarse dos veces seguidas.",
+  
+  
   "attack_max_flare": "Maxignición",
   "attack_max_flare_description": "Hace daño y hace que el usuario invoque Día Soleado por 5 turnos.",
   "attack_max_flutterby": "Maxinsecto",
