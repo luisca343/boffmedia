@@ -59,7 +59,7 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
     }, [selectedUsers]);
 
     const memoizedUsers = useMemo(() => users.map((user) => (
-        <div className="flex items-center hover:bg-main-500" key={user.uuid}>
+        <div className="flex items-center hover:bg-neutral-500" key={user.uuid}>
             <label htmlFor={user.uuid} className="w-full flex items-center">
                 <CabezaJugador width={30} height={30} uuid={user.uuid} nombreNPC={user.username} autoRotate={false} tag={false} zoom={1} />
                 <div className="ml-2">{user.username}</div>
@@ -74,13 +74,13 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
     return (
         <Popover onOpenChange={(open) => openNewChat(open)}>
             <PopoverTrigger className="ml-auto bg-primary-400 text-black h-8 w-8 rounded-full ">+</PopoverTrigger>
-            <PopoverContent className="bg-main-800 text-main-50 w-[300px] p-4 border border-main-900">
+            <PopoverContent className="bg-neutral-800 text-neutral-50 w-[300px] p-4 border border-neutral-900">
                 <div className="flex flex-col">
                     <div>Crear nuevo chat</div>
                     {memoizedUsers}
-                    <div className="flex items-center border border-main-900 mt-2 rounded-md">
-                        <Input value={groupName} onChange={(e) => setGroupName(e.target.value)} type="text" placeholder={placeholderText} className="h-8 bg-main-800 text-main-50 border-none rounded-none" disabled={selectedUsers.length < 2} />
-                        <Button className="bg-main-900 hover:bg-main-600" onClick={() => createChat()}>Crear</Button>
+                    <div className="flex items-center border border-neutral-900 mt-2 rounded-md">
+                        <Input value={groupName} onChange={(e) => setGroupName(e.target.value)} type="text" placeholder={placeholderText} className="h-8 bg-neutral-800 text-neutral-50 border-none rounded-none" disabled={selectedUsers.length < 2} />
+                        <Button className="bg-neutral-900 hover:bg-neutral-600" onClick={() => createChat()}>Crear</Button>
                     </div>
                 </div>
             </PopoverContent>

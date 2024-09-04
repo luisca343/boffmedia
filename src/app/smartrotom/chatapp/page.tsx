@@ -88,18 +88,18 @@ export default function ChatApp() {
 
     return (
         <div className="w-full h-full flex">
-            <div className="flex flex-col h-full w-1/4  bg-main-800  border-r border-main-900 ">
-                <div className="h-16 p-2 text-xl w-full flex items-center text-main-50 " > 
+            <div className="flex flex-col h-full w-1/4  bg-neutral-800  border-r border-neutral-900 ">
+                <div className="h-16 p-2 text-xl w-full flex items-center text-neutral-50 " > 
                     <div>Chats</div>
                     <CreateGroup setActiveChat={setChat} />
                 </div>
-                <div className="flex flex-col h-full  overflow-auto bg-main-800">
+                <div className="flex flex-col h-full  overflow-auto bg-neutral-800">
                     {chats.map((chat) => <Contact {...chat} key={chat.id} />)}
                 </div>
             </div>
-            <div className="flex flex-col w-3/4 h-full bg-main-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-main-900">
+            <div className="flex flex-col w-3/4 h-full bg-neutral-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-neutral-900">
                 {activeChat ? <Chat chats={chats} activeChat={activeChat} setActiveChat={setActiveChat}
-                    /> : <div className="h-full flex items-center justify-center text-main-50">Selecciona un chat</div>}
+                    /> : <div className="h-full flex items-center justify-center text-neutral-50">Selecciona un chat</div>}
             </div>
         </div>
     );
@@ -130,28 +130,28 @@ export default function ChatApp() {
 
             if(msg.type === 'image') return (
                 <p className="text-sm flex items-center">
-                    <PhotoIcon className="mr-2 text-main-50" height={20} width={20} strokeWidth={2} />
+                    <PhotoIcon className="mr-2 text-neutral-50" height={20} width={20} strokeWidth={2} />
                     <span>Imagen</span>
                 </p>
             );
 
             if(msg.type === 'video') return (
                 <p className="text-sm flex items-center">
-                    <VideoCameraIcon className="mr-2 text-main-50" height={20} width={20} strokeWidth={2} />
+                    <VideoCameraIcon className="mr-2 text-neutral-50" height={20} width={20} strokeWidth={2} />
                     <span>Video</span>
                 </p>
             );
 
             if(msg.type === 'audio') return (
                 <p className="text-sm flex items-center">
-                    <SpeakerWaveIcon className="mr-2 text-main-50" height={20} width={20} strokeWidth={2} />
+                    <SpeakerWaveIcon className="mr-2 text-neutral-50" height={20} width={20} strokeWidth={2} />
                     <span>Audio</span>
                 </p>
             );
 
             if(msg.type === 'call') return (
                 <p className="text-sm flex items-center">
-                <PhoneIcon className="mr-2 text-main-50" height={20} width={20} strokeWidth={2} />
+                <PhoneIcon className="mr-2 text-neutral-50" height={20} width={20} strokeWidth={2} />
                     <span>Llamada de {msg.content} segundos</span>
                 </p>
             );
@@ -161,13 +161,13 @@ export default function ChatApp() {
         function Contact(chat: ChatData){
             return (
                 <div>
-                    <div className={`${activeChat === chat.id ? 'bg-main-700' : 'bg-main-800'} hover:bg-main-700 h-[100px] flex items-center w-full`} onClick={()  => setActiveChat(chat.id)}>
+                    <div className={`${activeChat === chat.id ? 'bg-neutral-700' : 'bg-neutral-800'} hover:bg-neutral-700 h-[100px] flex items-center w-full`} onClick={()  => setActiveChat(chat.id)}>
                         <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px'/>
-                        <div className="h-1/2  ml-4 text-main-50  flex flex-col justify-between items-start ">
+                        <div className="h-1/2  ml-4 text-neutral-50  flex flex-col justify-between items-start ">
                             <p className="text-sm font-bold">{chat.name}</p>
                             {LastMessage(chat)}
                         </div>
-                        <div className="h-1/2  ml-auto mr-4 text-main-50 flex flex-col justify-between items-end ">
+                        <div className="h-1/2  ml-auto mr-4 text-neutral-50 flex flex-col justify-between items-end ">
                             <p className="text-sm">{strToDate(chat.messages[0]?.createdAt)}</p>
                             {chat.unread > 0 && <p className="flex items-center justify-center text-sm bg-primary-400  rounded-md w-6 h-6">{chat.unread}</p> }
                         </div>
