@@ -1,8 +1,8 @@
-import {mineGamesDetail, mineGames, mineRewards } from '@/_db/schema/SmartRotomMine';
+import {mineGamesDetail, mineGames, mineRewards, DetallePartidaMina } from '@/_db/schema/SmartRotomMine';
 import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
-import { and, desc, eq, max, sum } from 'drizzle-orm';
+import { and, desc, eq, inArray, max, sum } from 'drizzle-orm';
 import { ResultSetHeader } from 'mysql2';
 
 @Injectable()
@@ -163,4 +163,20 @@ export class MinaService {
         return arr;
     }
 
+    async claim(uuid: string) {
+        const res = await this.db.getDrizzle().select({ id: mineGamesDetail.id, rewardId: mineGamesDetail.rewardId })
+            .from(mineGames)
+            .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
+            .where(and(eq(mineGames.uuid, uuid), eq(mineGamesDetail.claimed, 0)));
+    
+        const ids = res.map((row) => row.id);
+    
+        if (ids.length > 0) {
+            await this.db.getDrizzle().update(mineGamesDetail)
+                .set({ claimed: 1 } as any)
+                .where(inArray(mineGamesDetail.id, ids));
+        }
+
+        return ids;
+    }
 }

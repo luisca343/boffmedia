@@ -47,5 +47,10 @@ export class MinaController {
     async getUnclaimed(@Param('uuid') uuid: string) {
       return await this.minaService.getUnclaimed(uuid);
     }
+
+    @Post('claim')
+    async claim(@Body() body: {uuid: string}) {
+      return await this.minaService.claim(body.uuid);
+    }
   
 }
