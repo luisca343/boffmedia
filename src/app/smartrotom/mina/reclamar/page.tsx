@@ -4,7 +4,7 @@ import { BoffSession } from "@/components/smartrotom/AppWrapper"
 import { useSession } from "next-auth/react"
 import MenuWrapper from "../_components/MenuWrapper"
 import { useEffect, useState } from "react"
-import { rotomGET } from "@/services/boffAPI"
+import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { isMinecraft, mcefQuery } from "@/services/mcefHelper"
 import Image from "next/image"
 import { toast } from 'react-toastify';
@@ -23,14 +23,29 @@ export default function Reclamar(){
     
 
     async function claimReward(){
+        
         if(!session) return
         if(!await isMinecraft()) {
             toast.error('No estas en Minecraft')
         }
+        // Convert unclaimet to array
+
+        let unclaimedArray = []
+        for (const key in unclaimed) {
+            unclaimedArray.push({
+                id: key,
+                cantidad: unclaimed[key]
+            })
+        }
+
         try {
-            await mcefQuery('claimRewards', {query: "claimRewards", unclaimed});
-            console.log('Promise resolved successfully');
+            const res = await mcefQuery('darCaja', {query: "darCaja", objetos: unclaimedArray});
+            rotomPOST('/mine/claim/', {uuid: session.user.smartRotomUser.uuid}).then(res => {
+                toast.success('Recompensas reclamadas')
+                window.location.reload()
+            })
         } catch (error) {
+            toast.error('Error al reclamar recompensas')
             console.error('Promise rejected with error', error);
         }
     }
@@ -54,7 +69,7 @@ export default function Reclamar(){
             })
             : <h2>Nada para reclamar</h2>
         }
-        <button onClick={() => claimReward()} className="bg-primary-400 text-main-50 rounded-md p-2 mt-4">Reclamar</button>
+            <button onClick={() => claimReward()} className="bg-primary-400 text-main-50 rounded-md p-2 mt-4">Reclamar</button>
         </div>
     </MenuWrapper>
     )

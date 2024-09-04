@@ -23,6 +23,7 @@ export async function mcefQuery(query: string, data: Object = {}){
                     try {
                         parsedResponse = JSON.parse(response);
                     } catch (error) {
+                        alert('Response: ' + response);
                         reject('Error parsing response: ' + error);
                     }
                     resolve(parsedResponse);
