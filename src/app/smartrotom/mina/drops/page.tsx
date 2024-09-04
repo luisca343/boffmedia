@@ -39,7 +39,7 @@ export default async function Drops() {
                                             style={{imageRendering: "pixelated"}}
                                         />
                                         <p className="text-main-400 text-center">{drop.name}</p>
-                                        <p className="text-main-400">{getPercentage(drop.value, totalValue)}%</p>
+                                        <p className="text-main-400 text-center">{getPercentage(drop.value, totalValue)}%</p>
                                     </div>
                                 ))}
                             </div>
