@@ -4,7 +4,7 @@ import { getSmartRotomUser } from "@/lib/utils";
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react"
-import { PokemonSprite } from "../pokedex/_components/PokemonSprite";
+import { PokemonSprite } from "../../pokedex/_components/PokemonSprite";
 
 export default function CamaraLucha(){
     const [combates, setCombates] = useState([])
