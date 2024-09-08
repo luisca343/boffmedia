@@ -166,4 +166,19 @@ export class SmartrotomService {
         } as SmartRotomUserAchievement).execute()
     } 
 
+    async getRepeticiones(uuid: string) {
+        return await this.db.getDrizzle()
+            .select({id: smartRotomReplays.id, team1: smartRotomReplays.team1, team2: smartRotomReplays.team2, replay: smartRotomReplays.replay, winner: smartRotomReplays.winner, side1: smartRotomReplays.side1, side2: smartRotomReplays.side2})
+            .from(smartRotomReplays)
+            .leftJoin(
+                smartRotomUserReplays,
+                and(
+                    eq(smartRotomUserReplays.replayId, smartRotomReplays.id),
+                    eq(smartRotomUserReplays.uuid, uuid)
+                )
+            )
+            .where(eq(smartRotomUserReplays.uuid, uuid))
+            .orderBy(desc(smartRotomReplays.id))
+    }
+
 }

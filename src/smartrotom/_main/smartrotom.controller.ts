@@ -52,6 +52,11 @@ export class SmartrotomController {
     async addBattleAchievement(@Body() battleAchievement:  LogroCombate){
         return await this.smartrotomService.addBattleAchievement(battleAchievement)
     }
+
+    @Get('repeticiones/:uuid')
+    async getRepeticiones(@Param('uuid') uuid: string){
+        return this.smartrotomService.getRepeticiones(uuid)
+    }
 }
 
 interface SmartRotomPost {
