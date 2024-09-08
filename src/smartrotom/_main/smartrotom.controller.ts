@@ -80,6 +80,7 @@ export interface LogroCombate extends SmartRotomPost {
     npc: string;
     victoria: boolean;
     logro: string;
-    equipo: PokemonData[];
+    team1: PokemonData[];
+    team2: PokemonData[];
     replay: string;
   }

@@ -131,7 +131,8 @@ export class SmartrotomService {
         const insert = await this.db.getDrizzle().insert(smartRotomReplays).values({
             side1: battleAchievement.uuid,
             side2: battleAchievement.npc,
-            team1: JSON.stringify(battleAchievement.equipo),
+            team1: JSON.stringify(battleAchievement.team1),
+            team2: JSON.stringify(battleAchievement.team2),
             replay: battleAchievement.replay,
             winner: battleAchievement.victoria ? 1 : 2
         } as SmartRotomReplay).execute()
