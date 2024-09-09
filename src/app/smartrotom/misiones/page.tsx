@@ -10,79 +10,10 @@ import { ItemSprite } from "../pokedex/_components/PokemonSprite";
 import { Item } from "@radix-ui/react-select";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useRotomQuests } from "./_hooks/useRotomQuests";
+import { IDialogue, IQuestObjective, IQuestReward, QuestData, QuestStatus } from "./_types/Quest";
 const NpcSkin = React.lazy(() => import("@/components/smartrotom/MinecraftSkin"));
 
-
-enum QuestStatus {
-    ACTIVE= "ACTIVE",
-    COMPLETED= "COMPLETED",
-    FAILED = "FAILED",
-    AVAILABLE = "AVAILABLE",
-    LOCKED = "LOCKED",
-}
-
-interface IDialogue {
-    id: number;
-    name: string;
-    text: string;
-    questId: number;
-    requirements: IQuestRequirements;
-}
-
-interface IQuestCategory {
-    quests: number[];
-}
-
-interface IQuestObjective {
-    name: string;
-    progress: number;
-    total: number;
-}
-
-interface IQuestReward {
-    item: string;
-    count: number;
-}
-
-interface ScoreboardRequirements {
-    scoreboardObjective: string;
-    scoreboardType: string;
-    scoreboardValue: number;
-    
-}
-
-interface FactionRequirements {
-    factionId: number;
-    factionAvailable: string;
-    factionStance: string;
-}
-
-interface IQuestRequirements {
-    available: boolean;
-    requiredQuests: number[];
-    requiredDialogs: number[];
-    requiredLevel: number;
-    requiredTime: number;
-    factionRequirements: FactionRequirements[];
-    scoreboardRequirements: ScoreboardRequirements[];
-}
-
-export type QuestData = {
-    id: number;
-    name: string;
-    logText: string;
-    completeText: string;
-    repeatable: boolean;
-    type: number;
-    nextQuest: number;
-    category: string;
-    status: QuestStatus;
-    objectives: IQuestObjective[];
-    requirements: IQuestRequirements;
-    dialogId: number;
-    
-    rewards: IQuestReward[];
-}
 
 function parseTestData(jsonString: string) {
     const testData = JSON.parse(jsonString);
@@ -96,12 +27,7 @@ function parseTestData(jsonString: string) {
 }
 
 export default function Misiones(){
-    const { data: session} = useSession()
-    const [quests, setMisiones] = useState([] as QuestData[])
-    const [categories, setCategories] = useState({} as {[key: string]: IQuestCategory})
-    const [dialogs, setDialogs] = useState([] as IDialogue[])
-    const [npcs, setNpcs] = useState([] as any[])
-
+    const { quests, categories, dialogs, npcs } = useRotomQuests()
     const [book, setBook] = useState(null) as any
 
 
@@ -109,17 +35,7 @@ export default function Misiones(){
     const questPages = {} as {[key: number]: number} // {questId: page}
     const dialogPages = {} as {[key: number]: number} // {dialogId: page}
 
-    useEffect(() => {
-        if(!session) return
-        rotomPOST("/misiones", { uuid: getSmartRotomUser(session).uuid })
-        .then((response) => {
-            setMisiones(response.quests)
-            setCategories(response.categories)
-            setDialogs(response.dialogs)
-            setNpcs(response.npcs)
-        })
-    }, [])
-
+ 
 
     function getStatusStyles(status: QuestStatus){
         switch(status){
@@ -146,7 +62,7 @@ export default function Misiones(){
 
     if(!quests) return <div>Cargando...</div>
     return(
-        <section className=" bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
+        <section className="text-black bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
           <Book pageColor="-purple" setBook={(e) => setBook(e)}>
             <Page book={book} number={pageNum++} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>Misiones</div>
