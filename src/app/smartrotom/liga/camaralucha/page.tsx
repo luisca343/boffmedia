@@ -1,10 +1,11 @@
 "use client"
 import { Game } from "@/app/battlesim/replay/_components/Game";
-import { getSmartRotomUser } from "@/lib/utils";
+import { getSmartRotomUser, strToDate } from "@/lib/utils";
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react"
 import { PokemonSprite } from "../../pokedex/_components/PokemonSprite";
+import { getBattleConfig } from "../utils";
 
 export default function CamaraLucha(){
     const [combates, setCombates] = useState([])
@@ -20,15 +21,18 @@ export default function CamaraLucha(){
         <div  className="text-black">
             <h1>Camara Lucha</h1>
             <div>
-                {combates.map((combate: any) => (
-                    <div key={combate.id} className="flex">
+                {combates.map(async (combate: any) => {
+                    const configCombate = await getBattleConfig(combate.side2)
+                    console.log('configCombate', configCombate)
+                    return <div key={combate.id} className="flex">
+                        {strToDate(combate.date)}
                         {combate.side1}
                         <TeamPreview team={JSON.parse(combate.team1)} />
                         vs
                         {combate.team2 &&<TeamPreview team={JSON.parse(combate.team2)} />}
                         {combate.side2}
                     </div>
-                ))}
+                })}
             </div>
         </div>
     )

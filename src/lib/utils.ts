@@ -39,3 +39,4 @@ export function parseDate (date: string | Date) {
   const dateObj = new Date(date)
   return dateObj.toLocaleDateString() + " " + dateObj.toLocaleTimeString()
 }
+
