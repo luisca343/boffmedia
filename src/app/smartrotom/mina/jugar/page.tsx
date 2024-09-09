@@ -18,6 +18,7 @@ enum Tool {
 }
 
 export default function Jugar(){
+    const {data: session} = useSession() as {data: BoffSession | null}
     const [index, setIndex] = useState(0)
     const [mineMap, setMap] = useState<Array<Array<any>>>([])
     const [rewards, setRewards] = useState<{ reward: Reward; x: number; y: number; }[]>([]) 
@@ -25,7 +26,6 @@ export default function Jugar(){
     const [tool, setTool] = useState(0)
     const [damage, setDamage] = useState(0)
     const [open, setOpen] = useState(false)
-    const {data: session} = useSession() as {data: BoffSession | null}
     const router = useRouter()
     const shakeAnim = useAnimation()
 

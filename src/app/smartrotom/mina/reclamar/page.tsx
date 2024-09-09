@@ -8,19 +8,10 @@ import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { isMinecraft, mcefQuery } from "@/services/mcefHelper"
 import Image from "next/image"
 import { toast } from 'react-toastify';
+import { useUnclaimedRewards } from "../_hooks/useUnclaimedRewards"
 
 export default function Reclamar(){
-    const {data: session} = useSession() as {data: BoffSession | null}
-    const [unclaimed, setUnclaimed] = useState<{[key: string]: number}>()
-
-    useEffect(() => {
-        if(session){
-            rotomGET('/mine/unclaimed/' + session.user.smartRotomUser.uuid).then(res => {
-                setUnclaimed(res)
-            })
-        }
-    }, [session])
-    
+    const {session, unclaimed, setUnclaimed} = useUnclaimedRewards()
 
     async function claimReward(){
         

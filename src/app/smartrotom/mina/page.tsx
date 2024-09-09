@@ -1,40 +1,9 @@
-//"use client"
 import './mina.css'
-import Link from "next/link";
-/*import { useEffect, useState } from "react";
-import { useSession } from 'next-auth/react';
-import { rotomGET, rotomPOST } from '@/services/boffAPI';
-import { BoffSession } from '@/components/smartrotom/AppWrapper';
-import { useRouter } from 'next/navigation';*/
 import { BarraEnergia } from './_components/BarraEnergia';
 import MenuWrapper from './_components/MenuWrapper';
 import { LinkMina } from './_components/LinkMina';
 
 export default function Mina(){
-    /*
-    const {data: session} = useSession() as {data: BoffSession | null}
-    
-    const [energia, setEnergia] = useState(0)
-    const [energiaMax, setEnergiaMax] = useState(0)
-    const [ultimaRecarga, setUltimaRecarga] = useState<Date>(new Date())
-    const [iniciar, setIniciar] = useState(false)
-*/
-    /*
-    useEffect(() => {
-        if(session){
-            rotomGET(`/mine/energy/${session.user?.smartRotomUser.uuid}`).then(res => {
-                setEnergiaMax(res.energiaMax)
-                
-                setEnergia(res.energia)
-
-                let date = new Date(Date.parse(res.ultimaRecarga))
-                setUltimaRecarga(date)
-            })
-        }
-    }, [session, iniciar])*/
-    
-
-
     return (
             <MenuWrapper>
                 <div className={`p-4 h-full w-full lg:w-3/5 ml-auto mr-5 flex flex-col`}>

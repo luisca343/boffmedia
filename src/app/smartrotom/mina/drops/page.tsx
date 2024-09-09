@@ -1,23 +1,7 @@
 import { rotomGET } from "@/services/boffAPI";
 import MenuWrapper from "../_components/MenuWrapper";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-
-type Drop = {
-    id: number;
-    value: number;
-    name: string;
-    type: string;
-    itemId: string;
-    width: number;
-    height: number;
-}
-
-type DropByType = {
-    [key: string]: {
-        items: Drop[];
-        totalValue: number;
-    }
-}
+import { Drop, DropByType } from "../_types/Drops";
 
 export default async function Drops() {
     const {drops, totalValue} = await rotomGET('/mine/rewardsbytype') as {drops: DropByType, totalValue: number};

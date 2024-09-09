@@ -1,26 +1,15 @@
 "use client"
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
-import { rotomGET } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
 import '../mina.css'
 import Image from "next/image";
 import MenuWrapper from "../_components/MenuWrapper";
+import useMineHistory from "../_hooks/useMineHistory";
 
 export default function History(){
-    const {data: session} = useSession() as {data: BoffSession | null}
-    const [history, setHistory] = useState([]);
-
-    useEffect(() => {
-        const datos = rotomGET(`/mine/history/${session?.user.smartRotomUser.uuid}`).then(res => {
-            setHistory(res);
-        })
-
-    }, [session]);
-
+    const {mineHistory, setMineHistory} = useMineHistory();
+    
     return(
         <MenuWrapper className={` bg-main-900 text-main-50 flex flex-wrap items-start justify-evenly`}>
-            {Object.values(history).reverse()?.map((game: any, i: number) => {
+            {Object.values(mineHistory).reverse()?.map((game: any, i: number) => {
                 return (
                     <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-main-900 bg-opacity-80">
                         <div className=" flex flex-row">
