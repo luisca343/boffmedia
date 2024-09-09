@@ -3,44 +3,28 @@ import { Book, BookLink, Page, PageTitle, turnPage } from "@/components/ui/book/
 import './pasaporte.css'
 import { useSession } from "next-auth/react";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
-import { useEffect, useState } from "react";
-import { rotomPOST } from "@/services/boffAPI";
+import { useState } from "react";
 import ActiveTeam from "./_components/ActiveTeam";
-import useTranslation from 'next-translate/useTranslation'
 import Badges from "./_components/Badges";
-import { SmartRotomAchievement, parseAchievementData } from "./types";
 import { parseDate } from "@/lib/utils";
-import Link from "next/link";
-import { InternalLink } from "@/components/nav/Link";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Game } from "@/app/battlesim/replay/_components/Game";
+import { useStats } from "./_hooks/useStats";
+import { useCurrentTeam } from "./_hooks/useCurrentTeam";
+import { useAchievements } from "./_hooks/useAchievements";
+import { SmartRotomAchievement } from "./_types/Achievement";
 
 export default function Pasaporte(){
   const [book, setBook] = useState(null) as any
   const {data: session} = useSession() as {data: BoffSession | null, status: string};
   const uuid = session?.user.smartRotomUser.uuid as string
   const username = session?.user.smartRotomUser.username as string
-  const { t: movesTrans } = useTranslation("smartrotom/pokedex/moves")
 
-  const [stats, setStats] = useState(null) as any
-  const [team,setTeam] = useState(null) as any
-  const [ achievements, setAchievements] = useState([] as SmartRotomAchievement[])
+  const {stats} = useStats(uuid)
+  const {currentTeam } = useCurrentTeam(uuid)
+  const {achievements} = useAchievements(uuid)
 
-  const obtainedBadges = achievements.filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
-
-
-  useEffect(()=>{
-    rotomPOST('/stats',{uuid}).then((res)=>{
-      setStats(res)
-    })
-    rotomPOST('/team',{uuid}).then((res)=>{
-      setTeam(res)
-    })
-    rotomPOST('/achievements',{uuid}).then((res)=>{
-      console.log('achievements',res)
-      setAchievements(res)
-    })
-  }, [])
+  const obtainedBadges = (achievements ?? []).filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 
   let page  = 0;
   let badgePage = 4
@@ -89,7 +73,7 @@ export default function Pasaporte(){
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Equipo Actual"/>
-              {team && <ActiveTeam team={team} />}
+              {currentTeam && <ActiveTeam team={currentTeam} />}
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Medallas"/>

@@ -1,6 +1,6 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { parseDate } from "@/lib/utils";
-import { SmartRotomAchievement } from "../types";
+import { SmartRotomAchievement } from "../_types/Achievement";
 import { BookLink } from "@/components/ui/book/book";
 
 
