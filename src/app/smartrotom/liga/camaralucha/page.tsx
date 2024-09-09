@@ -23,7 +23,7 @@ export default function CamaraLucha(){
             <div>
                 {combates.map(async (combate: any) => {
                     const configCombate = await getBattleConfig(combate.side2)
-                    console.log('configCombate', configCombate)
+                    
                     return <div key={combate.id} className="flex">
                         {strToDate(combate.date)}
                         {combate.side1}
