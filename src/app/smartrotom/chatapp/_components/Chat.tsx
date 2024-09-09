@@ -10,26 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { PhoneIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-toastify';
+import { ChatData } from "../_types/Chat";
 
-type Message = {
-    id: number;
-    content: string;
-    createdAt: string;
-    uuid: string;
-    chatId: number;
-    type: string;
-}
 
-export type ChatData = {
-    id: number;
-    name: string;
-    type: number;
-    messages: Message[];
-    unread: number;
-    image: string;
-    members: string[];
-
-}
 
 export function Chat({chats, activeChat, setActiveChat}: {chats: ChatData[], activeChat: number, setActiveChat: (id: number) => void}) {
     const [chat, setChat] = useState(chats[0] as ChatData); 

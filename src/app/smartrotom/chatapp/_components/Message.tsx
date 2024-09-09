@@ -1,22 +1,14 @@
 import { getSmartRotomUser, strToDate, strToTime } from "@/lib/utils";
 import { parse } from "path";
+import { Message as MessageType } from "../_types/Chat";
 
-type Message = {
-    id: number;
-    content: string;
-    createdAt: string;
-    uuid: string;
-    chatId: number;
-    type: string;
-}
-
-export function parseSystemMessage(message: Message){
+export function parseSystemMessage(message: MessageType){
     if(message.type === 'call') return `Llamada de ${message.content} segundos`
 
     return message.content
 }
 
-export function Message({message, session, img=false, prev} : {message: Message, session: any, img?: boolean, prev: string}){
+export function Message({message, session, img=false, prev} : {message: MessageType, session: any, img?: boolean, prev: string}){
     const isSender = message.uuid === getSmartRotomUser(session).uuid;
     if(message.uuid === 'system') return(
         <div className="text-center text-[10px] font-normal self-center bg-primary-400 text-black p-1 max-w-[50%] rounded-lg border border-black mb-2" key={message.id}>
