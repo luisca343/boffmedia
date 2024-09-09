@@ -5,6 +5,12 @@ import axios from 'axios';
 import { and, desc, eq, asc, sql } from 'drizzle-orm';
 import { LogroCombate } from './smartrotom.controller';
 import { repl } from '@nestjs/core';
+import { date } from 'drizzle-orm/mysql-core';
+
+import * as fs from 'fs';
+import *  as  path from 'path';
+import { promises as fsPromises } from 'fs';
+
 
 @Injectable()
 export class SmartrotomService {
@@ -126,11 +132,12 @@ export class SmartrotomService {
     }
 
     async addBattleAchievement(battleAchievement: LogroCombate) {
+        console.log('battleAchievement', battleAchievement)
         const hasAchievement = await this.playerHasAchievement(battleAchievement.uuid, battleAchievement.logro)
 
         const insert = await this.db.getDrizzle().insert(smartRotomReplays).values({
-            side1: battleAchievement.uuid,
-            side2: battleAchievement.npc,
+            side1: battleAchievement.name1,
+            side2: battleAchievement.name2,
             team1: JSON.stringify(battleAchievement.team1),
             team2: JSON.stringify(battleAchievement.team2),
             replay: battleAchievement.replay,
@@ -168,7 +175,11 @@ export class SmartrotomService {
 
     async getRepeticiones(uuid: string) {
         return await this.db.getDrizzle()
-            .select({id: smartRotomReplays.id, team1: smartRotomReplays.team1, team2: smartRotomReplays.team2, replay: smartRotomReplays.replay, winner: smartRotomReplays.winner, side1: smartRotomReplays.side1, side2: smartRotomReplays.side2})
+            .select({id: smartRotomReplays.id, team1: smartRotomReplays.team1, team2: smartRotomReplays.team2, 
+                replay: smartRotomReplays.replay, winner: smartRotomReplays.winner, side1: 
+                smartRotomReplays.side1, side2: smartRotomReplays.side2,
+                date: smartRotomReplays.createdAt,
+            })
             .from(smartRotomReplays)
             .leftJoin(
                 smartRotomUserReplays,
@@ -179,6 +190,19 @@ export class SmartrotomService {
             )
             .where(eq(smartRotomUserReplays.uuid, uuid))
             .orderBy(desc(smartRotomReplays.id))
+    }
+
+    async getBattleConfig(npcConfigName: string) {
+        const dir = path.join(__dirname, '../../../', 'public/smartrotom/combates/entrenadores');
+        const fileName = path.join(dir, npcConfigName + '/config.json');
+        console.log('fileName', fileName)
+
+        if(!fs.existsSync(fileName)) return {error: 'Config not found'}
+
+
+        return JSON.parse(await fsPromises.readFile(fileName, 'utf8'))
+
+        
     }
 
 }

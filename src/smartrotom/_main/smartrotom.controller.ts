@@ -57,6 +57,11 @@ export class SmartrotomController {
     async getRepeticiones(@Param('uuid') uuid: string){
         return this.smartrotomService.getRepeticiones(uuid)
     }
+
+    @Get('battleconfig/:npcConfigName')
+    async getBattleConfig(@Param('npcConfigName') npcConfigName: string){
+        return this.smartrotomService.getBattleConfig(npcConfigName)
+    }
 }
 
 interface SmartRotomPost {
@@ -82,9 +87,10 @@ interface PokemonData {
 }
 
 export interface LogroCombate extends SmartRotomPost {
-    npc: string;
     victoria: boolean;
     logro: string;
+    name1: string;
+    name2: string;
     team1: PokemonData[];
     team2: PokemonData[];
     replay: string;
