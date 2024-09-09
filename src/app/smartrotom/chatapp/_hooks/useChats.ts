@@ -2,6 +2,7 @@ import { getSmartRotomUser } from '@/lib/utils';
 import { rotomGET } from '@/services/boffAPI';
 import { useState, useEffect, useCallback } from 'react';
 import { ChatData, Message } from '../_types/Chat';
+import { BoffSession } from '@/types';
 
 type UseChatsReturnType = {
     chats: ChatData[],
@@ -10,7 +11,7 @@ type UseChatsReturnType = {
     updateChats: (message: Message, activeChat: number) => void
 };
 
-function useChats(session: any): UseChatsReturnType {
+function useChats(session: BoffSession): UseChatsReturnType {
     const [chats, setChats] = useState<ChatData[]>([]);
 
     const fetchChats = useCallback(async () => {
