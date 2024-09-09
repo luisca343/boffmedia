@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
 import useSocketStore from "@/app/useSocketStore";
@@ -74,7 +75,7 @@ export function Chat({chats, activeChat, setActiveChat}: {chats: ChatData[], act
     return (
         <div className="flex flex-col w-full h-full overflow-hidden">
             <div className="h-16 p-2 text-xl w-full bg-neutral-800 flex items-center text-neutral-50 border-b border-neutral-900" > 
-                <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px'/>
+                <img src={chat.image} className="ml-2 rounded-full"  width='50px' height='50px' alt=""/>
                 <div className="ml-2">{chat.name}</div>
                 <Button className="ml-auto bg-inherit p-2" onClick={() => call()}><PhoneIcon height={30} width={30} strokeWidth={2} /></Button>
                 <Button className="bg-inherit p-2" onClick={() => setActiveChat(0)}><XMarkIcon height={30} width={30} strokeWidth={2} /></Button>

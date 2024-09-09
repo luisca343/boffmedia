@@ -24,6 +24,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
             className="ml-2 rounded-full"
             width="50px"
             height="50px"
+            alt="profile picture"
           />
           <div className="h-1/2  ml-4 text-neutral-50  flex flex-col justify-between items-start ">
             <p className="text-sm font-bold">{chat.name}</p>
