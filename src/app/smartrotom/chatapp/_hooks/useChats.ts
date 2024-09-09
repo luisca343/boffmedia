@@ -3,15 +3,18 @@ import { rotomGET } from '@/services/boffAPI';
 import { useState, useEffect, useCallback } from 'react';
 import { ChatData, Message } from '../_types/Chat';
 import { BoffSession } from '@/types';
+import { useSession } from 'next-auth/react';
 
 type UseChatsReturnType = {
+    session: BoffSession,
     chats: ChatData[],
     setChats: React.Dispatch<React.SetStateAction<ChatData[]>>,
     refresh: () => void,
     updateChats: (message: Message, activeChat: number) => void
 };
 
-function useChats(session: BoffSession): UseChatsReturnType {
+function useChats(): UseChatsReturnType {
+    const { data: session } = useSession();
     const [chats, setChats] = useState<ChatData[]>([]);
 
     const fetchChats = useCallback(async () => {
@@ -45,7 +48,7 @@ function useChats(session: BoffSession): UseChatsReturnType {
         if (activeChat !== message.id) return;
     };
 
-    return { chats, setChats, refresh: fetchChats, updateChats };
+    return { session, chats, setChats, refresh: fetchChats, updateChats };
 }
 
 export default useChats;

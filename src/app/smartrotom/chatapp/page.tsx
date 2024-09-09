@@ -11,10 +11,9 @@ import useChats from "./_hooks/useChats";
 import { Contact } from "./_components/Contact";
 
 export default function ChatApp() {
-  const { data: session } = useSession();
-  const { chats, setChats, refresh, updateChats } = useChats(session);
+  const { session, chats, refresh, updateChats } = useChats();
   const [activeChat, setActiveChat] = useState(0);
-  const { socket, connect } = useSocketStore();
+  const { socket } = useSocketStore();
 
   useEffect(() => {
     if (socket) {

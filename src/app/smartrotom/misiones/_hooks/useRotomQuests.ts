@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { getSmartRotomUser } from "@/lib/utils"
 import { rotomPOST } from "@/services/boffAPI"
 import { useSession } from "next-auth/react"
