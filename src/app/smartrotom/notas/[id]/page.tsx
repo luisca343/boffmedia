@@ -2,7 +2,7 @@
 
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { rotomGET } from '@/services/boffAPI';
+import { useDocument } from '../_hooks/useDocument';
 
 const CustomEditor = dynamic( () => {
   return import( '@/components/editor/TestEditor' );
@@ -10,16 +10,7 @@ const CustomEditor = dynamic( () => {
 
 export default function Note({params} : {params: {id: string}}){
   const { id } = params;
-  const [data, setData] = React.useState<any>(null);
-
-  useEffect(() => {
-    rotomGET(`/documents/${id}`)
-    .then((res) => {
-      setData(res.content);
-      //rewrite url
-    });
-    
-  }, [id]);
+  const { data } = useDocument(id);
 
   return (
   <div className='h-full border'>

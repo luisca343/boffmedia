@@ -2,35 +2,10 @@
 
 import { InternalLink } from "@/components/nav/Link"
 import { strToDate } from "@/lib/utils"
-import { rotomGET, rotomPOST } from "@/services/boffAPI"
-import { useSession } from "next-auth/react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useDocuments } from "../_hooks/useDocuments"
 
 export function DocumentsList() {
-    const {data: session} = useSession() as any
-    const [documents, setDocuments] = useState([])
-    const router = useRouter()
-
-    useEffect(() => {
-        const result = rotomGET(`/documents/all/${session?.user.smartRotomUser?.uuid}`)
-            .then((res) => {
-                setDocuments(res)
-            }
-        )
-    }, [session])
-
-    function createNote() {
-        rotomPOST(`/documents/create`, {title: "New Note", content: "", type: 0, userUuid: session?.user.smartRotomUser?.uuid})
-            .then((res) => {
-                if(res.id){
-                    router.push(`/smartrotom/notas/${res.id}`)
-                }
-            }
-        )
-    }
-
+    const {documents, createNote} = useDocuments()
     return (
         <div className="bg-main-800  ">
             <div className="flex flex-wrap justify-start">
