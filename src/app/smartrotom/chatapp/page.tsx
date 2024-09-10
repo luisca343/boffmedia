@@ -7,11 +7,11 @@ import useSocketStore from "@/app/useSocketStore";
 import { Chat } from "./_components/Chat";
 import { CreateGroup } from "./_components/CreateGroup";
 import {  Message as MessageType } from "./_types/Chat";
-import useChats from "./_hooks/useChats";
+import useGetChats from "./_hooks/useGetChats";
 import { Contact } from "./_components/Contact";
 
 export default function ChatApp() {
-  const { session, chats, refresh, updateChats } = useChats();
+  const { session, chats, refresh, updateChats } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
   const { socket } = useSocketStore();
 

@@ -5,7 +5,7 @@ import { ChatData, Message } from '../_types/Chat';
 import { BoffSession } from '@/types';
 import { useSession } from 'next-auth/react';
 
-type UseChatsReturnType = {
+type useGetChatsReturnType = {
     session: BoffSession,
     chats: ChatData[],
     setChats: React.Dispatch<React.SetStateAction<ChatData[]>>,
@@ -13,8 +13,8 @@ type UseChatsReturnType = {
     updateChats: (message: Message, activeChat: number) => void
 };
 
-function useChats(): UseChatsReturnType {
-    const { data: session } = useSession();
+function useGetChats(): useGetChatsReturnType {
+    const { data: session } = useSession() as unknown as { data: BoffSession };
     const [chats, setChats] = useState<ChatData[]>([]);
 
     const fetchChats = useCallback(async () => {
@@ -51,4 +51,4 @@ function useChats(): UseChatsReturnType {
     return { session, chats, setChats, refresh: fetchChats, updateChats };
 }
 
-export default useChats;
+export default useGetChats;

@@ -1,7 +1,7 @@
 import { rotomPOST } from "@/services/boffAPI";
 import { useEffect, useState } from "react";
 
-export function useStats(uuid: string) {
+export function useGetStats(uuid: string) {
     const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {

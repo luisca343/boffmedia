@@ -2,7 +2,7 @@ import { rotomPOST } from "@/services/boffAPI";
 import { useEffect, useState } from "react";
 import { ActiveTeam as ActiveTeamType } from "@/types/Pokemon";
 
-export function useCurrentTeam(uuid: string) {
+export function useGetCurrentTeam(uuid: string) {
     const [currentTeam, setCurrentTeam] = useState<ActiveTeamType>();
 
     useEffect(() => {

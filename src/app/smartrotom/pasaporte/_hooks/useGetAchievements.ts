@@ -2,7 +2,7 @@ import { rotomPOST } from "@/services/boffAPI";
 import { useEffect, useState } from "react";
 import { SmartRotomAchievement } from "../_types/Achievement";
 
-export function useAchievements(uuid: string) {
+export function useGetAchievements(uuid: string) {
     const [achievements, setAchievements] = useState<SmartRotomAchievement[]>();
 
     useEffect(() => {

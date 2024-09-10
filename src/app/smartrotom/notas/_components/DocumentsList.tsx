@@ -2,10 +2,10 @@
 
 import { InternalLink } from "@/components/nav/Link"
 import { strToDate } from "@/lib/utils"
-import { useDocuments } from "../_hooks/useDocuments"
+import { useGetDocuments } from "../_hooks/useGetDocuments"
 
 export function DocumentsList() {
-    const {documents, createNote} = useDocuments()
+    const {documents, createNote} = useGetDocuments()
     return (
         <div className="bg-main-800  ">
             <div className="flex flex-wrap justify-start">

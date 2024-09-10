@@ -9,9 +9,9 @@ import Badges from "./_components/Badges";
 import { parseDate } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Game } from "@/app/battlesim/replay/_components/Game";
-import { useStats } from "./_hooks/useStats";
-import { useCurrentTeam } from "./_hooks/useCurrentTeam";
-import { useAchievements } from "./_hooks/useAchievements";
+import { useGetStats } from "./_hooks/useGetStats";
+import { useGetCurrentTeam } from "./_hooks/useGetCurrentTeam";
+import { useGetAchievements } from "./_hooks/useGetAchievements";
 import { SmartRotomAchievement } from "./_types/Achievement";
 
 export default function Pasaporte(){
@@ -20,9 +20,9 @@ export default function Pasaporte(){
   const uuid = session?.user.smartRotomUser.uuid as string
   const username = session?.user.smartRotomUser.username as string
 
-  const {stats} = useStats(uuid)
-  const {currentTeam } = useCurrentTeam(uuid)
-  const {achievements} = useAchievements(uuid)
+  const {stats} = useGetStats(uuid)
+  const {currentTeam } = useGetCurrentTeam(uuid)
+  const {achievements} = useGetAchievements(uuid)
 
   const obtainedBadges = (achievements ?? []).filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 

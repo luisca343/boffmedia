@@ -1,7 +1,7 @@
 import { rotomGET } from "@/services/boffAPI";
 import { useEffect, useState } from "react";
 
-export function useDocument(id: string) {
+export function useGetDocument(id: string) {
   const [data, setData] = useState<Document>();
 
   useEffect(() => {

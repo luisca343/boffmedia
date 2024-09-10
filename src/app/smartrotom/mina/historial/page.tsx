@@ -2,10 +2,10 @@
 import '../mina.css'
 import Image from "next/image";
 import MenuWrapper from "../_components/MenuWrapper";
-import useMineHistory from "../_hooks/useMineHistory";
+import useGetMineHistory from "../_hooks/useGetMineHistory";
 
 export default function History(){
-    const {mineHistory, setMineHistory} = useMineHistory();
+    const {mineHistory, setMineHistory} = useGetMineHistory();
     
     return(
         <MenuWrapper className={` bg-main-900 text-main-50 flex flex-wrap items-start justify-evenly`}>

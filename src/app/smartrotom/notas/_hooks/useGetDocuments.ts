@@ -3,7 +3,7 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-export function useDocuments(){
+export function useGetDocuments(){
     const {data: session} = useSession() as any
     const [documents, setDocuments] = useState<Document[]>([])
     const router = useRouter()

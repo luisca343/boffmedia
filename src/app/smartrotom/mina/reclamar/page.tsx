@@ -1,17 +1,14 @@
 "use client"
 
-import { BoffSession } from "@/components/smartrotom/AppWrapper"
-import { useSession } from "next-auth/react"
 import MenuWrapper from "../_components/MenuWrapper"
-import { useEffect, useState } from "react"
-import { rotomGET, rotomPOST } from "@/services/boffAPI"
+import { rotomPOST } from "@/services/boffAPI"
 import { isMinecraft, mcefQuery } from "@/services/mcefHelper"
 import Image from "next/image"
 import { toast } from 'react-toastify';
-import { useUnclaimedRewards } from "../_hooks/useUnclaimedRewards"
+import { useGetUnclaimedRewards } from "../_hooks/useGetUnclaimedRewards"
 
 export default function Reclamar(){
-    const {session, unclaimed, setUnclaimed} = useUnclaimedRewards()
+    const {session, unclaimed, setUnclaimed} = useGetUnclaimedRewards()
 
     async function claimReward(){
         

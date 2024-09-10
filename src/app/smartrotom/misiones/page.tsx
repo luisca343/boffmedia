@@ -1,16 +1,8 @@
 "use client";
-import { CabezaJugador, NPCHead } from "@/components/smartrotom/CabezaMC";
 import { Book, Page } from "@/components/ui/book/book";
-import { getSmartRotomUser } from "@/lib/utils";
-import { GET, POST, rotomGET, rotomPOST } from "@/services/boffAPI"
-import { stat } from "fs";
-import { useSession } from "next-auth/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ItemSprite } from "../pokedex/_components/PokemonSprite";
-import { Item } from "@radix-ui/react-select";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { useRotomQuests } from "./_hooks/useRotomQuests";
+import { useGetRotomQuests } from "./_hooks/useGetRotomQuests";
 import { IDialogue, IQuestObjective, IQuestReward, QuestData, QuestStatus } from "./_types/Quest";
 const NpcSkin = React.lazy(() => import("@/components/smartrotom/MinecraftSkin"));
 
@@ -27,7 +19,7 @@ function parseTestData(jsonString: string) {
 }
 
 export default function Misiones(){
-    const { quests, categories, dialogs, npcs } = useRotomQuests()
+    const { quests, categories, dialogs, npcs } = useGetRotomQuests()
     const [book, setBook] = useState(null) as any
 
 

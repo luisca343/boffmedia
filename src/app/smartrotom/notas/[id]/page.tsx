@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import dynamic from 'next/dynamic';
-import { useDocument } from '../_hooks/useDocument';
+import { useGetDocument } from '../_hooks/useGetDocument';
 
 const CustomEditor = dynamic( () => {
   return import( '@/components/editor/TestEditor' );
@@ -10,7 +10,7 @@ const CustomEditor = dynamic( () => {
 
 export default function Note({params} : {params: {id: string}}){
   const { id } = params;
-  const { data } = useDocument(id);
+  const { data } = useGetDocument(id);
 
   return (
   <div className='h-full border'>
