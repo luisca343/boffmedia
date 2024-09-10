@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { IDialogue, IQuestCategory, QuestData } from "../_types/Quest"
 
-export function useRotomQuests(){
+export function useGetRotomQuests(){
     const { data: session} = useSession()
     const [quests, setMisiones] = useState([] as QuestData[])
     const [categories, setCategories] = useState({} as {[key: string]: IQuestCategory})

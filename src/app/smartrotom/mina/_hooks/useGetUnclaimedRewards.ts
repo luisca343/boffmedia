@@ -3,7 +3,7 @@ import { BoffSession } from "@/types"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
-export function useUnclaimedRewards(){
+export function useGetUnclaimedRewards(){
     const {data: session} = useSession() as {data: BoffSession | null}
     const [unclaimed, setUnclaimed] = useState<{[key: string]: number}>()
 
