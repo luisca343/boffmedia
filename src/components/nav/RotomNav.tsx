@@ -76,7 +76,7 @@ export default function RotomNav({setTema} : {setTema: (tema: string) => void}){
       
     function Notifications(){
         return(
-            <div className="flex flex-col bg-main-300 w-[33vw] rounded-md z-50 bg-pri">
+            <div className="flex flex-col bg-main-300 w-[33vw] rounded-md z-50">
                 <header className="flex justify-between items-center bg-main-800 p-4">
                     <h2 className="text-main-50">Notificaciones</h2>
                     <button onClick={clear} className="text-main-50">Limpiar</button>
