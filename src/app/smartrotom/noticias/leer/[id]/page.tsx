@@ -25,7 +25,7 @@ export default function Note({params} : {params: {id: string}}){
 
     if(error) return <div>{error}</div>
   return (
-    <div className='w-full h-full bg-main-800'>
+    <div className='w-full h-full bg-pink-100 lexend-mega'>
         <div className='h-full w-[70%] m-auto'>
         <CustomEditor
             initialData={data}

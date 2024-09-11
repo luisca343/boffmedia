@@ -94,7 +94,6 @@
 }
  
 @layer base {
-
   :root {
     --primary-50: #fdf6ef;
     --primary-100: #fbead9;
@@ -152,6 +151,19 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  
+  @layer components {
+    @font-face {
+      font-family: 'Lexend Mega';
+      src: url("/fonts/LexendMega-VariableFont_wght.ttf");
+    }
+  
+    .lexend-mega {
+      font-family: 'Lexend Mega', sans-serif;
+      letter-spacing: -2px;
+    }
   }
 
 }

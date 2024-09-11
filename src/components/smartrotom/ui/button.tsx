@@ -10,6 +10,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary-500 border-2 border-black shadow-light dark:shadow-dark hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none',
+        furret: 'bg-pink-400 border-2 border-black shadow-light dark:shadow-dark hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none dark:hover:shadow-none',
         noShadow: 'bg-primary-500 border-2 border-black',
         link: 'underline-offset-4 text-black hover:underline',
         neutral:

@@ -16,6 +16,10 @@
 
 /* --------- EDITOR STYLES  ---------------------------------------------------------------------------------------- */
 
+.ck{
+	height: 100%;
+}
+
 .editor__editable,
 /* Classic build. */
 main .ck-editor[role='application'] .ck.ck-content,
@@ -36,6 +40,10 @@ main .ck-editor[role='application'] .ck.ck-content,
 	font-weight: bold;
 	text-decoration: underline;
 	margin-bottom: 1em;
+}
+
+.ck-rounded-corners{
+	height: 100%!important;
 }
 
 .ck.ck-editor{
