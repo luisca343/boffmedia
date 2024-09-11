@@ -2,8 +2,24 @@ import { SmartRotomUser } from "@/types"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+import { extendTailwindMerge } from 'tailwind-merge';
+
+const customTwMerge = extendTailwindMerge({
+  extend: {
+  classGroups: {
+    // @ts-ignore
+    'text-shadow': ['text-shadow-border1', 'text-shadow-border2', 'text-shadow-custom'],
+  },
+  conflictingClassGroups: {
+    // @ts-ignore
+    'text-color': ['text-shadow'],
+  }
+}
+});
+
+
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return customTwMerge(clsx(inputs))
 }
 
 export function strToDate(date: string) {

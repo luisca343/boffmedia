@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 import React from "react";
+import { SmartRotomBadge } from "../smartrotom/ui/badge";
 
 export default function BreadcrumbNav({className} : {className?: string}){
     const path = usePathname()
@@ -33,12 +34,12 @@ export default function BreadcrumbNav({className} : {className?: string}){
 function Breadcrumb({index, parts}: {index: number, parts: string[]}){
     const nombre = rewrite(parts, index)
     const router = useRouter();
-    const texto = nombre == 'smartrotom' ? <HomeIcon height={20} width={20} strokeWidth={2.5}/> : nombre
+    const texto = nombre == 'smartrotom' ? <HomeIcon height={16} width={16} strokeWidth={2}/> : nombre
 
     return (
-        <Badge onClick={() => navegar(router, parts, index, isNavigable(nombre))} className="text-sm bg-primary-400 hover:bg-primary-600 hover:cursor-pointer text-black hover:text-main-50  border-black border shadow-sm shadow-black" key={index} >
+        <SmartRotomBadge variant="button" onClick={() => navegar(router, parts, index, isNavigable(nombre))}  key={index} >
             {texto}
-        </Badge>
+        </SmartRotomBadge>
     )
 }
 

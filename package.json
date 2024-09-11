@@ -58,7 +58,7 @@
     "simplex-noise": "^4.0.1",
     "skinview3d": "^3.0.1",
     "socket.io-client": "^4.7.4",
-    "tailwind-merge": "^2.2.1",
+    "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "tailwindcss-textshadow": "^2.1.3",
     "three": "^0.163.0",
