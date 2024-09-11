@@ -4,6 +4,8 @@ import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { SmartRotomButton } from "@/components/smartrotom/ui/button"
+import FurretNav from "../_components/FurretNav"
 
 export default  function EditarNoticia(){
     const [news, setNews] = useState([])
@@ -30,17 +32,15 @@ export default  function EditarNoticia(){
     }
 
     return (
-        <div>
-            <h1>Editar Noticia</h1>
-            <p>Selecciona una noticia para editar</p>
-            <div className="flex flex-wrap">
-                <button onClick={() => createNote()} className="text-main-50 bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center flex flex-col justify-center items-center">
+        <div className="bg-pink-200 text-black lexend-mega">
+            <FurretNav />
+            <div className="flex flex-wrap  space-x-4 space-y-2">
+                <SmartRotomButton  size='lg' onClick={() => createNote()} className="mt-2 ml-4">
                     <h2>Crear</h2>
-                </button>
+                </SmartRotomButton>
                 {news.map((n: any) => (
-                    <InternalLink key={n.id} href={`/noticias/editar/${n.id}`} className="flex flex-col w-36 items-center border border-black hover:text-main-500">
-                        <img src={`https://t3.ftcdn.net/jpg/04/60/01/36/360_F_460013622_6xF8uN6ubMvLx0tAJECBHfKPoNOR5cRa.jpg` } alt="imagen de noticia" />
-                        <h2>{n.title}</h2>
+                    <InternalLink key={n.id} href={`/noticias/editar/${n.id}`}>
+                        <SmartRotomButton variant='furret' size='lg'>{n.title}</SmartRotomButton>
                     </InternalLink>
                 ))}
             </div>

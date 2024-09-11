@@ -1,7 +1,7 @@
 "use client"
+import { subdomains } from "@/lib/utils";
 import Link from "next/link";
 
-const subdomains = ['smartrotom', 'battlesim'];
 
 export function InternalLink({ href, children, className, ...props }: { href: string, children: any, className?: string }) {
     const subdomain = window.location.host.split('.')[0];
