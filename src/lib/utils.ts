@@ -1,5 +1,6 @@
 import { SmartRotomUser } from "@/types"
 import { type ClassValue, clsx } from "clsx"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { twMerge } from "tailwind-merge"
 
 import { extendTailwindMerge } from 'tailwind-merge';
@@ -56,3 +57,22 @@ export function parseDate (date: string | Date) {
   return dateObj.toLocaleDateString() + " " + dateObj.toLocaleTimeString()
 }
 
+
+export const subdomains = ['smartrotom', 'battlesim'];
+
+export function relativeRedirect(router: AppRouterInstance, url: string) {
+  const subdomain = window.location.host.split('.')[0];
+  const currentApp = window.location.pathname.split('/')[1];
+
+  for (let s of subdomains) {
+      if (subdomain === s) {
+          return (
+              router.push(url)
+          );
+      }
+  }
+
+  return (
+    router.push(`/${currentApp}/${url}`)
+  );
+}
