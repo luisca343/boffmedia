@@ -56,7 +56,7 @@ export default function Misiones(){
     return(
         <section className="text-black bg-yellow-200 flex font-vinque  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(https://images.hdqwalls.com/wallpapers/2020-pokemon-mystery-dungeon-4k-o8.jpg)`}}>
           <Book pageColor="-purple" setBook={(e) => setBook(e)}>
-            <Page book={book} number={pageNum++} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
+            <Page dataDensity="hard" book={book} number={pageNum++} className="bg-blue-600 flex flex-col  bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>
               <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>Misiones</div>
               <img className="h-0 flex-1  opacity-80" src="/smartrotom/img/logo.webp" alt="description" style={{ mixBlendMode: 'normal' }} />
               <div className="mb-4 text-center text-4xl  text-yellow-200 font-bold  opacity-80" style={{ mixBlendMode: 'normal' }}>Región de Teras</div>
@@ -88,7 +88,7 @@ export default function Misiones(){
             })}
 
             
-            <Page  book={book} number={pageNum++} style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>Page 7</Page>
+            <Page dataDensity="hard"  book={book} number={pageNum++} style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero2.webp)`}}>Page 7</Page>
           </Book>
         </section>
     )
