@@ -164,6 +164,16 @@
       font-family: 'Lexend Mega', sans-serif;
       letter-spacing: -2px;
     }
+
+    @font-face {
+      font-family: 'Arcade Classic';
+      src: url("/fonts/arcadeclassic.ttf")
+    }
+
+    .arcade{
+      font-family: 'Arcade Classic', sans-serif;
+    }
+
   }
 
 }
