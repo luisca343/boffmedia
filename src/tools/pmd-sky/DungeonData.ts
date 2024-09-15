@@ -1,3 +1,5 @@
+import { Translate } from "next-translate";
+
 export const pmdSkyDungeons: { [key: number]: string } = {
   0: "Test Dungeon",
   1: "Beach Cave",
@@ -223,8 +225,8 @@ export function getFloors(dungeon: number): number {
   return parseInt(floors[dungeon*2] + floors[dungeon*2 + 1], 16);
 }
 
-export function getValidDungeons(): { key: number, name: string}[] {
+export function getValidDungeons(dungeonTrans: Translate) : { key: number, name: string }[] {
     return validQuestDungeons.map(key => (
-        { key, name: `${pmdSkyDungeons[key]} [${getFloors(key)}]` }
+        { key, name: dungeonTrans(key.toString()) }
       ));
 }

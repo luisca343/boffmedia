@@ -6,20 +6,21 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useState, useCallback } from "react";
-import { getValidDungeons } from "./DungeonData";
+import { getFloors, getValidDungeons } from "./DungeonData";
 import { getValidPokemon } from "./PokemonData";
 import { useFormStore } from "./store";
-import PokemonVirtualizedList from "../components/PokemonList";
 import { generateWonderMail } from "./Generate";
 import { Combobox } from "@/components/ui/combobox";
-import { getItemData, getPmdSkyId } from "./ItemData";
+import { getItemData } from "./ItemData";
+
+import useTranslation from "next-translate/useTranslation"
 
 
 
 export function SkyGenerator() {
     const [wonderMail, setWonderMail] = useState("");
+    const { t: dungeonsTrans } = useTranslation("tools/pmdsky/dungeons");
 
     const { formData, targetAvailable, setFormData, setTargetAvailable } = useFormStore();
     
@@ -56,14 +57,16 @@ export function SkyGenerator() {
                     <SelectValue placeholder="Select a dungeon" />
                 </SelectTrigger>
                 <SelectContent>
-                    {getValidDungeons().map((dungeon, index) =>
+                    {getValidDungeons(dungeonsTrans).map((dungeon, index) =>
                         <SelectItem key={index} value={dungeon.key.toString()}>{dungeon.name}</SelectItem>
                     )}
                 </SelectContent>
             </Select>
 
             <Label htmlFor="floor">Floor</Label>
-            <Input name="floor" type="number" placeholder="0" className="w-48 text-black"  value={formData.floor} onChange={(e) => setFormData({ floor: Number(e.target.value) })} />
+            <Input name="floor" type="number"
+                min={1} max={getFloors(formData.dungeon)}
+                className="w-48 text-black" value={formData.floor} onChange={(e) => setFormData({ floor: Number(e.target.value) })} />
 
             <Label htmlFor="clientPokemon">Client</Label>
             <Select name='clientPokemon' value={formData.clientPokemon.toString()} onValueChange={(value) => setFormData({ clientPokemon: Number(value) })}>
