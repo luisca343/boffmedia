@@ -6,6 +6,7 @@ import { getBattleConfig } from "../utils";
 import useBattleReplays from "../_hooks/useGetBattleReplays";
 import { BoffSession } from "@/types";
 import { PokemonData } from "../_types/Pokemon";
+import { InternalLink } from "@/components/nav/Link";
 
 export default function CamaraLucha(){
     const {data: session} = useSession() as unknown as {data: BoffSession};
@@ -18,14 +19,15 @@ export default function CamaraLucha(){
                 {replays.map(async (replay: any) => {
                     const configCombate = await getBattleConfig(replay.side2)
                     
-                    return <div key={replay.id} className="flex">
+                    return <InternalLink href={`/liga/camaralucha/ver/${replay.id}`} key={replay.id} className="flex">
+                        {replay.id}
                         {strToDate(replay.date)}
                         {replay.side1}
                         <TeamPreview team={JSON.parse(replay.team1)} />
                         vs
                         {replay.team2 &&<TeamPreview team={JSON.parse(replay.team2)} />}
                         {replay.side2}
-                    </div>
+                    </InternalLink>
                 })}
             </div>
         </div>
