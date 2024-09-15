@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getFloors } from "./DungeonData";
 
 export interface SkyFormData {
   questType: number;
@@ -37,12 +38,13 @@ export const useFormStore = create<FormState>((set, get) => ({
   },
   targetAvailable: false,
   setFormData: (data) => {
-    // Print the data to the console
-    console.log("Data to update:", data);
+    if(data.dungeon !== undefined) {
+      const newFloor = Math.min(get().formData.floor, getFloors(data.dungeon));
+      data.floor = newFloor;
+    }
 
     set((state) => {
       const newState = { ...state.formData, ...data };
-      console.log("Updated state:", newState);
       return { formData: newState };
     });
   },
