@@ -5,10 +5,15 @@ import { getScaleMultiplier } from "../_utils/viewUtils";
 
 export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, className?: string, props?: any }) {
     const [url, setUrl] = useState<string>('/battlesim/pokeball.png');
+    
 
     useEffect(() => {
-        const speciesNum = pokemon?.species.num;
-        const form = getFormName(pokemon?.species.forme);
+        if(!pokemon) {
+            setUrl('/battlesim/pokeball.png');
+            return;
+        }
+        const speciesNum = pokemon?.species?.num;
+        const form = getFormName(pokemon?.species?.forme);
         if (speciesNum) {
             getPokemonSprite(speciesNum, form, 'none', 'admin', false).then((res) => {
                 setUrl(res.url ?? '/battlesim/pokeball.png');
@@ -16,7 +21,7 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
         } else {
             setUrl('/battlesim/pokeball.png');
         }
-    }, [pokemon?.species.num]);
+    }, [pokemon?.species?.num]);
 
     const size = url === '/battlesim/pokeball.png' ? 12 : 24;
 
