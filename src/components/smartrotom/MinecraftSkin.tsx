@@ -12,7 +12,6 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
       let skin = await rotomGET(`/img/customNPC/render/${npcName}`);
 
       if (skin.error) {
-        console.log("Cache miss");
         const skinViewer = new SkinViewer({
           width: 200,
           height: 400,
