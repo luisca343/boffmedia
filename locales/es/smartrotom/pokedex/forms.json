@@ -2391,12 +2391,17 @@
     "pixelmon_tinkaglaze_description": "Jajaja qué tonto come fruta",
     "pixelmon_vespiteer": "Vespiteer",
     "pixelmon_vespiteer_description": "",
-    "pixelmon_mosquito": "Mosquito",
-    "pixelmon_mosquito_description": "",
     "pixelmon_slugsa": "Slugsa",
     "pixelmon_slugsa_description": "",
     "pixelmon_sandcargo": "Sandcargo",
-    "pixelmon_sandcargo_description": "Se parece mucho a un Magcargo, pero en realidad es un Pokémon diferente_ Su caparazón es más resistente y su cuerpo más pesado, además de estar hecho de arena_"
-    
+    "pixelmon_sandcargo_description": "Se parece mucho a un Magcargo, pero en realidad es un Pokémon diferente_ Su caparazón es más resistente y su cuerpo más pesado, además de estar hecho de arena_",
+    "pixelmon_mosquito": "Mosquito",
+    "pixelmon_mosquito_description": "",
+    "pixelmon_pollo": "Pollo",
+    "pixelmon_pollo_description": "",
+    "pixelmon_espinosaurio": "Espinosaurio",
+    "pixelmon_espinosaurio_description": "",
+    "pixelmon_triceratops": "Triceratops",
+    "pixelmon_triceratops_description": ""
 
 }
