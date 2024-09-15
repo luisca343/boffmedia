@@ -7,9 +7,14 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
     const povCentered = pov === side.n
     const player = side
     const avatarId = player?.avatar || 'unknown';
-    const uuid = player.avatar.includes('-') ? player.avatar : null;
-    const avatar = Sprites.getAvatar(avatarId);
+    const uuid = player.name.includes('player:') ? player.name.split(':')[1] : null;
+    const avatar = player.name.includes('npc:') ? player.name.split(':')[1] : Sprites.getAvatar(avatarId);
     const avatarNumber = parseInt(avatarId);
+
+    console.log(player.name)
+    console.log(uuid !== null)
+    console.log(avatarNumber >= 0)
+    
 
     const baseStyles: React.CSSProperties = {
         position: 'absolute',
@@ -64,7 +69,7 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
                 />
             ) : (
                 <NpcSkin
-                    npcName={avatarId}
+                    npcName={avatar}
                     height={50}
                     width={50}
                     style={npcStyles}

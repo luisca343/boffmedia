@@ -20,6 +20,18 @@ export type BattleCanvasRefProps = {
   ) => void;
 };
 
+function getParticipantName(name:string){
+    if(name.includes('player:')){
+        return name.split(':')[2];
+    }
+
+    if(name.includes('npc:')){
+        return name.split(':')[1];
+    }
+
+    return name;
+}
+
 export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: Battle, pov: 0 | 1, messageBar: string[] }, ref) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
@@ -43,7 +55,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                         Turno {battle.turn}
                     </div>
                     <span className="text-main-50 font-bold text-shadow-border1 ml-2">
-                        {p1.name} vs {p2.name}
+                        {getParticipantName(p1.name)} vs {getParticipantName(p2.name)}
                     </span>
                     </div>
                 <div className="m-1 w-2/3 flex flex-row-reverse">
