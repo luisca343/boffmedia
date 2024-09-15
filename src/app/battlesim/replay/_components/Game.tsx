@@ -14,7 +14,8 @@ import { switchAction, turnAction, moveAction, damageAction, healAction, faintAc
 import { ReplayControls } from "./ReplayControls";
 import useViewportWidth from "@/services/useViewPortWidth";
 import { ASPECT_RATIO } from "../../_utils/viewUtils";
-export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
+
+export function Game({battleName = 'medalla_doku', replayData}: {battleName?: string, replayData?: any}) {
   const [battleLog, setBattleLog] = useState<string | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [currentAction, setCurrentAction] = useState<number>(0);
@@ -53,6 +54,12 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
   const formatter = new LogFormatter('p1', battle);
 
   useEffect(() => {
+    if(replayData) {
+      setBattleLog(replayData.replay);
+      loadScene();
+      return;
+    }
+
     /*rotomGET(`/achievement/67d9b543-5ac9-41e1-a8a5-20d7689e24a4/${battleName}`)
       .then((res) => {
         const replay = res.replay;
@@ -78,6 +85,9 @@ export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {
     let started = false;
     let finalTurn = 0;
     for (const line of lines) {
+      const {args, kwArgs} = Protocol.parseBattleLine(line);
+      console.log(line);
+      console.log('args:', args);
       if(line.includes('|start')) started = true;
       if(!started) battle.add(line);
       if(line.includes('|turn|')) finalTurn++;
@@ -246,7 +256,8 @@ function setCurrentTurn(turn?: number) {
         await scene.clearPokemonElement(args[1].split(':')[0] as PokemonIdent);
         const audio = new Audio('/battlesim/audio/cries/mewtwo.mp3');
         //console.log(`https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`)
-        audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species.baseSpecies.toLowerCase()}.mp3`;
+        //audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.species?.baseSpecies?.toLowerCase()}.mp3`;
+        audio.src = `https://play.pokemonshowdown.com/audio/cries/${pokemon?.baseSpeciesForme?.toLowerCase()}.mp3`;
         audio.play();
         break;
       case 'turn':
@@ -307,9 +318,9 @@ function setCurrentTurn(turn?: number) {
 
   return (
     <>
-      <div className="flex w-full">
+      <div className="flex">
         <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
-        {logVisible &&<div className="w-1/4  bg-main-800 p-2 overflow-y-auto text-main-50" ref={logRef} style={{height:`${canvasWidth * ASPECT_RATIO}px`}}>
+        {logVisible &&<div className="w-[400px]  bg-main-800 p-2 overflow-y-auto text-main-50" ref={logRef} style={{height:`${canvasWidth * ASPECT_RATIO}px`}}>
           {htmlLog.map((line, index) => (
             <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
           ))}
