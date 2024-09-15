@@ -12,6 +12,7 @@ module.exports = {
     "/smartrotom/pokedex/localizacion": ["smartrotom/pokedex/spawns"],
     "/smartrotom/pasaporte": ["smartrotom/pokedex/moves", "smartrotom/pokedex/forms", "smartrotom/pokedex/abilities", "smartrotom/pokedex/common"],
     "/battlesim/replay/[name]": ["smartrotom/pokedex/common"],
+    "/tools/pmd": ["tools/pmdsky/dungeons"],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`/locales/${lang}/${ns}.json`).then((m) => m.default),
