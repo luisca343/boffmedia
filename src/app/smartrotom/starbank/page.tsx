@@ -11,7 +11,6 @@ import { AccountImage } from "./_components/AccountImage"
 import { formatMoney, getActiveAccountBalance } from "./bankUtils"
 import { useRouter } from 'next/navigation'
 import { AccountSelect } from "./_components/AccountSelect"
-import { set } from "react-hook-form"
 
 export default function StarBank(){
     const router = useRouter()
