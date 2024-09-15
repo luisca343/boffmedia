@@ -30,7 +30,7 @@ export function ReplayControls({
     if(canvasWidth === 0) return null;
 
     return(
-        <div className="flex justify-between p-2 bg-main-800 space-x-2" style={{ width: `${canvasWidth}px` }}>
+        <div className="flex justify-between p-2 bg-main-800 space-x-2" style={{ width: `${canvasWidth + (logVisible ? 400 : 0)}px` }}>
             <div className="flex space-x-2">
                 <ReplayControlsButton onClick={() => setIsPlaying(!isPlaying)} label={isPlaying ? "Pause" : "Play"}>
                     {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
