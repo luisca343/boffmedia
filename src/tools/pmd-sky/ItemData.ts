@@ -1,4 +1,4 @@
-export const pmdSkyItems = {
+const pmdSkyItems: { [key: string]: string } = {
     0: "None",
     1: "Stick",
     2: "Iron Thorn",
@@ -1313,3 +1313,18 @@ export const pmdSkyItems = {
     1351: "Purify Veil"
 }
 
+export function getItemData(): {label: string, value: string}[]  {
+    let data = []
+    for (let key in pmdSkyItems) {
+        data.push({label: pmdSkyItems[key], value: key})
+    }
+    return data
+}
+
+export function getPmdSkyId (item: string): number {
+    const key = Object.keys(pmdSkyItems).find(key => pmdSkyItems[key] === item);
+    if (key === undefined) {
+        throw new Error(`Item '${item}' not found in pmdSkyItems`);
+    }
+    return parseInt(key);
+}

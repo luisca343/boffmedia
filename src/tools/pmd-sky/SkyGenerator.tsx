@@ -10,33 +10,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState, useCallback } from "react";
 import { getValidDungeons } from "./DungeonData";
 import { getValidPokemon } from "./PokemonData";
-import ItemSelect from "../components/ItemSelect";
 import { useFormStore } from "./store";
 import PokemonVirtualizedList from "../components/PokemonList";
 import { generateWonderMail } from "./Generate";
+import { Combobox } from "@/components/ui/combobox";
+import { getItemData, getPmdSkyId } from "./ItemData";
 
 
 
 export function SkyGenerator() {
-    const [questType, setQuestType] = useState("0");
+    const [wonderMail, setWonderMail] = useState("");
 
     const { formData, targetAvailable, setFormData, setTargetAvailable } = useFormStore();
     
     const handleTargetItemChange = useCallback((value: string) => {
-        setFormData({ targetItem: value });
+        setFormData({ targetItem: Number(value) });
     }, [setFormData]);
 
     const handleRewardItemChange = useCallback((value: string) => {
-        setFormData({ rewardItem: value });
+        setFormData({ rewardItem: Number(value)  });
     }, [setFormData]);
 
 
+    function getWonderMail() {
+        const mail = generateWonderMail(formData);
+        setWonderMail(mail);
+    }
 
     return (
-        <div className="bg-gray-700 text-white">
+        <div className="bg-gray-700 text-black mysterydungeon text-2xl">
             <h1>Sky Generator</h1>
             <Label htmlFor="questType">Quest Type</Label>
-            <Select name="questType" value={formData.questType} onValueChange={(value) => setFormData({ questType: value })}>
+            <Select name="questType" value={formData.questType.toString()} onValueChange={(value) => setFormData({ questType: Number(value) })}>
                 <SelectTrigger className="w-48 text-black">
                     <SelectValue placeholder="Select a mission" />
                 </SelectTrigger>
@@ -46,7 +51,7 @@ export function SkyGenerator() {
             </Select>
 
             <Label htmlFor="dungeon">Dungeon</Label>
-            <Select name='dungeon' value={formData.dungeon} onValueChange={(value) => setFormData({ dungeon: value })}>
+            <Select name='dungeon' value={formData.dungeon.toString()} onValueChange={(value) => setFormData({ dungeon: Number(value) })}>
                 <SelectTrigger className="w-48 text-black">
                     <SelectValue placeholder="Select a dungeon" />
                 </SelectTrigger>
@@ -58,29 +63,22 @@ export function SkyGenerator() {
             </Select>
 
             <Label htmlFor="floor">Floor</Label>
-            <Input name="floor" type="number" placeholder="0" className="w-48 text-black"  value={formData.floor} onChange={(e) => setFormData({ floor: e.target.value })} />
+            <Input name="floor" type="number" placeholder="0" className="w-48 text-black"  value={formData.floor} onChange={(e) => setFormData({ floor: Number(e.target.value) })} />
 
             <Label htmlFor="clientPokemon">Client</Label>
-            <Select name='clientPokemon' value={formData.clientPokemon} onValueChange={(value) => setFormData({ clientPokemon: value })}>
+            <Select name='clientPokemon' value={formData.clientPokemon.toString()} onValueChange={(value) => setFormData({ clientPokemon: Number(value) })}>
                 <SelectTrigger className="w-48 text-black">
                     <SelectValue placeholder="Select a client" />
                 </SelectTrigger>
                 <SelectContent>
-                <PokemonVirtualizedList
-                    items={getValidPokemon()}
-                    itemHeight={40} // Adjust based on your item height
-                    renderItem={(client, index) => (
-                        <SelectItem key={index} value={client.key.toString()}>{client.name}</SelectItem>
-                    )}
-                />
-
+                    {getValidPokemon().map((client, index) => <SelectItem key={index} value={client.key.toString()}>{client.name}</SelectItem>)}
                 </SelectContent>
             </Select>
 
             <Label htmlFor="targetPokemon">Target</Label>
-            <Select name='targetPokemon' disabled={!targetAvailable} value={formData.targetPokemon} onValueChange={(value) => setFormData({ targetPokemon: value })}>
+            <Select name='targetPokemon' disabled={!targetAvailable} value={formData.targetPokemon.toString()} onValueChange={(value) => setFormData({ targetPokemon: Number(value) })}>
                 <SelectTrigger className="w-48 text-black">
-                    <SelectValue placeholder="Select a target" />
+                    <SelectValue placeholder="Select a target" className=" text-black"/>
                 </SelectTrigger>
                 <SelectContent>
                     {getValidPokemon().map((client, index) => <SelectItem key={index} value={client.key.toString()}>{client.name}</SelectItem>)}
@@ -88,10 +86,10 @@ export function SkyGenerator() {
             </Select>
 
             <Label htmlFor="targetItem">Target Item</Label>
-            <ItemSelect name="targetItem" value={formData.targetItem} onChange={handleTargetItemChange} />
+            <Combobox data={getItemData()} value={formData.targetItem.toString()} onChange={handleTargetItemChange} />
 
             <Label htmlFor="rewardType">Reward Type</Label>
-            <Select name="rewardType" value={formData.rewardType} onValueChange={(value) => setFormData({ rewardType: value })}>
+            <Select name="rewardType" value={formData.rewardType.toString()} onValueChange={(value) => setFormData({ rewardType: Number(value) })}>
                 <SelectTrigger className="w-48 text-black">
                     <SelectValue placeholder="Select a reward type" />
                 </SelectTrigger>
@@ -107,17 +105,23 @@ export function SkyGenerator() {
             </Select>
 
             <Label htmlFor="rewardItem">Reward Item</Label>
-            <ItemSelect name="rewardItem" value={formData.rewardItem} onChange={handleRewardItemChange} />
+            <Combobox data={getItemData()} value={formData.rewardItem.toString()} onChange={handleRewardItemChange} />
 
             <Label htmlFor="europeanVersion">European Version</Label>
             <Checkbox name="europeanVersion" checked={formData.europeanVersion} onCheckedChange={(value) => setFormData({ europeanVersion: value === true })} />
 
-            <Button onClick={() => generateWonderMail(formData)} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
+            <Button onClick={() => getWonderMail()} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
                 Generate
             </Button>
 
-            <Label htmlFor="generatedQuest">Generated Quest</Label>
-            <Textarea name="generatedQuest" className="w-96 h-32 text-black" />
+            <div>
+                <span>Generated Wonder Mail:</span>
+                <div className="text-9xl">
+                    {wonderMail.split('\n').map((line, index) => (
+                        <div key={index}>{line}</div>
+                    ))}
+                </div>
+            </div>
             
 
         </div>

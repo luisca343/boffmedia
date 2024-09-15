@@ -1,16 +1,16 @@
 import { create } from "zustand";
 
 export interface SkyFormData {
-  questType: string;
-  dungeon: string;
-  floor: string;
-  clientPokemon: string;
-  targetPokemon: string;
-  targetItem: string;
-  rewardType: string;
-  rewardItem: string;
+  questType: number;
+  dungeon: number;
+  floor: number;
+  clientPokemon: number;
+  targetPokemon: number;
+  targetItem: number;
+  rewardType: number;
+  rewardItem: number;
   europeanVersion: boolean;
-  generatedQuest: string;
+  generatedQuest: number;
   flavorText: string;
 }
 
@@ -23,16 +23,16 @@ interface FormState {
 
 export const useFormStore = create<FormState>((set, get) => ({
   formData: {
-    questType: "0",
-    dungeon: "",
-    floor: "",
-    clientPokemon: "",
-    targetPokemon: "",
-    targetItem: "",
-    rewardType: "",
-    rewardItem: "",
+    questType: 0,
+    dungeon: 1,
+    floor: 1,
+    clientPokemon: 0,
+    targetPokemon: 0,
+    targetItem: 0,
+    rewardType: 0,
+    rewardItem: 0,
     europeanVersion: false,
-    generatedQuest: "",
+    generatedQuest: 0,
     flavorText: "",
   },
   targetAvailable: false,

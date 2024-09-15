@@ -144,7 +144,7 @@ export function generateWonderMail(formData: SkyFormData){
 
     const struct = {} as StructType;
     
-		struct.missionType = parseInt(formData.questType)
+		struct.missionType = formData.questType
 		struct.missionSpecial = 0;
 		
 		struct.nullBits = 0;
@@ -152,14 +152,14 @@ export function generateWonderMail(formData: SkyFormData){
 		struct.restriction = 0;
 		struct.restrictionType = 0;
         console.log("REWARD TYPE "+formData.rewardType)
-		struct.rewardType = parseInt(formData.rewardType);
+		struct.rewardType = formData.rewardType;
 
         // Client
         if(formData.hasOwnProperty("forceClient")) {
 			struct.client = 1;
 		}
 		else {
-			const client = parseInt(formData.clientPokemon);
+			const client = formData.clientPokemon;
             const clientF = false
 			struct.client = getTrueMonID(client, clientF);
 		}
@@ -176,7 +176,7 @@ export function generateWonderMail(formData: SkyFormData){
 			struct.target = struct.client;
 		}
 		else {
-			var client = parseInt(formData.targetPokemon);
+			var client = formData.targetPokemon;
             const targetF = false
 			struct.target = getTrueMonID(client, targetF);
 		}
@@ -203,7 +203,7 @@ export function generateWonderMail(formData: SkyFormData){
 			struct.reward = 109;
 		}
 		else if(struct.rewardType >= 1 && struct.rewardType <= 4) {
-			struct.reward = parseInt(formData.rewardItem);
+			struct.reward = formData.rewardItem;
 		}
 		else if(struct.rewardType == 5 || struct.rewardType == 6) {
 			struct.reward = struct.client;
@@ -216,7 +216,7 @@ export function generateWonderMail(formData: SkyFormData){
         
 		// Target item - based on mission type
 		if(missionData.useTargetItem) {
-			struct.targetItem = parseInt(formData.targetItem);
+			struct.targetItem = formData.targetItem;
 		}
 		else {
 			// The game also seems to complain about not having a targetItem, so here's an Apple for you.
@@ -225,9 +225,9 @@ export function generateWonderMail(formData: SkyFormData){
 
         
 		// Dungeon/floor
-		var dungeon = parseInt(formData.dungeon, 10);
+		var dungeon = formData.dungeon;
 		struct.dungeon = dungeon || 1;
-		var floor = parseInt(formData.floor, 10);
+		var floor = formData.floor;
 		struct.floor = (floor >= 1 && floor <= 99) ? floor : 1;
 
         
