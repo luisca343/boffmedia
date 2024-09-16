@@ -580,3 +580,7 @@ export function getValidPokemon(): { label: string, value: string }[] {
 
     return valid;
 }
+
+export function isValidClient(client: number): boolean {
+    return validClients.includes(client);
+}

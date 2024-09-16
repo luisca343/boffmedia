@@ -1,6 +1,7 @@
 import { advance } from "@react-three/fiber";
-import { NIDORAN_FEMALE, NIDORAN_MALE, femaleOnlyPokemon, maleOnlyPokemon } from "./PokemonData";
+import { NIDORAN_FEMALE, NIDORAN_MALE, femaleOnlyPokemon, isValidClient, maleOnlyPokemon } from "./PokemonData";
 import { SkyFormData } from "./store";
+import { isValid } from "zod";
 
 const bitValues = "&67NPR89F0+#STXY45MCHJ-K12=%3Q@W"
 
@@ -155,10 +156,14 @@ export function generateWonderMail(formData: SkyFormData){
 		struct.rewardType = formData.rewardType;
 
         // Client
-        if(formData.hasOwnProperty("forceClient")) {
-			struct.client = 1;
+        if(formData.forceClient > 0) {
+			struct.client = formData.forceClient;
 		}
 		else {
+            if(!isValidClient(formData.clientPokemon)){
+                return alert("Invalid client pokemon")
+            }
+            
 			const client = formData.clientPokemon;
             const clientF = false
 			struct.client = getTrueMonID(client, clientF);
@@ -169,9 +174,9 @@ export function generateWonderMail(formData: SkyFormData){
         
 		
 		// Target
-		if(formData.hasOwnProperty("forceTarget")) {
-			struct.target = 1;
-		}
+		if(missionData.forceTarget) {
+            struct.target = missionData.forceTarget;
+        }
 		else if(missionData.clientIsTarget) {
 			struct.target = struct.client;
 		}
