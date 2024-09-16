@@ -20,13 +20,15 @@ import {
 } from "@/components/ui/popover"
 
 interface ComboboxProps {
-  data: { label: string, value: string }[];
+  data: { label: string, value: any }[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  disabled?: boolean;
+  className?: string;
 }
 
-export function Combobox({ data, value, onChange, placeholder = "Select Element" }: ComboboxProps) {
+export function Combobox({ data, value, onChange, placeholder = "Buscar Elemento", disabled = false, className }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
 
   const handleSelect = (currentValue: string) => {
@@ -42,11 +44,12 @@ export function Combobox({ data, value, onChange, placeholder = "Select Element"
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className={`"w-[200px] justify-between text-black ${className}`}
+          disabled={disabled}
         >
-          {value
+          {value && data.find((element) => element.value === value)?.label
             ? data.find((element) => element.value === value)?.label
-            : placeholder}
+            : "Selecciona un elemento"}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
