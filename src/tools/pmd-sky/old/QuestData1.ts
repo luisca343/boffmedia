@@ -1,17 +1,17 @@
 export const questTypes = [
-    { id: 0, value: "Rescue client" },
-    { id: 1, value: "Rescue target" },
-    { id: 2, value: "Escort to target" },
-    { id: 3, value: "Explore with client" },
-    { id: 4, value: "Prospect with client" },
-    { id: 5, value: "Guide client" },
-    { id: 6, value: "Find target item" },
-    { id: 7, value: "Deliver target item" },
-    { id: 8, value: "Search for client" },
-    { id: 9, value: "Steal from target" },
-    { id: 12, value: "Challenge Request" },
-    { id: 13, value: "Treasure hunt" },
-];
+    { value: "0", label: "Rescue client" },
+    { value: "1", label: "Rescue target" },
+    { value: "2", label: "Escort to target" },
+    { value: "3", label: "Explore with client" },
+    { value: "4", label: "Prospect with client" },
+    { value: "5", label: "Guide client" },
+    { value: "6", label: "Find target item" },
+    { value: "7", label: "Deliver target item" },
+    { value: "8", label: "Search for client" },
+    { value: "9", label: "Steal from target" },
+    { value: "12", label: "Challenge Request" },
+    { value: "13", label: "Treasure hunt" },
+]
 
 export enum questTypeEnum {
     RESCUE_CLIENT = 0,

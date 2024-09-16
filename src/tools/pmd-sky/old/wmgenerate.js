@@ -68,7 +68,7 @@ WMSGenData = {
 			{name: "Mewtwo", specialType: 1, forceClient: 150, forceTarget: 150, specialFloor: 145},
 			{name: "Entei", specialType: 2, forceClient: 271, forceTarget: 271, specialFloor: 146},
 			{name: "Raikou", specialType: 3, forceClient: 270, forceTarget: 270, specialFloor: 147},
-			{name: "Suicine", specialType: 4, forceClient: 272, forceTarget: 272, specialFloor: 148},
+			{name: "Suicune", specialType: 4, forceClient: 272, forceTarget: 272, specialFloor: 148},
 			{name: "Jirachi", specialType: 5, forceClient: 417, forceTarget: 417, specialFloor: 149}
 		]},
 		
