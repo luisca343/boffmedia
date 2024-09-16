@@ -225,8 +225,8 @@ export function getFloors(dungeon: number): number {
   return parseInt(floors[dungeon*2] + floors[dungeon*2 + 1], 16);
 }
 
-export function getValidDungeons(dungeonTrans: Translate) : { key: number, name: string }[] {
+export function getValidDungeons(dungeonTrans: Translate) : {label: string, value: string}[]  {
     return validQuestDungeons.map(key => (
-        { key, name: dungeonTrans(key.toString()) }
+        { value: key.toString(), label: dungeonTrans(key.toString()) }
       ));
 }
