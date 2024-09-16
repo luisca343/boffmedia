@@ -26,7 +26,7 @@ export function FicusNav() {
   if(app === 'noApp') return null
   //if (hide.includes(app)) return null
   return (
-    <nav className="bg-main-800 p-4">
+    <nav className="bg-main-900 p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div>
           <Link href="/wingull" className="text-main-50 mx-2">
