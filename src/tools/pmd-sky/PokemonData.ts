@@ -536,8 +536,9 @@ export const pmdSkyPokemon: { [key: number]: string } = {
 
 const validClients = [
     // Game extracted data
+    // 32 was removed from the list because it does not exist
     1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 18, 19, 
-    20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 32, 33, 34, 35, 36, 37, 
+    20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 33, 34, 35, 36, 37, 
     38, 39, 41, 42, 43, 44, 45, 46, 48, 49, 52, 53, 54, 55, 56, 57, 
     58, 59, 60, 61, 62, 64, 65, 66, 68, 69, 70, 72, 73, 74, 75, 76, 
     77, 78, 79, 80, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 
@@ -572,8 +573,10 @@ export const femaleOnlyPokemon = [
     0x01E, 0x109, 0x1C7, 0x1C2, 0x1C3, 0x1C4
 ]
 
-export function getValidPokemon(): { key: number, name: string}[] {
-    return validClients.map((key) => {
-        return { key, name: pmdSkyPokemon[key] }
+export function getValidPokemon(): { label: string, value: string }[] {
+    const valid =  validClients.map((key) => {
+        return { value: key.toString(), label: pmdSkyPokemon[key] }
     });
+
+    return valid;
 }
