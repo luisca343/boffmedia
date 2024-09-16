@@ -1,14 +1,5 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
-import { SelectValue } from "@radix-ui/react-select";
-import { questTypes } from "./old/QuestData1";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { useState, useCallback } from "react";
@@ -53,12 +44,19 @@ export function SkyGenerator() {
   );
 
   function getWonderMail() {
-    const mail = generateWonderMail(formData);
+    const mail = generateWonderMail(formData) || "";
     setWonderMail(mail);
   }
+
+
+  function updateEuropeanVersion(value: string | boolean) {
+    setFormData({ europeanVersion: value === true });
+    setWonderMail("");
+  }
+
   return (
     <div className="bg-main-800 min-h-full text-white p-6 shadow-lg mysterydungeon">
-      <div className="max-w-2xl  mx-auto">
+      <div className=" xl:w-2/3  mx-auto">
         <h1 className="text-4xl font-bold mb-6 text-center">Sky Generator</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -124,7 +122,7 @@ export function SkyGenerator() {
               type="number"
               min={1}
               max={getFloors(formData.dungeon)}
-              className="w-fit text-black"
+              className="w-full xl:w-24 text-black"
               value={formData.floor}
               onChange={(e) => setFormData({ floor: Number(e.target.value) })}
             />
@@ -184,7 +182,7 @@ export function SkyGenerator() {
             </div>
           </FormField>
 
-          <FormField label={commonTrans("REWARD_TYPE")} className=" col-span-2">
+          <FormField label={commonTrans("REWARD_TYPE")} className="md:col-span-2">
             <Combobox
               className="w-full"
               data={getRewardTypes(commonTrans)}
@@ -212,23 +210,25 @@ export function SkyGenerator() {
               disabled={!givesItem(formData.rewardType)}
             />
           </FormField>
-        </div>
 
-        <FormField label={commonTrans("EUROPEAN")}>
-          <Checkbox
-            checked={formData.europeanVersion}
-            onCheckedChange={(value) =>
-              setFormData({ europeanVersion: value === true })
-            }
-          />
-        </FormField>
+            <FormField label={commonTrans("EUROPEAN")} className="md:col-span-2 mx-auto flex justify-center items-center space-x-2">
+                <Checkbox
+                    className="border-white"
+                    checked={formData.europeanVersion}
+                    onCheckedChange={(value) =>
+                    updateEuropeanVersion(value)
+                    }
+                />
+            </FormField>
+
+        </div>
 
         <Button onClick={getWonderMail} className="w-full mb-4">
           {commonTrans("GENERATE_WONDER_MAIL")}
         </Button>
 
         {wonderMail && (
-          <div className="bg-main-700 p-4 rounded">
+          <div className="bg-main-700 p-4 rounded text-center">
             <h2 className="text-2xl font-semibold mb-2">Correo Secreto {formData.europeanVersion ? "(EU)" : ""}</h2>
             <div className="text-xl break-all">
               {wonderMail.split("\n").map((line, index) => (
@@ -240,7 +240,10 @@ export function SkyGenerator() {
       </div>
     </div>
   );
+
+  
 }
+
 
 function FormField({
   label,
@@ -253,7 +256,7 @@ function FormField({
 }) {
   return (
     <div className={className}>
-      <label className="block text-sm font-medium mb-1">{label}</label>
+      <label className="block text-lg font-medium mb-1">{label}</label>
       {children}
     </div>
   );
