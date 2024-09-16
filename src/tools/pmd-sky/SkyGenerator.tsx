@@ -1,5 +1,10 @@
-"use client"
-import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
+"use client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
 import { SelectValue } from "@radix-ui/react-select";
 import { questTypes } from "./old/QuestData1";
 import { Input } from "@/components/ui/input";
@@ -14,119 +19,242 @@ import { generateWonderMail } from "./Generate";
 import { Combobox } from "@/components/ui/combobox";
 import { getItemData } from "./ItemData";
 
-import useTranslation from "next-translate/useTranslation"
-
-
+import useTranslation from "next-translate/useTranslation";
+import {
+  getClientIsTarget,
+  getForceClient,
+  getQuestData,
+  getRewardTypes,
+  getSubQuestData,
+  getUseTargetItem,
+  givesItem,
+} from "./QuestData";
 
 export function SkyGenerator() {
-    const [wonderMail, setWonderMail] = useState("");
-    const { t: dungeonsTrans } = useTranslation("tools/pmdsky/dungeons");
+  const [wonderMail, setWonderMail] = useState("");
+  const { t: dungeonsTrans } = useTranslation("tools/pmdsky/dungeons");
+  const { t: commonTrans } = useTranslation("tools/pmdsky/common");
 
-    const { formData, targetAvailable, setFormData, setTargetAvailable } = useFormStore();
-    
-    const handleTargetItemChange = useCallback((value: string) => {
-        setFormData({ targetItem: Number(value) });
-    }, [setFormData]);
+  const { formData, targetAvailable, setFormData, setTargetAvailable } =
+    useFormStore();
 
-    const handleRewardItemChange = useCallback((value: string) => {
-        setFormData({ rewardItem: Number(value)  });
-    }, [setFormData]);
+  const handleTargetItemChange = useCallback(
+    (value: string) => {
+      setFormData({ targetItem: Number(value) });
+    },
+    [setFormData]
+  );
 
+  const handleRewardItemChange = useCallback(
+    (value: string) => {
+      setFormData({ rewardItem: Number(value) });
+    },
+    [setFormData]
+  );
 
-    function getWonderMail() {
-        const mail = generateWonderMail(formData);
-        setWonderMail(mail);
-    }
+  function getWonderMail() {
+    const mail = generateWonderMail(formData);
+    setWonderMail(mail);
+  }
+  return (
+    <div className="bg-main-800 min-h-full text-white p-6 shadow-lg mysterydungeon">
+      <div className="max-w-2xl  mx-auto">
+        <h1 className="text-4xl font-bold mb-6 text-center">Sky Generator</h1>
 
-    return (
-        <div className="bg-gray-700 text-black mysterydungeon text-2xl">
-            <h1>Sky Generator</h1>
-            <Label htmlFor="questType">Quest Type</Label>
-            <Select name="questType" value={formData.questType.toString()} onValueChange={(value) => setFormData({ questType: Number(value) })}>
-                <SelectTrigger className="w-48 text-black">
-                    <SelectValue placeholder="Select a mission" />
-                </SelectTrigger>
-                <SelectContent>
-                    {questTypes.map((type, index) => <SelectItem key={index} value={type.id.toString()}>{type.value}</SelectItem>)}
-                </SelectContent>
-            </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <FormField label={commonTrans("QUEST_TYPE")}>
+            <Combobox
+              className="w-full"
+              data={getQuestData(commonTrans)}
+              value={formData.questType.toString()}
+              onChange={(value) =>
+                setFormData({
+                  questType: Number(value),
+                  forceClient: getForceClient(
+                    Number(value),
+                    formData.specialQuestType
+                  ),
+                  forceTarget: getForceClient(
+                    Number(value),
+                    formData.specialQuestType
+                  ),
+                })
+              }
+            />
+          </FormField>
 
-            <Label htmlFor="dungeon">Dungeon</Label>
-            <Select name='dungeon' value={formData.dungeon.toString()} onValueChange={(value) => setFormData({ dungeon: Number(value) })}>
-                <SelectTrigger className="w-48 text-black">
-                    <SelectValue placeholder="Select a dungeon" />
-                </SelectTrigger>
-                <SelectContent>
-                    {getValidDungeons(dungeonsTrans).map((dungeon, index) =>
-                        <SelectItem key={index} value={dungeon.key.toString()}>{dungeon.name}</SelectItem>
-                    )}
-                </SelectContent>
-            </Select>
+          <FormField label={commonTrans("QUEST_SUBTYPE")}>
+            <Combobox
+              className="w-full"
+              data={getSubQuestData(formData.questType, commonTrans)}
+              value={formData.specialQuestType.toString()}
+              disabled={
+                getForceClient(
+                  formData.questType,
+                  formData.specialQuestType
+                ) === 0
+              }
+              onChange={(value) =>
+                setFormData({
+                  specialQuestType: Number(value),
+                  forceClient: getForceClient(
+                    formData.questType,
+                    Number(value)
+                  ),
+                  forceTarget: getForceClient(
+                    formData.questType,
+                    Number(value)
+                  ),
+                })
+              }
+            />
+          </FormField>
 
-            <Label htmlFor="floor">Floor</Label>
-            <Input name="floor" type="number"
-                min={1} max={getFloors(formData.dungeon)}
-                className="w-48 text-black" value={formData.floor} onChange={(e) => setFormData({ floor: Number(e.target.value) })} />
+          <FormField label={commonTrans("DUNGEON")}>
+            <Combobox
+              className="w-full"
+              data={getValidDungeons(dungeonsTrans)}
+              value={formData.dungeon.toString()}
+              onChange={(value) => setFormData({ dungeon: Number(value) })}
+            />
+          </FormField>
 
-            <Label htmlFor="clientPokemon">Client</Label>
-            <Select name='clientPokemon' value={formData.clientPokemon.toString()} onValueChange={(value) => setFormData({ clientPokemon: Number(value) })}>
-                <SelectTrigger className="w-48 text-black">
-                    <SelectValue placeholder="Select a client" />
-                </SelectTrigger>
-                <SelectContent>
-                    {getValidPokemon().map((client, index) => <SelectItem key={index} value={client.key.toString()}>{client.name}</SelectItem>)}
-                </SelectContent>
-            </Select>
+          <FormField label="Floor">
+            <Input
+              type="number"
+              min={1}
+              max={getFloors(formData.dungeon)}
+              className="w-fit text-black"
+              value={formData.floor}
+              onChange={(e) => setFormData({ floor: Number(e.target.value) })}
+            />
+          </FormField>
 
-            <Label htmlFor="targetPokemon">Target</Label>
-            <Select name='targetPokemon' disabled={!targetAvailable} value={formData.targetPokemon.toString()} onValueChange={(value) => setFormData({ targetPokemon: Number(value) })}>
-                <SelectTrigger className="w-48 text-black">
-                    <SelectValue placeholder="Select a target" className=" text-black"/>
-                </SelectTrigger>
-                <SelectContent>
-                    {getValidPokemon().map((client, index) => <SelectItem key={index} value={client.key.toString()}>{client.name}</SelectItem>)}
-                </SelectContent>
-            </Select>
-
-            <Label htmlFor="targetItem">Target Item</Label>
-            <Combobox data={getItemData()} value={formData.targetItem.toString()} onChange={handleTargetItemChange} />
-
-            <Label htmlFor="rewardType">Reward Type</Label>
-            <Select name="rewardType" value={formData.rewardType.toString()} onValueChange={(value) => setFormData({ rewardType: Number(value) })}>
-                <SelectTrigger className="w-48 text-black">
-                    <SelectValue placeholder="Select a reward type" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="0">Cash</SelectItem>
-                    <SelectItem value="1">Cash + ??? (Reward item)</SelectItem>
-                    <SelectItem value="2">Item</SelectItem>
-                    <SelectItem value="3">Item + ??? (Random)</SelectItem>
-                    <SelectItem value="4">??? (Reward item)</SelectItem>
-                    <SelectItem value="5">??? (Egg)</SelectItem>
-                    <SelectItem value="6">??? (Client joins)</SelectItem>
-                </SelectContent>
-            </Select>
-
-            <Label htmlFor="rewardItem">Reward Item</Label>
-            <Combobox data={getItemData()} value={formData.rewardItem.toString()} onChange={handleRewardItemChange} />
-
-            <Label htmlFor="europeanVersion">European Version</Label>
-            <Checkbox name="europeanVersion" checked={formData.europeanVersion} onCheckedChange={(value) => setFormData({ europeanVersion: value === true })} />
-
-            <Button onClick={() => getWonderMail()} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4">
-                Generate
-            </Button>
-
-            <div>
-                <span>Generated Wonder Mail:</span>
-                <div className="text-9xl">
-                    {wonderMail.split('\n').map((line, index) => (
-                        <div key={index}>{line}</div>
-                    ))}
-                </div>
+          <FormField label={commonTrans("CLIENT_POKEMON")}>
+            <div className="flex items-center">
+              <Combobox
+                data={getValidPokemon()}
+                value={formData.clientPokemon.toString()}
+                onChange={(value) =>
+                  setFormData({ clientPokemon: Number(value) })
+                }
+                disabled={
+                  getForceClient(
+                    formData.questType,
+                    formData.specialQuestType
+                  ) > 0
+                }
+                className="flex-grow"
+              />
+              <img
+                width={40}
+                height={40}
+                src={formData.clientSprite}
+                alt="Client Sprite"
+                className="ml-2"
+                style={{ imageRendering: "pixelated" }}
+              />
             </div>
-            
+          </FormField>
 
+          <FormField label={commonTrans("TARGET_POKEMON")}>
+            <div className="flex items-center">
+              <Combobox
+                data={getValidPokemon()}
+                value={formData.targetPokemon.toString()}
+                onChange={(value) =>
+                  setFormData({ targetPokemon: Number(value) })
+                }
+                disabled={
+                  getForceClient(
+                    formData.questType,
+                    formData.specialQuestType
+                  ) > 0 || getClientIsTarget(formData.questType)
+                }
+                className="flex-grow"
+              />
+              <img
+                width={40}
+                height={40}
+                src={formData.targetSprite}
+                alt="Target Sprite"
+                className="ml-2"
+                style={{ imageRendering: "pixelated" }}
+              />
+            </div>
+          </FormField>
+
+          <FormField label={commonTrans("REWARD_TYPE")} className=" col-span-2">
+            <Combobox
+              className="w-full"
+              data={getRewardTypes(commonTrans)}
+              value={formData.rewardType.toString()}
+              onChange={(value) => setFormData({ rewardType: Number(value) })}
+            />
+          </FormField>
+
+          <FormField label={commonTrans("TARGET_ITEM")}>
+            <Combobox
+              className="w-full"
+              data={getItemData()}
+              value={formData.targetItem.toString()}
+              onChange={handleTargetItemChange}
+              disabled={!getUseTargetItem(formData.questType)}
+            />
+          </FormField>
+
+          <FormField label={commonTrans("REWARD_ITEM")}>
+            <Combobox
+              className="w-full"
+              data={getItemData()}
+              value={formData.rewardItem.toString()}
+              onChange={handleRewardItemChange}
+              disabled={!givesItem(formData.rewardType)}
+            />
+          </FormField>
         </div>
-    );
+
+        <FormField label={commonTrans("EUROPEAN")}>
+          <Checkbox
+            checked={formData.europeanVersion}
+            onCheckedChange={(value) =>
+              setFormData({ europeanVersion: value === true })
+            }
+          />
+        </FormField>
+
+        <Button onClick={getWonderMail} className="w-full mb-4">
+          {commonTrans("GENERATE_WONDER_MAIL")}
+        </Button>
+
+        {wonderMail && (
+          <div className="bg-main-700 p-4 rounded">
+            <h2 className="text-2xl font-semibold mb-2">Correo Secreto {formData.europeanVersion ? "(EU)" : ""}</h2>
+            <div className="text-xl break-all">
+              {wonderMail.split("\n").map((line, index) => (
+                <div key={index}>{line}</div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function FormField({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      {children}
+    </div>
+  );
 }
