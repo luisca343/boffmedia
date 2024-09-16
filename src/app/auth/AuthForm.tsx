@@ -54,7 +54,7 @@ export default function AuthForm({redirect = '/', url='boffmedia'} : {url?: stri
 
     return (
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="bg-main-50 w-1/2 p-10">
+                <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col  bg-main-50 w-1/2 p-10">
                     <FormField control={form.control} name="username" render={({field}) => (
                         <FormItem>
                             <FormLabel>Username</FormLabel>
@@ -87,7 +87,7 @@ export default function AuthForm({redirect = '/', url='boffmedia'} : {url?: stri
                     )}/>
 
                     
-                    <Button type="submit">Enviar</Button>
+                    <Button type="submit" className="mt-2">Enviar</Button>
                 </form>
             </Form>
     )
@@ -96,7 +96,9 @@ export default function AuthForm({redirect = '/', url='boffmedia'} : {url?: stri
 
 export function FormCenteredInPage({redirect = '/', url='boffmedia'} : {url?: string, redirect?: string}) {
     return (
-        <div className="flex h-full items-center justify-center bg-main-700 p-24">
+        <div className="flex flex-col h-full items-center justify-center bg-main-700 p-24">
+            <span className="text-4xl font-bold text-main-50 mb-2 text-center">SmartRotom En Construcción</span>
+            <span className="text-xl font-bold text-main-50 mb-2 text-center">(El login requiere cuenta de BoffMedia vinculada a Minecraft, y solo Luisca la tiene así que mala suerte)</span>
             <AuthForm redirect={redirect} url={url}/>
         </div>
     )
