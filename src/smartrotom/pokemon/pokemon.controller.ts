@@ -152,4 +152,9 @@ export class PokemonController {
         return this.pokemonService.getBiomes();
     }
 
+    @Get('pmd/:name')
+    getPokemonByPMD(@Param('name') name: string){
+        return this.pokemonService.getPmdSprite(name);
+    }
+
 }

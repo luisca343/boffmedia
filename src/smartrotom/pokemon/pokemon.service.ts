@@ -263,7 +263,7 @@ export class PokemonService {
             includeMatches: false,
             keys: ['name', 'nickname']
         }
-        const fuse = new Fuse<any>(this.pokemonData.species, options);
+        const fuse = new Fuse<Pokemon>(this.pokemonData.species, options);
         const result = fuse.search(name);
         return result.slice(0, amount)
     }
@@ -674,6 +674,20 @@ export class PokemonService {
 
         return sortedBiomesObj
     }
+
+    async getPmdSprite(name: string){
+        console.log(name)
+        const pkm = this.getPokemonByName(name, 1)[0].item
+        console.log(pkm)
+        const dex = pkm.dex.toString().padStart(4, '0')
+        const pmdFolder = path.join(__dirname, '../../../', 'public/smartrotom/img/pmd/portrait', dex)
+        const pmdSprite = path.join(pmdFolder, 'Normal.png')
+
+        console.log(path.join('/smartrotom/img/pmd/portrait', dex, 'Normal.png'))
+
+        if(fs.existsSync(pmdSprite)) return {url: path.join('/smartrotom/img/pmd/portrait', dex, 'Normal.png')}
+        return {url: '/smartrotom/img/pmd/portrait/0000/Normal.png'}
+    } 
 
     async test(){
         // @ts-ignore
