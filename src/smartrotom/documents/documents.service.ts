@@ -64,13 +64,12 @@ export class DocumentsService {
     async getActiveNews(){
         const file = path.join(__dirname, '../../../../', 'public/smartrotom/data/news.json');
         const data =  JSON.parse(await fs.promises.readFile(file, 'utf8'))
-        console.log(data)
         return data
     }
 
     async updateActiveNews(body: {id:number, newsId: number, newsData: {subtitle: string, image: string}}){
         const file = path.join(__dirname, '../../../../', 'public/smartrotom/data/news.json');
-        const data =  JSON.parse(await fs.promises.readFile(file, 'utf8'))
+        const data =  await JSON.parse(await fs.promises.readFile(file, 'utf8'))
 
         let index = data.findIndex((n: any) => n.id == body.id)
 
@@ -89,7 +88,6 @@ export class DocumentsService {
 
         await fs.promises.writeFile(file, JSON.stringify(data, null, 2))
         return data
-        
         
     }
 }
