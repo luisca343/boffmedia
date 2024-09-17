@@ -45,6 +45,7 @@ import { DiscordService } from './discord/_main/discord.service';
 import { DiscordModule } from './discord/_main/discord.module';
 import { CommandsService } from './discord/_commands/commands.service';
 import { CommandsModule } from './discord/_commands/commands.module';
+import { LigaModule } from './smartrotom/liga/liga.module';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { CommandsModule } from './discord/_commands/commands.module';
     ArcadeModule,
     DiscordModule,
     CommandsModule,
+    LigaModule,
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController],
   providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService],
