@@ -13,7 +13,7 @@ export class PokemonData {
     }
     
     pokemonList = [];
-    species = [];
+    species = [] as Pokemon[];
 
     highestDex = 0;
     speciesByDex = {}
