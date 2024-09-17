@@ -195,7 +195,6 @@ export class SmartrotomService {
     async getBattleConfig(npcConfigName: string) {
         const dir = path.join(__dirname, '../../../', 'public/smartrotom/combates/entrenadores');
         const fileName = path.join(dir, npcConfigName + '/config.json');
-        console.log('fileName', fileName)
 
         if(!fs.existsSync(fileName)) return {error: 'Config not found'}
 
