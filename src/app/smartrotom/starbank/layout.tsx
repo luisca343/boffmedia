@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 import { SideMenu } from "./_components/SideMenu";
 import TopBar from "./_components/TopBar";
 
@@ -7,6 +8,14 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
+  const currentRoute = usePathname();
+  let currentPage = currentRoute.split("/").pop();
+
+  if(currentPage === undefined) {
+    currentPage = "home";
+  }
+
+
   return (
     <div
       className="flex overflow-hidden bg-blue-100 "
@@ -15,9 +24,9 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
         backgroundSize: "cover",
       }}
     >
-      <SideMenu />
+      <SideMenu currentPage={currentPage}/>
       <div className="h-full w-full overflow-hidden">
-        <TopBar />
+        <TopBar  currentPage={currentPage}/>
         <div className="h-full w-full">{children}</div>
       </div>
     </div>
