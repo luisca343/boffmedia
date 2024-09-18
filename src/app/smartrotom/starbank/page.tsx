@@ -191,6 +191,7 @@ export default function StarBank() {
           </BankSectionContent>
           <BankSectionFooter>
             <BankSectionButton
+            className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => {
                 router.push("/smartrotom/starbank/transacciones");
               }}
@@ -204,7 +205,7 @@ export default function StarBank() {
             <DollarSign className="mr-2" /> Transferir Dinero
           </button>
           <button className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
-            <CreditCard className="mr-2" /> Administrar Tarjetas
+            <CreditCard className="mr-2" /> Administrar Cuentas
           </button>
           <button className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
             <Send className="mr-2" /> Pagar Facturas
