@@ -279,10 +279,7 @@ export function TablaTransacciones({
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-blue-50 sticky top-0 z-10">
           <tr>
-            <th></th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
-              Razón
-            </th>
+            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Razón</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
               Cantidad
             </th>
