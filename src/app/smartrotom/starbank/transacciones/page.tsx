@@ -1,64 +1,160 @@
-"use client"
+"use client";
 import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { rotomGET } from "@/services/boffAPI";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { BankSection, BankSectionContent, BankSectionFooter, BankSectionHeader } from "../_components/BankSection";
-import { Transactions } from "../page";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { SendMoney } from "../_components/SendMoney";
 import { getValidAccountId } from "../bankUtils";
+import { Download, Filter, Search } from "lucide-react";
+import { strToDate } from "@/lib/utils";
 
-export default function Transacciones(){
-    const { data: session } = useSession() as {data: BoffSession | null}
-    const [transactions, setTransactions] = useState([])
-    const [accounts, setAccounts] = useState([])
-    const [activeAccount, setActiveAccount] = useState(-1)
-    
-    useEffect(() => {
-        if (session?.user) {
-            rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid)
-                .then((res) => {
-                    setAccounts(res);
-                });
+import {
+  useReactTable,
+  getCoreRowModel,
+  flexRender,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  ColumnFiltersState,
+  Table,
+  Row,
+  Column,
+  Cell,
+} from "@tanstack/react-table";
+import { BankSectionButton } from "../_components/BankSection";
+import { Input } from "@/components/ui/input";
+import { TransactionsTable, columns } from "./_util/TransactionsTable";
 
+interface Transaction {
+  from: number;
+  to: number;
+  amount: number;
+  fromBalance: number;
+  toBalance: number;
+  reason: string;
+  type: string;
+  date: string;
+  isPayer: boolean;
+}
+
+export interface CellDefProps<TData> {
+  table: Table<TData>;
+  row: Row<TData>;
+  column: Column<TData>;
+  cell: Cell<TData, unknown>;
+  getValue: () => any;
+  renderValue: () => any;
+}
+
+export default function Transacciones() {
+  const { data: session } = useSession() as { data: BoffSession | null };
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [accounts, setAccounts] = useState([]);
+  const [activeAccount, setActiveAccount] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const table = useReactTable({
+    data: transactions,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      globalFilter: searchTerm,
+      columnFilters,
+    },
+    initialState: {
+      pagination: {
+        pageIndex: 0,
+        pageSize: 12,
+      },
+    },
+    getPaginationRowModel: getPaginationRowModel(),
+    meta: {
+      activeAccount,
+    },
+  });
+
+  useEffect(() => {
+    if (session?.user) {
+      rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid).then(
+        (res) => {
+          setAccounts(res);
         }
-    }, [session]);
+      );
+    }
+  }, [session]);
 
-    useEffect(() => {
-        if (accounts.length === 0) return
-        const account = getValidAccountId(accounts)
-        setActiveAccount(account)
+  useEffect(() => {
+    if (accounts.length === 0) return;
+    const account = getValidAccountId(accounts);
+    setActiveAccount(account);
 
-        rotomGET("/starbank/transactions/" + account)
-        .then((res) => {
-            setTransactions(res);
+    rotomGET("/starbank/transactions/" + account).then((res) => {
+      const transactionData = res.map((transaction: Transaction) => {
+        const isActiveAccount = transaction.from == account;
+        return {
+          isPayer: isActiveAccount,
+          reason: transaction.reason,
+          amount: transaction.amount,
+          balance: isActiveAccount ? transaction.fromBalance : transaction.toBalance,
+          date: transaction.date,
+        };
+      });
+
+      setTransactions(transactionData);
     });
-    }, [accounts]);
+  }, [accounts]);
 
+  function updateFilters(columnId: string, value: string) {
+    const newFilters = columnFilters.filter((f) => f.id !== columnId);
+    if (value) {
+      newFilters.push({ id: columnId, value });
+    }
+    setColumnFilters(newFilters);
+  }
 
-    if(accounts.length === 0) return <div>Cargando...</div>
-    return(
-        <div className="flex flex-col w-full h-full p-2">
-            <BankSection className="w-[70%] h-full m-auto">
-                <BankSectionHeader >Transacciones </BankSectionHeader>
-                <BankSectionContent>
-                    <Transactions activeAccount={getValidAccountId(accounts)} />
-                </BankSectionContent>
-                <BankSectionFooter>
-                    <Dialog>
-                        <DialogTrigger>
-                            <div className="bg-blue-900 hover:bg-blue-700 text-main-50 p-2 rounded-md">Enviar dinero</div>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>Enviar dinero</DialogHeader>
-                            <DialogDescription>
-                                <SendMoney />
-                            </DialogDescription>
-                        </DialogContent>
-                    </Dialog>
-                </BankSectionFooter>
-            </BankSection>
-        </div>
-    )
+  if (accounts.length === 0) return <div>Cargando...</div>;
+  return (
+    <main className="h-full flex flex-col max-w-6xl mx-auto space-y-6 p-4">
+      {/* Transactions Table */}
+      <div className="bg-white shadow-md rounded-lg overflow-hidden w-full mx-auto h-[75%]">
+        <TransactionsTable
+          table={table}
+          columnFilters={columnFilters}
+          updateFilters={updateFilters}
+          />
+      </div>
+      {/* Pagination (simplified for this example) */}
+      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md max-h-[15%]">
+        <BankSectionButton onClick={() => table.previousPage()}>
+          Anterior
+        </BankSectionButton>
+        <span className="text-sm text-gray-700">
+          Página {table.getState().pagination.pageIndex + 1} de{" "}
+          {table.getPageCount()}
+        </span>
+        <BankSectionButton
+          onClick={() =>
+            table.getState().pagination.pageIndex + 1 < table.getPageCount()
+              ? table.nextPage()
+              : null
+          }
+        >
+          Siguiente
+        </BankSectionButton>
+      </div>
+    </main>
+  );
+}
+
+function esPagador(transaction: any, activeAccount: any) {
+  return transaction.from == activeAccount;
 }
