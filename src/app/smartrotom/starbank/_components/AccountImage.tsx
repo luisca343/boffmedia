@@ -16,7 +16,7 @@ export function AccountImage({type, name, width=48, height=48}: {type: string, n
     }
 
     return (
-        <img width={width} height={height} src={src} alt={name} className="rounded-full" />
+        <img width={width} height={height} src={src} alt={name} className="rounded-full " />
     );
 }
 

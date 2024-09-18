@@ -107,7 +107,7 @@ export const SideMenu = () => {
   const [isOpened, setIsOpened] = useState(false);
   const controls = useAnimation();
   return (
-    <div className="h-full ">
+    <aside className="h-full ">
       <motion.div 
         className="mx-auto  w-full h-full  relative"
         initial="closed"
@@ -122,9 +122,9 @@ export const SideMenu = () => {
         onMouseOut={() => !isOpened && controls.start({ left: 'calc(100% - 6rem)' })} 
       >
         <div className="h-full w-full bg-blue-950 flex flex-col  relative z-10">
-          <div className="w-full bg-main-900 h-24  text-blue-100 font-bold italic pointer-events-none flex items-center justify-center rounded-b-xl">
-            <div className="bg-main-50 min-w-16 h-16 rounded-full text-center text-9xl flex items-center mx-2">
-              <img src="/smartrotom/img/apps/starbank.webp" alt="logo" className="h-16 w-16" />
+          <div className="w-full bg-blue-950 h-20  text-blue-100 font-bold italic pointer-events-none flex items-center justify-center">
+            <div className="bg-main-50 min-w-12 h-12 rounded-full text-center text-9xl flex items-center mx-2">
+              <img src="/smartrotom/img/apps/starbank.webp" alt="logo" className="h-12 w-12" />
             </div>
             <AnimatePresence>
               {isOpened && (
@@ -177,6 +177,6 @@ export const SideMenu = () => {
           ><ChevronRightIcon strokeWidth={3} height={48} width={48} className='text-blue-100'/></motion.div>
         </motion.div>
       </motion.div>
-    </div>
+    </aside>
   )
 }
