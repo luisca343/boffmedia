@@ -1,37 +1,17 @@
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
-import { rotomGET } from "@/services/boffAPI";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
-import { getValidAccountId } from "../bankUtils";
+import { useEffect } from "react";
+import { useStarBankStore } from "./useStarBankStore";
+import { BoffSession } from "@/types";
 
-export default function useStarBank(){
+export default function useStarBank() {
     const { data: session } = useSession() as { data: BoffSession | null };
-    const [accounts, setAccounts] = useState([]);
-    const [activeAccount, setActiveAccount] = useState(-1);
+    const { fetchAccounts } = useStarBankStore();
 
     useEffect(() => {
-        if (session?.user) {
-            rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid).then(
-                (res) => {
-                    setAccounts(res);
-                    setActiveAccount(getValidAccountId(res));
-                }
-            );
+        if (session) {
+            fetchAccounts(session);
         }
-    }, [session]);
-    
-    console.log({
-        accounts,
-        setAccounts,
-        activeAccount: accounts.find((account: any) => account.id === activeAccount),
-        setActiveAccount
-    });
+    }, [session, fetchAccounts]);
 
-    return {
-        accounts,
-        setAccounts,
-        activeAccount: accounts.find((account: any) => account.id === activeAccount),
-        setActiveAccount
-    }
-    
+    return useStarBankStore();
 }
