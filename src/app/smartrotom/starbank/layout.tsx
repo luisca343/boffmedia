@@ -18,7 +18,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
 
   return (
     <div
-      className="flex overflow-hidden bg-blue-100 "
+      className="flex overflow-hidden bg-blue-50 "
       style={{
         backgroundRepeat: "no-repeat",
         backgroundSize: "cover",

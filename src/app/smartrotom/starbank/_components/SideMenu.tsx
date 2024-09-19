@@ -3,38 +3,46 @@ import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { BanknotesIcon, CalendarIcon, ChartBarIcon, ChevronRightIcon, ChevronUpIcon, CreditCardIcon, CurrencyYenIcon, HomeIcon, PresentationChartLineIcon, TicketIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { InternalLink } from '@/components/nav/Link';
+
 const items = [
   {
+    id: 'starbank',
     text: 'General',
     icon: HomeIcon,
     url: '/starbank/'
   },
   {
+    id: 'cuentas',
     text: 'Cuentas',
     icon: CreditCardIcon,
     url: '/starbank/cuentas'
   },
   {
+    id: 'transacciones',
     text: 'Transacciones',
     icon: CurrencyYenIcon,
     url: '/starbank/transacciones'
   },
   {
+    id: 'enviar',
     text: 'Enviar Dinero',
     icon: BanknotesIcon,
     url: '/starbank/enviar'
   },
   {
+    id: 'facturas',
     text: 'Facturas',
     icon: TicketIcon,
     url: '/starbank/facturas'
   },
   {
+    id: 'graficas',
     text: 'Gráficas',
     icon: PresentationChartLineIcon,
     url: '/starbank/graficas'
   },
   {
+    id: 'calendario',
     text: 'Calendario de Pagos',
     icon: CalendarIcon,
     url: '/starbank/calendario'
@@ -77,11 +85,11 @@ const menuIconVariants = {
     x: [0, -i*2.4, 0],
   })
 }
-const MenuItem = ({ isOpened, i, item: { text, Icon, url } }: { isOpened: boolean, i: number, item: { text: string, Icon: any, url:string } }) => {
+const MenuItem = ({ isOpened, i, item: { text, Icon, url }, className }: { isOpened: boolean, i: number, item: { text: string, Icon: any, url:string }, className:string }) => {
   return (
-    <InternalLink href={url}>
+    <InternalLink href={url} className='z-20'>
       <motion.div 
-        className="flex items-center text-blue-100  hover:text-blue-300 cursor-pointer " 
+        className={`flex items-center text-blue-100  hover:text-blue-300 cursor-pointer ${className}`} 
         variants={menuIconVariants}
         custom={i}
         whileHover={{ scale: 1.1 }}
@@ -103,7 +111,7 @@ const MenuItem = ({ isOpened, i, item: { text, Icon, url } }: { isOpened: boolea
     </InternalLink>    
   );
 }
-export const SideMenu = () => {
+export const SideMenu = ({currentPage} : {currentPage: string}) => {
   const [isOpened, setIsOpened] = useState(false);
   const controls = useAnimation();
   return (
@@ -142,11 +150,11 @@ export const SideMenu = () => {
             }}
           >
           </motion.div>
-          <div className='mt-8 mx-8'>
+          <div className='mt-8 mx-8 z-20'>
           {items.map((item, i) => {
             if (!item.text) return (
               <motion.div 
-                className="line" 
+                className={`line ${currentPage === item.id && 'bg-blue-100'}`}
                 key={i}
                 animate={{ 
                   width: isOpened ? '75%' : '60%',
@@ -160,6 +168,7 @@ export const SideMenu = () => {
                 item={{ text: item.text.toString(), Icon: item.icon, url: item.url}} 
                 i={i+1}
                 key={i} 
+                className={`${currentPage === item.id && 'bg-blue-100 rounded-lg text-blue-900 z-20'}`}
               />
             )
           })}
@@ -167,7 +176,7 @@ export const SideMenu = () => {
         </div>
     
         <motion.div 
-          className={`absolute h-14 w-14 top-28  bg-blue-950 rounded-lg transform rotate-45 text-right pt-1 pr-1.5 text-xl z-10 cursor-pointer `}
+          className={`absolute h-14 w-14 top-24  bg-blue-950 rounded-lg transform rotate-45 text-right pt-1 pr-1.5 text-xl z-10 cursor-pointer `}
           animate={controls}
           initial={{ left: 'calc(100% - 6rem)' }}
           onClick={() => setIsOpened(!isOpened)}

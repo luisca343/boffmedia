@@ -33,12 +33,13 @@ export const columns: ColumnDef<Transaction>[] = [
     accessorKey: "isPayer",
     cell: (props: CellDefProps<Transaction>) => {
       const { row, table } = props;
+      const meta = table.options.meta as { activeAccount: number };
       return (
         <AccountImage
           height={32}
           width={32}
           account={row.original}
-          activeAccount={table.options.meta.activeAccount}
+          activeAccount={meta.activeAccount}
         />
       );
     },
@@ -56,7 +57,12 @@ export const columns: ColumnDef<Transaction>[] = [
     filterFn: filterAmount,
     cell: renderMoney,
   },
-  { header: "Fecha", accessorKey: "date", filterFn: filterDate, cell: renderDate },
+  {
+    header: "Fecha",
+    accessorKey: "date",
+    filterFn: filterDate,
+    cell: renderDate,
+  },
 ];
 
 function renderMoney(props: CellDefProps<Transaction>) {
@@ -66,9 +72,10 @@ function renderMoney(props: CellDefProps<Transaction>) {
   return (
     <div
       className={
-        isAmount ? isPayer
-          ? "text-red-500 flex items-center"
-          : "text-green-500 flex items-center"
+        isAmount
+          ? isPayer
+            ? "text-red-500 flex items-center"
+            : "text-green-500 flex items-center"
           : "font-bold flex items-center text-lg text-blue-950"
       }
     >
@@ -116,33 +123,33 @@ export function TransactionsTable({
         <tr>
           <th colSpan={2}>
             <Input
-              className="bg-blue-800 text-white placeholder-white border-none"
+              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
               placeholder="Filtrar transacciones"
-              value={columnFilters.find((f) => f.id === "reason")?.value || ""}
+              value={(columnFilters.find((f) => f.id === "reason")?.value as string) || ""}
               onChange={(e) => updateFilters("reason", e.target.value)}
             />
           </th>
           <th>
             <Input
-              className="bg-blue-800 text-white  border-none"
+              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
               placeholder="Filtrar Cantidad"
-              value={columnFilters.find((f) => f.id === "amount")?.value || ""}
+              value={(columnFilters.find((f) => f.id === "amount")?.value as string) || ""}
               onChange={(e) => updateFilters("amount", e.target.value)}
             />
           </th>
           <th>
             <Input
-              className="bg-blue-800 text-white  border-none"
+              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
               placeholder="Filtrar Saldo"
-              value={columnFilters.find((f) => f.id === "balance")?.value || ""}
+              value={(columnFilters.find((f) => f.id === "balance")?.value as string) || ""}
               onChange={(e) => updateFilters("balance", e.target.value)}
             />
           </th>
           <th>
             <Input
-              className="bg-blue-800 text-white  border-none"
+              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
               placeholder="Filtrar Fecha"
-              value={columnFilters.find((f) => f.id === "date")?.value || ""}
+              value={(columnFilters.find((f) => f.id === "date")?.value as string) || ""}
               onChange={(e) => updateFilters("date", e.target.value)}
             />
           </th>

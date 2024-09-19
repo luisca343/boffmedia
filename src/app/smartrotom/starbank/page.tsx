@@ -137,7 +137,7 @@ export default function StarBank() {
             type="monotone"
             dataKey="balance"
             stroke="#1e3a8a"
-            fill="#1e3a8a"
+            fill="#3b82f6"
             activeDot={{ r: 8 }}
           />
         </AreaChart>
@@ -277,7 +277,7 @@ export function TablaTransacciones({
   return (
     <div className="relative overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-blue-50 sticky top-0 z-10">
+        <thead className="sticky top-0 z-10">
           <tr>
             <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Razón</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
@@ -291,10 +291,10 @@ export function TablaTransacciones({
         <tbody className="bg-white divide-y divide-gray-200">
           {transactions.map((transaction: any) => (
             <tr key={transaction.id}>
-              <td className="py-2 whitespace-nowrap text-sm text-blue-900 flex justify-center">
+              <td className="py-2 whitespace-nowrap text-sm text-black flex justify-center">
                 <AccountImage type={transaction.type} name={transaction.name} />
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                 {transaction.reason}
               </td>
               <td
@@ -306,7 +306,7 @@ export function TablaTransacciones({
               >
                 ¥{transaction.amount}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-700">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                 {strToDate(transaction.date)}
               </td>
             </tr>

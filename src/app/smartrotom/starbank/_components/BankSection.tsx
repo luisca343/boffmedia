@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 export function BankSectionHeader({ children = 'Test' }: { children?: string }) {
     return (
-        <div className="text-xl font-semibold text-blue-950 mb-4">{children}</div>
+        <div className="text-2xl font-semibold text-blue-800 mb-4">{children}</div>
     );
 }
 
@@ -24,7 +24,7 @@ export function BankSectionFooter({ children }: { children?: ReactNode }) {
 
 export function BankSection({ children, className }: { children: any, className?: string }) {
     return (
-        <div className={`flex flex-col p-6  bg-white bg-opacity-90 rounded-md shadow-xl ${className}`}>
+        <div className={`flex flex-col p-6  bg-white bg-opacity-90 rounded-md ${className} border border-blue-200`}>
             {children}
         </div>
     );
