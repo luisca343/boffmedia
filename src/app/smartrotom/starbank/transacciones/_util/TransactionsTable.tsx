@@ -14,6 +14,7 @@ import {
 import { CellDefProps } from "../page"; // Adjust the import path as needed
 import { Input } from "@/components/ui/input";
 import { strToDate } from "@/lib/utils";
+import { formatMoney } from "../../bankUtils";
 
 interface Transaction {
   from: number;
@@ -79,8 +80,7 @@ function renderMoney(props: CellDefProps<Transaction>) {
           : "font-bold flex items-center text-lg text-blue-950"
       }
     >
-      <span className="mr-2">{cell.getValue() as React.ReactNode}</span>
-      <JapaneseYen size={16} />
+      <span className="mr-2">{formatMoney(cell.getValue() as number)}</span>
     </div>
   );
 }

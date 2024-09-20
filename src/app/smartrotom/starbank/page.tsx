@@ -19,7 +19,8 @@ import { AccountImage } from "./_components/AccountImage";
 import { formatMoney, getActiveAccountBalance } from "./bankUtils";
 import { useRouter } from "next/navigation";
 import { AccountSelect } from "./_components/AccountSelect";
-import { Button } from "@/components/ui/button";
+
+import useTranslation from "next-translate/useTranslation";
 import {
   AreaChart,
   Area,
@@ -34,6 +35,7 @@ import {
 import { ArrowRight, DollarSign, CreditCard, Send, Menu } from "lucide-react";
 
 export default function StarBank() {
+  const { t: dungeonsTrans } = useTranslation("tools/pmdsky/dungeons");
   const router = useRouter();
   const { data: session } = useSession() as { data: BoffSession | null };
   const [accounts, setAccounts] = useState([] as any[]);
@@ -277,7 +279,7 @@ export function TablaTransacciones({
   return (
     <div className="relative overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="sticky top-0 z-10">
+        <thead className="sticky top-0 z-10 bg-white">
           <tr>
             <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Razón</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">

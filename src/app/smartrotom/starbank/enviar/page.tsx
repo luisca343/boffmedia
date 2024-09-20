@@ -11,8 +11,8 @@ export default function EnviarDinero(){
     const { data: session } = useSession() as {data: BoffSession | null}
 
     return(
-        <div className="flex flex-col w-full h-full p-2 justify-center items-center">
-            <BankSection className=" self-center align-middle w-[50%] h-[50%] ">
+        <div className="flex flex-col w-full h-full mt-6 p-2 items-center">
+            <BankSection className=" self-center align-middle w-[50%] ">
                 <BankSectionHeader >Enviar Dinero </BankSectionHeader>
                 <BankSectionContent>
                     <SendMoney />

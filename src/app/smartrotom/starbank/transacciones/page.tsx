@@ -27,7 +27,7 @@ import {
   Column,
   Cell,
 } from "@tanstack/react-table";
-import { BankSectionButton } from "../_components/BankSection";
+import { BankSection, BankSectionButton } from "../_components/BankSection";
 import { Input } from "@/components/ui/input";
 import { TransactionsTable, columns } from "./_util/TransactionsTable";
 
@@ -125,15 +125,15 @@ export default function Transacciones() {
   return (
     <main className="h-full flex flex-col max-w-6xl mx-auto space-y-6 p-4">
       {/* Transactions Table */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden w-full mx-auto h-[75%]">
+      <BankSection variant="noPadding" className=" bg-white rounded-lg overflow-hidden w-full mx-auto h-[75%]">
         <TransactionsTable
           table={table}
           columnFilters={columnFilters}
           updateFilters={updateFilters}
           />
-      </div>
+      </BankSection>
       {/* Pagination (simplified for this example) */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-md max-h-[15%]">
+      <div className="flex justify-between items-center bg-white p-4 shadow-md max-h-[15%] rounded-md border border-blue-200">
         <BankSectionButton onClick={() => table.previousPage()}>
           Anterior
         </BankSectionButton>

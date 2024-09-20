@@ -11,7 +11,7 @@ import {
 } from "../_components/BankSection";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
-import { changeActiveAccount, getValidAccountId } from "../bankUtils";
+import { changeActiveAccount, formatMoney, getValidAccountId } from "../bankUtils";
 import {
   Dialog,
   DialogContent,
@@ -50,7 +50,7 @@ export default function Cuentas() {
                         <p className="text-sm text-blue-700">
                           Balance:{" "}
                           <span className="font-semibold">
-                            {account.balance} ¥
+                            {formatMoney(account.balance)}
                           </span>
                         </p>
                       </div>
