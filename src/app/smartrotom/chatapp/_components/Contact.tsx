@@ -1,14 +1,13 @@
 import { getSmartRotomUser, strToDate } from "@/lib/utils";
 import { ChatData } from "../_types/Chat";
 import {
-  PhoneIcon,
-  ArrowUpRightIcon,
-  ArrowDownLeftIcon,
-  PhotoIcon,
-  VideoCameraIcon,
-  SpeakerWaveIcon,
-} from "@heroicons/react/24/outline";
-
+  Phone,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Image as ImageIcon,
+  Video,
+  Volume2,
+} from "lucide-react";
 
 export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatData, activeChat: number, setActiveChat: (id: number) => void, session: any}) {
     return (
@@ -41,10 +40,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
         </div>
       </div>
     );
-    
   }
-
-  
 
   function LastMessage(chat: ChatData, session: any) {
     let msg = chat?.messages[0] || null;
@@ -53,14 +49,14 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
       return (
         <p className="text-sm flex items-center">
           {msg.uuid === getSmartRotomUser(session).uuid ? (
-            <ArrowUpRightIcon
+            <ArrowUpRight
               className="mr-2 text-green-500"
               height={20}
               width={20}
               strokeWidth={2}
             />
           ) : (
-            <ArrowDownLeftIcon
+            <ArrowDownLeft
               className="mr-2 text-red-500"
               height={20}
               width={20}
@@ -78,7 +74,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
     if (msg.type === "image")
       return (
         <p className="text-sm flex items-center">
-          <PhotoIcon
+          <ImageIcon
             className="mr-2 text-neutral-50"
             height={20}
             width={20}
@@ -91,7 +87,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
     if (msg.type === "video")
       return (
         <p className="text-sm flex items-center">
-          <VideoCameraIcon
+          <Video
             className="mr-2 text-neutral-50"
             height={20}
             width={20}
@@ -104,7 +100,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
     if (msg.type === "audio")
       return (
         <p className="text-sm flex items-center">
-          <SpeakerWaveIcon
+          <Volume2
             className="mr-2 text-neutral-50"
             height={20}
             width={20}
@@ -117,7 +113,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
     if (msg.type === "call")
       return (
         <p className="text-sm flex items-center">
-          <PhoneIcon
+          <Phone
             className="mr-2 text-neutral-50"
             height={20}
             width={20}
