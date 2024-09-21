@@ -1,11 +1,17 @@
 import { rotomGET } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession";
-import { BoffSession } from "@/types"
 import { useEffect, useState } from "react"
+
+export interface UnclaimedRewards {
+    name: string
+    type: string
+    amount: number
+    itemId: string
+}
 
 export function useGetUnclaimedRewards(){
     const { session } = useBoffSession();
-    const [unclaimed, setUnclaimed] = useState<{[key: string]: number}>()
+    const [unclaimed, setUnclaimed] = useState<UnclaimedRewards[]>([])
 
     useEffect(() => {
         if(session){
@@ -15,6 +21,10 @@ export function useGetUnclaimedRewards(){
         }
     }, [session])
 
-    return { session, unclaimed, setUnclaimed }
+    return { session, unclaimed, setUnclaimed, getBoxes }
+
+    function getBoxes() {
+        return Math.ceil(unclaimed.length / 27)
+    }
     
 }
