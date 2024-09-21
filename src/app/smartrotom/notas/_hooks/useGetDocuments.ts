@@ -1,10 +1,10 @@
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
-import { useSession } from "next-auth/react"
+import { useBoffSession } from "@/services/useBoffSession";
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 export function useGetDocuments(){
-    const {data: session} = useSession() as any
+    const { session } = useBoffSession();
     const [documents, setDocuments] = useState<Document[]>([])
     const router = useRouter()
 

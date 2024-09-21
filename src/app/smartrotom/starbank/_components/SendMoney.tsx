@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
-import { useSession } from "next-auth/react";
 import { rotomGET, rotomPOST } from "@/services/boffAPI";
 import { AccountSelect } from "./AccountSelect";
 import { Input } from "@/components/ui/input";
@@ -8,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { formatMoney, getValidAccountId } from "../bankUtils";
 import { ArrowRight, DollarSign } from "lucide-react";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export function SendMoney() {
-  const { data: session } = useSession() as { data: BoffSession | null };
+    const { session } = useBoffSession();
   const [myAccounts, setMyAccounts] = useState([] as any);
   const [myActiveAccount, setMyActiveAccount] = useState(-1);
   const [accounts, setAccounts] = useState([]);
@@ -24,17 +23,12 @@ export function SendMoney() {
       setAccounts(res);
     });
 
-    loadMyAccounts();
-  }, [session]);
-
-  function loadMyAccounts() {
-    if (!session) return;
     rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid).then(
       (res) => {
         setMyAccounts(res);
       }
     );
-  }
+  }, [session]);
 
   useEffect(() => {
     if (myAccounts.length === 0) return;
@@ -75,7 +69,7 @@ export function SendMoney() {
       toast.success("Transferencia realizada");
       setAmount(0);
       setConcept("");
-      loadMyAccounts();
+
     });
   }
 

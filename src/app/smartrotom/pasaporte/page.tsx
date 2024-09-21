@@ -1,8 +1,6 @@
 'use client'
 import { Book, BookLink, Page, PageTitle, turnPage } from "@/components/ui/book/book";
 import './pasaporte.css'
-import { useSession } from "next-auth/react";
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { useState } from "react";
 import ActiveTeam from "./_components/ActiveTeam";
 import Badges from "./_components/Badges";
@@ -13,10 +11,11 @@ import { useGetStats } from "./_hooks/useGetStats";
 import { useGetCurrentTeam } from "./_hooks/useGetCurrentTeam";
 import { useGetAchievements } from "./_hooks/useGetAchievements";
 import { SmartRotomAchievement } from "./_types/Achievement";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function Pasaporte(){
   const [book, setBook] = useState(null) as any
-  const {data: session} = useSession() as {data: BoffSession | null, status: string};
+  const { session } = useBoffSession();
   const uuid = session?.user.smartRotomUser.uuid as string
   const username = session?.user.smartRotomUser.username as string
 

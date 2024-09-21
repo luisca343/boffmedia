@@ -1,15 +1,15 @@
 "use client"
 import { InternalLink } from "@/components/nav/Link"
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
-import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { SmartRotomButton } from "@/components/smartrotom/ui/button"
 import FurretNav from "../_components/FurretNav"
+import { useBoffSession } from "@/services/useBoffSession"
 
 export default  function EditarNoticia(){
     const [news, setNews] = useState([])
-    const {data: session} = useSession() as any
+    const { session } = useBoffSession();
     const router = useRouter()
 
     useEffect(() => {

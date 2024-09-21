@@ -1,12 +1,9 @@
 "use client";
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
-import { rotomGET, rotomPOST } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import {  rotomPOST } from "@/services/boffAPI";
+import {  useState } from "react";
 import {
   BankSection,
   BankSectionContent,
-  BankSectionFooter,
   BankSectionHeader,
 } from "../_components/BankSection";
 import { toast } from "react-toastify";
@@ -21,11 +18,11 @@ import {
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import { AccountImage } from "../_components/AccountImage";
-import { Ban } from "lucide-react";
 import useStarBank from "../_hooks/useStarBank";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function Cuentas() {
-  const { data: session } = useSession() as { data: BoffSession | null };
+  const { session } = useBoffSession();
   const {accounts, setAccounts, activeAccount, setActiveAccount} = useStarBank();
 
   return (

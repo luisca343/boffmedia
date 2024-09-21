@@ -1,10 +1,10 @@
 import { rotomGET } from "@/services/boffAPI"
+import { useBoffSession } from "@/services/useBoffSession";
 import { BoffSession } from "@/types"
-import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 
 export function useGetUnclaimedRewards(){
-    const {data: session} = useSession() as {data: BoffSession | null}
+    const { session } = useBoffSession();
     const [unclaimed, setUnclaimed] = useState<{[key: string]: number}>()
 
     useEffect(() => {

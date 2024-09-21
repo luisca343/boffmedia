@@ -1,8 +1,8 @@
 "use client"
-import { useSession } from "next-auth/react";
 import { rotomGET } from '@/services/boffAPI'
 import { useEffect, useState } from "react";
 import { getSmartRotomUser } from "@/lib/utils";
+import { useBoffSession } from "@/services/useBoffSession";
 
 type PokedexRegistries = {
     seenPokemon: number;
@@ -14,7 +14,7 @@ type PokedexRegistries = {
 }
 
 export default function MenuHeader(){
-    const {data: session} = useSession()  as any
+    const { session } = useBoffSession();
     const [pokedexRegistries, setPokedexRegistries] = useState<PokedexRegistries>({} as PokedexRegistries)
 
     useEffect(() => {

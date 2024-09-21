@@ -4,7 +4,6 @@
 import useSocketStore from "@/app/useSocketStore";
 import { getSmartRotomUser } from "@/lib/utils";
 import { rotomPOST } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { Message } from "./Message";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { ChatData } from "../_types/Chat";
 import { Phone, Send, X } from "lucide-react";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export function Chat({
   chats,
@@ -25,7 +25,7 @@ export function Chat({
   const [chat, setChat] = useState(chats[0] as ChatData);
   const [message, setMessage] = useState("" as string);
   const { socket, connect } = useSocketStore();
-  const { data: session } = useSession();
+  const { session } = useBoffSession();
 
   const messagesEndRef = useRef(null);
 

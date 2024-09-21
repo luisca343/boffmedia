@@ -1,15 +1,15 @@
 "use client"
 import { strToDate } from "@/lib/utils";
-import { useSession } from "next-auth/react";
 import { PokemonSprite } from "../../pokedex/_components/PokemonSprite";
 import { getBattleConfig } from "../utils";
 import useBattleReplays from "../_hooks/useGetBattleReplays";
 import { BoffSession } from "@/types";
 import { PokemonData } from "../_types/Pokemon";
 import { InternalLink } from "@/components/nav/Link";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function CamaraLucha(){
-    const {data: session} = useSession() as unknown as {data: BoffSession};
+    const { session } = useBoffSession();
     const { replays, setReplays } = useBattleReplays(session);
     
     return(

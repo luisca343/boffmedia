@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { getSmartRotomUser } from "@/lib/utils"
 import { rotomPOST } from "@/services/boffAPI"
-import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { IDialogue, IQuestCategory, QuestData } from "../_types/Quest"
+import { useBoffSession } from "@/services/useBoffSession"
 
 export function useGetRotomQuests(){
-    const { data: session} = useSession()
+    const { session } = useBoffSession();
     const [quests, setMisiones] = useState([] as QuestData[])
     const [categories, setCategories] = useState({} as {[key: string]: IQuestCategory})
     const [dialogs, setDialogs] = useState([] as IDialogue[])

@@ -1,8 +1,7 @@
 "use client";
 import { getSmartRotomUser } from "@/lib/utils";
-import { GET, POST, rotomGET, rotomPOST } from "@/services/boffAPI"
-import { stat } from "fs";
-import { useSession } from "next-auth/react";
+import { rotomPOST } from "@/services/boffAPI"
+import { useBoffSession } from "@/services/useBoffSession";
 import { useEffect, useState } from "react";
 
 
@@ -152,7 +151,7 @@ const testDataAsObject = {
 } as {quests: {[key: number]: QuestData}, categories: {[key: number]: string}}
 
 export default function Misiones(){
-    const { data: session} = useSession()
+    const { session } = useBoffSession();
     const [quests, setMisiones] = useState({} as {[key: number]: QuestData})
     const [categories, setCategories] = useState({} as {[key: number]: string})
     useEffect(() => {

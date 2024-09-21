@@ -1,8 +1,8 @@
 "use client"
 import { BoffSession } from '@/components/smartrotom/AppWrapper';
 import { rotomGET } from '@/services/boffAPI';
+import { useBoffSession } from '@/services/useBoffSession';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
 type Energy = {
@@ -12,7 +12,7 @@ type Energy = {
 }
 
 export function BarraEnergia() {
-    const {data: session} = useSession() as {data: BoffSession | null}
+    const { session } = useBoffSession();
     const [energy, setEnergy] = useState(0)
     const [maxEnergy, setMaxEnergy] = useState(0)
     const [ultimaRecarga, setUltimaRecarga] = useState<Date>(new Date())

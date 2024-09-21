@@ -2,17 +2,15 @@
 
 import { getSmartRotomUser } from "@/lib/utils"
 import { rotomGET } from "@/services/boffAPI"
-import { useSession } from "next-auth/react"
 import { useEffect, useState } from "react"
 import { PokedexRegistry } from "@/types/Pokemon"
 import { PokemonSprite } from "./PokemonSprite"
 import { StatusIcon } from "./StatusIcon"
-import Link from "next/link"
-import { PokedexSection } from "./PokedexSection"
 import { InternalLink } from "@/components/nav/Link"
+import { useBoffSession } from "@/services/useBoffSession"
 
 export function LastRegistries(){
-    const {data: session} = useSession()
+    const { session } = useBoffSession();
     const [registries, setRegistries] = useState() as [PokedexRegistry[], Function]
 
     useEffect(() => {

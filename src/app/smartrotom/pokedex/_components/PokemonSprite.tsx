@@ -3,14 +3,11 @@
 
 import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
-import { set } from "react-hook-form";
-import { getDisplayName, getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
-import { useSession } from "next-auth/react";
+import {  getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
 import { getSmartRotomUser } from "@/lib/utils";
-import { StatusIcon, StatusIconv2 } from "./StatusIcon";
-import Link from "next/link";
+import {  StatusIconv2 } from "./StatusIcon";
 import { InternalLink } from "@/components/nav/Link";
-import useTranslation from 'next-translate/useTranslation'
+import { useBoffSession } from "@/services/useBoffSession";
 
 
 
@@ -18,7 +15,7 @@ export function PokemonSpriteLink({children, id, form, palette, width=80, height
     {text:string, id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, link?: boolean, children?: any, hideCaught?: boolean, hideSeen?: boolean}) {
         const [imageUrl, setImageUrl] = useState() as any;
         const [loaded, setLoaded] = useState(false)
-        const {data: session} = useSession()  as any
+        const { session } = useBoffSession();
     
     
         useEffect(() => {
@@ -58,7 +55,7 @@ export function PokemonSprite({id, form, palette, width=100, height=100, pixelat
     {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, forceBlack?: boolean}) {
     const [imageUrl, setImageUrl] = useState() as any;
     const [loaded, setLoaded] = useState(false)
-    const {data: session} = useSession()  as any
+    const { session } = useBoffSession();
 
 
     useEffect(() => {

@@ -6,12 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getSmartRotomUser } from "@/lib/utils"
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
-import { useSession } from "next-auth/react"
+import { useBoffSession } from "@/services/useBoffSession"
 import { useState, useMemo, use, useEffect } from "react"
 import { toast } from 'react-toastify'
 
 export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => void}) {
-    const {data: session} = useSession();
+    const { session } = useBoffSession();
     const [users, setUsers] = useState([] as any[]);
     const [groupName, setGroupName] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([] as {username: string, uuid: string}[]);

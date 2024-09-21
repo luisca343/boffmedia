@@ -1,9 +1,6 @@
 "use client";
-
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { strToDate } from "@/lib/utils";
 import { rotomGET } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
 import {
   useEffect,
   useState,
@@ -19,12 +16,9 @@ import { AccountImage } from "./_components/AccountImage";
 import { formatMoney, getActiveAccountBalance } from "./bankUtils";
 import { useRouter } from "next/navigation";
 import { AccountSelect } from "./_components/AccountSelect";
-
-import useTranslation from "next-translate/useTranslation";
 import {
   AreaChart,
   Area,
-  XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
@@ -33,11 +27,11 @@ import {
 } from "recharts";
 
 import { ArrowRight, DollarSign, CreditCard, Send, Menu } from "lucide-react";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function StarBank() {
-  const { t: dungeonsTrans } = useTranslation("tools/pmdsky/dungeons");
   const router = useRouter();
-  const { data: session } = useSession() as { data: BoffSession | null };
+  const { session } = useBoffSession();
   const [accounts, setAccounts] = useState([] as any[]);
   const [activeAccount, setActiveAccount] = useState(-1);
   const [transactions, setTransactions] = useState([]);

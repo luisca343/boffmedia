@@ -4,7 +4,6 @@ import {
   Table,
   flexRender,
 } from "@tanstack/react-table";
-import { JapaneseYen } from "lucide-react";
 import { AccountImage } from "../../_components/AccountImage";
 import {
   filterAmount,

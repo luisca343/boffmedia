@@ -2,18 +2,17 @@
 import { App } from "@/types";
 import Image from "next/image";
 import {motion} from "framer-motion";
-import Link from "next/link";
 import { DndContext, DragEndEvent, closestCenter, useSensors } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
 import {CSS} from '@dnd-kit/utilities';
 import {MouseSensor, useSensor} from '@dnd-kit/core';
 import { rotomPOST } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
 import { useEffect, useState, useCallback } from "react";
 import { InternalLink } from "../nav/Link";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export function AppList() {
-  const {data: session} = useSession()  as any
+  const { session, status } = useBoffSession();
   const [apps, setApps] = useState<App[]>([]);
 
   useEffect(() => {
@@ -29,7 +28,7 @@ export function AppList() {
 }
 
 export function SortableGrid({className, apps, setApps}  : {className?: string, apps: App[], setApps: Function}) {
-  const {data: session} = useSession()  as any
+  const { session } = useBoffSession() 
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 5,

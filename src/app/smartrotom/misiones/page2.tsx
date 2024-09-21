@@ -2,7 +2,7 @@
 import { Book, BookLink, Page, PageTitle } from "@/components/ui/book/book";
 import { getSmartRotomUser } from "@/lib/utils";
 import { rotomPOST } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
+import { useBoffSession } from "@/services/useBoffSession";
 import { useEffect, useState } from "react";
 
 enum QuestStatus {
@@ -78,7 +78,7 @@ export type QuestData = {
 
 
 export default function Misiones(){
-    const { data: session} = useSession()
+    const { session } = useBoffSession();
     const [quests, setMisiones] = useState([] as QuestData[])
     const [categories, setCategories] = useState({} as {[key: string]: IQuestCategory})
     const [dialogs, setDialogs] = useState([] as IDialogue[])

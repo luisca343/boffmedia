@@ -7,10 +7,10 @@ import {motion, useAnimation}     from 'framer-motion'
 import { AlertDialog, AlertDialogContent, AlertDialogHeader } from "@/components/ui/alert-dialog"
 import { BarraEnergia } from "../_components/BarraEnergia"
 import { useRouter } from 'next/navigation';
-import { useSession } from "next-auth/react"
 import { BoffSession } from "@/components/smartrotom/AppWrapper"
 import { Button } from "@/components/ui/button"
 import { rotomPOST } from "@/services/boffAPI"
+import { useBoffSession } from "@/services/useBoffSession"
 
 enum Tool {
     PICKAXE = 1,
@@ -18,7 +18,7 @@ enum Tool {
 }
 
 export default function Jugar(){
-    const {data: session} = useSession() as {data: BoffSession | null}
+    const { session } = useBoffSession();
     const [index, setIndex] = useState(0)
     const [mineMap, setMap] = useState<Array<Array<any>>>([])
     const [rewards, setRewards] = useState<{ reward: Reward; x: number; y: number; }[]>([]) 

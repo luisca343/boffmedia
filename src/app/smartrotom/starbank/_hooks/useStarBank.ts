@@ -1,10 +1,9 @@
-import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useStarBankStore } from "./useStarBankStore";
-import { BoffSession } from "@/types";
+import { useStarBankStore } from "../_stores/useStarBankStore";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function useStarBank() {
-    const { data: session } = useSession() as { data: BoffSession | null };
+    const { session } = useBoffSession();
     const { fetchAccounts } = useStarBankStore();
 
     useEffect(() => {

@@ -1,19 +1,9 @@
 "use client";
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { rotomGET } from "@/services/boffAPI";
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { SendMoney } from "../_components/SendMoney";
 import { getValidAccountId } from "../bankUtils";
 import { AccountImage } from "../_components/AccountImage";
-import { Download, Filter, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { strToDate } from "@/lib/utils";
 
 import {
@@ -25,6 +15,7 @@ import {
 } from "@tanstack/react-table";
 import { filterTransactions } from "../_util/TransactionFilter";
 import { BankSectionButton } from "../_components/BankSection";
+import { useBoffSession } from "@/services/useBoffSession";
 
 interface Transaction {
   from: number;
@@ -40,7 +31,7 @@ interface Transaction {
 }
 
 export default function Transacciones() {
-  const { data: session } = useSession() as { data: BoffSession | null };
+  const { session } = useBoffSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [accounts, setAccounts] = useState([]);
   const [activeAccount, setActiveAccount] = useState(-1);

@@ -1,9 +1,10 @@
 
 "use client"
-import { signIn, signOut, useSession } from "next-auth/react";
+import { useBoffSession } from "@/services/useBoffSession";
+import { signIn, signOut } from "next-auth/react";
 
 export function SettingsPage({ setTema } : { setTema: (tema: string) => void}){
-    const { data: session } = useSession() as {data: any};
+    const { session } = useBoffSession();
 
     return (
         <div>

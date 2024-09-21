@@ -1,12 +1,12 @@
-"use client"
-import { useSession } from "next-auth/react";
+"use client";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function SessionTest() {
-    const { data: session } = useSession();
-    return(
-        <div>
-            <h1>Session Test</h1>
-            <pre>{JSON.stringify(session, null, 2)}</pre>
-        </div>
-    )
+  const { session } = useBoffSession();
+  return (
+    <div>
+      <h1>Session Test</h1>
+      <pre>{JSON.stringify(session, null, 2)}</pre>
+    </div>
+  );
 }
