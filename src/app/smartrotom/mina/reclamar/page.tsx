@@ -1,64 +1,93 @@
-"use client"
+"use client";
 
-import MenuWrapper from "../_components/MenuWrapper"
-import { rotomPOST } from "@/services/boffAPI"
-import { isMinecraft, mcefQuery } from "@/services/mcefHelper"
-import Image from "next/image"
-import { toast } from 'react-toastify';
-import { useGetUnclaimedRewards } from "../_hooks/useGetUnclaimedRewards"
+import MenuWrapper from "../_components/MenuWrapper";
+import { rotomPOST } from "@/services/boffAPI";
+import { isMinecraft, mcefQuery } from "@/services/mcefHelper";
+import Image from "next/image";
+import { toast } from "react-toastify";
+import {
+  UnclaimedRewards,
+  useGetUnclaimedRewards,
+} from "../_hooks/useGetUnclaimedRewards";
+import { Button } from "@/components/ui/button";
+import { SmartRotomButton } from "@/components/smartrotom/ui/button";
 
-export default function Reclamar(){
-    const {session, unclaimed, setUnclaimed} = useGetUnclaimedRewards()
+export default function Reclamar() {
+  const { session, unclaimed, setUnclaimed, getBoxes } =
+    useGetUnclaimedRewards();
 
-    async function claimReward(){
-        
-        if(!session) return
-        if(!await isMinecraft()) {
-            toast.error('No estas en Minecraft')
-        }
-        // Convert unclaimet to array
+  console.log(unclaimed);
 
-        let unclaimedArray = []
-        for (const key in unclaimed) {
-            unclaimedArray.push({
-                id: key,
-                cantidad: unclaimed[key]
-            })
-        }
-
-        try {
-            const res = await mcefQuery('darCaja', {query: "darCaja", objetos: unclaimedArray});
-            rotomPOST('/mine/claim/', {uuid: session.user.smartRotomUser.uuid}).then(res => {
-                toast.success('Recompensas reclamadas')
-                window.location.reload()
-            })
-        } catch (error) {
-            toast.error('Error al reclamar recompensas')
-            console.error('Promise rejected with error', error);
-        }
+  async function claimReward() {
+    if (!session) return;
+    if (!(await isMinecraft())) {
+      toast.error("No estas en Minecraft");
+      return;
     }
 
-    return(
-    <MenuWrapper>
-        <div>
-        {
-            unclaimed ? 
-            Object.keys(unclaimed).map((key, i) => {
-                return (
-                    <div key={i} className="relative inline-block">
-                        <Image width={128} height={128} src={`/smartrotom/img/apps/mina/recompensas/${key.split(':')[1]}.png`} 
-                            alt="Reward" className=" object-cover relative" style={{imageRendering: "pixelated"}}
-                            />
-                        <span className="absolute bottom-0 right-0 bg-primary-400 text-main-50 text-md rounded-full h-8 w-8 flex items-center justify-center">
-                            {unclaimed[key]}
-                        </span>
-                    </div>
-                )
-            })
-            : <h2>Nada para reclamar</h2>
-        }
-            <button onClick={() => claimReward()} className="bg-primary-400 text-main-50 rounded-md p-2 mt-4">Reclamar</button>
+    try {
+      const response = await rotomPOST("/claim-rewards", {
+        rewards: unclaimed,
+      });
+      if (response.success) {
+        toast.success("Recompensas reclamadas con éxito");
+        setUnclaimed([]);
+      } else {
+        toast.error("Error al reclamar recompensas");
+      }
+    } catch (error) {
+      toast.error("Error al reclamar recompensas");
+    }
+  }
+
+  function groupRewardsByType(rewards: UnclaimedRewards[]) {
+    return rewards.reduce((acc, reward) => {
+      if (!acc[reward.type]) {
+        acc[reward.type] = [];
+      }
+      acc[reward.type].push(reward);
+      return acc;
+    }, {} as Record<string, UnclaimedRewards[]>);
+  }
+
+  const groupedRewards = groupRewardsByType(unclaimed);
+
+  return (
+    <MenuWrapper className="w-full min-h-full overflow-hidden bg-gray-900 text-white  pt-4  flex flex-col items-center  text-shadow-border2">
+      <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl">
+        <div className="space-y-4 overflow-auto">
+          {Object.keys(groupedRewards).map((type) => (
+            <div key={type}>
+              <h3 className="text-2xl  mb-2">{type}</h3>
+              <div className="flex space-x-2">
+                {groupedRewards[type].map((reward, index) => (
+                  <div key={index} className="relative group flex space-x-2">
+                    <Image
+                      key={index}
+                      alt={reward.itemId}
+                      width={32}
+                      height={32}
+                      src={`/smartrotom/img/apps/mina/recompensas/${
+                        reward.itemId?.split(":")[1]
+                      }.png`}
+                      style={{ imageRendering: "pixelated" }}
+                    />
+                    <span className="ml-2">x{reward.amount}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
+        <div className="mt-6 flex justify-center">
+          <SmartRotomButton
+            onClick={claimReward}
+            className=" text-white text-xl  text-shadow-border1"
+          >
+            RECLAMAR TODO ({getBoxes()} CAJAS)
+          </SmartRotomButton>
+        </div>
+      </div>
     </MenuWrapper>
-    )
+  );
 }

@@ -1,34 +1,43 @@
-"use client"
-import '../mina.css'
+"use client";
+import "../mina.css";
 import Image from "next/image";
 import MenuWrapper from "../_components/MenuWrapper";
 import useGetMineHistory from "../_hooks/useGetMineHistory";
 
-export default function History(){
-    const {mineHistory, setMineHistory} = useGetMineHistory();
-    
-    return(
-        <MenuWrapper className={` bg-main-900 text-main-50 flex flex-wrap items-start justify-evenly`}>
-            {Object.values(mineHistory).reverse()?.map((game: any, i: number) => {
-                return (
-                    <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-main-900 bg-opacity-80">
-                        <div className=" flex flex-row">
-                            {game.map((reward: any, index: number) => {
-                                return (
-                                    <div key={reward.id+ "-" +index} className="flex flex-col m-2 justify-between items-center pb-2 h-full">
-                                        <Image alt={reward.itemId} width={64} height={64} 
-                                            src={`/smartrotom/img/apps/mina/recompensas/${reward.itemId?.split(':')[1]}.png`}
-                                            style={{imageRendering: "pixelated"}}
-                                        />
-                                        <p className="text-main-400">{reward.objeto}</p>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                            <p className="text-main-400">{new Date(game[0].date).toLocaleString()}</p>
-                    </div>
-                )
-            })}
-        </MenuWrapper>
-    )
+export default function History() {
+  const { mineHistory, setMineHistory } = useGetMineHistory();
+
+  return (
+    <MenuWrapper className="w-full min-h-full  bg-gray-900 text-white flex flex-col items-center">
+      <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl m-4">
+        <h2 className="text-2xl font-bold mb-4">HISTORIAL</h2>
+        <div className="space-y-4 overflow-auto">
+          {Object.values(mineHistory)
+            .reverse()
+            .map((game: any, index: number) => (
+              <div
+                key={index}
+                className="flex justify-between items-center border-b border-gray-600 pb-2"
+              >
+                <span>{new Date(game[0].date).toLocaleString()}</span>
+                <div className="flex space-x-2">
+                  {game.map((reward: any, i: number) => (
+                    <Image
+                      key={i}
+                      alt={reward.itemId}
+                      width={32}
+                      height={32}
+                      src={`/smartrotom/img/apps/mina/recompensas/${
+                        reward.itemId?.split(":")[1]
+                      }.png`}
+                      style={{ imageRendering: "pixelated" }}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    </MenuWrapper>
+  );
 }

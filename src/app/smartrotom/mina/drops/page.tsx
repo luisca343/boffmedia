@@ -1,40 +1,58 @@
 import { rotomGET } from "@/services/boffAPI";
 import MenuWrapper from "../_components/MenuWrapper";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { Drop, DropByType } from "../_types/Drops";
 
 export default async function Drops() {
-    const {drops, totalValue} = await rotomGET('/mine/rewardsbytype') as {drops: DropByType, totalValue: number};
-    return (
-        <MenuWrapper>
-            <div>
-                {Object.keys(drops).map((type: string) => (
-                    <Collapsible key={type}>
-                        <CollapsibleTrigger className="mx-auto text-2xl p-4 border rounded shadow flex flex-col items-center m-2 bg-main-900 bg-opacity-95 w-[90%] text-main-400">
-                            {type} - {getPercentage(drops[type].totalValue, totalValue)}%
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                            <div className="flex flex-wrap justify-center mx-auto w-4/5">
-                                {drops[type].items.map((drop: Drop) => (
-                                    <div key={drop.id} className="text-lg w-1/6 p-4 border rounded shadow flex flex-col items-center m-2 bg-main-900 bg-opacity-85">
-                                        <img src={`/smartrotom/img/apps/mina/recompensas/${drop.itemId.split(':')[1]}.png`}
-                                            alt={drop.name} 
-                                            className="w-16 h-16 mb-2"
-                                            style={{imageRendering: "pixelated"}}
-                                        />
-                                        <p className="text-main-400 text-center">{drop.name}</p>
-                                        <p className="text-main-400 text-center">{getPercentage(drop.value, totalValue)}%</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
-                ))}
-            </div>
-        </MenuWrapper>
-    );
+  const { drops, totalValue } = (await rotomGET("/mine/rewardsbytype")) as {
+    drops: DropByType;
+    totalValue: number;
+  };
+  return (
+    <MenuWrapper className="w-full min-h-full overflow-hidden bg-gray-900 text-white pt-4   flex flex-col items-center">
+      <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-full">
+        <h2 className="text-2xl font-bold mb-4">DROPS</h2>
+        <div className="space-y-4 overflow-auto">
+          {Object.keys(drops).map((type: string) => (
+            <Collapsible key={type}>
+              <CollapsibleTrigger className="mx-auto text-2xl p-4 border-b  shadow flex flex-col items-center m-2 w-[80%] text-main-300">
+                {type} - {getPercentage(drops[type].totalValue, totalValue)}%
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="flex flex-wrap justify-center mx-auto w-4/5">
+                  {drops[type].items.map((drop: Drop) => (
+                    <div
+                      key={drop.id}
+                      className="p-4  rounded  flex flex-col items-center m-2 "
+                    >
+                      <img
+                        src={`/smartrotom/img/apps/mina/recompensas/${
+                          drop.itemId.split(":")[1]
+                        }.png`}
+                        alt={drop.name}
+                        className="w-12 h-12 mb-2"
+                        style={{ imageRendering: "pixelated" }}
+                      />
+                      <p className="text-main-300 text-center text-lg ">{drop.name}</p>
+                      <p className="text-main-300 text-center text-md ">
+                        {getPercentage(drop.value, totalValue)}%
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
+        </div>
+      </div>
+    </MenuWrapper>
+  );
 }
 
 function getPercentage(value: number, total: number) {
-    return (value / total * 100.0).toFixed(3);
+  return ((value / total) * 100.0).toFixed(3);
 }

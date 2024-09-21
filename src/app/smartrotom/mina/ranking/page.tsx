@@ -1,20 +1,31 @@
 import { rotomGET } from "@/services/boffAPI";
 import MenuWrapper from "../_components/MenuWrapper";
 
-export default async function Ranking(){
-    const ranking = await rotomGET('/mine/ranking')  as any[]
-    return(
-        <MenuWrapper>
-            <div>
-                {ranking?.map((user: any, i: number) => {
-                    return (
-                        <div key={i} className="p-4 border rounded shadow  w-auto flex flex-col items-center m-2  bg-main-900 bg-opacity-80">
-                            <p className="text-main-400">{user.username}</p>
-                            <p className="text-main-400">{user.value}</p>
-                        </div>
-                    )
-                })}
-            </div>
-        </MenuWrapper>
-    )
+export default async function Ranking() {
+  const ranking = (await rotomGET("/mine/ranking")) as any[];
+  return (
+    <MenuWrapper className="w-full h-screen overflow-hidden bg-gray-900 text-white pt-4  flex flex-col items-center">
+      <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl ">
+        <h2 className="text-2xl font-bold mb-4">RANKING</h2>
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-600">
+              <th className="py-2">Posición</th>
+              <th className="py-2">Jugador</th>
+              <th className="py-2">Puntos</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ranking?.map((user: any, i: number) => (
+              <tr key={i} className="border-b border-gray-600">
+                <td className="py-2 text-center">{i + 1}</td>
+                <td className="py-2 text-center">{user.username}</td>
+                <td className="py-2 text-center">{user.value}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </MenuWrapper>
+  );
 }
