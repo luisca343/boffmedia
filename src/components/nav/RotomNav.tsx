@@ -36,6 +36,7 @@ import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
 import { SettingsPage } from "../smartrotom/Settings";
 import { getSmartRotomUser } from "@/lib/utils";
 import { useBoffSession } from "@/services/useBoffSession";
+import { Bell, Check, Trash2, X } from "lucide-react";
 
 export default function RotomNav({
   setTema,
@@ -85,24 +86,69 @@ export default function RotomNav({
 
   function Notifications() {
     return (
-      <div className="flex flex-col bg-main-300 w-[33vw] rounded-md z-50">
-        <header className="flex justify-between items-center bg-main-800 p-4">
-          <h2 className="text-main-50">Notificaciones</h2>
-          <button onClick={clear} className="text-main-50">
-            Limpiar
-          </button>
-          <button onClick={markAllAsRead} className="text-main-50">
-            Marcar todas como leídas
-          </button>
-          <span className="text-main-50">{unreadCount}</span>
+      <div className="w-80 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <header className="bg-gray-700 p-4 flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Bell className="text-gray-300" size={20} />
+            <h2 className="text-gray-100 font-semibold">Notificaciones</h2>
+          </div>
+          <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+            {unreadCount}
+          </span>
         </header>
-        <div className="flex flex-col bg-main-300 p-4">
-          {notifications.map((notif, i) => (
-            <div key={i} className="text-main-50 bg-main-500 p-2 m-2">
-              {notif.content?.toString()}
+        <div className="p-4 space-y-2 max-h-80 overflow-y-auto">
+          {notifications.map((notif) => (
+            <div
+              key={notif.id}
+              className={`p-3 rounded text-sm flex flex-col ${
+                notif.read
+                  ? "bg-gray-700 text-gray-400"
+                  : "bg-gray-600 text-gray-200"
+              }`}
+            >
+              <div className="flex justify-between items-start mb-2">
+                <span className="flex-grow">{notif.content?.toString()}</span>
+                {!notif.read && (
+                  <span className="bg-blue-500 w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1"></span>
+                )}
+              </div>
+              <div className="flex justify-end space-x-2">
+                {!notif.read && (
+                  <button
+                    onClick={() => markAsRead(notif.id)}
+                    className="text-gray-400 hover:text-white"
+                    aria-label="Mark as read"
+                  >
+                    <Check size={16} />
+                  </button>
+                )}
+                <button
+                  onClick={() => remove(notif.id)}
+                  className="text-gray-400 hover:text-white"
+                  aria-label="Delete notification"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
           ))}
         </div>
+        <footer className="bg-gray-700 p-2 flex justify-between">
+          <button
+            onClick={clear}
+            className="flex items-center space-x-1 text-gray-300 hover:text-white text-sm"
+          >
+            <Trash2 size={16} />
+            <span>Limpiar</span>
+          </button>
+          <button
+            onClick={markAllAsRead}
+            className="flex items-center space-x-1 text-gray-300 hover:text-white text-sm"
+          >
+            <Check size={16} />
+            <span>Marcar todas como leídas</span>
+          </button>
+        </footer>
       </div>
     );
   }
