@@ -39,6 +39,7 @@ export class AppsService {
   }
 
   async getForPlayer(uuid: string) {
+    if (!uuid) return [];
     const result = await this.db.getDrizzle().execute(sql`
         (SELECT sa.id, sa.url,  sa.name, sao.order as orden FROM rotom_apps sa
           LEFT JOIN rotom_user_apps sao ON sa.id = sao.app_id
