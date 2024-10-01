@@ -16,7 +16,7 @@ import {
   Cell,
 } from "@tanstack/react-table";
 import { BankSection, BankSectionButton } from "../_components/BankSection";
-import { TransactionsTable, columns } from "./_util/TransactionsTable";
+import { TransactionsTable, columns } from "./_components/TransactionsTable";
 import { useBoffSession } from "@/services/useBoffSession";
 
 interface Transaction {
