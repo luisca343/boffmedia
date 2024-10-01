@@ -100,7 +100,7 @@ export function filterReason(row: any, columnId: string, filterValue: string) {
 
   export function filterAmount(row: any, columnId: string, filterValue: string) {
     const searchTerms = filterValue.split(" ");
-    const amount = row.getValue("amount");
+    const amount = row.getValue(columnId);
     let filterIn = true;
     for (const term of searchTerms) {
       if (
