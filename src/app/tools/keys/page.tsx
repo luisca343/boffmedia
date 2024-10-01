@@ -1,38 +1,41 @@
-"use client"
-
-import { useState, useEffect } from 'react'
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+"use client";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { GET, apiGET } from "@/services/boffAPI";
+import { useEffect, useState } from "react";
+import { Suspense } from "react";
 
 interface SteamKey {
-  name: string
-  source: string
-  claimed: string
+  name: string;
+  source: string;
+  claimed: string;
 }
 
-export default function Component() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [steamKeys, setSteamKeys] = useState<SteamKey[]>([])
+export default function KeysPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [steamKeys, setSteamKeys] = useState<SteamKey[]>([]);
 
   useEffect(() => {
-    async function fetchData() {
-      const res = await fetch("http://localhost:34301/steamkeys")
-      const data = await res.json()
+    apiGET(`/steamkeys`).then((res) => {
+      setSteamKeys(res);
+    });
+  });
 
-      // Filter out entries where key.name is empty or key.claimed is "s"
-      const filteredData = data.filter((key: SteamKey) => key.name && key.claimed !== "s")
-      setSteamKeys(filteredData)
-    }
+  const filteredData = steamKeys.filter(
+    (key) =>
+      key.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      key.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      key.claimed.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    fetchData()
-  }, [])
-
-  const filteredData = steamKeys.filter(key =>
-    key.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    key.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    key.claimed.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
+  if (!steamKeys) return <div>Loading...</div>;
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
@@ -55,7 +58,10 @@ export default function Component() {
             </TableHeader>
             <TableBody>
               {filteredData.map((key) => (
-                <TableRow key={key.name} className="hover:bg-gray-700 transition-colors duration-200">
+                <TableRow
+                  key={key.name}
+                  className="hover:bg-gray-700 transition-colors duration-200"
+                >
                   <TableCell className="font-medium">{key.name}</TableCell>
                   <TableCell>{key.source}</TableCell>
                 </TableRow>
@@ -65,5 +71,5 @@ export default function Component() {
         </div>
       </div>
     </div>
-  )
+  );
 }

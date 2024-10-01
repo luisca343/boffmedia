@@ -38,6 +38,7 @@ export const columns: ColumnDef<Transaction>[] = [
         <AccountImage
           height={32}
           width={32}
+          // @ts-ignore
           account={row.original}
           activeAccount={meta.activeAccount}
         />

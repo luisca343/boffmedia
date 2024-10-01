@@ -193,7 +193,7 @@ export function ArmourerModel({ name }: { name: string }) {
           .setPath("/smartrotom/armourers/model-exports/")
           .load(`${name}.obj`, function (object) {
             object.traverse(
-              (child: { isMesh: any; material: { map: Texture } }) => {
+              (child: any ) => {
                 if (child.isMesh) {
                   child.material.map = texture;
                 }
