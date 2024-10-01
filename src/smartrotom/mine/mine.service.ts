@@ -145,22 +145,30 @@ export class MinaService {
     }
 
     async getUnclaimed(uuid: string) {
-        const res = await this.db.getDrizzle().select({itemId: mineRewards.itemId, name: mineRewards.name})
-            .from(mineGames)
-            .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
-            .leftJoin(mineRewards, eq(mineRewards.id, mineGamesDetail.rewardId))
-            .where(and(eq(mineGames.uuid, uuid), eq(mineGamesDetail.claimed, 0)));
-
+        const res = await this.db.getDrizzle().select({
+            itemId: mineRewards.itemId,
+            name: mineRewards.name,
+            type: mineRewards.type
+        })
+        .from(mineGames)
+        .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
+        .leftJoin(mineRewards, eq(mineRewards.id, mineGamesDetail.rewardId))
+        .where(and(eq(mineGames.uuid, uuid), eq(mineGamesDetail.claimed, 0)));
+    
         // Group by item
-        let arr =  res.reduce((acc, curr) => {
-            if(!acc[curr.itemId]) {
-                acc[curr.itemId] = 0;
+        let groupedItems = res.reduce((acc, curr) => {
+            if (!acc[curr.itemId]) {
+                acc[curr.itemId] = { name: curr.name, type: curr.type, amount: 0, itemId: curr.itemId };
             }
-            acc[curr.itemId] += 1;
+            acc[curr.itemId].amount += 1;
             return acc;
-        }, {} as {[key: string]: number});
-        
-        return arr;
+        }, {} as { [key: string]: { name: string, type: string, amount: number, itemId: string } });
+    
+        // Convert to array
+        let items = Object.values(groupedItems);
+    
+        console.log(items);
+        return items;
     }
 
     async claim(uuid: string) {
