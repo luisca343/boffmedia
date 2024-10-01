@@ -123,7 +123,7 @@ export function TransactionsTable({
           <th colSpan={2}>
             <Input
               className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
-              placeholder="Filtrar transacciones"
+              placeholder="Filtrar Transacciones"
               value={(columnFilters.find((f) => f.id === "reason")?.value as string) || ""}
               onChange={(e) => updateFilters("reason", e.target.value)}
             />
