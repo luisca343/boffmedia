@@ -60,4 +60,9 @@ export class AppController {
     console.log(body);
     return {url: ""};
   }
+
+  @Get("steamkeys")
+  async steamkeys() {
+    return await this.appService.steamKeys();
+  }
 }
