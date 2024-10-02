@@ -20,7 +20,7 @@ FROM base AS release
 COPY --from=dependencies /app/prod_node_modules ./node_modules
 COPY drizzle ./drizzle
 COPY --from=build /app/dist ./dist
-COPY server/boffmedia-a39cdd7a63c7.json ./boffmedia-a39cdd7a63c7.json
+COPY server ./server
 EXPOSE 3000
 
 CMD ["npm", "run", "start:prod"]
