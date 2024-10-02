@@ -23,16 +23,20 @@ export default function TreeNode({ name, structure, path }: TreeNodeProps) {
       <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 transition-colors duration-150">
         {isDirectory && (
           <button onClick={toggleOpen} className="focus:outline-none">
-            {isOpen ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />}
+            {isOpen ? (
+              <ChevronDown className="w-4 h-4 text-purple-400" />
+            ) : (
+              <ChevronRight className="w-4 h-4 text-purple-400" />
+            )}
           </button>
         )}
         {isDirectory ? (
           <Folder className="w-5 h-5 text-yellow-500" />
         ) : (
-          <File className="w-5 h-5 text-blue-300" />
+          <File className="w-5 h-5 text-blue-400" />
         )}
         {!isDirectory ? (
-          <Link href={fullPath} className="text-blue-400 hover:underline font-medium">
+          <Link href={fullPath} className="text-blue-400 hover:text-blue-300 hover:underline font-medium transition-colors duration-150">
             {structure}
           </Link>
         ) : (
@@ -40,7 +44,7 @@ export default function TreeNode({ name, structure, path }: TreeNodeProps) {
         )}
       </div>
       {isDirectory && isOpen && (
-        <div className="pl-6 mt-1 border-l-2 border-gray-200">
+        <div className="pl-6 mt-1 border-l-2 border-gray-700">
           {Object.entries(structure).map(([key, value]) => (
             <TreeNode key={key} name={key} structure={value} path={fullPath} />
           ))}
