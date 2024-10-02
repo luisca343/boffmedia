@@ -20,7 +20,6 @@ FROM base AS release
 COPY --from=dependencies /app/prod_node_modules ./node_modules
 COPY drizzle ./drizzle
 COPY --from=build /app/dist ./dist
-COPY server ./server
 EXPOSE 3000
 
 CMD ["npm", "run", "start:prod"]
