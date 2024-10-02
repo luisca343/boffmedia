@@ -58,7 +58,7 @@ export default function LandingPage() {
               description:
                 "Mejora tu experiencia de juego con nuestra colección de herramientas útiles.",
               icon: <Gamepad2 className="w-20 h-20" />,
-              link: "/tools",
+              link: "/herramientas",
               color: "from-yellow-500 to-orange-400",
             },
           ].map((item, index) => (

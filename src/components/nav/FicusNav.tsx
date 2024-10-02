@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 const HIDDEN_APPS = ['smartrotom', 'battlesim']
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/tools', label: 'Herramientas' },
+  { href: '/herramientas', label: 'Herramientas' },
   { href: '/wingull', label: 'Pixelmon Wingull' },
   { href: '/smartrotom', label: 'SmartRotom' },
 ]

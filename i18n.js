@@ -13,7 +13,7 @@ module.exports = {
     "/smartrotom/pasaporte": ["smartrotom/pokedex/moves", "smartrotom/pokedex/forms", "smartrotom/pokedex/abilities", "smartrotom/pokedex/common"],
     "/battlesim/replay/[name]": ["smartrotom/pokedex/common"],
 
-    "/(boffmedia)/tools/pokemon/pmdsky": ["tools/pmdsky/dungeons", "tools/pmdsky/common"],
+    "/(boffmedia)/herramientas/pokemon/pmdsky": ["tools/pmdsky/dungeons", "tools/pmdsky/common"],
   },
   loadLocaleFrom: (lang, ns) =>
     import(`/locales/${lang}/${ns}.json`).then((m) => m.default),

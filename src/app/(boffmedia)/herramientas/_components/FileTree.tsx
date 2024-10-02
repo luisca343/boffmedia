@@ -12,7 +12,7 @@ export default function FileTree({ structure }: FileTreeProps) {
     <div className="p-4 bg-gray-800 rounded-lg ">
       <div className="space-y-2">
         {Object.entries(structure).map(([key, value]) => (
-          <TreeNode key={key} name={key} structure={value} path="/tools" />
+          <TreeNode key={key} name={key} structure={value} path="/herramientas" />
         ))}
       </div>
     </div>
