@@ -18,13 +18,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  
   return (
     <GlobalProviders>
       <TooltipProvider>
-          <AppWrapper>{children}</AppWrapper>
-      </TooltipProvider >
+        <AppWrapper>{children}</AppWrapper>
+      </TooltipProvider>
     </GlobalProviders>
   );
 }
