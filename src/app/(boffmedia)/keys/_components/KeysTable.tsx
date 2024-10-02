@@ -84,6 +84,7 @@ export default function KeysTable() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="text-cyan-400">#</TableHead>
                 <TableHead className="text-cyan-400">Juego</TableHead>
                 <TableHead className="text-cyan-400">Bundle</TableHead>
                 <TableHead className="text-cyan-400">Estado</TableHead>
@@ -102,6 +103,7 @@ export default function KeysTable() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                   >
+                    <TableCell className="font-medium">{displayedKeys.indexOf(key) + 1}</TableCell>
                     <TableCell className="font-medium">
                       <motion.div
                         className="flex items-center gap-2"
