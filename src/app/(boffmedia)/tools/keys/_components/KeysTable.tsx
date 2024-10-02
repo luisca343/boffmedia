@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -11,18 +11,24 @@ import {
 } from "@/components/ui/table";
 import useGetKeys from "../_hooks/useGetKeys";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gift, Key } from "lucide-react";
-
-interface SteamKey {
-  name: string;
-  source: string;
-  claimed: string;
-}
+import { Gift, Key, ExternalLink } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose,
+} from "@/components/ui/dialog";
+import useFetchSteamData from "../_hooks/useFetchSteamData";
+import { SteamDialog } from "./SteamDialog";
 
 export default function KeysTable() {
   const { filteredKeys, filter, setFilter } = useGetKeys();
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
-  const [showClaimed, setShowClaimed] = useState<boolean>(true);
+  const [showClaimed, setShowClaimed] = useState<boolean>(false);
+  const { selectedGame, isModalVisible, setIsModalVisible, fetchGameData } =
+    useFetchSteamData();
 
   if (!filteredKeys) return <div>Loading...</div>;
 
@@ -85,6 +91,7 @@ export default function KeysTable() {
             <TableHeader>
               <TableRow>
                 <TableHead className="text-cyan-400">#</TableHead>
+                <TableHead className="text-cyan-400">Image</TableHead>
                 <TableHead className="text-cyan-400">Juego</TableHead>
                 <TableHead className="text-cyan-400">Bundle</TableHead>
                 <TableHead className="text-cyan-400">Estado</TableHead>
@@ -95,24 +102,41 @@ export default function KeysTable() {
                 {displayedKeys.map((key) => (
                   <motion.tr
                     key={key.name}
-                    className="hover:bg-gray-700 transition-colors duration-200"
+                    className="hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
                     onMouseEnter={() => setHoveredRow(key.name)}
                     onMouseLeave={() => setHoveredRow(null)}
+                    onClick={() => fetchGameData(key.steamID)}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <TableCell className="font-medium">{displayedKeys.indexOf(key) + 1}</TableCell>
                     <TableCell className="font-medium">
-                      <motion.div
-                        className="flex items-center gap-2"
-                        animate={{ scale: hoveredRow === key.name ? 1.05 : 1 }}
-                        transition={{ duration: 0.2 }}
-                      >
+                      {displayedKeys.indexOf(key) + 1}
+                    </TableCell>
+                    <TableCell>
+                      <img
+                        src={key.imageUrl}
+                        alt={`Imagen de ${key.name}`}
+                        className="w-10 h-10 object-cover rounded-lg"
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
                         <Gift className="w-5 h-5 text-cyan-400" />
-                        {key.name}
-                      </motion.div>
+                        <span className="flex items-center gap-1">
+                          {key.name}
+                        </span>
+                        <a
+                          href={`https://store.steampowered.com/app/${key.steamID}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-cyan-400"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </div>
                     </TableCell>
                     <TableCell>{key.source}</TableCell>
                     <TableCell>
@@ -133,15 +157,13 @@ export default function KeysTable() {
             </TableBody>
           </Table>
         </motion.div>
-        <motion.div
-          className="mt-8 p-4 bg-gray-800 rounded-lg text-center text-gray-300 shadow-md"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-        >
-          Contacta con Luisca si te interesa alguna.
-        </motion.div>
       </div>
+
+      <SteamDialog
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        selectedGame={selectedGame}
+      />
     </div>
   );
 }
