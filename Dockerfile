@@ -19,8 +19,8 @@ RUN npm run build
 FROM base AS release
 COPY --from=dependencies /app/prod_node_modules ./node_modules
 COPY drizzle ./drizzle
-COPY --from=build /app/dist ./dist
 COPY boffmedia-a39cdd7a63c7.json ./boffmedia-a39cdd7a63c7.json
+COPY --from=build /app/dist ./dist
 EXPOSE 3000
 
 CMD ["npm", "run", "start:prod"]
