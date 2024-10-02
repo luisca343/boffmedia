@@ -1,6 +1,6 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import { ArrowRight, Smartphone, Gamepad2, ChevronRight } from 'lucide-react'
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Smartphone, Gamepad2, ChevronRight } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -11,15 +11,20 @@ export default function LandingPage() {
             <div className="absolute inset-0 bg-black opacity-50"></div>
             <div className="relative z-10">
               <Image
-                src="https://i.imgur.com/1yE4G8g.png"
+                src="/img/boff.png"
                 alt="BoffMedia Logo"
                 width={150}
                 height={150}
                 className="mx-auto mb-8 drop-shadow-glow"
               />
-              <h1 className="text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500">Bienvenido a BoffMedia</h1>
-              <p className="text-2xl mb-10 text-gray-300">Tu portal a experiencias de juego inmersivas y herramientas útiles</p>
-              <Link 
+              <h1 className="text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500">
+                Bienvenido a BoffMedia
+              </h1>
+              <p className="text-2xl mb-10 text-gray-300">
+                Tu portal a experiencias de juego inmersivas y herramientas
+                útiles
+              </p>
+              <Link
                 href="/wingull"
                 className="bg-red-500 text-white px-8 py-4 rounded-full font-bold text-xl hover:bg-red-600 transition duration-300 inline-flex items-center shadow-neon"
               >
@@ -34,37 +39,51 @@ export default function LandingPage() {
           {[
             {
               title: "Pixelmon Wingull 2",
-              description: "Vive la última aventura Pokémon en Minecraft. ¡Próximamente!",
+              description:
+                "Vive la última aventura Pokémon en Minecraft. ¡Próximamente!",
               icon: "/img/win-80.png",
               link: "/wingull",
-              color: "from-blue-500 to-green-400"
+              color: "from-blue-500 to-green-400",
             },
             {
               title: "SmartRotom",
-              description: "Accede a tu smartphone del juego desde cualquier lugar. Mantente conectado al mundo Pixelmon.",
+              description:
+                "Accede a tu smartphone del juego desde cualquier lugar. Mantente conectado al mundo Pixelmon.",
               icon: <Smartphone className="w-20 h-20" />,
               link: "/smartrotom",
-              color: "from-orange-500 to-red-600"
+              color: "from-orange-500 to-red-600",
             },
             {
               title: "Herramientas de Juego",
-              description: "Mejora tu experiencia de juego con nuestra colección de herramientas útiles.",
+              description:
+                "Mejora tu experiencia de juego con nuestra colección de herramientas útiles.",
               icon: <Gamepad2 className="w-20 h-20" />,
               link: "/tools",
-              color: "from-yellow-500 to-orange-400"
-            }
+              color: "from-yellow-500 to-orange-400",
+            },
           ].map((item, index) => (
-            <div key={index} className="bg-gray-800 p-8 rounded-lg border border-gray-700 shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1">
-              <div className={`bg-gradient-to-br ${item.color} p-4 rounded-full inline-block mb-6`}>
-                {typeof item.icon === 'string' ? (
-                  <img src={item.icon} alt={`Icono de ${item.title}`} className="w-20 h-20 object-cover" />
+            <div
+              key={index}
+              className="bg-gray-800 p-8 rounded-lg border border-gray-700 shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1"
+            >
+              <div
+                className={`bg-gradient-to-br ${item.color} p-4 rounded-full inline-block mb-6`}
+              >
+                {typeof item.icon === "string" ? (
+                  <img
+                    src={item.icon}
+                    alt={`Icono de ${item.title}`}
+                    className="w-20 h-20 object-cover"
+                  />
                 ) : (
                   item.icon
                 )}
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">{item.title}</h2>
+              <h2 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                {item.title}
+              </h2>
               <p className="text-gray-300 mb-6">{item.description}</p>
-              <Link 
+              <Link
                 href={item.link}
                 className="text-blue-400 hover:text-blue-300 font-bold text-lg flex items-center transition duration-300"
               >
@@ -78,19 +97,31 @@ export default function LandingPage() {
         <section className="bg-gradient-to-r from-blue-600 to-purple-600 p-12 mb-16 rounded-lg shadow-lg relative overflow-hidden">
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="relative z-10">
-            <h2 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500">Otros Eventos Emocionantes</h2>
+            <h2 className="text-4xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500">
+              Otros Eventos Emocionantes
+            </h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-inner">
-                <h3 className="text-2xl font-bold mb-4 text-blue-400">Minecraft Bingo</h3>
-                <p className="text-gray-300 mb-4">¡Pon a prueba tu conocimiento y velocidad en Minecraft en nuestros emocionantes eventos de Bingo!</p>
+                <h3 className="text-2xl font-bold mb-4 text-blue-400">
+                  Minecraft Bingo
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  ¡Pon a prueba tu conocimiento y velocidad en Minecraft en
+                  nuestros emocionantes eventos de Bingo!
+                </p>
               </div>
               <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-inner">
-                <h3 className="text-2xl font-bold mb-4 text-green-400">Project ZomBOFF</h3>
-                <p className="text-gray-300 mb-4">Sobrevive al apocalipsis zombi con amigos en nuestros servidores personalizados de Project Zomboid.</p>
+                <h3 className="text-2xl font-bold mb-4 text-green-400">
+                  Project ZomBOFF
+                </h3>
+                <p className="text-gray-300 mb-4">
+                  Sobrevive al apocalipsis zombi con amigos en nuestros
+                  servidores personalizados de Project Zomboid.
+                </p>
               </div>
             </div>
             <div className="mt-10 text-center">
-              <Link 
+              <Link
                 href="/events"
                 className="inline-flex items-center bg-purple-600 text-white px-8 py-4 rounded-full font-bold text-xl hover:bg-purple-700 transition duration-300 shadow-neon"
               >
@@ -102,17 +133,22 @@ export default function LandingPage() {
         </section>
 
         <section className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Únete a la Comunidad BoffMedia</h2>
-          <p className="text-xl mb-10 text-gray-300 max-w-2xl mx-auto">¡Mantente actualizado sobre nuestros últimos eventos, servidores y herramientas!</p>
+          <h2 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+            Únete a la Comunidad BoffMedia
+          </h2>
+          <p className="text-xl mb-10 text-gray-300 max-w-2xl mx-auto">
+            ¡Mantente actualizado sobre nuestros últimos eventos, servidores y
+            herramientas!
+          </p>
           <form className="max-w-md mx-auto">
             <div className="flex flex-col sm:flex-row">
-              <input 
-                type="email" 
-                placeholder="Ingresa tu correo electrónico" 
+              <input
+                type="email"
+                placeholder="Ingresa tu correo electrónico"
                 className="flex-grow px-6 py-4 rounded-full border-2 border-purple-500 bg-gray-800 text-white mb-4 sm:mb-0 sm:mr-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 required
               />
-              <button 
+              <button
                 type="submit"
                 className="px-8 py-4 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 text-white font-bold text-xl hover:from-purple-700 hover:to-blue-600 transition duration-300 shadow-neon"
               >
@@ -126,15 +162,17 @@ export default function LandingPage() {
       <footer className="bg-gray-800 text-gray-300 py-12">
         <div className="container mx-auto px-4 text-center">
           <Image
-            src="https://i.imgur.com/1yE4G8g.png"
+            src="/img/boff.png"
             alt="BoffMedia Logo"
             width={100}
             height={100}
             className="mx-auto mb-6 drop-shadow-glow"
           />
-          <p className="text-xl">&copy; 2024 BoffMedia. Todos los derechos reservados.</p>
+          <p className="text-xl">
+            &copy; 2024 BoffMedia. Todos los derechos reservados.
+          </p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
