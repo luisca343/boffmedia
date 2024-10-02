@@ -52,32 +52,33 @@ export class AppService {
   }
 
   async steamKeys() {
-        //AIzaSyCxjks7gBH5U1FtDd_Y1QOvOciSlr1XtQE
-        const auth = new google.auth.GoogleAuth({
-          keyFile: 'boffmedia-a39cdd7a63c7.json',
-          scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
-      });
-      
-  
-   
-      const client = await auth.getClient() as any;
-      const sheets = google.sheets({ version: 'v4', auth: client }) as sheets_v4.Sheets;
-   
-         const spreadsheetId = '1mQopLvsmDuz5iHJ9WVN5NLH78UsKrK6E364v3i8a00c';
-          const range = 'A2:D';
-          const response = await sheets.spreadsheets.values.get({
-            spreadsheetId,
-            range,
-          });
+    //AIzaSyCxjks7gBH5U1FtDd_Y1QOvOciSlr1XtQE
+    const auth = new google.auth.GoogleAuth({
+      keyFile: 'boffmedia-a39cdd7a63c7.json',
+      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    });
 
-          const rows = response.data.values;
-          // We send everything except the "key" column
-          return rows.map((row) => {
-            return {
-              name: row[0],
-              source: row[1],
-              claimed: row[3],
-            };
-          });
+    const client = (await auth.getClient()) as any;
+    const sheets = google.sheets({
+      version: 'v4',
+      auth: client,
+    }) as sheets_v4.Sheets;
+
+    const spreadsheetId = '1mQopLvsmDuz5iHJ9WVN5NLH78UsKrK6E364v3i8a00c';
+    const range = 'A2:D';
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range,
+    });
+
+    const rows = response.data.values;
+    // We send everything except the "key" column
+    return rows.map((row) => {
+      return {
+        name: row[0],
+        source: row[1],
+        claimed: row[3],
+      };
+    });
   }
 }
