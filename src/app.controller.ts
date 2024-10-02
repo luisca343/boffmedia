@@ -65,4 +65,9 @@ export class AppController {
   async steamkeys() {
     return await this.appService.steamKeys();
   }
+
+  @Get("steamdata/:steamID")
+  async steamData(@Param("steamID") steamID: string) {
+    return await this.appService.getSteamData(steamID);
+  }
 }
