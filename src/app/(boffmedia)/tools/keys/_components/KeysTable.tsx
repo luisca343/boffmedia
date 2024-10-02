@@ -133,6 +133,14 @@ export default function KeysTable() {
             </TableBody>
           </Table>
         </motion.div>
+        <motion.div
+          className="mt-8 p-4 bg-gray-800 rounded-lg text-center text-gray-300 shadow-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          Contacta con Luisca si te interesa alguna.
+        </motion.div>
       </div>
     </div>
   );

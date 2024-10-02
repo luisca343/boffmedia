@@ -29,6 +29,11 @@ const nextConfig = {
                 protocol: 'https',
                 hostname: 'i.ytimg.com',
                 port: ''
+            },
+            {
+                protocol: 'https',
+                hostname: 'i.imgur.com',
+                port: ''
             }
         ]
     },

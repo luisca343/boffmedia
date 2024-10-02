@@ -1,41 +1,56 @@
-"use client"
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import RotomNav from './RotomNav'
-import { signIn, signOut } from "next-auth/react";
-import { getValidSubdomain } from '@/lib/subdomain';
-import { headers } from 'next/headers'
-import { useEffect, useState } from 'react';
 
+const HIDDEN_APPS = ['smartrotom', 'battlesim']
+const NAV_LINKS = [
+  { href: '/', label: 'Home' },
+  { href: '/tools', label: 'Herramientas' },
+  { href: '/wingull', label: 'Pixelmon Wingull' },
+  { href: '/smartrotom', label: 'SmartRotom' },
+]
 
-const hide = ['smartrotom', 'battlesim', 'wingull']
 export function FicusNav() {
   const pathname = usePathname()
-  const [app, setApp] = useState('noApp');
+  const [currentApp, setCurrentApp] = useState<string | null>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setApp(pathname.split('/')[1].split('/')[0]);
-    }
-  }, [pathname]);
+    const app = pathname.split('/')[1] || "boffmedia"
+    setCurrentApp(app || null)
+  }, [pathname])
 
-  for(let h of hide){
-      if(h == app) return null
+  if (!currentApp || HIDDEN_APPS.includes(currentApp)) {
+    return null
   }
 
-  if(app === 'noApp') return null
-  //if (hide.includes(app)) return null
+  function inPage(href: string) {
+    return pathname.startsWith(href) && href !== '/' || pathname === href
+  }
+
   return (
-    <nav className="bg-main-950 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div>
-          <Link href="/wingull" className="text-main-50 mx-2">
-            Pixelmon Wingull
-          </Link>
-          <Link href="/smartrotom" className="text-main-50 mx-2">
-            SmartRotom
-          </Link>
-        </div>
+    <nav className="bg-gray-800 p-4 shadow-lg" aria-label="Main Navigation">
+      <div className="container mx-auto">
+        <ul className="flex flex-wrap justify-start items-center gap-6">
+          {NAV_LINKS.map(({ href, label }) => (
+            <li key={href}>
+              <Link
+                href={href}
+                className={`text-gray-300 hover:text-white transition-colors duration-200 ease-in-out relative group ${
+                  inPage(href) ? 'font-medium' : ''
+                }`}
+              >
+                {label}
+                <span
+                  className={`absolute left-0 right-0 bottom-0 h-0.5 bg-blue-500 transform ${
+                    inPage(href) ? 'scale-x-100' : 'scale-x-0'
+                  } group-hover:scale-x-100 transition-transform duration-200 ease-in-out`}
+                ></span>
+              </Link>
+            </li>
+          ))}
+        </ul>
       </div>
     </nav>
   )
