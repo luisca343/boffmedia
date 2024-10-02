@@ -35,7 +35,8 @@ function useGetKeys(): useGetKeysReturnType {
   }, [fetchKeys]);
 
   function filterKeys() {
-    const filteredKeys = keys.filter((key) => key.name !== "");
+    let filteredKeys = keys.filter((key) => key.name !== "");
+    filteredKeys = filteredKeys.filter((key) => key.claimed === "n");
 
     const filterSearch = filteredKeys.filter(
       (key) =>
