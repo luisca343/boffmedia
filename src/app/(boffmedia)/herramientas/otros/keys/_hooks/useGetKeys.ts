@@ -15,6 +15,8 @@ interface KeyData {
   key: string;
   source: string;
   claimed: string;
+  steamID: string;
+  imageUrl: string;
 }
 
 function useGetKeys(): useGetKeysReturnType {
