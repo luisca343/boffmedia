@@ -44,7 +44,7 @@ export default function TreeNode({ name, structure, path }: TreeNodeProps) {
         )}
       </div>
       {isDirectory && isOpen && (
-        <div className="pl-6 mt-1 border-l-2 border-gray-700">
+        <div className="ml-4 pl-4 mt-1 border-l-2 border-gray-700">
           {Object.entries(structure).map(([key, value]) => (
             <TreeNode key={key} name={key} structure={value} path={fullPath} />
           ))}

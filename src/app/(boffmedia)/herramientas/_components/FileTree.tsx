@@ -13,7 +13,7 @@ export default function FileTree({ structure }: FileTreeProps) {
       <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
         Explorador de Herramientas
       </h2>
-      <div className="space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {Object.entries(structure).map(([key, value]) => (
           <TreeNode key={key} name={key} structure={value} path="/herramientas" />
         ))}
