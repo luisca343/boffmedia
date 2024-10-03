@@ -31,7 +31,7 @@ export class InvitesService {
   }
 
   async findOne(id: string) {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM wingull_invites WHERE id = ?', [id]);
+    const [rows] = await this.db.getConnection().execute('SELECT id, uuid, username, created_at as createdAt, used_at as usedAt, deleted_at as deletedAt FROM wingull_invites WHERE id = ?', [id]);
     return rows[0];
   }
 
@@ -80,7 +80,7 @@ export class InvitesService {
       return boff;
     }
     
-    let ret = await this.db.getConnection().execute('UPDATE wingull_invites SET usedAt = ? WHERE id = ?', [new Date(), id]);
+    let ret = await this.db.getConnection().execute('UPDATE wingull_invites SET used_at = ? WHERE id = ?', [new Date(), id]);
     console.log("User created successfully");
     return ret;
   }
