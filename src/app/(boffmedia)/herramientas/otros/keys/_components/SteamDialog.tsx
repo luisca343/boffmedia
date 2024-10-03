@@ -152,33 +152,42 @@ export function SteamDialog({
           <TabsContent value="media" className="mt-4">
             <div className="space-y-4">
               <div className="relative aspect-video">
-                <AnimatePresence mode="wait">
-                  {selectedGame.media && selectedGame.media[selectedMediaIndex] && (
-                    "thumbnail" in selectedGame.media[selectedMediaIndex] ? (
-                      <motion.video
-                        key={`video-${selectedMediaIndex}`}
-                        src={selectedGame.media[selectedMediaIndex].mp4[480]}
-                        className="w-full h-full object-cover rounded-lg"
-                        controls
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    ) : (
-                      <motion.img
-                        key={`image-${selectedMediaIndex}`}
-                        src={selectedGame.media[selectedMediaIndex].path_thumbnail}
-                        alt={`Media ${selectedMediaIndex + 1}`}
-                        className="w-full h-full object-cover rounded-lg"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    )
-                  )}
-                </AnimatePresence>
+              <AnimatePresence mode="wait">
+                {selectedGame.media && selectedGame.media[selectedMediaIndex] && (
+                  (() => {
+                    const isVideo = "thumbnail" in selectedGame.media[selectedMediaIndex];
+                    if (isVideo) {
+                      const video = selectedGame.media[selectedMediaIndex] as any
+                      return (
+                        <motion.video
+                          key={`video-${selectedMediaIndex}`}
+                          src={video.mp4[480]}
+                          className="w-full h-full object-cover rounded-lg"
+                          controls
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      );
+                    } else {
+                      const image = selectedGame.media[selectedMediaIndex] as any
+                      return (
+                        <motion.img
+                          key={`image-${selectedMediaIndex}`}
+                          src={image.path_thumbnail}
+                          alt={`Media ${selectedMediaIndex + 1}`}
+                          className="w-full h-full object-cover rounded-lg"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.3 }}
+                        />
+                      );
+                    }
+                  })()
+                )}
+              </AnimatePresence>
                 <button
                   onClick={handlePreviousMedia}
                   className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
