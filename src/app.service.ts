@@ -127,7 +127,6 @@ export class AppService {
     return steamKeys;
   }
 
-  
   async getSteamData(steamID: string): Promise<GameData> {
     const url = `https://store.steampowered.com/api/appdetails?appids=${steamID}&l=spanish`;
     const response = await axios.get(url);
@@ -138,29 +137,67 @@ export class AppService {
 
     const initialFormatted = initialPrice ? `${initialPrice / 100} €` : 'N/A';
     const finalFormatted = finalPrice ? `${finalPrice / 100} €` : 'N/A';
-    
 
-    return {
+    const trailers = gameData.movies || [] as Video[];
+    const screenshots = gameData.screenshots || [] as Image[];
+
+    const media = [...trailers, ...screenshots] as (Video | Image)[];
+
+    const data = {
       name: gameData.name,
       normalPrice: initialFormatted,
       currentPrice: finalFormatted,
       discountPercent: gameData.price_overview?.discount_percent || 0,
-      trailerImages: gameData.movies?.map((movie: any) => movie.webm['480']) || [],
+      trailerImages:
+        gameData.movies?.map((movie: any) => movie.webm['480']) || [],
       genres: gameData.genres?.map((genre: any) => genre.description) || [],
       description: gameData.detailed_description,
       shortDescription: gameData.short_description,
       headerImage: gameData.header_image,
-      screenshots: gameData.screenshots?.map((screenshot: any) => screenshot.path_full) || [],
+      screenshots:
+        gameData.screenshots?.map((screenshot: any) => screenshot.path_full) ||
+        [],
       releaseDate: gameData.release_date?.date,
       developers: gameData.developers || [],
       publishers: gameData.publishers || [],
-      platforms: gameData.platforms || { windows: false, mac: false, linux: false },
-      categories: gameData.categories?.map((category: any) => category.description) || [],
+      platforms: gameData.platforms || {
+        windows: false,
+        mac: false,
+        linux: false,
+      },
+      categories:
+        gameData.categories?.map((category: any) => category.description) || [],
       website: gameData.website || '',
+
+      media: media,
     };
+
+    return data;
   }
 }
 
+export interface Image {
+  id: number;
+  path_thumbnail: string;
+  path_full: string;
+}
+
+export interface Video {
+  id: number;
+  name: string;
+  thumbnail: string;
+  webm: {
+    '480': string;
+    max: string;
+  };
+
+  mp4: {
+    '480': string;
+    max: string;
+  };
+
+  highlight: boolean;
+}
 
 export interface GameData {
   name: string;
@@ -183,4 +220,6 @@ export interface GameData {
   };
   categories: string[];
   website: string;
+
+  media: (Video | Image)[];
 }
