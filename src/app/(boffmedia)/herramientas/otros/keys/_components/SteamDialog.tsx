@@ -100,7 +100,7 @@ export function SteamDialog({
               </h3>
               <div 
                 dangerouslySetInnerHTML={{ __html: selectedGame.description }}
-                className="text-gray-300 w-[616px] m-auto"
+                className="text-gray-300 w-[616px]"
               />
               <h3 className="text-lg font-semibold mb-2 mt-4 text-orange-400 flex items-center gap-2">
                 <Tag className="w-5 h-5" />
