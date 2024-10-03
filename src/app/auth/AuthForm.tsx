@@ -43,7 +43,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia' }: { url?: 
   return (
     <div className="flex items-center justify-center min-h-screen w-full bg-gray-900 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center bg-no-repeat">
       <div className="w-full max-w-md p-8 bg-gray-800 bg-opacity-80 rounded-lg shadow-xl backdrop-blur-sm border border-gray-700">
-        <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">Sign In</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">Iniciar Sesión</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
