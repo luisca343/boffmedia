@@ -11,6 +11,9 @@ import {
 } from "lucide-react";
 import { BoffFooter } from "./_components/BoffFooter";
 import BoffLayout from "./_components/BoffLayout";
+import EventCalendar from "./_components/EventCalendar";
+import { UpcomingEvents } from "./_components/UpcomingEvents";
+import { ClassificationTable } from "./_components/ClassificationTable";
 
 export default function GamingLandingPage() {
   return (
@@ -122,42 +125,9 @@ export default function GamingLandingPage() {
                 <div className="absolute inset-0 bg-black opacity-50"></div>
                 <div className="relative z-10">
                   <h2 className="text-4xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500">
-                    Próximos Eventos
+                    Eventos Destacados
                   </h2>
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-inner">
-                      <h3 className="text-2xl font-bold mb-4 text-blue-400">
-                        Minecraft Bingo
-                      </h3>
-                      <p className="text-gray-300 mb-4">
-                        ¡Pon a prueba tu conocimiento y velocidad en Minecraft
-                        en nuestros emocionantes eventos de Bingo!
-                      </p>
-                      <Link
-                        href="/eventos/minecraft-bingo"
-                        className="inline-flex items-center text-blue-400 hover:text-blue-300 font-bold"
-                      >
-                        Unirse al Evento
-                        <ChevronRight className="ml-1" />
-                      </Link>
-                    </div>
-                    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-inner">
-                      <h3 className="text-2xl font-bold mb-4 text-green-400">
-                        Project ZomBOFF
-                      </h3>
-                      <p className="text-gray-300 mb-4">
-                        Sobrevive al apocalipsis zombi con amigos en nuestros
-                        servidores personalizados de Project Zomboid.
-                      </p>
-                      <Link
-                        href="/eventos/project-zomboff"
-                        className="inline-flex items-center text-green-400 hover:text-green-300 font-bold"
-                      >
-                        Unirse al Evento
-                        <ChevronRight className="ml-1" />
-                      </Link>
-                    </div>
-                  </div>
+                  <UpcomingEvents />
                 </div>
               </div>
             </section>
@@ -166,121 +136,14 @@ export default function GamingLandingPage() {
               <h2 className="text-4xl font-bold mb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-yellow-400">
                 Calendario de Eventos
               </h2>
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {[
-                    { date: "15 Oct", event: "Torneo Pixelmon", time: "18:00" },
-                    { date: "22 Oct", event: "Minecraft Bingo", time: "20:00" },
-                    {
-                      date: "29 Oct",
-                      event: "Noche de ZomBOFF",
-                      time: "22:00",
-                    },
-                    {
-                      date: "5 Nov",
-                      event: "Carrera de Elytra",
-                      time: "19:00",
-                    },
-                    {
-                      date: "12 Nov",
-                      event: "Batalla de Constructores",
-                      time: "17:00",
-                    },
-                    {
-                      date: "19 Nov",
-                      event: "Maratón de Supervivencia",
-                      time: "15:00",
-                    },
-                  ].map((item, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center space-x-4 p-4 bg-gray-700 rounded-lg"
-                    >
-                      <Calendar className="w-8 h-8 text-yellow-400" />
-                      <div>
-                        <p className="font-bold text-white">{item.event}</p>
-                        <p className="text-gray-300">
-                          {item.date} - {item.time}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <EventCalendar />
             </section>
 
             <section className="mb-24">
               <h2 className="text-4xl font-bold mb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
                 Tabla de Clasificación
               </h2>
-              <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg overflow-x-auto">
-                <table className="w-full text-left">
-                  <thead>
-                    <tr className="border-b border-gray-700">
-                      <th className="py-3 px-4">Posición</th>
-                      <th className="py-3 px-4">Jugador</th>
-                      <th className="py-3 px-4">Puntos</th>
-                      <th className="py-3 px-4">Insignias</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[
-                      {
-                        position: 1,
-                        player: "Herobrine",
-                        points: 420000,
-                        badges: 69,
-                      },
-                      {
-                        position: 2,
-                        player: "Lausci",
-                        points: 14500,
-                        badges: 7,
-                      },
-                      {
-                        position: 3,
-                        player: "Manolo el Furro",
-                        points: 14000,
-                        badges: 7,
-                      },
-                      {
-                        position: 4,
-                        player: "El Martillo que perforará los cielos",
-                        points: 13500,
-                        badges: 5,
-                      },
-                      {
-                        position: 5,
-                        player: "Eskarmina",
-                        points: 13000,
-                        badges: 6,
-                      },
-                      {
-                        position: 6,
-                        player: "Walfie",
-                        points: 13500,
-                        badges: 6,
-                      },
-                      { position: 7, player: "Yho", points: 12000, badges: 5 },
-                      { position: 999, player: "Cuason", points: 0, badges: 0 },
-                    ].map((item, index) => (
-                      <tr key={index} className="border-b border-gray-700">
-                        <td className="py-3 px-4 font-bold text-yellow-400">
-                          {item.position}
-                        </td>
-                        <td className="py-3 px-4">{item.player}</td>
-                        <td className="py-3 px-4">{item.points}</td>
-                        <td className="py-3 px-4">
-                          <div className="flex items-center">
-                            <Trophy className="w-5 h-5 text-yellow-400 mr-2" />
-                            {item.badges}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <ClassificationTable />
             </section>
 
             <section className="text-center mb-24">
