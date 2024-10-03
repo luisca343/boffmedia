@@ -36,23 +36,27 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
     </Dialog>
   )
 }
+interface CommandInputProps extends React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> {
+  dark?: boolean;
+  className?: string;
+}
 
 const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
->(({ className, ...props }, ref) => (
-  <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
-    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+  CommandInputProps
+>(({ dark, className, ...props }, ref) => (
+  <div className="relative flex items-center border-b" cmdk-input-wrapper="">
+    <Search className={`absolute left-3 h-4 w-4 opacity-50 ${dark ? 'text-white' : 'text-black'}`} />
     <CommandPrimitive.Input
       ref={ref}
       className={cn(
-        "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 dark:placeholder:text-gray-400",
+        " flex h-11 w-full rounded-md bg-transparent py-3 pl-10 text-sm outline-none placeholder:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 dark:placeholder:text-gray-400",
         className
       )}
       {...props}
     />
   </div>
-))
+));
 
 CommandInput.displayName = CommandPrimitive.Input.displayName
 

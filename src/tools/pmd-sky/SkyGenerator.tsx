@@ -48,21 +48,22 @@ export function SkyGenerator() {
     setWonderMail(mail);
   }
 
-
   function updateEuropeanVersion(value: string | boolean) {
     setFormData({ europeanVersion: value === true });
     setWonderMail("");
   }
 
   return (
-    <div className="bg-main-800 min-h-full text-white p-6 shadow-lg mysterydungeon">
-      <div className=" xl:w-2/3  mx-auto">
-        <h1 className="text-4xl font-bold mb-6 text-center">Sky Generator</h1>
+    <div className="min-h-screen text-orange-100 p-6">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">
+          Sky Generator
+        </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <FormField label={commonTrans("QUEST_TYPE")}>
-            <Combobox
-              className="w-full"
+            <Combobox variant="orange"  
+              className="w-full bg-gray-800 border-orange-600 text-orange-100"
               data={getQuestData(commonTrans)}
               value={formData.questType.toString()}
               onChange={(value) =>
@@ -82,8 +83,8 @@ export function SkyGenerator() {
           </FormField>
 
           <FormField label={commonTrans("QUEST_SUBTYPE")}>
-            <Combobox
-              className="w-full"
+            <Combobox variant="orange" 
+              className="w-full bg-gray-800 border-orange-600 text-orange-100"
               data={getSubQuestData(formData.questType, commonTrans)}
               value={formData.specialQuestType.toString()}
               disabled={
@@ -109,8 +110,8 @@ export function SkyGenerator() {
           </FormField>
 
           <FormField label={commonTrans("DUNGEON")}>
-            <Combobox
-              className="w-full"
+            <Combobox variant="orange"  
+              className="w-full bg-gray-800 border-orange-600 text-orange-100"
               data={getValidDungeons(dungeonsTrans)}
               value={formData.dungeon.toString()}
               onChange={(value) => setFormData({ dungeon: Number(value) })}
@@ -122,7 +123,7 @@ export function SkyGenerator() {
               type="number"
               min={1}
               max={getFloors(formData.dungeon)}
-              className="w-full xl:w-24 text-black"
+              className="w-full xl:w-24 bg-gray-800 border-orange-600 text-orange-100"
               value={formData.floor}
               onChange={(e) => setFormData({ floor: Number(e.target.value) })}
             />
@@ -130,7 +131,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("CLIENT_POKEMON")}>
             <div className="flex items-center">
-              <Combobox
+              <Combobox variant="orange" 
                 data={getValidPokemon()}
                 value={formData.clientPokemon.toString()}
                 onChange={(value) =>
@@ -142,7 +143,7 @@ export function SkyGenerator() {
                     formData.specialQuestType
                   ) > 0
                 }
-                className="flex-grow"
+                className="flex-grow bg-gray-800 border-orange-600 text-orange-100"
               />
               <img
                 width={40}
@@ -157,7 +158,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("TARGET_POKEMON")}>
             <div className="flex items-center">
-              <Combobox
+              <Combobox variant="orange" 
                 data={getValidPokemon()}
                 value={formData.targetPokemon.toString()}
                 onChange={(value) =>
@@ -169,7 +170,7 @@ export function SkyGenerator() {
                     formData.specialQuestType
                   ) > 0 || getClientIsTarget(formData.questType)
                 }
-                className="flex-grow"
+                className="flex-grow bg-gray-800 border-orange-600 text-orange-100"
               />
               <img
                 width={40}
@@ -183,8 +184,8 @@ export function SkyGenerator() {
           </FormField>
 
           <FormField label={commonTrans("REWARD_TYPE")} className="md:col-span-2">
-            <Combobox
-              className="w-full"
+            <Combobox variant="orange" 
+              className="w-full bg-gray-800 border-orange-600 text-orange-100"
               data={getRewardTypes(commonTrans)}
               value={formData.rewardType.toString()}
               onChange={(value) => setFormData({ rewardType: Number(value) })}
@@ -192,8 +193,8 @@ export function SkyGenerator() {
           </FormField>
 
           <FormField label={commonTrans("TARGET_ITEM")}>
-            <Combobox
-              className="w-full"
+            <Combobox variant="orange" 
+              className="w-full bg-gray-800 border-orange-600 text-orange-100"
               data={getItemData()}
               value={formData.targetItem.toString()}
               onChange={handleTargetItemChange}
@@ -202,8 +203,8 @@ export function SkyGenerator() {
           </FormField>
 
           <FormField label={commonTrans("REWARD_ITEM")}>
-            <Combobox
-              className="w-full"
+            <Combobox variant="orange" 
+              className="w-full bg-gray-800 border-orange-600 text-orange-100"
               data={getItemData()}
               value={formData.rewardItem.toString()}
               onChange={handleRewardItemChange}
@@ -211,26 +212,30 @@ export function SkyGenerator() {
             />
           </FormField>
 
-            <FormField label={commonTrans("EUROPEAN")} className="md:col-span-2 mx-auto flex justify-center items-center space-x-2">
-                <Checkbox
-                    className="border-white"
-                    checked={formData.europeanVersion}
-                    onCheckedChange={(value) =>
-                    updateEuropeanVersion(value)
-                    }
-                />
-            </FormField>
-
+          <FormField label={commonTrans("EUROPEAN")} className="md:col-span-2 mx-auto flex justify-center items-center space-x-2">
+            <Checkbox
+              className="border-orange-600"
+              checked={formData.europeanVersion}
+              onCheckedChange={(value) =>
+                updateEuropeanVersion(value)
+              }
+            />
+          </FormField>
         </div>
 
-        <Button onClick={getWonderMail} className="w-full mb-4">
+        <Button 
+          onClick={getWonderMail} 
+          className="w-full mb-4 bg-orange-600 hover:bg-orange-700 text-white"
+        >
           {commonTrans("GENERATE_WONDER_MAIL")}
         </Button>
 
         {wonderMail && (
-          <div className="bg-main-700 p-4 rounded text-center">
-            <h2 className="text-2xl font-semibold mb-2">Correo Secreto {formData.europeanVersion ? "(EU)" : ""}</h2>
-            <div className="text-xl break-all">
+          <div className="bg-gray-800 p-4 rounded-lg text-center border border-orange-600">
+            <h2 className="text-2xl font-semibold mb-2 text-orange-400">
+              Correo Secreto {formData.europeanVersion ? "(EU)" : ""}
+            </h2>
+            <div className="text-xl break-all text-orange-100">
               {wonderMail.split("\n").map((line, index) => (
                 <div key={index}>{line}</div>
               ))}
@@ -240,10 +245,7 @@ export function SkyGenerator() {
       </div>
     </div>
   );
-
-  
 }
-
 
 function FormField({
   label,
@@ -256,7 +258,7 @@ function FormField({
 }) {
   return (
     <div className={className}>
-      <label className="block text-lg font-medium mb-1">{label}</label>
+      <label className="block text-lg font-medium mb-1 text-orange-300">{label}</label>
       {children}
     </div>
   );

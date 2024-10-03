@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,14 +13,6 @@ import {
 import useGetKeys from "../_hooks/useGetKeys";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, Key, ExternalLink } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-} from "@/components/ui/dialog";
 import useFetchSteamData from "../_hooks/useFetchSteamData";
 import { SteamDialog } from "./SteamDialog";
 
@@ -40,7 +33,7 @@ export default function KeysTable() {
     <div className="min-h-screen text-gray-100 p-8">
       <div className="max-w-4xl mx-auto">
         <motion.h1
-          className="text-5xl font-bold mb-8 text-center text-cyan-400 flex items-center justify-center gap-4"
+          className="text-5xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600 flex items-center justify-center gap-4"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -56,7 +49,7 @@ export default function KeysTable() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Buscar claves..."
-            className="mb-6 bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400 focus:ring-cyan-400 focus:border-cyan-400"
+            className="mb-6 bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400 focus:ring-orange-400 focus:border-orange-400"
           />
         </motion.div>
         <motion.div
@@ -73,28 +66,28 @@ export default function KeysTable() {
                 onChange={() => setShowClaimed(!showClaimed)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-gray-600 rounded-full transition peer-checked:bg-cyan-400 peer-focus:ring-4 peer-focus:ring-cyan-400/25"></div>
+              <div className="w-11 h-6 bg-gray-600 rounded-full transition peer-checked:bg-orange-400 peer-focus:ring-4 peer-focus:ring-orange-400/25"></div>
               <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-5 peer-checked:bg-gray-900"></div>
             </div>
-            <span className="text-lg font-medium text-gray-300 group-hover:text-cyan-400 transition">
+            <span className="text-lg font-medium text-orange-300 group-hover:text-orange-400 transition">
               Mostrar reclamados
             </span>
           </label>
         </motion.div>
         <motion.div
-          className="bg-gray-800 rounded-lg shadow-lg overflow-hidden"
+          className="bg-gray-800 rounded-lg shadow-lg overflow-hidden border border-gray-700"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="text-cyan-400">#</TableHead>
-                <TableHead className="text-cyan-400">Image</TableHead>
-                <TableHead className="text-cyan-400">Juego</TableHead>
-                <TableHead className="text-cyan-400">Bundle</TableHead>
-                <TableHead className="text-cyan-400">Estado</TableHead>
+              <TableRow className="bg-gray-900">
+                <TableHead className="text-orange-400">#</TableHead>
+                <TableHead className="text-orange-400">Image</TableHead>
+                <TableHead className="text-orange-400">Juego</TableHead>
+                <TableHead className="text-orange-400">Bundle</TableHead>
+                <TableHead className="text-orange-400">Estado</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -111,7 +104,7 @@ export default function KeysTable() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-gray-300">
                       {displayedKeys.indexOf(key) + 1}
                     </TableCell>
                     <TableCell>
@@ -123,14 +116,14 @@ export default function KeysTable() {
                     </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <Gift className="w-5 h-5 text-cyan-400" />
-                        <span className="flex items-center gap-1">
+                        <Gift className="w-5 h-5 text-orange-400" />
+                        <span className="flex items-center gap-1 text-gray-100">
                           {key.name}
                         </span>
                         <a
                           href={`https://store.steampowered.com/app/${key.steamID}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="text-cyan-400"
+                          className="text-orange-400 hover:text-orange-300"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -138,7 +131,7 @@ export default function KeysTable() {
                         </a>
                       </div>
                     </TableCell>
-                    <TableCell>{key.source}</TableCell>
+                    <TableCell className="text-gray-300">{key.source}</TableCell>
                     <TableCell>
                       <motion.div
                         className={`flex items-center gap-2 px-3 py-1 rounded-full ${

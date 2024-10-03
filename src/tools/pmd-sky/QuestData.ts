@@ -84,6 +84,7 @@ export function getQuestData(commonTrans: Translate): { label: string, value: st
         return { 
             label: commonTrans(`questTypes.${type.name}`), 
             value: type.mainType.toString(),
+            realValue: type.mainType.toString(),
             specialType: type.specialType
         }
     })

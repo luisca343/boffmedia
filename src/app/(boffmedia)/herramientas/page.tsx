@@ -1,3 +1,4 @@
+import BoffLayout from "../_components/BoffLayout";
 import FileTree from "./_components/FileTree";
 
 const fileStructure = {
@@ -11,10 +12,10 @@ const fileStructure = {
 
 export default function FileStructurePage() {
   return (
-    <div className="bg-gray-900  min-h-full">
-      <div className="container mx-auto p-4 ">
+    <BoffLayout footer={false}>
+      <div className="container mx-auto p-4">
         <FileTree structure={fileStructure} />
       </div>
-    </div>
+    </BoffLayout>
   );
 }

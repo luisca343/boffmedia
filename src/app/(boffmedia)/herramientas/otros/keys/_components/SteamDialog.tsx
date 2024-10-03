@@ -3,15 +3,14 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogClose,
 } from "@/components/ui/dialog";
-import { DollarSign, Gift, Info, Key, Tag, Video } from "lucide-react";
+import { DollarSign, Gift, Info, Tag, Video, ChevronLeft, ChevronRight } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SteamGame } from "../_hooks/useFetchSteamData";
 
@@ -27,15 +26,46 @@ export function SteamDialog({
   selectedGame,
 }: ImprovedDialogProps) {
   const [activeTab, setActiveTab] = useState("info");
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
+
+
+  const handlePreviousMedia = useCallback(() => {
+    setSelectedMediaIndex((prev) => 
+      prev > 0 ? prev - 1 : (selectedGame?.media?.length || 1) - 1
+    );
+  }, [selectedGame?.media]);
+
+  const handleNextMedia = useCallback(() => {
+    setSelectedMediaIndex((prev) => 
+      prev < (selectedGame?.media?.length || 1) - 1 ? prev + 1 : 0
+    );
+  }, [selectedGame?.media]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (activeTab === "media") {
+        if (event.key === "ArrowLeft") {
+          handlePreviousMedia();
+        } else if (event.key === "ArrowRight") {
+          handleNextMedia();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeTab, handlePreviousMedia, handleNextMedia]);
 
   if (!selectedGame) return null;
-
   return (
     <Dialog open={isModalVisible} onOpenChange={setIsModalVisible}>
-      <DialogContent className="sm:max-w-[700px] xl:max-w-[1200px] bg-gray-900 text-gray-100">
+      <DialogContent className="sm:max-w-[700px] xl:max-w-[1200px] bg-gray-900 text-gray-100 border border-gray-700">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-cyan-400 flex items-center gap-2">
-            <Gift className="w-6 h-6" />
+          <DialogTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600 flex items-center gap-2">
+            <Gift className="w-6 h-6 text-orange-400" />
             {selectedGame.name}
           </DialogTitle>
         </DialogHeader>
@@ -43,48 +73,53 @@ export function SteamDialog({
           <TabsList className="grid w-full grid-cols-3 bg-gray-800">
             <TabsTrigger
               value="info"
-              className="text-gray-300 data-[state=active]:text-cyan-400"
+              className="text-gray-300 data-[state=active]:text-orange-400 data-[state=active]:bg-gray-700"
             >
               <Info className="w-4 h-4 mr-2" />
               Información
             </TabsTrigger>
             <TabsTrigger
               value="pricing"
-              className="text-gray-300 data-[state=active]:text-cyan-400"
+              className="text-gray-300 data-[state=active]:text-orange-400 data-[state=active]:bg-gray-700"
             >
               <DollarSign className="w-4 h-4 mr-2" />
               Precios
             </TabsTrigger>
             <TabsTrigger
-              value="trailers"
-              className="text-gray-300 data-[state=active]:text-cyan-400"
+              value="media"
+              className="text-gray-300 data-[state=active]:text-orange-400 data-[state=active]:bg-gray-700"
             >
               <Video className="w-4 h-4 mr-2" />
-              Tráilers
+              Media
             </TabsTrigger>
           </TabsList>
           <TabsContent value="info" className="mt-4">
             <ScrollArea className="sm:h-[300px] xl:h-[600px] rounded-md border border-gray-700 p-4">
-              <h3 className="text-lg font-semibold mb-2 text-cyan-400">
+              <h3 className="text-lg font-semibold mb-2 text-orange-400">
                 Descripción
               </h3>
-              <div
+              <div 
                 dangerouslySetInnerHTML={{ __html: selectedGame.description }}
+                className="text-gray-300 w-[616px] m-auto"
               />
-              <h3 className="text-lg font-semibold mb-2 text-cyan-400 flex items-center gap-2">
+              <h3 className="text-lg font-semibold mb-2 mt-4 text-orange-400 flex items-center gap-2">
                 <Tag className="w-5 h-5" />
                 Géneros
               </h3>
               <div className="flex flex-wrap gap-2">
-                {selectedGame.genres.map((genre, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="bg-gray-700 text-cyan-400"
-                  >
-                    {genre}
-                  </Badge>
-                ))}
+                {selectedGame.genres ? (
+                  selectedGame.genres.map((genre, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-gray-700 text-orange-400"
+                    >
+                      {genre}
+                    </Badge>
+                  ))
+                ) : (
+                  <span className="text-gray-300">No hay géneros</span>
+                )}
               </div>
             </ScrollArea>
           </TabsContent>
@@ -100,7 +135,7 @@ export function SteamDialog({
               )}
               <div className="flex justify-between items-center p-4 bg-gray-800 rounded-lg">
                 <span className="text-gray-300">Precio Actual:</span>
-                <span className="text-2xl font-bold text-cyan-400">
+                <span className="text-2xl font-bold text-orange-400">
                   {selectedGame.currentPrice}
                 </span>
               </div>
@@ -114,31 +149,90 @@ export function SteamDialog({
               )}
             </div>
           </TabsContent>
-          <TabsContent value="trailers" className="mt-4">
-            <ScrollArea className="sm:h-[300px] xl:h-[600px]">
-              <div className="grid grid-cols-2 gap-4">
-                {selectedGame.trailerImages.map((image, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.1 }}
-                  >
-                    <video
-                      src={image}
-                      className="w-full h-auto object-cover rounded-lg"
-                      controls
-                    />
-                  </motion.div>
-                ))}
+          <TabsContent value="media" className="mt-4">
+            <div className="space-y-4">
+              <div className="relative aspect-video">
+                <AnimatePresence mode="wait">
+                  {selectedGame.media && selectedGame.media[selectedMediaIndex] && (
+                    "thumbnail" in selectedGame.media[selectedMediaIndex] ? (
+                      <motion.video
+                        key={`video-${selectedMediaIndex}`}
+                        src={selectedGame.media[selectedMediaIndex].mp4[480]}
+                        className="w-full h-full object-cover rounded-lg"
+                        controls
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    ) : (
+                      <motion.img
+                        key={`image-${selectedMediaIndex}`}
+                        src={selectedGame.media[selectedMediaIndex].path_thumbnail}
+                        alt={`Media ${selectedMediaIndex + 1}`}
+                        className="w-full h-full object-cover rounded-lg"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )
+                  )}
+                </AnimatePresence>
+                <button
+                  onClick={handlePreviousMedia}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+                  aria-label="Previous media"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={handleNextMedia}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
+                  aria-label="Next media"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
               </div>
-            </ScrollArea>
+              <ScrollArea className="w-full">
+                <div className="flex space-x-2 pb-4">
+                  {selectedGame.media?.map((media, index) => {
+                    const isVideo = "thumbnail" in media;
+                    return (
+                      <motion.div
+                        key={index}
+                        className={`relative cursor-pointer ${
+                          index === selectedMediaIndex ? "ring-2 ring-orange-500" : ""
+                        }`}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        onClick={() => setSelectedMediaIndex(index)}
+                      >
+                        <img
+                          src={isVideo ? media.thumbnail : media.path_thumbnail}
+                          alt={`Thumbnail ${index + 1}`}
+                          className="w-24 h-14 object-cover rounded"
+                        />
+                        {isVideo && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-6 h-6 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                              <div className="w-0 h-0 border-t-4 border-t-transparent border-l-8 border-l-white border-b-4 border-b-transparent ml-0.5"></div>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </ScrollArea>
+            </div>
           </TabsContent>
         </Tabs>
         <DialogClose asChild>
           <Button
             variant="secondary"
-            className="mt-4 w-full bg-cyan-400 text-gray-900 hover:bg-cyan-500"
+            className="mt-4 w-full bg-orange-600 text-white hover:bg-orange-700 transition-colors duration-200"
           >
             Cerrar
           </Button>
