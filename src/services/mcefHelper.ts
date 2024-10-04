@@ -1,5 +1,7 @@
 export async function isMinecraft() {
     const usuario = await getDatosUsuarioMC();
+    const result = usuario?.username ? true : false;
+    
     return usuario?.username ? true : false;
 }
 
