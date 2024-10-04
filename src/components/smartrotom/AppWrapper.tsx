@@ -2,6 +2,9 @@
 import { useSession } from "next-auth/react";
 import RotomNav from "../nav/RotomNav";
 
+import { AlertTriangle } from "lucide-react";
+import { motion } from "framer-motion";
+
 import { signIn } from "next-auth/react";
 import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
@@ -102,17 +105,22 @@ export default function AppWrapper({
     return <FormCenteredInPage url="boffmedia" redirect="/smartrotom" />;
   }
 
-  function boffMediaLinked() {
-    return session?.user.username;
+  function boffMediaLinked(): boolean {
+    return session?.user.username ? true : false;
   }
 
-  function smartRotomLinked() {
-    return session?.user.smartRotomUser?.uuid;
+  function smartRotomLinked(): boolean {
+    return session?.user.smartRotomUser?.uuid ? true : false;
   }
+
+  console.log(session);
+  console.log(status);
+  console.log(boffMediaLinked());
+  console.log(smartRotomLinked());
 
   if (status === "authenticated" && !smartRotomLinked()) {
-    if (!isMinecraft())
-      return <RotomError error="Usuario de SmartRotom no vinculado" />;
+    if (!isMC)
+      return <RotomErrorPage error="Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web." />;
     return <AuthForm url="smartrotom" redirect="/smartrotom" />;
   }
 
@@ -137,11 +145,34 @@ export default function AppWrapper({
   );
 }
 
+function RotomErrorPage({ error }: { error: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full bg-orange-400 text-orange-950 font-mono">
+      <RotomError error={error} />
+    </div>
+  );
+}
+
 function RotomError({ error }: { error: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-bold">
-      <h1>Error</h1>
-      <p>{error}</p>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="bg-orange-200 p-8 rounded-lg shadow-lg border-2 border-orange-300"
+    >
+      <div className="flex items-center mb-4">
+        <AlertTriangle className="w-8 h-8 text-orange-500 mr-2" />
+        <h1 className="text-2xl font-bold">Error Detectado</h1>
+      </div>
+      <div className="bg-orange-300 p-4 rounded">
+        <p className="text-sm">{error}</p>
+      </div>
+      <div className="mt-6 text-center">
+        <p className="text-xs text-orange-700">
+          SmartRotom Error Code: <span className="font-bold">SR-001</span>
+        </p>
+      </div>
+    </motion.div>
   );
 }
