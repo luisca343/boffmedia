@@ -4,7 +4,7 @@ import { Gamepad2, Twitch, Twitter } from "lucide-react";
 
 export function BoffFooter() {
   return (
-    <footer className="bg-gray-800 text-orange-100 py-12">
+    <footer className="bg-gray-800 text-orange-100 py-8">
       <div className="container mx-auto px-4 text-center">
         <Image
           src="/img/boff.png"

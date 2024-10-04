@@ -15,7 +15,7 @@ const formSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
 
-export default function AuthForm({ redirect = '/', url = 'boffmedia' }: { url?: string, redirect?: string }) {
+export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '' }: { url?: string, redirect?: string, message?: string }) {
   const router = useRouter()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,6 +46,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia' }: { url?: 
         <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">Iniciar Sesión</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {message && <p className="text-orange-100 text-center">{message}</p>}
             <FormField
               control={form.control}
               name="username"
@@ -93,11 +94,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia' }: { url?: 
 export function FormCenteredInPage({ redirect = '/', url = 'boffmedia' }: { url?: string, redirect?: string }) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-850 p-4">
-      <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600 mb-2 text-center">SmartRotom En Construcción</h1>
-      <p className="text-xl font-bold text-orange-100 mb-6 text-center max-w-2xl">
-        (El login requiere cuenta de BoffMedia vinculada a Minecraft, y solo Luisca la tiene así que mala suerte)
-      </p>
-      <AuthForm redirect={redirect} url={url} />
+      <AuthForm redirect={redirect} url={url} message={"(El login requiere cuenta de BoffMedia vinculada a Minecraft, y solo Luisca la tiene así que mala suerte)"}/>
     </div>
   )
 }

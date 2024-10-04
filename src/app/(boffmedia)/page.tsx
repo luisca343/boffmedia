@@ -145,7 +145,7 @@ export default function GamingLandingPage() {
               </h2>
               <ClassificationTable />
             </section>
-
+            {/* 
             <section className="text-center mb-24">
               <h2 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
                 Únete a la Comunidad BoffMedia
@@ -187,6 +187,7 @@ export default function GamingLandingPage() {
                 </Link>
               </div>
             </section>
+            */}
           </main>
         </div>
       </div>
