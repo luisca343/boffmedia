@@ -12,6 +12,7 @@ module.exports = {
     "/smartrotom/pokedex/localizacion": ["smartrotom/pokedex/spawns"],
     "/smartrotom/pasaporte": ["smartrotom/pokedex/moves", "smartrotom/pokedex/forms", "smartrotom/pokedex/abilities", "smartrotom/pokedex/common"],
     "/battlesim/replay/[name]": ["smartrotom/pokedex/common"],
+    "/smartrotom/arcade/squirdle": ["smartrotom/pokedex/common", "smartrotom/pokedex/forms"],
 
     "/(boffmedia)/herramientas/pokemon/pmdsky": ["tools/pmdsky/dungeons", "tools/pmdsky/common"],
   },

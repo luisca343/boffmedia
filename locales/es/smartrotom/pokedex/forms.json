@@ -1,12 +1,28 @@
 {
     "form_teras": "de Teras",
     "form_omnitrix": "Omnitrix",
+    "form_omnitrixgmax": "Omnitrix Gigamax",
     "form_omnitrixmega": "Omnitrix Mega",
     "form_sakura": "Sakura",
     "form_ramalbun": "Ram'Albun",
+    "form_ramalbunmega": "Ram'Albun Mega",
     "form_volcanic": "Volcánico",
+    "form_volcanicgmax": "Volcánico Gigamax",
+    "form_pesadilla": "Pesadilla",
     "form_astral": "Astral",
+    "form_astralheat": "Calor Astral",
+    "form_astralwash": "Lavado Astral",
+    "form_astralfrost": "Frío Astral",
+    "form_astralfan": "Ventilador Astral",
+    "form_astralmow": "Corte Astral",
+    "form_astralmidday": "Astral Diurno",
+    "form_astralmidnight": "Astral Nocturno",
+    "form_astraldusk": "Astral Crepuscular",
+    "form_astralshorn": "Esquilado Astral",
+    "form_lowkey": "Grave",
+
     "palette_shiny2": "Terashiny",
+    
     
     "form": "{{pokemon}} {{form}}",
     "form_mega": "Mega",
@@ -63,6 +79,7 @@
     "form_quarter": "Cuarto",
     "form_gibbous": "Gibosa",
     "form_rain": "Lluvioso",
+    "form_creator": "Creador",
 
     "form_attack":"Ataque",
     "form_defense":"Defensa",
@@ -197,6 +214,21 @@
     "form_phd": "Erudita",
     "form_popstar": "Superstar",
     "form_rockstar": "Roquera",
+    "form_new": "Nuevo",
+    "form_altered": "Alterado",
+    "form_land": "Tierra",
+    "form_zen": "Zen",
+    "form_battle": "Batalla",
+    "form_fifty": "50%",
+    "form_ten": "10%",
+    "form_radiantsun": "Sol Radiante",
+    "form_fullmoon": "Luna Llena",
+    "form_original": "Original",
+    "form_noice": "Sin Hielo",
+    "form_three": "Tres",
+    "form_two": "Dos",
+    "form_chasanova": "Casanova",
+
 
     "palette_none": "Base",
     "palette_shiny": "Shiny",
@@ -2402,6 +2434,16 @@
     "pixelmon_espinosaurio": "Espinosaurio",
     "pixelmon_espinosaurio_description": "",
     "pixelmon_triceratops": "Triceratops",
-    "pixelmon_triceratops_description": ""
+    "pixelmon_triceratops_description": "",
+    "pixelmon_scorpeon": "Scorpeon",
+    "pixelmon_scorpeon_description": "",
+    "pixelmon_scaleon": "Scaleon",
+    "pixelmon_scaleon_description": "",
+    "pixelmon_guardeon": "Guardeon",
+    "pixelmon_guardeon_description": "",
+    "pixelmon_brawleon": "Brawleon",
+    "pixelmon_brawleon_description": "",
+    "pixelmon_crysteon": "Crysteon",
+    "pixelmon_crysteon_description": ""
 
 }
