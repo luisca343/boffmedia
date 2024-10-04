@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import *  as  path from 'path';
 import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
-import { GenderProperties, Pokemon } from '@/types/pokemon';
+import { Form, GenderProperties, Pokemon } from '@/types/pokemon';
 import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
 import { PokemonData } from './utils/PokemonData';
 import { MoveData } from './utils/MoveData';
@@ -456,6 +456,10 @@ export class PokemonService {
 
     getPokemonNamePalette(){
         return this.pokemonData.speciesByNameFormPalette
+    }
+
+    getPokemonWordleData(){
+        return this.pokemonData.wordleData
     }
 
     getFormId(pokemonId: number, form: string){

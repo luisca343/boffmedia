@@ -157,4 +157,10 @@ export class PokemonController {
         return this.pokemonService.getPmdSprite(name);
     }
 
+
+    @Get('wordle')
+    getWordle(){
+        return this.pokemonService.getPokemonWordleData();
+    }
+
 }
