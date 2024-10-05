@@ -1,117 +1,185 @@
-"use client";
+"use client"
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
+import React, { useState, useEffect } from 'react'
+import { Puzzle } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import StarsBackground from '../_components/StarsBackground'
+import RainbowText from '../_components/RainbowText'
 
-const GRID_SIZE = 3;
-const EMPTY_TILE = GRID_SIZE * GRID_SIZE - 1;
+interface PuzzlePiece {
+  id: number
+  src: string
+  position: number
+}
 
-export default function Component() {
-  const [tiles, setTiles] = useState<number[]>([]);
-  const [moves, setMoves] = useState(0);
+interface Star {
+  x: number
+  y: number
+  size: number
+}
+
+export default function FramerMotionSteamLogoPuzzle() {
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [pieces, setPieces] = useState<PuzzlePiece[]>([])
+  const [emptyIndex, setEmptyIndex] = useState<number>(8)
+  const [isComplete, setIsComplete] = useState<boolean>(false)
+  const [stars, setStars] = useState<Star[]>([])
+  const width = 3
+  const height = 3
 
   useEffect(() => {
-    resetGame();
-  }, []);
-
-  const resetGame = () => {
-    const newTiles = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => i);
-    for (let i = newTiles.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [newTiles[i], newTiles[j]] = [newTiles[j], newTiles[i]];
+    const img = new Image()
+    img.src = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/steam-Ll038vGbTpPrpTm9AiPMgZqMvg3FHF.png"
+    img.crossOrigin = "anonymous"
+    img.onload = () => {
+      setImageLoaded(true)
+      createPuzzlePieces(img)
     }
-    setTiles(newTiles);
-    setMoves(0);
-  };
+  }, [])
 
-  const handleTileClick = (index: number) => {
-    const emptyIndex = tiles.indexOf(EMPTY_TILE);
-    if (isAdjacent(index, emptyIndex)) {
-      const newTiles = [...tiles];
-      [newTiles[index], newTiles[emptyIndex]] = [
-        newTiles[emptyIndex],
-        newTiles[index],
-      ];
-      setTiles(newTiles);
-      setMoves(moves + 1);
+  const createPuzzlePieces = (img: HTMLImageElement) => {
+    const pieceWidth = Math.floor(img.width / width)
+    const pieceHeight = Math.floor(img.height / height)
+    const canvas = document.createElement('canvas')
+    canvas.width = pieceWidth
+    canvas.height = pieceHeight
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const newPieces: PuzzlePiece[] = []
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        ctx.clearRect(0, 0, pieceWidth, pieceHeight)
+        ctx.drawImage(
+          img,
+          x * pieceWidth, y * pieceHeight, pieceWidth, pieceHeight,
+          0, 0, pieceWidth, pieceHeight
+        )
+        newPieces.push({
+          id: y * width + x,
+          src: canvas.toDataURL(),
+          position: y * width + x
+        })
+      }
     }
-  };
+
+    shufflePieces(newPieces)
+  }
+
+  const shufflePieces = (piecesToShuffle: PuzzlePiece[]) => {
+    let shuffled = [...piecesToShuffle]
+    let emptyPos = shuffled.length - 1
+    
+    for (let i = 0; i < 1000; i++) {
+      const possibleMoves = []
+      if (emptyPos % width > 0) possibleMoves.push(-1)
+      if (emptyPos % width < width - 1) possibleMoves.push(1)
+      if (emptyPos - width >= 0) possibleMoves.push(-width)
+      if (emptyPos + width < shuffled.length) possibleMoves.push(width)
+
+      const move = possibleMoves[Math.floor(Math.random() * possibleMoves.length)]
+      const newEmptyPos = emptyPos + move
+      
+      shuffled[emptyPos].position = newEmptyPos
+      shuffled[newEmptyPos].position = emptyPos
+      ;[shuffled[emptyPos], shuffled[newEmptyPos]] = [shuffled[newEmptyPos], shuffled[emptyPos]]
+      emptyPos = newEmptyPos
+    }
+
+    setPieces(shuffled.filter(piece => piece.id !== 8))
+    setEmptyIndex(emptyPos)
+  }
+
+  const handlePieceClick = (clickedPiece: PuzzlePiece) => {
+    if (isAdjacent(clickedPiece.position, emptyIndex)) {
+      const newPieces = pieces.map(piece => 
+        piece.id === clickedPiece.id 
+          ? { ...piece, position: emptyIndex }
+          : piece
+      )
+      setPieces(newPieces)
+      setEmptyIndex(clickedPiece.position)
+      checkCompletion(newPieces)
+    }
+  }
 
   const isAdjacent = (index1: number, index2: number) => {
-    const row1 = Math.floor(index1 / GRID_SIZE);
-    const col1 = index1 % GRID_SIZE;
-    const row2 = Math.floor(index2 / GRID_SIZE);
-    const col2 = index2 % GRID_SIZE;
-    return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1;
-  };
+    const row1 = Math.floor(index1 / width)
+    const col1 = index1 % width
+    const row2 = Math.floor(index2 / width)
+    const col2 = index2 % width
+    return Math.abs(row1 - row2) + Math.abs(col1 - col2) === 1
+  }
 
-  const isSolved = () => {
-    return tiles.every((tile, index) => tile === index);
-  };
-
-  const getTilePosition = (index: number) => {
-    const row = Math.floor(index / GRID_SIZE);
-    const col = index % GRID_SIZE;
-    return { top: `-${row * 100}%`, left: `-${col * 100}%` };
-  };
+  const checkCompletion = (currentPieces: PuzzlePiece[]) => {
+    setIsComplete(currentPieces.every((piece) => piece.id === piece.position))
+  }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-orange-100">
-      <h1 className="text-3xl font-bold mb-4 text-orange-600">Wingull Slide</h1>
-      <div className="relative w-72 h-72 mb-4 bg-orange-200 rounded overflow-hidden">
-        {tiles.map((tile, index) => (
-          <Button
-            key={index}
-            onClick={() => handleTileClick(index)}
-            className={`absolute w-24 h-24 p-0 overflow-hidden transition-all duration-300 ease-in-out ${
-              tile === EMPTY_TILE ? "opacity-0" : "opacity-100"
-            }`}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-purple-900 p-4 font-mono relative overflow-hidden">
+      <StarsBackground />
+      <RainbowText text="Puzles Arcade Temáticos y Originales" />
+      {imageLoaded ? (
+        <>
+          <div 
+            className="relative bg-gray-800 bg-opacity-80 rounded-lg p-1 z-10"
             style={{
-              top: `${Math.floor(index / GRID_SIZE) * 33.333}%`,
-              left: `${(index % GRID_SIZE) * 33.333}%`,
+              width: '300px',
+              height: '300px',
             }}
-            disabled={tile === EMPTY_TILE}
           >
-            {tile !== EMPTY_TILE && (
-              <div className="relative w-full h-full overflow-hidden">
-                <Image
-                  src="/img/boff.png"
-                  alt={`Wingull piece ${tile + 1}`}
-                  objectFit="cover"
-                  className="select-none"
-                  width={96}
-                  height={96}
-                  style={{
-                    position: "absolute",
-                    ...getTilePosition(tile),
+            <AnimatePresence>
+              {pieces.map((piece) => (
+                <motion.div
+                  key={piece.id}
+                  className="absolute w-[98px] h-[98px] cursor-pointer hover:opacity-80"
+                  initial={false}
+                  animate={{
+                    x: (piece.position % width) * 100,
+                    y: Math.floor(piece.position / width) * 100,
                   }}
-                />
-              </div>
-            )}
-          </Button>
-        ))}
-      </div>
-      <p className="mb-4 text-orange-600">Moves: {moves}</p>
-      {isSolved() && (
-        <div className="mb-4 text-center">
-          <p className="text-green-600 font-bold">
-            Congratulations! You solved the puzzle!
-          </p>
-          <div className="w-48 h-48 mx-auto mt-2 relative">
-            <Image
-              width={96}
-              height={96}
-              src="/img/boff.png"
-              alt="Complete Wingull"
-              objectFit="contain"
-            />
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  onClick={() => handlePieceClick(piece)}
+                >
+                  <img
+                    src={piece.src}
+                    alt={`Puzzle piece ${piece.id}`}
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
+          {isComplete && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-4 text-2xl font-bold text-green-400 z-10"
+            >
+              Puzzle Completed!
+            </motion.div>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => shufflePieces(pieces)}
+            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 z-10"
+          >
+            Shuffle
+          </motion.button>
+          <div className="mt-8 flex items-center justify-center space-x-4 z-10">
+            <Puzzle className="w-8 h-8 text-blue-500 animate-bounce" />
+            <p className="text-lg text-white">Slide the pieces to solve the puzzle!</p>
+            <Puzzle className="w-8 h-8 text-blue-500 animate-bounce" />
+          </div>
+        </>
+      ) : (
+        <div className="w-64 h-64 rounded-full border-4 border-blue-500 flex items-center justify-center z-10">
+          <p className="text-white">Loading...</p>
         </div>
       )}
-      <Button onClick={resetGame} className="bg-orange-500 hover:bg-orange-600">
-        New Game
-      </Button>
     </div>
-  );
+  )
 }

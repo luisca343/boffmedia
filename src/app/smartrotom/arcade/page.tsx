@@ -1,13 +1,7 @@
-"use client";
-import {
-  Joystick,
-  WholeWord,
-  Pickaxe,
-  Grid,
-  Puzzle,
-} from "lucide-react";
-import { useState, useEffect } from "react";
+import { Joystick, WholeWord, Pickaxe, Grid, Puzzle } from "lucide-react";
 import { InternalLink } from "@/components/nav/Link";
+import RainbowText from "./_components/RainbowText";
+import StarsBackground from "./_components/StarsBackground";
 
 const juegos = [
   {
@@ -20,13 +14,13 @@ const juegos = [
     nombre: "Minería",
     icono: Pickaxe,
     color: "green",
-    href: "/arcade/mineria",
+    href: "/mina",
   },
   {
-    nombre: "Pokedoku",
+    nombre: "TypeDoku",
     icono: Grid,
     color: "yellow",
-    href: "/arcade/pokedoku",
+    href: "/arcade/typedoku",
   },
   {
     nombre: "Puzle",
@@ -37,46 +31,10 @@ const juegos = [
 ];
 
 export default function CentroArcade() {
-  const [estrellas, setEstrellas] = useState<
-    { x: number; y: number; tamaño: number }[]
-  >([]);
-
-  useEffect(() => {
-    const nuevasEstrellas = Array.from({ length: 100 }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      tamaño: Math.random() * 2 + 1,
-    }));
-    setEstrellas(nuevasEstrellas);
-  }, []);
-
   return (
     <div className="min-h-screen w-full bg-purple-900 flex flex-col items-center justify-center p-4 font-mono relative overflow-hidden">
-      {estrellas.map((estrella, index) => (
-        <div
-          key={index}
-          className="absolute bg-white rounded-full animate-twinkle"
-          style={{
-            left: `${estrella.x}%`,
-            top: `${estrella.y}%`,
-            width: `${estrella.tamaño}px`,
-            height: `${estrella.tamaño}px`,
-            animationDelay: `${Math.random() * 5}s`,
-          }}
-        />
-      ))}
-      <h1 className="text-4xl font-bold mb-12 text-center z-10 animate-pulse">
-        <span className="text-pink-500 text-6xl">T</span>
-        <span className="text-pink-500">he </span>
-        <span className="text-cyan-400 text-6xl">E</span>
-        <span className="text-cyan-400">xciting </span>
-        <span className="text-yellow-300 text-6xl">R</span>
-        <span className="text-yellow-300">etro </span>
-        <span className="text-green-400 text-6xl">A</span>
-        <span className="text-green-400">rcade </span>
-        <span className="text-purple-400 text-6xl">S</span>
-        <span className="text-purple-400">tation</span>
-      </h1>
+      <StarsBackground />
+      <RainbowText text="Tu Estación Retro Arcade Sorprendente" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl w-full z-10">
         {juegos.map((juego) => (
           <InternalLink
