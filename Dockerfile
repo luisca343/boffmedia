@@ -14,7 +14,7 @@ RUN npm install
 FROM dependencies AS build
 COPY . .
 RUN npm run build
-RUN npm run drizzle:migrate
+RUN npm run drizzle-kit generate
 
 # ---- Release ----
 FROM base AS release
