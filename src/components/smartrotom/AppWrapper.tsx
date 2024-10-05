@@ -112,12 +112,7 @@ export default function AppWrapper({
   function smartRotomLinked(): boolean {
     return session?.user.smartRotomUser?.uuid ? true : false;
   }
-
-  console.log(session);
-  console.log(status);
-  console.log(boffMediaLinked());
-  console.log(smartRotomLinked());
-
+  
   if (status === "authenticated" && !smartRotomLinked()) {
     if (!isMC)
       return <RotomErrorPage error="Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web." />;

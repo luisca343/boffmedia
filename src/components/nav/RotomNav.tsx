@@ -58,7 +58,6 @@ export default function RotomNav({
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log("RotomNav");
     if (!socket && session) {
       connect(getSmartRotomUser(session));
       return;
