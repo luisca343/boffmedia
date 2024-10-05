@@ -1,30 +1,90 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { InternalLink } from "@/components/nav/Link"
 import { strToDate } from "@/lib/utils"
 import { useGetDocuments } from "../_hooks/useGetDocuments"
+import { useGetDocument } from "../_hooks/useGetDocument"
+import { Button } from "@/components/ui/button"
+import { FileText, PlusCircle } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import CustomEditor from "@/components/editor/TestEditor"
 
 export function DocumentsList() {
-    const {documents, createNote} = useGetDocuments()
+    const { documents, createNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
+    const [searchTerm, setSearchTerm] = useState("")
+    const [filteredDocuments, setFilteredDocuments] = useState(documents)
+    const { data: selectedNote } = useGetDocument(selectedNoteId)
+
+    useEffect(() => {
+        setFilteredDocuments(
+            documents.filter((doc) =>
+                doc.title.toLowerCase().includes(searchTerm.toLowerCase())
+            )
+        )
+    }, [documents, searchTerm])
+
+    const handleNoteClick = (id: string) => {
+        setSelectedNoteId(id)
+    }
+
     return (
-        <div className="bg-main-800  ">
-            <div className="flex flex-wrap justify-start">
-                    <button onClick={() => createNote()} className="text-main-50 bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center flex flex-col justify-center items-center">
-                        <h2>Crear</h2>
-                    </button>
-                    {documents.length > 0 ? 
-                    documents.map((doc: any) => {
-                        return (
-                            <InternalLink key={doc.uuid} href={`/notas/${doc.id}`}>
-                                <div className="text-main-50 bg-main-700 p-2 rounded-lg m-2 hover:bg-main-500 w-[300px] text-center">
-                                    <h2>{doc.title}</h2>
-                                    <div>{strToDate(doc.updatedAt)}</div>
+        <div className="h-full flex">
+            <div className="w-[15%] py-4 h-full bg-gray-100 border-r border-gray-200 flex flex-col">
+                <div className="p-4">
+                    <Button onClick={createNote} className="w-full" variant="default">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Nueva Nota
+                    </Button>
+                </div>
+                <div className="px-4 mb-4">
+                    <Input 
+                        placeholder="Buscar notas..." 
+                        className="w-full"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <ScrollArea className="flex-grow">
+                    {filteredDocuments.length > 0 ? (
+                        <div className="px-2">
+                            {filteredDocuments.map((doc: any) => (
+                                <div 
+                                    key={doc.uuid} 
+                                    onClick={() => handleNoteClick(doc.id)}
+                                    className="p-2 rounded-lg hover:bg-gray-200 transition-colors mb-2 cursor-pointer"
+                                >
+                                    <div className="flex items-center">
+                                        <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                                        <h3 className="font-medium text-sm truncate">{doc.title}</h3>
+                                    </div>
+                                    <p className="text-xs text-gray-500 mt-1">{strToDate(doc.updatedAt)}</p>
                                 </div>
-                            </InternalLink>
-                        )
-                    }) : <p className="text-main-50">No documents found</p>    
-                }
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 text-sm p-4">No notes found</p>
+                    )}
+                </ScrollArea>
+            </div>
+            <div className="w-[85%]  bg-white p-6 overflow-hidden">
+                {selectedNoteId !="" ? (
+                    <div className="w-full h-full">
+                            <CustomEditor
+                            initialData={selectedNote}
+                            documentId={selectedNoteId}
+                            documentType={0}
+                            refresh={fetchDocuments}
+    />
+                    </div>
+                ) : (
+                    <>
+                        <h1 className="text-2xl font-bold mb-4">Welcome to Your Notes</h1>
+                        <p className="text-gray-600">Select a note from the sidebar or create a new one to get started.</p>
+                    </>
+                )}
             </div>
         </div>
     )
-}   
+}

@@ -72,42 +72,60 @@ const editorConfiguration = {
     }
 };
 
-// @ts-ignore
-function CustomEditor( props ) {
-        return (
-            <CKEditor
-                // @ts-ignore
-                editor={ Editor.Editor }
-                config={ editorConfiguration }
-                data={ props.initialData }
-                
-                onReady={ editor => {
-                    console.log( 'Editor is ready to use!', editor );
-                    const editorBarElement = document.querySelector( '.ck-toolbar__items' );
-                    if( props.readonly ){
-                        editor.enableReadOnlyMode("sdfsedgd");
-                        document.querySelector( '.ck-editor__top' )?.classList.add( 'hidden' );
-                    }
-                    const newButton = document.createElement( 'button' );
-                    newButton.innerHTML = '💾';
-                    newButton.classList.add( 'ck-button' );
-                    newButton.onclick = () => {
-                        const data = editor.getData();
-                        const h1 = data.match( /<h1>(.*?)<\/h1>/ );
-                        let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
-                        sendToast( `Guardando cambios en ${ title }...`);
-                        rotomPOST( `/documents/save/${ props.documentId }`, { title, content: data, documentType: props.documentType} )
-                    };
-                    editorBarElement?.prepend( newButton );
+// Helper function to create the save button
+function createSaveButton (editor: any, props: { documentId: any; documentType: any; refresh: () => void; })  {
+    const saveButton = document.createElement('button');
+    saveButton.id = 'saveButton';
+    saveButton.innerHTML = '💾';
+    saveButton.classList.add('ck-button');
+    saveButton.onclick = () => {
+        const data = editor.getData();
+        const documentId = props.documentId;
+        const h1 = data.match(/<h1>(.*?)<\/h1>/);
+        let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
+        rotomPOST(`/documents/save/${documentId}`, { title, content: data, documentType: props.documentType })
+            .then(() => {
+                console.log("SAVED SAVED SAVED");
+                console.log({ id: props.documentId, title, data });
+                sendToast(`Cambios guardados en ${title}`);
+                props.refresh();
+            });
+    };
+    return saveButton;
+};
 
-                
-                }}
-                onChange={ (event, editor ) => {
-                    const data = editor.getData();
-                    console.log( { event, editor, data } );
-                } }
-            />
-        )
+// @ts-ignore
+function CustomEditor(props) {
+    return (
+        <CKEditor
+            // @ts-ignore
+            editor={Editor.Editor}
+            config={editorConfiguration}
+            data={props.initialData}
+
+            onReady={editor => {
+                console.log('Editor is ready to use!', editor);
+                const editorBarElement = document.querySelector('.ck-toolbar__items');
+                if (props.readonly) {
+                    editor.enableReadOnlyMode("sdfsedgd");
+                    document.querySelector('.ck-editor__top')?.classList.add('hidden');
+                }
+                const saveButton = createSaveButton(editor, props);
+                editorBarElement?.prepend(saveButton);
+            }}
+            onChange={(event, editor) => {
+                const data = editor.getData();
+                // Recreate the save button
+                const saveButton = document.getElementById('saveButton');
+                if (saveButton) {
+                    saveButton.remove();
+                }
+                const editorBarElement = document.querySelector('.ck-toolbar__items');
+                const newSaveButton = createSaveButton(editor, props);
+                editorBarElement?.prepend(newSaveButton);
+            }}
+        />
+    )
 }
 
 export default CustomEditor;

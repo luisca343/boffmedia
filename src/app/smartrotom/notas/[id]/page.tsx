@@ -8,7 +8,7 @@ const CustomEditor = dynamic( () => {
   return import( '@/components/editor/TestEditor' );
 }, { ssr: false } );
 
-export default function Note({params} : {params: {id: string}}){
+export default function Note({params, refresh} : {params: {id: string}, refresh: () => void}) {
   const { id } = params;
   const { data } = useGetDocument(id);
 
@@ -18,6 +18,7 @@ export default function Note({params} : {params: {id: string}}){
       initialData={data}
       documentId={id}
       documentType={0}
+      refresh={refresh}
     />
   </div>
   );
