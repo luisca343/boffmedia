@@ -1,5 +1,5 @@
+import { BoffSession } from "@/types";
 import { create } from "zustand";
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
 
 interface SessionStore {
     session: BoffSession | null;

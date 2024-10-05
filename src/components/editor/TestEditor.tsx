@@ -72,23 +72,23 @@ const editorConfiguration = {
     }
 };
 
-// Helper function to create the save button
-function createSaveButton (editor: any, props: { documentId: any; documentType: any; refresh: () => void; })  {
+function createSaveButton (data: any, props: { documentId: any; documentType: any; refresh: () => void; type?: string; }) {
+    console.log("=== CREATE SAVE BUTTON ===");
+    const endpoint = props.type === 'news' ? 'savenews' : 'save';
     const saveButton = document.createElement('button');
     saveButton.id = 'saveButton';
     saveButton.innerHTML = '💾';
     saveButton.classList.add('ck-button');
     saveButton.onclick = () => {
-        const data = editor.getData();
         const documentId = props.documentId;
         const h1 = data.match(/<h1>(.*?)<\/h1>/);
         let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
-        rotomPOST(`/documents/save/${documentId}`, { title, content: data, documentType: props.documentType })
+        rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, documentType: props.documentType })
             .then(() => {
                 console.log("SAVED SAVED SAVED");
                 console.log({ id: props.documentId, title, data });
                 sendToast(`Cambios guardados en ${title}`);
-                props.refresh();
+                if(props) props.refresh();
             });
     };
     return saveButton;
@@ -101,7 +101,7 @@ function CustomEditor(props) {
             // @ts-ignore
             editor={Editor.Editor}
             config={editorConfiguration}
-            data={props.initialData}
+            data={props.document.content}
 
             onReady={editor => {
                 console.log('Editor is ready to use!', editor);
@@ -121,7 +121,7 @@ function CustomEditor(props) {
                     saveButton.remove();
                 }
                 const editorBarElement = document.querySelector('.ck-toolbar__items');
-                const newSaveButton = createSaveButton(editor, props);
+                const newSaveButton = createSaveButton(data, props);
                 editorBarElement?.prepend(newSaveButton);
             }}
         />

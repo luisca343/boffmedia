@@ -40,23 +40,39 @@ const variantStyles = {
   },
 };
 
-const CardComponent: React.FC<CardComponentProps> = ({
-  variant,
-  news,
-}) => {
+const CardComponent: React.FC<CardComponentProps> = ({ variant, news }) => {
   const { cardClass, buttonClass } = variantStyles[variant];
 
+  if (!news)
+    return (
+      <Card
+        className={`overflow-hidden transform hover:scale-105 transition-transform border-8 border-black ${cardClass}`}
+      >
+        <CardContent className="p-6">
+          <h3 className="text-4xl font-bold mb-4 pop-shadow text-white">¡VACÍO!</h3>
+          <p className="text-2xl mb-4 font-comic leading-relaxed">
+            Furret está buscando más noticias para llenar este espacio...
+          </p>
+          <div className="w-24 h-24 mx-auto mb-4 bg-yellow-300 rounded-full border-4 border-black flex items-center justify-center">
+            <span className="text-5xl">🔍</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
   return (
     <Card
-      className={`overflow-hidden transform hover:scale-105 transition-transform border-4 border-black ${cardClass}`}
+      className={`overflow-hidden transform hover:scale-105 transition-transform border-8 border-black ${cardClass}`}
     >
       <CardContent className="p-6">
         <h3 className="text-4xl font-bold mb-2 pop-shadow text-white">
           {news.title}
         </h3>
-        <p className="text-xl font-comic">{news.content || "Previsualización no disponible"}</p>
-        <InternalLink href={`/noticias/leer/${news.id}`} 
-          className={`block w-fit mt-4 font-bold py-2 px-4 rounded-full transform hover:scale-110 transition-transform button-pop-shadow ${buttonClass}`}
+        <p className="text-xl font-comic">
+          {news.content || "Previsualización no disponible"}
+        </p>
+        <InternalLink
+          href={`/noticias/leer/${news.id}`}
+          className={`inline-block mt-4 font-bold py-2 px-4 rounded-full transform hover:scale-110 transition-transform button-pop-shadow ${buttonClass}`}
         >
           {news.buttonText || "Leer más"}
         </InternalLink>

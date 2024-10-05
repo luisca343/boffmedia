@@ -11,24 +11,21 @@ export interface SmartRotomUser {
   world: null | string; // Assuming world can be either null or a string
 }
 
-export interface User {
-  email: string;
-  username: string;
-  smartRotomUser: SmartRotomUser;
+export interface UserBase {
   iat: number;
   exp: number;
   jti: string;
 }
 
+export interface User extends UserBase {
+  email: string;
+  username: string;
+  smartRotomUser: SmartRotomUser;
+  roles: string[];
+}
+
 export type BoffSession = {
-  user: {
-    username: string | null;
-    email: string | null;
-    smartRotomUser: {
-      username: string;
-      uuid: string;
-    };
-  };
+  user: User;
 };
 
 export interface SmartRotomResponse {

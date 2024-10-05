@@ -13,22 +13,8 @@ import { LoadingScreen } from "./Loading";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CallStatus } from "./CallStatus";
+import { BoffSession } from "@/types";
 
-export type BoffSession = {
-  expires: string;
-  user: {
-    username: string | null;
-    email: string | null;
-    smartRotomUser: {
-      username: string;
-      uuid: string;
-      world: string;
-    };
-    exp: number;
-    iat: number;
-    jti: string;
-  };
-};
 
 export default function AppWrapper({
   children,

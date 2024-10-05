@@ -10,13 +10,13 @@ const CustomEditor = dynamic( () => {
 
 export default function Note({params} : {params: {id: string}}){
   const { id } = params;
-  const [data, setData] = React.useState<any>(null);
+  const [data, setData] = React.useState<any>({});
 
   useEffect(() => {
-    rotomGET(`/documents/${id}`)
+    rotomGET(`/documents/news/${id}`)
     .then((res) => {
-      setData(res.content);
-      //rewrite url
+      setData(res);
+      console.log(res);
     });
     
   }, [id]);
@@ -25,9 +25,10 @@ export default function Note({params} : {params: {id: string}}){
     <div className='w-full h-full bg-main-800'>
         <div className='h-full w-[70%] m-auto'>
         <CustomEditor
-            initialData={data}
+            document={data}
             documentId={id}
             documentType={1}
+            type='news'
         />
     </div>
   </div>

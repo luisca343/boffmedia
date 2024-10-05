@@ -75,7 +75,7 @@ export function DocumentsList() {
                 {selectedNoteId !="" ? (
                     <div className="w-full h-full">
                             <CustomEditor
-                            initialData={selectedNote}
+                            document={selectedNote}
                             documentId={selectedNoteId}
                             documentType={0}
                             refresh={fetchDocuments}

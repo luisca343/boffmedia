@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { rotomGET } from "@/services/boffAPI";
 import { getValidAccountId } from "../bankUtils";
+import { BoffSession } from "@/types";
 
 interface Account {
   id: number;

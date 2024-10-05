@@ -1,5 +1,4 @@
 "use client"
-import { BoffSession } from "@/components/smartrotom/AppWrapper";
 import { rotomGET } from "@/services/boffAPI";
 import { useEffect, useState } from "react";
 import { BankSection, BankSectionContent, BankSectionHeader } from "../_components/BankSection";

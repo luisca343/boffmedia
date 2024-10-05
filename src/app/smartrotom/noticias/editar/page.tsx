@@ -4,7 +4,6 @@ import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { SmartRotomButton } from "@/components/smartrotom/ui/button"
-import FurretNav from "../_componentsOld/FurretNav"
 import { useBoffSession } from "@/services/useBoffSession"
 
 export default  function EditarNoticia(){
@@ -33,7 +32,6 @@ export default  function EditarNoticia(){
 
     return (
         <div className="bg-pink-200 text-black lexend-mega">
-            <FurretNav />
             <div className="flex flex-wrap  space-x-4 space-y-2">
                 <SmartRotomButton  size='lg' onClick={() => createNote()} className="mt-2 ml-4">
                     <h2>Crear</h2>

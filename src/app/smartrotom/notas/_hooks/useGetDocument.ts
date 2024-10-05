@@ -7,7 +7,7 @@ export function useGetDocument(id: string) {
   useEffect(() => {
     rotomGET(`/documents/${id}`)
     .then((res) => {
-      setData(res.content);
+      setData(res);
       //rewrite url
     });
     
