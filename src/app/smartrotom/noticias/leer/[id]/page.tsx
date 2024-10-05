@@ -20,15 +20,10 @@ export default function ReadPage({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     setIsLoading(true);
-    rotomGET(`/documents/${id}`)
+    rotomGET(`/documents/news/${id}`)
       .then((res) => {
-        if (res.type !== 1) {
-          setError(
-            "¡Ups! No se puede leer este documento. ¡Parece que Furret se lo ha comido!"
-          );
-        } else {
-          setData(res);
-        }
+        console.log(res);
+        setData(res);
       })
       .catch(() => {
         setError(
@@ -101,8 +96,17 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   }
 
   function getContent() {
+    console.log("========================");
     const modifiedContent = data.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
+    console.log(modifiedContent);
     return modifiedContent;
+  }
+
+  function getModifiedData() {
+    return {
+      ...data,
+      content: getContent(),
+    };
   }
 
   return (
@@ -114,7 +118,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
               {data.title}
             </h1>
             <CustomEditor
-              initialData={getContent()}
+              document={getModifiedData()}
               documentId={id}
               documentType={1}
               readonly={true}

@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InternalLink } from "@/components/nav/Link";
 import { NewsItem } from "../page";
+import { getPreview } from "../_util";
 
 interface CardComponentProps {
   variant: "blue" | "purple" | "green" | "red" | "yellow" | "pink" | "default";
@@ -68,7 +69,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ variant, news }) => {
           {news.title}
         </h3>
         <p className="text-xl font-comic">
-          {news.content || "Previsualización no disponible"}
+          {getPreview(news, 100)}
         </p>
         <InternalLink
           href={`/noticias/leer/${news.id}`}
