@@ -25,10 +25,11 @@ export function getPreview(news: NewsItem, length: number) {
       const truncatedText = innerText.slice(0, remainingChars) + "...";
 
       elements.push(<div key={count}>{truncatedText}</div>);
+      charCount += truncatedText.length; // Update charCount with truncated text length
       break;
     } else {
       elements.push(<div key={count}>{innerText}</div>);
-      charCount += innerText.length;
+      charCount += innerText.length; // Update charCount with innerText length
     }
 
     count++;
