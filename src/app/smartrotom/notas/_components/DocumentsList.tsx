@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { InternalLink } from "@/components/nav/Link"
 import { strToDate } from "@/lib/utils"
 import { useGetDocuments } from "../_hooks/useGetDocuments"
 import { useGetDocument } from "../_hooks/useGetDocument"
@@ -9,7 +8,11 @@ import { Button } from "@/components/ui/button"
 import { FileText, PlusCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import CustomEditor from "@/components/editor/TestEditor"
+import dynamic from "next/dynamic"
+
+const CustomEditor = dynamic( () => {
+    return import( '@/components/editor/TestEditor' );
+  }, { ssr: false } );
 
 export function DocumentsList() {
     const { documents, createNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
