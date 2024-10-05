@@ -4,7 +4,7 @@ import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { SmartRotomButton } from "@/components/smartrotom/ui/button"
-import FurretNav from "../_components/FurretNav"
+import FurretNav from "../_componentsOld/FurretNav"
 import { useBoffSession } from "@/services/useBoffSession"
 
 export default  function EditarNoticia(){
