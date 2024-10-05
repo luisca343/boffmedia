@@ -96,7 +96,6 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   }
 
   function getContent() {
-    console.log("========================");
     const modifiedContent = data.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
     console.log(modifiedContent);
     return modifiedContent;
@@ -111,7 +110,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="min-h-full bg-yellow-300 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="mx-auto  w-[70%]">
         <Card className="bg-white border-8 border-black mb-8">
           <CardContent className="p-8">
             <h1 className="text-6xl font-bold mb-6 text-red-500 pop-shadow text-center">
