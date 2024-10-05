@@ -1,19 +1,20 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
+import { RotomNews } from '@/_db/schema/SmartRotomDocuments';
 
 @Controller('smartrotom/documents')
 export class DocumentsController {
     constructor(
         private documentsService: DocumentsService,
     ) {}
-    @Get('activeNews')
+    @Get('news')
     async getActiveNews(){
-        return await this.documentsService.getActiveNews()
+        return await this.documentsService.getNews()
     }
 
-    @Post('activeNews')
-    async updateActiveNews(@Body() body: {id:number, newsId: number, newsData: {subtitle: string, image: string}}){
-        return await this.documentsService.updateActiveNews(body)
+    @Post('news/:newsId')
+    async updateActiveNews(@Body() news: RotomNews, @Param('newsId') newsId: number){
+        return await this.documentsService.saveNews(news, newsId)
     }
 
     @Get('news')

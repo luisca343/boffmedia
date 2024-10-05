@@ -1,93 +1,171 @@
-import { RotomDocument, rotomDocuments, rotomDocumentsUsers } from '@/_db/schema/SmartRotomDocuments';
+import {
+  RotomDocument,
+  RotomNews,
+  rotomDocuments,
+  rotomDocumentsUsers,
+  rotomNews,
+} from '@/_db/schema/SmartRotomDocuments';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { and, desc, eq } from 'drizzle-orm';
 import * as fs from 'fs';
-import *  as  path from 'path';
+import * as path from 'path';
 
 @Injectable()
 export class DocumentsService {
-    constructor(
-        private db: MySQL2Service,
-    ) {}
+  constructor(private db: MySQL2Service) {}
 
-    async getNews(){
-        return await this.db.getDrizzle().select().from(rotomDocuments).where(eq(rotomDocuments.type, 1)).orderBy(desc(rotomDocuments.updatedAt))
+  async getNews() {
+    return await this.db
+      .getDrizzle()
+      .select()
+      .from(rotomNews)
+      .orderBy(desc(rotomNews.updatedAt));
+  }
+
+  async getNewsById(newsId: number) {
+    return (await this.db
+      .getDrizzle()
+      .select()
+      .from(rotomNews)
+      .where(eq(rotomNews.id, newsId)))[0];
+  }
+
+  async getNotes(uuid: string) {
+    return await this.db
+      .getDrizzle()
+      .select({
+        id: rotomDocuments.id,
+        title: rotomDocuments.title,
+        type: rotomDocuments.type,
+        createdAt: rotomDocuments.createdAt,
+        updatedAt: rotomDocuments.updatedAt,
+      })
+      .from(rotomDocuments)
+      .innerJoin(
+        rotomDocumentsUsers,
+        eq(rotomDocuments.id, rotomDocumentsUsers.documentId),
+      )
+      .orderBy(desc(rotomDocuments.updatedAt));
+  }
+
+  async getDocument(id: number) {
+    return (
+      await this.db
+        .getDrizzle()
+        .select()
+        .from(rotomDocuments)
+        .where(eq(rotomDocuments.id, id))
+    )[0];
+  }
+
+  async saveNote(
+    id: number,
+    title: string,
+    content: string,
+    documentType: number,
+  ) {
+    const exists = await this.db
+      .getDrizzle()
+      .select()
+      .from(rotomDocuments)
+      .where(eq(rotomDocuments.id, id));
+
+    let result;
+    if (exists.length === 0 || id === 0) {
+      result = await this.db
+        .getDrizzle()
+        .insert(rotomDocuments)
+        .values({
+          title,
+          type: documentType,
+          public: 0,
+          content,
+          id: id,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as RotomDocument)
+        .execute();
+    } else {
+      result = await this.db
+        .getDrizzle()
+        .update(rotomDocuments)
+        .set({ title, content, type: documentType, updatedAt: new Date() })
+        .where(eq(rotomDocuments.id, id))
+        .execute();
     }
 
-    async getNewsById(newsId: number){
-        return await this.db.getDrizzle().select().from(rotomDocuments).where(eq(rotomDocuments.id, newsId))
+    return { success: true, id: result[0].insertId };
+  }
+
+  async saveNews( news: RotomNews, newsId: number) {
+    const exists = await this.db
+      .getDrizzle()
+      .select()
+      .from(rotomNews)
+      .where(eq(rotomNews.id, newsId));
+
+    let result;
+
+
+    if (exists.length === 0) {
+      result = await this.db
+        .getDrizzle()
+        .insert(rotomNews)
+        .values({
+          title: news.title,
+          subtitle: news.subtitle,
+          subcategory: news.subcategory,
+          content: `<h1>${news.title}</h1>`,
+          buttonText: news.buttonText,
+          imageUrl: news.imageUrl,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        } as RotomNews)
+        .execute();
+    } else {
+      console.log(news)
+      result = await this.db
+        .getDrizzle()
+        .update(rotomNews)
+        .set({
+          title: news.title,
+          subtitle: news.subtitle,
+          subcategory: news.subcategory,
+          content: news.content,
+          buttonText: news.buttonText,
+          imageUrl: news.imageUrl,
+          updatedAt: new Date(),
+        } as RotomNews)
+        .where(eq(rotomNews.id, newsId))
+        .execute();
+
+        console.log(result)
     }
 
-    async getNotes(uuid: string) {
-        return (await this.db.getDrizzle().select({id: rotomDocuments.id, title: rotomDocuments.title, type: rotomDocuments.type, public: rotomDocuments.public, createdAt: rotomDocuments.createdAt, updatedAt: rotomDocuments.updatedAt}).from(rotomDocuments)
-            .innerJoin(rotomDocumentsUsers, eq(rotomDocuments.id, rotomDocumentsUsers.documentId))
-            .where(and(eq(rotomDocumentsUsers.uuid, uuid), eq(rotomDocuments.type, 0)))
-            .orderBy(desc(rotomDocuments.updatedAt))
-        
-        )
+    return { success: true, id: result[0].insertId };
+    
+  }
+
+  async addNoteToUser(documentId: number, uuid: string) {
+    const exists = await this.db
+      .getDrizzle()
+      .select()
+      .from(rotomDocumentsUsers)
+      .where(
+        and(
+          eq(rotomDocumentsUsers.documentId, documentId),
+          eq(rotomDocumentsUsers.uuid, uuid),
+        ),
+      );
+
+    if (exists.length === 0) {
+      await this.db
+        .getDrizzle()
+        .insert(rotomDocumentsUsers)
+        .values({ documentId, uuid })
+        .execute();
     }
+  }
 
-    async getDocument(id: number) {
-        return (await this.db.getDrizzle().select().from(rotomDocuments).where(eq(rotomDocuments.id, id)))[0]
-    }
-
-    async saveNote(id: number, title: string, content: string, documentType: number) {
-        const exists = await this.db.getDrizzle().select().from(rotomDocuments).where(eq(rotomDocuments.id, id));
-        
-        let result
-        if(exists.length === 0 || id === 0) {
-            result = await this.db.getDrizzle().insert(rotomDocuments)
-            .values({
-                    title, type: documentType, public:0, content, id: id, createdAt: new Date(), updatedAt: new Date()
-                } as RotomDocument)
-            .execute();
-        } else {
-            result = await this.db.getDrizzle().update(rotomDocuments)
-            .set({title, content, type: documentType, updatedAt: new Date()})
-            .where(eq(rotomDocuments.id, id))
-            .execute();
-        }
-
-        return {success: true, id: result[0].insertId}
-    }
-
-    async addNoteToUser(documentId: number, uuid: string) {
-        const exists = await this.db.getDrizzle().select().from(rotomDocumentsUsers)
-        .where(and(eq(rotomDocumentsUsers.documentId, documentId),eq(rotomDocumentsUsers.uuid, uuid)))
-
-        if(exists.length === 0) {
-            await this.db.getDrizzle().insert(rotomDocumentsUsers).values({documentId, uuid}).execute();
-        }
-    }
-
-    async getActiveNews(){
-        const file = path.join(__dirname, '../../../../', 'public/smartrotom/data/news.json');
-        const data =  JSON.parse(await fs.promises.readFile(file, 'utf8'))
-        return data
-    }
-
-    async updateActiveNews(body: {id:number, newsId: number, newsData: {subtitle: string, image: string}}){
-        const file = path.join(__dirname, '../../../../', 'public/smartrotom/data/news.json');
-        const data =  await JSON.parse(await fs.promises.readFile(file, 'utf8'))
-
-        let index = data.findIndex((n: any) => n.id == body.id)
-
-        if(index === -1) {
-            data.push({subtitle: body.newsData.subtitle, image: body.newsData.image, newsId: body.newsId, id: body.id})
-            index = data.findIndex((n: any) => n.id == body.id)
-        }
-
-
-        data[index].subtitle = body.newsData.subtitle
-        data[index].image = body.newsData.image
-        data[index].newsId = body.newsId
-
-        const news = await this.getNewsById(body.newsId)
-        data[index].title = news[0].title
-
-        await fs.promises.writeFile(file, JSON.stringify(data, null, 2))
-        return data
-        
-    }
 }

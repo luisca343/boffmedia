@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import {  smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { eq, or } from 'drizzle-orm';
-import { BoffMediaUser, boffMediaUsers } from '@/_db/schema/BoffMedia';
+import { BoffMediaUser, boffMediaRoles, boffMediaUserRoles, boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { error } from 'console';
 
@@ -71,6 +71,16 @@ export class UsersService {
     return users[0];
   }
 
+  async getUserRoles(userId: number) {
+    const data = await this.db.getDrizzle().select({role: boffMediaRoles.name}).from(boffMediaUserRoles)
+      .leftJoin(boffMediaRoles, eq(boffMediaRoles.id, boffMediaUserRoles.roleId))
+      .where(eq(boffMediaUserRoles.userId, userId));
+
+      const roles = data.map((d: {role: string}) => d.role);
+
+      return roles;
+  }
+
   async validateUser(username: string, password: string): Promise<SessionUser | null> {
     const user = await this.findFullUserWithName(username);
     if (!user) {
@@ -78,11 +88,11 @@ export class UsersService {
     }
   
     const match = await bcrypt.compare(password, user.boffmedia_users.password);
+    if(!match) return null;
 
-    console.log(user);
     let userToReturn = this.getSessionUser(user);
 
-    return match ? userToReturn : null;
+    return userToReturn
   }
 
   
@@ -111,10 +121,13 @@ export class UsersService {
   }
 
 
-  getSessionUser({boffmedia_users, rotom_users}: {boffmedia_users: BoffMediaUser, rotom_users: SmartRotomUser}){
+  async getSessionUser({boffmedia_users, rotom_users}: {boffmedia_users: BoffMediaUser, rotom_users: SmartRotomUser}){
+    const roles = await this.getUserRoles(boffmedia_users.id);
+
     return {
       username: boffmedia_users?.username,
       email: boffmedia_users?.email,
+      roles,
       smartRotomUser: {
         username: rotom_users?.username,
         uuid: rotom_users?.uuid,

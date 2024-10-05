@@ -5,7 +5,6 @@ export const rotomDocuments = mysqlTable("rotom_documents", {
     id: int("id").primaryKey().autoincrement(),
     title: varchar("title", { length: 255 }).notNull(),
     type: int("type").notNull(),
-    public: int("public").notNull(),
     content: text("content").notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
@@ -19,3 +18,18 @@ export const rotomDocumentsUsers = mysqlTable("rotom_documents_users", {
 });
 
 export type RotomDocumentUser = typeof rotomDocumentsUsers.$inferSelect;
+
+export const rotomNews = mysqlTable("rotom_news", {
+    id: int("id").primaryKey().autoincrement(),
+    title: varchar("title", { length: 255 }).notNull(),
+    subtitle: varchar("subtitle", { length: 255 }),
+    subcategory: varchar("subcategory", { length: 255 }),
+    public: int("public").notNull(),
+    content: text("content").notNull(),
+    buttonText: varchar("button_text", { length: 255 }),
+    imageUrl: varchar("image_url", { length: 255 }),
+    createdAt: timestamp("created_at").notNull(),
+    updatedAt: timestamp("updated_at").notNull(),
+});
+
+export type RotomNews = typeof rotomNews.$inferSelect;
