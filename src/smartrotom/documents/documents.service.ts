@@ -7,28 +7,60 @@ import {
 } from '@/_db/schema/SmartRotomDocuments';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
-import { and, desc, eq } from 'drizzle-orm';
-import * as fs from 'fs';
-import * as path from 'path';
-
+import { and, desc, eq, inArray } from 'drizzle-orm';
 @Injectable()
 export class DocumentsService {
   constructor(private db: MySQL2Service) {}
 
   async getNews() {
-    return await this.db
+    const news = await this.db
       .getDrizzle()
       .select()
       .from(rotomNews)
       .orderBy(desc(rotomNews.id));
+
+    const featured = news.find((item) => item.featured === 1);
+
+    return { featured, news };
+  }
+
+  async updateNewsStatus(published: number[], featured: number) {
+    await this.db
+      .getDrizzle()
+      .update(rotomNews)
+      .set({ published: 0 } as RotomNews)
+      .execute();
+
+    await this.db
+      .getDrizzle()
+      .update(rotomNews)
+      .set({ published: 1 } as RotomNews)
+      .where(inArray(rotomNews.id, published))
+      .execute();
+
+    await this.db
+      .getDrizzle()
+      .update(rotomNews)
+      .set({ featured: 0 } as RotomNews)
+      .execute();
+
+    await this.db
+      .getDrizzle()
+      .update(rotomNews)
+      .set({ featured: 1 } as RotomNews)
+      .where(eq(rotomNews.id, featured));
+
+    return { success: true };
   }
 
   async getNewsById(newsId: number) {
-    return (await this.db
-      .getDrizzle()
-      .select()
-      .from(rotomNews)
-      .where(eq(rotomNews.id, newsId)))[0];
+    return (
+      await this.db
+        .getDrizzle()
+        .select()
+        .from(rotomNews)
+        .where(eq(rotomNews.id, newsId))
+    )[0];
   }
 
   async getNotes(uuid: string) {
@@ -98,7 +130,7 @@ export class DocumentsService {
     return { success: true, id: result[0].insertId };
   }
 
-  async saveNews( news: RotomNews, newsId: number) {
+  async saveNews(news: RotomNews, newsId: number) {
     const exists = await this.db
       .getDrizzle()
       .select()
@@ -106,7 +138,6 @@ export class DocumentsService {
       .where(eq(rotomNews.id, newsId));
 
     let result;
-
 
     if (exists.length === 0) {
       result = await this.db
@@ -124,7 +155,7 @@ export class DocumentsService {
         } as RotomNews)
         .execute();
     } else {
-      console.log(news)
+      console.log(news);
       result = await this.db
         .getDrizzle()
         .update(rotomNews)
@@ -140,11 +171,10 @@ export class DocumentsService {
         .where(eq(rotomNews.id, newsId))
         .execute();
 
-        console.log(result)
+      console.log(result);
     }
 
     return { success: true, id: result[0].insertId };
-    
   }
 
   async addNoteToUser(documentId: number, uuid: string) {
@@ -167,5 +197,4 @@ export class DocumentsService {
         .execute();
     }
   }
-
 }

@@ -10,12 +10,20 @@ export class DocumentsController {
     @Get('news')
     async getActiveNews(){
         return await this.documentsService.getNews()
+    }    
+    
+    @Post('newsstatus')
+    async updateNewsStatus(@Body() news: {published: number[], featured: number}){
+        console.log(news)
+        return await this.documentsService.updateNewsStatus(news.published, news.featured)
     }
+
 
     @Post('news/:newsId')
     async updateActiveNews(@Body() news: RotomNews, @Param('newsId') newsId: number){
         return await this.documentsService.saveNews(news, newsId)
     }
+
 
     @Get('news')
     async getNews(){
