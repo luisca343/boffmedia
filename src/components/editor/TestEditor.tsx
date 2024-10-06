@@ -72,7 +72,9 @@ const editorConfiguration = {
     }
 };
 
-function createSaveButton (data: any, props: { documentId: any; documentType: any; refresh: () => void; type?: string; }) {
+function createSaveButton (data: any, props: {
+    updateNews: any; documentId: any; documentType: any; refresh: () => void; type?: string; 
+}) {
     console.log("=== CREATE SAVE BUTTON ===");
     const endpoint = props.type === 'news' ? 'news' : 'save';
     const saveButton = document.createElement('button');
@@ -89,6 +91,7 @@ function createSaveButton (data: any, props: { documentId: any; documentType: an
                 console.log({ id: props.documentId, title, data });
                 sendToast(`Cambios guardados en ${title}`);
                 if(props.refresh) props.refresh();
+                if(props.updateNews) props.updateNews(props.documentId, data);
             });
     };
     return saveButton;
