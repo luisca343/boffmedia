@@ -20,7 +20,7 @@ export class DocumentsService {
       .getDrizzle()
       .select()
       .from(rotomNews)
-      .orderBy(desc(rotomNews.updatedAt));
+      .orderBy(desc(rotomNews.id));
   }
 
   async getNewsById(newsId: number) {
