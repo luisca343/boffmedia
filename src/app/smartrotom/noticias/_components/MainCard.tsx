@@ -7,7 +7,7 @@ import { NewsItem } from "../page";
 import { getPreview } from "../_util";
 
 interface MainCardProps {
-  news: NewsItem;
+  news: NewsItem | undefined;
 }
 
 const MainCard: React.FC<MainCardProps> = ({ news }) => {

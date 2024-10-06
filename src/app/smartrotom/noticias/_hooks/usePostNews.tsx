@@ -9,7 +9,7 @@ export default function usePostNews(){
         console.log(news);
         const res = await rotomPOST(`/documents/news/${news.id}`, news);
         console.log(res);
-        res.error ? console.error(res.error) : window.location.href = "/smartrotom/noticias/editar/" + res.id;
+        res.error ? console.error(res.error) : window.location.reload();
     }
 
     return { postNews };
