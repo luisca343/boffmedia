@@ -1,4 +1,4 @@
-import { Joystick, WholeWord, Pickaxe, Grid, Puzzle } from "lucide-react";
+import { Joystick, WholeWord, Pickaxe, Grid, Puzzle, Bomb } from "lucide-react";
 import { InternalLink } from "@/components/nav/Link";
 import RainbowText from "./_components/RainbowText";
 import StarsBackground from "./_components/StarsBackground";
@@ -28,6 +28,12 @@ const juegos = [
     color: "blue",
     href: "/arcade/puzle",
   },
+  {
+    nombre: "Voltorb Flip",
+    icono: Bomb,
+    color: "red",
+    href: "/arcade/voltorb",
+  }
 ];
 
 export default function CentroArcade() {
