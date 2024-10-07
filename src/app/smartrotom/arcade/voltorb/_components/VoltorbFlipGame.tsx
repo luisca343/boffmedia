@@ -218,7 +218,9 @@ export default function VoltorbFlipGame() {
   function handleStopOrRestart() {
     if (gameOver) {
       // Restart the game from level 1
-      setLevel(1);
+      //setLevel(1);
+      const level = calculateLevelRegression();
+      setLevel(level);
       setTotalCoins(0);
       initializeGame();
     } else if (gameWon) {
