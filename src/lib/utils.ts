@@ -83,3 +83,7 @@ export function firstToUpper(str: string) {
     .map(part => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
 }
+
+export function padWithZeroes(num: number, length: number) {
+  return num.toString().padStart(length, '0');
+}
