@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { Cell } from './types'
+import Image from 'next/image'
 
 interface CellProps {
   cell: Cell
@@ -11,7 +12,7 @@ interface CellProps {
 function CellComponent({ cell, onClick }: CellProps) {
   return (
     <motion.div
-      className={`w-12 h-12 rounded-md cursor-pointer`}
+      className={`w-20 h-20 rounded-md cursor-pointer`}
       initial={false}
       animate={{ rotateY: cell.revealed ? 180 : 0 }}
       transition={{ duration: 0.6 }}
@@ -27,9 +28,16 @@ function CellComponent({ cell, onClick }: CellProps) {
             {[0, 1, 2, 3].map(mark => (
               <div key={mark} className="w-5 h-5 flex items-center justify-center">
                 {cell.marks.includes(mark) && (
-                  <span className="text-xs font-bold">
-                    {mark === 0 ? '💣' : mark}
-                  </span>
+                  mark === 0 ? (
+                    <Image
+                      src="/smartrotom/img/apps/arcade/voltorb.png"
+                      alt="Voltorb"
+                      width={16}
+                      height={16}
+                    />
+                  ) : (
+                    <span className="text-xs font-bold">{mark}</span>
+                  )
                 )}
               </div>
             ))}
@@ -46,7 +54,12 @@ function CellComponent({ cell, onClick }: CellProps) {
           style={{ transform: 'rotateY(180deg)' }}
         >
           {cell.value === 0 ? (
-            <span className="text-2xl">💣</span>
+            <Image
+              src="/smartrotom/img/apps/arcade/voltorb.png"
+              alt="Voltorb"
+              width={32}
+              height={32}
+            />
           ) : (
             <span className="text-2xl font-bold text-white">{cell.value}</span>
           )}

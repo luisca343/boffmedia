@@ -145,6 +145,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
         "float-wingull": "float-wingull 8s ease-in-out infinite",
         "bounce-spin": "bounce-spin 6s ease-in-out infinite",
+        'appear': 'appear 0.3s ease-out',
       },
     },
   },
