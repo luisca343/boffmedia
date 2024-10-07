@@ -8,7 +8,7 @@ export default function VoltorbFlip() {
     <div className="flex flex-col h-full w-full bg-purple-900 p-4 font-mono">
       <StarsBackground />
       <div className="flex items-center justify-center mb-4">
-        <RainbowText size="xl" text="Gira Voltorb" />
+        <RainbowText size="lg" text="Gira Voltorb" />
       </div>
       <VoltorbFlipGame />
     </div>

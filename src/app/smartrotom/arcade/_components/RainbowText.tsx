@@ -10,7 +10,7 @@ const colors = ['text-pink-500', 'text-cyan-400', 'text-yellow-300', 'text-green
 
 const RainbowText = React.memo(({ text, size = 'md', className = '' }: RainbowTextProps) => {
   const shuffledColors = colors.sort(() => Math.random() - 0.5);
-  const sizeClass = size === 'sm' ? 'text-sm' : size === 'md' ? 'text-2xl' : size === 'lg' ? 'text-4xl' : 'text-6xl mb-12';
+  const sizeClass = size === 'sm' ? 'text-sm' : size === 'md' ? 'text-2xl' : size === 'lg' ? 'text-5xl mb-4' : 'text-6xl mb-12';
   const combinedClassName = `font-bold text-center z-10 animate-pulse ${sizeClass} ${className}`;
 
   const words = text.split(' ');
