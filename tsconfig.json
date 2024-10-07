@@ -20,9 +20,10 @@
     "esModuleInterop": true,
     "allowJs": true,
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@common/*": ["../common/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js", "../common/**/*"],
   "exclude": ["node_modules, public"]
 }
