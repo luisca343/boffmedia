@@ -2,23 +2,29 @@ import React from 'react';
 
 interface RainbowTextProps {
   text: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  className?: string;
 }
 
-function RainbowText({ text }: RainbowTextProps) {
-  const colors = ['text-pink-500', 'text-cyan-400', 'text-yellow-300', 'text-green-400', 'text-purple-400'];
-  
+const colors = ['text-pink-500', 'text-cyan-400', 'text-yellow-300', 'text-green-400', 'text-purple-400', 'text-red-400', 'text-blue-400', 'text-indigo-400'];
+
+const RainbowText = React.memo(({ text, size = 'md', className = '' }: RainbowTextProps) => {
+  const shuffledColors = colors.sort(() => Math.random() - 0.5);
+  const sizeClass = size === 'sm' ? 'text-sm' : size === 'md' ? 'text-2xl' : size === 'lg' ? 'text-4xl' : 'text-6xl mb-12';
+  const combinedClassName = `font-bold text-center z-10 animate-pulse ${sizeClass} ${className}`;
+
   const words = text.split(' ');
 
   return (
-    <h1 className="text-4xl font-bold mb-12 text-center z-10 animate-pulse">
+    <h1 className={combinedClassName}>
       {words.map((word, index) => {
-        const colorClass = colors[index % colors.length];
+        const colorClass = shuffledColors[index % colors.length];
         const firstChar = word.charAt(0);
         const isUppercase = firstChar === firstChar.toUpperCase();
         return (
           <span key={index}>
             {isUppercase ? (
-              <span className={`${colorClass} text-6xl`}>{firstChar}</span>
+              <span className={`${colorClass} ${sizeClass}`}>{firstChar}</span>
             ) : (
               <span className={colorClass}>{firstChar}</span>
             )}
@@ -28,6 +34,8 @@ function RainbowText({ text }: RainbowTextProps) {
       })}
     </h1>
   );
-}
+});
 
-export default RainbowText;
+RainbowText.displayName = 'RainbowText';
+
+export { RainbowText };

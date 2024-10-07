@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import {  RefreshCw, Undo, Redo, Lightbulb, PencilLine, HelpCircle } from 'lucide-react'
 import StarsBackground from '../_components/StarsBackground'
-import RainbowText from '../_components/RainbowText'
+import {RainbowText} from '../_components/RainbowText'
 
 const GRID_SIZE = 9
 const BOX_SIZE = 3

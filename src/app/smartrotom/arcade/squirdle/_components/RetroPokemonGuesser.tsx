@@ -22,7 +22,7 @@ import Fuse from "fuse.js";
 import { useGetWordlePokemon } from "../_hooks/useGetWordlePokemon";
 import useTranslation from "next-translate/useTranslation";
 import StarsBackground from "../../_components/StarsBackground";
-import RainbowText from "../../_components/RainbowText";
+import {RainbowText} from "../../_components/RainbowText";
 
 type Pokemon = {
   name: string;

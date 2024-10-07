@@ -1,7 +1,8 @@
 import { Joystick, WholeWord, Pickaxe, Grid, Puzzle, Bomb } from "lucide-react";
 import { InternalLink } from "@/components/nav/Link";
-import RainbowText from "./_components/RainbowText";
+import { RainbowText } from "./_components/RainbowText";
 import StarsBackground from "./_components/StarsBackground";
+import VoltorbImage from "./voltorb/_components/VoltorbIcon";
 
 const juegos = [
   {
@@ -17,6 +18,12 @@ const juegos = [
     href: "/mina",
   },
   {
+    nombre: "Gira Voltorb",
+    image: <VoltorbImage size="xl" />,
+    color: "red",
+    href: "/arcade/voltorb",
+  },
+  {
     nombre: "TypeDoku",
     icono: Grid,
     color: "yellow",
@@ -28,19 +35,13 @@ const juegos = [
     color: "blue",
     href: "/arcade/puzle",
   },
-  {
-    nombre: "Voltorb Flip",
-    icono: Bomb,
-    color: "red",
-    href: "/arcade/voltorb",
-  }
 ];
 
 export default function CentroArcade() {
   return (
     <div className="min-h-screen w-full bg-purple-900 flex flex-col items-center justify-center p-4 font-mono relative overflow-hidden">
       <StarsBackground />
-      <RainbowText text="Tu Estación Retro Arcade Sorprendente" />
+      <RainbowText size="xl" text="Tu Estación Retro Arcade Sorprendente" />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl w-full z-10">
         {juegos.map((juego) => (
           <InternalLink
@@ -48,7 +49,11 @@ export default function CentroArcade() {
             href={juego.href}
             className={`bg-gray-800 bg-opacity-80 border-4 border-${juego.color}-500 rounded-lg p-6 flex flex-col items-center justify-center space-y-4 hover:bg-gray-700 hover:bg-opacity-80 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-${juego.color}-400 focus:ring-opacity-50`}
           >
-            <juego.icono className={`w-16 h-16 text-${juego.color}-400`} />
+            {juego.icono ? (
+              <juego.icono className={`w-16 h-16 text-${juego.color}-400`} />
+            ) : (
+              juego.image
+            )}
             <h2 className={`text-2xl font-bold text-${juego.color}-300`}>
               {juego.nombre}
             </h2>

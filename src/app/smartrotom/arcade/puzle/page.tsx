@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Puzzle } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import StarsBackground from '../_components/StarsBackground'
-import RainbowText from '../_components/RainbowText'
+import {RainbowText} from '../_components/RainbowText'
 
 interface PuzzlePiece {
   id: number
