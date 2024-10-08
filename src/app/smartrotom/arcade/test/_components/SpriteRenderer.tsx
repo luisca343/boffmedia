@@ -20,21 +20,22 @@ export const SpriteRenderer: React.FC<SpriteRendererProps> = ({
   currentAnim,
   horizontalOffset,
 }) => {
+  const directions = currentAnim.Name === "Sleep" ? 1 : 8;
+
+  const frameWidth = currentAnim.FrameWidth * SPRITE_SCALE;
+  const frameHeight = currentAnim.FrameHeight * SPRITE_SCALE;
+  const backgroundImage = `url(/smartrotom/img/pmd/sprite/${padWithZeroes(num, 4)}/${currentAnimation}-Anim.png)`;
+  const backgroundPosition = `-${currentFrame * frameWidth}px -${direction * frameHeight}px`;
+  const backgroundSize = `${frameWidth * currentAnim.Durations.length}px ${frameHeight * directions}px`;
+
   return (
     <div
       style={{
-        width: `${currentAnim.FrameWidth * SPRITE_SCALE}px`,
-        height: `${currentAnim.FrameHeight * SPRITE_SCALE}px`,
-        backgroundImage:
-          currentAnimation === "Hop"
-            ? `url(/smartrotom/img/pmd/sprite/${padWithZeroes(num, 4)}/Hop-Anim.png)`
-            : `url(/smartrotom/img/pmd/sprite/${padWithZeroes(num, 4)}/Walk-Anim.png)`,
-        backgroundPosition: `-${
-          currentFrame * currentAnim.FrameWidth * SPRITE_SCALE
-        }px -${direction * currentAnim.FrameHeight * SPRITE_SCALE}px`,
-        backgroundSize: `${
-          currentAnim.FrameWidth * currentAnim.Durations.length * SPRITE_SCALE
-        }px ${currentAnim.FrameHeight * 8 * SPRITE_SCALE}px`,
+        width: `${frameWidth}px`,
+        height: `${frameHeight}px`,
+        backgroundImage,
+        backgroundPosition,
+        backgroundSize,
         imageRendering: "pixelated",
         pointerEvents: "auto",
         transform: `translateX(${horizontalOffset}px)`,

@@ -24,7 +24,6 @@ export function useAnimationLogic(num: number) {
     const parser = new XMLParser({ ignoreAttributes: false });
     const data = parser.parse(xmlData) as RootObject;
     setAnimData(data.AnimData);
-
     loadAllAnimations(data.AnimData);
   }, []);
 
@@ -45,9 +44,10 @@ export function useAnimationLogic(num: number) {
     if (!loadedAnimations) return;
     setError(null);
 
-    const currentAnim = loadedAnimations.find(
+    let currentAnim = loadedAnimations.find(
       (a) => a.Name === currentAnimation
     );
+    
     if (!currentAnim) {
       setError(`Animation "${currentAnimation}" not found 2`);
       return;
@@ -150,7 +150,6 @@ export function useAnimationLogic(num: number) {
       anims.map(async (anim) => {
         try {
           const data = await loadAnimData(animData, anim.Name);
-          console.log(`Loaded animation: ${data.Name}`);
           animations.push(data);
         } catch (err) {
           console.error(err);

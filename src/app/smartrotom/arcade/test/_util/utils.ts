@@ -6,8 +6,7 @@ export function calculateNextFrame(
   durations: number[],
   speed: number
 ): number {
-  const frameDuration =
-    (durations[currentFrame] / speed) * FRAME_DURATION_MULTIPLIER;
+  const frameDuration = (durations[currentFrame] / speed) * FRAME_DURATION_MULTIPLIER;
   return (currentFrame + 1) % durations.length;
 }
 
