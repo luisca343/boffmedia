@@ -60,6 +60,10 @@ main .ck-editor[role='application'] .ck.ck-content,
 	width: 100%;
 }
 
+.ck-sticky-panel__content{
+	border-width: 1px 1px 1px !important;
+}
+
 /* Because of sidebar `position: relative`, Edge is overriding the outline of a focused editor. */
 .ck.ck-editor__editable {
 	position: relative;
