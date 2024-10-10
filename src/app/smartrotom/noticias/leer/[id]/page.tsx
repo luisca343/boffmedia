@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InternalLink } from "@/components/nav/Link";
 import Image from "next/image";
+import FurretHeader from "../../_components/Header";
+import FurretFooter from "../../_components/Footer";
 
 const CustomEditor = dynamic(() => import("@/components/editor/TestEditor"), {
   ssr: false,
@@ -109,29 +111,32 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-full bg-yellow-300 py-8 px-4">
-      <div className="mx-auto  w-[70%]">
-        <Card className="bg-white border-8 border-black mb-8">
-          <CardContent className="p-8">
-            <h1 className="text-6xl font-bold mb-6 text-red-500 pop-shadow text-center">
-              {data.title}
-            </h1>
-            <CustomEditor
-              document={getModifiedData()}
-              documentId={id}
-              documentType={1}
-              readonly={true}
-            />
-          </CardContent>
-        </Card>
-        <div className="text-center">
-          <InternalLink
-            href="/noticias"
-            className="bg-blue-500 text-white hover:bg-blue-600 font-bold py-4 px-8 rounded-full text-2xl transform hover:scale-110 transition-transform button-pop-shadow inline-block"
-          >
-            Volver a las Noticias
-          </InternalLink>
-        </div>
+    <div className="min-h-full bg-yellow-200 text-black font-sans p-4 md:p-8 overflow-hidden">
+      <div className="w-[80%] mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] ">
+        <FurretHeader />
+          <Card>
+            <CardContent className="p-8">
+              <h1 className="text-6xl font-bold mb-6 text-red-500 pop-shadow text-center">
+                {data.title}
+              </h1>
+              <CustomEditor
+                document={getModifiedData()}
+                documentId={id}
+                documentType={1}
+                readonly={true}
+              />
+            </CardContent>
+          </Card>
+          <div className="text-center  py-4">
+            <InternalLink
+              href="/noticias"
+              className="bg-blue-500 text-white hover:bg-blue-600 font-bold py-4 px-8 rounded-full text-2xl transform hover:scale-110 transition-transform button-pop-shadow inline-block"
+            >
+              Volver a las Noticias
+            </InternalLink>
+          </div>
+
+          <FurretFooter />
       </div>
       <style jsx global>{`
         @import url("https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap");
