@@ -22,7 +22,7 @@ export default function RootLayout({
     <GlobalProviders>
       <html lang="en">
         <body
-          className={`${inter.className} flex flex-col h-screen overflow-hidden`}
+          className={`${inter.className} flex flex-col h-screen overflow-hidden bg-transparent`}
         >
           <ToastContainer position="bottom-right" theme="dark" />
           <FicusNav />
