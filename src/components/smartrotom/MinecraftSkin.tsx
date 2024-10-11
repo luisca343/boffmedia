@@ -55,7 +55,7 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
   }, [npcName]);
 
   if (skin === null) {
-    return <div style={{ width, height, minWidth: width, minHeight: height }}></div>;
+    return <img width={width} height={height} src={'/smartrotom/img/customNPC/renders/steve.png'} alt={npcName} style={style}/>
   }
 
   return (

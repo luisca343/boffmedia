@@ -67,6 +67,15 @@ export type QuestData = {
     objectives: IQuestObjective[];
     requirements: IQuestRequirements;
     dialogId: number;
-    
     rewards: IQuestReward[];
 }
+
+export interface INPC {
+    name: string;
+    dialogId: number;
+    skin: string;
+  }
+  
+  export interface ICategories {
+    [key: string]: number[];
+  }

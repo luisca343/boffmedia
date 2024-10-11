@@ -2,7 +2,7 @@
 import { getSmartRotomUser } from "@/lib/utils"
 import { rotomPOST } from "@/services/boffAPI"
 import { useEffect, useState } from "react"
-import { IDialogue, IQuestCategory, QuestData } from "../_types/Quest"
+import { IDialogue, IQuestCategory, QuestData } from "../_types/questTypes"
 import { useBoffSession } from "@/services/useBoffSession"
 
 export function useGetRotomQuests(){
@@ -17,6 +17,7 @@ export function useGetRotomQuests(){
         if(!session) return
         rotomPOST("/misiones", { uuid: getSmartRotomUser(session).uuid })
         .then((response) => {
+            console.log(response)
             setMisiones(response.quests)
             setCategories(response.categories)
             setDialogs(response.dialogs)
