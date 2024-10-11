@@ -87,3 +87,30 @@ export function firstToUpper(str: string) {
 export function padWithZeroes(num: number, length: number) {
   return num.toString().padStart(length, '0');
 }
+
+export function realTimeToMCTime(hours: number, minutes: number): number {
+  let mcTime = (hours * 1000 + minutes * 100 / 6 - 6000) % 24000;
+  if (mcTime < 0) {
+    mcTime += 24000;
+  }
+  return mcTime;
+}
+
+
+export function mcTimeToRealTime(mcTime: number): string {
+  mcTime = (mcTime + 6000) % 24000;
+  if (mcTime < 0) {
+    mcTime += 24000;
+  }
+
+  const totalMinutes = mcTime * 6 / 100;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = Math.floor(totalMinutes % 60);
+
+  return `${padWithZeroes(hours, 2)}:${padWithZeroes(minutes, 2)}`;
+}
+
+export function getClearTime(timeToClear: number, currentTime: number){
+  let timeToClearInMC = (currentTime + timeToClear) % 24000;
+  return mcTimeToRealTime(timeToClearInMC);
+}

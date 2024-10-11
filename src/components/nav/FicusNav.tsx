@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useBoffSession } from "@/services/useBoffSession";
 import { signOut } from "next-auth/react";
 
-const HIDDEN_APPS = ["smartrotom", "battlesim"];
+const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion"];
 const NAV_LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/herramientas", label: "Herramientas" },
