@@ -53,7 +53,7 @@ export default function QuestLog() {
   if (!quests) return <div className="min-h-screen flex items-center justify-center bg-stone-900 text-amber-400">Cargando tu aventura...</div>
 
   return (
-    <div className="w-full h-full bg-[url('/smartrotom/img/apps/misiones/fantasy-bg.jpg')] bg-cover bg-center flex items-center justify-center">
+    <div className="quests w-full h-full bg-[url('/smartrotom/img/apps/misiones/fantasy-bg.jpg')] bg-cover bg-center flex items-center justify-center">
       <div className="w-full h-full bg-stone-900/90 overflow-hidden backdrop-blur-sm relative flex flex-col">
         <div className="relative z-10 flex-grow flex flex-col overflow-hidden p-4">
           <h1 className="text-5xl font-bold text-center mb-8 text-amber-400 font-rpg">Registro de Misiones</h1>
@@ -143,7 +143,7 @@ export default function QuestLog() {
                         ))}
                     </ul>
                   </div>
-                  <div className="col-span-2 overflow-auto">
+                  <div className="col-span-2 overflow-auto rounded-lg border-2 shadow-lg border-amber-500">
                     {selectedQuest ? (
                       <QuestDetails quest={selectedQuest} dialogs={dialogs} npcs={npcs} />
                     ) : (

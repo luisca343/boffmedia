@@ -185,12 +185,12 @@
     }
 
     @font-face {
-      font-family: 'Seagram';
-      src: url("/fonts/Seagram tfb.ttf")
+      font-family: 'Quests';
+      src: url("/fonts/SuperLegendBoy-4w8Y.ttf")
     }
 
-    .seagram {
-      font-family: 'Seagram', sans-serif;
+    .quests {
+      font-family: 'Quests', sans-serif;
     }
 
   }

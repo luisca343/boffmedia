@@ -32,7 +32,7 @@ export function getNPCName(npcs: INPC[], dialogId: number) {
 
 export function QuestDetails({ quest, dialogs, npcs }: { quest: QuestData; dialogs: IDialogue[]; npcs: INPC[] }) {
   return (
-    <div className="bg-stone-800 text-stone-100 p-6 rounded-lg border-2 border-amber-500 shadow-lg">
+    <div className="bg-stone-800 text-stone-100 p-6 min-h-full w-full">
         <div className='flex justify-between'>
             <h2 className="text-3xl font-bold text-amber-400 mb-4 font-rpg">{quest.name}</h2>
             <div className="flex items-center justify-start mb-4 space-x-2">

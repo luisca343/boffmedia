@@ -50,9 +50,6 @@ export async function request(method: string, url: string, data?: any) {
 
   try {
     const res = await fetch(url, options);
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
     return await res.json();
   } catch (error) {
     console.error(`Error in request: ${(error as Error).message}`);
