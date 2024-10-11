@@ -1,83 +1,102 @@
-import axios from 'axios'
-
-type options = {
-  method: string,
+type Options = {
+  method: string;
   headers: {
-    'Content-Type': string
-  },
-  body?: string,
+    "Content-Type": string;
+  };
+  body?: string;
   next: {
-    revalidate: number
+    revalidate: number;
+  };
+};
+
+function getApiUrl(): string {
+  const apiUrl = process.env.NEXT_PUBLIC_API;
+  if (!apiUrl) {
+    throw new Error("NEXT_PUBLIC_API environment variable is not set");
   }
+  return apiUrl;
 }
 
+function getServer(): string {
+  const server = process.env.NEXT_PUBLIC_MC_WORLD;
+  if (!server) {
+    throw new Error("NEXT_PUBLIC_MC_WORLD environment variable is not set");
+  }
+  return server;
+}
 
-export async function request(method: string, url: string, data: any) {
-  const options = {
+function getTerasApiUrl(): string {
+  const apiUrl = process.env.NEXT_PUBLIC_TERAS_API;
+  if (!apiUrl) {
+    throw new Error("NEXT_PUBLIC_TERAS_API environment variable is not set");
+  }
+  return apiUrl;
+}
+
+export async function request(method: string, url: string, data?: any) {
+  const options: Options = {
     method,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     next: {
-      revalidate: 0
-    }
-  } as options;
+      revalidate: 0,
+    },
+  };
 
-  if (method !== 'GET') {
+  if (method !== "GET" && data) {
     options.body = JSON.stringify(data);
   }
 
-  const res = await fetch(url, options);
-  return await res.json();
-}
-
-export async function request2(method: string, url: string, data: any) {
-  return axios.request({
-    method,
-    url,
-    data,
-  })
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    return await res.json();
+  } catch (error) {
+    console.error(`Error in request: ${(error as Error).message}`);
+    throw error;
+  }
 }
 
 export async function GET(url: string) {
-  try {
-    return await request('GET', url, null);
-  } catch (error) {
-    throw error;
-  }
+  return request("GET", url);
 }
 
 export async function POST(url: string, data: any) {
-  try {
-    return await request('POST', url, data);
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
+  return request("POST", url, data);
 }
 
 export async function apiGET(url: string) {
-  return await GET(`${process.env.NEXT_PUBLIC_API}${url}`)
+  return GET(`${getApiUrl()}${url}`);
 }
 
 export async function rotomGET(url: string) {
-  return await GET(`${process.env.NEXT_PUBLIC_API}/smartrotom${url}`)
+  return apiGET(`/smartrotom${url}`);
 }
 
 export async function wingullGET(url: string) {
-  let datos = await GET(`${process.env.NEXT_PUBLIC_API}/wingull${url}`)
-  return await GET(`${process.env.NEXT_PUBLIC_API}/wingull${url}`)
+  return GET(`${getApiUrl()}/wingull${url}`);
 }
 
 export async function rotomPOST(url: string, data: any) {
-  data.server = process.env.NEXT_PUBLIC_MC_WORLD
-  return await POST(`${process.env.NEXT_PUBLIC_API}/smartrotom${url}`, data)
+  data.server = getServer();
+  return POST(`${getApiUrl()}/smartrotom${url}`, data);
 }
 
 export async function wingullPOST(url: string, data: any) {
-  return await POST(`${process.env.NEXT_PUBLIC_API}/wingull${url}`, data)
+  return POST(`${getApiUrl()}/wingull${url}`, data);
 }
 
 export async function boffPOST(url: string, data: any) {
-  return await POST(`${process.env.NEXT_PUBLIC_API}${url}`, data)
+  return POST(`${getApiUrl()}${url}`, data);
+}
+
+export async function terasGET(url: string) {
+  return GET(`${getTerasApiUrl()}${url}`);
+}
+
+export async function terasPOST(url: string, data: any) {
+  return POST(`${getTerasApiUrl()}${url}`, data);
 }
