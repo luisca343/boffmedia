@@ -184,6 +184,15 @@
       font-family: 'Mystery Dungeon', sans-serif;
     }
 
+    @font-face {
+      font-family: 'Seagram';
+      src: url("/fonts/Seagram tfb.ttf")
+    }
+
+    .seagram {
+      font-family: 'Seagram', sans-serif;
+    }
+
   }
 
 
