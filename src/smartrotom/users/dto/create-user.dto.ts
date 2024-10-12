@@ -1,10 +1,17 @@
-export class CreateSmartrotomUserDto {
-    uuid: string;
-    username: string;
-    world?: string;
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional } from 'class-validator';
 
-    constructor(uuid: string, username: string) {
-        this.uuid = uuid;
-        this.username = username;
-    }
+export class CreateSmartrotomUserDto {
+  @ApiProperty({ description: 'UUID of the user' })
+  @IsString()
+  uuid: string;
+
+  @ApiProperty({ description: 'Username of the user' })
+  @IsString()
+  username: string;
+
+  @ApiProperty({ description: 'World of the user', required: false })
+  @IsOptional()
+  @IsString()
+  world?: string;
 }

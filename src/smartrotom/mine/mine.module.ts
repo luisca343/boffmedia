@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { DocumentsService } from './documents.service';
-import { DocumentsController } from './documents.controller';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { LoggerModule } from '@/logger/logger.module';
 import { ResponseModule } from '@/response/response.module';
+import { MinaService } from './mine.service';
+import { MinaController } from './mine.controller';
 
 @Module({
   imports: [LoggerModule, ResponseModule],
-  providers: [DocumentsService, MySQL2Service],
-  controllers: [DocumentsController],
+  providers: [MinaService, MySQL2Service],
+  controllers: [MinaController],
 })
 export class DocumentsModule {}

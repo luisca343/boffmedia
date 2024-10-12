@@ -4,8 +4,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
 import axios from 'axios';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('boffmedia')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}

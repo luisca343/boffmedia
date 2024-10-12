@@ -96,8 +96,6 @@ export class ChatappService {
 
 
     async createMessage(chatId: number, message: string, uuid: string, type: string = 'text'){
-        console.log('CREATING MESSAGE')
-        
         const insert = await this.db.getDrizzle().insert(rotomChatMessages)
             .values({chatId, content: message, senderUUID: uuid, type} as RotomChatMessage) as ResultSetHeader[]
         
@@ -105,8 +103,6 @@ export class ChatappService {
 
 
         const users = chatId == 1 ? this.socketGateway.users : await this.getChatMembers(chatId)
-
-
         let sentToSelf = false
         users.forEach((user: {uuid: string}) => {
             let socket = this.socketGateway.users.find((u: {uuid: string}) => u.uuid === user.uuid)
@@ -123,19 +119,12 @@ export class ChatappService {
     }
 
     async createChat(player: string, users: string[], name: string){
-        console.log('CREATING CHAT')
-
         const chatUsers = new Set(users)
         chatUsers.add(player)
-
         const uuids = Array.from(chatUsers)
-        console.log(uuids)
-
         let chatName = name
         let chatType = 1
-
         if(uuids.length == 1){
-            
             const exists = await this.db.getDrizzle().select({id: rotomChats.id}).from(rotomChats)
                 .where(eq(rotomChats.name, chatName))
     
@@ -160,8 +149,6 @@ export class ChatappService {
                 return chatExists[0].id
             }
             
-            
-
             console.log('Creating private chat')
             console.log(chatName)
         } else if (uuids.length > 2){
@@ -215,8 +202,6 @@ export class ChatappService {
     endCall(chatId: number, startTime: number){
         const endTime = new Date().getTime()
         const callDuration = Math.floor((endTime - startTime) / 1000)
-
-
 
         return this.createMessage(chatId, `${callDuration}`, 'system', 'call') 
     }

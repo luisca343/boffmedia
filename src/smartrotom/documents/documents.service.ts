@@ -8,6 +8,7 @@ import {
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { Injectable } from '@nestjs/common';
 import { and, desc, eq, inArray } from 'drizzle-orm';
+import { CreateNewsDto } from './dto/create-news-dto';
 @Injectable()
 export class DocumentsService {
   constructor(private db: MySQL2Service) {}
@@ -130,7 +131,7 @@ export class DocumentsService {
     return { success: true, id: result[0].insertId };
   }
 
-  async saveNews(news: RotomNews, newsId: number) {
+  async saveNews(news: CreateNewsDto, newsId: number) {
     const exists = await this.db
       .getDrizzle()
       .select()

@@ -46,6 +46,9 @@ import { DiscordModule } from './discord/_main/discord.module';
 import { CommandsService } from './discord/_commands/commands.service';
 import { CommandsModule } from './discord/_commands/commands.module';
 import { LigaModule } from './smartrotom/liga/liga.module';
+import { ResponseService } from './response/response.service';
+import { ResponseModule } from './response/response.module';
+import { LoggerModule } from './logger/logger.module';
 
 @Module({
   imports: [
@@ -83,9 +86,11 @@ import { LigaModule } from './smartrotom/liga/liga.module';
     DiscordModule,
     CommandsModule,
     LigaModule,
+    ResponseModule,
+    LoggerModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController],
-  providers: [AppService, MySQL2Service, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService],
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {

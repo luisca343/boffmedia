@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import {  smartrotomUsers } from '@/_db/schema/SmartRotom';
@@ -50,7 +49,7 @@ export class UsersService {
 
   async findAll() {
     const [rows] = await this.db.getConnection().query('SELECT * FROM boffmedia_users');
-    return <User[]>rows;
+    return <BoffMediaUser[]>rows;
   }
 
   async findOne(id: number) {

@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { SmartrotomUser } from './entities/user.entity';
 import { MySQL2Service } from '../../_utils/MySQL2Service';
-import { RowDataPacket } from 'mysql2';
-import { smartrotomUsers } from '@/_db/schema/SmartRotom';
-import { eq } from 'drizzle-orm';
+import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
 
 @Injectable()
 export class SmartRotomUsersService {
@@ -41,9 +38,9 @@ export class SmartRotomUsersService {
     return usuario
   }
 
-  async findAll(): Promise<SmartrotomUser[]> {
+  async findAll(): Promise<SmartRotomUser[]> {
     const [rows] = await this.db.getConnection().query('SELECT * FROM rotom_users');
-    return <SmartrotomUser[]>rows;
+    return <SmartRotomUser[]>rows;
   }
 
   async findOne(uuid: string) {

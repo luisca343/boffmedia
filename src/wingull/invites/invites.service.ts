@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateInviteDto } from './dto/create-invite.dto';
 import { UpdateInviteDto } from './dto/update-invite.dto';
-import { Invite } from './entities/invite.entity';
 import { RegisterDataDto } from './dto/register-data.dto';
 import { UsersService } from '../../boffmedia/users/users.service';
 import { shortToLongUUID } from '../../_utils/stringUtils';
@@ -9,6 +8,7 @@ import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { Invite } from '@/_db/schema/Wingull';
 
 @Injectable()
 export class InvitesService {

@@ -9,3 +9,5 @@ export const wingullInvites = mysqlTable("wingull_invites", {
     usedAt: datetime("used_at").default(sql`CURRENT_TIMESTAMP()`),
     deletedAt: datetime("deleted_at")
 }); 
+
+export type Invite = typeof wingullInvites.$inferSelect;

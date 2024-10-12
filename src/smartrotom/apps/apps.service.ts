@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
-import { App } from './entities/app.entity';
 import { MySQL2Service } from '../../_utils/MySQL2Service';
-import { smartrotomApps, smartrotomUserApps } from '@/_db/schema/SmartRotom';
+import { SmartRotomApp, smartrotomApps, smartrotomUserApps } from '@/_db/schema/SmartRotom';
 import { eq, sql } from 'drizzle-orm';
 
 @Injectable()
@@ -12,63 +11,85 @@ export class AppsService {
     private db: MySQL2Service,
   ) {}
 
-  async test(){
-    let test = await this.db.insertAndReturn<App>('rotom_apps', 'INSERT INTO rotom_apps SET ?', {name: 'test'}) 
-    return test;
-  }
-
-  async create(createAppDto: CreateAppDto) {
-    const [rows] = await this.db.getConnection().execute('INSERT INTO rotom_apps SET ?', [createAppDto]);
-    return rows;
-  }
-
-  async order(order: {id: number, order: number}[], uuid: string) {
-    const dlt =  await this.db.getDrizzle().delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
-
-    const values = order.map((app) => ({uuid, appId: app.id, order: app.order}));
-
-    const insert = await this.db.getDrizzle().insert(smartrotomUserApps).values(values);
-
-
-    return {insert}
-  }
-
   async findAll() {
-    const [rows] = await this.db.getConnection().execute('SELECT * FROM rotom_apps');
-    return rows;
+    try {
+      const result = await this.db.getDrizzle().select().from(smartrotomApps);
+      return result;
+    } catch (error) {
+      throw new HttpException('Failed to find all apps', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async create(appData: CreateAppDto) {
+    try {
+      const result = await this.db.getDrizzle().insert(smartrotomApps).values(appData);
+      return result[0];
+    } catch (error) {
+      throw new HttpException('Failed to create app', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async order(order: { id: number, order: number }[], uuid: string) {
+    try {
+      await this.db.getDrizzle().delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
+
+      const values = order.map((app) => ({ uuid, appId: app.id, order: app.order }));
+      const insert = await this.db.getDrizzle().insert(smartrotomUserApps).values(values);
+
+      return { insert };
+    } catch (error) {
+      throw new HttpException('Failed to order apps', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async getForPlayer(uuid: string) {
-    if (!uuid) return [];
-    const result = await this.db.getDrizzle().execute(sql`
-        (SELECT sa.id, sa.url,  sa.name, sao.order as orden FROM rotom_apps sa
-          LEFT JOIN rotom_user_apps sao ON sa.id = sao.app_id
+    try {
+      if (!uuid) return [];
+      const result = await this.db.getDrizzle().execute(sql`
+        (SELECT sa.id, sa.url, sa.name, sao.order as orden FROM ${smartrotomApps} sa
+          LEFT JOIN ${smartrotomUserApps} sao ON sa.id = sao.app_id
           WHERE sao.uuid = ${uuid})
-          UNION ALL
-          (SELECT sa.id, sa.url,  sa.name, 999 as orden FROM rotom_apps sa
-            WHERE id NOT IN (
-              SELECT app_id FROM rotom_user_apps sao
-              WHERE sao.uuid = ${uuid}
-            )
+        UNION ALL
+        (SELECT sa.id, sa.url, sa.name, 999 as orden FROM ${smartrotomApps} sa
+          WHERE id NOT IN (
+            SELECT app_id FROM ${smartrotomUserApps} sao
+            WHERE sao.uuid = ${uuid}
           )
-          ORDER  BY orden ASC`);
+        )
+        ORDER BY orden ASC
+      `);
 
-    const apps = result[0] as unknown as App[];
-    return apps;
+      const apps = result[0] as unknown as SmartRotomApp[];
+      return apps;
+    } catch (error) {
+      throw new HttpException('Failed to get apps for player', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async findOne(id: number) {
-    const rows = await this.db.query
-    return rows[0];
+    try {
+      const result = await this.db.getDrizzle().select().from(smartrotomApps).where(eq(smartrotomApps.id, id));
+      return result[0];
+    } catch (error) {
+      throw new HttpException('Failed to find app', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async update(id: number, updateAppDto: UpdateAppDto) {
-    const [rows] = await this.db.getConnection().execute('UPDATE rotom_apps SET ? WHERE id = ?', [updateAppDto, id]);
-    return rows;
+    try {
+      const result = await this.db.getDrizzle().update(smartrotomApps).set(updateAppDto).where(eq(smartrotomApps.id, id));
+      return result[0];
+    } catch (error) {
+      throw new HttpException('Failed to update app', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async remove(id: number) {
-    const [rows] = await this.db.getConnection().execute('DELETE FROM rotom_apps WHERE id = ?', [id]);
-    return rows;
+    try {
+      const result = await this.db.getDrizzle().delete(smartrotomApps).where(eq(smartrotomApps.id, id));
+      return result[0];
+    } catch (error) {
+      throw new HttpException('Failed to remove app', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
