@@ -25,15 +25,16 @@ async function bootstrap() {
   console.log('EL PUERTO ES: ' + configService.get('PORT'));
 
   if (process.env.NODE_ENV !== 'production') {
+    /*
     const config = new DocumentBuilder()
       .setTitle('BoffMedia API')
       .setDescription('The BoffMedia API description')
       .setVersion('1.0')
       .build();
     const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);
+    SwaggerModule.setup('api', app, document);*/
 
-    /*
+    
     const config = new DocumentBuilder()
       .setTitle('BoffMedia API')
       .setDescription('The BoffMedia API description')
@@ -80,7 +81,7 @@ async function bootstrap() {
       document.components.schemas = sortedSchemas;
     }
   
-    SwaggerModule.setup('api', app, document);*/
+    SwaggerModule.setup('api', app, document);
   }
 
   await app.listen(34301);
