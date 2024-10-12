@@ -110,6 +110,22 @@ export function mcTimeToRealTime(mcTime: number): string {
   return `${padWithZeroes(hours, 2)}:${padWithZeroes(minutes, 2)}`;
 }
 
+export function mcTimeToRealTimeWithExtraDays(mcTime: number): string {
+  mcTime = (mcTime + 6000) % 24000;
+  if (mcTime < 0) {
+    mcTime += 24000;
+  }
+
+  const totalMinutes = mcTime * 6 / 100;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = Math.floor(totalMinutes % 60);
+
+  const days = Math.floor(hours / 24);
+  const daysTxt = days > 0 ? `(+${days} días)` : '';
+
+  return `${padWithZeroes(hours, 2)}:${padWithZeroes(minutes, 2)} ${daysTxt}`;
+}
+
 export function getClearTime(timeToClear: number, currentTime: number){
   let timeToClearInMC = (currentTime + timeToClear) % 24000;
   return mcTimeToRealTime(timeToClearInMC);
