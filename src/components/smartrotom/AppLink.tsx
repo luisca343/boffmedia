@@ -17,6 +17,7 @@ export function AppList() {
 
   useEffect(() => {
     rotomPOST('/apps/player',{uuid: session?.user?.smartRotomUser?.uuid}).then((res: App[]) => {
+      console.log(res);
       setApps(res);
     });
   }, [session?.user?.smartRotomUser?.uuid]);

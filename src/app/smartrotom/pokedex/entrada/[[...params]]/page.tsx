@@ -1,6 +1,5 @@
 import { rotomGET } from "@/services/boffAPI"
 import { Movement, Pokemon } from "../../_types/pokemon"
-import Link from "next/link"
 import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemonId, getPokemonNameAndForm } from "../../dexUtils"
 import { EvoTree } from "./_components/EvoTree"
 import { PokemonSprite } from "../../_components/PokemonSprite"

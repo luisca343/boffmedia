@@ -21,7 +21,7 @@ export function getStatusStyles(status: QuestStatus) {
 }
 
 export function getSkin(npcs: INPC[], dialogId: number) {
-  const npc = npcs.find(npc => npc.dialogId === dialogId)
+  const npc = npcs?.find(npc => npc.dialogId === dialogId)
   return npc ? npc.skin : "steve"
 }
 
