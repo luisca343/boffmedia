@@ -22,7 +22,7 @@ export function useGetDocuments(){
     }
 
     function createNote() {
-        rotomPOST(`/documents/create`, {title: "New Note", content: "", type: 0, userUuid: session?.user.smartRotomUser?.uuid})
+        rotomPOST(`/documents/create`, {title: "New Note", content: "", type: 0, uuid: session?.user.smartRotomUser?.uuid})
             .then((res) => {
                 if(res.id){
                     fetchDocuments()

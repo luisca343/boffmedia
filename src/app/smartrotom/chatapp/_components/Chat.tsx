@@ -59,7 +59,7 @@ export function Chat({
     }
 
     rotomPOST(`/chatapp/messages/${chat.id}`, {
-      mensaje: message,
+      message: message,
       uuid: getSmartRotomUser(session).uuid,
     }).then((res) => {
       setMessage("");

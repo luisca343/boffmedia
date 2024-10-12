@@ -85,7 +85,7 @@ function createSaveButton (data: any, props: {
         const documentId = props.documentId;
         const h1 = data.match(/<h1>(.*?)<\/h1>/);
         let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
-        rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, documentType: props.documentType })
+        rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, type: props.documentType })
             .then(() => {
                 console.log("SAVED SAVED SAVED");
                 console.log({ id: props.documentId, title, data });
