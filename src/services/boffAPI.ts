@@ -50,7 +50,12 @@ export async function request(method: string, url: string, data?: any) {
 
   try {
     const res = await fetch(url, options);
-    return await res.json();
+    const result = await res.json();
+    if(!result.data) {
+      console.log(`Query ${url} is not updated`);
+      return result;
+    }
+    return result.data;
   } catch (error) {
     console.error(`Error in request: ${(error as Error).message}`);
     throw error;
