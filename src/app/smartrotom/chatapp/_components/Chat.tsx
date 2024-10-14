@@ -67,15 +67,6 @@ export function Chat({
   }
 
   function call() {
-    /*
-        mcefQuery('startCall', {uuid: getSmartRotomUser(session).uuid, members: chat.members.join(',')})
-            .then((res: any) => {
-                if(res.error) return toast.error(res.error)
-            })
-            .finally(() => {
-                setActiveChat(0)
-            })*/
-
     rotomPOST(`/chatapp/call/${chat.id}`, {
       uuid: getSmartRotomUser(session).uuid,
     }).then((res) => {

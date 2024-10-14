@@ -8,9 +8,8 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { CabezaJugador } from "./CabezaMC";
-import { mcefQuery } from "@/services/mcefHelper";
-import { SmartRotomResponse } from "@/types";
 import { useBoffSession } from "@/services/useBoffSession";
+import { leaveCall, setCall } from "@/services/mcefApi";
 
 enum UserStatus {
   RINGING = "RINGING",
@@ -18,12 +17,12 @@ enum UserStatus {
   IDLE = "IDLE",
 }
 
-interface UserData {
+export interface UserData {
   uuid: string;
   status: UserStatus;
 }
 
-interface CallData {
+export interface CallData {
   users: UserData[];
   caller: string;
   chatId: string;
@@ -171,9 +170,13 @@ export function CallStatus() {
       user: getSmartRotomUser(session),
     });
 
-    mcefQuery("setCall", callData)
-      .then((response: unknown) => {
-        const smartRotomResponse = response as SmartRotomResponse;
+    setCall(callData)
+      .then((result) => {
+        if (result.error) {
+          console.error("Error setting call", result.error);
+          return;
+        }
+        const smartRotomResponse = result.data!;
         if (smartRotomResponse.status === 200) {
           console.log("Only one user in call, stopping sound");
         }
@@ -194,12 +197,16 @@ export function CallStatus() {
     });
     clearCall();
 
-    mcefQuery("leaveCall", activeCall)
-      .then((response: unknown) => {
-        const smartRotomResponse = response as SmartRotomResponse;
+    leaveCall(activeCall)
+      .then((result) => {
+        if (result.error) {
+          console.error("Error leaving call", result.error);
+          return;
+        }
+        const smartRotomResponse = result.data!;
         console.log("Leave Call:", smartRotomResponse);
       })
-      .catch((error) => console.error("Error setting call", error));
+      .catch((error) => console.error("Error leaving call", error));
   }
 
   if (!activeCall.caller) return null;

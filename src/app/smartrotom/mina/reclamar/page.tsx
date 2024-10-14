@@ -2,15 +2,14 @@
 
 import MenuWrapper from "../_components/MenuWrapper";
 import { rotomPOST } from "@/services/boffAPI";
-import { isMinecraft, mcefQuery } from "@/services/mcefHelper";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import {
   UnclaimedRewards,
   useGetUnclaimedRewards,
 } from "../_hooks/useGetUnclaimedRewards";
-import { Button } from "@/components/ui/button";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
+import { isMinecraft } from "@/services/mcefHelper";
 
 export default function Reclamar() {
   const { session, unclaimed, setUnclaimed, getBoxes } =
@@ -20,7 +19,7 @@ export default function Reclamar() {
 
   async function claimReward() {
     if (!session) return;
-    if (!(await isMinecraft())) {
+    if (!isMinecraft()) {
       toast.error("No estas en Minecraft");
       return;
     }

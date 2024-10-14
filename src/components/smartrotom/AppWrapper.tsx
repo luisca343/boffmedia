@@ -6,7 +6,7 @@ import { AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { signIn } from "next-auth/react";
-import { getDatosUsuarioMC, isMinecraft } from "@/services/mcefHelper";
+import { isMinecraft } from "@/services/mcefHelper";
 import { useEffect, useState } from "react";
 import AuthForm, { FormCenteredInPage } from "@/app/auth/AuthForm";
 import { LoadingScreen } from "./Loading";
@@ -14,6 +14,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CallStatus } from "./CallStatus";
 import { BoffSession } from "@/types";
+import { getMcUserData } from "@/services/mcefApi";
 
 
 export default function AppWrapper({
@@ -47,30 +48,34 @@ export default function AppWrapper({
      }*/
 
   useEffect(() => {
-    isMinecraft().then((res) => {
-      setIsMC(res);
-    });
+    const isSmart = isMinecraft();
+    setIsMC(isSmart);
 
     const fetchDatosUsuario = async () => {
-      if (typeof window !== "undefined") {
-        const data = (await getDatosUsuarioMC()) as {
-          username: string;
-          uuid: string;
-          world: string;
-        };
-
-        const response = await signIn("minecraft", {
-          redirect: false,
-          username: data.username,
-          uuid: data.uuid,
-          world: data.world,
-        });
-        if (response?.error) {
+      if (isSmart) {
+        const { data, error } = await getMcUserData();
+    
+        if (error) {
           setDatosUsuario(null);
           return;
         }
+    
+        if (data) {
+          const response = await signIn('minecraft', {
+            redirect: false,
+            username: data.username,
+            uuid: data.uuid,
+            world: data.world,
+          });
+    
+          if (response?.error) {
+            setDatosUsuario(null);
+            return;
+          }
+    
+          setDatosUsuario(data);
+        }
       } else {
-        console.log("No window");
         setDatosUsuario(null);
       }
     };

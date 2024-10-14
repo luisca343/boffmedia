@@ -1,9 +1,6 @@
 "use client"
-import { rotomGET } from "@/services/boffAPI";
-import { PokedexSection } from "../_components/PokedexSection";
 import { PossibleSpawns } from "../_components/PossibleSpawns";
-import { useEffect, useState } from "react";
-import { mcefQuery } from "@/services/mcefHelper";
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 

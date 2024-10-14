@@ -1,35 +1,31 @@
-"use client"
-import { mcefQuery } from '@/services/mcefHelper';
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { openPC } from "@/services/mcefApi";
 
 export default function PC() {
   const [salir, setSalir] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    console.log('test');
-    abrirPC();
+  const abrirPC = useCallback(async () => {
+    try {
+      await openPC();
+      setSalir(true);
+    } catch (err) {
+      console.error("Error opening PC:", err);
+      setSalir(true);
+    }
   }, []);
 
-  function abrirPC() {
-    mcefQuery('abrirPC', {})
-      .then((msg) => {
-        setSalir(true);
-      })
-      .catch((err) => {
-        setSalir(true);
-      });
-  }
-
   useEffect(() => {
+    abrirPC();
     if (salir) {
-      router.push('/smartrotom');
+      router.push("/smartrotom");
     }
-  }, [salir, router]);
+  }, [abrirPC, salir, router]);
 
   return (
-    <div className='pantalla pantallaPrincipal'>
+    <div className="pantalla pantallaPrincipal">
       {/* No need for Navigate component */}
     </div>
   );
