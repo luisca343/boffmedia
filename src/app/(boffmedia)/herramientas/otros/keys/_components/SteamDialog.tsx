@@ -20,7 +20,7 @@ interface ImprovedDialogProps {
   selectedGame: SteamGame | null;
 }
 
-export function SteamDialog({
+export default function SteamDialog({
   isModalVisible,
   setIsModalVisible,
   selectedGame,

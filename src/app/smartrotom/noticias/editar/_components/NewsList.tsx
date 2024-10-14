@@ -14,6 +14,8 @@ interface NewsListProps {
   publishedNewsIds: number[]
   featuredNewsId: number | null
   setSelectedNewsId: (id: number) => void
+  handlePublishToggle: (id: number) => void
+  handleFeaturedToggle: (id: number) => void
 }
 
 export default function NewsList({
@@ -21,6 +23,8 @@ export default function NewsList({
   publishedNewsIds,
   featuredNewsId,
   setSelectedNewsId,
+  handlePublishToggle,
+  handleFeaturedToggle,
 }: NewsListProps) {
   const [searchTerm, setSearchTerm] = useState('')
   const [filteredNews, setFilteredNews] = useState(news)
@@ -35,7 +39,7 @@ export default function NewsList({
 
   function handleNewsClick(id: number, event: React.MouseEvent) {
     const target = event.target as HTMLElement
-    if (target.tagName.toLowerCase() !== 'button') {
+    if (target.tagName.toLowerCase() !== 'input') {
       setSelectedNewsId(id)
     }
   }
@@ -67,6 +71,7 @@ export default function NewsList({
                   <Checkbox
                     id={`published-${item.id}`}
                     checked={publishedNewsIds.includes(item.id)}
+                    onCheckedChange={() => handlePublishToggle(item.id)}
                     className="mr-2 border-2 border-black"
                   />
                   <label
@@ -78,6 +83,7 @@ export default function NewsList({
                   <Checkbox
                     id={`featured-${item.id}`}
                     checked={item.id === featuredNewsId}
+                    onCheckedChange={() => handleFeaturedToggle(item.id)}
                     className="mr-2 border-2 border-black"
                   />
                   <label

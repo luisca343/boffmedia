@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense, lazy } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -10,24 +10,36 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import useGetKeys from "../_hooks/useGetKeys";
 import { motion, AnimatePresence } from "framer-motion";
 import { Gift, Key, ExternalLink } from "lucide-react";
+import useGetKeys from "../_hooks/useGetKeys";
 import useFetchSteamData from "../_hooks/useFetchSteamData";
-import { SteamDialog } from "./SteamDialog";
+const SteamDialog = lazy(() => import("./SteamDialog"));
 
 export default function KeysTable() {
   const { filteredKeys, filter, setFilter } = useGetKeys();
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [showClaimed, setShowClaimed] = useState<boolean>(false);
-  const { selectedGame, isModalVisible, setIsModalVisible, fetchGameData } =
-    useFetchSteamData();
+  const { selectedGame, isModalVisible, setIsModalVisible, fetchGameData } = useFetchSteamData();
 
   if (!filteredKeys) return <div>Loading...</div>;
 
   const displayedKeys = showClaimed
     ? filteredKeys
     : filteredKeys.filter((key) => key.claimed !== "s");
+
+  // Aggregate keys by game name and activation state
+  const aggregatedKeys = displayedKeys.reduce((acc: { [key: string]: any }, key) => {
+    const keyIdentifier = `${key.name}-${key.claimed}`;
+    if (!acc[keyIdentifier]) {
+      acc[keyIdentifier] = { ...key, count: 1 };
+    } else {
+      acc[keyIdentifier].count += 1;
+    }
+    return acc;
+  }, {});
+
+  const aggregatedKeysArray = Object.values(aggregatedKeys);
 
   return (
     <div className="min-h-screen text-gray-100 p-8">
@@ -92,9 +104,9 @@ export default function KeysTable() {
             </TableHeader>
             <TableBody>
               <AnimatePresence>
-                {displayedKeys.map((key) => (
+                {aggregatedKeysArray.map((key, index) => (
                   <motion.tr
-                    key={key.name}
+                    key={`${key.name}-${key.claimed}`}
                     className="hover:bg-gray-700 transition-colors duration-200 cursor-pointer"
                     onMouseEnter={() => setHoveredRow(key.name)}
                     onMouseLeave={() => setHoveredRow(null)}
@@ -105,7 +117,7 @@ export default function KeysTable() {
                     transition={{ duration: 0.3 }}
                   >
                     <TableCell className="font-medium text-gray-300">
-                      {displayedKeys.indexOf(key) + 1}
+                      {index + 1}
                     </TableCell>
                     <TableCell>
                       <img
@@ -118,7 +130,7 @@ export default function KeysTable() {
                       <div className="flex items-center gap-2">
                         <Gift className="w-5 h-5 text-orange-400" />
                         <span className="flex items-center gap-1 text-gray-100">
-                          {key.name}
+                          {key.name} {key.count > 1 && `x${key.count}`}
                         </span>
                         <a
                           href={`https://store.steampowered.com/app/${key.steamID}`}
@@ -152,11 +164,13 @@ export default function KeysTable() {
         </motion.div>
       </div>
 
-      <SteamDialog
-        isModalVisible={isModalVisible}
-        setIsModalVisible={setIsModalVisible}
-        selectedGame={selectedGame}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <SteamDialog
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+          selectedGame={selectedGame}
+        />
+      </Suspense>
     </div>
   );
 }
