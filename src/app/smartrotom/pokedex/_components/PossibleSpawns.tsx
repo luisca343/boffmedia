@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { PokemonSpriteLink } from "./PokemonSprite";
 import useTranslation from "next-translate/useTranslation";
-import { getSpawns } from "@/services/mcefApi";
+import { getSpawns } from "@/services/mcef/mcefApi";
 
 export type PossibleSpawn = {
   dex: number;

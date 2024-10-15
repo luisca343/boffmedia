@@ -6,7 +6,7 @@ import { AlertTriangle } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { signIn } from "next-auth/react";
-import { isMinecraft } from "@/services/mcefHelper";
+import { isMinecraft } from "@/services/mcef/mcefHelper";
 import { useEffect, useState } from "react";
 import AuthForm, { FormCenteredInPage } from "@/app/auth/AuthForm";
 import { LoadingScreen } from "./Loading";
@@ -14,7 +14,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CallStatus } from "./CallStatus";
 import { BoffSession } from "@/types";
-import { getMcUserData } from "@/services/mcefApi";
+import { getMcUserData } from "@/services/mcef/mcefApi";
 
 
 export default function AppWrapper({

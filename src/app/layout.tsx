@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { FicusNav } from "@/components/nav/FicusNav";
+import FicusNav  from "@/components/nav/FicusNav";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalProviders } from "./GlobalProviders";

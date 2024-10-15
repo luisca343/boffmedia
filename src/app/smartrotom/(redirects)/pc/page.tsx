@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { openPC } from "@/services/mcefApi";
+import { openPC } from "@/services/mcef/mcefApi";
 
 export default function PC() {
   const [salir, setSalir] = useState(false);

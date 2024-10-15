@@ -9,7 +9,7 @@ import {
   useGetUnclaimedRewards,
 } from "../_hooks/useGetUnclaimedRewards";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
-import { isMinecraft } from "@/services/mcefHelper";
+import { isMinecraft } from "@/services/mcef/mcefHelper";
 
 export default function Reclamar() {
   const { session, unclaimed, setUnclaimed, getBoxes } =

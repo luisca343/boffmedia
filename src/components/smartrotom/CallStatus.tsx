@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { CabezaJugador } from "./CabezaMC";
 import { useBoffSession } from "@/services/useBoffSession";
-import { leaveCall, setCall } from "@/services/mcefApi";
+import { leaveCall, setCall } from "@/services/mcef/mcefApi";
 
 enum UserStatus {
   RINGING = "RINGING",
