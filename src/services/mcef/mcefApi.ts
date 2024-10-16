@@ -5,7 +5,7 @@ import { CallData } from '@/components/smartrotom/CallStatus';
 import { SmartRotomResponse } from '@/types';
 
 export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string }>> {
-    const result = await mcefQuery<{ username: string; uuid: string; world: string }>('getUserData');
+    const result = await mcefQuery<{ username: string; uuid: string; world: string }>('GET_USER_DATA');
     if (result.error) {
         console.error('Error fetching user data:', result.error);
     } else {
@@ -15,7 +15,7 @@ export async function getMcUserData(): Promise<QueryResult<{ username: string; u
 }
 
 export async function openPC(): Promise<void> {
-    const result = await mcefQuery<void>('openPC', {});
+    const result = await mcefQuery<void>('OPEN_PC', {});
     if (result.error) {
         console.error('Error in openPC:', result.error);
         throw new Error(result.error);
@@ -23,7 +23,7 @@ export async function openPC(): Promise<void> {
 }
 
 export async function getSpawns(): Promise<QueryResult<PossibleSpawn[]>> {
-    const result = await mcefQuery<PossibleSpawn[]>('getSpawns');
+    const result = await mcefQuery<PossibleSpawn[]>('GET_SPAWNS');
     if (result.error) {
         return { data: getSpawnsPlaceholder, status: 200 };
     } 
@@ -32,7 +32,7 @@ export async function getSpawns(): Promise<QueryResult<PossibleSpawn[]>> {
 }
 
 export async function setCall(callData: CallData): Promise<QueryResult<SmartRotomResponse>> {
-    const result = await mcefQuery<SmartRotomResponse>('setCall', {...callData});
+    const result = await mcefQuery<SmartRotomResponse>('SET_CALL', {...callData});
     if (result.error) {
         console.error('Error setting call:', result.error);
     }
@@ -40,7 +40,7 @@ export async function setCall(callData: CallData): Promise<QueryResult<SmartRoto
 }
 
 export async function leaveCall(callData: CallData): Promise<QueryResult<SmartRotomResponse>> {
-    const result = await mcefQuery<SmartRotomResponse>('leaveCall', {...callData});
+    const result = await mcefQuery<SmartRotomResponse>('LEAVE_CALL', {...callData});
     if (result.error) {
         console.error('Error leaving call:', result.error);
     }
