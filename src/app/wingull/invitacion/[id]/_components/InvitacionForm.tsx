@@ -63,7 +63,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 relative">
       <BackgroundDecorations />
-      <Card className="w-full max-w-3xl shadow-xl bg-blue-800 bg-opacity-70 text-white rounded-xl overflow-hidden relative z-10">
+      <Card className="w-full max-w-4xl shadow-xl bg-blue-800 bg-opacity-70 text-white rounded-xl overflow-hidden relative z-10">
         <CardHeader className="border-b border-blue-700">
           <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-bold text-yellow-300">Invitación: Plan de Desarrollo de Teras</CardTitle>
