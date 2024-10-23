@@ -29,16 +29,18 @@ export class AppsService {
     }
   }
 
-  async order(order: { id: number, order: number }[], uuid: string) {
+  async order(order: { id: number | string, order: number }[], uuid: string) {
     try {
       await this.db.getDrizzle().delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
 
-      const values = order.map((app) => ({ uuid, appId: app.id, order: app.order }));
+      const values = order
+        .filter((app) => typeof app.id === 'number')
+        .map((app) => ({ uuid, appId: app.id, order: app.order })) as { uuid: string, appId: number, order: number }[];
       const insert = await this.db.getDrizzle().insert(smartrotomUserApps).values(values);
 
       return { insert };
     } catch (error) {
-      throw new HttpException('Failed to order apps', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 

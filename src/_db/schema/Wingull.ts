@@ -6,7 +6,7 @@ export const wingullInvites = mysqlTable("wingull_invites", {
     uuid: varchar("uuid", { length: 36 }).notNull(),
     username: varchar("username", { length: 32 }).notNull(),
     createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
-    usedAt: datetime("used_at").default(sql`CURRENT_TIMESTAMP()`),
+    usedAt: datetime("used_at"),
     deletedAt: datetime("deleted_at")
 }); 
 
