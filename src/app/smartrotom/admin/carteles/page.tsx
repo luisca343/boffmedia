@@ -10,9 +10,15 @@ import { ArrowDown, ArrowLeft, ArrowRight, Plus, Minus, Copy, Check } from 'luci
 import HighwaySign from './_components/HighwaySign'
 import GlitchStyles from '../_components/GlitchStyles'
 
+interface Destination {
+  name: string;
+  distance: string;
+  direction: "down" | "left" | "right";
+}
+
 export default function CartelesAutopista() {
   const [highway, setHighway] = useState('')
-  const [destinations, setDestinations] = useState([{ name: '', distance: '', direction: 'down' }])
+  const [destinations, setDestinations] = useState<Destination[]>([{ name: '', distance: '', direction: 'down' }])
   const [signUrl, setSignUrl] = useState('')
   const [copied, setCopied] = useState(false)
 
@@ -55,7 +61,7 @@ export default function CartelesAutopista() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-black text-green-400 font-mono p-4">
+    <div className="w-full min-h-full bg-black text-green-400 font-mono p-4">
       <h1 className="text-3xl font-bold mb-6 text-center text-green-500 uppercase tracking-widest glitch" style={{textShadow: '2px 2px #00ff00, -2px -2px #0000ff'}}>
         Generador de Señales de Carretera
       </h1>
@@ -169,10 +175,9 @@ export default function CartelesAutopista() {
           <CardTitle className="text-green-400">Vista Previa</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="border border-green-500">
-            <HighwaySign highway={highway} destinations={destinations} width={250} height={200} />
+          <div className=" flex justify-center">
+            <HighwaySign highway={highway} destinations={destinations} width={500} height={300} />
           </div>
-          <p className="text-sm text-green-600 mt-2">Esta vista previa muestra valores predeterminados para los campos vacíos. La imagen final solo incluirá la información que proporciones.</p>
         </CardContent>
       </Card>
       <GlitchStyles />
