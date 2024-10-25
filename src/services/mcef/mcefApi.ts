@@ -46,3 +46,11 @@ export async function leaveCall(callData: CallData): Promise<QueryResult<SmartRo
     }
     return result;
 }
+
+export async function sendChatMessage(message: string): Promise<QueryResult<SmartRotomResponse>> {
+    const result = await mcefQuery<SmartRotomResponse>('CHAT_MESSAGE', { message });
+    if (result.error) {
+        console.error('Error sending chat message:', result.error);
+    }
+    return result;
+}
