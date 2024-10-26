@@ -1,6 +1,7 @@
 import { MovingSection } from "./_components/MovingSection";
 import { BackgroundDecorations } from "./_components/BackgroundDecorations";
 import Image from "next/image";
+import Footer from "./_components/Footer";
 
 export default function Page() {
   return (
@@ -48,13 +49,7 @@ export default function Page() {
         </div>
         <MovingSection />
       </main>
-      <footer className="bg-blue-900 bg-opacity-80 py-6 mt-auto border-t border-blue-300">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-blue-200">
-            &copy; 2024 Pixelmon Wingull. Todos los derechos reservados.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
