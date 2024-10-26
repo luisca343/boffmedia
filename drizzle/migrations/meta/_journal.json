@@ -2,5 +2,12 @@
   "version": "5",
   "dialect": "mysql",
   "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1729953582352,
+      "tag": "0000_typical_steel_serpent",
+      "breakpoints": true
+    }
   ]
 }
