@@ -24,7 +24,7 @@ export class AppService {
     private db: MySQL2Service,
     private pokemonService: PokemonService,
   ) {
-    //db.migrar();
+    db.migrar();
     pokemonService.loadData();
     this.loadCache();
   }
