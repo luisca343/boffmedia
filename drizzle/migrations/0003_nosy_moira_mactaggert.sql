@@ -1,1 +1,0 @@
-ALTER TABLE `rotom_user_achievements` ADD PRIMARY KEY(`achievement_id`,`uuid`);

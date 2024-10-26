@@ -1,1 +1,0 @@
-ALTER TABLE `wingull_invites` MODIFY COLUMN `used_at` datetime;

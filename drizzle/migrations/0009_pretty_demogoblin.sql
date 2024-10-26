@@ -1,1 +1,0 @@
-ALTER TABLE `discord_users` ADD `tts_voice` varchar(32) DEFAULT 'Enrique';

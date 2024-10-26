@@ -1,1 +1,0 @@
-ALTER TABLE `rotom_user_achievements` ADD `data` text DEFAULT (null);
