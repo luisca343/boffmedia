@@ -1,4 +1,4 @@
-import { Translate } from "next-translate"
+
 
 export const missionTypes = [
     {name: "RESCUE_CLIENT", mainType: 0, specialType: 0, clientIsTarget: true},
@@ -79,7 +79,7 @@ export const missionTypes = [
     }[]
 }[]
 
-export function getQuestData(commonTrans: Translate): { label: string, value: string, specialType?: number, subTypes?: { label: string, value: number, specialFloor?: number }[] }[] {
+export function getQuestData(commonTrans: (key: string) => string): { label: string, value: string, specialType?: number, subTypes?: { label: string, value: number, specialFloor?: number }[] }[] {
     return missionTypes.map((type) => {
         return { 
             label: commonTrans(`questTypes.${type.name}`), 
@@ -90,7 +90,7 @@ export function getQuestData(commonTrans: Translate): { label: string, value: st
     })
 }
 
-export function getSubQuestData(mainType: number, commonTrans: Translate): { label: string, value: string, specialFloor?: number }[] {
+export function getSubQuestData(mainType: number, commonTrans: (key: string) => string): { label: string, value: string, specialFloor?: number }[] {
     const type = missionTypes.find((type) => type.mainType === mainType)
     if (!type || !type.subTypes) return []
     
@@ -143,7 +143,7 @@ const rewardTypes = [
 
 ]
 
-export function getRewardTypes(commonTrans: Translate): { label: string, value: string, item?: boolean }[] {
+export function getRewardTypes(commonTrans: (key: string) => string): { label: string, value: string, item?: boolean }[] {
     return rewardTypes.map((type) => {
         return { label: commonTrans(`rewardTypes.${type.name}`)
             , value: type.value.toString(), item: type.item }

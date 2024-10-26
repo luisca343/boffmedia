@@ -3,6 +3,8 @@ import MenuWrapper from "../_components/MenuWrapper";
 
 export default async function Ranking() {
   const ranking = (await rotomGET("/mine/ranking")) as any[];
+
+  if(!ranking) return <></>
   return (
     <MenuWrapper className="w-full h-screen overflow-hidden bg-gray-900 text-white pt-4  flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl ">
@@ -16,13 +18,15 @@ export default async function Ranking() {
             </tr>
           </thead>
           <tbody>
-            {ranking?.map((user: any, i: number) => (
+            {/* 
+            {ranking.map((user: any, i: number) => (
               <tr key={i} className="border-b border-gray-600">
                 <td className="py-2 text-center">{i + 1}</td>
                 <td className="py-2 text-center">{user.username}</td>
                 <td className="py-2 text-center">{user.value}</td>
               </tr>
             ))}
+            */}
           </tbody>
         </table>
       </div>

@@ -12,6 +12,7 @@ export default async function Drops() {
     drops: DropByType;
     totalValue: number;
   };
+  if(!drops) return <></>
   return (
     <MenuWrapper className="w-full min-h-full overflow-hidden bg-gray-900 text-white pt-4   flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-full">
