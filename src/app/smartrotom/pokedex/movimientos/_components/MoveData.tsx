@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import TypeBadge from "../../entrada/[[...params]]/_components/TypeBadge";
 import { MoveData, MoveEffect } from "./MoveEffect";
 import { rotomGET } from "@/services/boffAPI";
-import useTranslation from 'next-translate/useTranslation'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
+import { useTranslations } from "next-intl";
 
 export default function MoveDataElement({id} : {id: string}){
-    const { t:movesTrans } = useTranslation("smartrotom/pokedex/moves")
+    const movesTrans  = useTranslations("");
     const [move, setMove] = useState() as [MoveData, any]
 
     useEffect(() => {

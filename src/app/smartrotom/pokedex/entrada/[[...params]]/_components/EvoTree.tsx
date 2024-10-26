@@ -1,7 +1,6 @@
 import { rotomGET } from "@/services/boffAPI"
 import { ArrowRightCircleIcon } from "lucide-react"
 import getPokemonSprite, { getItemSprite, getPokemonName } from "../../../dexUtils"
-import useTranslation from 'next-translate/useTranslation'
 import Image from "next/image"
 import { Evolution } from "@/types/Pokemon"
 import { ItemSprite, PokemonSprite } from "../../../_components/PokemonSprite"
@@ -9,15 +8,17 @@ import Link from "next/link"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import React from "react"
 import { InternalLink } from "@/components/nav/Link"
+import { useTranslations } from "next-intl"
+import { getTranslations } from "next-intl/server"
 
 
 
 export async function EvoTree({params}: {params: {id: string}}){
     const {tree, depth} = await rotomGET(`/pokemon/evotree/${params.id}`)
-    const { t } = useTranslation("smartrotom/pokedex/forms")
-    const { t: evoTrans } = useTranslation("smartrotom/pokedex/common")
-    const { t:biomeTrans } = useTranslation("smartrotom/pokedex/spawns")
-    const { t:moveTrans } = useTranslation("smartrotom/pokedex/moves")
+    const t  = await getTranslations("");
+    const evoTrans  = await getTranslations("");
+    const biomeTrans  = await getTranslations("");
+    const moveTrans  = await getTranslations("");
 
     function renderTree2(tree: any){
         return <div className=" h-full flex-col justify-center items-center  rounded-lg m-2" >

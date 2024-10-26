@@ -6,6 +6,9 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalProviders } from "./GlobalProviders";
 
+import {NextIntlClientProvider} from 'next-intl';
+import {getLocale, getMessages} from 'next-intl/server';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -13,11 +16,14 @@ export const metadata: Metadata = {
   description: "BoffMedia",
 };
 
-export default function RootLayout({
+export default async  function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+  
   return (
     <GlobalProviders>
       <html lang="en">
@@ -27,7 +33,9 @@ export default function RootLayout({
           <ToastContainer position="bottom-right" theme="dark" />
           <FicusNav />
           <section className="overflow-auto border-solid no-scrollbar flex-1">
-            {children}
+            <NextIntlClientProvider messages={messages}>
+              {children}
+            </NextIntlClientProvider>
           </section>
         </body>
       </html>

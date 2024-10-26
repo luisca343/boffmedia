@@ -2,7 +2,6 @@ import { LastRegistries } from "./_components/LastRegistries";
 import MenuHeader from "./_components/MenuHeader";
 import { PokedexSection } from "./_components/PokedexSection";
 import PokemonSearchBar from "./_components/PokemonSearchBar";
-import useTranslation from 'next-translate/useTranslation'
 import { PossibleSpawns } from "./_components/PossibleSpawns";
 import Link from "next/link";
 import { InternalLink } from "@/components/nav/Link";

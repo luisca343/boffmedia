@@ -106,7 +106,7 @@
   "attack_ember_description": "Ataca con llamas pequeñas que pueden causar quemaduras.",
   "attack_expanding_force": "Vasta fuerza",
   "attack_expanding_force_description": "El usuario ataca al objetivo con su fuerza psíquica. La potencia de este movimiento aumenta y daña a todos los Pokémon oponentes en presencia de un campo psíquico.",
-  "attack_expanding_force.onpsychicterrain": "¡El rango de Vasta fuerza se ve incrementado debido al tipo de terreno!",
+  "attack_expanding_force_onpsychicterrain": "¡El rango de Vasta fuerza se ve incrementado debido al tipo de terreno!",
   "attack_explosion": "Explosión",
   "attack_explosion_description": "El usuario explota para causar daños a los objetivos a su alrededor. Se confunde al usar este movimiento.",
   "attack_fire_blast": "Llamarada",

@@ -1,11 +1,11 @@
 "use client"
 import { rotomGET } from "@/services/boffAPI";
 import { PokemonSprite } from "../../_components/PokemonSprite";
-import useTranslation from 'next-translate/useTranslation'
 import { PossibleSpawns, PossibleSpawnsSection } from "../../_components/PossibleSpawns";
 import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { useTranslations } from "next-intl";
 
 export default function Localizacion({params} : {params: {id: string}}){
     const { id } = params;
@@ -24,7 +24,7 @@ export default function Localizacion({params} : {params: {id: string}}){
     }, [id])
 
 
-    const {t: spawnsTranslation} = useTranslation("smartrotom/pokedex/spawns")
+    const spawnsTranslation  = useTranslations("");
     
     if(!pokemon) return <h1>404</h1>
     return(

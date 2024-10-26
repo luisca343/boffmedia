@@ -1,11 +1,11 @@
 import { ActiveTeam as ActiveTeamType } from "@/types/Pokemon";
 import { PokemonSprite } from "../../pokedex/_components/PokemonSprite";
 import { Table } from "@/components/ui/table";
-import useTranslation from 'next-translate/useTranslation'
+import { useTranslations } from "next-intl";
 
 export default function ActiveTeam({team, className}: {team: ActiveTeamType, className?: string}){
-    const { t: movesTrans } = useTranslation("smartrotom/pokedex/moves")
-    const { t: abilitiesTrans } = useTranslation("smartrotom/pokedex/abilities")
+    const movesTrans  = useTranslations("");
+    const abilitiesTrans  = useTranslations("");
     
     return(
         <div className={`font-vinque flex flex-col justify-around  h-[90%] w-full ${className}`}>

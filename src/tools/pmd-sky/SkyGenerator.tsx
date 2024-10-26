@@ -10,7 +10,6 @@ import { generateWonderMail } from "./Generate";
 import { Combobox } from "@/components/ui/combobox";
 import { getItemData } from "./ItemData";
 
-import useTranslation from "next-translate/useTranslation";
 import {
   getClientIsTarget,
   getForceClient,
@@ -20,11 +19,12 @@ import {
   getUseTargetItem,
   givesItem,
 } from "./QuestData";
+import { useTranslations } from "next-intl";
 
 export function SkyGenerator() {
   const [wonderMail, setWonderMail] = useState("");
-  const { t: dungeonsTrans } = useTranslation("tools/pmdsky/dungeons");
-  const { t: commonTrans } = useTranslation("tools/pmdsky/common");
+  const dungeonsTrans  = useTranslations("");
+  const commonTrans  = useTranslations("");
 
   const { formData, targetAvailable, setFormData, setTargetAvailable } =
     useFormStore();

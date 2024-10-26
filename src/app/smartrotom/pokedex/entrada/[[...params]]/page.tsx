@@ -4,7 +4,6 @@ import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemo
 import { EvoTree } from "./_components/EvoTree"
 import { PokemonSprite } from "../../_components/PokemonSprite"
 import { TypeTable } from "./_components/TypeTable"
-import useTranslation from 'next-translate/useTranslation'
 import TypeBadge from "./_components/TypeBadge"
 import { StatsTable } from "./_components/StatsTable"
 import { EntryHeader } from "./_components/EntryHeader"
@@ -15,10 +14,11 @@ import { Abilities, GenderProperties } from "@/types/Pokemon"
 import { PokedexSection } from "../../_components/PokedexSection"
 import { InternalLink } from "@/components/nav/Link"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { getTranslations } from "next-intl/server"
 
 
 export default async function EntradaPokedex({params}: any){
-    const { t: formsTranslation } = useTranslation("smartrotom/pokedex/forms")
+    const formsTranslation  = await getTranslations("");
     
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
 

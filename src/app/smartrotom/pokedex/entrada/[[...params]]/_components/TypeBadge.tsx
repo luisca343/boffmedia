@@ -1,4 +1,5 @@
-import useTranslation from 'next-translate/useTranslation'
+import { useTranslations } from "next-intl";
+
 
 const colors = {
     normal: { backgroundColor: "#9fa19f", textColor: "black" },
@@ -25,7 +26,7 @@ const colors = {
 } as {[key: string]: {backgroundColor: string, textColor: string}}
 
 export default function TypeBadge({type}: {type: string}){
-    const { t } = useTranslation("smartrotom/pokedex/common")
+    const t  = useTranslations("");
     const typeColors = colors[type.toLowerCase()];
     return <div className={` m-1 h-8 w-32 font-bold text-xl 2xl:text-base min-w-28 flex flex-row items-center  text-main-50 bg-${type.toLowerCase()} pl-2 pr-2 rounded text-shadow-border2 2xl:text-shadow-border1`} 
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>
@@ -36,7 +37,7 @@ export default function TypeBadge({type}: {type: string}){
 
 
 export function TypeBadgeSmall({type}: {type: string}){
-    const { t } = useTranslation("smartrotom/pokedex/common")
+    const t  = useTranslations("");
     const typeColors = colors[type.toLowerCase().trim()];
     return <div className={` m-1 h-6 font-bold text-xs w-16 flex flex-row items-center  text-main-50 bg-${type.toLowerCase().trim()} pl-1 pr-1 rounded text-shadow-border1`} 
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>

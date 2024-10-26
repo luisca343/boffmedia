@@ -4,8 +4,11 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getPokemonNameAndForm } from "../../../dexUtils";
 import { Pokemon } from "@/types/Pokemon";
 import { InternalLink } from "@/components/nav/Link";
+import { useTranslations } from "next-intl";
 
-export function EntryHeader({pokemon, formName, prev, next, t} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}, t: any}) {
+export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}}) {
+    
+    const t  = useTranslations("");
     return <header className="flex flex-col bg-main-950 text-main-50 h-24 z-10 p-2 text-xl 2xl:text-lg" >
         <div className="w-full flex flex-1 justify-between items-center">
             <InternalLink className="flex flex-row  items-center hover:text-primary-400" 

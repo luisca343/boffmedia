@@ -2,8 +2,8 @@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { rotomGET } from "@/services/boffAPI";
 import MoveDataElement from "./_components/MoveData";
-import useTranslation from 'next-translate/useTranslation'
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface Move {
     name: string;
@@ -12,7 +12,7 @@ interface Move {
 
 export default function Movimientos() {
     const [moves, setMoves] = useState<Move[] | null>(null);
-    const { t } = useTranslation("smartrotom/pokedex/moves");
+    const t  = useTranslations("");
 
     useEffect(() => {
         rotomGET('/pokemon/moves').then((res) => {

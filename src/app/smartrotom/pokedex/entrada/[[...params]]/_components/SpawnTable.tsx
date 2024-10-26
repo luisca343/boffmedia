@@ -1,13 +1,13 @@
 import { TableBody } from "@/components/ui/table";
 import { SpawnInfo } from "../../../_types/spawnInfo";
-import useTranslation from 'next-translate/useTranslation'
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 import { PokemonSprite } from "../../../_components/PokemonSprite";
 import { InternalLink } from "@/components/nav/Link";
+import { useTranslations } from "next-intl";
 
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
-    const { t } = useTranslation("smartrotom/pokedex/spawns")
-    const { t: formsTrans } = useTranslation("smartrotom/pokedex/forms")
+    const t  = useTranslations("");
+    const formsTrans  = useTranslations("");
     if(spawns.length == 0) return <div className="  text-main-50 text-shadow-border1 flex justify-center ">
     <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
         Este Pokémon no spawnea

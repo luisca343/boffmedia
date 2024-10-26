@@ -1,11 +1,11 @@
 
-import useTranslation from 'next-translate/useTranslation'
 import { Table, TableRow, TableHeader, TableCell, TableBody, TableHead, TableFooter } from "@/components/ui/table"
 import { BattleStats, EvYields, Pokemon } from '@/types/Pokemon'
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader,PokedexRow } from '../../../_components/PokedexTable'
+import { useTranslations } from "next-intl";
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number }){
-    const { t } = useTranslation("smartrotom/pokedex/common")
+  const t  = useTranslations("");
     const stats = pokemon.forms[formIndex].battleStats ? pokemon.forms[formIndex].battleStats : pokemon.forms[0].battleStats as BattleStats
     if(!stats) return <h1>Stats not found</h1>
     let evYields = pokemon.forms[formIndex].evYields ? pokemon.forms[formIndex].evYields : pokemon.forms[0].evYields as EvYields 

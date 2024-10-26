@@ -39,7 +39,7 @@ export function getPokemonNameAndForm(name: string, form: string, t: any){
 }
 
 export function getForm(form: string, t: any){
-    return t(`form_${form || 'base'}`)
+    return (`form_${form || 'base'}`)
 }
 
 export function getFormIndex(pokemon: Pokemon, formName: string){

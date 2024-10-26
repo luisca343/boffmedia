@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { PokemonSpriteLink } from "./PokemonSprite";
-import useTranslation from "next-translate/useTranslation";
 import { getSpawns } from "@/services/mcef/mcefApi";
+import { useTranslations } from "next-intl";
 
 export type PossibleSpawn = {
   dex: number;
@@ -20,7 +20,7 @@ export function PossibleSpawnsSection({
   hideSeen = true,
   title,
 }: {
-  pokemonSpawns?: PossibleSpawn[];
+  pokemonSpawns?: any;
   hideCaught?: boolean;
   hideSeen?: boolean;
   title: string;
@@ -72,7 +72,7 @@ export function PossibleSpawns({
   hideSeen?: boolean;
   id?: string;
 }) {
-  const { t } = useTranslation("smartrotom/pokedex/forms");
+  const t  = useTranslations("");
   const [spawns, setSpawns] = useState<PossibleSpawn[]>();
   useEffect(() => {
     if (pokemonSpawns && pokemonSpawns.length > 0) {

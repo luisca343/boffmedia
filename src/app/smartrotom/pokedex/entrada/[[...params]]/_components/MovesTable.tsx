@@ -3,13 +3,13 @@ import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
 import { LevelUpMove, Moves, Pokemon } from "@/types/Pokemon";
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 
-import useTranslation from 'next-translate/useTranslation'
 import TypeBadge from "./TypeBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import MoveDataElement from "../../../movimientos/_components/MoveData";
+import { useTranslations } from "next-intl";
 
 export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?: boolean, moveData?: any}){
-    const { t } = useTranslation("smartrotom/pokedex/moves")
+    const t  = useTranslations("");
     let sortedMoves = {} as {[key: string]: any[]}
     Object.entries(moves).forEach(([key, value]: [string, any]) => {
         if(key === 'levelUpMoves') {
@@ -118,7 +118,8 @@ export function OtherMovesTable({pokemon, formIndex, moveData}: {pokemon: Pokemo
 
     Object.keys(moves).forEach((key) => {
         if(key !== 'levelUpMoves') {
-            movesList[key] = moves[key]
+            // @ts-ignore
+            movesList[key] = moves[key] 
         }
     })
     

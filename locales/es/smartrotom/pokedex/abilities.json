@@ -1,5 +1,5 @@
 {
-    "ability_Adaptability": "Adaptable",
+  "ability_Adaptability": "Adaptable",
   "ability_Adaptability_description": "Potencia los movimientos del mismo tipo.",
   "ability_Aerilate": "Piel Celeste",
   "ability_Aerilate_description": "Cambia el tipo de los movimientos de tipo normal por tipo volador.",
@@ -106,7 +106,7 @@
   "ability_Download": "Descarga",
   "ability_Download_description": "Ajusta el poder acorde con la habilidad del rival.",
   "ability_DragonsMaw": "Mandíbula dragón",
-  "ability_DragonsMaw.discription": "Potencia los movimientos de tipo Dragón.",
+  "ability_DragonsMaw_description": "Potencia los movimientos de tipo Dragón.",
   "ability_Drizzle": "Llovizna",
   "ability_Drizzle_description": "Cambia el clima a lluvioso en batalla.",
   "ability_Drought": "Sequía",

@@ -20,9 +20,9 @@ import {
 } from "lucide-react";
 import Fuse from "fuse.js";
 import { useGetWordlePokemon } from "../_hooks/useGetWordlePokemon";
-import useTranslation from "next-translate/useTranslation";
 import StarsBackground from "../../_components/StarsBackground";
 import {RainbowText} from "../../_components/RainbowText";
+import {useTranslations} from 'next-intl';
 
 type Pokemon = {
   name: string;
@@ -42,7 +42,7 @@ const TypeBadge = ({
     type: string;
     status: "possible" | "incorrect" | "correct" | "present";
   }) => {
-    const { t: commonTrans } = useTranslation("smartrotom/pokedex/common");
+    const commonTrans = useTranslations("");
   
     return (
       <span
@@ -92,8 +92,8 @@ export default function RetroPokemonGuesser() {
     const [suggestions, setSuggestions] = useState<Pokemon[]>([]);
     const [gameOver, setGameOver] = useState(false);
     const [isDoubleType, setIsDoubleType] = useState<boolean | null>(null);
-    const { t: formsTrans } = useTranslation("smartrotom/pokedex/forms");
-    const { t: commonTrans } = useTranslation("smartrotom/pokedex/common");
+    const formsTrans =  useTranslations("");
+    const commonTrans = useTranslations("");
   
     const { pokemonData, allTypes, targetPokemon } = useGetWordlePokemon();
   

@@ -1,9 +1,10 @@
 import { InternalLink } from "@/components/nav/Link"
 import { rotomGET } from "@/services/boffAPI"
-import useTranslation from 'next-translate/useTranslation'
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 export default async function Biomas(){
-    const {t: spawnsTranslation} = useTranslation("smartrotom/pokedex/spawns")
+    const spawnsTranslation  = await getTranslations("");
     const biomes = await rotomGET('/pokemon/biomes') as Record<string, number>
     //<h3>{biome.name} - {biome.amount}</h3>
     return(
