@@ -23,8 +23,11 @@
 
     "palette_shiny2": "Terashiny",
     
+    "Forms": {
+
+    },
     
-    "form": "{{pokemon}} {{form}}",
+    "form": "{pokemon} {form}",
     "form_mega": "Mega",
     "form_terasmega": "de Teras Mega",
     "form_megax": "Mega X",
