@@ -1,5 +1,6 @@
 
 "use client"
+import { isMinecraft } from "@/services/mcef/mcefHelper";
 import { useBoffSession } from "@/services/useBoffSession";
 import { signIn, signOut } from "next-auth/react";
 
@@ -8,6 +9,7 @@ export function SettingsPage({ setTema } : { setTema: (tema: string) => void}){
 
     return (
         <div>
+            <span>Device: {isMinecraft() ? "SmartRotom" : "Browser"}</span>
             <div className="flex flex-col p-2 bg-primary-500 text-main-50 ">
                 <button onClick={() => setTema('')}  className="block w-full text-left">Tema 1</button>
                <button onClick={() => setTema('theme-light')} className="block w-full text-left">Tema 2</button>
