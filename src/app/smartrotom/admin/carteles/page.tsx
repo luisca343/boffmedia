@@ -41,7 +41,7 @@ export default function CartelesAutopista() {
 
   useEffect(() => {
     const baseUrl = process.env.NEXT_PUBLIC_URL || ''
-    let url = `${baseUrl}/highway-sign?highway=${encodeURIComponent(highway)}`
+    let url = `${baseUrl}/smartrotom/cartel?highway=${encodeURIComponent(highway)}`
     destinations.forEach((dest, index) => {
       if (dest.name || dest.distance) {
         url += `&dest${index + 1}=${encodeURIComponent(dest.name)}&dist${index + 1}=${encodeURIComponent(dest.distance)}&dir${index + 1}=${encodeURIComponent(dest.direction)}`
