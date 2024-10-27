@@ -11,13 +11,11 @@ export interface QueryResult<T> {
 }
 
 export function isMinecraft(): boolean {
-    const existsMcefQuery = !!window.mcefQuery;
-    console.log('isMC', existsMcefQuery);
-    return existsMcefQuery;
+    return !!window.mcefQuery;
 }
 
 export async function mcefQuery<T>(query: string, data: Record<string, unknown> = {}): Promise<QueryResult<T>> {
-    if (!window.mcefQuery) {
+    if (!isMinecraft()) {
         return { error: 'mcefQuery not available', status: 500 };
     }
     const datos = { query, ...data };
