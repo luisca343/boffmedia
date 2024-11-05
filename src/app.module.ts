@@ -49,6 +49,9 @@ import { LigaModule } from './smartrotom/liga/liga.module';
 import { ResponseService } from './response/response.service';
 import { ResponseModule } from './response/response.module';
 import { LoggerModule } from './logger/logger.module';
+import { PtcgpController } from './boffmedia/herramientas/ptcgp/ptcgp.controller';
+import { PtcgpModule } from './boffmedia/herramientas/ptcgp/ptcgp.module';
+import { PtcgpService } from './boffmedia/herramientas/ptcgp/ptcgp.service';
 
 @Module({
   imports: [
@@ -87,10 +90,11 @@ import { LoggerModule } from './logger/logger.module';
     CommandsModule,
     LigaModule,
     ResponseModule,
-    LoggerModule
+    LoggerModule,
+    PtcgpModule
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, PtcgpService],
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
