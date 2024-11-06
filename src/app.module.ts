@@ -52,6 +52,7 @@ import { LoggerModule } from './logger/logger.module';
 import { PtcgpController } from './boffmedia/herramientas/ptcgp/ptcgp.controller';
 import { PtcgpModule } from './boffmedia/herramientas/ptcgp/ptcgp.module';
 import { PtcgpService } from './boffmedia/herramientas/ptcgp/ptcgp.service';
+import { ConfigService } from './config.service';
 
 @Module({
   imports: [
@@ -94,7 +95,11 @@ import { PtcgpService } from './boffmedia/herramientas/ptcgp/ptcgp.service';
     PtcgpModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, PtcgpService],
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, PtcgpService, {
+    provide: ConfigService,
+    useClass: ConfigService,
+  }],
+  exports: [ConfigService]
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
