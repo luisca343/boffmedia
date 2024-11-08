@@ -73,14 +73,17 @@ export class ConfigService extends NestConfigService {
       const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
       const buffer = Buffer.from(response.data, 'binary');
 
-      const imageDir = path.join(this.publicPath, path.dirname(subPath));
-      await fs.mkdir(imageDir, { recursive: true });
+      const fullPath = path.join(this.publicPath, 'img', subPath);
+      const dirPath = path.dirname(fullPath);
 
-      const filePath = path.join(this.publicPath, subPath);
-      await fs.writeFile(filePath, buffer);
+      // Ensure the directory exists
+      await fs.mkdir(dirPath, { recursive: true });
+
+      // Save the file
+      await fs.writeFile(fullPath, buffer);
 
       this.logger.log(`Image saved: ${subPath}`);
-      return `/${subPath}`;
+      return `/img/${subPath}`;
     } catch (error) {
       this.logger.error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
       throw new Error(`Failed to save image from URL ${imageUrl}: ${error.message}`);
@@ -88,7 +91,7 @@ export class ConfigService extends NestConfigService {
   }
 
   async imageExists(subPath: string): Promise<boolean> {
-    const filePath = path.join(this.publicPath, subPath);
+    const filePath = path.join(this.publicPath, 'img', subPath);
     try {
       await fs.access(filePath);
       return true;
