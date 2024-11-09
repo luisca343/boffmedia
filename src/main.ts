@@ -88,44 +88,4 @@ async function bootstrap() {
   console.log('Server open');
 }
 
-
-
-
-
-
-const http = require('http');
-const httpProxy = require('http-proxy');
-
-// Create a proxy server
-const proxy = httpProxy.createProxyServer({});
-
-// Create an HTTP server to listen for requests
-const server = http.createServer((req, res) => {
-  // Log the request details
-  console.log(`Request: ${req.method} ${req.url}`);
-  console.log('Headers:', req.headers);
-
-  // Proxy the request to the target server
-  proxy.web(req, res, { target: req.url }, (err) => {
-    console.error('Proxy error:', err);
-    res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end('Proxy error');
-  });
-});
-
-// Listen on port 8080
-server.listen(8080, () => {
-  console.log('Proxy server listening on port 8080');
-});
-
-// Handle proxy errors
-proxy.on('error', (err, req, res) => {
-  console.error('Proxy error:', err);
-  res.writeHead(500, { 'Content-Type': 'text/plain' });
-  res.end('Proxy error');
-});
-
-
-
-
 bootstrap();
