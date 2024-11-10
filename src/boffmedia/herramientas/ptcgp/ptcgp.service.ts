@@ -2,26 +2,61 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { ConfigService } from '@/config.service';
+import { Observable, Subject } from 'rxjs';
+
+
+interface FetchStatusData {
+  status: 'fetching' | 'success' | 'error';
+  message: string;
+  timestamp: string;
+}
+
 
 @Injectable()
 export class PtcgpService {
   private readonly logger = new Logger(PtcgpService.name);
   private readonly subdir = 'ptgcp';
   private readonly baseUrl = 'https://www.serebii.net';
+  private fetchStatus = new Subject<FetchStatusData>();
 
   constructor(private configService: ConfigService) {}
 
   async getSets(): Promise<any> {
-    const sets = await this.configService.readDataFile(this.subdir, 'detailed_sets.json');
-    if (sets && false) {
-      this.logger.log('Detailed sets found in file, returning from cache');
-      return sets;
-    }
-    this.logger.log('Detailed sets not found in file, fetching from Serebii');
-    const basicSets = await this.fetchSets();
-    const detailedSets = await this.fetchDetailedSets(basicSets);
-    await this.configService.writeDataFile(this.subdir, 'detailed_sets.json', detailedSets);
-    return detailedSets;
+      const sets = await this.configService.readDataFile(this.subdir, 'detailed_sets.json');
+      if (sets) {
+          this.logger.log('Datos de Serebii encontrados en caché');
+          return sets;
+      }
+      this.logger.log('Datos de Serebii no encontrados en caché, iniciando búsqueda...');
+      return this.startFetch();
+  }
+
+  async startFetch(): Promise<any> {
+      this.updateFetchStatus('fetching', 'Cargando datos de Serebii...');
+      try {
+          const basicSets = await this.fetchSets();
+          const detailedSets = await this.fetchDetailedSets(basicSets);
+          await this.configService.writeDataFile(this.subdir, 'detailed_sets.json', detailedSets);
+          this.updateFetchStatus('success', 'Datos de Serebii cargados correctamente');
+          return detailedSets;
+      } catch (error) {
+          this.logger.error('Error al cargar datos de Serebii:', error);
+          this.updateFetchStatus('error', 'Error al cargar datos de Serebii');
+          throw error;
+      }
+  }
+
+  getFetchStatus(): Observable<FetchStatusData> {
+      return this.fetchStatus.asObservable();
+  }
+
+  private updateFetchStatus(status: 'fetching' | 'success' | 'error', message: string) {
+      const statusData: FetchStatusData = {
+          status,
+          message,
+          timestamp: new Date().toISOString()
+      };
+      this.fetchStatus.next(statusData);
   }
 
   private async fetchSets(): Promise<any> {
