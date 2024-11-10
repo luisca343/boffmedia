@@ -91,6 +91,10 @@ export async function wingullPOST(url: string, data: any) {
   return POST(`${getApiUrl()}/wingull${url}`, data);
 }
 
+export async function boffGET(url: string) {
+  return GET(`${getApiUrl()}${url}`);
+}
+
 export async function boffPOST(url: string, data: any) {
   return POST(`${getApiUrl()}${url}`, data);
 }
