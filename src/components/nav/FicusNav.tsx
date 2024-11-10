@@ -34,7 +34,7 @@ export default function OptimizedFicusNav() {
   }
 
   return (
-    <nav className="bg-gray-900 p-4 shadow-lg" aria-label="Navegación Principal">
+    <nav className="bg-gray-900 p-4 shadow-lg fixed w-full z-20" aria-label="Navegación Principal">
       <div className="container mx-auto flex justify-between items-center">
         <ul className="flex flex-wrap justify-start items-center gap-6">
           {NAV_LINKS.map(({ href, label }) => (

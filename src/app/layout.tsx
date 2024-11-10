@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import FicusNav  from "@/components/nav/FicusNav";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { GlobalProviders } from "./GlobalProviders";
 
 import {NextIntlClientProvider} from 'next-intl';
 import {getLocale, getMessages} from 'next-intl/server';
+import OptimizedFicusNav from "@/components/nav/FicusNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,7 +31,7 @@ export default async  function RootLayout({
           className={`${inter.className} flex flex-col h-screen overflow-hidden bg-transparent`}
         >
           <ToastContainer position="bottom-right" theme="dark" />
-          <FicusNav />
+          <OptimizedFicusNav />
           <section className="overflow-auto border-solid no-scrollbar flex-1">
             <NextIntlClientProvider messages={messages}>
               {children}
