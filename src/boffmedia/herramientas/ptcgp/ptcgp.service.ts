@@ -179,28 +179,33 @@ export class PtcgpService {
     return cleaned;
   }
 
+
   private async scrapeCardList($: cheerio.CheerioAPI, setName: string): Promise<any[]> {
     const cards: any[] = [];
-    const rows = $('h2:contains("Card List")').nextAll('table').first().find('tr').slice(1).get();
-
-    for (const row of rows) {
-      const cells = $(row).find('td');
-
-      const image = cells.eq(1).find('img').attr('src');
-      const imageUrl = image ? this.fixImageUrl(image, setName) : '';
-
+    const cardListTable = $('h2:contains("Card List")').nextAll('table').first();
+    const rows = cardListTable.find('> tbody > tr').get();
+    
+    this.logger.debug(`Found ${rows.length} rows in the Card List table for ${setName}`);
+    let cardNumber = 1;
+    for (const [index, row] of rows.entries()) {
+      const cells = $(row).children('td');
+      cardNumber = index + 1;
       const firstCellContent = cells.eq(0).html() || '';
       const numberMatch = firstCellContent.match(/(\d+)\s*\/\s*(\d+)/);
-      const number = numberMatch ? numberMatch[1] : imageUrl.split('/').pop()?.split('.')[0] || 'unknown';
+      const number = numberMatch ? numberMatch[1] : null;
       const fullNumber = numberMatch ? numberMatch[0] : 'N/A';
       
       const rarityImg = cells.eq(0).find('img').attr('src');
       const rarity = rarityImg ? rarityImg.split('/').pop()?.split('.')[0] || 'unknown' : 'unknown';
 
+      const image = cells.eq(1).find('img').attr('src');
+      const imageUrl = image ? this.fixImageUrl(image, setName) : '';
       let localImagePath = '';
+
+      /*
       if (imageUrl) {
         localImagePath = await this.saveImage(imageUrl);
-      }
+      }*/
 
       const name = cells.eq(2).text().trim();
       
@@ -216,29 +221,33 @@ export class PtcgpService {
       const weaknessValue = weaknessValueText ? parseInt(weaknessValueText, 10) : null;
       
       const retreatCost = typeAndStats.eq(2).find('td').eq(1).find('img').length || 0;
-      const packImg = cells.eq(4).find('img').attr('src');
-      const pack = packImg ? this.fixImageUrl(packImg, '').split('/').pop()?.split('.')[0] || 'unknown' : 'unknown';
+      const packImgs = cells.eq(4).find('img');
+      const packNames = packImgs.map((i, img) => {
+        const src = $(img).attr('src');
+        return src ? this.fixImageUrl(src, '').split('/').pop()?.split('.')[0] || 'unknown' : 'unknown';
+      }).get();
+      
 
       // Download the card image
-      const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${number}.jpg`;
-      const cardImagePath = await this.saveCardImage(cardImageUrl, setName, number || 'unknown');
+      const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${cardNumber}.jpg`;
+      const cardImagePath = await this.saveCardImage(cardImageUrl, setName, cardNumber);
 
       cards.push({
-        number,
+        cardNumber,
         fullNumber,
-        image: localImagePath,
-        cardImage: cardImagePath,
+        image: cardImagePath,
         name: name || 'Unknown',
         type,
         hp,
         weakness,
         weaknessValue,
         retreatCost,
-        pack,
+        packs: packNames,
         rarity,
       });
     }
 
+    this.logger.debug(`Scraped ${cards.length} cards from ${setName}`);
     return cards;
   }
 
@@ -348,8 +357,8 @@ export class PtcgpService {
     return this.configService.saveImageFromUrl(imageUrl, localPath);
   }
 
-  private async saveCardImage(imageUrl: string, setName: string, cardNumber: string): Promise<string> {
-    const localPath = `/cards/${setName}/${cardNumber}.jpg`;
+  private async saveCardImage(imageUrl: string, setName: string, cardNumber: number): Promise<string> {
+    const localPath = `/tcgpocket/cards/${setName}/${cardNumber}.jpg`;
     
     if (await this.configService.imageExists(localPath)) {
       this.logger.debug(`Card image already exists: ${localPath}`);
@@ -357,6 +366,7 @@ export class PtcgpService {
     }
 
     this.logger.debug(`Downloading card image: ${imageUrl}`);
-    return this.configService.saveImageFromUrl(imageUrl, localPath);
+    this.configService.saveImageFromUrl(imageUrl, localPath);
+    return localPath;
   }
 }
