@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
 import { boffPOST } from "@/services/boffAPI";
+import UnauthorizedPage from "../_components/Unauthorized";
 
 
 interface FetchStatusData {
@@ -43,7 +44,7 @@ export default function AdminPage() {
     }
 
     if(!session?.user.roles.includes("BOFF_ADMIN")){
-        return <h1>Unauthorized</h1>
+        return <UnauthorizedPage />
     }
 
     return (

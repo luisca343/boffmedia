@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from "next/navigation"
-import { LogOut, LogIn } from "lucide-react"
+import { LogOut, LogIn, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useBoffSession } from "@/services/useBoffSession"
 import { signOut } from "next-auth/react"
@@ -43,13 +43,23 @@ export default function UserAuthSection() {
   }
 
   return (
-    <Button
-      variant="ghost"
-      onClick={() => router.push("/auth")}
-      className="text-orange-300 hover:text-orange-200 hover:bg-gray-800 transition-colors duration-200"
-    >
-      <LogIn className="h-5 w-5 mr-2" />
-      Iniciar sesión
-    </Button>
+    <>
+      <Button
+        variant="ghost"
+        onClick={() => router.push("/auth?mode=login")}
+        className="text-orange-300 hover:text-orange-200 hover:bg-gray-800 transition-colors duration-200"
+      >
+        <LogIn className="h-5 w-5 mr-2" />
+        Iniciar sesión
+      </Button>
+      <Button
+        variant="ghost"
+        onClick={() => router.push("/auth?mode=register")}
+        className="text-orange-300 hover:text-orange-200 hover:bg-gray-800 transition-colors duration-200"
+      >
+        <UserPlus className="h-5 w-5 mr-2" />
+        Registrarse
+      </Button>
+    </>
   )
 }
