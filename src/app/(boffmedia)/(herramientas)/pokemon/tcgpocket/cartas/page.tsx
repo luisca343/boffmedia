@@ -15,7 +15,7 @@ interface Card {
 
 export default function TCGPocket() {
   const [cards, setCards] = useState<Card[]>([]);
-  const dungeonsTrans = useTranslations("tgcpocket");
+  const dungeonsTrans = useTranslations("tcgpocket");
 
   useEffect(() => {
     boffGET("/herramientas/ptcgp/cards").then((data: Card[]) => {

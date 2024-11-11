@@ -16,7 +16,7 @@ interface Card {
 
 export default function TCGPocket() {
   const [cards, setCards] = useState<Card[]>([]);
-  const trans = useTranslations("tgcpocket");
+  const trans = useTranslations("tcgpocket");
 
   useEffect(() => {
     boffGET("/herramientas/ptcgp/boosterpacks").then((data: Card[]) => {
