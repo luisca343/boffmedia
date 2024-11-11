@@ -21,6 +21,13 @@ export class UsersController {
   }
 
 
+  @Post('register')
+  async register(@Body() createUserDto: any) {
+    console.log('Registrando usuario en BoffMedia');
+    const user = JSON.parse(createUserDto.body) as CreateUserDto;
+    return await this.usersService.createFromBoffMedia(user);
+  }
+
   @Post("login")
   async login(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.validateUser(createUserDto.username, createUserDto.password);

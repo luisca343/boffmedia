@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import {  smartrotomUsers } from '@/_db/schema/SmartRotom';
-import { eq, or } from 'drizzle-orm';
+import { cosineDistance, eq, or } from 'drizzle-orm';
 import { BoffMediaUser, boffMediaRoles, boffMediaUserRoles, boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { error } from 'console';
@@ -25,7 +25,44 @@ export class UsersService {
     private db: MySQL2Service,
   ) {}
 
+  
+  async createFromBoffMedia(boffMediaUser: Partial<BoffMediaUser>) {
+    if (!boffMediaUser.password || boffMediaUser.password.trim() === '') {
+        throw new BadRequestException('Password is required');
+    }
 
+    console.log('Creando usuario en BoffMedia v2');
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(boffMediaUser.password, salt);
+
+        console.log('Creando usuario en BoffMedia', salt, hash);
+
+        const user = {
+            email: boffMediaUser.email,
+            username: boffMediaUser.username,
+            password: hash,
+            uuid: boffMediaUser.uuid
+        };
+
+        console.log('Creando usuario en BoffMedia', user);
+
+        const result = await this.db.getDrizzle().insert(boffMediaUsers).values(user as BoffMediaUser).execute();
+        
+        // Remove the password from the returned user object
+        const { password, ...userWithoutPassword } = user;
+        return { ...userWithoutPassword, id: result[0].insertId, ok: true };
+    } catch (error) {
+        if (error.code === 'ER_DUP_ENTRY') {
+            return { error: 'Nombre de usuario o email ya en uso' };
+        }
+        if (error instanceof BadRequestException) {
+            throw error;
+        }
+        throw new Error('Error creating user: ' + error.message);
+    }
+}
   async create(boffMediaUser: BoffMediaUser, smartrotomUser: SmartRotomUser) {
     console.log('Creando usuario en BoffMedia', boffMediaUser);
     const hash = await bcrypt.hash(boffMediaUser.password, 12);

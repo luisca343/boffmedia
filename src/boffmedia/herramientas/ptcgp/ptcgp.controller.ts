@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Sse } from '@nestjs/common';
+import { Controller, Get, Param, Post, Sse } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -49,11 +49,28 @@ export class PtcgpController {
         return this.ptcgpService.getBoosterPacks();
     }
 
+
     @Get("cards")
     @ApiOperation({ summary: 'Get all cards' })
     @ApiResponse({ status: 200, description: 'Cards found successfully.' })
     @ApiResponse({ status: 500, description: 'Failed to find cards.' })
     async getCards() {
         return this.ptcgpService.getCards();
+    }
+
+    @Get("cards/:pack")
+    @ApiOperation({ summary: 'Get card by ID' })
+    @ApiResponse({ status: 200, description: 'Card found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find card.' })
+    async getCard(@Param('pack') pack: string, @Param('number') number: number) {
+        return this.ptcgpService.getCards(pack);
+    }
+
+    @Get("cards/:pack/:number")
+    @ApiOperation({ summary: 'Get card by ID' })
+    @ApiResponse({ status: 200, description: 'Card found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find card.' })
+    async getCardByNumber(@Param('pack') pack: string, @Param('number') number: number) {
+        return this.ptcgpService.getCard(pack, number);
     }
 }

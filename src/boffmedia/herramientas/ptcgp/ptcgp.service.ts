@@ -6,7 +6,7 @@ import { Observable, Subject } from 'rxjs';
 import { CardSet, PtcgpData } from './ptcgp.types';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { TcgpBoosterPack, TcgpCard, tcgpBoosterPacks, tcgpCards, tcgpCardsPacks, tcgpExpansions } from '@/_db/schema/TCGP';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 
 
 interface FetchStatusData {
@@ -39,6 +39,11 @@ export class PtcgpService {
       .orderBy(asc(tcgpCards.expansion), asc(tcgpCards.number)).execute();
   }
 
+  async getCard(expansion: string, number: number): Promise<TcgpCard> {
+    return this.db.getDrizzle().select().from(tcgpCards).where(and(eq(tcgpCards.expansion, expansion), eq(tcgpCards.number, number))).execute() as any;
+  }
+
+  
   async getSets(): Promise<any> {
       const sets = await this.configService.readDataFile(this.subdir, 'sets.json');
       if (sets && false) {
@@ -231,7 +236,7 @@ export class PtcgpService {
 
     for (let i = 0; i < packNames.length; i++) {
       const imageUrl = packImages[i] ? this.fixImageUrl(packImages[i], setName) : '';
-      let localImagePath = '';
+      let localImagePath = 'packs/';
       if (imageUrl) {
         localImagePath = await this.saveImage(imageUrl);
       }
@@ -310,14 +315,14 @@ export class PtcgpService {
     const rows = cardListTable.find('> tbody > tr').get();
     
     this.logger.debug(`Found ${rows.length} rows in the Card List table for ${setName}`);
-    let cardNumber = 1;
     for (const [index, row] of rows.entries()) {
       if(index === 0) continue;
       const cells = $(row).children('td');
       const firstCellContent = cells.eq(0).html() || '';
-      const numberMatch = firstCellContent.match(/(\d+)\s*\/\s*(\d+)/);
-      const number = numberMatch ? numberMatch[1] : null;
+      const numberMatch = firstCellContent.match(/(\d+)\s*\/\s*(.+)/);
+      const number = numberMatch ? parseInt(numberMatch[1]) : null;
       const fullNumber = numberMatch ? numberMatch[0] : 'N/A';
+      
       
       const rarityImg = cells.eq(0).find('img').attr('src');
       const rarity = rarityImg ? rarityImg.split('/').pop()?.split('.')[0] || 'unknown' : 'unknown';
@@ -355,13 +360,14 @@ export class PtcgpService {
       
 
       // Download the card image
-      const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${cardNumber}.jpg`;
-      const cardImagePath = await this.saveCardImage(cardImageUrl, setName, cardNumber);
+      const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${number}.png`;
+      const cardImagePath = await this.saveCardImage(cardImageUrl, setName, number);
 
       const card = {
+        id: `${setName}-${number}`,
         expansion: setName,
         name,
-        number: cardNumber,
+        number,
         rarity,
         type,
         hp,
@@ -375,7 +381,8 @@ export class PtcgpService {
 
       packIds.forEach(packName => {
         this.db.getDrizzle().insert(tcgpCardsPacks).values({
-          card_id: resultId,
+          expansion: setName,
+          card_number: number,
           pack_id: packName,
         }).execute();
       });
@@ -394,8 +401,6 @@ export class PtcgpService {
         packs: packNames,
         rarity,
       });*/
-
-      cardNumber++;
     }
 
     this.logger.debug(`Scraped ${cards.length} cards from ${setName}`);

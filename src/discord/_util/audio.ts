@@ -12,19 +12,22 @@ export async function playAudio(message: Message, service: CommandsService) {
     const voiceChannel = message.member.voice.channel;
     
     if (!voiceChannel) {
-        return message.channel.send('You need to be in a voice channel to play music!');
+        const channel = message.channel as any;
+        return channel.send('You need to be in a voice channel to play music!');
     }
 
     const voice = await getVoice(service, message.author.id) || 'Enrique';
     const audioStream = await downloadAudio(voice, message.content.replace('#','almohadilla'));
     if (!audioStream) {
-        return message.channel.send('There was an error downloading the audio');
+        const channel = message.channel as any;
+        return channel.send('There was an error downloading the audio');
     }
 
+    const adapterCreator = voiceChannel.guild.voiceAdapterCreator as any;
     const connection = joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: voiceChannel.guild.id,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+        adapterCreator,
     });
 
     audioQueue.push(audioStream);
