@@ -37,7 +37,18 @@ CREATE TABLE `tcgp_expansions` (
 	CONSTRAINT `tcgp_expansions_name_unique` UNIQUE(`name`)
 );
 --> statement-breakpoint
+CREATE TABLE `tcgp_users_cards` (
+	`user_id` int NOT NULL,
+	`expansion` varchar(32) NOT NULL,
+	`card_number` int NOT NULL,
+	`count` int NOT NULL,
+	`obtained_at` datetime NOT NULL,
+	CONSTRAINT `tcgp_users_cards_user_id_expansion_card_number_pk` PRIMARY KEY(`user_id`,`expansion`,`card_number`)
+);
+--> statement-breakpoint
 ALTER TABLE `tcgp_booster_packs` ADD CONSTRAINT `tcgp_booster_packs_expansion_tcgp_expansions_id_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_expansions`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tcgp_cards` ADD CONSTRAINT `tcgp_cards_expansion_tcgp_expansions_id_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_expansions`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tcgp_cards_packs` ADD CONSTRAINT `tcgp_cards_packs_expansion_tcgp_cards_expansion_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_cards`(`expansion`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `tcgp_cards_packs` ADD CONSTRAINT `tcgp_cards_packs_pack_id_tcgp_booster_packs_name_fk` FOREIGN KEY (`pack_id`) REFERENCES `tcgp_booster_packs`(`name`) ON DELETE cascade ON UPDATE cascade;
+ALTER TABLE `tcgp_cards_packs` ADD CONSTRAINT `tcgp_cards_packs_pack_id_tcgp_booster_packs_name_fk` FOREIGN KEY (`pack_id`) REFERENCES `tcgp_booster_packs`(`name`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `tcgp_users_cards` ADD CONSTRAINT `tcgp_users_cards_user_id_boffmedia_users_id_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `tcgp_users_cards` ADD CONSTRAINT `tcgp_users_cards_expansion_tcgp_cards_expansion_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_cards`(`expansion`) ON DELETE cascade ON UPDATE cascade;

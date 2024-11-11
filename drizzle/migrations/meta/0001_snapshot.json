@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "5f9c942f-cfb6-4cc8-873e-55c2078c2468",
+  "id": "0b44f9b4-82a9-4a04-9477-0f37b1bba47a",
   "prevId": "7e453c19-f369-41e4-a5a6-f58f31308267",
   "tables": {
     "boffmedia_roles": {
@@ -2096,6 +2096,86 @@
           ]
         }
       }
+    },
+    "tcgp_users_cards": {
+      "name": "tcgp_users_cards",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expansion": {
+          "name": "expansion",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "card_number": {
+          "name": "card_number",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "count": {
+          "name": "count",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "obtained_at": {
+          "name": "obtained_at",
+          "type": "datetime",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "tcgp_users_cards_user_id_boffmedia_users_id_fk": {
+          "name": "tcgp_users_cards_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tcgp_users_cards",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "tcgp_users_cards_expansion_tcgp_cards_expansion_fk": {
+          "name": "tcgp_users_cards_expansion_tcgp_cards_expansion_fk",
+          "tableFrom": "tcgp_users_cards",
+          "tableTo": "tcgp_cards",
+          "columnsFrom": [
+            "expansion"
+          ],
+          "columnsTo": [
+            "expansion"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "tcgp_users_cards_user_id_expansion_card_number_pk": {
+          "name": "tcgp_users_cards_user_id_expansion_card_number_pk",
+          "columns": [
+            "user_id",
+            "expansion",
+            "card_number"
+          ]
+        }
+      },
+      "uniqueConstraints": {}
     },
     "wingull_invites": {
       "name": "wingull_invites",

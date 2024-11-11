@@ -5,8 +5,9 @@ import { ConfigService } from '@/config.service';
 import { Observable, Subject } from 'rxjs';
 import { CardSet, PtcgpData } from './ptcgp.types';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { TcgpBoosterPack, TcgpCard, tcgpBoosterPacks, tcgpCards, tcgpCardsPacks, tcgpExpansions } from '@/_db/schema/TCGP';
+import { TcgpBoosterPack, TcgpCard, tcgpBoosterPacks, tcgpCards, tcgpCardsPacks, tcgpExpansions, tcgpUsersCards } from '@/_db/schema/TCGP';
 import { and, asc, eq } from 'drizzle-orm';
+import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 
 interface FetchStatusData {
@@ -42,6 +43,96 @@ export class PtcgpService {
   async getCard(expansion: string, number: number): Promise<TcgpCard> {
     return this.db.getDrizzle().select().from(tcgpCards).where(and(eq(tcgpCards.expansion, expansion), eq(tcgpCards.number, number))).execute() as any;
   }
+
+  async getUserCards(username: string) {
+    const data = await this.db.getDrizzle()
+      .select({
+        expansion: tcgpUsersCards.expansion,
+        cardNumber: tcgpUsersCards.card_number,
+        count: tcgpUsersCards.count,
+        cardName: tcgpCards.name
+      })
+      .from(tcgpUsersCards)
+      .innerJoin(boffMediaUsers, eq(tcgpUsersCards.user_id, boffMediaUsers.id))
+      .leftJoin(tcgpCards, and(
+        eq(tcgpUsersCards.expansion, tcgpCards.expansion),
+        eq(tcgpUsersCards.card_number, tcgpCards.number)
+      ))
+      .where(eq(boffMediaUsers.username, username))
+      .execute();
+
+    return data;
+  }
+
+  async batchUpdateUserCards(username: string, cardUpdates: { expansion: string; cardNumber: number; packId: string; change: number }[]) {
+    console.log('Updating cards for user:', username, cardUpdates);
+    const db = this.db.getDrizzle();
+
+    await db.transaction(async (tx) => {
+      const user = await tx.select({ id: boffMediaUsers.id })
+        .from(boffMediaUsers)
+        .where(eq(boffMediaUsers.username, username))
+        .execute();
+
+      if (user.length === 0) {
+        throw new Error('User not found');
+      }
+
+      const userId = user[0].id;
+
+      for (const update of cardUpdates) {
+        const { expansion, cardNumber, packId, change } = update;
+
+        const existingCard = await tx
+          .select()
+          .from(tcgpUsersCards)
+          .where(and(
+            eq(tcgpUsersCards.user_id, userId),
+            eq(tcgpUsersCards.expansion, expansion),
+            eq(tcgpUsersCards.card_number, cardNumber),
+          ))
+          .execute();
+
+        if (existingCard.length > 0) {
+          const newCount = Math.max(existingCard[0].count + change, 0);
+          if (newCount === 0) {
+            await tx
+              .delete(tcgpUsersCards)
+              .where(and(
+                eq(tcgpUsersCards.user_id, userId),
+                eq(tcgpUsersCards.expansion, expansion),
+                eq(tcgpUsersCards.card_number, cardNumber),
+              ))
+              .execute();
+          } else {
+            await tx
+              .update(tcgpUsersCards)
+              .set({ count: newCount, obtained_at: new Date() })
+              .where(and(
+                eq(tcgpUsersCards.user_id, userId),
+                eq(tcgpUsersCards.expansion, expansion),
+                eq(tcgpUsersCards.card_number, cardNumber),
+              ))
+              .execute();
+          }
+        } else if (change > 0) {
+          await tx
+            .insert(tcgpUsersCards)
+            .values({
+              user_id: userId,
+              expansion,
+              card_number: cardNumber,
+              count: change,
+              obtained_at: new Date(),
+            })
+            .execute();
+        }
+      }
+    });
+
+    return { success: true, message: 'Cards updated successfully' };
+  }
+
 
   
   async getSets(): Promise<any> {

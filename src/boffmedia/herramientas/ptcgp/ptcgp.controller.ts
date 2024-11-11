@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Sse } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Req, Sse } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -72,5 +72,24 @@ export class PtcgpController {
     @ApiResponse({ status: 500, description: 'Failed to find card.' })
     async getCardByNumber(@Param('pack') pack: string, @Param('number') number: number) {
         return this.ptcgpService.getCard(pack, number);
+    }
+
+    @Post("user-cards")
+    @ApiOperation({ summary: 'Get all cards for the authenticated user' })
+    @ApiResponse({ status: 200, description: 'User cards found successfully.' })
+    @ApiResponse({ status: 401, description: 'Unauthorized.' })
+    @ApiResponse({ status: 500, description: 'Failed to find user cards.' })
+    async getUserCards(@Body() user: { username: string }) {
+        return await this.ptcgpService.getUserCards(user.username);
+    }
+
+    @Post("update-cards")
+    @ApiOperation({ summary: 'Update multiple cards in the user\'s collection' })
+    @ApiResponse({ status: 200, description: 'Cards updated successfully.' })
+    @ApiResponse({ status: 401, description: 'Unauthorized.' })
+    @ApiResponse({ status: 500, description: 'Failed to update cards.' })
+    async updateUserCards(@Body() updateData: { username: string, updates: { expansion: string, cardNumber: number, packId: string, change: number }[] }) {
+        console.log('Updating cards for user:', updateData);
+        return this.ptcgpService.batchUpdateUserCards(updateData.username, updateData.updates);
     }
 }

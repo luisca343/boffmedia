@@ -1,4 +1,6 @@
 import { datetime, int, mysqlTable, primaryKey, unique, varchar } from "drizzle-orm/mysql-core";
+import { boffMediaUsers } from "./BoffMedia";
+import { count } from "console";
 
 export const tcgpExpansions = mysqlTable("tcgp_expansions", {
     id: varchar("id", { length: 32 }).notNull().primaryKey().unique(),
@@ -55,3 +57,25 @@ export const tcgpCardsPacks = mysqlTable("tcgp_cards_packs", {
 ));
 
 export type TcgpCardPack = typeof tcgpCardsPacks.$inferSelect;
+
+export const tcgpUsersCards = mysqlTable("tcgp_users_cards", {
+    user_id: int("user_id").notNull().references(() => boffMediaUsers.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    expansion: varchar("expansion", { length: 32 }).notNull().references(() => tcgpCards.expansion, {onDelete: "cascade", onUpdate: "cascade"}),
+    card_number: int("card_number").notNull(),
+    count: int("count").notNull(),
+    obtained_at: datetime("obtained_at").notNull()
+}, (table) => (
+    {
+        primaryKey: primaryKey({ columns: [table.user_id, table.expansion, table.card_number] }),
+        foreignKeys: [
+            {
+                columns: [table.expansion, table.card_number],
+                references: [tcgpCardsPacks.expansion, tcgpCardsPacks.card_number],
+                onDelete: "cascade",
+                onUpdate: "cascade"
+            }
+        ]
+    }
+));
+
+export type TcgpUserCard = typeof tcgpUsersCards.$inferSelect;
