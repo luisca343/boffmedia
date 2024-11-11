@@ -32,7 +32,7 @@ export default async  function RootLayout({
         >
           <ToastContainer position="bottom-right" theme="dark" />
           <OptimizedFicusNav />
-          <section className="overflow-auto border-solid no-scrollbar flex-1 mt-16">
+          <section className="overflow-auto border-solid no-scrollbar flex-1 pt-16">
             <NextIntlClientProvider messages={messages}>
               {children}
             </NextIntlClientProvider>

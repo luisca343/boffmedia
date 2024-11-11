@@ -1,6 +1,5 @@
 import React from 'react';
 import { BoffFooter } from './BoffFooter';
-import OptimizedFicusNav from '@/components/nav/FicusNav';
 
 export default function BoffLayout({ children, footer = true }: { children: React.ReactNode, footer?: boolean }) {
   return (

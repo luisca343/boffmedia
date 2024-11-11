@@ -14,7 +14,7 @@ const fileStructure = {
 export default function FileStructurePage() {
   return (
     <BoffLayout footer={false}>
-      <div className="container mx-auto p-4 mt-16">
+      <div className="container mx-auto p-4">
         <FileTree structure={fileStructure} />
       </div>
     </BoffLayout>

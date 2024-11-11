@@ -2,11 +2,23 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import dynamic from 'next/dynamic'
 
-const NotificationPopover = dynamic(() => import('./NotificationPopover'), { ssr: false })
-const UserAuthSection = dynamic(() => import('./UserAuthSection'), { ssr: false })
+const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
+  ssr: false,
+  loading: () => <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
+})
+
+const UserAuthSection = dynamic(() => import('./UserAuthSection'), { 
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center space-x-2">
+      <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
+      <div className="w-16 h-4 bg-gray-800 rounded animate-pulse" />
+    </div>
+  )
+})
 
 const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion"]
 const NAV_LINKS = [
@@ -19,23 +31,21 @@ const NAV_LINKS = [
 export default function OptimizedFicusNav() {
   const pathname = usePathname()
   const [currentApp, setCurrentApp] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     const app = pathname.split("/")[1] || "boffmedia"
     setCurrentApp(app || null)
+    setMounted(true)
   }, [pathname])
-
-  if (!currentApp || HIDDEN_APPS.includes(currentApp)) {
-    return null
-  }
 
   function inPage(href: string) {
     return (pathname.startsWith(href) && href !== "/") || pathname === href
   }
 
   return (
-    <nav className="bg-gray-900 p-4 shadow-lg fixed w-full z-20" aria-label="Navegación Principal">
-      <div className="container mx-auto flex justify-between items-center">
+    <nav className="bg-gray-900 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
+      <div className="container mx-auto flex justify-between items-center h-full">
         <ul className="flex flex-wrap justify-start items-center gap-6">
           {NAV_LINKS.map(({ href, label }) => (
             <li key={href}>
@@ -57,8 +67,20 @@ export default function OptimizedFicusNav() {
           ))}
         </ul>
         <div className="flex items-center gap-4">
-          <NotificationPopover />
-          <UserAuthSection />
+          {mounted && currentApp && !HIDDEN_APPS.includes(currentApp) ? (
+            <>
+              <NotificationPopover />
+              <UserAuthSection />
+            </>
+          ) : (
+            <>
+              <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-gray-800 rounded animate-pulse" />
+              </div>
+            </>
+          )}
         </div>
       </div>
     </nav>

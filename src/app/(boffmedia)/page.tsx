@@ -20,7 +20,7 @@ export default function GamingLandingPage() {
     <BoffLayout>
       <div className="min-h-screen text-white font-sans relative">
         <div className="relative z-10">
-          <main className="container mx-auto px-4 py-12">
+          <main className="container mx-auto px-4">
             <section className="mb-24 text-center">
               <Image
                 src="/img/boff.png"

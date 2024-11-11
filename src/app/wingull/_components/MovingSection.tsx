@@ -6,10 +6,12 @@ import { motion } from "framer-motion"
 import { toast } from 'react-toastify';
 
 export function MovingSection() {
+  //const serverIP = 'wingull.boffmedia.es'
+  const serverIP = 'IP no disponible'
   const [isCopied, setIsCopied] = useState(false)
+  
 
   const handleConnect = () => {
-    const serverIP = 'wingull.boffmedia.es'
     navigator.clipboard.writeText(serverIP).then(() => {
       setIsCopied(true)
       toast.success("IP del servidor copiada. La IP del servidor ha sido copiada al portapapeles.")
@@ -34,7 +36,7 @@ export function MovingSection() {
       >
         {isCopied ? 'IP Copiada!' : 'Conectar al Servidor'}
       </Button>
-      <p className="mt-4 text-sm">Haz clic para copiar la IP del servidor: wingull.boffmedia.es</p>
+      <p className="mt-4 text-sm">Haz clic para copiar la IP del servidor: {serverIP}</p>
     </motion.div>
   )
 }
