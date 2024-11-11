@@ -39,4 +39,21 @@ export class PtcgpController {
             })
         );
     }
+
+
+    @Get("boosterpacks")
+    @ApiOperation({ summary: 'Get all booster packs' })
+    @ApiResponse({ status: 200, description: 'Booster packs found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find booster packs.' })
+    async getCollections() {
+        return this.ptcgpService.getBoosterPacks();
+    }
+
+    @Get("cards")
+    @ApiOperation({ summary: 'Get all cards' })
+    @ApiResponse({ status: 200, description: 'Cards found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find cards.' })
+    async getCards() {
+        return this.ptcgpService.getCards();
+    }
 }

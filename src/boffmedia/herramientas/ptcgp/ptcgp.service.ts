@@ -3,6 +3,10 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { ConfigService } from '@/config.service';
 import { Observable, Subject } from 'rxjs';
+import { CardSet, PtcgpData } from './ptcgp.types';
+import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { TcgpBoosterPack, TcgpCard, tcgpBoosterPacks, tcgpCards, tcgpCardsPacks, tcgpExpansions } from '@/_db/schema/TCGP';
+import { asc, eq } from 'drizzle-orm';
 
 
 interface FetchStatusData {
@@ -19,11 +23,25 @@ export class PtcgpService {
   private readonly baseUrl = 'https://www.serebii.net';
   private fetchStatus = new Subject<FetchStatusData>();
 
-  constructor(private configService: ConfigService) {}
+  constructor(
+    private db: MySQL2Service,
+    private configService: ConfigService) {}
+
+  async getBoosterPacks(expansion: string = null): Promise<TcgpBoosterPack[]> {
+    if(!expansion) return this.db.getDrizzle().select().from(tcgpBoosterPacks).execute();
+    return this.db.getDrizzle().select().from(tcgpBoosterPacks).where(eq(tcgpBoosterPacks.expansion, expansion)).execute();
+  }
+
+  async getCards(expansion: string = null): Promise<TcgpCard[]> {
+    if(!expansion) return this.db.getDrizzle().select().from(tcgpCards)
+      .orderBy(asc(tcgpCards.expansion), asc(tcgpCards.number)).execute();
+    return this.db.getDrizzle().select().from(tcgpCards).where(eq(tcgpCards.expansion, expansion))
+      .orderBy(asc(tcgpCards.expansion), asc(tcgpCards.number)).execute();
+  }
 
   async getSets(): Promise<any> {
-      const sets = await this.configService.readDataFile(this.subdir, 'detailed_sets.json');
-      if (sets) {
+      const sets = await this.configService.readDataFile(this.subdir, 'sets.json');
+      if (sets && false) {
           this.logger.log('Datos de Serebii encontrados en caché');
           return sets;
       }
@@ -36,7 +54,7 @@ export class PtcgpService {
       try {
           const basicSets = await this.fetchSets();
           const detailedSets = await this.fetchDetailedSets(basicSets);
-          await this.configService.writeDataFile(this.subdir, 'detailed_sets.json', detailedSets);
+          await this.configService.writeDataFile(this.subdir, 'sets.json', detailedSets);
           this.updateFetchStatus('success', 'Datos de Serebii cargados correctamente');
           return detailedSets;
       } catch (error) {
@@ -116,20 +134,55 @@ export class PtcgpService {
     }
   }
 
+  
+
   private async fetchDetailedSets(basicSets: any): Promise<any> {
     const detailedSets: any = {};
 
     for (const [section, sets] of Object.entries(basicSets)) {
       detailedSets[section] = [];
 
+      console.log(`Scraping detailed info for section ${section}...`);
+
+      const sectionId = section.toLowerCase().replace(/\s+/g, '');
+
       for (const set of sets as any[]) {
-        const setName = set.setName.toLowerCase().replace(/\s+/g, '');
-        const url = `${this.baseUrl}/tcgpocket/${setName}/`;
+
+      const setLogo = set.logo;
+      const setIcon = set.icon;
+      const setName = set.setName;
+      const setId = set.setName.toLowerCase().replace(/\s+/g, '');
+      const releaseDateStr = set.releaseDate; // October 30th 2024 || N/A
+      const releaseDate = null;
+
+      const url = `${this.baseUrl}/tcgpocket/${setId}/`;
+
+      const exists = await this.db.getDrizzle().select().from(tcgpExpansions).where(eq(tcgpExpansions.name, setName)).execute();
+
+      if (exists.length > 0) {
+        console.log(`Set ${setName} already exists in the database, skipping...`);
+        continue;
+      }
+
+      this.db.getDrizzle().insert(tcgpExpansions).values({
+        id: setId,
+        name: setName,
+        logo_url: setLogo,
+        icon_url: setIcon,
+        type: sectionId,
+      }).execute();
+
 
         try {
+          
           const response = await axios.get(url);
           const $ = cheerio.load(response.data);
 
+          await this.scrapeBoosterPackList($, setId);
+          await this.scrapeCardList($, setId);
+          
+
+          /*
           const detailedSet = {
             ...set,
             boosterPackList: await this.scrapeBoosterPackList($, setName),
@@ -138,9 +191,29 @@ export class PtcgpService {
             emblems: await this.scrapeEmblems($, setName),
             soloBattles: await this.scrapeSoloBattles($, setName),
             featuredCards: await this.scrapeFeaturedCards($, setName),
-          };
+          };*/
 
-          detailedSets[section].push(detailedSet);
+          
+          /*
+                const card = {
+                expansion: setName,
+                name,
+                number: cardNumber,
+                rarity,
+                type,
+                hp,
+                weakness,
+                weakness_value: weaknessValue,
+                retreat_cost: retreatCost,
+                image_url: cardImagePath,
+              } as TcgpCard;
+
+              this.db.getDrizzle().insert(tcgpCards).values(card).execute();
+          */
+
+          
+
+          //detailedSets[section].push(detailedSet);
         } catch (error) {
           this.logger.error(`Error scraping detailed info for set ${setName}:`, error);
         }
@@ -162,11 +235,27 @@ export class PtcgpService {
       if (imageUrl) {
         localImagePath = await this.saveImage(imageUrl);
       }
+
+      console.log(`Inserting booster pack ${packNames[i]} for set ${setName}`);
+      console.log(
+        {
+          name: packNames[i],
+          image_url: localImagePath,
+          expansion: setName,
+        }
+      )
+
+      this.db.getDrizzle().insert(tcgpBoosterPacks).values({
+        name: packNames[i],
+        expansion: setName,
+      }).execute();
+
+      /*
       boosterPacks.push({
         packName: packNames[i],
         image: localImagePath,
         fullName: packFullNames[i]
-      });
+      });*/
     }
 
     return boosterPacks;
@@ -223,8 +312,8 @@ export class PtcgpService {
     this.logger.debug(`Found ${rows.length} rows in the Card List table for ${setName}`);
     let cardNumber = 1;
     for (const [index, row] of rows.entries()) {
+      if(index === 0) continue;
       const cells = $(row).children('td');
-      cardNumber = index + 1;
       const firstCellContent = cells.eq(0).html() || '';
       const numberMatch = firstCellContent.match(/(\d+)\s*\/\s*(\d+)/);
       const number = numberMatch ? numberMatch[1] : null;
@@ -262,11 +351,36 @@ export class PtcgpService {
         return src ? this.fixImageUrl(src, '').split('/').pop()?.split('.')[0] || 'unknown' : 'unknown';
       }).get();
       
+      const packIds = packNames.map(name => name.toLowerCase().replace(/\s+/g, ''));
+      
 
       // Download the card image
       const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${cardNumber}.jpg`;
       const cardImagePath = await this.saveCardImage(cardImageUrl, setName, cardNumber);
 
+      const card = {
+        expansion: setName,
+        name,
+        number: cardNumber,
+        rarity,
+        type,
+        hp,
+        weakness,
+        weakness_value: weaknessValue,
+        retreat_cost: retreatCost,
+      } as TcgpCard;
+
+      const result = await this.db.getDrizzle().insert(tcgpCards).values(card);
+      const resultId = result[0].insertId;
+
+      packIds.forEach(packName => {
+        this.db.getDrizzle().insert(tcgpCardsPacks).values({
+          card_id: resultId,
+          pack_id: packName,
+        }).execute();
+      });
+
+      /*
       cards.push({
         cardNumber,
         fullNumber,
@@ -279,7 +393,9 @@ export class PtcgpService {
         retreatCost,
         packs: packNames,
         rarity,
-      });
+      });*/
+
+      cardNumber++;
     }
 
     this.logger.debug(`Scraped ${cards.length} cards from ${setName}`);
