@@ -14,7 +14,7 @@ interface TreeNodeProps {
 export default function TreeNode({ name, structure, path }: TreeNodeProps) {
   const [isOpen, setIsOpen] = useState(true)
   const isDirectory = typeof structure === 'object'
-  const fullPath = `${path}/${name}`
+  const fullPath = `${path.replace("/herramientas", "")}/${name}`
 
   const toggleOpen = () => setIsOpen(!isOpen)
 

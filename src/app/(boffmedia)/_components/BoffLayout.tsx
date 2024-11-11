@@ -10,7 +10,7 @@ export default function BoffLayout({ children, footer = true }: { children: Reac
         style={{ backgroundImage: `url("/img/boff-bg.svg")`, backgroundRepeat: 'repeat' }}
         aria-hidden="true"
       />
-      <div className="flex flex-col flex-grow z-10 relative pt-16"> {/* Added pt-16 here */}
+      <div className="flex flex-col flex-grow z-10 relative">
         <main className="container mx-auto px-4 py-12 flex-grow">
           {children}
         </main>

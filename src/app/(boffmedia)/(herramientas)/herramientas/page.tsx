@@ -1,10 +1,10 @@
-import BoffLayout from "../_components/BoffLayout";
-import FileTree from "./_components/FileTree";
+import BoffLayout from "../../_components/BoffLayout";
+import FileTree from "./../_components/FileTree";
 
 const fileStructure = {
   pokemon: {
     pmdsky: "Generador de Correos Mundo Misterioso",
-    tcgpocket: "Gestión colecciones TCG Pocket",
+    "tcgpocket/cartas": "Gestión colecciones TCG Pocket",
   },
   otros: {
     keys: "Claves de Steam"
@@ -14,7 +14,7 @@ const fileStructure = {
 export default function FileStructurePage() {
   return (
     <BoffLayout footer={false}>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 mt-16">
         <FileTree structure={fileStructure} />
       </div>
     </BoffLayout>
