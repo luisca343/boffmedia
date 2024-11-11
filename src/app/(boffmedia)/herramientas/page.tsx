@@ -4,6 +4,7 @@ import FileTree from "./_components/FileTree";
 const fileStructure = {
   pokemon: {
     pmdsky: "Generador de Correos Mundo Misterioso",
+    tcgpocket: "Gestión colecciones TCG Pocket",
   },
   otros: {
     keys: "Claves de Steam"
