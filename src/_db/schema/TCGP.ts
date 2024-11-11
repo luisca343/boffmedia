@@ -1,5 +1,4 @@
-import { sql } from "drizzle-orm";
-import { datetime, int, mysqlTable, unique, varchar } from "drizzle-orm/mysql-core";
+import { datetime, int, mysqlTable, primaryKey, unique, varchar } from "drizzle-orm/mysql-core";
 
 export const tcgpExpansions = mysqlTable("tcgp_expansions", {
     id: varchar("id", { length: 32 }).notNull().primaryKey().unique(),
@@ -20,10 +19,9 @@ export const tcgpBoosterPacks = mysqlTable("tcgp_booster_packs", {
 export type TcgpBoosterPack = typeof tcgpBoosterPacks.$inferSelect;
 
 export const tcgpCards = mysqlTable("tcgp_cards", {
-    id: int("id").primaryKey().autoincrement(),
     expansion: varchar("expansion", { length: 32 }).notNull().references(() => tcgpExpansions.id, {onDelete: "cascade", onUpdate: "cascade"}),
-    name: varchar("name", { length: 64 }).notNull(),
     number: int("number").notNull(),
+    name: varchar("name", { length: 64 }).notNull(),
     rarity: varchar("rarity", { length: 32 }).notNull(),
     type: varchar("type", { length: 32 }).notNull(),
     hp: int("hp"),
@@ -32,15 +30,28 @@ export const tcgpCards = mysqlTable("tcgp_cards", {
     retreat_cost: int("retreat_cost")
 }, (table) => (
     {
-        unique: unique().on(table.expansion, table.number)
+        primaryKey: primaryKey({ columns: [table.expansion, table.number] })
     }
 ));
 
 export type TcgpCard = typeof tcgpCards.$inferSelect;
 
 export const tcgpCardsPacks = mysqlTable("tcgp_cards_packs", {
-    card_id: int("card_id").notNull().references(() => tcgpCards.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    expansion: varchar("expansion", { length: 32 }).notNull().references(() => tcgpCards.expansion, {onDelete: "cascade", onUpdate: "cascade"}),
+    card_number: int("card_number").notNull(),
     pack_id: varchar("pack_id", { length: 32 }).notNull().references(() => tcgpBoosterPacks.name, {onDelete: "cascade", onUpdate: "cascade"}),
-});
+}, (table) => (
+    {
+        primaryKey: primaryKey({ columns: [table.expansion, table.card_number, table.pack_id] }),
+        foreignKeys: [
+            {
+                columns: [table.expansion, table.card_number],
+                references: [tcgpCards.expansion, tcgpCards.number],
+                onDelete: "cascade",
+                onUpdate: "cascade"
+            }
+        ]
+    }
+));
 
 export type TcgpCardPack = typeof tcgpCardsPacks.$inferSelect;

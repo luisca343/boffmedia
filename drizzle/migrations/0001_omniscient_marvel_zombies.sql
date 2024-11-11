@@ -6,23 +6,23 @@ CREATE TABLE `tcgp_booster_packs` (
 );
 --> statement-breakpoint
 CREATE TABLE `tcgp_cards` (
-	`id` int AUTO_INCREMENT NOT NULL,
 	`expansion` varchar(32) NOT NULL,
-	`name` varchar(64) NOT NULL,
 	`number` int NOT NULL,
+	`name` varchar(64) NOT NULL,
 	`rarity` varchar(32) NOT NULL,
 	`type` varchar(32) NOT NULL,
 	`hp` int,
 	`weakness` varchar(32),
 	`weakness_value` int,
 	`retreat_cost` int,
-	CONSTRAINT `tcgp_cards_id` PRIMARY KEY(`id`),
-	CONSTRAINT `tcgp_cards_expansion_number_unique` UNIQUE(`expansion`,`number`)
+	CONSTRAINT `tcgp_cards_expansion_number_pk` PRIMARY KEY(`expansion`,`number`)
 );
 --> statement-breakpoint
 CREATE TABLE `tcgp_cards_packs` (
-	`card_id` int NOT NULL,
-	`pack_id` varchar(32) NOT NULL
+	`expansion` varchar(32) NOT NULL,
+	`card_number` int NOT NULL,
+	`pack_id` varchar(32) NOT NULL,
+	CONSTRAINT `tcgp_cards_packs_expansion_card_number_pack_id_pk` PRIMARY KEY(`expansion`,`card_number`,`pack_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `tcgp_expansions` (
@@ -39,5 +39,5 @@ CREATE TABLE `tcgp_expansions` (
 --> statement-breakpoint
 ALTER TABLE `tcgp_booster_packs` ADD CONSTRAINT `tcgp_booster_packs_expansion_tcgp_expansions_id_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_expansions`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tcgp_cards` ADD CONSTRAINT `tcgp_cards_expansion_tcgp_expansions_id_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_expansions`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `tcgp_cards_packs` ADD CONSTRAINT `tcgp_cards_packs_card_id_tcgp_cards_id_fk` FOREIGN KEY (`card_id`) REFERENCES `tcgp_cards`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `tcgp_cards_packs` ADD CONSTRAINT `tcgp_cards_packs_expansion_tcgp_cards_expansion_fk` FOREIGN KEY (`expansion`) REFERENCES `tcgp_cards`(`expansion`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `tcgp_cards_packs` ADD CONSTRAINT `tcgp_cards_packs_pack_id_tcgp_booster_packs_name_fk` FOREIGN KEY (`pack_id`) REFERENCES `tcgp_booster_packs`(`name`) ON DELETE cascade ON UPDATE cascade;

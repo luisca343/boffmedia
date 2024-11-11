@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "3f4efc70-cf2b-463b-99c7-97037f562520",
+  "id": "5f9c942f-cfb6-4cc8-873e-55c2078c2468",
   "prevId": "7e453c19-f369-41e4-a5a6-f58f31308267",
   "tables": {
     "boffmedia_roles": {
@@ -1869,13 +1869,6 @@
     "tcgp_cards": {
       "name": "tcgp_cards",
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
         "expansion": {
           "name": "expansion",
           "type": "varchar(32)",
@@ -1883,16 +1876,16 @@
           "notNull": true,
           "autoincrement": false
         },
-        "name": {
-          "name": "name",
-          "type": "varchar(64)",
+        "number": {
+          "name": "number",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "number": {
-          "name": "number",
-          "type": "int",
+        "name": {
+          "name": "name",
+          "type": "varchar(64)",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -1957,28 +1950,28 @@
         }
       },
       "compositePrimaryKeys": {
-        "tcgp_cards_id": {
-          "name": "tcgp_cards_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {
-        "tcgp_cards_expansion_number_unique": {
-          "name": "tcgp_cards_expansion_number_unique",
+        "tcgp_cards_expansion_number_pk": {
+          "name": "tcgp_cards_expansion_number_pk",
           "columns": [
             "expansion",
             "number"
           ]
         }
-      }
+      },
+      "uniqueConstraints": {}
     },
     "tcgp_cards_packs": {
       "name": "tcgp_cards_packs",
       "columns": {
-        "card_id": {
-          "name": "card_id",
+        "expansion": {
+          "name": "expansion",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "card_number": {
+          "name": "card_number",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
@@ -1994,15 +1987,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "tcgp_cards_packs_card_id_tcgp_cards_id_fk": {
-          "name": "tcgp_cards_packs_card_id_tcgp_cards_id_fk",
+        "tcgp_cards_packs_expansion_tcgp_cards_expansion_fk": {
+          "name": "tcgp_cards_packs_expansion_tcgp_cards_expansion_fk",
           "tableFrom": "tcgp_cards_packs",
           "tableTo": "tcgp_cards",
           "columnsFrom": [
-            "card_id"
+            "expansion"
           ],
           "columnsTo": [
-            "id"
+            "expansion"
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
@@ -2021,7 +2014,16 @@
           "onUpdate": "cascade"
         }
       },
-      "compositePrimaryKeys": {},
+      "compositePrimaryKeys": {
+        "tcgp_cards_packs_expansion_card_number_pack_id_pk": {
+          "name": "tcgp_cards_packs_expansion_card_number_pack_id_pk",
+          "columns": [
+            "expansion",
+            "card_number",
+            "pack_id"
+          ]
+        }
+      },
       "uniqueConstraints": {}
     },
     "tcgp_expansions": {
