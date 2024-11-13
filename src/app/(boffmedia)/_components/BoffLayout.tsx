@@ -3,14 +3,14 @@ import { BoffFooter } from './BoffFooter';
 
 export default function BoffLayout({ children, footer = true }: { children: React.ReactNode, footer?: boolean }) {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900 text-white font-sans">
+    <div className="flex flex-col min-h-screen bg-main-900 text-white font-sans">
       <div 
-        className="fixed inset-0 w-full h-full z-0 opacity-30 pointer-events-none" 
+        className="fixed inset-0 w-full h-full z-0 opacity-50 pointer-events-none" 
         style={{ backgroundImage: `url("/img/boff-bg.svg")`, backgroundRepeat: 'repeat' }}
         aria-hidden="true"
       />
       <div className="flex flex-col flex-grow z-10 relative">
-        <main className="container mx-auto px-4 py-12 flex-grow">
+        <main className="container mx-auto px-4 py-12 flex-grow flex flex-col">
           {children}
         </main>
         {footer && <BoffFooter />}

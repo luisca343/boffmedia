@@ -61,7 +61,7 @@ const socialLinks = [
 
 export function BoffFooter() {
   return (
-    <footer className="bg-gray-800 text-orange-100 py-8">
+    <footer className="bg-main-800 text-orange-100 py-8">
       <div className="container mx-auto px-4 text-center">
         <p className="text-xl mb-4">
           &copy; 2024 BoffMedia. Todos los derechos reservados.

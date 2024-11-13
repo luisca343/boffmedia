@@ -16,12 +16,12 @@ interface RulesModalProps {
 export function RulesModal({ isOpen, onClose }: RulesModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[800px] h-[80vh] flex flex-col bg-gray-900 border-4 border-yellow-500 rounded-lg p-0 overflow-hidden">
-        <DialogHeader className="bg-gray-800 p-4 border-b-4 border-yellow-500">
+      <DialogContent className="max-w-[800px] h-[80vh] flex flex-col bg-main-900 border-4 border-yellow-500 rounded-lg p-0 overflow-hidden">
+        <DialogHeader className="bg-main-800 p-4 border-b-4 border-yellow-500">
           <DialogTitle className="text-center">
             <RainbowText text="Reglas de Gira Voltorb" size="lg" />
           </DialogTitle>
-          <DialogDescription className="text-center text-gray-300">
+          <DialogDescription className="text-center text-main-300">
             Descubre cómo jugar este emocionante juego de estrategia y suerte
           </DialogDescription>
         </DialogHeader>
@@ -31,7 +31,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 Introducción
               </h3>
-              <p className="text-gray-300">
+              <p className="text-main-300">
                 Gira Voltorb es una mezcla entre Picross y Buscaminas. Tu
                 objetivo es encontrar las cartas multiplicadoras sin voltear
                 ningún Voltorb.
@@ -42,7 +42,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 El Tablero
               </h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-300">
+              <ul className="list-disc list-inside space-y-2 text-main-300">
                 <li>El juego se desarrolla en una cuadrícula de 5x5.</li>
                 <li>
                   Bajo cada casilla se esconde un número (1, 2 o 3) o un
@@ -62,7 +62,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 Cómo Jugar
               </h3>
-              <ol className="list-decimal list-inside space-y-2 text-gray-300">
+              <ol className="list-decimal list-inside space-y-2 text-main-300">
                 <li>Haz clic en una casilla para voltearla.</li>
                 <li>
                   Si encuentras un multiplicador (x2 o x3), tus monedas se
@@ -87,7 +87,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 Niveles y Progresión
               </h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-300">
+              <ul className="list-disc list-inside space-y-2 text-main-300">
                 <li>Hay 8 niveles en total.</li>
                 <li>
                   Ganas y avanzas de nivel encontrando todas las cartas x2 y x3.
@@ -127,7 +127,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 Nivel 8
               </h3>
-              <p className="text-gray-300">
+              <p className="text-main-300">
                 Para alcanzar el nivel 8, debes ganar 5 juegos seguidos en
                 cualquier nivel, volteando 8 o más cartas multiplicadoras en
                 cada uno de estos 5 juegos.
@@ -138,7 +138,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 Modo Memo
               </h3>
-              <p className="text-gray-300">
+              <p className="text-main-300">
                 Puedes usar el modo Memo para marcar las casillas con símbolos
                 (Voltorb, 1, 2 o 3) sin voltearlas. Esto te ayuda a recordar tus
                 sospechas sobre el contenido de cada casilla.
@@ -149,7 +149,7 @@ export function RulesModal({ isOpen, onClose }: RulesModalProps) {
               <h3 className="text-xl font-bold mb-2 text-yellow-400">
                 Consejos
               </h3>
-              <ul className="list-disc list-inside space-y-2 text-gray-300">
+              <ul className="list-disc list-inside space-y-2 text-main-300">
                 <li>
                   Usa la información de las filas y columnas para deducir la
                   ubicación de los multiplicadores y Voltorbs.

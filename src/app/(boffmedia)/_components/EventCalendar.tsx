@@ -19,7 +19,7 @@ const events = [] as {
 
 export default function EventCalendar() {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
+    <div className="bg-main-800 p-6 rounded-lg border border-main-700 shadow-lg">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.length > 0 ? (
           events.map((item, index) => (
@@ -43,11 +43,11 @@ function EventCalendarElement({
   time: string;
 }) {
   return (
-    <div className="flex items-center space-x-4 p-4 bg-gray-700 rounded-lg">
+    <div className="flex items-center space-x-4 p-4 bg-main-700 rounded-lg">
       <Calendar className="w-8 h-8 text-yellow-400" />
       <div>
         <p className="font-bold text-white">{event}</p>
-        <p className="text-gray-300">
+        <p className="text-main-300">
           {date} - {time}
         </p>
       </div>
@@ -57,12 +57,12 @@ function EventCalendarElement({
 
 function NoEventsMessage() {
   return (
-    <div className="col-span-full flex flex-col items-center justify-center p-8 bg-gray-700 rounded-lg text-center">
+    <div className="col-span-full flex flex-col items-center justify-center p-8 bg-main-700 rounded-lg text-center">
       <Calendar className="w-16 h-16 text-yellow-400 mb-4" />
       <h3 className="text-xl font-bold text-white mb-2">
         No hay eventos próximamente
       </h3>
-      <p className="text-gray-300">
+      <p className="text-main-300">
         Estamos trabajando en traer nuevos eventos emocionantes. ¡Vuelve pronto!
       </p>
     </div>

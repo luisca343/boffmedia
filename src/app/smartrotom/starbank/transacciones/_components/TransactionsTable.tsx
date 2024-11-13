@@ -102,7 +102,7 @@ export function TransactionsTable({
   className?: string;
 }) {
   return (
-    <table className={`min-w-full divide-y divide-gray-200`}>
+    <table className={`min-w-full divide-y divide-main-200`}>
       <thead className="bg-blue-950 text-white">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
@@ -155,13 +155,13 @@ export function TransactionsTable({
           </th>
         </tr>
       </thead>
-      <tbody className="bg-white divide-y divide-gray-200 ">
+      <tbody className="bg-white divide-y divide-main-200 ">
         {table.getRowModel().rows.map((row) => (
           <tr key={row.id} className="hover:bg-blue-50">
             {row.getVisibleCells().map((cell) => (
               <td
                 key={cell.id}
-                className="px-6 py-2 whitespace-nowrap text-sm text-gray-900 "
+                className="px-6 py-2 whitespace-nowrap text-sm text-main-900 "
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>

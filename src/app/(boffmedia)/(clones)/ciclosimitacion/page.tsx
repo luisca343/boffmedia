@@ -36,7 +36,7 @@ export default function Page() {
                 <li>Conversor JSON a DBUnit XML</li>
               </ul>
 
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-main-600 mb-4">
                 Para acceder a una herramienta específica, seleccione la opción
                 correspondiente en el menú de navegación.
               </p>
@@ -49,7 +49,7 @@ export default function Page() {
               </Link>
             </div>
 
-            <footer className="mt-8 text-sm text-gray-600">
+            <footer className="mt-8 text-sm text-main-600">
               <p>
                 Para acceder a la aplicación con usuario y contraseña, debe
                 hacer clic en el icono de la esquina superior derecha.

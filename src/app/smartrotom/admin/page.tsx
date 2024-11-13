@@ -29,7 +29,7 @@ export default function PanelControlAdmin() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {appsAdmin.map((app) => (
           <Link href={app.enlace} key={app.nombre} className="block">
-            <Card className="hover:shadow-neon transition-all duration-300 bg-gray-900 border-green-500 border h-full">
+            <Card className="hover:shadow-neon transition-all duration-300 bg-main-900 border-green-500 border h-full">
               <CardHeader className="flex flex-row items-center space-x-4">
                 <div className="bg-green-900 rounded-sm p-2 text-green-400">
                   {app.icono}

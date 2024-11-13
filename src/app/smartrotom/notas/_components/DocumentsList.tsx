@@ -34,7 +34,7 @@ export function DocumentsList() {
 
     return (
         <div className="h-full flex">
-            <div className="w-[15%] py-4 h-full bg-gray-100 border-r border-gray-200 flex flex-col">
+            <div className="w-[15%] py-4 h-full bg-main-100 border-r border-main-200 flex flex-col">
                 <div className="p-4">
                     <Button onClick={createNote} className="w-full" variant="default">
                         <PlusCircle className="mr-2 h-4 w-4" />
@@ -56,18 +56,18 @@ export function DocumentsList() {
                                 <div 
                                     key={doc.uuid} 
                                     onClick={() => handleNoteClick(doc.id)}
-                                    className="p-2 rounded-lg hover:bg-gray-200 transition-colors mb-2 cursor-pointer"
+                                    className="p-2 rounded-lg hover:bg-main-200 transition-colors mb-2 cursor-pointer"
                                 >
                                     <div className="flex items-center">
-                                        <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                                        <FileText className="h-4 w-4 mr-2 text-main-500" />
                                         <h3 className="font-medium text-sm truncate">{doc.title}</h3>
                                     </div>
-                                    <p className="text-xs text-gray-500 mt-1">{strToDate(doc.updatedAt)}</p>
+                                    <p className="text-xs text-main-500 mt-1">{strToDate(doc.updatedAt)}</p>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="text-gray-500 text-sm p-4">No notes found</p>
+                        <p className="text-main-500 text-sm p-4">No notes found</p>
                     )}
                 </ScrollArea>
             </div>
@@ -84,7 +84,7 @@ export function DocumentsList() {
                 ) : (
                     <>
                         <h1 className="text-2xl font-bold mb-4">Welcome to Your Notes</h1>
-                        <p className="text-gray-600">Select a note from the sidebar or create a new one to get started.</p>
+                        <p className="text-main-600">Select a note from the sidebar or create a new one to get started.</p>
                     </>
                 )}
             </div>

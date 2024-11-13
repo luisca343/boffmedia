@@ -32,7 +32,7 @@ export default function GamingLandingPage() {
               <h1 className="text-7xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
                 Bienvenido a BoffMedia
               </h1>
-              <p className="text-2xl mb-10 text-gray-300 max-w-3xl mx-auto">
+              <p className="text-2xl mb-10 text-main-300 max-w-3xl mx-auto">
                 Sumérgete en experiencias de juego inmersivas y herramientas
                 poderosas para gamers
               </p>
@@ -46,7 +46,7 @@ export default function GamingLandingPage() {
                 </Link>
                 <Link
                   href="/comunidad"
-                  className="bg-gray-800 text-white px-8 py-4 rounded-full font-bold text-xl hover:bg-gray-700 transition duration-300 inline-flex items-center border-2 border-purple-500"
+                  className="bg-main-800 text-white px-8 py-4 rounded-full font-bold text-xl hover:bg-main-700 transition duration-300 inline-flex items-center border-2 border-purple-500"
                 >
                   Únete a la Comunidad
                   <ChevronRight className="ml-2" />
@@ -87,7 +87,7 @@ export default function GamingLandingPage() {
                 ].map((item, index) => (
                   <div
                     key={index}
-                    className="bg-gray-800 p-8 rounded-lg border border-gray-700 shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1"
+                    className="bg-main-800 p-8 rounded-lg border border-main-700 shadow-lg hover:shadow-2xl transition duration-300 transform hover:-translate-y-1"
                   >
                     <div
                       className={`bg-gradient-to-br ${item.color} p-4 rounded-full inline-block mb-6`}
@@ -107,7 +107,7 @@ export default function GamingLandingPage() {
                     <h3 className="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
                       {item.title}
                     </h3>
-                    <p className="text-gray-300 mb-6">{item.description}</p>
+                    <p className="text-main-300 mb-6">{item.description}</p>
                     <Link
                       href={item.link}
                       className="text-purple-400 hover:text-purple-300 font-bold text-lg flex items-center transition duration-300"
@@ -150,7 +150,7 @@ export default function GamingLandingPage() {
       <h2 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
       Únete a la Comunidad BoffMedia
       </h2>
-      <p className="text-xl mb-10 text-gray-300 max-w-2xl mx-auto">
+      <p className="text-xl mb-10 text-main-300 max-w-2xl mx-auto">
       ¡Mantente actualizado sobre nuestros últimos eventos, servidores
       y herramientas!
       </p>
@@ -159,7 +159,7 @@ export default function GamingLandingPage() {
       <input
       type="email"
       placeholder="Ingresa tu correo electrónico"
-      className="flex-grow px-6 py-4 rounded-full border-2 border-purple-500 bg-gray-800 text-white mb-4 sm:mb-0 sm:mr-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+      className="flex-grow px-6 py-4 rounded-full border-2 border-purple-500 bg-main-800 text-white mb-4 sm:mb-0 sm:mr-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
       required
       />
       <button
@@ -173,14 +173,14 @@ export default function GamingLandingPage() {
       <div className="flex justify-center space-x-6">
       <Link
       href="https://discord.gg/boffmedia"
-      className="text-gray-300 hover:text-purple-400 transition duration-300"
+      className="text-main-300 hover:text-purple-400 transition duration-300"
       >
       <Gamepad2 className="w-8 h-8" />
       <span className="sr-only">Únete a nuestro Discord</span>
       </Link>
       <Link
       href="https://twitch.tv/boffmedia"
-      className="text-gray-300 hover:text-purple-400 transition duration-300"
+      className="text-main-300 hover:text-purple-400 transition duration-300"
       >
       <Twitch className="w-8 h-8" />
       <span className="sr-only">Síguenos en Twitch</span>
