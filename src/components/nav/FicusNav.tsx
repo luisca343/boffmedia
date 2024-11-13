@@ -4,19 +4,18 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from 'next/dynamic'
-import { HerramientasMenu } from "./ToolsMenu"
 
 const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
   ssr: false,
-  loading: () => <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
+  loading: () => <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
 })
 
 const UserAuthSection = dynamic(() => import('./UserAuthSection'), { 
   ssr: false,
   loading: () => (
     <div className="flex items-center space-x-2">
-      <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
-      <div className="w-16 h-4 bg-main-800 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
+      <div className="w-16 h-4 bg-gray-800 rounded animate-pulse" />
     </div>
   )
 })
@@ -24,7 +23,7 @@ const UserAuthSection = dynamic(() => import('./UserAuthSection'), {
 const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion"]
 const NAV_LINKS = [
   { href: "/", label: "Inicio" },
-  { href: "/herramientas", label: "Herramientas", override: <HerramientasMenu /> },
+  { href: "/herramientas", label: "Herramientas" },
   { href: "/wingull", label: "Pixelmon Wingull" },
   { href: "/smartrotom", label: "SmartRotom" },
 ]
@@ -44,32 +43,26 @@ export default function OptimizedFicusNav() {
     return (pathname.startsWith(href) && href !== "/") || pathname === href
   }
 
-  if(currentApp && HIDDEN_APPS.includes(currentApp)) return <div className="-mb-16" />
-
   return (
-    <nav className="bg-main-900 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
+    <nav className="bg-gray-900 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
       <div className="container mx-auto flex justify-between items-center h-full">
         <ul className="flex flex-wrap justify-start items-center gap-6">
-          {NAV_LINKS.map(({ href, label, override }) => (
+          {NAV_LINKS.map(({ href, label }) => (
             <li key={href}>
-              {override ? (
-                override
-              ) : (
-                <Link
-                  href={href}
-                  className={`text-orange-300 hover:text-orange-100 transition-colors duration-200 ease-in-out relative group flex items-center ${
-                    inPage(href) ? "font-medium" : ""
-                  }`}
-                >
-                  <span className="relative z-10">{label}</span>
-                  <span
-                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform ${
-                      inPage(href) ? "scale-x-100" : "scale-x-0"
-                    } group-hover:scale-x-100 transition-transform duration-200 ease-in-out`}
-                    aria-hidden="true"
-                  ></span>
-                </Link>
-              )}
+              <Link
+                href={href}
+                className={`text-orange-300 hover:text-orange-100 transition-colors duration-200 ease-in-out relative group flex items-center ${
+                  inPage(href) ? "font-medium" : ""
+                }`}
+              >
+                <span className="relative z-10">{label}</span>
+                <span
+                  className={`absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform ${
+                    inPage(href) ? "scale-x-100" : "scale-x-0"
+                  } group-hover:scale-x-100 transition-transform duration-200 ease-in-out`}
+                  aria-hidden="true"
+                ></span>
+              </Link>
             </li>
           ))}
         </ul>
@@ -81,10 +74,10 @@ export default function OptimizedFicusNav() {
             </>
           ) : (
             <>
-              <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
+              <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
-                <div className="w-16 h-4 bg-main-800 rounded animate-pulse" />
+                <div className="w-8 h-8 bg-gray-800 rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-gray-800 rounded animate-pulse" />
               </div>
             </>
           )}

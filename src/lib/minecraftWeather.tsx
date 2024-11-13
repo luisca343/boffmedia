@@ -28,7 +28,7 @@ export const getDayNightIcon = (ticks: number): JSX.Element => {
   if (ticks >= 12000 && ticks < 13800) return <Sunset className="h-6 w-6 text-orange-500" />;
   if (ticks >= 13450 && ticks < 22550) return <Moon className="h-6 w-6 text-indigo-300" />;
   if (ticks >= 17500 && ticks < 18500) return <Moon className="h-6 w-6 text-indigo-400" />;
-  return <Cloud className="h-6 w-6 text-main-400" />;
+  return <Cloud className="h-6 w-6 text-gray-400" />;
 };
 
 export const formatMinecraftTime = (ticks: number): string => {

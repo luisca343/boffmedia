@@ -1,12 +1,6 @@
 {
-  "tcgpocket": {
-    "geneticapex": "Genes Formidables",
-    "promo-a": "Promo A",
-
-    "packs": {
-      "mewtwo": "Mewtwo - Genes Formidables",
-      "charizard": "Charizard - Genes Formidables",
-      "pikachu": "Pikachu - Genes Formidables"
+    "tcgpocket":{
+        "geneticapex": "Genes Formidables",
+        "promo-a": "Promo A"
     }
-  }
 }

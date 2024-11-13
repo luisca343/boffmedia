@@ -48,7 +48,7 @@ export function TamagotchiScreen({
   }
 
   return (
-    <div className={`w-64 h-64 rounded-lg overflow-hidden mb-8 relative shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)] border-2 border-main-600 z-20 transition-colors duration-300 ${state.isLightOn ? 'bg-green-200' : 'bg-main-800'}`}>
+    <div className={`w-64 h-64 rounded-lg overflow-hidden mb-8 relative shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)] border-2 border-gray-600 z-20 transition-colors duration-300 ${state.isLightOn ? 'bg-green-200' : 'bg-gray-800'}`}>
       <div className="absolute inset-0 bg-[linear-gradient(45deg,_rgba(0,0,0,0.1)_25%,_transparent_25%,_transparent_50%,_rgba(0,0,0,0.1)_50%,_rgba(0,0,0,0.1)_75%,_transparent_75%,_transparent)] bg-[length:4px_4px]"></div>
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.2)_0%,_rgba(255,255,255,0)_70%)]"></div>
       {isOn && isReset ? (
@@ -56,15 +56,15 @@ export function TamagotchiScreen({
           {isHatched ? (
             <>
               {/* Top Menu Items */}
-              <div className={`absolute top-0 left-0 right-0 flex justify-around py-2 z-30 border-b border-green-400/50 ${state.isLightOn ? 'bg-green-300/80' : 'bg-main-700/80'}`}>
+              <div className={`absolute top-0 left-0 right-0 flex justify-around py-2 z-30 border-b border-green-400/50 ${state.isLightOn ? 'bg-green-300/80' : 'bg-gray-700/80'}`}>
                 {MENU_ITEMS.slice(0, 4).map((item, index) => (
                   <div
                     key={index}
-                    className={`p-1 rounded-full ${selectedMenuIndex === index ? (state.isLightOn ? 'bg-green-500' : 'bg-main-500') : ''}`}
+                    className={`p-1 rounded-full ${selectedMenuIndex === index ? (state.isLightOn ? 'bg-green-500' : 'bg-gray-500') : ''}`}
                   >
                     {React.createElement(item.icon, {
                       size: 20,
-                      className: `${state.isLightOn ? 'text-green-800' : 'text-main-300'} ${selectedMenuIndex === index ? 'text-white' : ''}`,
+                      className: `${state.isLightOn ? 'text-green-800' : 'text-gray-300'} ${selectedMenuIndex === index ? 'text-white' : ''}`,
                     })}
                   </div>
                 ))}
@@ -72,7 +72,7 @@ export function TamagotchiScreen({
 
               {activeSubMenu === 'HEALTH_METER' ? (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className={`text-sm ${state.isLightOn ? 'text-green-800' : 'text-main-300'}`}>
+                  <div className={`text-sm ${state.isLightOn ? 'text-green-800' : 'text-gray-300'}`}>
                     {renderHealthMeter()}
                   </div>
                 </div>
@@ -108,15 +108,15 @@ export function TamagotchiScreen({
               )}
               
               {/* Bottom Menu Items */}
-              <div className={`absolute bottom-0 left-0 right-0 flex justify-around py-2 z-30 border-t border-green-400/50 ${state.isLightOn ? 'bg-green-300/80' : 'bg-main-700/80'}`}>
+              <div className={`absolute bottom-0 left-0 right-0 flex justify-around py-2 z-30 border-t border-green-400/50 ${state.isLightOn ? 'bg-green-300/80' : 'bg-gray-700/80'}`}>
                 {MENU_ITEMS.slice(4).map((item, index) => (
                   <div
                     key={index + 4}
-                    className={`p-1 rounded-full ${selectedMenuIndex === index + 4 ? (state.isLightOn ? 'bg-green-500' : 'bg-main-500') : ''}`}
+                    className={`p-1 rounded-full ${selectedMenuIndex === index + 4 ? (state.isLightOn ? 'bg-green-500' : 'bg-gray-500') : ''}`}
                   >
                     {React.createElement(item.icon, {
                       size: 20,
-                      className: `${state.isLightOn ? 'text-green-800' : 'text-main-300'} ${selectedMenuIndex === index + 4 ? 'text-white' : ''}`,
+                      className: `${state.isLightOn ? 'text-green-800' : 'text-gray-300'} ${selectedMenuIndex === index + 4 ? 'text-white' : ''}`,
                     })}
                   </div>
                 ))}
@@ -125,14 +125,14 @@ export function TamagotchiScreen({
               {/* Integrated Sub Menu */}
               {activeSubMenu && activeSubMenu !== 'HEALTH_METER' && (
                 <div className="absolute inset-x-0 top-12 flex justify-center items-start z-40">
-                  <div className={`px-4 py-2 rounded-b-lg shadow-md border-x border-b ${state.isLightOn ? 'bg-green-300/90 border-green-400' : 'bg-main-700/90 border-main-600'}`}>
+                  <div className={`px-4 py-2 rounded-b-lg shadow-md border-x border-b ${state.isLightOn ? 'bg-green-300/90 border-green-400' : 'bg-gray-700/90 border-gray-600'}`}>
                     <div className="flex space-x-4">
                       {MENU_ITEMS[selectedMenuIndex].subMenu?.map((item, index) => (
                         <div
                           key={index}
                           className={`p-2 rounded ${subMenuIndex === index 
-                            ? (state.isLightOn ? 'bg-green-500 text-white' : 'bg-main-500 text-white') 
-                            : (state.isLightOn ? 'bg-green-200 text-green-800' : 'bg-main-600 text-main-200')}`}
+                            ? (state.isLightOn ? 'bg-green-500 text-white' : 'bg-gray-500 text-white') 
+                            : (state.isLightOn ? 'bg-green-200 text-green-800' : 'bg-gray-600 text-gray-200')}`}
                         >
                           {item}
                         </div>
@@ -152,17 +152,17 @@ export function TamagotchiScreen({
             </>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <div className={`text-2xl font-bold animate-pulse ${state.isLightOn ? 'text-green-800' : 'text-main-300'}`}>Incubando...</div>
+              <div className={`text-2xl font-bold animate-pulse ${state.isLightOn ? 'text-green-800' : 'text-gray-300'}`}>Incubando...</div>
             </div>
           )}
         </>
       ) : isOn && !isReset ? (
         <div className="flex items-center justify-center h-full">
-          <div className={`text-2xl font-bold ${state.isLightOn ? 'text-green-800' : 'text-main-300'}`}>Presiona cualquier botón para iniciar</div>
+          <div className={`text-2xl font-bold ${state.isLightOn ? 'text-green-800' : 'text-gray-300'}`}>Presiona cualquier botón para iniciar</div>
         </div>
       ) : (
         <div className="flex items-center justify-center h-full">
-          <div className={`text-2xl font-bold ${state.isLightOn ? 'text-green-800' : 'text-main-300'}`}>Quita la pestaña para comenzar</div>
+          <div className={`text-2xl font-bold ${state.isLightOn ? 'text-green-800' : 'text-gray-300'}`}>Quita la pestaña para comenzar</div>
         </div>
       )}
     </div>

@@ -271,7 +271,7 @@ export function TablaTransacciones({
   console.log(transactions);
   return (
     <div className="relative overflow-x-auto">
-      <table className="min-w-full divide-y divide-main-200">
+      <table className="min-w-full divide-y divide-gray-200">
         <thead className="sticky top-0 z-10 bg-white">
           <tr>
             <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Razón</th>
@@ -283,7 +283,7 @@ export function TablaTransacciones({
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-main-200">
+        <tbody className="bg-white divide-y divide-gray-200">
           {transactions.map((transaction: any) => (
             <tr key={transaction.id}>
               <td className="py-2 whitespace-nowrap text-sm text-black flex justify-center">

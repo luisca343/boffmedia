@@ -113,17 +113,17 @@ export default function Transacciones() {
           <input
             type="text"
             placeholder="Buscar transacciones..."
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-main-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-main-400" />
+          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
         </div>
       </div>
 
       {/* Transactions Table */}
       <div className="bg-white shadow-md rounded-lg overflow-hidden w-full mx-auto  h-[65%]">
-        <table className="min-w-full divide-y divide-main-200">
+        <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-blue-950 text-white">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -142,7 +142,7 @@ export default function Transacciones() {
               </tr>
             ))}
           </thead>
-          <tbody className="bg-white divide-y divide-main-200">
+          <tbody className="bg-white divide-y divide-gray-200">
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-blue-50">
                 {row.getVisibleCells().map((cell) => {
@@ -190,7 +190,7 @@ export default function Transacciones() {
         <BankSectionButton onClick={() => table.previousPage()}>
           Anterior
         </BankSectionButton>
-        <span className="text-sm text-main-700">
+        <span className="text-sm text-gray-700">
           Página {table.getState().pagination.pageIndex + 1} de{" "}
           {table.getPageCount()}
         </span>

@@ -21,7 +21,7 @@ function MemoPanel({ memoMode, selectedMark, onToggleMemoMode, onSelectMark }: M
           <button
             key={mark}
             className={`w-full h-12 py-2 px-4 rounded ${
-              selectedMark === mark && memoMode ? 'bg-green-500' : 'bg-main-600'
+              selectedMark === mark && memoMode ? 'bg-green-500' : 'bg-gray-600'
             } text-white font-bold ${!memoMode && 'opacity-50 cursor-not-allowed'} flex items-center justify-center`}
             onClick={() => onSelectMark(mark)}
             disabled={!memoMode}

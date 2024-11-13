@@ -85,11 +85,11 @@ export default function RotomNav({
 
   function Notifications() {
     return (
-      <div className="w-80 bg-main-800 rounded-lg shadow-lg overflow-hidden">
-        <header className="bg-main-700 p-4 flex items-center justify-between">
+      <div className="w-80 bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <header className="bg-gray-700 p-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Bell className="text-main-300" size={20} />
-            <h2 className="text-main-100 font-semibold">Notificaciones</h2>
+            <Bell className="text-gray-300" size={20} />
+            <h2 className="text-gray-100 font-semibold">Notificaciones</h2>
           </div>
           <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
             {unreadCount}
@@ -101,8 +101,8 @@ export default function RotomNav({
               key={notif.id}
               className={`p-3 rounded text-sm flex flex-col ${
                 notif.read
-                  ? "bg-main-700 text-main-400"
-                  : "bg-main-600 text-main-200"
+                  ? "bg-gray-700 text-gray-400"
+                  : "bg-gray-600 text-gray-200"
               }`}
             >
               <div className="flex justify-between items-start mb-2">
@@ -115,7 +115,7 @@ export default function RotomNav({
                 {!notif.read && (
                   <button
                     onClick={() => markAsRead(notif.id)}
-                    className="text-main-400 hover:text-white"
+                    className="text-gray-400 hover:text-white"
                     aria-label="Mark as read"
                   >
                     <Check size={16} />
@@ -123,7 +123,7 @@ export default function RotomNav({
                 )}
                 <button
                   onClick={() => remove(notif.id)}
-                  className="text-main-400 hover:text-white"
+                  className="text-gray-400 hover:text-white"
                   aria-label="Delete notification"
                 >
                   <X size={16} />
@@ -132,17 +132,17 @@ export default function RotomNav({
             </div>
           ))}
         </div>
-        <footer className="bg-main-700 p-2 flex justify-between">
+        <footer className="bg-gray-700 p-2 flex justify-between">
           <button
             onClick={clear}
-            className="flex items-center space-x-1 text-main-300 hover:text-white text-sm"
+            className="flex items-center space-x-1 text-gray-300 hover:text-white text-sm"
           >
             <Trash2 size={16} />
             <span>Limpiar</span>
           </button>
           <button
             onClick={markAllAsRead}
-            className="flex items-center space-x-1 text-main-300 hover:text-white text-sm"
+            className="flex items-center space-x-1 text-gray-300 hover:text-white text-sm"
           >
             <Check size={16} />
             <span>Marcar todas como leídas</span>
@@ -168,7 +168,7 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="top"
-          className="bg-main-800 text-main-50 border-none"
+          className="bg-main-900 text-main-50 border-none"
           parentId="smartrotom"
         >
           <SheetHeader>

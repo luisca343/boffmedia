@@ -117,7 +117,7 @@ export function SendMoney() {
           </label>
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <DollarSign className="h-5 w-5 text-main-400" />
+              <DollarSign className="h-5 w-5 text-gray-400" />
             </div>
             <Input
               id="amount"
@@ -182,7 +182,7 @@ export function SendMoney() {
           </div>
         </div>
       )}
-      <div className="px-6 py-4 bg-main-50 border-t border-main-200">
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
         <Button
           onClick={sendMoney}
           className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-950 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

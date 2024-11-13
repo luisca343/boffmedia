@@ -123,7 +123,7 @@ export default function FramerMotionSteamLogoPuzzle() {
       {imageLoaded ? (
         <>
           <div 
-            className="relative bg-main-800 bg-opacity-80 rounded-lg p-1 z-10"
+            className="relative bg-gray-800 bg-opacity-80 rounded-lg p-1 z-10"
             style={{
               width: '300px',
               height: '300px',

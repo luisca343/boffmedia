@@ -30,7 +30,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-main-800 p-6 rounded-lg shadow-lg"
+      className="bg-gray-800 p-6 rounded-lg shadow-lg"
     >
       <div className="mb-4">
         <label htmlFor="name" className="block text-orange-300 mb-2">
@@ -42,7 +42,7 @@ export function ContactForm() {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-main-700 text-white border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded bg-gray-700 text-white border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
           required
         />
       </div>
@@ -56,7 +56,7 @@ export function ContactForm() {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-main-700 text-white border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded bg-gray-700 text-white border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
           required
         />
       </div>
@@ -69,7 +69,7 @@ export function ContactForm() {
           name="message"
           value={formData.message}
           onChange={handleChange}
-          className="w-full p-2 rounded bg-main-700 text-white border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full p-2 rounded bg-gray-700 text-white border border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
           rows={4}
           required
         ></textarea>

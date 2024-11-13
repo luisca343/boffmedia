@@ -31,7 +31,7 @@ export default function Cuentas() {
         <BankSection className="bg-white overflow-hidden max-h-[80%]">
           <BankSectionHeader>Your Accounts</BankSectionHeader>
           <BankSectionContent>
-            <ul className="divide-y divide-main-200 overflow-auto">
+            <ul className="divide-y divide-gray-200 overflow-auto">
               {accounts.map((account: any) => (
                 <li
                   key={account.id}

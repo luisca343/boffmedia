@@ -50,7 +50,7 @@ const TypeBadge = ({
           status === "possible"
             ? "bg-blue-500 text-white border-blue-300"
             : status === "incorrect"
-            ? "bg-main-400 text-black border-main-600"
+            ? "bg-gray-400 text-black border-gray-600"
             : status === "correct"
             ? "bg-green-500 text-white border-green-300"
             : "bg-yellow-500 text-black border-yellow-300"

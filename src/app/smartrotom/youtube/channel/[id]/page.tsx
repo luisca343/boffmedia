@@ -123,7 +123,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
         <InternalLink
           href={`/youtube/video/${item.snippet.resourceId.videoId}`}
           key={item.id.videoId}
-          className="group bg-main-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-main-700"
+          className="group bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-gray-700"
         >
           <div className="relative">
             <img
@@ -137,7 +137,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
             <h3 className="text-lg font-semibold line-clamp-2 mb-2 group-hover:text-red-500 transition-colors duration-300">
               {item.snippet.title}
             </h3>
-            <p className="text-sm text-main-400 group-hover:text-main-300 transition-colors duration-300">
+            <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
               {new Date(item.snippet.publishedAt).toLocaleDateString()}
             </p>
           </div>
@@ -147,7 +147,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
   )
 
   return (
-    <div className="min-h-screen bg-main-900 text-white">
+    <div className="min-h-screen bg-gray-900 text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center md:items-start mb-8">
           <img
@@ -159,7 +159,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
             <h1 className="text-3xl font-bold mb-2">
               {channelInfo.snippet.title}
             </h1>
-            <p className="text-main-400 mb-4">
+            <p className="text-gray-400 mb-4">
               {channelInfo.snippet.description}
             </p>
             <div className="flex justify-center md:justify-start space-x-4">
