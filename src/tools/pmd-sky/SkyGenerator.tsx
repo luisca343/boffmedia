@@ -63,7 +63,7 @@ export function SkyGenerator() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <FormField label={commonTrans("QUEST_TYPE")}>
             <Combobox variant="orange"  
-              className="w-full bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full bg-main-800 border-orange-600 text-orange-100"
               data={getQuestData(commonTrans)}
               value={formData.questType.toString()}
               onChange={(value) =>
@@ -84,7 +84,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("QUEST_SUBTYPE")}>
             <Combobox variant="orange" 
-              className="w-full bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full bg-main-800 border-orange-600 text-orange-100"
               data={getSubQuestData(formData.questType, commonTrans)}
               value={formData.specialQuestType.toString()}
               disabled={
@@ -111,7 +111,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("DUNGEON")}>
             <Combobox variant="orange"  
-              className="w-full bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full bg-main-800 border-orange-600 text-orange-100"
               data={getValidDungeons(dungeonsTrans)}
               value={formData.dungeon.toString()}
               onChange={(value) => setFormData({ dungeon: Number(value) })}
@@ -123,7 +123,7 @@ export function SkyGenerator() {
               type="number"
               min={1}
               max={getFloors(formData.dungeon)}
-              className="w-full xl:w-24 bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full xl:w-24 bg-main-800 border-orange-600 text-orange-100"
               value={formData.floor}
               onChange={(e) => setFormData({ floor: Number(e.target.value) })}
             />
@@ -143,7 +143,7 @@ export function SkyGenerator() {
                     formData.specialQuestType
                   ) > 0
                 }
-                className="flex-grow bg-gray-800 border-orange-600 text-orange-100"
+                className="flex-grow bg-main-800 border-orange-600 text-orange-100"
               />
               <img
                 width={40}
@@ -170,7 +170,7 @@ export function SkyGenerator() {
                     formData.specialQuestType
                   ) > 0 || getClientIsTarget(formData.questType)
                 }
-                className="flex-grow bg-gray-800 border-orange-600 text-orange-100"
+                className="flex-grow bg-main-800 border-orange-600 text-orange-100"
               />
               <img
                 width={40}
@@ -185,7 +185,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("REWARD_TYPE")} className="md:col-span-2">
             <Combobox variant="orange" 
-              className="w-full bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full bg-main-800 border-orange-600 text-orange-100"
               data={getRewardTypes(commonTrans)}
               value={formData.rewardType.toString()}
               onChange={(value) => setFormData({ rewardType: Number(value) })}
@@ -194,7 +194,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("TARGET_ITEM")}>
             <Combobox variant="orange" 
-              className="w-full bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full bg-main-800 border-orange-600 text-orange-100"
               data={getItemData()}
               value={formData.targetItem.toString()}
               onChange={handleTargetItemChange}
@@ -204,7 +204,7 @@ export function SkyGenerator() {
 
           <FormField label={commonTrans("REWARD_ITEM")}>
             <Combobox variant="orange" 
-              className="w-full bg-gray-800 border-orange-600 text-orange-100"
+              className="w-full bg-main-800 border-orange-600 text-orange-100"
               data={getItemData()}
               value={formData.rewardItem.toString()}
               onChange={handleRewardItemChange}
@@ -231,7 +231,7 @@ export function SkyGenerator() {
         </Button>
 
         {wonderMail && (
-          <div className="bg-gray-800 p-4 rounded-lg text-center border border-orange-600">
+          <div className="bg-main-800 p-4 rounded-lg text-center border border-orange-600">
             <h2 className="text-2xl font-semibold mb-2 text-orange-400">
               Correo Secreto {formData.europeanVersion ? "(EU)" : ""}
             </h2>

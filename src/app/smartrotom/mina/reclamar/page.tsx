@@ -52,7 +52,7 @@ export default function Reclamar() {
   const groupedRewards = groupRewardsByType(unclaimed);
 
   return (
-    <MenuWrapper className="w-full min-h-full overflow-hidden bg-gray-900 text-white  pt-4  flex flex-col items-center  text-shadow-border2">
+    <MenuWrapper className="w-full min-h-full overflow-hidden bg-main-900 text-white  pt-4  flex flex-col items-center  text-shadow-border2">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl">
         <div className="space-y-4 overflow-auto">
           {Object.keys(groupedRewards).map((type) => (

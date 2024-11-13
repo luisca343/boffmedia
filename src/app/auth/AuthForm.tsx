@@ -75,8 +75,8 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full bg-gray-900 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center bg-no-repeat">
-      <div className="w-full max-w-md p-8 bg-gray-800 bg-opacity-80 rounded-lg shadow-xl backdrop-blur-sm border border-gray-700">
+    <div className="flex items-center justify-center min-h-screen w-full bg-main-900 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center bg-no-repeat">
+      <div className="w-full max-w-md p-8 bg-main-800 bg-opacity-80 rounded-lg shadow-xl backdrop-blur-sm border border-main-700">
         <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">
           {isRegister ? 'Registrarse' : 'Iniciar Sesión'}
         </h2>
@@ -91,7 +91,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
                   <FormLabel className="text-orange-300 font-semibold">Username</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input placeholder="Enter your username" {...field} className="bg-gray-700 text-orange-100 border-gray-600 focus:border-orange-500 pl-10" />
+                      <Input placeholder="Enter your username" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
                     </div>
                   </FormControl>
@@ -109,7 +109,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
                     <FormLabel className="text-orange-300 font-semibold">Email</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input placeholder="Enter your email" type="email" {...field} className="bg-gray-700 text-orange-100 border-gray-600 focus:border-orange-500 pl-10" />
+                        <Input placeholder="Enter your email" type="email" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
                         <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
                       </div>
                     </FormControl>
@@ -127,7 +127,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
                   <FormLabel className="text-orange-300 font-semibold">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input placeholder="Enter your password" type="password" {...field} className="bg-gray-700 text-orange-100 border-gray-600 focus:border-orange-500 pl-10" />
+                      <Input placeholder="Enter your password" type="password" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
                       <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
                     </div>
                   </FormControl>
@@ -145,7 +145,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
                     <FormLabel className="text-orange-300 font-semibold">Confirm Password</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input placeholder="Confirm your password" type="password" {...field} className="bg-gray-700 text-orange-100 border-gray-600 focus:border-orange-500 pl-10" />
+                        <Input placeholder="Confirm your password" type="password" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
                       </div>
                     </FormControl>
