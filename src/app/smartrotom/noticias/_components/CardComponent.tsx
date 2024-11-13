@@ -37,7 +37,7 @@ const variantStyles = {
   },
   default: {
     cardClass: "bg-white text-black",
-    buttonClass: "bg-gray-300 text-black hover:bg-gray-400",
+    buttonClass: "bg-main-300 text-black hover:bg-main-400",
   },
 };
 

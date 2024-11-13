@@ -125,7 +125,7 @@ export default function Transacciones() {
         <BankSectionButton onClick={() => table.previousPage()}>
           Anterior
         </BankSectionButton>
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-main-700">
           Página {table.getState().pagination.pageIndex + 1} de{" "}
           {table.getPageCount()}
         </span>

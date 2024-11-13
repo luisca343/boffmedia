@@ -17,7 +17,7 @@ type Cell = {
 }
 
 const typeColors: { [key: string]: string } = {
-  Normal: 'bg-gray-400',
+  Normal: 'bg-main-400',
   Fire: 'bg-red-500',
   Water: 'bg-blue-500',
   Electric: 'bg-yellow-400',
@@ -317,12 +317,12 @@ export default function TypeDoku() {
                           <button
                             key={`${row}-${col}`}
                             className={`w-full aspect-square flex items-center justify-center text-xs sm:text-sm font-bold rounded-md border-2 transition-all duration-200 ${
-                              cell?.isGiven ? 'border-gray-500 cursor-not-allowed' : 'border-yellow-300 hover:border-yellow-500'
+                              cell?.isGiven ? 'border-main-500 cursor-not-allowed' : 'border-yellow-300 hover:border-yellow-500'
                             } ${
                               selectedCell && selectedCell[0] === row && selectedCell[1] === col
                                 ?'ring-2 ring-pink-500'
                                 : ''
-                            } ${cell?.value ? typeColors[cell.value] : 'bg-gray-700'}`}
+                            } ${cell?.value ? typeColors[cell.value] : 'bg-main-700'}`}
                             onClick={() => handleCellClick(row, col)}
                             disabled={cell?.isGiven}
                           >

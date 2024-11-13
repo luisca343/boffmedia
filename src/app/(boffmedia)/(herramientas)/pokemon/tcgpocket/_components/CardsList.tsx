@@ -24,7 +24,7 @@ export function CardsList({ cards }: { cards: Card[] }) {
             href={`/tcgpocket/cartas/${card.expansion}/${card.number}`}
             className="group block"
           >
-            <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-slate-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl">
+            <div className="relative bg-primary-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-primary-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl">
               <div className="relative w-full pb-[140%]">
                 <Image
                   src={`/img/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}

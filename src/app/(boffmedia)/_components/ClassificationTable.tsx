@@ -56,11 +56,11 @@ const tableData = [
 
 export function ClassificationTable() {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg overflow-x-auto">
+    <div className="bg-main-800 p-6 rounded-lg border border-main-700 shadow-lg overflow-x-auto">
       {tableData.length > 0 ? (
         <table className="w-full text-left">
           <thead>
-            <tr className="border-b border-gray-700">
+            <tr className="border-b border-main-700">
               <th className="py-3 px-4">Posición</th>
               <th className="py-3 px-4">Jugador</th>
               <th className="py-3 px-4">Puntos</th>
@@ -69,7 +69,7 @@ export function ClassificationTable() {
           </thead>
           <tbody>
             {tableData.map((item, index) => (
-              <tr key={index} className="border-b border-gray-700">
+              <tr key={index} className="border-b border-main-700">
                 <td className="py-3 px-4 font-bold text-yellow-400">
                   {item.position}
                 </td>
@@ -97,7 +97,7 @@ function NoDataMessage() {
     <div className="text-center py-12">
       <Users className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
       <h3 className="text-2xl font-bold mb-2 text-yellow-400">No hay datos de clasificación</h3>
-      <p className="text-gray-300 mb-4">
+      <p className="text-main-300 mb-4">
         Aún no tenemos datos de clasificación disponibles. ¡Sé el primero en participar y aparecer en la tabla!
       </p>
       <div className="flex justify-center items-center space-x-2">

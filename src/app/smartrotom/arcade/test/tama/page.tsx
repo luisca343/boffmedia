@@ -90,7 +90,7 @@ export default function PokemonTamagotchi() {
       <div className="relative w-[26rem] h-[32rem] flex flex-col items-center justify-center">
         {!tabRemoved && (
           <div 
-            className="absolute right-0 top-1/2 w-24 h-16 bg-yellow-300 transform translate-x-1/2 -translate-y-1/2 cursor-pointer z-0 flex items-center justify-center text-sm font-bold text-gray-800 shadow-lg rounded-r-lg"
+            className="absolute right-0 top-1/2 w-24 h-16 bg-yellow-300 transform translate-x-1/2 -translate-y-1/2 cursor-pointer z-0 flex items-center justify-center text-sm font-bold text-main-800 shadow-lg rounded-r-lg"
             onClick={removeTab}
           >
             Quitar Pestaña

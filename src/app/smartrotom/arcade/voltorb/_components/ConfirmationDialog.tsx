@@ -43,13 +43,13 @@ export default function ConfirmationDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent className={`bg-gray-900 border-4 ${variant === 'quit' ? 'border-red-500' : 'border-yellow-500'} rounded-lg p-0 max-w-md w-full ${animationClass}`}>
+      <AlertDialogContent className={`bg-main-900 border-4 ${variant === 'quit' ? 'border-red-500' : 'border-yellow-500'} rounded-lg p-0 max-w-md w-full ${animationClass}`}>
         <div className="pixel-corners p-8">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-2xl font-bold text-center mb-6 text-white">
               {title}
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-lg text-center text-gray-300">
+            <AlertDialogDescription className="text-lg text-center text-main-300">
               {description}
             </AlertDialogDescription>
           </AlertDialogHeader>
