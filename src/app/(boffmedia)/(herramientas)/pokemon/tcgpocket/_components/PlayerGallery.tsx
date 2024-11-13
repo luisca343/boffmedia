@@ -192,10 +192,10 @@ export function PlayerGallery({
         )}
         <div className="flex items-center space-x-4">
           <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-            <SelectTrigger className="w-[200px] bg-primary-700 text-white border-primary-600">
+            <SelectTrigger className="w-[200px] bg-main-700 text-white border-main-600">
               <SelectValue placeholder="Seleccionar evento" />
             </SelectTrigger>
-            <SelectContent className="bg-primary-700 text-white border-primary-600">
+            <SelectContent className="bg-main-700 text-white border-main-600">
               <SelectItem value="general">Todas las cartas</SelectItem>
               <SelectItem value="mewQuest">Mew Quest</SelectItem>
             </SelectContent>
@@ -211,7 +211,7 @@ export function PlayerGallery({
                 Recomendar Mejor Sobre
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-primary-800 text-white border-primary-700 max-w-4xl">
+            <DialogContent className="bg-main-800 text-white border-main-700 max-w-4xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold text-orange-300">Probabilidades de Nuevas Cartas por Pack</DialogTitle>
                 <DialogDescription className="text-main-300">
@@ -262,7 +262,7 @@ export function PlayerGallery({
                   transition={{ duration: 0.3 }}
                 >
                   <div className="group block">
-                    <div className={`relative bg-primary-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-primary-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl ${isMissing ? 'grayscale' : ''}`}>
+                    <div className={`relative bg-main-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-main-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl ${isMissing ? 'grayscale' : ''}`}>
                       <div className="aspect-[2.5/3.5] relative">
                         <Image
                           src={`/img/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}

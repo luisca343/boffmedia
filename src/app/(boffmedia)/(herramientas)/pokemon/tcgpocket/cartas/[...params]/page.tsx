@@ -86,7 +86,7 @@ export default function Expansions({ params }: { params: { params: [expansion: s
               transition={{ type: "spring", stiffness: 300 }}
             >
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary-foreground to-primary rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-main via-main-foreground to-main rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                 <Image
                   src={`/img/tcgpocket/cards/${expansion}/${id}.jpg`}
                   alt={cardData.name}
