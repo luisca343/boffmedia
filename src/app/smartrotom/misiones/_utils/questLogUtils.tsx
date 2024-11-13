@@ -16,7 +16,7 @@ export function getStatusStyles(status: QuestStatus) {
     case QuestStatus.AVAILABLE:
       return "bg-yellow-700 text-yellow-100"
     case QuestStatus.LOCKED:
-      return "bg-main-700 text-main-100"
+      return "bg-gray-700 text-gray-100"
   }
 }
 

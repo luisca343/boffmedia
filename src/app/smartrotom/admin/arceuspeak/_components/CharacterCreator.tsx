@@ -86,7 +86,7 @@ export default function CharacterCreator() {
         placeholder="Formato (ej: §l§f[§6Nombre del Personaje§f])"
         value={characterFormat}
         onChange={(e) => setCharacterFormat(e.target.value)}
-        className="bg-main-800 text-green-400 border-green-500"
+        className="bg-gray-800 text-green-400 border-green-500"
       />
       <div className="grid grid-cols-4 gap-2">
         {colorCodes.map((color) => (
@@ -108,13 +108,13 @@ export default function CharacterCreator() {
           <Button
             key={style.code}
             onClick={() => insertCode(style.code)}
-            className="bg-main-700 hover:bg-main-600 text-green-400"
+            className="bg-gray-700 hover:bg-gray-600 text-green-400"
           >
             {style.name}
           </Button>
         ))}
       </div>
-      <div className="bg-main-800 p-2 rounded border border-green-500">
+      <div className="bg-gray-800 p-2 rounded border border-green-500">
         <p className="text-green-400">Vista previa:</p>
         <p dangerouslySetInnerHTML={{ __html: previewHtml }} />
       </div>

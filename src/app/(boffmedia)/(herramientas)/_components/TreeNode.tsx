@@ -20,7 +20,7 @@ export default function TreeNode({ name, structure, path }: TreeNodeProps) {
 
   return (
     <div className="py-1">
-      <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-main-800 transition-colors duration-150">
+      <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-800 transition-colors duration-150">
         {isDirectory && (
           <button onClick={toggleOpen} className="focus:outline-none">
             {isOpen ? (

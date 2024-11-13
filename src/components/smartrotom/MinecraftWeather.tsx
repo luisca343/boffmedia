@@ -35,25 +35,25 @@ export default function MinecraftWeatherWidget() {
           <div className="flex items-center space-x-3">
             {getDayNightIcon(minecraftTime)}
             <div>
-              <p className="text-lg font-semibold text-main-800">
+              <p className="text-lg font-semibold text-gray-800">
                 {formatMinecraftTime(minecraftTime)}
               </p>
-              <p className="text-sm text-main-600">
+              <p className="text-sm text-gray-600">
                 {getDaySection(minecraftTime)}
               </p>
             </div>
           </div>
           <div className="flex items-center space-x-1">
-            <p className="text-md font-bold text-main-800 capitalize">
+            <p className="text-md font-bold text-gray-800 capitalize">
               {getWeatherName(weatherData.weather)}
             </p>
             {getWeatherIcon(weatherData.weather)}
           </div>
           <div className="text-right">
-            <p className="text-sm text-main-600">{
+            <p className="text-sm text-gray-600">{
               weatherData.weather == "clear" ? "Lluvia prevista en" : "Despejado en"
               }</p>
-            <p className="text-lg font-semibold text-main-800">
+            <p className="text-lg font-semibold text-gray-800">
               {formatTime(timeLeft)}
             </p>
           </div>

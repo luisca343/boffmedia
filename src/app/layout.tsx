@@ -28,11 +28,11 @@ export default async  function RootLayout({
     <GlobalProviders>
       <html lang="en">
         <body
-          className={`${inter.className} flex flex-col h-screen bg-transparent`}
+          className={`${inter.className} flex flex-col h-screen overflow-hidden bg-transparent`}
         >
           <ToastContainer position="bottom-right" theme="dark" />
           <OptimizedFicusNav />
-          <section className="border-solid no-scrollbar flex-1 pt-16">
+          <section className="overflow-auto border-solid no-scrollbar flex-1 pt-16">
             <NextIntlClientProvider messages={messages}>
               {children}
             </NextIntlClientProvider>

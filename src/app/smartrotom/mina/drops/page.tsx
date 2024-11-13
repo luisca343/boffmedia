@@ -14,7 +14,7 @@ export default async function Drops() {
   };
   if(!drops) return <></>
   return (
-    <MenuWrapper className="w-full min-h-full overflow-hidden bg-main-900 text-white pt-4   flex flex-col items-center">
+    <MenuWrapper className="w-full min-h-full overflow-hidden bg-gray-900 text-white pt-4   flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-full">
         <h2 className="text-2xl font-bold mb-4">DROPS</h2>
         <div className="space-y-4 overflow-auto">

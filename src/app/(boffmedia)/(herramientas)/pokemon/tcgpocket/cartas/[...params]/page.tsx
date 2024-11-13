@@ -25,11 +25,11 @@ interface Card {
 export default function Expansions({ params }: { params: { params: [expansion: string, id: string] } }) {
   const [expansion, id] = params.params;
   const [cardData, setCardData] = useState<Card | null>(null);
-  const trans = useTranslations("tcgpocket");
+  const trans = useTranslations("tgcpocket");
 
   useEffect(() => {
-    boffGET(`/herramientas/ptcgp/cards/${expansion}/${id}`).then((data: Card) => {
-      setCardData(data);
+    boffGET(`/herramientas/ptcgp/cards/${expansion}/${id}`).then((data: Card[]) => {
+      setCardData(data[0]);
     });
   }, [expansion, id]);
 
@@ -106,15 +106,15 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                   {/* Basic Info */}
                   <div className="space-y-6">
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Número</p>
+                      <p className="text-sm text-gray-400 mb-1">Número</p>
                       <p className="text-xl text-white">{cardData.number}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Expansión</p>
+                      <p className="text-sm text-gray-400 mb-1">Expansión</p>
                       <p className="text-xl text-white">{trans(cardData.expansion)}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Rareza</p>
+                      <p className="text-sm text-gray-400 mb-1">Rareza</p>
                       <div className="flex items-center">
                         {getRarityImages(cardData.rarity)}
                       </div>
@@ -124,7 +124,7 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                   {/* Stats */}
                   <div className="space-y-6">
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Tipo</p>
+                      <p className="text-sm text-gray-400 mb-1">Tipo</p>
                       <div className="flex items-center gap-2">
                         <div className="p-1 bg-white/10 rounded-full">
                           <Image
@@ -140,12 +140,12 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                     </div>
 
                     <div>
-                      <p className="text-sm text-main-400 mb-1">PS</p>
+                      <p className="text-sm text-gray-400 mb-1">PS</p>
                       <p className="text-xl text-white">{cardData.hp}</p>
                     </div>
 
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Debilidad</p>
+                      <p className="text-sm text-gray-400 mb-1">Debilidad</p>
                       <div className="flex items-center gap-2">
                         <div className="p-1 bg-white/10 rounded-full">
                           <Image
@@ -163,7 +163,7 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                     </div>
 
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Coste de Retirada</p>
+                      <p className="text-sm text-gray-400 mb-1">Coste de Retirada</p>
                       <div className="flex items-center gap-2">
                         {[...Array(cardData.retreat_cost)].map((_, index) => (
                           <div key={index} className="p-1 bg-white/10 rounded-full">
