@@ -86,11 +86,8 @@
   --text-secondary: var(--dark-neutral-300);
   --text-tertiary: var(--dark-neutral-500);
 
-  --text-contrast: var(--dark-neutral-950);
-
   --border: var(--dark-neutral-300);
   --input-border: var(--dark-neutral-400);
-  --border-dark: var(--dark-neutral-600);
 
   --success: var(--dark-success);
   --warning: var(--dark-warning);

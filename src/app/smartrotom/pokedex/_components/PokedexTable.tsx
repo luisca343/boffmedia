@@ -7,7 +7,7 @@ export default function PokedexTable({children}: {children: React.ReactNode}){
 }
 
 export function PokedexRow({children}: {children: React.ReactNode}){
-    return <TableRow className="hover:bg-secondary-hover border border-border-dark"  >
+    return <TableRow className="hover:bg-foreground0 border border-border-dark"  >
         {children}
     </TableRow>
 }

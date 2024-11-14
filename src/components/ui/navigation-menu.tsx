@@ -41,7 +41,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-foreground hover:text-text-tertiary focus:bg-foreground focus:text-text-tertiary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-foreground/50 data-[state=open]:bg-foreground/50 dark:bg-background dark:hover:bg-surface-3 dark:hover:text-text-primary dark:focus:bg-surface-3 dark:focus:text-text-primary dark:data-[active]:bg-surface-3/50 dark:data-[state=open]:bg-surface-3/50",
+  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-foreground hover:text-text-tertiary focus:bg-foreground focus:text-text-tertiary focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-foreground/50 data-[state=open]:bg-foreground/50 dark:bg-main-950 dark:hover:bg-surface-3 dark:hover:text-text-primary dark:focus:bg-surface-3 dark:focus:text-text-primary dark:data-[active]:bg-surface-3/50 dark:data-[state=open]:bg-surface-3/50",
   {
     variants: {
       variant: {

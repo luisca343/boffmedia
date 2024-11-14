@@ -31,7 +31,7 @@ export default function MenuHeader(){
 
     return(
         
-        <header className="flex bg-background items-center justify-evenly text-white h-12 z-10 p-2 text-xl 2xl:text-lg" >
+        <header className="flex bg-main-950 items-center justify-evenly text-white h-12 z-10 p-2 text-xl 2xl:text-lg" >
                 <div className="flex mr-2 items-center">
                     <img height={32} width={32} src={`/smartrotom/img/apps/pokedex/avistado.webp`} />
                     <span className="ml-1">Vistos</span>
