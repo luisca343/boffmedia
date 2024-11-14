@@ -51,8 +51,11 @@ import { ResponseModule } from './response/response.module';
 import { LoggerModule } from './logger/logger.module';
 import { PtcgpController } from './boffmedia/herramientas/ptcgp/ptcgp.controller';
 import { PtcgpModule } from './boffmedia/herramientas/ptcgp/ptcgp.module';
-import { PtcgpService } from './boffmedia/herramientas/ptcgp/ptcgp.service';
 import { ConfigService } from './config.service';
+import { TgcpCardService } from './boffmedia/herramientas/ptcgp/card.service';
+import { TgcpUserCardService } from './boffmedia/herramientas/ptcgp/user-card.service';
+import { TgcpPackService } from './boffmedia/herramientas/ptcgp/pack.service';
+import { TgcpScraperService } from './boffmedia/herramientas/ptcgp/scraper.service';
 
 @Module({
   imports: [
@@ -95,10 +98,12 @@ import { ConfigService } from './config.service';
     PtcgpModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, PtcgpService, {
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, {
     provide: ConfigService,
     useClass: ConfigService,
-  }],
+  }, TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService
+
+],
   exports: [ConfigService]
 })
 export class AppModule implements NestModule{
