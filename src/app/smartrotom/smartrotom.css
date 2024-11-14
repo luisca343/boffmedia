@@ -97,7 +97,7 @@
 
 .theme-light {
   --background: var(--light-neutral-100);
-  --foreground: var(--light-neutral-950);
+  --foreground: var(--light-neutral-900);
 
   --primary: var(--light-primary-500);
   --primary-hover: var(--light-primary-600);
