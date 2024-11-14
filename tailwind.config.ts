@@ -72,6 +72,7 @@ const config = {
           primary: 'rgb(var(--text-primary) / <alpha-value>)',
           secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
           tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
+          contrast: 'rgb(var(--text-contrast) / <alpha-value>)',
         },
         border: {
           DEFAULT: 'rgb(var(--border) / <alpha-value>)',

@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
 export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}}) {
     
     const t  = useTranslations("");
-    return <header className="flex flex-col bg-main-950 text-text-primary h-24 z-10 p-2 text-xl 2xl:text-lg" >
+    return <header className="flex flex-col bg-background text-text-primary h-24 z-10 p-2 text-xl 2xl:text-lg" >
         <div className="w-full flex flex-1 justify-between items-center">
             <InternalLink className="flex flex-row  items-center hover:text-primary" 
                 href={`/pokedex/entrada/${prev.dex}`}>
