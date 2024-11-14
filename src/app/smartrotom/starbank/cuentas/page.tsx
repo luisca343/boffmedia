@@ -108,7 +108,7 @@ export default function Cuentas() {
               onChange={(e) => setAccountName(e.target.value)}
             />
             <Button
-              className="bg-blue-900 hover:bg-blue-700 text-text-primary mt-2 p-2 rounded-md"
+              className="bg-blue-900 hover:bg-blue-700 text-main-50 mt-2 p-2 rounded-md"
               onClick={() => createAccount(accountName)}
             >
               Crear

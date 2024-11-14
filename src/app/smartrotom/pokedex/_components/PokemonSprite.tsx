@@ -39,7 +39,7 @@ export function PokemonSpriteLink({children, id, form, palette, width=80, height
         if(hideCaught && imageUrl.status === 2) return null
         if(hideSeen && imageUrl.status === 1) return null
         
-        return <InternalLink  className="flex flex-col items-center  hover:bg-foreground  rounded-sm text-center w-24 2xl:w-20   text-text-primary" href={`/pokedex/entrada/${id}`}>
+        return <InternalLink  className="flex flex-col items-center  hover:bg-main-400  rounded-sm text-center w-24 2xl:w-20   text-main-50" href={`/pokedex/entrada/${id}`}>
             <div style={{width, maxHeight:height}} className={` relative ${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}><img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
               className={` ${imageUrl.showImg ? '' : 'brightness-0'}`}/>
                  {showStatus && 

@@ -8,7 +8,7 @@ import { InternalLink } from "@/components/nav/Link";
 
 export default function PokedexMenu(){
     return (
-        <div className="bg-surface-3  ">
+        <div className="bg-main-800  ">
             <MenuHeader />
             <div className="mt-4">
                 <PokedexSection title="Búsqueda">

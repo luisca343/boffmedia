@@ -320,7 +320,7 @@ function setCurrentTurn(turn?: number) {
     <>
       <div className="flex">
         <BattleCanvas battle={battle} pov={pov} messageBar={messageBar} ref={battleCanvasRef} />
-        {logVisible &&<div className="w-[400px]  bg-surface-3 p-2 overflow-y-auto text-text-primary" ref={logRef} style={{height:`${canvasWidth * ASPECT_RATIO}px`}}>
+        {logVisible &&<div className="w-[400px]  bg-main-800 p-2 overflow-y-auto text-main-50" ref={logRef} style={{height:`${canvasWidth * ASPECT_RATIO}px`}}>
           {htmlLog.map((line, index) => (
             <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
           ))}

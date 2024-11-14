@@ -51,10 +51,10 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
             <div className="m-1 w-1/3 flex items-center h-fit">
-                    <div className="w-fit h-8 bg-surface-3 bg-opacity-90 py-1 px-2 rounded-md text-text-secondary z-50">
+                    <div className="w-fit h-8 bg-main-800 bg-opacity-90 py-1 px-2 rounded-md text-main-200 z-50">
                         Turno {battle.turn}
                     </div>
-                    <span className="text-text-primary font-bold text-shadow-border1 ml-2">
+                    <span className="text-main-50 font-bold text-shadow-border1 ml-2">
                         {getParticipantName(p1.name)} vs {getParticipantName(p2.name)}
                     </span>
                     </div>
@@ -76,7 +76,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 </div>
                 <div className="m-1 w-1/3 flex">
                 {
-                    messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-3 bg-opacity-90 py-1 px-2 rounded-md text-text-secondary z-50 absolute right-0 bottom-0">
+                    messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-main-800 bg-opacity-90 py-1 px-2 rounded-md text-main-200 z-50 absolute right-0 bottom-0">
                         {messageBar.map((message, index) => (
                             <div key={index} dangerouslySetInnerHTML={{ __html: message }}></div>
                         ))}
@@ -113,7 +113,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 />
             ))}
             <div id='overlay' className="absolute w-full h-full pointer-events-none">
-                <div className="absolute top-16 left-0 text-text-primary text-shadow-border1 z-20 ml-2">
+                <div className="absolute top-16 left-0 text-main-50 text-shadow-border1 z-20 ml-2">
                     {battle.sides.map((side) => {
                         return Object.values(side.sideConditions).map((value) => {
                             return <div key={`condition-${side.name}-${value.name}`}>{side.name}: {value.name} {value.minDuration} {value.maxDuration > 0 && `- ${value.maxDuration}`} turns</div>

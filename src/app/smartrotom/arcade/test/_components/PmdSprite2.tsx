@@ -283,7 +283,7 @@ export function PmdSpriteWithControls({ num }: { num: number }) {
           Rotate Right
         </button>
       </div>
-      <div className="mt-4 text-text-tertiary">
+      <div className="mt-4 text-main-700">
         <p>Animation: {currentAnimation}</p>
         <p>Direction: {direction}</p>
       </div>

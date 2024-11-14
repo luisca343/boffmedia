@@ -39,7 +39,7 @@ export default function Component() {
   const getWeatherIcon = (weather: string): JSX.Element => {
     switch (weather) {
       case "nublado":
-        return <Cloud className="h-12 w-12 text-text-tertiary" />;
+        return <Cloud className="h-12 w-12 text-main-400" />;
       case "lluvia":
         return <CloudRain className="h-12 w-12 text-blue-500" />;
       case "tormenta":
@@ -66,24 +66,24 @@ export default function Component() {
         <div className="flex items-center justify-between mb-4">
           {getWeatherIcon(weatherData.weather)}
           <div className="text-right">
-            <p className="text-2xl font-bold text-text-tertiary capitalize">
+            <p className="text-2xl font-bold text-main-800 capitalize">
               {weatherData.weather}
             </p>
-            <p className="text-sm text-text-tertiary">
+            <p className="text-sm text-main-600">
               Cambia en: {formatTime(timeLeft)}
             </p>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-sm text-text-tertiary">Hora del juego</p>
-            <p className="text-lg font-semibold text-text-tertiary">
+            <p className="text-sm text-main-600">Hora del juego</p>
+            <p className="text-lg font-semibold text-main-800">
               {formatMinecraftTime(minecraftTime)}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-text-tertiary">Sección</p>
-            <p className="text-lg font-semibold text-text-tertiary">
+            <p className="text-sm text-main-600">Sección</p>
+            <p className="text-lg font-semibold text-main-800">
               {getDaySection(minecraftTime)}
             </p>
           </div>

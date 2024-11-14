@@ -12,7 +12,7 @@ export function TypeTable({list, title, id, className=''}: {list: {[key: string]
                 <PokedexHeader>
                     <TableRow className="hover:bg-inherit border-none ">
                                 <PokedexHead> </PokedexHead>
-                                <PokedexHead  className="text-center bold text-text-primary font-bold ">{title}</PokedexHead>
+                                <PokedexHead  className="text-center bold text-main-50 font-bold ">{title}</PokedexHead>
                     </TableRow>
                 </PokedexHeader>
                 <TableBody>
@@ -20,7 +20,7 @@ export function TypeTable({list, title, id, className=''}: {list: {[key: string]
                         if(!Object.values(list).includes(effectivity)) return null
                         return (
                         <PokedexRow key={effectivity} >
-                            <PokedexHead className="font-bold text-text-primary w-24  ">x{effectivity}</PokedexHead>
+                            <PokedexHead className="font-bold text-main-50 w-24  ">x{effectivity}</PokedexHead>
                             <PokedexCell>
                             <div className="flex flex-row flex-wrap w-full " >
                                 {Object.entries(list)

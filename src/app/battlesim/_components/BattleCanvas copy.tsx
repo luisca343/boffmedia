@@ -25,7 +25,7 @@ export function BattleCanvas({battle, pov}: {battle: Battle, pov: 'p1' | 'p2'}) 
 
             <PlayerDataBar battle={battle} side="p1" pov={pov}/>
             <div id="game"  className="w-[440px] h-[360px] relative" >
-                <div className="absolute top-1 left-1 bg-surface-2 py-1 px-2 rounded-md text-text-secondary z-50">Turn {battle.turn}</div>
+                <div className="absolute top-1 left-1 bg-main-900 py-1 px-2 rounded-md text-main-200 z-50">Turn {battle.turn}</div>
             
                 <PokemonElement pokemon={pokemon["p1a"]} id="p1a" style={{top: offsets.p1a.top, left: offsets.p1a.left}}/>
                 <PokemonElement pokemon={pokemon["p1b"]} id="p1b" style={{top: offsets.p1b.top, left: offsets.p1b.left}}/>

@@ -66,7 +66,7 @@ export default function AdminPage() {
                             </Badge>
                         </div>
                         <p className="text-sm">{status.message}</p>
-                        <p className="text-xs text-text-primary0">
+                        <p className="text-xs text-main-500">
                             Última actualización: {new Date(status.timestamp).toLocaleString()}
                         </p>
                     </div>

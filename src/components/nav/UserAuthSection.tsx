@@ -27,13 +27,13 @@ export default function UserAuthSection() {
   if (session) {
     return (
       <>
-        <span className="text-primary">
+        <span className="text-orange-300">
           {session.user.username || session.user.smartRotomUser.username}
         </span>
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="text-primary hover:text-primary hover:bg-surface-3 transition-colors duration-200"
+          className="text-orange-300 hover:text-orange-200 hover:bg-main-800 transition-colors duration-200"
         >
           <LogOut className="h-5 w-5 mr-2" />
           Cerrar sesión
@@ -47,7 +47,7 @@ export default function UserAuthSection() {
       <Button
         variant="ghost"
         onClick={() => router.push("/auth?mode=login")}
-        className="text-primary hover:text-primary hover:bg-surface-3 transition-colors duration-200"
+        className="text-orange-300 hover:text-orange-200 hover:bg-main-800 transition-colors duration-200"
       >
         <LogIn className="h-5 w-5 mr-2" />
         Iniciar sesión
@@ -55,7 +55,7 @@ export default function UserAuthSection() {
       <Button
         variant="ghost"
         onClick={() => router.push("/auth?mode=register")}
-        className="text-primary hover:text-primary hover:bg-surface-3 transition-colors duration-200"
+        className="text-orange-300 hover:text-orange-200 hover:bg-main-800 transition-colors duration-200"
       >
         <UserPlus className="h-5 w-5 mr-2" />
         Registrarse

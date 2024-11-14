@@ -20,7 +20,7 @@ const SocketStatus = () => {
   <TooltipProvider>
     <Tooltip>
       <TooltipTrigger>
-      <div className='cursor-pointer bg-black text-text-primary h-10 text-xl flex items-center'>
+      <div className='cursor-pointer bg-black text-main-50 h-10 text-xl flex items-center'>
           <span className="lg:inline hidden">{socket && socket.connected ? 'Conectado' : 'Desconectado'}</span>
           <span className="lg:hidden">{socket && socket.connected ? '🟢' : '🔴'}</span>
       </div>

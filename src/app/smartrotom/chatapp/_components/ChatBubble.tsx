@@ -18,15 +18,15 @@ export default function ChatBubble({ message, sender, timestamp }: ChatBubblePro
         className={cn(
           "relative flex flex-col space-y-2 text-sm max-w-xs mx-2 px-4 py-3 rounded-xl",
           sender === "user"
-            ? "bg-gradient-to-br from-primary to-primary-hover text-white"
-            : "bg-foreground text-text-tertiary"
+            ? "bg-gradient-to-br from-orange-400 to-orange-600 text-white"
+            : "bg-main-200 text-main-900"
         )}
       >
         <span className="break-words">{message}</span>
         <span
           className={cn(
             "text-xs opacity-50",
-            sender === "user" ? "text-primary-light" : "text-text-primary0"
+            sender === "user" ? "text-orange-100" : "text-main-500"
           )}
         >
           {timestamp}
@@ -35,8 +35,8 @@ export default function ChatBubble({ message, sender, timestamp }: ChatBubblePro
           className={cn(
             "absolute bottom-0 w-3 h-3 transform",
             sender === "user"
-              ? "-right-1 bg-primary-hover rotate-45"
-              : "-left-1 bg-foreground -rotate-45"
+              ? "-right-1 bg-orange-600 rotate-45"
+              : "-left-1 bg-main-200 -rotate-45"
           )}
         />
       </div>

@@ -9,8 +9,8 @@ interface FileTreeProps {
 
 export default function FileTree({ structure }: FileTreeProps) {
   return (
-    <div className="p-6 bg-surface-2 rounded-lg border border-orange-700 shadow-lg">
-      <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-hover">
+    <div className="p-6 bg-main-900 rounded-lg border border-orange-700 shadow-lg">
+      <h2 className="text-3xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">
         Explorador de Herramientas
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

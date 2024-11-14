@@ -20,7 +20,7 @@ function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGridProps) {
               <CellComponent cell={cell} onClick={() => onCellClick(rowIndex, colIndex)} rowIndex={rowIndex} colIndex={colIndex} />
             </div>
           ))}
-          <div className="w-20 h-20 flex flex-col items-center justify-center bg-surface-3 rounded-md">
+          <div className="w-20 h-20 flex flex-col items-center justify-center bg-main-700 rounded-md">
             <div className="flex items-center">
               <Coins className="w-6 h-6 text-yellow-500 mr-1" />
               <span className="text-yellow-500 text-md font-bold">{rowInfo[rowIndex]?.coins}</span>
@@ -39,7 +39,7 @@ function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGridProps) {
         </>
       ))}
       {colInfo.map((info, index) => (
-        <div key={index} className="w-20 h-20 flex flex-col items-center justify-center bg-surface-3 rounded-md">
+        <div key={index} className="w-20 h-20 flex flex-col items-center justify-center bg-main-700 rounded-md">
           <div className="flex items-center">
             <Coins className="w-6 h-6 text-yellow-500 mr-1" />
             <span className="text-yellow-500 text-md font-bold">{info.coins}</span>

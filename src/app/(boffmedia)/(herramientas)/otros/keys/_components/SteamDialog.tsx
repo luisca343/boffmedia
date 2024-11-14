@@ -62,47 +62,47 @@ export default function SteamDialog({
   if (!selectedGame) return null;
   return (
     <Dialog open={isModalVisible} onOpenChange={setIsModalVisible}>
-      <DialogContent className="sm:max-w-[700px] xl:max-w-[1200px] bg-surface-2 text-text-primary border border-border-dark">
+      <DialogContent className="sm:max-w-[700px] xl:max-w-[1200px] bg-main-900 text-main-100 border border-main-700">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-hover flex items-center gap-2">
-            <Gift className="w-6 h-6 text-primary" />
+          <DialogTitle className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600 flex items-center gap-2">
+            <Gift className="w-6 h-6 text-orange-400" />
             {selectedGame.name}
           </DialogTitle>
         </DialogHeader>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-surface-3">
+          <TabsList className="grid w-full grid-cols-3 bg-main-800">
             <TabsTrigger
               value="info"
-              className="text-text-secondary data-[state=active]:text-primary data-[state=active]:bg-surface-3"
+              className="text-main-300 data-[state=active]:text-orange-400 data-[state=active]:bg-main-700"
             >
               <Info className="w-4 h-4 mr-2" />
               Información
             </TabsTrigger>
             <TabsTrigger
               value="pricing"
-              className="text-text-secondary data-[state=active]:text-primary data-[state=active]:bg-surface-3"
+              className="text-main-300 data-[state=active]:text-orange-400 data-[state=active]:bg-main-700"
             >
               <DollarSign className="w-4 h-4 mr-2" />
               Precios
             </TabsTrigger>
             <TabsTrigger
               value="media"
-              className="text-text-secondary data-[state=active]:text-primary data-[state=active]:bg-surface-3"
+              className="text-main-300 data-[state=active]:text-orange-400 data-[state=active]:bg-main-700"
             >
               <Video className="w-4 h-4 mr-2" />
               Media
             </TabsTrigger>
           </TabsList>
           <TabsContent value="info" className="mt-4">
-            <ScrollArea className="sm:h-[300px] xl:h-[600px] rounded-md border border-border-dark p-4">
-              <h3 className="text-lg font-semibold mb-2 text-primary">
+            <ScrollArea className="sm:h-[300px] xl:h-[600px] rounded-md border border-main-700 p-4">
+              <h3 className="text-lg font-semibold mb-2 text-orange-400">
                 Descripción
               </h3>
               <div 
                 dangerouslySetInnerHTML={{ __html: selectedGame.description }}
-                className="text-text-secondary w-[616px]"
+                className="text-main-300 w-[616px]"
               />
-              <h3 className="text-lg font-semibold mb-2 mt-4 text-primary flex items-center gap-2">
+              <h3 className="text-lg font-semibold mb-2 mt-4 text-orange-400 flex items-center gap-2">
                 <Tag className="w-5 h-5" />
                 Géneros
               </h3>
@@ -112,13 +112,13 @@ export default function SteamDialog({
                     <Badge
                       key={index}
                       variant="secondary"
-                      className="bg-surface-3 text-primary"
+                      className="bg-main-700 text-orange-400"
                     >
                       {genre}
                     </Badge>
                   ))
                 ) : (
-                  <span className="text-text-secondary">No hay géneros</span>
+                  <span className="text-main-300">No hay géneros</span>
                 )}
               </div>
             </ScrollArea>
@@ -126,22 +126,22 @@ export default function SteamDialog({
           <TabsContent value="pricing" className="mt-4">
             <div className="space-y-4">
               {selectedGame.normalPrice !== selectedGame.currentPrice && (
-                <div className="flex justify-between items-center p-4 bg-surface-3 rounded-lg">
-                  <span className="text-text-secondary">Precio Normal:</span>
-                  <span className="text-2xl font-bold text-text-primary">
+                <div className="flex justify-between items-center p-4 bg-main-800 rounded-lg">
+                  <span className="text-main-300">Precio Normal:</span>
+                  <span className="text-2xl font-bold text-main-100">
                     {selectedGame.normalPrice}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between items-center p-4 bg-surface-3 rounded-lg">
-                <span className="text-text-secondary">Precio Actual:</span>
-                <span className="text-2xl font-bold text-primary">
+              <div className="flex justify-between items-center p-4 bg-main-800 rounded-lg">
+                <span className="text-main-300">Precio Actual:</span>
+                <span className="text-2xl font-bold text-orange-400">
                   {selectedGame.currentPrice}
                 </span>
               </div>
               {selectedGame.normalPrice !== selectedGame.currentPrice && (
-                <div className="flex justify-between items-center p-4 bg-surface-3 rounded-lg">
-                  <span className="text-text-secondary">Descuento:</span>
+                <div className="flex justify-between items-center p-4 bg-main-800 rounded-lg">
+                  <span className="text-main-300">Descuento:</span>
                   <span className="text-2xl font-bold text-green-400">
                     {selectedGame.discountPercent} %
                   </span>
@@ -211,7 +211,7 @@ export default function SteamDialog({
                       <motion.div
                         key={index}
                         className={`relative cursor-pointer ${
-                          index === selectedMediaIndex ? "ring-2 ring-primary-light0" : ""
+                          index === selectedMediaIndex ? "ring-2 ring-orange-500" : ""
                         }`}
                         initial={{ opacity: 0, scale: 0.8 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -241,7 +241,7 @@ export default function SteamDialog({
         <DialogClose asChild>
           <Button
             variant="secondary"
-            className="mt-4 w-full bg-primary-hover text-white hover:bg-orange-700 transition-colors duration-200"
+            className="mt-4 w-full bg-orange-600 text-white hover:bg-orange-700 transition-colors duration-200"
           >
             Cerrar
           </Button>

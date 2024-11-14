@@ -19,8 +19,8 @@ export function Message({ message, session, img = false, prev }: { message: Mess
     >
       <div
         className={`border border-black  min-w-48 my-2 relative flex flex-col space-y-2 text-sm max-w-xs mx-2 px-3 py-1 rounded-xl ${sender === "system"
-          ? "bg-foreground text-text-tertiary"
-          : "bg-gradient-to-br from-primary to-primary-light0 text-black"
+          ? "bg-main-200 text-main-900"
+          : "bg-gradient-to-br from-orange-400 to-orange-500 text-black"
           }`}
       >
         {sender !== "user" && img && prev !== message.uuid && sender !== "system" ? (

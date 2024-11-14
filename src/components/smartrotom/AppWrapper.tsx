@@ -15,7 +15,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { CallStatus } from "./CallStatus";
 import { BoffSession } from "@/types";
 import { getMcUserData } from "@/services/mcef/mcefApi";
-import { useThemeStore } from "@/stores/themeStore";
 
 
 export default function AppWrapper({
@@ -30,7 +29,7 @@ export default function AppWrapper({
   const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
   const [isMC, setIsMC] = useState(false);
 
-  const {theme: theme} = useThemeStore();
+  const [tema, setTema] = useState("");
 
   /*
     if ('speechSynthesis' in window) {
@@ -115,14 +114,12 @@ export default function AppWrapper({
     //return <RotomError error="Usuario de BoffMedia no vinculado"/>
   }
 
-  console.log("Theme: ", theme);
-
   return (
     <section
       id="smartrotom"
-      className={`roboto flex flex-col h-screen overflow-hidden ${theme} text-black bg-transparent`}
+      className={`roboto flex flex-col h-screen overflow-hidden ${tema} text-black bg-transparent`}
     >
-      <RotomNav/>
+      <RotomNav setTema={setTema} />
       <ToastContainer position="bottom-right" theme="dark" />
       <main className="relative overflow-hidden border-solid no-scrollbar flex-1">
         <CallStatus />
@@ -136,7 +133,7 @@ export default function AppWrapper({
 
 function RotomErrorPage({ error }: { error: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-primary text-primary-active font-mono">
+    <div className="flex flex-col items-center justify-center h-full bg-orange-400 text-orange-950 font-mono">
       <RotomError error={error} />
     </div>
   );
@@ -148,13 +145,13 @@ function RotomError({ error }: { error: string }) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-primary-light p-8 rounded-lg shadow-lg border-2 border-primary"
+      className="bg-orange-200 p-8 rounded-lg shadow-lg border-2 border-orange-300"
     >
       <div className="flex items-center mb-4">
-        <AlertTriangle className="w-8 h-8 text-primary-light0 mr-2" />
+        <AlertTriangle className="w-8 h-8 text-orange-500 mr-2" />
         <h1 className="text-2xl font-bold">Error Detectado</h1>
       </div>
-      <div className="bg-primary p-4 rounded">
+      <div className="bg-orange-300 p-4 rounded">
         <p className="text-sm">{error}</p>
       </div>
       <div className="mt-6 text-center">

@@ -161,7 +161,7 @@ export function TransactionsTable({
             {row.getVisibleCells().map((cell) => (
               <td
                 key={cell.id}
-                className="px-6 py-2 whitespace-nowrap text-sm text-text-tertiary "
+                className="px-6 py-2 whitespace-nowrap text-sm text-main-900 "
               >
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </td>

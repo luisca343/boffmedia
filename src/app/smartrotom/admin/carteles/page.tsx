@@ -65,7 +65,7 @@ export default function CartelesAutopista() {
       <h1 className="text-3xl font-bold mb-6 text-center text-green-500 uppercase tracking-widest glitch" style={{textShadow: '2px 2px #00ff00, -2px -2px #0000ff'}}>
         Generador de Señales de Carretera
       </h1>
-      <Card className="bg-surface-2 border-green-500 border">
+      <Card className="bg-main-900 border-green-500 border">
         <CardHeader>
           <CardTitle className="text-green-400">Configuración de la Señal</CardTitle>
           <CardDescription className="text-green-600">Ingrese los detalles de la señal de carretera</CardDescription>
@@ -80,7 +80,7 @@ export default function CartelesAutopista() {
                 onChange={(e) => setHighway(e.target.value)}
                 required
                 placeholder="ej., A-2"
-                className="bg-surface-3 text-green-400 border-green-500"
+                className="bg-main-800 text-green-400 border-green-500"
               />
             </div>
             {destinations.map((dest, index) => (
@@ -94,7 +94,7 @@ export default function CartelesAutopista() {
                       value={dest.name}
                       onChange={(e) => handleDestinationChange(index, 'name', e.target.value)}
                       placeholder="ej., Madrid"
-                      className="bg-surface-3 text-green-400 border-green-500"
+                      className="bg-main-800 text-green-400 border-green-500"
                     />
                   </div>
                   <div className="flex-1">
@@ -105,7 +105,7 @@ export default function CartelesAutopista() {
                       onChange={(e) => handleDestinationChange(index, 'distance', e.target.value)}
                       placeholder="ej., 300"
                       type="number"
-                      className="bg-surface-3 text-green-400 border-green-500"
+                      className="bg-main-800 text-green-400 border-green-500"
                     />
                   </div>
                   <div className="flex-1">
@@ -114,10 +114,10 @@ export default function CartelesAutopista() {
                       value={dest.direction}
                       onValueChange={(value) => handleDestinationChange(index, 'direction', value)}
                     >
-                      <SelectTrigger id={`dir-${index}`} className="bg-surface-3 text-green-400 border-green-500">
+                      <SelectTrigger id={`dir-${index}`} className="bg-main-800 text-green-400 border-green-500">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-surface-3 text-green-400 border-green-500 select-content">
+                      <SelectContent className="bg-main-800 text-green-400 border-green-500 select-content">
                         <SelectItem value="down">
                           <div className="flex items-center">
                             <ArrowDown className="mr-2 h-4 w-4" />
@@ -154,7 +154,7 @@ export default function CartelesAutopista() {
               <Input
                 value={signUrl}
                 readOnly
-                className="pr-10 bg-surface-3 text-green-400 border-green-500"
+                className="pr-10 bg-main-800 text-green-400 border-green-500"
                 onClick={copyToClipboard}
               />
               <Button
@@ -170,7 +170,7 @@ export default function CartelesAutopista() {
           </div>
         </CardContent>
       </Card>
-      <Card className="mt-6 bg-surface-2 border-green-500 border">
+      <Card className="mt-6 bg-main-900 border-green-500 border">
         <CardHeader>
           <CardTitle className="text-green-400">Vista Previa</CardTitle>
         </CardHeader>

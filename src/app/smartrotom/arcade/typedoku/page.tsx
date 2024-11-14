@@ -17,7 +17,7 @@ type Cell = {
 }
 
 const typeColors: { [key: string]: string } = {
-  Normal: 'bg-foreground',
+  Normal: 'bg-main-400',
   Fire: 'bg-red-500',
   Water: 'bg-blue-500',
   Electric: 'bg-yellow-400',
@@ -317,12 +317,12 @@ export default function TypeDoku() {
                           <button
                             key={`${row}-${col}`}
                             className={`w-full aspect-square flex items-center justify-center text-xs sm:text-sm font-bold rounded-md border-2 transition-all duration-200 ${
-                              cell?.isGiven ? 'border-border-dark cursor-not-allowed' : 'border-yellow-300 hover:border-yellow-500'
+                              cell?.isGiven ? 'border-main-500 cursor-not-allowed' : 'border-yellow-300 hover:border-yellow-500'
                             } ${
                               selectedCell && selectedCell[0] === row && selectedCell[1] === col
                                 ?'ring-2 ring-pink-500'
                                 : ''
-                            } ${cell?.value ? typeColors[cell.value] : 'bg-surface-3'}`}
+                            } ${cell?.value ? typeColors[cell.value] : 'bg-main-700'}`}
                             onClick={() => handleCellClick(row, col)}
                             disabled={cell?.isGiven}
                           >
@@ -390,7 +390,7 @@ export default function TypeDoku() {
           </Button>
           <Button
             onClick={handleHint}
-            className="bg-primary-light text-white hover:bg-primary text-lg px-6 py-3 rounded-lg shadow-md border-2 border-primary-hover transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
+            className="bg-orange-500 text-white hover:bg-orange-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-orange-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
           >
             <Lightbulb className="mr-2" /> Pista (H)
           </Button>
