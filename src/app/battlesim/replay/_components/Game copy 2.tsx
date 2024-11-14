@@ -353,10 +353,10 @@ const replay = `|j|☆Rougewings
 
 return (
   <div>
-<div className="w-full h-full flex bg-main-700" id="fullgame">
+<div className="w-full h-full flex bg-surface-3" id="fullgame">
   <PlayerDataBar battle={battle} side={0} viewPoint={viewPoint} activePokemon={activePokemon}/>
   <div id="game" className="w-full h-full flex flex-col relative z-0">
-    <div className="absolute top-1 right-1 bg-main-800 py-1 px-2 rounded-md text-main-200 border border-main-200">Turn {battle.turn}</div>
+    <div className="absolute top-1 right-1 bg-surface-3 py-1 px-2 rounded-md text-text-secondary border border-border">Turn {battle.turn}</div>
     {active1.length === 3 ? <>
         <PokemonSprite viewPoint={viewPoint[0]} pokemon={getActiveTeam(0, activePokemon)[0]} id="p1a" className='bottom-[16%] left-[5%]'/>
         <PokemonSprite viewPoint={viewPoint[0]} pokemon={getActiveTeam(0, activePokemon)[1]} id="p1b" className='bottom-[8%] left-[33%]'/>
@@ -506,7 +506,7 @@ return (
           return (
             <div className={`w-[20%] h-full flex justify-center ${viewPoint[viewPoint[side]] === 0 ? 'flex-col' : 'flex-col-reverse'}`}>
               <PokemonTeamList team={currTeam} />
-              <div className="text-shadow-border1 text-main-50 text-center">{player?.name}</div>
+              <div className="text-shadow-border1 text-text-primary text-center">{player?.name}</div>
               
               {
                 avatarId !=0 ? <img className="mx-auto"  src={avatar} />

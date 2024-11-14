@@ -10,8 +10,8 @@ export function Header() {
   }
 
   return (
-    <header className="fixed top-[42px] left-0 right-0 z-40 bg-white border-b border-main-200 h-14 flex items-center justify-between px-0">
-      <div id="app_nome" className="w-60 flex items-center justify-between pl-4 border-r border-main-200 pr-4 h-full">
+    <header className="fixed top-[42px] left-0 right-0 z-40 bg-white border-b border-border h-14 flex items-center justify-between px-0">
+      <div id="app_nome" className="w-60 flex items-center justify-between pl-4 border-r border-border pr-4 h-full">
         <span className="font-bold whitespace-nowrap overflow-hidden">
           <span className="text-[#009ee0]">Ciclos</span>
           <span className="text-[#346ea1]">Imitación</span>

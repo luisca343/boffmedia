@@ -113,11 +113,11 @@ export default function Transacciones() {
           <input
             type="text"
             placeholder="Buscar transacciones..."
-            className="w-full pl-10 pr-4 py-2 rounded-md border border-main-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-4 py-2 rounded-md border border-border focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-main-400" />
+          <Search className="absolute left-3 top-2.5 h-5 w-5 text-text-tertiary" />
         </div>
       </div>
 
@@ -190,7 +190,7 @@ export default function Transacciones() {
         <BankSectionButton onClick={() => table.previousPage()}>
           Anterior
         </BankSectionButton>
-        <span className="text-sm text-main-700">
+        <span className="text-sm text-text-tertiary">
           Página {table.getState().pagination.pageIndex + 1} de{" "}
           {table.getPageCount()}
         </span>

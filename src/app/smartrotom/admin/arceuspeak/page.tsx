@@ -49,18 +49,18 @@ export default function ArceuSpeak() {
         <h1 className="text-3xl font-bold mb-6 text-center text-green-500 uppercase tracking-widest glitch">
           ArceuSpeak
         </h1>
-        <Card className="bg-main-900 border-green-500 border">
+        <Card className="bg-surface-2 border-green-500 border">
           <CardHeader>
             <CardTitle className="text-green-400">Enviar Mensaje</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <Select onValueChange={setSpeaker} defaultValue={speaker}>
-              <SelectTrigger className="w-full bg-main-800 text-green-400 border-green-500">
+              <SelectTrigger className="w-full bg-surface-3 text-green-400 border-green-500">
                 <SelectValue placeholder="Seleccionar emisor" />
               </SelectTrigger>
-              <SelectContent className="bg-main-800 text-green-400 border-green-500">
+              <SelectContent className="bg-surface-3 text-green-400 border-green-500">
                 {speakers.map((s) => (
-                  <SelectItem key={s.value} value={s.value} className="hover:bg-main-700">
+                  <SelectItem key={s.value} value={s.value} className="hover:bg-surface-3">
                     <span dangerouslySetInnerHTML={{ __html: formatToHtml(s.format) }} />
                   </SelectItem>
                 ))}
@@ -70,7 +70,7 @@ export default function ArceuSpeak() {
               placeholder="Escribe tu mensaje aquí"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="bg-main-800 text-green-400 border-green-500"
+              className="bg-surface-3 text-green-400 border-green-500"
             />
             <div className="flex space-x-4">
               <Button onClick={sendMessage} className="flex-1 bg-green-700 hover:bg-green-600 text-black">
@@ -82,7 +82,7 @@ export default function ArceuSpeak() {
                     Crear Personaje
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="bg-main-900 border-green-500 border">
+                <DialogContent className="bg-surface-2 border-green-500 border">
                   <DialogHeader>
                     <DialogTitle className="text-green-400">Crear Nuevo Personaje</DialogTitle>
                   </DialogHeader>

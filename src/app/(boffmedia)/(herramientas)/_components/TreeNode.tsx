@@ -20,27 +20,27 @@ export default function TreeNode({ name, structure, path }: TreeNodeProps) {
 
   return (
     <div className="py-1">
-      <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-main-800 transition-colors duration-150">
+      <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-surface-3 transition-colors duration-150">
         {isDirectory && (
           <button onClick={toggleOpen} className="focus:outline-none">
             {isOpen ? (
-              <ChevronDown className="w-4 h-4 text-orange-400" />
+              <ChevronDown className="w-4 h-4 text-primary" />
             ) : (
-              <ChevronRight className="w-4 h-4 text-orange-400" />
+              <ChevronRight className="w-4 h-4 text-primary" />
             )}
           </button>
         )}
         {isDirectory ? (
-          <Folder className="w-5 h-5 text-orange-500" />
+          <Folder className="w-5 h-5 text-primary-light0" />
         ) : (
-          <File className="w-5 h-5 text-orange-400" />
+          <File className="w-5 h-5 text-primary" />
         )}
         {!isDirectory ? (
-          <Link href={fullPath} className="text-orange-400 hover:text-orange-300 hover:underline font-medium transition-colors duration-150">
+          <Link href={fullPath} className="text-primary hover:text-primary hover:underline font-medium transition-colors duration-150">
             {structure}
           </Link>
         ) : (
-          <span className="font-medium text-orange-200">{firstToUpper(name)}</span>
+          <span className="font-medium text-primary">{firstToUpper(name)}</span>
         )}
       </div>
       {isDirectory && isOpen && (

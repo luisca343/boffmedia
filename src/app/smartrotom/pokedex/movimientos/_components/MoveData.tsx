@@ -47,9 +47,9 @@ export default function MoveDataElement({id} : {id: string}){
     )
 
     function Cell({ children, isActive, hitsAll }: { children: React.ReactNode, isActive: boolean, hitsAll?: boolean }) {
-        const bgColor = isActive && hitsAll ? "bg-red-500" : isActive ? "bg-primary-300" : "bg-main-600";
-        const textColor = isActive ? "text-black" : "text-main-100";
-        const borderColor = isActive && hitsAll ? "border-red-500" : isActive ? "border-primary-300" : "border-main-600";
+        const bgColor = isActive && hitsAll ? "bg-red-500" : isActive ? "bg-primary-300" : "bg-surface-5";
+        const textColor = isActive ? "text-black" : "text-text-primary";
+        const borderColor = isActive && hitsAll ? "border-red-500" : isActive ? "border-primary-300" : "border-border-dark";
     
         return (
             <div className={`border ${borderColor} ${bgColor} ${textColor} flex items-center justify-center text-center col-span-1 row-span-1`}>
@@ -66,9 +66,9 @@ export default function MoveDataElement({id} : {id: string}){
                         <HoverCardTrigger>
                             <InformationCircleIcon className="w-5 h-5 mr-1" />
                         </HoverCardTrigger>
-                        <HoverCardContent className="bg-main-800 text-main-50 w-72">
+                        <HoverCardContent className="bg-surface-3 text-text-primary w-72">
                             <div className="flex items-center mb-2">
-                                <div className="w-4 h-4 bg-main-600 border border-main-600 mr-2"></div>
+                                <div className="w-4 h-4 bg-surface-5 border border-border-dark mr-2"></div>
                                 <span>No alcanza al objetivo</span>
                             </div>
                             <div className="flex items-center mb-2">

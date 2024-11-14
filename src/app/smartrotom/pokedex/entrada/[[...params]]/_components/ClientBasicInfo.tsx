@@ -28,7 +28,7 @@ export function ClientBasicInfo({ pokemon, formIndex, formName }: { pokemon: Pok
                             {types.map((type: string) => <TypeBadge key={type} type={type}/>)}
                         </div>
                     </HoverCardTrigger>
-                    <HoverCardContent className="z-[200] bg-main-800 text-main-100 w-128">
+                    <HoverCardContent className="z-[200] bg-surface-3 text-text-primary w-128">
                         {rank && <div className="text-center">{`Ficus Rank: ${rank.ranking > 0 ? "#"+rank.ranking : ""}  Tier ${rank?.tier} `}</div>}
                     </HoverCardContent>
                 </HoverCard>

@@ -26,7 +26,7 @@ export default function PokemonSearchBar(){
             <Input type="text" placeholder="Buscar un Pokémon" value={text} onChange={(e) => type(e.target.value)} />
             <div className="overflow-auto h-48 flex flex-wrap justify-center">
                 {pokemon?.map(p => (
-                    <InternalLink href={`/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex justify-center hover:bg-main-600 text-main-50 items-center w-48 m-1 rounded-md">
+                    <InternalLink href={`/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex justify-center hover:bg-surface-5 text-text-primary items-center w-48 m-1 rounded-md">
                         <PokemonSprite width={40} id={p.item.dex} form={"base"} palette={"none"}/>
                         <span className='ml-2'>{p.item.name}</span>
                     </InternalLink>

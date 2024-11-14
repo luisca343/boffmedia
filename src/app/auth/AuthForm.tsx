@@ -75,24 +75,24 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen w-full bg-main-900 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center bg-no-repeat">
-      <div className="w-full max-w-md p-8 bg-main-800 bg-opacity-80 rounded-lg shadow-xl backdrop-blur-sm border border-main-700">
-        <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600">
+    <div className="flex items-center justify-center min-h-screen w-full bg-surface-2 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center bg-no-repeat">
+      <div className="w-full max-w-md p-8 bg-surface-3 bg-opacity-80 rounded-lg shadow-xl backdrop-blur-sm border border-border-dark">
+        <h2 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-hover">
           {isRegister ? 'Registrarse' : 'Iniciar Sesión'}
         </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {message && <p className="text-orange-100 text-center">{message}</p>}
+            {message && <p className="text-primary-light text-center">{message}</p>}
             <FormField
               control={form.control}
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-orange-300 font-semibold">Username</FormLabel>
+                  <FormLabel className="text-primary font-semibold">Username</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input placeholder="Enter your username" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
+                      <Input placeholder="Enter your username" {...field} className="bg-surface-3 text-primary-light border-border-dark focus:border-primary-light0 pl-10" />
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-5 h-5" />
                     </div>
                   </FormControl>
                   <FormMessage className="text-red-400" />
@@ -106,11 +106,11 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-orange-300 font-semibold">Email</FormLabel>
+                    <FormLabel className="text-primary font-semibold">Email</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input placeholder="Enter your email" type="email" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
+                        <Input placeholder="Enter your email" type="email" {...field} className="bg-surface-3 text-primary-light border-border-dark focus:border-primary-light0 pl-10" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-5 h-5" />
                       </div>
                     </FormControl>
                     <FormMessage className="text-red-400" />
@@ -124,11 +124,11 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-orange-300 font-semibold">Password</FormLabel>
+                  <FormLabel className="text-primary font-semibold">Password</FormLabel>
                   <FormControl>
                     <div className="relative">
-                      <Input placeholder="Enter your password" type="password" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
+                      <Input placeholder="Enter your password" type="password" {...field} className="bg-surface-3 text-primary-light border-border-dark focus:border-primary-light0 pl-10" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-5 h-5" />
                     </div>
                   </FormControl>
                   <FormMessage className="text-red-400" />
@@ -142,11 +142,11 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-orange-300 font-semibold">Confirm Password</FormLabel>
+                    <FormLabel className="text-primary font-semibold">Confirm Password</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input placeholder="Confirm your password" type="password" {...field} className="bg-main-700 text-orange-100 border-main-600 focus:border-orange-500 pl-10" />
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-orange-400 w-5 h-5" />
+                        <Input placeholder="Confirm your password" type="password" {...field} className="bg-surface-3 text-primary-light border-border-dark focus:border-primary-light0 pl-10" />
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary w-5 h-5" />
                       </div>
                     </FormControl>
                     <FormMessage className="text-red-400" />
@@ -155,7 +155,7 @@ export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '
               />
             )}
 
-            <Button type="submit" className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 transition-all duration-200 font-semibold py-2 rounded-md" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-gradient-to-r from-primary-light0 to-primary-hover text-white hover:from-primary-hover hover:to-orange-700 transition-all duration-200 font-semibold py-2 rounded-md" disabled={isLoading}>
               {isLoading ? 'Processing...' : isRegister ? 'Register' : 'Sign In'}
             </Button>
           </form>

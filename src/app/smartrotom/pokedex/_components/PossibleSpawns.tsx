@@ -48,7 +48,7 @@ export function PossibleSpawnsSection({
       className="flex flex-col  mb-4 rounded-xl p-2 w-[95%] m-auto"
       style={{ display: show ? "block" : "none" }}
     >
-      <h1 className="text-4xl text-center text-main-100 font-bold">
+      <h1 className="text-4xl text-center text-text-primary font-bold">
         {title} - {count}
       </h1>
       <PossibleSpawns

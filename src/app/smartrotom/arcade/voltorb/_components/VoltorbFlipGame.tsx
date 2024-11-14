@@ -323,7 +323,7 @@ export default function VoltorbFlipGame() {
           <div className="flex flex-col space-y-4 w-full lg:w-64">
             <div className="flex-grow flex flex-col justify-between space-y-4">
               {/* Scoreboard Container */}
-              <div className="flex-shrink-0  bg-main-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
+              <div className="flex-shrink-0  bg-surface-3 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
                 <RainbowText text="Puntuación" size="md" />
                 <Scoreboard
                   roundScore={roundScore}
@@ -333,7 +333,7 @@ export default function VoltorbFlipGame() {
               </div>
 
               {/* Memo Panel Container */}
-              <div className="flex-shrink-0 flex flex-col justify-center items-center  bg-main-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
+              <div className="flex-shrink-0 flex flex-col justify-center items-center  bg-surface-3 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
                 <RainbowText text="Notas" size="md" />
                 <MemoPanel
                   memoMode={memoMode}
@@ -344,7 +344,7 @@ export default function VoltorbFlipGame() {
               </div>
 
               {/* Buttons Container */}
-              <div className="mt-auto  bg-main-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
+              <div className="mt-auto  bg-surface-3 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
                 <RainbowText text="Botones" size="md" />
                 <div className="flex flex-col space-y-2">
                   <button
@@ -375,7 +375,7 @@ export default function VoltorbFlipGame() {
           </div>
 
           {/* Game Grid Container */}
-          <div className="bg-main-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg p-6">
+          <div className="bg-surface-3 bg-opacity-80 border-4 border-yellow-500 rounded-lg p-6">
             <GameGrid
               grid={grid}
               rowInfo={rowInfo}
@@ -387,7 +387,7 @@ export default function VoltorbFlipGame() {
 
         {/* Messages Container */}
         {(gameOver || gameWon || showLevelComplete) && (
-          <div className="bg-main-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg p-4 mt-4 w-full">
+          <div className="bg-surface-3 bg-opacity-80 border-4 border-yellow-500 rounded-lg p-4 mt-4 w-full">
             <Messages
               gameOver={gameOver}
               gameWon={gameWon}

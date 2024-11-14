@@ -85,12 +85,12 @@ export function SortableItem({app} : {app: App}) {
       {active ? 
         <motion.div  whileHover={{ scale: 1 }} key={app.id} className=" m-auto hover:cursor-pointer">
           <div className={estilos}><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>
-          <p className="text-main-50 text-center text:2xl lg:text-2xl text-shadow-main-border2">{app.name}</p>
+          <p className="text-white text-center text:2xl lg:text-2xl text-shadow-border2">{app.name}</p>
         </motion.div> : 
       <motion.div  whileHover={{ scale: 1.1 }} key={app.id} className=" m-auto hover:cursor-pointer">
         <InternalLink href={app.url}>
           <div className={estilos}><Image src={`/smartrotom/img/apps/${app.url}.webp`} alt={app.name} width={150} height={150}  className="w-full h-full" /></div>
-          <p className="text-main-50 text-center text:2xl lg:text-2xl text-shadow-main-border2">{app.name}</p>
+          <p className="text-white text-center text:2xl lg:text-2xl text-shadow-border2">{app.name}</p>
         </InternalLink>
       </motion.div>
       }

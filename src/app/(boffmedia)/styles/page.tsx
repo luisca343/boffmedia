@@ -30,17 +30,44 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useForm } from "react-hook-form"
+import { Theme, useThemeStore } from '@/stores/themeStore'
+import { Moon, Sun, Flower2, Droplet, Palmtree } from 'lucide-react'
+import { isMinecraft } from '@/services/mcef/mcefHelper'
 
 export default function BoffMediaStyleGuide() {
   const [comboboxValue, setComboboxValue] = React.useState("")
+  const {theme: theme, setTheme: setTheme} = useThemeStore();
   const form = useForm()
 
-  return (
-    <div className="p-6 bg-main-800 text-main-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-orange-300 mb-8">Guía de Estilo BoffMedia</h1>
+  const themeButtons: { theme: Theme, icon: React.ComponentType, label: string, global?: boolean }[] = [
+    { theme: 'theme-dark', icon: Moon, label: 'Oscuro', global: true },
+    { theme: 'theme-light', icon: Sun, label: 'Claro', global: true },
+    { theme: 'theme-tulipan', icon: Flower2, label: 'Tulipán' },
+    { theme: 'theme-mizu', icon: Droplet, label: 'Mizu' },
+    { theme: 'theme-oasis', icon: Palmtree, label: 'Oasis' },
+  ]
 
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Accordion</h2>
+  return (
+    <div className="p-6 text-text-primary min-h-screen bg-surface-1">
+      <h1 className="text-3xl font-bold text-primary mb-8">Guía de Estilo BoffMedia</h1>
+      <div className="flex flex-wrap gap-2 mb-8">
+        {themeButtons.map(({ theme: themeOption, icon: Icon, label, global }) => {
+          if(!global && !isMinecraft()) return null
+          return <Button
+            key={themeOption}
+            onClick={() => setTheme(themeOption)}
+            variant={theme === themeOption ? "default" : "outline"}
+            className="flex items-center gap-2"
+          >
+            <Icon/>
+            <span>{label}</span>
+          </Button>
+        
+    })}
+      </div>
+
+      <section className="mb-12 ">
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Accordion</h2>
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger>¿Es accesible?</AccordionTrigger>
@@ -64,89 +91,89 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Alert Dialog</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Alert Dialog</h2>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="outline">Mostrar Alerta</Button>
           </AlertDialogTrigger>
-          <AlertDialogContent>
+          <AlertDialogContent className="bg-surface-3 border-border-dark">
             <AlertDialogHeader>
-              <AlertDialogTitle>¿Estás absolutamente seguro?</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogTitle className="text-text-primary">¿Estás absolutamente seguro?</AlertDialogTitle>
+              <AlertDialogDescription className="text-text-secondary">
                 Esta acción no se puede deshacer. Esto eliminará permanentemente tu cuenta
                 y removerá tus datos de nuestros servidores.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction>Continuar</AlertDialogAction>
+              <AlertDialogCancel className="bg-surface-3 text-text-primary hover:bg-surface-5">Cancelar</AlertDialogCancel>
+              <AlertDialogAction className="bg-primary-600 text-text-primary hover:bg-primary-500">Continuar</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Avatar</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Avatar</h2>
         <div className="flex gap-4">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback className="bg-primary-700 text-text-primary">CN</AvatarFallback>
           </Avatar>
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback className="bg-primary-700 text-text-primary">CN</AvatarFallback>
           </Avatar>
           <Avatar>
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarFallback className="bg-primary-700 text-text-primary">CN</AvatarFallback>
           </Avatar>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Badge</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Badge</h2>
         <div className="flex flex-wrap gap-2">
-          <Badge>Predeterminado</Badge>
-          <Badge variant="secondary">Secundario</Badge>
-          <Badge variant="destructive">Destructivo</Badge>
-          <Badge variant="outline">Contorno</Badge>
+          <Badge className="bg-primary-600 text-text-primary">Predeterminado</Badge>
+          <Badge variant="secondary" className="bg-surface-3 text-text-primary">Secundario</Badge>
+          <Badge variant="destructive" className="bg-red-600 text-text-primary">Destructivo</Badge>
+          <Badge variant="outline" className="border-primary-500 text-primary">Contorno</Badge>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Button</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Button</h2>
         <div className="flex flex-wrap gap-4">
-          <Button>Botón Predeterminado</Button>
-          <Button variant="secondary">Botón Secundario</Button>
-          <Button variant="destructive">Botón Destructivo</Button>
-          <Button variant="outline">Botón de Contorno</Button>
-          <Button variant="ghost">Botón Fantasma</Button>
-          <Button variant="link">Botón de Enlace</Button>
+          <Button className="bg-primary-600 text-text-primary hover:bg-primary-500">Botón Predeterminado</Button>
+          <Button variant="secondary" className="bg-surface-3 text-text-primary hover:bg-surface-5">Botón Secundario</Button>
+          <Button variant="destructive" className="bg-red-600 text-text-primary hover:bg-red-500">Botón Destructivo</Button>
+          <Button variant="outline" className="border-primary-500 text-primary hover:bg-primary-500 hover:text-text-primary">Botón de Contorno</Button>
+          <Button variant="ghost" className="text-primary hover:bg-primary-500 hover:text-text-primary">Botón Fantasma</Button>
+          <Button variant="link" className="text-primary hover:text-text-primary">Botón de Enlace</Button>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Card</h2>
-        <Card className="max-w-md">
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Card</h2>
+        <Card className="max-w-md bg-surface-3 border-border-dark">
           <CardHeader>
-            <CardTitle>Título de la Tarjeta</CardTitle>
-            <CardDescription>La descripción de la tarjeta va aquí</CardDescription>
+            <CardTitle className="text-text-primary">Título de la Tarjeta</CardTitle>
+            <CardDescription className="text-text-secondary">La descripción de la tarjeta va aquí</CardDescription>
           </CardHeader>
           <CardContent>
-            <p>Este es el contenido principal de la tarjeta. Puedes poner cualquier información aquí.</p>
+            <p className="text-text-secondary">Este es el contenido principal de la tarjeta. Puedes poner cualquier información aquí.</p>
           </CardContent>
           <CardFooter>
-            <Button>Acción</Button>
+            <Button className="bg-primary-600 text-text-primary hover:bg-primary-500">Acción</Button>
           </CardFooter>
         </Card>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Checkbox</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Checkbox</h2>
         <div className="flex items-center space-x-2">
-          <Checkbox id="terms" />
+          <Checkbox id="terms" className="border-primary-500 text-text-tertiary" />
           <label
             htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-sm font-medium leading-none text-text-secondary peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
             Aceptar términos y condiciones
           </label>
@@ -154,19 +181,19 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Collapsible</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Collapsible</h2>
         <Collapsible>
-          <CollapsibleTrigger>
+          <CollapsibleTrigger className="text-primary hover:text-text-primary">
             Haz clic para expandir
           </CollapsibleTrigger>
-          <CollapsibleContent>
+          <CollapsibleContent className="text-text-secondary mt-2">
             Este es el contenido que se expande y colapsa.
           </CollapsibleContent>
         </Collapsible>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Combobox</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Combobox</h2>
         <Combobox
           data={[
             { label: "Inglés", value: "en" },
@@ -180,60 +207,61 @@ export default function BoffMediaStyleGuide() {
           value={comboboxValue}
           onChange={setComboboxValue}
           placeholder="Selecciona un idioma"
+          className="bg-surface-3 border-border-dark text-text-primary"
         />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Command</h2>
-        <Command className="rounded-lg border shadow-md">
-          <CommandInput placeholder="Escribe un comando o busca..." />
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Command</h2>
+        <Command className="rounded-lg border border-border-dark bg-surface-3 shadow-md">
+          <CommandInput placeholder="Escribe un comando o busca..." className="text-text-primary" />
           <CommandList>
-            <CommandEmpty>No se encontraron resultados.</CommandEmpty>
-            <CommandGroup heading="Sugerencias">
-              <CommandItem>Calendario</CommandItem>
-              <CommandItem>Buscar Emoji</CommandItem>
-              <CommandItem>Calculadora</CommandItem>
+            <CommandEmpty className="text-text-secondary">No se encontraron resultados.</CommandEmpty>
+            <CommandGroup heading="Sugerencias" className="text-primary">
+              <CommandItem className="text-text-secondary hover:bg-surface-3">Calendario</CommandItem>
+              <CommandItem className="text-text-secondary hover:bg-surface-3">Buscar Emoji</CommandItem>
+              <CommandItem className="text-text-secondary hover:bg-surface-3">Calculadora</CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Dialog</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Dialog</h2>
         <Dialog>
           <DialogTrigger asChild>
-            <Button variant="outline">Abrir Diálogo</Button>
+            <Button variant="outline" className="border-primary-500 text-primary hover:bg-primary-500 hover:text-text-primary">Abrir Diálogo</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] bg-surface-3 border-border-dark">
             <DialogHeader>
-              <DialogTitle>Editar perfil</DialogTitle>
-              <DialogDescription>
+              <DialogTitle className="text-text-primary">Editar perfil</DialogTitle>
+              <DialogDescription className="text-text-secondary">
                 Realiza cambios en tu perfil aquí. Haz clic en guardar cuando hayas terminado.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
+                <Label htmlFor="name" className="text-right text-text-secondary">
                   Nombre
                 </Label>
-                <Input id="name" value="Pedro Duarte" className="col-span-3" />
+                <Input id="name" value="Pedro Duarte" className="col-span-3 bg-surface-3 border-border-dark text-text-primary" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="username" className="text-right">
+                <Label htmlFor="username" className="text-right text-text-secondary">
                   Nombre de usuario
                 </Label>
-                <Input id="username" value="@peduarte" className="col-span-3" />
+                <Input id="username" value="@peduarte" className="col-span-3 bg-surface-3 border-border-dark text-text-primary" />
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Guardar cambios</Button>
+              <Button type="submit" className="bg-primary-600 text-text-primary hover:bg-primary-500">Guardar cambios</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Form</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Form</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(() => {})} className="space-y-8">
             <FormField
@@ -241,41 +269,41 @@ export default function BoffMediaStyleGuide() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nombre de usuario</FormLabel>
+                  <FormLabel className="text-text-secondary">Nombre de usuario</FormLabel>
                   <FormControl>
-                    <Input placeholder="shadcn" {...field} />
+                    <Input placeholder="shadcn" {...field} className="bg-surface-3 border-border-dark text-text-primary" />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-text-secondary">
                     Este es tu nombre de usuario público.
                   </FormDescription>
-                  <FormMessage />
+                  <FormMessage className="text-red-400" />
                 </FormItem>
               )}
             />
-            <Button type="submit">Enviar</Button>
+            <Button type="submit" className="bg-primary-600 text-text-primary hover:bg-primary-500">Enviar</Button>
           </form>
         </Form>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Hover Card</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Hover Card</h2>
         <HoverCard>
           <HoverCardTrigger asChild>
-            <Button variant="link">@nextjs</Button>
+            <Button variant="link" className="text-primary hover:text-text-primary">@nextjs</Button>
           </HoverCardTrigger>
-          <HoverCardContent className="w-80">
+          <HoverCardContent className="w-80 bg-surface-3 border-border-dark">
             <div className="flex justify-between space-x-4">
               <Avatar>
                 <AvatarImage src="https://github.com/vercel.png" />
-                <AvatarFallback>VC</AvatarFallback>
+                <AvatarFallback className="bg-primary-700 text-text-primary">VC</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
-                <h4 className="text-sm font-semibold">@nextjs</h4>
-                <p className="text-sm">
+                <h4 className="text-sm font-semibold text-text-primary">@nextjs</h4>
+                <p className="text-sm text-text-secondary">
                   El framework React para la Web
                 </p>
                 <div className="flex items-center pt-2">
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-text-tertiary">
                     Creado por @vercel
                   </span>
                 </div>
@@ -286,61 +314,61 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Input</h2>
-        <Input type="email" placeholder="Email" />
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Input</h2>
+        <Input type="email" placeholder="Email" className="bg-surface-3 border-border-dark text-text-primary" />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Label</h2>
-        <Label htmlFor="email">Email</Label>
-        <Input type="email" id="email" placeholder="m@example.com" />
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Label</h2>
+        <Label htmlFor="email" className="text-text-secondary">Email</Label>
+        <Input type="email" id="email" placeholder="m@example.com" className="bg-surface-3 border-border-dark text-text-primary mt-1" />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Popover</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Popover</h2>
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">Abrir popover</Button>
+            <Button variant="outline" className="border-primary-500 text-primary hover:bg-primary-500 hover:text-text-primary">Abrir popover</Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80">
+          <PopoverContent className="w-80 bg-surface-3 border-border-dark">
             <div className="grid gap-4">
               <div className="space-y-2">
-                <h4 className="font-medium leading-none">Dimensiones</h4>
-                <p className="text-sm text-muted-foreground">
+                <h4 className="font-medium leading-none text-text-primary">Dimensiones</h4>
+                <p className="text-sm text-text-secondary">
                   Establece las dimensiones para la capa.
                 </p>
               </div>
               <div className="grid gap-2">
                 <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="width">Ancho</Label>
+                  <Label htmlFor="width" className="text-text-secondary">Ancho</Label>
                   <Input
                     id="width"
                     defaultValue="100%"
-                    className="col-span-2 h-8"
+                    className="col-span-2 h-8 bg-surface-3 border-border-dark text-text-primary"
                   />
                 </div>
                 <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="maxWidth">Ancho máximo</Label>
+                  <Label htmlFor="maxWidth" className="text-text-secondary">Ancho máximo</Label>
                   <Input
                     id="maxWidth"
                     defaultValue="300px"
-                    className="col-span-2 h-8"
+                    className="col-span-2 h-8 bg-surface-3 border-border-dark text-text-primary"
                   />
                 </div>
                 <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="height">Alto</Label>
+                  <Label htmlFor="height" className="text-text-secondary">Alto</Label>
                   <Input
                     id="height"
                     defaultValue="25px"
-                    className="col-span-2 h-8"
+                    className="col-span-2 h-8 bg-surface-3 border-border-dark text-text-primary"
                   />
                 </div>
                 <div className="grid grid-cols-3 items-center gap-4">
-                  <Label htmlFor="maxHeight">Alto máximo</Label>
+                  <Label htmlFor="maxHeight" className="text-text-secondary">Alto máximo</Label>
                   <Input
                     id="maxHeight"
                     defaultValue="none"
-                    className="col-span-2 h-8"
+                    className="col-span-2 h-8 bg-surface-3 border-border-dark text-text-primary"
                   />
                 </div>
               </div>
@@ -350,45 +378,45 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Select</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Select</h2>
         <Select>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-surface-3 border-border-dark text-text-primary">
             <SelectValue placeholder="Tema" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="light">Claro</SelectItem>
-            <SelectItem value="dark">Oscuro</SelectItem>
-            <SelectItem value="system">Sistema</SelectItem>
+          <SelectContent className="bg-surface-3 border-border-dark">
+            <SelectItem value="light" className="text-text-secondary">Claro</SelectItem>
+            <SelectItem value="dark" className="text-text-secondary">Oscuro</SelectItem>
+            <SelectItem value="system" className="text-text-secondary">Sistema</SelectItem>
           </SelectContent>
         </Select>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Separator</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Separator</h2>
         <div className="space-y-1">
-          <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
-          <p className="text-sm text-muted-foreground">Una biblioteca de componentes UI de código abierto.</p>
+          <h4 className="text-sm font-medium leading-none text-primary">Radix Primitives</h4>
+          <p className="text-sm text-text-secondary">Una biblioteca de componentes UI de código abierto.</p>
         </div>
-        <Separator className="my-4" />
+        <Separator className="my-4 bg-surface-3" />
         <div className="flex h-5 items-center space-x-4 text-sm">
-          <div>Blog</div>
-          <Separator orientation="vertical" />
-          <div>Docs</div>
-          <Separator orientation="vertical" />
-          <div>Source</div>
+          <div className="text-text-secondary">Blog</div>
+          <Separator orientation="vertical" className="bg-surface-3" />
+          <div className="text-text-secondary">Docs</div>
+          <Separator orientation="vertical" className="bg-surface-3" />
+          <div className="text-text-secondary">Source</div>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Sheet</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Sheet</h2>
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline">Abrir hoja</Button>
+            <Button variant="outline" className="border-primary-500 text-primary hover:bg-primary-500 hover:text-text-primary">Abrir hoja</Button>
           </SheetTrigger>
-          <SheetContent>
+          <SheetContent className="bg-surface-3 border-border-dark">
             <SheetHeader>
-              <SheetTitle>¿Estás absolutamente seguro?</SheetTitle>
-              <SheetDescription>
+              <SheetTitle className="text-text-primary">¿Estás absolutamente seguro?</SheetTitle>
+              <SheetDescription className="text-text-secondary">
                 Esta acción no se puede deshacer. Esto eliminará permanentemente tu cuenta
                 y removerá tus datos de nuestros servidores.
               </SheetDescription>
@@ -398,107 +426,107 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Skeleton</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Skeleton</h2>
         <div className="flex items-center space-x-4">
-          <Skeleton className="h-12 w-12 rounded-full" />
+          <Skeleton className="h-12 w-12 rounded-full bg-surface-3" />
           <div className="space-y-2">
-            <Skeleton className="h-4 w-[250px]" />
-            <Skeleton className="h-4 w-[200px]" />
+            <Skeleton className="h-4 w-[250px] bg-surface-3" />
+            <Skeleton className="h-4 w-[200px] bg-surface-3" />
           </div>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Slider</h2>
-        <Slider defaultValue={[33]} max={100} step={1} />
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Slider</h2>
+        <Slider defaultValue={[33]} max={100} step={1} className="[&_[role=slider]]:bg-primary-600" />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Switch</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Switch</h2>
         <div className="flex items-center space-x-2">
-          <Switch id="airplane-mode" />
-          <Label htmlFor="airplane-mode">Modo avión</Label>
+          <Switch id="airplane-mode" className="bg-surface-3 data-[state=checked]:bg-primary-600" />
+          <Label htmlFor="airplane-mode" className="text-text-secondary">Modo avión</Label>
         </div>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Table</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Table</h2>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">ID</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Cantidad</TableHead>
+            <TableRow className="border-border-dark">
+              <TableHead className="w-[100px] text-primary">ID</TableHead>
+              <TableHead className="text-primary">Nombre</TableHead>
+              <TableHead className="text-primary">Estado</TableHead>
+              <TableHead className="text-right text-primary">Cantidad</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">001</TableCell>
-              <TableCell>Juan Pérez</TableCell>
-              <TableCell>Activo</TableCell>
-              <TableCell className="text-right">$250.00</TableCell>
+            <TableRow className="border-border-dark">
+              <TableCell className="font-medium text-text-secondary">001</TableCell>
+              <TableCell className="text-text-secondary">Juan Pérez</TableCell>
+              <TableCell className="text-text-secondary">Activo</TableCell>
+              <TableCell className="text-right text-text-secondary">$250.00</TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">002</TableCell>
-              <TableCell>María García</TableCell>
-              <TableCell>Inactivo</TableCell>
-              <TableCell className="text-right">$150.00</TableCell>
+            <TableRow className="border-border-dark">
+              <TableCell className="font-medium text-text-secondary">002</TableCell>
+              <TableCell className="text-text-secondary">María García</TableCell>
+              <TableCell className="text-text-secondary">Inactivo</TableCell>
+              <TableCell className="text-right text-text-secondary">$150.00</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Tabs</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Tabs</h2>
         <Tabs defaultValue="account" className="w-[400px]">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="account">Cuenta</TabsTrigger>
-            <TabsTrigger value="password">Contraseña</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-surface-3">
+            <TabsTrigger value="account" className="data-[state=active]:bg-surface-3 data-[state=active]:text-primary">Cuenta</TabsTrigger>
+            <TabsTrigger value="password" className="data-[state=active]:bg-surface-3 data-[state=active]:text-primary">Contraseña</TabsTrigger>
           </TabsList>
           <TabsContent value="account">
-            <Card>
+            <Card className="bg-surface-3 border-border-dark">
               <CardHeader>
-                <CardTitle>Cuenta</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-text-primary">Cuenta</CardTitle>
+                <CardDescription className="text-text-secondary">
                   Realiza cambios en tu cuenta aquí. Haz clic en guardar cuando hayas terminado.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="space-y-1">
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input id="name" defaultValue="Pedro Duarte" />
+                  <Label htmlFor="name" className="text-text-secondary">Nombre</Label>
+                  <Input id="name" defaultValue="Pedro Duarte" className="bg-surface-3 border-border-dark text-text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="username">Nombre de usuario</Label>
-                  <Input id="username" defaultValue="@peduarte" />
+                  <Label htmlFor="username" className="text-text-secondary">Nombre de usuario</Label>
+                  <Input id="username" defaultValue="@peduarte" className="bg-surface-3 border-border-dark text-text-primary" />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>Guardar cambios</Button>
+                <Button className="bg-primary-600 text-text-primary hover:bg-primary-500">Guardar cambios</Button>
               </CardFooter>
             </Card>
           </TabsContent>
           <TabsContent value="password">
-            <Card>
+            <Card className="bg-surface-3 border-border-dark">
               <CardHeader>
-                <CardTitle>Contraseña</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-text-primary">Contraseña</CardTitle>
+                <CardDescription className="text-text-secondary">
                   Cambia tu contraseña aquí. Después de guardar, se cerrará tu sesión.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="space-y-1">
-                  <Label htmlFor="current">Contraseña actual</Label>
-                  <Input id="current" type="password" />
+                  <Label htmlFor="current" className="text-text-secondary">Contraseña actual</Label>
+                  <Input id="current" type="password" className="bg-surface-3 border-border-dark text-text-primary" />
                 </div>
                 <div className="space-y-1">
-                  <Label htmlFor="new">Nueva contraseña</Label>
-                  <Input id="new" type="password" />
+                  <Label htmlFor="new" className="text-text-secondary">Nueva contraseña</Label>
+                  <Input id="new" type="password" className="bg-surface-3 border-border-dark text-text-primary" />
                 </div>
               </CardContent>
               <CardFooter>
-                <Button>Guardar contraseña</Button>
+                <Button className="bg-primary-600 text-text-primary hover:bg-primary-500">Guardar contraseña</Button>
               </CardFooter>
             </Card>
           </TabsContent>
@@ -506,18 +534,18 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Textarea</h2>
-        <Textarea placeholder="Escribe tu mensaje aquí." />
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Textarea</h2>
+        <Textarea placeholder="Escribe tu mensaje aquí." className="bg-surface-3 border-border-dark text-text-primary" />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Tooltip</h2>
+        <h2 className="text-2xl font-semibold text-text-primary mb-4">Tooltip</h2>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="outline">Pasa el cursor</Button>
+              <Button variant="outline" className="border-primary-500 text-text-secondary hover:bg-primary-500 hover:text-text-primary">Pasa el cursor</Button>
             </TooltipTrigger>
-            <TooltipContent>
+            <TooltipContent className="bg-surface-3 border-border-dark text-text-primary">
               <p>Añade al carrito</p>
             </TooltipContent>
           </Tooltip>

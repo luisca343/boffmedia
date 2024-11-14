@@ -7,7 +7,7 @@ export default function Mina(){
     return (
             <MenuWrapper>
                 <div className={`p-4 h-full w-full lg:w-3/5 ml-auto mr-5 flex flex-col`}>
-                <div className={`text-2xl xl:text-8xl font-custom margin-2 text-right text-main-100 text-shadow-border3 `}>Mina 2.0</div>
+                <div className={`text-2xl xl:text-8xl font-custom margin-2 text-right text-text-primary text-shadow-border3 `}>Mina 2.0</div>
                 <LinkMina className='mt-12' href='/mina/jugar'>Jugar</LinkMina>
                 <LinkMina href='/mina/historial'>Historial</LinkMina>
                 <LinkMina href='/mina/ranking'>Ranking</LinkMina>

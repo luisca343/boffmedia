@@ -42,10 +42,10 @@ export default function KeysTable() {
   const aggregatedKeysArray = Object.values(aggregatedKeys);
 
   return (
-    <div className="min-h-screen text-main-100 p-8">
+    <div className="min-h-screen text-text-primary p-8">
       <div className="max-w-4xl mx-auto">
         <motion.h1
-          className="text-5xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-300 to-orange-600 flex items-center justify-center gap-4"
+          className="text-5xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-hover flex items-center justify-center gap-4"
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
@@ -61,7 +61,7 @@ export default function KeysTable() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Buscar claves..."
-            className="mb-6 bg-main-800 border-main-700 text-main-100 placeholder-main-400 focus:ring-orange-400 focus:border-orange-400"
+            className="mb-6 bg-surface-3 border-border-dark text-text-primary placeholder-main-400 focus:ring-primary focus:border-primary"
           />
         </motion.div>
         <motion.div
@@ -78,28 +78,28 @@ export default function KeysTable() {
                 onChange={() => setShowClaimed(!showClaimed)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-main-600 rounded-full transition peer-checked:bg-orange-400 peer-focus:ring-4 peer-focus:ring-orange-400/25"></div>
-              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-5 peer-checked:bg-main-900"></div>
+              <div className="w-11 h-6 bg-surface-5 rounded-full transition peer-checked:bg-primary peer-focus:ring-4 peer-focus:ring-primary/25"></div>
+              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-5 peer-checked:bg-surface-2"></div>
             </div>
-            <span className="text-lg font-medium text-orange-300 group-hover:text-orange-400 transition">
+            <span className="text-lg font-medium text-primary group-hover:text-primary transition">
               Mostrar reclamados
             </span>
           </label>
         </motion.div>
         <motion.div
-          className="bg-main-700 rounded-lg shadow-lg overflow-hidden border border-main-600"
+          className="bg-surface-3 rounded-lg shadow-lg overflow-hidden border border-border-dark"
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <Table>
             <TableHeader>
-              <TableRow className="bg-main-900">
-                <TableHead className="text-orange-400">#</TableHead>
-                <TableHead className="text-orange-400">Image</TableHead>
-                <TableHead className="text-orange-400">Juego</TableHead>
-                <TableHead className="text-orange-400">Bundle</TableHead>
-                <TableHead className="text-orange-400">Estado</TableHead>
+              <TableRow className="bg-surface-2">
+                <TableHead className="text-primary">#</TableHead>
+                <TableHead className="text-primary">Image</TableHead>
+                <TableHead className="text-primary">Juego</TableHead>
+                <TableHead className="text-primary">Bundle</TableHead>
+                <TableHead className="text-primary">Estado</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -107,7 +107,7 @@ export default function KeysTable() {
                 {aggregatedKeysArray.map((key, index) => (
                   <motion.tr
                     key={`${key.name}-${key.claimed}`}
-                    className="hover:bg-main-700 transition-colors duration-200 cursor-pointer"
+                    className="hover:bg-surface-3 transition-colors duration-200 cursor-pointer"
                     onMouseEnter={() => setHoveredRow(key.name)}
                     onMouseLeave={() => setHoveredRow(null)}
                     onClick={() => fetchGameData(key.steamID)}
@@ -116,7 +116,7 @@ export default function KeysTable() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
                   >
-                    <TableCell className="font-medium text-main-300">
+                    <TableCell className="font-medium text-text-secondary">
                       {index + 1}
                     </TableCell>
                     <TableCell>
@@ -128,14 +128,14 @@ export default function KeysTable() {
                     </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <Gift className="w-5 h-5 text-orange-400" />
-                        <span className="flex items-center gap-1 text-main-100">
+                        <Gift className="w-5 h-5 text-primary" />
+                        <span className="flex items-center gap-1 text-text-primary">
                           {key.name} {key.count > 1 && `x${key.count}`}
                         </span>
                         <a
                           href={`https://store.steampowered.com/app/${key.steamID}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="text-orange-400 hover:text-orange-300"
+                          className="text-primary hover:text-primary"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -143,7 +143,7 @@ export default function KeysTable() {
                         </a>
                       </div>
                     </TableCell>
-                    <TableCell className="text-main-300">{key.source}</TableCell>
+                    <TableCell className="text-text-secondary">{key.source}</TableCell>
                     <TableCell>
                       <motion.div
                         className={`flex items-center gap-2 px-3 py-1 rounded-full ${

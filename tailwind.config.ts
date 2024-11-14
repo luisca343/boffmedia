@@ -44,74 +44,44 @@ const config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
-        main: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+        test: 'rgb(var(--test) / <alpha-value>)',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        primary: {
+          DEFAULT: 'rgb(var(--primary) / <alpha-value>)',
+          hover: 'rgb(var(--primary-hover) / <alpha-value>)',
+          active: 'rgb(var(--primary-active) / <alpha-value>)',
+          light: 'rgb(var(--primary-light) / <alpha-value>)',
         },
-          
-		primary: {
-		  50: '#fff7ed',
-		  100: '#ffedd5',
-		  200: '#fed7aa',
-		  300: '#fdba74',
-		  400: '#fb923c',
-		  500: '#f97316',
-		  600: '#ea580c',
-		  700: '#c2410c',
-		  800: '#9a3412',
-		  900: '#7c2d12',
-		  950: '#431407',
-		},
-        bg: {
-          page: "#0f172a", // Darker blue for main background
-          navbar: "#1e293b", // Slightly lighter blue for navbar
-          card: "#1f2937", // Dark blue-gray for cards
-          highlight: "#334155", // Lighter blue-gray for highlights
+        secondary: {
+          DEFAULT: 'rgb(var(--secondary) / <alpha-value>)',
+          hover: 'rgb(var(--secondary-hover) / <alpha-value>)',
+          active: 'rgb(var(--secondary-active) / <alpha-value>)',
+        },
+        accent: {
+          DEFAULT: 'rgb(var(--accent) / <alpha-value>)',
+          hover: 'rgb(var(--accent-hover) / <alpha-value>)',
+          active: 'rgb(var(--accent-active) / <alpha-value>)',
+        },
+        surface: {
+          1: 'rgb(var(--surface-1) / <alpha-value>)',
+          2: 'rgb(var(--surface-2) / <alpha-value>)',
+          3: 'rgb(var(--surface-3) / <alpha-value>)',
         },
         text: {
-          primary: "#f1f5f9", // Very light gray for primary text
-          secondary: "#94a3b8", // Light blue-gray for secondary text
-          accent: "#f97316", // Keeping the original orange for accents
+          primary: 'rgb(var(--text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
         },
         border: {
-          default: "#334155", // Subtle border color
-          accent: "#f97316", // Keeping orange border for emphasis
+          DEFAULT: 'rgb(var(--border) / <alpha-value>)',
+          dark: 'rgb(var(--border-dark) / <alpha-value>)',
         },
-        primary: {
-          "50": "var(--primary-50)",
-          "100": "var(--primary-100)",
-          "200": "var(--primary-200)",
-          "300": "var(--primary-300)",
-          "400": "var(--primary-400)",
-          "500": "var(--primary-500)",
-          "600": "var(--primary-600)",
-          "700": "var(--primary-700)",
-          "800": "var(--primary-800)",
-          "900": "var(--primary-900)",
-          "950": "var(--primary-950)",
-        },
-        main: {
-          "50": "var(--main-50)",
-          "100": "var(--main-100)",
-          "200": "var(--main-200)",
-          "300": "var(--main-300)",
-          "400": "var(--main-400)",
-          "500": "var(--main-500)",
-          "600": "var(--main-600)",
-          "700": "var(--main-700)",
-          "800": "var(--main-800)",
-          "900": "var(--main-900)",
-          "950": "var(--main-950)",
-        },
+        inputBorder: 'rgb(var(--input-border) / <alpha-value>)',
+        success: 'rgb(var(--success) / <alpha-value>)',
+        warning: 'rgb(var(--warning) / <alpha-value>)',
+        error: 'rgb(var(--error) / <alpha-value>)',
+        info: 'rgb(var(--info) / <alpha-value>)',
         gray: {
           "50": "#f9fafb",
           "100": "#f3f4f6",
@@ -126,15 +96,9 @@ const config = {
           "900": "#111827",
           "950": "#030712",
         },
-        border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
+        //background: "hsl(var(--background))",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
@@ -142,10 +106,6 @@ const config = {
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",

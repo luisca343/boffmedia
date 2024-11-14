@@ -9,7 +9,7 @@ const ReplayControlsButton: FC<ReplayControlsButtonProps> = ({ children, label, 
   return (
     <button
       {...props}
-      className={`p-1 px-2  bg-main-600 text-main-50 rounded hover:bg-main-700 focus:outline-none focus:ring-2 focus:ring-main-500 ${props.className}`}
+      className={`p-1 px-2  bg-surface-5 text-text-primary rounded hover:bg-surface-3 focus:outline-none focus:ring-2 focus:ring-main-500 ${props.className}`}
     >
       <div className="flex flex-col items-center">
         {children}

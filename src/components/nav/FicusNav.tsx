@@ -8,15 +8,15 @@ import { HerramientasMenu } from "./ToolsMenu"
 
 const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
   ssr: false,
-  loading: () => <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
+  loading: () => <div className="w-8 h-8 bg-surface-3 rounded-full animate-pulse" />
 })
 
 const UserAuthSection = dynamic(() => import('./UserAuthSection'), { 
   ssr: false,
   loading: () => (
     <div className="flex items-center space-x-2">
-      <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
-      <div className="w-16 h-4 bg-main-800 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-surface-3 rounded-full animate-pulse" />
+      <div className="w-16 h-4 bg-surface-3 rounded animate-pulse" />
     </div>
   )
 })
@@ -47,7 +47,7 @@ export default function OptimizedFicusNav() {
   if(currentApp && HIDDEN_APPS.includes(currentApp)) return <div className="-mb-16" />
 
   return (
-    <nav className="bg-main-900 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
+    <nav className="bg-surface-2 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
       <div className="container mx-auto flex justify-between items-center h-full">
         <ul className="flex flex-wrap justify-start items-center gap-6">
           {NAV_LINKS.map(({ href, label, override }) => (
@@ -57,13 +57,13 @@ export default function OptimizedFicusNav() {
               ) : (
                 <Link
                   href={href}
-                  className={`text-orange-300 hover:text-orange-100 transition-colors duration-200 ease-in-out relative group flex items-center ${
+                  className={`text-primary hover:text-primary-light transition-colors duration-200 ease-in-out relative group flex items-center ${
                     inPage(href) ? "font-medium" : ""
                   }`}
                 >
                   <span className="relative z-10">{label}</span>
                   <span
-                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform ${
+                    className={`absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary to-primary-hover transform ${
                       inPage(href) ? "scale-x-100" : "scale-x-0"
                     } group-hover:scale-x-100 transition-transform duration-200 ease-in-out`}
                     aria-hidden="true"
@@ -81,10 +81,10 @@ export default function OptimizedFicusNav() {
             </>
           ) : (
             <>
-              <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
+              <div className="w-8 h-8 bg-surface-3 rounded-full animate-pulse" />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-main-800 rounded-full animate-pulse" />
-                <div className="w-16 h-4 bg-main-800 rounded animate-pulse" />
+                <div className="w-8 h-8 bg-surface-3 rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-surface-3 rounded animate-pulse" />
               </div>
             </>
           )}

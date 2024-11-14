@@ -345,7 +345,7 @@ console.log(team)
   return (
     <div className="w-[20%] h-full">
       <PokemonTeamList team={team} />
-      <div className="text-shadow-border1 text-main-50">{battle.sides[0].name}</div>
+      <div className="text-shadow-border1 text-text-primary">{battle.sides[0].name}</div>
       <img className="mx-auto" style={{height:'100px', width:'45px', transform: reverse && 'scaleX(-1)'}} src="https://crafatar.com/renders/body/67d9b543-5ac9-41e1-a8a5-20d7689e24a4" />
     </div>
   )
@@ -365,10 +365,10 @@ const active1 = battle.sides[0].active
 const active2 = battle.sides[1].active
 
   return (
-  <div className="w-full h-full flex bg-main-700">
+  <div className="w-full h-full flex bg-surface-3">
     <PlayerDataBar team={team1}/>
     <div id="game" className="w-full h-full flex flex-col relative">
-      <div className="absolute top-1 right-1 bg-main-800 py-1 px-2 rounded-md text-main-200 border border-main-200">Turn {battle.turn}</div>
+      <div className="absolute top-1 right-1 bg-surface-3 py-1 px-2 rounded-md text-text-secondary border border-border">Turn {battle.turn}</div>
       {active1.length === 3 ? <>
           <PokemonSprite pokemon={active1[0]} id="p1a" className='bottom-[16%] left-[5%]'/>
           <PokemonSprite pokemon={active1[1]} id="p1b" className='bottom-[8%] left-[33%]'/>

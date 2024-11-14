@@ -13,13 +13,13 @@ export default function BreadcrumbNav({className} : {className?: string}){
     const parts = path.split('/').filter(Boolean)
 
     return (
-        <div className={`${className} flex bg-main-50 rounded-sm h-8 items-center ps-4 text-black`}>
+        <div className={`${className} flex bg-foreground rounded-sm h-8 items-center ps-4 text-primary`}>
             {parts.map((part, index) => {
 
                 const href = '/' + parts.slice(0, index + 1).join('/')
                 return (
                     <React.Fragment key={`breadcrumb-${index}`}>
-                        {index > 0 && <span className="text-3xl font-bold m-1 text-primary">/</span>}
+                        {index > 0 && <span className="text-3xl font-bold m-1 ">/</span>}
                         <Breadcrumb index={index} key={index} parts={parts} />
                     </React.Fragment>
                 )

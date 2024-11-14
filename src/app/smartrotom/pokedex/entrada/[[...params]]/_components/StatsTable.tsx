@@ -67,10 +67,10 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
     
 
     return (
-        <div className="flex flex-col justify-center items-center text-main-200 w-full ">
+        <div className="flex flex-col justify-center items-center text-text-secondary w-full ">
             <PokedexTable>
                 <PokedexHeader>
-                    <TableRow className='hover:bg-main-900  font-bold'>
+                    <TableRow className='hover:bg-surface-2  font-bold'>
                         <PokedexHead className='w-40'> </PokedexHead>
                         <PokedexHead >Estadística base</PokedexHead>
                         <PokedexHead  colSpan={2}>Nivel 50</PokedexHead>
@@ -86,7 +86,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                             <PokedexHead className=" border  font-bold">{t(`stat_${stat.toLowerCase()}`)}</PokedexHead>
                             <PokedexCell className="relative border  border-collapse">
                                 <div className="absolute inset-0  rounded px-2 text-start pl-2 bold text-sm flex justify-start items-center" style={{width: `${((statValue + 5)  / (maxStat + 5)) * 100}%`, backgroundColor: getColorStat(statValue)}}>
-                                  <div className='text-main-50 text-lg font-bold text-shadow-border1'>{statValue}</div>
+                                  <div className='text-text-primary text-lg font-bold text-shadow-border1'>{statValue}</div>
                                 </div>
                             </PokedexCell>
                             <PokedexCell >{calculateStat(stat, statValue, 50, 0, 0, 0.9)}</PokedexCell>
@@ -98,7 +98,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                     })}
                 </TableBody>
                 <PokedexHeader>
-                    <TableRow className='hover:bg-main-900 font-bold'>
+                    <TableRow className='hover:bg-surface-2 font-bold'>
                         <PokedexHead >Total</PokedexHead>
                         <PokedexHead >{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexHead>
                         <PokedexHead >Min</PokedexHead>

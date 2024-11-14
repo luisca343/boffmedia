@@ -47,7 +47,7 @@ export default function CentroArcade() {
           <InternalLink
             key={juego.nombre}
             href={juego.href}
-            className={`bg-main-800 bg-opacity-80 border-4 border-${juego.color}-500 rounded-lg p-6 flex flex-col items-center justify-center space-y-4 hover:bg-main-700 hover:bg-opacity-80 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-${juego.color}-400 focus:ring-opacity-50`}
+            className={`bg-surface-3 bg-opacity-80 border-4 border-${juego.color}-500 rounded-lg p-6 flex flex-col items-center justify-center space-y-4 hover:bg-surface-3 hover:bg-opacity-80 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-${juego.color}-400 focus:ring-opacity-50`}
           >
             {juego.icono ? (
               <juego.icono className={`w-16 h-16 text-${juego.color}-400`} />
