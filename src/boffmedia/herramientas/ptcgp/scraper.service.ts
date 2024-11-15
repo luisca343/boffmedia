@@ -248,7 +248,7 @@ export class TgcpScraperService {
       console.log(packIds);
       
       // Download the card image
-      const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${number}.png`;
+      const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${number}.jpg`;
       const cardImagePath = await this.saveCardImage(cardImageUrl, setName, number);
 
       const card = {
