@@ -37,7 +37,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import PercentageToDecimal from "./PercentageToDecimal"
 import { useRouter } from "next/router"
 import { usePathname } from "next/navigation"
-import { useGalleryData } from "../galeria/_hooks/useGalleryData"
 
 interface Card {
   expansion: string
@@ -48,6 +47,12 @@ interface Card {
 
 interface PlayerGalleryProps {
   username: string
+  allCards: Card[]
+  userCards: Record<string, number>
+  loading: boolean
+  onAddCard?: (card: Card) => void
+  onRemoveCard?: (card: Card) => void
+  onSaveChanges?: () => void
 }
 
 interface PackProbabilities {
@@ -95,10 +100,13 @@ function ProbabilityTable({ probabilities }: { probabilities: Record<string, Pac
 
 export function PlayerGallery({
   username,
+  allCards,
+  userCards,
+  loading,
+  onAddCard,
+  onRemoveCard,
+  onSaveChanges
 }: PlayerGalleryProps) {
-  const { allCards, userCards, loading, error, updateUserCards } = useGalleryData(username || '')
-
-
   const [hideMissingCards, setHideMissingCards] = useState(false)
   const [changes, setChanges] = useState<Record<string, number>>({})
   const [cardCount, setCardCount] = useState(0)
@@ -113,43 +121,30 @@ export function PlayerGallery({
   const editable = pathname === '/pokemon/tcgpocket/galeria';
 
 
-
   useEffect(() => {
     const count = Object.values(userCards).reduce((acc, curr) => acc + curr, 0)
     setCardCount(count)
   }, [userCards])
 
-  
-
-
   const handleAddCard = (card: Card) => {
-    const key = `${card.expansion}_${card.number}`
-    setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
-  }
-
-  const handleRemoveCard = (card: Card) => {
-    const key = `${card.expansion}_${card.number}`
-    const currentCount = userCards[key] || 0
-    const changeCount = changes[key] || 0
-    if (currentCount + changeCount > 0) {
-      setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) - 1 }))
+    if (editable && onAddCard) {
+      onAddCard(card)
+      const key = `${card.expansion}_${card.number}`
+      setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
     }
   }
 
-  const saveChanges = async () => {
-    const updates = Object.entries(changes).map(([key, change]) => {
-      const [expansion, cardNumber] = key.split('_')
-      return {
-        expansion,
-        cardNumber: parseInt(cardNumber),
-        change,
+  const handleRemoveCard = (card: Card) => {
+    if (editable && onRemoveCard) {
+      onRemoveCard(card)
+      const key = `${card.expansion}_${card.number}`
+      const currentCount = userCards[key] || 0
+      const changeCount = changes[key] || 0
+      if (currentCount + changeCount > 0) {
+        setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) - 1 }))
       }
-    })
-
-    await updateUserCards(updates)
-    setChanges({})
+    }
   }
-
 
   const getBestPack = async () => {
     setBestPackLoading(true)
@@ -335,7 +330,7 @@ export function PlayerGallery({
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-4 right-4"
         >
-          <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600" disabled={loading}>
+          <Button onClick={onSaveChanges} className="bg-primary-500 hover:bg-primary-600" disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Guardar Cambios
           </Button>
