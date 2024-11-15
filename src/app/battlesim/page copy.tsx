@@ -249,12 +249,12 @@ export default function Test() {
   style={{backgroundImage: `url(https://i.imgur.com/EIKbeGK.png)`
   , backgroundSize: 'cover', opacity: 0.8}}
   >
-    <div className="w-[20%] flex flex-col  bg-main-50 bg-opacity-40">
+    <div className="w-[20%] flex flex-col  bg-surface-50 bg-opacity-40">
       <div>Player 1</div>
       <PokemonTeam team={battle.sides[0].team} />
     </div>
     <GameCanvas pokemon={pokemon}/>
-    <div className="w-[20%] flex flex-col bg-main-50 bg-opacity-40">
+    <div className="w-[20%] flex flex-col bg-surface-50 bg-opacity-40">
       <div>Player 2</div>
       <PokemonTeam team={battle.sides[1].team} />
     </div>

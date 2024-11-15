@@ -148,7 +148,7 @@ export default function FicusAI() {
         />
         <button
           onClick={enviarMensaje}
-          className="bg-blue-800 text-main-50 px-4 py-2 rounded"
+          className="bg-blue-800 text-surface-50 px-4 py-2 rounded"
         >
           Enviar
         </button>
@@ -166,12 +166,12 @@ function MensajeChat({
 }) {
   const messageClass =
     sender === "user"
-      ? "bg-blue-800 text-main-50 self-end"
-      : "bg-green-800 text-main-50 self-start";
+      ? "bg-blue-800 text-surface-50 self-end"
+      : "bg-green-800 text-surface-50 self-start";
 
   return (
     <li
-      className={`border border-main-950 rounded p-3 m-2 max-w-full ${messageClass} whitespace-pre-wrap`}
+      className={`border border-surface-950 rounded p-3 m-2 max-w-full ${messageClass} whitespace-pre-wrap`}
       style={{ maxWidth: "90%" }} // Adjust the maximum width as needed
     >
       {mensaje.parts.map((msg, index) => {

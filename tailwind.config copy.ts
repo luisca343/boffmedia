@@ -13,7 +13,6 @@ const config = {
   prefix: "",
   theme: {
     container: {
-      center: "true",
       padding: "2rem",
       screens: {
         "2xl": "1400px",
@@ -44,7 +43,6 @@ const config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
-
         primary: {
           50: 'rgb(var(--primary-50) / <alpha-value>)',
           100: 'rgb(var(--primary-100) / <alpha-value>)',
@@ -149,6 +147,19 @@ const config = {
           900: 'rgb(var(--info-900) / <alpha-value>)',
           950: 'rgb(var(--info-950) / <alpha-value>)',
         },
+        test: 'rgb(var(--test) / <alpha-value>)',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        text: {
+          primary: 'rgb(var(--text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
+        },
+        border: {
+          DEFAULT: 'rgb(var(--border) / <alpha-value>)',
+          dark: 'rgb(var(--border-dark) / <alpha-value>)',
+        },
+        inputBorder: 'rgb(var(--input-border) / <alpha-value>)',
         gray: {
           "50": "#f9fafb",
           "100": "#f3f4f6",
@@ -163,11 +174,25 @@ const config = {
           "900": "#111827",
           "950": "#030712",
         },
-        border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        //background: "hsl(var(--background))",
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -210,6 +235,23 @@ const config = {
             transform: "translateY(-20px) rotate(180deg)",
           },
         },
+        /*
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },*/
       },
       animation: {
         "float-wingull": "float-wingull 8s ease-in-out infinite",
@@ -225,12 +267,11 @@ const config = {
     require("tailwindcss-textshadow"),
     tplugin(({ theme, addUtilities }) => {
       const shadowUtilities: { [key: string]: { textShadow: string } } = {};
-      const colors = theme("colors") as Record<string, string>;
+      const colors = theme("colors") as Record<string, any>;
 
       for (const color in colors) {
         if (typeof colors[color] === "object") {
-          const borderColor = colors[color][900].replace("<alpha-value>", ".8");
-
+          const borderColor = colors[color][900];
 
           shadowUtilities[`.text-shadow-${color}-border1`] = {
             textShadow: `${borderColor} 1px 0px 0px, ${borderColor} 0.540302px 0.841471px 0px, ${borderColor} -0.416147px 0.909297px 0px, ${borderColor} -0.989992px 0.14112px 0px, ${borderColor} -0.653644px -0.756802px 0px, ${borderColor} 0.283662px -0.958924px 0px, ${borderColor} 0.96017px -0.279415px 0px`,

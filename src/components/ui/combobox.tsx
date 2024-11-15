@@ -52,7 +52,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-[200px] justify-between bg-main-800 text-orange-400 border-orange-500 hover:bg-main-700 focus:ring-orange-400",
+            "w-[200px] justify-between bg-surface-800 text-primary-400 border-primary-500 hover:bg-surface-700 focus:ring-primary-400",
             className
           )}
           disabled={disabled}
@@ -63,27 +63,27 @@ export function Combobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0 bg-main-800 border-orange-500">
-        <Command className="bg-main-800 rounded-md">
+      <PopoverContent className="w-[200px] p-0 bg-surface-800 border-primary-500">
+        <Command className="bg-surface-800 rounded-md">
           <CommandInput 
             placeholder={placeholder} 
-            className="bg-main-700 text-orange-100 placeholder-orange-300 border-orange-500 focus:ring-orange-400"
+            className="bg-surface-700 text-primary-100 placeholder-primary-300 border-primary-500 focus:ring-primary-400"
           />
           <CommandList>
-            <CommandEmpty className="text-orange-300">No element found.</CommandEmpty>
+            <CommandEmpty className="text-primary-300">No element found.</CommandEmpty>
             <CommandGroup>
               {data.map((element) => (
                 <CommandItem
                   key={element.value}
                   value={element.value}
                   onSelect={handleSelect}
-                  className="text-orange-100 hover:bg-main-700 data-[selected=true]:bg-orange-500 data-[selected=true]:text-main-950"
+                  className="text-primary-100 hover:bg-surface-700 data-[selected=true]:bg-primary-500 data-[selected=true]:text-surface-950"
                 >
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
                       value === element.value ? "opacity-100" : "opacity-0",
-                      "text-orange-400"
+                      "text-primary-400"
                     )}
                   />
                   {element.label}

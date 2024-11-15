@@ -135,7 +135,7 @@ export function Chat({
         <Button
           type="submit"
           onClick={sendMessage}
-          className="bg-orange-400 hover:bg-orange-500 text-black"
+          className="bg-primary-400 hover:bg-primary-500 text-black"
         >
           <Send />
         </Button>

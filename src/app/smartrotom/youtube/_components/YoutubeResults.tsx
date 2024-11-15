@@ -41,13 +41,13 @@ export default function YoutubeResults() {
   };
 
   return (
-<div className="min-h-screen bg-main-900 text-white">
-      <header className="sticky top-0 z-10 bg-main-800 shadow-md">
+<div className="min-h-screen bg-surface-900 text-white">
+      <header className="sticky top-0 z-10 bg-surface-800 shadow-md">
         <div className="container mx-auto px-4 py-4 flex items-center">
           <Input
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            className="flex-grow mr-2 bg-main-700 text-white placeholder-main-400 border-main-600"
+            className="flex-grow mr-2 bg-surface-700 text-white placeholder-surface-400 border-surface-600"
             placeholder="Search YouTube"
           />
           <Button onClick={handleSearch} className="bg-red-600 hover:bg-red-700">
@@ -63,7 +63,7 @@ export default function YoutubeResults() {
                 <InternalLink
                   href={`/youtube/channel/${video.snippet.channelId}`}
                   key={video.etag}
-                  className="bg-main-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-main-700"
+                  className="bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700"
                 >
                   <div className="aspect-w-16 aspect-h-9">
                     <img
@@ -76,7 +76,7 @@ export default function YoutubeResults() {
                     <h3 className="text-lg font-semibold line-clamp-2 mb-1 group-hover:text-red-500 transition-colors duration-300">
                       {video.snippet.title}
                     </h3>
-                    <p className="text-sm text-main-400 group-hover:text-main-300 transition-colors duration-300">
+                    <p className="text-sm text-surface-400 group-hover:text-surface-300 transition-colors duration-300">
                       {video.snippet.channelTitle}
                     </p>
                   </div>
@@ -88,7 +88,7 @@ export default function YoutubeResults() {
               <InternalLink
                 key={video.id.videoId}
                 href={`/youtube/video/${video.id.videoId}`}
-                className="group bg-main-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-main-700"
+                className="group bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700"
               >
                 <div className="aspect-w-16 aspect-h-9 relative">
                   <img
@@ -102,7 +102,7 @@ export default function YoutubeResults() {
                   <h3 className="text-lg font-semibold line-clamp-2 mb-1 group-hover:text-red-500 transition-colors duration-300">
                     {video.snippet.title}
                   </h3>
-                  <p className="text-sm text-main-400 group-hover:text-main-300 transition-colors duration-300">
+                  <p className="text-sm text-surface-400 group-hover:text-surface-300 transition-colors duration-300">
                     {video.snippet.channelTitle}
                   </p>
                 </div>

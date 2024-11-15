@@ -174,7 +174,7 @@ export function PlayerGallery({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-orange-300 text-center">
+      <h1 className="text-3xl font-bold mb-6 text-primary-300 text-center">
         Galería de {username} ({cardCount} cartas)
       </h1>
       <div className="flex flex-col sm:flex-row items-center justify-between mb-4 space-y-4 sm:space-y-0">
@@ -192,10 +192,10 @@ export function PlayerGallery({
         )}
         <div className="flex items-center space-x-4">
           <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-            <SelectTrigger className="w-[200px] bg-main-700 text-white border-main-600">
+            <SelectTrigger className="w-[200px] bg-surface-700 text-white border-surface-600">
               <SelectValue placeholder="Seleccionar evento" />
             </SelectTrigger>
-            <SelectContent className="bg-main-700 text-white border-main-600">
+            <SelectContent className="bg-surface-700 text-white border-surface-600">
               <SelectItem value="general">Todas las cartas</SelectItem>
               <SelectItem value="mewQuest">Mew Quest</SelectItem>
             </SelectContent>
@@ -211,10 +211,10 @@ export function PlayerGallery({
                 Recomendar Mejor Sobre
               </Button>
             </DialogTrigger>
-            <DialogContent className="bg-main-800 text-white border-main-700 max-w-4xl">
+            <DialogContent className="bg-surface-800 text-white border-surface-700 max-w-4xl">
               <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-orange-300">Probabilidades de Nuevas Cartas por Pack</DialogTitle>
-                <DialogDescription className="text-main-300">
+                <DialogTitle className="text-2xl font-bold text-primary-300">Probabilidades de Nuevas Cartas por Pack</DialogTitle>
+                <DialogDescription className="text-surface-300">
                   {selectedEvent === "general" ? (
                     `El mejor pack para obtener nuevas cartas es: ${bestPackData?.bestPack.name}`
                   ) : (
@@ -237,10 +237,10 @@ export function PlayerGallery({
       </div>
       {loading ? (
         <div className="flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="w-8 h-8 text-orange-500 animate-spin" />
+          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
         </div>
       ) : allCards.length === 0 ? (
-        <p className="text-center text-main-300">No se encontraron cartas.</p>
+        <p className="text-center text-surface-300">No se encontraron cartas.</p>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
           <AnimatePresence>
@@ -262,7 +262,7 @@ export function PlayerGallery({
                   transition={{ duration: 0.3 }}
                 >
                   <div className="group block">
-                    <div className={`relative bg-main-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-main-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl ${isMissing ? 'grayscale' : ''}`}>
+                    <div className={`relative bg-surface-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-surface-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl ${isMissing ? 'grayscale' : ''}`}>
                       <div className="aspect-[2.5/3.5] relative">
                         <Image
                           src={`/img/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}
@@ -278,7 +278,7 @@ export function PlayerGallery({
                         <h3 className="text-sm text-white text-center truncate font-medium">
                           {card.name}
                         </h3>
-                        <p className="text-xs text-main-400 text-center">{trans(card.expansion)}</p>
+                        <p className="text-xs text-surface-400 text-center">{trans(card.expansion)}</p>
                         {editable && (
                           <div className="flex justify-between items-center mt-2">
                             <Button
@@ -326,7 +326,7 @@ export function PlayerGallery({
           animate={{ opacity: 1, y: 0 }}
           className="fixed bottom-4 right-4"
         >
-          <Button onClick={onSaveChanges} className="bg-orange-500 hover:bg-orange-600" disabled={loading}>
+          <Button onClick={onSaveChanges} className="bg-primary-500 hover:bg-primary-600" disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Guardar Cambios
           </Button>

@@ -41,12 +41,12 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-main-100 hover:text-main-900 focus:bg-main-100 focus:text-main-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-main-100/50 data-[state=open]:bg-main-100/50 dark:bg-main-950 dark:hover:bg-main-800 dark:hover:text-main-50 dark:focus:bg-main-800 dark:focus:text-main-50 dark:data-[active]:bg-main-800/50 dark:data-[state=open]:bg-main-800/50",
+  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-100 hover:text-surface-900 focus:bg-surface-100 focus:text-surface-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-surface-100/50 data-[state=open]:bg-surface-100/50 dark:bg-surface-950 dark:hover:bg-surface-800 dark:hover:text-surface-50 dark:focus:bg-surface-800 dark:focus:text-surface-50 dark:data-[active]:bg-surface-800/50 dark:data-[state=open]:bg-surface-800/50",
   {
     variants: {
       variant: {
         default: "",
-        boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-orange-300 hover:text-orange-100 px-0 font-normal text-base h-auto relative",
+        boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-300 hover:text-primary-100 px-0 font-normal text-base h-auto relative",
       },
     },
     defaultVariants: {
@@ -73,7 +73,7 @@ const NavigationMenuTrigger = React.forwardRef<
     )}
     {variant === "boffmedia" && (
       <span
-        className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-orange-400 to-orange-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
+        className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
         aria-hidden="true"
       />
     )}
@@ -105,7 +105,7 @@ const NavigationMenuViewport = React.forwardRef<
   <div className={cn("absolute left-0 top-full flex justify-center")}>
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-main-800 bg-main-900 text-orange-300 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
+        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-surface-800 bg-surface-900 text-primary-300 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
         className
       )}
       ref={ref}
@@ -127,7 +127,7 @@ const NavigationMenuIndicator = React.forwardRef<
     )}
     {...props}
   >
-    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-main-800 shadow-md" />
+    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-surface-800 shadow-md" />
   </NavigationMenuPrimitive.Indicator>
 ))
 NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName

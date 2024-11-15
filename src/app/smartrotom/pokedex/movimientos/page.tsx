@@ -22,17 +22,17 @@ export default function Movimientos() {
 
     if (!moves) return <div>loading...</div>;
     return (
-        <div className="bg-main-800 flex flex-wrap text-main-100 w-full justify-between p-2">
+        <div className="bg-surface-800 flex flex-wrap text-surface-100 w-full justify-between p-2">
             {moves.map((move: Move) => (
                 <HoverCard key={move.name}>
                     <HoverCardTrigger 
                         onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${move.name}`} 
-                        className="flex flex-col p-2 text-center items-center justify-center hover:text-main-800 hover:bg-main-400 w-64 h-32 border rounded-lg my-1"
+                        className="flex flex-col p-2 text-center items-center justify-center hover:text-surface-800 hover:bg-surface-400 w-64 h-32 border rounded-lg my-1"
                     >
                         <span className="text-lg font-medium">{t(`attack_${move.name.toLowerCase().replaceAll(" ", "_")}`)}</span>
                         <span className="text-sm">{move.count}</span>
                     </HoverCardTrigger>
-                    <HoverCardContent className="bg-main-700 text-main-50 w-[400px] border-main-950 border font-normal p-4 rounded-lg">
+                    <HoverCardContent className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal p-4 rounded-lg">
                         <MoveDataElement id={move.name} />
                     </HoverCardContent>
                 </HoverCard>

@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
     const t  = useTranslations("");
     const formsTrans  = useTranslations("");
-    if(spawns.length == 0) return <div className="  text-main-50 text-shadow-border1 flex justify-center ">
+    if(spawns.length == 0) return <div className="  text-surface-50 text-shadow-border1 flex justify-center ">
     <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
         Este Pokémon no spawnea
     </div>

@@ -15,8 +15,8 @@ export default function PokemonDetail({pokemon, children, className, offset = 20
     <HoverCardTrigger  className={className}>
         {children}
     </HoverCardTrigger>
-    <HoverCardContent className=" bg-main-800 bg-opacity-90 text-main-100 w-128 px-2 py-1 z-50  text-start" side="bottom" align="end">
-        <div className="flex flex-col border-b-2 border-main-50 py-1">
+    <HoverCardContent className=" bg-surface-800 bg-opacity-90 text-surface-100 w-128 px-2 py-1 z-50  text-start" side="bottom" align="end">
+        <div className="flex flex-col border-b-2 border-surface-50 py-1">
             <div><span className="font-bold text-lg">{pokemon.name}</span><span className="ml-2 text-sm">{pokemon.speciesForme} L{pokemon.level}</span></div>
             <div className="flex">
                 {types.map(type => <TypeBadgeSmall key={type} type={type} />)}

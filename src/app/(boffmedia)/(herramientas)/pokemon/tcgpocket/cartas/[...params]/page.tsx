@@ -86,7 +86,7 @@ export default function Expansions({ params }: { params: { params: [expansion: s
               transition={{ type: "spring", stiffness: 300 }}
             >
               <div className="relative group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-main via-main-foreground to-main rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="absolute -inset-1 bg-gradient-to-r from-main via-surface-foreground to-main rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
                 <Image
                   src={`/img/tcgpocket/cards/${expansion}/${id}.jpg`}
                   alt={cardData.name}
@@ -106,15 +106,15 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                   {/* Basic Info */}
                   <div className="space-y-6">
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Número</p>
+                      <p className="text-sm text-surface-400 mb-1">Número</p>
                       <p className="text-xl text-white">{cardData.number}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Expansión</p>
+                      <p className="text-sm text-surface-400 mb-1">Expansión</p>
                       <p className="text-xl text-white">{trans(cardData.expansion)}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Rareza</p>
+                      <p className="text-sm text-surface-400 mb-1">Rareza</p>
                       <div className="flex items-center">
                         {getRarityImages(cardData.rarity)}
                       </div>
@@ -124,7 +124,7 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                   {/* Stats */}
                   <div className="space-y-6">
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Tipo</p>
+                      <p className="text-sm text-surface-400 mb-1">Tipo</p>
                       <div className="flex items-center gap-2">
                         <div className="p-1 bg-white/10 rounded-full">
                           <Image
@@ -140,12 +140,12 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                     </div>
 
                     <div>
-                      <p className="text-sm text-main-400 mb-1">PS</p>
+                      <p className="text-sm text-surface-400 mb-1">PS</p>
                       <p className="text-xl text-white">{cardData.hp}</p>
                     </div>
 
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Debilidad</p>
+                      <p className="text-sm text-surface-400 mb-1">Debilidad</p>
                       <div className="flex items-center gap-2">
                         <div className="p-1 bg-white/10 rounded-full">
                           <Image
@@ -163,7 +163,7 @@ export default function Expansions({ params }: { params: { params: [expansion: s
                     </div>
 
                     <div>
-                      <p className="text-sm text-main-400 mb-1">Coste de Retirada</p>
+                      <p className="text-sm text-surface-400 mb-1">Coste de Retirada</p>
                       <div className="flex items-center gap-2">
                         {[...Array(cardData.retreat_cost)].map((_, index) => (
                           <div key={index} className="p-1 bg-white/10 rounded-full">

@@ -21,14 +21,14 @@ export const getWeatherIcon = (weather: string): JSX.Element => {
 };
 
 export const getDayNightIcon = (ticks: number): JSX.Element => {
-  if ((ticks >= 22500 && ticks < 24000) || (ticks >= 0 && ticks < 300)) return <Sunrise className="h-6 w-6 text-orange-500" />;
+  if ((ticks >= 22500 && ticks < 24000) || (ticks >= 0 && ticks < 300)) return <Sunrise className="h-6 w-6 text-primary-500" />;
   if ((ticks >= 300 && ticks < 6000)) return <Sun className="h-6 w-6 text-yellow-300" />;
   if (ticks >= 5500 && ticks < 6500) return <Sun className="h-6 w-6 text-yellow-500" />;
   if (ticks >= 6000 && ticks < 12000) return <Sun className="h-6 w-6 text-yellow-600" />;
-  if (ticks >= 12000 && ticks < 13800) return <Sunset className="h-6 w-6 text-orange-500" />;
+  if (ticks >= 12000 && ticks < 13800) return <Sunset className="h-6 w-6 text-primary-500" />;
   if (ticks >= 13450 && ticks < 22550) return <Moon className="h-6 w-6 text-indigo-300" />;
   if (ticks >= 17500 && ticks < 18500) return <Moon className="h-6 w-6 text-indigo-400" />;
-  return <Cloud className="h-6 w-6 text-main-400" />;
+  return <Cloud className="h-6 w-6 text-surface-400" />;
 };
 
 export const formatMinecraftTime = (ticks: number): string => {

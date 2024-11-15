@@ -114,7 +114,7 @@ export default function Pasaporte(){
             {achievement.replay && (
               <Popover>
                 <PopoverTrigger className="text-base self-end ml-2 hover:text-blue-500">Ver Reptición</PopoverTrigger>
-                <PopoverContent className="ml-12 w-fit h-fit page border border-main-950 shadow-2xl">
+                <PopoverContent className="ml-12 w-fit h-fit page border border-surface-950 shadow-2xl">
                   <Game battleName={achievement.id}/>
                 </PopoverContent>
               </Popover>

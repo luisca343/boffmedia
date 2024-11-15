@@ -167,8 +167,8 @@ export default function Jugar(){
     return (
         <div className="bg-cover bg-repeat  overflow-hidden" style={{backgroundImage: 'url(/smartrotom/img/apps/mina/gui/fondo.png)'}}>
             <AlertDialog open={open}>
-                <AlertDialogContent className='bg-main-900 border-main-950'>
-                    {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-main-50 text-center text-2xl">Recompensas obtenidas</div>}
+                <AlertDialogContent className='bg-surface-900 border-surface-950'>
+                    {obtainedRewards.length === 0 ?  <></> : <div className="w-full text-surface-50 text-center text-2xl">Recompensas obtenidas</div>}
                     <div className="flex flex-row justify-center items-center">
                     {obtainedRewards.map((reward, i) => {
                         return (
@@ -178,21 +178,21 @@ export default function Jugar(){
                                     style={{imageRendering: "pixelated"}}
                                     
                                     />
-                                <div className="text-main-50">{reward.reward.name}</div>
+                                <div className="text-surface-50">{reward.reward.name}</div>
                             </div>
                     )})}
                     </div>
                     <BarraEnergia/>
                     <div className="flex justify-evenly">
                         <Button 
-                            className="text-main-50 border border-main-50 hover:bg-main-600"
+                            className="text-surface-50 border border-surface-50 hover:bg-surface-600"
                             onClick={async () => {
                                 jugar(session, router, "/smartrotom/mina")
                                 setOpen(false)
                                 generateMap()
                             }}>
                             {index === 0 ? 'Jugar' : 'Volver a Jugar'}</Button>
-                        <Button className="text-main-50 border border-main-50 hover:bg-main-600" onClick={() => router.replace('/smartrotom/mina')}>Cerrar</Button>
+                        <Button className="text-surface-50 border border-surface-50 hover:bg-surface-600" onClick={() => router.replace('/smartrotom/mina')}>Cerrar</Button>
                     </div>
                 </AlertDialogContent>
             </AlertDialog>

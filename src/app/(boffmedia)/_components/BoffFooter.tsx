@@ -61,7 +61,7 @@ const socialLinks = [
 
 export function BoffFooter() {
   return (
-    <footer className="bg-main-800 text-orange-100 py-8">
+    <footer className="bg-surface-800 text-primary-100 py-8">
       <div className="container mx-auto px-4 text-center">
         <p className="text-xl mb-4">
           &copy; 2024 BoffMedia. Todos los derechos reservados.
@@ -72,7 +72,7 @@ export function BoffFooter() {
               <li key={item.name}>
                 <Link
                   href={item.link}
-                  className="text-orange-300 hover:text-orange-400 transition duration-300"
+                  className="text-primary-300 hover:text-primary-400 transition duration-300"
                 >
                   {item.name}
                 </Link>
@@ -85,7 +85,7 @@ export function BoffFooter() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-orange-300 hover:text-orange-400 transition duration-300"
+              className="text-primary-300 hover:text-primary-400 transition duration-300"
             >
               <item.icon className="w-8 h-8" />
               <span className="sr-only">Síguenos en {item.name}</span>

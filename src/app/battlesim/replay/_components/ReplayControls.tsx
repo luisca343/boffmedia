@@ -30,7 +30,7 @@ export function ReplayControls({
     if(canvasWidth === 0) return null;
 
     return(
-        <div className="flex justify-between p-2 bg-main-800 space-x-2" style={{ width: `${canvasWidth + (logVisible ? 400 : 0)}px` }}>
+        <div className="flex justify-between p-2 bg-surface-800 space-x-2" style={{ width: `${canvasWidth + (logVisible ? 400 : 0)}px` }}>
             <div className="flex space-x-2">
                 <ReplayControlsButton onClick={() => setIsPlaying(!isPlaying)} label={isPlaying ? "Pause" : "Play"}>
                     {isPlaying ? <PauseIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
@@ -58,7 +58,7 @@ export function ReplayControls({
                     <BoltIcon className="h-5 w-5" />
                 </ReplayControlsButton>
                 <Input
-                    className="w-32 border border-main-900"
+                    className="w-32 border border-surface-900"
                     type="string"
                     value={simulatedAttack}
                     onChange={(e) => setSimulatedAttack(e.target.value)}
@@ -71,7 +71,7 @@ export function ReplayControls({
                     <ArrowRightIcon className="h-5 w-5" />
                 </ReplayControlsButton>
                 <Input
-                    className="w-20 border border-main-900"
+                    className="w-20 border border-surface-900"
                     type="number"
                     value={turnInput}
                     onChange={(e) => setTurnInput(parseInt(e.target.value))}

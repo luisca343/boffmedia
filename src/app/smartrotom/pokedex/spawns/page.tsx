@@ -19,12 +19,12 @@ export default function Spawns(){
     const [hideSeen, setHideSeen] = useState(false)
 
     return(
-        <div className="bg-main-800  ">
-        <Label className="text-main-50 text-2xl">Mostrar Avistados</Label>
-        <Checkbox id="seen" onClick={() => setHideSeen(!hideSeen)} className="bg-main-400 text-main-50 p-2 rounded-xl m-2">Mostrar Avistados</Checkbox>
+        <div className="bg-surface-800  ">
+        <Label className="text-surface-50 text-2xl">Mostrar Avistados</Label>
+        <Checkbox id="seen" onClick={() => setHideSeen(!hideSeen)} className="bg-surface-400 text-surface-50 p-2 rounded-xl m-2">Mostrar Avistados</Checkbox>
             <div className="hidden 2xl:flex justify-center">
-                <Label className="text-main-50 text-2xl">Mostrar Atrapados</Label>
-                <Checkbox id="caught" onClick={() => setHideCaught(!hideCaught)} className="bg-main-400 text-main-50 p-2 rounded-xl m-2">Mostrar Atrapados</Checkbox>
+                <Label className="text-surface-50 text-2xl">Mostrar Atrapados</Label>
+                <Checkbox id="caught" onClick={() => setHideCaught(!hideCaught)} className="bg-surface-400 text-surface-50 p-2 rounded-xl m-2">Mostrar Atrapados</Checkbox>
             </div>
             <PossibleSpawns hideCaught={hideCaught} hideSeen={hideSeen}/>
         </div>

@@ -36,11 +36,11 @@ export default function BoffMediaStyleGuide() {
   const form = useForm()
 
   return (
-    <div className="p-6 bg-main-800 text-main-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-orange-300 mb-8">Guía de Estilo BoffMedia</h1>
+    <div className="p-6 bg-surface-800 text-surface-100 min-h-screen">
+      <h1 className="text-3xl font-bold text-primary-300 mb-8">Guía de Estilo BoffMedia</h1>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Accordion</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Accordion</h2>
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="item-1">
             <AccordionTrigger>¿Es accesible?</AccordionTrigger>
@@ -64,7 +64,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Alert Dialog</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Alert Dialog</h2>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="outline">Mostrar Alerta</Button>
@@ -86,7 +86,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Avatar</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Avatar</h2>
         <div className="flex gap-4">
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -103,7 +103,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Badge</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Badge</h2>
         <div className="flex flex-wrap gap-2">
           <Badge>Predeterminado</Badge>
           <Badge variant="secondary">Secundario</Badge>
@@ -113,7 +113,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Button</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Button</h2>
         <div className="flex flex-wrap gap-4">
           <Button>Botón Predeterminado</Button>
           <Button variant="secondary">Botón Secundario</Button>
@@ -125,7 +125,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Card</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Card</h2>
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle>Título de la Tarjeta</CardTitle>
@@ -141,7 +141,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Checkbox</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Checkbox</h2>
         <div className="flex items-center space-x-2">
           <Checkbox id="terms" />
           <label
@@ -154,7 +154,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Collapsible</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Collapsible</h2>
         <Collapsible>
           <CollapsibleTrigger>
             Haz clic para expandir
@@ -166,7 +166,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Combobox</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Combobox</h2>
         <Combobox
           data={[
             { label: "Inglés", value: "en" },
@@ -184,7 +184,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Command</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Command</h2>
         <Command className="rounded-lg border shadow-md">
           <CommandInput placeholder="Escribe un comando o busca..." />
           <CommandList>
@@ -199,7 +199,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Dialog</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Dialog</h2>
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="outline">Abrir Diálogo</Button>
@@ -233,7 +233,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Form</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Form</h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(() => {})} className="space-y-8">
             <FormField
@@ -258,7 +258,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Hover Card</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Hover Card</h2>
         <HoverCard>
           <HoverCardTrigger asChild>
             <Button variant="link">@nextjs</Button>
@@ -286,18 +286,18 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Input</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Input</h2>
         <Input type="email" placeholder="Email" />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Label</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Label</h2>
         <Label htmlFor="email">Email</Label>
         <Input type="email" id="email" placeholder="m@example.com" />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Popover</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Popover</h2>
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline">Abrir popover</Button>
@@ -350,7 +350,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Select</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Select</h2>
         <Select>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Tema" />
@@ -364,7 +364,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Separator</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Separator</h2>
         <div className="space-y-1">
           <h4 className="text-sm font-medium leading-none">Radix Primitives</h4>
           <p className="text-sm text-muted-foreground">Una biblioteca de componentes UI de código abierto.</p>
@@ -380,7 +380,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Sheet</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Sheet</h2>
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="outline">Abrir hoja</Button>
@@ -398,7 +398,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Skeleton</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Skeleton</h2>
         <div className="flex items-center space-x-4">
           <Skeleton className="h-12 w-12 rounded-full" />
           <div className="space-y-2">
@@ -409,12 +409,12 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Slider</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Slider</h2>
         <Slider defaultValue={[33]} max={100} step={1} />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Switch</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Switch</h2>
         <div className="flex items-center space-x-2">
           <Switch id="airplane-mode" />
           <Label htmlFor="airplane-mode">Modo avión</Label>
@@ -422,7 +422,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Table</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Table</h2>
         <Table>
           <TableHeader>
             <TableRow>
@@ -450,7 +450,7 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Tabs</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Tabs</h2>
         <Tabs defaultValue="account" className="w-[400px]">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="account">Cuenta</TabsTrigger>
@@ -506,12 +506,12 @@ export default function BoffMediaStyleGuide() {
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Textarea</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Textarea</h2>
         <Textarea placeholder="Escribe tu mensaje aquí." />
       </section>
 
       <section className="mb-12">
-        <h2 className="text-2xl font-semibold text-orange-300 mb-4">Tooltip</h2>
+        <h2 className="text-2xl font-semibold text-primary-300 mb-4">Tooltip</h2>
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>

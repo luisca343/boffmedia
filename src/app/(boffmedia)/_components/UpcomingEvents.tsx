@@ -66,7 +66,7 @@ function EventCard({
   const colorData = colors[color] || colors.blue;
   return (
     <div
-      className={`bg-main-800 p-6 rounded-lg border border-main-700 shadow-inner`}
+      className={`bg-surface-800 p-6 rounded-lg border border-surface-700 shadow-inner`}
     >
       <h3
         className={`text-2xl font-bold mb-4`}
@@ -74,7 +74,7 @@ function EventCard({
       >
         {name}
       </h3>
-      <p className="text-main-300 mb-4">{description}</p>
+      <p className="text-surface-300 mb-4">{description}</p>
       <Link
         href="/eventos/minecraft-bingo"
         className="inline-flex items-center text-purple-400 hover:text-purple-300 font-bold"
@@ -88,10 +88,10 @@ function EventCard({
 
 function NoEventsCard() {
   return (
-    <div className="md:col-span-2 bg-main-800 p-8 rounded-lg border border-main-700 shadow-inner text-center">
+    <div className="md:col-span-2 bg-surface-800 p-8 rounded-lg border border-surface-700 shadow-inner text-center">
       <Calendar className="w-16 h-16 text-purple-400 mx-auto mb-4" />
       <h3 className="text-2xl font-bold mb-4 text-purple-400">No hay eventos próximos</h3>
-      <p className="text-main-300 mb-6">
+      <p className="text-surface-300 mb-6">
         Estamos preparando nuevos y emocionantes eventos para ti. ¡Vuelve pronto para descubrir qué tenemos planeado!
       </p>
       <Link

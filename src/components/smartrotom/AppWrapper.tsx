@@ -133,7 +133,7 @@ export default function AppWrapper({
 
 function RotomErrorPage({ error }: { error: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full bg-orange-400 text-orange-950 font-mono">
+    <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
       <RotomError error={error} />
     </div>
   );
@@ -145,17 +145,17 @@ function RotomError({ error }: { error: string }) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-orange-200 p-8 rounded-lg shadow-lg border-2 border-orange-300"
+      className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300"
     >
       <div className="flex items-center mb-4">
-        <AlertTriangle className="w-8 h-8 text-orange-500 mr-2" />
+        <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />
         <h1 className="text-2xl font-bold">Error Detectado</h1>
       </div>
-      <div className="bg-orange-300 p-4 rounded">
+      <div className="bg-primary-300 p-4 rounded">
         <p className="text-sm">{error}</p>
       </div>
       <div className="mt-6 text-center">
-        <p className="text-xs text-orange-700">
+        <p className="text-xs text-primary-700">
           SmartRotom Error Code: <span className="font-bold">SR-001</span>
         </p>
       </div>

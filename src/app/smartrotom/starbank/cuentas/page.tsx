@@ -31,7 +31,7 @@ export default function Cuentas() {
         <BankSection className="bg-white overflow-hidden max-h-[80%]">
           <BankSectionHeader>Your Accounts</BankSectionHeader>
           <BankSectionContent>
-            <ul className="divide-y divide-main-200 overflow-auto">
+            <ul className="divide-y divide-surface-200 overflow-auto">
               {accounts.map((account: any) => (
                 <li
                   key={account.id}
@@ -108,7 +108,7 @@ export default function Cuentas() {
               onChange={(e) => setAccountName(e.target.value)}
             />
             <Button
-              className="bg-blue-900 hover:bg-blue-700 text-main-50 mt-2 p-2 rounded-md"
+              className="bg-blue-900 hover:bg-blue-700 text-surface-50 mt-2 p-2 rounded-md"
               onClick={() => createAccount(accountName)}
             >
               Crear

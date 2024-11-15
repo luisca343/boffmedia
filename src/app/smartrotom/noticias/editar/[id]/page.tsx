@@ -22,7 +22,7 @@ export default function Note({params} : {params: {id: string}}){
   }, [id]);
 
   return (
-    <div className='w-full h-full bg-main-800'>
+    <div className='w-full h-full bg-surface-800'>
         <div className='h-full w-[70%] m-auto'>
         <CustomEditor
             document={data}
