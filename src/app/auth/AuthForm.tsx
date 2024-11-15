@@ -6,7 +6,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from "next-auth/react"
 import { Lock, Mail, User } from "lucide-react"
 import { useState } from "react"
@@ -25,9 +25,12 @@ const registerSchema = loginSchema.extend({
   path: ["confirmPassword"],
 })
 
-export default function AuthForm({ redirect = '/', url = 'boffmedia', message= '', isRegister = false }: { url?: string, redirect?: string, message?: string, isRegister?: boolean }) {
+export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { url?: string, redirect?: string, message?: string }) {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const mode = searchParams.get('mode')
+  const isRegister = mode === 'register'
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(isRegister ? registerSchema : loginSchema),
