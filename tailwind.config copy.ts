@@ -1,3 +1,4 @@
+import { DEFAULT } from "@react-three/fiber/dist/declarations/src/core/utils";
 import { plugin } from "postcss";
 import type { Config } from "tailwindcss";
 import tplugin from "tailwindcss/plugin";
@@ -271,7 +272,7 @@ const config = {
 
       for (const color in colors) {
         if (typeof colors[color] === "object") {
-          const borderColor = colors[color][900];
+          const borderColor = colors[color][DEFAULT];
 
           shadowUtilities[`.text-shadow-${color}-border1`] = {
             textShadow: `${borderColor} 1px 0px 0px, ${borderColor} 0.540302px 0.841471px 0px, ${borderColor} -0.416147px 0.909297px 0px, ${borderColor} -0.989992px 0.14112px 0px, ${borderColor} -0.653644px -0.756802px 0px, ${borderColor} 0.283662px -0.958924px 0px, ${borderColor} 0.96017px -0.279415px 0px`,
