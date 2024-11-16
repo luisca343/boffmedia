@@ -1,6 +1,7 @@
 import { datetime, int, mysqlTable, primaryKey, unique, varchar } from "drizzle-orm/mysql-core";
 import { boffMediaUsers } from "./BoffMedia";
 import { count } from "console";
+import { sql } from "drizzle-orm";
 
 export const tcgpExpansions = mysqlTable("tcgp_expansions", {
     id: varchar("id", { length: 32 }).notNull().primaryKey().unique(),
@@ -79,3 +80,15 @@ export const tcgpUsersCards = mysqlTable("tcgp_users_cards", {
 ));
 
 export type TcgpUserCard = typeof tcgpUsersCards.$inferSelect;
+
+
+export const tcgpUserCardHistory = mysqlTable("tcgp_user_card_history", {
+    id: int("id").primaryKey().autoincrement(),
+    user_id: int("user_id").notNull().references(() => boffMediaUsers.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    expansion: varchar("expansion", { length: 32 }).notNull(),
+    card_number: int("card_number").notNull(),
+    count: int("count").notNull(),
+    updated_at: datetime("updated_at").notNull().default(sql`CURRENT_TIMESTAMP()`),
+  });
+  
+  export type TcgpUserCardHistory = typeof tcgpUserCardHistory.$inferSelect;

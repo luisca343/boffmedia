@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Sse } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Sse } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -189,6 +189,27 @@ export class PtcgpController {
           throw error;
         }
         throw new HttpException('Failed to calculate pack probabilities', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+
+    @Get("recent-updates")
+    @ApiOperation({ summary: 'Get recent card updates for the user' })
+    @ApiResponse({ status: 200, description: 'Recent updates found successfully.' })
+    @ApiResponse({ status: 401, description: 'Unauthorized.' })
+    @ApiResponse({ status: 500, description: 'Failed to find recent updates.' })
+    async getRecentUpdates(
+      @Query('username') username: string,
+      @Query('limit') limit: string = "10",
+      @Query('offset') offset: string = "0"
+    ) {
+      try {
+        console.log('Getting recent updates for user:', username);
+        const updates =  await this.userCardService.getRecentCardUpdates(username, parseInt(limit), parseInt(offset));
+        return updates;
+      } catch (error) {
+        console.log('Failed to get recent updates:', error);
+        throw new HttpException('Failed to get recent updates', HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
 

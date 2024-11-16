@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { tcgpCards, tcgpUsersCards } from '@/_db/schema/TCGP';
-import { and, eq } from 'drizzle-orm';
+import { tcgpCards, tcgpUserCardHistory, tcgpUsersCards } from '@/_db/schema/TCGP';
+import { and, desc, eq } from 'drizzle-orm';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 @Injectable()
@@ -88,9 +88,63 @@ export class TgcpUserCardService {
             })
             .execute();
         }
+
+        // Add history entry
+        await tx
+          .insert(tcgpUserCardHistory)
+          .values({
+            user_id: userId,
+            expansion,
+            card_number: cardNumber,
+            count: change,
+          })
+          .execute();
       }
     });
 
     return { success: true, message: 'Cards updated successfully' };
+  }
+
+  async getRecentCardUpdates(username: string, limit: number = 10, offset: number = 0) {
+    const db = this.db.getDrizzle();
+
+    const user = await db.select({ id: boffMediaUsers.id })
+      .from(boffMediaUsers)
+      .where(eq(boffMediaUsers.username, username))
+      .execute();
+
+    if (user.length === 0) {
+      console.log('User not found');
+      throw new Error('User not found');
+    }
+
+    const userId = user[0].id;
+    console.log('userId', userId);
+
+    console.log('limit', limit);
+    console.log('offset', offset);
+
+    const updates = await db
+      .select({
+        id: tcgpUserCardHistory.id,
+        expansion: tcgpUserCardHistory.expansion,
+        cardNumber: tcgpUserCardHistory.card_number,
+        count: tcgpUserCardHistory.count,
+        updatedAt: tcgpUserCardHistory.updated_at,
+        cardName: tcgpCards.name,
+      })
+      .from(tcgpUserCardHistory)
+      .leftJoin(tcgpCards, and(
+        eq(tcgpUserCardHistory.expansion, tcgpCards.expansion),
+        eq(tcgpUserCardHistory.card_number, tcgpCards.number)
+      ))
+      .where(eq(tcgpUserCardHistory.user_id, userId))
+      .orderBy(desc(tcgpUserCardHistory.updated_at))
+      .limit(limit)
+      .offset(offset)
+      .execute();
+
+    console.log('updates', updates);
+    return updates;
   }
 }

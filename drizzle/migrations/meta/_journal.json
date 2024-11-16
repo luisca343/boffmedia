@@ -15,6 +15,13 @@
       "when": 1731365845354,
       "tag": "0001_serious_fat_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1731755630708,
+      "tag": "0002_big_amphibian",
+      "breakpoints": true
     }
   ]
 }
