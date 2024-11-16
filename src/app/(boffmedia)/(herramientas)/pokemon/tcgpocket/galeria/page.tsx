@@ -22,34 +22,6 @@ export default function UserGallery() {
 
   const { allCards, userCards, loading, error, updateUserCards } = useGalleryData(session?.user?.username || '')
 
-  const handleAddCard = (card: Card) => {
-    const key = `${card.expansion}_${card.number}`
-    setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
-  }
-
-  const handleRemoveCard = (card: Card) => {
-    const key = `${card.expansion}_${card.number}`
-    const currentCount = userCards[key] || 0
-    const changeCount = changes[key] || 0
-    if (currentCount + changeCount > 0) {
-      setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) - 1 }))
-    }
-  }
-
-  const saveChanges = async () => {
-    const updates = Object.entries(changes).map(([key, change]) => {
-      const [expansion, cardNumber] = key.split('_')
-      return {
-        expansion,
-        cardNumber: parseInt(cardNumber),
-        change,
-      }
-    })
-
-    await updateUserCards(updates)
-    setChanges({})
-  }
-
   if (status === 'loading') {
     return (
       <BoffLayout>
@@ -101,12 +73,6 @@ export default function UserGallery() {
     <BoffLayout>
       <PlayerGallery
         username={session.user.username}
-        allCards={allCards}
-        userCards={userCards}
-        loading={loading}
-        onAddCard={handleAddCard}
-        onRemoveCard={handleRemoveCard}
-        onSaveChanges={saveChanges}
       />
     </BoffLayout>
   )

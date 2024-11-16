@@ -1,0 +1,66 @@
+import { Button } from "@/components/ui/button"
+import { Loader2, ChevronDown, AlertCircle } from 'lucide-react'
+import { RecentUpdate } from '../types'
+import { useTranslations } from "next-intl"
+
+interface RecentUpdatesProps {
+  recentUpdates: RecentUpdate[]
+  recentUpdatesError: string | null
+  recentUpdatesLoading: boolean
+  fetchRecentUpdates: () => void
+}
+
+export function RecentUpdates({
+  recentUpdates,
+  recentUpdatesError,
+  recentUpdatesLoading,
+  fetchRecentUpdates
+}: RecentUpdatesProps) {
+    const trans = useTranslations('tcgpocket')
+
+
+  return (
+    <div className="bg-surface-800 rounded-xl p-6 shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-primary-300">Actualizaciones Recientes</h2>
+      <div className="space-y-4">
+        {recentUpdatesError ? (
+          <div className="flex items-center justify-center text-red-500 bg-red-100 rounded-lg p-4">
+            <AlertCircle className="mr-2 h-5 w-5" />
+            <span>{recentUpdatesError}</span>
+          </div>
+        ) : recentUpdates.length === 0 ? (
+          <p className="text-surface-400 text-center">No hay actualizaciones recientes</p>
+        ) : (
+          <>
+            {recentUpdates.map((update) => (
+              <div key={update.id} className="flex items-center justify-between py-2 border-b border-surface-700 last:border-b-0">
+                <div>
+                  <span className="text-white font-medium">{update.cardName}</span>
+                  <span className="text-surface-400 ml-2 text-sm">({trans(update.expansion)})</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className={`font-bold ${update.count > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                    {update.count > 0 ? '+' : ''}{update.count}
+                  </span>
+                  <span className="text-surface-400 text-sm">{new Date(update.updatedAt).toLocaleString()}</span>
+                </div>
+              </div>
+            ))}
+            <Button
+              onClick={fetchRecentUpdates}
+              className="w-full bg-surface-700 hover:bg-surface-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+              disabled={recentUpdatesLoading}
+            >
+              {recentUpdatesLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <ChevronDown className="mr-2 h-4 w-4" />
+              )}
+              Cargar Más
+            </Button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

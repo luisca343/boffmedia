@@ -1,5 +1,7 @@
 {
   "tcgpocket": {
+    
+
     "geneticapex": "Genes Formidables",
     "promo-a": "Promo A",
 
@@ -7,6 +9,8 @@
       "mewtwo": "Mewtwo - Genes Formidables",
       "charizard": "Charizard - Genes Formidables",
       "pikachu": "Pikachu - Genes Formidables"
-    }
+    },
+
+    "mewQuest": "Misión de Mew"
   }
 }

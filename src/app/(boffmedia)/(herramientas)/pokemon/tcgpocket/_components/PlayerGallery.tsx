@@ -1,126 +1,75 @@
-"use client"
+'use client'
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { Loader2, Plus, Minus, Save, Gift } from "lucide-react"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import { Loader2, Save } from 'lucide-react'
 import { useTranslations } from "next-intl"
 import { toast } from 'react-toastify'
-import { boffPOST } from "@/services/boffAPI"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import PercentageToDecimal from "./PercentageToDecimal"
-import { useRouter } from "next/router"
+import { boffPOST, boffGET } from "@/services/boffAPI"
 import { usePathname } from "next/navigation"
 import { useGalleryData } from "../galeria/_hooks/useGalleryData"
-
-interface Card {
-  expansion: string
-  number: number
-  name: string
-  count: number
-}
+import { PlayerGalleryHeader } from "./PlayerGalleryHeader"
+import { CardGrid } from "./CardGrid"
+import { RecentUpdates } from "./RecentUpdates"
+import { BestPackDialog } from "./BestPackDialog"
+import { Card, PackProbabilities, RecentUpdate, PackData, AllPackProbabilities } from '../types'
+import { CollectionGroup } from "./CollectionGroup"
 
 interface PlayerGalleryProps {
   username: string
 }
 
-interface PackProbabilities {
-  newCardProbabilities: number[]
-  aggregateProbability: number
-}
-
-function ProbabilityTable({ probabilities }: { probabilities: Record<string, PackProbabilities> }) {
-  const trans = useTranslations('tcgpocket')
-
-
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-white">Sobre</TableHead>
-          <TableHead className="text-white">Cartas 1-3</TableHead>
-          <TableHead className="text-white">Carta 4</TableHead>
-          <TableHead className="text-white">Carta 5</TableHead>
-          <TableHead className="text-white">Total</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {Object.entries(probabilities).map(([packName, probs]) => (
-          <TableRow key={packName}>
-            <TableCell className="text-white">{trans(`packs.${packName}`)}</TableCell>
-            <TableCell className="text-white">
-                <PercentageToDecimal num={probs.newCardProbabilities[0] * 100} fixed={3} />
-              </TableCell>
-              <TableCell className="text-white">
-                <PercentageToDecimal num={probs.newCardProbabilities[3] * 100} fixed={3} />
-              </TableCell>
-              <TableCell className="text-white">
-                <PercentageToDecimal num={probs.newCardProbabilities[4] * 100} fixed={3} />
-              </TableCell>
-              <TableCell className="text-white">
-                <PercentageToDecimal num={probs.aggregateProbability * 100} fixed={3} />
-              </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-}
-
-export function PlayerGallery({
-  username,
-}: PlayerGalleryProps) {
+export function PlayerGallery({ username }: PlayerGalleryProps) {
   const { allCards, userCards, loading, error, updateUserCards } = useGalleryData(username || '')
-
 
   const [hideMissingCards, setHideMissingCards] = useState(false)
   const [changes, setChanges] = useState<Record<string, number>>({})
   const [cardCount, setCardCount] = useState(0)
   const [bestPackLoading, setBestPackLoading] = useState(false)
-  const [bestPackData, setBestPackData] = useState<{ bestPack: any, probabilities: PackProbabilities, allPackProbabilities: Record<string, PackProbabilities> } | null>(null)
+  const [bestPackData, setBestPackData] = useState<{ bestPack: PackData, allPackProbabilities: AllPackProbabilities } | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<string>("general")
-  const [eventPackData, setEventPackData] = useState<{ bestPack: any, probabilities: PackProbabilities, allPackProbabilities: Record<string, PackProbabilities>, missingEventCards: string[] , totalEventCards: number } | null>(null)
+  const [eventPackData, setEventPackData] = useState<{ bestPack: PackData, allPackProbabilities: AllPackProbabilities, missingEventCards: string[], totalEventCards: number } | null>(null)
+  const [recentUpdates, setRecentUpdates] = useState<RecentUpdate[]>([])
+  const [recentUpdatesLoading, setRecentUpdatesLoading] = useState(false)
+  const [recentUpdatesOffset, setRecentUpdatesOffset] = useState(0)
+  const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
   const trans = useTranslations('tcgpocket')
 
   const pathname = usePathname();
   const editable = pathname === '/pokemon/tcgpocket/galeria';
-
-
 
   useEffect(() => {
     const count = Object.values(userCards).reduce((acc, curr) => acc + curr, 0)
     setCardCount(count)
   }, [userCards])
 
-  
+  useEffect(() => {
+    fetchRecentUpdates()
+  }, [username])
 
+  const fetchRecentUpdates = async () => {
+    if (recentUpdatesLoading) return
+    setRecentUpdatesLoading(true)
+    setRecentUpdatesError(null)
+    try {
+      const response = await boffGET(`/herramientas/ptcgp/recent-updates?username=${username}&limit=10&offset=${recentUpdatesOffset}`)
+      const updates = Array.isArray(response) ? response : []
+      if (updates.length > 0) {
+        setRecentUpdates(prevUpdates => [...prevUpdates, ...updates])
+        setRecentUpdatesOffset(prevOffset => prevOffset + updates.length)
+      } else {
+        toast.info('No more updates to load')
+      }
+    } catch (error) {
+      console.error('Error fetching recent updates:', error)
+      setRecentUpdatesError('Failed to fetch recent updates. Please try again later.')
+      toast.error('Failed to fetch recent updates')
+    } finally {
+      setRecentUpdatesLoading(false)
+    }
+  }
 
   const handleAddCard = (card: Card) => {
     const key = `${card.expansion}_${card.number}`
@@ -147,9 +96,18 @@ export function PlayerGallery({
     })
 
     await updateUserCards(updates)
+    const newUpdates = updates.map(update => ({
+      id: Date.now(),
+      expansion: update.expansion,
+      cardNumber: update.cardNumber,
+      count: update.change,
+      updatedAt: new Date().toISOString(),
+      cardName: allCards.find(card => card.expansion === update.expansion && card.number === update.cardNumber)?.name || 'Unknown Card'
+    }));
+
+    setRecentUpdates(prevUpdates => [...newUpdates, ...prevUpdates]);
     setChanges({})
   }
-
 
   const getBestPack = async () => {
     setBestPackLoading(true)
@@ -181,166 +139,85 @@ export function PlayerGallery({
     }
   }
 
+  const groupCardsByExpansion = (cards: Card[]) => {
+    return cards.reduce((acc, card) => {
+      if (!acc[card.expansion]) {
+        acc[card.expansion] = [];
+      }
+      acc[card.expansion].push(card);
+      return acc;
+    }, {} as Record<string, Card[]>);
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-primary-300 text-center">
-        Galería de {username} ({cardCount} cartas)
-      </h1>
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-4 space-y-4 sm:space-y-0">
-        {editable && (
-          <div className="flex items-center">
-            <Label htmlFor="hide-missing" className="mr-2 text-white">
-              Ocultar cartas faltantes
-            </Label>
-            <Switch
-              id="hide-missing"
-              checked={hideMissingCards}
-              onCheckedChange={setHideMissingCards}
+    <div className="min-h-screen  text-white">
+      <div className="container mx-auto px-4 py-8">
+        <PlayerGalleryHeader
+          username={username}
+          cardCount={cardCount}
+          editable={editable}
+          hideMissingCards={hideMissingCards}
+          setHideMissingCards={setHideMissingCards}
+          selectedEvent={selectedEvent}
+          setSelectedEvent={setSelectedEvent}
+          getBestPack={getBestPack}
+          bestPackLoading={bestPackLoading}
+        />
+        <div className="mt-8 grid gap-8 md:grid-cols-[2fr,1fr]">
+          <div className="space-y-8">
+            {loading ? (
+              <div className="flex items-center justify-center min-h-[50vh]">
+                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+              </div>
+            ) : allCards.length === 0 ? (
+              <p className="text-center text-surface-300">No se encontraron cartas.</p>
+            ) : (
+              Object.entries(groupCardsByExpansion(allCards)).map(([expansion, cards]) => (
+                <CollectionGroup
+                  key={expansion}
+                  expansion={expansion}
+                  cards={cards}
+                  userCards={userCards}
+                  changes={changes}
+                  hideMissingCards={hideMissingCards}
+                  editable={editable}
+                  loading={loading}
+                  handleAddCard={handleAddCard}
+                  handleRemoveCard={handleRemoveCard}
+                  trans={trans}
+                />
+              ))
+            )}
+          </div>
+          <div>
+            <RecentUpdates
+              recentUpdates={recentUpdates}
+              recentUpdatesError={recentUpdatesError}
+              recentUpdatesLoading={recentUpdatesLoading}
+              fetchRecentUpdates={fetchRecentUpdates}
             />
           </div>
-        )}
-        <div className="flex items-center space-x-4">
-          <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-            <SelectTrigger className="w-[200px] bg-surface-700 text-white border-surface-600">
-              <SelectValue placeholder="Seleccionar evento" />
-            </SelectTrigger>
-            <SelectContent className="bg-surface-700 text-white border-surface-600">
-              <SelectItem value="general">Todas las cartas</SelectItem>
-              <SelectItem value="mewQuest">Mew Quest</SelectItem>
-            </SelectContent>
-          </Select>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                onClick={getBestPack}
-                className="bg-purple-500 hover:bg-purple-600"
-                disabled={bestPackLoading}
-              >
-                {bestPackLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Gift className="mr-2 h-4 w-4" />}
-                Recomendar Mejor Sobre
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="bg-surface-800 text-white border-surface-700 max-w-4xl">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-bold text-primary-300">Probabilidades de Nuevas Cartas por Pack</DialogTitle>
-                <DialogDescription className="text-surface-300">
-                  {selectedEvent === "general" ? (
-                    `El mejor pack para obtener nuevas cartas es: ${bestPackData?.bestPack.name}`
-                  ) : (
-                    <>
-                      <p>El mejor pack para obtener nuevas cartas del evento {selectedEvent} es: {eventPackData?.bestPack.name}</p>
-                      <p className="mt-2">Cartas faltantes del evento: {eventPackData?.missingEventCards.length} de {eventPackData?.totalEventCards}</p>
-                      <p className="mt-2 text-sm">Lista de cartas faltantes: {eventPackData?.missingEventCards.join(', ')}</p>
-                    </>
-                  )}
-                </DialogDescription>
-              </DialogHeader>
-              {selectedEvent === "general" ? (
-                bestPackData && <ProbabilityTable probabilities={bestPackData.allPackProbabilities} />
-              ) : (
-                eventPackData && <ProbabilityTable probabilities={eventPackData.allPackProbabilities} />
-              )}
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
-      {loading ? (
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-        </div>
-      ) : allCards.length === 0 ? (
-        <p className="text-center text-surface-300">No se encontraron cartas.</p>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          <AnimatePresence>
-            {allCards.map((card) => {
-              const key = `${card.expansion}_${card.number}`
-              const count = (userCards[key] || 0) + (changes[key] || 0)
-              const isMissing = count === 0
-
-              if (hideMissingCards && isMissing) {
-                return null
-              }
-
-              return (
-                <motion.div
-                  key={key}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="group block">
-                    <div className={`relative bg-surface-800/50 backdrop-blur-sm rounded-xl p-3 transition-all duration-300 hover:bg-surface-700/50 hover:scale-105 hover:-translate-y-1 shadow-lg hover:shadow-xl ${isMissing ? 'grayscale' : ''}`}>
-                      <div className="aspect-[2.5/3.5] relative">
-                        <Image
-                          src={`/img/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}
-                          alt={card.name}
-                          layout="fill"
-                          objectFit="contain"
-                          className="rounded-lg transition-transform duration-300"
-                          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-                          priority
-                        />
-                      </div>
-                      <div className="mt-2">
-                        <h3 className="text-sm text-white text-center truncate font-medium">
-                          {card.name}
-                        </h3>
-                        <p className="text-xs text-surface-400 text-center">{trans(card.expansion)}</p>
-                        {editable && (
-                          <div className="flex justify-between items-center mt-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleRemoveCard(card)}
-                              className="p-1 opacity-100 group-hover:opacity-100 transition-opacity"
-                              disabled={loading || count === 0}
-                            >
-                              <Minus className="h-4 w-4 text-black" />
-                            </Button>
-                            <span className="text-white font-bold">
-                              {count}
-                            </span>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleAddCard(card)}
-                              className="p-1 opacity-100 group-hover:opacity-100 transition-opacity"
-                              disabled={loading}
-                            >
-                              <Plus className="h-4 w-4 text-black" />
-                            </Button>
-                          </div>
-                        )}
-                        {!editable && (
-                          <div className="mt-2">
-                            <span className="text-white font-bold">
-                              {count}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </AnimatePresence>
-        </div>
-      )}
       {editable && Object.keys(changes).length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-4 right-4"
+          className="fixed bottom-4 right-4 z-50"
         >
-          <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600" disabled={loading}>
+          <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" disabled={loading}>
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Guardar Cambios
           </Button>
         </motion.div>
       )}
+      <BestPackDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        selectedEvent={selectedEvent}
+        bestPackData={bestPackData}
+        eventPackData={eventPackData}
+      />
     </div>
   )
 }
