@@ -46,7 +46,8 @@ const navigationMenuTriggerStyle = cva(
     variants: {
       variant: {
         default: "",
-        boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-300 hover:text-primary-100 px-0 font-normal text-base h-auto relative",
+        boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-300 hover:text-primary-100 focus:text-primary-300  px-0 font-normal text-base h-auto relative",
+        boffmedia2: "bg-transparent hover:bg-transparent focus:bg-transparent focus:text-primary-300 text-primary-300 hover:text-primary-100 px-0 font-normal text-base h-auto relative",
       },
     },
     defaultVariants: {

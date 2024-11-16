@@ -154,7 +154,7 @@ export default function RotomNav({
 
   return (
     <nav
-      className={`h-12 z-20 flex items-center px-2 ${
+      className={`h-12 z-20 flex items-center px-2 fixed w-full ${
         pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-900"
       }`}
     >
