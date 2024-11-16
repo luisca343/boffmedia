@@ -10,10 +10,10 @@ import { boffPOST, boffGET } from "@/services/boffAPI"
 import { usePathname } from "next/navigation"
 import { useGalleryData } from "../galeria/_hooks/useGalleryData"
 import { PlayerGalleryHeader } from "./PlayerGalleryHeader"
-import { CardGrid } from "./CardGrid"
+// import { CardGrid } from "./CardGrid" //Removed as per update instruction
 import { RecentUpdates } from "./RecentUpdates"
 import { BestPackDialog } from "./BestPackDialog"
-import { Card, PackProbabilities, RecentUpdate, PackData, AllPackProbabilities } from '../types'
+import { Card,  RecentUpdate, PackData, AllPackProbabilities } from '../types'
 import { CollectionGroup } from "./CollectionGroup"
 
 interface PlayerGalleryProps {
@@ -35,6 +35,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const [recentUpdatesLoading, setRecentUpdatesLoading] = useState(false)
   const [recentUpdatesOffset, setRecentUpdatesOffset] = useState(0)
   const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
+  const [showAmounts, setShowAmounts] = useState(true) // Added new state variable
   const trans = useTranslations('tcgpocket')
 
   const pathname = usePathname();
@@ -139,18 +140,8 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
     }
   }
 
-  const groupCardsByExpansion = (cards: Card[]) => {
-    return cards.reduce((acc, card) => {
-      if (!acc[card.expansion]) {
-        acc[card.expansion] = [];
-      }
-      acc[card.expansion].push(card);
-      return acc;
-    }, {} as Record<string, Card[]>);
-  };
-
   return (
-    <div className="min-h-screen  text-white">
+    <div className="min-h-screen bg-gradient-to-b from-surface-900 to-surface-800 text-white">
       <div className="container mx-auto px-4 py-8">
         <PlayerGalleryHeader
           username={username}
@@ -162,6 +153,8 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
           setSelectedEvent={setSelectedEvent}
           getBestPack={getBestPack}
           bestPackLoading={bestPackLoading}
+          showAmounts={showAmounts} // Added showAmounts prop
+          setShowAmounts={setShowAmounts} // Added setShowAmounts prop
         />
         <div className="mt-8 grid gap-8 md:grid-cols-[2fr,1fr]">
           <div className="space-y-8">
@@ -172,21 +165,25 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
             ) : allCards.length === 0 ? (
               <p className="text-center text-surface-300">No se encontraron cartas.</p>
             ) : (
-              Object.entries(groupCardsByExpansion(allCards)).map(([expansion, cards]) => (
-                <CollectionGroup
-                  key={expansion}
-                  expansion={expansion}
-                  cards={cards}
-                  userCards={userCards}
-                  changes={changes}
-                  hideMissingCards={hideMissingCards}
-                  editable={editable}
-                  loading={loading}
-                  handleAddCard={handleAddCard}
-                  handleRemoveCard={handleRemoveCard}
-                  trans={trans}
-                />
-              ))
+              <div>
+                {/* CardGrid component removed,  replace with alternative card display logic if needed */}
+                {Object.entries(allCards.reduce<Record<string, Card[]>>((acc, curr) => ({...acc, [curr.expansion]: [...(acc[curr.expansion] || []), curr]}), {})).map(([expansion, cards]) => (
+                  <CollectionGroup
+                    key={expansion}
+                    expansion={expansion}
+                    cards={cards}
+                    userCards={userCards}
+                    changes={changes}
+                    hideMissingCards={hideMissingCards}
+                    editable={editable}
+                    loading={loading}
+                    handleAddCard={handleAddCard}
+                    handleRemoveCard={handleRemoveCard}
+                    trans={trans}
+                    showAmounts={showAmounts} // Passed showAmounts prop
+                  />
+                ))}
+              </div>
             )}
           </div>
           <div>

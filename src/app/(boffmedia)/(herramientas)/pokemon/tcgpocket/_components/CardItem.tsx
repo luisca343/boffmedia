@@ -13,6 +13,7 @@ interface CardItemProps {
   handleAddCard: (card: Card) => void
   handleRemoveCard: (card: Card) => void
   trans: (key: string) => string
+  showAmounts: boolean
 }
 
 export function CardItem({
@@ -23,7 +24,8 @@ export function CardItem({
   loading,
   handleAddCard,
   handleRemoveCard,
-  trans
+  trans,
+  showAmounts
 }: CardItemProps) {
   return (
     <motion.div
@@ -44,14 +46,19 @@ export function CardItem({
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
             priority
           />
+          {((!editable && count > 0) || (editable && showAmounts && count > 0)) && (
+            <div className="absolute top-2 right-2 bg-primary-500 text-white font-bold rounded-full w-8 h-8 flex items-center justify-center shadow-md">
+              {count}
+            </div>
+          )}
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
-            <h3 className="text-sm font-medium truncate">
-              {card.name}
-            </h3>
-            <p className="text-xs text-surface-300">{trans(card.expansion)}</p>
-            {editable && (
+        {editable && (
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+              <h3 className="text-sm font-medium truncate">
+                {card.name}
+              </h3>
+              <p className="text-xs text-surface-300">{trans(card.expansion)}</p>
               <div className="flex justify-between items-center mt-2">
                 <Button
                   size="sm"
@@ -75,16 +82,9 @@ export function CardItem({
                   <Plus className="h-4 w-4 text-white" />
                 </Button>
               </div>
-            )}
-            {!editable && (
-              <div className="mt-2">
-                <span className="text-white font-bold">
-                  {count}
-                </span>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   )

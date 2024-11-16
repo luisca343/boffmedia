@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 const HERRAMIENTAS = {
   pokemon: [
     { href: "/pokemon/pmdsky", label: "Generador de Correos Mundo Misterioso" },
-    { href: "/pokemon/tcgpocket/cartas", label: "Gestión colecciones TCG Pocket" },
+    { href: "/pokemon/tcgpocket", label: "Herramientas para TCG Pocket" },
   ],
   otros: [
     { href: "/otros/keys", label: "Claves de Steam" },

@@ -15,6 +15,7 @@ interface CollectionGroupProps {
   handleAddCard: (card: Card) => void
   handleRemoveCard: (card: Card) => void
   trans: (key: string) => string
+  showAmounts: boolean
 }
 
 export function CollectionGroup({
@@ -27,7 +28,8 @@ export function CollectionGroup({
   loading,
   handleAddCard,
   handleRemoveCard,
-  trans
+  trans,
+  showAmounts
 }: CollectionGroupProps) {
   const [isExpanded, setIsExpanded] = useState(true)
 
@@ -83,6 +85,7 @@ export function CollectionGroup({
                     handleAddCard={handleAddCard}
                     handleRemoveCard={handleRemoveCard}
                     trans={trans}
+                    showAmounts={showAmounts}
                   />
                 )
               })}

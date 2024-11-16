@@ -12,6 +12,7 @@ interface CardGridProps {
   handleAddCard: (card: Card) => void
   handleRemoveCard: (card: Card) => void
   trans: (key: string) => string
+  showAmounts: boolean
 }
 
 export function CardGrid({
@@ -23,7 +24,8 @@ export function CardGrid({
   loading,
   handleAddCard,
   handleRemoveCard,
-  trans
+  trans,
+  showAmounts
 }: CardGridProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
@@ -48,6 +50,7 @@ export function CardGrid({
               handleAddCard={handleAddCard}
               handleRemoveCard={handleRemoveCard}
               trans={trans}
+              showAmounts={showAmounts}
             />
           )
         })}

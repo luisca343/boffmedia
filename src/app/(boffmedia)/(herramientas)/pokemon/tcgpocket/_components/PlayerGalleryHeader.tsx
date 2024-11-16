@@ -21,6 +21,8 @@ interface PlayerGalleryHeaderProps {
   setSelectedEvent: (value: string) => void
   getBestPack: () => void
   bestPackLoading: boolean
+  showAmounts: boolean
+  setShowAmounts: (value: boolean) => void
 }
 
 export function PlayerGalleryHeader({
@@ -32,7 +34,9 @@ export function PlayerGalleryHeader({
   selectedEvent,
   setSelectedEvent,
   getBestPack,
-  bestPackLoading
+  bestPackLoading,
+  showAmounts,
+  setShowAmounts
 }: PlayerGalleryHeaderProps) {
     const trans = useTranslations('tcgpocket')
   return (
@@ -45,15 +49,27 @@ export function PlayerGalleryHeader({
       </p>
       <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
         {editable && (
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="hide-missing"
-              checked={hideMissingCards}
-              onCheckedChange={setHideMissingCards}
-            />
-            <Label htmlFor="hide-missing" className="text-surface-200">
-              Ocultar cartas faltantes
-            </Label>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="hide-missing"
+                checked={hideMissingCards}
+                onCheckedChange={setHideMissingCards}
+              />
+              <Label htmlFor="hide-missing" className="text-surface-200">
+                Ocultar cartas faltantes
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="show-amounts"
+                checked={showAmounts}
+                onCheckedChange={setShowAmounts}
+              />
+              <Label htmlFor="show-amounts" className="text-surface-200">
+                Mostrar cantidades
+              </Label>
+            </div>
           </div>
         )}
         <div className="flex items-center space-x-4">
