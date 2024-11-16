@@ -20,8 +20,8 @@ export type BoffMediaPermission = typeof boffMediaRoles.$inferSelect;
 
 export const boffMediaUserRoles = mysqlTable("boffmedia_user_roles", {
     id: int("id").primaryKey().autoincrement(),
-    userId: int("userId"),
-    roleId: int("roleId")
+    userId: int("userId").references(() => boffMediaUsers.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    roleId: int("roleId").references(() => boffMediaRoles.id, {onDelete: "cascade", onUpdate: "cascade"}),
 });
 
 export type BoffMediaUserPermission = typeof boffMediaUserRoles.$inferSelect;

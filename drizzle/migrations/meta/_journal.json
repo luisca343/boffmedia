@@ -22,6 +22,13 @@
       "when": 1731755630708,
       "tag": "0002_big_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1731794110637,
+      "tag": "0003_fair_red_wolf",
+      "breakpoints": true
     }
   ]
 }

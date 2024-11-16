@@ -119,10 +119,6 @@ export class TgcpUserCardService {
     }
 
     const userId = user[0].id;
-    console.log('userId', userId);
-
-    console.log('limit', limit);
-    console.log('offset', offset);
 
     const updates = await db
       .select({

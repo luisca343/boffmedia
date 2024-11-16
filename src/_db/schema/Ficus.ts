@@ -4,7 +4,7 @@ import { datetime, int, mysqlTable, text, varchar } from "drizzle-orm/mysql-core
 
 export const ficusFrases = mysqlTable("ficus_quotes", {
     id: int("id").primaryKey().autoincrement(),
-    discordId: varchar("discord_id", { length: 32 }).notNull(),
+    discordId: varchar("discord_id", { length: 32 }).notNull().references(() => discordUsers.userId, {onDelete: "cascade", onUpdate: "cascade"}),
     serverID: varchar("server_id", { length: 32 }).notNull(),
     quote: text("quote").notNull(),
     comment: text("comment"),
