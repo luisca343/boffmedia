@@ -141,7 +141,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-900 to-surface-800 text-white">
+    <div className="min-h-screen  text-white">
       <div className="container mx-auto px-4 py-8">
         <PlayerGalleryHeader
           username={username}
