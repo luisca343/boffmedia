@@ -7,7 +7,7 @@ export default function Page() {
   return (
     <div className="min-h-screen flex flex-col text-white relative">
       <BackgroundDecorations />
-      <main className="flex-grow container mx-auto px-4 py-16 relative">
+      <main className="flex-grow container mx-auto px-4 py-8 relative">
         <div className="text-center mb-16 relative">
           <Image
             src="/img/win-full.png"
