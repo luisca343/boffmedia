@@ -10,12 +10,11 @@ import { boffPOST, boffGET } from "@/services/boffAPI"
 import { usePathname } from "next/navigation"
 import { useGalleryData } from "../galeria/_hooks/useGalleryData"
 import { PlayerGalleryHeader } from "./PlayerGalleryHeader"
-// import { CardGrid } from "./CardGrid" //Removed as per update instruction
 import { RecentUpdates } from "./RecentUpdates"
 import { BestPackDialog } from "./BestPackDialog"
-import { Card,  RecentUpdate, PackData, AllPackProbabilities } from '../types'
+import { Card, PackProbabilities, RecentUpdate, PackData, AllPackProbabilities } from '../types'
+import { FilterComponent } from "./FilterComponent"
 import { CollectionGroup } from "./CollectionGroup"
-
 interface PlayerGalleryProps {
   username: string
 }
@@ -35,8 +34,10 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const [recentUpdatesLoading, setRecentUpdatesLoading] = useState(false)
   const [recentUpdatesOffset, setRecentUpdatesOffset] = useState(0)
   const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
-  const [showAmounts, setShowAmounts] = useState(true) // Added new state variable
+  const [showAmounts, setShowAmounts] = useState(true)
   const trans = useTranslations('tcgpocket')
+  const [nameFilter, setNameFilter] = useState("")
+  const [expansionFilter, setExpansionFilter] = useState("")
 
   const pathname = usePathname();
   const editable = pathname === '/pokemon/tcgpocket/galeria';
@@ -141,7 +142,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   }
 
   return (
-    <div className="min-h-screen  text-white">
+    <div className="min-h-screen text-white">
       <div className="container mx-auto px-4 py-8">
         <PlayerGalleryHeader
           username={username}
@@ -153,9 +154,19 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
           setSelectedEvent={setSelectedEvent}
           getBestPack={getBestPack}
           bestPackLoading={bestPackLoading}
-          showAmounts={showAmounts} // Added showAmounts prop
-          setShowAmounts={setShowAmounts} // Added setShowAmounts prop
+          showAmounts={showAmounts}
+          setShowAmounts={setShowAmounts}
         />
+        <div className="mt-8">
+          <FilterComponent
+            expansions={Array.from(new Set(allCards.map(card => card.expansion)))}
+            onFilterChange={(name, expansion) => {
+              setNameFilter(name)
+              setExpansionFilter(expansion)
+            }}
+            trans={trans}
+          />
+        </div>
         <div className="mt-8 grid gap-8 md:grid-cols-[2fr,1fr]">
           <div className="space-y-8">
             {loading ? (
@@ -166,8 +177,21 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
               <p className="text-center text-surface-300">No se encontraron cartas.</p>
             ) : (
               <div>
-                {/* CardGrid component removed,  replace with alternative card display logic if needed */}
-                {Object.entries(allCards.reduce<Record<string, Card[]>>((acc, curr) => ({...acc, [curr.expansion]: [...(acc[curr.expansion] || []), curr]}), {})).map(([expansion, cards]) => (
+                {Object.entries(
+                  allCards
+                    .filter(card =>
+                      (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
+                        card.number.toString().includes(nameFilter)) &&
+                      (expansionFilter === "" || card.expansion === expansionFilter)
+                    )
+                    .reduce<Record<string, Card[]>>((acc, curr) => {
+                      if (!acc[curr.expansion]) {
+                        acc[curr.expansion] = []
+                      }
+                      acc[curr.expansion].push(curr)
+                      return acc
+                    }, {})
+                ).map(([expansion, cards]) => (
                   <CollectionGroup
                     key={expansion}
                     expansion={expansion}
@@ -180,7 +204,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                     handleAddCard={handleAddCard}
                     handleRemoveCard={handleRemoveCard}
                     trans={trans}
-                    showAmounts={showAmounts} // Passed showAmounts prop
+                    showAmounts={showAmounts}
                   />
                 ))}
               </div>

@@ -38,18 +38,20 @@ export function PlayerGalleryHeader({
   showAmounts,
   setShowAmounts
 }: PlayerGalleryHeaderProps) {
-    const trans = useTranslations('tcgpocket')
+  const trans = useTranslations('tcgpocket')
   return (
     <div className="space-y-6">
-      <h1 className="text-4xl font-bold text-primary-300 text-center">
-        Galería de {username}
-      </h1>
-      <p className="text-xl text-center text-surface-300">
-        {cardCount} cartas en la colección
-      </p>
-      <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0 sm:space-x-4">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold text-primary-300">
+          Galería de {username}
+        </h1>
+        <p className="text-xl text-surface-300 mt-2">
+          {cardCount} cartas en la colección
+        </p>
+      </div>
+      <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
         {editable && (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+          <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center space-x-2">
               <Switch
                 id="hide-missing"
