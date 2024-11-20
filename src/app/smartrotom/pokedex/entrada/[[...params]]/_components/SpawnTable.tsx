@@ -61,21 +61,20 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
 
     return (
         <PokedexTable>
-            <PokedexHeader>
-                <PokedexRow>
-                    <PokedexHead> </PokedexHead>
-                    <PokedexHead> Variante </PokedexHead>
-                    <PokedexHead> Tipo </PokedexHead>
-                    <PokedexHead> Biomas </PokedexHead>
-                    <PokedexHead> Niveles </PokedexHead>
-                    <PokedexHead> Localización </PokedexHead>
-                    <PokedexHead> Horas </PokedexHead>
-                    <PokedexHead> Altura </PokedexHead>
-                    <PokedexHead> Rareza </PokedexHead>
-
-                </PokedexRow>
-            </PokedexHeader>
-            <TableBody>
+          <PokedexHeader>
+            <PokedexRow>
+              <PokedexHead className="w-16"> </PokedexHead>
+              <PokedexHead>Variante</PokedexHead>
+              <PokedexHead>Tipo</PokedexHead>
+              <PokedexHead>Biomas</PokedexHead>
+              <PokedexHead>Niveles</PokedexHead>
+              <PokedexHead>Localización</PokedexHead>
+              <PokedexHead>Horas</PokedexHead>
+              <PokedexHead>Altura</PokedexHead>
+              <PokedexHead>Rareza</PokedexHead>
+            </PokedexRow>
+          </PokedexHeader>
+          <TableBody>
                 {spawns.map((spawn) => {
                     const fullName = `${spawn.pokemonName} ${spawn.pokemonForm} ${spawn.pokemonPalette || ''}`
                     const biomas = spawn.condition?.stringBiomes?.filter(biome =>
@@ -98,32 +97,33 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                     const times = spawn.condition?.times?.map((time) => {
                         return t(`${time.toLowerCase()}`)
                     }) || [t("anytime")]
-                    
 
-                    return <PokedexRow key={spawn.spawnType}>
-                        <PokedexHead className="h-50 w-12">
-                        <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50}/>
-                        </PokedexHead>
+                    return (
+                      <PokedexRow key={spawn.spawnType}>
+                        <PokedexCell hard className="w-16">
+                          <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50} />
+                        </PokedexCell>
                         <PokedexCell>{getFormPalette(spawn)}</PokedexCell>
                         <PokedexCell>{t(spawn.spawnType)}</PokedexCell>
                         <PokedexCell>
-                        {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
-                            <span key={biome.biome} className="hover:text-primary-400">
-                            <InternalLink href={`/pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
-                            {index < biomas.length - 1 ? ', ' : ''}
+                          {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
+                            <span key={biome.biome} className="hover:text-primary-400 transition-colors">
+                              <InternalLink href={`/pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
+                              {index < biomas.length - 1 ? ', ' : ''}
                             </span>
-                        )) : 'Cualquiera'}
+                          )) : 'Cualquiera'}
                         </PokedexCell>
-                        <PokedexCell>{`${spawn.minLevel} - ${spawn.maxLevel}`}</PokedexCell>
+                        <PokedexCell className="text-center">{`${spawn.minLevel} - ${spawn.maxLevel}`}</PokedexCell>
                         <PokedexCell>{stringLocationTypes.join(', ')}</PokedexCell>
                         <PokedexCell>{times.join(', ')}</PokedexCell>
                         <PokedexCell>{height}</PokedexCell>
-                        <PokedexCell className={getRarityColor(spawn.rarity)}>{getRarity(spawn.rarity)}</PokedexCell>
-                    </PokedexRow>
-                })}
-            </TableBody>
-        </PokedexTable>
-    )
+                        <PokedexCell className={`text-center font-medium ${getRarityColor(spawn.rarity)}`}>{getRarity(spawn.rarity)}</PokedexCell>
+                      </PokedexRow>
+                    )
+                  })}
+                </TableBody>
+              </PokedexTable>
+            )
 
     function getFormPalette(spawn: SpawnInfo){
         const form = spawn.pokemonForm === 'base' ? '' : formsTrans(`form_${spawn.pokemonForm}`)

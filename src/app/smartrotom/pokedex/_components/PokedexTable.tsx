@@ -1,31 +1,92 @@
-import { Table, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import React from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 
-export default function PokedexTable({children}: {children: React.ReactNode}){
-    return <Table  className="text-center  border-collapse bg-surface-600 border border-surface-950 my-4 font-bold text-xl 2xl:text-base text-surface-100">
-        {children}
-    </Table>
+interface PokedexTableProps {
+  children: React.ReactNode
+  className?: string
 }
 
-export function PokedexRow({children}: {children: React.ReactNode}){
-    return <TableRow className="hover:bg-surface-500 border border-surface-950"  >
+export function PokedexTable({ children, className }: PokedexTableProps) {
+  return (
+    <div className="w-full overflow-x-auto rounded-xl shadow-lg bg-surface-700 my-4">
+      <Table className={cn("w-full text-sm border-separate border-spacing-0", className)}>
         {children}
+      </Table>
+    </div>
+  )
+}
+
+interface PokedexRowProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export function PokedexRow({ children, className }: PokedexRowProps) {
+  return (
+    <TableRow className={cn("transition-all hover:bg-surface-600/50 group", className)}>
+      {children}
     </TableRow>
+  )
 }
 
-export function PokedexHeader({children}: {children: React.ReactNode}){
-    return <TableHeader className=" bg-surface-900 hover:bg-surface-900 border border-surface-950">
-        {children}
+interface PokedexHeaderProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export function PokedexHeader({ children, className }: PokedexHeaderProps) {
+  return (
+    <TableHeader className={cn("bg-surface-900 sticky top-0 z-10 b", className)}>
+      {children}
     </TableHeader>
+  )
 }
 
-export function PokedexCell({children='', className= '', colSpan= 1}: {children: React.ReactNode, className?: string, colSpan?: number}){
-    return <TableCell className={`2xl:border border-2 border-surface-950 p-1 ${className} `} colSpan={colSpan}>
-        {children}
+interface PokedexCellProps {
+  children?: React.ReactNode
+  className?: string
+  colSpan?: number
+  hard?: boolean
+}
+
+export function PokedexCell({ children = '', className = '', colSpan = 1, hard = false }: PokedexCellProps) {
+  return (
+    <TableCell 
+      className={cn(
+        "p-2 border-b transition-colors",
+        hard ? "border-surface-600/50 bg-surface-900 text-surface-50" : "border-surface-600/50 text-surface-50",
+        "group-hover:border-surface-500",
+        "first:pl-3 last:pr-3",
+        className
+      )} 
+      colSpan={colSpan}
+    >
+      {children}
     </TableCell>
+  )
 }
 
-export function PokedexHead({children, className, colSpan= 1}: {children: React.ReactNode, className?: string, colSpan?: number}){
-    return <PokedexCell className={`bg-surface-900 text-surface-50 ${className}`} colSpan={colSpan}>
-        {children}
-    </PokedexCell>
+interface PokedexHeadProps {
+  children: React.ReactNode
+  className?: string
+  colSpan?: number
 }
+
+export function PokedexHead({ children, className, colSpan = 1 }: PokedexHeadProps) {
+  return (
+    <TableHead 
+      className={cn(
+        "text-surface-50 font-bold p-4 text-left",
+        "border-b border-surface-50/30",
+        "first:pl-6 last:pr-6",
+        className
+      )} 
+      colSpan={colSpan}
+    >
+      {children}
+    </TableHead>
+  )
+}
+
+export default PokedexTable

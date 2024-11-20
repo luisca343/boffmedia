@@ -108,6 +108,7 @@ export default async function EntradaPokedex({params}: any){
 
                 <PokedexSection id='moves' title="Movimientos">
                     <LevelMovesTable pokemon={pokemon} formIndex={formIndex} moveData={moves}/>
+                    <div className="mt-8" />
                     <OtherMovesTable pokemon={pokemon} formIndex={formIndex} moveData={moves}/>
                 </PokedexSection>
 

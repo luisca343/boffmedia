@@ -49,55 +49,58 @@ export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?
         sortedMoves = sortedMovesCopy
     }
     
-
-    return <PokedexTable>
-            <PokedexHeader>
-                <TableRow>
-                    <PokedexHead> </PokedexHead>
-                    <PokedexHead>Nombre</PokedexHead>
-                    <PokedexHead>Tipo</PokedexHead>
-                    <PokedexHead>Categoría</PokedexHead>
-                    <PokedexHead>Potencia</PokedexHead>
-                    <PokedexHead>Precisión</PokedexHead>
-                    <PokedexHead>PP</PokedexHead>
-                    <PokedexHead>Método</PokedexHead>
-                </TableRow>
-            </PokedexHeader>
-            <TableBody >
-                {Object.entries(sortedMoves).map(([key, value], index) => {
-                    let extraMoveData
-                    try{
-                        extraMoveData = moveData[key]
-                    } catch(e) {
-                        console.log(`Error loading move data for ${key}`)
-                    }
-                    if (extraMoveData) {
-                        return <PokedexRow key={key}>
-                            <PokedexHead className="w-12">{index + 1}</PokedexHead>
-                            <PokedexCell>
-                                <HoverCard>
-                                    {/* Redirect to: /pokedex/movimientos/${key} */}
-                                    <HoverCardTrigger onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${key}`} className="hover:cursor-pointer hover:text-primary-400">
-                                        {t(`attack_${key.toLowerCase().replace(" ", "_")}`)}
-                                    </HoverCardTrigger>
-                                    <HoverCardContent  className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal">
-                                        <MoveDataElement id={key}/>
-                                    </HoverCardContent>
-
-                                </HoverCard>
-                             </PokedexCell>
-                            <PokedexCell className="w-28"><TypeBadge type={extraMoveData.type.toLowerCase()}/></PokedexCell>
-                            <PokedexCell className="w-28"><TypeBadge type={extraMoveData.category.toLowerCase()}/></PokedexCell>
-                            <PokedexCell>{extraMoveData.power !== 0 && extraMoveData.power}</PokedexCell>
-                            <PokedexCell>{extraMoveData.accuracy !== -1 && extraMoveData.accuracy}</PokedexCell>
-                            <PokedexCell>{extraMoveData.pp}</PokedexCell>
-                            <PokedexCell>{value.reverse().join(', ')}</PokedexCell>
-                        </PokedexRow>
-                    }
-                })}
-                
-            </TableBody>
+    return (
+        <PokedexTable>
+          <PokedexHeader>
+            <PokedexRow>
+              <PokedexHead className="w-12 text-center">#</PokedexHead>
+              <PokedexHead>Nombre</PokedexHead>
+              <PokedexHead>Tipo</PokedexHead>
+              <PokedexHead>Categoría</PokedexHead>
+              <PokedexHead className="text-center">Potencia</PokedexHead>
+              <PokedexHead className="text-center">Precisión</PokedexHead>
+              <PokedexHead className="text-center">PP</PokedexHead>
+              <PokedexHead>Método</PokedexHead>
+            </PokedexRow>
+          </PokedexHeader>
+          <TableBody>
+            {Object.entries(sortedMoves).map(([key, value], index) => {
+              let extraMoveData
+              try {
+                extraMoveData = moveData[key]
+              } catch (e) {
+                console.log(`Error loading move data for ${key}`)
+              }
+              if (extraMoveData) {
+                return (
+                  <PokedexRow key={key}>
+                    <PokedexCell hard className="text-center font-medium">{index + 1}</PokedexCell>
+                    <PokedexCell>
+                      <HoverCard>
+                        <HoverCardTrigger
+                          onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${key}`}
+                          className="hover:cursor-pointer hover:text-primary-400 transition-colors"
+                        >
+                          {t(`attack_${key.toLowerCase().replace(" ", "_")}`)}
+                        </HoverCardTrigger>
+                        <HoverCardContent className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal">
+                          <MoveDataElement id={key} />
+                        </HoverCardContent>
+                      </HoverCard>
+                    </PokedexCell>
+                    <PokedexCell><TypeBadge type={extraMoveData.type.toLowerCase()} /></PokedexCell>
+                    <PokedexCell><TypeBadge type={extraMoveData.category.toLowerCase()} /></PokedexCell>
+                    <PokedexCell className="text-center">{extraMoveData.power !== 0 ? extraMoveData.power : '-'}</PokedexCell>
+                    <PokedexCell className="text-center">{extraMoveData.accuracy !== -1 ? extraMoveData.accuracy : '-'}</PokedexCell>
+                    <PokedexCell className="text-center">{extraMoveData.pp}</PokedexCell>
+                    <PokedexCell>{value.reverse().join(', ')}</PokedexCell>
+                  </PokedexRow>
+                )
+              }
+            })}
+          </TableBody>
         </PokedexTable>
+      )
 }
 
 export function LevelMovesTable({pokemon, formIndex, moveData}: {pokemon: Pokemon, formIndex: number, moveData: any}) {

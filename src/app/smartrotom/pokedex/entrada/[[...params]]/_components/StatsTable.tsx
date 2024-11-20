@@ -65,50 +65,56 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
         return `#${(((1 << 24) + (rr << 16) + (rg << 8) + rb) | 0).toString(16).slice(1)}`;
       }
     
-
-    return (
-        <div className="flex flex-col justify-center items-center text-surface-200 w-full ">
-            <PokedexTable>
-                <PokedexHeader>
-                    <TableRow className='hover:bg-surface-900  font-bold'>
-                        <PokedexHead className='w-40'> </PokedexHead>
-                        <PokedexHead >Estadística base</PokedexHead>
-                        <PokedexHead  colSpan={2}>Nivel 50</PokedexHead>
-                        <PokedexHead  colSpan={2} >Nivel 100</PokedexHead>
-                        <PokedexHead >PE</PokedexHead>
-                    </TableRow>
-                </PokedexHeader>
-                <TableBody>
-                    {Object.keys(stats).map((stat) => {
-                        const statValue = stats[stat as keyof BattleStats]
-                        const statColor = statValue > 100 ? 'text-green-400' : 'text-red-400'
-                        return <PokedexRow key={stat}>
-                            <PokedexHead className=" border  font-bold">{t(`stat_${stat.toLowerCase()}`)}</PokedexHead>
-                            <PokedexCell className="relative border  border-collapse">
-                                <div className="absolute inset-0  rounded px-2 text-start pl-2 bold text-sm flex justify-start items-center" style={{width: `${((statValue + 5)  / (maxStat + 5)) * 100}%`, backgroundColor: getColorStat(statValue)}}>
-                                  <div className='text-surface-50 text-lg font-bold text-shadow-border1'>{statValue}</div>
-                                </div>
-                            </PokedexCell>
-                            <PokedexCell >{calculateStat(stat, statValue, 50, 0, 0, 0.9)}</PokedexCell>
-                            <PokedexCell >{calculateStat(stat, statValue, 50, 31, 252, 1.1)}</PokedexCell>
-                            <PokedexCell >{calculateStat(stat, statValue, 100, 0, 0, 0.9)}</PokedexCell>
-                            <PokedexCell >{calculateStat(stat, statValue, 100, 31, 252, 1.1)}</PokedexCell>
-                            <PokedexCell >{evYields[stat as keyof EvYields] || 0} </PokedexCell>
-                        </PokedexRow>
-                    })}
-                </TableBody>
-                <PokedexHeader>
-                    <TableRow className='hover:bg-surface-900 font-bold'>
-                        <PokedexHead >Total</PokedexHead>
-                        <PokedexHead >{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexHead>
-                        <PokedexHead >Min</PokedexHead>
-                        <PokedexHead >Max</PokedexHead>
-                        <PokedexHead >Min</PokedexHead>
-                        <PokedexHead >Max</PokedexHead>
-                        <PokedexHead> </PokedexHead>
-                    </TableRow>
-                </PokedexHeader>
-            </PokedexTable>
+      return (
+        <div className="flex flex-col justify-center items-center text-surface-200 w-full">
+          <PokedexTable>
+            <PokedexHeader>
+              <PokedexRow>
+                <PokedexHead> </PokedexHead>
+                <PokedexHead >Estadística Base</PokedexHead>
+                <PokedexHead colSpan={2} className="text-center">Nivel 50</PokedexHead>
+                <PokedexHead colSpan={2} className="text-center">Nivel 100</PokedexHead>
+                <PokedexHead className="text-center">PE</PokedexHead>
+              </PokedexRow>
+            </PokedexHeader>
+            <TableBody>
+              {Object.keys(stats).map((stat) => {
+                const statValue = stats[stat as keyof BattleStats]
+                return (
+                  <PokedexRow key={stat}>
+                    <PokedexCell hard className="font-medium w-40">{t(`stat_${stat.toLowerCase()}`)}</PokedexCell>
+                    <PokedexCell className="relative p-0 h-10 w-96">
+                      <div
+                        className="absolute inset-0 flex items-center px-3"
+                        style={{
+                          width: `${((statValue + 5) / (maxStat + 5)) * 100}%`,
+                          backgroundColor: getColorStat(statValue)
+                        }}
+                      >
+                        <span className="text-surface-50 text-lg font-bold text-shadow-border1">{statValue}</span>
+                      </div>
+                    </PokedexCell>
+                    <PokedexCell className="text-center">{calculateStat(stat, statValue, 50, 0, 0, 0.9)}</PokedexCell>
+                    <PokedexCell className="text-center">{calculateStat(stat, statValue, 50, 31, 252, 1.1)}</PokedexCell>
+                    <PokedexCell className="text-center">{calculateStat(stat, statValue, 100, 0, 0, 0.9)}</PokedexCell>
+                    <PokedexCell className="text-center">{calculateStat(stat, statValue, 100, 31, 252, 1.1)}</PokedexCell>
+                    <PokedexCell className="text-center">{evYields[stat as keyof EvYields] || 0}</PokedexCell>
+                  </PokedexRow>
+                )
+              })}
+            </TableBody>
+            <PokedexHeader>
+              <PokedexRow>
+                <PokedexCell hard>Total</PokedexCell>
+                <PokedexCell hard>{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexCell>
+                <PokedexCell hard className="text-center">Min</PokedexCell>
+                <PokedexCell hard className="text-center">Max</PokedexCell>
+                <PokedexCell hard className="text-center">Min</PokedexCell>
+                <PokedexCell hard className="text-center">Max</PokedexCell>
+                <PokedexCell hard> </PokedexCell>
+              </PokedexRow>
+            </PokedexHeader>
+          </PokedexTable>
         </div>
-    )
+      )
 }

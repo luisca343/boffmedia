@@ -6,36 +6,34 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export function TypeTable({list, title, id, className=''}: {list: {[key: string]: number}, title?: string, id?: string, className?: string}){
     const effectivities = [4, 2, 1, 0.5, 0.25, 0]
 
-    return(
-        <div className={`flex m-2 ${className}`} id={id}>
-            <PokedexTable >
-                <PokedexHeader>
-                    <TableRow className="hover:bg-inherit border-none ">
-                                <PokedexHead> </PokedexHead>
-                                <PokedexHead  className="text-center bold text-surface-50 font-bold ">{title}</PokedexHead>
-                    </TableRow>
-                </PokedexHeader>
-                <TableBody>
-                    {effectivities.map(effectivity => {
-                        if(!Object.values(list).includes(effectivity)) return null
-                        return (
-                        <PokedexRow key={effectivity} >
-                            <PokedexHead className="font-bold text-surface-50 w-24  ">x{effectivity}</PokedexHead>
-                            <PokedexCell>
-                            <div className="flex flex-row flex-wrap w-full " >
-                                {Object.entries(list)
-                                .map((entry) => {
-                                    const [type, value] = entry
-                                    if(value == effectivity) return <TypeBadge type={type} />
-                                    return null
-                                })}
-                            </div>
-                            </PokedexCell>
-                        </PokedexRow>
-                    )
-                })}
+    return (
+        <div className={`m-2 ${className}`} id={id}>
+          <PokedexTable>
+            <PokedexHeader>
+              <PokedexRow>
+                <PokedexHead colSpan={2} className="text-center text-lg">{title}</PokedexHead>
+              </PokedexRow>
+            </PokedexHeader>
+            <TableBody>
+              {effectivities.map(effectivity => {
+                if (!Object.values(list).includes(effectivity)) return null
+                return (
+                  <PokedexRow key={effectivity}>
+                    <PokedexCell hard className="font-bold text-surface-50 w-24 text-center">x{effectivity}</PokedexCell>
+                    <PokedexCell>
+                      <div className="flex flex-row flex-wrap gap-1">
+                        {Object.entries(list)
+                          .map(([type, value]) => {
+                            if (value == effectivity) return <TypeBadge key={type} type={type} />
+                            return null
+                          })}
+                      </div>
+                    </PokedexCell>
+                  </PokedexRow>
+                )
+              })}
             </TableBody>
-            </PokedexTable>
+          </PokedexTable>
         </div>
-    )
+      )
 }
