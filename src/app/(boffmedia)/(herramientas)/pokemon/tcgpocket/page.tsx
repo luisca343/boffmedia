@@ -7,6 +7,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Users, CreditCard, ChevronRight } from 'lucide-react'
+import BoffLayout from '@/app/(boffmedia)/_components/BoffLayout'
 
 export default function TCGPocket() {
     const [username, setUsername] = useState('')
@@ -24,7 +25,7 @@ export default function TCGPocket() {
     ]
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-surface-900 to-surface-800 text-white p-8">
+        <BoffLayout>
             <div className="max-w-4xl mx-auto">
                 <h1 className="text-4xl font-bold text-center mb-8 text-primary-300">TCGPocket</h1>
                 
@@ -76,6 +77,6 @@ export default function TCGPocket() {
                     ))}
                 </div>
             </div>
-        </div>
+        </BoffLayout>
     )
 }
