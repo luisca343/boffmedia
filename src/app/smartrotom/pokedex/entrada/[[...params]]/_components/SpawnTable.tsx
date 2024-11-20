@@ -64,14 +64,14 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
           <PokedexHeader>
             <PokedexRow>
               <PokedexHead className="w-16"> </PokedexHead>
-              <PokedexHead>Variante</PokedexHead>
-              <PokedexHead>Tipo</PokedexHead>
-              <PokedexHead>Biomas</PokedexHead>
-              <PokedexHead>Niveles</PokedexHead>
-              <PokedexHead>Localización</PokedexHead>
-              <PokedexHead>Horas</PokedexHead>
-              <PokedexHead>Altura</PokedexHead>
-              <PokedexHead>Rareza</PokedexHead>
+              <PokedexHead className="text-center">Variante</PokedexHead>
+              <PokedexHead className="text-center">Tipo</PokedexHead>
+              <PokedexHead className="text-center">Biomas</PokedexHead>
+              <PokedexHead className="text-center">Niveles</PokedexHead>
+              <PokedexHead className="text-center">Localización</PokedexHead>
+              <PokedexHead className="text-center">Horas</PokedexHead>
+              <PokedexHead className="text-center">Altura</PokedexHead>
+              <PokedexHead className="text-center">Rareza</PokedexHead>
             </PokedexRow>
           </PokedexHeader>
           <TableBody>
@@ -103,9 +103,9 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                         <PokedexCell hard className="w-16">
                           <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50} />
                         </PokedexCell>
-                        <PokedexCell>{getFormPalette(spawn)}</PokedexCell>
-                        <PokedexCell>{t(spawn.spawnType)}</PokedexCell>
-                        <PokedexCell>
+                        <PokedexCell className="text-center">{getFormPalette(spawn)}</PokedexCell>
+                        <PokedexCell className="text-center">{t(spawn.spawnType)}</PokedexCell>
+                        <PokedexCell className="text-center">
                           {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
                             <span key={biome.biome} className="hover:text-primary-400 transition-colors">
                               <InternalLink href={`/pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
@@ -114,9 +114,9 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                           )) : 'Cualquiera'}
                         </PokedexCell>
                         <PokedexCell className="text-center">{`${spawn.minLevel} - ${spawn.maxLevel}`}</PokedexCell>
-                        <PokedexCell>{stringLocationTypes.join(', ')}</PokedexCell>
-                        <PokedexCell>{times.join(', ')}</PokedexCell>
-                        <PokedexCell>{height}</PokedexCell>
+                        <PokedexCell className="text-center">{stringLocationTypes.join(', ')}</PokedexCell>
+                        <PokedexCell className="text-center">{times.join(', ')}</PokedexCell>
+                        <PokedexCell className="text-center">{height}</PokedexCell>
                         <PokedexCell className={`text-center font-medium ${getRarityColor(spawn.rarity)}`}>{getRarity(spawn.rarity)}</PokedexCell>
                       </PokedexRow>
                     )

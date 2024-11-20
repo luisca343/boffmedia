@@ -54,13 +54,13 @@ export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?
           <PokedexHeader>
             <PokedexRow>
               <PokedexHead className="w-12 text-center">#</PokedexHead>
-              <PokedexHead>Nombre</PokedexHead>
-              <PokedexHead>Tipo</PokedexHead>
-              <PokedexHead>Categoría</PokedexHead>
+              <PokedexHead className="text-center">Nombre</PokedexHead>
+              <PokedexHead className="text-center">Tipo</PokedexHead>
+              <PokedexHead className="text-center">Categoría</PokedexHead>
               <PokedexHead className="text-center">Potencia</PokedexHead>
               <PokedexHead className="text-center">Precisión</PokedexHead>
               <PokedexHead className="text-center">PP</PokedexHead>
-              <PokedexHead>Método</PokedexHead>
+              <PokedexHead className="text-center">Método</PokedexHead>
             </PokedexRow>
           </PokedexHeader>
           <TableBody>
@@ -75,7 +75,7 @@ export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?
                 return (
                   <PokedexRow key={key}>
                     <PokedexCell hard className="text-center font-medium">{index + 1}</PokedexCell>
-                    <PokedexCell>
+                    <PokedexCell className="text-center">
                       <HoverCard>
                         <HoverCardTrigger
                           onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${key}`}
@@ -88,12 +88,12 @@ export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?
                         </HoverCardContent>
                       </HoverCard>
                     </PokedexCell>
-                    <PokedexCell><TypeBadge type={extraMoveData.type.toLowerCase()} /></PokedexCell>
-                    <PokedexCell><TypeBadge type={extraMoveData.category.toLowerCase()} /></PokedexCell>
+                    <PokedexCell className="text-center w-28"><TypeBadge type={extraMoveData.type.toLowerCase()} /></PokedexCell>
+                    <PokedexCell className="text-center w-28"><TypeBadge type={extraMoveData.category.toLowerCase()} /></PokedexCell>
                     <PokedexCell className="text-center">{extraMoveData.power !== 0 ? extraMoveData.power : '-'}</PokedexCell>
                     <PokedexCell className="text-center">{extraMoveData.accuracy !== -1 ? extraMoveData.accuracy : '-'}</PokedexCell>
                     <PokedexCell className="text-center">{extraMoveData.pp}</PokedexCell>
-                    <PokedexCell>{value.reverse().join(', ')}</PokedexCell>
+                    <PokedexCell className="text-center">{value.reverse().join(', ')}</PokedexCell>
                   </PokedexRow>
                 )
               }

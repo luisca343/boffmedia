@@ -106,7 +106,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
             <PokedexHeader>
               <PokedexRow>
                 <PokedexCell hard>Total</PokedexCell>
-                <PokedexCell hard>{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexCell>
+                <PokedexCell hard className="font-bold text-lg">{Object.values(stats).reduce((acc, val) => acc + val).toString()}</PokedexCell>
                 <PokedexCell hard className="text-center">Min</PokedexCell>
                 <PokedexCell hard className="text-center">Max</PokedexCell>
                 <PokedexCell hard className="text-center">Min</PokedexCell>
