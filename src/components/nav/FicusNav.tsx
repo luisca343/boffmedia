@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from 'next/dynamic'
+import { Home } from 'lucide-react'
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
 
@@ -24,7 +25,7 @@ const UserAuthSection = dynamic(() => import('./UserAuthSection'), {
 
 const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion"]
 const NAV_LINKS = [
-  { href: "/", label: "Inicio" },
+  { href: "/", label: "Inicio", icon: <Home className="h-5 w-5" /> },
   { href: "/herramientas", label: "Herramientas", override: <HerramientasMenu /> },
   { href: "/wingull", label: "Pixelmon Wingull", override: <WingullMenu /> },
 ]
@@ -47,20 +48,24 @@ export default function OptimizedFicusNav() {
   if(currentApp && HIDDEN_APPS.includes(currentApp)) return <div className="-mb-16" />
 
   return (
-    <nav className="bg-surface-800 border border-b-surface-700 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
-      <div className="container mx-auto flex justify-between items-center h-full">
+    <nav 
+      className="bg-surface-800 border-b border-surface-700 shadow-lg fixed w-full z-20 h-16"
+      aria-label="Navegación Principal"
+    >
+      <div className="container mx-auto flex justify-between items-center h-full px-4">
         <ul className="flex flex-wrap justify-start items-center gap-6">
-          {NAV_LINKS.map(({ href, label, override }) => (
+          {NAV_LINKS.map(({ href, label, icon, override }) => (
             <li key={href}>
               {override ? (
                 override
               ) : (
                 <Link
                   href={href}
-                  className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center ${
+                  className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
                     inPage(href) ? "font-medium" : ""
                   }`}
                 >
+                  {icon && <span className="text-primary-400">{icon}</span>}
                   <span className="relative z-10">{label}</span>
                   <span
                     className={`absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform ${
