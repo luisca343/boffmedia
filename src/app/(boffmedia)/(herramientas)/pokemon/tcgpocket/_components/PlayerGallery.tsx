@@ -15,6 +15,8 @@ import { BestPackDialog } from "./BestPackDialog"
 import { Card, PackProbabilities, RecentUpdate, PackData, AllPackProbabilities } from '../types'
 import { FilterComponent } from "./FilterComponent"
 import { CollectionGroup } from "./CollectionGroup"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
 interface PlayerGalleryProps {
   username: string
 }
@@ -35,6 +37,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const [recentUpdatesOffset, setRecentUpdatesOffset] = useState(0)
   const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
   const [showAmounts, setShowAmounts] = useState(true)
+  const [isRecentUpdatesOpen, setIsRecentUpdatesOpen] = useState(false)
   const trans = useTranslations('tcgpocket')
   const [nameFilter, setNameFilter] = useState("")
   const [expansionFilter, setExpansionFilter] = useState("")
@@ -156,6 +159,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
           bestPackLoading={bestPackLoading}
           showAmounts={showAmounts}
           setShowAmounts={setShowAmounts}
+          onRecentUpdatesClick={() => setIsRecentUpdatesOpen(true)}
         />
         <div className="mt-8">
           <FilterComponent
@@ -167,57 +171,47 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
             trans={trans}
           />
         </div>
-        <div className="mt-8 grid gap-8 md:grid-cols-[2fr,1fr]">
-          <div className="space-y-8">
-            {loading ? (
-              <div className="flex items-center justify-center min-h-[50vh]">
-                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-              </div>
-            ) : allCards.length === 0 ? (
-              <p className="text-center text-surface-300">No se encontraron cartas.</p>
-            ) : (
-              <div>
-                {Object.entries(
-                  allCards
-                    .filter(card =>
-                      (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
-                        card.number.toString().includes(nameFilter)) &&
-                      (expansionFilter === "" || card.expansion === expansionFilter)
-                    )
-                    .reduce<Record<string, Card[]>>((acc, curr) => {
-                      if (!acc[curr.expansion]) {
-                        acc[curr.expansion] = []
-                      }
-                      acc[curr.expansion].push(curr)
-                      return acc
-                    }, {})
-                ).map(([expansion, cards]) => (
-                  <CollectionGroup
-                    key={expansion}
-                    expansion={expansion}
-                    cards={cards}
-                    userCards={userCards}
-                    changes={changes}
-                    hideMissingCards={hideMissingCards}
-                    editable={editable}
-                    loading={loading}
-                    handleAddCard={handleAddCard}
-                    handleRemoveCard={handleRemoveCard}
-                    trans={trans}
-                    showAmounts={showAmounts}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-          <div>
-            <RecentUpdates
-              recentUpdates={recentUpdates}
-              recentUpdatesError={recentUpdatesError}
-              recentUpdatesLoading={recentUpdatesLoading}
-              fetchRecentUpdates={fetchRecentUpdates}
-            />
-          </div>
+        <div className="mt-8">
+          {loading ? (
+            <div className="flex items-center justify-center min-h-[50vh]">
+              <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+            </div>
+          ) : allCards.length === 0 ? (
+            <p className="text-center text-surface-300">No se encontraron cartas.</p>
+          ) : (
+            <div>
+              {Object.entries(
+                allCards
+                  .filter(card =>
+                    (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
+                      card.number.toString().includes(nameFilter)) &&
+                    (expansionFilter === "" || card.expansion === expansionFilter)
+                  )
+                  .reduce<Record<string, Card[]>>((acc, curr) => {
+                    if (!acc[curr.expansion]) {
+                      acc[curr.expansion] = []
+                    }
+                    acc[curr.expansion].push(curr)
+                    return acc
+                  }, {})
+              ).map(([expansion, cards]) => (
+                <CollectionGroup
+                  key={expansion}
+                  expansion={expansion}
+                  cards={cards}
+                  userCards={userCards}
+                  changes={changes}
+                  hideMissingCards={hideMissingCards}
+                  editable={editable}
+                  loading={loading}
+                  handleAddCard={handleAddCard}
+                  handleRemoveCard={handleRemoveCard}
+                  trans={trans}
+                  showAmounts={showAmounts}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
       {editable && Object.keys(changes).length > 0 && (
@@ -239,6 +233,19 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
         bestPackData={bestPackData}
         eventPackData={eventPackData}
       />
+      <Dialog open={isRecentUpdatesOpen} onOpenChange={setIsRecentUpdatesOpen}>
+        <DialogContent className="bg-surface-800 text-white max-h-[70vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>Cartas Recientes</DialogTitle>
+          </DialogHeader>
+          <RecentUpdates
+            recentUpdates={recentUpdates}
+            recentUpdatesError={recentUpdatesError}
+            recentUpdatesLoading={recentUpdatesLoading}
+            fetchRecentUpdates={fetchRecentUpdates}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

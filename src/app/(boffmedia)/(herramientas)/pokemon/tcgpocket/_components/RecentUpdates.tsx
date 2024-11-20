@@ -20,7 +20,7 @@ export function RecentUpdates({
 
 
   return (
-    <div className="bg-surface-800 rounded-xl p-6 shadow-lg">
+    <div className="bg-surface-800 rounded-xl p-6 h-[50vh] overflow-auto">
       <h2 className="text-2xl font-bold mb-4 text-primary-300">Actualizaciones Recientes</h2>
       <div className="space-y-4">
         {recentUpdatesError ? (

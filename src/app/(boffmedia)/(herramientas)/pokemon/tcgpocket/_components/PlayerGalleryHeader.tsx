@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Loader2, Gift } from 'lucide-react'
+import { Loader2, Gift, Clock } from 'lucide-react'
 import { useTranslations } from "next-intl"
 
 interface PlayerGalleryHeaderProps {
@@ -23,6 +23,7 @@ interface PlayerGalleryHeaderProps {
   bestPackLoading: boolean
   showAmounts: boolean
   setShowAmounts: (value: boolean) => void
+  onRecentUpdatesClick: () => void
 }
 
 export function PlayerGalleryHeader({
@@ -36,7 +37,8 @@ export function PlayerGalleryHeader({
   getBestPack,
   bestPackLoading,
   showAmounts,
-  setShowAmounts
+  setShowAmounts,
+  onRecentUpdatesClick
 }: PlayerGalleryHeaderProps) {
   const trans = useTranslations('tcgpocket')
   return (
@@ -91,6 +93,13 @@ export function PlayerGalleryHeader({
           >
             {bestPackLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Gift className="mr-2 h-4 w-4" />}
             Recomendar Mejor Sobre
+          </Button>
+          <Button
+            onClick={onRecentUpdatesClick}
+            className="bg-surface-700 hover:bg-surface-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+          >
+            <Clock className="mr-2 h-4 w-4" />
+            Cartas Recientes
           </Button>
         </div>
       </div>
