@@ -6,6 +6,7 @@ import { LogOut, LogIn, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useBoffSession } from "@/services/useBoffSession"
 import { signOut } from "next-auth/react"
+import { InternalLink } from './Link'
 
 export default function UserAuthSection() {
   const [mounted, setMounted] = useState(false)
@@ -27,9 +28,9 @@ export default function UserAuthSection() {
   if (session) {
     return (
       <>
-        <span className="text-primary-300">
+        <InternalLink className="text-primary-300" href='/perfil'>
           {session.user.username || session.user.smartRotomUser.username}
-        </span>
+        </InternalLink>
         <Button
           variant="ghost"
           onClick={handleLogout}

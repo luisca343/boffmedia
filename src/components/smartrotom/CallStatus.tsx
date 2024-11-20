@@ -215,7 +215,7 @@ export function CallStatus() {
     <nav
       className={`flex flex-col items-center justify-center absolute ${
         isExpanded ? "right-0 w-full h-full" : "left-0 w-60 h-12"
-      } bg-surface-900 text-surface-50 font-bold z-20 ${
+      } bg-surface-800 text-surface-50 font-bold z-20 ${
         activeCall || isExpanded ? "" : "hidden"
       }`}
     >

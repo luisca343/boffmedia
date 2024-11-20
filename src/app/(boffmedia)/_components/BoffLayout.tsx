@@ -3,10 +3,10 @@ import { BoffFooter } from './BoffFooter';
 
 export default function BoffLayout({ children, footer = true }: { children: React.ReactNode, footer?: boolean }) {
   return (
-    <div className="flex flex-col min-h-screen bg-surface-900 text-white font-sans">
+    <div className="flex flex-col min-h-full bg-surface-900 text-white font-sans">
       <div 
         className="fixed inset-0 w-full h-full z-0 opacity-50 pointer-events-none" 
-        style={{ backgroundImage: `url("/img/boff.svg")`, backgroundRepeat: 'repeat' }}
+        style={{ backgroundImage: `url("/img/boff.svg")`, backgroundSize: 'cover', backgroundPosition: 'center' }}
         aria-hidden="true"
       />
       <div className="flex flex-col flex-grow z-10 relative">

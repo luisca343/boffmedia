@@ -155,7 +155,7 @@ export default function RotomNav({
   return (
     <nav
       className={`h-12 z-20 flex items-center px-2 fixed w-full ${
-        pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-900"
+        pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-800"
       }`}
     >
       <BotonPrev />
@@ -185,7 +185,7 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-surface-900 text-surface-50 border-none flex flex-col w-max"
+          className="bg-surface-800 text-surface-50 border-none flex flex-col w-max"
           parentId="smartrotom"
         >
           <SheetHeader>

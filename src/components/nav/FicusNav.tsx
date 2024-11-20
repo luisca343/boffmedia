@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from 'next/dynamic'
 import { HerramientasMenu } from "./ToolsMenu"
+import { WingullMenu } from "./WingullMenu"
 
 const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
   ssr: false,
@@ -25,8 +26,7 @@ const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion"]
 const NAV_LINKS = [
   { href: "/", label: "Inicio" },
   { href: "/herramientas", label: "Herramientas", override: <HerramientasMenu /> },
-  { href: "/wingull", label: "Pixelmon Wingull" },
-  { href: "/smartrotom", label: "SmartRotom" },
+  { href: "/wingull", label: "Pixelmon Wingull", override: <WingullMenu /> },
 ]
 
 export default function OptimizedFicusNav() {
@@ -47,7 +47,7 @@ export default function OptimizedFicusNav() {
   if(currentApp && HIDDEN_APPS.includes(currentApp)) return <div className="-mb-16" />
 
   return (
-    <nav className="bg-surface-900 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
+    <nav className="bg-surface-800 border border-b-surface-700 p-4 shadow-lg fixed w-full z-20 h-16" aria-label="Navegación Principal">
       <div className="container mx-auto flex justify-between items-center h-full">
         <ul className="flex flex-wrap justify-start items-center gap-6">
           {NAV_LINKS.map(({ href, label, override }) => (
