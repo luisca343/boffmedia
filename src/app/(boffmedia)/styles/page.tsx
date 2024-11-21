@@ -30,13 +30,14 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import { useForm } from "react-hook-form"
+import BoffLayout from '../_components/BoffLayout'
 
 export default function BoffMediaStyleGuide() {
   const [comboboxValue, setComboboxValue] = React.useState("")
   const form = useForm()
 
   return (
-    <div className="p-6 bg-surface-800 text-surface-100 min-h-screen">
+    <BoffLayout>
       <h1 className="text-3xl font-bold text-primary-300 mb-8">Guía de Estilo BoffMedia</h1>
 
       <section className="mb-12">
@@ -524,6 +525,6 @@ export default function BoffMediaStyleGuide() {
         </TooltipProvider>
       </section>
 
-    </div>
+    </BoffLayout>
   )
 }
