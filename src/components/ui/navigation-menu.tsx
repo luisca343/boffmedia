@@ -41,7 +41,7 @@ NavigationMenuList.displayName = NavigationMenuPrimitive.List.displayName
 const NavigationMenuItem = NavigationMenuPrimitive.Item
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-100 hover:text-surface-900 focus:bg-surface-100 focus:text-surface-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-surface-100/50 data-[state=open]:bg-surface-100/50 dark:bg-surface-950 dark:hover:bg-surface-700 dark:hover:text-surface-50 dark:focus:bg-surface-700 dark:focus:text-surface-50 dark:data-[active]:bg-surface-700/50 dark:data-[state=open]:bg-surface-700/50",
+  "group inline-flex h-10 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-surface-100 hover:text-surface-900 focus:bg-surface-100 focus:text-surface-900 focus:outline-none disabled:pointer-events-none disabled:opacity-50 data-[active]:bg-surface-100/50 data-[state=open]:bg-surface-100/50 dark:bg-surface-950 dark:hover:bg-surface-800 dark:hover:text-surface-50 dark:focus:bg-surface-800 dark:focus:text-surface-50 dark:data-[active]:bg-surface-800/50 dark:data-[state=open]:bg-surface-800/50",
   {
     variants: {
       variant: {
@@ -106,7 +106,7 @@ const NavigationMenuViewport = React.forwardRef<
   <div className={cn("absolute left-0 top-full flex justify-center")}>
     <NavigationMenuPrimitive.Viewport
       className={cn(
-        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-surface-600 bg-surface-700 text-primary-300 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
+        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-surface-700 bg-surface-800 text-primary-300 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
         className
       )}
       ref={ref}
@@ -128,7 +128,7 @@ const NavigationMenuIndicator = React.forwardRef<
     )}
     {...props}
   >
-    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-surface-700 shadow-md" />
+    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-surface-800 shadow-md" />
   </NavigationMenuPrimitive.Indicator>
 ))
 NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName

@@ -33,7 +33,7 @@ export default function NotificationPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" className="relative hover:bg-surface-700 transition-colors duration-200">
+        <Button variant="ghost" className="relative hover:bg-surface-800 transition-colors duration-200">
           <Bell className="h-5 w-5 text-primary-300" />
           {unreadCount > 0 && (
             <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
@@ -42,7 +42,7 @@ export default function NotificationPopover() {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 bg-surface-700 border-surface-600 text-primary-100">
+      <PopoverContent className="w-80 bg-surface-800 border-surface-700 text-primary-100">
         <div className="flex justify-between items-center mb-2">
           <h3 className="text-lg font-semibold">Notificaciones</h3>
           <Button variant="ghost" size="sm" onClick={() => clear()}>

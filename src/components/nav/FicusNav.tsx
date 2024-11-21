@@ -10,15 +10,15 @@ import { WingullMenu } from "./WingullMenu"
 
 const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
   ssr: false,
-  loading: () => <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
+  loading: () => <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
 })
 
 const UserAuthSection = dynamic(() => import('./UserAuthSection'), { 
   ssr: false,
   loading: () => (
     <div className="flex items-center space-x-2">
-      <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
-      <div className="w-16 h-4 bg-surface-700 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
+      <div className="w-16 h-4 bg-surface-800 rounded animate-pulse" />
     </div>
   )
 })
@@ -49,7 +49,7 @@ export default function OptimizedFicusNav() {
 
   return (
     <nav 
-      className="bg-surface-700 border-b border-surface-600 shadow-lg fixed w-full z-20 h-16"
+      className="bg-surface-800 border-b border-surface-700 shadow-lg fixed w-full z-20 h-16"
       aria-label="Navegación Principal"
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
@@ -86,10 +86,10 @@ export default function OptimizedFicusNav() {
             </>
           ) : (
             <>
-              <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
+              <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
-                <div className="w-16 h-4 bg-surface-700 rounded animate-pulse" />
+                <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-surface-800 rounded animate-pulse" />
               </div>
             </>
           )}

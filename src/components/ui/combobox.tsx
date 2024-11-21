@@ -52,7 +52,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-[200px] justify-between bg-surface-700 text-primary-400 border-primary-500 hover:bg-surface-700 focus:ring-primary-400",
+            "w-[200px] justify-between bg-surface-800 text-primary-400 border-primary-500 hover:bg-surface-700 focus:ring-primary-400",
             className
           )}
           disabled={disabled}
@@ -63,8 +63,8 @@ export function Combobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0 bg-surface-700 border-primary-500">
-        <Command className="bg-surface-700 rounded-md">
+      <PopoverContent className="w-[200px] p-0 bg-surface-800 border-primary-500">
+        <Command className="bg-surface-800 rounded-md">
           <CommandInput 
             placeholder={placeholder} 
             className="bg-surface-700 text-primary-100 placeholder-primary-300 border-primary-500 focus:ring-primary-400"

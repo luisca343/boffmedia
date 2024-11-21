@@ -34,7 +34,7 @@ export default function UserAuthSection() {
         <Button
           variant="ghost"
           onClick={handleLogout}
-          className="text-primary-300 hover:text-primary-200 hover:bg-surface-700 transition-colors duration-200"
+          className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
         >
           <LogOut className="h-5 w-5 mr-2" />
           Cerrar sesión
@@ -48,7 +48,7 @@ export default function UserAuthSection() {
       <Button
         variant="ghost"
         onClick={() => router.push("/auth?mode=login")}
-        className="text-primary-300 hover:text-primary-200 hover:bg-surface-700 transition-colors duration-200"
+        className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
       >
         <LogIn className="h-5 w-5 mr-2" />
         Iniciar sesión
@@ -56,7 +56,7 @@ export default function UserAuthSection() {
       <Button
         variant="ghost"
         onClick={() => router.push("/auth?mode=register")}
-        className="text-primary-300 hover:text-primary-200 hover:bg-surface-700 transition-colors duration-200"
+        className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
       >
         <UserPlus className="h-5 w-5 mr-2" />
         Registrarse
