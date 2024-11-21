@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { useBoffSession } from "@/services/useBoffSession"
 import { signOut } from "next-auth/react"
 import { InternalLink } from './Link'
+import Link from 'next/link'
 
 export default function UserAuthSection() {
   const [mounted, setMounted] = useState(false)
@@ -28,9 +29,9 @@ export default function UserAuthSection() {
   if (session) {
     return (
       <>
-        <InternalLink className="text-primary-300" href='/perfil'>
+        <Link className="text-primary-300" href='/perfil'>
           {session.user.username || session.user.smartRotomUser.username}
-        </InternalLink>
+        </Link>
         <Button
           variant="ghost"
           onClick={handleLogout}
