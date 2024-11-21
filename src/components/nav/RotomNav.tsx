@@ -85,7 +85,7 @@ export default function RotomNav({
 
   function Notifications() {
     return (
-      <div className="w-80 bg-surface-800 rounded-lg shadow-lg overflow-hidden">
+      <div className="w-80 bg-surface-700 rounded-lg shadow-lg overflow-hidden">
         <header className="bg-surface-700 p-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Bell className="text-surface-300" size={20} />
@@ -155,7 +155,7 @@ export default function RotomNav({
   return (
     <nav
       className={`h-12 z-20 flex items-center px-2 fixed w-full ${
-        pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-800"
+        pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-700"
       }`}
     >
       <BotonPrev />
@@ -168,7 +168,7 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="top"
-          className="bg-surface-800 text-surface-50 border-none"
+          className="bg-surface-700 text-surface-50 border-none"
           parentId="smartrotom"
         >
           <SheetHeader>
@@ -185,7 +185,7 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-surface-800 text-surface-50 border-none flex flex-col w-max"
+          className="bg-surface-700 text-surface-50 border-none flex flex-col w-max"
           parentId="smartrotom"
         >
           <SheetHeader>

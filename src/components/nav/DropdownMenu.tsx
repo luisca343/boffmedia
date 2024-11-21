@@ -36,7 +36,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
     >
       <Button 
         variant="ghost" 
-        className="pr-0 pl-2 py-2 z-20 text-primary-300 hover:text-primary-100 hover:bg-surface-800/50 transition-all duration-200 text-base group"
+        className="pr-0 pl-2 py-2 z-20 text-primary-300 hover:text-primary-100 hover:bg-surface-700/50 transition-all duration-200 text-base group"
       >
         {mainLink ? (
           <Link href={mainLink.href} className="flex items-center gap-2">
@@ -52,9 +52,9 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       </Button>
       {isOpen && (
         <div 
-          className="absolute pt-3 z-10 w-96 bg-surface-800/95 backdrop-blur-sm  shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
+          className="absolute pt-3 z-10 w-96 bg-surface-700/95 backdrop-blur-sm  shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
         >
-          <div className="border border-surface-700 border-t-surface-800">
+          <div className="border border-surface-600 border-t-surface-800">
           {sections.map((section, index) => (
             <React.Fragment key={section.title}>
               {index > 0 && <div className="bg-surface-700 h-[1px]"/>}
