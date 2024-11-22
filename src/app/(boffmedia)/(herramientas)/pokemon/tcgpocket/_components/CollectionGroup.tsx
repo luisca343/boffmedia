@@ -64,7 +64,7 @@ export function CollectionGroup({
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 p-4 bg-surface-800 rounded-b-lg">
+            <div className="grid grid-cols-5 gap-1 xl:gap-4 sm:gap-6 p-4 bg-surface-800 rounded-b-lg">
               {cards.map((card) => {
                 const key = `${card.expansion}_${card.number}`
                 const count = (userCards[key] || 0) + (changes[key] || 0)

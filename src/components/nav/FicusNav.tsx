@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from 'next/dynamic'
-import { Home } from 'lucide-react'
+import { Home, Menu, X } from 'lucide-react'
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
 
@@ -34,6 +34,7 @@ export default function OptimizedFicusNav() {
   const pathname = usePathname()
   const [currentApp, setCurrentApp] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
     const app = pathname.split("/")[1] || "boffmedia"
@@ -53,9 +54,16 @@ export default function OptimizedFicusNav() {
       aria-label="Navegación Principal"
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
-        <ul className="flex flex-wrap justify-start items-center gap-6">
+        <button
+          className="lg:hidden text-primary-300 hover:text-primary-100"
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
+        >
+          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+        <ul className={`lg:flex flex-wrap justify-start items-center gap-6 ${isMenuOpen ? 'flex flex-col absolute top-16 left-0 w-full bg-surface-800 p-4 space-y-4' : 'hidden'}`}>
           {NAV_LINKS.map(({ href, label, icon, override }) => (
-            <li key={href}>
+            <li key={href} className={isMenuOpen ? 'w-full' : ''}>
               {override ? (
                 override
               ) : (
@@ -63,7 +71,8 @@ export default function OptimizedFicusNav() {
                   href={href}
                   className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
                     inPage(href) ? "font-medium" : ""
-                  }`}
+                  } ${isMenuOpen ? 'w-full' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   {icon && <span className="text-primary-400">{icon}</span>}
                   <span className="relative z-10">{label}</span>
@@ -98,3 +107,4 @@ export default function OptimizedFicusNav() {
     </nav>
   )
 }
+

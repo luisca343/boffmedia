@@ -42,18 +42,18 @@ export function PlayerGalleryHeader({
 }: PlayerGalleryHeaderProps) {
   const trans = useTranslations('tcgpocket')
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-primary-300">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary-300">
           Galería de {username}
         </h1>
-        <p className="text-xl text-surface-300 mt-2">
+        <p className="text-base sm:text-lg md:text-xl text-surface-300 mt-2">
           {cardCount} cartas en la colección
         </p>
       </div>
-      <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+      <div className="flex flex-col lg:flex-row lg:justify-between space-y-4">
         {editable && (
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <div className="flex items-center space-x-2">
               <Switch
                 id="hide-missing"
@@ -76,9 +76,9 @@ export function PlayerGalleryHeader({
             </div>
           </div>
         )}
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
           <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-            <SelectTrigger className="w-[200px] bg-surface-700 text-white border-surface-600">
+            <SelectTrigger className="w-full sm:w-[200px] bg-surface-700 text-white border-surface-600">
               <SelectValue placeholder="Seleccionar evento" />
             </SelectTrigger>
             <SelectContent className="bg-surface-700 text-white border-surface-600">
@@ -88,7 +88,7 @@ export function PlayerGalleryHeader({
           </Select>
           <Button
             onClick={getBestPack}
-            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+            className="w-full sm:w-auto bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
             disabled={bestPackLoading}
           >
             {bestPackLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Gift className="mr-2 h-4 w-4" />}
@@ -96,7 +96,7 @@ export function PlayerGalleryHeader({
           </Button>
           <Button
             onClick={onRecentUpdatesClick}
-            className="bg-surface-700 hover:bg-surface-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
+            className="w-full sm:w-auto bg-surface-700 hover:bg-surface-600 text-white font-semibold py-2 px-4 rounded-full shadow-md transition-all duration-300 ease-in-out transform hover:scale-105"
           >
             <Clock className="mr-2 h-4 w-4" />
             Cartas Recientes
@@ -106,3 +106,4 @@ export function PlayerGalleryHeader({
     </div>
   )
 }
+
