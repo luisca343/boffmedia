@@ -28,6 +28,10 @@ const MotionLink = motion(Link)
 export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomDropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
 
+  const closeMenu = () => {
+    setIsOpen(false)
+  }
+
   return (
     <div
       className="relative"
@@ -37,9 +41,10 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       <Button 
         variant="ghost" 
         className="pr-0 pl-2 py-2 z-20 text-primary-300 hover:text-primary-100 hover:bg-surface-800/50 transition-all duration-200 text-base group"
+        onClick={() => setIsOpen(!isOpen)}
       >
         {mainLink ? (
-          <Link href={mainLink.href} className="flex items-center gap-2">
+          <Link href={mainLink.href} className="flex items-center gap-2" onClick={closeMenu}>
             {mainLink.label}
             <ChevronDown className="h-4 w-4 opacity-50 group-hover:rotate-180 transition-transform duration-200" />
           </Link>
@@ -52,7 +57,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       </Button>
       {isOpen && (
         <div 
-          className="absolute pt-3 z-10 w-96 bg-surface-800/95 backdrop-blur-sm  shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
+          className="absolute pt-3 z-10 w-96 bg-surface-800/95 backdrop-blur-sm shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
         >
           <div className="border border-surface-700 border-t-surface-800">
           {sections.map((section, index) => (
@@ -67,6 +72,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.2, delay: itemIndex * 0.05 }}
                   key={item.href}
+                  onClick={closeMenu}
                 >
                   <span className="flex items-center gap-3">
                     {item.icon && <span className="text-primary-400">{item.icon}</span>}
@@ -83,3 +89,4 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
     </div>
   )
 }
+
