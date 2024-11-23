@@ -65,7 +65,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
         setRecentUpdates(prevUpdates => [...prevUpdates, ...updates])
         setRecentUpdatesOffset(prevOffset => prevOffset + updates.length)
       } else {
-        toast.info('No more updates to load')
+        //toast.info('No more updates to load')
       }
     } catch (error) {
       console.error('Error fetching recent updates:', error)
@@ -146,85 +146,92 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
 
   return (
     <div className="min-h-screen text-white">
-      <div className="container mx-auto px-4 py-8">
-        <PlayerGalleryHeader
-          username={username}
-          cardCount={cardCount}
-          editable={editable}
-          hideMissingCards={hideMissingCards}
-          setHideMissingCards={setHideMissingCards}
-          selectedEvent={selectedEvent}
-          setSelectedEvent={setSelectedEvent}
-          getBestPack={getBestPack}
-          bestPackLoading={bestPackLoading}
-          showAmounts={showAmounts}
-          setShowAmounts={setShowAmounts}
-          onRecentUpdatesClick={() => setIsRecentUpdatesOpen(true)}
-        />
-        <div className="mt-8">
-          <FilterComponent
-            expansions={Array.from(new Set(allCards.map(card => card.expansion)))}
-            onFilterChange={(name, expansion) => {
-              setNameFilter(name)
-              setExpansionFilter(expansion)
-            }}
-            trans={trans}
-          />
+      {Object.keys(userCards).length === 0 ? (
+        <div className="container mx-auto px-4 py-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Gallería no encontrada</h2>
+          <p>Esta galería no existe o todavía no tiene cartas.</p>
         </div>
-        <div className="mt-8">
-          {loading ? (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-            </div>
-          ) : allCards.length === 0 ? (
-            <p className="text-center text-surface-300">No se encontraron cartas.</p>
-          ) : (
-            <div>
-              {Object.entries(
-                allCards
-                  .filter(card =>
-                    (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
-                      card.number.toString().includes(nameFilter)) &&
-                    (expansionFilter === "" || card.expansion === expansionFilter)
-                  )
-                  .reduce<Record<string, Card[]>>((acc, curr) => {
-                    if (!acc[curr.expansion]) {
-                      acc[curr.expansion] = []
-                    }
-                    acc[curr.expansion].push(curr)
-                    return acc
-                  }, {})
-              ).map(([expansion, cards]) => (
-                <CollectionGroup
-                  key={expansion}
-                  expansion={expansion}
-                  cards={cards}
-                  userCards={userCards}
-                  changes={changes}
-                  hideMissingCards={hideMissingCards}
-                  editable={editable}
-                  loading={loading}
-                  handleAddCard={handleAddCard}
-                  handleRemoveCard={handleRemoveCard}
-                  trans={trans}
-                  showAmounts={showAmounts}
-                />
-              ))}
-            </div>
+      ) : (
+        <div className="container mx-auto px-4 py-8">
+          <PlayerGalleryHeader
+            username={username}
+            cardCount={cardCount}
+            editable={editable}
+            hideMissingCards={hideMissingCards}
+            setHideMissingCards={setHideMissingCards}
+            selectedEvent={selectedEvent}
+            setSelectedEvent={setSelectedEvent}
+            getBestPack={getBestPack}
+            bestPackLoading={bestPackLoading}
+            showAmounts={showAmounts}
+            setShowAmounts={setShowAmounts}
+            onRecentUpdatesClick={() => setIsRecentUpdatesOpen(true)}
+          />
+          <div className="mt-8">
+            <FilterComponent
+              expansions={Array.from(new Set(allCards.map(card => card.expansion)))}
+              onFilterChange={(name, expansion) => {
+                setNameFilter(name)
+                setExpansionFilter(expansion)
+              }}
+              trans={trans}
+            />
+          </div>
+          <div className="mt-8">
+            {loading ? (
+              <div className="flex items-center justify-center min-h-[50vh]">
+                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+              </div>
+            ) : allCards.length === 0 ? (
+              <p className="text-center text-surface-300">No se encontraron cartas.</p>
+            ) : (
+              <div>
+                {Object.entries(
+                  allCards
+                    .filter(card =>
+                      (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
+                        card.number.toString().includes(nameFilter)) &&
+                      (expansionFilter === "" || card.expansion === expansionFilter)
+                    )
+                    .reduce<Record<string, Card[]>>((acc, curr) => {
+                      if (!acc[curr.expansion]) {
+                        acc[curr.expansion] = []
+                      }
+                      acc[curr.expansion].push(curr)
+                      return acc
+                    }, {})
+                ).map(([expansion, cards]) => (
+                  <CollectionGroup
+                    key={expansion}
+                    expansion={expansion}
+                    cards={cards}
+                    userCards={userCards}
+                    changes={changes}
+                    hideMissingCards={hideMissingCards}
+                    editable={editable}
+                    loading={loading}
+                    handleAddCard={handleAddCard}
+                    handleRemoveCard={handleRemoveCard}
+                    trans={trans}
+                    showAmounts={showAmounts}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          {editable && Object.keys(changes).length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="fixed bottom-4 right-4 z-50"
+            >
+              <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" disabled={loading}>
+                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+                Guardar Cambios
+              </Button>
+            </motion.div>
           )}
         </div>
-      </div>
-      {editable && Object.keys(changes).length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-4 right-4 z-50"
-        >
-          <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" disabled={loading}>
-            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            Guardar Cambios
-          </Button>
-        </motion.div>
       )}
       <BestPackDialog
         isOpen={isDialogOpen}
@@ -249,3 +256,4 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
     </div>
   )
 }
+
