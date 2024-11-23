@@ -8,13 +8,13 @@ import { motion } from "framer-motion";
 import { signIn } from "next-auth/react";
 import { isMinecraft } from "@/services/mcef/mcefHelper";
 import { useEffect, useState } from "react";
-import AuthForm, { FormCenteredInPage } from "@/app/auth/AuthForm";
 import { LoadingScreen } from "./Loading";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CallStatus } from "./CallStatus";
 import { BoffSession } from "@/types";
 import { getMcUserData } from "@/services/mcef/mcefApi";
+import { AuthForm } from "@/app/auth/AuthForm";
 
 
 export default function AppWrapper({
@@ -93,7 +93,7 @@ export default function AppWrapper({
   }
 
   if (status === "unauthenticated" && !isMC) {
-    return <FormCenteredInPage url="boffmedia" redirect="/smartrotom" />;
+    return <AuthForm url="boffmedia" redirect="/smartrotom" />;
   }
 
   function boffMediaLinked(): boolean {
