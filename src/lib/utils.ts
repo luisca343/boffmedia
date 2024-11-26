@@ -58,7 +58,7 @@ export function parseDate (date: string | Date) {
 }
 
 
-export const subdomains = ['smartrotom', 'battlesim'];
+export const subdomains = ['smartrotom', 'battlesim', 'test', 'localtest', 'blog', 'forum']
 
 export function relativeRedirect(router: AppRouterInstance, url: string) {
   const subdomain = window.location.host.split('.')[0];

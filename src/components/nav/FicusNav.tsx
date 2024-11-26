@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic'
 import { Home, Menu, X } from 'lucide-react'
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
+import { InternalLink } from "./Link"
 
 const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
   ssr: false,
@@ -67,7 +68,7 @@ export default function OptimizedFicusNav() {
               {override ? (
                 override
               ) : (
-                <Link
+                <InternalLink
                   href={href}
                   className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
                     inPage(href) ? "font-medium" : ""
@@ -82,7 +83,7 @@ export default function OptimizedFicusNav() {
                     } group-hover:scale-x-100 transition-transform duration-200 ease-in-out`}
                     aria-hidden="true"
                   ></span>
-                </Link>
+                </InternalLink>
               )}
             </li>
           ))}

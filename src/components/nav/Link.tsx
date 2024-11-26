@@ -1,11 +1,15 @@
 "use client"
 import { subdomains } from "@/lib/utils";
+import { on } from "events";
 import Link from "next/link";
 
 
-export function InternalLink({ href, children, className, ...props }: { href: string, children: any, className?: string }) {
-    // Check if window exists
+export function InternalLink({ href, children, className, onClick, ...props }: { href: string, children: any, className?: string, onClick?: any }) {
+    if(onClick) {
+        onClick()
+    }
 
+    // Check if window exists
     if (typeof window === 'undefined') {
         return (<Link href={href} {...props} className={className}>{children}</Link>);
     }
