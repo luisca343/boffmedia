@@ -19,8 +19,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <TooltipProvider>
-      <AppWrapper>{children}</AppWrapper>
-    </TooltipProvider>
+    <GlobalProviders>
+      <TooltipProvider>
+        <AppWrapper>{children}</AppWrapper>
+      </TooltipProvider>
+    </GlobalProviders>
   );
 }
