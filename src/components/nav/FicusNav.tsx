@@ -50,7 +50,7 @@ export default function OptimizedFicusNav() {
     return (pathname.startsWith(href) && href !== "/") || pathname === href
   }
 
-  if(currentApp && HIDDEN_APPS.includes(currentApp) || subdomain && HIDDEN_APPS.includes(subdomain)) return <div className="-mb-16" />
+  //if(currentApp && HIDDEN_APPS.includes(currentApp) || subdomain && HIDDEN_APPS.includes(subdomain)) return <div className="-mb-16" />
 
   return (
     <nav 
