@@ -34,12 +34,15 @@ const NAV_LINKS = [
 export default function OptimizedFicusNav() {
   const pathname = usePathname()
   const [currentApp, setCurrentApp] = useState<string | null>(null)
+  const [subdomain, setSubdomain] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   useEffect(() => {
     const app = pathname.split("/")[1] || "boffmedia"
+    const subdomain = window.location.host.split('.')[0];
     setCurrentApp(app || null)
+    setSubdomain(subdomain)
     setMounted(true)
   }, [pathname])
 
@@ -47,7 +50,7 @@ export default function OptimizedFicusNav() {
     return (pathname.startsWith(href) && href !== "/") || pathname === href
   }
 
-  if(currentApp && HIDDEN_APPS.includes(currentApp)) return <div className="-mb-16" />
+  if(currentApp && HIDDEN_APPS.includes(currentApp) || subdomain && HIDDEN_APPS.includes(subdomain)) return <div className="-mb-16" />
 
   return (
     <nav 
