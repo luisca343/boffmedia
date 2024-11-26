@@ -24,7 +24,7 @@ const UserAuthSection = dynamic(() => import('./UserAuthSection'), {
   )
 })
 
-const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion"]
+const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion", "blog", "forum"]
 const NAV_LINKS = [
   { href: "/", label: "Inicio", icon: <Home className="h-5 w-5" /> },
   { href: "/herramientas", label: "Herramientas", override: <HerramientasMenu /> },
