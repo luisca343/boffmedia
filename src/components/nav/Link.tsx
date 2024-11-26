@@ -4,7 +4,7 @@ import { on } from "events";
 import Link from "next/link";
 
 
-export function InternalLink({ href, children, className, onClick, ...props }: { href: string, children: any, className?: string, onClick?: any }) {
+export function InternalLink({ href, children, className, onClick, app = null, ...props }: { href: string, children: any, className?: string, onClick?: any, app?: string | null }) {
     if(onClick) {
         onClick()
     }
@@ -15,9 +15,9 @@ export function InternalLink({ href, children, className, onClick, ...props }: {
     }
 
     const subdomain = window.location.host.split('.')[0];
-    const currentApp = window.location.pathname.split('/')[1]
+    if(app === null) app = window.location.pathname.split('/')[1]
 
-    if(currentApp === '') {
+    if(app === '') {
         return (
             <Link href={href} {...props}  className={className}>
                 {children}
@@ -35,7 +35,7 @@ export function InternalLink({ href, children, className, onClick, ...props }: {
         }
     }
     return (
-        <Link href={`/${currentApp}/${href}`} {...props} className={className}>
+        <Link href={`${app && `/${app}`}/${href}`} {...props} className={className}>
             {children}
         </Link>
     );

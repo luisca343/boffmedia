@@ -72,6 +72,7 @@ export default function OptimizedFicusNav() {
                 override
               ) : (
                 <InternalLink
+                  app={href === "/" ? "" : null}
                   href={href}
                   className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
                     inPage(href) ? "font-medium" : ""
