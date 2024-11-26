@@ -9,15 +9,12 @@ import {
   Calendar,
   Trophy,
 } from "lucide-react";
-import { BoffFooter } from "./_components/BoffFooter";
-import BoffLayout from "./_components/BoffLayout";
 import EventCalendar from "./_components/EventCalendar";
 import { UpcomingEvents } from "./_components/UpcomingEvents";
 import { ClassificationTable } from "./_components/ClassificationTable";
 
 export default function GamingLandingPage() {
   return (
-    <BoffLayout>
       <div className="min-h-screen text-white font-sans relative">
         <div className="relative z-10">
           <main className="container mx-auto px-4">
@@ -150,7 +147,6 @@ export default function GamingLandingPage() {
           </main>
         </div>
       </div>
-    </BoffLayout>
   );
 }
 

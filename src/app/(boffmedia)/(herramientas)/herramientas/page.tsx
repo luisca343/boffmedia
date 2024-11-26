@@ -1,4 +1,3 @@
-import BoffLayout from "../../_components/BoffLayout";
 import FileTree from "./../_components/FileTree";
 
 const fileStructure = {
@@ -7,16 +6,14 @@ const fileStructure = {
     "tcgpocket/cartas": "Gestión colecciones TCG Pocket",
   },
   otros: {
-    keys: "Claves de Steam"
-  }
+    keys: "Claves de Steam",
+  },
 };
 
 export default function FileStructurePage() {
   return (
-    <BoffLayout footer={false}>
-      <div className="container mx-auto p-4">
-        <FileTree structure={fileStructure} />
-      </div>
-    </BoffLayout>
+    <div className="container mx-auto p-4">
+      <FileTree structure={fileStructure} />
+    </div>
   );
 }
