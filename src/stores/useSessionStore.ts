@@ -1,16 +1,16 @@
-import { BoffSession } from "@/types";
+import { Session } from "next-auth";
 import { create } from "zustand";
 
 interface SessionStore {
-    session: BoffSession | null;
+    session: Session | null;
     sessionStatus: "loading" | "loaded" | "error";
-    setSession: (session: BoffSession) => void;
+    setSession: (session: Session) => void;
     setStatus: (status: "loading" | "loaded" | "error") => void;
 }
 
 export const useSessionStore = create<SessionStore>((set) => ({
     session: null,
-    setSession: (session: BoffSession) => set({ session }),
+    setSession: (session: Session) => set({ session }),
     sessionStatus: "loading",
     setStatus: (sessionStatus: "loading" | "loaded" | "error") => set({ sessionStatus })
 }));

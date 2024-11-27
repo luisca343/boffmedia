@@ -9,7 +9,6 @@ export default function UnauthorizedPage() {
   const router = useRouter()
 
   return (
-    <BoffLayout>
       <div className="flex items-center justify-center">
         <div className="text-center p-8 bg-surface-800 rounded-lg shadow-xl max-w-md w-full">
           <AlertTriangle className="mx-auto h-16 w-16 text-primary-500 mb-6" />
@@ -34,6 +33,5 @@ export default function UnauthorizedPage() {
           </div>
         </div>
       </div>
-    </BoffLayout>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from 'next/dynamic'
@@ -46,9 +46,13 @@ export default function OptimizedFicusNav() {
     setMounted(true)
   }, [pathname])
 
-  function inPage(href: string) {
+  const inPage = useCallback((href: string) => {
     return (pathname.startsWith(href) && href !== "/") || pathname === href
-  }
+  }, [pathname])
+
+  const handleMenuItemClick = useCallback(() => {
+    setIsMenuOpen(false)
+  }, [])
 
   //if(currentApp && HIDDEN_APPS.includes(currentApp) || subdomain && HIDDEN_APPS.includes(subdomain)) return <div className="-mb-16" />
 
@@ -77,7 +81,7 @@ export default function OptimizedFicusNav() {
                   className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
                     inPage(href) ? "font-medium" : ""
                   } ${isMenuOpen ? 'w-full' : ''}`}
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleMenuItemClick}
                 >
                   {icon && <span className="text-primary-400">{icon}</span>}
                   <span className="relative z-10">{label}</span>

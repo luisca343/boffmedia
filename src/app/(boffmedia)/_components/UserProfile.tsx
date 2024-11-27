@@ -1,34 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import { useBoffSession } from "@/services/useBoffSession";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, Mail, User, LinkIcon } from "lucide-react";
+import { Gamepad2, LinkIcon } from 'lucide-react';
+import useSocketStore from "@/stores/useSocketStore";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function UserProfile() {
   const { session } = useBoffSession();
+  const socket = useSocketStore((state) => state.socket);
   const user = session?.user;
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user || {});
 
   const linkDiscord = async () => {
-    // Simulating Discord OAuth flow
     console.log("Linking Discord account...");
-    // In a real implementation, you would redirect to Discord OAuth here
-    // and handle the callback in a separate component/route
     setTimeout(() => {
       setEditedUser((prevUser) => ({ ...prevUser, discordLinked: true }));
     }, 2000);
   };
 
   const handleSave = () => {
-    // Here you would typically send the updated user data to your backend
     console.log("Saving user data:", editedUser);
     setIsEditing(false);
   };
@@ -56,7 +54,7 @@ export default function UserProfile() {
                 alt={user.username || "User"}
               />
               <AvatarFallback>
-                {user.username ? user.username.charAt(0) : "U"}
+                {user.username ? user.username.charAt(0).toUpperCase() : "U"}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -76,7 +74,7 @@ export default function UserProfile() {
                 id="name"
                 value={editedUser.username || ""}
                 onChange={(e) =>
-                  setEditedUser((prev) => ({ ...prev, name: e.target.value }))
+                  setEditedUser((prev) => ({ ...prev, username: e.target.value }))
                 }
                 disabled={!isEditing}
               />
@@ -98,7 +96,7 @@ export default function UserProfile() {
           <div className="flex items-center space-x-2">
             <Gamepad2 className="text-muted-foreground" />
             <span>Discord Account:</span>
-            {editedUser.discordLinked ? (
+            {editedUser.discordId ? (
               <Badge variant="outline" className="ml-2">
                 Linked
               </Badge>
@@ -112,6 +110,14 @@ export default function UserProfile() {
                 <LinkIcon className="mr-2 h-4 w-4" /> Link Discord
               </Button>
             )}
+          </div>
+
+          <div>
+            Roles: {user.roles?.join(", ") || "No roles assigned"}
+          </div>
+
+          <div>
+            Socket: {socket ? socket.id : "Not connected"}
           </div>
 
           {isEditing ? (
@@ -137,3 +143,4 @@ export default function UserProfile() {
     </div>
   );
 }
+
