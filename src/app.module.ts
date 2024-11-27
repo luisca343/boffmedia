@@ -29,7 +29,7 @@ import { DocumentsModule } from './smartrotom/documents/documents.module';
 import { ChatappController } from './smartrotom/chatapp/chatapp.controller';
 import { ChatappService } from './smartrotom/chatapp/chatapp.service';
 import { ChatappModule } from './smartrotom/chatapp/chatapp.module';
-import { SocketsModule } from './smartrotom/sockets/sockets.module';
+import { SocketsModule } from './sockets/sockets.module';
 import { MisionesModule } from './smartrotom/misiones/misiones.module';
 import { SmartrotomController } from './smartrotom/_main/smartrotom.controller';
 import { SmartrotomModule } from './smartrotom/_main/smartrotom.module';
@@ -56,6 +56,8 @@ import { TgcpCardService } from './boffmedia/herramientas/ptcgp/card.service';
 import { TgcpUserCardService } from './boffmedia/herramientas/ptcgp/user-card.service';
 import { TgcpPackService } from './boffmedia/herramientas/ptcgp/pack.service';
 import { TgcpScraperService } from './boffmedia/herramientas/ptcgp/scraper.service';
+import { AuthModule } from './auth/auth.module';
+//import { EventsModule } from './boffmedia/events/events.module';
 
 @Module({
   imports: [
@@ -95,7 +97,9 @@ import { TgcpScraperService } from './boffmedia/herramientas/ptcgp/scraper.servi
     LigaModule,
     ResponseModule,
     LoggerModule,
-    PtcgpModule
+    PtcgpModule,
+    //EventsModule,
+    AuthModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, {

@@ -6,7 +6,7 @@ import {
     WebSocketServer,
   } from '@nestjs/websockets';
   import { Server, Socket } from 'socket.io';
-import { ChatappService } from '../chatapp/chatapp.service';
+import { ChatappService } from '../smartrotom/chatapp/chatapp.service';
 import { Inject, forwardRef } from '@nestjs/common';
   
   @WebSocketGateway(34304, {

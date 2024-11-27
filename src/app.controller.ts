@@ -3,13 +3,44 @@ import { AppService } from './app.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createWriteStream } from 'fs';
 import { mkdir } from 'fs/promises';
+import { promises as fs } from 'fs';
 import axios from 'axios';
+import { join } from 'path';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('boffmedia')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
+
+  @Get("zomboid")
+  async zomboid() {
+    const filePath = join(__dirname, '..', 'public', 'data', 'zomboid', 'data.txt');
+    try {
+      const data = await fs.readFile(filePath, 'utf8');
+      const lines = data.split('\n');
+      const result = {};
+
+      lines.forEach(line => {
+        const [key, value] = line.split('=');
+        if (key && value) {
+          const baseKey = key.replace(/Date$/, '');
+          if (!result[baseKey]) {
+            result[baseKey] = {};
+          }
+          if (key.endsWith('Date')) {
+            result[baseKey].date = Number(value);
+          } else {
+            result[baseKey].value = Number(value);
+          }
+        }
+      });
+
+      return result;
+    } catch (err) {
+      return { error: 'Failed to read file' };
+    }
+  }
 
   @Get()
   getDBPort(): number {

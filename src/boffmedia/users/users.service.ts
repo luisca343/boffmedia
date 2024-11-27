@@ -161,7 +161,8 @@ export class UsersService {
     const roles = await this.getUserRoles(boffmedia_users.id);
 
     return {
-      username: boffmedia_users?.username,
+      id: boffmedia_users?.id,
+      name: boffmedia_users?.username,
       email: boffmedia_users?.email,
       roles,
       smartRotomUser: {
@@ -172,11 +173,57 @@ export class UsersService {
     } as SessionUser;
   }
 
+  async findByEmail(email: string): Promise<SessionUser | null> {
+    let test = await this.db.getDrizzle().select().from(boffMediaUsers)
+    .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+    .where(eq(boffMediaUsers.email, email))
+
+    if(test.length === 0) return null;
+
+    let res = test[0];
+    let user = this.getSessionUser(res);
+
+    return user;
+  }
+
+  async createFromGoogle(googleUser: any): Promise<SessionUser> {
+    console.log('Creating user from Google:', googleUser);
+    const exists = await this.db.getDrizzle().select().from(boffMediaUsers)
+    .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+    .where(eq(boffMediaUsers.email, googleUser.email));
+
+    if(exists.length > 0) {
+      console.log('User already exists:', exists[0]);
+      return this.getSessionUser(exists[0]);
+    }
+    
+
+
+    try {
+      const user = {
+        email: googleUser.email,
+        username: googleUser.email.split('@')[0], // Generate a username from email
+        password: '', // We don't need a password for Google auth
+        uuid: null, // You may want to generate a UUID here
+      };
+  
+      const result = await this.db.getDrizzle().insert(boffMediaUsers).values(user as BoffMediaUser).execute();
+      console.log('User created:', result);
+      const newUser = await this.findByEmail(user.email);
+      console.log('New user:', newUser);
+      return newUser;
+      
+    } catch (error) {
+      console.error('Error creating user from Google:', error);
+      throw error;
+    }
+  }
+  
 }
 
 
 type SessionUser = {
-  username: string,
+  name: string,
   email: string,
   smartRotomUser: {
     username: string,
