@@ -1,10 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import * as bcrypt from 'bcrypt';
-import { error } from 'console';
 import { SmartRotomUsersService } from '@/smartrotom/users/users.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -13,13 +12,6 @@ export class UsersController {
     private readonly smartrotomUsersService: SmartRotomUsersService
   
   ) {}
-
-
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    // TODO: CREATE STANDALONE BOFFMEDIA USER
-  }
-
 
   @Post('register')
   async register(@Body() createUserDto: any) {
@@ -32,6 +24,7 @@ export class UsersController {
   async login(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.validateUser(createUserDto.username, createUserDto.password);
     if (!user) return { error: 'Usuario o contraseña incorrectos' };
+    console.log('Usuario:', user);
     return user;
   }
 
@@ -67,5 +60,23 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleAuth(@Req() req) {}
+
+  @Post('google/callback')
+  async googleAuthRedirect(@Body() body) {
+    try {
+      const user = await this.usersService.findByEmail(body.email);
+      
+      if (user) return {user, ok: true};
+      const newUser = await this.usersService.createFromGoogle(body);
+      return {user: newUser, ok: true};
+    } catch (error) {
+      console.error('Error in Google callback:', error);
+      return JSON.stringify({ error: 'An error occurred during Google authentication' });
+    }
   }
 }
