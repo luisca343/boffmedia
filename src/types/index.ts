@@ -1,12 +1,12 @@
 import { DefaultSession, DefaultUser } from "next-auth"
 
 export type SmartRotomUser = {
-  username: string
+  name: string
   uuid: string
   world: string | null
 }
 
-export interface BoffUser extends DefaultUser {
+export interface BoffUser { //extends DefaultUser {
   id: string
   email: string
   username: string

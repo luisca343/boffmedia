@@ -1,4 +1,4 @@
-import { NextAuthOptions, User } from "next-auth"
+import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import { boffPOST } from '@/services/boffAPI'
@@ -66,34 +66,67 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      authorization: {
+        params: {
+          prompt: "select_account"
+        }
+      }
     })
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      console.log('==== SIGN IN ====');
+      console.log('User:', user);
+      console.log('Account:', account);
+      console.log('Profile:', profile);
+      if (account?.provider === 'google') {
+
+        console.log('Sending Google callback to backend: ', {
+          email: profile?.email,
+          name: profile?.name,
+          picture: profile?.image
+        });
+        
+        try {
+          const response = await boffPOST('/users/google/callback', { 
+            email: profile?.email,
+            name: profile?.name,
+            picture: profile?.image
+          });
+          
+          console.log('Google callback response:', response);
+
+          if (!response.ok) {
+            throw new Error('Failed to authenticate with backend');
+          }
+
+          const userData = await response.user;
+          user.id = userData.id;
+          user.roles = userData.roles;
+          user.smartRotomUser = userData.smartRotomUser;
+
+          return true;
+        } catch (error) {
+          console.error('Error in Google sign in:', error);
+          return false;
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, account }) {
+      console.log('==== JWT ====');
+      console.log('Token:', token);
+      console.log('User:', user);
+      console.log('Account:', account);
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.username = user.username;
+        token.name = user.name;
         token.roles = user.roles;
         token.smartRotomUser = user.smartRotomUser;
       }
       if (account && account.provider === "google") {
-        try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/google/callback`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ token: account.access_token }),
-          });
-          const data = await response.json();
-          if (data.error) {
-            throw new Error(data.error);
-          }
-          token = { ...token, ...data };
-        } catch (error) {
-          console.error("Error in Google callback:", error);
-        }
+        token.accessToken = account.access_token;
       }
       return token;
     },
@@ -102,7 +135,7 @@ export const authOptions: NextAuthOptions = {
         ...session.user,
         id: token.id as string,
         email: token.email as string,
-        username: token.username as string,
+        name: token.name as string,
         roles: token.roles as string[],
         smartRotomUser: token.smartRotomUser as {
           username: string;
@@ -114,14 +147,10 @@ export const authOptions: NextAuthOptions = {
     },
   },
   events: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
-        // Handle Google sign-in event
         console.log('Google user signed in:', user);
       }
-    },
-    async signOut({ token }) {
-      // logger.info('User signed out', { userId: token.id });
     },
   },
   session: {

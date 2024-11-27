@@ -51,15 +51,15 @@ export default function UserProfile() {
             <Avatar className="w-20 h-20">
               <AvatarImage
                 src={user.image || "/placeholder.svg?height=100&width=100"}
-                alt={user.username || "User"}
+                alt={user.name || "User"}
               />
               <AvatarFallback>
-                {user.username ? user.username.charAt(0).toUpperCase() : "U"}
+                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
               </AvatarFallback>
             </Avatar>
             <div>
               <h2 className="text-2xl font-semibold">
-                {user.username || "Anonymous User"}
+                {user.name || "Anonymous User"}
               </h2>
               <p className="text-muted-foreground">
                 {user.email || "No email provided"}
@@ -72,7 +72,7 @@ export default function UserProfile() {
               <Label htmlFor="name">Name</Label>
               <Input
                 id="name"
-                value={editedUser.username || ""}
+                value={editedUser.name || ""}
                 onChange={(e) =>
                   setEditedUser((prev) => ({ ...prev, username: e.target.value }))
                 }

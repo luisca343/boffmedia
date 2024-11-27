@@ -30,7 +30,7 @@ export default function UserAuthSection() {
     return (
       <>
         <Link className="text-primary-300" href='/perfil'>
-          {session.user.username || session.user.smartRotomUser.username}
+          {session.user.name || session.user.smartRotomUser?.name}
         </Link>
         <Button
           variant="ghost"

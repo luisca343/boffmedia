@@ -22,7 +22,7 @@ export default async function Ranking() {
             {ranking.map((user: any, i: number) => (
               <tr key={i} className="border-b border-surface-600">
                 <td className="py-2 text-center">{i + 1}</td>
-                <td className="py-2 text-center">{user.username}</td>
+                <td className="py-2 text-center">{user.name}</td>
                 <td className="py-2 text-center">{user.value}</td>
               </tr>
             ))}
