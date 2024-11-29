@@ -1,42 +1,55 @@
 "use client"
-import { subdomains } from "@/lib/utils";
-import { on } from "events";
-import Link from "next/link";
 
+import { useCallback, useMemo } from 'react'
+import Link from "next/link"
+import { useRouter } from 'next/navigation'
+import { subdomains } from "@/lib/utils"
 
-export function InternalLink({ href, children, className, onClick, app = null, ...props }: { href: string, children: any, className?: string, onClick?: any, app?: string | null }) {
-    if(onClick) {
-        onClick()
-    }
-
-    // Check if window exists
-    if (typeof window === 'undefined') {
-        return (<Link href={href} {...props} className={className}>{children}</Link>);
-    }
-
-    const subdomain = window.location.host.split('.')[0];
-    if(app === null) app = window.location.pathname.split('/')[1]
-
-    if(app === '') {
-        return (
-            <Link href={href} {...props}  className={className}>
-                {children}
-            </Link>
-        );
-    }
-
-    for (let s of subdomains) {
-        if (subdomain === s) {
-            return (
-                <Link href={href} {...props} className={className}>
-                    {children}
-                </Link>
-            );
-        }
-    }
-    return (
-        <Link href={`${app && `/${app}`}/${href}`} {...props} className={className}>
-            {children}
-        </Link>
-    );
+interface InternalLinkProps {
+  href: string
+  children: React.ReactNode
+  className?: string
+  onClick?: () => void
+  app?: string | null
 }
+
+export function InternalLink({ href, children, className, onClick, app = null, ...props }: InternalLinkProps) {
+  const router = useRouter()
+
+  const subdomain = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.host.split('.')[0]
+    }
+    return ''
+  }, [])
+
+  const currentApp = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname.split('/')[1] || ''
+    }
+    return ''
+  }, [])
+
+  const isSubdomain = useMemo(() => subdomains.includes(subdomain), [subdomain])
+
+  const finalHref = useMemo(() => {
+    if (app === '') return href
+    if (isSubdomain) return href
+    return `${app || currentApp ? `/${app || currentApp}` : ''}${href}`
+  }, [href, app, isSubdomain, currentApp])
+
+  const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    if (onClick) {
+      onClick()
+    }
+    router.push(finalHref)
+  }, [onClick, router, finalHref])
+
+  return (
+    <Link href={finalHref} {...props} className={className} onClick={handleClick}>
+      {children}
+    </Link>
+  )
+}
+

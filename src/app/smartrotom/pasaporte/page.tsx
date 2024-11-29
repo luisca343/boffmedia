@@ -16,8 +16,8 @@ import { useBoffSession } from "@/services/useBoffSession";
 export default function Pasaporte(){
   const [book, setBook] = useState(null) as any
   const { session } = useBoffSession();
-  const uuid = session?.user.smartRotomUser.uuid as string
-  const username = session?.user.smartRotomUser.username as string
+  const uuid = session?.user.smartRotomUser?.uuid as string
+  const username = session?.user.smartRotomUser?.name as string
 
   const {stats} = useGetStats(uuid)
   const {currentTeam } = useGetCurrentTeam(uuid)

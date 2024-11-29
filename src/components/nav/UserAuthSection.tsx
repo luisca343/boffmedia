@@ -30,7 +30,7 @@ export default function UserAuthSection() {
     return (
       <>
         <Link className="text-primary-300" href='/perfil'>
-          {session.user.username || session.user.smartRotomUser.username}
+          {session.user.name || session.user.smartRotomUser?.name}
         </Link>
         <Button
           variant="ghost"
@@ -48,7 +48,7 @@ export default function UserAuthSection() {
     <>
       <Button
         variant="ghost"
-        onClick={() => router.push("/auth?mode=login")}
+        onClick={() => router.push("/api/auth/signin")}
         className="text-primary-300 hover:text-primary-200 hover:bg-surface-800 transition-colors duration-200"
       >
         <LogIn className="h-5 w-5 mr-2" />

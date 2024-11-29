@@ -20,7 +20,7 @@ export default function UserGallery() {
   const [changes, setChanges] = useState<Record<string, number>>({});
 
   const { allCards, userCards, loading, error, updateUserCards } =
-    useGalleryData(session?.user?.username || "");
+    useGalleryData(session?.user?.name || "");
 
   if (status === "loading") {
     return (
@@ -68,5 +68,5 @@ export default function UserGallery() {
     );
   }
 
-  return <PlayerGallery username={session.user.username} />;
+  return <PlayerGallery username={session.user.name!} />;
 }

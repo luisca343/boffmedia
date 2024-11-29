@@ -12,9 +12,9 @@ import { LoadingScreen } from "./Loading";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { CallStatus } from "./CallStatus";
-import { BoffSession } from "@/types";
 import { getMcUserData } from "@/services/mcef/mcefApi";
 import { AuthForm } from "@/app/auth/AuthForm";
+import { Session } from "next-auth";
 
 
 export default function AppWrapper({
@@ -23,7 +23,7 @@ export default function AppWrapper({
   children: React.ReactNode;
 }) {
   const { data: session, status } = useSession() as {
-    data: BoffSession | null;
+    data: Session;
     status: string;
   };
   const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
@@ -97,7 +97,7 @@ export default function AppWrapper({
   }
 
   function boffMediaLinked(): boolean {
-    return session?.user.username ? true : false;
+    return session?.user.name ? true : false;
   }
 
   function smartRotomLinked(): boolean {
