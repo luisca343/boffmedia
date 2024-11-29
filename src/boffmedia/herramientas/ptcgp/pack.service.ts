@@ -281,7 +281,7 @@ export class TgcpPackService {
     const missingEventCards = eventCards.filter(
       (eventCard) =>
         !presentCards.some((presentCard) =>
-          presentCard.name.toLowerCase().includes(eventCard.toLowerCase()),
+          presentCard.name.toLowerCase().replace("ex", "").trim() === (eventCard.toLowerCase()),
         ),
     );
   
