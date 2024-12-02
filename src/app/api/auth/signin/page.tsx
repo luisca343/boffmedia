@@ -1,10 +1,10 @@
-
-import { AuthForm } from "@/app/auth/AuthForm"
+import { Suspense } from 'react';
+import { AuthForm } from "@/app/auth/AuthForm";
 
 export default function SignInPage() {
   return (
-    <div>
+    <Suspense fallback={<div>Loading...</div>}>
       <AuthForm redirect="/" />
-    </div>
-  )
+    </Suspense>
+  );
 }
