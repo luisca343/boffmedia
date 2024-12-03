@@ -114,10 +114,6 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async jwt({ token, user, account }) {
-      console.log('==== JWT ====');
-      console.log('Token:', token);
-      console.log('User:', user);
-      console.log('Account:', account);
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -157,6 +153,6 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
 }
 
