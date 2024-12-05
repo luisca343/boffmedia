@@ -57,6 +57,7 @@ import { TgcpUserCardService } from './boffmedia/herramientas/ptcgp/user-card.se
 import { TgcpPackService } from './boffmedia/herramientas/ptcgp/pack.service';
 import { TgcpScraperService } from './boffmedia/herramientas/ptcgp/scraper.service';
 import { AuthModule } from './auth/auth.module';
+import { ShowdownGateway } from './battlesimulator/showdown.gateway';
 //import { EventsModule } from './boffmedia/events/events.module';
 
 @Module({
@@ -105,7 +106,7 @@ import { AuthModule } from './auth/auth.module';
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, {
     provide: ConfigService,
     useClass: ConfigService,
-  }, TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService
+  }, TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, ShowdownGateway
 
 ],
   exports: [ConfigService]
