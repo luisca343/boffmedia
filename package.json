@@ -38,6 +38,7 @@
     "@pkmn/client": "^0.6.25",
     "@pkmn/data": "^0.9.5",
     "@pkmn/img": "^0.2.28",
+    "@pkmn/login": "^0.2.0",
     "@pkmn/protocol": "^0.6.25",
     "@pkmn/randoms": "^0.9.5",
     "@pkmn/sim": "^0.9.5",
