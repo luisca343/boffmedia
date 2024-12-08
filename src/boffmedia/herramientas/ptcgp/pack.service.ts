@@ -184,6 +184,7 @@ export class TgcpPackService {
       [key: string]: {
         newCardProbabilities: number[];
         aggregateProbability: number;
+        availableCards: string[];
       };
     } = {};
 
@@ -191,6 +192,7 @@ export class TgcpPackService {
       packProbabilities[packId] = {
         newCardProbabilities: [0, 0, 0, 0, 0],
         aggregateProbability: 0,
+        availableCards: [],
       };
 
       for (const rarity in accumulatedChances[packId]) {
@@ -206,6 +208,9 @@ export class TgcpPackService {
           (acc, prob) => acc * (1 - prob),
           1,
         );
+      packProbabilities[packId].availableCards = missingCards
+        .filter(card => card.pack === packId)
+        .map(card => card.name);
     }
 
     const bestPack = Object.entries(packProbabilities).reduce(
@@ -360,6 +365,7 @@ export class TgcpPackService {
       [key: string]: {
         newCardProbabilities: number[];
         aggregateProbability: number;
+        availableCards: string[];
       };
     } = {};
   
@@ -367,6 +373,7 @@ export class TgcpPackService {
       packProbabilities[packId] = {
         newCardProbabilities: [0, 0, 0, 0, 0],
         aggregateProbability: 0,
+        availableCards: [],
       };
   
       for (const rarity in accumulatedChances[packId]) {
@@ -380,6 +387,9 @@ export class TgcpPackService {
           (acc, prob) => acc * (1 - Math.min(prob, 1)),
           1,
         );
+      packProbabilities[packId].availableCards = missingCards
+        .filter(card => packCards.some(pc => pc.name === card.name && pc.packId === packId))
+        .map(card => card.name);
     }
   
     const bestPack = Object.entries(packProbabilities).reduce(
@@ -417,3 +427,4 @@ export class TgcpPackService {
     };
   }
 }
+
