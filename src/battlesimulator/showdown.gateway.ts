@@ -84,6 +84,7 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
         if (clientId) {
           const clientData = this.clients.get(clientId);
           if (clientData) {
+            clientData.showdownWs.send(cmd);
             client.emit('loginSuccess', cmd);
           }
         }
