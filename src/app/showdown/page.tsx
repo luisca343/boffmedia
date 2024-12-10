@@ -1,9 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { io, Socket } from 'socket.io-client'
 
-import { Protocol } from '@pkmn/protocol'
+import { Args, Protocol } from '@pkmn/protocol'
+import { UpdateUserResult, QueryType } from './util/types'
+import { handleChallstr, handleFormats, handleUpdateSearch, handleUpdateUser } from './util/queryHandler'
 
 const SERVER = 'http://localhost:34305'
 const RECONNECT_INTERVAL = 5000 // 5 seconds
@@ -21,11 +23,15 @@ export default function ShowdownPage() {
   const [isConnected, setIsConnected] = useState(false)
   const [challstr, setChallstr] = useState('')
 
-  const addMessage = useCallback((type: Message['type'], content: string) => {
-    setMessages(prev => [...prev, { type, content }])
-  }, [])
+  const [battles, setBattles] = useState<{
+    [roomid: string]: string
+  }>({})
 
-  const connectWebSocket = useCallback(() => {
+  function addMessage(type: Message['type'], content: string) {
+    setMessages(prev => [...prev, { type, content }])
+  }
+
+  function connectWebSocket() {
     if (socket) {
       socket.disconnect()
     }
@@ -44,31 +50,52 @@ export default function ShowdownPage() {
 
 
     newSocket.on('showdownMessage', (data: string) => {
+      let roomid = 'lobby';
       if (data.charAt(0) === '>') {
         const nlIndex = data.indexOf('\n');
         if (nlIndex < 0) return;
-        const roomid = toRoomid(data.substring(1, nlIndex));
+        roomid = toRoomid(data.substring(1, nlIndex));
         data = data.substring(nlIndex + 1);
-    }
+      }
 
-    const lines = data.split('\n');
+      const lines = data.split('\n');
 
-    lines.forEach((line) => {
-        const parsed = Protocol.parseLine(line);
-        console.log('Parsed message:', parsed);
-        addMessage('received', `Received: ${line}`);
-    });
+      lines.forEach((line) => {
+        const message = Protocol.parseLine(line) as any;
 
-    /*
-      addMessage('received', `Received: ${data}`)
+        if (!message) return;
 
-      const parsed = Protocol.parseLine(data)
-      console.log('Parsed message:', parsed)*/
+        const queryType = message[0] as QueryType;
 
+        switch (queryType) {
+          case 'updateuser':
+            const updateUser = handleUpdateUser(message);
+            console.log('Update user:', updateUser);
+            break;
+          case 'challstr':
+            const challStrResult = handleChallstr(message);
+            setChallstr(challStrResult.challstr);
+            break;
+          case 'formats':
+            const formats = handleFormats(message);
+            console.log('Formats:', formats);
+            break;
+          case 'updatesearch':
+            const updateSearch = handleUpdateSearch(message);
+            break;
+          default:
+            console.warn(`Unhandled message type: ${queryType}`, message);
+        }
+
+        console.log(`[${roomid}]:`, message);
+        addMessage('received', `[${roomid}]: ${line}`);
+      });
+
+      /*
       if (data.startsWith('|challstr|')) {
         const newChallstr = data.slice(10)
         setChallstr(newChallstr)
-      }
+      }*/
     })
 
     newSocket.on('disconnect', (reason) => {
@@ -97,7 +124,7 @@ export default function ShowdownPage() {
     })
 
     setSocket(newSocket)
-  }, [addMessage])
+  }
 
   useEffect(() => {
     connectWebSocket()
@@ -107,9 +134,9 @@ export default function ShowdownPage() {
         socket.disconnect()
       }
     }
-  }, [connectWebSocket])
+  }, [])
 
-  const sendMessage = (message: string) => {
+  function sendMessage(message: string) {
     if (socket && socket.connected) {
       socket.emit('sendToShowdown', message)
       addMessage('sent', `Sent: ${message}`)
@@ -118,7 +145,7 @@ export default function ShowdownPage() {
     }
   }
 
-  const handleLogin = () => {
+  function handleLogin() {
     if (!username || !password) {
       addMessage('error', 'Login failed: Username or password not set')
       return
@@ -137,7 +164,14 @@ export default function ShowdownPage() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 h-full flex flex-col">
+    <nav>
+        {Object.entries(battles).map(([roomid, battle]) => (
+          <div key={roomid} className="flex items-center">
+            {battle}
+          </div>
+        ))}
+    </nav>
       <h1 className="text-2xl font-bold mb-4">Showdown Connection</h1>
       <div className="mb-4">
         <input
@@ -179,7 +213,7 @@ export default function ShowdownPage() {
           Reconnect
         </button>
       </div>
-      <div className="border p-4 h-64 overflow-y-auto">
+      <div className="border p-4 flex-1 overflow-y-auto">
         {messages.map((msg, index) => (
           <p key={index} className={`${
             msg.type === 'error' ? 'text-red-500' :
@@ -199,3 +233,4 @@ export default function ShowdownPage() {
 function toRoomid(roomid: string) {
 	return roomid.replace(/[^a-zA-Z0-9-]+/g, '').toLowerCase();
 }
+
