@@ -304,8 +304,8 @@ export class TgcpPackService {
   
     // Filter the expansion cards to only include the missing event cards
     const missingCards = expansionCards.filter((card) =>
-      missingEventCards.some((eventCard) =>
-        card.name.toLowerCase().includes(eventCard.toLowerCase()),
+      missingEventCards.some((eventCard) => 
+        card.name.toLowerCase().replace(" ex", "").trim() === eventCard.toLowerCase(),
       ),
     );
   
@@ -341,6 +341,7 @@ export class TgcpPackService {
       const packCardsForMissingCard = packCards.filter(
         (pc) => pc.cardNumber === card.number
       );
+
   
       for (const packCard of packCardsForMissingCard) {
         if (!accumulatedChances[packCard.packId]) {

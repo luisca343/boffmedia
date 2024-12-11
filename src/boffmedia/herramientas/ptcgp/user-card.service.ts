@@ -140,7 +140,6 @@ export class TgcpUserCardService {
       .offset(offset)
       .execute();
 
-    console.log('updates', updates);
     return updates;
   }
 }
