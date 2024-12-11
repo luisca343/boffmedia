@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { apiReference } from '@scalar/nestjs-api-reference'
+
 const bodyParser = require('body-parser');
 
 async function bootstrap() {
@@ -81,7 +83,17 @@ async function bootstrap() {
       document.components.schemas = sortedSchemas;
     }
   
-    SwaggerModule.setup('api', app, document);
+    //SwaggerModule.setup('api', app, document);
+  
+    app.use(
+      '/reference',
+      apiReference({
+        spec: {
+          content: document,
+        },
+      }),
+    )
+
   }
 
   await app.listen(34301);
