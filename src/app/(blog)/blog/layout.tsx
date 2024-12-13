@@ -1,3 +1,4 @@
+import { GlobalProviders } from "@/app/GlobalProviders";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
@@ -14,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
+    <GlobalProviders>
         {children}
-    </div>
+    </GlobalProviders>
   );
 }

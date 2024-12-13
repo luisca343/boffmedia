@@ -1,9 +1,10 @@
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from "next-auth/providers/credentials"
-import GoogleProvider from "next-auth/providers/google"
-import { boffPOST } from '@/services/boffAPI'
-import { BoffUser } from "@/types"
-import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors'
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { boffPOST } from '@/services/boffAPI';
+import { BoffUser } from "@/types";
+import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
+import { CookiesOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -80,7 +81,6 @@ export const authOptions: NextAuthOptions = {
       console.log('Account:', account);
       console.log('Profile:', profile);
       if (account?.provider === 'google') {
-
         console.log('Sending Google callback to backend: ', {
           email: profile?.email,
           name: profile?.name,
@@ -124,6 +124,7 @@ export const authOptions: NextAuthOptions = {
       if (account && account.provider === "google") {
         token.accessToken = account.access_token;
       }
+      console.log('JWT token:', token);
       return token;
     },
     async session({ session, token }) {
@@ -139,6 +140,7 @@ export const authOptions: NextAuthOptions = {
           world: string;
         } | undefined
       } as BoffUser;
+      console.log('Session:', session);
       return session;
     },
   },
@@ -154,5 +156,17 @@ export const authOptions: NextAuthOptions = {
     maxAge: 60 * 60 * 24 * 30, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET,
-}
+  cookies: {
+    sessionToken: {
+      name: `__Secure-next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.boffmedia.es' : '.ficuslab.es'
+      }
+    }
+  } as Partial<CookiesOptions>,
+};
 
