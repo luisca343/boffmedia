@@ -12,7 +12,7 @@ import OptimizedFicusNav from "@/components/nav/FicusNav";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BoffMedia",
+  title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
   description: "BoffMedia",
 };
 

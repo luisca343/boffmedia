@@ -12,7 +12,7 @@ import BoffLayout from "./_components/BoffLayout";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BoffMedia",
+  title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
   description: "BoffMedia",
 };
 
