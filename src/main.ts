@@ -16,6 +16,7 @@ async function bootstrap() {
     'https://boffmedia.es',
     'http://local.boffmedia.es',
     'http://smartrotom.local.boffmedia.es',
+    'https://ficuslab.es',
     'https://blog.ficuslab.es',
   ];
   app.enableCors({ origin }); // Enable CORS for the specified origin
