@@ -4,11 +4,14 @@
 
     "geneticapex": "Genes Formidables",
     "promo-a": "Promo A",
+    "mythicalisland": "Isla Singular",
 
     "packs": {
       "mewtwo": "Mewtwo - Genes Formidables",
       "charizard": "Charizard - Genes Formidables",
-      "pikachu": "Pikachu - Genes Formidables"
+      "pikachu": "Pikachu - Genes Formidables",
+
+      "mew": "Mew - Isla Singular"
     },
 
     "mewQuest": "Misión de Mew"
