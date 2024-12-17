@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Users, CreditCard, ChevronRight } from "lucide-react";
+import { Search, Users, CreditCard, ChevronRight, SwordIcon } from "lucide-react";
 
 export default function TCGPocket() {
   const [username, setUsername] = useState("");
@@ -36,6 +36,12 @@ export default function TCGPocket() {
       description: "Navega por todas las cartas disponibles",
       icon: CreditCard,
       href: "/pokemon/tcgpocket/cartas",
+    },
+    {
+      title: "Combates individuales",
+      description: "Comprueba los equipos y recompensas",
+      icon: SwordIcon,
+      href: "/pokemon/tcgpocket/combates",
     },
   ];
 
