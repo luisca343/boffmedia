@@ -6,6 +6,11 @@ import { TgcpCardService } from './card.service';
 import { TgcpUserCardService } from './user-card.service';
 import { TgcpPackService } from './pack.service';
 import { TgcpScraperService } from './scraper.service';
+import { PtcgpBattleService } from './battle.service';
+
+import * as fs from 'fs';
+import * as path from 'path';
+import { promises as fsPromises } from 'fs';
 
 @ApiTags('/herramientas/ptcgp')
 @Controller('/herramientas/ptcgp')
@@ -14,7 +19,8 @@ export class PtcgpController {
         private cardService: TgcpCardService,
         private userCardService: TgcpUserCardService,
         private packService: TgcpPackService,
-        private scraperService: TgcpScraperService
+        private scraperService: TgcpScraperService,
+        private battleService: PtcgpBattleService
     ) {}
 
     @Get("/serebii")
@@ -213,4 +219,39 @@ export class PtcgpController {
       }
     }
 
+    @Get("battle-data/:id")
+    @ApiOperation({ summary: 'Get battle data' })
+    @ApiResponse({ status: 200, description: 'Battle data found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find battle data.' })
+    async getBattleData(@Param('id') id: string): Promise<any> {
+        return this.battleService.getBattleData(`https://www.serebii.net/tcgpocket/solobattles/${id}.shtml`);
+    }
+
+    @Get("combate2/:id")
+    @ApiOperation({ summary: 'Get battle data 2' })
+    @ApiResponse({ status: 200, description: 'Battle data found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find battle data.' })
+    async getBattleData2(@Param('id') id: string): Promise<any> {
+      const data = await fsPromises.readFile(`public/data/tcgpocket/battles/${id}.json`, 'utf8');
+      const battleData = JSON.parse(data);
+      return battleData;
+        
+    }
+
+    @Get("scrapesolobattles")
+    @ApiOperation({ summary: 'Scrape solo battles' })
+    @ApiResponse({ status: 200, description: 'Solo battles scraped successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to scrape solo battles.' })
+    async getSoloBattles(): Promise<any> {
+        return this.scraperService.scrapeSoloBattles();
+    }
+
+    @Get("solobattles")
+    @ApiOperation({ summary: 'Get solo battles' })
+    @ApiResponse({ status: 200, description: 'Solo battles found successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to find solo battles.' })
+    async getSoloBattles2(): Promise<any> {
+        const battles = await fsPromises.readFile('public/data/tcgpocket/solobattles.json', 'utf8');
+        return JSON.parse(battles);
+    }
 }

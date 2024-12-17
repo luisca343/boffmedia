@@ -7,6 +7,7 @@ import { TgcpCardService } from './card.service';
 import { TgcpUserCardService } from './user-card.service';
 import { TgcpPackService } from './pack.service';
 import { TgcpScraperService } from './scraper.service';
+import { PtcgpBattleService } from './battle.service';
 
 @Module({
   imports: [ConfigModule],
@@ -17,6 +18,7 @@ import { TgcpScraperService } from './scraper.service';
     TgcpPackService,
     TgcpScraperService,
     ConfigService,
+    PtcgpBattleService,
     MySQL2Service
   ],
 })

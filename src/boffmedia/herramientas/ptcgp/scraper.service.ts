@@ -5,7 +5,7 @@ import { ConfigService } from '@/config.service';
 import { Observable, Subject } from 'rxjs';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { tcgpBoosterPacks, tcgpCards, tcgpCardsPacks, tcgpExpansions } from '@/_db/schema/TCGP';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 interface FetchStatusData {
   status: 'fetching' | 'success' | 'error';
@@ -16,7 +16,7 @@ interface FetchStatusData {
 @Injectable()
 export class TgcpScraperService {
   private readonly logger = new Logger(TgcpScraperService.name);
-  private readonly subdir = 'ptgcp';
+  private readonly subdir = 'tcgpocket';
   private readonly baseUrl = 'https://www.serebii.net';
   private fetchStatus = new Subject<FetchStatusData>();
 
@@ -24,6 +24,7 @@ export class TgcpScraperService {
     private db: MySQL2Service,
     private configService: ConfigService
   ) {}
+
 
   async getSets(): Promise<any> {
     const sets = await this.configService.readDataFile(this.subdir, 'sets.json');
@@ -33,6 +34,53 @@ export class TgcpScraperService {
     }
     this.logger.log('Datos de Serebii no encontrados en caché, iniciando búsqueda...');
     return this.startFetch();
+  }
+
+  async scrapeSoloBattles(){
+    try {
+      console.log('Fetching solo battles data from Serebii...');
+      const response = await axios.get('https://www.serebii.net/tcgpocket/solobattles.shtml');
+      const $ = cheerio.load(response.data);
+      
+      const soloBattles = {};
+      let currentLocation = null;
+  
+      // Find all location headers and their content
+      $('td.fooevo, td.fooinfo').each((_, element) => {
+        const $element = $(element);
+        
+        if ($element.hasClass('fooevo')) {
+          const locationName = $element.text().trim();
+          if (locationName) {
+            currentLocation = locationName;
+            soloBattles[currentLocation] = [];
+          }
+        } else if ($element.hasClass('fooinfo') && currentLocation) {
+          // Process each battle within the current location
+          $element.find('a').each((_, link) => {
+            const $link = $(link);
+            const battleName = $link.text().trim();
+            const battleUrl = $link.attr('href');
+            if (battleName && battleUrl) {
+              const battleId = battleUrl.split('/').pop()?.split('.')[0] || '';
+              soloBattles[currentLocation].push({
+                id: battleId,
+                name: battleName,
+                url: `https://www.serebii.net/tcgpocket/${battleUrl}`
+              });
+            }
+          });
+        }
+      });
+  
+      console.log('Scraped Solo Battles structure:');
+      console.log(JSON.stringify(soloBattles, null, 2));
+      
+      return soloBattles;
+    } catch (error) {
+      console.error('Error scraping solo battles:', error);
+      throw error;
+    }
   }
 
   async startFetch(): Promise<any> {
@@ -140,20 +188,45 @@ export class TgcpScraperService {
 
         const url = `${this.baseUrl}/tcgpocket/${setId}/`;
 
-        const exists = await this.db.getDrizzle().select().from(tcgpExpansions).where(eq(tcgpExpansions.name, setName)).execute();
+        const [existingSet] = await this.db.getDrizzle()
+          .select()
+          .from(tcgpExpansions)
+          .where(eq(tcgpExpansions.id, setId))
+          .execute();
 
-        if (exists.length > 0) {
-          console.log(`Set ${setName} already exists in the database, skipping...`);
-          continue;
+        if (!existingSet) {
+          await this.db.getDrizzle().insert(tcgpExpansions).values({
+            id: setId,
+            name: setName,
+            logo_url: setLogo,
+            icon_url: setIcon,
+            type: sectionId,
+          }).execute();
+          console.log(`Set ${setName} added to the database.`);
+        } else {
+          // Check if any fields need updating
+          const needsUpdate = existingSet.name !== setName ||
+                              existingSet.logo_url !== setLogo ||
+                              existingSet.icon_url !== setIcon ||
+                              existingSet.type !== sectionId;
+
+          if (needsUpdate) {
+            await this.db.getDrizzle()
+              .update(tcgpExpansions)
+              .set({
+                name: setName,
+                logo_url: setLogo,
+                icon_url: setIcon,
+                type: sectionId,
+              })
+              .where(eq(tcgpExpansions.id, setId))
+              .execute();
+            console.log(`Set ${setName} updated in the database.`);
+          } else {
+            console.log(`Set ${setName} already exists and is up to date.`);
+          }
         }
 
-        this.db.getDrizzle().insert(tcgpExpansions).values({
-          id: setId,
-          name: setName,
-          logo_url: setLogo,
-          icon_url: setIcon,
-          type: sectionId,
-        }).execute();
 
         try {
           const response = await axios.get(url);
@@ -183,19 +256,26 @@ export class TgcpScraperService {
         localImagePath = await this.saveImage(imageUrl);
       }
 
-      console.log(`Inserting booster pack ${packNames[i]} for set ${setName}`);
-      console.log(
-        {
-          name: packNames[i],
-          image_url: localImagePath,
-          expansion: setName,
-        }
-      )
+      console.log(`Processing booster pack ${packNames[i]} for set ${setName}`);
 
-      this.db.getDrizzle().insert(tcgpBoosterPacks).values({
-        name: packNames[i],
-        expansion: setName,
-      }).execute();
+      const existingPack = await this.db.getDrizzle()
+        .select()
+        .from(tcgpBoosterPacks)
+        .where(and(
+          eq(tcgpBoosterPacks.name, packNames[i]),
+          eq(tcgpBoosterPacks.expansion, setName)
+        ))
+        .execute();
+
+      if (existingPack.length === 0) {
+        await this.db.getDrizzle().insert(tcgpBoosterPacks).values({
+          name: packNames[i],
+          expansion: setName,
+        }).execute();
+        console.log(`Inserted new booster pack ${packNames[i]} for set ${setName}`);
+      } else {
+        console.log(`Booster pack ${packNames[i]} for set ${setName} already exists, skipping insertion`);
+      }
     }
 
     return boosterPacks;
@@ -251,29 +331,41 @@ export class TgcpScraperService {
       const cardImageUrl = `${this.baseUrl}/tcgpocket/${setName}/${number}.jpg`;
       const cardImagePath = await this.saveCardImage(cardImageUrl, setName, number);
 
-      const card = {
-        id: `${setName}-${number}`,
-        expansion: setName,
-        name,
-        number,
-        rarity,
-        type,
-        hp,
-        weakness,
-        weakness_value: weaknessValue,
-        retreat_cost: retreatCost,
-      } as any;
+      const existingCard = await this.db.getDrizzle()
+        .select()
+        .from(tcgpCards)
+        .where(and(eq(tcgpCards.expansion, setName), eq(tcgpCards.number, number)))
+        .execute();
 
-      const result = await this.db.getDrizzle().insert(tcgpCards).values(card);
-      const resultId = result[0].insertId;
-
-      packIds.forEach(packName => {
-        this.db.getDrizzle().insert(tcgpCardsPacks).values({
+      if (existingCard.length === 0) {
+        const card = {
+          id: `${setName}-${number}`,
           expansion: setName,
-          card_number: number,
-          pack_id: packName,
-        }).execute();
-      });
+          name,
+          number,
+          rarity,
+          type,
+          hp,
+          weakness,
+          weakness_value: weaknessValue,
+          retreat_cost: retreatCost,
+        } as any;
+
+        const result = await this.db.getDrizzle().insert(tcgpCards).values(card);
+        const resultId = result[0].insertId;
+
+        console.log(`New card added: ${name} (${setName}-${number})`);
+
+        for (const packName of packIds) {
+          await this.db.getDrizzle().insert(tcgpCardsPacks).values({
+            expansion: setName,
+            card_number: number,
+            pack_id: packName,
+          }).execute();
+        }
+      } else {
+        console.log(`Card already exists: ${name} (${setName}-${number})`);
+      }
     }
 
     this.logger.debug(`Scraped ${cards.length} cards from ${setName}`);
@@ -295,7 +387,7 @@ export class TgcpScraperService {
     }
     
     // Ensure 'tcgpocket' is always present
-    if (!parts.includes('tcgpocket')) {
+    if (!parts.includes('tcgpоcket')) {
       parts.unshift('tcgpocket');
     }
     
@@ -327,4 +419,7 @@ export class TgcpScraperService {
     this.configService.saveImageFromUrl(imageUrl, localPath);
     return localPath;
   }
+
+  
 }
+
