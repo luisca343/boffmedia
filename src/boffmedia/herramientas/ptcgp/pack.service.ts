@@ -7,7 +7,7 @@ import {
   tcgpCardsPacks,
   tcgpUsersCards,
 } from '@/_db/schema/TCGP';
-import { and, eq, isNull } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 @Injectable()
@@ -243,6 +243,154 @@ export class TgcpPackService {
     };
   }
 
+  async getBestPackForExpansion(username: string, expansion: string) {
+    const db = this.db.getDrizzle();
+
+    const user = await db
+      .select({ id: boffMediaUsers.id })
+      .from(boffMediaUsers)
+      .where(eq(boffMediaUsers.username, username))
+      .execute();
+
+    if (user.length === 0) {
+      throw new Error('User not found');
+    }
+
+    const userId = user[0].id;
+
+    const missingCards = await db
+      .select({
+        expansion: tcgpCards.expansion,
+        number: tcgpCards.number,
+        rarity: tcgpCards.rarity,
+        name: tcgpCards.name,
+        pack: tcgpCardsPacks.pack_id,
+      })
+      .from(tcgpCards)
+      .leftJoin(
+        tcgpUsersCards,
+        and(
+          eq(tcgpUsersCards.user_id, userId),
+          eq(tcgpUsersCards.expansion, tcgpCards.expansion),
+          eq(tcgpUsersCards.card_number, tcgpCards.number),
+        ),
+      )
+      .leftJoin(
+        tcgpCardsPacks,
+        and(
+          eq(tcgpCardsPacks.expansion, tcgpCards.expansion),
+          eq(tcgpCardsPacks.card_number, tcgpCards.number),
+        ),
+      )
+      .where(
+        and(
+          isNull(tcgpUsersCards.user_id),
+          eq(tcgpCards.expansion, expansion)
+        )
+      )
+      .execute();
+
+    const totalExpansionCards = await db
+      .select({ count: sql`count(*)` })
+      .from(tcgpCards)
+      .where(eq(tcgpCards.expansion, expansion))
+      .execute();
+
+    const totalCards = totalExpansionCards[0]?.count || 0;
+
+    const accumulatedChances: {
+      [boosterPack: string]: { [key: string]: number[] };
+    } = {};
+
+    for (const card of missingCards) {
+      if (!card.pack) continue;
+      if (!accumulatedChances[card.pack]) {
+        accumulatedChances[card.pack] = {};
+      }
+
+      const packProbabilities = await this.calculateIndividualProbabilities(card.expansion, card.pack);
+
+      if (
+        typeof packProbabilities === 'object' &&
+        !('message' in packProbabilities)
+      ) {
+        if (!accumulatedChances[card.pack][card.rarity]) {
+          accumulatedChances[card.pack][card.rarity] = [0, 0, 0, 0, 0];
+        }
+
+        for (let i = 0; i < 5; i++) {
+          accumulatedChances[card.pack][card.rarity][i] +=
+            packProbabilities[card.rarity][i];
+        }
+      }
+    }
+
+    const packProbabilities: {
+      [key: string]: {
+        newCardProbabilities: number[];
+        aggregateProbability: number;
+        availableCards: string[];
+      };
+    } = {};
+
+    for (const packId in accumulatedChances) {
+      packProbabilities[packId] = {
+        newCardProbabilities: [0, 0, 0, 0, 0],
+        aggregateProbability: 0,
+        availableCards: [],
+      };
+
+      for (const rarity in accumulatedChances[packId]) {
+        for (let i = 0; i < 5; i++) {
+          packProbabilities[packId].newCardProbabilities[i] +=
+            accumulatedChances[packId][rarity][i];
+        }
+      }
+
+      packProbabilities[packId].aggregateProbability =
+        1 -
+        packProbabilities[packId].newCardProbabilities.reduce(
+          (acc, prob) => acc * (1 - prob),
+          1,
+        );
+      packProbabilities[packId].availableCards = missingCards
+        .filter(card => card.pack === packId)
+        .map(card => card.name);
+    }
+
+    const bestPack = Object.entries(packProbabilities).reduce(
+      (best, [packId, probabilities]) => {
+        return probabilities.aggregateProbability > best.probability
+          ? { packId, probability: probabilities.aggregateProbability }
+          : best;
+      },
+      { packId: null, probability: -1 },
+    );
+
+    if (bestPack.packId === null) {
+      return { message: `You have all the cards for the ${expansion} expansion! No best pack to recommend.` };
+    }
+
+    const packDetails = await db
+      .select()
+      .from(tcgpBoosterPacks)
+      .where(eq(tcgpBoosterPacks.name, bestPack.packId))
+      .execute();
+
+    if (packDetails.length === 0) {
+      return { message: 'Best pack details not found in the database.' };
+    }
+
+    return {
+      bestPack: packDetails[0],
+      probabilities: packProbabilities[bestPack.packId],
+      allPackProbabilities: packProbabilities,
+      missingCards: missingCards.map(card => card.name),
+      totalMissingCards: missingCards.length,
+      totalCards: totalCards,
+    };
+  }
+
   async getBestPackForEvent(
     username: string,
     eventCards: string[],
@@ -423,8 +571,8 @@ export class TgcpPackService {
       bestPack: packDetails[0],
       probabilities: packProbabilities[bestPack.packId],
       allPackProbabilities: packProbabilities,
-      missingEventCards,
-      totalEventCards: eventCards.length,
+      missingCards: missingEventCards,
+      totalCards: eventCards.length,
     };
   }
 }

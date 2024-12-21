@@ -122,6 +122,22 @@ export class PtcgpController {
       }
     }
     
+    @Post("best-pack-for-expansion")
+    @ApiOperation({ summary: 'Get the best pack to pull for a specific expansion' })
+    @ApiResponse({ status: 200, description: 'Best pack for expansion found successfully.' })
+    @ApiResponse({ status: 401, description: 'Unauthorized.' })
+    @ApiResponse({ status: 500, description: 'Failed to find best pack for expansion.' })
+    async getBestPackForExpansion(@Body() data: { username: string, eventName: string }) {
+      try {
+        const result = await this.packService.getBestPackForExpansion(data.username, data.eventName);
+        if (result.message) {
+          return { message: result.message };
+        }
+        return result;
+      } catch (error) {
+        throw new HttpException('Failed to get best pack for expansion', HttpStatus.INTERNAL_SERVER_ERROR);
+      }
+    }
   
     @Post("best-pack-for-event")
     @ApiOperation({ summary: 'Get the best pack to pull for a specific event' })
