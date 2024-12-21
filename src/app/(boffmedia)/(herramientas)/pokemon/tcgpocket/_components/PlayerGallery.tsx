@@ -127,7 +127,8 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
           setIsDialogOpen(true)
         }
       } else {
-        const result = await boffPOST('/herramientas/ptcgp/best-pack-for-event', { username, eventName: selectedEvent })
+        const [type, eventName] = selectedEvent.split(':')
+        const result = await boffPOST(`/herramientas/ptcgp/best-pack-for-${type}`, { username, eventName: eventName })
         if (result.message) {
           toast.info(result.message)
         } else {

@@ -83,7 +83,9 @@ export function PlayerGalleryHeader({
             </SelectTrigger>
             <SelectContent className="bg-surface-700 text-white border-surface-600">
               <SelectItem value="general">Todas las cartas</SelectItem>
-              <SelectItem value="mewQuest">{trans("mewQuest")}</SelectItem>
+              <SelectItem value="expansion:geneticapex">{trans("geneticapex")}</SelectItem>
+              <SelectItem value="expansion:mythicalisland">{trans("mythicalisland")}</SelectItem>
+              <SelectItem value="event:mewQuest">{trans("mewQuest")}</SelectItem>
             </SelectContent>
           </Select>
           <Button
