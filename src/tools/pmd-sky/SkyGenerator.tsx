@@ -20,6 +20,7 @@ import {
   givesItem,
 } from "./QuestData";
 import { useTranslations } from "next-intl";
+import { Card } from "@/components/ui/card";
 
 export function SkyGenerator() {
   const [wonderMail, setWonderMail] = useState("");
@@ -55,7 +56,7 @@ export function SkyGenerator() {
 
   return (
     <div className="min-h-screen text-primary-100 p-6">
-      <div className="max-w-4xl mx-auto">
+      <Card className="max-w-4xl mx-auto p-8 rounded-xl">
         <h1 className="text-4xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-600">
           Sky Generator
         </h1>
@@ -242,7 +243,7 @@ export function SkyGenerator() {
             </div>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
