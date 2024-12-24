@@ -35,8 +35,13 @@ export function InternalLink({ href, children, className, onClick, app = null, .
   const finalHref = useMemo(() => {
     if (app === '') return href
     if (isSubdomain) return href
-    return `${app || currentApp ? `/${app || currentApp}` : ''}${href}`
+    return `${app || currentApp ? `/${app || currentApp}` : ''}${appendSlash(href)}`
   }, [href, app, isSubdomain, currentApp])
+
+  function appendSlash(path: string) {
+    if (path[0] === '/') return path
+    return `/${path}`
+  }
 
   const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
