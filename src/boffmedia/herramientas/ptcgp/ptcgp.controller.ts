@@ -7,9 +7,6 @@ import { TgcpUserCardService } from './user-card.service';
 import { TgcpPackService } from './pack.service';
 import { TgcpScraperService } from './scraper.service';
 import { PtcgpBattleService } from './battle.service';
-
-import * as fs from 'fs';
-import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 
 @ApiTags('/herramientas/ptcgp')

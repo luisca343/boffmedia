@@ -72,9 +72,6 @@ export class TgcpScraperService {
           });
         }
       });
-  
-      console.log('Scraped Solo Battles structure:');
-      console.log(JSON.stringify(soloBattles, null, 2));
       
       return soloBattles;
     } catch (error) {
