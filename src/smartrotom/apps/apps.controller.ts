@@ -15,6 +15,7 @@ import { UpdateAppDto } from './dto/update-app.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateAppDto } from './dto/create-app.dto';
 import { ResponseService } from '@/response/response.service';
+import { OrderAppDto } from './dto/order-apps.dto';
 
 @ApiTags('smartrotom/apps')
 @Controller('/smartrotom/apps')
@@ -62,7 +63,7 @@ export class AppsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Apps ordered successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to order apps.' })
   @Post('order')
-  async order(@Body() order: { newOrder: { id: number; order: number }[]; uuid: string },) {
+  async order(@Body() order: OrderAppDto) {
     const action = 'order apps';
     try {
       this.responseService.logRequest(action, order);
@@ -89,7 +90,7 @@ export class AppsController {
       this.responseService.handleError(action, error);
     }
   }
-  
+
   @Get(':id')
   @ApiOperation({ summary: 'Get an app by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'App found successfully.' })
@@ -109,7 +110,7 @@ export class AppsController {
       this.responseService.handleError(action, error);
     }
   }
-  
+
   @Patch(':id')
   @ApiOperation({ summary: 'Update an app by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'App updated successfully.' })
