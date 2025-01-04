@@ -11,40 +11,53 @@ export class AppsService {
     private db: MySQL2Service,
   ) {}
 
-  async findAll() {
+  async findAll(page: number = 1, limit: number = 10): Promise<{ apps: SmartRotomApp[], total: number }> {
     try {
-      const result = await this.db.getDrizzle().select().from(smartrotomApps);
-      return result;
+      const offset = (page - 1) * limit;
+      const [apps, countResult] = await Promise.all([
+        this.db.getDrizzle().select().from(smartrotomApps).limit(limit).offset(offset),
+        this.db.getDrizzle().select({ count: sql`count(*)` }).from(smartrotomApps)
+      ]);
+      const total = Number(countResult[0].count);
+      return { apps, total };
     } catch (error) {
-      throw new HttpException('Failed to find all apps', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('Failed to find apps', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async create(appData: CreateAppDto) {
+  async create(appData: CreateAppDto): Promise<SmartRotomApp> {
     try {
-      const result = await this.db.getDrizzle().insert(smartrotomApps).values(appData);
-      return result[0];
+      const [result] = await this.db.getDrizzle().insert(smartrotomApps).values(appData);
+      if (!result.insertId) {
+        throw new Error('Failed to insert app');
+      }
+      return this.findOne(result.insertId);
     } catch (error) {
       throw new HttpException('Failed to create app', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async order(order: { id: number | string, order: number }[], uuid: string) {
+  async order(order: { id: number | string, order: number }[], uuid: string): Promise<{ success: boolean }> {
+    const drizzle = this.db.getDrizzle();
     try {
-      await this.db.getDrizzle().delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
+      await drizzle.transaction(async (tx) => {
+        await tx.delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
 
-      const values = order
-        .filter((app) => typeof app.id === 'number')
-        .map((app) => ({ uuid, appId: app.id, order: app.order })) as { uuid: string, appId: number, order: number }[];
-      const insert = await this.db.getDrizzle().insert(smartrotomUserApps).values(values);
-
-      return { insert };
+        const values = order
+          .filter((app) => typeof app.id === 'number')
+          .map((app) => ({ uuid, appId: app.id as number, order: app.order }));
+        
+        if (values.length > 0) {
+          await tx.insert(smartrotomUserApps).values(values);
+        }
+      });
+      return { success: true };
     } catch (error) {
-      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('Failed to order apps', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async getForPlayer(uuid: string) {
+  async getForPlayer(uuid: string): Promise<SmartRotomApp[]> {
     try {
       if (!uuid) return [];
       const result = await this.db.getDrizzle().execute(sql`
@@ -61,36 +74,41 @@ export class AppsService {
         ORDER BY orden ASC
       `);
 
-      const apps = result[0] as unknown as SmartRotomApp[];
-      return apps;
+      return result[0] as unknown as SmartRotomApp[];
     } catch (error) {
       throw new HttpException('Failed to get apps for player', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: number): Promise<SmartRotomApp | null> {
     try {
-      const result = await this.db.getDrizzle().select().from(smartrotomApps).where(eq(smartrotomApps.id, id));
-      return result[0];
+      const [result] = await this.db.getDrizzle().select().from(smartrotomApps).where(eq(smartrotomApps.id, id));
+      return result || null;
     } catch (error) {
       throw new HttpException('Failed to find app', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async update(id: number, updateAppDto: UpdateAppDto) {
+  async update(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp | null> {
     try {
-      const result = await this.db.getDrizzle().update(smartrotomApps).set(updateAppDto).where(eq(smartrotomApps.id, id));
-      return result[0];
+      await this.db.getDrizzle().update(smartrotomApps).set(updateAppDto).where(eq(smartrotomApps.id, id));
+      return this.findOne(id);
     } catch (error) {
       throw new HttpException('Failed to update app', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
-  async remove(id: number) {
+  async remove(id: number): Promise<{ success: boolean }> {
     try {
       const result = await this.db.getDrizzle().delete(smartrotomApps).where(eq(smartrotomApps.id, id));
-      return result[0];
+      if (result[0].affectedRows === 0) {
+        throw new HttpException('App not found', HttpStatus.NOT_FOUND);
+      }
+      return { success: true };
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException('Failed to remove app', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
