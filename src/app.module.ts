@@ -59,6 +59,7 @@ import { TgcpScraperService } from './boffmedia/herramientas/ptcgp/scraper.servi
 import { AuthModule } from './auth/auth.module';
 import { ShowdownGateway } from './battlesimulator/showdown.gateway';
 import { PtcgpBattleService } from './boffmedia/herramientas/ptcgp/battle.service';
+import { DrizzleModule } from './drizzle/drizzle.module';
 //import { EventsModule } from './boffmedia/events/events.module';
 
 @Module({
@@ -101,7 +102,8 @@ import { PtcgpBattleService } from './boffmedia/herramientas/ptcgp/battle.servic
     LoggerModule,
     PtcgpModule,
     //EventsModule,
-    AuthModule
+    AuthModule,
+    DrizzleModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, {
