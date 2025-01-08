@@ -28,7 +28,7 @@ export class AppsService {
       const total = Number(countResult[0].count);
       return { apps, total };
     } catch (error) {
-      throw new HttpException('Failed to find apps', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to find apps: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -40,7 +40,7 @@ export class AppsService {
       }
       return this.findOne(result.insertId);
     } catch (error) {
-      throw new HttpException('Failed to create app', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to create app: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -60,7 +60,7 @@ export class AppsService {
       });
       return { success: true };
     } catch (error) {
-      throw new HttpException('Failed to order apps', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to order apps: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -83,7 +83,7 @@ export class AppsService {
 
       return result[0] as unknown as SmartRotomApp[];
     } catch (error) {
-      throw new HttpException('Failed to get apps for player', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to get apps for player: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -92,7 +92,7 @@ export class AppsService {
       const [result] = await this.db.select().from(smartrotomApps).where(eq(smartrotomApps.id, id));
       return result || null;
     } catch (error) {
-      throw new HttpException('Failed to find app', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to find app: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -101,7 +101,7 @@ export class AppsService {
       await this.db.update(smartrotomApps).set(updateAppDto).where(eq(smartrotomApps.id, id));
       return this.findOne(id);
     } catch (error) {
-      throw new HttpException('Failed to update app', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to update app: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -113,10 +113,7 @@ export class AppsService {
       }
       return { success: true };
     } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException('Failed to remove app', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to remove app: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
