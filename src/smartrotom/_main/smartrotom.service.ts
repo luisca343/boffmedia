@@ -7,8 +7,8 @@ import {
   smartRotomUserAchievements,
   smartRotomUserReplays,
 } from '@/_db/schema/SmartRotom';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
+
+import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { and, desc, eq, asc, sql } from 'drizzle-orm';
 import * as fs from 'fs';
@@ -16,9 +16,15 @@ import * as path from 'path';
 import { promises as fsPromises } from 'fs';
 import { BattleAchievementDto } from '../_dto/battle-achievement-dto';
 
+
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
+
 @Injectable()
 export class SmartrotomService {
-  constructor(private db: MySQL2Service) {}
+  constructor(
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+  ) {}
 
   async getStats(uuid: string) {
     return axios
@@ -33,7 +39,6 @@ export class SmartrotomService {
 
   async getAchievements(uuid: string) {
     return await this.db
-      .getDrizzle()
       .select({
         id: smartRotomAchievements.id,
         name: smartRotomAchievements.name,
@@ -84,7 +89,6 @@ export class SmartrotomService {
 
   async getAchievementForPlayer(uuid: string, achievementId: string) {
     const data = await this.db
-      .getDrizzle()
       .select({
         id: smartRotomAchievements.id,
         name: smartRotomAchievements.name,
@@ -127,7 +131,6 @@ export class SmartrotomService {
 
   async playerHasAchievement(uuid: string, achievementId: string) {
     const data = await this.db
-      .getDrizzle()
       .select({
         id: smartRotomAchievements.id,
         completed: smartRotomUserAchievements.completed,
@@ -165,7 +168,6 @@ export class SmartrotomService {
     );
 
     const insert = await this.db
-      .getDrizzle()
       .insert(smartRotomReplays)
       .values({
         side1: battleAchievement.name1,
@@ -180,7 +182,6 @@ export class SmartrotomService {
     const insertId = insert[0].insertId;
 
     const insertRelation = await this.db
-      .getDrizzle()
       .insert(smartRotomUserReplays)
       .values({
         replayId: insertId,
@@ -196,7 +197,6 @@ export class SmartrotomService {
       return { error: 'Achievement already completed' };
 
     return this.db
-      .getDrizzle()
       .insert(smartRotomUserAchievements)
       .values({
         dataId: insertId,
@@ -211,7 +211,6 @@ export class SmartrotomService {
 
   async getRepeticiones(uuid: string) {
     return await this.db
-      .getDrizzle()
       .select({
         id: smartRotomReplays.id,
         team1: smartRotomReplays.team1,

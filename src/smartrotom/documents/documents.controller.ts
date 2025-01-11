@@ -1,6 +1,5 @@
-import { Body, Controller, Get, Param, Post, HttpStatus, HttpException, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, HttpStatus, Logger } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
-import { RotomNews } from '@/_db/schema/SmartRotomDocuments';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';
 import { CreateNewsDto } from './dto/create-news-dto';
@@ -16,6 +15,42 @@ export class DocumentsController {
     private readonly documentsService: DocumentsService,
     private readonly responseService: ResponseService,
   ) {}
+
+  
+
+  @Get('all/:uuid')
+  @ApiOperation({ summary: 'Get notes for a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Notes retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve notes.' })
+  async getNotes(@Param('uuid') uuid: string) {
+    const action = 'get notes';
+    try {
+      this.responseService.logRequest(action, { uuid });
+      const notes = await this.documentsService.getNotes(uuid);
+      this.responseService.logSuccess(action, notes);
+      return this.responseService.createSuccessResponse('Notes retrieved successfully', notes);
+    } catch (error) {
+      this.responseService.handleError(action, error, { uuid });
+    }
+  }
+
+  @Post('create')
+  @ApiOperation({ summary: 'Create a new note' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Note created successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create note.' })
+  async createNote(@Body() body: CreateDocumentDtoWithUuid) {
+    const action = 'create note';
+    try {
+      this.responseService.logRequest(action, body);
+      const noteInsert = await this.documentsService.saveNote(0, body.title, body.content, body.type);
+      await this.documentsService.addNoteToUser(noteInsert.id, body.uuid);
+      const result = { id: noteInsert.id, success: true };
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Note created successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, body);
+    }
+  }
 
   @Get('news')
   @ApiOperation({ summary: 'Get all news' })
@@ -78,40 +113,6 @@ export class DocumentsController {
       return this.responseService.createSuccessResponse('News status updated successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error, news);
-    }
-  }
-
-  @Get('all/:uuid')
-  @ApiOperation({ summary: 'Get notes for a player' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Notes retrieved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve notes.' })
-  async getNotes(@Param('uuid') uuid: string) {
-    const action = 'get notes';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const notes = await this.documentsService.getNotes(uuid);
-      this.responseService.logSuccess(action, notes);
-      return this.responseService.createSuccessResponse('Notes retrieved successfully', notes);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
-  }
-
-  @Post('create')
-  @ApiOperation({ summary: 'Create a new note' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Note created successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create note.' })
-  async createNote(@Body() body: CreateDocumentDtoWithUuid) {
-    const action = 'create note';
-    try {
-      this.responseService.logRequest(action, body);
-      const noteInsert = await this.documentsService.saveNote(0, body.title, body.content, body.type);
-      await this.documentsService.addNoteToUser(noteInsert.id, body.uuid);
-      const result = { id: noteInsert.id, success: true };
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Note created successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, body);
     }
   }
 

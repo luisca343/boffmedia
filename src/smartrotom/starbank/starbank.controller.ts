@@ -17,22 +17,6 @@ export class StarbankController {
     private readonly responseService: ResponseService,
   ) {}
 
-  @Get('balance/:uuid')
-  @ApiOperation({ summary: 'Get balance for a user' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Balance retrieved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve balance.' })
-  async getBalance(@Param('uuid') uuid: string) {
-    const action = 'get balance';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const balance = await this.starbankService.getBalance(uuid);
-      this.responseService.logSuccess(action, balance);
-      return this.responseService.createSuccessResponse('Balance retrieved successfully', balance);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
-  }
-
   @Get('accounts')
   @ApiOperation({ summary: 'Get all accounts' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Accounts retrieved successfully.' })
@@ -81,19 +65,19 @@ export class StarbankController {
     }
   }
 
-  @Post('trainerdefeat')
-  @ApiOperation({ summary: 'Handle trainer defeat' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Trainer defeat handled successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to handle trainer defeat.' })
-  async trainerDefeat(@Body() body: TrainerDefeatMoneyDto) {
-    const action = 'handle trainer defeat';
+  @Get('balance/:uuid')
+  @ApiOperation({ summary: 'Get balance for a user' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Balance retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve balance.' })
+  async getBalance(@Param('uuid') uuid: string) {
+    const action = 'get balance';
     try {
-      this.responseService.logRequest(action, body);
-      const result = await this.starbankService.trainerDefeat(body.money, body.uuid);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Trainer defeat handled successfully', result);
+      this.responseService.logRequest(action, { uuid });
+      const balance = await this.starbankService.getBalance(uuid);
+      this.responseService.logSuccess(action, balance);
+      return this.responseService.createSuccessResponse('Balance retrieved successfully', balance);
     } catch (error) {
-      this.responseService.handleError(action, error, body);
+      this.responseService.handleError(action, error, { uuid });
     }
   }
 
@@ -113,17 +97,17 @@ export class StarbankController {
     }
   }
 
-  @Post('transfer')
-  @ApiOperation({ summary: 'Transfer money between accounts' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Transfer handled successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to handle transfer.' })
-  async transfer(@Body() body: CreateTransferDto) {
-    const action = 'transfer money';
+  @Post('trainerdefeat')
+  @ApiOperation({ summary: 'Handle trainer defeat' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Trainer defeat handled successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to handle trainer defeat.' })
+  async trainerDefeat(@Body() body: TrainerDefeatMoneyDto) {
+    const action = 'handle trainer defeat';
     try {
       this.responseService.logRequest(action, body);
-      const result = await this.starbankService.transfer(body.from, body.to, body.amount, body.concept);
+      const result = await this.starbankService.trainerDefeat(body.money, body.uuid);
       this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Transfer handled successfully', result);
+      return this.responseService.createSuccessResponse('Trainer defeat handled successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error, body);
     }
@@ -142,6 +126,22 @@ export class StarbankController {
       return this.responseService.createSuccessResponse('Transactions retrieved successfully', transactions);
     } catch (error) {
       this.responseService.handleError(action, error, { account, limit });
+    }
+  }
+
+  @Post('transfer')
+  @ApiOperation({ summary: 'Transfer money between accounts' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Transfer handled successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to handle transfer.' })
+  async transfer(@Body() body: CreateTransferDto) {
+    const action = 'transfer money';
+    try {
+      this.responseService.logRequest(action, body);
+      const result = await this.starbankService.transfer(body.from, body.to, body.amount, body.concept);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Transfer handled successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, body);
     }
   }
 

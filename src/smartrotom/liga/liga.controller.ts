@@ -1,4 +1,4 @@
-import { Controller, Get, Param, HttpStatus, HttpException, Logger } from '@nestjs/common';
+import { Controller, Get, Param, HttpStatus, Logger } from '@nestjs/common';
 import { LigaService } from './liga.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';

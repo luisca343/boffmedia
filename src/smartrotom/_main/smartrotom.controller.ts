@@ -27,46 +27,14 @@ export class SmartrotomController {
     private readonly responseService: ResponseService,
   ) {}
 
-  @Post('battle-achievements')
-  @ApiOperation({ summary: 'Get battle achievements for a player' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Battle achievements retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve battle achievements.',
-  })
-  @ApiBody({ type: UuidDto })
-  async getAchievements(@Body() { uuid }: { uuid: string }) {
-    const action = 'get battle achievements';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const achievements = await this.smartrotomService.getAchievements(uuid);
-      this.responseService.logSuccess(action, achievements);
-      return this.responseService.createSuccessResponse(
-        'Battle achievements retrieved successfully',
-        achievements,
-      );
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
-  }
-
   @Get('battle-achievement/:uuid/:achievementId')
   @ApiOperation({ summary: 'Get a specific achievement for a player' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Battle chievement retrieved successfully.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle chievement retrieved successfully.'})
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to retrieve battle achievement.',
   })
-  async getAchievementForPlayer(
-    @Param('uuid') uuid: string,
-    @Param('achievementId') achievementId: string,
-  ) {
+  async getAchievementForPlayer(@Param('uuid') uuid: string, @Param('achievementId') achievementId: string ) {
     const action = 'get achievement for player';
     try {
       this.responseService.logRequest(action, { uuid, achievementId });
@@ -84,16 +52,30 @@ export class SmartrotomController {
     }
   }
 
+  @Post('battle-achievements')
+  @ApiOperation({ summary: 'Get battle achievements for a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle achievements retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle achievements.' })
+  @ApiBody({ type: UuidDto })
+  async getAchievements(@Body() { uuid }: UuidDto) {
+    const action = 'get battle achievements';
+    try {
+      this.responseService.logRequest(action, { uuid });
+      const achievements = await this.smartrotomService.getAchievements(uuid);
+      this.responseService.logSuccess(action, achievements);
+      return this.responseService.createSuccessResponse(
+        'Battle achievements retrieved successfully',
+        achievements,
+      );
+    } catch (error) {
+      this.responseService.handleError(action, error, { uuid });
+    }
+  }
+
   @Post('img/customNPC')
   @ApiOperation({ summary: 'Upload a custom NPC image' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Image uploaded successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to upload image.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Image uploaded successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to upload image.' })
   async img(@Body() { npcName, image }: NpcImageDto) {
     const action = 'upload custom NPC image';
     try {
@@ -115,18 +97,9 @@ export class SmartrotomController {
 
   @Get('img/customNPC/render/:npcName')
   @ApiOperation({ summary: 'Get a custom NPC render image' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Render image retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Render image not found.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve render image.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Render image retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Render image not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve render image.' })
   async getImg(@Param('npcName') npcName: string) {
     const action = 'get custom NPC render image';
     try {
@@ -149,18 +122,9 @@ export class SmartrotomController {
 
   @Get('img/customNPC/:npcName')
   @ApiOperation({ summary: 'Get a custom NPC image' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Image retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'Image not found.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve image.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Image retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Image not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve image.' })
   async get(@Param('npcName') npcName: string) {
     const action = 'get custom NPC image';
     try {
@@ -183,14 +147,8 @@ export class SmartrotomController {
 
   @Post('stats')
   @ApiOperation({ summary: 'Get stats for a player' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Stats retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve stats.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Stats retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve stats.' })
   async getStats(@Body() { uuid }: UuidDto) {
     const action = 'get stats';
     try {
@@ -208,14 +166,8 @@ export class SmartrotomController {
 
   @Post('team')
   @ApiOperation({ summary: 'Get team for a player' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Team retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve team.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Team retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve team.' })
   async getTeam(@Body() { uuid }: UuidDto) {
     const action = 'get team';
     try {
@@ -233,14 +185,8 @@ export class SmartrotomController {
 
   @Get('regions')
   @ApiOperation({ summary: 'Get regions' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Regions retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve regions.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Regions retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve regions.' })
   async getRegions() {
     const regions = await axios.get(`${process.env.WINGULL_API}/regions`);
 
@@ -289,17 +235,9 @@ export class SmartrotomController {
    **/
 
   @Post('battle')
-  @ApiOperation({
-    summary: 'Saves a Battle, and registers its achievement if any',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Battle saved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to save battle.',
-  })
+  @ApiOperation({ summary: 'Saves a Battle, and registers its achievement if any' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle saved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to save battle.', })
   @ApiBody({ type: BattleAchievementDto })
   async addBattleAchievement(@Body() battleAchievement: BattleAchievementDto) {
     const action = 'add battle achievement';
@@ -319,10 +257,7 @@ export class SmartrotomController {
 
   @Get('repeticiones/:uuid')
   @ApiOperation({ summary: 'Get repetitions for a player' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Repetitions retrieved successfully.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Repetitions retrieved successfully.' })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: 'Failed to retrieve repetitions.',
@@ -344,14 +279,8 @@ export class SmartrotomController {
 
   @Get('battleconfig/:npcConfigName')
   @ApiOperation({ summary: 'Get battle configuration' })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'Battle configuration retrieved successfully.',
-  })
-  @ApiResponse({
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: 'Failed to retrieve battle configuration.',
-  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle configuration retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle configuration.' })
   async getBattleConfig(@Param('npcConfigName') npcConfigName: string) {
     const action = 'get battle configuration';
     try {

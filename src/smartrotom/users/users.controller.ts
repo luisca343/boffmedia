@@ -18,22 +18,6 @@ export class UsersController {
     private readonly responseService: ResponseService,
   ) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'User created successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create user.' })
-  async create(@Body() createUserDto: CreateSmartrotomUserDto) {
-    const action = 'create user';
-    try {
-      this.responseService.logRequest(action, createUserDto);
-      const user = await this.usersService.create(createUserDto);
-      this.responseService.logSuccess(action, user);
-      return this.responseService.createSuccessResponse('User created successfully', user);
-    } catch (error) {
-      this.responseService.handleError(action, error, createUserDto);
-    }
-  }
-
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Users retrieved successfully.' })
@@ -50,29 +34,19 @@ export class UsersController {
     }
   }
 
-  @Post('initialize')
-  @ApiOperation({ summary: 'Initialize user and accounts' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User and accounts initialized successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to initialize user and accounts.' })
-  async initialize(@Body() data: CreateSmartrotomUserDto) {
-    const action = 'initialize user and accounts';
+  @Post()
+  @ApiOperation({ summary: 'Create a new user' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'User created successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create user.' })
+  async create(@Body() createUserDto: CreateSmartrotomUserDto) {
+    const action = 'create user';
     try {
-      this.responseService.logRequest(action, data);
-      let user = await this.usersService.findOne(data.uuid);
-      if (!user) await this.usersService.create({ uuid: data.uuid, username: data.username, world: data.world });
-      user = await this.usersService.findOne(data.uuid);
-
-      let accounts = await this.starbankService.getAccounts(data.uuid);
-      if (accounts.length === 0) {
-        await this.starbankService.createMainAccount(data.uuid, data.username);
-      }
-      accounts = await this.starbankService.getAccounts(data.uuid);
-
-      const result = { user, accounts };
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('User and accounts initialized successfully', result);
+      this.responseService.logRequest(action, createUserDto);
+      const user = await this.usersService.create(createUserDto);
+      this.responseService.logSuccess(action, user);
+      return this.responseService.createSuccessResponse('User created successfully', user);
     } catch (error) {
-      this.responseService.handleError(action, error, data);
+      this.responseService.handleError(action, error, createUserDto);
     }
   }
 
@@ -103,19 +77,45 @@ export class UsersController {
     }
   }
 
-  @Get(':uuid')
-  @ApiOperation({ summary: 'Get a user by UUID' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User retrieved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve user.' })
-  async findOne(@Param('uuid') uuid: string) {
-    const action = 'find user by UUID';
+  @Post('initialize')
+  @ApiOperation({ summary: 'Initialize user and accounts' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User and accounts initialized successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to initialize user and accounts.' })
+  async initialize(@Body() data: CreateSmartrotomUserDto) {
+    const action = 'initialize user and accounts';
     try {
-      this.responseService.logRequest(action, { uuid });
-      const user = await this.usersService.findOne(uuid);
-      this.responseService.logSuccess(action, user);
-      return this.responseService.createSuccessResponse('User retrieved successfully', user);
+      this.responseService.logRequest(action, data);
+      let user = await this.usersService.findOne(data.uuid);
+      if (!user) await this.usersService.create({ uuid: data.uuid, username: data.username, world: data.world });
+      user = await this.usersService.findOne(data.uuid);
+
+      let accounts = await this.starbankService.getAccounts(data.uuid);
+      if (accounts.length === 0) {
+        await this.starbankService.createMainAccount(data.uuid, data.username);
+      }
+      accounts = await this.starbankService.getAccounts(data.uuid);
+
+      const result = { user, accounts };
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('User and accounts initialized successfully', result);
     } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
+      this.responseService.handleError(action, error, data);
+    }
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User deleted successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to delete user.' })
+  async remove(@Param('id') id: string) {
+    const action = 'delete user';
+    try {
+      this.responseService.logRequest(action, { id });
+      const result = await this.usersService.remove(+id);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('User deleted successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { id });
     }
   }
 
@@ -135,19 +135,19 @@ export class UsersController {
     }
   }
 
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a user by ID' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'User deleted successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to delete user.' })
-  async remove(@Param('id') id: string) {
-    const action = 'delete user';
+  @Get(':uuid')
+  @ApiOperation({ summary: 'Get a user by UUID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve user.' })
+  async findOne(@Param('uuid') uuid: string) {
+    const action = 'find user by UUID';
     try {
-      this.responseService.logRequest(action, { id });
-      const result = await this.usersService.remove(+id);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('User deleted successfully', result);
+      this.responseService.logRequest(action, { uuid });
+      const user = await this.usersService.findOne(uuid);
+      this.responseService.logSuccess(action, user);
+      return this.responseService.createSuccessResponse('User retrieved successfully', user);
     } catch (error) {
-      this.responseService.handleError(action, error, { id });
+      this.responseService.handleError(action, error, { uuid });
     }
   }
 }

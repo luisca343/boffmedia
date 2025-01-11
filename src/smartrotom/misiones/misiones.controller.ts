@@ -29,22 +29,6 @@ export class MisionesController {
     }
   }
 
-  @Post('npcs')
-  @ApiOperation({ summary: 'Update NPCs' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'NPCs updated successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update NPCs.' })
-  async updateNPCs(@Body() body: { npcs: any }) {
-    const action = 'update NPCs';
-    try {
-      this.responseService.logRequest(action, body);
-      const result = await this.misionesService.updateNPCs(body.npcs);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('NPCs updated successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, body);
-    }
-  }
-
   @Post()
   @ApiOperation({ summary: 'Get quests for user' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Quests for user retrieved successfully.' })
@@ -56,6 +40,22 @@ export class MisionesController {
       const quests = await this.misionesService.getQuestsForUser(body.uuid);
       this.responseService.logSuccess(action, quests);
       return this.responseService.createSuccessResponse('Quests for user retrieved successfully', quests);
+    } catch (error) {
+      this.responseService.handleError(action, error, body);
+    }
+  }
+
+  @Post('npcs')
+  @ApiOperation({ summary: 'Update NPCs' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'NPCs updated successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update NPCs.' })
+  async updateNPCs(@Body() body: { npcs: any }) {
+    const action = 'update NPCs';
+    try {
+      this.responseService.logRequest(action, body);
+      const result = await this.misionesService.updateNPCs(body.npcs);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('NPCs updated successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error, body);
     }

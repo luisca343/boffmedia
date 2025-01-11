@@ -1,4 +1,4 @@
-import { Controller, Get, HttpStatus, HttpException, Logger, Param } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Logger, Param } from '@nestjs/common';
 import { ArcadeService } from './arcade.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';

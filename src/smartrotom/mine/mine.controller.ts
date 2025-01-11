@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, HttpStatus, HttpException, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, HttpStatus, Logger } from '@nestjs/common';
 import { MinaService } from './mine.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';
@@ -13,6 +13,39 @@ export class MinaController {
     private readonly responseService: ResponseService,
   ) {}
 
+
+  @Post('claim')
+  @ApiOperation({ summary: 'Claim rewards for a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Rewards claimed successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to claim rewards.' })
+  async claim(@Body() body: { uuid: string }) {
+    const action = 'claim rewards';
+    try {
+      this.responseService.logRequest(action, body);
+      const result = await this.minaService.claim(body.uuid);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Rewards claimed successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, body);
+    }
+  }
+
+  @Post('endgame')
+  @ApiOperation({ summary: 'End the game and submit rewards' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Game ended and rewards submitted successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to end the game and submit rewards.' })
+  async endGame(@Body() body: { uuid: string, rewards: { value: number, id: number }[] }) {
+    const action = 'end game and submit rewards';
+    try {
+      this.responseService.logRequest(action, body);
+      const result = await this.minaService.endGame(body.uuid, body.rewards);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Game ended and rewards submitted successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, body);
+    }
+  }
+
   @Get('energy/:uuid')
   @ApiOperation({ summary: 'Get energy for a player' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Energy retrieved successfully.' })
@@ -24,6 +57,22 @@ export class MinaController {
       const energy = await this.minaService.getEnergy(uuid);
       this.responseService.logSuccess(action, energy);
       return this.responseService.createSuccessResponse('Energy retrieved successfully', energy);
+    } catch (error) {
+      this.responseService.handleError(action, error, { uuid });
+    }
+  }
+
+  @Get('history/:uuid')
+  @ApiOperation({ summary: 'Get game history for a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Game history retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve game history.' })
+  async getHistory(@Param('uuid') uuid: string) {
+    const action = 'get game history';
+    try {
+      this.responseService.logRequest(action, { uuid });
+      const history = await this.minaService.getHistory(uuid);
+      this.responseService.logSuccess(action, history);
+      return this.responseService.createSuccessResponse('Game history retrieved successfully', history);
     } catch (error) {
       this.responseService.handleError(action, error, { uuid });
     }
@@ -45,19 +94,19 @@ export class MinaController {
     }
   }
 
-  @Post('endgame')
-  @ApiOperation({ summary: 'End the game and submit rewards' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Game ended and rewards submitted successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to end the game and submit rewards.' })
-  async endGame(@Body() body: { uuid: string, rewards: { value: number, id: number }[] }) {
-    const action = 'end game and submit rewards';
+  @Get('ranking')
+  @ApiOperation({ summary: 'Get game ranking' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ranking retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve ranking.' })
+  async getRanking() {
+    const action = 'get game ranking';
     try {
-      this.responseService.logRequest(action, body);
-      const result = await this.minaService.endGame(body.uuid, body.rewards);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Game ended and rewards submitted successfully', result);
+      this.responseService.logRequest(action, null);
+      const ranking = await this.minaService.getRanking();
+      this.responseService.logSuccess(action, ranking);
+      return this.responseService.createSuccessResponse('Ranking retrieved successfully', ranking);
     } catch (error) {
-      this.responseService.handleError(action, error, body);
+      this.responseService.handleError(action, error);
     }
   }
 
@@ -93,38 +142,6 @@ export class MinaController {
     }
   }
 
-  @Get('history/:uuid')
-  @ApiOperation({ summary: 'Get game history for a player' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Game history retrieved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve game history.' })
-  async getHistory(@Param('uuid') uuid: string) {
-    const action = 'get game history';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const history = await this.minaService.getHistory(uuid);
-      this.responseService.logSuccess(action, history);
-      return this.responseService.createSuccessResponse('Game history retrieved successfully', history);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
-  }
-
-  @Get('ranking')
-  @ApiOperation({ summary: 'Get game ranking' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Ranking retrieved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve ranking.' })
-  async getRanking() {
-    const action = 'get game ranking';
-    try {
-      this.responseService.logRequest(action, null);
-      const ranking = await this.minaService.getRanking();
-      this.responseService.logSuccess(action, ranking);
-      return this.responseService.createSuccessResponse('Ranking retrieved successfully', ranking);
-    } catch (error) {
-      this.responseService.handleError(action, error);
-    }
-  }
-
   @Get('unclaimed/:uuid')
   @ApiOperation({ summary: 'Get unclaimed rewards for a player' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Unclaimed rewards retrieved successfully.' })
@@ -138,22 +155,6 @@ export class MinaController {
       return this.responseService.createSuccessResponse('Unclaimed rewards retrieved successfully', unclaimed);
     } catch (error) {
       this.responseService.handleError(action, error, { uuid });
-    }
-  }
-
-  @Post('claim')
-  @ApiOperation({ summary: 'Claim rewards for a player' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Rewards claimed successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to claim rewards.' })
-  async claim(@Body() body: { uuid: string }) {
-    const action = 'claim rewards';
-    try {
-      this.responseService.logRequest(action, body);
-      const result = await this.minaService.claim(body.uuid);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Rewards claimed successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, body);
     }
   }
 }
