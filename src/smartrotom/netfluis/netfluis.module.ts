@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { NetfluisController } from './netfluis.controller';
 import { NetfluisService } from './netfluis.service';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { DrizzleModule } from '@/drizzle/drizzle.module';
 
 @Module({
   controllers: [NetfluisController],
-  providers: [NetfluisService, MySQL2Service],
+  providers: [NetfluisService],
   exports: [NetfluisService],
+  imports: [DrizzleModule]
 })
 export class NetfluisModule {}

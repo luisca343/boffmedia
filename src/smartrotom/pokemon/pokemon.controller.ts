@@ -1,6 +1,5 @@
 import { Body, Controller, Get, HttpStatus, Logger, Param, Post } from '@nestjs/common';
 import { PokemonService } from './pokemon.service';
-import { uuid } from 'drizzle-orm/pg-core';
 import { ResponseService } from '@/response/response.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 

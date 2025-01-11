@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import OpenAI from 'openai';
 import { PokemonService } from '../pokemon/pokemon.service';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';
 
@@ -20,7 +21,7 @@ export type FicusMessage = {
 export class ChatService {
   constructor(
     private pokemonService: PokemonService,
-    private db: MySQL2Service,
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
   async start() {
     if (!openai) {
@@ -43,7 +44,6 @@ export class ChatService {
 
   async getMessages(uuid: string) {
     let res = await this.db
-      .getDrizzle()
       .select({ content: ficusMessages.content })
       .from(ficusMessages)
       .where(eq(ficusMessages.uuid, uuid))
@@ -62,7 +62,6 @@ export class ChatService {
 
   async storeMessage(uuid: string, mensaje: FicusMessage) {
     this.db
-      .getDrizzle()
       .insert(ficusMessages)
       .values({ uuid, content: mensaje })
       .execute();

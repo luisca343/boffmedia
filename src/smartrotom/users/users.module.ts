@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SmartRotomUsersService } from './users.service';
 import { UsersController } from './users.controller';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { StarbankService } from '../starbank/starbank.service';
 import { LoggerModule } from '@/logger/logger.module';
 import { ResponseModule } from '@/response/response.module';
+import { DrizzleModule } from '@/drizzle/drizzle.module';
 
 @Module({
-  imports: [LoggerModule, ResponseModule],
+  imports: [LoggerModule, ResponseModule, DrizzleModule],
   controllers: [UsersController],
-  providers: [SmartRotomUsersService, MySQL2Service, StarbankService],
+  providers: [SmartRotomUsersService, StarbankService],
   exports: [SmartRotomUsersService],
 })
 export class SmartRotomUsersModule {}

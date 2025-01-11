@@ -4,10 +4,11 @@ import { LigaService } from './liga.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { LoggerModule } from '@/logger/logger.module';
 import { ResponseModule } from '@/response/response.module';
+import { DrizzleModule } from '@/drizzle/drizzle.module';
 
 @Module({
-  imports: [ResponseModule, LoggerModule],
+  imports: [ResponseModule, LoggerModule, DrizzleModule],
   controllers: [LigaController],
-  providers: [LigaService, MySQL2Service],
+  providers: [LigaService],
 })
 export class LigaModule {}

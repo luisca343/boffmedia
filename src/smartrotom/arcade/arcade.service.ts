@@ -1,13 +1,13 @@
-import { MySQL2Service } from '@/_utils/MySQL2Service';
+
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Inject, Injectable } from '@nestjs/common';
-import { PokemonService } from '../pokemon/pokemon.service';
 
 @Injectable()
 export class ArcadeService {
     constructor(
-        private db: MySQL2Service,
-        private pokemonService: PokemonService
-    ) {}
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+      ) {}
 
     getWordle() {
         return 'wordle';

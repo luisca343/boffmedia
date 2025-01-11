@@ -1,13 +1,14 @@
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
-import * as fs from 'fs';
+
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
+import { Inject, Injectable } from '@nestjs/common';
 import *  as  path from 'path';
 import { promises as fsPromises } from 'fs';
 
 @Injectable()
 export class NetfluisService {
     constructor(
-        private db: MySQL2Service,
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
     ) {}
 
     async test(){

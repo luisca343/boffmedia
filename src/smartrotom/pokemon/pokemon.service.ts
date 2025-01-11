@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import *  as  path from 'path';
 import Fuse from 'fuse.js'
 import { google, sheets_v4 } from 'googleapis';
-import { Form, GenderProperties, Pokemon } from '@/types/pokemon';
-import { getDeffensiveScore, getDeffensiveScoreRanking, getOffensiveScoreRanking, getOverallScoreRanking, wolfeyTypeRanking } from './utils/types';
+import { GenderProperties, Pokemon } from '@/types/pokemon';
+import { getOverallScoreRanking } from './utils/types';
 import { PokemonData } from './utils/PokemonData';
 import { MoveData } from './utils/MoveData';
 import { SpawnData } from './utils/SpawnData';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { and, desc, eq } from 'drizzle-orm';
 import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
@@ -16,7 +17,7 @@ import { MySqlRawQueryResult } from 'drizzle-orm/mysql2';
 @Injectable()
 export class PokemonService {
     constructor(
-        private db: MySQL2Service,
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
     ) {}
     pokemonData: PokemonData;
     moveData: MoveData;
@@ -115,7 +116,7 @@ export class PokemonService {
 
         if(pokemonId > 0) {
             if(!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 1000){
-                const pokemonStatus = await this.db.getDrizzle()
+                const pokemonStatus = await this.db
                 .select().from(pokedexRegistry)
                 .where(and(
                     eq(pokedexRegistry.uuid, uuid),
@@ -133,7 +134,7 @@ export class PokemonService {
 
 
             /*
-            const pokemonStatus = await this.db.getDrizzle()
+            const pokemonStatus = await this.db
                 .select().from(pokedexRegistry)
                 .where(and(
                     eq(pokedexRegistry.uuid, uuid),
@@ -483,7 +484,7 @@ export class PokemonService {
         const formId = form || 'base'
         const paletteId = palette || 'none'
         
-        const res = await this.db.getDrizzle()
+        const res = await this.db
             .select({seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
             .from(pokedexRegistry)
             .where(and(
@@ -497,7 +498,7 @@ export class PokemonService {
             if(res.length === 0){
                 console.log('INSERTING')
                 let caughtAt = status === 1 ? new Date() : null
-                const result = await this.db.getDrizzle()
+                const result = await this.db
                 .insert(pokedexRegistry)
                 .values({uuid, pokemonId, formId, paletteId, seenAt: new Date(), caughtAt} as PokedexRegistry)
                 .execute() as MySqlRawQueryResult
@@ -511,7 +512,7 @@ export class PokemonService {
                 console.log('INSERTING 2')
                 const registry = res[0] as PokedexRegistry
                 if(registry.caughtAt !== null) return {success: false, message: 'Pokemon already caught'}
-                const result = await this.db.getDrizzle().update(pokedexRegistry).set({caughtAt: new Date()} as PokedexRegistry)
+                const result = await this.db.update(pokedexRegistry).set({caughtAt: new Date()} as PokedexRegistry)
                     .where(and(
                         eq(pokedexRegistry.uuid, uuid),
                         eq(pokedexRegistry.pokemonId, pokemonId),
@@ -527,7 +528,7 @@ export class PokemonService {
     }
 
     async getPokedex(uuid: string){
-        const dex = await this.db.getDrizzle()
+        const dex = await this.db
             .selectDistinct({pokemonId: pokedexRegistry.pokemonId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt, paletteId: pokedexRegistry.paletteId})
             .from(pokedexRegistry)
             .where(eq(pokedexRegistry.uuid, uuid))
@@ -550,7 +551,7 @@ export class PokemonService {
     }
 
     async getRegistries(uuid: string){
-        const dex = await this.db.getDrizzle()
+        const dex = await this.db
             .select({pokemonId: pokedexRegistry.pokemonId, formId: pokedexRegistry.formId, paletteId: pokedexRegistry.paletteId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
             .from(pokedexRegistry)
             .where(eq(pokedexRegistry.uuid, uuid))

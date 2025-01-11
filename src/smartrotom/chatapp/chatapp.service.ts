@@ -1,18 +1,16 @@
 import { RotomChatMessage, rotomChatMessageReads, rotomChatMessages, rotomChatUsers, rotomChats } from '@/_db/schema/SmartRotomChat';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { asc, desc, eq, max, min } from 'drizzle-orm';
-import { last } from 'rxjs';
 import { SocketsGateway } from '../../sockets/sockets.gateway';
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { ResultSetHeader } from 'mysql2';
-import { error, group } from 'console';
-import { uuid } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class ChatappService {
     constructor(
-        private db: MySQL2Service,
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
         @Inject(forwardRef(() => SocketsGateway))
         private socketGateway: SocketsGateway
     ) {}
@@ -22,15 +20,15 @@ export class ChatappService {
             image: rotomChats.image, createdAt: rotomChats.createdAt, updatedAt: rotomChats.updatedAt
         }
 
-        const userGroups = await this.db.getDrizzle().selectDistinct(params).from(rotomChats)
+        const userGroups = await this.db.selectDistinct(params).from(rotomChats)
             .leftJoin(rotomChatUsers, eq(rotomChatUsers.chatId, rotomChats.id))
             .where(eq(rotomChatUsers.uuid, uuid))
-            .union(this.db.getDrizzle().select({...params}).from(rotomChats).where(eq(rotomChats.type, 0)))
+            .union(this.db.select({...params}).from(rotomChats).where(eq(rotomChats.type, 0)))
 
 
        const groups = await Promise.all(userGroups.map(async (group: {id: number, name: string, type: number, description: string, 
             image: string, createdAt: Date, updatedAt: Date, messages: {id: number, content: string, createdAt: Date}[], unread: number, members: {uuid: string}[]}) => {
-            const messages = (await this.db.getDrizzle()
+            const messages = (await this.db
                 .select({id: rotomChatMessages.id, content: rotomChatMessages.content, createdAt: rotomChatMessages.createdAt, uuid: rotomChatMessages.senderUUID, type: rotomChatMessages.type})
                 .from(rotomChatMessages)
                 .where(eq(rotomChatMessages.chatId, group.id))
@@ -40,7 +38,7 @@ export class ChatappService {
                 const members = await this.getChatMembers(group.id)
 
                 const otherPlayerUUID = group.name.split('_').filter((name) => name !== uuid)[0]
-                const otherPlayerName = (await this.db.getDrizzle().select({name: smartrotomUsers.username}).from(smartrotomUsers).where(eq(smartrotomUsers.uuid, otherPlayerUUID)))[0]?.name || 'Mensajes guardados'
+                const otherPlayerName = (await this.db.select({name: smartrotomUsers.username}).from(smartrotomUsers).where(eq(smartrotomUsers.uuid, otherPlayerUUID)))[0]?.name || 'Mensajes guardados'
                 
                 const chatName = group.type == 0 || group.type == 3 ? group.name : otherPlayerName || 'Mensajes guardados'
                 const imageName = group.image || 'default.webp'
@@ -66,7 +64,7 @@ export class ChatappService {
         return groups
 
         /*
-        return this.db.getDrizzle().select({...params, lastMessage: rotomChatMessages.chatId}).from(rotomChats)
+        return this.db.select({...params, lastMessage: rotomChatMessages.chatId}).from(rotomChats)
             .leftJoin(rotomChatUsers, eq(rotomChats.id, rotomChatUsers.chatId))
             .leftJoin(rotomChatMessages, eq(rotomChats.id, rotomChatMessages.chatId))
             .leftJoin(rotomChatMessageReads, eq(rotomChatMessages.id, rotomChatMessageReads.messageId))
@@ -74,7 +72,7 @@ export class ChatappService {
             .orderBy(desc(rotomChatMessages.createdAt))
             .having(eq(rotomChatMessages.id, max(rotomChatMessages.id)))
             .union(
-                this.db.getDrizzle().select({...params, lastMessage: rotomChatMessages.chatId}).from(rotomChats)
+                this.db.select({...params, lastMessage: rotomChatMessages.chatId}).from(rotomChats)
                 .leftJoin(rotomChatMessages, eq(rotomChats.id, rotomChatMessages.chatId))
                 .where(eq(rotomChats.type, 0))
             )*/
@@ -83,20 +81,20 @@ export class ChatappService {
     }
 
     async getMessages(chatId: number){
-        return this.db.getDrizzle().select({id: rotomChatMessages.id, text: rotomChatMessages.content, date: rotomChatMessages.createdAt, uuid: rotomChatMessages.senderUUID})
+        return this.db.select({id: rotomChatMessages.id, text: rotomChatMessages.content, date: rotomChatMessages.createdAt, uuid: rotomChatMessages.senderUUID})
             .from(rotomChatMessages)
             .where(eq(rotomChatMessages.chatId, chatId))
             .orderBy(asc(rotomChatMessages.createdAt))
     }
 
     async getChatMembers(chatId: number){
-        return this.db.getDrizzle().select({uuid: rotomChatUsers.uuid}).from(rotomChatUsers)
+        return this.db.select({uuid: rotomChatUsers.uuid}).from(rotomChatUsers)
             .where(eq(rotomChatUsers.chatId, chatId))
     }
 
 
     async createMessage(chatId: number, message: string, uuid: string, type: string = 'text'){
-        const insert = await this.db.getDrizzle().insert(rotomChatMessages)
+        const insert = await this.db.insert(rotomChatMessages)
             .values({chatId, content: message, senderUUID: uuid, type} as RotomChatMessage) as ResultSetHeader[]
         
         const insertId = insert[0].insertId
@@ -125,7 +123,7 @@ export class ChatappService {
         let chatName = name
         let chatType = 1
         if(uuids.length == 1){
-            const exists = await this.db.getDrizzle().select({id: rotomChats.id}).from(rotomChats)
+            const exists = await this.db.select({id: rotomChats.id}).from(rotomChats)
                 .where(eq(rotomChats.name, chatName))
     
             if(exists.length > 0){
@@ -141,7 +139,7 @@ export class ChatappService {
             chatName = uuids.join('_')
             chatType = 2
 
-            const chatExists = await this.db.getDrizzle().select({id: rotomChats.id}).from(rotomChats)
+            const chatExists = await this.db.select({id: rotomChats.id}).from(rotomChats)
                 .where(eq(rotomChats.name, chatName))
 
             if(chatExists.length > 0){
@@ -157,13 +155,13 @@ export class ChatappService {
             console.log(chatName)
         }
 
-        const newChat = await this.db.getDrizzle().insert(rotomChats)
+        const newChat = await this.db.insert(rotomChats)
             .values({type: chatType, name: chatName, description: 'Chat'}) as ResultSetHeader[]
 
         const insertId = newChat[0].insertId
 
         uuids.forEach(async (uuid) => {
-            await this.db.getDrizzle().insert(rotomChatUsers)
+            await this.db.insert(rotomChatUsers)
                 .values({chatId: insertId, uuid})
         })
 

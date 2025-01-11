@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ArcadeController } from './arcade.controller';
 import { ArcadeService } from './arcade.service';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { PokemonService } from '../pokemon/pokemon.service';
 import { LoggerModule } from '@/logger/logger.module';
 import { ResponseModule } from '@/response/response.module';
+import { DrizzleModule } from '@/drizzle/drizzle.module';
 
 @Module({
-    imports: [LoggerModule, ResponseModule],
+    imports: [LoggerModule, ResponseModule, DrizzleModule],
     controllers: [ArcadeController],
-    providers: [ArcadeService, MySQL2Service, PokemonService],
+    providers: [ArcadeService],
 
 })
 export class ArcadeModule {}

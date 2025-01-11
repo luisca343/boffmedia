@@ -1,7 +1,8 @@
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { StarBankAccount, starBankAccounts, starBankTransactions, starBankUsersAccounts } from '@/_db/schema/SmartRotomStarBank';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
+import { Inject, Injectable } from '@nestjs/common';
 import { desc, eq, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { RowDataPacket } from 'mysql2';
@@ -10,11 +11,11 @@ import axios from 'axios';
 @Injectable()
 export class StarbankService {
     constructor(
-        private db: MySQL2Service,
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
     ) {}
 
     async getMainAccount(uuid: string) {
-        const res = await this.db.getDrizzle().select({id: starBankAccounts.id, balance: starBankAccounts.balance}).from(starBankAccounts)
+        const res = await this.db.select({id: starBankAccounts.id, balance: starBankAccounts.balance}).from(starBankAccounts)
             .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
             .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
 
@@ -22,7 +23,7 @@ export class StarbankService {
     }
 
     async getBalance(uuid: string) {
-        const res = await this.db.getDrizzle().select({balance: starBankAccounts.balance}).from(starBankAccounts)
+        const res = await this.db.select({balance: starBankAccounts.balance}).from(starBankAccounts)
             .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
             .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
             
@@ -34,13 +35,13 @@ export class StarbankService {
     }
 
     async getAllAccounts() {
-        return await this.db.getDrizzle()
+        return await this.db
             .selectDistinct({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name, type: starBankAccounts.type})
             .from(starBankAccounts)
     }
 
     async getAccounts(uuid: string) {
-        const res = await this.db.getDrizzle().selectDistinct({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name, type: starBankAccounts.type}).from(starBankAccounts)
+        const res = await this.db.selectDistinct({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name, type: starBankAccounts.type}).from(starBankAccounts)
             .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
             .innerJoin(smartrotomUsers, eq(starBankUsersAccounts.uuid, uuid))
         if(res.length === 0)  return []
@@ -52,9 +53,9 @@ export class StarbankService {
             return this.createMainAccount(uuid, name);
         }
         
-        const res = await this.db.getDrizzle().insert(starBankAccounts).values({name, balance: 0, type: "SECONDARY"} as StarBankAccount).execute() as RowDataPacket[];
+        const res = await this.db.insert(starBankAccounts).values({name, balance: 0, type: "SECONDARY"} as StarBankAccount).execute() as RowDataPacket[];
         const insert = res[0];
-        const res2 = await this.db.getDrizzle().insert(starBankUsersAccounts).values({uuid, accountId: insert.insertId}).execute();
+        const res2 = await this.db.insert(starBankUsersAccounts).values({uuid, accountId: insert.insertId}).execute();
         
         return {success: true}
     }
@@ -65,14 +66,14 @@ export class StarbankService {
         if(res) {
             return {success: false}
         }
-        const res2 = await this.db.getDrizzle().insert(starBankAccounts).values({name: username, balance: 0, type: "MAIN"} as StarBankAccount).execute() as RowDataPacket[];
+        const res2 = await this.db.insert(starBankAccounts).values({name: username, balance: 0, type: "MAIN"} as StarBankAccount).execute() as RowDataPacket[];
         const insert = res2[0];
-        const res3 = await this.db.getDrizzle().insert(starBankUsersAccounts).values({uuid, accountId: insert.insertId}).execute();
+        const res3 = await this.db.insert(starBankUsersAccounts).values({uuid, accountId: insert.insertId}).execute();
         return {success: true}
     }
 
     async getAccountInfo(accountId: number) {
-        return await this.db.getDrizzle()
+        return await this.db
             .select({balance: starBankAccounts.balance, type: starBankAccounts.type, uuid: starBankUsersAccounts.uuid})
             .from(starBankAccounts)
             .leftJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
@@ -133,8 +134,8 @@ export class StarbankService {
     }
 
     async transaction(from:number, to: number, amount: number, reason: string, type: string) {
-        const fromAccount = await this.db.getDrizzle().select({balance: starBankAccounts.balance}).from(starBankAccounts).where(eq(starBankAccounts.id, from));
-        const toAccount = await this.db.getDrizzle().select({balance: starBankAccounts.balance}).from(starBankAccounts).where(eq(starBankAccounts.id, to));
+        const fromAccount = await this.db.select({balance: starBankAccounts.balance}).from(starBankAccounts).where(eq(starBankAccounts.id, from));
+        const toAccount = await this.db.select({balance: starBankAccounts.balance}).from(starBankAccounts).where(eq(starBankAccounts.id, to));
         
         if(fromAccount.length === 0 || toAccount.length === 0) {
             return {success: false}
@@ -146,13 +147,13 @@ export class StarbankService {
 
 
         
-        await this.db.getDrizzle().update(starBankAccounts).set({balance: fromAccount[0].balance - amount} as StarBankAccount).where(eq(starBankAccounts.id, from)).execute();
-        await this.db.getDrizzle().update(starBankAccounts).set({balance: toAccount[0].balance + amount} as StarBankAccount).where(eq(starBankAccounts.id, to)).execute();
+        await this.db.update(starBankAccounts).set({balance: fromAccount[0].balance - amount} as StarBankAccount).where(eq(starBankAccounts.id, from)).execute();
+        await this.db.update(starBankAccounts).set({balance: toAccount[0].balance + amount} as StarBankAccount).where(eq(starBankAccounts.id, to)).execute();
         
         const fromBalance = from === 0 ? 0 : fromAccount[0].balance - amount;
         const toBalance = to === 0 ? 0 : toAccount[0].balance + amount;
 
-        await this.db.getDrizzle().insert(starBankTransactions).values({
+        await this.db.insert(starBankTransactions).values({
             from,
             to,
             amount,
@@ -169,7 +170,7 @@ export class StarbankService {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
 
-        const res = await this.db.getDrizzle().selectDistinct(
+        const res = await this.db.selectDistinct(
             {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
                 reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
                 toBalance: starBankTransactions.toBalance, type: starBankTransactions.type, 
@@ -190,7 +191,7 @@ export class StarbankService {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
 
-        const res = await this.db.getDrizzle().selectDistinct(
+        const res = await this.db.selectDistinct(
             {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
                 reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
                 toBalance: starBankTransactions.toBalance, type: starBankTransactions.type, 
@@ -211,7 +212,7 @@ export class StarbankService {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
         
-        const res = await this.db.getDrizzle().selectDistinct(
+        const res = await this.db.selectDistinct(
             {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
                 reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
                 toBalance: starBankTransactions.toBalance, type: starBankTransactions.type, 
@@ -234,7 +235,7 @@ export class StarbankService {
         const toJoin = alias(starBankAccounts, "to");
         const fromJoin = alias(starBankAccounts, "from");
         
-        const res = await this.db.getDrizzle().select(
+        const res = await this.db.select(
             {from: starBankTransactions.from, to: starBankTransactions.to, amount: starBankTransactions.amount, 
                 reason: starBankTransactions.reason, fromBalance: starBankTransactions.fromBalance, 
                 toBalance: starBankTransactions.toBalance, type: starBankTransactions.type, 

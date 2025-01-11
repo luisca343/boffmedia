@@ -1,16 +1,17 @@
 import { smartRotomReplays } from '@/_db/schema/SmartRotom';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
+import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class LigaService {
     constructor(
-        private db: MySQL2Service,
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
     ) {}
 
     async getReplay(id: number) {
-        return await this.db.getDrizzle().select().from(smartRotomReplays).where(eq(smartRotomReplays.id, id));
+        return await this.db.select().from(smartRotomReplays).where(eq(smartRotomReplays.id, id));
     }
 
 }

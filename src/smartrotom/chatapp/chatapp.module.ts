@@ -6,11 +6,12 @@ import { SocketsGateway } from '../../sockets/sockets.gateway';
 import { SocketsModule } from '../../sockets/sockets.module';
 import { ResponseModule } from '@/response/response.module';
 import { LoggerModule } from '@/logger/logger.module';
+import { DrizzleModule } from '@/drizzle/drizzle.module';
 
 @Module({
-    providers: [ChatappService, MySQL2Service],
+    providers: [ChatappService],
     controllers: [ChatappController],
     exports: [ChatappService],
-    imports: [forwardRef(() => SocketsModule), ResponseModule, LoggerModule],
+    imports: [forwardRef(() => SocketsModule), ResponseModule, LoggerModule, DrizzleModule],
   })
 export class ChatappModule {}

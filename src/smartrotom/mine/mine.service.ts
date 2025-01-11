@@ -1,14 +1,15 @@
 import {mineGamesDetail, mineGames, mineRewards, DetallePartidaMina } from '@/_db/schema/SmartRotomMine';
 import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { Injectable } from '@nestjs/common';
+import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
+import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, inArray, max, sum } from 'drizzle-orm';
 import { ResultSetHeader } from 'mysql2';
 
 @Injectable()
 export class MinaService {
     constructor(
-        private db: MySQL2Service,
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
     ) {}
 
     
@@ -34,7 +35,7 @@ export class MinaService {
 
     if(newEnergy > energy.energy) {
         const newTime = lastCharge.getTime() +  hoursToCharge * 60 * 60 * 1000;
-        const test = await this.db.getDrizzle().update(smartrotomUsers).set({energy: newEnergy, lastCharge: new Date(newTime)} as SmartRotomUser).where(eq(smartrotomUsers.uuid, uuid));
+        const test = await this.db.update(smartrotomUsers).set({energy: newEnergy, lastCharge: new Date(newTime)} as SmartRotomUser).where(eq(smartrotomUsers.uuid, uuid));
     }
 
     return {energy: newEnergy, maxEnergy, lastCharge};
@@ -42,7 +43,7 @@ export class MinaService {
 
 
   async getEnergyFromBBDD(uuid: string) {
-    const res = await this.db.getDrizzle().select({energy: smartrotomUsers.energy}).from(smartrotomUsers).where(eq(smartrotomUsers.uuid, uuid));
+    const res = await this.db.select({energy: smartrotomUsers.energy}).from(smartrotomUsers).where(eq(smartrotomUsers.uuid, uuid));
     const energy = {
       energy: res[0].energy,
       maxEnergy: 10
@@ -51,7 +52,7 @@ export class MinaService {
   }
 
   async getLastCharge(uuid: string) {
-    const res = await this.db.getDrizzle().select({ultimaRecarga: smartrotomUsers.lastCharge}).from(smartrotomUsers).where(eq(smartrotomUsers.uuid, uuid));
+    const res = await this.db.select({ultimaRecarga: smartrotomUsers.lastCharge}).from(smartrotomUsers).where(eq(smartrotomUsers.uuid, uuid));
     return res[0].ultimaRecarga;
     }
 
@@ -66,17 +67,17 @@ export class MinaService {
             update = {energy: energy.energy - 1, lastCharge: new Date()} as SmartRotomUser
         }
 
-        const insert = await this.db.getDrizzle().insert(mineGames).values({uuid: uuid}) as ResultSetHeader[]
-        await this.db.getDrizzle().update(smartrotomUsers).set(update).where(eq(smartrotomUsers.uuid, uuid));
+        const insert = await this.db.insert(mineGames).values({uuid: uuid}) as ResultSetHeader[]
+        await this.db.update(smartrotomUsers).set(update).where(eq(smartrotomUsers.uuid, uuid));
 
         return {idPartida: insert[0].insertId};
     }
 
     async getRewards() {
-        return await this.db.getDrizzle().select().from(mineRewards);
+        return await this.db.select().from(mineRewards);
     }
     async getRewardsByType() {
-        const rewards = await this.db.getDrizzle().select().from(mineRewards);
+        const rewards = await this.db.select().from(mineRewards);
         let arr = rewards.reduce((acc, curr) => {
             if (!acc[curr.type]) {
                 acc[curr.type] = { items: [], totalValue: 0 };
@@ -98,19 +99,19 @@ export class MinaService {
     }
 
     async endGame(uuid: string, rewards: {value:number, id: number}[] ) {
-      const ultimaPartida = await this.db.getDrizzle().select({id: mineGames.id}).from(mineGames).where(eq(mineGames.uuid, uuid)).orderBy(desc(mineGames.id)).limit(1);
+      const ultimaPartida = await this.db.select({id: mineGames.id}).from(mineGames).where(eq(mineGames.uuid, uuid)).orderBy(desc(mineGames.id)).limit(1);
       const id = ultimaPartida[0].id;
-      const res = await this.db.getDrizzle().select({valor: max(mineRewards.value)}).from(mineRewards);
+      const res = await this.db.select({valor: max(mineRewards.value)}).from(mineRewards);
       const valorMax = res[0].valor;
 
       
-      return this.db.getDrizzle().insert(mineGamesDetail).values(rewards.map(reward => {
+      return this.db.insert(mineGamesDetail).values(rewards.map(reward => {
           return {gameId: id, rewardId: reward.id, value:  valorMax / reward.value, claimed: 0}
       }));
     }
 
     async getHistory(uuid: string) {
-        const history =  (await this.db.getDrizzle().select({id: mineGames.id, itemId: mineRewards.itemId, 
+        const history =  (await this.db.select({id: mineGames.id, itemId: mineRewards.itemId, 
             itemName: mineRewards.name, claimed: mineGamesDetail.claimed, value: mineGamesDetail.value, date: mineGames.createdAt})
         .from(mineGames)
         .leftJoin(mineGamesDetail, eq(mineGames.id, mineGamesDetail.gameId))
@@ -135,7 +136,7 @@ export class MinaService {
     }
 
     async getRanking() {
-        return await this.db.getDrizzle()
+        return await this.db
             .select({username: smartrotomUsers.username, value: sum(mineGamesDetail.value)})
             .from(mineGames)
             .leftJoin(smartrotomUsers, eq(smartrotomUsers.uuid, mineGames.uuid))
@@ -145,7 +146,7 @@ export class MinaService {
     }
 
     async getUnclaimed(uuid: string) {
-        const res = await this.db.getDrizzle().select({
+        const res = await this.db.select({
             itemId: mineRewards.itemId,
             name: mineRewards.name,
             type: mineRewards.type
@@ -172,7 +173,7 @@ export class MinaService {
     }
 
     async claim(uuid: string) {
-        const res = await this.db.getDrizzle().select({ id: mineGamesDetail.id, rewardId: mineGamesDetail.rewardId })
+        const res = await this.db.select({ id: mineGamesDetail.id, rewardId: mineGamesDetail.rewardId })
             .from(mineGames)
             .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
             .where(and(eq(mineGames.uuid, uuid), eq(mineGamesDetail.claimed, 0)));
@@ -180,7 +181,7 @@ export class MinaService {
         const ids = res.map((row) => row.id);
     
         if (ids.length > 0) {
-            await this.db.getDrizzle().update(mineGamesDetail)
+            await this.db.update(mineGamesDetail)
                 .set({ claimed: 1 } as any)
                 .where(inArray(mineGamesDetail.id, ids));
         }
