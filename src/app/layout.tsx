@@ -26,11 +26,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <NextIntlClientProvider messages={messages}>
       <body
         className={`${inter.className} flex flex-col h-screen bg-transparent`}
       >
         {children}
       </body>
+      </NextIntlClientProvider>
     </html>
   );
 }
