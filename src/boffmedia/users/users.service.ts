@@ -192,9 +192,9 @@ export class UsersService {
     try {
       const user = {
         email: googleUser.email,
-        username: googleUser.email.split('@')[0], // Generate a username from email
-        password: '', // We don't need a password for Google auth
-        uuid: null, // You may want to generate a UUID here
+        username: googleUser.email.split('@')[0],
+        password: '',
+        uuid: null,
       };
 
       const result = await this.db.insert(boffMediaUsers).values(user as BoffMediaUser).execute();
