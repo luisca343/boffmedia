@@ -1,35 +1,31 @@
 "use client"
 import { App } from "@/types";
 import Image from "next/image";
-import {motion} from "framer-motion";
+import { motion } from "framer-motion";
 import { DndContext, DragEndEvent, closestCenter, useSensors } from "@dnd-kit/core";
 import { SortableContext, rectSortingStrategy, useSortable, arrayMove } from "@dnd-kit/sortable";
-import {CSS} from '@dnd-kit/utilities';
-import {MouseSensor, useSensor} from '@dnd-kit/core';
-import { rotomPOST } from "@/services/boffAPI";
-import { useEffect, useState, useCallback } from "react";
+import { CSS } from '@dnd-kit/utilities';
+import { MouseSensor, useSensor } from '@dnd-kit/core';
+import { useCallback } from "react";
 import { InternalLink } from "../nav/Link";
 import { useBoffSession } from "@/services/useBoffSession";
+import { useGetAppsForPlayer } from "@/hooks/apps/useGetAppsForPlayer";
+import { useOrderApps } from "@/hooks/apps/useOrderApps";
 
 export function AppList() {
-  const { session, status } = useBoffSession();
-  const [apps, setApps] = useState<App[]>([]);
+  const { session } = useBoffSession();
+  const { apps, setApps, loading, error } = useGetAppsForPlayer(session?.user?.smartRotomUser?.uuid);
 
-  useEffect(() => {
-    rotomPOST('/apps/player',{uuid: session?.user?.smartRotomUser?.uuid}).then((res: App[]) => {
-      console.log(res);
-      setApps(res);
-    });
-  }, [session?.user?.smartRotomUser?.uuid]);
+  if (loading) return null;
+  if (error) return <div>Error: {error}</div>;
+  if (apps.length === 0) return <></>;
 
-  if(apps.length === 0) return (<></>)
-  return (
-    <SortableGrid apps={apps} setApps={setApps} />
-  );
+  return <SortableGrid apps={apps} setApps={setApps} />;
 }
 
-export function SortableGrid({className, apps, setApps}  : {className?: string, apps: App[], setApps: Function}) {
-  const { session } = useBoffSession() 
+export function SortableGrid({ className, apps, setApps }: { className?: string, apps: App[], setApps: React.Dispatch<React.SetStateAction<App[]>> }) {
+  const { session } = useBoffSession();
+  const { order, loading, error } = useOrderApps();
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 5,
@@ -38,30 +34,33 @@ export function SortableGrid({className, apps, setApps}  : {className?: string, 
 
   const sensors = useSensors(mouseSensor);
   const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const {active, over} = event;
+    const { active, over } = event;
     if (over && active.id !== over.id) {
       const apps2 = arrayMove(apps, apps.indexOf(apps.find(app => app.id === active.id) as App), apps.indexOf(apps.find(app => app.id === over.id) as App));
-      const newOrder = apps2.map(app => ({id: app.id, order: apps2.indexOf(app)}));
-      rotomPOST('/apps/order', {newOrder, uuid: session?.user?.smartRotomUser?.uuid});
+      const newOrder = apps2.map(app => ({ id: app.id, order: apps2.indexOf(app) }));
+      order({ newOrder, uuid: session?.user?.smartRotomUser?.uuid! });
 
       setApps(apps2);
-      }
-  }, [apps, setApps, session]);
+    }
+  }, [apps, setApps, session, order]);
+
+  if (loading) return <div>Updating order...</div>;
+  if (error) return <div>Error updating order: {error}</div>;
 
   return (
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter} sensors={sensors}>
       <SortableContext items={apps} strategy={rectSortingStrategy} >
         <ul className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 content-between gap-y-1 pb-4 overflow-auto">
-            {apps.map((app, index) => (
-            <SortableItem key={`app-${index}`} app={app}/>
-            ))}
+          {apps.map((app, index) => (
+            <SortableItem key={`app-${index}`} app={app} />
+          ))}
         </ul>
       </SortableContext>
     </DndContext>
   );
 }
 
-export function SortableItem({app} : {app: App}) {
+export function SortableItem({ app }: { app: App }) {
   const {
     attributes,
     listeners,
@@ -70,15 +69,14 @@ export function SortableItem({app} : {app: App}) {
     transition,
     active,
     isDragging,
-    
-  } = useSortable({id: app.id});
+  } = useSortable({ id: app.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
   };
 
-  let estilos = `w-24 h-24  sm:w-36 sm:h-36 ${isDragging ? 'opacity-50' : ''}`
+  let estilos = `w-24 h-24  sm:w-36 sm:h-36 ${isDragging ? 'opacity-50' : ''}`;
 
   return (
     <li ref={setNodeRef} style={style} {...attributes} {...listeners} className="m-auto hover:cursor-pointer mb-2">
@@ -97,3 +95,4 @@ export function SortableItem({app} : {app: App}) {
     </li>
   );
 }
+

@@ -27,3 +27,10 @@ declare module "next-auth/jwt" {
   interface JWT extends BoffUser {}
 }
 
+export type App = {
+  id: number
+  name: string
+  url: string
+  active: number
+}
+
