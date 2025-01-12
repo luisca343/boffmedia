@@ -2,7 +2,6 @@
 "use client";
 import "./test.css";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import useSocketStore from "@/app/useSocketStore";
 import { Chat } from "./_components/Chat";
 import { CreateGroup } from "./_components/CreateGroup";

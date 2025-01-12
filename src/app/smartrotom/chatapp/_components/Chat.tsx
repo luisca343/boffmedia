@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { ChatData } from "../_types/Chat";
 import { Phone, Send, X } from "lucide-react";
 import { useBoffSession } from "@/services/useBoffSession";
+import { rotomChatAppService } from "@/services/api/rotomChatAppService";
 
 export function Chat({
   chats,
@@ -58,7 +59,7 @@ export function Chat({
       return;
     }
 
-    rotomPOST(`/chatapp/messages/${chat.id}`, {
+    rotomChatAppService.createMessage(chat.id, {
       message: message,
       uuid: getSmartRotomUser(session).uuid,
     }).then((res) => {
@@ -67,9 +68,7 @@ export function Chat({
   }
 
   function call() {
-    rotomPOST(`/chatapp/call/${chat.id}`, {
-      uuid: getSmartRotomUser(session).uuid,
-    }).then((res) => {
+    rotomChatAppService.call(chat.id, getSmartRotomUser(session).uuid).then((res) => {
       if (res.error) return toast.error(res.error);
     });
   }
