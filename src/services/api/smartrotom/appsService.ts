@@ -3,7 +3,7 @@ import { CreateAppDto } from '@/types/dto/create-app.dto';
 import { OrderAppDto } from '@/types/dto/order-apps.dto';
 import { UpdateAppDto } from '@/types/dto/update-app.dto';
 
-export const rotomAppsService = {
+export const appsService = {
   findAll: () => rotomGET('/apps'),
   create: (createAppDto: CreateAppDto) => rotomPOST('/apps', createAppDto),
   order: (orderAppDto: OrderAppDto) => rotomPOST('/apps/order', orderAppDto),

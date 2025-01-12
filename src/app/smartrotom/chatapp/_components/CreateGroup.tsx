@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getSmartRotomUser } from "@/lib/utils"
-import { rotomChatAppService } from "@/services/api/rotomChatAppService"
+import { chatAppService } from "@/services/api/smartrotom/chatAppService"
 import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useState, useMemo, use, useEffect } from "react"
@@ -37,13 +37,13 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
         const player = getSmartRotomUser(session).uuid;
         toast.info('Creando chat con ' + selectedUsers.map((user) => user.uuid).join(', '));
         if (selectedUsers.length == 0) {
-            rotomChatAppService.createChat({ player, users: [], name: 'Mensajes Guardados' }).then((res) => {
+            chatAppService.createChat({ player, users: [], name: 'Mensajes Guardados' }).then((res) => {
                 setActiveChat(res);
             });
         } else if (groupName == '' && selectedUsers.length > 1) {
             toast.error('Ingresa un nombre para el chat');
         } else {
-            rotomChatAppService.createChat({ player, users: selectedUsers.map((user) => user.uuid), name: groupName })
+            chatAppService.createChat({ player, users: selectedUsers.map((user) => user.uuid), name: groupName })
                 .then((res) => {
                     setActiveChat(res);
                 });

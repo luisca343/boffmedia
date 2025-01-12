@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useRotomRequest } from '../useRotomRequest';
-import { rotomAppsService } from '@/services/api/rotomAppsService';
+import { appsService } from '@/services/api/smartrotom/appsService';
 import { App } from '@/types';
 
 export const useGetAppsForPlayer = (uuid: string | undefined) => {
@@ -8,7 +8,7 @@ export const useGetAppsForPlayer = (uuid: string | undefined) => {
   const [apps, setApps] = useState<App[]>([]);
 
   const getForPlayer = useCallback((uuid: string) => {
-    return handleRequest<App[]>(() => rotomAppsService.getForPlayer(uuid));
+    return handleRequest<App[]>(() => appsService.getForPlayer(uuid));
   }, [handleRequest]);
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import { CreateDocumentDto, CreateDocumentDtoWithUuid } from '@/types/dto/create
 import { CreateNewsDto } from '@/types/dto/create-news-dto';
 import { NewsStatusDto } from '@/types/dto/news-status-dto';
 
-export const rotomDocumentsService = {
+export const documentsService = {
   getNotes: (uuid: string) => rotomGET(`/documents/all/${uuid}`),
   createNote: (data: CreateDocumentDtoWithUuid) => rotomPOST('/documents/create', data),
   getAllNews: () => rotomGET('/documents/news'),

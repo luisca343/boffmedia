@@ -2,7 +2,7 @@ import { rotomGET, rotomPOST } from '@/services/boffAPI';
 import { CreateChatDto } from '@/types/dto/create-chat-dto';
 import { CreateChatMessageDto } from '@/types/dto/create-chat-message-dto';
 
-export const rotomChatAppService = {
+export const chatAppService = {
   call: (chatId: number, uuid: string) => rotomPOST(`/chatapp/call/${chatId}`, { uuid }),
   createChat: (data: CreateChatDto) => rotomPOST('/chatapp/chat', data),
   getChats: (uuid: string) => rotomGET(`/chatapp/chats/${uuid}`),

@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
 import { ChatData, Message } from '../_types/Chat';
 import { getSmartRotomUser } from '@/lib/utils';
-import { useChatAppGetChats } from '@/hooks/chatapp/useChatAppGetChats';
+import { useChatAppGetChats } from '@/hooks/chatapp/useGetChats';
 
 type useChatAppGetChatsWithUpdateReturnType = {
   session: Session,
