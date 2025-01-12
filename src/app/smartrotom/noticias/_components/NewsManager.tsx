@@ -4,15 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { NewsItem } from "../page";
-import usePostNews from "../_hooks/usePostNews";
+import { useUpdateActiveNews } from "@/hooks/documents/useUpdateActiveNews";
+import { CreateNewsDto } from "@/types/dto/create-news-dto";
 
 interface NewsManagerProps {
-  initialNews?: NewsItem;
+  initialNews?: CreateNewsDto;
 }
 
 const NewsManager: React.FC<NewsManagerProps> = ({ initialNews }) => {
-  const { postNews } = usePostNews();
-  const [news, setNews] = useState<NewsItem>(
+  const { updateActiveNews } = useUpdateActiveNews();
+  const [news, setNews] = useState<CreateNewsDto>(
     initialNews || {
       id: Date.now(),
       title: "",
@@ -20,7 +21,7 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews }) => {
       content: "",
       buttonText: "Leer más",
       imageUrl: "",
-    }
+    } as CreateNewsDto
   );
 
   const handleChange = (
@@ -31,7 +32,7 @@ const NewsManager: React.FC<NewsManagerProps> = ({ initialNews }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    postNews(news);
+    updateActiveNews(news.id, news);
   };
 
   return (
