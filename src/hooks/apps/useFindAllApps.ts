@@ -1,14 +1,18 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { App } from '@/types';
 import { useRotomRequest } from '../useRotomRequest';
 import { appsService } from '@/services/api/smartrotom/appsService';
 
 export const useFindAllApps = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+  const { loading, error, data: apps, handleRequest } = useRotomRequest<App[]>();
 
   const findAll = useCallback(() => {
-    return handleRequest<App[]>(appsService.findAll);
+    handleRequest(() => appsService.findAll());
   }, [handleRequest]);
 
-  return { findAll, loading, error };
+  useEffect(() => {
+    findAll();
+  }, [findAll]);
+
+  return { apps, findAll, loading, error };
 };

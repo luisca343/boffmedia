@@ -8,7 +8,7 @@ export const useGetAppsForPlayer = (uuid: string | undefined) => {
   const [apps, setApps] = useState<App[]>([]);
 
   const getForPlayer = useCallback((uuid: string) => {
-    return handleRequest<App[]>(() => appsService.getForPlayer(uuid));
+    return handleRequest(() => appsService.getForPlayer(uuid)) as Promise<App[]>;
   }, [handleRequest]);
 
   useEffect(() => {

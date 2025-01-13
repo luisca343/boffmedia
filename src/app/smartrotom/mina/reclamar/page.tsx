@@ -4,18 +4,12 @@ import MenuWrapper from "../_components/MenuWrapper";
 import { rotomPOST } from "@/services/boffAPI";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import {
-  UnclaimedRewards,
-  useGetUnclaimedRewards,
-} from "../_hooks/useGetUnclaimedRewards";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
 import { isMinecraft } from "@/services/mcef/mcefHelper";
+import { UnclaimedRewards, useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
 
 export default function Reclamar() {
-  const { session, unclaimed, setUnclaimed, getBoxes } =
-    useGetUnclaimedRewards();
-
-  console.log(unclaimed);
+  const { session, unclaimed, setUnclaimed, getBoxes, loading } = useGetUnclaimed();
 
   async function claimReward() {
     if (!session) return;
@@ -49,7 +43,8 @@ export default function Reclamar() {
     }, {} as Record<string, UnclaimedRewards[]>);
   }
 
-  const groupedRewards = groupRewardsByType(unclaimed);
+  if(loading) return null;
+  const groupedRewards = groupRewardsByType(unclaimed!);
 
   return (
     <MenuWrapper className="w-full min-h-full overflow-hidden bg-surface-900 text-white  pt-4  flex flex-col items-center  text-shadow-border2">

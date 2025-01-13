@@ -7,37 +7,25 @@ import { useChatAppGetChats } from '@/hooks/chatapp/useGetChats';
 
 type useChatAppGetChatsWithUpdateReturnType = {
   session: Session,
-  chats: ChatData[],
-  setChats: React.Dispatch<React.SetStateAction<ChatData[]>>,
+  chats: ChatData[] | null,
+  setChats: React.Dispatch<React.SetStateAction<ChatData[] | null>>,
   refresh: () => void,
   updateChats: (message: Message, activeChat: number) => void,
   loading: boolean,
-    error: any
+  error: any
 };
 
 function useChatAppGetChatsWithUpdate(): useChatAppGetChatsWithUpdateReturnType {
   const { data: session } = useSession() as unknown as { data: Session };
-  const [chats, setChats] = useState<ChatData[]>([]);
-  const { getChats, loading, error } = useChatAppGetChats();
+  const { getChats, setChats, chats, loading, error } = useChatAppGetChats(getSmartRotomUser(session).uuid);
 
-  const fetchChats = useCallback(async () => {
-    if (!session) return;
-    try {
-      const res = await getChats(getSmartRotomUser(session).uuid);
-      if (res) {
-        setChats(res);
-      }
-    } catch (error) {
-      console.error('Failed to fetch chats:', error);
-    }
-  }, [session, getChats]);
-
-  useEffect(() => {
-    fetchChats();
-  }, [fetchChats]);
+  const refresh = useCallback(() => {
+    getChats();
+  }, [getChats]);
 
   const updateChats = (message: Message, activeChat: number) => {
-    setChats((prev: ChatData[]) => {
+    setChats((prev: ChatData[] | null) => {
+      if (!prev) return prev;
       const chat = prev.find((chat) => chat.id == message.chatId);
       if (!chat) return prev;
       chat.messages.unshift({ id: message.id, chatId: message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type });
@@ -54,7 +42,7 @@ function useChatAppGetChatsWithUpdate(): useChatAppGetChatsWithUpdateReturnType 
     if (activeChat !== message.id) return;
   };
 
-  return { session, chats, setChats, refresh: fetchChats, updateChats, loading, error };
+  return { session, chats, setChats, refresh, updateChats, loading, error };
 }
 
 export default useChatAppGetChatsWithUpdate;

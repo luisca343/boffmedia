@@ -10,7 +10,7 @@ import useGetChats from "./_hooks/useGetChats";
 import { Contact } from "./_components/Contact";
 
 export default function ChatApp() {
-  const { session, chats, refresh, updateChats } = useGetChats();
+  const { session, chats, refresh, updateChats, loading } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
   const { socket } = useSocketStore();
 
@@ -22,6 +22,8 @@ export default function ChatApp() {
     }
   }, [session]);
 
+  if (!chats) return null;
+  
   return (
     <div className="w-full h-full flex">
       <div className="flex flex-col h-full w-1/4  bg-neutral-800  border-r border-neutral-900 ">
@@ -30,7 +32,7 @@ export default function ChatApp() {
           <CreateGroup setActiveChat={setChat} />
         </div>
         <div className="flex flex-col h-full  overflow-auto bg-neutral-800">
-          {chats.map((chat) => (
+          {chats!.map((chat) => (
             <Contact chat={chat} key={chat.id} activeChat={activeChat} setActiveChat={setChat} session={session}/>
           ))}
         </div>
@@ -38,7 +40,7 @@ export default function ChatApp() {
       <div className="flex flex-col w-3/4 h-full bg-neutral-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-neutral-900">
         {activeChat ? (
           <Chat
-            chats={chats}
+            chats={chats!}
             activeChat={activeChat}
             setActiveChat={setActiveChat}
           />
@@ -52,7 +54,7 @@ export default function ChatApp() {
   );
 
   async function setChat(id: number) {
-    const chat = chats.find((chat) => chat.id === id);
+    const chat = chats!.find((chat) => chat.id === id);
     if (!chat) {
       await refresh();
     }

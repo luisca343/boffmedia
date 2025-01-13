@@ -2,17 +2,19 @@
 import "../mina.css";
 import Image from "next/image";
 import MenuWrapper from "../_components/MenuWrapper";
-import useGetMineHistory from "../_hooks/useGetMineHistory";
+import { useGetHistory } from "@/hooks/mina/useGetHistory";
+import { useBoffSession } from "@/services/useBoffSession";
 
 export default function History() {
-  const { mineHistory, setMineHistory } = useGetMineHistory();
+  const { session } = useBoffSession();
+  const { history } = useGetHistory(session?.user?.smartRotomUser?.uuid!);
 
   return (
     <MenuWrapper className="w-full min-h-full  bg-surface-900 text-white flex flex-col items-center">
       <div className="bg-black bg-opacity-70 p-6 rounded-lg w-3/4 max-w-3xl m-4">
         <h2 className="text-2xl font-bold mb-4">HISTORIAL</h2>
         <div className="space-y-4 overflow-auto">
-          {Object.values(mineHistory)
+          {Object.values(history || {})
             .reverse()
             .map((game: any, index: number) => (
               <div

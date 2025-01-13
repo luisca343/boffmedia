@@ -6,9 +6,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Drop, DropByType } from "../_types/Drops";
+import { minaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Drops() {
-  const { drops, totalValue } = (await rotomGET("/mine/rewardsbytype")) as {
+  const { drops, totalValue } = await minaService.getRewardsByType() as {
     drops: DropByType;
     totalValue: number;
   };

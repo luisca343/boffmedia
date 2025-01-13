@@ -1,6 +1,5 @@
 "use client";
 
-import { Hora } from "@/components/Hora";
 import useGetWeather from "@/app/smartrotom/tiempo/_hooks/useGetWeather";
 import {
   getDayNightIcon,

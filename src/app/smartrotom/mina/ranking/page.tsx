@@ -1,8 +1,9 @@
 import { rotomGET } from "@/services/boffAPI";
 import MenuWrapper from "../_components/MenuWrapper";
+import { minaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Ranking() {
-  const ranking = (await rotomGET("/mine/ranking")) as any[];
+  const ranking = await minaService.getRanking();
 
   if(!ranking) return <></>
   return (
