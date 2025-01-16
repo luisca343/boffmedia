@@ -353,6 +353,7 @@ export class ChatService {
   }
 
   async sendHabitat(uuid, pkmName) {
+    /*
     let { biomes, name } =
       await this.pokemonService.getBiomesByPokemonName(pkmName);
     if (biomes && biomes.length > 0) {
@@ -377,6 +378,6 @@ export class ChatService {
           { type: 'text', content: 'No tengo información sobre ese Pokémon.' },
         ],
       });
-    }
+    }*/
   }
 }

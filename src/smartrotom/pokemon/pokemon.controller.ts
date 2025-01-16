@@ -22,30 +22,14 @@ export class PokemonController {
         const action = 'get all Pokémon';
         try {
             this.responseService.logRequest(action, null);
-            const pokemon = await this.pokemonService.getPokemon();
+            const pokemon = await this.pokemonService.getAllPokemon();
             this.responseService.logSuccess(action, pokemon);
             return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
         } catch (error) {
             this.responseService.handleError(action, error);
         }
     }
-    
-    @Get('overallscoreranking')
-    @ApiOperation({ summary: 'Get overall score ranking' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Overall score ranking retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve overall score ranking.' })
-    async getOverallScoreRanking() {
-        const action = 'get overall score ranking';
-        try {
-            this.responseService.logRequest(action, null);
-            const ranking = await this.pokemonService.getOverallRanking();
-            this.responseService.logSuccess(action, ranking);
-            return this.responseService.createSuccessResponse('Overall score ranking retrieved successfully', ranking);
-        } catch (error) {
-            this.responseService.handleError(action, error);
-        }
-    }
-    
+
     @Get('dex/:dex')
     @ApiOperation({ summary: 'Get Pokémon by Dex number' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
@@ -59,6 +43,230 @@ export class PokemonController {
             return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
         } catch (error) {
             this.responseService.handleError(action, error, { dex });
+        }
+    }
+
+    @Get('moves')
+    @ApiOperation({ summary: 'Get all Pokémon moves, and which Pokémon learn them' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'All Pokémon moves retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve all Pokémon moves.' })
+    async getAllMoves() {
+        const action = 'get all Pokémon moves';
+        try {
+            this.responseService.logRequest(action, null);
+            const moves = await this.pokemonService.getAllMoves();
+            this.responseService.logSuccess(action, moves);
+            return this.responseService.createSuccessResponse('All Pokémon moves retrieved successfully', moves);
+        } catch (error) {
+            this.responseService.handleError(action, error);
+        }
+    }
+
+    @Get('moves/:id/:form')
+    @ApiOperation({ summary: 'Get Pokémon moves by ID and form' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon moves retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon moves.' })
+    async getMoves(@Param('id') id: number, @Param('form') form: number) {
+        const action = 'get Pokémon moves by ID and form';
+        try {
+            this.responseService.logRequest(action, { id, form });
+            const moves = await this.pokemonService.getMoves(id, form);
+            this.responseService.logSuccess(action, moves);
+            return this.responseService.createSuccessResponse('Pokémon moves retrieved successfully', moves);
+        } catch (error) {
+            this.responseService.handleError(action, error, { id, form });
+        }
+    }
+    
+    @Get('names')
+    @ApiOperation({ summary: 'Get Pokémon names' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon names retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon names.' })
+    async getPokemonNames() {
+        const action = 'get Pokémon names';
+        try {
+            this.responseService.logRequest(action, null);
+            const names = await this.pokemonService.getPokemonNames();
+            this.responseService.logSuccess(action, names);
+            return this.responseService.createSuccessResponse('Pokémon names retrieved successfully', names);
+        } catch (error) {
+            this.responseService.handleError(action, error);
+        }
+    }
+
+    
+    @Get('spawns/:name')
+    @ApiOperation({ summary: 'Get spawns by Pokémon name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Spawns retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve spawns.' })
+    async getSpawns(@Param('name') name: string) {
+        const action = 'get spawns by Pokémon name';
+        try {
+            this.responseService.logRequest(action, { name });
+            const spawns = await this.pokemonService.getSpawnByPokemon(name);
+            this.responseService.logSuccess(action, spawns);
+            return this.responseService.createSuccessResponse('Spawns retrieved successfully', spawns);
+        } catch (error) {
+            this.responseService.handleError(action, error, { name });
+        }
+    }
+
+    @Get('move/:name/pokemon')
+    @ApiOperation({ summary: 'Get Pokémon by move name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
+    async getPokemonByMove(@Param('name') name: string) {
+        const action = 'get Pokémon by move name';
+        try {
+            this.responseService.logRequest(action, { name });
+            const pokemon = await this.pokemonService.getPokemonByMove(name);
+            this.responseService.logSuccess(action, pokemon);
+            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
+        } catch (error) {
+            this.responseService.handleError(action, error, { name });
+        }
+    }
+    
+    @Get('biomes')
+    @ApiOperation({ summary: 'Get all biomes' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Biomes retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve biomes.' })
+    async getBiomes() {
+        const action = 'get all biomes';
+        try {
+            this.responseService.logRequest(action, null);
+            const biomes = await this.pokemonService.getBiomes();
+            this.responseService.logSuccess(action, biomes);
+            return this.responseService.createSuccessResponse('Biomes retrieved successfully', biomes);
+        } catch (error) {
+            this.responseService.handleError(action, error);
+        }
+    }
+    
+    @Get('biome/:name')
+    @ApiOperation({ summary: 'Get Pokémon by biome name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
+    async getPokemonByBiome(@Param('name') name: string) {
+        const action = 'get Pokémon by biome name';
+        try {
+            this.responseService.logRequest(action, { name });
+            const pokemon = await this.pokemonService.getPokemonByBiome(name);
+            this.responseService.logSuccess(action, pokemon);
+            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
+        } catch (error) {
+            this.responseService.handleError(action, error, { name });
+        }
+    }
+
+    @Get('image/:id/:form/:palette/:uuid/:hide')
+    @ApiOperation({ summary: 'Get Pokémon image' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Image retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve image.' })
+    async getImage(
+        @Param('id') pokemonId: number,
+        @Param('form') formName: string,
+        @Param('palette') paletteName: string,
+        @Param('uuid') uuid: string,
+        @Param('hide') hide: number,
+    ) {
+        const action = 'get Pokémon image';
+        try {
+            this.responseService.logRequest(action, { pokemonId, formName, paletteName, uuid, hide });
+            const image = await this.pokemonService.getImage({ pokemonId, formName, paletteName, uuid, hide });
+            this.responseService.logSuccess(action, image);
+            return this.responseService.createSuccessResponse('Image retrieved successfully', image);
+        } catch (error) {
+            this.responseService.handleError(action, error, { pokemonId, formName, paletteName, uuid, hide });
+        }
+    }
+
+    @Get('sprite/:id/:form/:palette/:uuid/:hide')
+    @ApiOperation({ summary: 'Get Pokémon sprite' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Sprite retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve sprite.' })
+    async getSprite(
+        @Param('id') pokemonId: number,
+        @Param('form') formName: string,
+        @Param('palette') paletteName: string,
+        @Param('uuid') uuid: string,
+        @Param('hide') hide: number,
+    ) {
+        const action = 'get Pokémon sprite';
+        try {
+            this.responseService.logRequest(action, { pokemonId, formName, paletteName, uuid, hide });
+            const sprite = await this.pokemonService.getImage({ pokemonId, formName, paletteName, uuid, type: 'sprite', hide });
+            this.responseService.logSuccess(action, sprite);
+            return this.responseService.createSuccessResponse('Sprite retrieved successfully', sprite);
+        } catch (error) {
+            this.responseService.handleError(action, error, { pokemonId, formName, paletteName, uuid, hide });
+        }
+    }
+
+    @Get('nextprev/:id')
+    @ApiOperation({ summary: 'Get next and previous Pokémon by ID' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Next and previous Pokémon retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve next and previous Pokémon.' })
+    async getNextPrev(@Param('id') id: string) {
+        const action = 'get next and previous Pokémon by ID';
+        try {
+            this.responseService.logRequest(action, { id });
+            const nextPrev = await this.pokemonService.getNextPrev(parseInt(id));
+            this.responseService.logSuccess(action, nextPrev);
+            return this.responseService.createSuccessResponse('Next and previous Pokémon retrieved successfully', nextPrev);
+        } catch (error) {
+            this.responseService.handleError(action, error, { id });
+        }
+    }
+
+    @Get('evotree/:id')
+    @ApiOperation({ summary: 'Get Pokémon evolution tree by ID' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon evolution tree retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon evolution tree.' })
+    async getEvoTree(@Param('id') id: string) {
+        const action = 'get Pokémon evolution tree by ID';
+        try {
+            this.responseService.logRequest(action, { id });
+            const evoTree = await this.pokemonService.getEvoTree(parseInt(id));
+            this.responseService.logSuccess(action, evoTree);
+            return this.responseService.createSuccessResponse('Pokémon evolution tree retrieved successfully', evoTree);
+        } catch (error) {
+            this.responseService.handleError(action, error, { id });
+        }
+    }
+
+    
+    
+    @Get('item/sprite/:name')
+    @ApiOperation({ summary: 'Get item sprite by name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Item sprite retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve item sprite.' })
+    async getItemSprite(@Param('name') name: string) {
+        const action = 'get item sprite by name';
+        try {
+            this.responseService.logRequest(action, { name });
+            const sprite = await this.pokemonService.getItemSprite(name);
+            this.responseService.logSuccess(action, sprite);
+            return this.responseService.createSuccessResponse('Item sprite retrieved successfully', sprite);
+        } catch (error) {
+            this.responseService.handleError(action, error, { name });
+        }
+    }
+
+    /*
+    @Get('overallscoreranking')
+    @ApiOperation({ summary: 'Get overall score ranking' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Overall score ranking retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve overall score ranking.' })
+    async getOverallScoreRanking() {
+        const action = 'get overall score ranking';
+        try {
+            this.responseService.logRequest(action, null);
+            const ranking = await this.pokemonService.getOverallRanking();
+            this.responseService.logSuccess(action, ranking);
+            return this.responseService.createSuccessResponse('Overall score ranking retrieved successfully', ranking);
+        } catch (error) {
+            this.responseService.handleError(action, error);
         }
     }
     
@@ -79,21 +287,6 @@ export class PokemonController {
         }
     }
     
-    @Get('names')
-    @ApiOperation({ summary: 'Get Pokémon names' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon names retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon names.' })
-    async getPokemonNames() {
-        const action = 'get Pokémon names';
-        try {
-            this.responseService.logRequest(action, null);
-            const names = await this.pokemonService.getPokemonNames();
-            this.responseService.logSuccess(action, names);
-            return this.responseService.createSuccessResponse('Pokémon names retrieved successfully', names);
-        } catch (error) {
-            this.responseService.handleError(action, error);
-        }
-    }
     
     @Get('nameforms')
     @ApiOperation({ summary: 'Get species by name with form' })
@@ -208,21 +401,7 @@ export class PokemonController {
         }
     }
     
-    @Get('nextprev/:id')
-    @ApiOperation({ summary: 'Get next and previous Pokémon by ID' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Next and previous Pokémon retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve next and previous Pokémon.' })
-    async getNextPrev(@Param('id') id: string) {
-        const action = 'get next and previous Pokémon by ID';
-        try {
-            this.responseService.logRequest(action, { id });
-            const nextPrev = await this.pokemonService.getNextPrev(parseInt(id));
-            this.responseService.logSuccess(action, nextPrev);
-            return this.responseService.createSuccessResponse('Next and previous Pokémon retrieved successfully', nextPrev);
-        } catch (error) {
-            this.responseService.handleError(action, error, { id });
-        }
-    }
+
     
     @Get('search/species/:name')
     @ApiOperation({ summary: 'Get Pokémon by name' })
@@ -272,38 +451,7 @@ export class PokemonController {
         }
     }
     
-    @Get('evotree/:id')
-    @ApiOperation({ summary: 'Get Pokémon evolution tree by ID' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon evolution tree retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon evolution tree.' })
-    async getEvoTree(@Param('id') id: string) {
-        const action = 'get Pokémon evolution tree by ID';
-        try {
-            this.responseService.logRequest(action, { id });
-            const evoTree = await this.pokemonService.getEvoTree(parseInt(id));
-            this.responseService.logSuccess(action, evoTree);
-            return this.responseService.createSuccessResponse('Pokémon evolution tree retrieved successfully', evoTree);
-        } catch (error) {
-            this.responseService.handleError(action, error, { id });
-        }
-    }
-    
-    @Get('moves/:id/:form')
-    @ApiOperation({ summary: 'Get Pokémon moves by ID and form' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon moves retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon moves.' })
-    async getMoves(@Param('id') id: number, @Param('form') form: number) {
-        const action = 'get Pokémon moves by ID and form';
-        try {
-            this.responseService.logRequest(action, { id, form });
-            const moves = await this.pokemonService.getMoves(id, form);
-            this.responseService.logSuccess(action, moves);
-            return this.responseService.createSuccessResponse('Pokémon moves retrieved successfully', moves);
-        } catch (error) {
-            this.responseService.handleError(action, error, { id, form });
-        }
-    }
-    
+
     @Get('moves')
     @ApiOperation({ summary: 'Get all Pokémon moves' })
     @ApiResponse({ status: HttpStatus.OK, description: 'All Pokémon moves retrieved successfully.' })
@@ -335,37 +483,8 @@ export class PokemonController {
         }
     }
     
-    @Get('move/:name/pokemon')
-    @ApiOperation({ summary: 'Get Pokémon by move name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
-    async getPokemonByMove(@Param('name') name: string) {
-        const action = 'get Pokémon by move name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const pokemon = await this.pokemonService.getPokemonByMove(name);
-            this.responseService.logSuccess(action, pokemon);
-            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
-        }
-    }
+
     
-    @Get('spawns/:name')
-    @ApiOperation({ summary: 'Get spawns by Pokémon name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Spawns retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve spawns.' })
-    async getSpawns(@Param('name') name: string) {
-        const action = 'get spawns by Pokémon name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const spawns = await this.pokemonService.getSpawns(name);
-            this.responseService.logSuccess(action, spawns);
-            return this.responseService.createSuccessResponse('Spawns retrieved successfully', spawns);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
-        }
-    }
     
     @Get('allspawns/:name')
     @ApiOperation({ summary: 'Get all spawns by Pokémon name' })
@@ -383,27 +502,7 @@ export class PokemonController {
         }
     }
     
-    @Get('image/:id/:form/:palette/:uuid/:hide')
-    @ApiOperation({ summary: 'Get Pokémon image' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Image retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve image.' })
-    async getImage(
-        @Param('id') pokemonId: number,
-        @Param('form') formName: string,
-        @Param('palette') paletteName: string,
-        @Param('uuid') uuid: string,
-        @Param('hide') hide: number,
-    ) {
-        const action = 'get Pokémon image';
-        try {
-            this.responseService.logRequest(action, { pokemonId, formName, paletteName, uuid, hide });
-            const image = await this.pokemonService.getImage({ pokemonId, formName, paletteName, uuid, hide });
-            this.responseService.logSuccess(action, image);
-            return this.responseService.createSuccessResponse('Image retrieved successfully', image);
-        } catch (error) {
-            this.responseService.handleError(action, error, { pokemonId, formName, paletteName, uuid, hide });
-        }
-    }
+
     
     @Get('sprite/:id/:form/:palette/:uuid/:hide')
     @ApiOperation({ summary: 'Get Pokémon sprite' })
@@ -424,22 +523,6 @@ export class PokemonController {
             return this.responseService.createSuccessResponse('Sprite retrieved successfully', sprite);
         } catch (error) {
             this.responseService.handleError(action, error, { pokemonId, formName, paletteName, uuid, hide });
-        }
-    }
-    
-    @Get('item/sprite/:name')
-    @ApiOperation({ summary: 'Get item sprite by name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Item sprite retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve item sprite.' })
-    async getItemSprite(@Param('name') name: string) {
-        const action = 'get item sprite by name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const sprite = await this.pokemonService.getItemSprite(name);
-            this.responseService.logSuccess(action, sprite);
-            return this.responseService.createSuccessResponse('Item sprite retrieved successfully', sprite);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
         }
     }
     
@@ -508,38 +591,6 @@ export class PokemonController {
         }
     }
     
-    @Get('biome/:name')
-    @ApiOperation({ summary: 'Get Pokémon by biome name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
-    async getPokemonByBiome(@Param('name') name: string) {
-        const action = 'get Pokémon by biome name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const pokemon = await this.pokemonService.getPokemonByBiome(name);
-            this.responseService.logSuccess(action, pokemon);
-            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
-        }
-    }
-    
-    @Get('biomes')
-    @ApiOperation({ summary: 'Get all biomes' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Biomes retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve biomes.' })
-    async getBiomes() {
-        const action = 'get all biomes';
-        try {
-            this.responseService.logRequest(action, null);
-            const biomes = await this.pokemonService.getBiomes();
-            this.responseService.logSuccess(action, biomes);
-            return this.responseService.createSuccessResponse('Biomes retrieved successfully', biomes);
-        } catch (error) {
-            this.responseService.handleError(action, error);
-        }
-    }
-    
     @Get('pmd/:name')
     @ApiOperation({ summary: 'Get Pokémon by PMD name' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
@@ -570,6 +621,6 @@ export class PokemonController {
         } catch (error) {
             this.responseService.handleError(action, error);
         }
-    }
+    }*/
     
 }

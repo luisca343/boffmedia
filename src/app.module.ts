@@ -60,6 +60,9 @@ import { AuthModule } from './auth/auth.module';
 import { ShowdownGateway } from './battlesimulator/showdown.gateway';
 import { PtcgpBattleService } from './boffmedia/herramientas/ptcgp/battle.service';
 import { DrizzleModule } from './drizzle/drizzle.module';
+import { PokemonDataService } from './smartrotom/pokemon/pokemon-data.service';
+import { MoveDataService } from './smartrotom/pokemon/move-data.service';
+import { SpawnDataService } from './smartrotom/pokemon/spawn-data.service';
 //import { EventsModule } from './boffmedia/events/events.module';
 
 @Module({
@@ -106,7 +109,7 @@ import { DrizzleModule } from './drizzle/drizzle.module';
     DrizzleModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, ArcadeService, DiscordService, CommandsService, {
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, ArcadeService, DiscordService, CommandsService, {
     provide: ConfigService,
     useClass: ConfigService,
   }, TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway
