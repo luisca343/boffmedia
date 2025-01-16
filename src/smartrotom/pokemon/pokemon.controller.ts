@@ -253,6 +253,40 @@ export class PokemonController {
         }
     }
 
+    
+    @Get('search/species/:name')
+    @ApiOperation({ summary: 'Get Pokémon by name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
+    async getPokemonByName(@Param('name') name: string) {
+        const action = 'get Pokémon by name';
+        try {
+            this.responseService.logRequest(action, { name });
+            const pokemon = await this.pokemonService.searchPokemonByName(name);
+            this.responseService.logSuccess(action, pokemon);
+            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
+        } catch (error) {
+            this.responseService.handleError(action, error, { name });
+        }
+    }
+
+    
+    @Get('registries/:uuid')
+    @ApiOperation({ summary: 'Get Pokédex registries by UUID' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokédex registries retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokédex registries.' })
+    async getPokedexRegistries(@Param('uuid') uuid: string) {
+        const action = 'get Pokédex registries by UUID';
+        try {
+            this.responseService.logRequest(action, { uuid });
+            const registries = await this.pokemonService.getRegistries(uuid);
+            this.responseService.logSuccess(action, registries);
+            return this.responseService.createSuccessResponse('Pokédex registries retrieved successfully', registries);
+        } catch (error) {
+            this.responseService.handleError(action, error, { uuid });
+        }
+    }
+
     /*
     @Get('overallscoreranking')
     @ApiOperation({ summary: 'Get overall score ranking' })
@@ -403,21 +437,6 @@ export class PokemonController {
     
 
     
-    @Get('search/species/:name')
-    @ApiOperation({ summary: 'Get Pokémon by name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
-    async getPokemonByName(@Param('name') name: string) {
-        const action = 'get Pokémon by name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const pokemon = await this.pokemonService.getPokemonByName(name);
-            this.responseService.logSuccess(action, pokemon);
-            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
-        }
-    }
     
     @Get('stats/:name')
     @ApiOperation({ summary: 'Get Pokémon stats by name' })
@@ -574,22 +593,6 @@ export class PokemonController {
         }
     }
     
-    
-    @Get('registries/:uuid')
-    @ApiOperation({ summary: 'Get Pokédex registries by UUID' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokédex registries retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokédex registries.' })
-    async getPokedexRegistries(@Param('uuid') uuid: string) {
-        const action = 'get Pokédex registries by UUID';
-        try {
-            this.responseService.logRequest(action, { uuid });
-            const registries = await this.pokemonService.getRegistries(uuid);
-            this.responseService.logSuccess(action, registries);
-            return this.responseService.createSuccessResponse('Pokédex registries retrieved successfully', registries);
-        } catch (error) {
-            this.responseService.handleError(action, error, { uuid });
-        }
-    }
     
     @Get('pmd/:name')
     @ApiOperation({ summary: 'Get Pokémon by PMD name' })
