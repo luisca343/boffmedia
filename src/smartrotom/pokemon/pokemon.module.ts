@@ -8,10 +8,11 @@ import { DrizzleModule } from '@/drizzle/drizzle.module';
 import { PokemonDataService } from './pokemon-data.service';
 import { MoveDataService } from './move-data.service';
 import { SpawnDataService } from './spawn-data.service';
+import { PokemonImageService } from './pokemon-image.service';
 
 @Module({
   imports: [LoggerModule, ResponseModule, DrizzleModule],
-  providers: [PokemonService, PokemonDataService, MoveDataService, SpawnDataService],
+  providers: [PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService],
   controllers: [PokemonController],
   exports: [PokemonService],
 })

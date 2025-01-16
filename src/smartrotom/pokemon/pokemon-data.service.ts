@@ -4,6 +4,16 @@ import { MoveDataService } from './move-data.service';
 import { Pokemon, PokemonForm } from './interfaces/pokemon.interface';
 import * as path from 'path';
 
+
+export interface EvoTreeNode {
+  pkm: string;
+  evos: { [key: string]: EvoTreeNode };
+  dex: number;
+  index: number;
+  methods?: any[];
+}
+
+
 @Injectable()
 export class PokemonDataService extends BaseDataService {
   constructor(private readonly moveDataService: MoveDataService) {
@@ -252,5 +262,93 @@ export class PokemonDataService extends BaseDataService {
   getAllSpeciesByMove(): { [key: string]: { speciesID: number; form: string }[] } {
     return this.speciesByMove;
   }
+
+
+
+  
+  getEvoTree(id: number): { depth: number; tree: { [key: string]: EvoTreeNode } } {
+    const pkm = this.getSpeciesByDex(id);
+    if (!pkm) {
+      throw new Error(`Pokemon with id ${id} not found`);
+    }
+    
+    let preEvo = pkm;
+    while (preEvo.forms[0].preEvolutions?.length > 0) {
+      const preEvoName = preEvo.forms[0].preEvolutions[0].toLowerCase();
+      preEvo = this.getSpeciesByName(preEvoName);
+      if (!preEvo) {
+        break;
+      }
+    }
+    const evoTree = this.getEvos(preEvo, 'all');
+    return evoTree;
+  }
+  
+  getEvos(pokemon: Pokemon, currentForm: string, evos: { [key: string]: EvoTreeNode } = {}): { depth: number; tree: { [key: string]: EvoTreeNode } } {
+    if (currentForm === '') currentForm = 'base';
+    
+    for (const form of pokemon.forms) {
+      const formName = form.name || 'base';
+      const pkmId = `${pokemon.name}_${formName}`;
+      
+      if ((currentForm !== 'all' || formName.includes('gmax')) && formName !== currentForm) continue;
+      
+      if (Object.keys(evos).length === 0) {
+        evos[pkmId] = { pkm: pokemon.name, evos: {}, dex: pokemon.dex, index: form.index + 1 };
+      }
+      
+      let currentPokemon = evos[pkmId];
+      
+      if (!form.evolutions) {
+        continue;
+      }
+      
+      for (const evo of form.evolutions) {
+        const [evoPokemonName, evoFormName] = this.getFormName(evo.to);
+        const evoId = `${evoPokemonName}_${evoFormName}`;
+        if (!currentPokemon.evos) currentPokemon.evos = {};
+        const evoArray = currentPokemon.evos;
+        
+        const evoPokemon = this.getSpeciesByName(evoPokemonName);
+        if (!evoPokemon) continue;
+        
+        const evoFormIndex = evoPokemon.forms.findIndex((f) => f.name === evoFormName);
+        
+        if (!evoArray[evoId]) {
+          evoArray[evoId] = {
+            pkm: evoPokemonName,
+            evos: {},
+            dex: evoPokemon.dex,
+            index: (evoFormIndex > -1 ? evoFormIndex : 0) + 1
+          };
+        }
+        
+        if (!evoArray[evoId].methods) {
+          evoArray[evoId].methods = [];
+        }
+        evoArray[evoId].methods.push(evo);
+        
+        this.getEvos(evoPokemon, evoFormName, evoArray);
+      }
+    }
+    return { depth: this.getEvoTreeDepth(evos), tree: evos };
+  }
+  
+  private getEvoTreeDepth(evos: { [key: string]: EvoTreeNode }, depth = 0): number {
+    let maxDepth = depth;
+    for (const evo in evos) {
+      const evoDepth = this.getEvoTreeDepth(evos[evo].evos, depth + 1);
+      if (evoDepth > maxDepth) maxDepth = evoDepth;
+    }
+    return maxDepth;
+  }
+  
+  private getFormName(evolutionString: string): [string, string] {
+    const parts = evolutionString.split(':');
+    return [parts[0], parts[1] || 'base'];
+  }
+
+
 }
+
 
