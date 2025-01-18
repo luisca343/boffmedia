@@ -263,7 +263,21 @@ export class PokemonDataService extends BaseDataService {
     return this.speciesByMove;
   }
 
-
+  getAllMovesSortedByCount(): { name: string; count: number }[] {
+    const moveCounts: { [key: string]: number } = {};
+  
+    for (const move in this.speciesByMove) {
+      if (this.speciesByMove.hasOwnProperty(move)) {
+        moveCounts[move] = this.speciesByMove[move].length;
+      }
+    }
+  
+    const sortedMoves = Object.entries(moveCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  
+    return sortedMoves;
+  }
 
   
   getEvoTree(id: number): { depth: number; tree: { [key: string]: EvoTreeNode } } {

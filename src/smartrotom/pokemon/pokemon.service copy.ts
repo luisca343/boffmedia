@@ -716,4 +716,10 @@ export class PokemonService {
 
         return biomes
     }
+
+
+
+
+
+    
 }

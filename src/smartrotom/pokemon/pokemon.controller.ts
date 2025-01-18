@@ -102,10 +102,28 @@ export class PokemonController {
     async getSpawns(@Param('name') name: string) {
         const action = 'get spawns by Pokémon name';
         try {
+            console.log("GET SPAWNS")
             this.responseService.logRequest(action, { name });
             const spawns = await this.pokemonService.getSpawnByPokemon(name);
+            console.log(spawns)
             this.responseService.logSuccess(action, spawns);
             return this.responseService.createSuccessResponse('Spawns retrieved successfully', spawns);
+        } catch (error) {
+            this.responseService.handleError(action, error, { name });
+        }
+    }
+
+    @Get('move/:name')
+    @ApiOperation({ summary: 'Get move by name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Move retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve move.' })
+    async getMove(@Param('name') name: string) {
+        const action = 'get move by name';
+        try {
+            this.responseService.logRequest(action, { name });
+            const move = await this.pokemonService.getMove(name);
+            this.responseService.logSuccess(action, move);
+            return this.responseService.createSuccessResponse('Move retrieved successfully', move);
         } catch (error) {
             this.responseService.handleError(action, error, { name });
         }
@@ -486,21 +504,7 @@ export class PokemonController {
             this.responseService.handleError(action, error);
         }
     }
-    @Get('move/:name')
-    @ApiOperation({ summary: 'Get move by name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Move retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve move.' })
-    async getMove(@Param('name') name: string) {
-        const action = 'get move by name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const move = await this.pokemonService.getMove(name);
-            this.responseService.logSuccess(action, move);
-            return this.responseService.createSuccessResponse('Move retrieved successfully', move);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
-        }
-    }
+
     
 
     

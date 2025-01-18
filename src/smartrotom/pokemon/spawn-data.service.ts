@@ -58,7 +58,7 @@ export class SpawnDataService extends BaseDataService {
       spawnInfo.pokemonDex = this.pokemonDataService.getSpeciesByName(speciesName)?.dex || 0;
 
       this.addSpawnInfoToBiomes(biomes, spawnInfo);
-      this.addSpawnInfoToCollections(speciesName, pokemonID, spawnInfo);
+      this.addSpawnInfoToCollections(speciesName, form, pokemonID, spawnInfo);
     });
   }
 
@@ -69,7 +69,7 @@ export class SpawnDataService extends BaseDataService {
     });
   }
 
-  private addSpawnInfoToCollections(speciesName: string | undefined, pokemonID: string, spawnInfo: SpawnInfo) {
+  private addSpawnInfoToCollections(speciesName: string | undefined, form: string, pokemonID: string, spawnInfo: SpawnInfo) {
     if (!speciesName) return;
 
     if (!this.spawnByPokemon[speciesName]) this.spawnByPokemon[speciesName] = [];
@@ -93,7 +93,7 @@ export class SpawnDataService extends BaseDataService {
   }
 
   getSpawnByPokemon(name: string): SpawnInfo[] {
-    return this.spawnByPokemon[name] || [];
+    return this.spawnByPokemonAndForm[name] || [];
   }
 
   getBiomesByPokemon(name: string): string[] {

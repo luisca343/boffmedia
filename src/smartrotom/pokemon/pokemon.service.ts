@@ -45,8 +45,8 @@ export class PokemonService {
     return this.pokemonDataService.getSpeciesByDex(dex);
   }
   
-  getAllMoves(): { [key: string]: { speciesID: number; form: string }[] } {
-    return this.pokemonDataService.getAllSpeciesByMove();
+  getAllMoves(): { name: string; count: number }[] {
+    return this.pokemonDataService.getAllMovesSortedByCount();
   }
   
   getMoves(id: number, formIndex: number) {
@@ -82,8 +82,14 @@ export class PokemonService {
   getSpawnByPokemon(name: string): SpawnInfo[] {
     return this.spawnDataService.getSpawnByPokemon(name);
   }
+
+  getMove(name: string) {
+    return this.moveDataService.getMove(name);
+  }
   
   getPokemonByMove(name: string): { speciesID: number; form: string }[] | undefined {
+    console.log('getPokemonByMove', name);
+    console.log(this.pokemonDataService.getSpeciesByMove(name));
     return this.pokemonDataService.getSpeciesByMove(name);
   }
   
