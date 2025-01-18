@@ -15,7 +15,7 @@ export class ChatappService {
         private socketGateway: SocketsGateway
     ) {}
 
-    async getChats(uuid: string){
+    async getChats(uuid: string): Promise<Group[]>{
         const params = {id:rotomChats.id , name: rotomChats.name, type: rotomChats.type, description: rotomChats.description, 
             image: rotomChats.image, createdAt: rotomChats.createdAt, updatedAt: rotomChats.updatedAt
         }
@@ -51,7 +51,7 @@ export class ChatappService {
                 group.members = members
 
                 return group
-        }))
+        })) as Group[]
 
 
         groups.sort((a, b) => {
@@ -80,7 +80,7 @@ export class ChatappService {
             
     }
 
-    async getMessages(chatId: number){
+    async getMessages(chatId: number): Promise<RotomMessage[]>{
         return this.db.select({id: rotomChatMessages.id, text: rotomChatMessages.content, date: rotomChatMessages.createdAt, uuid: rotomChatMessages.senderUUID})
             .from(rotomChatMessages)
             .where(eq(rotomChatMessages.chatId, chatId))
@@ -93,7 +93,7 @@ export class ChatappService {
     }
 
 
-    async createMessage(chatId: number, message: string, uuid: string, type: string = 'text'){
+    async createMessage(chatId: number, message: string, uuid: string, type: string = 'text'): Promise<RotomMessage>{
         const insert = await this.db.insert(rotomChatMessages)
             .values({chatId, content: message, senderUUID: uuid, type} as RotomChatMessage) as ResultSetHeader[]
         
@@ -113,10 +113,10 @@ export class ChatappService {
 
         })
 
-        return {id: chatId, text: message, date: new Date(), uuid: uuid}
+        return {id: chatId, text: message, date: new Date(), uuid: uuid} as RotomMessage
     }
 
-    async createChat(player: string, users: string[], name: string){
+    async createChat(player: string, users: string[], name: string): Promise<number>{
         const chatUsers = new Set(users)
         chatUsers.add(player)
         const uuids = Array.from(chatUsers)
@@ -194,7 +194,7 @@ export class ChatappService {
             }
         })
 
-        return 1
+        return {chatId, caller: uuid, users: connectedUsers}
     }
 
     endCall(chatId: number, startTime: number){

@@ -3,7 +3,7 @@ import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, inArray, max, sum } from 'drizzle-orm';
+import { and, desc, eq, inArray, max, sql, sum } from 'drizzle-orm';
 import { ResultSetHeader } from 'mysql2';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class MinaService {
     ) {}
 
     
-  async getEnergy(uuid: string) {
+  async getEnergy(uuid: string): Promise<{energy: number, maxEnergy: number, lastCharge: Date}> {
     const hoursToCharge = 1;
     const maxEnergy = 10;
     let energy = await this.getEnergyFromBBDD(uuid);
@@ -73,10 +73,11 @@ export class MinaService {
         return {idPartida: insert[0].insertId};
     }
 
-    async getRewards() {
+    async getRewards(): Promise<RewardEntry[]> {
         return await this.db.select().from(mineRewards);
     }
-    async getRewardsByType() {
+
+    async getRewardsByType(): Promise<{ drops: { [key: string]: { items: RewardEntry[], totalValue: number } }, totalValue: number }> {
         const rewards = await this.db.select().from(mineRewards);
         let arr = rewards.reduce((acc, curr) => {
             if (!acc[curr.type]) {
@@ -98,19 +99,23 @@ export class MinaService {
         return { drops: arr, totalValue };
     }
 
-    async endGame(uuid: string, rewards: {value:number, id: number}[] ) {
+    async endGame(uuid: string, rewards: {value:number, id: number}[] ): Promise<{idPartida: number}> {
       const ultimaPartida = await this.db.select({id: mineGames.id}).from(mineGames).where(eq(mineGames.uuid, uuid)).orderBy(desc(mineGames.id)).limit(1);
       const id = ultimaPartida[0].id;
       const res = await this.db.select({valor: max(mineRewards.value)}).from(mineRewards);
       const valorMax = res[0].valor;
 
       
-      return this.db.insert(mineGamesDetail).values(rewards.map(reward => {
+      this.db.insert(mineGamesDetail).values(rewards.map(reward => {
           return {gameId: id, rewardId: reward.id, value:  valorMax / reward.value, claimed: 0}
       }));
+
+      return {idPartida: id};
     }
 
-    async getHistory(uuid: string) {
+
+
+    async getHistory(uuid: string): Promise<{[key: number]: HistoryEntry[]}> {
         const history =  (await this.db.select({id: mineGames.id, itemId: mineRewards.itemId, 
             itemName: mineRewards.name, claimed: mineGamesDetail.claimed, value: mineGamesDetail.value, date: mineGames.createdAt})
         .from(mineGames)
@@ -135,15 +140,18 @@ export class MinaService {
         return arr
     }
 
-    async getRanking() {
+    async getRanking(): Promise<RankingEntry[]> {
         return await this.db
-            .select({username: smartrotomUsers.username, value: sum(mineGamesDetail.value)})
-            .from(mineGames)
-            .leftJoin(smartrotomUsers, eq(smartrotomUsers.uuid, mineGames.uuid))
-            .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
-            .groupBy(smartrotomUsers.uuid)
-            .orderBy(desc(sum(mineGamesDetail.value)));
-    }
+          .select({
+            username: smartrotomUsers.username,
+            value: sql<number>`SUM(${mineGamesDetail.value})`.as('value')
+          })
+          .from(mineGames)
+          .leftJoin(smartrotomUsers, eq(smartrotomUsers.uuid, mineGames.uuid))
+          .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))
+          .groupBy(smartrotomUsers.uuid)
+          .orderBy(desc(sum(mineGamesDetail.value))) as RankingEntry[];
+      }
 
     async getUnclaimed(uuid: string) {
         const res = await this.db.select({
@@ -172,7 +180,7 @@ export class MinaService {
         return items;
     }
 
-    async claim(uuid: string) {
+    async claim(uuid: string): Promise<number[]> {
         const res = await this.db.select({ id: mineGamesDetail.id, rewardId: mineGamesDetail.rewardId })
             .from(mineGames)
             .leftJoin(mineGamesDetail, eq(mineGamesDetail.gameId, mineGames.id))

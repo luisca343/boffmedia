@@ -7,6 +7,7 @@ import { desc, eq, or } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { RowDataPacket } from 'mysql2';
 import axios from 'axios';
+import { StarBankAccount as StarBankAccountType } from './types';
 
 @Injectable()
 export class StarbankService {
@@ -34,7 +35,7 @@ export class StarbankService {
         return {balance: res[0].balance}
     }
 
-    async getAllAccounts() {
+    async getAllAccounts(): Promise<StarBankAccountType[]> {
         return await this.db
             .selectDistinct({id: starBankAccounts.id, balance: starBankAccounts.balance, name: starBankAccounts.name, type: starBankAccounts.type})
             .from(starBankAccounts)
@@ -131,6 +132,8 @@ export class StarbankService {
             console.log(`Venta de ${body.count} ${body.itemName} a ${body.npcName} por ${total}`)
             await this.transaction( 0, account.id, total,  `Venta de ${body.count} ${body.itemName} a ${body.npcName}`, "VENTA");
         }
+
+        return {success: true}
     }
 
     async transaction(from:number, to: number, amount: number, reason: string, type: string) {

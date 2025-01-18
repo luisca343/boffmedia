@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
-import { IDialogue, IQuestCategory, QuestData } from './types';
+import { IDialogue, IQuestCategory, NPC, QuestData, QuestStatus, QuestSystemData } from './types';
 
 @Injectable()
 export class MisionesService {
@@ -9,11 +9,11 @@ export class MisionesService {
   private quests: QuestData[] = null;
   private dialogs: IDialogue[] = null;
   private categories: IQuestCategory[] = null;
-  private npcs: { name: string; dialogId: number; skin: string }[] = null;
+  private npcs: NPC[] = null;
 
   private lastUpdate = 0;
 
-  async getAllQuests(force: number): Promise<any> {
+  async getAllQuests(force: number): Promise<QuestSystemData> {
     if (!this.quests && !force) return this.getAllQuests(1);
     if (this.quests && Date.now() - this.lastUpdate < 4 * 60 * 60 * 1000 && !force) {
       return {

@@ -1,9 +1,12 @@
+import { text } from "stream/consumers";
+
 export enum QuestStatus {
   ACTIVE = 'ACTIVE',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED',
   AVAILABLE = 'AVAILABLE',
   LOCKED = 'LOCKED',
+  NOT_STARTED = 'NOT_STARTED',
 }
 
 export interface IDialogue {
@@ -51,7 +54,7 @@ export interface IQuestRequirements {
   scoreboardRequirements: ScoreboardRequirements[];
 }
 
-export type QuestData = {
+export interface QuestData {
   id: number;
   name: string;
   logText: string;
@@ -64,6 +67,20 @@ export type QuestData = {
   objectives: IQuestObjective[];
   requirements: IQuestRequirements;
   dialogId: number;
-
   rewards: IQuestReward[];
-};
+}
+
+export interface NPC {
+  id: number
+  name: string
+  text: string
+  questId: number
+  requirements: IQuestRequirements
+}
+
+export interface QuestSystemData {
+  quests: QuestData[]
+  categories: IQuestCategory[]
+  dialogs: IDialogue[]
+  npcs: NPC[]
+}

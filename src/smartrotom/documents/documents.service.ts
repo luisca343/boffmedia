@@ -8,7 +8,7 @@ import { CreateNewsDto } from './dto/create-news-dto';
 export class DocumentsService {
   constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
 
-  async getNews() {
+  async getNews(): Promise<{ featured: RotomNews; news: RotomNews[] }> {
     const news = await this.db
       
       .select()
@@ -20,7 +20,7 @@ export class DocumentsService {
     return { featured, news };
   }
 
-  async updateNewsStatus(published: number[], featured: number) {
+  async updateNewsStatus(published: number[], featured: number): Promise<{ success: boolean }> {
     await this.db
       
       .update(rotomNews)
@@ -49,7 +49,7 @@ export class DocumentsService {
     return { success: true };
   }
 
-  async getNewsById(newsId: number) {
+  async getNewsById(newsId: number): Promise<RotomNews> {
     return (
       await this.db
         
@@ -59,9 +59,8 @@ export class DocumentsService {
     )[0];
   }
 
-  async getNotes(uuid: string) {
+  async getNotes(uuid: string): Promise<Note[]> {
     return await this.db
-      
       .select({
         id: rotomDocuments.id,
         title: rotomDocuments.title,
@@ -74,10 +73,10 @@ export class DocumentsService {
         rotomDocumentsUsers,
         eq(rotomDocuments.id, rotomDocumentsUsers.documentId),
       )
-      .orderBy(desc(rotomDocuments.updatedAt));
+      .orderBy(desc(rotomDocuments.updatedAt)) as unknown as Note[];
   }
 
-  async getDocument(id: number) {
+  async getDocument(id: number): Promise<RotomDocument> {
     return (
       await this.db
         
@@ -87,12 +86,7 @@ export class DocumentsService {
     )[0];
   }
 
-  async saveNote(
-    id: number,
-    title: string,
-    content: string,
-    documentType: number,
-  ) {
+  async saveNote(id: number, title: string, content: string, documentType: number): Promise<{ success: boolean; id: number }> {
     const exists = await this.db
       
       .select()
@@ -126,7 +120,7 @@ export class DocumentsService {
     return { success: true, id: result[0].insertId };
   }
 
-  async saveNews(news: CreateNewsDto, newsId: number) {
+  async saveNews(news: CreateNewsDto, newsId: number): Promise<{ success: boolean; id: number }> {
     const exists = await this.db
       
       .select()
@@ -167,13 +161,13 @@ export class DocumentsService {
         .where(eq(rotomNews.id, newsId))
         .execute();
 
-      console.log(result);
+      return { success: true, id: newsId };
     }
 
     return { success: true, id: result[0].insertId };
   }
 
-  async addNoteToUser(documentId: number, uuid: string) {
+  async addNoteToUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
     const exists = await this.db
       
       .select()
@@ -192,5 +186,7 @@ export class DocumentsService {
         .values({ documentId, uuid })
         .execute();
     }
+
+    return { success: true };
   }
 }
