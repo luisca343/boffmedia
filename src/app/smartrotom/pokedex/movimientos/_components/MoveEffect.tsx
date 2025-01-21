@@ -47,6 +47,9 @@ export type Effect = {
     minHits: number,
     maxHits: number,
     stages: number,
+
+    maxLayers?: number,
+    damage?: number,
 }
 
 

@@ -1,4 +1,3 @@
-
 import { Table, TableRow, TableHeader, TableCell, TableBody, TableHead, TableFooter } from "@/components/ui/table"
 import { BattleStats, EvYields, Pokemon } from '@/types/Pokemon'
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader,PokedexRow } from '../../../_components/PokedexTable'
@@ -78,7 +77,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
               </PokedexRow>
             </PokedexHeader>
             <TableBody>
-              {Object.keys(stats).map((stat) => {
+              {Object.keys(stats).map((stat: any) => {
                 const statValue = stats[stat as keyof BattleStats]
                 return (
                   <PokedexRow key={stat}>
@@ -98,7 +97,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                     <PokedexCell className="text-center">{calculateStat(stat, statValue, 50, 31, 252, 1.1)}</PokedexCell>
                     <PokedexCell className="text-center">{calculateStat(stat, statValue, 100, 0, 0, 0.9)}</PokedexCell>
                     <PokedexCell className="text-center">{calculateStat(stat, statValue, 100, 31, 252, 1.1)}</PokedexCell>
-                    <PokedexCell className="text-center">{evYields[stat as keyof EvYields] || 0}</PokedexCell>
+                    <PokedexCell className="text-center">{evYields?.[stat as keyof EvYields] ?? 0}</PokedexCell>
                   </PokedexRow>
                 )
               })}

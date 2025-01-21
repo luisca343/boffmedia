@@ -14,7 +14,7 @@ export default function MoveDataElement({id} : {id: string}){
     useEffect(() => {
         rotomGET(`/pokemon/move/${id}`)
             .then((res) => {
-                setMove(res)
+                setMove(res.data)
             })
     }, [id])
 

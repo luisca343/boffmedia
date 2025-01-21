@@ -1,13 +1,44 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { documentsService } from '@/services/api/smartrotom/documentsService';
+import { useRotomRequest } from "../useRotomRequest";
+import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { useMemo } from "react";
 
-export const useGetAllNews = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export type News = {
+  id: number;
+  title: string;
+  subtitle: string;
+  subcategory: string;
+  published: number;
+  featured: number;
+  content: string;
+  buttonText: string;
+  imageUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-  const getNews = useCallback(() => {
-    return handleRequest(() => documentsService.getAllNews());
-  }, [handleRequest]);
+type NewsResponse = {
+  featured: News;
+  news: News[];
+}
 
-  return { getNews, loading, error };
-};
+export function useGetAllNews() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest<NewsResponse>(documentsService.getAllNews);
+
+  const featured = useMemo(() => data?.featured, [data]);
+  const news = useMemo(() => data?.news || [], [data]);
+  const published = useMemo(() => 
+    news.filter(n => n.id !== featured?.id && n.published === 1),
+    [news, featured]
+  );
+
+  return { 
+    featured, 
+    published, 
+    news, 
+    fetchNews: refetch, 
+    setNews: setData,
+    isLoading,
+    error
+  };
+}
+

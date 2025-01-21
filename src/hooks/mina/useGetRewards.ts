@@ -1,17 +1,15 @@
-import { useCallback, useEffect } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { minaService } from '@/services/api/smartrotom/minaService';
+import { useRotomRequest } from "../useRotomRequest";
+import { minaService } from "@/services/api/smartrotom/minaService";
 
-export const useGetRewards = () => {
-  const { loading, error, data: rewards, handleRequest } = useRotomRequest();
+export function useGetRewards() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.getRewards)
 
-  const getRewards = useCallback(() => {
-    return handleRequest(() => minaService.getRewards());
-  }, [handleRequest]);
+  return {
+    rewards: data,
+    error,
+    isLoading,
+    refetch,
+    setRewards: setData
+  }
+}
 
-  useEffect(() => {
-    getRewards();
-  }, [getRewards]);
-
-  return { rewards, loading, error };
-};

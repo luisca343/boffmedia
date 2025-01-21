@@ -39,18 +39,9 @@ export function Chat({
     const chat = chats.find((chat) => chat.id === activeChat);
     if (!chat) return;
     setChat(chat);
-    /*
-        rotomGET(`/chatapp/messages/${chat.id}`)
-            .then((res) => {
-                console.log(`Messages from chat ${chat.id}`, res)
-                setMessages(res);
-            })*/
-
+    
     if (socket) {
-      /*
-            socket.on('chat:message', (message: Message) => {
-                setMessages((prev) => [...prev, message])
-            })*/
+
     }
   }, [activeChat]);
 

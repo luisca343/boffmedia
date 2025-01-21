@@ -169,7 +169,6 @@ export default function RotomNav({
         <SheetContent
           side="top"
           className="bg-surface-800 text-surface-50 border-none"
-          parentId="smartrotom"
         >
           <SheetHeader>
             <SheetTitle className="text-surface-50">Ajustes</SheetTitle>
@@ -186,7 +185,6 @@ export default function RotomNav({
         <SheetContent
           side="right"
           className="bg-surface-800 text-surface-50 border-none flex flex-col w-max"
-          parentId="smartrotom"
         >
           <SheetHeader>
             <SheetTitle className="text-surface-50 text-2xl font-bold">

@@ -1,14 +1,21 @@
-import { useCallback } from 'react';
-import { CreateChatDto } from '@/types/dto/create-chat-dto';
-import { useRotomRequest } from '../useRotomRequest';
-import { chatAppService } from '@/services/api/smartrotom/chatAppService';
+import { useRotomRequest } from "../useRotomRequest";
+import { chatAppService } from "@/services/api/smartrotom/chatAppService";
+import { CreateChatDto } from "@/types/dto/create-chat-dto";
 
-export const useChatAppCreateChat = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useCreateChat() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.createChat)
 
-  const createChat = useCallback((data: CreateChatDto) => {
-    return handleRequest(() => chatAppService.createChat(data));
-  }, [handleRequest]);
+  const createChat = (chatData: CreateChatDto) => {
+    return chatAppService.createChat(chatData);
+  }
 
-  return { createChat, loading, error };
-};
+  return {
+    createdChat: data,
+    error,
+    isLoading,
+    refetch,
+    createChat,
+    setCreatedChat: setData
+  }
+}
+

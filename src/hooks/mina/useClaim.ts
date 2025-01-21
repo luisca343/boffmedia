@@ -1,13 +1,15 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { minaService } from '@/services/api/smartrotom/minaService';
+import { useRotomRequest } from "../useRotomRequest";
+import { minaService } from "@/services/api/smartrotom/minaService";
 
-export const useClaim = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useClaim(uuid: string) {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.claim, { uuid })
 
-  const claim = useCallback((data: { uuid: string }) => {
-    return handleRequest(() => minaService.claim(data));
-  }, [handleRequest]);
+  return {
+    claim: data,
+    error,
+    isLoading,
+    refetch,
+    setClaim: setData
+  }
+}
 
-  return { claim, loading, error };
-};

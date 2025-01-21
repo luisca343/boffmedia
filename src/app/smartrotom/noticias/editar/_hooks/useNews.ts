@@ -1,24 +1,34 @@
-import { useState, useEffect } from 'react'
-import { rotomPOST } from '@/services/boffAPI'
+import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
-import { useGetNews } from '../../_hooks/useGetNews'
+import { useGetAllNews } from '@/hooks/documents/useGetAllNews'
+import { useUpdateNewsStatus } from '@/hooks/documents/useUpdateNewsStatus'
+import { NewsStatusDto } from '@/types/dto/news-status-dto'
 
 export function useNews() {
-  const { news, setNews } = useGetNews()
+  const { news, featured, published, setNews, error: fetchError, isLoading } = useGetAllNews()
+  const { updateNewsStatus, error: updateError } = useUpdateNewsStatus()
+  
   const [publishedNewsIds, setPublishedNewsIds] = useState<number[]>([])
   const [featuredNewsId, setFeaturedNewsId] = useState<number | null>(null)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
   useEffect(() => {
-    // Initialize publishedNewsIds and featuredNewsId based on fetched data
-    const publishedIds = news
-      .filter((item) => item.published)
-      .map((item) => item.id)
-    const featuredId = news.find((item) => item.featured)?.id || null
+    if (fetchError) {
+      toast.error('Failed to fetch news. Please try again.')
+    }
+  }, [fetchError])
 
-    setPublishedNewsIds(publishedIds)
-    setFeaturedNewsId(featuredId)
-  }, [news])
+  useEffect(() => {
+    if (news && featured) {
+      const publishedIds = published.map(item => item.id)
+      setPublishedNewsIds(publishedIds)
+      setFeaturedNewsId(featured.id)
+    }
+  }, [news, featured, published])
+
+  const allNews = useMemo(() => {
+    return featured ? [featured, ...published] : published
+  }, [featured, published])
 
   function handlePublishToggle(id: number) {
     setPublishedNewsIds((prev) =>
@@ -44,16 +54,26 @@ export function useNews() {
     if (!featuredNewsId) {
       return toast.error('Debes seleccionar una noticia destacada')
     }
-    rotomPOST('/documents/newsstatus', {
+
+    const statusData: NewsStatusDto = {
       published: publishedNewsIds,
       featured: featuredNewsId,
-    }).then(() => {
-      setHasUnsavedChanges(false)
-    })
+    }
+
+    updateNewsStatus(statusData)
+      .then(() => {
+        setHasUnsavedChanges(false)
+        toast.success('News status updated successfully')
+      })
+      .catch(() => {
+        if (updateError) {
+          toast.error('Failed to update news status. Please try again.')
+        }
+      })
   }
 
   return {
-    news,
+    news: allNews,
     setNews,
     publishedNewsIds,
     featuredNewsId,
@@ -61,5 +81,7 @@ export function useNews() {
     handlePublishToggle,
     handleFeaturedToggle,
     handleSave,
+    isLoading,
   }
 }
+

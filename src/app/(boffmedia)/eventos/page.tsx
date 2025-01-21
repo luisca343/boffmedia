@@ -12,7 +12,7 @@ export default function EventsPage() {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const data = await boffGET('/events') as Event[];
+        const data = (await boffGET('/events')).data as Event[];
         setEvents(data);
       } catch (err) {
         setError('Failed to load events');

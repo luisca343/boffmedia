@@ -1,7 +1,6 @@
-import { SmartRotomResponse } from "@/types";
 
 
-export interface BattleReplay extends SmartRotomResponse {
+export interface BattleReplay {
     id: number;
     side1: string;
     side2: string;

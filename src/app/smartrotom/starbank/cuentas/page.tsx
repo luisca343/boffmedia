@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { AccountImage } from "../_components/AccountImage";
 import useStarBank from "../_hooks/useStarBank";
 import { useBoffSession } from "@/services/useBoffSession";
+import { starbankService } from "@/services/api/smartrotom/starbankService";
 
 export default function Cuentas() {
   const { session } = useBoffSession();
@@ -78,9 +79,9 @@ export default function Cuentas() {
   );
 
   function createAccount(name: string = "Nueva Cuenta") {
-    rotomPOST("/starbank/accounts/", {
+    starbankService.createAccount({
       name,
-      uuid: session?.user.smartRotomUser.uuid,
+      uuid: session?.user.smartRotomUser?.uuid!,
     }).then(() => {
       alert("Cuenta creada");
     });

@@ -22,7 +22,7 @@ export default async function EntradaPokedex({params}: any){
     
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
 
-    const pokemon = await rotomGET(`/pokemon/dex/${pokemonIndex}`) as Pokemon
+    const pokemon = (await rotomGET(`/pokemon/dex/${pokemonIndex}`)).data as Pokemon
     
 
     if (pokemonIndex === undefined) {
@@ -41,15 +41,16 @@ export default async function EntradaPokedex({params}: any){
        
     
 
-    const {next, prev} = await rotomGET(`/pokemon/nextprev/${pokemonIndex}`) as {next: Pokemon, prev: Pokemon}
-    const moves = await rotomGET(`/pokemon/moves/${pokemonIndex}/${formIndex}`) as Movement[]
+    const {next, prev} = (await rotomGET(`/pokemon/nextprev/${pokemonIndex}`)).data as {next: Pokemon, prev: Pokemon}
+    const moves = (await rotomGET(`/pokemon/moves/${pokemonIndex}/${formIndex}`)).data as Movement[]
 
     if(!pokemon) return <h1>Pokemon no encontrado {pokemonIndex}</h1>
     if(!pokemon.forms[formIndex]) return <h1>Forma no encontrada {formIndex}</h1>
 
     const formName = getFormName(pokemon, formIndex)
     
-    const spawns = await rotomGET(`/pokemon/spawns/${getPokemonId(pokemon.name, formName)}`) as SpawnInfo[]
+    const spawns = (await rotomGET(`/pokemon/spawns/${getPokemonId(pokemon.name, formName)}`)).data as SpawnInfo[]
+    console.log(spawns)
 
     const type1 = pokemon.forms[formIndex]?.types?.[0] ?? pokemon.forms[0]?.types?.[0] as string
     const type2 = pokemon.forms[formIndex]?.types?.[1] ?? pokemon.forms[0]?.types?.[1] as string
@@ -65,7 +66,7 @@ export default async function EntradaPokedex({params}: any){
     })})
     return (
         <section className="flex flex-col overflow-hidden text-surface-50 bg-surface-800 ">
-            <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} t={formsTranslation}/>
+            <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} />
             <section className="flex flex-col  bg-surface-800 overflow-auto pt-4">
                 <PokedexSection id='info' title="Información">
                     <BasicInfo formName={formName}/>

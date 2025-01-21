@@ -6,6 +6,7 @@ import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
 
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
+  console.log(spawns)
     const t  = useTranslations("");
     const formsTrans  = useTranslations("");
     if(spawns.length == 0) return <div className="  text-surface-50 text-shadow-border1 flex justify-center ">

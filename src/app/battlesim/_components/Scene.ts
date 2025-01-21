@@ -4,13 +4,19 @@ import { BattleMoveAnims, BattleOtherAnims } from "../_utils/battle-animations-m
 import { BattleEffects } from "../_utils/battle_animations";
 import { getImageSize, getOffset, getScaleMultiplier, TARGET_WIDTH} from "../_utils/viewUtils";
 export class BG {
-	animate(test:any) {
+	animate(test:any, test2:any) {
 		return this;
 	}
+
+	delay: any;
 }
 
+
+export class ExtraBattleProps {
+	mySide: any;
+}
 export class Scene {
-	battle: Battle;
+	battle: any
 	gameElement: HTMLElement;
 	currentAnimations: any[] = [];
 	acceleration: number;
@@ -31,7 +37,7 @@ export class Scene {
 		return new Promise(resolve => setTimeout(resolve, time));
 	}
 	
-	backgroundEffect(background:string, duration: number, opacity: number) {
+	backgroundEffect(background:string, duration: number, opacity: number, idontknow?: number) {
 	}
 	
 	async showPopup(position: PokemonIdent, text: string, duration: number = 1000) {
@@ -116,7 +122,7 @@ export class Scene {
 	}
 	
 	async playEffect(effect: string, position: PokemonIdent,  callback?: () => void) {
-		const pos = position.split(':')[0];
+		const pos = position.split(':')[0] as PokemonIdent;
 		const element = getOffset(this.battle, pos, getScaleMultiplier());
 		if(!element) return;
 		
@@ -140,7 +146,7 @@ export class Scene {
 		});
 	}
 	
-	async showEffect(effect: string, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: string, callback?: () => void) {
+	async showEffect(effect: any, start: ScenePos, end: ScenePos, transition: string, after?: string, additionalCss?: any, callback?: () => void) {
 		const effectData = BattleEffects[effect];
 		if (!effectData) return;
 		const startTime = start.time || 0;
@@ -268,6 +274,9 @@ export class PokemonSprite {
 	
 	animationQueue: any[] = [];
 	animCounter: number = 0;
+	
+	sp: any;
+	isMissedPokemon: boolean = false;
 	
 	leftof(offset: number) {
 		return this.x() - offset;

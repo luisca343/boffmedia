@@ -1,13 +1,15 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { documentsService } from '@/services/api/smartrotom/documentsService';
+import { useRotomRequest } from "../useRotomRequest";
+import { documentsService } from "@/services/api/smartrotom/documentsService";
 
-export const useGetNotes = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useGetNotes(uuid: string) {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.getNotes, uuid)
 
-  const getNotes = useCallback((uuid: string) => {
-    return handleRequest(() => documentsService.getNotes(uuid));
-  }, [handleRequest]);
+  return {
+    notes: data,
+    error,
+    isLoading,
+    refetch,
+    setNotes: setData
+  }
+}
 
-  return { getNotes, loading, error };
-};

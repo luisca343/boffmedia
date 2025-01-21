@@ -9,7 +9,7 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
 
   useEffect(() => {
     const fetchSkin = async () => {
-      let skin = await rotomGET(`/img/customNPC/render/${npcName}`);
+      let skin = (await rotomGET(`/img/customNPC/render/${npcName}`)).data as any;
 
       if (skin.error) {
         const skinViewer = new SkinViewer({
@@ -25,7 +25,7 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
         skinViewer.camera.position.y = 22.0;
         skinViewer.camera.position.z = 42.0;
 
-        let skin = await rotomGET(`/img/customNPC/${npcName}`);
+        let skin = (await rotomGET(`/img/customNPC/${npcName}`)).data as any;
         console.log("SE GA DETECTADO LA SKIN", skin);
         if (skin.error) {
           await skinViewer.loadSkin(`/smartrotom/img/customNPC/steve.png`);

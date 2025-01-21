@@ -1,54 +1,52 @@
 "use client"
+import { useState, useMemo, useEffect } from "react"
+import { toast } from 'react-toastify'
 import { CabezaJugador } from "@/components/smartrotom/CabezaMC"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { getSmartRotomUser } from "@/lib/utils"
-import { chatAppService } from "@/services/api/smartrotom/chatAppService"
-import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
-import { useState, useMemo, use, useEffect } from "react"
-import { toast } from 'react-toastify'
+import { useCreateChat } from "@/hooks/chatapp/useCreateChat"
+import { useGetAllUsers } from "@/hooks/users/useGetAllUsers"
 
 export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => void}) {
     const { session } = useBoffSession();
-    const [users, setUsers] = useState([] as any[]);
+    const { users, error: usersError, isLoading: usersLoading, refetch: refetchUsers } = useGetAllUsers();
+    const { createChat, error: createChatError, isLoading: createChatLoading } = useCreateChat();
     const [groupName, setGroupName] = useState('');
     const [selectedUsers, setSelectedUsers] = useState([] as {username: string, uuid: string}[]);
     const [placeholderText, setPlaceholderText] = useState('Selecciona al menos 2 usuarios');
 
     function openNewChat(open: boolean) {
         if (open) {
-            rotomGET('/users')
-                .then((res: {uuid:string}[]) => {
-                    // Remove current user from list
-                    const filteredUsers = res.filter((user) => user.uuid !== getSmartRotomUser(session).uuid);
-                    setUsers(filteredUsers);
-
-                    
-                });
+            refetchUsers();
         } else {
-            setUsers([]);
+            setSelectedUsers([]);
+            setGroupName('');
         }
     }
 
-    function createChat() {
+    async function handleCreateChat() {
         const player = getSmartRotomUser(session).uuid;
         toast.info('Creando chat con ' + selectedUsers.map((user) => user.uuid).join(', '));
-        if (selectedUsers.length == 0) {
-            chatAppService.createChat({ player, users: [], name: 'Mensajes Guardados' }).then((res) => {
-                setActiveChat(res);
-            });
-        } else if (groupName == '' && selectedUsers.length > 1) {
-            toast.error('Ingresa un nombre para el chat');
-        } else {
-            chatAppService.createChat({ player, users: selectedUsers.map((user) => user.uuid), name: groupName })
-                .then((res) => {
-                    setActiveChat(res);
-                });
+        
+        try {
+            let result;
+            if (selectedUsers.length === 0) {
+                result = await createChat({ player, users: [], name: 'Mensajes Guardados' }) as any;
+            } else if (groupName === '' && selectedUsers.length > 1) {
+                return toast.error('Ingresa un nombre para el chat');
+            } else {
+                result = await createChat({ player, users: selectedUsers.map((user) => user.uuid), name: groupName });
+            }
+            setActiveChat(result.data.id);
+        } catch (error) {
+            toast.error('Error al crear el chat');
         }
     }
+
     useEffect(() => {
         if (selectedUsers.length > 1) {
             setPlaceholderText('Nombre del grupo');
@@ -59,7 +57,18 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
         }
     }, [selectedUsers]);
 
-    const memoizedUsers = useMemo(() => users.map((user) => (
+    useEffect(() => {
+        if (usersError) {
+            toast.error('Error al cargar usuarios');
+        }
+    }, [usersError]);
+
+    const filteredUsers = useMemo(() => {
+        if (!users) return [];
+        return users.filter((user) => user.uuid !== getSmartRotomUser(session).uuid);
+    }, [users, session]);
+
+    const memoizedUsers = useMemo(() => filteredUsers.map((user) => (
         <div className="flex items-center hover:bg-neutral-500" key={user.uuid}>
             <label htmlFor={user.uuid} className="w-full flex items-center">
                 <CabezaJugador width={30} height={30} uuid={user.uuid} nombreNPC={user.username} autoRotate={false} tag={false} zoom={1} />
@@ -70,7 +79,7 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
                 }} />
             </label>
         </div>
-    )), [users, setSelectedUsers]);
+    )), [filteredUsers, setSelectedUsers]);
 
     return (
         <Popover onOpenChange={(open) => openNewChat(open)}>
@@ -78,13 +87,31 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
             <PopoverContent className="bg-neutral-800 text-neutral-50 w-[300px] p-4 border border-neutral-900">
                 <div className="flex flex-col">
                     <div>Crear nuevo chat</div>
-                    {memoizedUsers}
+                    {usersLoading ? (
+                        <div>Cargando usuarios...</div>
+                    ) : (
+                        memoizedUsers
+                    )}
                     <div className="flex items-center border border-neutral-900 mt-2 rounded-md">
-                        <Input value={groupName} onChange={(e) => setGroupName(e.target.value)} type="text" placeholder={placeholderText} className="h-8 bg-neutral-800 text-neutral-50 border-none rounded-none" disabled={selectedUsers.length < 2} />
-                        <Button className="bg-neutral-900 hover:bg-neutral-600" onClick={() => createChat()}>Crear</Button>
+                        <Input 
+                            value={groupName} 
+                            onChange={(e) => setGroupName(e.target.value)} 
+                            type="text" 
+                            placeholder={placeholderText} 
+                            className="h-8 bg-neutral-800 text-neutral-50 border-none rounded-none" 
+                            disabled={selectedUsers.length < 2} 
+                        />
+                        <Button 
+                            className="bg-neutral-900 hover:bg-neutral-600" 
+                            onClick={handleCreateChat}
+                            disabled={createChatLoading}
+                        >
+                            {createChatLoading ? 'Creando...' : 'Crear'}
+                        </Button>
                     </div>
                 </div>
             </PopoverContent>
         </Popover>
     );
 }
+

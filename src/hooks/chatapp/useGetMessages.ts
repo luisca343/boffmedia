@@ -1,20 +1,15 @@
-import { useCallback, useEffect } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { chatAppService } from '@/services/api/smartrotom/chatAppService';
-import { Message } from '@/app/smartrotom/chatapp/_types/Chat';
+import { useRotomRequest } from "../useRotomRequest";
+import { chatAppService } from "@/services/api/smartrotom/chatAppService";
 
-export const useChatAppGetMessages = (chatId: number) => {
-  const { loading, error, data: messages, handleRequest } = useRotomRequest<Message[]>();
+export function useGetMessages(chatId: number) {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.getMessages, chatId)
 
-  const getMessages = useCallback(() => {
-    return handleRequest(() => chatAppService.getMessages(chatId));
-  }, [handleRequest, chatId]);
+  return {
+    messages: data,
+    error,
+    isLoading,
+    refetch,
+    setMessages: setData
+  }
+}
 
-  useEffect(() => {
-    if (chatId) {
-      getMessages();
-    }
-  }, [chatId, getMessages]);
-
-  return { messages, getMessages, loading, error };
-};

@@ -1,15 +1,17 @@
-import { rotomGET, rotomPOST } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
+import { SuccessResponse } from '@/types';
+import { App, OrderedApp } from '@/types/apps';
 import { CreateAppDto } from '@/types/dto/create-app.dto';
 import { OrderAppDto } from '@/types/dto/order-apps.dto';
 import { UpdateAppDto } from '@/types/dto/update-app.dto';
 
 export const appsService = {
-  findAll: () => rotomGET('/apps'),
-  create: (createAppDto: CreateAppDto) => rotomPOST('/apps', createAppDto),
-  order: (orderAppDto: OrderAppDto) => rotomPOST('/apps/order', orderAppDto),
-  getForPlayer: (uuid: string) => rotomPOST('/apps/player', { uuid }),
-  findOne: (id: number) => rotomGET(`/apps/${id}`),
-  update: (id: number, updateAppDto: UpdateAppDto) => rotomPOST(`/apps/${id}`, updateAppDto),
-  remove: (id: number) => rotomPOST(`/apps/${id}`, { method: 'DELETE' }),
+  findAll: () => rotomGET<App[]>('/apps'),
+  create: (createAppDto: CreateAppDto) => rotomPOST<App>('/apps', createAppDto),
+  order: (orderAppDto: OrderAppDto) => rotomPOST<SuccessResponse>('/apps/order', orderAppDto),
+  getForPlayer: (uuid: string) => rotomPOST<OrderedApp[]>('/apps/player', { uuid }),
+  findOne: (id: number) => rotomGET<App>(`/apps/${id}`),
+  update: (id: number, updateAppDto: UpdateAppDto) => rotomPOST<App>(`/apps/${id}`, updateAppDto),
+  remove: (id: number) => rotomPOST<SuccessResponse>(`/apps/${id}`, { method: 'DELETE' }),
 };
 

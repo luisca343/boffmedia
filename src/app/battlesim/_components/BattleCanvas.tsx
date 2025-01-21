@@ -32,7 +32,7 @@ function getParticipantName(name:string){
     return name;
 }
 
-export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: Battle, pov: 0 | 1, messageBar: string[] }, ref) => {
+export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: Battle, pov: 0 | 1 | any, messageBar?: string[] }, ref) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
 
@@ -76,8 +76,8 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 </div>
                 <div className="m-1 w-1/3 flex">
                 {
-                    messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50 absolute right-0 bottom-0">
-                        {messageBar.map((message, index) => (
+                    messageBar!.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50 absolute right-0 bottom-0">
+                        {messageBar!.map((message, index) => (
                             <div key={index} dangerouslySetInnerHTML={{ __html: message }}></div>
                         ))}
                     </div>

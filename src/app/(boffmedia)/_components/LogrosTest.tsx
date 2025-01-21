@@ -1,5 +1,5 @@
 import { FaAward, FaMedal, FaStar } from 'react-icons/fa'
-import { GiCutDiamond, GiZombie, GiFootprint, GiShotgun, GiHuntingRifle, GiCardRandom, GiMagicWand } from 'react-icons/gi'
+import { GiCardRandom, GiCutDiamond, GiFairyWand, GiFootprint, GiRaiseZombie, GiShotgun, GiWinchesterRifle } from 'react-icons/gi'
 import { cn } from "@/lib/utils"
 
 type RarityType = 'bronce' | 'plata' | 'oro' | 'platino' | 'diamante'
@@ -51,21 +51,21 @@ function AchievementCard({ achievement }: { achievement: Achievement }) {
 
 export default function ZomboidAchievements() {
   const achievements: Achievement[] = [
-    { name: "Exterminador Novato", description: "Elimina 100 zombies", rarity: 'bronce', achievementIcon: GiZombie },
-    { name: "Exterminador Experimentado", description: "Elimina 1,000 zombies", rarity: 'plata', achievementIcon: GiZombie },
-    { name: "Exterminador Experto", description: "Elimina 10,000 zombies", rarity: 'oro', achievementIcon: GiZombie },
-    { name: "Leyenda Zombie", description: "Elimina 100,000 zombies", rarity: 'diamante', achievementIcon: GiZombie },
+    { name: "Exterminador Novato", description: "Elimina 100 zombies", rarity: 'bronce', achievementIcon: GiRaiseZombie },
+    { name: "Exterminador Experimentado", description: "Elimina 1,000 zombies", rarity: 'plata', achievementIcon: GiRaiseZombie },
+    { name: "Exterminador Experto", description: "Elimina 10,000 zombies", rarity: 'oro', achievementIcon: GiRaiseZombie },
+    { name: "Leyenda Zombie", description: "Elimina 100,000 zombies", rarity: 'diamante', achievementIcon: GiRaiseZombie },
     { name: "Caminante", description: "Camina 10 km", rarity: 'bronce', achievementIcon: GiFootprint },
     { name: "Trotamundos", description: "Camina 50 km", rarity: 'plata', achievementIcon: GiFootprint },
     { name: "Maratonista", description: "Camina 100 km", rarity: 'oro', achievementIcon: GiFootprint },
     { name: "Explorador Legendario", description: "Camina 500 km", rarity: 'diamante', achievementIcon: GiFootprint },
     { name: "Cazador Novato", description: "Encuentra tu primera escopeta", rarity: 'bronce', achievementIcon: GiShotgun },
-    { name: "Francotirador Principiante", description: "Encuentra tu primer rifle", rarity: 'plata', achievementIcon: GiHuntingRifle },
+    { name: "Francotirador Principiante", description: "Encuentra tu primer rifle", rarity: 'plata', achievementIcon: GiWinchesterRifle },
     { name: "Coleccionista Pokémon Novato", description: "Colecciona 10 cartas Pokémon diferentes", rarity: 'bronce', achievementIcon: GiCardRandom },
     { name: "Coleccionista Pokémon Avanzado", description: "Colecciona 50 cartas Pokémon diferentes", rarity: 'plata', achievementIcon: GiCardRandom },
     { name: "Maestro Coleccionista Pokémon", description: "Colecciona 100 cartas Pokémon diferentes", rarity: 'oro', achievementIcon: GiCardRandom },
     { name: "Coleccionista Pokémon Legendario", description: "Colecciona todas las cartas Pokémon disponibles", rarity: 'diamante', achievementIcon: GiCardRandom },
-    { name: "Card Captor", description: "Encuentra el bastón de Sakura", rarity: 'platino', achievementIcon: GiMagicWand },
+    { name: "Card Captor", description: "Encuentra el bastón de Sakura", rarity: 'platino', achievementIcon: GiFairyWand },
   ]
 
   return (

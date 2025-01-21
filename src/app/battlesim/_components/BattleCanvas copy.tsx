@@ -1,3 +1,4 @@
+/*
 import { Battle } from "@pkmn/client";
 import PokemonSprite from "../_components_old/PokemonSprite";
 import PokemonElement from "../_components_old/PokemonElement";
@@ -92,4 +93,4 @@ function Hazard({hazard, side}: {hazard: [string, {name: string, level: number, 
             })}
         </>
     );
-}
+}*/

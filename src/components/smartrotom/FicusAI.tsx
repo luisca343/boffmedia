@@ -22,7 +22,7 @@ type PokemonStats = {
 
 export default function FicusAI() {
   const { session } = useBoffSession();
-  const uuid = useMemo(() => session?.user.smartRotomUser.uuid, [session]);
+  const uuid = useMemo(() => session?.user.smartRotomUser!.uuid, [session]);
   const [text, setText] = useState("");
   const [mensajes, setMensajes] = useState<Mensaje[]>([
     {
@@ -43,7 +43,7 @@ export default function FicusAI() {
     if (!uuid) return;
     const fetchMessages = async () => {
       if (uuid) {
-        let msgs = await rotomGET(`/chat/${uuid}`);
+        let msgs = (await rotomGET(`/chat/${uuid}`)) as any;
         if (msgs.length === 0) {
           let mensaje = await rotomPOST("/chat/first", { uuid });
           msgs = [mensaje];
@@ -70,20 +70,20 @@ export default function FicusAI() {
     // Simulate bot typing before sending a message
     setTyping(true);
 
-    let msg = await rotomPOST("/chat/send", {
-      uuid: session?.user.smartRotomUser.uuid,
+    let msg = (await rotomPOST("/chat/send", {
+      uuid: session?.user.smartRotomUser!.uuid,
       mensaje: { sender: "user", parts: [{ type: "text", content: text }] },
-    });
+    })).data as any;
 
     // Create a new message for the bot's response
     const newBotMessage: Mensaje = { sender: "bot", parts: [] };
 
     // Add the new message to the state
-    setMensajes((prevMensajes) => [...prevMensajes, msg]);
+    setMensajes((prevMensajes:any) => [...prevMensajes, msg] );
 
     async function processParts() {
-      for (let i = 0; i < msg.parts.length; i++) {
-        let part = msg.parts[i];
+      for (let i = 0; i < msg.data.parts.length; i++) {
+        let part = msg.data.parts[i];
         if (part.type === "text") {
           await new Promise((resolve) => {
             let index = 0;

@@ -55,7 +55,7 @@ export default function NotificationPopover() {
               No hay notificaciones
             </p>
           ) : (
-            notifications.map((notification) => (
+            notifications.map((notification:any) => (
               <div
                 key={notification.id}
                 className="mb-2 p-2 bg-surface-700 rounded"

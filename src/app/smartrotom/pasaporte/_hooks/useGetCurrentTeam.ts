@@ -6,7 +6,7 @@ export function useGetCurrentTeam(uuid: string) {
     const [currentTeam, setCurrentTeam] = useState<ActiveTeamType>();
 
     useEffect(() => {
-        rotomPOST('/team',{uuid}).then((res)=>{
+        rotomPOST('/team',{uuid}).then((res:any)=>{
             setCurrentTeam(res)
           })
     }, [])

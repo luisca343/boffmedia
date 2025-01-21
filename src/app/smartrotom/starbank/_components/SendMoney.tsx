@@ -1,41 +1,35 @@
 import { useEffect, useState } from "react";
-import { rotomGET, rotomPOST } from "@/services/boffAPI";
 import { AccountSelect } from "./AccountSelect";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { formatMoney, getValidAccountId } from "../bankUtils";
-import { ArrowRight, DollarSign } from "lucide-react";
+import { ArrowRight, DollarSign } from 'lucide-react';
 import { useBoffSession } from "@/services/useBoffSession";
+import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
+import { useGetAllAccounts } from "@/hooks/starbank/useGetAllAccounts";
+import { useTransfer } from "@/hooks/starbank/useTransfer";
+import { CreateTransferDto } from "@/types/dto/create-transfer-dto";
+import { Account } from "@/services/api/smartrotom/usersService";
 
 export function SendMoney() {
-    const { session } = useBoffSession();
-  const [myAccounts, setMyAccounts] = useState([] as any);
+  const { session } = useBoffSession();
   const [myActiveAccount, setMyActiveAccount] = useState(-1);
-  const [accounts, setAccounts] = useState([]);
   const [activeAccount, setActiveAccount] = useState(-1);
   const [amount, setAmount] = useState(0);
   const [concept, setConcept] = useState("");
 
-  useEffect(() => {
-    if (!session) return;
-    rotomGET("/starbank/accounts/").then((res) => {
-      setAccounts(res);
-    });
-
-    rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid).then(
-      (res) => {
-        setMyAccounts(res);
-      }
-    );
-  }, [session]);
+  const { accounts: allAccounts, error: allAccountsError, isLoading: allAccountsLoading } = useGetAllAccounts();
+  const { accounts: myAccounts, error: myAccountsError, isLoading: myAccountsLoading } = useGetAccounts(session?.user?.smartRotomUser?.uuid!);
+  const { transfer, error: transferError, isLoading: transferLoading } = useTransfer();
 
   useEffect(() => {
-    if (myAccounts.length === 0) return;
-    setMyActiveAccount(getValidAccountId(myAccounts));
-  }, [myAccounts, accounts]);
+    if (myAccounts && myAccounts.length > 0) {
+      setMyActiveAccount(getValidAccountId(myAccounts));
+    }
+  }, [myAccounts]);
 
-  function sendMoney() {
+  async function sendMoney() {
     if (activeAccount === -1 || myActiveAccount === -1) {
       toast.error("Selecciona una cuenta");
       return;
@@ -48,29 +42,35 @@ export function SendMoney() {
       toast.error("Ingresa una cantidad válida");
       return;
     }
-    if (
-      amount >
-      myAccounts.find((account: any) => account.id === myActiveAccount)?.balance
-    ) {
+    const myAccount = myAccounts?.find((account: Account) => account.id === myActiveAccount);
+    if (!myAccount || amount > myAccount.balance) {
       toast.error("No tienes suficiente saldo");
       return;
     }
-    const data = {
+
+    const transferData: CreateTransferDto = {
       from: myActiveAccount,
       to: activeAccount,
       amount: amount,
       concept: concept,
     };
-    rotomPOST("/starbank/transfer", data).then((res) => {
-      if (res.error) {
-        toast.error(res.error);
-        return;
-      }
+
+    try {
+      await transfer(transferData);
       toast.success("Transferencia realizada");
       setAmount(0);
       setConcept("");
+    } catch (error) {
+      toast.error("Error al realizar la transferencia");
+    }
+  }
 
-    });
+  if (allAccountsLoading || myAccountsLoading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (allAccountsError || myAccountsError) {
+    return <div>Error al cargar las cuentas</div>;
   }
 
   return (
@@ -85,7 +85,7 @@ export function SendMoney() {
           </label>
           <AccountSelect
             id="fromAccount"
-            accounts={myAccounts}
+            accounts={myAccounts || []}
             activeAccount={myActiveAccount}
             setActiveAccount={setMyActiveAccount}
             className="mt-1 block w-full"
@@ -101,7 +101,7 @@ export function SendMoney() {
           </label>
           <AccountSelect
             id="toAccount"
-            accounts={accounts}
+            accounts={allAccounts || []}
             activeAccount={activeAccount}
             setActiveAccount={setActiveAccount}
             className="mt-1 block w-full"
@@ -123,11 +123,7 @@ export function SendMoney() {
               id="amount"
               type="number"
               min={1}
-              max={
-                myAccounts.find(
-                  (account: any) => account.id === myActiveAccount
-                )?.balance
-              }
+              max={myAccounts?.find((account: Account) => account.id === myActiveAccount)?.balance}
               placeholder="0.00"
               className="pl-10 pr-12"
               onChange={(e) => setAmount(parseInt(e.target.value))}
@@ -162,9 +158,9 @@ export function SendMoney() {
             </span>
             <span className="text-sm font-bold text-blue-950">
               {formatMoney(
-                myAccounts.find(
-                  (account: any) => account.id === myActiveAccount
-                )?.balance
+                myAccounts?.find(
+                  (account: Account) => account.id === myActiveAccount
+                )?.balance!
               )}
             </span>
           </div>
@@ -174,9 +170,9 @@ export function SendMoney() {
             </span>
             <span className="text-sm font-bold text-blue-950">
               {formatMoney(
-                myAccounts.find(
-                  (account: any) => account.id === myActiveAccount
-                )?.balance - (amount || 0)
+                (myAccounts?.find(
+                  (account: Account) => account.id === myActiveAccount
+                )?.balance || 0) - (amount || 0)
               )}
             </span>
           </div>
@@ -185,12 +181,14 @@ export function SendMoney() {
       <div className="px-6 py-4 bg-surface-50 border-t border-surface-200">
         <Button
           onClick={sendMoney}
+          disabled={transferLoading}
           className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-950 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
-          Enviar Dinero
+          {transferLoading ? 'Enviando...' : 'Enviar Dinero'}
           <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
         </Button>
       </div>
     </div>
   );
 }
+

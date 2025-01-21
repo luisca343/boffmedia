@@ -17,8 +17,7 @@ export function LastRegistries(){
         if(session){
             rotomGET(`/pokemon/registries/${getSmartRotomUser(session).uuid}`)
                 .then((response) => {
-                    console.log(response)
-                    setRegistries(response)
+                    setRegistries(response.data)
                 })
                 .catch((error) => {
                     console.log(error)

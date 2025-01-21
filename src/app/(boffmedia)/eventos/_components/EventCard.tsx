@@ -14,7 +14,7 @@ interface Event {
 }
 
 interface EventCardProps {
-  event: Event
+  event: any
 }
 
 export function EventCard({ event }: EventCardProps) {

@@ -19,8 +19,8 @@ export default function MenuHeader(){
 
     useEffect(() => {
         rotomGET(`/pokemon/pokedex/${getSmartRotomUser(session).uuid}`)
-            .then((res: PokedexRegistries) => {
-                setPokedexRegistries(res)
+            .then((res: any) => {
+                setPokedexRegistries(res.data)
             })
             .catch((err) => {
                 console.error(err)

@@ -1,18 +1,16 @@
 import { create } from "zustand";
-import { rotomGET } from "@/services/boffAPI";
 import { getValidAccountId } from "../bankUtils";
-import { BoffSession } from "@/types";
+import { Session } from "next-auth";
+import { Account } from "@/services/api/smartrotom/usersService";
+import { starbankService } from "@/services/api/smartrotom/starbankService";
 
-interface Account {
-  id: number;
-}
 
 interface StarBankState {
   accounts: Account[];
   activeAccount: Account | null;
   setAccounts: (accounts: Account[]) => void;
   setActiveAccount: (id: number | null) => void;
-  fetchAccounts: (session: BoffSession) => void;
+  fetchAccounts: (session: Session) => void;
 }
 
 export const useStarBankStore = create<StarBankState>((set, get) => ({
@@ -25,12 +23,10 @@ export const useStarBankStore = create<StarBankState>((set, get) => ({
   },
   fetchAccounts: async (session) => {
     if (session?.user) {
-      const res = await rotomGET(
-        "/starbank/accounts/" + session.user.smartRotomUser.uuid
-      );
-      const validAccountId = getValidAccountId(res);
-      const activeAccount = res.find((account: { id: number; }) => account.id === validAccountId) || null;
-      set({ accounts: res, activeAccount });
+      const accounts = (await starbankService.getAccounts(session.user.smartRotomUser?.uuid!)).data!;
+      const validAccountId = getValidAccountId(accounts);
+      const activeAccount = accounts.find((account: { id: number; }) => account.id === validAccountId) || null;
+      set({ accounts: accounts, activeAccount });
     }
   },
 }));

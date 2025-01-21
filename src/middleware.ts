@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getValidSubdomain } from '@/lib/subdomain';
@@ -18,9 +17,10 @@ export async function middleware(req: NextRequest) {
 
   if (subdomain) {
     // Subdomain available, rewriting
-    if(!url.pathname.includes("api"))
-    url.pathname = `/${subdomain}${url.pathname}`;
-  } 
+    if (!url.pathname.includes("api")) {
+      url.pathname = `/${subdomain}${url.pathname}`;
+    }
+  }
 
   return NextResponse.rewrite(url);
 }

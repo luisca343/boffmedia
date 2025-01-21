@@ -14,18 +14,7 @@ import { CellDefProps } from "../page"; // Adjust the import path as needed
 import { Input } from "@/components/ui/input";
 import { strToDate } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
-
-interface Transaction {
-  from: number;
-  to: number;
-  amount: number;
-  fromBalance: number;
-  toBalance: number;
-  reason: string;
-  type: string;
-  date: string;
-  isPayer: boolean;
-}
+import { Transaction } from "@/types/starbank";
 
 export const columns: ColumnDef<Transaction>[] = [
   {

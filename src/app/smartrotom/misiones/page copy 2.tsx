@@ -1,3 +1,4 @@
+/*
 "use client";
 import { Book, Page } from "@/components/ui/book/book";
 import React, { useState } from "react";
@@ -236,3 +237,4 @@ export default function Misiones(){
     }
 }
 
+*/

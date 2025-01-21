@@ -14,7 +14,7 @@ import { getTranslations } from "next-intl/server"
 
 
 export async function EvoTree({params}: {params: {id: string}}){
-    const {tree, depth} = await rotomGET(`/pokemon/evotree/${params.id}`)
+    const {tree, depth} = (await rotomGET(`/pokemon/evotree/${params.id}`)).data as {tree: any, depth: number}
     const t  = await getTranslations("");
     const evoTrans  = await getTranslations("");
     const biomeTrans  = await getTranslations("");

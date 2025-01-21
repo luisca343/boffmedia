@@ -5,9 +5,6 @@ import {
   Smartphone,
   Gamepad2,
   ChevronRight,
-  Twitch,
-  Calendar,
-  Trophy,
 } from "lucide-react";
 import EventCalendar from "./_components/EventCalendar";
 import { UpcomingEvents } from "./_components/UpcomingEvents";

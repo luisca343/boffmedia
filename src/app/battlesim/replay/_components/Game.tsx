@@ -219,7 +219,7 @@ function setCurrentTurn(turn?: number) {
     });
   }
 
-  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any }> {
+  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType | any): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, [key: string]: any }> {
     switch (args[0]) {
         case 'switch': {
             await switchAction(scene, getRelativeIdent(args[1]), args[2] as PokemonDetails, args[3] as PokemonHPStatus);

@@ -1,17 +1,18 @@
-const pages = ["battlesim", "smartrotom"]
+const pages = ["battlesim", "smartrotom"];
 
-export const getValidSubdomain = (host?: string | null) => {
-    let subdomain: string | null = null;
-    if (!host && typeof window !== 'undefined') {
-      // On client side, get the host from window
-      host = window.location.host;
+export const getValidSubdomain = (host?: string | null): string | null => {
+  if (!host) {
+    return null;
+  }
+
+  const parts = host.split('.');
+  if (parts.length > 2) {
+    const candidate = parts[0];
+    if (candidate && !candidate.includes('localhost') && !candidate.includes('local')) {
+      // Valid candidate
+      return candidate;
     }
-    if (host && host.split('.').length > 2) {
-      const candidate = host.split('.')[0];
-      if (candidate && !candidate.includes('localhost') && !candidate.includes('local')) {
-        // Valid candidate
-        subdomain = candidate;
-      }
-    }
-    return subdomain;
+  }
+
+  return null;
 };

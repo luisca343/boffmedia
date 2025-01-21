@@ -10,7 +10,7 @@ import useGetChats from "./_hooks/useGetChats";
 import { Contact } from "./_components/Contact";
 
 export default function ChatApp() {
-  const { session, chats, refresh, updateChats, loading } = useGetChats();
+  const { session, chats, refresh, updateChats, isLoading } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
   const { socket } = useSocketStore();
 
@@ -32,7 +32,7 @@ export default function ChatApp() {
           <CreateGroup setActiveChat={setChat} />
         </div>
         <div className="flex flex-col h-full  overflow-auto bg-neutral-800">
-          {chats!.map((chat) => (
+          {chats!.map((chat:any) => (
             <Contact chat={chat} key={chat.id} activeChat={activeChat} setActiveChat={setChat} session={session}/>
           ))}
         </div>
@@ -54,7 +54,7 @@ export default function ChatApp() {
   );
 
   async function setChat(id: number) {
-    const chat = chats!.find((chat) => chat.id === id);
+    const chat = chats!.find((chat:any) => chat.id === id);
     if (!chat) {
       await refresh();
     }

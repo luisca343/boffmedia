@@ -6,13 +6,16 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
 import { isMinecraft } from "@/services/mcef/mcefHelper";
-import { UnclaimedRewards, useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
+import { useBoffSession } from "@/services/useBoffSession";
+import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
+import { UnclaimedReward } from "@/types/mina";
 
 export default function Reclamar() {
-  const { session, unclaimed, setUnclaimed, getBoxes, loading } = useGetUnclaimed();
+  const { session } = useBoffSession();
+  const { unclaimed, setUnclaimed, boxes, isLoading } = useGetUnclaimed(session.user.smartRotomUser?.uuid!);
 
   async function claimReward() {
-    if (!session) return;
+    if (!unclaimed) return;
     if (!isMinecraft()) {
       toast.error("No estas en Minecraft");
       return;
@@ -22,7 +25,7 @@ export default function Reclamar() {
       const response = await rotomPOST("/claim-rewards", {
         rewards: unclaimed,
       });
-      if (response.success) {
+      if (response.data) {
         toast.success("Recompensas reclamadas con éxito");
         setUnclaimed([]);
       } else {
@@ -33,17 +36,17 @@ export default function Reclamar() {
     }
   }
 
-  function groupRewardsByType(rewards: UnclaimedRewards[]) {
+  function groupRewardsByType(rewards: UnclaimedReward[]) {
     return rewards.reduce((acc, reward) => {
       if (!acc[reward.type]) {
         acc[reward.type] = [];
       }
       acc[reward.type].push(reward);
       return acc;
-    }, {} as Record<string, UnclaimedRewards[]>);
+    }, {} as Record<string, UnclaimedReward[]>);
   }
 
-  if(loading) return null;
+  if(!unclaimed) return null;
   const groupedRewards = groupRewardsByType(unclaimed!);
 
   return (
@@ -78,7 +81,7 @@ export default function Reclamar() {
             onClick={claimReward}
             className=" text-white text-xl  text-shadow-border1"
           >
-            RECLAMAR TODO ({getBoxes()} CAJAS)
+            RECLAMAR TODO ({boxes} CAJAS)
           </SmartRotomButton>
         </div>
       </div>

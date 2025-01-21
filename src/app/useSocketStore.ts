@@ -5,7 +5,7 @@ import { create } from 'zustand';
 interface SocketStore {
   socket: Socket | null;
   user: SmartRotomUser | null;
-  connect: (user: SmartRotomUser) => void;
+  connect: (user?: SmartRotomUser) => void;
   disconnect: () => void;
 }
 

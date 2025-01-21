@@ -1,10 +1,6 @@
 "use client";
 import { strToDate } from "@/lib/utils";
-import { rotomGET } from "@/services/boffAPI";
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 import {
   BankSection,
   BankSectionButton,
@@ -25,56 +21,37 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import { ArrowRight, DollarSign, CreditCard, Send, Menu } from "lucide-react";
+import { ArrowRight, DollarSign, CreditCard, Send } from 'lucide-react';
 import { useBoffSession } from "@/services/useBoffSession";
+import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
+import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
+import { FullTransaction, Transaction } from "@/types/starbank";
 
 export default function StarBank() {
   const router = useRouter();
   const { session } = useBoffSession();
-  const [accounts, setAccounts] = useState([] as any[]);
   const [activeAccount, setActiveAccount] = useState(-1);
-  const [transactions, setTransactions] = useState([]);
-  const [transfers, setTransfers] = useState([]);
+
+  const { accounts, error: accountsError, isLoading: accountsLoading } = useGetAccounts(session?.user?.smartRotomUser?.uuid || '');
+  const { transactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount, 100);
+  const { transfers, error: transfersError, isLoading: transfersLoading } = useGetTransfers(activeAccount);
 
   useEffect(() => {
-    if (session?.user) {
-      rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid).then(
-        (res) => {
-          setAccounts(res);
-        }
-      );
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (accounts.length > 0) {
+    if (accounts && accounts.length > 0) {
       const storedAccount = localStorage.getItem("activeAccount") as string;
       if (storedAccount) {
         changeAccount(
-          accounts.find((acc: any) => acc.id === parseInt(storedAccount)).id >=
-            0
+          accounts.find((acc: any) => acc.id === parseInt(storedAccount))?.id! >= 0
             ? parseInt(storedAccount)
             : accounts[0].id
         );
       } else {
         setActiveAccount(accounts[0].id);
-        localStorage.setItem("activeAccount", accounts[0].id);
+        localStorage.setItem("activeAccount", accounts[0].id.toString());
       }
     }
   }, [accounts]);
-
-  useEffect(() => {
-    if (activeAccount === -1) return;
-    rotomGET("/starbank/transactions/" + activeAccount + "?limit=100").then(
-      (res) => {
-        setTransactions(res);
-      }
-    );
-
-    rotomGET("/starbank/transfers/" + activeAccount).then((res) => {
-      setTransfers(res);
-    });
-  }, [activeAccount]);
 
   function changeAccount(account: number) {
     setActiveAccount(account);
@@ -82,8 +59,8 @@ export default function StarBank() {
   }
 
   function getData() {
-    const data = transactions
-      .slice()
+    return transactions
+      ?.slice()
       .reverse()
       .reduce((acc: any, transaction: any) => {
         const transactionType =
@@ -98,12 +75,8 @@ export default function StarBank() {
           balance: currentBalance,
         });
         return acc;
-      }, []);
-
-    return data;
+      }, []) || [];
   }
-
-  
 
   function TestChart({
     data,
@@ -144,6 +117,14 @@ export default function StarBank() {
     return <TestChart data={getData()} className="h-full " />;
   }
 
+  if (accountsLoading || transactionsLoading || transfersLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (accountsError || transactionsError || transfersError) {
+    return <div>Error: {accountsError || transactionsError || transfersError}</div>;
+  }
+
   return (
     <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
       <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -151,7 +132,7 @@ export default function StarBank() {
           <BankSectionHeader>Balance de cuenta</BankSectionHeader>
           <BankSectionContent>
             <div className="text-4xl 2xl:text-5xl font-bold text-blue-700 ">
-              {formatMoney(getActiveAccountBalance(accounts, activeAccount))}
+              {formatMoney(getActiveAccountBalance(accounts!, activeAccount))}
             </div>
           </BankSectionContent>
           <BankSectionFooter>
@@ -186,7 +167,7 @@ export default function StarBank() {
           </BankSectionContent>
           <BankSectionFooter>
             <BankSectionButton
-            className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => {
                 router.push("/smartrotom/starbank/transacciones");
               }}
@@ -353,16 +334,37 @@ export function Transactions({
   className?: string;
   fecth?: boolean;
 }) {
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<FullTransaction[]>([]);
+  const { transactions: fetchedTransactions, isLoading, error } = useGetTransactions(activeAccount, 100);
+
+
   useEffect(() => {
-    if (!fecth) return setTransactions(trans);
-    if (activeAccount === -1) return;
-    rotomGET("/starbank/transactions/" + activeAccount + "?limit=100").then(
-      (res) => {
-        setTransactions(res);
-      }
+    if (!fetch) {
+      setTransactions(trans);
+    } else if (fetchedTransactions) {
+      setTransactions(fetchedTransactions);
+    }
+  }, [fetch, trans, fetchedTransactions]);
+
+  if (isLoading) {
+    return (
+      <div className="h-full p-2 overflow-auto">
+        <div className="text-center 2xl:text-2xl font-bold">
+          Cargando transacciones...
+        </div>
+      </div>
     );
-  }, [trans, activeAccount]);
+  }
+
+  if (error) {
+    return (
+      <div className="h-full p-2 overflow-auto">
+        <div className="text-center 2xl:text-2xl font-bold text-red-600">
+          Error al cargar las transacciones
+        </div>
+      </div>
+    );
+  }
 
   if (transactions.length === 0) {
     return (
@@ -373,6 +375,7 @@ export function Transactions({
       </div>
     );
   }
+  
   return (
     <TablaTransacciones
       transactions={transactions}

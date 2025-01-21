@@ -1,3 +1,4 @@
+/*
 "use client";
 import { getSmartRotomUser } from "@/lib/utils";
 import { rotomPOST } from "@/services/boffAPI"
@@ -246,4 +247,4 @@ export default function Misiones(){
             </div>
         </div>
     )
-}
+}*/

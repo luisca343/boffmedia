@@ -51,7 +51,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(values),
         })
-        if (response.ok) {
+        if (response.statusCode === 201) {
           router.push('/auth?mode=login&message=Registration successful. Please log in.')
         } else {
           alert(response.error || 'Registration failed')

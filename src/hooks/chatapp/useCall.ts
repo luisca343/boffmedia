@@ -1,13 +1,20 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { chatAppService } from '@/services/api/smartrotom/chatAppService';
+import { useRotomRequest } from "../useRotomRequest";
+import { chatAppService } from "@/services/api/smartrotom/chatAppService";
 
-export const useChatAppCall = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useCall() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.call)
 
-  const call = useCallback((chatId: number, uuid: string) => {
-    return handleRequest(() => chatAppService.call(chatId, uuid));
-  }, [handleRequest]);
+  const call = (chatId: number, uuid: string) => {
+    return chatAppService.call(chatId, uuid);
+  }
 
-  return { call, loading, error };
-};
+  return {
+    callData: data,
+    error,
+    isLoading,
+    refetch,
+    call,
+    setCallData: setData
+  }
+}
+

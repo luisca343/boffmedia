@@ -16,7 +16,7 @@ import { getImageSize, getScaleMultiplier } from './viewUtils';
 
 
 
-export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
+export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data?: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
 	faint:{
 		anim(scene, [attacker], data) {
 			attacker.anim({
@@ -2992,7 +2992,7 @@ export const BattleStatusAnims: {[k: string]: {anim: (scene: Scene, args: Pokemo
 	},
 };
 BattleStatusAnims['focuspunch'] = {anim: BattleStatusAnims['flinch'].anim};
-export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
+export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data?: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
 
 	taunt: {
 		anim(scene, [attacker, defender], data) {
@@ -22955,6 +22955,7 @@ export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: Pokemon
 				opacity: 0,
 			}, 'accel');
 		},
+		/*
 		residualAnim(scene, [attacker]) {
 			scene.backgroundEffect(`url('/smartrotom/test/fx/bg-space.jpg')`, 600, 0.4);
 
@@ -22972,7 +22973,7 @@ export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: Pokemon
 			}, 'decel', 'explode');
 
 			scene.timeOffset += 500;
-		},
+		},*/
 	},
 	healingwish: {
 		anim(scene, [attacker]) {
@@ -22989,6 +22990,7 @@ export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: Pokemon
 				opacity: 0,
 			}, 'accel');
 		},
+		/*
 		residualAnim(scene, [attacker]) {
 			scene.showEffect('wisp', {
 				x: attacker.x(),
@@ -23002,7 +23004,7 @@ export const BattleMoveAnims:  {[k: string]: {anim: (scene: Scene, args: Pokemon
 				z: attacker.z(),
 				opacity: 1,
 			}, 'decel', 'explode');
-		},
+		},*/
 	},
 	stealthrock: {
 		anim(scene, [attacker, defender]) {

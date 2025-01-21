@@ -72,7 +72,7 @@ export default function Movimiento({params} : {params: {id: string}}){
         if(!id) return
         rotomGET(`/pokemon/move/${id}/pokemon`)
         .then((res) => {
-            setPokemon(res)
+            setPokemon(res.data)
         })
 
     }, [id])

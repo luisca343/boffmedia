@@ -2,15 +2,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Reward, generateGame, getMineMap, jugar } from "../utils"
+import { generateGame, jugar } from "../utils"
 import {motion, useAnimation}     from 'framer-motion'
 import { AlertDialog, AlertDialogContent, AlertDialogHeader } from "@/components/ui/alert-dialog"
 import { BarraEnergia } from "../_components/BarraEnergia"
 import { useRouter } from 'next/navigation';
-import { BoffSession } from "@/components/smartrotom/AppWrapper"
 import { Button } from "@/components/ui/button"
 import { rotomPOST } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
+import { RewardEntry } from "@/types/mina"
 
 enum Tool {
     PICKAXE = 1,
@@ -21,8 +21,8 @@ export default function Jugar(){
     const { session } = useBoffSession();
     const [index, setIndex] = useState(0)
     const [mineMap, setMap] = useState<Array<Array<any>>>([])
-    const [rewards, setRewards] = useState<{ reward: Reward; x: number; y: number; }[]>([]) 
-    const [obtainedRewards, setObtainedRewards] = useState<{ reward: Reward; x: number; y: number; }[]>([]) 
+    const [rewards, setRewards] = useState<{ reward: RewardEntry; x: number; y: number; }[]>([]) 
+    const [obtainedRewards, setObtainedRewards] = useState<{ reward: RewardEntry; x: number; y: number; }[]>([]) 
     const [tool, setTool] = useState(0)
     const [damage, setDamage] = useState(0)
     const [open, setOpen] = useState(false)
@@ -45,7 +45,7 @@ export default function Jugar(){
         const {map, positions} = await generateGame(rowNum, colNum)
 
         await setMap(map)
-        await setRewards(positions as { reward: Reward; x: number; y: number; }[])
+        await setRewards(positions as { reward: RewardEntry; x: number; y: number; }[])
         await setObtainedRewards([])
         await setDamage(0)
     }
@@ -160,7 +160,7 @@ export default function Jugar(){
         if(open) return
         setOpen(true)
         let obtained = obtainedRewards.map(reward => ({id: reward.reward.id, value: reward.reward.value}))
-        await rotomPOST('/mine/endgame', {uuid: session?.user.smartRotomUser.uuid, rewards: obtained})
+        await rotomPOST('/mine/endgame', {uuid: session?.user.smartRotomUser?.uuid, rewards: obtained})
         await setIndex(index + 1)
     }
 

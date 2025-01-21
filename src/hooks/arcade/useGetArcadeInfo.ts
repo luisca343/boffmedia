@@ -1,15 +1,15 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { App } from '@/types';
-import { arcadeService } from '@/services/api/smartrotom/arcadeService';
+import { useRotomRequest } from "../useRotomRequest";
+import { arcadeService } from "@/services/api/smartrotom/arcadeService";
 
-export const useGetArcadeInfo = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useGetArcadeInfo() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(arcadeService.getInfo)
 
-  const info = useCallback(() => {
-    return handleRequest<App>(() => arcadeService.getInfo());
-  }, [handleRequest]);
-
-  return { info, loading, error };
-};
+  return {
+    arcadeInfo: data,
+    error,
+    isLoading,
+    refetch,
+    setArcadeInfo: setData
+  }
+}
 

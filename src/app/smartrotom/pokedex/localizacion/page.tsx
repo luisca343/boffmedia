@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 
 export default async function Biomas(){
     const spawnsTranslation  = await getTranslations("");
-    const biomes = await rotomGET('/pokemon/biomes') as Record<string, number>
+    const biomes = (await rotomGET('/pokemon/biomes')).data as Record<string, number>
     //<h3>{biome.name} - {biome.amount}</h3>
     return(
     <div className="bg-surface-800  flex flex-wrap text-surface-100 w-full justify-between p-2">

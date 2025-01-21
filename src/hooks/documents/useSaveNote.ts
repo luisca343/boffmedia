@@ -1,14 +1,21 @@
-import { useCallback } from 'react';
-import { CreateDocumentDto } from '@/types/dto/create-document.dto';
-import { useRotomRequest } from '../useRotomRequest';
-import { documentsService } from '@/services/api/smartrotom/documentsService';
+import { useRotomRequest } from "../useRotomRequest";
+import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { CreateDocumentDto } from "@/types/dto/create-document.dto";
 
-export const useSaveNote = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useSaveNote() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.saveNote)
 
-  const saveNote = useCallback((id: number, data: CreateDocumentDto) => {
-    return handleRequest(() => documentsService.saveNote(id, data));
-  }, [handleRequest]);
+  const saveNote = (id: number, noteData: CreateDocumentDto) => {
+    return documentsService.saveNote(id, noteData);
+  }
 
-  return { saveNote, loading, error };
-};
+  return {
+    savedNote: data,
+    error,
+    isLoading,
+    refetch,
+    saveNote,
+    setSavedNote: setData
+  }
+}
+

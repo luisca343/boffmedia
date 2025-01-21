@@ -16,11 +16,11 @@ export function useGetWordlePokemon(){
     const types = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"];
 
     useEffect(() => {
-        rotomGET("/pokemon/wordle").then((res) => {
-            setPokemon(res);
-            const randomIndex = Math.floor(Math.random() * res.length);
-            console.log(res[randomIndex]);
-            setTargetPokemon(res[randomIndex]);
+        rotomGET("/pokemon/wordle").then((res:any) => {
+            setPokemon(res.data);
+            const randomIndex = Math.floor(Math.random() * res.data.length);
+            console.log(res.data[randomIndex]);
+            setTargetPokemon(res.data[randomIndex]);
         });
     }, []);
 

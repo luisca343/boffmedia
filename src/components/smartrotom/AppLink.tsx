@@ -11,21 +11,17 @@ import { InternalLink } from "../nav/Link";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetAppsForPlayer } from "@/hooks/apps/useGetAppsForPlayer";
 import { useOrderApps } from "@/hooks/apps/useOrderApps";
+import { OrderedApp } from "@/types/apps";
 
 export function AppList() {
   const { session } = useBoffSession();
-  const { apps, setApps, loading, error } = useGetAppsForPlayer(session?.user?.smartRotomUser?.uuid);
-
-  if (loading) return null;
-  if (error) return <div>Error: {error}</div>;
-  if (apps.length === 0) return <></>;
-
+  const { apps, setApps, isLoading, error } = useGetAppsForPlayer(session?.user?.smartRotomUser?.uuid!);
   return <SortableGrid apps={apps} setApps={setApps} />;
 }
 
-export function SortableGrid({ className, apps, setApps }: { className?: string, apps: App[], setApps: React.Dispatch<React.SetStateAction<App[]>> }) {
+export function SortableGrid({ className, apps, setApps }: { className?: string, apps: OrderedApp[], setApps: (apps: OrderedApp[]) => void }) {
   const { session } = useBoffSession();
-  const { order, loading, error } = useOrderApps();
+  const { orderApps, isLoading, error } = useOrderApps();
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
       distance: 5,
@@ -36,16 +32,16 @@ export function SortableGrid({ className, apps, setApps }: { className?: string,
   const handleDragEnd = useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
-      const apps2 = arrayMove(apps, apps.indexOf(apps.find(app => app.id === active.id) as App), apps.indexOf(apps.find(app => app.id === over.id) as App));
+      const apps2 = arrayMove(apps, apps.indexOf(apps.find(app => app.id === active.id) as OrderedApp), apps.indexOf(apps.find(app => app.id === over.id) as OrderedApp));
       const newOrder = apps2.map(app => ({ id: app.id, order: apps2.indexOf(app) }));
-      order({ newOrder, uuid: session?.user?.smartRotomUser?.uuid! });
+      orderApps({ newOrder, uuid: session?.user?.smartRotomUser?.uuid! });
 
       setApps(apps2);
     }
-  }, [apps, setApps, session, order]);
+  }, [apps, setApps, session]);
 
-  if (loading) return <div>Updating order...</div>;
-  if (error) return <div>Error updating order: {error}</div>;
+  if (isLoading) return <div>Updating order...</div>;
+  // if (error) return <div>Error updating order: {error}</div>;
 
   return (
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter} sensors={sensors}>
@@ -60,7 +56,7 @@ export function SortableGrid({ className, apps, setApps }: { className?: string,
   );
 }
 
-export function SortableItem({ app }: { app: App }) {
+export function SortableItem({ app }: { app: OrderedApp }) {
   const {
     attributes,
     listeners,

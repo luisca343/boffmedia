@@ -50,7 +50,7 @@ export interface PmdSpriteRef {
   setDirection: (direction: number) => void;
   setCurrentAnimation: (animation: "Walk" | "Hop") => void;
   setAnimSpeed: (speed: number) => void;
-  handleJump: () => void;
+  handleJump: (a?: any) => void;
 }
 
 export const PmdSprite = forwardRef<PmdSpriteRef, PmdSpriteProps>(

@@ -1,3 +1,4 @@
+/*
 "use client"
 import { Battle, Pokemon, Side } from "@pkmn/client";
 import { PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
@@ -514,3 +515,4 @@ return (
 
 
 }
+*/

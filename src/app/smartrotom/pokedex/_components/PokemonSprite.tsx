@@ -35,7 +35,7 @@ export function PokemonSpriteLink({children, id, form, palette, width=80, height
           }, []);
 
 
-        if(!loaded) return <Loading width={width} height={height}/>
+        if(!imageUrl) return <Loading width={width} height={height}/>
         if(hideCaught && imageUrl.status === 2) return null
         if(hideSeen && imageUrl.status === 1) return null
         
@@ -74,7 +74,7 @@ export function PokemonSprite({id, form, palette, width=100, height=100, pixelat
         }
       }, []);
 
-    if(!loaded) return <Loading width={width} height={height}/>
+    if(!imageUrl) return <Loading width={width} height={height}/>
     return <div style={{width, maxHeight:height}} className={` relative ${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}><img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
         className={` ${imageUrl.showImg && !forceBlack ? '' : 'brightness-0'}`}/>
            {showStatus && 

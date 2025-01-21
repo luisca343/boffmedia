@@ -14,7 +14,7 @@ export default function PokemonSearchBar(){
     async function type(value: string){
         setText(value)
         if(value.length > 2) {
-            const res = await rotomGET(`/pokemon/search/species/${value}`)
+            const res = (await rotomGET(`/pokemon/search/species/${value}`)).data as any
             setPokemon(res)
         }
         if(value.length === 0) setPokemon([])

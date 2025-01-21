@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
@@ -353,7 +352,7 @@ export default function PokeathonHurdleGame() {
             <div className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white text-xs text-center py-1">
               {pokemons[lane].endTime
                 ? formatTime(
-                    (pokemons[lane].endTime - (pokemons[lane].startTime || 0)) /
+                    (pokemons[lane]?.endTime ?? 0 - (pokemons[lane]?.startTime ?? 0)) /
                       1000
                   )
                 : formatTime(currentTime)}
