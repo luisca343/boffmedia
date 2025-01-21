@@ -9,6 +9,8 @@ import OptimizedFicusNav from "@/components/nav/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 import BoffLayout from "./_components/BoffLayout";
 
+import '../globals.css';
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
