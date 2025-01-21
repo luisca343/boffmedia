@@ -8,6 +8,8 @@ import OptimizedFicusNav from "@/components/nav/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 import BoffLayout from "./_components/BoffLayout";
 
+import '../globals.css'
+
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
   description: "BoffMedia",
