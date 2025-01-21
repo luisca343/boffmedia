@@ -2,7 +2,7 @@ import { QuestData } from '../types'
 import { QuestDisplay } from '../_components/QuestDisplay'
 import { calculateTotalRewards } from '../utils/calculateTotalRewards'
 import Image from 'next/image'
-import { boffGET, rotomGET } from '@/services/boffAPI'
+import { boffGET } from '@/services/boffAPI'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTranslations } from 'next-intl/server'
 

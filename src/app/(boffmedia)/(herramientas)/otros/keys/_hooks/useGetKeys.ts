@@ -1,5 +1,5 @@
 "use client"
-import { apiGET, rotomGET } from "@/services/boffAPI";
+import { apiGET } from "@/services/boffAPI";
 import { useCallback, useEffect, useState } from "react";
 
 type useGetKeysReturnType = {
