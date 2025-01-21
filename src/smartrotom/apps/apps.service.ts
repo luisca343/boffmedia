@@ -12,11 +12,10 @@ export class AppsService {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
   
-  async findAll(page: number = 1, limit: number = 10): Promise<{ apps: SmartRotomApp[], total: number }> {
+  async findAll(): Promise<SmartRotomApp[]> {
     try {
-      const offset = (page - 1) * limit;
       const [apps, countResult] = await Promise.all([
-        this.db.select().from(smartrotomApps).limit(limit).offset(offset).execute(),
+        this.db.select().from(smartrotomApps).execute(),
         this.db.select({ count: sql`count(*)` }).from(smartrotomApps).execute()
       ]);
       
@@ -25,7 +24,7 @@ export class AppsService {
       }
 
       const total = Number(countResult[0].count);
-      return { apps, total };
+      return apps;
     } catch (error) {
       throw new HttpException(`Failed to find apps: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
     }
