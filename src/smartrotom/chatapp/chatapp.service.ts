@@ -105,7 +105,7 @@ export class ChatappService {
         users.forEach((user: {uuid: string}) => {
             let socket = this.socketGateway.users.find((u: {uuid: string}) => u.uuid === user.uuid)
             console.log(`Trying to send message to ${user.uuid}`)
-            if(user.uuid !== uuid || !sentToSelf) {
+            if(user.uuid !== uuid || sentToSelf) {
                 console.log(`Sending message to ${user.uuid}`)
                 this.socketGateway.server.to(socket.socketId).emit('chat:message', {chatId, id:insertId, content: message, createdAt: new Date(), uuid: uuid})
                 if(user.uuid === uuid) sentToSelf = true
