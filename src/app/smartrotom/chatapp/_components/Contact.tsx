@@ -15,7 +15,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
         <div
           className={`${
             activeChat === chat.id ? "bg-neutral-700" : "bg-neutral-800"
-          } hover:bg-neutral-700 h-[100px] flex items-center w-full`}
+          } hover:bg-neutral-700 h-[100px] flex items-center w-full hover:cursor-pointer`}
           onClick={() => setActiveChat(chat.id)}
         >
           <img

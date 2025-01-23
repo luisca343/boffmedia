@@ -1,4 +1,4 @@
-import { AppList } from "@/components/smartrotom/AppLink";
+import { AppList } from "@/components/smartrotom/AppList";
 import ClickableClock from "@/components/smartrotom/ClickableClock";
 
 export default function SmartrotomHome() {

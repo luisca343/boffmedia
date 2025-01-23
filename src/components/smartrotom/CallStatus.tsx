@@ -7,7 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import { CabezaJugador } from "./CabezaMC";
+import { CabezaJugador } from "./minecraft/CabezaMC";
 import { useBoffSession } from "@/services/useBoffSession";
 import { leaveCall, setCall } from "@/services/mcef/mcefApi";
 

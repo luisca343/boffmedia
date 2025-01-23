@@ -1,6 +1,6 @@
 "use client"
-import { IdleAnimation, NameTagObject, SkinViewer } from "skinview3d"
 import { useEffect, useRef, useState } from "react"
+import { IdleAnimation, NameTagObject, SkinViewer } from "skinview3d"
 
 
 export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, zoom = 1, width= 150, height= 150, className='', ...props} : {uuid: string, nombreNPC: string, autoRotate?: boolean, tag?: boolean, zoom?: number, width?: number, height?: number, className?: string}) {
@@ -69,8 +69,6 @@ export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, 
           <img src={url} alt={npcName} className="absolute top-0 left-0 w-full h-full" />
       </div>
       )
-
-
 
       async function updateNPCImage(npcName: string) {
         const canvas = document.createElement('canvas')

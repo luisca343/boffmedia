@@ -1,7 +1,7 @@
 "use client"
 import { useState, useMemo, useEffect } from "react"
 import { toast } from 'react-toastify'
-import { CabezaJugador } from "@/components/smartrotom/CabezaMC"
+import { CabezaJugador } from "@/components/smartrotom/minecraft/CabezaMC"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -102,7 +102,7 @@ export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => voi
                             disabled={selectedUsers.length < 2} 
                         />
                         <Button 
-                            className="bg-neutral-900 hover:bg-neutral-600" 
+                            className="bg-neutral-900 hover:bg-neutral-600 text-neutral-100" 
                             onClick={handleCreateChat}
                             disabled={createChatLoading}
                         >

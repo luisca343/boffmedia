@@ -9,7 +9,7 @@ interface SocketStore {
   disconnect: () => void;
 }
 
-const useSocketStore = create<SocketStore>((set, get) => ({
+const useSocketStore = create<SocketStore>((set, get): SocketStore => ({
   user: null,
   socket: null,
   connect: async (user) => {

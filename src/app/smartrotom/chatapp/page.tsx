@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import "./test.css";
-import { useEffect, useState } from "react";
-import useSocketStore from "@/app/useSocketStore";
 import { Chat } from "./_components/Chat";
-import { CreateGroup } from "./_components/CreateGroup";
-import {  Message as MessageType } from "./_types/Chat";
+import { useEffect, useState } from "react";
 import useGetChats from "./_hooks/useGetChats";
 import { Contact } from "./_components/Contact";
+import useSocketStore from "@/app/useSocketStore";
+import {  Message as MessageType } from "./_types/Chat";
+import { CreateGroup } from "./_components/CreateGroup";
 
 export default function ChatApp() {
   const { session, chats, refresh, updateChats, isLoading } = useGetChats();
@@ -25,9 +25,9 @@ export default function ChatApp() {
   if (!chats) return null;
   
   return (
-    <div className="w-full h-full flex">
-      <div className="flex flex-col h-full w-1/4  bg-neutral-800  border-r border-neutral-900 ">
-        <div className="h-16 p-2 text-xl w-full flex items-center text-neutral-50 ">
+    <div className="w-full h-full flex overflow-hidden">
+    <div className="flex flex-col h-full w-1/4 bg-neutral-800 border-r border-neutral-900">
+      <div className="h-[4.25rem] p-2 text-xl w-full flex items-center justify-between text-neutral-50 border-b border-neutral-900">
           <div>Chats</div>
           <CreateGroup setActiveChat={setChat} />
         </div>
@@ -37,7 +37,7 @@ export default function ChatApp() {
           ))}
         </div>
       </div>
-      <div className="flex flex-col w-3/4 h-full bg-neutral-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-neutral-900">
+      <div className="flex flex-col w-3/4 h-full bg-neutral-800 overflow-hidden bg-center bg-cover bg-no-repeat">
         {activeChat ? (
           <Chat
             chats={chats!}
