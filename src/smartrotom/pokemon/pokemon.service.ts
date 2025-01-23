@@ -111,6 +111,40 @@ export class PokemonService {
     .execute()
     return dex
   }
+
+  
+  async getPokedex(uuid: string) {
+    const dex = await this.db
+      .selectDistinct({
+        pokemonId: pokedexRegistry.pokemonId,
+        seenAt: pokedexRegistry.seenAt,
+        caughtAt: pokedexRegistry.caughtAt,
+        paletteId: pokedexRegistry.paletteId,
+      })
+      .from(pokedexRegistry)
+      .where(eq(pokedexRegistry.uuid, uuid))
+      .execute()
+
+    const seenUniquePokemonIds = new Set(dex.filter((p) => p.seenAt !== null).map((p) => p.pokemonId))
+    const caughtUniquePokemonIds = new Set(dex.filter((p) => p.caughtAt !== null).map((p) => p.pokemonId))
+
+    const seenPokemon = seenUniquePokemonIds.size
+    const caughtPokemon = caughtUniquePokemonIds.size
+
+    const shinyPokemon = dex.filter((p) => p.paletteId === "shiny" && p.caughtAt !== null).length
+    const totalPokemon = this.pokemonDataService.getAllSpecies().length
+    const missingPokemon = totalPokemon - seenPokemon
+    const missingCaughtPokemon = totalPokemon - caughtPokemon
+
+    return {
+      seenPokemon,
+      caughtPokemon,
+      totalPokemon,
+      missingPokemon,
+      missingCaughtPokemon,
+      shinyPokemon,
+    }
+  }
   
   getNextPrev(id: number): { prev: Pokemon | undefined; next: Pokemon | undefined } {
     const allSpecies = this.pokemonDataService.getAllSpecies();
