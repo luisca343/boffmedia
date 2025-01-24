@@ -1,5 +1,7 @@
-import { rotomGET, rotomPOST } from "@/services/boffAPI"
-import { Pokemon } from "@/types/Pokemon"
+import { Palette, Pokemon } from "@/types/Pokemon"
+import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { url } from "inspector"
+import { usePokemonStore } from "@/stores/pokemonStore"
 
 export default function getPokemonSpriteOld(name: string, form: string, shiny: boolean){
     const formString = form && form != 'base' ? `_${form.toUpperCase()}` : ''
@@ -7,19 +9,129 @@ export default function getPokemonSpriteOld(name: string, form: string, shiny: b
     return `/smartrotom/img/sprites/${folderString}/${name.toUpperCase()}${formString}.png`
 }
 
-export async function getPokemonImage(id: number, form: string, palette: string, uuid = '', hide: boolean){
-    const img = await rotomGET(`/pokemon/image/${id}/${form}/${palette}/${uuid}/${hide ? 1 : 0}`)
-    return await img.data as any
+export async function getPokemonImageOld(id: number, form: string, palette: string, uuid = '', hide: boolean){
+    const img = (await pokemonService.getImage({pokemonId: id, formName: form, paletteName: palette, uuid: uuid, hide: hide ? 1 : 0})).data
+    return img
 }
+
+export async function getPokemonSpriteOld2(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
+    const img = (await pokemonService.getSprite({pokemonId: id, formName: form, paletteName: palette, uuid: uuid, hide: hide ? 1 : 0})).data
+    return img
+}
+
+const SPRITES_BASE_URL = '/smartrotom/packs'
+const IMAGES_BASE_URL = '/smartrotom/img/sprites'
+
+const indexedImages = {} as {[key: string]: string}
+const indexedSprites = {} as {[key: string]: string}
+
+
+export async function getPokemonImage(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
+    const key = `${id}_${form}_${palette}`
+    /*if (indexedImages[key]) {
+        return {
+            url: indexedImages[key],
+            type: 'image',
+            showImg: true,
+            status: 0
+        }
+    }*/
+
+    const { getPokemonByDex } = await usePokemonStore.getState()
+    const pokemon = (await getPokemonByDex(id))
+    const pokemonName = pokemon?.name.toUpperCase();
+    
+    const imageFolder = palette === 'shiny' ? 'Front Shiny' : palette === 'none' ? 'Front' : '';
+    const pokemonImageName = form == "base" ? pokemonName : `${pokemonName}_${form.toUpperCase()}`;
+
+    const image = `${IMAGES_BASE_URL}/${imageFolder}/${pokemonImageName}.png`;
+
+    indexedImages[key] = image;
+    return {
+        url: image,
+        type: 'image',
+        showImg: true,
+        status: 0
+    }
+    
+}
+
+function getSpriteURL(palette:Palette, pokemonId?: number){
+    if(pokemonId == 774) return 'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png'
+    return typeof palette.sprite === 'string' ? palette.sprite : palette.sprite.resource
+  }
 
 export async function getPokemonSprite(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
-    const img = await rotomGET(`/pokemon/sprite/${id}/${form}/${palette}/${uuid}/${hide ? 1 : 0}`)
-    return await  img.data as any
-}
+    const key = `${id}_${form}_${palette}`
+    /*if (indexedSprites[key]) {
+        return {
+            url: indexedSprites[key],
+            type: 'sprite',
+            showImg: true,
+            status: 0
+        }
+    }*/
+    const { getPokemonByDex} = await usePokemonStore.getState()
+    const pokemon = (await getPokemonByDex(id))!
+
+    const formData = pokemon.forms.find((f) => f.name === form) || pokemon.forms[0];
+    let paletteData;
+    formData.genderProperties && Object.values(formData.genderProperties).forEach((genderProperty) => {
+      genderProperty.palettes.forEach((p) => {
+        if (p.name === palette) paletteData = p;
+        return;
+      });
+    });
+    
+    if (!palette) {
+    if (formData.genderProperties) {
+        paletteData = formData.genderProperties[0].palettes[0];
+    }
+    }
+    
+    if (!paletteData) {
+        throw new Error(`Palette data not found for palette: ${palette}`);
+    }
+    const sprite = getSpriteURL(paletteData, id).split(':')[1];
+
+    const defaultUrl = `${SPRITES_BASE_URL}/default_resourcepack/assets/pixelmon/textures/${sprite}`;
+    const fallbackUrl = `${SPRITES_BASE_URL}/resourcepack/assets/pixelmon/textures/${sprite}`;
+
+    try {
+      const response = await fetch(defaultUrl, { method: 'HEAD' });
+      if (response.ok) {
+        indexedSprites[key] = defaultUrl;
+        return {
+            url: defaultUrl,
+            type: 'sprite',
+            showImg: true,
+            status: 0
+        }
+      } else {
+        indexedSprites[key] = fallbackUrl;
+        return {
+            url: fallbackUrl,
+            type: 'sprite',
+            showImg: true,
+            status: 0
+        }
+      }
+    } catch (error) {
+      console.error(`Error checking sprite existence: ${error}`);
+      indexedSprites[key] = fallbackUrl;
+      return {
+            url: fallbackUrl,
+            type: 'sprite',
+            showImg: true,
+            status: 0
+        }
+    }
+  }
+
 
 export async function getItemSprite(name: string){
-    const img = await rotomGET(`/pokemon/item/sprite/${name}`)
-    return await  img.data as any
+    const img = (await pokemonService.getItemSprite(name)).data
+    return await  img
 }
 
 export function getPokemonName(name: string, t: any){
