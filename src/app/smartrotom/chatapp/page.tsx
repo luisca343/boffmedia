@@ -37,7 +37,7 @@ export default function ChatApp() {
           ))}
         </div>
       </div>
-      <div className="flex flex-col w-3/4 h-full bg-neutral-800 overflow-hidden bg-center bg-cover bg-no-repeat">
+      <div className="flex flex-col w-3/4 h-full bg-neutral-700  overflow-hidden bg-center bg-cover bg-no-repeat  border-neutral-900">
         {activeChat ? (
           <Chat
             chats={chats!}

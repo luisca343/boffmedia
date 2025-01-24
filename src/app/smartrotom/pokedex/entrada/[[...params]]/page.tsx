@@ -1,20 +1,20 @@
-import { rotomGET } from "@/services/boffAPI"
-import { Movement, Pokemon } from "../../_types/pokemon"
-import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemonId, getPokemonNameAndForm } from "../../dexUtils"
+import { Pokemon } from "../../_types/pokemon"
 import { EvoTree } from "./_components/EvoTree"
-import { PokemonSprite } from "../../_components/PokemonSprite"
-import { TypeTable } from "./_components/TypeTable"
 import TypeBadge from "./_components/TypeBadge"
-import { StatsTable } from "./_components/StatsTable"
-import { EntryHeader } from "./_components/EntryHeader"
-import { LevelMovesTable, MovesTable, OtherMovesTable } from "./_components/MovesTable"
 import { SpawnInfo } from "../../_types/spawnInfo"
-import { SpawnTable } from "./_components/SpawnTable"
-import { Abilities, GenderProperties } from "@/types/Pokemon"
-import { PokedexSection } from "../../_components/PokedexSection"
-import { InternalLink } from "@/components/nav/Link"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { getTranslations } from "next-intl/server"
+import { TypeTable } from "./_components/TypeTable"
+import { InternalLink } from "@/components/nav/Link"
+import { StatsTable } from "./_components/StatsTable"
+import { SpawnTable } from "./_components/SpawnTable"
+import { EntryHeader } from "./_components/EntryHeader"
+import { Abilities, GenderProperties } from "@/types/Pokemon"
+import { PokemonSprite } from "../../_components/PokemonSprite"
+import { PokedexSection } from "../../_components/PokedexSection"
+import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { LevelMovesTable, OtherMovesTable } from "./_components/MovesTable"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemonId } from "../../dexUtils"
 
 
 export default async function EntradaPokedex({params}: any){
@@ -22,7 +22,7 @@ export default async function EntradaPokedex({params}: any){
     
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
 
-    const pokemon = (await rotomGET(`/pokemon/dex/${pokemonIndex}`)).data as Pokemon
+    const pokemon = (await pokemonService.getPokemonByDex(pokemonIndex)).data as Pokemon
     
 
     if (pokemonIndex === undefined) {
@@ -37,20 +37,16 @@ export default async function EntradaPokedex({params}: any){
     } else {
         formIndex = parseInt(formIndex+"") - 1;
     }
-   
-       
-    
 
-    const {next, prev} = (await rotomGET(`/pokemon/nextprev/${pokemonIndex}`)).data as {next: Pokemon, prev: Pokemon}
-    const moves = (await rotomGET(`/pokemon/moves/${pokemonIndex}/${formIndex}`)).data as Movement[]
+    const {next, prev} = (await pokemonService.getNextPrev(pokemonIndex)).data!
+    const moves = await (await pokemonService.getMoves(pokemonIndex, formIndex)).data
 
     if(!pokemon) return <h1>Pokemon no encontrado {pokemonIndex}</h1>
     if(!pokemon.forms[formIndex]) return <h1>Forma no encontrada {formIndex}</h1>
 
     const formName = getFormName(pokemon, formIndex)
     
-    const spawns = (await rotomGET(`/pokemon/spawns/${getPokemonId(pokemon.name, formName)}`)).data as SpawnInfo[]
-    console.log(spawns)
+    const spawns = (await pokemonService.getSpawnByPokemon(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
 
     const type1 = pokemon.forms[formIndex]?.types?.[0] ?? pokemon.forms[0]?.types?.[0] as string
     const type2 = pokemon.forms[formIndex]?.types?.[1] ?? pokemon.forms[0]?.types?.[1] as string
@@ -65,9 +61,9 @@ export default async function EntradaPokedex({params}: any){
             }
     })})
     return (
-        <section className="flex flex-col overflow-hidden text-surface-50 bg-surface-800 ">
+        <section className="flex flex-col overflow-hidden text-surface-50">
             <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} />
-            <section className="flex flex-col  bg-surface-800 overflow-auto pt-4">
+            <section className="flex flex-col  bg-surface-800 overflow-auto p-4">
                 <PokedexSection id='info' title="Información">
                     <BasicInfo formName={formName}/>
                 </PokedexSection>

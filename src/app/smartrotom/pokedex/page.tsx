@@ -10,11 +10,10 @@ export default function PokedexMenu(){
     return (
         <div className="bg-surface-800  ">
             <MenuHeader />
-            <div className="mt-4">
+            <div className="mt-4 p-4">
                 <PokedexSection title="Búsqueda">
                     <PokemonSearchBar />
                 </PokedexSection>
-
                 <PokedexSection title="Últimos Registros">
                     <LastRegistries />
                 </PokedexSection>
