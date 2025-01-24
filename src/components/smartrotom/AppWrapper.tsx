@@ -120,7 +120,7 @@ export default function AppWrapper({
       <ToastContainer position="bottom-right" theme="dark" />
       <main className="relative flex-1 pt-12 flex overflow-hidden">
         <CallStatus />
-        <div className="h-full w-full flex overflow-hidden">{children}</div>
+        <div className="h-full w-full [&>*]:w-full flex overflow-hidden">{children}</div>
       </main>
     </section>
   )

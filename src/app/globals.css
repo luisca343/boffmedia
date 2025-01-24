@@ -34,6 +34,7 @@
 
 @layer base {
   :root {
+    
     --primary-50: 255 247 237;
     --primary-100: 255 237 213;
     --primary-200: 254 215 170;
