@@ -1,28 +1,42 @@
+import { Pokemon } from "@/app/smartrotom/pokedex/_types/pokemon";
 import { rotomGET } from "@/services/boffAPI"
+import { EvolutionTree, PokedexData, PokemonMove, Registry } from "@/types/pokedex";
+
+type ImageResult = {
+  url: string;
+  type: string;
+  status: number;
+  showImg: boolean;
+}
+
+type ItemSpriteResult = {
+  url: string;
+}
 
 export const pokemonService = {
-  getAllPokemon: () => rotomGET("/smartrotom/pokemon"),
-  getPokemonByDex: (dex: number) => rotomGET(`/smartrotom/pokemon/dex/${dex}`),
-  getAllMoves: () => rotomGET("/smartrotom/pokemon/moves"),
-  getMoves: (id: number, form: number) => rotomGET(`/smartrotom/pokemon/moves/${id}/${form}`),
-  getPokemonNames: () => rotomGET("/smartrotom/pokemon/names"),
-  getSpawnByPokemon: (name: string) => rotomGET(`/smartrotom/pokemon/spawns/${name}`),
-  getMove: (name: string) => rotomGET(`/smartrotom/pokemon/move/${name}`),
-  getPokemonByMove: (name: string) => rotomGET(`/smartrotom/pokemon/move/${name}/pokemon`),
-  getBiomes: () => rotomGET("/smartrotom/pokemon/biomes"),
-  getPokemonByBiome: (name: string) => rotomGET(`/smartrotom/pokemon/biome/${name}`),
+  getAllPokemon: () => rotomGET("/pokemon"),
+  getPokemonByDex: (dex: number) => rotomGET<Pokemon>(`/pokemon/dex/${dex}`),
+  getAllMoves: () => rotomGET("/pokemon/moves"),
+  getMoves: (id: number, form: number) => rotomGET<PokemonMove[]>(`/pokemon/moves/${id}/${form}`),
+  getPokemonNames: () => rotomGET("/pokemon/names"),
+  getSpawnByPokemon: (name: string) => rotomGET(`/pokemon/spawns/${name}`),
+  getMove: (name: string) => rotomGET(`/pokemon/move/${name}`),
+  getPokemonByMove: (name: string) => rotomGET(`/pokemon/move/${name}/pokemon`),
+  getBiomes: () => rotomGET("/pokemon/biomes"),
+  getPokemonByBiome: (name: string) => rotomGET(`/pokemon/biome/${name}`),
   getImage: (params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) =>
-    rotomGET(
-      `/smartrotom/pokemon/image/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
+    rotomGET<ImageResult>(
+      `/pokemon/image/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
     ),
   getSprite: (params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) =>
-    rotomGET(
-      `/smartrotom/pokemon/sprite/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
+    rotomGET<ImageResult>(
+      `/pokemon/sprite/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
     ),
-  getNextPrev: (id: number) => rotomGET(`/smartrotom/pokemon/nextprev/${id}`),
-  getEvoTree: (id: number) => rotomGET(`/smartrotom/pokemon/evotree/${id}`),
-  getItemSprite: (name: string) => rotomGET(`/smartrotom/pokemon/item/sprite/${name}`),
-  searchPokemonByName: (name: string) => rotomGET(`/smartrotom/pokemon/search/species/${name}`),
-  getRegistries: (uuid: string) => rotomGET(`/smartrotom/pokemon/registries/${uuid}`),
+  getItemSprite: (name: string) => rotomGET<ItemSpriteResult>(`/pokemon/item/sprite/${name}`),
+  getNextPrev: (id: number) => rotomGET<{next: Pokemon, prev: Pokemon}>(`/pokemon/nextprev/${id}`),
+  getEvoTree: (id: number) => rotomGET<EvolutionTree>(`/pokemon/evotree/${id}`),
+  searchPokemonByName: (name: string) => rotomGET(`/pokemon/search/species/${name}`),
+  getRegistries: (uuid: string) => rotomGET<Registry[]>(`/pokemon/registries/${uuid}`),
+  getPokedexStatus:  (uuid: string) => rotomGET<PokedexData>(`/pokemon/pokedex-status/${uuid}`),
 }
 
