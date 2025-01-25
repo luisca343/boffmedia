@@ -45,7 +45,7 @@ export function Message({
   return (
     <div className={`flex w-full ${sender === "user" ? "justify-end" : "justify-start"}`}>
       <div
-        className={`relative flex flex-col mb-0.5 min-w-16  text-sm max-w-xs mx-2 ${
+        className={`relative flex flex-col mb-0.5 min-w-16  text-lg max-w-3xl mx-2 ${
           isLastInSequence ? "mb-1" : ""
         } ${isFirstInSequence ? "mt-1" : ""}`}
       >
