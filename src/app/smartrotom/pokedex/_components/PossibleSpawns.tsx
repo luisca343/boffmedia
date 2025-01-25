@@ -104,6 +104,7 @@ export function PossibleSpawns({
           form={spawn.form}
           palette={spawn.palette}
           text={getDisplayName(spawn.species, spawn.form, spawn.palette)}
+          hide={true}
         >
           <div className="text-xs hidden 2xl:block">
             {getDisplayName(spawn.species, spawn.form, spawn.palette)}

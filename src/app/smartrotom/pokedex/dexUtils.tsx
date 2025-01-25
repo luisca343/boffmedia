@@ -1,23 +1,7 @@
 import { Palette, Pokemon } from "@/types/Pokemon"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
-import { url } from "inspector"
 import { usePokemonStore } from "@/stores/pokemonStore"
-
-export default function getPokemonSpriteOld(name: string, form: string, shiny: boolean){
-    const formString = form && form != 'base' ? `_${form.toUpperCase()}` : ''
-    const folderString = shiny ? 'Front Shiny' : 'Front'
-    return `/smartrotom/img/sprites/${folderString}/${name.toUpperCase()}${formString}.png`
-}
-
-export async function getPokemonImageOld(id: number, form: string, palette: string, uuid = '', hide: boolean){
-    const img = (await pokemonService.getImage({pokemonId: id, formName: form, paletteName: palette, uuid: uuid, hide: hide ? 1 : 0})).data
-    return img
-}
-
-export async function getPokemonSpriteOld2(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
-    const img = (await pokemonService.getSprite({pokemonId: id, formName: form, paletteName: palette, uuid: uuid, hide: hide ? 1 : 0})).data
-    return img
-}
+import type { Pokemon as PokemonType } from "@/app/smartrotom/pokedex/_types/pokemon"
 
 const SPRITES_BASE_URL = '/smartrotom/packs'
 const IMAGES_BASE_URL = '/smartrotom/img/sprites'
@@ -25,17 +9,16 @@ const IMAGES_BASE_URL = '/smartrotom/img/sprites'
 const indexedImages = {} as {[key: string]: string}
 const indexedSprites = {} as {[key: string]: string}
 
-
 export async function getPokemonImage(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
     const key = `${id}_${form}_${palette}`
-    /*if (indexedImages[key]) {
+    if (indexedImages[key]) {
         return {
             url: indexedImages[key],
             type: 'image',
             showImg: true,
             status: 0
         }
-    }*/
+    }
 
     const { getPokemonByDex } = await usePokemonStore.getState()
     const pokemon = (await getPokemonByDex(id))
@@ -63,14 +46,14 @@ function getSpriteURL(palette:Palette, pokemonId?: number){
 
 export async function getPokemonSprite(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
     const key = `${id}_${form}_${palette}`
-    /*if (indexedSprites[key]) {
+    if (indexedSprites[key]) {
         return {
             url: indexedSprites[key],
             type: 'sprite',
             showImg: true,
             status: 0
         }
-    }*/
+    }
     const { getPokemonByDex} = await usePokemonStore.getState()
     const pokemon = (await getPokemonByDex(id))!
 
@@ -97,6 +80,8 @@ export async function getPokemonSprite(id: number, form: string, palette: string
     const defaultUrl = `${SPRITES_BASE_URL}/default_resourcepack/assets/pixelmon/textures/${sprite}`;
     const fallbackUrl = `${SPRITES_BASE_URL}/resourcepack/assets/pixelmon/textures/${sprite}`;
 
+    const displayStatus = await getDisplayStatus(id, form, hide)
+
     try {
       const response = await fetch(defaultUrl, { method: 'HEAD' });
       if (response.ok) {
@@ -104,7 +89,7 @@ export async function getPokemonSprite(id: number, form: string, palette: string
         return {
             url: defaultUrl,
             type: 'sprite',
-            showImg: true,
+            showImg: displayStatus,
             status: 0
         }
       } else {
@@ -112,7 +97,7 @@ export async function getPokemonSprite(id: number, form: string, palette: string
         return {
             url: fallbackUrl,
             type: 'sprite',
-            showImg: true,
+            showImg: displayStatus,
             status: 0
         }
       }
@@ -122,12 +107,19 @@ export async function getPokemonSprite(id: number, form: string, palette: string
       return {
             url: fallbackUrl,
             type: 'sprite',
-            showImg: true,
+            showImg: displayStatus,
             status: 0
         }
     }
   }
 
+  export function getDisplayStatus(pokemonId: number, form: string, hide: boolean): boolean {
+    if(!hide) return true;
+    const pokedexData = usePokemonStore.getState().pokedexData;
+    const seen = pokedexData?.seenPokemon ?? [];
+    const key = `${pokemonId}:${form}`;
+    return seen.includes(key);
+}
 
 export async function getItemSprite(name: string){
     const img = (await pokemonService.getItemSprite(name)).data

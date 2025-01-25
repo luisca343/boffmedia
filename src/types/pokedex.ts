@@ -9,9 +9,9 @@ export type Registry = {
 }
 
 export type PokedexData = {
-    seenPokemon: number[]
-    caughtPokemon: number[]
-    shinyPokemon: number[]
+    seenPokemon: string[]
+    caughtPokemon: string[]
+    shinyPokemon: string[]
     totalPokemon: number
     seenCount: number
     caughtCount: number
