@@ -1,8 +1,8 @@
-import { Palette, Pokemon } from "@/types/Pokemon"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
-import { usePokemonStore } from "@/stores/pokemonStore"
-import type { Pokemon as PokemonType } from "@/app/smartrotom/pokedex/_types/pokemon"
 import { PokedexData } from "@/types/pokedex"
+import { Palette, Pokemon } from "@/types/Pokemon"
+import { usePokemonStore } from "@/stores/pokemonStore"
+import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import type { Pokemon as PokemonType } from "@/app/smartrotom/pokedex/_types/pokemon"
 
 const SPRITES_BASE_URL = '/smartrotom/packs'
 const IMAGES_BASE_URL = '/smartrotom/img/sprites'
@@ -47,14 +47,13 @@ function getSpriteURL(palette:Palette, pokemonId?: number){
   }
 
 export async function getPokemonSprite(id: number, form: string, palette: string = 'none', hide: boolean, pokedexData: PokedexData){
-    const displayStatus = await getDisplayStatus(id, form, hide, pokedexData)
+    const pokedexStatus = getPokedexStatus(id, form, hide, pokedexData)
     const key = `${id}_${form}_${palette}`
     if (indexedSprites[key]) {
         return {
             url: indexedSprites[key],
             type: 'sprite',
-            showImg: displayStatus,
-            status: 0
+            status: pokedexStatus
         }
     }
     const { getPokemonByDex} = await usePokemonStore.getState()
@@ -91,16 +90,14 @@ export async function getPokemonSprite(id: number, form: string, palette: string
         return {
             url: defaultUrl,
             type: 'sprite',
-            showImg: displayStatus,
-            status: 0
+            status: pokedexStatus
         }
       } else {
         indexedSprites[key] = fallbackUrl;
         return {
             url: fallbackUrl,
             type: 'sprite',
-            showImg: displayStatus,
-            status: 0
+            status: pokedexStatus
         }
       }
     } catch (error) {
@@ -109,8 +106,7 @@ export async function getPokemonSprite(id: number, form: string, palette: string
       return {
             url: fallbackUrl,
             type: 'sprite',
-            showImg: displayStatus,
-            status: 0
+            status: pokedexStatus
         }
     }
   }
@@ -121,6 +117,22 @@ export async function getPokemonSprite(id: number, form: string, palette: string
     const seen = pokedexData?.seenPokemon;
     const key = `${pokemonId}:${form}`;
     return seen.includes(key);
+}
+
+export enum PokedexStatus {
+    UNSEEN,
+    SEEN,
+    CAUGHT,
+    SHINY
+}
+
+export function getPokedexStatus(pokemonId: number, form: string, hide: boolean, pokedexData: PokedexData): PokedexStatus {
+    const seen = pokedexData?.seenPokemon;
+    const caught = pokedexData?.caughtPokemon;
+    const key = `${pokemonId}:${form}`;
+    if (caught.includes(key)) return PokedexStatus.CAUGHT;
+    if (seen.includes(key)) return PokedexStatus.SEEN;
+    return PokedexStatus.UNSEEN;
 }
 
 export function getDisplayPokemonName(pokemonId: number, form: string, name: string, hide: boolean, pokemonData: PokedexData): string {
@@ -211,9 +223,19 @@ export function getFormName(pokemon: Pokemon, formIndex: number){
     return pokemon.forms[formIndex].name || 'base'
 }
 
+export function getPokemonNameFromIdAndForm(id: number, form: string, pokemon: PokemonType){
+    console.log(pokemon)
+    return pokemon?.name || ''
+}
+
+export function getTranslatedName(id:number, form: string, trans: any){
+    const name = getPokemonNameFromIdAndForm(id, form, [])
+    return trans(`form`, {pokemon: getPokemonName(name, trans), form: `${trans(`form_${form}`)}`})
+}
+
 export function getDisplayName(name: string, id: number, form: string, palette: string, hide: boolean, t: any, pokedexData: PokedexData) {
     if(!getDisplayStatus(id, form, hide, pokedexData)) return '???';
-
+    
 
     //if (form.includes('segment')) form = 'base';
     const formDisplay = form !== "base" ? t(`form_${form}`) : "";

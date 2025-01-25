@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
-import { PokemonName, PokemonSprite } from "./PokemonSprite"
+import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
 import { InternalLink } from "@/components/nav/Link"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
 import { usePokemonStore } from "@/stores/pokemonStore"
@@ -25,10 +25,9 @@ export default function PokemonSearchBar(){
             <Input variant="dark" type="text" placeholder="Buscar un Pokémon" value={text} onChange={(e) => typeKey(e.target.value)} />
             <div className="overflow-auto h-48 flex flex-wrap justify-center">
                 {pokemon?.map(p => (
-                    <InternalLink href={`/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex justify-center hover:bg-surface-600 text-surface-50 items-center w-48 m-1 rounded-md">
-                        <PokemonSprite width={40} id={p.item.dex} form={"base"} palette={"none"} hide={true}/>
-                        <PokemonName id={p.item.dex} form={"base"} palette={"none"} hide={true} name={p.item.name} />
-                    </InternalLink>
+                    <div className="flex justify-center hover:bg-surface-600 text-surface-50 items-center w-48 m-1 rounded-md"  key={p.item.dex}>
+                        <PokemonSpriteLink  width={40} id={p.item.dex} form={"base"} palette={"none"} hide={true} displayName={true} />
+                    </div>
                 ))}
             </div>
         </div>

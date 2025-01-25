@@ -14,17 +14,7 @@ export type PossibleSpawn = {
   percentage: number;
 };
 
-export function PossibleSpawnsSection({
-  pokemonSpawns,
-  hideCaught = true,
-  hideSeen = true,
-  title,
-}: {
-  pokemonSpawns?: any;
-  hideCaught?: boolean;
-  hideSeen?: boolean;
-  title: string;
-}) {
+export function PossibleSpawnsSection({pokemonSpawns, hideCaught = true, hideSeen = true, title, }: { pokemonSpawns?: any; hideCaught?: boolean; hideSeen?: boolean; title: string; }) {
   const [show, setShow] = useState(true);
   const [loaded, setLoaded] = useState(false); // Step 1: Initialize loaded state
   const [count, setCount] = useState(pokemonSpawns?.length);
@@ -33,9 +23,7 @@ export function PossibleSpawnsSection({
     const titleEl = document.getElementById(title);
 
     if (titleEl) {
-      const children = titleEl.getElementsByTagName(
-        "a"
-      ) as HTMLCollectionOf<HTMLAnchorElement>;
+      const children = titleEl.getElementsByTagName("a") as HTMLCollectionOf<HTMLAnchorElement>;
       setCount(children.length);
       setShow(children.length > 0); // Corrected logic to set 'show'
     }
@@ -61,17 +49,7 @@ export function PossibleSpawnsSection({
   );
 }
 
-export function PossibleSpawns({
-  pokemonSpawns,
-  hideCaught = true,
-  hideSeen = true,
-  id,
-}: {
-  pokemonSpawns?: PossibleSpawn[];
-  hideCaught?: boolean;
-  hideSeen?: boolean;
-  id?: string;
-}) {
+export function PossibleSpawns({ pokemonSpawns, hideCaught = true, hideSeen = true, id, }: { pokemonSpawns?: PossibleSpawn[]; hideCaught?: boolean; hideSeen?: boolean; id?: string; }) {
   const [spawns, setSpawns] = useState<PossibleSpawn[]>();
   useEffect(() => {
     if (pokemonSpawns && pokemonSpawns.length > 0) {
@@ -96,7 +74,6 @@ export function PossibleSpawns({
     <div className="flex  flex-wrap justify-center" id={id}>
       {spawns?.map((spawn) => (
         <PokemonSpriteLink
-          name={spawn.species}
           hideCaught={hideCaught}
           hideSeen={hideSeen}
           key={spawn.species}
@@ -104,6 +81,7 @@ export function PossibleSpawns({
           form={spawn.form}
           palette={spawn.palette}
           hide={true}
+          displayName={true}
         >
           <div className="font-bold text-xl 2xl:text-base">
             {formatPercentage(spawn.percentage)} %

@@ -29,7 +29,6 @@ export async function EvoTree({params}: {params: {id: string}}){
                 return <div key={key} className='w-full flex flex-row items-center ' style={{height:`${100/Object.keys(tree).length}%`}}>
                     <InternalLink href={`/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-surface-700 rounded-md">
                         <PokemonSprite id={subTree.dex} form={form} palette='none' width={100} height={100}/>
-                        <span className="text-center">{t(`form`, {pokemon: getPokemonName(pkmName, t), form: `${t(`form_${form}`)}`})}</span>
                     </InternalLink>
                     <div className="flex flex-col ">
                         {Object.keys(evos)?.length > 0 && Object.keys(evos).map((evo: any, index: number) => {

@@ -1,32 +1,40 @@
 "use client"
-import { PossibleSpawns } from "../_components/PossibleSpawns";
-import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { PossibleSpawns } from "../_components/PossibleSpawns"
+import { useState } from "react"
+import { Label } from "@/components/ui/label"
+import { Switch } from "@/components/ui/switch"
 
 type PossibleSpawn = {
-    dex: number;
-    species: string;
-    form: string;
-    palette: string;
-    rarity: number;
-    percentage: number;
+  dex: number
+  species: string
+  form: string
+  palette: string
+  rarity: number
+  percentage: number
 }
 
+export default function Spawns() {
+  const [showCaught, setShowCaught] = useState(true)
+  const [showSeen, setShowSeen] = useState(true)
 
-export default function Spawns(){
-    const [hideCaught, setHideCaught] = useState(false)
-    const [hideSeen, setHideSeen] = useState(false)
-
-    return(
-        <div className="bg-surface-800  ">
-        <Label className="text-surface-50 text-2xl">Mostrar Avistados</Label>
-        <Checkbox id="seen" onClick={() => setHideSeen(!hideSeen)} className="bg-surface-400 text-surface-50 p-2 rounded-xl m-2">Mostrar Avistados</Checkbox>
-            <div className="hidden 2xl:flex justify-center">
-                <Label className="text-surface-50 text-2xl">Mostrar Atrapados</Label>
-                <Checkbox id="caught" onClick={() => setHideCaught(!hideCaught)} className="bg-surface-400 text-surface-50 p-2 rounded-xl m-2">Mostrar Atrapados</Checkbox>
-            </div>
-            <PossibleSpawns hideCaught={hideCaught} hideSeen={hideSeen}/>
+  return (
+    <div className="bg-surface-800 p-4">
+      <div className="flex gap-4 flex-row">
+        <div className="flex items-center space-x-2">
+          <Switch id="show-seen" checked={showSeen} onCheckedChange={setShowSeen} />
+          <Label htmlFor="show-seen" className="text-surface-50 text-lg">
+            Avistados
+          </Label>
         </div>
-    )
+        <div className="flex items-center space-x-2">
+          <Switch id="show-caught" checked={showCaught} onCheckedChange={setShowCaught} />
+          <Label htmlFor="show-caught" className="text-surface-50 text-lg">
+            Atrapados
+          </Label>
+        </div>
+      </div>
+      <PossibleSpawns hideCaught={!showCaught} hideSeen={!showSeen} />
+    </div>
+  )
 }
+
