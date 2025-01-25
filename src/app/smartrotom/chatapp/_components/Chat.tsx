@@ -22,15 +22,19 @@ export function Chat({
   setActiveChat: (id: number) => void
 }) {
   const [chat, setChat] = useState(chats[0] as ChatData)
-  const [message, setMessage] = useState("" as string)
+  const [message, setMessage] = useState("")
   const { socket } = useSocketStore()
   const { session } = useBoffSession()
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesStartRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesStartRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
+  }
 
   useEffect(() => {
-    messagesEndRef?.current?.scrollIntoView({ behavior: "smooth" })
-  }, [chat.messages])
+    scrollToBottom()
+  }, [chat.messages, chat]) // Added chat to dependencies
 
   useEffect(() => {
     const chat = chats.find((chat) => chat.id === activeChat)
@@ -48,7 +52,7 @@ export function Chat({
     }
 
     const newMessage: MessageType = {
-      id: 0,
+      id: Date.now(), // Temporary ID
       content: message,
       createdAt: new Date().toISOString(),
       uuid: getSmartRotomUser(session).uuid,
@@ -69,6 +73,10 @@ export function Chat({
       .then(() => {
         setMessage("")
       })
+      .catch((error) => {
+        console.error("Failed to send message:", error)
+        toast.error("Failed to send message. Please try again.")
+      })
   }
 
   function call() {
@@ -78,7 +86,7 @@ export function Chat({
   }
 
   return (
-    <div className="flex flex-col w-full h-full overflow-auto">
+    <div className="flex flex-col w-full h-full">
       <div className="h-16 px-4 w-full bg-neutral-800 flex items-center border-b border-neutral-900 shadow-sm">
         <img
           src={chat.image || "/placeholder.svg"}
@@ -96,13 +104,14 @@ export function Chat({
         </Button>
       </div>
       <div
-        className="flex-1 overflow-y-auto p-4"
+        className="flex-1 overflow-y-auto p-4 flex flex-col-reverse"
         style={{
           backgroundImage: "url('/smartrotom/img/fondoChat2.avif')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
+        <div ref={messagesStartRef} />
         {chat.messages.map((message, index) => (
           <Message
             key={message.id}
@@ -113,10 +122,10 @@ export function Chat({
             next={index > 0 ? chat.messages[index - 1] : null}
           />
         ))}
-        <div ref={messagesEndRef} />
       </div>
       <div className="p-4 bg-neutral-800 flex items-center space-x-2 border-t border-black">
-        <Input variant={"neutral"}
+        <Input
+          variant="neutral"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
@@ -125,7 +134,7 @@ export function Chat({
               sendMessage()
             }
           }}
-          placeholder="Escibe un mensaje..."
+          placeholder="Escribe un mensaje..."
           className="flex-1"
         />
         <Button type="submit" onClick={sendMessage} className="bg-primary-400 hover:bg-primary-500 text-black">

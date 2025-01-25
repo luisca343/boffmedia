@@ -31,13 +31,13 @@ export function Message({
     if (sender === "system") return "rounded-lg"
     if (isSender) {
       if (isFirstInSequence && isLastInSequence) return "rounded-3xl"
-      if (isFirstInSequence) return "rounded-b-3xl rounded-tl-3xl rounded-tr-lg"
-      if (isLastInSequence) return "rounded-t-3xl rounded-bl-3xl rounded-br-lg"
+      if (isLastInSequence) return "rounded-b-3xl rounded-tl-3xl rounded-tr-lg"
+      if (isFirstInSequence) return "rounded-t-3xl rounded-bl-3xl rounded-br-lg"
       return "rounded-l-3xl rounded-r-lg"
     } else {
       if (isFirstInSequence && isLastInSequence) return "rounded-3xl"
-      if (isFirstInSequence) return "rounded-b-3xl rounded-tr-3xl rounded-tl-lg"
-      if (isLastInSequence) return "rounded-t-3xl rounded-br-3xl rounded-bl-lg"
+      if (isLastInSequence) return "rounded-b-3xl rounded-tr-3xl rounded-tl-lg"
+      if (isFirstInSequence) return "rounded-t-3xl rounded-br-3xl rounded-bl-lg"
       return "rounded-r-3xl rounded-l-lg"
     }
   }
@@ -46,23 +46,21 @@ export function Message({
     <div className={`flex w-full ${sender === "user" ? "justify-end" : "justify-start"}`}>
       <div
         className={`relative flex flex-col mb-0.5 min-w-16  text-sm max-w-xs mx-2 ${
-          isFirstInSequence ? "mb-1" : ""
-        } ${isLastInSequence ? "mt-1" : ""}`}
+          isLastInSequence ? "mb-1" : ""
+        } ${isFirstInSequence ? "mt-1" : ""}`}
       >
-        {sender !== "user" && img && isFirstInSequence && sender !== "system" && (
+        {sender !== "user" && img && isLastInSequence && sender !== "system" && (
           <img
             src={`https://crafatar.com/avatars/${message.uuid}`}
             alt={`profile picture for ${message.uuid}`}
-            className="w-6 h-6 rounded-full absolute -left-8 top-0"
+            className="w-6 h-6 rounded-full absolute -left-8 bottom-0"
           />
         )}
-        {/* 
-        {isLastInSequence && (
+        {isFirstInSequence && (
           <span className={`text-xs ${sender === "user" ? "text-gray-400 self-end" : "text-gray-500"} mb-1`}>
             {timestamp}
           </span>
         )}
-        */}
         <div
           className={`px-4 py-2 ${getBubbleShape()} ${
             sender === "system"
