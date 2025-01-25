@@ -2,6 +2,7 @@ import { Palette, Pokemon } from "@/types/Pokemon"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import type { Pokemon as PokemonType } from "@/app/smartrotom/pokedex/_types/pokemon"
+import { PokedexData } from "@/types/pokedex"
 
 const SPRITES_BASE_URL = '/smartrotom/packs'
 const IMAGES_BASE_URL = '/smartrotom/img/sprites'
@@ -9,13 +10,14 @@ const IMAGES_BASE_URL = '/smartrotom/img/sprites'
 const indexedImages = {} as {[key: string]: string}
 const indexedSprites = {} as {[key: string]: string}
 
-export async function getPokemonImage(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
+export async function getPokemonImage(id: number, form: string, palette: string = 'none', hide: boolean, pokedexData: PokedexData){
+    const displayStatus = await getDisplayStatus(id, form, hide, pokedexData)
     const key = `${id}_${form}_${palette}`
     if (indexedImages[key]) {
         return {
             url: indexedImages[key],
             type: 'image',
-            showImg: true,
+            showImg: displayStatus,
             status: 0
         }
     }
@@ -33,7 +35,7 @@ export async function getPokemonImage(id: number, form: string, palette: string 
     return {
         url: image,
         type: 'image',
-        showImg: true,
+        showImg: displayStatus,
         status: 0
     }
     
@@ -44,13 +46,14 @@ function getSpriteURL(palette:Palette, pokemonId?: number){
     return typeof palette.sprite === 'string' ? palette.sprite : palette.sprite.resource
   }
 
-export async function getPokemonSprite(id: number, form: string, palette: string = 'none', uuid = '', hide: boolean){
+export async function getPokemonSprite(id: number, form: string, palette: string = 'none', hide: boolean, pokedexData: PokedexData){
+    const displayStatus = await getDisplayStatus(id, form, hide, pokedexData)
     const key = `${id}_${form}_${palette}`
     if (indexedSprites[key]) {
         return {
             url: indexedSprites[key],
             type: 'sprite',
-            showImg: true,
+            showImg: displayStatus,
             status: 0
         }
     }
@@ -80,7 +83,6 @@ export async function getPokemonSprite(id: number, form: string, palette: string
     const defaultUrl = `${SPRITES_BASE_URL}/default_resourcepack/assets/pixelmon/textures/${sprite}`;
     const fallbackUrl = `${SPRITES_BASE_URL}/resourcepack/assets/pixelmon/textures/${sprite}`;
 
-    const displayStatus = await getDisplayStatus(id, form, hide)
 
     try {
       const response = await fetch(defaultUrl, { method: 'HEAD' });
@@ -113,12 +115,16 @@ export async function getPokemonSprite(id: number, form: string, palette: string
     }
   }
 
-  export function getDisplayStatus(pokemonId: number, form: string, hide: boolean): boolean {
-    if(!hide) return true;
-    const pokedexData = usePokemonStore.getState().pokedexData;
-    const seen = pokedexData?.seenPokemon ?? [];
+  export function getDisplayStatus(pokemonId: number, form: string, hide: boolean, pokedexData: PokedexData): boolean {
+    if(!hide || pokemonId < 2000) return true;
+    if(!pokedexData) return false;
+    const seen = pokedexData?.seenPokemon;
     const key = `${pokemonId}:${form}`;
     return seen.includes(key);
+}
+
+export function getDisplayPokemonName(pokemonId: number, form: string, name: string, hide: boolean, pokemonData: PokedexData): string {
+    return getDisplayStatus(pokemonId, form, hide, pokemonData) ? name : '???';
 }
 
 export async function getItemSprite(name: string){
@@ -205,10 +211,14 @@ export function getFormName(pokemon: Pokemon, formIndex: number){
     return pokemon.forms[formIndex].name || 'base'
 }
 
+export function getDisplayName(name: string, id: number, form: string, palette: string, hide: boolean, t: any, pokedexData: PokedexData) {
+    if(!getDisplayStatus(id, form, hide, pokedexData)) return '???';
 
-export function getDisplayName(species: string, form: string, palette: string, t: any) {
+
     //if (form.includes('segment')) form = 'base';
-    const formDisplay = form !== 'base' ? t(`form_${form}`) : '';
-    const paletteDisplay = palette !== 'none' ? t(`palette_${palette}`) : '';
-    return `${species}${formDisplay ? ` ${formDisplay}` : ''}${paletteDisplay ? ` ${paletteDisplay}` : ''}`;
-}
+    const formDisplay = form !== "base" ? t(`form_${form}`) : "";
+    const paletteDisplay = palette !== "none" ? t(`palette_${palette}`) : "";
+    return `${name}${formDisplay ? ` ${formDisplay}` : ""}${
+      paletteDisplay ? ` ${paletteDisplay}` : ""
+    }`;
+  }

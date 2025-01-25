@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
-import { PokemonSprite } from "./PokemonSprite"
+import { PokemonName, PokemonSprite } from "./PokemonSprite"
 import { InternalLink } from "@/components/nav/Link"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { usePokemonStore } from "@/stores/pokemonStore"
 
 export default function PokemonSearchBar(){
     const [text, setText] = useState("")
@@ -25,8 +26,8 @@ export default function PokemonSearchBar(){
             <div className="overflow-auto h-48 flex flex-wrap justify-center">
                 {pokemon?.map(p => (
                     <InternalLink href={`/pokedex/entrada/${p.item.dex}`} key={p.item.dex} className="flex justify-center hover:bg-surface-600 text-surface-50 items-center w-48 m-1 rounded-md">
-                        <PokemonSprite width={40} id={p.item.dex} form={"base"} palette={"none"}/>
-                        <span className='ml-2'>{p.item.name}</span>
+                        <PokemonSprite width={40} id={p.item.dex} form={"base"} palette={"none"} hide={true}/>
+                        <PokemonName id={p.item.dex} form={"base"} palette={"none"} hide={true} name={p.item.name} />
                     </InternalLink>
                 ))}
             </div>

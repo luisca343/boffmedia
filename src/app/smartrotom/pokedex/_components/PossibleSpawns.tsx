@@ -72,7 +72,6 @@ export function PossibleSpawns({
   hideSeen?: boolean;
   id?: string;
 }) {
-  const t  = useTranslations("");
   const [spawns, setSpawns] = useState<PossibleSpawn[]>();
   useEffect(() => {
     if (pokemonSpawns && pokemonSpawns.length > 0) {
@@ -97,18 +96,15 @@ export function PossibleSpawns({
     <div className="flex  flex-wrap justify-center" id={id}>
       {spawns?.map((spawn) => (
         <PokemonSpriteLink
+          name={spawn.species}
           hideCaught={hideCaught}
           hideSeen={hideSeen}
           key={spawn.species}
           id={spawn.dex}
           form={spawn.form}
           palette={spawn.palette}
-          text={getDisplayName(spawn.species, spawn.form, spawn.palette)}
           hide={true}
         >
-          <div className="text-xs hidden 2xl:block">
-            {getDisplayName(spawn.species, spawn.form, spawn.palette)}
-          </div>
           <div className="font-bold text-xl 2xl:text-base">
             {formatPercentage(spawn.percentage)} %
           </div>
@@ -125,14 +121,5 @@ export function PossibleSpawns({
     } else {
       return percentage.toFixed(2);
     }
-  }
-
-  function getDisplayName(species: string, form: string, palette: string) {
-    //if (form.includes('segment')) form = 'base';
-    const formDisplay = form !== "base" ? t(`form_${form}`) : "";
-    const paletteDisplay = palette !== "none" ? t(`palette_${palette}`) : "";
-    return `${species}${formDisplay ? ` ${formDisplay}` : ""}${
-      paletteDisplay ? ` ${paletteDisplay}` : ""
-    }`;
   }
 }

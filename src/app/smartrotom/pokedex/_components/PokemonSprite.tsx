@@ -3,39 +3,37 @@
 
 import { Loading } from "@/components/smartrotom/Loading";
 import { useEffect, useState } from "react";
-import {  getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
-import { getSmartRotomUser } from "@/lib/utils";
+import {  getDisplayName, getDisplayPokemonName, getItemSprite, getPokemonImage, getPokemonSprite } from "../dexUtils";
 import {  StatusIconv2 } from "./StatusIcon";
 import { InternalLink } from "@/components/nav/Link";
-import { useBoffSession } from "@/services/useBoffSession";
+import { usePokemonStore } from "@/stores/pokemonStore";
+import { useTranslations } from "next-intl";
 
 
 
-export function PokemonSpriteLink({children, id, form, palette, width=80, height=80, pixelated = true, hide=false, showStatus= true, link=true, hideCaught= false, hideSeen= false}:
-    {text:string, id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, link?: boolean, children?: any, hideCaught?: boolean, hideSeen?: boolean}) {
+export function PokemonSpriteLink({name, children, id, form, palette, width=80, height=80, pixelated = true, hide=false, showStatus= true, link=true, hideCaught= false, hideSeen= false}:
+    {name: string, id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, link?: boolean, children?: any, hideCaught?: boolean, hideSeen?: boolean}) {
         const [imageUrl, setImageUrl] = useState() as any;
-        const [loaded, setLoaded] = useState(false)
-        const { session } = useBoffSession();
-    
-    
+        const {pokedexData} = usePokemonStore()
+        const trans  = useTranslations("");
+
         useEffect(() => {
+            if(!pokedexData) return
             if(pixelated) {
-                getPokemonSprite(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
+                getPokemonSprite(id, form, palette, hide, pokedexData).then((img) => {
                         setImageUrl(img)
-                        setLoaded(true)
                     }
                 )
             } else {
-                getPokemonImage(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
+                getPokemonImage(id, form, palette, hide, pokedexData).then((img) => {
                         setImageUrl(img)
-                        setLoaded(true)
                     }
                 )
             }
-          }, []);
+          }, [pokedexData]);
 
 
-        if(!imageUrl) return <Loading width={width} height={height}/>
+        if(!imageUrl || !pokedexData) return <Loading width={width} height={height}/>
         if(hideCaught && imageUrl.status === 2) return null
         if(hideSeen && imageUrl.status === 1) return null
         
@@ -47,34 +45,48 @@ export function PokemonSpriteLink({children, id, form, palette, width=80, height
                       <StatusIconv2 status={imageUrl.status}  palette={palette} width={width} height={height}/>
                  </div>}
               </div>
+              
+            <div className="text-xs hidden 2xl:block">
+                {getDisplayName(name, id, form, palette, hide, trans, pokedexData)}
+            </div>
             {children && <div className="text-xs hidden 2xl:block">{children}</div>}
         </InternalLink>
 }
 
+export function PokemonName({id, form, palette, name, hide=true}: 
+    {id:number, form: string, palette: string, name: string, hide?: boolean }) {
+        const {pokedexData} = usePokemonStore()
+
+        if(!pokedexData) return null
+
+    return <span>{getDisplayPokemonName(id, form, name, hide, pokedexData)}</span>
+
+}
+    
+
+
 export function PokemonSprite({id, form, palette, width=100, height=100, pixelated = true, hide=true, showStatus= true, forceBlack=false}: 
     {id:number, form: string, palette: string, width?: number, height?: number, pixelated?: boolean, hide?: boolean, showStatus?: boolean, forceBlack?: boolean}) {
     const [imageUrl, setImageUrl] = useState() as any;
-    const [loaded, setLoaded] = useState(false)
-    const { session } = useBoffSession();
+    const {pokedexData} = usePokemonStore()
 
 
     useEffect(() => {
+        if(!pokedexData) return
         if(pixelated) {
-            getPokemonSprite(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
+            getPokemonSprite(id, form, palette, hide, pokedexData).then((img) => {
                     setImageUrl(img)
-                    setLoaded(true)
                 }
             )
         } else {
-            getPokemonImage(id, form, palette, getSmartRotomUser(session).uuid, hide).then((img) => {
+            getPokemonImage(id, form, palette, hide, pokedexData).then((img) => {
                     setImageUrl(img)
-                    setLoaded(true)
                 }
             )
         }
-      }, []);
+      }, [pokedexData]);
 
-    if(!imageUrl) return <Loading width={width} height={height}/>
+    if(!imageUrl || !pokedexData) return <Loading width={width} height={height}/>
     return <div style={{width, maxHeight:height}} className={` relative ${imageUrl?.type === 'sprite' ? 'mb-2 mt-[-0.5rem]' : ''}`}><img width={width} height={height} src={imageUrl?.url} alt="pokemon" style={{imageRendering:'pixelated'}} 
         className={` ${imageUrl.showImg && !forceBlack ? '' : 'brightness-0'}`}/>
            {showStatus && 
