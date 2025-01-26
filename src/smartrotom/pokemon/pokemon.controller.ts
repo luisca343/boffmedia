@@ -288,22 +288,6 @@ export class PokemonController {
         }
     }
 
-    @Get('pokedex/:uuid')
-    @ApiOperation({ summary: 'Get Pokédex registry by UUID' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokédex registry retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokédex registry.' })
-    async getPokedexRegistry(@Param('uuid') uuid: string) {
-        const action = 'get Pokédex registry by UUID';
-        try {
-            this.responseService.logRequest(action, { uuid });
-            const registry = await this.pokemonService.getPokedex(uuid);
-            this.responseService.logSuccess(action, registry);
-            return this.responseService.createSuccessResponse('Pokédex registry retrieved successfully', registry);
-        } catch (error) {
-            this.responseService.handleError(action, error, { uuid });
-        }
-    }
-    
     @Get('registries/:uuid')
     @ApiOperation({ summary: 'Get Pokédex registries by UUID' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Pokédex registries retrieved successfully.' })
@@ -315,6 +299,22 @@ export class PokemonController {
             const registries = await this.pokemonService.getRegistries(uuid);
             this.responseService.logSuccess(action, registries);
             return this.responseService.createSuccessResponse('Pokédex registries retrieved successfully', registries);
+        } catch (error) {
+            this.responseService.handleError(action, error, { uuid });
+        }
+    }
+
+    @Get('pokedex-status/:uuid')
+    @ApiOperation({ summary: 'Get detailed Pokédex status for a player' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Detailed Pokédex status retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve detailed Pokédex status.' })
+    async getDetailedPokedexStatus(@Param('uuid') uuid: string) {
+        const action = 'get detailed Pokédex status';
+        try {
+            this.responseService.logRequest(action, { uuid });
+            const status = await this.pokemonService.getDetailedPokedexStatus(uuid);
+            this.responseService.logSuccess(action, status);
+            return this.responseService.createSuccessResponse('Detailed Pokédex status retrieved successfully', status);
         } catch (error) {
             this.responseService.handleError(action, error, { uuid });
         }

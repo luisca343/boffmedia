@@ -88,9 +88,7 @@ export class PokemonService {
   }
   
   getPokemonByMove(name: string): { speciesID: number; form: string }[] | undefined {
-    console.log('getPokemonByMove', name);
-    console.log(this.pokemonDataService.getSpeciesByMove(name));
-    return this.pokemonDataService.getSpeciesByMove(name);
+    return this.pokemonDataService.sortByDex(this.pokemonDataService.getSpeciesByMove(name), 'speciesID');
   }
   
   getBiomes(): { [key: string]: number } {
@@ -147,17 +145,17 @@ export class PokemonService {
   }
   
   getNextPrev(id: number): { prev: Pokemon | undefined; next: Pokemon | undefined } {
-    const allSpecies = this.pokemonDataService.getAllSpecies();
-    const currIndex = allSpecies.findIndex(species => species.dex === id);
-    
+    const allSpecies = this.pokemonDataService.getAllSpecies()
+    const currIndex = allSpecies.findIndex((species) => species.dex === id)
+
     if (currIndex === -1) {
-      return { prev: undefined, next: undefined };
+      return { prev: undefined, next: undefined }
     }
-    
-    const prev = currIndex > 1 ? allSpecies[currIndex - 1] : allSpecies[allSpecies.length - 1];
-    const next = currIndex < allSpecies.length - 1 ? allSpecies[currIndex + 1] : allSpecies[0];
-    
-    return { prev, next };
+
+    const prev = currIndex > 0 ? allSpecies[currIndex - 1] : allSpecies[allSpecies.length - 1]
+    const next = currIndex < allSpecies.length - 1 ? allSpecies[currIndex + 1] : allSpecies[0]
+
+    return { prev, next }
   }
   
   getEvoTree(id: number): { depth: number; tree: { [key: string]: EvoTreeNode } } {
@@ -171,7 +169,59 @@ export class PokemonService {
   async getImage({pokemonId = 1, formName = "base", paletteName = 'none', uuid, type = 'img', hide }) {
     return this.pokemonImageService.getImage({ pokemonId, formName, paletteName, uuid, type, hide });
   }
-  
+
+  async getDetailedPokedexStatus(uuid: string) {
+    const registries = await this.db
+      .select({
+        pokemonId: pokedexRegistry.pokemonId,
+        formId: pokedexRegistry.formId,
+        paletteId: pokedexRegistry.paletteId,
+        seenAt: pokedexRegistry.seenAt,
+        caughtAt: pokedexRegistry.caughtAt,
+      })
+      .from(pokedexRegistry)
+      .where(eq(pokedexRegistry.uuid, uuid))
+      .execute()
+
+    const seenPokemon = new Set<string>()
+    const caughtPokemon = new Set<string>()
+    const shinyPokemon = new Set<string>()
+
+    registries.forEach((registry) => {
+      const pokemonFormId = `${registry.pokemonId}:${registry.formId}`
+      if (registry.seenAt) {
+        seenPokemon.add(pokemonFormId)
+      }
+      if (registry.caughtAt) {
+        caughtPokemon.add(pokemonFormId)
+      }
+      if (registry.paletteId === "shiny" && registry.caughtAt) {
+        shinyPokemon.add(pokemonFormId)
+      }
+    })
+
+    const allPokemon = this.pokemonDataService.getAllSpecies()
+    const totalPokemon = allPokemon.length
+    const totalForms = allPokemon.reduce((total, pokemon) => total + pokemon.forms.length, 0)
+
+    const detailedStatus = {
+      seenPokemon: Array.from(seenPokemon),
+      caughtPokemon: Array.from(caughtPokemon),
+      shinyPokemon: Array.from(shinyPokemon),
+      totalPokemon,
+      totalForms,
+      seenCount: seenPokemon.size,
+      caughtCount: caughtPokemon.size,
+      shinyCount: shinyPokemon.size,
+      missingSeenPokemon: totalPokemon - seenPokemon.size,
+      missingCaughtPokemon: totalPokemon - caughtPokemon.size,
+      missingSeenForms: totalForms - seenPokemon.size,
+      missingCaughtForms: totalForms - caughtPokemon.size,
+    }
+
+    return detailedStatus
+  }
+
   // Used in Chat
   countPokemon(): number {
     return this.pokemonDataService.getAllSpecies().length;

@@ -45,6 +45,7 @@ export class PokemonDataService extends BaseDataService {
 
     pokemonData.forEach((data: Pokemon) => this.processSpecies(data));
 
+    this.sortByDex(this.species);
     this.sortMovesByCount();
     this.logStatistics(startingTime);
   }
@@ -185,6 +186,10 @@ export class PokemonDataService extends BaseDataService {
         sprite: 'none',
       };
     }
+  }
+
+  public sortByDex(list, dex = 'dex') {
+    return list.sort((a, b) => a[dex] - b[dex]);
   }
 
   private sortMovesByCount() {
