@@ -15,6 +15,7 @@ import { pokemonService } from "@/services/api/smartrotom/pokemonService"
 import { LevelMovesTable, OtherMovesTable } from "./_components/MovesTable"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemonId } from "../../dexUtils"
+import { useGetPokedex } from "@/hooks/pokemon/useGetPokedex"
 
 
 export default async function EntradaPokedex({params}: any){
@@ -23,6 +24,7 @@ export default async function EntradaPokedex({params}: any){
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
 
     const pokemon = (await pokemonService.getPokemonByDex(pokemonIndex)).data as Pokemon
+
     
 
     if (pokemonIndex === undefined) {

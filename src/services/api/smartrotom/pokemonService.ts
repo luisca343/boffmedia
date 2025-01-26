@@ -13,6 +13,11 @@ type ItemSpriteResult = {
   url: string;
 }
 
+type PokemonByMove = {
+  speciesID: number;
+  form: string;
+}
+
 export const pokemonService = {
   getAllPokemon: () => rotomGET("/pokemon"),
   getPokemonByDex: (dex: number) => rotomGET<Pokemon>(`/pokemon/dex/${dex}`),
@@ -21,7 +26,7 @@ export const pokemonService = {
   getPokemonNames: () => rotomGET("/pokemon/names"),
   getSpawnByPokemon: (name: string) => rotomGET(`/pokemon/spawns/${name}`),
   getMove: (name: string) => rotomGET(`/pokemon/move/${name}`),
-  getPokemonByMove: (name: string) => rotomGET(`/pokemon/move/${name}/pokemon`),
+  getPokemonByMove: (name: string) => rotomGET<PokemonByMove[]>(`/pokemon/move/${name}/pokemon`),
   getBiomes: () => rotomGET("/pokemon/biomes"),
   getPokemonByBiome: (name: string) => rotomGET(`/pokemon/biome/${name}`),
   getImage: (params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) =>

@@ -135,10 +135,6 @@ export function getPokedexStatus(pokemonId: number, form: string, hide: boolean,
     return PokedexStatus.UNSEEN;
 }
 
-export function getDisplayPokemonName(pokemonId: number, form: string, name: string, hide: boolean, pokemonData: PokedexData): string {
-    return getDisplayStatus(pokemonId, form, hide, pokemonData) ? name : '???';
-}
-
 export async function getItemSprite(name: string){
     const img = (await pokemonService.getItemSprite(name)).data
     return await  img
@@ -191,7 +187,7 @@ const typeChart = {
 } as {[key: string]: {[key: string]: number}}
  
 export function getEffectifity(moveType: string, targetType: string){
-    return typeChart[moveType][targetType] || 1
+    return typeChart[moveType.toLowerCase()][targetType] || 1
 }
 
 
@@ -211,8 +207,8 @@ export function getPokemonCoverage(type1: string, type2 ='') {
     const result = {} as {[key: string]: number}
 
     for(let type in typeChart){
-        const type1Effectiveness = typeChart[type1.toLowerCase()][type] ?? 1;
-        const type2Effectiveness = type2 != '' ? typeChart[type2.toLowerCase()][type] ?? 1 : 0;
+        const type1Effectiveness = getEffectifity(type1, type) || 1
+        const type2Effectiveness = type2 != '' ? getEffectifity(type2, type) ?? 1 : 0;
         result[type] = type1Effectiveness > type2Effectiveness ? type1Effectiveness : type2Effectiveness 
     }
 
@@ -224,13 +220,7 @@ export function getFormName(pokemon: Pokemon, formIndex: number){
 }
 
 export function getPokemonNameFromIdAndForm(id: number, form: string, pokemon: PokemonType){
-    console.log(pokemon)
     return pokemon?.name || ''
-}
-
-export function getTranslatedName(id:number, form: string, trans: any){
-    const name = getPokemonNameFromIdAndForm(id, form, [])
-    return trans(`form`, {pokemon: getPokemonName(name, trans), form: `${trans(`form_${form}`)}`})
 }
 
 export function getDisplayName(name: string, id: number, form: string, palette: string, hide: boolean, t: any, pokedexData: PokedexData) {

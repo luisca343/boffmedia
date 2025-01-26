@@ -5,7 +5,15 @@ import { StatusIconv2 } from "./StatusIcon"
 import { InternalLink } from "@/components/nav/Link"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { Loading } from "@/components/smartrotom/Loading"
-import { getItemSprite, getPokemonImage, getPokemonNameFromIdAndForm, getPokemonSprite, PokedexStatus } from "../dexUtils"
+import {
+  getItemSprite,
+  getPokemonImage,
+  getPokemonNameFromIdAndForm,
+  getPokemonSprite,
+  PokedexStatus,
+} from "../dexUtils"
+import { useBoffSession } from "@/services/useBoffSession"
+import { usePokedexData } from "@/hooks/usePokedexData"
 
 export type PokemonSpriteProps = {
   children?: any
@@ -51,22 +59,24 @@ export function PokemonSpriteLink({
   const [spriteData, setSpriteData] = useState<{ url: string; type: string; status: PokedexStatus } | undefined>(
     undefined,
   )
-  const { pokedexData } = usePokemonStore()
+  const {pokedexData} = usePokedexData()
 
   useEffect(() => {
-    if (!pokedexData) return
-    if (pixelated) {
-      getPokemonSprite(id, form, palette, hide, pokedexData).then((res) => {
+    const fetchData = async () => {
+      if (!pokedexData) return
+      try {
+        const res = pixelated
+          ? await getPokemonSprite(id, form, palette, hide, pokedexData)
+          : await getPokemonImage(id, form, palette, hide, pokedexData)
         setSpriteData(res)
-      })
-    } else {
-      getPokemonImage(id, form, palette, hide, pokedexData).then((res) => {
-        setSpriteData(res)
-      })
+      } catch (error) {
+        console.error("Error fetching sprite:", error)
+      }
     }
-  }, [pokedexData, id, form, palette, hide, pixelated])
+    fetchData()
+  }, [id, form, palette, hide, pixelated, pokedexData])
 
-  if (!spriteData || !pokedexData) return <Loading width={width} height={height} />
+  if (!spriteData) return <Loading width={width} height={height} />
   if (!getVisibility(spriteData.status, hideCaught, hideSeen)) return null
 
   const spriteContent = (
@@ -116,22 +126,24 @@ export function PokemonSprite({
   const [spriteData, setSpriteData] = useState<{ url: string; type: string; status: PokedexStatus } | undefined>(
     undefined,
   )
-  const { pokedexData } = usePokemonStore()
+  const {pokedexData} = usePokedexData()
 
   useEffect(() => {
-    if (!pokedexData) return
-    if (pixelated) {
-      getPokemonSprite(id, form, palette, hide, pokedexData).then((res) => {
+    const fetchData = async () => {
+      if (!pokedexData) return
+      try {
+        const res = pixelated
+          ? await getPokemonSprite(id, form, palette, hide, pokedexData)
+          : await getPokemonImage(id, form, palette, hide, pokedexData)
         setSpriteData(res)
-      })
-    } else {
-      getPokemonImage(id, form, palette, hide, pokedexData).then((res) => {
-        setSpriteData(res)
-      })
+      } catch (error) {
+        console.error("Error fetching sprite:", error)
+      }
     }
-  }, [pokedexData, id, form, palette, hide, pixelated]) // Added form to dependencies
+    fetchData()
+  }, [id, form, palette, hide, pixelated, pokedexData])
 
-  if (!spriteData || !pokedexData) return <Loading width={width} height={height} />
+  if (!spriteData) return <Loading width={width} height={height} />
   if (!getVisibility(spriteData.status, hideCaught, hideSeen)) return null
   return (
     <>
@@ -145,7 +157,7 @@ export function PokemonSprite({
           src={spriteData?.url || "/placeholder.svg"}
           alt="pokemon"
           style={{ imageRendering: "pixelated" }}
-          className={` ${spriteData.status === PokedexStatus.UNSEEN && hide || forceBlack ? "brightness-0" : ""}`}
+          className={` ${(spriteData.status === PokedexStatus.UNSEEN && hide) || forceBlack ? "brightness-0" : ""}`}
         />
         {showStatus && (
           <div className="absolute top-1 right-1">
@@ -173,7 +185,7 @@ export function PokemonNameElement({
     getPokemonByDex(id).then((p) => {
       setPokemon(p)
     })
-  }, [getPokemonByDex, id])
+  }, [getPokemonByDex, id, setPokemon]) // Added setPokemon to dependencies
 
   return <span className="text-xs text-white text-center">{getPokemonNameFromIdAndForm(id, form, pokemon)}</span>
 }
