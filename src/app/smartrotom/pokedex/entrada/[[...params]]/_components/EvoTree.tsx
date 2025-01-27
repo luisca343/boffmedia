@@ -1,15 +1,10 @@
 import React from "react"
+import { SubTree } from "@/types/pokedex"
 import { Evolution } from "@/types/Pokemon"
-import { rotomGET } from "@/services/boffAPI"
 import { getTranslations } from "next-intl/server"
-import { getPokemonName } from "../../../dexUtils"
-import { InternalLink } from "@/components/nav/Link"
-import { ItemSprite, PokemonSprite } from "../../../_components/PokemonSprite"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
-import { EvolutionTree, SubTree } from "@/types/pokedex"
-
-
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { ItemSprite, PokemonSpriteLink } from "../../../_components/PokemonSprite"
 
 export async function EvoTree({params}: {params: {id: string}}){
     const {tree, depth} = (await pokemonService.getEvoTree(parseInt(params.id))).data!
@@ -19,7 +14,7 @@ export async function EvoTree({params}: {params: {id: string}}){
     const moveTrans  = await getTranslations("");
 
     function renderTree(tree: SubTree){
-        return <div className=" h-full flex-col justify-center items-center  rounded-lg m-2" >
+        return <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
           {Object.keys(tree).map((key:string) => {
             const [pkmName, form] = key.split('_')
             const subTree = tree[key]
@@ -27,9 +22,7 @@ export async function EvoTree({params}: {params: {id: string}}){
             if(Object.keys(subTree).length == 0) return <h1>TET</h1>
             if(!subTree.pkm) return <h1>NO PKM</h1>
                 return <div key={key} className='w-full flex flex-row items-center ' style={{height:`${100/Object.keys(tree).length}%`}}>
-                    <InternalLink href={`/pokedex/entrada/${subTree.dex}/${subTree.index}`} className="flex flex-col justify-center items-center w-[200px] hover:bg-surface-700 rounded-md">
-                        <PokemonSprite id={subTree.dex} form={form} palette='none' width={100} height={100}/>
-                    </InternalLink>
+                        <PokemonSpriteLink id={subTree.dex} form={form} palette='none' width={100} height={100} hide={true} displayName={true}/>
                     <div className="flex flex-col ">
                         {Object.keys(evos)?.length > 0 && Object.keys(evos).map((evo: any, index: number) => {
                             const opacity = index % 2 == 0 ? 0.5 : 1
@@ -37,7 +30,7 @@ export async function EvoTree({params}: {params: {id: string}}){
                             
                             return (
                             <div key={`${evo}`} className="flex items-center justify-center p-2" >
-                                <div className="flex flex-col items-center w-[350px] " >
+                                <div className="flex flex-col items-center " >
                                     {thisEvos.methods?.map(
                                         (method: Evolution) => {
                                             return getEvolutionMethod(method)
@@ -54,9 +47,12 @@ export async function EvoTree({params}: {params: {id: string}}){
     }
 
     return <div className="  text-surface-50 text-shadow-border1 flex justify-center ">
-            {depth > 1 ? renderTree(tree) : <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
-                    Este Pokémon no tiene evoluciones
-            </div>}
+            {depth > 1 ? renderTree(tree) : 
+                <div className=" h-full flex-col justify-center items-center text-center rounded-lg m-2" >
+                        <div className="flex justify-center">{renderTree(tree)}</div>
+                        <span className="text-xl">Este Pokémon no tiene evoluciones</span>
+                </div>
+            }
         </div>
    
 

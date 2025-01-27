@@ -1,7 +1,6 @@
 "use client"
-import { Loading } from "@/components/smartrotom/Loading";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation";
 import { PokemonSprite } from "../../_components/PokemonSprite";
 
 
