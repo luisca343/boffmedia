@@ -7,11 +7,12 @@ import Badges from "./_components/Badges";
 import { parseDate } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Game } from "@/app/battlesim/replay/_components/Game";
-import { useGetStats } from "./_hooks/useGetStats";
-import { useGetCurrentTeam } from "./_hooks/useGetCurrentTeam";
-import { useGetAchievements } from "./_hooks/useGetAchievements";
 import { SmartRotomAchievement } from "./_types/Achievement";
 import { useBoffSession } from "@/services/useBoffSession";
+import { useGetPlayerStats } from "@/hooks/player/useGetPlayerStats";
+import { useGetPlayerTeam } from "@/hooks/player/useGetPlayerTeam";
+import { useGetAchievements } from "@/hooks/achievements/useGetAchievements";
+import { Achievement } from "@/services/api/smartrotom/achievementsService";
 
 export default function Pasaporte(){
   const [book, setBook] = useState(null) as any
@@ -19,13 +20,14 @@ export default function Pasaporte(){
   const uuid = session?.user.smartRotomUser?.uuid as string
   const username = session?.user.smartRotomUser?.name as string
 
-  const {stats} = useGetStats(uuid)
-  const {currentTeam } = useGetCurrentTeam(uuid)
+  const {playerStats} = useGetPlayerStats(uuid)
+  const {playerTeam } = useGetPlayerTeam(uuid)
   const {achievements} = useGetAchievements(uuid)
 
+  console.log('GET ACHIEVEMENTS')
   console.log(achievements)
 
-  const obtainedBadges = (achievements ?? []).filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
+  const obtainedBadges = (achievements ?? []).filter((achievement: Achievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 
   let page  = 0;
   let badgePage = 4
@@ -74,7 +76,7 @@ export default function Pasaporte(){
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Equipo Actual"/>
-              {currentTeam && <ActiveTeam team={currentTeam} />}
+              {playerTeam && <ActiveTeam team={playerTeam} />}
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Medallas"/>
