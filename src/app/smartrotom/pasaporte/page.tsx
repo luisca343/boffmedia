@@ -23,6 +23,8 @@ export default function Pasaporte(){
   const {currentTeam } = useGetCurrentTeam(uuid)
   const {achievements} = useGetAchievements(uuid)
 
+  console.log(achievements)
+
   const obtainedBadges = (achievements ?? []).filter((achievement: SmartRotomAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 
   let page  = 0;
