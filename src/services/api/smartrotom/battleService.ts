@@ -19,7 +19,7 @@ export interface BattleConfig {
 }
 
 export const battleService = {
-  getRepeticiones: (uuid: string) => rotomGET<Repeticion[]>(`/smartrotom/battle/repetitions/${uuid}`),
-  getBattleConfig: (npcConfigName: string) => rotomGET<BattleConfig>(`/smartrotom/battle/config/${npcConfigName}`),
+  getRepeticiones: (uuid: string) => rotomGET<Repeticion[]>(`/battle/repetitions/${uuid}`),
+  getBattleConfig: (npcConfigName: string) => rotomGET<BattleConfig>(`/battle/config/${npcConfigName}`),
 }
 

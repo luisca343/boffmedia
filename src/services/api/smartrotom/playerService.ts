@@ -32,7 +32,7 @@ type MinecraftStats = {
   };
 
 export const playerService = {
-  getStats: (uuid: string) => rotomPOST<MinecraftStats>("/smartrotom/player/stats", { uuid }),
-  getTeam: (uuid: string) => rotomPOST<PokemonTeam>("/smartrotom/player/team", { uuid }),
+  getStats: (uuid: string) => rotomPOST<MinecraftStats>("/player/stats", { uuid }),
+  getTeam: (uuid: string) => rotomPOST<PokemonTeam>("/player/team", { uuid }),
 }
 

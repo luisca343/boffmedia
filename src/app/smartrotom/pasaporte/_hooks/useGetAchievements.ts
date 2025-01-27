@@ -9,7 +9,7 @@ export function useGetAchievements(uuid: string) {
         rotomPOST('/battle-achievements',{uuid}).then((res:any)=>{
             setAchievements(res)
           })
-    }, [])
+    }, [uuid])
 
     return { achievements, setAchievements } as { achievements: SmartRotomAchievement[], setAchievements: React.Dispatch<React.SetStateAction<SmartRotomAchievement[] | undefined>> }
 
