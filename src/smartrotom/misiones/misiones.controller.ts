@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Post, Query, HttpStatus, Logger } from '@nestjs/common';
+import fs from 'fs';
+import { Body, Controller, Get, Post, Query, HttpStatus, Logger, Param, HttpException } from '@nestjs/common';
 import { MisionesService } from './misiones.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';
+import { NpcImageDto } from '../_dto/npc-image-dto';
 
 @ApiTags('smartrotom/misiones')
 @Controller('/smartrotom/misiones')
@@ -60,4 +62,78 @@ export class MisionesController {
       this.responseService.handleError(action, error, body);
     }
   }
+
+  @Post('img/customNPC')
+  @ApiOperation({ summary: 'Upload a custom NPC image' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Image uploaded successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to upload image.' })
+  async img(@Body() { npcName, image }: NpcImageDto) {
+    const action = 'upload custom NPC image';
+    try {
+      this.responseService.logRequest(action, { npcName });
+      fs.writeFileSync(
+        `./public/smartrotom/img/customNPC/renders/${npcName}.png`,
+        image.replace(/^data:image\/png;base64,/, ''),
+        'base64',
+      );
+      this.responseService.logSuccess(action, { status: 'OK' });
+      return this.responseService.createSuccessResponse(
+        'Image uploaded successfully',
+        { status: 'OK' },
+      );
+    } catch (error) {
+      this.responseService.handleError(action, error, { npcName });
+    }
+  }
+
+  @Get('img/customNPC/render/:npcName')
+  @ApiOperation({ summary: 'Get a custom NPC render image' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Render image retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Render image not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve render image.' })
+  async getImg(@Param('npcName') npcName: string) {
+    const action = 'get custom NPC render image';
+    try {
+      this.responseService.logRequest(action, { npcName });
+      const exists = fs.existsSync(
+        `./public/smartrotom/img/customNPC/renders/${npcName}.png`,
+      );
+      if (!exists) {
+        throw new HttpException('Render image not found', HttpStatus.NOT_FOUND);
+      }
+      this.responseService.logSuccess(action, { status: 'OK' });
+      return this.responseService.createSuccessResponse(
+        'Render image retrieved successfully',
+        { status: 'OK' },
+      );
+    } catch (error) {
+      this.responseService.handleError(action, error, { npcName });
+    }
+  }
+
+  @Get('img/customNPC/:npcName')
+  @ApiOperation({ summary: 'Get a custom NPC image' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Image retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Image not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve image.' })
+  async get(@Param('npcName') npcName: string) {
+    const action = 'get custom NPC image';
+    try {
+      this.responseService.logRequest(action, { npcName });
+      const exists = fs.existsSync(
+        `./public/smartrotom/img/customNPC/${npcName}.png`,
+      );
+      if (!exists) {
+        throw new HttpException('Image not found', HttpStatus.NOT_FOUND);
+      }
+      this.responseService.logSuccess(action, { status: 'OK' });
+      return this.responseService.createSuccessResponse(
+        'Image retrieved successfully',
+        { status: 'OK' },
+      );
+    } catch (error) {
+      this.responseService.handleError(action, error, { npcName });
+    }
+  }
+
 }

@@ -2,8 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { SmartRotomAppsModule } from './smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from './smartrotom/users/users.module';
 import { InvitesModule } from './wingull/invites/invites.module';
@@ -24,7 +22,6 @@ import { StarbankModule } from './smartrotom/starbank/starbank.module';
 import { NetfluisService } from './smartrotom/netfluis/netfluis.service';
 import { NetfluisModule } from './smartrotom/netfluis/netfluis.module';
 import { MinecraftMiddleware } from './minecraft.middleware';
-import { LoggingUtil } from './_utils/LoggingUtils';
 import { DocumentsModule } from './smartrotom/documents/documents.module';
 import { ChatappController } from './smartrotom/chatapp/chatapp.controller';
 import { ChatappService } from './smartrotom/chatapp/chatapp.service';
@@ -64,6 +61,11 @@ import { PokemonDataService } from './smartrotom/pokemon/pokemon-data.service';
 import { MoveDataService } from './smartrotom/pokemon/move-data.service';
 import { SpawnDataService } from './smartrotom/pokemon/spawn-data.service';
 import { PokemonImageService } from './smartrotom/pokemon/pokemon-image.service';
+import { AchievementModule } from './smartrotom/achievement/achievement.module';
+import { AchievementService } from './smartrotom/achievement/achievement.service';
+import { PlayerModule } from './smartrotom/player/player.module';
+import { PlayerService } from './smartrotom/player/player.service';
+import { RegionModule } from './smartrotom/region/region.module';
 //import { EventsModule } from './boffmedia/events/events.module';
 
 @Module({
@@ -72,17 +74,6 @@ import { PokemonImageService } from './smartrotom/pokemon/pokemon-image.service'
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
-    //TypeOrmModule.forRoot({
-      //type: 'mysql',
-      //host: process.env.DB_HOST,
-      //port: parseInt(process.env.DB_PORT),
-      //username: process.env.DB_USER,
-      //password: process.env.DB_PASSWORD,
-      //database: process.env.DB_NAME,
-      //entities: [App, SmartrotomUser],
-      //entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      //synchronize: process.env.DB_SYNC === 'true',
-    //}),
     SmartRotomAppsModule,
     SmartRotomUsersModule,
     UsersModule,
@@ -107,13 +98,19 @@ import { PokemonImageService } from './smartrotom/pokemon/pokemon-image.service'
     PtcgpModule,
     //EventsModule,
     AuthModule,
-    DrizzleModule
+    DrizzleModule,
+    AchievementModule,
+    BattleModule,
+    PlayerModule,
+    RegionModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, {
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
+     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule,
+    {
     provide: ConfigService,
     useClass: ConfigService,
-  }, TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway
+  }
 
 ],
   exports: [ConfigService]

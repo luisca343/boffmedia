@@ -344,8 +344,6 @@ export class PokemonService {
         }
         const evoTree = this.getEvos(preEvo, 'all')
         return evoTree
-
-        
     }
 
     getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
