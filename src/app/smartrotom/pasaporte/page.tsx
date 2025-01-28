@@ -34,11 +34,7 @@ export default function Pasaporte(){
     return(
       <section className=" bg-yellow-200 flex bg-center bg-no-repeat bg-fixed bg-cover">
           <Book setBook={setBook}>
-            <Page dataDensity="hard" book={book} number={page++} className="font-vinque bg-blue-600 flex  flex-col " style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
-              <div className="text-center text-6xl mt-4 text-yellow-200 font-bold opacity-80" style={{ mixBlendMode: 'normal' }}>PASAPORTE</div>
-              <img className="h-0 flex-1  opacity-80" src="/smartrotom/img/logo.webp" alt="description" style={{ mixBlendMode: 'normal' }} />
-              <div className="mb-4 text-center text-4xl  text-yellow-200 font-bold  opacity-80" style={{ mixBlendMode: 'normal' }}>Región de Teras</div>
-            </Page>
+            <Page dataDensity="hard" book={book} number={page++} className="font-vinque bg-blue-600 flex  flex-col " style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/pasaporte.png)`}} />
             <Page book={book} number={page++} >
               <PageTitle title="Indice"/>
               <div className="flex flex-col justify-start items-start w-full py-4 px-8">
