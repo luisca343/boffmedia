@@ -16,9 +16,8 @@ export function Book({children, pageColor= '', setBook}: {children?: React.React
   const pages = React.Children.toArray(children).map((content, index) => { 
     return { content, index }});
 
-    
   if(pages.length % 2 !== 0){
-      pages.splice(pages.length - 1, 0, {content: <Page>Relleno</Page>, index: -2});
+      pages.splice(pages.length - 1, 0, {content: <Page book={pageFlip} number={pages.length-1} dataDensity = "soft" className = 'bg-[#fde3e3]'></Page>, index: pages.length-1});
   }
   
 
@@ -96,6 +95,7 @@ export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]
           </BookLink>
         </>
         }
+      {dataDensity === "soft" && <div className="texture-overlay"></div> }
     </div>
     );
 };
