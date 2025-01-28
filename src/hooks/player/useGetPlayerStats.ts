@@ -5,7 +5,7 @@ export function useGetPlayerStats(uuid: string) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(playerService.getStats, uuid)
 
   return {
-    playerStats: data,
+    playerStats: data?.stats,
     error,
     isLoading,
     refetch,

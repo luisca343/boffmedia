@@ -1,5 +1,5 @@
 'use client'
-import { Book, BookLink, Page, PageTitle, turnPage } from "@/components/ui/book/book";
+import { Book, BookLink, Page, PageFlip, PageTitle, turnPage } from "@/components/ui/book/book";
 import './pasaporte.css'
 import { useState } from "react";
 import ActiveTeam from "./_components/ActiveTeam";
@@ -13,9 +13,12 @@ import { useGetPlayerStats } from "@/hooks/player/useGetPlayerStats";
 import { useGetPlayerTeam } from "@/hooks/player/useGetPlayerTeam";
 import { useGetAchievements } from "@/hooks/achievements/useGetAchievements";
 import { Achievement } from "@/services/api/smartrotom/achievementsService";
+import { PlayerStatsPage } from "./_components/PlayerStatsPage";
+import { IndexPage } from "./_components/IndexPage";
+import { BadgePage } from "./_components/BadgePage";
 
 export default function Pasaporte(){
-  const [book, setBook] = useState(null) as any
+  const [book, setBook] = useState<PageFlip>({ getPageCount: () => 0 })  
   const { session } = useBoffSession();
   const uuid = session?.user.smartRotomUser?.uuid as string
   const username = session?.user.smartRotomUser?.name as string
@@ -37,38 +40,11 @@ export default function Pasaporte(){
             <Page dataDensity="hard" book={book} number={page++} className="font-vinque bg-blue-600 flex  flex-col " style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/pasaporte.png)`}} />
             <Page book={book} number={page++} >
               <PageTitle title="Indice"/>
-              <div className="flex flex-col justify-start items-start w-full py-4 px-8">
-                <BookLink book={book} page={1}  className="text-2xl font-bold">1. Índice</BookLink>
-                <BookLink book={book} page={2}  className="text-2xl font-bold">2. Datos Jugador</BookLink>
-                <BookLink book={book} page={3}  className="text-2xl font-bold">3. Equipo Actual</BookLink>
-                <BookLink book={book} page={badgePage}  className="text-2xl font-bold">4. Medallas</BookLink>
-                <div className="ml-6 flex flex-wrap">
-                {
-                  achievements && achievements.map((achievement: any, index)=>{
-                    if(achievement.completed === 1 && achievement.category === 'Gimnasios'){
-                      const page  = ++badgePage
-                      return <BookLink className="mr-2 font-bold" key={achievement.name} book={book} page={page}>{page}. {achievement.name}</BookLink>
-                    }
-                  }
-                  )
-                }
-                </div>
-                <BookLink book={book} page={5 + obtainedBadges}  className="text-2xl font-bold">{5 + obtainedBadges}. Logros</BookLink>
-
-              </div>
+              <IndexPage book={book} badgePage={badgePage} achievements={achievements} obtainedBadges={obtainedBadges}/>
             </Page>
-            <Page book={book} number={page++} >
-              <div className="flex flex-col">
-                <PageTitle title="Datos Jugador"/>
-                <div className="flex">
-                  <div style={{width:'150px'}}>
-                    <img src={`https://crafatar.com/renders/body/${uuid}?overlay`} alt="description" />
-                  </div>
-                  <span className="text-xl font-bold">{username}</span>
-                </div>
-                
-               
-              </div>
+            <Page book={book} number={page++}>
+                <PageTitle title="Datos Jugador" />
+                <PlayerStatsPage stats={playerStats} username={username} uuid={uuid} />
             </Page>
             <Page book={book} number={page++} >
               <PageTitle title="Equipo Actual"/>
@@ -79,19 +55,17 @@ export default function Pasaporte(){
               <Badges book={book} achievementData={achievements}></Badges>
             </Page>
             {
-              achievements && achievements.map((achievement: SmartRotomAchievement)=>{
-                if(achievement.completed && achievement.category === 'Gimnasios'){
-                  const team = achievement.team ? JSON.parse(achievement.team) : null
-                  
-
-                  return <Page key={achievement.name} book={book} number={page++} >
-                    <BadgePageTitle title={achievement.name} achievement={achievement} />
-                    <div className="flex-1">
-                      <ActiveTeam team={team} className="h-[95%]"/>
-                    </div>
-                  </Page>
-                }
-              })
+              achievements &&
+                achievements.map((achievement: SmartRotomAchievement) => {
+                  if (achievement.completed && achievement.category === "Gimnasios") {
+                    const team = achievement.team ? JSON.parse(achievement.team) : null
+                    return (
+                      <Page key={achievement.name} book={book} number={page++}>
+                        <BadgePage achievement={achievement} team={team} />
+                      </Page>
+                    )
+                  }
+                })
             }
             <Page dataDensity="hard" book={book} number={page++}  style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/cuero.webp)`}}>
             </Page>
