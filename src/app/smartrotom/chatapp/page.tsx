@@ -8,11 +8,12 @@ import { Contact } from "./_components/Contact";
 import useSocketStore from "@/app/useSocketStore";
 import {  Message as MessageType } from "./_types/Chat";
 import { CreateGroup } from "./_components/CreateGroup";
+import { useSocketAuth } from "@/services/useSocketAuth";
 
 export default function ChatApp() {
   const { session, chats, refresh, updateChats, isLoading } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
-  const { socket } = useSocketStore();
+  const socket = useSocketAuth()
 
   useEffect(() => {
     if (socket) {
