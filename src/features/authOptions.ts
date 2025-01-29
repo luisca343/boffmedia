@@ -29,13 +29,7 @@ export const authOptions: NextAuthOptions = {
           }
           const response = (await boffPOST(`/users/login`, credentials)).data as any;
           if (response && !response.error) {
-            const user: User = {
-              id: response.id,
-              name: response.name,
-              email: response.email,
-              image: response.image,
-            };
-            return user;
+            return response;
           }
           throw new AuthError("Invalid credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
         } catch (error) {
