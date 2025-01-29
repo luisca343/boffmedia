@@ -27,7 +27,10 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   app.useGlobalFilters(new DuplicateEntryExceptionFilter());
 
-  app.use('/', express.static(join(__dirname, '..', 'public')));
+  const publicPath = join(__dirname, '..', 'public');
+  console.log(`Serving static files from: ${publicPath}`);
+  
+  app.use('/', express.static(publicPath));
 
   console.log('EL PUERTO ES: ' + configService.get('PORT'));
 
