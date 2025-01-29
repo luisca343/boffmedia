@@ -1,9 +1,11 @@
-import { NestFactory } from '@nestjs/core';
+import { join } from 'path';
+import * as express from 'express';
 import { AppModule } from './app.module';
+import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
-import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
 
 const bodyParser = require('body-parser');
 
@@ -24,6 +26,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   app.useGlobalFilters(new DuplicateEntryExceptionFilter());
+
+  app.use('/public', express.static(join(__dirname, '..', 'public')));
 
   console.log('EL PUERTO ES: ' + configService.get('PORT'));
 
