@@ -58,7 +58,7 @@ function SortableGrid({
     <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter} sensors={sensors}>
       <SortableContext items={apps} strategy={rectSortingStrategy}>
         <motion.ul
-          className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 content-between gap-y-1 py-2 overflow-auto"
+          className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 content-between gap-y-1 pt-2 pb-16 overflow-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}

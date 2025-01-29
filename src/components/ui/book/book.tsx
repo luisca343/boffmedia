@@ -78,10 +78,10 @@ interface PageCoverProps {
 export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0, book}: 
   {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number, book?: PageFlip}) {
 
-    if(!book) return <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}></div>
+    if(!book) return <div style={{...style, position: 'relative'}} className={`h-full w-full page drop-shadow-2xl p-2 flex flex-col `} data-density={dataDensity}></div>
     return (
-    <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}>
-        {children}
+    <div style={{ position: 'relative'}} className={` h-full w-full page drop-shadow-2xl flex flex-col `} data-density={dataDensity}>
+        <div style={{...style}} className="h-full w-full bg-cover bg-center">{children}</div>
         {dataDensity === 'soft' && <>
           <span className={`absolute bottom-2 ${number % 2 ? 'left-4' : 'right-4'}`}>
               {number}

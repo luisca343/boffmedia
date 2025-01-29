@@ -1,117 +1,177 @@
 "use client"
+
 import { useState, useMemo, useEffect } from "react"
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify"
+import { Plus, Loader2, Users2, Search } from "lucide-react"
 import { CabezaJugador } from "@/components/smartrotom/minecraft/CabezaMC"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { getSmartRotomUser } from "@/lib/utils"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useCreateChat } from "@/hooks/chatapp/useCreateChat"
 import { useGetAllUsers } from "@/hooks/users/useGetAllUsers"
 
-export function CreateGroup({setActiveChat}: {setActiveChat: (id: number) => void}) {
-    const { session } = useBoffSession();
-    const { users, error: usersError, isLoading: usersLoading, refetch: refetchUsers } = useGetAllUsers();
-    const { createChat, error: createChatError, isLoading: createChatLoading } = useCreateChat();
-    const [groupName, setGroupName] = useState('');
-    const [selectedUsers, setSelectedUsers] = useState([] as {username: string, uuid: string}[]);
-    const [placeholderText, setPlaceholderText] = useState('Selecciona al menos 2 usuarios');
+export function CreateGroup({ setActiveChat }: { setActiveChat: (id: number) => void }) {
+  const { session } = useBoffSession()
+  const { users, error: usersError, isLoading: usersLoading, refetch: refetchUsers } = useGetAllUsers()
+  const { createChat, error: createChatError, isLoading: createChatLoading } = useCreateChat()
+  const [groupName, setGroupName] = useState("")
+  const [selectedUsers, setSelectedUsers] = useState([] as { username: string; uuid: string }[])
+  const [open, setOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
-    function openNewChat(open: boolean) {
-        if (open) {
-            refetchUsers();
-        } else {
-            setSelectedUsers([]);
-            setGroupName('');
-        }
+  const placeholderText = useMemo(() => {
+    if (selectedUsers.length > 1) return "Nombre del grupo"
+    if (selectedUsers.length === 1) return selectedUsers[0].username
+    return "Mensajes Guardados"
+  }, [selectedUsers])
+
+  function handleOpenChange(open: boolean) {
+    setOpen(open)
+    if (open) {
+      refetchUsers()
+    } else {
+      setSelectedUsers([])
+      setGroupName("")
+      setSearchQuery("")
     }
+  }
 
-    async function handleCreateChat() {
-        const player = getSmartRotomUser(session).uuid;
-        toast.info('Creando chat con ' + selectedUsers.map((user) => user.uuid).join(', '));
-        
-        try {
-            let result;
-            if (selectedUsers.length === 0) {
-                result = await createChat({ player, users: [], name: 'Mensajes Guardados' }) as any;
-            } else if (groupName === '' && selectedUsers.length > 1) {
-                return toast.error('Ingresa un nombre para el chat');
-            } else {
-                result = await createChat({ player, users: selectedUsers.map((user) => user.uuid), name: groupName });
-            }
-            setActiveChat(result.data.id);
-        } catch (error) {
-            toast.error('Error al crear el chat');
-        }
+  async function handleCreateChat() {
+    const player = getSmartRotomUser(session).uuid
+
+    try {
+      if (selectedUsers.length === 0) {
+        const result = (await createChat({
+          player,
+          users: [],
+          name: "Mensajes Guardados",
+        })) as any
+        setActiveChat(result.data.id)
+      } else if (groupName === "" && selectedUsers.length > 1) {
+        return toast.error("Ingresa un nombre para el chat")
+      } else {
+        const result = await createChat({
+          player,
+          users: selectedUsers.map((user) => user.uuid),
+          name: groupName,
+        })
+        setActiveChat(result.data!)
+      }
+      setOpen(false)
+    } catch (error) {
+      toast.error("Error al crear el chat")
     }
+  }
 
-    useEffect(() => {
-        if (selectedUsers.length > 1) {
-            setPlaceholderText('Nombre del grupo');
-        } else if (selectedUsers.length === 1) {
-            setPlaceholderText(selectedUsers[0].username);
-        } else {
-            setPlaceholderText('Mensajes Guardados');
-        }
-    }, [selectedUsers]);
+  useEffect(() => {
+    if (usersError) {
+      toast.error("Error al cargar usuarios")
+    }
+  }, [usersError])
 
-    useEffect(() => {
-        if (usersError) {
-            toast.error('Error al cargar usuarios');
-        }
-    }, [usersError]);
+  const filteredUsers = useMemo(() => {
+    if (!users) return []
+    return users
+      .filter((user) => user.uuid !== getSmartRotomUser(session).uuid)
+      .filter((user) => user.username.toLowerCase().includes(searchQuery.toLowerCase()))
+  }, [users, session, searchQuery])
 
-    const filteredUsers = useMemo(() => {
-        if (!users) return [];
-        return users.filter((user) => user.uuid !== getSmartRotomUser(session).uuid);
-    }, [users, session]);
-
-    const memoizedUsers = useMemo(() => filteredUsers.map((user) => (
-        <div className="flex items-center hover:bg-neutral-500" key={user.uuid}>
-            <label htmlFor={user.uuid} className="w-full flex items-center">
-                <CabezaJugador width={30} height={30} uuid={user.uuid} nombreNPC={user.username} autoRotate={false} tag={false} zoom={1} />
-                <div className="ml-2">{user.username}</div>
-                <Checkbox id={user.uuid} className="ml-auto" onCheckedChange={(checked: boolean) => {
-                    if (checked) setSelectedUsers((prev) => [...prev, user]);
-                    else setSelectedUsers((prev) => prev.filter((u) => u.uuid !== user.uuid));
-                }} />
-            </label>
-        </div>
-    )), [filteredUsers, setSelectedUsers]);
-
-    return (
-        <Popover onOpenChange={(open) => openNewChat(open)}>
-            <PopoverTrigger className="ml-auto bg-primary-400 text-black h-8 w-8 rounded-full ">+</PopoverTrigger>
-            <PopoverContent className="bg-neutral-800 text-neutral-50 w-[300px] p-4 border border-neutral-900">
-                <div className="flex flex-col">
-                    <div>Crear nuevo chat</div>
-                    {usersLoading ? (
-                        <div>Cargando usuarios...</div>
-                    ) : (
-                        memoizedUsers
-                    )}
-                    <div className="flex items-center border border-neutral-900 mt-2 rounded-md">
-                        <Input 
-                            value={groupName} 
-                            onChange={(e) => setGroupName(e.target.value)} 
-                            type="text" 
-                            placeholder={placeholderText} 
-                            className="h-8 bg-neutral-800 text-neutral-50 border-none rounded-none" 
-                            disabled={selectedUsers.length < 2} 
-                        />
-                        <Button 
-                            className="bg-neutral-900 hover:bg-neutral-600 text-neutral-100" 
-                            onClick={handleCreateChat}
-                            disabled={createChatLoading}
-                        >
-                            {createChatLoading ? 'Creando...' : 'Crear'}
-                        </Button>
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button size="icon" variant="ghost" className="rounded-full h-10 w-10 ml-auto hover:bg-primary/20">
+          <Plus className="h-5 w-5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] bg-neutral-900 text-neutral-50 border-neutral-800">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Users2 className="h-5 w-5" />
+            Crear nuevo chat
+          </DialogTitle>
+          <div className="relative mt-4">
+            <Input
+              placeholder="Buscar usuarios..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-neutral-800 border-neutral-700 pl-9 focus-visible:ring-primary/50"
+            />
+            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" />
+          </div>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <div className="space-y-4">
+            {usersLoading ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-6 w-6 animate-spin" />
+              </div>
+            ) : (
+              <ScrollArea className="h-[200px] pr-4">
+                <div className="space-y-2">
+                  {filteredUsers.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-neutral-500">
+                      <Users2 className="h-10 w-10 mb-2" />
+                      <p className="text-sm">
+                        {searchQuery ? "No se encontraron usuarios" : "No hay usuarios disponibles"}
+                      </p>
                     </div>
+                  ) : (
+                    filteredUsers.map((user) => (
+                      <label
+                        htmlFor={user.uuid}
+                        key={user.uuid}
+                        className="flex items-center space-x-3 p-2 rounded-lg hover:bg-neutral-800 cursor-pointer transition-colors"
+                      >
+                        <CabezaJugador
+                          width={36}
+                          height={36}
+                          uuid={user.uuid}
+                          nombreNPC={user.username}
+                          autoRotate={false}
+                          tag={false}
+                          zoom={1}
+                        />
+                        <span className="flex-1 text-sm font-medium">{user.username}</span>
+                        <Checkbox
+                          id={user.uuid}
+                          className="border-neutral-700"
+                          onCheckedChange={(checked: boolean) => {
+                            if (checked) {
+                              setSelectedUsers((prev) => [...prev, user])
+                            } else {
+                              setSelectedUsers((prev) => prev.filter((u) => u.uuid !== user.uuid))
+                            }
+                          }}
+                        />
+                      </label>
+                    ))
+                  )}
                 </div>
-            </PopoverContent>
-        </Popover>
-    );
+              </ScrollArea>
+            )}
+            <div className="flex items-center gap-2">
+              <Input
+                value={groupName}
+                onChange={(e) => setGroupName(e.target.value)}
+                placeholder={placeholderText}
+                className="bg-neutral-800 border-neutral-700 focus-visible:ring-primary/50"
+                disabled={selectedUsers.length < 2}
+              />
+              <Button
+                onClick={handleCreateChat}
+                disabled={createChatLoading}
+              >
+                {createChatLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Crear"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
 }
 

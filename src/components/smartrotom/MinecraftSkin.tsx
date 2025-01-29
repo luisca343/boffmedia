@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { rotomGET, rotomPOST } from "@/services/boffAPI";
 import { SkinViewer } from "skinview3d";
+import { misionesService } from "@/services/api/smartrotom/misionesService";
 
 const skinCache = new Map<string, string>();
 
@@ -9,9 +9,8 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
 
   useEffect(() => {
     const fetchSkin = async () => {
-      let skin = (await rotomGET(`/img/customNPC/render/${npcName}`)).data as any;
-
-      if (skin.error) {
+      let skin = (await misionesService.getCustomNpcRender(npcName)).data as any;
+      if (!skin) {
         const skinViewer = new SkinViewer({
           width: 200,
           height: 400,
@@ -25,9 +24,8 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
         skinViewer.camera.position.y = 22.0;
         skinViewer.camera.position.z = 42.0;
 
-        let skin = (await rotomGET(`/img/customNPC/${npcName}`)).data as any;
-        console.log("SE GA DETECTADO LA SKIN", skin);
-        if (skin.error) {
+        let skin = (await misionesService.getCustomNpcImage(npcName)).data as any;
+        if (!skin) {
           await skinViewer.loadSkin(`/smartrotom/img/customNPC/steve.png`);
         } else {
           await skinViewer.loadSkin(`/smartrotom/img/customNPC/${npcName}.png`);
@@ -39,12 +37,12 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
         skinCache.set(npcName, image);
         skin = { img: image };
 
-        rotomPOST('/img/customNPC', { npcName, image });
+        misionesService.uploadCustomNpcImage({ npcName, image });
 
         skinViewer.dispose();
       }
 
-      if (!skin.error) {
+      if (skin) {
         setSkin(`/smartrotom/img/customNPC/renders/${npcName}.png`);
       } else {
         setSkin(null);

@@ -103,13 +103,11 @@ export async function wingullGET<T>(url: string): Promise<ApiResponse<T>> {
 
 export async function rotomPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   data.server = getServer();
-  console.log(data);
   return apiPOST<T>(`/smartrotom${url}`, data);
 }
 
 export async function rotomPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
   data.server = getServer();
-  console.log(data);
   return apiPATCH<T>(`/smartrotom${url}`, data);
 }
 

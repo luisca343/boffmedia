@@ -2,12 +2,15 @@ import { getPokemonSprite } from "@/app/smartrotom/pokedex/dexUtils";
 import { Pokemon } from "@pkmn/client";
 import { useEffect, useState } from "react";
 import { getScaleMultiplier } from "../_utils/viewUtils";
+import { usePokemonStore } from "@/stores/pokemonStore";
 
 export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, className?: string, props?: any }) {
     const [url, setUrl] = useState<string>('/battlesim/pokeball.png');
+    const {pokedexData} = usePokemonStore();
     
 
     useEffect(() => {
+        if(!pokedexData) return;
         if(!pokemon) {
             setUrl('/battlesim/pokeball.png');
             return;
@@ -15,13 +18,13 @@ export function PokemonSprite({ pokemon, className }: { pokemon: Pokemon, classN
         const speciesNum = pokemon?.species?.num;
         const form = getFormName(pokemon?.species?.forme);
         if (speciesNum) {
-            getPokemonSprite(speciesNum, form, 'none', 'admin', false).then((res) => {
+            getPokemonSprite(speciesNum, form, 'none', false, pokedexData).then((res) => {
                 setUrl(res.url ?? '/battlesim/pokeball.png');
             });
         } else {
             setUrl('/battlesim/pokeball.png');
         }
-    }, [pokemon?.species?.num]);
+    }, [pokemon?.species?.num, pokedexData]);
 
     const size = url === '/battlesim/pokeball.png' ? 12 : 24;
 
