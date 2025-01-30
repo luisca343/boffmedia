@@ -66,6 +66,7 @@ import { AchievementService } from './smartrotom/achievement/achievement.service
 import { PlayerModule } from './smartrotom/player/player.module';
 import { PlayerService } from './smartrotom/player/player.service';
 import { RegionModule } from './smartrotom/region/region.module';
+import { UsersService } from './boffmedia/users/users.service';
 //import { EventsModule } from './boffmedia/events/events.module';
 
 @Module({
@@ -102,11 +103,12 @@ import { RegionModule } from './smartrotom/region/region.module';
     AchievementModule,
     BattleModule,
     PlayerModule,
-    RegionModule
+    RegionModule,
+    UsersModule
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
-     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule,
+     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService,
     {
     provide: ConfigService,
     useClass: ConfigService,

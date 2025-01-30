@@ -25,7 +25,11 @@ export class InvitesController {
     console.log("ID: " + id);
     let invite = await this.invitesService.findOne(id);
 
-    if(invite) return res.status(200).send(invite);
+    if(invite) return res.status(200).send({
+      "statusCode": 200,
+      "data": invite
+      
+    });
     return res.status(200).send(
       {
         "statusCode": 404,

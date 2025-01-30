@@ -4,94 +4,120 @@ import {
     SubscribeMessage,
     WebSocketGateway,
     WebSocketServer,
-  } from '@nestjs/websockets';
-  import { Server, Socket } from 'socket.io';
-import { ChatappService } from '../smartrotom/chatapp/chatapp.service';
-import { Inject, forwardRef } from '@nestjs/common';
+    type OnGatewayDisconnect,
+    type OnGatewayConnection,
+  } from "@nestjs/websockets"
+  import type { Server, Socket } from "socket.io"
+  import { ChatappService } from "../smartrotom/chatapp/chatapp.service"
+  import { Inject, forwardRef } from "@nestjs/common"
   
   @WebSocketGateway(34304, {
     cors: {
-      origin: '*',
-    }
+      origin: "*",
+    },
   })
-  export class SocketsGateway {
+  export class SocketsGateway implements OnGatewayDisconnect, OnGatewayConnection {
     @WebSocketServer()
-    server: Server;
-    users: {uuid: string, socketId: string}[] = [];
+    server: Server
+    users: Map<string, { uuid: string; socketId: string }> = new Map();
+  
     constructor(
-        @Inject(forwardRef(() => ChatappService))
-        private chatAppService: ChatappService
+      @Inject(forwardRef(() => ChatappService))
+      private chatAppService: ChatappService
     ) {}
-    
-    @SubscribeMessage('connection')
-    handleConnection(@ConnectedSocket() client: Socket): boolean{
-        console.log(`Client with ID ${client.id} connected`);
-        console.log('Users: ', this.server.sockets.sockets.size);
-        return client.emit('connection', null);
-        
-    }
-    @SubscribeMessage('smartrotom:connection')
-    handleSmartRotomConnection(@ConnectedSocket() client: Socket, @MessageBody() smartRotomUser: any): boolean{
-        const sockets = this.server.sockets.sockets;
-        const user = {...smartRotomUser, socketId: client.id};
-
-        const userIndex = this.users.findIndex(user => user.uuid === smartRotomUser.uuid);
-        if(userIndex !== -1){
-            this.users[userIndex].socketId = client.id;
-            return client.emit('smartrotom:connection', smartRotomUser);
-        }
-        
-        this.users.push(user);
-        return client.emit('smartrotom:connection', smartRotomUser);
+  
+    handleConnection(client: Socket) {
+      console.log(`Client with ID ${client.id} connected`)
+      console.log("Total connections:", this.server.sockets.sockets.size)
     }
   
-    @SubscribeMessage('disconnect')
-    handleDisconnect(@ConnectedSocket() client: Socket): void{
-        console.log(`Client with ID ${client.id} disconnected`);
-        console.log('Previuos users: ', this.users);
-        this.users = this.users.filter(user => user.socketId !== client.id);
-        console.log('Current users: ', this.users);
-        console.log(`Client with ID ${client.id} disconnected`);
+    @SubscribeMessage("smartrotom:connection")
+    handleSmartRotomConnection(@ConnectedSocket() client: Socket, @MessageBody() smartRotomUser: any): boolean {
+      console.log(`SmartRotom connection for user ${smartRotomUser.uuid}`)
+  
+      // If the user already has a connection, disconnect the old one
+      const existingUser = this.users.get(smartRotomUser.uuid)
+      if (existingUser && existingUser.socketId !== client.id) {
+        const oldSocket = this.server.sockets.sockets.get(existingUser.socketId)
+        if (oldSocket) {
+          console.log(`Disconnecting old socket for user ${smartRotomUser.uuid}`)
+          oldSocket.disconnect(true)
+        }
+      }
+  
+      // Update or add the new connection
+      this.users.set(smartRotomUser.uuid, { uuid: smartRotomUser.uuid, socketId: client.id })
+      console.log(`Updated connection for user ${smartRotomUser.uuid}`)
+      console.log("Current users:", this.users.size)
+  
+      return client.emit("smartrotom:connection", smartRotomUser)
     }
-    
-    
+  
+    handleDisconnect(client: Socket) {
+      console.log(`Client with ID ${client.id} disconnected`)
+  
+      // Find and remove the disconnected user
+      for (const [uuid, user] of this.users.entries()) {
+        if (user.socketId === client.id) {
+          this.users.delete(uuid)
+          console.log(`Removed user ${uuid} from connections`)
+          break
+        }
+      }
+  
+      console.log("Current users:", this.users.size)
+      console.log("Total connections:", this.server.sockets.sockets.size)
+    }
+  
     /* ChatApp */
-    @SubscribeMessage('chat:exitcall')
-    handleChatExit(@ConnectedSocket() client: Socket, 
-        @MessageBody() data: {call: {chatId: number, users: { uuid:string, status:string}[], caller: string}, user: any, startTime: number}): void{
-       // Remove the user from the call
-       console.log(`Exit call signal sent by ${data.user.uuid}`);
-       data.call.users = data.call.users.filter(user => user.uuid !== data.user.uuid);
-       const sockets = this.server.sockets.sockets;
-       const currentUsers = data.call.users.filter(user => user.status === 'IN_CALL');
-       if(currentUsers.length === 0){
-            this.chatAppService.endCall(data.call.chatId, data.startTime);
-            return;
-       }
-       
+    @SubscribeMessage("chat:exitcall")
+    handleChatExit(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: {call: {chatId: number, users: { uuid:string, status:string}[], caller: string}, user: any, startTime: number},
+    ): void {
+      // Remove the user from the call
+      console.log(`Exit call signal sent by ${data.user.uuid}`)
+      data.call.users = data.call.users.filter((user) => user.uuid !== data.user.uuid)
+      const sockets = this.server.sockets.sockets
+      const currentUsers = data.call.users.filter((user) => user.status === "IN_CALL")
+      console.log("Current users in call: ", currentUsers)
 
-        data.call.users.forEach(user => {
-            const userSocket = this.users.find(u => u.uuid === user.uuid);
-            if(userSocket){
-                this.server.to(userSocket.socketId).emit('chat:exitcall', data);
-            }
-        });
+
+  
+      data.call.users.forEach((user) => {
+        const userSocket = this.users.get(user.uuid)
+        if (userSocket) {
+            console.log(`Sending exit call signal to ${user.uuid}`)
+          this.server.to(userSocket.socketId).emit("chat:exitcall", data)
+        }
+      })
+
+      if (currentUsers.length === 0) {
+        this.chatAppService.endCall(data.call.chatId, data.startTime)
+        return
+      }
     }
-    @SubscribeMessage('chat:joincall')
-    handleChatJoin(@ConnectedSocket() client: Socket, @MessageBody() data: {call: {users: {uuid:string, status:string}[], caller: string}, user: any}): void{
-        console.log(`Join call signal sent by ${data.user.uuid}`);
-        const sockets = this.server.sockets.sockets;
-        const users = data.call.users.map(user => user.uuid);
-        const connectedUsers = this.users.map(user => user.uuid);
-
-        console.log('Users: ', users);
-        console.log('Connected users: ', connectedUsers);
-
-        data.call.users.forEach(user => {
-            const userSocket = this.users.find(u => u.uuid === user.uuid);
-            if(userSocket){
-                this.server.to(userSocket.socketId).emit('chat:joincall', {uuid: data.user.uuid});
-            }
-        });
+    @SubscribeMessage("chat:joincall")
+    handleChatJoin(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: {call: {users: {uuid:string, status:string}[], caller: string}, user: any},
+    ): void {
+      console.log(`Join call signal sent by ${data.user.uuid}`)
+      const sockets = this.server.sockets.sockets
+      const users = data.call.users.map((user) => user.uuid)
+      const connectedUsers = Array.from(this.users.keys())
+  
+      console.log("Users: ", users)
+      console.log("Connected users: ", connectedUsers)
+  
+      data.call.users.forEach((user) => {
+        const userSocket = this.users.get(user.uuid)
+        if (userSocket) {
+            console.log(`Sending join call signal to ${user.uuid}`)
+          this.server.to(userSocket.socketId).emit("chat:joincall", { uuid: data.user.uuid })
+        }
+      })
     }
   }
+  
+  

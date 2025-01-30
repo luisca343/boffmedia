@@ -15,7 +15,6 @@ export class UsersController {
 
   @Post('register')
   async register(@Body() createUserDto: any) {
-    console.log('Registrando usuario en BoffMedia');
     const user = JSON.parse(createUserDto.body) as CreateUserDto;
     return await this.usersService.createFromBoffMedia(user);
   }
@@ -24,8 +23,11 @@ export class UsersController {
   async login(@Body() createUserDto: CreateUserDto) {
     const user = await this.usersService.validateUser(createUserDto.username, createUserDto.password);
     if (!user) return { error: 'Usuario o contraseña incorrectos' };
-    console.log('Usuario:', user);
-    return user;
+    return {
+      data: user,
+      statusCode: 200,
+      message: 'Usuario encontrado'
+    }
   }
 
 
@@ -38,8 +40,11 @@ export class UsersController {
       return {error: 'Usuario creado en SmartRotom'};
     }
     
-    
-    return usuario;
+    return {
+      data: usuario,
+      statusCode: 200,
+      message: 'Usuario encontrado'
+    }
   }
 
   @Get()

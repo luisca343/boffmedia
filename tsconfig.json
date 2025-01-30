@@ -23,6 +23,10 @@
       "@/*": ["src/*"]
     }
   },
+  "watchOptions": {
+    "watchFile": "fixedPollingInterval",
+  }
+  ,
   "include": ["src/**/*.ts", "src/**/*.js"],
   "exclude": ["node_modules, public"]
 }

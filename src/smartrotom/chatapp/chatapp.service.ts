@@ -103,10 +103,11 @@ export class ChatappService {
         const users = chatId == 1 ? this.socketGateway.users : await this.getChatMembers(chatId)
         let sentToSelf = false
         users.forEach((user: {uuid: string}) => {
-            let socket = this.socketGateway.users.find((u: {uuid: string}) => u.uuid === user.uuid)
+            let socket = this.socketGateway.users.get(user.uuid)
             console.log(`Trying to send message to ${user.uuid}`)
             if(user.uuid !== uuid || sentToSelf) {
                 console.log(`Sending message to ${user.uuid}`)
+                console.log(`Socket: ${socket.socketId}`)
                 this.socketGateway.server.to(socket.socketId).emit('chat:message', {chatId, id:insertId, content: message, createdAt: new Date(), uuid: uuid})
                 if(user.uuid === uuid) sentToSelf = true
             }
@@ -127,7 +128,7 @@ export class ChatappService {
                 .where(eq(rotomChats.name, chatName))
     
             if(exists.length > 0){
-                return exists[0].id
+                return exists[0].id 
             }
 
             chatType = 1
@@ -169,25 +170,31 @@ export class ChatappService {
     }
 
     async call(chatId: number, uuid: string){
+    console.log(`------------- CALLER: ${uuid} -------------`)
         let users = await this.getChatMembers(chatId)
         users = users.filter((user: {uuid: string}) => user.uuid !== uuid)
         
         if(users.length == 0) return {error: 'No users in chat'}
 
-        const userSocket = this.socketGateway.users.find((user: {uuid: string}) => user.uuid === uuid)
+        const userSocket = this.socketGateway.users.get(uuid)
         if(!userSocket) return {error: 'User not connected'}
 
         const callUsers = users.map((user: {uuid: string}) => ({uuid: user.uuid, status: 'RINGING'}));
-        const connectedUsers = callUsers.filter((user: {uuid: string}) => this.socketGateway.users.find((u: {uuid: string}) => u.uuid === user.uuid))
+        console.log(`Calling users: ${callUsers.map((user: {uuid: string}) => user.uuid)}`)
+        const connectedUsers = callUsers.filter((user: {uuid: string}) => this.socketGateway.users.has(user.uuid))
 
+        console.log(`Connected users: ${connectedUsers.map((user: {uuid: string}) => user.uuid)}`)
         if(connectedUsers.length == 0) return {error: 'No users connected'}
 
         connectedUsers.push({uuid, status: 'IN_CALL'})
 
-        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId,caller: uuid, users: connectedUsers})
+        console.log(`Sending call signal to the caller ${userSocket.socketId} with uuid ${userSocket.uuid}`)
+        this.socketGateway.server.to(userSocket.socketId).emit('chat:call', {chatId, caller: uuid, users: connectedUsers})
         
         this.socketGateway.users.forEach((user: {uuid: string, socketId: string}) => {
+            console.log(`Sending call signal to ${user.socketId} with uuid ${user.uuid}`)
             if(users.find((u: {uuid: string}) => u.uuid === user.uuid)){
+                console.log(`User ${user.socketId} with uuid ${user.uuid} in chat`)
                 this.socketGateway.server.to(user.socketId).emit('chat:call', {chatId, caller: uuid, users: connectedUsers})
             } else { 
                 console.log(`User ${user.uuid} not in chat`)

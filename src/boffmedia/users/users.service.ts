@@ -27,13 +27,10 @@ export class UsersService {
       throw new BadRequestException('Password is required');
     }
 
-    console.log('Creando usuario en BoffMedia v2');
-
     try {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(boffMediaUser.password, salt);
 
-      console.log('Creando usuario en BoffMedia', salt, hash);
 
       const user = {
         email: boffMediaUser.email,
@@ -42,7 +39,6 @@ export class UsersService {
         uuid: boffMediaUser.uuid
       };
 
-      console.log('Creando usuario en BoffMedia', user);
 
       const result = await this.db.insert(boffMediaUsers).values(user as BoffMediaUser).execute();
 
@@ -69,10 +65,8 @@ export class UsersService {
       password: hash
     };
     const existe = await this.db.select().from(boffMediaUsers).where(or(eq(boffMediaUsers.uuid, boffMediaUser.uuid), eq(boffMediaUsers.username, boffMediaUser.username))).execute();
-    console.log(existe);
 
     if (existe.length > 0) return { error: "El usuario ya existe" }
-    console.log('El usuario BOFF no existe, creando...');
 
     const boffInsert = await this.db.insert(boffMediaUsers).values({ ...user, uuid: boffMediaUser.uuid } as BoffMediaUser).execute();
     const newUser = await this.findFullUserWithName(boffMediaUser.username);
@@ -150,6 +144,19 @@ export class UsersService {
   }
 
   async getSessionUser({ boffmedia_users, rotom_users }: { boffmedia_users: BoffMediaUser, rotom_users: SmartRotomUser }) {
+    if(!boffmedia_users) {
+      return {
+        id: null,
+        name: null,
+        email: null,
+        roles: [],
+        smartRotomUser: {
+          username: rotom_users?.username,
+          uuid: rotom_users?.uuid,
+          world: rotom_users?.world
+        }
+      }
+    }
     const roles = await this.getUserRoles(boffmedia_users.id);
 
     return {
@@ -198,9 +205,7 @@ export class UsersService {
       };
 
       const result = await this.db.insert(boffMediaUsers).values(user as BoffMediaUser).execute();
-      console.log('User created:', result);
       const newUser = await this.findByEmail(user.email);
-      console.log('New user:', newUser);
       return newUser;
 
     } catch (error) {
