@@ -1,7 +1,7 @@
 import { PossibleSpawn } from '@/app/smartrotom/pokedex/_components/PossibleSpawns';
 import { QueryResult, mcefQuery } from './mcefHelper';
 import { getSpawnsPlaceholder } from './mcefPlaceholders';
-import { CallData } from '@/components/smartrotom/CallStatus';
+import { CallData } from '@/components/smartrotom/calls/CallStatus';
 
 export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string }>> {
     const result = await mcefQuery<{ username: string; uuid: string; world: string }>('GET_USER_DATA');
