@@ -42,6 +42,10 @@ export function Message({
     }
   }
 
+  if(sender === "system") return (
+    <SystemMessage content={content} />
+  )
+
   return (
     <div className={`flex w-full ${sender === "user" ? "justify-end" : "justify-start"}`}>
       <div
@@ -49,11 +53,11 @@ export function Message({
           isLastInSequence ? "mb-1" : ""
         } ${isFirstInSequence ? "mt-1" : ""}`}
       >
-        {sender !== "user" && img && isLastInSequence && sender !== "system" && (
+        {sender !== "user" && img && isLastInSequence && (
           <img
             src={`https://crafatar.com/avatars/${message.uuid}`}
             alt={`profile picture for ${message.uuid}`}
-            className="w-6 h-6 rounded-full absolute -left-8 bottom-0"
+            className="w-6 h-6 rounded-full absolute -left-4 -bottom-2"
           />
         )}
         {isFirstInSequence && (
@@ -63,9 +67,7 @@ export function Message({
         )}
         <div
           className={`px-4 py-2 ${getBubbleShape()} ${
-            sender === "system"
-              ? "bg-gray-200 text-neutral-800"
-              : sender === "user"
+            sender === "user"
                 ? "bg-primary-400 text-neutral-800"
                 : "bg-gray-300 text-neutral-800"
           }`}
@@ -77,3 +79,10 @@ export function Message({
   )
 }
 
+export function SystemMessage({ content }: { content: string }) {
+  return (
+    <div className="flex justify-center text-sm text-gray-500">
+      <span className="px-2 my-1 bg-gray-200 rounded-lg">{content}</span>
+    </div>
+  )
+}
