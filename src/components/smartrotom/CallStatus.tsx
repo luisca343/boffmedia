@@ -1,4 +1,4 @@
-import useSocketStore from "@/app/useSocketStore";
+
 import { getSmartRotomUser } from "@/lib/utils";
 import {
   PhoneIcon,
@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { CabezaJugador } from "./minecraft/CabezaMC";
 import { useBoffSession } from "@/services/useBoffSession";
 import { leaveCall, setCall } from "@/services/mcef/mcefApi";
+import useSocketStore from "@/stores/useSocketStore";
 
 enum UserStatus {
   RINGING = "RINGING",
@@ -82,7 +83,11 @@ export function CallStatus() {
   const startCall = useCallback(
     (data: CallData) => {
       if (!socket) return;
-      if (getSmartRotomUser(session).uuid !== data.caller) playSound();
+      if (getSmartRotomUser(session).uuid !== data.caller) {
+        playSound();
+      } else {
+        setCall(data);
+      }
       setCallStartTime(Date.now());
       setActiveCall({
         ...data,

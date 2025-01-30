@@ -5,23 +5,23 @@ import { Chat } from "./_components/Chat";
 import { useEffect, useState } from "react";
 import useGetChats from "./_hooks/useGetChats";
 import { Contact } from "./_components/Contact";
-import useSocketStore from "@/app/useSocketStore";
 import {  Message as MessageType } from "./_types/Chat";
 import { CreateGroup } from "./_components/CreateGroup";
-import { useSocketAuth } from "@/services/useSocketAuth";
+import { useSocket } from "@/services/useSocket";
 
 export default function ChatApp() {
   const { session, chats, refresh, updateChats, isLoading } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
-  const socket = useSocketAuth()
+  const {socket} = useSocket()
 
   useEffect(() => {
     if (socket) {
       socket.on("chat:message", (message: MessageType) => {
+        console.log("chat:message event received", message);
         updateChats(message, activeChat);
       });
     }
-  }, [session]);
+  }, [socket]);
 
   if (!chats) return null;
   

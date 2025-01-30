@@ -72,3 +72,4 @@ const nextConfig = {
 
 export default bundleAnalyzer(withNextIntl(nextConfig));
 //export default bundleAnalyzer(nextConfig);
+

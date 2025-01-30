@@ -7,10 +7,10 @@ import { Phone, Send, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import useSocketStore from "@/app/useSocketStore"
 import { useEffect, useRef, useState } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
 import { chatAppService } from "@/services/api/smartrotom/chatAppService"
+import useSocketStore from "@/stores/useSocketStore"
 
 export function Chat({
   chats,

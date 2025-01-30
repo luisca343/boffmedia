@@ -7,7 +7,6 @@ import BreadcrumbNav from "./BreadbrumbNav";
 import FicusAI from "../smartrotom/FicusAI";
 import { usePathname } from "next/navigation";
 import { getSmartRotomUser } from "@/lib/utils";
-import useSocketStore from "@/app/useSocketStore";
 import { Bell, Check, Trash2, X } from "lucide-react";
 import { SettingsPage } from "../smartrotom/Settings";
 import { Popover, PopoverTrigger } from "../ui/popover";
@@ -18,6 +17,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import useSocketStore from "@/stores/useSocketStore";
 
 export default function RotomNav({
   setTema,
