@@ -86,6 +86,7 @@ export function PlayerGalleryHeader({
               <SelectItem value="expansion:geneticapex">{trans("geneticapex")}</SelectItem>
               <SelectItem value="expansion:mythicalisland">{trans("mythicalisland")}</SelectItem>
               <SelectItem value="event:mewQuest">{trans("mewQuest")}</SelectItem>
+              <SelectItem value="expansion:space-timesmackdown">{trans("space-timesmackdown")}</SelectItem>
             </SelectContent>
           </Select>
           <Button
