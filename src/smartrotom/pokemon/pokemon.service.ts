@@ -86,6 +86,10 @@ export class PokemonService {
   getMove(name: string) {
     return this.moveDataService.getMove(name);
   }
+
+  getWordleData(): { name: string; form: string; type1: string; type2: string; gen: number; weight: number; height: number }[] {
+    return this.pokemonDataService.getWordleData();
+  }
   
   getPokemonByMove(name: string): { speciesID: number; form: string }[] | undefined {
     return this.pokemonDataService.sortByDex(this.pokemonDataService.getSpeciesByMove(name), 'speciesID');

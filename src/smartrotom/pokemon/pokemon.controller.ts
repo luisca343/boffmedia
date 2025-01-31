@@ -320,6 +320,24 @@ export class PokemonController {
         }
     }
 
+    
+    
+    @Get('wordle')
+    @ApiOperation({ summary: 'Get Pokémon Wordle data' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon Wordle data retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon Wordle data.' })
+    async getWordle() {
+        const action = 'get Pokémon Wordle data';
+        try {
+            this.responseService.logRequest(action, null);
+            const wordleData = await this.pokemonService.getWordleData();
+            this.responseService.logSuccess(action, wordleData);
+            return this.responseService.createSuccessResponse('Pokémon Wordle data retrieved successfully', wordleData);
+        } catch (error) {
+            this.responseService.handleError(action, error);
+        }
+    }
+
     /*
     @Get('overallscoreranking')
     @ApiOperation({ summary: 'Get overall score ranking' })
@@ -612,22 +630,6 @@ export class PokemonController {
             return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
         } catch (error) {
             this.responseService.handleError(action, error, { name });
-        }
-    }
-    
-    @Get('wordle')
-    @ApiOperation({ summary: 'Get Pokémon Wordle data' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon Wordle data retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon Wordle data.' })
-    async getWordle() {
-        const action = 'get Pokémon Wordle data';
-        try {
-            this.responseService.logRequest(action, null);
-            const wordleData = await this.pokemonService.getPokemonWordleData();
-            this.responseService.logSuccess(action, wordleData);
-            return this.responseService.createSuccessResponse('Pokémon Wordle data retrieved successfully', wordleData);
-        } catch (error) {
-            this.responseService.handleError(action, error);
         }
     }*/
     
