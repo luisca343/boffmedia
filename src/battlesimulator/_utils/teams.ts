@@ -14,8 +14,9 @@ export function getRandomTeam(){
     Teams.setGeneratorFactory(TeamGenerators);
     const prng = new PRNG();
     
+    
     const options = {
-        seed: prng.seed,
+        seed: prng.getSeed(),
     }
     
     const team = Teams.generate('gen9randombattle', options);
