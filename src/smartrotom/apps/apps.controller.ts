@@ -5,6 +5,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateAppDto } from './dto/create-app.dto';
 import { ResponseService } from '@/response/response.service';
 import { OrderAppDto } from './dto/order-apps.dto';
+import { PlayerAppDto } from './dto/player-app-dto';
 
 @ApiTags('smartrotom/apps')
 @Controller('/smartrotom/apps')
@@ -75,6 +76,45 @@ export class AppsController {
       const apps = await this.appsService.getForPlayer(uuid);
       this.responseService.logSuccess(action, apps);
       return this.responseService.createSuccessResponse('Apps found for player successfully', apps);
+    } catch (error) {
+      this.responseService.handleError(action, error);
+    }
+  }
+
+  @Post('player/add')
+  @ApiOperation({ summary: 'Add an app to a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'App added to player successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid uuid or appId.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'App not found or not active.' })
+  @ApiResponse({ status: HttpStatus.CONFLICT, description: 'App already added to player.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to add app to player.' })
+  @ApiBody({ type: PlayerAppDto })
+  async addAppToPlayer(@Body() { uuid, appId }: { uuid: string, appId: number }) {
+    const action = 'add app to player';
+    try {
+      this.responseService.logRequest(action, { uuid, appId });
+      const result = await this.appsService.addAppToPlayer(uuid, appId);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('App added to player successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error);
+    }
+  }
+
+  @Post('player/remove')
+  @ApiOperation({ summary: 'Remove an app from a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'App removed from player successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid uuid or appId.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'App not found in player\'s list.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to remove app from player.' })
+  @ApiBody({ type: PlayerAppDto })
+  async removeAppFromPlayer(@Body() { uuid, appId }: { uuid: string, appId: number }) {
+    const action = 'remove app from player';
+    try {
+      this.responseService.logRequest(action, { uuid, appId });
+      const result = await this.appsService.removeAppFromPlayer(uuid, appId);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('App removed from player successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error);
     }

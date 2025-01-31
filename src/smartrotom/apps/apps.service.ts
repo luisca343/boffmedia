@@ -1,8 +1,8 @@
 import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
-import { SmartRotomApp, smartrotomApps, smartrotomUserApps } from '@/_db/schema/SmartRotom';
-import { eq, sql } from 'drizzle-orm';
+import { SmartRotomApp, smartrotomApps, SmartRotomUserApp, smartrotomUserApps } from '@/_db/schema/SmartRotom';
+import { and, eq, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 
@@ -42,46 +42,125 @@ export class AppsService {
     }
   }
 
-  async order(order: { id: number | string, order: number }[], uuid: string): Promise<{ success: boolean }> {
-    const drizzle = this.db;
+  async order(order: { id: number | string; order: number }[], uuid: string): Promise<{ success: boolean }> {
+    const drizzle = this.db
     try {
       await drizzle.transaction(async (tx) => {
-        await tx.delete(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid));
+        // Fetch existing apps for the player
+        const existingApps = await tx.select().from(smartrotomUserApps).where(eq(smartrotomUserApps.uuid, uuid))
 
-        const values = order
-          .filter((app) => typeof app.id === 'number')
-          .map((app) => ({ uuid, appId: app.id as number, order: app.order }));
-        
-        if (values.length > 0) {
-          await tx.insert(smartrotomUserApps).values(values);
+        // Create a set of existing app IDs for quick lookup
+        const existingAppIds = new Set(existingApps.map((app) => app.appId))
+
+        // Filter out any apps that are not in the existing set
+        const validOrder = order.filter((app) => existingAppIds.has(Number(app.id)))
+
+        // Update the order of existing apps
+        for (const app of validOrder) {
+          await tx
+            .update(smartrotomUserApps)
+            .set({ order: app.order } as SmartRotomUserApp)
+            .where(and(eq(smartrotomUserApps.uuid, uuid), eq(smartrotomUserApps.appId, Number(app.id))))
         }
-      });
-      return { success: true };
+
+        await tx
+          .update(smartrotomUserApps)
+          .set({ order: 999 } as SmartRotomUserApp)
+          .where(
+            and(
+              eq(smartrotomUserApps.uuid, uuid),
+              sql`${smartrotomUserApps.appId} NOT IN (${validOrder.map((app) => Number(app.id))})`,
+            ),
+          )
+      })
+      return { success: true }
     } catch (error) {
-      throw new HttpException(`Failed to order apps: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to order apps: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
   async getForPlayer(uuid: string): Promise<SmartRotomApp[]> {
     try {
-      if (!uuid) return [];
+      if (!uuid) return []
       const result = await this.db.execute(sql`
-        (SELECT sa.id, sa.url, sa.name, sao.order as orden FROM ${smartrotomApps} sa
-          LEFT JOIN ${smartrotomUserApps} sao ON sa.id = sao.app_id
-          WHERE sao.uuid = ${uuid})
-        UNION ALL
-        (SELECT sa.id, sa.url, sa.name, 999 as orden FROM ${smartrotomApps} sa
-          WHERE id NOT IN (
-            SELECT app_id FROM ${smartrotomUserApps} sao
-            WHERE sao.uuid = ${uuid}
-          )
-        )
-        ORDER BY orden ASC
-      `);
+      SELECT DISTINCT sa.id, sa.url, sa.name, 
+        COALESCE(sao.order, 999) as orden,
+        CASE WHEN sao.uuid IS NOT NULL THEN 1 ELSE 0 END as is_user_app
+      FROM ${smartrotomApps} sa
+      LEFT JOIN ${smartrotomUserApps} sao ON sa.id = sao.app_id AND sao.uuid = ${uuid}
+      WHERE sa.active = 1 OR sao.uuid = ${uuid}
+      ORDER BY is_user_app DESC, orden ASC, sa.name ASC
+    `)
 
-      return result[0] as unknown as SmartRotomApp[];
+      return result[0] as unknown as SmartRotomApp[]
     } catch (error) {
-      throw new HttpException(`Failed to get apps for player: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(`Failed to get apps for player: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async addAppToPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
+    try {
+      if (!uuid || !appId) {
+        throw new HttpException("Invalid uuid or appId", HttpStatus.BAD_REQUEST)
+      }
+
+      // Check if the app exists and is active
+      const [app] = await this.db
+        .select()
+        .from(smartrotomApps)
+        .where(and(eq(smartrotomApps.id, appId), eq(smartrotomApps.active, 0)))
+
+      if (!app) {
+        throw new HttpException("App not found or already active", HttpStatus.NOT_FOUND)
+      }
+
+      // Check if the app is already in the player's list
+      const [existingUserApp] = await this.db
+        .select()
+        .from(smartrotomUserApps)
+        .where(and(eq(smartrotomUserApps.uuid, uuid), eq(smartrotomUserApps.appId, appId)))
+
+      if (existingUserApp) {
+        throw new HttpException("App already added to player", HttpStatus.CONFLICT)
+      }
+
+      // Insert the new app for the player
+      await this.db.insert(smartrotomUserApps).values({
+        uuid,
+        appId,
+        order: 999,
+      } as SmartRotomUserApp
+    )
+
+      return { success: true }
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
+      throw new HttpException(`Failed to add app to player: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async removeAppFromPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
+    try {
+      if (!uuid || !appId) {
+        throw new HttpException("Invalid uuid or appId", HttpStatus.BAD_REQUEST)
+      }
+
+      const result = await this.db
+        .delete(smartrotomUserApps)
+        .where(and(eq(smartrotomUserApps.uuid, uuid), eq(smartrotomUserApps.appId, appId)))
+
+      if (result[0].affectedRows === 0) {
+        throw new HttpException("App not found in player's list", HttpStatus.NOT_FOUND)
+      }
+
+      return { success: true }
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error
+      }
+      throw new HttpException(`Failed to remove app from player: ${error.message}`, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
