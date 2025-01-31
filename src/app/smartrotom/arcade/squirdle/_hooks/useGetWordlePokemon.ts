@@ -12,13 +12,13 @@ interface WordlePokemon {
 }
 
 export function useGetWordlePokemon(){
-    const {getUUID} = useBoffSession();
+    const {getMinecraftUUID} = useBoffSession();
     const [pokemon, setPokemon] = useState<WordlePokemon[]>([]);
     const [targetPokemon, setTargetPokemon] = useState<WordlePokemon | null>(null);
     const types = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"];
 
     useEffect(() => {
-        if(!getUUID()) return;
+        if(!getMinecraftUUID()) return;
         rotomGET(`/pokemon/wordle`).then((res:any) => {
             setPokemon(res.data);
             const randomIndex = Math.floor(Math.random() * res.data.length);
