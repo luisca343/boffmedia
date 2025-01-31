@@ -17,6 +17,18 @@ const appsAdmin = [
     descripcion: "Generar carteles de autopista",
     icono: <Wifi className="w-6 h-6" />,
     enlace: "/smartrotom/admin/carteles"
+  },
+  {
+    nombre: "Rendimiento del Servidor",
+    descripcion: "Monitor de rendimiento del servidor",
+    icono: <Wifi className="w-6 h-6" />,
+    enlace: "/smartrotom/admin/rendimiento"
+  },
+  {
+    nombre: "Gestión de Apps",
+    descripcion: "Gestión de aplicaciones del jugador",
+    icono: <Wifi className="w-6 h-6" />,
+    enlace: "/smartrotom/admin/apps"
   }
 ]
 

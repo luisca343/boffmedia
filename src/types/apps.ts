@@ -1,14 +1,11 @@
-export interface BaseApp{
+export interface App{
     id: number;
     name: string;
     url: string;
+    active: number;    
 }
 
-export interface App extends BaseApp{
-    active: boolean;    
-}
-
-export interface OrderedApp extends BaseApp{
+export interface OrderedApp extends App{
     order: number;
 }
 
