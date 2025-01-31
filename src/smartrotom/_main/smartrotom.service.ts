@@ -27,4 +27,8 @@ export class SmartrotomService {
     const performance = await axios.get(`${process.env.WINGULL_API}/performance`);
     return performance.data;
   }
+
+  async processRaceResult(result: any) {
+    console.log(result);
+  }
 }

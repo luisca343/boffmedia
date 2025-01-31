@@ -8,9 +8,23 @@ import { BattleAchievementDto } from '../_dto/battle-achievement-dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Body, Controller, Get, Param, Post, HttpException, HttpStatus, Logger } from '@nestjs/common';
 
+export class ParticipanteCarreraDto {
+  uuid: string;
+  nombre: string;
+  posicion: number;
+  tiempo: number;
+}
+
+export class ResultadoCarreraDto {
+  fecha: number;
+  circuito: string;
+  participantes: ParticipanteCarreraDto[];
+}
+
 @ApiTags('smartrotom')
 @Controller('smartrotom')
 export class SmartrotomController {
+  
   private readonly logger = new Logger(SmartrotomController.name);
 
   constructor(
@@ -28,6 +42,25 @@ export class SmartrotomController {
       data: performance,
       statusCode: 200,
       message: 'Performance retrieved successfully',
+    }
+  }
+
+  @Post('/karts/carrera')
+  @ApiOperation({ summary: 'Finalizar carrera' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Carrera finalizada exitosamente.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Error al finalizar la carrera.' })
+  async finalizarCarrera(@Body() resultadoCarreraDto: ResultadoCarreraDto) {
+    try {
+      // Process the race result
+      const result = await this.smartrotomService.processRaceResult(resultadoCarreraDto);
+      return {
+        data: result,
+        statusCode: 200,
+        message: 'Carrera finalizada exitosamente',
+      };
+    } catch (error) {
+      this.logger.error('Error al finalizar la carrera:', error);
+      throw new HttpException('Error al finalizar la carrera', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }
