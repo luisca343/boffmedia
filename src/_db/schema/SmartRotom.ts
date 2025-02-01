@@ -81,3 +81,12 @@ export const smartRotomUserReplays = mysqlTable("rotom_user_replays", {
 });
 
 export type SmartRotomUserReplay = typeof smartRotomUserReplays.$inferSelect;
+
+export const smartRotomArceuSpeak = mysqlTable("rotom_arceuspeak", {
+    id: int("id").primaryKey().autoincrement(),
+    name: varchar("name", { length: 32 }).notNull(),
+    value: varchar("value", { length: 32 }).notNull(),
+    format: varchar("format", { length: 32 }).notNull(),
+});
+
+export type SmartRotomArceuSpeak = typeof smartRotomArceuSpeak.$inferSelect;

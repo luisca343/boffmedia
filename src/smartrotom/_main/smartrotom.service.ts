@@ -3,6 +3,7 @@ import {
   SmartRotomUserAchievement,
   SmartRotomUserReplay,
   smartRotomAchievements,
+  smartRotomArceuSpeak,
   smartRotomReplays,
   smartRotomUserAchievements,
   smartRotomUserReplays,
@@ -30,5 +31,13 @@ export class SmartrotomService {
 
   async processRaceResult(result: any) {
     console.log(result);
+  }
+
+  async getArceuspeak() {
+    return await this.db.select().from(smartRotomArceuSpeak).execute();
+  }
+
+  async createOrUpdateArceuspeak(name: string, value: string, format: string) {
+    return await this.db.insert(smartRotomArceuSpeak).values({name, value, format}).execute();
   }
 }

@@ -63,4 +63,40 @@ export class SmartrotomController {
       throw new HttpException('Error al finalizar la carrera', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @Get('arceuspeak')
+  @ApiOperation({ summary: 'Get Arceuspeak available characters' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Characters retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve characters.' })
+  async getArceuspeak() {
+    try {
+      const characters = await this.smartrotomService.getArceuspeak();
+      return {
+        data: characters,
+        statusCode: 200,
+        message: 'Characters retrieved successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to retrieve characters:', error);
+      throw new HttpException('Failed to retrieve characters', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('arceuspeak')
+  @ApiOperation({ summary: 'Create or update Arceuspeak character' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Character created or updated successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create or update character.' })
+  async createOrUpdateArceuspeak(@Body() {name, value, format}: {name: string, value: string, format: string}) {
+    try {
+      const result = await this.smartrotomService.createOrUpdateArceuspeak(name, value, format);
+      return {
+        data: result,
+        statusCode: 200,
+        message: 'Character created or updated successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to create or update character:', error);
+      throw new HttpException('Failed to create or update character', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
