@@ -57,7 +57,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       </Button>
       {isOpen && (
         <div 
-          className="absolute pt-3 z-10 w-96 bg-surface-800/95 backdrop-blur-sm shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
+          className="absolute pt-3 z-10 w-96 bg-surface-800 backdrop-blur-sm shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
         >
           <div className="border border-surface-700 border-t-surface-800">
           {sections.map((section, index) => (

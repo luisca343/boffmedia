@@ -44,6 +44,10 @@ export async function POST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return request<T>("POST", url, data);
 }
 
+export async function PUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return request<T>("PUT", url, data);
+}
+
 export async function PATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return request<T>("PATCH", url, data);
 }
@@ -84,6 +88,10 @@ export async function apiPOST<T>(url: string, data: any): Promise<ApiResponse<T>
   return POST<T>(`${getApiUrl()}${url}`, data);
 }
 
+export async function apiPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return PUT<T>(`${getApiUrl()}${url}`, data);
+}
+
 export async function apiPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return PATCH<T>(`${getApiUrl()}${url}`, data);
 }
@@ -104,6 +112,11 @@ export async function wingullGET<T>(url: string): Promise<ApiResponse<T>> {
 export async function rotomPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   data.server = getServer();
   return apiPOST<T>(`/smartrotom${url}`, data);
+}
+
+export async function rotomPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  data.server = getServer();
+  return apiPUT<T>(`/smartrotom${url}`, data);
 }
 
 export async function rotomPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
