@@ -69,6 +69,9 @@ import { RegionModule } from './smartrotom/region/region.module';
 import { UsersService } from './boffmedia/users/users.service';
 import { SmartrotomService } from './smartrotom/_main/smartrotom.service';
 //import { EventsModule } from './boffmedia/events/events.module';
+import { EventsController } from './smartrotom/events/events.controller';
+import { EventsService } from './smartrotom/events/events.service';
+import { EventsModule } from './smartrotom/events/events.module';
 
 @Module({
   imports: [
@@ -106,15 +109,17 @@ import { SmartrotomService } from './smartrotom/_main/smartrotom.service';
     PlayerModule,
     RegionModule,
     UsersModule,
-    SmartrotomModule
+    SmartrotomModule,
+    EventsModule
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService,
     {
     provide: ConfigService,
     useClass: ConfigService,
-  }
+  },
+    EventsService
 
 ],
   exports: [ConfigService]
