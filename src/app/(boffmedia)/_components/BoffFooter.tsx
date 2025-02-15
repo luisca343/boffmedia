@@ -5,8 +5,8 @@ import { Gamepad } from "lucide-react"
 
 export function BoffFooter() {
   return (
-    <footer className="bg-surface-800">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="bg-surface-800 h-72">
+      <div className="container mx-auto px-4 pt-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
