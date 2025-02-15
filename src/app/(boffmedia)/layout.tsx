@@ -9,6 +9,7 @@ import { GlobalProviders } from "../GlobalProviders";
 import BoffLayout from "./_components/BoffLayout";
 
 import '../globals.css'
+import { BoffFooter } from "./_components/BoffFooter";
 
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
@@ -27,9 +28,12 @@ export default async function RootLayout({
     <GlobalProviders>
       <ToastContainer position="bottom-right" theme="dark" />
       <OptimizedFicusNav />
-      <section className="border-solid no-scrollbar flex-1 pt-16">
+      <section className="border-solid no-scrollbar flex-1 pt-16 bg-surface-900">
         <NextIntlClientProvider messages={messages}>
-          <BoffLayout>{children}</BoffLayout>
+          <section className="flex-1 min-h-[calc(100vh-20rem)]">
+            {children}
+          </section>
+          <BoffFooter />
         </NextIntlClientProvider>
       </section>
     </GlobalProviders>

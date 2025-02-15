@@ -1,27 +1,29 @@
-'use client'
+"use client"
 
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import dynamic from 'next/dynamic'
-import { Home, Menu, X } from 'lucide-react'
+import dynamic from "next/dynamic"
+import { Home, Menu } from "lucide-react"
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
 import { InternalLink } from "./Link"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
-const NotificationPopover = dynamic(() => import('./NotificationPopover'), { 
+const NotificationPopover = dynamic(() => import("./NotificationPopover"), {
   ssr: false,
-  loading: () => <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
+  loading: () => <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />,
 })
 
-const UserAuthSection = dynamic(() => import('./UserAuthSection'), { 
+const UserAuthSection = dynamic(() => import("./UserAuthSection"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center space-x-2">
-      <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
-      <div className="w-16 h-4 bg-surface-800 rounded animate-pulse" />
+      <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
+      <div className="w-16 h-4 bg-surface-700 rounded animate-pulse" />
     </div>
-  )
+  ),
 })
 
 const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion", "blog", "forum"]
@@ -40,47 +42,46 @@ export default function OptimizedFicusNav() {
 
   useEffect(() => {
     const app = pathname.split("/")[1] || "boffmedia"
-    const subdomain = window.location.host.split('.')[0];
+    const subdomain = window.location.host.split(".")[0]
     setCurrentApp(app || null)
     setSubdomain(subdomain)
     setMounted(true)
   }, [pathname])
 
-  const inPage = useCallback((href: string) => {
-    return (pathname.startsWith(href) && href !== "/") || pathname === href
-  }, [pathname])
+  const inPage = useCallback(
+    (href: string) => {
+      return (pathname.startsWith(href) && href !== "/") || pathname === href
+    },
+    [pathname],
+  )
 
   const handleMenuItemClick = useCallback(() => {
     setIsMenuOpen(false)
   }, [])
 
-  //if(currentApp && HIDDEN_APPS.includes(currentApp) || subdomain && HIDDEN_APPS.includes(subdomain)) return <div className="-mb-16" />
-
   return (
-    <nav 
-      className="bg-surface-800 border-b border-surface-700 shadow-lg fixed w-full z-20 h-16"
+    <nav
+      className="bg-surface-900 border-b border-surface-700 shadow-lg fixed w-full z-20 h-16"
       aria-label="Navegación Principal"
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
-        <button
-          className="lg:hidden text-primary-300 hover:text-primary-100"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-        <ul className={`lg:flex flex-wrap justify-start items-center gap-6 ${isMenuOpen ? 'flex flex-col absolute top-16 left-0 w-full bg-surface-800 p-4 space-y-4' : 'hidden'}`}>
+        <Link href="/" className="flex items-center space-x-2">
+          <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text">
+            BoffMedia
+          </span>
+        </Link>
+        <div className="hidden md:flex items-center space-x-6">
           {NAV_LINKS.map(({ href, label, icon, override }) => (
-            <li key={href} className={isMenuOpen ? 'w-full' : ''}>
+            <div key={href}>
               {override ? (
                 override
               ) : (
                 <InternalLink
                   app={href === "/" ? "" : null}
                   href={href}
-                  className={`text-primary-300 hover:text-primary-100 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
-                    inPage(href) ? "font-medium" : ""
-                  } ${isMenuOpen ? 'w-full' : ''}`}
+                  className={`text-surface-300 hover:text-primary-400 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
+                    inPage(href) ? "font-medium text-primary-400" : ""
+                  }`}
                   onClick={handleMenuItemClick}
                 >
                   {icon && <span className="text-primary-400">{icon}</span>}
@@ -93,9 +94,9 @@ export default function OptimizedFicusNav() {
                   ></span>
                 </InternalLink>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
         <div className="flex items-center gap-4">
           {mounted && currentApp && !HIDDEN_APPS.includes(currentApp) ? (
             <>
@@ -104,13 +105,44 @@ export default function OptimizedFicusNav() {
             </>
           ) : (
             <>
-              <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
+              <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />
-                <div className="w-16 h-4 bg-surface-800 rounded animate-pulse" />
+                <div className="w-8 h-8 bg-surface-700 rounded-full animate-pulse" />
+                <div className="w-16 h-4 bg-surface-700 rounded animate-pulse" />
               </div>
             </>
           )}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Abrir menú</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-surface-900">
+              <nav className="flex flex-col gap-4">
+                {NAV_LINKS.map(({ href, label, icon, override }) => (
+                  <div key={href}>
+                    {override ? (
+                      override
+                    ) : (
+                      <InternalLink
+                        app={href === "/" ? "" : null}
+                        href={href}
+                        className={`text-surface-300 hover:text-primary-400 transition-colors duration-200 ease-in-out flex items-center gap-2 ${
+                          inPage(href) ? "font-medium text-primary-400" : ""
+                        }`}
+                        onClick={handleMenuItemClick}
+                      >
+                        {icon && <span className="text-primary-400">{icon}</span>}
+                        <span>{label}</span>
+                      </InternalLink>
+                    )}
+                  </div>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>

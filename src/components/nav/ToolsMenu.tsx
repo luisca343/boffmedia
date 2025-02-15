@@ -1,5 +1,5 @@
 import { FaSteam } from 'react-icons/fa'
-import { CustomDropdownMenu } from './DropdownMenu'
+import { CustomDropdownMenu, MenuSectionProps } from './DropdownMenu'
 import { 
   Gamepad2, 
   Swords, 
@@ -36,7 +36,8 @@ const HERRAMIENTAS_MENU = {
           href: "/otros/keys", 
           label: "Claves de Steam", 
           description: "Gestiona y comparte tus claves de juegos",
-          icon: <FaSteam className="h-5 w-5" />
+          icon: <FaSteam className="h-5 w-5" />,
+          roles: ["BOFF_ADMIN"]
         },
         { 
           href: "/otros/sorteos", 
@@ -46,7 +47,7 @@ const HERRAMIENTAS_MENU = {
         },
       ],
     },
-  ],
+  ] as MenuSectionProps[],
 }
 
 export function HerramientasMenu() {

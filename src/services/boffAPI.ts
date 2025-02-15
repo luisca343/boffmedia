@@ -29,6 +29,7 @@ async function request<T>(method: string, url: string, data?: any): Promise<ApiR
   try {
     const res = await fetch(url, options);
     const result: ApiResponse<T> = await res.json();
+    console.warn(`Request to ${url} returned:`, result);
     return result;
   } catch (error) {
     console.error(`Error in request: ${(error as Error).message}`);

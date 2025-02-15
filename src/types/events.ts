@@ -3,6 +3,8 @@ export interface Event {
     title: string
     game: number
     description: string | null
+    icon: string
+    banner: string | null
     startDate: Date
     endDate: Date
     type: "event" | "server"
@@ -92,3 +94,10 @@ export interface Event {
     lastUpdated: Date
   }
   
+
+  export interface Game {
+    id?: number
+    title: string
+    description: string
+    icon: string
+  }

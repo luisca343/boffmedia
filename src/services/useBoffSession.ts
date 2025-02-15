@@ -15,6 +15,14 @@ export const useBoffSession = () => {
     return session.user.roles.includes(role.toUpperCase())
   }
 
+  function isBoffAdmin() {
+    return hasRole('BOFF_ADMIN')
+  }
+
+  function isRotomAdmin() {
+    return hasRole('TERAS_ADMIN')
+  }
+
   function getMinecraftUUID() {
     return session?.user.smartRotomUser?.uuid!
   }
@@ -23,7 +31,9 @@ export const useBoffSession = () => {
     session: session as Session, 
     getMinecraftUUID,
     status, 
-    hasRole 
+    hasRole,
+    isBoffAdmin,
+    isRotomAdmin
   }
 }
 

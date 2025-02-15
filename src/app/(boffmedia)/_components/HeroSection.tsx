@@ -1,50 +1,64 @@
-import { Suspense } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowRight,
-  Smartphone,
-  Gamepad2,
-  ChevronRight,
-} from "lucide-react";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
-
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
+import Image from "next/image"
 
 export function HeroSection() {
   return (
-    <section className="mb-12 md:mb-24 text-center">
-      <Image
-        src="/img/boff-logo.webp"
-        alt="Logo de BoffMedia"
-        width={150}
-        height={150}
-        className="mx-auto mb-6 md:mb-8 drop-shadow-glow w-24 h-24 md:w-36 md:h-36"
-        priority
+    <div className="relative overflow-hidden bg-surface-950">
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `url("/img/boff.svg")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       />
-      <h1 className="text-4xl md:text-7xl font-bold mb-4 md:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-        Bienvenido a BoffMedia
-      </h1>
-      <p className="text-lg md:text-2xl mb-6 md:mb-10 text-surface-300 max-w-3xl mx-auto">
-        Sumérgete en experiencias de juego inmersivas y herramientas
-        poderosas para gamers
-      </p>
-      <div className="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-6">
-        <Link
-          href="/wingull"
-          className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold text-lg md:text-xl hover:from-purple-700 hover:to-pink-700 transition duration-300 inline-flex items-center justify-center shadow-neon"
-        >
-          Explora Pixelmon Wingull 2
-          <ArrowRight className="ml-2" aria-hidden="true" />
-        </Link>
-        <Link
-          href="/comunidad"
-          className="bg-surface-800 text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-bold text-lg md:text-xl hover:bg-surface-700 transition duration-300 inline-flex items-center justify-center border-2 border-purple-500"
-        >
-          Únete a la Comunidad
-          <ChevronRight className="ml-2" aria-hidden="true" />
-        </Link>
+      <div className="relative h-[calc(100vh-4rem)] container mx-auto px-4 py-24 sm:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+          <div className="text-center lg:text-left">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-surface-50">
+              Tu aventura gaming
+              <span className="block text-primary-400">comienza aquí</span>
+            </h1>
+            <p className="text-xl text-surface-200 mb-8">
+              Sumérgete en experiencias de juego inmersivas, compite en torneos épicos y forma parte de una comunidad
+              apasionada de gamers.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white" asChild>
+                <Link href="/games">
+                  Explorar Juegos
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-primary-500 text-primary-500 hover:bg-primary-500/10"
+                asChild
+              >
+                <Link href="/community">Unirse a la Comunidad</Link>
+              </Button>
+            </div>
+          </div>
+          <div className="relative hidden lg:block">
+            <Image
+              src="/img/boff-full.webp"
+              alt="Gaming Illustration"
+              width={500}
+              height={500}
+              className="rounded-lg"
+            />
+            {/*
+            <div className="absolute -top-4 -left-4 w-24 h-24 bg-warning-400 rounded-full flex items-center justify-center animate-bounce">
+              <span className="text-2xl font-bold text-surface-900">¡Nuevo!</span>
+            </div>
+            */}
+          </div>
+        </div>
       </div>
-    </section>
-  );
+    </div>
+  )
 }
+

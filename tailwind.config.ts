@@ -44,7 +44,6 @@ const config = {
         reverseBoxShadowY: "-4px",
       },
       colors: {
-
         primary: {
           50: 'rgb(var(--primary-50) / <alpha-value>)',
           100: 'rgb(var(--primary-100) / <alpha-value>)',

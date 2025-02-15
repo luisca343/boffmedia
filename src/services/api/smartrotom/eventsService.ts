@@ -1,15 +1,23 @@
-import { type ApiResponse, apiGET, apiPOST, apiDELETE, apiPUT } from "@/services/boffAPI"
+import { type ApiResponse, apiGET, apiPOST, apiDELETE, apiPUT, apiPATCH } from "@/services/boffAPI"
 import { CreateEventDto } from "@/types/dto/create-event.dto"
+import { CreateGameDto } from "@/types/dto/create-game.dto"
 import { CreateMedalDto } from "@/types/dto/create-medal.dto"
 import { CreateTeamDto } from "@/types/dto/create-team.dto"
 import { UpdateProgressDto } from "@/types/dto/update-progress.dto"
-import { Event, EventMedal, EventTeam } from "@/types/events"
+import { Event, EventMedal, EventTeam, Game } from "@/types/events"
+import { get } from "http"
 
 export const eventsService = {
   // Event Management
   getEvents: () => apiGET<Event[]>("/boffmedia/events"),
-  getEvent: (id: number) => apiGET<Event>(`/boffmedia/events/${id}`),
-  createEvent: (createEventDto: CreateEventDto) => apiPOST<Event>("/boffmedia/events", createEventDto),
+  getEvent: (id: number) => apiGET<Event>(`/boffmedia/events/event/${id}`),
+  createEvent: (createEventDto: CreateEventDto) => apiPOST<Event>("/boffmedia/events/event", createEventDto),
+
+  // Game Management
+  getGames: () => apiGET<Game[]>("/boffmedia/events/games"),
+  getGame: (id: number) => apiGET<Game>(`/boffmedia/events/games/${id}`),
+  createGame: (game: Game) => apiPOST<CreateGameDto>("/boffmedia/events/games", game),
+  updateGame: (id: number, game: Game) => apiPATCH<CreateGameDto>(`/boffmedia/events/games/${id}`, game),
 
   // Team Management
   createTeam: (eventId: number, createTeamDto: CreateTeamDto) =>

@@ -14,13 +14,14 @@ export function useSocketAuth() {
   const connectionAttempted = useRef(false)
 
   useEffect(() => {
+    /*
     console.log("useSocketAuth effect running", {
       session,
       socket,
       connectionAttempted: connectionAttempted.current,
       status,
       isConnecting,
-    })
+    })*/
     if (
       status === "authenticated" &&
       session?.user?.smartRotomUser &&
