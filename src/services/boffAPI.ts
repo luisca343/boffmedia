@@ -149,3 +149,62 @@ export async function terasPOST<T>(url: string, data: any): Promise<ApiResponse<
   return POST<T>(`${getTerasApiUrl()}${url}`, data);
 }
 
+
+interface UploadResponse {
+  filename: string;
+  path: string;
+  url: string;
+}
+
+async function uploadRequest<T>(
+  url: string, 
+  file: File, 
+  options?: { path?: string; filename?: string }
+): Promise<ApiResponse<T>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  // Ensure path and filename are properly appended to FormData
+  if (options?.path) {
+    formData.append('path', options.path);
+  }
+  if (options?.filename) {
+    formData.append('filename', options.filename);
+  }
+  
+  if (options?.path) {
+    formData.append('path', options.path);
+  }
+  
+  if (options?.filename) {
+    formData.append('filename', options.filename);
+  }
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      next: {
+        revalidate: 0,
+      },
+    });
+    
+    const result: ApiResponse<T> = await res.json();
+    console.warn(`Upload request to ${url} returned:`, result);
+    return result;
+  } catch (error) {
+    console.error(`Error in upload request: ${(error as Error).message}`);
+    throw error;
+  }
+}
+
+export async function apiUpload(
+  file: File, 
+  options?: { path?: string; filename?: string }
+): Promise<ApiResponse<UploadResponse>> {
+  return uploadRequest<UploadResponse>(
+    `${getApiUrl()}/upload/image`,
+    file,
+    options
+  );
+}

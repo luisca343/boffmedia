@@ -1,15 +1,16 @@
-"use client";
+"use client"
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Gamepad2, LinkIcon } from 'lucide-react';
+import { Camera, Gamepad2, LinkIcon, Loader2 } from 'lucide-react';
 import useSocketStore from "@/stores/useSocketStore";
 import { useBoffSession } from "@/services/useBoffSession";
+import { uploadService } from "@/services/api/smartrotom/uploadService";
 
 export default function UserProfile() {
   const { session } = useBoffSession();
@@ -18,6 +19,15 @@ export default function UserProfile() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user || {});
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (user) {
+      setEditedUser(user);
+    }
+  }, [user]);
 
   const linkDiscord = async () => {
     console.log("Linking Discord account...");
@@ -29,6 +39,39 @@ export default function UserProfile() {
   const handleSave = () => {
     console.log("Saving user data:", editedUser);
     setIsEditing(false);
+  };
+
+  const handleImageClick = () => {
+    if (!isUploading) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadError(null);
+    setIsUploading(true);
+
+    try {
+      const response = await uploadService.uploadProfileImage(file, user?.id || 'default');
+
+      console.log("Upload response:", response);
+      
+      if (response.data) {
+        setEditedUser(prev => ({
+          ...prev,
+          image: response.data!.url
+        }));
+      } else {
+        setUploadError('Upload failed: No response data');
+      }
+    } catch (err) {
+      setUploadError('Upload failed: ' + (err instanceof Error ? err.message : 'Unknown error'));
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   if (!user) {
@@ -48,22 +91,50 @@ export default function UserProfile() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
-            <Avatar className="w-20 h-20">
-              <AvatarImage
-                src={user.image || "/placeholder.svg?height=100&width=100"}
-                alt={user.name || "User"}
+            <div className="relative group cursor-pointer" onClick={handleImageClick}>
+              <Avatar className="w-20 h-20 relative">
+                <AvatarImage
+                  src={`/uploads/profiles/${editedUser.id || '0'}.jpg` || "/placeholder.svg?height=100&width=100"}
+                  alt={editedUser.name || "User"}
+                />
+                <AvatarFallback>
+                  {editedUser.name ? editedUser.name.charAt(0).toUpperCase() : "U"}
+                </AvatarFallback>
+                
+                {/* Upload overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+
+                {/* Loading overlay */}
+                {isUploading && (
+                  <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  </div>
+                )}
+              </Avatar>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept="image/*"
+                onChange={handleFileChange}
               />
-              <AvatarFallback>
-                {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-              </AvatarFallback>
-            </Avatar>
+            </div>
+
             <div>
               <h2 className="text-2xl font-semibold">
-                {user.name || "Anonymous User"}
+                {editedUser.name || "Anonymous User"}
               </h2>
               <p className="text-muted-foreground">
-                {user.email || "No email provided"}
+                {editedUser.email || "No email provided"}
               </p>
+              {uploadError && (
+                <p className="text-sm text-destructive mt-1">
+                  {uploadError}
+                </p>
+              )}
             </div>
           </div>
 
@@ -74,7 +145,7 @@ export default function UserProfile() {
                 id="name"
                 value={editedUser.name || ""}
                 onChange={(e) =>
-                  setEditedUser((prev) => ({ ...prev, username: e.target.value }))
+                  setEditedUser((prev) => ({ ...prev, name: e.target.value }))
                 }
                 disabled={!isEditing}
               />
@@ -143,4 +214,3 @@ export default function UserProfile() {
     </div>
   );
 }
-
