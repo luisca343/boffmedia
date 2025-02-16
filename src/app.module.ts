@@ -33,7 +33,7 @@ import { SmartrotomModule } from './smartrotom/_main/smartrotom.module';
 import { BattleService } from './battlesimulator/battle/battle.service';
 import { BattleController } from './battlesimulator/battle/battle.controller';
 import { BattleModule } from './battlesimulator/battle/battle.module';
-import { SharexModule } from './sharex/sharex/sharex.module';
+import { SharexModule } from './util/sharex/sharex.module';
 import { ArcadeModule } from './smartrotom/arcade/arcade.module';
 import { ArcadeController } from './smartrotom/arcade/arcade.controller';
 import { ArcadeService } from './smartrotom/arcade/arcade.service';
@@ -72,6 +72,8 @@ import { SmartrotomService } from './smartrotom/_main/smartrotom.service';
 import { EventsController } from './smartrotom/events/events.controller';
 import { EventsService } from './smartrotom/events/events.service';
 import { EventsModule } from './smartrotom/events/events.module';
+import { UploadController } from './util/upload/upload.controller';
+import { UploadModule } from './util/upload/upload.module';
 
 @Module({
   imports: [
@@ -110,9 +112,10 @@ import { EventsModule } from './smartrotom/events/events.module';
     RegionModule,
     UsersModule,
     SmartrotomModule,
-    EventsModule
+    EventsModule,
+    UploadModule,
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService,
     {

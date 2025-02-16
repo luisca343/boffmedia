@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, HttpStatus, Delete, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, HttpStatus, Delete, Put, Patch } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';
@@ -7,6 +7,7 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { JoinTeamDto } from './dto/join-team.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
+import { CreateGameDto } from './dto/create-game.dto';
 
 @ApiTags('boffmedia/events')
 @Controller('boffmedia/events')
@@ -32,7 +33,7 @@ export class EventsController {
     }
   }
 
-  @Get(':id')
+  @Get('/event/:id')
   @ApiOperation({ summary: 'Get event by id' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Event retrieved successfully.' })
   async getEvent(@Param('id') id: number) {
@@ -47,7 +48,8 @@ export class EventsController {
     }
   }
 
-  @Post()
+
+  @Post('/event')
   @ApiOperation({ summary: 'Create a new event' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Event created successfully.' })
   async createEvent(@Body() createEventDto: CreateEventDto) {
@@ -61,6 +63,67 @@ export class EventsController {
       this.responseService.handleError(action, error, createEventDto);
     }
   }
+
+  @Get('/games')
+  @ApiOperation({ summary: 'Get all games' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Games retrieved successfully.' })
+  async getGames() {
+    const action = 'get games';
+    try {
+      this.responseService.logRequest(action, {});
+      const result = await this.eventsService.getGames();
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Games retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error);
+    }
+  }
+
+  @Get('/games/:id')
+  @ApiOperation({ summary: 'Get game by id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Game retrieved successfully.' })
+  async getGame(@Param('id') id: number) {
+    const action = 'get game';
+    try {
+      this.responseService.logRequest(action, { id });
+      const result = await this.eventsService.getGame(id);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Game retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { id });
+    }
+  }
+
+  @Post('/games')
+  @ApiOperation({ summary: 'Create a new game' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Game created successfully.' })
+  async createGame(@Body() createGameDto: CreateGameDto) {
+    const action = 'create game';
+    try {
+      this.responseService.logRequest(action, createGameDto);
+      const result = await this.eventsService.createGame(createGameDto);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Game created successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, createGameDto);
+    }
+  }
+
+  @Patch('games/:id')
+  @ApiOperation({ summary: 'Update game' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Game updated successfully.' })
+  async updateGame(@Param('id') id: number, @Body() createGameDto: CreateGameDto) {
+    const action = 'update game';
+    try {
+      this.responseService.logRequest(action, { id, ...createGameDto });
+      const result = await this.eventsService.updateGame(id, createGameDto);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Game updated successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { id, ...createGameDto });
+    }
+  }
+
 
   // Team Management
   @Post(':eventId/teams')

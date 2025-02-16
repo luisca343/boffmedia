@@ -21,12 +21,15 @@ import {
   EventChallenge,
   boffMediaEventChallenges,
   boffMediaEventParticipants,
-  EventParticipant
+  EventParticipant,
+  Game,
+  boffMediaGames
 } from '@/_db/schema/Events';
 import { CreateEventDto } from './dto/create-event.dto';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { CreateMedalDto } from './dto/create-medal.dto';
+import { CreateGameDto } from './dto/create-game.dto';
 
 @Injectable()
 export class EventsService {
@@ -58,6 +61,42 @@ export class EventsService {
       } as Event);
     
     return this.getEvent(result[0].insertId);
+  }
+
+  async getGames(): Promise<Game[]> {
+    return this.db.select().from(boffMediaGames);
+  }
+
+
+  async getGame(id: number): Promise<Game> {
+    const result = await this.db.select()
+      .from(boffMediaGames)
+      .where(eq(boffMediaGames.id, id));
+    return result[0];
+  }
+
+  async createGame(createGameDto: CreateGameDto): Promise<Game> {
+    const result = await this.db.insert(boffMediaGames)
+      .values({
+        title: createGameDto.title,
+        description: createGameDto.description,
+        icon: createGameDto.icon
+      } as Game);
+    
+      console.log(result);
+    return this.getGame(result[0].insertId);
+  }
+
+  async updateGame(id: number, createGameDto: CreateGameDto): Promise<Game> {
+    await this.db.update(boffMediaGames)
+      .set({
+        title: createGameDto.title,
+        description: createGameDto.description,
+        icon: createGameDto.icon
+      } as Game)
+      .where(eq(boffMediaGames.id, id));
+    
+    return this.getGame(id);
   }
 
   async getEventAchievements(eventId: number): Promise<Achievement[]> {
