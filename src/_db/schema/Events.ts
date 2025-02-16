@@ -16,6 +16,8 @@ export const boffMediaEvents = mysqlTable("boffmedia_events", {
   title: varchar("title", { length: 255 }).notNull(),
   game: int("game").references(() => boffMediaGames.id, { onDelete: "cascade", onUpdate: "cascade" }),
   description: text("description"),
+  icon: varchar("icon", { length: 255 }).notNull(),
+  banner: varchar("banner", { length: 255 }),
   startDate: datetime("start_date").notNull(),
   endDate: datetime("end_date").notNull(),
   type: mysqlEnum("type", ["event", "server"]).notNull(),

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateMedalDto {
+  
   @ApiProperty({ description: 'The name of the medal' })
   name: string;
 
