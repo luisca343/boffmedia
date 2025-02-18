@@ -7,6 +7,15 @@ import { UpdateProgressDto } from "@/types/dto/update-progress.dto"
 import { Event, EventMedal, EventTeam, Game } from "@/types/events"
 import { get } from "http"
 
+type leaderboards = {
+  userId: number
+  username: string
+  medals: number
+  medalPoints: number
+  achievements: number
+  achievementPoints: number
+}
+
 export const eventsService = {
   // Event Management
   getEvents: () => apiGET<Event[]>("/boffmedia/events"),
@@ -36,6 +45,7 @@ export const eventsService = {
     apiPUT<ApiResponse>(`/boffmedia/events/${eventId}/progress`, updateProgressDto),
 
   // Leaderboards
+  getLeaderboards: () => apiGET<leaderboards>("/boffmedia/events/leaderboards"),
   getLeaderboard: (eventId: number) => apiGET<any[]>(`/boffmedia/events/${eventId}/leaderboard`),
   getTeamLeaderboard: (eventId: number) =>
     apiGET<any[]>(`/boffmedia/events/${eventId}/teams/leaderboard`),

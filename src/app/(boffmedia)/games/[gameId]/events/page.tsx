@@ -1,9 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -26,6 +24,7 @@ import { useBoffSession } from "@/services/useBoffSession"
 
 export default function GameEvents({ params }: { params: { gameId: string } }) {
   const { gameId } = params
+  const gameIdNumber = Number(gameId)
   const [events, setEvents] = useState<Event[]>([])
   const [game, setGame] = useState<Game | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -33,7 +32,7 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
   const [newEvent, setNewEvent] = useState<CreateEventDto>({
     title: "",
     description: "",
-    gameId: Number(gameId),
+    gameId: gameIdNumber,
     icon: "",
     startDate: "",
     endDate: "",
@@ -43,42 +42,57 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
   const [isCreating, setIsCreating] = useState(false)
   const { isBoffAdmin } = useBoffSession()
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [gameData, eventsData] = await Promise.all([
-          eventsService.getGame(Number(gameId)),
-          eventsService.getEvents(),
-        ])
-        setGame(gameData.data!)
-        setEvents(eventsData.data!.filter((event) => event.game === Number(gameId)))
-        setIsLoading(false)
-      } catch (err) {
-        setError("Error fetching data")
-        setIsLoading(false)
+  // Use a memoized fetch function to prevent recreating on every render
+  const fetchData = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      // First fetch just the game data
+      const gameData = await eventsService.getGame(gameIdNumber)
+      if (!gameData.data) {
+        throw new Error("Game not found")
       }
+      setGame(gameData.data)
+      
+      // Then fetch events for this specific game
+      const eventsData = await eventsService.getEvents()
+      if (eventsData.data) {
+        // Filter events on the client side
+        const filteredEvents = eventsData.data.filter((event) => event.game === gameIdNumber)
+        setEvents(filteredEvents)
+      }
+    } catch (err) {
+      setError("Error fetching data: " + (err instanceof Error ? err.message : String(err)))
+    } finally {
+      setIsLoading(false)
     }
+  }, [gameIdNumber]) // Only depends on gameId
+
+  // Initial data fetch
+  useEffect(() => {
     fetchData()
-  }, [gameId])
+  }, [fetchData]) // fetchData is memoized, so this won't cause loops
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsCreating(true)
     try {
-      await eventsService.createEvent(newEvent)
+      const result = await eventsService.createEvent(newEvent)
+      if (result.data) {
+        // Just add the new event to the existing events array
+        setEvents(prevEvents => [...prevEvents, result.data!])
+      }
+      
+      // Reset form
       setNewEvent({
         title: "",
         description: "",
         icon: "",
-        gameId: Number(gameId),
+        gameId: gameIdNumber,
         startDate: "",
         endDate: "",
         type: "event",
       })
       setIsDialogOpen(false)
-      // Refresh events
-      const eventsData = await eventsService.getEvents()
-      setEvents(eventsData.data!.filter((event) => event.game === Number(gameId)))
     } catch (error) {
       console.error("Error creating event:", error)
     } finally {
@@ -95,7 +109,14 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
   }
 
   if (error) {
-    return <div className="text-center text-error-500">Error: {error}</div>
+    return (
+      <div className="text-center py-8">
+        <div className="text-error-500 mb-4">{error}</div>
+        <Button onClick={fetchData} className="bg-primary-500 hover:bg-primary-600 text-white">
+          Reintentar
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -122,6 +143,7 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreateEvent} className="space-y-4">
+                {/* Form fields remain the same */}
                 <Input
                   placeholder="Título del evento"
                   value={newEvent.title}
@@ -183,39 +205,45 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
-          <Card key={event.id} className="bg-surface-800 border-surface-700">
-            {event.banner && (
-              <img
-                src={event.banner || "/placeholder.svg"}
-                alt={event.title}
-                className="w-full h-32 object-cover rounded-t-lg"
-              />
-            )}
-            <CardHeader className="flex flex-row items-center space-x-4">
-              <img src={`/img/${event.icon}` || "/placeholder.svg"} alt={event.title} className="w-12 rounded-full" />
-              <div>
-                <CardTitle className="text-surface-50">{event.title}</CardTitle>
-                <CardDescription className="text-surface-400">{event.description}</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col space-y-2">
-                <p className="text-surface-300">
-                  <Calendar className="inline-block mr-2 h-4 w-4" />
-                  Inicio: {format(new Date(event.startDate), "dd/MM/yyyy HH:mm")}
-                </p>
-                <p className="text-surface-300">
-                  <Calendar className="inline-block mr-2 h-4 w-4" />
-                  Fin: {format(new Date(event.endDate), "dd/MM/yyyy HH:mm")}
-                </p>
-                <p className="text-surface-300">Tipo: {event.type === "event" ? "Evento" : "Servidor"}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {events.length > 0 ? (
+          events.map((event) => (
+            <Card key={event.id} className="bg-surface-800 border-surface-700">
+              {event.banner && (
+                <img
+                  src={event.banner || "/placeholder.svg"}
+                  alt={event.title}
+                  className="w-full h-32 object-cover rounded-t-lg"
+                />
+              )}
+              <CardHeader className="flex flex-row items-center space-x-4">
+                <img src={`/img/${event.icon}` || "/placeholder.svg"} alt={event.title} className="w-12 rounded-full" />
+                <div>
+                  <CardTitle className="text-surface-50">{event.title}</CardTitle>
+                  <CardDescription className="text-surface-400">{event.description}</CardDescription>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col space-y-2">
+                  <p className="text-surface-300">
+                    <Calendar className="inline-block mr-2 h-4 w-4" />
+                    Inicio: {format(new Date(event.startDate), "dd/MM/yyyy HH:mm")}
+                  </p>
+                  <p className="text-surface-300">
+                    <Calendar className="inline-block mr-2 h-4 w-4" />
+                    Fin: {format(new Date(event.endDate), "dd/MM/yyyy HH:mm")}
+                  </p>
+                  <p className="text-surface-300">Tipo: {event.type === "event" ? "Evento" : "Servidor"}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        ) : (
+          <div className="col-span-full text-center py-12 text-surface-400">
+            <Calendar className="mx-auto h-12 w-12 mb-4 opacity-50" />
+            <p>No hay eventos para este juego todavía</p>
+          </div>
+        )}
       </div>
     </div>
   )
 }
-
