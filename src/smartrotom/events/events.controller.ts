@@ -258,6 +258,21 @@ export class EventsController {
   }
 
   // Leaderboards
+  @Get('/leaderboards')
+  @ApiOperation({ summary: 'Get all leaderboards' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Leaderboards retrieved successfully.' })
+  async getLeaderboards() {
+    const action = 'get leaderboards';
+    try {
+      this.responseService.logRequest(action, {});
+      const result = await this.eventsService.getLeaderboards();
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Leaderboards retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error);
+    }
+  }
+
   @Get(':eventId/leaderboard')
   @ApiOperation({ summary: 'Get event leaderboard' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Leaderboard retrieved successfully.' })

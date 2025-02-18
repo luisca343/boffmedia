@@ -18,8 +18,6 @@ import {
   boffMediaEventMedals,
   EventMedalProgress,
   boffMediaEventMedalProgress,
-  EventChallenge,
-  boffMediaEventChallenges,
   boffMediaEventParticipants,
   EventParticipant,
   Game,
@@ -30,6 +28,7 @@ import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { CreateGameDto } from './dto/create-game.dto';
+import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
 @Injectable()
 export class EventsService {
@@ -57,6 +56,7 @@ export class EventsService {
         game: createEventDto.gameId,
         startDate: new Date(createEventDto.startDate),
         endDate: new Date(createEventDto.endDate),
+        icon: createEventDto.icon,
         type: createEventDto.type
       } as Event);
     
@@ -343,6 +343,41 @@ export class EventsService {
       ));
   
     return progressRecords[0];
+  }
+
+  async getLeaderboards() {
+    return this.db
+      .select({
+        userId: boffMediaEventParticipants.userId,
+        username: boffMediaUsers.username, // Add the user name
+        medals: sql<number>`COUNT(DISTINCT ${boffMediaEventMedalProgress.medalId})`.as('medal_count'),
+        medalPoints: sql<number>`SUM(${boffMediaEventMedals.points})`.as('total_score'),
+        achievements: sql<number>`COUNT(DISTINCT ${boffMediaAchievementProgress.achievementId})`.as('achievement_count'),
+        achievementPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('achievement_points')
+      })
+      .from(boffMediaEventParticipants)
+      .leftJoin(
+        boffMediaEventMedalProgress,
+        eq(boffMediaEventMedalProgress.userId, boffMediaEventParticipants.userId)
+      )
+      .leftJoin(
+        boffMediaEventMedals,
+        eq(boffMediaEventMedals.id, boffMediaEventMedalProgress.medalId)
+      )
+      .leftJoin(
+        boffMediaAchievementProgress,
+        eq(boffMediaAchievementProgress.userId, boffMediaEventParticipants.userId)
+      )
+      .leftJoin(
+        boffMediaAchievements,
+        eq(boffMediaAchievements.id, boffMediaAchievementProgress.achievementId)
+      )
+      .leftJoin(
+        boffMediaUsers,
+        eq(boffMediaUsers.id, boffMediaEventParticipants.userId) // Join with boffMediaUsers to get the user name
+      )
+      .groupBy(boffMediaEventParticipants.userId, boffMediaUsers.username) // Group by userId and userName
+      .orderBy(desc(sql<number>`total_score`));
   }
 
   async getLeaderboard(eventId: number) {

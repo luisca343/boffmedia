@@ -18,4 +18,7 @@ export class CreateEventDto {
 
   @ApiProperty({ description: 'The type of event (event/server)' })
   type: 'event' | 'server';
+
+  @ApiProperty({ description: 'The icon of the event' })
+  icon: string;
 }
