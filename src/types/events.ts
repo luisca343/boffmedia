@@ -1,103 +1,111 @@
 export interface Event {
-    id: number
-    title: string
-    game: number
-    description: string | null
-    icon: string
-    banner: string | null
-    startDate: Date
-    endDate: Date
-    type: "event" | "server"
-  }
-  
-  // Team types
-  export interface EventTeam {
-    id: number
-    eventId: number
-    name: string
-    tag: string | null
-    icon: string | null
-    leaderId: number
-    createdAt: Date
-    totalScore: number
-  }
-  
-  export interface EventTeamMember {
-    teamId: number
-    userId: number
-    role: "leader" | "member"
-    joinedAt: Date
-  }
-  
-  // Medal type
-  export interface EventMedal {
-    id: number
-    eventId: number
-    name: string
-    description: string | null
-    icon: string
-    points: number
-    category: "placement" | "challenge" | "participation"
-    placement: number | null
-    maxProgress: number
-    order: number
-    createdAt: Date
-  }
-  
-  // Additional related types
-  export interface EventParticipant {
-    userId: number
-    eventId: number
-    comment: string | null
-  }
-  
-  export interface EventChallenge {
-    id: number
-    eventId: number
-    name: string
-    description: string | null
-    startDate: Date
-    endDate: Date
-    medalId: number
-    maxProgress: number
-    active: number
-  }
-  
-  export interface EventMedalProgress {
-    userId: number
-    medalId: number
-    currentProgress: number
-    earned: number
-    earnedAt: Date | null
-    lastUpdated: Date
-  }
-  
-  export interface Achievement {
-    id: number
-    title: string
-    description: string | null
-    icon: string
-    eventId: number
-    target: number
-    rarity: "bronze" | "silver" | "gold" | "platinum" | "diamond"
-    points: number
-    createdAt: Date
-    updatedAt: Date
-  }
-  
-  export interface AchievementProgress {
-    userId: number
-    achievementId: number
-    progress: number
-    completed: number
-    completedAt: Date | null
-    lastUpdated: Date
-  }
-  
+  id: number
+  title: string
+  game: number
+  description: string | null
+  icon: string
+  banner: string | null
+  startDate: Date
+  endDate: Date
+  status: "upcoming" | "active" | "completed"
+  visibility: "public" | "private"
+  type: "event" | "server"
+  createdAt: Date
+  updatedAt: Date
+}
 
-  export interface Game {
-    id?: number
-    title: string
-    description: string
-    icon: string
-  }
+// Team types
+export interface EventTeam {
+  id: number
+  eventId: number
+  name: string
+  tag: string | null
+  icon: string | null
+  totalScore: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface EventTeamMember {
+  teamId: number
+  userId: number
+  role: "leader" | "member"
+  joinedAt: Date
+  updatedAt: Date
+}
+
+// Achievement type
+export interface Achievement {
+  id: number
+  eventId: number
+  name: string
+  description: string | null
+  icon: string
+  maxProgress: number
+  points: number
+  itemType: "achievement" | "medal"
+  category: "competition" | "challenge" | "participation" | "achievement"
+  rarity: "bronze" | "silver" | "gold" | "platinum" | "diamond" | null
+  order: number
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Additional related types
+export interface EventParticipant {
+  userId: number
+  eventId: number
+  comment: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface UserProgress {
+  userId: number
+  achievementId: number
+  currentProgress: number
+  isCompleted: number
+  completedAt: Date | null
+  lastUpdated: Date
+  createdAt: Date
+}
+
+export interface PointsHistory {
+  id: number
+  userId: number
+  eventId: number
+  teamId: number | null
+  achievementId: number
+  pointsAwarded: number
+  reason: string
+  metadata: string | null
+  awardedAt: Date
+  createdAt: Date
+}
+
+export interface Game {
+  id?: number
+  title: string
+  description: string
+  icon: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type LeaderboardEntry = {
+  userId: number
+  username: string
+  achievementPoints: number
+  medalPoints: number
+  totalPoints: number
+  achievementCount: number
+  medalCount: number
+}
+
+export type TeamLeaderboardEntry = {
+  teamId: number
+  teamName: string
+  teamTag: string | null
+  score: number
+  memberCount: number
+}
