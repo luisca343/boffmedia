@@ -4,7 +4,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { CreateMedalDto } from './dto/create-medal.dto';
+import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { JoinTeamDto } from './dto/join-team.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -197,44 +197,42 @@ export class EventsController {
     }
   }
 
-  // Medal and Progress Management
-  @Post(':eventId/medals')
-  @ApiOperation({ summary: 'Create a new medal for an event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Medal created successfully.' })
-  async createMedal(
+  // Achievement Management
+  @Post(':eventId/achievements')
+  @ApiOperation({ summary: 'Create a new achievement for an event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Achievement created successfully.' })
+  async createAchievement(
     @Param('eventId') eventId: number,
-    @Body() createMedalDto: CreateMedalDto
+    @Body() createAchievementDto: CreateAchievementDto
   ) {
-    const action = 'create medal';
+    const action = 'create achievement';
     try {
-      console.log('eventId', eventId);
-      console.log('createMedalDto', createMedalDto);
-      this.responseService.logRequest(action, { eventId, ...createMedalDto });
-      const result = await this.eventsService.createMedal(eventId, createMedalDto);
+      this.responseService.logRequest(action, { eventId, ...createAchievementDto });
+      const result = await this.eventsService.createAchievement(eventId, createAchievementDto);
       this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Medal created successfully', result);
+      return this.responseService.createSuccessResponse('Achievement created successfully', result);
     } catch (error) {
-      this.responseService.handleError(action, error, { eventId, ...createMedalDto });
+      this.responseService.handleError(action, error, { eventId, ...createAchievementDto });
     }
   }
 
-  @Get(':eventId/medals')
-  @ApiOperation({ summary: 'Get all medals for an event' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Medals retrieved successfully.' })
-  async getEventMedals(@Param('eventId') eventId: number) {
-    const action = 'get event medals';
+  @Get(':eventId/achievements')
+  @ApiOperation({ summary: 'Get all achievements for an event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Achievements retrieved successfully.' })
+  async getEventAchievements(@Param('eventId') eventId: number) {
+    const action = 'get event achievements';
     try {
       this.responseService.logRequest(action, { eventId });
-      const result = await this.eventsService.getEventMedals(eventId);
+      const result = await this.eventsService.getEventAchievements(eventId);
       this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Medals retrieved successfully', result);
+      return this.responseService.createSuccessResponse('Achievements retrieved successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error, { eventId });
     }
   }
 
   @Put(':eventId/progress')
-  @ApiOperation({ summary: 'Update progress for a medal' })
+  @ApiOperation({ summary: 'Update progress for an achievement' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Progress updated successfully.' })
   async updateProgress(
     @Param('eventId') eventId: number,
@@ -246,7 +244,7 @@ export class EventsController {
       const result = await this.eventsService.updateProgress(
         eventId,
         updateProgressDto.userId,
-        updateProgressDto.medalId,
+        updateProgressDto.achievementId,
         updateProgressDto.progress,
         updateProgressDto.teamId
       );

@@ -6,27 +6,23 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 import { 
   boffMediaEvents,
   boffMediaAchievements,
-  boffMediaAchievementProgress,
+  boffMediaUserProgress,
   Event,
   Achievement,
-  AchievementProgress,
+  UserProgress,
   boffMediaEventTeams,
   EventTeam,
   boffMediaEventTeamMembers,
   EventTeamMember,
-  EventMedal,
-  boffMediaEventMedals,
-  EventMedalProgress,
-  boffMediaEventMedalProgress,
   boffMediaEventParticipants,
   EventParticipant,
   Game,
-  boffMediaGames
+  boffMediaGames,
+  validateUserCanReceiveAchievement,
 } from '@/_db/schema/Events';
 import { CreateEventDto } from './dto/create-event.dto';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { CreateMedalDto } from './dto/create-medal.dto';
 import { CreateGameDto } from './dto/create-game.dto';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 
@@ -57,7 +53,9 @@ export class EventsService {
         startDate: new Date(createEventDto.startDate),
         endDate: new Date(createEventDto.endDate),
         icon: createEventDto.icon,
-        type: createEventDto.type
+        type: createEventDto.type,
+        createdAt: new Date(),
+        updatedAt: new Date()
       } as Event);
     
     return this.getEvent(result[0].insertId);
@@ -66,7 +64,6 @@ export class EventsService {
   async getGames(): Promise<Game[]> {
     return this.db.select().from(boffMediaGames);
   }
-
 
   async getGame(id: number): Promise<Game> {
     const result = await this.db.select()
@@ -80,10 +77,11 @@ export class EventsService {
       .values({
         title: createGameDto.title,
         description: createGameDto.description,
-        icon: createGameDto.icon
+        icon: createGameDto.icon,
+        createdAt: new Date(),
+        updatedAt: new Date()
       } as Game);
     
-      console.log(result);
     return this.getGame(result[0].insertId);
   }
 
@@ -92,7 +90,8 @@ export class EventsService {
       .set({
         title: createGameDto.title,
         description: createGameDto.description,
-        icon: createGameDto.icon
+        icon: createGameDto.icon,
+        updatedAt: new Date()
       } as Game)
       .where(eq(boffMediaGames.id, id));
     
@@ -109,12 +108,17 @@ export class EventsService {
     const result = await this.db.insert(boffMediaAchievements)
       .values({
         eventId,
-        title: createAchievementDto.title,
+        name: createAchievementDto.name,
         description: createAchievementDto.description,
         icon: createAchievementDto.icon,
-        target: createAchievementDto.target,
+        maxProgress: createAchievementDto.maxProgress || 1,
+        points: createAchievementDto.points,
+        itemType: 'achievement',
+        category: createAchievementDto.category,
         rarity: createAchievementDto.rarity,
-        points: createAchievementDto.points
+        order: createAchievementDto.order || 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
       } as Achievement);
 
     const achievements = await this.db.select()
@@ -127,74 +131,105 @@ export class EventsService {
   async getUserAchievements(userId: number): Promise<(Achievement & { progress: number })[]> {
     return this.db.select({
       achievement: boffMediaAchievements,
-      progress: boffMediaAchievementProgress.progress
+      progress: boffMediaUserProgress.currentProgress
     })
     .from(boffMediaAchievements)
     .leftJoin(
-      boffMediaAchievementProgress,
+      boffMediaUserProgress,
       and(
-        eq(boffMediaAchievementProgress.achievementId, boffMediaAchievements.id),
-        eq(boffMediaAchievementProgress.userId, userId)
+        eq(boffMediaUserProgress.achievementId, boffMediaAchievements.id),
+        eq(boffMediaUserProgress.userId, userId)
       )
     ) as any;
   }
 
-  async updateAchievementProgress(
-    userId: number,
+  async updateProgress(
+    eventId: number,
+    userId: number, 
     achievementId: number,
-    progressIncrement: number
-  ): Promise<AchievementProgress> {
+    progress: number,
+    teamId?: number
+  ): Promise<UserProgress> {
+    // 1. Validate user can receive this achievement
+    const canReceive = await validateUserCanReceiveAchievement(userId, achievementId, this.db);
+    if (!canReceive) {
+      throw new Error('User is not eligible to receive this achievement');
+    }
+  
+    // 2. Get achievement details
     const achievement = await this.db.select()
       .from(boffMediaAchievements)
       .where(eq(boffMediaAchievements.id, achievementId));
-
+  
     if (!achievement[0]) throw new Error('Achievement not found');
-
-    const result = await this.db.insert(boffMediaAchievementProgress)
-      .values({
-        userId,
-        achievementId,
-        progress: progressIncrement,
-        completed: progressIncrement >= achievement[0].target ? 1 : 0,
-        completedAt: progressIncrement >= achievement[0].target ? new Date() : null,
-        lastUpdated: new Date()
-      } as AchievementProgress)
-      .onDuplicateKeyUpdate({
-        progress: progressIncrement,
-        completed: progressIncrement >= achievement[0].target ? 1 : 0,
-        completedAt: progressIncrement >= achievement[0].target ? new Date() : null,
-        lastUpdated: new Date()
-      } as any);
-
-    const progress = await this.db.select()
-      .from(boffMediaAchievementProgress)
+  
+    // 3. Update progress
+    const isCompleted = progress >= achievement[0].maxProgress ? 1 : 0;
+    const completedAt = isCompleted ? new Date() : null;
+  
+    await this.db.insert(boffMediaUserProgress).values({
+      userId,
+      achievementId,
+      currentProgress: progress,
+      isCompleted,
+      completedAt,
+      lastUpdated: new Date(),
+      createdAt: new Date()
+    } as UserProgress)
+    .onDuplicateKeyUpdate({
+      currentProgress: progress,
+      isCompleted,
+      completedAt,
+      lastUpdated: new Date()
+    } as any);
+  
+    // 4. If completed and team exists, update team score
+    if (isCompleted && teamId) {
+      await this.updateTeamScore(teamId);
+    }
+  
+    return this.db.select()
+      .from(boffMediaUserProgress)
       .where(and(
-        eq(boffMediaAchievementProgress.userId, userId),
-        eq(boffMediaAchievementProgress.achievementId, achievementId)
-      ));
-
-    return progress[0];
+        eq(boffMediaUserProgress.userId, userId),
+        eq(boffMediaUserProgress.achievementId, achievementId)
+      ))
+      .then(results => results[0]);
   }
-
+  
   async createTeam(eventId: number, createTeamDto: CreateTeamDto): Promise<EventTeam> {
+    // 1. Create the team
     const result = await this.db.insert(boffMediaEventTeams).values({
       eventId,
       name: createTeamDto.name,
       tag: createTeamDto.tag,
       icon: createTeamDto.icon,
-      leaderId: createTeamDto.leaderId,
-      createdAt: new Date()
+      totalScore: 0,
+      createdAt: new Date(),
+      updatedAt: new Date()
     } as EventTeam);
   
-    // Add leader as team member
+    const teamId = result[0].insertId;
+    
+    // 2. Add leader as team member with leader role
     await this.db.insert(boffMediaEventTeamMembers).values({
-      teamId: result[0].insertId,
+      teamId,
       userId: createTeamDto.leaderId,
       role: 'leader',
-      joinedAt: new Date()
+      joinedAt: new Date(),
+      updatedAt: new Date()
     } as EventTeamMember);
   
-    return this.getTeam(result[0].insertId);
+    // 3. Add leader to event participants
+    await this.db.insert(boffMediaEventParticipants).values({
+      userId: createTeamDto.leaderId,
+      eventId,
+      comment: `Created team ${createTeamDto.name}`,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    } as EventParticipant);
+  
+    return this.getTeam(teamId);
   }
 
   async getEventTeams(eventId: number): Promise<EventTeam[]> {
@@ -207,28 +242,36 @@ export class EventsService {
   async joinTeam(eventId: number, teamId: number, userId: number): Promise<EventTeamMember> {
     // Check if user is already in a team for this event
     const existingTeam = await this.db.select()
-      .from(boffMediaEventParticipants)
+      .from(boffMediaEventTeamMembers)
+      .innerJoin(
+        boffMediaEventTeams,
+        eq(boffMediaEventTeams.id, boffMediaEventTeamMembers.teamId)
+      )
       .where(and(
-        eq(boffMediaEventParticipants.eventId, eventId),
-        eq(boffMediaEventParticipants.userId, userId)
+        eq(boffMediaEventTeams.eventId, eventId),
+        eq(boffMediaEventTeamMembers.userId, userId)
       ));
   
-    if (existingTeam[0]) {
+    if (existingTeam.length > 0) {
       throw new Error('User is already in a team for this event');
     }
   
+    // Add user to team members
     await this.db.insert(boffMediaEventTeamMembers).values({
       teamId,
       userId,
       role: 'member',
-      joinedAt: new Date()
+      joinedAt: new Date(),
+      updatedAt: new Date()
     } as EventTeamMember);
   
     // Add to event participants
     await this.db.insert(boffMediaEventParticipants).values({
       userId,
       eventId,
-      comment: `Joined team ${teamId}`
+      comment: `Joined team ${teamId}`,
+      createdAt: new Date(),
+      updatedAt: new Date()
     } as EventParticipant);
   
     const members = await this.db.select()
@@ -253,20 +296,27 @@ export class EventsService {
       .where(eq(boffMediaEventTeamMembers.teamId, teamId));
   }
 
-
   async leaveTeam(eventId: number, teamId: number, userId: number): Promise<{ success: boolean }> {
-    const team = await this.getTeam(teamId);
+    // Check if user is the team leader
+    const member = await this.db.select()
+      .from(boffMediaEventTeamMembers)
+      .where(and(
+        eq(boffMediaEventTeamMembers.teamId, teamId),
+        eq(boffMediaEventTeamMembers.userId, userId)
+      ));
     
-    if (team.leaderId === userId) {
+    if (member[0]?.role === 'leader') {
       throw new Error('Team leader cannot leave the team');
     }
   
+    // Remove from team members
     await this.db.delete(boffMediaEventTeamMembers)
       .where(and(
         eq(boffMediaEventTeamMembers.teamId, teamId),
         eq(boffMediaEventTeamMembers.userId, userId)
       ));
   
+    // Remove from event participants
     await this.db.delete(boffMediaEventParticipants)
       .where(and(
         eq(boffMediaEventParticipants.eventId, eventId),
@@ -275,136 +325,60 @@ export class EventsService {
   
     return { success: true };
   }
-  
-  async createMedal(eventId: number, createMedalDto: CreateMedalDto): Promise<EventMedal> {
-    const result = await this.db.insert(boffMediaEventMedals).values({
-      eventId,
-      name: createMedalDto.name,
-      description: createMedalDto.description,
-      icon: createMedalDto.icon,
-      points: createMedalDto.points,
-      category: createMedalDto.category,
-      placement: createMedalDto.placement,
-      maxProgress: createMedalDto.maxProgress,
-      order: createMedalDto.order,
-      createdAt: new Date()
-    } as EventMedal);
-  
-    const medals = await this.db.select()
-      .from(boffMediaEventMedals)
-      .where(eq(boffMediaEventMedals.id, result[0].insertId));
-    return medals[0];
-  }
-
-  async getEventMedals(eventId: number): Promise<EventMedal[]> {
-    return this.db.select()
-      .from(boffMediaEventMedals)
-      .where(eq(boffMediaEventMedals.eventId, eventId))
-      .orderBy(boffMediaEventMedals.order);
-  }
-
-  async updateProgress(
-    eventId: number,
-    userId: number,
-    medalId: number,
-    progress: number,
-    teamId?: number
-  ): Promise<EventMedalProgress> {
-    const medal = await this.db.select()
-      .from(boffMediaEventMedals)
-      .where(eq(boffMediaEventMedals.id, medalId));
-  
-    if (!medal[0]) throw new Error('Medal not found');
-  
-    await this.db.insert(boffMediaEventMedalProgress).values({
-      userId,
-      medalId,
-      currentProgress: progress,
-      earned: progress >= medal[0].maxProgress ? 1 : 0,
-      earnedAt: progress >= medal[0].maxProgress ? new Date() : null,
-      lastUpdated: new Date()
-    } as EventMedalProgress)
-    .onDuplicateKeyUpdate({
-      currentProgress: progress,
-      earned: progress >= medal[0].maxProgress ? 1 : 0,
-      earnedAt: progress >= medal[0].maxProgress ? new Date() : null,
-      lastUpdated: new Date()
-    } as any);
-  
-    if (progress >= medal[0].maxProgress && teamId) {
-      await this.updateTeamScore(teamId);
-    }
-  
-    const progressRecords = await this.db.select()
-      .from(boffMediaEventMedalProgress)
-      .where(and(
-        eq(boffMediaEventMedalProgress.userId, userId),
-        eq(boffMediaEventMedalProgress.medalId, medalId)
-      ));
-  
-    return progressRecords[0];
-  }
 
   async getLeaderboards() {
-    return this.db
+    const baseQuery = this.db
       .select({
-        userId: boffMediaEventParticipants.userId,
-        username: boffMediaUsers.username, // Add the user name
-        medals: sql<number>`COUNT(DISTINCT ${boffMediaEventMedalProgress.medalId})`.as('medal_count'),
-        medalPoints: sql<number>`SUM(${boffMediaEventMedals.points})`.as('total_score'),
-        achievements: sql<number>`COUNT(DISTINCT ${boffMediaAchievementProgress.achievementId})`.as('achievement_count'),
-        achievementPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('achievement_points')
+        userId: boffMediaUserProgress.userId,
+        username: boffMediaUsers.username,
+        achievementPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('achievement_points'),
+        medalPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('medal_points'),
+        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('total_points'),
+        achievementCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaUserProgress.achievementId} END)`.as('achievement_count'),
+        medalCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaUserProgress.achievementId} END)`.as('medal_count')
       })
-      .from(boffMediaEventParticipants)
-      .leftJoin(
-        boffMediaEventMedalProgress,
-        eq(boffMediaEventMedalProgress.userId, boffMediaEventParticipants.userId)
-      )
-      .leftJoin(
-        boffMediaEventMedals,
-        eq(boffMediaEventMedals.id, boffMediaEventMedalProgress.medalId)
-      )
-      .leftJoin(
-        boffMediaAchievementProgress,
-        eq(boffMediaAchievementProgress.userId, boffMediaEventParticipants.userId)
-      )
-      .leftJoin(
+      .from(boffMediaUserProgress)
+      .innerJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaAchievementProgress.achievementId)
+        eq(boffMediaAchievements.id, boffMediaUserProgress.achievementId)
       )
       .leftJoin(
         boffMediaUsers,
-        eq(boffMediaUsers.id, boffMediaEventParticipants.userId) // Join with boffMediaUsers to get the user name
+        eq(boffMediaUsers.id, boffMediaUserProgress.userId)
       )
-      .groupBy(boffMediaEventParticipants.userId, boffMediaUsers.username) // Group by userId and userName
-      .orderBy(desc(sql<number>`total_score`));
+      .where(eq(boffMediaUserProgress.isCompleted, 1))
+      .groupBy(boffMediaUserProgress.userId, boffMediaUsers.username)
+      .orderBy(desc(sql<number>`total_points`));
+  
+    return baseQuery;
   }
 
   async getLeaderboard(eventId: number) {
     return this.db
       .select({
-        userId: boffMediaEventParticipants.userId,
-        score: sql<number>`SUM(${boffMediaEventMedals.points})`.as('total_score'),
-        medals: sql<number>`COUNT(DISTINCT ${boffMediaEventMedalProgress.medalId})`.as('medal_count')
+        userId: boffMediaUserProgress.userId,
+        username: boffMediaUsers.username,
+        achievementPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('achievement_points'),
+        medalPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('medal_points'),
+        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('total_points'),
+        achievementCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaUserProgress.achievementId} END)`.as('achievement_count'),
+        medalCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaUserProgress.achievementId} END)`.as('medal_count')
       })
-      .from(boffMediaEventParticipants)
-      .leftJoin(
-        boffMediaEventMedalProgress,
-        eq(boffMediaEventMedalProgress.userId, boffMediaEventParticipants.userId)
+      .from(boffMediaUserProgress)
+      .innerJoin(
+        boffMediaAchievements,
+        eq(boffMediaAchievements.id, boffMediaUserProgress.achievementId)
       )
       .leftJoin(
-        boffMediaEventMedals,
-        and(
-          eq(boffMediaEventMedals.id, boffMediaEventMedalProgress.medalId),
-          eq(boffMediaEventMedals.eventId, eventId)
-        )
+        boffMediaUsers,
+        eq(boffMediaUsers.id, boffMediaUserProgress.userId)
       )
       .where(and(
-        eq(boffMediaEventParticipants.eventId, eventId),
-        eq(boffMediaEventMedalProgress.earned, 1)
+        eq(boffMediaAchievements.eventId, eventId),
+        eq(boffMediaUserProgress.isCompleted, 1)
       ))
-      .groupBy(boffMediaEventParticipants.userId)
-      .orderBy(desc(sql<number>`total_score`));
+      .groupBy(boffMediaUserProgress.userId, boffMediaUsers.username)
+      .orderBy(desc(sql<number>`total_points`));
   }
 
   async getTeamLeaderboard(eventId: number) {
@@ -422,38 +396,40 @@ export class EventsService {
         eq(boffMediaEventTeamMembers.teamId, boffMediaEventTeams.id)
       )
       .where(eq(boffMediaEventTeams.eventId, eventId))
-      .groupBy(boffMediaEventTeams.id)
+      .groupBy(boffMediaEventTeams.id, boffMediaEventTeams.name, boffMediaEventTeams.tag, boffMediaEventTeams.totalScore)
       .orderBy(desc(boffMediaEventTeams.totalScore));
   }
-
 
   private async updateTeamScore(teamId: number): Promise<void> {
     const totalScore = await this.calculateTeamScore(teamId);
     await this.db.update(boffMediaEventTeams)
-      .set({ totalScore } as EventTeam)
+      .set({ 
+        totalScore,
+        updatedAt: new Date()
+      } as EventTeam)
       .where(eq(boffMediaEventTeams.id, teamId));
   }
 
   private async calculateTeamScore(teamId: number): Promise<number> {
+    // Calculate team score by summing points from completed achievements
     const result = await this.db
       .select({
-        score: sql<number>`SUM(${boffMediaEventMedals.points})`
+        score: sql<number>`SUM(${boffMediaAchievements.points})`
       })
-      .from(boffMediaEventMedalProgress)
-      .innerJoin(
-        boffMediaEventMedals,
-        eq(boffMediaEventMedals.id, boffMediaEventMedalProgress.medalId)
-      )
+      .from(boffMediaUserProgress)
       .innerJoin(
         boffMediaEventTeamMembers,
-        eq(boffMediaEventTeamMembers.userId, boffMediaEventMedalProgress.userId)
+        eq(boffMediaEventTeamMembers.userId, boffMediaUserProgress.userId)
+      )
+      .innerJoin(
+        boffMediaAchievements,
+        eq(boffMediaAchievements.id, boffMediaUserProgress.achievementId)
       )
       .where(and(
         eq(boffMediaEventTeamMembers.teamId, teamId),
-        eq(boffMediaEventMedalProgress.earned, 1)
+        eq(boffMediaUserProgress.isCompleted, 1)
       ));
   
     return result[0]?.score || 0;
   }
-
 }
