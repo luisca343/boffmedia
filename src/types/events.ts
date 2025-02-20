@@ -38,6 +38,7 @@ export interface EventTeamMember {
 export interface Achievement {
   id: number
   eventId: number
+  eventName: string
   name: string
   description: string | null
   icon: string

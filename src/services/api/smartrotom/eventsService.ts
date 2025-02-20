@@ -29,6 +29,7 @@ export const eventsService = {
     apiDELETE<ApiResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/members/${userId}`),
 
   // Achievement Management
+  getAchievements: () => apiGET<Achievement[]>("/boffmedia/events/achievements"),
   createAchievement: (eventId: number, createAchievementDto: CreateAchievementDto) =>
     apiPOST<Achievement>(`/boffmedia/events/${eventId}/achievements`, createAchievementDto),
   getEventAchievements: (eventId: number) => apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`),

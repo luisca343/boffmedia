@@ -1,16 +1,17 @@
 "use client"
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Calendar, Trophy, Users } from "lucide-react"
+import { Award, Calendar, Medal, Trophy, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { InternalLink } from "@/components/nav/Link"
+import { LeaderboardEntry } from "@/types/events"
 
 export function EventsSection() {
   const { events, error, isLoading, refetch } = useGetEvents()
-  const { leaderboards, error: leaderboardError, isLoading: leaderboardLoading } = useGetLeaderboards() // 0 is just a placeholder since it's not used
+  const { leaderboards, error: leaderboardError, isLoading: leaderboardLoading } = useGetLeaderboards()
   
   if (isLoading) return (
     <section className="py-24 bg-gradient-to-br from-surface-800 to-surface-900">
@@ -45,7 +46,7 @@ export function EventsSection() {
 
   // Get top players from the global leaderboards
   const topPlayers = leaderboards && Array.isArray(leaderboards)
-    ? [...leaderboards].sort((a, b) => b.score - a.score).slice(0, 3)
+    ? [...leaderboards].sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 3) as LeaderboardEntry[]
     : []
 
   return (
@@ -144,12 +145,18 @@ export function EventsSection() {
                           <h4 className="font-semibold text-lg text-surface-50">
                             {player.username || `Jugador ${player.userId}`}
                           </h4>
-                          <p className="text-surface-300">{player.medalPoints?.toLocaleString() || 0} puntos</p>
+                          <p className="text-surface-300">{player.totalPoints?.toLocaleString() || 0} puntos</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Trophy className="h-6 w-6 text-warning-500" />
-                        <span className="text-lg font-semibold text-surface-50">{player.medals || 0}</span>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                          <Medal className="h-5 w-5 text-primary-500" />
+                          <span className="text-lg font-semibold text-surface-50">{player.medalCount || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Award className="h-5 w-5 text-warning-500" />
+                          <span className="text-lg font-semibold text-surface-50">{player.achievementCount || 0}</span>
+                        </div>
                       </div>
                     </div>
                   ))}
