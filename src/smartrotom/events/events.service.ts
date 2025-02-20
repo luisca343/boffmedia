@@ -98,6 +98,27 @@ export class EventsService {
     return this.getGame(id);
   }
 
+  async getAchievements(): Promise<Achievement[]> {
+    return this.db.select({
+      id: boffMediaAchievements.id,
+      description: boffMediaAchievements.description,
+      name: boffMediaAchievements.name,
+      icon: boffMediaAchievements.icon,
+      createdAt: boffMediaAchievements.createdAt,
+      updatedAt: boffMediaAchievements.updatedAt,
+      itemType: boffMediaAchievements.itemType,
+      maxProgress: boffMediaAchievements.maxProgress,
+      points: boffMediaAchievements.points,
+      eventId: boffMediaAchievements.eventId,
+      category: boffMediaAchievements.category,
+      rarity: boffMediaAchievements.rarity,
+      hidden: boffMediaAchievements.hidden,
+      order: boffMediaAchievements.order
+    })
+      .from(boffMediaAchievements)
+      .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
+  }
+
   async getEventAchievements(eventId: number): Promise<Achievement[]> {
     return this.db.select()
       .from(boffMediaAchievements)

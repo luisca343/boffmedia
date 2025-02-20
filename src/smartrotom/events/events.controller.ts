@@ -196,6 +196,20 @@ export class EventsController {
       this.responseService.handleError(action, error, { eventId, teamId, userId });
     }
   }
+  @Get('/achievements')
+  @ApiOperation({ summary: 'Get all achievements' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Achievements retrieved successfully.' })
+  async getAchievements() {
+    const action = 'get achievements';
+    try {
+      this.responseService.logRequest(action, {});
+      const result = await this.eventsService.getAchievements();
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Achievements retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error);
+    }
+  }
 
   // Achievement Management
   @Post(':eventId/achievements')
