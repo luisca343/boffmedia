@@ -2,32 +2,32 @@
 
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
-import { useGetGames } from "@/hooks/events/useGetGames"
-import type { Game } from "@/types/events"
-import { GameHeader } from "./GameHeader"
-import { GamesList } from "./GamesList"
-import { GameLoadingState } from "./GameLoadingState"
-import { GameErrorState } from "./GameErrorState"
-import { GameCreateDialog } from "./GameCreateDialog"
-import { GameEditDialog } from "./GameEditDialog"
-import { GameDeleteDialog } from "./GameDeleteDialog"
+import { useGetTeams } from "@/hooks/events/useGetTeams"
+import type { EventTeam } from "@/types/events"
+import { TeamHeader } from "./TeamHeader"
+import { TeamsList } from "./TeamsList"
+import { TeamLoadingState } from "./TeamLoadingState"
+import { TeamErrorState } from "./TeamErrorState"
+import { TeamCreateDialog } from "./TeamCreateDialog"
+import { TeamEditDialog } from "./TeamEditDialog"
+import { TeamDeleteDialog } from "./TeamDeleteDialog"
 
-export function GamesTab() {
-  const { games, isLoading, error, refetch } = useGetGames()
+export function TeamsTab() {
+  const { teams, isLoading, error, refetch } = useGetTeams()
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedGame, setSelectedGame] = useState<Game | null>(null)
+  const [selectedTeam, setSelectedTeam] = useState<EventTeam | null>(null)
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false)
   const [isOpenEditDialog, setIsOpenEditDialog] = useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
 
-  const filteredGames = games
+  const filteredTeams = teams
     ? searchTerm
-      ? games.filter(
-          (game) =>
-            game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            game.description.toLowerCase().includes(searchTerm.toLowerCase())
+      ? teams.filter(
+          (team) =>
+            team.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (team.tag && team.tag.toLowerCase().includes(searchTerm.toLowerCase()))
         )
-      : games
+      : teams
     : []
 
   const handleCreateSuccess = () => {
@@ -45,51 +45,51 @@ export function GamesTab() {
     refetch()
   }
 
-  if (isLoading) return <GameLoadingState />
-  if (error) return <GameErrorState error={error} onRetry={refetch} />
+  if (isLoading) return <TeamLoadingState />
+  if (error) return <TeamErrorState error={error} onRetry={refetch} />
 
   return (
     <div>
       <Card className="bg-surface-800 border-surface-700 mb-6">
-        <GameHeader
-          totalGames={filteredGames.length}
+        <TeamHeader
+          totalTeams={filteredTeams.length}
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
           onCreateNew={() => setIsOpenCreateDialog(true)}
         />
 
-        <GamesList
-          games={filteredGames}
-          onEdit={(game) => {
-            setSelectedGame(game)
+        <TeamsList
+          teams={filteredTeams}
+          onEdit={(team) => {
+            setSelectedTeam(team)
             setIsOpenEditDialog(true)
           }}
-          onDelete={(game) => {
-            setSelectedGame(game)
+          onDelete={(team) => {
+            setSelectedTeam(team)
             setIsOpenDeleteDialog(true)
           }}
         />
       </Card>
 
-      <GameCreateDialog
+      <TeamCreateDialog
         open={isOpenCreateDialog}
         onOpenChange={setIsOpenCreateDialog}
         onSuccess={handleCreateSuccess}
       />
 
-      {selectedGame && (
+      {selectedTeam && (
         <>
-          <GameEditDialog
+          <TeamEditDialog
             open={isOpenEditDialog}
             onOpenChange={setIsOpenEditDialog}
-            game={selectedGame}
+            team={selectedTeam}
             onSuccess={handleEditSuccess}
           />
 
-          <GameDeleteDialog
+          <TeamDeleteDialog
             open={isOpenDeleteDialog}
             onOpenChange={setIsOpenDeleteDialog}
-            game={selectedGame}
+            team={selectedTeam}
             onSuccess={handleDeleteSuccess}
           />
         </>

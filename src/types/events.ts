@@ -1,23 +1,26 @@
 export interface Event {
   id: number
+  parentId: number
   title: string
   game: number
+  gameName: string
   description: string | null
   icon: string
   banner: string | null
-  startDate: Date
-  endDate: Date
+  startDate: string
+  endDate: string
   status: "upcoming" | "active" | "completed"
   visibility: "public" | "private"
   type: "event" | "server"
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
 // Team types
 export interface EventTeam {
   id: number
   eventId: number
+  eventName: string
   name: string
   tag: string | null
   icon: string | null
@@ -85,7 +88,7 @@ export interface PointsHistory {
 }
 
 export interface Game {
-  id?: number
+  id: number
   title: string
   description: string
   icon: string

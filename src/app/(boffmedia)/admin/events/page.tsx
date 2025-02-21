@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css"
 import { GamesTab } from "./_components/games/GamesTab"
 import { EventsTab } from "./_components/events/EventsTab"
 import { AchievementsTab } from "./_components/achievements/AchievementsTab"
+import { TeamsTab } from "./_components/teams/TeamsTab"
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("games")
@@ -29,12 +30,12 @@ export default function AdminDashboard() {
             <Calendar className="h-4 w-4 mr-2" />
             Eventos
           </TabsTrigger>
-          {/*
+          
           <TabsTrigger value="teams" className="data-[state=active]:bg-primary-500">
             <Users className="h-4 w-4 mr-2" />
             Equipos
           </TabsTrigger>
-        */}
+        
           <TabsTrigger value="achievements" className="data-[state=active]:bg-primary-500">
             <Award className="h-4 w-4 mr-2" />
             Logros
@@ -49,7 +50,9 @@ export default function AdminDashboard() {
             <EventsTab />
         </TabsContent>
 
-        {/*<TabsContent value="teams"></TabsContent>*/}
+        <TabsContent value="teams">
+          <TeamsTab />
+        </TabsContent>
 
         <TabsContent value="achievements">
             <AchievementsTab />

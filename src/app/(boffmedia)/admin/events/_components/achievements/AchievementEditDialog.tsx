@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
 import type { Achievement } from "@/types/events"
+import { eventsService } from "@/services/api/smartrotom/eventsService"
 
 interface AchievementEditDialogProps {
   open: boolean
@@ -16,11 +17,19 @@ interface AchievementEditDialogProps {
 export function AchievementEditDialog({ open, onOpenChange, achievement, onSuccess }: AchievementEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  const formDefaultValues = {
+    id: achievement.id,
+    name: achievement.name,
+    description: achievement.description || undefined,
+    icon: achievement.icon || undefined,
+    eventId: achievement.eventId,
+    points: achievement.points,
+  }
+
   const handleSubmit = async (data: AchievementFormValues) => {
     setIsSubmitting(true)
     try {
-      // Note: Update endpoint needs to be implemented
-      // await eventsService.updateAchievement(achievement.eventId, achievement.id!, data)
+      await eventsService.updateAchievement(achievement.eventId, achievement.id!, data)
       toast.success(`El logro "${data.name}" ha sido actualizado con éxito.`)
       onSuccess()
     } catch (error) {
@@ -41,7 +50,7 @@ export function AchievementEditDialog({ open, onOpenChange, achievement, onSucce
         </DialogHeader>
 
         <AchievementForm
-          defaultValues={achievement}
+          defaultValues={formDefaultValues}
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}

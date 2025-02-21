@@ -15,32 +15,24 @@ import { AchievementDeleteDialog } from "./AchievementDeleteDialog"
 export function AchievementsTab() {
   const { achievements, isLoading, error, refetch } = useGetAchievements()
   const [searchTerm, setSearchTerm] = useState("")
-  const [filteredAchievements, setFilteredAchievements] = useState<Achievement[]>([])
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null)
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false)
   const [isOpenEditDialog, setIsOpenEditDialog] = useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null)
 
-  useEffect(() => {
-    if (achievements) {
-      let filtered = achievements
-
-      if (selectedEventId) {
-        filtered = filtered.filter((achievement) => achievement.eventId === selectedEventId)
-      }
-
-      if (searchTerm) {
-        filtered = filtered.filter(
-          (achievement) =>
-            achievement.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            achievement.description!.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredAchievements = achievements
+    ? achievements
+        .filter((achievement) => 
+          selectedEventId ? achievement.eventId === selectedEventId : true
         )
-      }
-
-      setFilteredAchievements(filtered)
-    }
-  }, [achievements, searchTerm, selectedEventId])
+        .filter((achievement) =>
+          searchTerm
+            ? achievement.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              achievement.description?.toLowerCase().includes(searchTerm.toLowerCase())
+            : true
+        )
+    : []
 
   const handleCreateSuccess = () => {
     setIsOpenCreateDialog(false)

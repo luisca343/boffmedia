@@ -6,17 +6,22 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetGames } from "@/hooks/events/useGetGames"
+import type { Event } from "@/types/events"
 
 const eventSchema = z.object({
   id: z.number().optional(),
+  parentId: z.number().optional(),
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  icon: z.string().optional(),
-  gameId: z.number(),
-  startDate: z.string().min(1, "La fecha de inicio es requerida"),
-  endDate: z.string().min(1, "La fecha de finalización es requerida"),
+  icon: z.string().url("Debe ser una URL válida").optional(),
+  banner: z.string().url("Debe ser una URL válida").optional(),
+  game: z.number(),
+  startDate: z.string(),
+  endDate: z.string(),
   type: z.enum(["event", "server"]),
+  visibility: z.enum(["public", "private"]),
 })
 
 export type EventFormValues = z.infer<typeof eventSchema>
@@ -27,6 +32,7 @@ interface EventFormProps {
   onSubmit: (data: EventFormValues) => void
   onCancel: () => void
   submitLabel?: string
+  parentEvent?: Event | null
 }
 
 export function EventForm({
@@ -35,25 +41,75 @@ export function EventForm({
   onSubmit,
   onCancel,
   submitLabel = "Guardar",
+  parentEvent,
 }: EventFormProps) {
+  const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { games, isLoading: isLoadingGames } = useGetGames()
+
+  // Filter out events that can be parents (only server type events)
+  const parentEvents =
+    events?.filter(
+      (event) =>
+        event.type === "server" &&
+        event.id !== defaultValues?.id && // Can't be parent of itself
+        !event.parentId, // Only top-level servers can be parents
+    ) || []
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
-    defaultValues: defaultValues || {
-      title: "",
-      description: "",
-      icon: "",
-      gameId: 0,
-      startDate: "",
-      endDate: "",
-      type: "event",
+    defaultValues: {
+      ...defaultValues,
+      parentId: parentEvent?.id || defaultValues?.parentId,
+      type: defaultValues?.type || (parentEvent ? "event" : "server"),
     },
   })
+
+  // If this is a child event, force type to "event"
+  const isChildEvent = Boolean(form.watch("parentId"))
+  if (isChildEvent && form.watch("type") === "server") {
+    form.setValue("type", "event")
+  }
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+        {!parentEvent && ( // Only show parent selection if not creating from a parent
+          <FormField
+            control={form.control}
+            name="parentId"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Servidor Principal (Opcional)</FormLabel>
+                <Select
+                  onValueChange={(value) => field.onChange(value ? Number(value) : undefined)}
+                  defaultValue={field.value?.toString()}
+                  disabled={isLoadingEvents}
+                >
+                  <FormControl>
+                    <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                      <SelectValue placeholder="Selecciona un servidor principal" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-surface-800 border-surface-700">
+                    <SelectItem value="-1">Ninguno (Evento independiente)</SelectItem>
+                    {parentEvents.map((event) => (
+                      <SelectItem key={event.id} value={event.id.toString()}>
+                        {event.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  {isChildEvent
+                    ? "Este evento será parte de un servidor principal."
+                    : "Opcionalmente, este evento puede ser parte de un servidor principal."}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <FormField
           control={form.control}
           name="title"
@@ -94,7 +150,7 @@ export function EventForm({
 
         <FormField
           control={form.control}
-          name="gameId"
+          name="game"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Juego</FormLabel>
@@ -110,7 +166,7 @@ export function EventForm({
                 </FormControl>
                 <SelectContent className="bg-surface-800 border-surface-700">
                   {games?.map((game) => (
-                    <SelectItem key={game.id} value={game.id!.toString()}>
+                    <SelectItem key={game.id} value={game.id.toString()}>
                       {game.title}
                     </SelectItem>
                   ))}
@@ -160,28 +216,61 @@ export function EventForm({
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Tipo de Evento</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                    <SelectValue placeholder="Selecciona el tipo" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-surface-800 border-surface-700">
-                  <SelectItem value="event">Evento</SelectItem>
-                  <SelectItem value="server">Servidor</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>Selecciona el tipo de evento.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo de Evento</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  disabled={isChildEvent} // Disable if child event
+                >
+                  <FormControl>
+                    <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                      <SelectValue placeholder="Selecciona el tipo" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-surface-800 border-surface-700">
+                    <SelectItem value="event">Evento</SelectItem>
+                    <SelectItem value="server">Servidor</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  {isChildEvent
+                    ? "Los eventos dentro de un servidor son siempre de tipo 'evento'."
+                    : "Selecciona el tipo de evento."}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="visibility"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Visibilidad</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
+                      <SelectValue placeholder="Selecciona la visibilidad" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent className="bg-surface-800 border-surface-700">
+                    <SelectItem value="public">Público</SelectItem>
+                    <SelectItem value="private">Privado</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>Controla quién puede ver este evento.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
@@ -198,6 +287,26 @@ export function EventForm({
                 />
               </FormControl>
               <FormDescription>URL de la imagen que se usará como icono.</FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="banner"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Banner URL (opcional)</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://ejemplo.com/banner.jpg"
+                  className="bg-surface-700 border-surface-600 text-surface-50"
+                  {...field}
+                  value={field.value || ""}
+                />
+              </FormControl>
+              <FormDescription>URL de la imagen que se usará como banner.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

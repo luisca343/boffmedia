@@ -30,7 +30,7 @@ export function GameCreateDialog({ open, onOpenChange, onSuccess }: GameCreateDi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-surface-800 border-surface-700 text-surface-50">
+      <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">Crear Nuevo Juego</DialogTitle>
           <DialogDescription className="text-surface-300">

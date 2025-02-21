@@ -27,7 +27,6 @@ export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDe
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
-      // Note: Delete endpoint needs to be implemented
       // await eventsService.deleteGame(game.id)
       toast.success(`El juego "${game.title}" ha sido eliminado con éxito.`)
       onSuccess()
@@ -40,7 +39,7 @@ export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-surface-800 border-surface-700 text-surface-50">
+      <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">Confirmar Eliminación</DialogTitle>
           <DialogDescription className="text-surface-300">

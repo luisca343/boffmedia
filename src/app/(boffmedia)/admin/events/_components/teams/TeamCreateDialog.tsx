@@ -3,31 +3,26 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "react-toastify"
-import { GameForm, type GameFormValues } from "./GameForm"
-import type { Game } from "@/types/events"
 import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { TeamForm, type TeamFormValues } from "./TeamForm"
 
-interface GameEditDialogProps {
+interface TeamCreateDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  game: Game
   onSuccess: () => void
 }
 
-export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEditDialogProps) {
+export function TeamCreateDialog({ open, onOpenChange, onSuccess }: TeamCreateDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (data: GameFormValues) => {
+  const handleSubmit = async (data: TeamFormValues) => {
     setIsSubmitting(true)
     try {
-      await eventsService.updateGame(game.id!, {
-        ...game,
-        ...data,
-      })
-      toast.success(`El juego "${data.title}" ha sido actualizado con éxito.`)
+      await (await eventsService.createTeam(data.eventId, data)).data
+      toast.success(`El equipo "${data.name}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar actualizar el juego.")
+      toast.error("Ocurrió un error al intentar crear el equipo.")
     } finally {
       setIsSubmitting(false)
     }
@@ -37,18 +32,17 @@ export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEdit
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Editar Juego</DialogTitle>
+          <DialogTitle className="text-xl">Crear Nuevo Equipo</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Actualiza la información del juego seleccionado.
+            Completa el formulario para añadir un nuevo equipo al sistema.
           </DialogDescription>
         </DialogHeader>
 
-        <GameForm
-          defaultValues={game}
+        <TeamForm
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
-          submitLabel={isSubmitting ? "Actualizando..." : "Guardar Cambios"}
+          submitLabel={isSubmitting ? "Creando..." : "Crear Equipo"}
         />
       </DialogContent>
     </Dialog>

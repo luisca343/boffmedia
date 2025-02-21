@@ -30,7 +30,7 @@ export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreate
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-surface-800 border-surface-700 text-surface-50">
+      <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">Crear Nuevo Evento</DialogTitle>
           <DialogDescription className="text-surface-300">

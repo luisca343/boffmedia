@@ -11,28 +11,28 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { toast } from "react-toastify"
-import { Award, RefreshCw } from "lucide-react"
-import type { Achievement } from "@/types/events"
+import { Users, RefreshCw } from "lucide-react"
+import type { EventTeam } from "@/types/events"
 
-interface AchievementDeleteDialogProps {
+interface TeamDeleteDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  achievement: Achievement
+  team: EventTeam
   onSuccess: () => void
 }
 
-export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuccess }: AchievementDeleteDialogProps) {
+export function TeamDeleteDialog({ open, onOpenChange, team, onSuccess }: TeamDeleteDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
       // Note: Delete endpoint needs to be implemented
-      // await eventsService.deleteAchievement(achievement.eventId, achievement.id)
-      toast.success(`El logro "${achievement.name}" ha sido eliminado con éxito.`)
+      // await eventsService.deleteTeam(team.eventId, team.id)
+      toast.success(`El equipo "${team.name}" ha sido eliminado con éxito.`)
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar eliminar el logro.")
+      toast.error("Ocurrió un error al intentar eliminar el equipo.")
     } finally {
       setIsSubmitting(false)
     }
@@ -44,27 +44,27 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
         <DialogHeader>
           <DialogTitle className="text-xl">Confirmar Eliminación</DialogTitle>
           <DialogDescription className="text-surface-300">
-            ¿Estás seguro de que deseas eliminar este logro? Esta acción no se puede deshacer.
+            ¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
           <div className="flex items-center gap-3 p-4 bg-surface-700/50 rounded-lg mb-4">
             <div className="w-12 h-12 rounded bg-surface-600 flex items-center justify-center overflow-hidden">
-              {achievement.icon ? (
-                <img src={`/img/${achievement.icon}`} alt={achievement.name} className="w-full h-full object-cover" />
+              {team.icon ? (
+                <img src={`/img/${team.icon}`} alt={team.name} className="w-full h-full object-cover" />
               ) : (
-                <Award className="h-6 w-6 text-surface-500" />
+                <Users className="h-6 w-6 text-surface-500" />
               )}
             </div>
             <div>
-              <h4 className="font-medium text-surface-50">{achievement.name}</h4>
-              <p className="text-sm text-surface-300">ID: {achievement.id}</p>
+              <h4 className="font-medium text-surface-50">{team.name}</h4>
+              <p className="text-sm text-surface-300">ID: {team.id}</p>
             </div>
           </div>
 
           <p className="text-warning-500 text-sm">
-            Nota: Eliminar este logro afectará a todos los usuarios que lo hayan desbloqueado.
+            Nota: Eliminar este equipo afectará a todos sus miembros y sus registros de puntuación.
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
                 Eliminando...
               </>
             ) : (
-              "Eliminar Logro"
+              "Eliminar Equipo"
             )}
           </Button>
         </DialogFooter>

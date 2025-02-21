@@ -12,7 +12,6 @@ export function useRotomRequest<T>(
   const fetchData = useCallback(async () => {
     try {
       const response = await apiFunction(...params)
-      console.log('useRotomRequest =>', response)
       if (response.error) {
         setError(response.error)
       } else {

@@ -15,27 +15,20 @@ import { EventDeleteDialog } from "./EventDeleteDialog"
 export function EventsTab() {
   const { events, isLoading, error, refetch } = useGetEvents()
   const [searchTerm, setSearchTerm] = useState("")
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>([])
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [isOpenCreateDialog, setIsOpenCreateDialog] = useState(false)
   const [isOpenEditDialog, setIsOpenEditDialog] = useState(false)
   const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false)
 
-  useEffect(() => {
-    if (events) {
-      if (searchTerm) {
-        setFilteredEvents(
-          events.filter(
-            (event) =>
-              event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              event.description!.toLowerCase().includes(searchTerm.toLowerCase()),
-          ),
+  const filteredEvents = events
+    ? searchTerm
+      ? events.filter(
+          (event) =>
+            event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            event.description?.toLowerCase().includes(searchTerm.toLowerCase())
         )
-      } else {
-        setFilteredEvents(events)
-      }
-    }
-  }, [events, searchTerm])
+      : events
+    : []
 
   const handleCreateSuccess = () => {
     setIsOpenCreateDialog(false)
