@@ -33,8 +33,25 @@ export class EventsService {
   ) {}
 
   async getEvents(): Promise<Event[]> {
-    return this.db.select().from(boffMediaEvents)
-      .orderBy(desc(boffMediaEvents.startDate));
+    return this.db.select({
+      id: boffMediaEvents.id,
+      parentId: boffMediaEvents.parentId,
+      title: boffMediaEvents.title,
+      description: boffMediaEvents.description,
+      game: boffMediaEvents.game,
+      gameName: boffMediaGames.title,
+      icon: boffMediaEvents.icon,
+      banner: boffMediaEvents.banner,
+      startDate: boffMediaEvents.startDate,
+      endDate: boffMediaEvents.endDate,
+      status: boffMediaEvents.status,
+      visibility: boffMediaEvents.visibility,
+      type: boffMediaEvents.type,
+      createdAt: boffMediaEvents.createdAt,
+      updatedAt: boffMediaEvents.updatedAt
+    })
+    .from(boffMediaEvents)
+    .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.game))
   }
 
   async getEvent(id: number): Promise<Event> {
@@ -43,7 +60,7 @@ export class EventsService {
       .where(eq(boffMediaEvents.id, id));
     return result[0];
   }
-
+  
   async createEvent(createEventDto: CreateEventDto): Promise<Event> {
     const result = await this.db.insert(boffMediaEvents)
       .values({
@@ -52,13 +69,34 @@ export class EventsService {
         game: createEventDto.gameId,
         startDate: new Date(createEventDto.startDate),
         endDate: new Date(createEventDto.endDate),
+        visibility: createEventDto.visibility,
         icon: createEventDto.icon,
+        banner: createEventDto.banner,
         type: createEventDto.type,
         createdAt: new Date(),
         updatedAt: new Date()
       } as Event);
     
     return this.getEvent(result[0].insertId);
+  }
+
+  async updateEvent(id: number, createEventDto: CreateEventDto): Promise<Event> {
+    await this.db.update(boffMediaEvents)
+      .set({
+        title: createEventDto.title,
+        description: createEventDto.description,
+        game: createEventDto.gameId,
+        startDate: new Date(createEventDto.startDate),
+        endDate: new Date(createEventDto.endDate),
+        visibility: createEventDto.visibility,
+        icon: createEventDto.icon,
+        banner: createEventDto.banner,
+        type: createEventDto.type,
+        updatedAt: new Date()
+      } as Event)
+      .where(eq(boffMediaEvents.id, id));
+    
+    return this.getEvent(id);
   }
 
   async getGames(): Promise<Game[]> {
@@ -110,6 +148,7 @@ export class EventsService {
       maxProgress: boffMediaAchievements.maxProgress,
       points: boffMediaAchievements.points,
       eventId: boffMediaAchievements.eventId,
+      eventName: boffMediaEvents.title,
       category: boffMediaAchievements.category,
       rarity: boffMediaAchievements.rarity,
       hidden: boffMediaAchievements.hidden,
@@ -119,6 +158,31 @@ export class EventsService {
       .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
   }
 
+  async getAchievement(id: number): Promise<Achievement> {
+    const result = await this.db.select()
+      .from(boffMediaAchievements)
+      .where(eq(boffMediaAchievements.id, id));
+    return result[0];
+  }
+
+  async updateAchievement(eventId: number, id: number, createAchievementDto: CreateAchievementDto): Promise<Achievement> {
+    await this.db.update(boffMediaAchievements)
+      .set({
+        name: createAchievementDto.name,
+        description: createAchievementDto.description,
+        icon: createAchievementDto.icon,
+        maxProgress: createAchievementDto.maxProgress || 1,
+        points: createAchievementDto.points,
+        category: createAchievementDto.category,
+        rarity: createAchievementDto.rarity,
+        order: createAchievementDto.order || 0,
+        updatedAt: new Date()
+      } as Achievement)
+      .where(eq(boffMediaAchievements.id, id));
+    
+    return this.getAchievement(id);
+  }
+    
   async getEventAchievements(eventId: number): Promise<Achievement[]> {
     return this.db.select()
       .from(boffMediaAchievements)
@@ -251,6 +315,36 @@ export class EventsService {
     } as EventParticipant);
   
     return this.getTeam(teamId);
+  }
+
+  async updateTeam(eventId: number, teamId: number, createTeamDto: CreateTeamDto): Promise<EventTeam> {
+    await this.db.update(boffMediaEventTeams)
+      .set({
+        name: createTeamDto.name,
+        tag: createTeamDto.tag,
+        icon: createTeamDto.icon,
+        updatedAt: new Date()
+      } as EventTeam)
+      .where(eq(boffMediaEventTeams.id, teamId));
+    
+    return this.getTeam(teamId);
+  }
+
+  async getTeams(): Promise<EventTeam[]> {
+    return this.db.select({
+      id: boffMediaEventTeams.id,
+      eventId: boffMediaEventTeams.eventId,
+      eventName: boffMediaEvents.title,
+      name: boffMediaEventTeams.name,
+      tag: boffMediaEventTeams.tag,
+      icon: boffMediaEventTeams.icon,
+      totalScore: boffMediaEventTeams.totalScore,
+      status: boffMediaEventTeams.status,
+      createdAt: boffMediaEventTeams.createdAt,
+      updatedAt: boffMediaEventTeams.updatedAt
+    })
+    .from(boffMediaEventTeams)
+    .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaEventTeams.eventId));
   }
 
   async getEventTeams(eventId: number): Promise<EventTeam[]> {

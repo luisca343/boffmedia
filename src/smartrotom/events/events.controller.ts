@@ -64,6 +64,21 @@ export class EventsController {
     }
   }
 
+  @Patch('/event/:id')
+  @ApiOperation({ summary: 'Update event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Event updated successfully.' })
+  async updateEvent(@Param('id') id: number, @Body() createEventDto: CreateEventDto) {
+    const action = 'update event';
+    try {
+      this.responseService.logRequest(action, { id, ...createEventDto });
+      const result = await this.eventsService.updateEvent(id, createEventDto);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Event updated successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { id, ...createEventDto });
+    }
+  }
+
   @Get('/games')
   @ApiOperation({ summary: 'Get all games' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Games retrieved successfully.' })
@@ -144,6 +159,40 @@ export class EventsController {
     }
   }
 
+  @Patch(':eventId/teams/:teamId')
+  @ApiOperation({ summary: 'Update team' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Team updated successfully.' })
+  async updateTeam(
+    @Param('eventId') eventId: number,
+    @Param('teamId') teamId: number,
+    @Body() createTeamDto: CreateTeamDto
+  ) {
+    const action = 'update team';
+    try {
+      this.responseService.logRequest(action, { eventId, teamId, ...createTeamDto });
+      const result = await this.eventsService.updateTeam(eventId, teamId, createTeamDto);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Team updated successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { eventId, teamId, ...createTeamDto });
+    }
+  }
+
+  @Get('/teams')
+  @ApiOperation({ summary: 'Get all teams' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Teams retrieved successfully.' })
+  async getTeams() {
+    const action = 'get teams';
+    try {
+      this.responseService.logRequest(action, {});
+      const result = await this.eventsService.getTeams();
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Teams retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error);
+    }
+  }
+
   @Get(':eventId/teams')
   @ApiOperation({ summary: 'Get all teams in an event' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Teams retrieved successfully.' })
@@ -196,6 +245,8 @@ export class EventsController {
       this.responseService.handleError(action, error, { eventId, teamId, userId });
     }
   }
+
+  // Achievement Management
   @Get('/achievements')
   @ApiOperation({ summary: 'Get all achievements' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Achievements retrieved successfully.' })
@@ -211,7 +262,6 @@ export class EventsController {
     }
   }
 
-  // Achievement Management
   @Post(':eventId/achievements')
   @ApiOperation({ summary: 'Create a new achievement for an event' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Achievement created successfully.' })
@@ -227,6 +277,25 @@ export class EventsController {
       return this.responseService.createSuccessResponse('Achievement created successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error, { eventId, ...createAchievementDto });
+    }
+  }
+
+  @Patch(':eventId/achievements/:achievementId')
+  @ApiOperation({ summary: 'Update achievement' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Achievement updated successfully.' })
+  async updateAchievement(
+    @Param('eventId') eventId: number,
+    @Param('achievementId') achievementId: number,
+    @Body() createAchievementDto: CreateAchievementDto
+  ) {
+    const action = 'update achievement';
+    try {
+      this.responseService.logRequest(action, { eventId, achievementId, ...createAchievementDto });
+      const result = await this.eventsService.updateAchievement(eventId, achievementId, createAchievementDto);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Achievement updated successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { eventId, achievementId, ...createAchievementDto });
     }
   }
 

@@ -35,6 +35,7 @@ export type Game = typeof boffMediaGames.$inferSelect;
 
 export const boffMediaEvents = mysqlTable("boffmedia_events", {
   id: int("id").primaryKey().autoincrement(),
+  parentId: int("parent_id").references(() => boffMediaEvents.id, { onDelete: "cascade", onUpdate: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
   game: int("game").references(() => boffMediaGames.id, { onDelete: "cascade", onUpdate: "cascade" }),
   description: text("description"),
