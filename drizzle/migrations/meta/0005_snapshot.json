@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "8a7de0a7-c29f-4c57-8bcb-45f555bb080b",
+  "id": "413bd65a-eed9-4297-9276-4d404bb632f1",
   "prevId": "1f2508d5-9754-4a3a-9e3a-d69587918d54",
   "tables": {
     "boffmedia_roles": {
@@ -252,6 +252,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "hidden": {
+          "name": "hidden",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
         "order": {
           "name": "order",
           "type": "int",
@@ -334,6 +342,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('registered','confirmed','declined','removed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'registered'"
         },
         "comment": {
           "name": "comment",
@@ -544,6 +560,14 @@
           "autoincrement": false,
           "default": 0
         },
+        "status": {
+          "name": "status",
+          "type": "enum('active','disqualified','withdrew')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'active'"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -605,6 +629,13 @@
           "notNull": true,
           "autoincrement": true
         },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "title": {
           "name": "title",
           "type": "varchar(255)",
@@ -654,6 +685,22 @@
           "notNull": true,
           "autoincrement": false
         },
+        "status": {
+          "name": "status",
+          "type": "enum('upcoming','active','completed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'upcoming'"
+        },
+        "visibility": {
+          "name": "visibility",
+          "type": "enum('public','private')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'private'"
+        },
         "type": {
           "name": "type",
           "type": "enum('event','server')",
@@ -688,6 +735,19 @@
         }
       },
       "foreignKeys": {
+        "boffmedia_events_parent_id_boffmedia_events_id_fk": {
+          "name": "boffmedia_events_parent_id_boffmedia_events_id_fk",
+          "tableFrom": "boffmedia_events",
+          "tableTo": "boffmedia_events",
+          "columnsFrom": [
+            "parent_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
         "boffmedia_events_game_boffmedia_games_id_fk": {
           "name": "boffmedia_events_game_boffmedia_games_id_fk",
           "tableFrom": "boffmedia_events",
@@ -765,273 +825,6 @@
       "compositePrimaryKeys": {
         "boffmedia_games_id": {
           "name": "boffmedia_games_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {}
-    },
-    "boffmedia_points_config": {
-      "name": "boffmedia_points_config",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "event_id": {
-          "name": "event_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "category": {
-          "name": "category",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "multiplier": {
-          "name": "multiplier",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 100
-        },
-        "rules": {
-          "name": "rules",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()"
-        }
-      },
-      "indexes": {
-        "pc_event_idx": {
-          "name": "pc_event_idx",
-          "columns": [
-            "event_id"
-          ],
-          "isUnique": false
-        },
-        "pc_category_idx": {
-          "name": "pc_category_idx",
-          "columns": [
-            "category"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "pc_event_fk": {
-          "name": "pc_event_fk",
-          "tableFrom": "boffmedia_points_config",
-          "tableTo": "boffmedia_events",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "boffmedia_points_config_id": {
-          "name": "boffmedia_points_config_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {}
-    },
-    "boffmedia_points_history": {
-      "name": "boffmedia_points_history",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "event_id": {
-          "name": "event_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "team_id": {
-          "name": "team_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "achievement_id": {
-          "name": "achievement_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "points_awarded": {
-          "name": "points_awarded",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "reason": {
-          "name": "reason",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "metadata": {
-          "name": "metadata",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "awarded_at": {
-          "name": "awarded_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP()"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP()"
-        }
-      },
-      "indexes": {
-        "ph_user_idx": {
-          "name": "ph_user_idx",
-          "columns": [
-            "user_id"
-          ],
-          "isUnique": false
-        },
-        "ph_event_idx": {
-          "name": "ph_event_idx",
-          "columns": [
-            "event_id"
-          ],
-          "isUnique": false
-        },
-        "ph_team_idx": {
-          "name": "ph_team_idx",
-          "columns": [
-            "team_id"
-          ],
-          "isUnique": false
-        },
-        "ph_achievement_idx": {
-          "name": "ph_achievement_idx",
-          "columns": [
-            "achievement_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "ph_user_fk": {
-          "name": "ph_user_fk",
-          "tableFrom": "boffmedia_points_history",
-          "tableTo": "boffmedia_users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "ph_event_fk": {
-          "name": "ph_event_fk",
-          "tableFrom": "boffmedia_points_history",
-          "tableTo": "boffmedia_events",
-          "columnsFrom": [
-            "event_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
-        },
-        "ph_team_fk": {
-          "name": "ph_team_fk",
-          "tableFrom": "boffmedia_points_history",
-          "tableTo": "boffmedia_event_teams",
-          "columnsFrom": [
-            "team_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "cascade"
-        },
-        "ph_achievement_fk": {
-          "name": "ph_achievement_fk",
-          "tableFrom": "boffmedia_points_history",
-          "tableTo": "boffmedia_achievements",
-          "columnsFrom": [
-            "achievement_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "cascade"
-        }
-      },
-      "compositePrimaryKeys": {
-        "boffmedia_points_history_id": {
-          "name": "boffmedia_points_history_id",
           "columns": [
             "id"
           ]
