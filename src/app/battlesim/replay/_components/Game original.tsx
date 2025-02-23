@@ -20,41 +20,41 @@ import { ReplayControls } from "./ReplayControls";
 import useViewportWidth from "@/services/useViewPortWidth";
 import { ASPECT_RATIO } from "../../_utils/viewUtils";
 import { create } from "zustand";
-import { useGameState } from "../../_hooks/useGameState";
+
+// Battle Store Types and Implementation
+interface BattleStore {
+  battle: Battle;
+  setBattle: (battle: Battle) => void;
+}
+
+const useBattleStore = create<BattleStore>((set) => ({
+  battle: new Battle(new Generations(Dex as any)),
+  setBattle: (battle: Battle) => set({ battle }),
+}));
+
+// Custom hooks for battle state management
+const useBattle = () => useBattleStore((state) => state.battle);
+const useSetBattle = () => useBattleStore((state) => state.setBattle);
 
 // Game Component
 export function Game({battleName = 'medalla_doku', replayData}: {battleName?: string, replayData?: any}) {
-  const { 
-    battle, 
-    setBattle, 
-    battleLog,
-    currentAction,
-    scene,
-    htmlLog,
-    isPlaying,
-    messageBar,
-    turnInput,
-    newTurn,
-    settingTurn,
-    lastTurn,
-    simulatedAttack,
-    logVisible,
-    pov,
-    setBattleLog,
-    setCurrentAction,
-    setScene,
-    setHtmlLog: setLog,
-    setIsPlaying,
-    setMessageBar,
-    setTurnInput,
-    setNewTurn,
-    setSettingTurn,
-    setLastTurn,
-    setSimulatedAttack,
-    setLogVisible,
-    setPov, 
-  } = useGameState();
-
+  // Core state
+  const [battleLog, setBattleLog] = useState<string | null>(null);
+  const [currentAction, setCurrentAction] = useState<number>(0);
+  const [scene, setScene] = useState<Scene | null>(null);
+  const [htmlLog, setLog] = useState<string[]>([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [messageBar, setMessageBar] = useState<string[]>([]);
+  
+  // UI state
+  const [turnInput, setTurnInput] = useState<number>(0);
+  const [newTurn, setNewTurn] = useState<number>(0);
+  const [settingTurn, setSettingTurn] = useState(false);
+  const [lastTurn, setLastTurn] = useState<number>(0);
+  const [simulatedAttack, setSimulatedAttack] = useState<string>('contactattack');
+  const [logVisible, setLogVisible] = useState(false);
+  const [pov, setPov] = useState<0 | 1>(0);
+  
   // Refs
   const battleCanvasRef = useRef<any>(null);
   const logRef = useRef<HTMLDivElement>(null);
@@ -62,6 +62,10 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   
   // Canvas width
   const [, canvasWidth] = useViewportWidth();
+  
+  // Battle state
+  const battle = useBattle();
+  const setBattle = useSetBattle();
   
   // Initialize formatter
   const formatter = new LogFormatter('p1', battle);
