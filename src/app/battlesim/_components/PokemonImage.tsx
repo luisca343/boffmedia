@@ -33,7 +33,7 @@ export function PokemonImage(
     if (side === 'p2' && battleType === 'raid') {
         multiplier = 2.5;
     } else {
-        multiplier = side === 'p2' ? .6 : 1.3;
+        multiplier = side === 'p2' ? .65 : 1.3;
     }
 
 
@@ -74,7 +74,7 @@ export function PokemonImage(
             </div>
             <div className="pokemon-container" style={{
                 position: 'absolute',
-                zIndex: 1
+                zIndex: 100
             }}>
                 <img
                     className={className} src={url} width={w} height={h}

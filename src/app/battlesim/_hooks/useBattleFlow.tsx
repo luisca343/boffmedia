@@ -2,18 +2,10 @@ import { useEffect } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
-import { ArgType, BattleArgsKWArgType, PokemonIdent, Protocol } from "@pkmn/protocol";
+import { ArgType, BattleArgsKWArgsTypes, BattleArgsKWArgType, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
 import { Scene } from "../_components/Scene";
-import { 
-  switchAction, 
-  turnAction, 
-  moveAction, 
-  damageAction, 
-  healAction, 
-  faintAction, 
-  missAction 
-} from "../_utils/battleActions";
+import { switchAction, faintAction } from "../_utils/battleActions";
 import { useBattleActions } from './useBattleActions';
 
 export function useBattleFlow(
@@ -28,9 +20,9 @@ export function useBattleFlow(
   settingTurn: boolean,
   pov: 0 | 1,
   setCurrentAction: (action: number) => void,
-  setHtmlLog: (log: string[]) => void,
+  setHtmlLog: React.Dispatch<React.SetStateAction<string[]>>,
   setIsPlaying: (playing: boolean) => void,
-  setMessageBar: (messages: string[]) => void,
+  setMessageBar: React.Dispatch<React.SetStateAction<string[]>>,
   setSettingTurn: (setting: boolean) => void
 ) {
   const battleActions = useBattleActions(battle, scene, pov);
@@ -113,7 +105,7 @@ export function useBattleFlow(
     return new Promise<void>(async (resolve) => {
       try {
         const html = formatter.formatHTML(args, kwArgs);
-        const params = await getParams(args, kwArgs);
+        const params = await getParams(args, kwArgs as BattleArgsKWArgsTypes);
         
         currentBattle.add(args, kwArgs);
         updateBattleLog(html, currentBattle, args[0]);
@@ -187,7 +179,7 @@ export function useBattleFlow(
     }
   }
 
-  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgType): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgType, data?: any }> {
+  async function getParams(args: ArgType, kwArgs: BattleArgsKWArgsTypes): Promise<{ args: ArgType, kwArgs: BattleArgsKWArgsTypes, data?: any }> {
     switch (args[0]) {
       case 'switch':
         try {
@@ -216,6 +208,7 @@ export function useBattleFlow(
       const damage = battle.damagePercentage(args[1] as PokemonIdent, args[2] as PokemonHPStatus);
       return { args, kwArgs, data: { damage } };
       case '-heal':
+        
       const fromEffect = kwArgs.from && battle.get('conditions', kwArgs.from);
       const revival = fromEffect?.id === 'revivalblessing';
       const poke = battle.getPokemon(args[1], revival)!;

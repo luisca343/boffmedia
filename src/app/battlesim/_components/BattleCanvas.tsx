@@ -92,7 +92,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 key={position}
                 battle={battle}
                 pokemon={pokemon[position]}
-                ref={el => pokemonRefs.current[position] = el as PokemonRefType}
+                ref={(el: PokemonRefType | null) => { if (el) pokemonRefs.current[position] = el; }}
                 side={battle.p1}
                 position={position}
                 />
@@ -107,7 +107,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                     key={position}
                     battle={battle}
                     pokemon={pokemon[position]}
-                    ref={el => pokemonRefs.current[position] = el as PokemonRefType}
+                    ref={(el: PokemonRefType | null) => { if (el) pokemonRefs.current[position] = el; }}
                     side={battle.p2}
                     position={position}
                 />
