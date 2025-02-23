@@ -27,7 +27,7 @@ export function MovingSection() {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.6 }}
-      className="text-center"
+      className="text-center  text-shadow-border1"
     >
       <h2 className="text-3xl font-bold mb-6">¡Únete a la Aventura Hoy!</h2>
       <Button 

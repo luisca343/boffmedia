@@ -73,17 +73,17 @@
     --accent-950: 74 4 78;
 
     
-    --surface-50: 250 250 250;
-    --surface-100: 241 244 245;
-    --surface-200: 228 228 231;
-    --surface-300: 212 212 216;
-    --surface-400: 161 161 122;
-    --surface-500: 113 113 122;
-    --surface-600: 82 82 90;
-    --surface-700: 63 63 70;
-    --surface-800: 39 39 42;
-    --surface-900: 24 24 27;
-    --surface-950: 10 10 11;
+    --surface-50: 250 251 252;   /* #FAFBFC - Clean white */
+    --surface-100: 240 242 245;  /* #F0F2F5 - Ice gray */
+    --surface-200: 226 230 234;  /* #E2E6EA - Cool light */
+    --surface-300: 203 209 216;  /* #CBD1D8 - Slate accent */
+    --surface-400: 158 166 176;  /* #9EA6B0 - Balanced gray */
+    --surface-500: 108 117 128;  /* #6C7580 - Neutral slate */
+    --surface-600: 75 84 95;     /* #4B545F - Deep slate */
+    --surface-700: 52 61 72;     /* #343D48 - Rich slate */
+    --surface-800: 33 41 51;     /* #212933 - Deep background */
+    --surface-900: 22 28 36;     /* #161C24 - Darker slate */
+    --surface-950: 13 17 23;     /* #0D1117 - Deepest background */
     
     /*
     --surface-50: 248 250 252;

@@ -1,13 +1,15 @@
-import Image from "next/image";
+import Image from "next/image"
 
 interface BackgroundDecorationsProps {
-  includeGradient?: boolean;
+  includeGradient?: boolean
 }
 
 export function BackgroundDecorations({ includeGradient = true }: BackgroundDecorationsProps) {
   return (
-    <div className={`-z-10 absolute inset-0 overflow-hidden pointer-events-none ${includeGradient ? 'bg-gradient-to-b from-blue-400 via-blue-500 to-blue-600' : ''}`}>
-      <div className="absolute inset-0 overflow-hidden opacity-20">
+    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
+      {includeGradient && <div className="absolute inset-0 bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500" />}
+      {!includeGradient && <div className="absolute inset-0 bg-[url(/img/w-bg.png)] bg-cover bg-center " />}
+      <div className="absolute inset-0 overflow-hidden opacity-60">
         <Image
           src="/img/Wingull_silhouette.png"
           alt="Wingull silhouette"
@@ -24,5 +26,6 @@ export function BackgroundDecorations({ includeGradient = true }: BackgroundDeco
         />
       </div>
     </div>
-  );
+  )
 }
+

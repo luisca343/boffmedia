@@ -30,7 +30,7 @@ export default async function RootLayout({
       <OptimizedFicusNav />
       <section className="border-solid no-scrollbar flex-1 pt-16 bg-surface-900">
         <NextIntlClientProvider messages={messages}>
-          <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)]">
+          <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)] [&>*:not(.main)]:py-8">
             {children}
           </section>
           <BoffFooter />
