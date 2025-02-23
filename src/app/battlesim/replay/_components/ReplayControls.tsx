@@ -10,7 +10,7 @@ export type ReplayControlsProps = {
     setIsPlaying: (isPlaying: boolean) => void;
     setCurrentTurn: (turn?: number) => void;
     pov: number;
-    setPov: (pov: number) => void;
+    setPov: React.Dispatch<React.SetStateAction<0 | 1>>;
     simulateAttack: () => void;
     simulatedAttack: string;
     setSimulatedAttack: (simulatedAttack: string) => void;
