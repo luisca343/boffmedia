@@ -10,7 +10,7 @@ import {
   missAction 
 } from "../_utils/battleActions";
 
-export function useBattleActions(battle: Battle, scene: Scene | null) {
+export function useBattleActions(battle: Battle, scene: Scene | null, pov: 0 | 1) {
   const handleSwitchAction = async (args: ArgType): Promise<number> => {
     const pokemonIdent = getRelativeIdent(args[1]);
     
