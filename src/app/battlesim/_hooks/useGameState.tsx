@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Scene } from "../_components/Scene";
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { create } from 'zustand';
 import { Protocol } from '@pkmn/protocol';
+import { Scene } from '../_utils/Scene';
 
 // Battle Store Types and Implementation
 interface BattleStore {

@@ -4,7 +4,7 @@ import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
 import { ArgType, BattleArgsKWArgsTypes, BattleArgsKWArgType, PokemonDetails, PokemonHPStatus, PokemonIdent, Protocol } from "@pkmn/protocol";
 import { LogFormatter } from '@pkmn/view';
-import { Scene } from "../_components/Scene";
+import { Scene } from "../_utils/Scene";
 import { switchAction, faintAction } from "../_utils/battleActions";
 import { useBattleActions } from './useBattleActions';
 

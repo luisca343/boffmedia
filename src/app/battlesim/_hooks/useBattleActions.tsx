@@ -1,5 +1,5 @@
 import { Battle } from "@pkmn/client";
-import { Scene } from "../_components/Scene";
+import { Scene } from "../_utils/Scene";
 import { ArgType, Num, PokemonIdent } from "@pkmn/protocol";
 import { 
   turnAction, 

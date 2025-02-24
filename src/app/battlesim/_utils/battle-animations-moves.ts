@@ -9,7 +9,8 @@
  * @license CC0-1.0
  */
 
-import { PokemonSprite, Scene} from '../_components/Scene'
+import { PokemonSprite } from './PokemonSprite';
+import { Scene} from './Scene'
 import { getImageSize, getScaleMultiplier } from './viewUtils';
 
 

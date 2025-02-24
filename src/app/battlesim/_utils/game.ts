@@ -1,4 +1,3 @@
-import { Sprites } from "@pkmn/img";
 import { Protocol } from "@pkmn/protocol";
 import { GenerationNum, Generations } from '@pkmn/data';
 import { Dex, PRNG, TeamValidator, Teams as DTeams, BattleStreams, RandomPlayerAI } from '@pkmn/sim';
