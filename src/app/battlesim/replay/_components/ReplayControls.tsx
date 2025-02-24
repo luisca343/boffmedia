@@ -29,6 +29,16 @@ export function ReplayControls({
 
     if(canvasWidth === 0) return null;
 
+    function previousTurn() {
+        const newTurn = Math.max(1, battle.turn - 1);
+        setCurrentTurn(newTurn);
+    }
+    
+    function nextTurn() {
+        const newTurn = Math.min(lastTurn, battle.turn + 1);
+        setCurrentTurn(newTurn);
+    }
+
     return(
         <div className="flex justify-between p-2 bg-surface-800 space-x-2" style={{ width: `${canvasWidth + (logVisible ? 400 : 0)}px` }}>
             <div className="flex space-x-2">
@@ -40,10 +50,10 @@ export function ReplayControls({
                 </ReplayControlsButton>
             </div>
             <div className="flex space-x-2">
-                <ReplayControlsButton onClick={() => setCurrentTurn(battle.turn - 1)} label="Previous Turn">
+                <ReplayControlsButton onClick={previousTurn} label="Previous Turn">
                     <ChevronLeftIcon className="h-5 w-5" />
                 </ReplayControlsButton>
-                <ReplayControlsButton onClick={() => setCurrentTurn(battle.turn + 1)} label="Next Turn">
+                <ReplayControlsButton onClick={nextTurn} label="Next Turn">
                     <ChevronRightIcon className="h-5 w-5" />
                 </ReplayControlsButton>
             </div>
