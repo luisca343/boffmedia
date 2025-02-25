@@ -11,6 +11,8 @@ import { Hazard } from "./Hazard";
 import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
 import BattlePreview from "./BattlePreview";
+import countActions from "../_utils/battleUtils";
+import BattleEndScreen from "./BattleEndScreen";
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -33,8 +35,9 @@ function getParticipantName(name:string){
     return name;
 }
 
-export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOverlay, setBattleStarted, setIsPlaying }: 
-        { battle: Battle, pov: 0 | 1 | any, messageBar?: string[], showPreviewOverlay: boolean, setBattleStarted: (started: boolean) => void, setIsPlaying: (playing: boolean) => void }, ref: React.Ref<BattleCanvasRefProps>) => {
+export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOverlay, setBattleStarted, setIsPlaying, currentAction, battleLog }: 
+        { battle: Battle, pov: 0 | 1 | any, messageBar?: string[], showPreviewOverlay: boolean, setBattleStarted: (started: boolean) => void, setIsPlaying: (playing: boolean) => void, currentAction: number, battleLog: string | null
+         }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
 
@@ -54,7 +57,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOv
                   
                   {/* Preview overlay only shows when needed */}
                   {showPreviewOverlay && (
-                    <div className="absolute inset-0 z-10">
+                    <div className="absolute inset-0">
                       <BattlePreview 
                         battle={battle} 
                         pov={pov}
@@ -65,6 +68,22 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOv
                       />
                     </div>
                   )}
+
+                  {currentAction === countActions(battleLog) && (
+                    <div className="absolute inset-0">
+                      <BattleEndScreen 
+                        battle={battle} 
+                        pov={pov}
+                        onRestart={
+                            () => {
+                                setBattleStarted(false);
+                                setIsPlaying(false);
+                            }
+                        }
+                      />
+                    </div>
+                  )}
+                  
                   
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
             <div className="m-1 w-1/3 flex items-center h-fit">

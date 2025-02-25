@@ -32,9 +32,6 @@ export function useBattleFlow(
 
   // Main battle flow control
   useEffect(() => {
-    console.log('===== Battle flow effect =====');
-    console.log('isPlaying:', isPlaying);
-    console.log('currentAction:', currentAction);
     if(isPlaying && currentAction !== -1) {
       const lines = battleLog ? battleLog.split('\n') : [];
       if(lines.length === 0 || currentAction >= lines.length) {
@@ -52,12 +49,6 @@ export function useBattleFlow(
   }, [currentAction, isPlaying]);
 
   const handleTurnChange = () => {
-    console.log('----- Handling turn change -----');
-    console.log('newTurn:', newTurn);
-    console.log('lastTurn:', lastTurn);
-    console.log('settingTurn:', settingTurn);
-    console.log('isPlaying:', isPlaying);
-    console.log('currentAction:', currentAction);
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
     
@@ -65,8 +56,6 @@ export function useBattleFlow(
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
 
-    console.log('--- changeTurn:', changeTurn);
-    
     if(changeTurn === 0) {
       resetBattle(currBattle, changeTurn);
       return;
@@ -211,6 +200,11 @@ export function useBattleFlow(
           break;
         case '-miss':
           timeout = await battleActions.handleMissAction(args);
+          break;
+        case 'win':
+          // Handle win action - store the winner in battle state
+          currentBattle.winner = args[1] as string;
+          timeout = 0;
           break;
         case 'inactive': case 't:': case '-resisted': case '':
         case 'join': case 'gametype': case 'player': case 'teamsize': case 'gen': case 'tier':

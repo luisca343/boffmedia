@@ -1,4 +1,4 @@
-import { PokemonIdent } from "@pkmn/protocol";
+import { Battle } from "@pkmn/client";
 
 /**
  * Position data for scene elements
@@ -50,4 +50,12 @@ export interface ReplayData {
   replay: string
   winner: number
   createdAt: string
+}
+
+
+// Extend the Battle type to include winner property
+declare module "@pkmn/client" {
+  interface Battle {
+    winner?: string;
+  }
 }

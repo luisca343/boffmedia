@@ -136,6 +136,8 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
         showPreviewOverlay={showPreviewOverlay}
         setBattleStarted={setBattleStarted}
         setIsPlaying={setIsPlaying}
+        currentAction={currentAction}
+        battleLog={battleLog}
       />
 
       {logVisible && (
