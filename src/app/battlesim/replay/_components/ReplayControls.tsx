@@ -30,7 +30,7 @@ export function ReplayControls({
     if(canvasWidth === 0) return null;
 
     function previousTurn() {
-        const newTurn = Math.max(1, battle.turn - 1);
+        const newTurn = Math.max(0, battle.turn - 1);
         setCurrentTurn(newTurn);
     }
     
@@ -68,6 +68,7 @@ export function ReplayControls({
                     <BoltIcon className="h-5 w-5" />
                 </ReplayControlsButton>
                 <Input
+                    variant={'dark'}
                     className="w-32 border border-surface-900"
                     type="string"
                     value={simulatedAttack}
@@ -81,6 +82,7 @@ export function ReplayControls({
                     <ArrowRightIcon className="h-5 w-5" />
                 </ReplayControlsButton>
                 <Input
+                    variant={'dark'}
                     className="w-20 border border-surface-900"
                     type="number"
                     value={turnInput}

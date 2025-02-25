@@ -40,3 +40,14 @@ export interface AnimationProps {
   startingPosition: StartingPosition;
   [key: string]: any;
 }
+
+
+export interface ReplayData {
+  side1: string
+  side2: string
+  team1: string
+  team2: string
+  replay: string
+  winner: number
+  createdAt: string
+}

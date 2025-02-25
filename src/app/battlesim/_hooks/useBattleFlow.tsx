@@ -32,6 +32,9 @@ export function useBattleFlow(
 
   // Main battle flow control
   useEffect(() => {
+    console.log('===== Battle flow effect =====');
+    console.log('isPlaying:', isPlaying);
+    console.log('currentAction:', currentAction);
     if(isPlaying && currentAction !== -1) {
       const lines = battleLog ? battleLog.split('\n') : [];
       if(lines.length === 0 || currentAction >= lines.length) {
@@ -49,12 +52,20 @@ export function useBattleFlow(
   }, [currentAction, isPlaying]);
 
   const handleTurnChange = () => {
+    console.log('----- Handling turn change -----');
+    console.log('newTurn:', newTurn);
+    console.log('lastTurn:', lastTurn);
+    console.log('settingTurn:', settingTurn);
+    console.log('isPlaying:', isPlaying);
+    console.log('currentAction:', currentAction);
     const lines = battleLog ? battleLog.split('\n') : [];
     const currBattle = new Battle(new Generations(Dex as any));
     
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
+
+    console.log('--- changeTurn:', changeTurn);
     
     if(changeTurn === 0) {
       resetBattle(currBattle, changeTurn);
@@ -83,11 +94,57 @@ export function useBattleFlow(
   };
 
   const resetBattle = (currBattle: Battle, turn: number) => {
-    currBattle.setTurn(turn);
+    // Create a completely new battle instance
+    const freshBattle = new Battle(new Generations(Dex as any));
+    
+    // Set turn to 0
+    freshBattle.setTurn(turn);
+    
+    // Reset HTML log and message bar
     setHtmlLog([]);
+    setMessageBar([]);
+    
+    // Stop playback
     setIsPlaying(false);
+    
+    // Reset current action to start
     setCurrentAction(0);
-    setBattle(currBattle);
+    
+    // Clear scene if available
+    if (scene) {
+      // Clear any active Pokemon on the field
+      Object.keys(freshBattle.sides).forEach(side => {
+        const activePokemon = freshBattle.sides[side]?.active[0];
+        if (activePokemon) {
+          const pokemonIdent = `${side}a:` as PokemonIdent;
+          scene.clearPokemonElement(pokemonIdent);
+        }
+      });
+    }
+    
+    // Process initial setup lines from the battle log
+    if (battleLog) {
+      const lines = battleLog.split('\n');
+      let startFound = false;
+      
+      for (const line of lines) {
+        // Only process lines until 'start' command is found
+        if (line.includes('|start')) {
+          startFound = true;
+          freshBattle.add(line);
+          break;
+        }
+        
+        // Add setup commands to the fresh battle
+        if (!startFound) {
+          freshBattle.add(line);
+        }
+      }
+    }
+    
+    // Update the battle state
+    setBattle(freshBattle);
+    setSettingTurn(false);
   };
 
   const updateBattleState = (currBattle: Battle, turn: number, actionIndex: number) => {

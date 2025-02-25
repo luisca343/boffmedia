@@ -5,6 +5,7 @@ import { Dex } from '@pkmn/sim';
 import { create } from 'zustand';
 import { Protocol } from '@pkmn/protocol';
 import { Scene } from '../_utils/Scene';
+import { ReplayData } from '../types';
 
 // Battle Store Types and Implementation
 interface BattleStore {
@@ -53,7 +54,7 @@ interface GameState {
     setPov: (pov: 0 | 1) => void;
 }
 
-export function useGameState(replayData?: any) {
+export function useGameState(replayData?: ReplayData) {
     // Battle state from store
     const battle = useBattleStore((state) => state.battle);
     const setBattle = useBattleStore((state) => state.setBattle);
@@ -77,11 +78,13 @@ export function useGameState(replayData?: any) {
     
     // Initialize battle data
     useEffect(() => {
+        
         if(replayData) {
             setBattleLog(replayData.replay);
             loadScene();
             return;
         }
+        
         
         fetch(`https://api.boffmedia.es/smartrotom/combates/booststera.txt`)
         .then(response => response.text())

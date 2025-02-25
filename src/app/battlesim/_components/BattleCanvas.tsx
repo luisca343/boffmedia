@@ -10,6 +10,7 @@ import { PokemonTeam } from "./PokemonTeam";
 import { Hazard } from "./Hazard";
 import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
+import BattlePreview from "./BattlePreview";
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -32,7 +33,8 @@ function getParticipantName(name:string){
     return name;
 }
 
-export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: Battle, pov: 0 | 1 | any, messageBar?: string[] }, ref) => {
+export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOverlay, setBattleStarted, setIsPlaying }: 
+        { battle: Battle, pov: 0 | 1 | any, messageBar?: string[], showPreviewOverlay: boolean, setBattleStarted: (started: boolean) => void, setIsPlaying: (playing: boolean) => void }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
 
@@ -49,6 +51,21 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
         <div  id="game" className="flex overflow-hidden relative select-none" style={{
             backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
+                  
+                  {/* Preview overlay only shows when needed */}
+                  {showPreviewOverlay && (
+                    <div className="absolute inset-0 z-10">
+                      <BattlePreview 
+                        battle={battle} 
+                        pov={pov}
+                        onStartBattle={() => {
+                          setBattleStarted(true);
+                          setIsPlaying(true);
+                        }}
+                      />
+                    </div>
+                  )}
+                  
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
             <div className="m-1 w-1/3 flex items-center h-fit">
                     <div className="w-fit h-8 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50">
