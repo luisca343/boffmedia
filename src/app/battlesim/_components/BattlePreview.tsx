@@ -38,13 +38,13 @@ export const BattlePreview = ({ battle, pov, onStartBattle }: {
       <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
       
       {/* Content Container */}
-      <div className="z-10 flex flex-col items-center justify-center w-full h-full">
+      <div className="flex flex-col items-center justify-center w-full h-full">
         {/* Main Content */}
-        <div className="flex items-center justify-between w-full px-8 mb-12">
+        <div className="flex items-center justify-between w-full px-8 mb-12 ">
           {/* Trainer 1 */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center z-[999]">
             <div 
-              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 rounded-full bg-surface-800 bg-opacity-50 border-4 border-primary-500 shadow-lg overflow-hidden"
+              className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 rounded-full bg-surface-800 bg-opacity-50 border-4 border-primary-500 shadow-lg overflow-hidden "
               style={{
                 backgroundImage: `url(/battlesim/trainers/${p1Name.toLowerCase()}.png)`,
                 backgroundSize: 'cover',
@@ -64,7 +64,7 @@ export const BattlePreview = ({ battle, pov, onStartBattle }: {
           </div>
           
           {/* VS Element */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center z-[999]">
             <div className="relative scale-up-down-animation">
               <div className="text-6xl md:text-7xl lg:text-8xl font-extrabold text-primary-500 text-shadow-lg transform -rotate-6">
                 VS
@@ -76,7 +76,7 @@ export const BattlePreview = ({ battle, pov, onStartBattle }: {
           </div>
           
           {/* Trainer 2 */}
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center z-[999]">
             <div 
               className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 mb-4 rounded-full bg-surface-800 bg-opacity-50 border-4 border-surface-500 shadow-lg overflow-hidden"
               style={{

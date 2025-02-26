@@ -69,7 +69,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOv
                     </div>
                   )}
 
-                  {currentAction === countActions(battleLog) && (
+                  {currentAction >= countActions(battleLog) - 1 && (
                     <div className="absolute inset-0">
                       <BattleEndScreen 
                         battle={battle} 

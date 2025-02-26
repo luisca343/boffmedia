@@ -81,7 +81,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
-    setCurrentAction, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
+    setCurrentAction, countActions, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
     setNewTurn, setSettingTurn, setLastTurn, setSimulatedAttack, setLogVisible, setPov, setCurrentTurn} = useGameState(loadedReplayData);
   
   const battleFlow = useBattleFlow(
@@ -126,7 +126,8 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
   
   return (
     <>
-    <div className="flex relative">
+    <div className="flex">
+    <div className="flex flex-col relative">
       {/* Battle Canvas is always rendered */}
       <BattleCanvas 
         battle={battle} 
@@ -140,44 +141,50 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
         battleLog={battleLog}
       />
 
-      {logVisible && (
-        <div 
-          className="w-[400px] bg-surface-800 p-2 overflow-y-auto text-surface-50" 
-          ref={logRef} 
-          style={{height:`${canvasWidth * ASPECT_RATIO}px`}}
-        >
-          {htmlLog.map((line, index) => (
-            <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
-          ))}
-        </div>
-      )}
+      <ReplayControls 
+        battle={battle}
+        isPlaying={isPlaying}
+        setIsPlaying={(playing) => {
+          // Mark battle as started if playing
+          if (playing) {
+            setBattleStarted(true);
+          }
+          setIsPlaying(playing);
+        }}
+        setCurrentTurn={(turn) => {
+          const battleStarted = turn! > 0;
+          setBattleStarted(battleStarted);
+          setCurrentTurn(turn);
+        }}
+        pov={pov}
+        setPov={setPov}
+        simulateAttack={simulateAttack}
+        simulatedAttack={simulatedAttack}
+        setSimulatedAttack={setSimulatedAttack}
+        turnInput={turnInput}
+        setTurnInput={setTurnInput}
+        lastTurn={lastTurn}
+        logVisible={logVisible}
+        setLogVisible={setLogVisible}
+        countActions={countActions}
+        setCurrentAction={setCurrentAction}
+      />
     </div>
-    <ReplayControls 
-      battle={battle}
-      isPlaying={isPlaying}
-      setIsPlaying={(playing) => {
-        // Mark battle as started if playing
-        if (playing) {
-          setBattleStarted(true);
-        }
-        setIsPlaying(playing);
-      }}
-      setCurrentTurn={(turn) => {
-        const battleStarted = turn! > 0;
-        setBattleStarted(battleStarted);
-        setCurrentTurn(turn);
-      }}
-      pov={pov}
-      setPov={setPov}
-      simulateAttack={simulateAttack}
-      simulatedAttack={simulatedAttack}
-      setSimulatedAttack={setSimulatedAttack}
-      turnInput={turnInput}
-      setTurnInput={setTurnInput}
-      lastTurn={lastTurn}
-      logVisible={logVisible}
-      setLogVisible={setLogVisible}
-    />
+    <div className="flex flex-col">
+      {logVisible && (
+          <div 
+            className="w-[400px] bg-surface-800 p-2 overflow-y-auto text-surface-50 h-full" 
+            ref={logRef} 
+            style={{height:`${canvasWidth * ASPECT_RATIO}px`}}
+          >
+            {htmlLog.map((line, index) => (
+              <div key={index} dangerouslySetInnerHTML={{ __html: line }} />
+            ))}
+          </div>
+        )}
+      <div className="bg-surface-800 flex-1" />
+      </div>
+    </div>
     {process.env.NODE_ENV === 'development' && (
       <div className="mt-4">
         <h3 className="text-lg font-bold mb-2">Debug Information</h3>

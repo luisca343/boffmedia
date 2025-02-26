@@ -55,15 +55,44 @@ export function useBattleFlow(
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
-
+  
     if(changeTurn === 0) {
       resetBattle(currBattle, changeTurn);
       return;
     }
     
     setHtmlLog([]);
+    
+    // If we're going to the state after the last turn (battle end)
+    if(changeTurn === lastTurn + 1) {
+      // Process ALL actions to ensure the win action is included
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (!line.trim()) continue; // Skip empty lines
+        
+        const {args, kwArgs} = Protocol.parseBattleLine(line);
+        currBattle.add(line);
+        
+        // If this is a win action, make sure we properly set the winner
+        if (args[0] === 'win') {
+          console.log("Processing win action:", args[1]);
+          currBattle.winner = args[1] as string;
+        }
+        
+        setHtmlLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
+      }
+      
+      // Set current action to the last action (not 0)
+      const lastActionIndex = lines.filter(line => line.trim()).length;
+      updateBattleState(currBattle, changeTurn, lastActionIndex);
+      return;
+    }
+    
+    // Normal turn change logic (existing code)
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
+      if (!line.trim()) continue; // Skip empty lines
+      
       const {args, kwArgs} = Protocol.parseBattleLine(line);
       currBattle.add(line);
       
@@ -75,10 +104,6 @@ export function useBattleFlow(
         }
       }
       setHtmlLog((prev) => [...prev, formatter.formatHTML(args, kwArgs)]);
-    }
-    
-    if(changeTurn === lastTurn + 1) {
-      updateBattleState(currBattle, changeTurn, 0);
     }
   };
 

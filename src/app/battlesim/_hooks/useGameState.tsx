@@ -142,6 +142,10 @@ export function useGameState(replayData?: ReplayData) {
             subtree: true
         });
     };
+
+    function countActions(): number {
+        return battleLog ? battleLog.split('\n').length : 0;
+    }
     
     return {
         // Core state
@@ -177,6 +181,7 @@ export function useGameState(replayData?: ReplayData) {
         setSimulatedAttack,
         setLogVisible,
         setPov,
-        setCurrentTurn
+        setCurrentTurn,
+        countActions
     };
 }
