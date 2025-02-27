@@ -60,7 +60,7 @@ export function PokemonImage(
                 zIndex: 0,
                 transform: `
                         scaleY(-.75)
-                        translateY(-${h * .75}px)
+                        translateY(-${ h * 1.1}px)
                         `,
                 opacity: .5 
             }}>
