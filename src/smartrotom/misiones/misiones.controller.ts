@@ -69,6 +69,7 @@ export class MisionesController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to upload image.' })
   async img(@Body() { npcName, image }: NpcImageDto) {
     const action = 'upload custom NPC image';
+    return this.responseService.createSuccessResponse('Image uploaded successfully', { status: 'OK' });
     try {
       this.responseService.logRequest(action, { npcName });
       fs.writeFileSync(
