@@ -16,6 +16,7 @@ export function useGalleryData(username: string) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
+    if(!username) return
     fetchData()
   }, [username])
 
