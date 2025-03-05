@@ -25,6 +25,7 @@ export function useGalleryData(username: string) {
         (await boffGET('/herramientas/ptcgp/cards')).data as Card[],
         (await boffPOST('/herramientas/ptcgp/user-cards', { username })).data as Card[],
       ])
+      if(!allCardsData || !userCardsData) return  
       setAllCards(allCardsData)
       const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: any) => {
         acc[`${card.expansion}_${card.cardNumber}`] = card.count
