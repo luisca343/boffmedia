@@ -22,8 +22,10 @@ export function useGalleryData(username: string) {
   const fetchData = async () => {
     try {
       const [allCardsData, userCardsData] = await Promise.all([
-        (await boffGET('/herramientas/ptcgp/cards')).data as Card[],
-        (await boffPOST('/herramientas/ptcgp/user-cards', { username })).data as Card[],
+        /* @ts-ignore */
+        (await boffGET('/herramientas/ptcgp/cards')) as Card[],
+        /* @ts-ignore */
+        (await boffPOST('/herramientas/ptcgp/user-cards', { username })) as Card[],
       ])
       if(!allCardsData || !userCardsData) return  
       setAllCards(allCardsData)
