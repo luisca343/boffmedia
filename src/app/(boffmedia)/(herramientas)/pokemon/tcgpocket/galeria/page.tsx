@@ -19,8 +19,7 @@ export default function UserGallery() {
   const router = useRouter();
   const [changes, setChanges] = useState<Record<string, number>>({});
 
-  const { allCards, userCards, loading, error, updateUserCards } =
-    useGalleryData(session?.user?.name || "");
+  const { allCards, userCards, loading, error, updateUserCards } = useGalleryData(session?.user?.name || "");
 
   if (status === "loading") {
     return (
