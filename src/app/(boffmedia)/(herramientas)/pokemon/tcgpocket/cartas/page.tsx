@@ -15,7 +15,8 @@ export default function CartasPage() {
 
   useEffect(() => {
     boffGET("/herramientas/ptcgp/cards").then((data) => {
-      setCards(data.data as Card[]);
+      /* @ts-ignore */
+      setCards(data as Card[]);
     });
   }, []);
 
