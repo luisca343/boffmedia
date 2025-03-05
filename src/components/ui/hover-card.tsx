@@ -11,7 +11,7 @@ const HoverCardTrigger = HoverCardPrimitive.Trigger
 
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content> & { variant?: "default" | "info" | "warning" }
+  React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content> & { variant?: "default" | "info" | "warning"  | "paper" }
 >(({ className, align = "center", sideOffset = 4, variant = "default", ...props }, ref) => {
   const variantClasses = {
     default: "bg-surface-800 border-primary-600 text-surface-100",

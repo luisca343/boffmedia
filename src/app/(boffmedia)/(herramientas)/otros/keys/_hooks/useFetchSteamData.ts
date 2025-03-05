@@ -56,8 +56,8 @@ const useFetchSteamData = () => {
 
   const fetchGameData = async (steamID: string) => {
     try {
-      const response = await apiGET(`/steamdata/${steamID}`);
-      const gameData = response;
+      const response = (await apiGET(`/steamdata/${steamID}`)).data;
+      const gameData = response as SteamGame;
 
       setSelectedGame(gameData);
       setIsModalVisible(true);

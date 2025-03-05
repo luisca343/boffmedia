@@ -1,13 +1,14 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { ligaService } from '@/services/api/smartrotom/ligaService';
+import { useRotomRequest } from "../useRotomRequest";
+import { ligaService } from "@/services/api/smartrotom/ligaService";
 
-export const useGetReplay = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useGetReplay(id: number) {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(ligaService.getReplay, id)
 
-  const getReplay = useCallback((id: number) => {
-    return handleRequest(() => ligaService.getReplay(id));
-  }, [handleRequest]);
-
-  return { getReplay, loading, error };
-};
+  return {
+    replay: data,
+    error,
+    isLoading,
+    refetch,
+    setReplay: setData
+  }
+}

@@ -14,8 +14,8 @@ export default function CartasPage() {
   const dungeonsTrans = useTranslations("tcgpocket");
 
   useEffect(() => {
-    boffGET("/herramientas/ptcgp/cards").then((data: Card[]) => {
-      setCards(data);
+    boffGET("/herramientas/ptcgp/cards").then((data) => {
+      setCards(data.data as Card[]);
     });
   }, []);
 

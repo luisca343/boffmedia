@@ -1,9 +1,29 @@
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { ChevronDown } from "lucide-react"
 
-export function PokedexSection({title, children, id, className='', btn=''}: {title: string, children: any, id?: string, className?: string, btn?: any}){
-    return <Collapsible defaultOpen={true} className={`flex flex-col justify-center w-[95%] 2xl:w-[90%] m-auto ${className} `} id={id}>
-        <CollapsibleTrigger className="text-2xl border-b-2 2xl:border-b border-surface-300  mb-4 mt-2 text-surface-50 text-start">{title}
-         <span className='ml-2 text-sm '>{btn}</span></CollapsibleTrigger>
-        <CollapsibleContent>{children}</CollapsibleContent>
-    </Collapsible>
-}
+export function PokedexSection({
+    title,
+    children,
+    id,
+    className = "",
+    btn = "",
+  }: {
+    title: string
+    children: React.ReactNode
+    id?: string
+    className?: string
+    btn?: React.ReactNode
+  }) {
+    return (
+      <Collapsible defaultOpen={true} className={`w-full max-w-[95%] 2xl:max-w-[90%] mx-auto my-2 py-2 ${className}`} id={id}>
+        <CollapsibleTrigger className="flex w-full items-center justify-between border-b-2 border-slate-700 pb-2 text-start text-xl font-semibold text-slate-100">
+          {title}
+          <div className="flex items-center">
+            {btn && <span className="mr-4 text-sm">{btn}</span>}
+            <ChevronDown className="h-5 w-5 text-slate-400 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4">{children}</CollapsibleContent>
+      </Collapsible>
+    )
+  }

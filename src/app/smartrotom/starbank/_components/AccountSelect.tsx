@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 
 
 
-export function AccountSelect({accounts, activeAccount, setActiveAccount, id}: {accounts: any, activeAccount: any, setActiveAccount: any, id?: string}){
+export function AccountSelect({accounts, activeAccount, setActiveAccount, id, className}: {accounts: any, activeAccount: any, setActiveAccount: any, id?: string, className?: string}) {
     const [filter, setFilter] = useState("")
     const filteredAccounts = accounts.filter((account: any) => account.name.toLowerCase().includes(filter) || account.type.toLowerCase().includes(filter))
 

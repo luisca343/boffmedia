@@ -4,11 +4,11 @@ import React from 'react';
 import MainCard from "./_components/MainCard";
 import CardComponent from "./_components/CardComponent";
 import PopStyles from "./_components/PopStyles";
-import { useGetNews } from "./_hooks/useGetNews";
 import { InternalLink } from "@/components/nav/Link";
 import FurretHeader from './_components/Header';
 import FurretFooter from './_components/Footer';
 import PopArtWallpaper from './_components/PopArtWallpaper';
+import { useGetAllNews } from '@/hooks/documents/useGetAllNews';
 
 export interface NewsItem {
   id: number;
@@ -20,7 +20,7 @@ export interface NewsItem {
 }
 
 export default function FurretTodayPopArtEspanol() {
-  const {featured, published} = useGetNews();
+  const {featured, published} = useGetAllNews();
 
   return (
     <div className="min-h-full relative">

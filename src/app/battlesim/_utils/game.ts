@@ -1,4 +1,3 @@
-import { Sprites } from "@pkmn/img";
 import { Protocol } from "@pkmn/protocol";
 import { GenerationNum, Generations } from '@pkmn/data';
 import { Dex, PRNG, TeamValidator, Teams as DTeams, BattleStreams, RandomPlayerAI } from '@pkmn/sim';
@@ -45,7 +44,7 @@ export async function generateLog(replay:string){
         return log;
 }
 
-export async function updateLog(log, turn:number,  args: any, kwArgs: { [k: string]: any; }, line?: string) {
+export async function updateLog(log:any, turn:number,  args: any, kwArgs: { [k: string]: any; }, line?: string) {
     //console.log(turn, text);
     let img1 = {} as { gen: number; w: number; h: number; url: string; pixelated: boolean; }
     let img2 = {} as { gen: number; w: number; h: number; url: string; pixelated: boolean; }

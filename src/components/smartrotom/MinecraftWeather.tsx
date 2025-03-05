@@ -10,7 +10,7 @@ import {
 } from "@/lib/minecraftWeather";
 
 export default function MinecraftWeatherWidget() {
-  const { weatherData, timeLeft, minecraftTime, refreshWeather } =
+  const { weatherData, minecraftTime, refreshWeather } =
     useGetWeather();
 
   const formatTime = (seconds: number): string => {
@@ -54,7 +54,7 @@ export default function MinecraftWeatherWidget() {
               weatherData.weather == "clear" ? "Lluvia prevista en" : "Despejado en"
               }</p>
             <p className="text-lg font-semibold text-surface-800">
-              {formatTime(timeLeft)}
+              {formatTime(weatherData.timeUntilChange)}
             </p>
           </div>
         </div>

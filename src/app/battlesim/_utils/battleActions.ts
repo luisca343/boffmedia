@@ -1,7 +1,6 @@
 import { Battle } from "@pkmn/client";
 import { Num, PokemonDetails, PokemonHPStatus, PokemonIdent } from "@pkmn/protocol";
-import { Scene } from "../_components/Scene";
-
+import { Scene } from "./Scene";
 
 export async function turnAction(currentBattle: Battle, turn: Num) {
   return await new Promise<void>((resolve) => {

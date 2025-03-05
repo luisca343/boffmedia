@@ -346,7 +346,7 @@ export class Scene {
 		const attackerPos = this.getPosition(attacker);
 		const defenderPos = this.getPosition(defender);
 		
-		animFunc.anim(this, [attackerSprite, defenderSprite]);
+		animFunc.anim(this as any, [attackerSprite, defenderSprite] as any);
 		
 		// Use Promise.all to wait for all animations to complete
 		return await Promise.all(this.currentAnimations).then(() => {

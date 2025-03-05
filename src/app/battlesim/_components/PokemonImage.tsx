@@ -8,8 +8,8 @@ type PokemonImageProps = {
     pokemon: Pokemon;
     side?: 'p1' | 'p2';
     className?: string;
-    viewportWidth: number;
-    battle: any;
+    viewportWidth?: number;
+    battle?: any;
     
 };
 
@@ -17,6 +17,8 @@ type PokemonImageProps = {
 export function PokemonImage(
     {id, pokemon, side = 'p2', className, viewportWidth, battle}:  PokemonImageProps) {
     if (!pokemon) return <div></div>;
+    if(!viewportWidth) viewportWidth = window.innerWidth;
+    if(!battle) battle = null;
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     
     
@@ -31,7 +33,7 @@ export function PokemonImage(
     if (side === 'p2' && battleType === 'raid') {
         multiplier = 2.5;
     } else {
-        multiplier = side === 'p2' ? .6 : 1.3;
+        multiplier = side === 'p2' ? .65 : 1.3;
     }
 
 
@@ -58,7 +60,7 @@ export function PokemonImage(
                 zIndex: 0,
                 transform: `
                         scaleY(-.75)
-                        translateY(-${h * .75}px)
+                        translateY(-${ h * 1.1}px)
                         `,
                 opacity: .5 
             }}>
@@ -72,7 +74,7 @@ export function PokemonImage(
             </div>
             <div className="pokemon-container" style={{
                 position: 'absolute',
-                zIndex: 1
+                zIndex: 100
             }}>
                 <img
                     className={className} src={url} width={w} height={h}

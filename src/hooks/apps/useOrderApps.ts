@@ -1,16 +1,21 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { appsService } from '@/services/api/smartrotom/appsService';
-import { OrderAppDto } from '@/types/dto/order-apps.dto';
+import { useRotomRequest } from "../useRotomRequest";
+import { appsService } from "@/services/api/smartrotom/appsService";
+import { OrderAppDto } from "@/types/dto/order-apps.dto";
 
+export function useOrderApps() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.order)
 
-export const useOrderApps = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+  const orderApps = (orderAppDto: OrderAppDto) => {
+    return appsService.order(orderAppDto);
+  }
 
-  const order = useCallback((orderAppDto: OrderAppDto) => {
-    return handleRequest<{ success: boolean }>(() => appsService.order(orderAppDto));
-  }, [handleRequest]);
-
-  return { order, loading, error };
-};
+  return {
+    order: data,
+    error,
+    isLoading,
+    refetch,
+    orderApps,
+    setOrder: setData
+  }
+}
 

@@ -2,14 +2,14 @@ import { QuestData } from '../types'
 import { QuestDisplay } from '../_components/QuestDisplay'
 import { calculateTotalRewards } from '../utils/calculateTotalRewards'
 import Image from 'next/image'
-import { boffGET, rotomGET } from '@/services/boffAPI'
+import { boffGET } from '@/services/boffAPI'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTranslations } from 'next-intl/server'
 
 
 export default async function Combates({params} : {params: {id: string}}) {
   const { id } = params
-  const data = await boffGET(`/herramientas/ptcgp/combate2/${id}`)
+  const data = (await boffGET(`/herramientas/ptcgp/combate2/${id}`)).data as QuestData
   const totalRewards = calculateTotalRewards(data.quests, data.commonRewards)
   const trans = await getTranslations('tcgpocket')
   if(!data) return <div>loading...</div>

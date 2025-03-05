@@ -1,42 +1,23 @@
 "use client";
 import { Hora } from "../Hora";
-import BreadcrumbNav from "./BreadbrumbNav";
-import {
-  BotonAjustes,
-  BotonIA,
-  BotonNext,
-  BotonNotification,
-  BotonPrev,
-  BotonReload,
-} from "./BotonNav";
-import useSocketStore from "@/app/useSocketStore";
-import { useEffect, useState } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useEffect } from "react";
+import { Badge } from "../ui/badge";
 import { Socket } from "socket.io-client";
+import BreadcrumbNav from "./BreadbrumbNav";
+import FicusAI from "../smartrotom/FicusAI";
 import { usePathname } from "next/navigation";
+import { getSmartRotomUser } from "@/lib/utils";
+import { Bell, Check, Trash2, X } from "lucide-react";
+import { SettingsPage } from "../smartrotom/Settings";
 import { Popover, PopoverTrigger } from "../ui/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import FicusAI from "../smartrotom/FicusAI";
-import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
-import { Badge } from "../ui/badge";
-import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
-import { SettingsPage } from "../smartrotom/Settings";
-import { getSmartRotomUser } from "@/lib/utils";
 import { useBoffSession } from "@/services/useBoffSession";
-import { Bell, Check, Trash2, X } from "lucide-react";
+import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
+import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import useSocketStore from "@/stores/useSocketStore";
 
 export default function RotomNav({
   setTema,
@@ -169,7 +150,6 @@ export default function RotomNav({
         <SheetContent
           side="top"
           className="bg-surface-800 text-surface-50 border-none"
-          parentId="smartrotom"
         >
           <SheetHeader>
             <SheetTitle className="text-surface-50">Ajustes</SheetTitle>
@@ -186,7 +166,6 @@ export default function RotomNav({
         <SheetContent
           side="right"
           className="bg-surface-800 text-surface-50 border-none flex flex-col w-max"
-          parentId="smartrotom"
         >
           <SheetHeader>
             <SheetTitle className="text-surface-50 text-2xl font-bold">

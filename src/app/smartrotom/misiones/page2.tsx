@@ -1,3 +1,4 @@
+/*
 "use client"
 import { Book, BookLink, Page, PageTitle } from "@/components/ui/book/book";
 import { getSmartRotomUser } from "@/lib/utils";
@@ -143,3 +144,4 @@ export default function Misiones(){
 
 }
 
+*/

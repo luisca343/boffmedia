@@ -1,16 +1,21 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { appsService } from '@/services/api/smartrotom/appsService';
-import { CreateAppDto } from '@/types/dto/create-app.dto';
-import { App } from '@/types';
+import { useRotomRequest } from "../useRotomRequest";
+import { appsService } from "@/services/api/smartrotom/appsService";
+import { CreateAppDto } from "@/types/dto/create-app.dto";
 
-export const useCreateApp = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useCreateApp() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.create)
 
-  const create = useCallback((createAppDto: CreateAppDto) => {
-    return handleRequest<App>(() => appsService.create(createAppDto));
-  }, [handleRequest]);
+  const createApp = (createAppDto: CreateAppDto) => {
+    return appsService.create(createAppDto);
+  }
 
-  return { create, loading, error };
-};
+  return {
+    createdApp: data,
+    error,
+    isLoading,
+    refetch,
+    createApp,
+    setCreatedApp: setData
+  }
+}
 

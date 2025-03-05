@@ -10,6 +10,9 @@ import { PokemonTeam } from "./PokemonTeam";
 import { Hazard } from "./Hazard";
 import { PokemonIdent } from "@pkmn/protocol";
 import useViewportWidth from "@/services/useViewPortWidth";
+import BattlePreview from "./BattlePreview";
+import countActions from "../_utils/battleUtils";
+import BattleEndScreen from "./BattleEndScreen";
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -32,7 +35,9 @@ function getParticipantName(name:string){
     return name;
 }
 
-export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: Battle, pov: 0 | 1, messageBar: string[] }, ref) => {
+export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOverlay, setBattleStarted, setIsPlaying, currentAction, battleLog }: 
+        { battle: Battle, pov: 0 | 1 | any, messageBar?: string[], showPreviewOverlay: boolean, setBattleStarted: (started: boolean) => void, setIsPlaying: (playing: boolean) => void, currentAction: number, battleLog: string | null
+         }, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
 
@@ -49,6 +54,37 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
         <div  id="game" className="flex overflow-hidden relative select-none" style={{
             backgroundImage: 'url(/battlesim/fx/bg/hagane.png)', 
             backgroundSize: `100% 100%`, width: canvasWidth, height: canvasWidth * ASPECT_RATIO }}>        
+                  
+                  {/* Preview overlay only shows when needed */}
+                  {showPreviewOverlay && (
+                    <div className="absolute inset-0">
+                      <BattlePreview 
+                        battle={battle} 
+                        pov={pov}
+                        onStartBattle={() => {
+                          setBattleStarted(true);
+                          setIsPlaying(true);
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {currentAction >= countActions(battleLog) - 1 && (
+                    <div className="absolute inset-0">
+                      <BattleEndScreen 
+                        battle={battle} 
+                        pov={pov}
+                        onRestart={
+                            () => {
+                                setBattleStarted(false);
+                                setIsPlaying(false);
+                            }
+                        }
+                      />
+                    </div>
+                  )}
+                  
+                  
             <div className="h-[20%] lg:h-[15%] xl:h-[13%] w-full absolute top-0 flex justify-between z-10">
             <div className="m-1 w-1/3 flex items-center h-fit">
                     <div className="w-fit h-8 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50">
@@ -76,8 +112,8 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 </div>
                 <div className="m-1 w-1/3 flex">
                 {
-                    messageBar.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50 absolute right-0 bottom-0">
-                        {messageBar.map((message, index) => (
+                    messageBar!.length > 0 && <div className="w-1/3 h-fit m-1 flex-1 bg-surface-800 bg-opacity-90 py-1 px-2 rounded-md text-surface-200 z-50 absolute right-0 bottom-0">
+                        {messageBar!.map((message, index) => (
                             <div key={index} dangerouslySetInnerHTML={{ __html: message }}></div>
                         ))}
                     </div>
@@ -92,7 +128,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                 key={position}
                 battle={battle}
                 pokemon={pokemon[position]}
-                ref={el => pokemonRefs.current[position] = el as PokemonRefType}
+                ref={(el: PokemonRefType | null) => { if (el) pokemonRefs.current[position] = el; }}
                 side={battle.p1}
                 position={position}
                 />
@@ -107,7 +143,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar }: { battle: B
                     key={position}
                     battle={battle}
                     pokemon={pokemon[position]}
-                    ref={el => pokemonRefs.current[position] = el as PokemonRefType}
+                    ref={(el: PokemonRefType | null) => { if (el) pokemonRefs.current[position] = el; }}
                     side={battle.p2}
                     position={position}
                 />

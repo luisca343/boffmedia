@@ -18,7 +18,7 @@ export default function useGetWeather() {
 
   const fetchWeatherData = useCallback(async () => {
     try {
-      const data = await terasGET("/weather");
+      const data = (await terasGET("/weather")) as any;
       setWeatherData(data);
       setChangeTime(data.changeTime);
       setMinecraftTime(data.minecraftTime);

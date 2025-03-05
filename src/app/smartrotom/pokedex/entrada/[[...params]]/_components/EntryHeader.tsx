@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { PokemonSprite } from "../../../_components/PokemonSprite";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
-import { getPokemonNameAndForm } from "../../../dexUtils";
+import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils";
 import { Pokemon } from "@/types/Pokemon";
 import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
@@ -13,16 +13,16 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
         <div className="w-full flex flex-1 justify-between items-center">
             <InternalLink className="flex flex-row  items-center hover:text-primary-400" 
                 href={`/pokedex/entrada/${prev.dex}`}>
-                <PokemonSprite id={prev.dex} form="base" palette='none' width={50} height={50}/>
-                <ChevronLeftIcon className="w-6"/>#{prev.dex} - {prev.name}
+                <PokemonSprite id={prev.dex} form="base" palette='none' width={50} height={50} hide={true} inverted={true}/>
+                <ChevronLeftIcon className="w-6"/>#{prev.dex} - {getDisplayStatus(prev.dex, 'base', true) ? prev.name : '???'}
             </InternalLink>
             <div className="flex items-center justify-center text-4xl 2xl:text-2xl">
-                #{pokemon.dex} - {getPokemonNameAndForm(pokemon.name, formName, t)}
-                <PokemonSprite id={pokemon.dex} form={formName} palette='none' width={50} height={50}/>
+                #{pokemon.dex} - {getDisplayStatus(pokemon.dex, formName, true) ? getPokemonNameAndForm(pokemon.name, formName, t) : '???'}
+                <PokemonSprite id={pokemon.dex} form={formName} palette='none' width={50} height={50} hide={true} inverted={true}/>
             </div>
-            <InternalLink className="flex flex-row items-center hover:text-primary-400" href={`/pokedex/entrada/${next.dex}`}>#{next.dex} - {next.name}
+            <InternalLink className="flex flex-row items-center hover:text-primary-400" href={`/pokedex/entrada/${next.dex}`}>#{next.dex} - {getDisplayStatus(next.dex, 'base', true) ? next.name : '???'}
                 <ChevronRightIcon className="w-6"/>
-                <PokemonSprite id={next.dex} form="base" palette='none' width={50} height={50}/>
+                <PokemonSprite id={next.dex} form="base" palette='none' width={50} height={50} hide={true} inverted={true}/>
             </InternalLink>
         </div>
         <div className="w-full flex justify-evenly items-center scroll-smooth">

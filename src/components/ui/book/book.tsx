@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import './book.css'
 
 
-type PageFlip = {
+export type PageFlip = {
     getPageCount: () => number ;
     
 };
@@ -16,9 +16,8 @@ export function Book({children, pageColor= '', setBook}: {children?: React.React
   const pages = React.Children.toArray(children).map((content, index) => { 
     return { content, index }});
 
-    
   if(pages.length % 2 !== 0){
-      pages.splice(pages.length - 1, 0, {content: <Page>Relleno</Page>, index: -2});
+      pages.splice(pages.length - 1, 0, {content: <Page book={pageFlip} number={pages.length-1} dataDensity = "soft" className = 'bg-[#fde3e3]'></Page>, index: pages.length-1});
   }
   
 
@@ -79,10 +78,10 @@ interface PageCoverProps {
 export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]', style, number=0, book}: 
   {children?: React.ReactNode, dataDensity?: "hard" | "soft", className?: string, style?: React.CSSProperties, number?: number, book?: PageFlip}) {
 
-    if(!book) return <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}></div>
+    if(!book) return <div style={{...style, position: 'relative'}} className={`h-full w-full page drop-shadow-2xl p-2 flex flex-col `} data-density={dataDensity}></div>
     return (
-    <div style={{...style, position: 'relative'}} className={` h-full w-full page drop-shadow-2xl p-2 flex flex-col ${className}`} data-density={dataDensity}>
-        {children}
+    <div style={{ position: 'relative'}} className={` h-full w-full page drop-shadow-2xl flex flex-col `} data-density={dataDensity}>
+        <div style={{...style}} className="h-full w-full bg-cover bg-center">{children}</div>
         {dataDensity === 'soft' && <>
           <span className={`absolute bottom-2 ${number % 2 ? 'left-4' : 'right-4'}`}>
               {number}
@@ -96,6 +95,7 @@ export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]
           </BookLink>
         </>
         }
+      {dataDensity === "soft" && <div className="texture-overlay"></div> }
     </div>
     );
 };
@@ -103,7 +103,7 @@ export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]
 
 export function BookLink({children, book, page, className}: {children: React.ReactNode, book: any, page: number, className?: string}){
     return (
-        <button className={`hover:cursor-pointer hover:underline hover:text-blue-500 ${className}`} onClick={(e) => turnPage(book, page, e)}>
+        <button className={`hover:cursor-pointer hover:underline hover:text-gray-700 transition-colors duration-200 font-vinque ${className}`} onClick={(e) => turnPage(book, page, e)}>
             {children}
         </button>
     )

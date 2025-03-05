@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { smartrotomService } from '@/services/api/smartrotom/smartrotomService'
+import { toast } from 'react-toastify'
 
 const colorCodes = [
   { name: "Negro", code: "0", textColor: "white" },
@@ -46,7 +48,8 @@ const formatToHtml = (format: string) => {
 }
 
 export default function CharacterCreator() {
-  const [characterFormat, setCharacterFormat] = useState("§l§f[§6Nombre del Personaje§f]")
+  const [name, setName] = useState('')
+  const [characterFormat, setCharacterFormat] = useState("")
   const [previewHtml, setPreviewHtml] = useState("")
   const formatInputRef = useRef<HTMLInputElement>(null)
 
@@ -71,16 +74,31 @@ export default function CharacterCreator() {
     }
   }
 
-  const createCharacter = () => {
+  const createCharacter = async () => {
     const newCharacter = {
-      format: characterFormat
+      format: characterFormat,
+      name: name,
+      value: `${name.toLowerCase().replaceAll(' ', '_')}`
     }
-    console.log(`Nuevo personaje creado:`, newCharacter)
-    // Aquí iría la lógica para guardar el nuevo personaje
+
+    console.log(newCharacter)
+    
+    const res = await smartrotomService.postArceuSpeak(newCharacter)
+    if(res.statusCode === 200) {
+      toast.success('Personaje creado')
+    } else {
+      toast.error('Error al crear personaje')
+    }
   }
 
   return (
     <div className="space-y-4">
+      <Input
+        placeholder="Nombre del Personaje"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        className="bg-surface-800 text-green-400 border-green-500"
+      />
       <Input
         ref={formatInputRef}
         placeholder="Formato (ej: §l§f[§6Nombre del Personaje§f])"

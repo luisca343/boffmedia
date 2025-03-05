@@ -4,7 +4,6 @@ import { SendMoney } from "../_components/SendMoney";
 import { useBoffSession } from "@/services/useBoffSession";
 
 export default function EnviarDinero(){
-    const { session } = useBoffSession();
 
     return(
         <div className="flex flex-col w-full h-full mt-6 p-2 items-center">

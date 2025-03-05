@@ -1,4 +1,5 @@
 import { rotomGET } from "@/services/boffAPI";
+import { useBoffSession } from "@/services/useBoffSession";
 import { useEffect, useState } from "react";
 
 interface WordlePokemon {
@@ -11,16 +12,18 @@ interface WordlePokemon {
 }
 
 export function useGetWordlePokemon(){
+    const {getMinecraftUUID} = useBoffSession();
     const [pokemon, setPokemon] = useState<WordlePokemon[]>([]);
     const [targetPokemon, setTargetPokemon] = useState<WordlePokemon | null>(null);
     const types = ["normal", "fire", "water", "electric", "grass", "ice", "fighting", "poison", "ground", "flying", "psychic", "bug", "rock", "ghost", "dragon", "dark", "steel", "fairy"];
 
     useEffect(() => {
-        rotomGET("/pokemon/wordle").then((res) => {
-            setPokemon(res);
-            const randomIndex = Math.floor(Math.random() * res.length);
-            console.log(res[randomIndex]);
-            setTargetPokemon(res[randomIndex]);
+        if(!getMinecraftUUID()) return;
+        rotomGET(`/pokemon/wordle`).then((res:any) => {
+            setPokemon(res.data);
+            const randomIndex = Math.floor(Math.random() * res.data.length);
+            console.log(res.data[randomIndex]);
+            setTargetPokemon(res.data[randomIndex]);
         });
     }, []);
 

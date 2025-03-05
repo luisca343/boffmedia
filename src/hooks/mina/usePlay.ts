@@ -1,13 +1,10 @@
 import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
 import { minaService } from '@/services/api/smartrotom/minaService';
+import { useRotomRequest } from '../useRotomRequest';
 
-export const usePlay = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export const usePlay = (uuid: string) => {
+  const requestFn = useCallback(() => minaService.play({ uuid }), [uuid]);
 
-  const play = useCallback((data: { uuid: string }) => {
-    return handleRequest(() => minaService.play(data));
-  }, [handleRequest]);
-
-  return { play, loading, error };
+  return useRotomRequest(requestFn, [uuid]);
 };
+

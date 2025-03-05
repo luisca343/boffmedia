@@ -1,6 +1,5 @@
 import React from 'react'; // Ensure React is imported if using JSX
 import { Battle, Pokemon, Side } from "@pkmn/client";
-import { Protocol } from "@pkmn/protocol";
 import { Dex } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
 import { Game } from '../_components/Game';

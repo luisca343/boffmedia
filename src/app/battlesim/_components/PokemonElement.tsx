@@ -21,10 +21,8 @@ export type PokemonRefType = {
 }
 
     
-    export const PokemonElement = forwardRef(({ battle, pokemon, side, position }: PokemonElementProps, ref) => {
+    export const PokemonElement = forwardRef(({ battle, pokemon, side, position }: PokemonElementProps, ref: any) => {
         const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
-
-
         return (
             <animated.div
                 id={position}

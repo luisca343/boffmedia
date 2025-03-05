@@ -6,10 +6,10 @@ export function useGetAchievements(uuid: string) {
     const [achievements, setAchievements] = useState<SmartRotomAchievement[]>();
 
     useEffect(() => {
-        rotomPOST('/battle-achievements',{uuid}).then((res)=>{
+        rotomPOST('/battle-achievements',{uuid}).then((res:any)=>{
             setAchievements(res)
           })
-    }, [])
+    }, [uuid])
 
     return { achievements, setAchievements } as { achievements: SmartRotomAchievement[], setAchievements: React.Dispatch<React.SetStateAction<SmartRotomAchievement[] | undefined>> }
 

@@ -1,8 +1,5 @@
 import { GlobalProviders } from "@/app/GlobalProviders";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -16,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <GlobalProviders>
-        {children}
+      {children}
     </GlobalProviders>
   );
 }

@@ -1,5 +1,4 @@
 "use client";
-import { rotomGET } from "@/services/boffAPI";
 import { useEffect, useState } from "react";
 import { getValidAccountId } from "../bankUtils";
 
@@ -18,18 +17,9 @@ import {
 import { BankSection, BankSectionButton } from "../_components/BankSection";
 import { TransactionsTable, columns } from "./_components/TransactionsTable";
 import { useBoffSession } from "@/services/useBoffSession";
-
-interface Transaction {
-  from: number;
-  to: number;
-  amount: number;
-  fromBalance: number;
-  toBalance: number;
-  reason: string;
-  type: string;
-  date: string;
-  isPayer: boolean;
-}
+import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
+import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
+import { FullTransaction, Transaction } from "@/types/starbank";
 
 export interface CellDefProps<TData> {
   table: Table<TData>;
@@ -40,14 +30,16 @@ export interface CellDefProps<TData> {
   renderValue: () => any;
 }
 
+
 export default function Transacciones() {
   const { session } = useBoffSession();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [accounts, setAccounts] = useState([]);
   const [activeAccount, setActiveAccount] = useState(-1);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const { accounts, error: accountsError, isLoading: accountsLoading } = useGetAccounts(session?.user?.smartRotomUser?.uuid!);
+  const { transactions: fetchedTransactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount);
 
   const table = useReactTable({
     data: transactions,
@@ -71,23 +63,16 @@ export default function Transacciones() {
   });
 
   useEffect(() => {
-    if (session?.user) {
-      rotomGET("/starbank/accounts/" + session.user.smartRotomUser.uuid).then(
-        (res) => {
-          setAccounts(res);
-        }
-      );
+    if (accounts && accounts.length > 0) {
+      const account = getValidAccountId(accounts);
+      setActiveAccount(account);
     }
-  }, [session]);
+  }, [accounts]);
 
   useEffect(() => {
-    if (accounts.length === 0) return;
-    const account = getValidAccountId(accounts);
-    setActiveAccount(account);
-
-    rotomGET("/starbank/transactions/" + account).then((res) => {
-      const transactionData = res.map((transaction: Transaction) => {
-        const isActiveAccount = transaction.from == account;
+    if (fetchedTransactions) {
+      const transactionData = fetchedTransactions.map((transaction: FullTransaction) => {
+        const isActiveAccount = transaction.from == activeAccount;
         return {
           isPayer: isActiveAccount,
           reason: transaction.reason,
@@ -98,8 +83,8 @@ export default function Transacciones() {
       });
 
       setTransactions(transactionData);
-    });
-  }, [accounts]);
+    }
+  }, [fetchedTransactions, activeAccount]);
 
   function updateFilters(columnId: string, value: string) {
     const newFilters = columnFilters.filter((f) => f.id !== columnId);
@@ -109,7 +94,9 @@ export default function Transacciones() {
     setColumnFilters(newFilters);
   }
 
-  if (accounts.length === 0) return <div>Cargando...</div>;
+  if (accountsLoading || transactionsLoading) return <div>Cargando...</div>;
+  if (accountsError || transactionsError) return <div>Error: {accountsError || transactionsError}</div>;
+
   return (
     <main className="h-full flex flex-col max-w-6xl mx-auto space-y-6 p-4">
       {/* Transactions Table */}
@@ -118,11 +105,11 @@ export default function Transacciones() {
           table={table}
           columnFilters={columnFilters}
           updateFilters={updateFilters}
-          />
+        />
       </BankSection>
       {/* Pagination (simplified for this example) */}
       <div className="flex justify-between items-center bg-white p-4 shadow-md max-h-[15%] rounded-md border border-blue-200">
-        <BankSectionButton onClick={() => table.previousPage()}>
+        <BankSectionButton onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           Anterior
         </BankSectionButton>
         <span className="text-sm text-surface-700">
@@ -130,11 +117,8 @@ export default function Transacciones() {
           {table.getPageCount()}
         </span>
         <BankSectionButton
-          onClick={() =>
-            table.getState().pagination.pageIndex + 1 < table.getPageCount()
-              ? table.nextPage()
-              : null
-          }
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
         >
           Siguiente
         </BankSectionButton>
@@ -143,6 +127,3 @@ export default function Transacciones() {
   );
 }
 
-function esPagador(transaction: any, activeAccount: any) {
-  return transaction.from == activeAccount;
-}

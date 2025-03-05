@@ -20,6 +20,7 @@ const colors = {
     dark: { backgroundColor: "#50413f", textColor: "white" },
     steel: { backgroundColor: "#60a1b8", textColor: "white" },
     fairy: { backgroundColor: "#ef71ef", textColor: "white" },
+    
     physical: { backgroundColor: "#ff4400", textColor: "white" },
     special: { backgroundColor: "#2266cc", textColor: "white" },
     status: { backgroundColor: "#999999", textColor: "black" },
@@ -27,6 +28,7 @@ const colors = {
 
 export default function TypeBadge({type}: {type: string}){
     const t  = useTranslations("");
+    if(!type) return null
     const typeColors = colors[type.toLowerCase()];
     return <div className={` m-1 h-8 w-32 font-bold text-xl 2xl:text-base min-w-28 flex flex-row items-center  text-surface-50 bg-${type.toLowerCase()} pl-2 pr-2 rounded text-shadow-border2 2xl:text-shadow-border1`} 
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>
@@ -38,6 +40,7 @@ export default function TypeBadge({type}: {type: string}){
 
 export function TypeBadgeSmall({type}: {type: string}){
     const t  = useTranslations("");
+    if(!type) return null
     const typeColors = colors[type.toLowerCase().trim()];
     return <div className={` m-1 h-6 font-bold text-xs w-16 flex flex-row items-center  text-surface-50 bg-${type.toLowerCase().trim()} pl-1 pr-1 rounded text-shadow-border1`} 
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>

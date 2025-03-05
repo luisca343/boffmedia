@@ -2,23 +2,14 @@
 
 // @ts-ignore
 import NoiseMap from 'noise-map'
-import { rotomGET, rotomPOST } from '@/services/boffAPI';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { toast } from 'react-toastify';
+import { minaService } from '@/services/api/smartrotom/minaService';
+import { RewardEntry } from '@/types/mina';
 
-export type Reward = {
-    id: number;
-    name: string;
-    width: number;
-    height: number;
-    url: string;
-    value: number;
-    itemId: string;
-
-}
 
 export async function generateGame(numFilas: number, numColumnas: number){
-    const rewards = await getRewards();
+    const rewards = await getRewards() as RewardEntry[];
     const positions = await generatePositions(numFilas, numColumnas, rewards);
     const map = await getMineMap(numFilas, numColumnas);
 
@@ -44,14 +35,14 @@ export async function getMineMap(numFilas: number, numColumnas: number) {
 }
 
 async function getRewards(cantidad: number = 5) {
-    const rewards = await rotomGET('/mine/rewards');
+    const {data: rewards} = await minaService.getRewards() as {data: RewardEntry[]};
     const rewardsTmp = []
     console.log(rewards);
     
-    let valorTotal = rewards.reduce((acc:number, reward: Reward) => acc + reward.value, 0);
+    let valorTotal = rewards.reduce((acc:number, reward: RewardEntry) => acc + reward.value, 0);
     for (let i = 0; i < cantidad; i++) {
         let valor = Math.random() * valorTotal;
-        let reward = rewards.find((reward: Reward) => {
+        let reward = rewards.find((reward: RewardEntry) => {
             valor -= reward.value;
             return valor <= 0;
         });
@@ -63,13 +54,13 @@ async function getRewards(cantidad: number = 5) {
 }
 
 async function getRewardsNoRepeat(cantidad: number = 5) {
-    let rewards = await rotomGET('/mine/rewards');
+    const {data: rewards} = await minaService.getRewards() as {data: RewardEntry[]};
     const rewardsTmp = [];
     
-    let valorTotal = rewards.reduce((acc:number, reward: Reward) => acc + reward.value, 0);
+    let valorTotal = rewards.reduce((acc:number, reward: RewardEntry) => acc + reward.value, 0);
     for (let i = 0; i < cantidad; i++) {
         let valor = Math.random() * valorTotal;
-        let index = rewards.findIndex((reward: Reward) => {
+        let index = rewards.findIndex((reward: RewardEntry) => {
             valor -= reward.value;
             return valor <= 0;
         });
@@ -78,14 +69,14 @@ async function getRewardsNoRepeat(cantidad: number = 5) {
         
         // Remove the selected reward from the array and decrease the total value
         rewards.splice(index, 1);
-        valorTotal -= reward.valor;
+        valorTotal -= reward.value;
     }
 
     return rewardsTmp;
 }
 
-async function generatePositions(rowNum: number, colNum: number, rewards: Reward[]) {
-    const positions = [] as {reward: Reward ,x: number, y: number}[];
+async function generatePositions(rowNum: number, colNum: number, rewards: RewardEntry[]) {
+    const positions = [] as {reward: RewardEntry ,x: number, y: number}[];
     let errors = 0;
 
     for(let i = 0; i < rewards.length; i++) {
@@ -126,7 +117,7 @@ async function generatePositions(rowNum: number, colNum: number, rewards: Reward
 }
 
 
-function  validPosition(rew: {reward: Reward, x: number, y: number}, comparing: {reward: Reward, x: number, y: number}) {
+function  validPosition(rew: {reward: RewardEntry, x: number, y: number}, comparing: {reward: RewardEntry, x: number, y: number}) {
     return rew.x < comparing.x + comparing.reward.width &&
         rew.x + rew.reward.width > comparing.x &&
         rew.y < comparing.y + comparing.reward.height &&
@@ -135,7 +126,7 @@ function  validPosition(rew: {reward: Reward, x: number, y: number}, comparing: 
 
 
 export function jugar(session: any, router: AppRouterInstance, redirect: string = "" ){
-    rotomPOST('/mine/play', {uuid: session?.user.smartRotomUser.uuid}).then(res => {
+    minaService.play({uuid: session?.user.smartRotomUser.uuid}).then(res => {
         if(!res.error) return router.push('/smartrotom/mina/jugar')
         toast.error(res.error)
         redirect != "" && router.push(redirect)

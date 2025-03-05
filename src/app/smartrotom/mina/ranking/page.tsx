@@ -1,4 +1,3 @@
-import { rotomGET } from "@/services/boffAPI";
 import MenuWrapper from "../_components/MenuWrapper";
 import { minaService } from "@/services/api/smartrotom/minaService";
 

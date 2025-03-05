@@ -1,14 +1,20 @@
-import { useCallback } from 'react';
-import { appsService } from '@/services/api/smartrotom/appsService';
-import { useRotomRequest } from '../useRotomRequest';
+import { useRotomRequest } from "../useRotomRequest";
+import { appsService } from "@/services/api/smartrotom/appsService";
 
-export const useRemoveApp = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useRemoveApp() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.remove)
 
-  const remove = useCallback((id: number) => {
-    return handleRequest<{ success: boolean }>(() => appsService.remove(id));
-  }, [handleRequest]);
+  const removeApp = (id: number) => {
+    return appsService.remove(id);
+  }
 
-  return { remove, loading, error };
-};
+  return {
+    removedApp: data,
+    error,
+    isLoading,
+    refetch,
+    removeApp,
+    setRemovedApp: setData
+  }
+}
 

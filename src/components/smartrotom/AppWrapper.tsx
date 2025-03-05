@@ -1,35 +1,32 @@
-"use client";
-import { useSession } from "next-auth/react";
-import RotomNav from "../nav/RotomNav";
-
-import { AlertTriangle } from "lucide-react";
-import { motion } from "framer-motion";
-
-import { signIn } from "next-auth/react";
-import { isMinecraft } from "@/services/mcef/mcefHelper";
-import { useEffect, useState } from "react";
-import { LoadingScreen } from "./Loading";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { CallStatus } from "./CallStatus";
-import { getMcUserData } from "@/services/mcef/mcefApi";
-import { AuthForm } from "@/app/auth/AuthForm";
-import { Session } from "next-auth";
-
+"use client"
+import type { Session } from "next-auth"
+import RotomNav from "../nav/RotomNav"
+import { motion } from "framer-motion"
+import { signIn } from "next-auth/react"
+import { LoadingScreen } from "./Loading"
+import { CallStatus } from "./calls/CallStatus"
+import { useEffect, useState } from "react"
+import { useSession } from "next-auth/react"
+import { AlertTriangle } from "lucide-react"
+import { AuthForm } from "@/app/auth/AuthForm"
+import "react-toastify/dist/ReactToastify.css"
+import { ToastContainer } from "react-toastify"
+import { getMcUserData } from "@/services/mcef/mcefApi"
+import { isMinecraft } from "@/services/mcef/mcefHelper"
 
 export default function AppWrapper({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   const { data: session, status } = useSession() as {
-    data: Session;
-    status: string;
-  };
-  const [datosUsuario, setDatosUsuario] = useState<Object | null>(null);
-  const [isMC, setIsMC] = useState(false);
+    data: Session
+    status: string
+  }
+  const [datosUsuario, setDatosUsuario] = useState<Object | null>(null)
+  const [isMC, setIsMC] = useState(false)
 
-  const [tema, setTema] = useState("");
+  const [tema, setTema] = useState("")
 
   /*
     if ('speechSynthesis' in window) {
@@ -48,66 +45,66 @@ export default function AppWrapper({
      }*/
 
   useEffect(() => {
-    const isSmart = isMinecraft();
-    setIsMC(isSmart);
+    const isSmart = isMinecraft()
+    setIsMC(isSmart)
 
     const fetchDatosUsuario = async () => {
       if (isSmart) {
-        const { data, error } = await getMcUserData();
-    
+        const { data, error } = await getMcUserData()
+
         if (error) {
-          setDatosUsuario(null);
-          return;
+          setDatosUsuario(null)
+          return
         }
-    
+
         if (data) {
-          const response = await signIn('minecraft', {
+          const response = await signIn("minecraft", {
             redirect: false,
             username: data.username,
             uuid: data.uuid,
             world: data.world,
-          });
-    
+          })
+
           if (response?.error) {
-            setDatosUsuario(null);
-            return;
+            setDatosUsuario(null)
+            return
           }
-    
-          setDatosUsuario(data);
+
+          setDatosUsuario(data)
         }
       } else {
-        setDatosUsuario(null);
+        setDatosUsuario(null)
       }
-    };
-    fetchDatosUsuario();
-  }, []);
+    }
+    fetchDatosUsuario()
+  }, [])
 
   if (status === "loading") {
-    return <LoadingScreen />;
+    return <LoadingScreen />
   }
 
   if (status === "unauthenticated" && isMC) {
-    if (!datosUsuario) return <LoadingScreen />;
+    if (!datosUsuario) return <LoadingScreen />
 
-    return <p>{Object.values(datosUsuario)}</p>;
+    return <p>{Object.values(datosUsuario)}</p>
   }
 
   if (status === "unauthenticated" && !isMC) {
-    return <AuthForm url="boffmedia" redirect="/smartrotom" />;
+    return <AuthForm url="boffmedia" redirect="/smartrotom" />
   }
 
   function boffMediaLinked(): boolean {
-    return session?.user.name ? true : false;
+    return session?.user.name ? true : false
   }
 
   function smartRotomLinked(): boolean {
-    return session?.user.smartRotomUser?.uuid ? true : false;
+    return session?.user.smartRotomUser?.uuid ? true : false
   }
-  
+
   if (status === "authenticated" && !smartRotomLinked()) {
     if (!isMC)
-      return <RotomErrorPage error="Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web." />;
-    return <AuthForm url="smartrotom" redirect="/smartrotom" />;
+      return <RotomErrorPage error="Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web." />
+    return <AuthForm url="smartrotom" redirect="/smartrotom" />
   }
 
   if (status === "authenticated" && !boffMediaLinked()) {
@@ -117,18 +114,16 @@ export default function AppWrapper({
   return (
     <section
       id="smartrotom"
-      className={`roboto flex flex-col h-screen  ${tema} text-black bg-transparent`}
+      className={`roboto flex flex-col h-screen max-h-screen overflow-hidden  ${tema} text-black bg-transparent`}
     >
       <RotomNav setTema={setTema} />
       <ToastContainer position="bottom-right" theme="dark" />
-      <main className="relative border-solid no-scrollbar flex-1 pt-12">
+      <main className="relative flex-1 pt-12 flex overflow-hidden">
         <CallStatus />
-        <div className="h-full w-full [&>*]:h-full [&>*]:overflow-auto">
-          {children}
-        </div>
+        <div className="h-full w-full [&>*]:w-full flex overflow-hidden">{children}</div>
       </main>
     </section>
-  );
+  )
 }
 
 function RotomErrorPage({ error }: { error: string }) {
@@ -136,7 +131,7 @@ function RotomErrorPage({ error }: { error: string }) {
     <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
       <RotomError error={error} />
     </div>
-  );
+  )
 }
 
 function RotomError({ error }: { error: string }) {
@@ -160,5 +155,6 @@ function RotomError({ error }: { error: string }) {
         </p>
       </div>
     </motion.div>
-  );
+  )
 }
+

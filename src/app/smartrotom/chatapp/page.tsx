@@ -1,38 +1,39 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import "./test.css";
-import { useEffect, useState } from "react";
-import useSocketStore from "@/app/useSocketStore";
 import { Chat } from "./_components/Chat";
-import { CreateGroup } from "./_components/CreateGroup";
-import {  Message as MessageType } from "./_types/Chat";
+import { useEffect, useState } from "react";
 import useGetChats from "./_hooks/useGetChats";
 import { Contact } from "./_components/Contact";
+import {  Message as MessageType } from "./_types/Chat";
+import { CreateGroup } from "./_components/CreateGroup";
+import { useSocket } from "@/services/useSocket";
 
 export default function ChatApp() {
-  const { session, chats, refresh, updateChats, loading } = useGetChats();
+  const { session, chats, refresh, updateChats, isLoading } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
-  const { socket } = useSocketStore();
+  const {socket} = useSocket()
 
   useEffect(() => {
     if (socket) {
       socket.on("chat:message", (message: MessageType) => {
+        console.log("chat:message event received", message);
         updateChats(message, activeChat);
       });
     }
-  }, [session]);
+  }, [socket]);
 
   if (!chats) return null;
   
   return (
-    <div className="w-full h-full flex">
-      <div className="flex flex-col h-full w-1/4  bg-neutral-800  border-r border-neutral-900 ">
-        <div className="h-16 p-2 text-xl w-full flex items-center text-neutral-50 ">
+    <div className="w-full h-full flex overflow-hidden">
+    <div className="flex flex-col h-full w-1/4 bg-neutral-800 border-r border-neutral-900">
+      <div className="h-[4.25rem] p-2 text-xl w-full flex items-center justify-between text-neutral-50 border-b border-neutral-900">
           <div>Chats</div>
           <CreateGroup setActiveChat={setChat} />
         </div>
         <div className="flex flex-col h-full  overflow-auto bg-neutral-800">
-          {chats!.map((chat) => (
+          {chats!.map((chat:any) => (
             <Contact chat={chat} key={chat.id} activeChat={activeChat} setActiveChat={setChat} session={session}/>
           ))}
         </div>
@@ -54,7 +55,7 @@ export default function ChatApp() {
   );
 
   async function setChat(id: number) {
-    const chat = chats!.find((chat) => chat.id === id);
+    const chat = chats!.find((chat:any) => chat.id === id);
     if (!chat) {
       await refresh();
     }

@@ -27,7 +27,7 @@ export default function NewsEditor() {
   function updateNews(id: number, content: string) {
     const newNews = news.map((item) =>
       item.id === id ? { ...item, content } : item
-    )
+    ) as any;
     setNews(newNews)
   }
 

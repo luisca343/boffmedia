@@ -17,9 +17,11 @@ export default function Localizacion({params} : {params: {id: string}}){
 
     useEffect(() => {
         if(!id) return
+        console.log(id)
+        
         rotomGET(`/pokemon/biome/${id}`)
             .then((res) => {
-                setPokemon(res)
+                setPokemon(res.data)
             })
     }, [id])
 

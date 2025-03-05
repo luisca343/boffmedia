@@ -1,14 +1,21 @@
-import { useCallback } from 'react';
-import { CreateNewsDto } from '@/types/dto/create-news-dto';
-import { useRotomRequest } from '../useRotomRequest';
-import { documentsService } from '@/services/api/smartrotom/documentsService';
+import { useRotomRequest } from "../useRotomRequest";
+import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { CreateNewsDto } from "@/types/dto/create-news-dto";
 
-export const useUpdateActiveNews = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useUpdateActiveNews() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.updateActiveNews)
 
-  const updateActiveNews = useCallback((newsId: number, data: CreateNewsDto) => {
-    return handleRequest(() => documentsService.updateActiveNews(newsId, data));
-  }, [handleRequest]);
+  const updateActiveNews = (newsId: number, newsData: CreateNewsDto) => {
+    return documentsService.updateActiveNews(newsId, newsData);
+  }
 
-  return { updateActiveNews, loading, error };
-};
+  return {
+    updatedNews: data,
+    error,
+    isLoading,
+    refetch,
+    updateActiveNews,
+    setUpdatedNews: setData
+  }
+}
+

@@ -1,25 +1,32 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react'
+import { ApiResponse } from '@/services/boffAPI'
 
-export const useRotomRequest = <T>() => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<T | null>(null);
+export function useRotomRequest<T>(
+  apiFunction: (...args: any[]) => Promise<ApiResponse<T>>,
+  ...params: any[]
+) {
+  const [data, setData] = useState<T | null | undefined>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
-  const handleRequest = useCallback(async (requestFn: () => Promise<T>): Promise<T | null> => {
-    setLoading(true);
-    setError(null);
-    
+  const fetchData = useCallback(async () => {
     try {
-      const result = await requestFn();
-      setData(result);
-      return result;
+      const response = await apiFunction(...params)
+      if (response.error) {
+        setError(response.error)
+      } else {
+        setData(response.data ?? null)
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-      return null;
+      setError(err instanceof Error ? err.message : String(err))
     } finally {
-      setLoading(false);
+      setIsLoading(false)
     }
-  }, []);
+  }, [apiFunction, ...params])
 
-  return { loading, error, data, setData, handleRequest };
-};
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
+  return { data, error, isLoading, refetch: fetchData, setData }
+}

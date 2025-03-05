@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { strToDate } from "@/lib/utils"
 import { useGetDocuments } from "../_hooks/useGetDocuments"
-import { useGetDocument } from "../_hooks/useGetDocument"
+import { useGetDocument } from "../_hooks/useGetDocumentDeprecated"
 import { Button } from "@/components/ui/button"
 import { FileText, PlusCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -15,28 +15,33 @@ const CustomEditor = dynamic( () => {
   }, { ssr: false } );
 
 export function DocumentsList() {
-    const { documents, createNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
+    const { notes, newNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
     const [searchTerm, setSearchTerm] = useState("")
-    const [filteredDocuments, setFilteredDocuments] = useState(documents)
+    const [filteredDocuments, setFilteredDocuments] = useState(notes)
     const { data: selectedNote } = useGetDocument(selectedNoteId)
 
+    
+
     useEffect(() => {
+        if(!notes) return
         setFilteredDocuments(
-            documents.filter((doc) =>
+            notes.filter((doc) =>
                 doc.title.toLowerCase().includes(searchTerm.toLowerCase())
             )
         )
-    }, [documents, searchTerm])
+    }, [notes, searchTerm])
 
     const handleNoteClick = (id: string) => {
         setSelectedNoteId(id)
     }
 
+    if(!filteredDocuments) return null
+
     return (
         <div className="h-full flex">
             <div className="w-[15%] py-4 h-full bg-surface-100 border-r border-surface-200 flex flex-col">
                 <div className="p-4">
-                    <Button onClick={createNote} className="w-full" variant="default">
+                    <Button onClick={newNote} className="w-full" variant="default">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Nueva Nota
                     </Button>

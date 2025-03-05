@@ -5,16 +5,20 @@ import Link from "next/link"
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { motion } from "framer-motion"
+import { useBoffSession } from "@/services/useBoffSession"
 
-interface MenuItemProps {
+ interface MenuItemProps {
   href: string
   label: string
   icon?: React.ReactNode
+  description?: string
+  roles?: string[]
 }
 
-interface MenuSectionProps {
+export interface MenuSectionProps {
   title: string
   items: MenuItemProps[]
+  description?: string
 }
 
 interface CustomDropdownMenuProps {
@@ -27,6 +31,7 @@ const MotionLink = motion(Link)
 
 export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomDropdownMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { hasRole } = useBoffSession()
 
   const closeMenu = () => {
     setIsOpen(false)
@@ -57,36 +62,37 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       </Button>
       {isOpen && (
         <div 
-          className="absolute pt-3 z-10 w-96 bg-surface-800/95 backdrop-blur-sm shadow-xl shadow-surface-800/20 rounded-lg overflow-hidden"
+          className="absolute pt-3 z-10 w-96 bg-surface-900 backdrop-blur-sm shadow-xl shadow-surface-900/20 rounded-lg overflow-hidden"
         >
-          <div className="border border-surface-700 border-t-surface-800">
-          {sections.map((section, index) => (
-            <React.Fragment key={section.title}>
-              {index > 0 && <div className="bg-surface-700 h-[1px]"/>}
-              <h3 className="px-4 py-2 text-sm font-semibold text-amber-400/90 uppercase tracking-wider">{section.title}</h3>
-              {section.items.map((item, itemIndex) => (
-                <MotionLink
-                  href={item.href}
-                  className="px-4 py-2 text-base text-primary-200 hover:text-primary-100 hover:bg-surface-700/50 cursor-pointer transition-colors duration-200 focus:bg-surface-700/70 focus:text-primary-100 flex items-center justify-between group"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.2, delay: itemIndex * 0.05 }}
-                  key={item.href}
-                  onClick={closeMenu}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon && <span className="text-primary-400">{item.icon}</span>}
-                    {item.label}
-                  </span>
-                  <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                </MotionLink>
-              ))}
-            </React.Fragment>
-          ))}
-        </div>
+          <div className="border border-surface-800 border-t-surface-900">
+            {sections.map((section, index) => (
+              <React.Fragment key={section.title}>
+                {index > 0 && <div className="bg-surface-800 h-[1px]"/>}
+                <h3 className="px-4 py-2 text-sm font-semibold text-amber-400/90 uppercase tracking-wider">{section.title}</h3>
+                {section.items
+                  .filter(item => !item.roles || hasRole(item.roles))
+                  .map((item, itemIndex) => (
+                    <MotionLink
+                      href={item.href}
+                      className="px-4 py-2 text-base text-primary-200 hover:text-primary-100 hover:bg-surface-800/50 cursor-pointer transition-colors duration-200 focus:bg-surface-800/70 focus:text-primary-100 flex items-center justify-between group"
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: itemIndex * 0.05 }}
+                      key={item.href}
+                      onClick={closeMenu}
+                    >
+                      <span className="flex items-center gap-3">
+                        {item.icon && <span className="text-primary-400">{item.icon}</span>}
+                        {item.label}
+                      </span>
+                      <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    </MotionLink>
+                  ))}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       )}
     </div>
   )
 }
-

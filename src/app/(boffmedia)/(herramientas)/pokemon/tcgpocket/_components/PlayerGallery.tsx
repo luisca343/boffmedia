@@ -122,7 +122,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
         if (result.message) {
           toast.info(result.message)
         } else {
-          setBestPackData(result)
+          setBestPackData(result.data as { bestPack: PackData, allPackProbabilities: AllPackProbabilities })
           setEventPackData(null)
           setIsDialogOpen(true)
         }
@@ -132,7 +132,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
         if (result.message) {
           toast.info(result.message)
         } else {
-          setEventPackData(result)
+          setEventPackData(result.data as { bestPack: PackData, allPackProbabilities: AllPackProbabilities, missingEventCards: string[], totalEventCards: number })
           setBestPackData(null)
           setIsDialogOpen(true)
         }

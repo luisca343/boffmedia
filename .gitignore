@@ -38,3 +38,10 @@ next-env.d.ts
 /src/ckeditor5/node_modules
 /src/ckeditor5/build
 src/app/icon.ico
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

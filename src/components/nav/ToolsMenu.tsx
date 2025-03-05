@@ -1,24 +1,53 @@
-
-import { CustomDropdownMenu } from './DropdownMenu'
-import { Wrench, GamepadIcon as PokemonGo, ComputerIcon as Steam } from 'lucide-react'
+import { FaSteam } from 'react-icons/fa'
+import { CustomDropdownMenu, MenuSectionProps } from './DropdownMenu'
+import { 
+  Gamepad2, 
+  Swords, 
+  Cpu, 
+  Gift, 
+} from 'lucide-react'
 
 const HERRAMIENTAS_MENU = {
   triggerLabel: "Herramientas",
   sections: [
     {
       title: "Pokémon",
+      description: "Herramientas relacionadas con juegos Pokémon",
       items: [
-        { href: "/pokemon/pmdsky", label: "Generador de Correos Exploradores del Cielo", icon: <PokemonGo className="h-5 w-5" /> },
-        { href: "/pokemon/tcgpocket", label: "TCG Pocket", icon: <PokemonGo className="h-5 w-5" /> },
+        { 
+          href: "/pokemon/pmdsky", 
+          label: "Exploradores del Cielo", 
+          description: "Generador de correos para Pokémon Mystery Dungeon",
+          icon: <Gamepad2 className="h-5 w-5" />
+        },
+        { 
+          href: "/pokemon/tcgpocket", 
+          label: "TCG Pocket", 
+          description: "Herramientas para Pokémon Trading Card Game",
+          icon: <Swords className="h-5 w-5" />
+        },
       ],
     },
     {
-      title: "Otros",
+      title: "Gaming",
+      description: "Utilidades para jugadores",
       items: [
-        { href: "/otros/keys", label: "Claves de Steam", icon: <Steam className="h-5 w-5" /> },
+        { 
+          href: "/otros/keys", 
+          label: "Claves de Steam", 
+          description: "Gestiona y comparte tus claves de juegos",
+          icon: <FaSteam className="h-5 w-5" />,
+          roles: ["BOFF_ADMIN"]
+        },
+        { 
+          href: "/otros/sorteos", 
+          label: "Sorteos", 
+          description: "Participa en sorteos de juegos y más",
+          icon: <Gift className="h-5 w-5" />
+        },
       ],
     },
-  ],
+  ] as MenuSectionProps[],
 }
 
 export function HerramientasMenu() {

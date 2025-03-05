@@ -1,144 +1,147 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-"use client";
+"use client"
 
-import useSocketStore from "@/app/useSocketStore";
-import { getSmartRotomUser } from "@/lib/utils";
-import { rotomPOST } from "@/services/boffAPI";
-import { useEffect, useRef, useState } from "react";
-import { Message } from "./Message";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
-import { ChatData } from "../_types/Chat";
-import { Phone, Send, X } from "lucide-react";
-import { useBoffSession } from "@/services/useBoffSession";
-import { chatAppService } from "@/services/api/smartrotom/chatAppService";
+import { Message } from "./Message"
+import { toast } from "react-toastify"
+import type { ChatData, Message as MessageType } from "../_types/Chat"
+import { Phone, Send, X } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { getSmartRotomUser } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { useEffect, useRef, useState } from "react"
+import { useBoffSession } from "@/services/useBoffSession"
+import { chatAppService } from "@/services/api/smartrotom/chatAppService"
+import useSocketStore from "@/stores/useSocketStore"
 
 export function Chat({
   chats,
   activeChat,
   setActiveChat,
 }: {
-  chats: ChatData[];
-  activeChat: number;
-  setActiveChat: (id: number) => void;
+  chats: ChatData[]
+  activeChat: number
+  setActiveChat: (id: number) => void
 }) {
-  const [chat, setChat] = useState(chats[0] as ChatData);
-  const [message, setMessage] = useState("" as string);
-  const { socket, connect } = useSocketStore();
-  const { session } = useBoffSession();
+  const [chat, setChat] = useState(chats[0] as ChatData)
+  const [message, setMessage] = useState("")
+  const { socket } = useSocketStore()
+  const { session } = useBoffSession()
 
-  const messagesEndRef = useRef(null);
+  const messagesStartRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = () => {
+    messagesStartRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
+  }
 
   useEffect(() => {
-    // @ts-ignore
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chat.messages]);
+    scrollToBottom()
+  }, [chat.messages, chat]) // Added chat to dependencies
 
   useEffect(() => {
-    const chat = chats.find((chat) => chat.id === activeChat);
-    if (!chat) return;
-    setChat(chat);
-    /*
-        rotomGET(`/chatapp/messages/${chat.id}`)
-            .then((res) => {
-                console.log(`Messages from chat ${chat.id}`, res)
-                setMessages(res);
-            })*/
+    const chat = chats.find((chat) => chat.id === activeChat)
+    if (!chat) return
+    setChat(chat)
 
     if (socket) {
-      /*
-            socket.on('chat:message', (message: Message) => {
-                setMessages((prev) => [...prev, message])
-            })*/
+      // Socket logic here if needed
     }
-  }, [activeChat]);
+  }, [activeChat, chats, socket])
 
   function sendMessage() {
     if (!message.trim()) {
-      return;
+      return
     }
 
-    chatAppService.createMessage(chat.id, {
-      message: message,
+    const newMessage: MessageType = {
+      id: Date.now(), // Temporary ID
+      content: message,
+      createdAt: new Date().toISOString(),
       uuid: getSmartRotomUser(session).uuid,
-    }).then((res) => {
-      setMessage("");
-    });
+      chatId: chat.id,
+      type: "text",
+    }
+
+    setChat((prev) => ({
+      ...prev,
+      messages: [newMessage, ...prev.messages],
+    }))
+
+    chatAppService
+      .createMessage(chat.id, {
+        message: message,
+        uuid: getSmartRotomUser(session).uuid,
+      })
+      .then(() => {
+        setMessage("")
+      })
+      .catch((error) => {
+        console.error("Failed to send message:", error)
+        toast.error("Failed to send message. Please try again.")
+      })
   }
 
   function call() {
     chatAppService.call(chat.id, getSmartRotomUser(session).uuid).then((res) => {
-      if (res.error) return toast.error(res.error);
-    });
+      if (res.error) return toast.error(res.error)
+    })
   }
 
   return (
-    <div className="flex flex-col w-full h-full overflow-hidden">
-      <div className="h-16 p-2 text-xl w-full bg-neutral-800 flex items-center text-neutral-50 border-b border-neutral-900">
+    <div className="flex flex-col w-full h-full">
+      <div className="h-16 px-4 w-full bg-neutral-800 flex items-center border-b border-neutral-900 shadow-sm">
         <img
-          src={chat.image}
-          className="ml-2 rounded-full"
-          width="50px"
-          height="50px"
-          alt=""
+          src={chat.image || "/placeholder.svg"}
+          className="rounded-full object-cover"
+          width="40"
+          height="40"
+          alt={chat.name}
         />
-        <div className="ml-2">{chat.name}</div>
-        <Button className="ml-auto bg-inherit p-2" onClick={() => call()}>
-          <Phone height={30} width={30} strokeWidth={2} />
+        <div className="ml-3 font-semibold text-neutral-50">{chat.name}</div>
+        <Button variant="ghost" size="icon" className="ml-auto bg-inherit" onClick={() => call()}>
+          <Phone className="h-5 w-5" />
         </Button>
-        <Button className="bg-inherit p-2" onClick={() => setActiveChat(0)}>
-          <X height={30} width={30} strokeWidth={2} />
+        <Button variant="ghost" size="icon" className="bg-inherit" onClick={() => setActiveChat(0)}>
+          <X className="h-5 w-5" />
         </Button>
       </div>
       <div
-        className="w-full flex flex-col-reverse overflow-auto h-full items-start justify-start"
-        style={{ backgroundImage: "url('/smartrotom/img/fondoChat2.avif')" }}
+        className="flex-1 overflow-y-auto p-4 flex flex-col-reverse"
+        style={{
+          backgroundImage: "url('/smartrotom/img/fondoChat2.avif')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
       >
-        {chat.messages.map((message, index) => {
-          const previousMessage = chat.messages[index + 1];
-          const currentGroup = chat; //chats.find((chat) => chat.id === activeChat);
-          if (currentGroup?.type !== 1)
-            return (
-              <Message
-                message={message}
-                session={session}
-                key={message.id}
-                img={true}
-                prev={previousMessage?.uuid}
-              />
-            );
-          return (
-            <Message
-              message={message}
-              session={session}
-              key={message.id}
-              prev={previousMessage?.uuid}
-            />
-          );
-        })}
+        <div ref={messagesStartRef} />
+        {chat.messages.map((message, index) => (
+          <Message
+            key={message.id}
+            message={message}
+            session={session}
+            img={chat.type !== 1}
+            prev={index < chat.messages.length - 1 ? chat.messages[index + 1] : null}
+            next={index > 0 ? chat.messages[index - 1] : null}
+          />
+        ))}
       </div>
       <div className="p-4 bg-neutral-800 flex items-center space-x-2 border-t border-black">
         <Input
+          variant="neutral"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage();
+              e.preventDefault()
+              sendMessage()
             }
           }}
-          placeholder="Escribe un mensaje"
+          placeholder="Escribe un mensaje..."
           className="flex-1"
         />
-        <Button
-          type="submit"
-          onClick={sendMessage}
-          className="bg-primary-400 hover:bg-primary-500 text-black"
-        >
-          <Send />
+        <Button type="submit" onClick={sendMessage} className="bg-primary-400 hover:bg-primary-500 text-black">
+          <Send className="h-5 w-5" />
         </Button>
       </div>
     </div>
-  );
+  )
 }
+

@@ -18,9 +18,9 @@ export default function Expansions({
   const [cards, setCards] = useState<Card[]>([]);
 
   useEffect(() => {
-    boffGET(`/herramientas/ptcgp/cards/${expansion}`).then((data: Card[]) => {
+    boffGET(`/herramientas/ptcgp/cards/${expansion}`).then((data) => {
       console.log(data);
-      setCards(data);
+      setCards(data.data as Card[]);
     });
   }, []);
 

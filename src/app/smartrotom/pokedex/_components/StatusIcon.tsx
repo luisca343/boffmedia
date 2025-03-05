@@ -1,11 +1,5 @@
 import Image from "next/image"
-
-export enum Status {
-    UNKNOWN,
-    SEEN,
-    CAUGHT,
-    SHINY
-}
+import { PokedexStatus } from "../dexUtils"
 
 export function StatusIcon({palette, seenAt, caughtAt}: {palette: string, seenAt: Date | string, caughtAt: Date | string | undefined | null}){
     if(caughtAt) {
@@ -17,7 +11,7 @@ export function StatusIcon({palette, seenAt, caughtAt}: {palette: string, seenAt
 }
 
 
-export function StatusIconv2({palette, status, width=24, height=24}: {palette: string, status: Status, width?: number, height?: number}){
+export function StatusIconv2({palette, status, width=24, height=24}: {palette: string, status: PokedexStatus, width?: number, height?: number}){
     if(status === 2) {
         if(palette === 'shiny') return <Image height={ height / 3 } width={ width / 3 } src={`/smartrotom/img/apps/pokedex/shiny.webp`} alt="Shiny"/>
         return <Image height={ height / 3} width={ width / 3} src={`/smartrotom/img/apps/pokedex/capturado.webp`} alt="Capturado"/>

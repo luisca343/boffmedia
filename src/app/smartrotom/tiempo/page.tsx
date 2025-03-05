@@ -13,7 +13,7 @@ import {
 import useGetWeather from "./_hooks/useGetWeather";
 
 export default function Component() {
-  const { weatherData, timeLeft, minecraftTime, refreshWeather } = useGetWeather();
+  const { weatherData, minecraftTime, refreshWeather } = useGetWeather();
 
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -70,7 +70,7 @@ export default function Component() {
               {weatherData.weather}
             </p>
             <p className="text-sm text-surface-600">
-              Cambia en: {formatTime(timeLeft)}
+              Cambia en: {formatTime(weatherData.timeUntilChange)}
             </p>
           </div>
         </div>

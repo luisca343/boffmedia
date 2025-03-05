@@ -15,8 +15,8 @@ export default function Movimientos() {
     const t  = useTranslations("");
 
     useEffect(() => {
-        rotomGET('/pokemon/moves').then((res) => {
-            setMoves(res);
+        rotomGET('/pokemon/moves').then((res:any) => {
+            setMoves(res.data);
         });
     }, []);
 

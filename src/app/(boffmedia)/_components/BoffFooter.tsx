@@ -1,101 +1,105 @@
 import Link from "next/link"
-import { TbBrandBluesky, TbBrandDiscord, TbBrandInstagram, TbBrandTiktok, TbBrandTwitch, TbBrandTwitter, TbBrandYoutube } from "react-icons/tb"
-
-const footerLinks = [
-  { name: "Contacto", link: "/contacto" },
-  /*
-  {
-    name: "Política de Devoluciones y Cancelaciones",
-    link: "/politicas/devoluciones",
-  },
-  {
-    name: "Política de Reembolsos",
-    link: "/politicas/reembolsos",
-  },*/
-  {
-    name: "Términos de Servicio",
-    link: "/politicas/terminos",
-  },
-  {
-    name: "Política de Privacidad",
-    link: "/politicas/privacidad",
-  },
-]
-
-const socialLinks = [
-  {
-    name: "Twitter",
-    icon: TbBrandTwitter,
-    href: "https://twitter.com/boffmedia",
-  },
-  {
-    name: "Bluesky",
-    icon: TbBrandBluesky,
-    href: "https://bsky.app/profile/boffmedia.es",
-  },
-  {
-    name: "Instagram",
-    icon: TbBrandInstagram,
-    href: "https://instagram.com/boffmedia",
-  },
-  {
-    name: "YouTube",
-    icon: TbBrandYoutube,
-    href: "https://www.youtube.com/@boffmedia",
-  },
-  {
-    name: "Twitch",
-    icon: TbBrandTwitch,
-    href: "https://twitch.tv/boffmedia",
-  },
-  {
-    name: "TikTok",
-    icon: TbBrandTiktok,
-    href: "https://tiktok.com/@boffmedia",
-  },
-  {
-    name: "Discord",
-    icon: TbBrandDiscord,
-    href: "https://discord.gg/RjhVY2eK9m",
-  },
-]
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Gamepad } from "lucide-react"
 
 export function BoffFooter() {
   return (
-    <footer className="bg-surface-800 text-primary-100 py-6">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-          <div className="text-center md:text-left">
-            <p className="text-sm">&copy; 2024 BoffMedia. Todos los derechos reservados.</p>
+    <footer className="bg-surface-800 h-72">
+      <div className="container mx-auto px-4 pt-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Gamepad className="h-6 w-6 text-primary-500" />
+              <span className="text-lg font-bold text-surface-50">BoffMedia</span>
+            </div>
+            <p className="text-sm text-surface-300">Tu plataforma de gaming definitiva</p>
           </div>
-          <nav className="order-last md:order-none">
-            <ul className="flex flex-wrap justify-center gap-2 text-xs">
-              {footerLinks.map((item) => (
-                <li key={item.name}>
-                  <Link
-                    href={item.link}
-                    className="text-primary-300 hover:text-primary-400 transition duration-300"
-                  >
-                    {item.name}
-                  </Link>
-                </li>
-              ))}
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-surface-50">Plataforma</h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/games"
+                  className="text-surface-300 hover:text-primary-400 transition-colors"
+                >
+                  Juegos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/events"
+                  className="text-surface-300 hover:text-primary-400 transition-colors"
+                >
+                  Eventos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/community"
+                  className="text-surface-300 hover:text-primary-400 transition-colors"
+                >
+                  Comunidad
+                </Link>
+              </li>
             </ul>
-          </nav>
-          <div className="flex justify-center md:justify-end space-x-3">
-            {socialLinks.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="text-primary-300 hover:text-primary-400 transition duration-300"
-              >
-                <item.icon className="w-6 h-6" />
-                <span className="sr-only">Síguenos en {item.name}</span>
-              </Link>
-            ))}
+          </div>
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-surface-50">Compañía</h4>
+            <ul className="space-y-2 text-sm">
+              <li>
+                <Link
+                  href="/about"
+                  className="text-surface-300 hover:text-primary-400 transition-colors"
+                >
+                  Sobre Nosotros
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/blog"
+                  className="text-surface-300 hover:text-primary-400 transition-colors"
+                >
+                  Blog
+                </Link>
+              </li>
+            </ul>
+          </div>
+          <div className="space-y-4">
+            <h4 className="text-sm font-semibold text-surface-50">Suscríbete al Newsletter</h4>
+            <div className="flex space-x-2">
+              <Input
+                placeholder="Email"
+                type="email"
+                className="bg-surface-700 border-surface-600"
+              />
+              <Button type="submit" className="bg-primary-500 hover:bg-primary-600 text-white">
+                Unirse
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-surface-700 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-surface-300">
+            © 2024 BoffMedia. Todos los derechos reservados.
+          </p>
+          <div className="flex gap-4">
+            <Link
+              href="/privacidad"
+              className="text-sm text-surface-300 hover:text-primary-400 transition-colors"
+            >
+              Privacidad
+            </Link>
+            <Link
+              href="/terminos"
+              className="text-sm text-surface-300 hover:text-primary-400 transition-colors"
+            >
+              Términos
+            </Link>
           </div>
         </div>
       </div>
     </footer>
   )
 }
+

@@ -1,4 +1,6 @@
-export function getValidAccountId(accounts: { id: number }[]): number {
+import { Account } from "@/services/api/smartrotom/usersService";
+
+export function getValidAccountId(accounts: Account[]): number {
     const storedAccount = localStorage.getItem("activeAccount");
     if (storedAccount) {
         const accountId = parseInt(storedAccount);

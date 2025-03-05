@@ -1,9 +1,9 @@
 import React from 'react'
-import { QuestData, IDialogue, IQuestObjective, IQuestReward, QuestStatus, INPC } from "../_types/questTypes"
 import { Progress } from "@/components/ui/progress"
 import { Scroll, Target, Gift, MapPin, User } from 'lucide-react'
 import NpcSkin from "@/components/smartrotom/MinecraftSkin"
 import { ItemSprite } from "../../pokedex/_components/PokemonSprite"
+import { IDialogue, IQuestObjective, IQuestReward, NPC, QuestData, QuestStatus } from '@/types/misiones'
 
 export function getStatusStyles(status: QuestStatus) {
   switch (status) {
@@ -20,17 +20,17 @@ export function getStatusStyles(status: QuestStatus) {
   }
 }
 
-export function getSkin(npcs: INPC[], dialogId: number) {
+export function getSkin(npcs: NPC[], dialogId: number) {
   const npc = npcs?.find(npc => npc.dialogId === dialogId)
   return npc ? npc.skin : "steve"
 }
 
-export function getNPCName(npcs: INPC[], dialogId: number) {
+export function getNPCName(npcs: NPC[], dialogId: number) {
   const npc = npcs.find(npc => npc.dialogId === dialogId)
   return npc ? npc.name : "Steve"
 }
 
-export function QuestDetails({ quest, dialogs, npcs }: { quest: QuestData; dialogs: IDialogue[]; npcs: INPC[] }) {
+export function QuestDetails({ quest, dialogs, npcs }: { quest: QuestData; dialogs: IDialogue[]; npcs: NPC[] }) {
   return (
     <div className="bg-stone-800 text-stone-100 p-6 min-h-full w-full">
         <div className='flex justify-between'>
@@ -106,7 +106,7 @@ export function QuestDetails({ quest, dialogs, npcs }: { quest: QuestData; dialo
   )
 }
 
-export function DialogItem({ dialog, npcs }: { dialog: IDialogue; npcs: INPC[] }) {
+export function DialogItem({ dialog, npcs }: { dialog: IDialogue; npcs: NPC[] }) {
   return (
     <div className="bg-stone-800 text-stone-100 p-4 rounded-lg border-2 border-amber-500 shadow-lg mb-4">
       <h3 className="flex items-center text-xl font-bold text-amber-400 mb-2">

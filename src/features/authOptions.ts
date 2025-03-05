@@ -5,6 +5,9 @@ import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
+import { User } from "@/services/api/smartrotom/usersService";
+
+
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -19,14 +22,14 @@ export const authOptions: NextAuthOptions = {
         username: { label: "Username", type: "text", placeholder: "jsmith" },
         password: { label: "Password", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         try {
           if (!credentials?.username || !credentials?.password) {
             throw new AuthError("Missing username or password", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          const user = await boffPOST(`/users/login`, credentials);
-          if (user && !user.error) {
-            return user;
+          const response = (await boffPOST(`/users/login`, credentials)).data as any;
+          if (response && !response.error) {
+            return response;
           }
           throw new AuthError("Invalid credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
         } catch (error) {
@@ -42,21 +45,25 @@ export const authOptions: NextAuthOptions = {
         uuid: { label: "UUID", type: "text" },
         world: { label: "World", type: "text" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         try {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          const user = await boffPOST(`/users/loginmc`, credentials);
-          if (user && !user.error) {
-            return {
-              ...user,
+          const response = (await boffPOST(`/users/loginmc`, credentials)).data as any;
+          if (response && !response.error) {
+            const user: User = {
+              id: response.id,
+              name: response.name,
+              email: response.email,
+              image: response.image,
               smartRotomUser: {
                 username: credentials.username,
                 uuid: credentials.uuid,
                 world: credentials.world
               }
             };
+            return user;
           }
           throw new AuthError("Invalid Minecraft credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
         } catch (error) {
@@ -88,15 +95,15 @@ export const authOptions: NextAuthOptions = {
         });
         
         try {
-          const response = await boffPOST('/users/google/callback', { 
+          const response = (await boffPOST('/users/google/callback', { 
             email: profile?.email,
             name: profile?.name,
             picture: profile?.image
-          });
+          })).data as any;
           
           console.log('Google callback response:', response);
 
-          if (!response.ok) {
+          if (!response.statusCode || response.statusCode !== 200) {
             throw new Error('Failed to authenticate with backend');
           }
 

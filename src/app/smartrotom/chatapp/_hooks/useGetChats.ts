@@ -3,30 +3,27 @@ import { useSession } from 'next-auth/react';
 import { Session } from 'next-auth';
 import { ChatData, Message } from '../_types/Chat';
 import { getSmartRotomUser } from '@/lib/utils';
-import { useChatAppGetChats } from '@/hooks/chatapp/useGetChats';
+import { useGetChats } from '@/hooks/chatapp/useGetChats';
 
 type useChatAppGetChatsWithUpdateReturnType = {
   session: Session,
-  chats: ChatData[] | null,
-  setChats: React.Dispatch<React.SetStateAction<ChatData[] | null>>,
+  chats: any | null,
+  setChats: React.Dispatch<React.SetStateAction<any | null>>,
   refresh: () => void,
   updateChats: (message: Message, activeChat: number) => void,
-  loading: boolean,
+  isLoading: boolean,
   error: any
 };
 
 function useChatAppGetChatsWithUpdate(): useChatAppGetChatsWithUpdateReturnType {
   const { data: session } = useSession() as unknown as { data: Session };
-  const { getChats, setChats, chats, loading, error } = useChatAppGetChats(getSmartRotomUser(session).uuid);
+  const { setChats, chats, isLoading, refetch, error } = useGetChats(getSmartRotomUser(session).uuid);
 
-  const refresh = useCallback(() => {
-    getChats();
-  }, [getChats]);
 
   const updateChats = (message: Message, activeChat: number) => {
-    setChats((prev: ChatData[] | null) => {
+    setChats((prev: any) => {
       if (!prev) return prev;
-      const chat = prev.find((chat) => chat.id == message.chatId);
+      const chat = prev.find((chat: ChatData) => chat.id == message.chatId); 
       if (!chat) return prev;
       chat.messages.unshift({ id: message.id, chatId: message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type });
 
@@ -42,7 +39,7 @@ function useChatAppGetChatsWithUpdate(): useChatAppGetChatsWithUpdateReturnType 
     if (activeChat !== message.id) return;
   };
 
-  return { session, chats, setChats, refresh, updateChats, loading, error };
+  return { session, chats, setChats, refresh: refetch, updateChats, isLoading, error };
 }
 
 export default useChatAppGetChatsWithUpdate;

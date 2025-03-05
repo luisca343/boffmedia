@@ -1,16 +1,21 @@
-import { useCallback } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { appsService } from '@/services/api/smartrotom/appsService';
-import { UpdateAppDto } from '@/types/dto/update-app.dto';
-import { App } from '@/types';
+import { useRotomRequest } from "../useRotomRequest";
+import { appsService } from "@/services/api/smartrotom/appsService";
+import { UpdateAppDto } from "@/types/dto/update-app.dto";
 
-export const useUpdateApp = () => {
-  const { loading, error, handleRequest } = useRotomRequest();
+export function useUpdateApp() {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.update)
 
-  const update = useCallback((id: number, updateAppDto: UpdateAppDto) => {
-    return handleRequest<App>(() => appsService.update(id, updateAppDto));
-  }, [handleRequest]);
+  const updateApp = (id: number, updateAppDto: UpdateAppDto) => {
+    return appsService.update(id, updateAppDto);
+  }
 
-  return { update, loading, error };
-};
+  return {
+    updatedApp: data,
+    error,
+    isLoading,
+    refetch,
+    updateApp,
+    setUpdatedApp: setData
+  }
+}
 

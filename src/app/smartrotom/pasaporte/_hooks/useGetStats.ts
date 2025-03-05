@@ -5,7 +5,7 @@ export function useGetStats(uuid: string) {
     const [stats, setStats] = useState<Stats | null>(null);
 
     useEffect(() => {
-        rotomPOST('/stats',{uuid}).then((res)=>{
+        rotomPOST('/stats',{uuid}).then((res:any)=>{
             setStats(res)
           })
     }, [])

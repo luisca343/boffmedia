@@ -1,13 +1,19 @@
-import { rotomGET, rotomPOST } from '@/services/boffAPI';
+import { rotomPOST, rotomGET } from '@/services/boffAPI'
+import { HistoryEntry, RankingEntry, RewardEntry, UnclaimedReward } from '@/types/mina';
+
+export type PlayResponse = any;
+
+
 
 export const minaService = {
-  claim: (data: { uuid: string }) => rotomPOST('/mine/claim', data),
-  endGame: (data: { uuid: string, rewards: { value: number, id: number }[] }) => rotomPOST('/mine/endgame', data),
-  getEnergy: (uuid: string) => rotomGET(`/mine/energy/${uuid}`),
-  getHistory: (uuid: string) => rotomGET(`/mine/history/${uuid}`),
-  play: (data: { uuid: string }) => rotomPOST('/mine/play', data),
-  getRanking: () => rotomGET('/mine/ranking'),
-  getRewards: () => rotomGET('/mine/rewards'),
-  getRewardsByType: () => rotomGET('/mine/rewardsbytype'),
-  getUnclaimed: (uuid: string) => rotomGET(`/mine/unclaimed/${uuid}`)
-};
+  claim: (params: { uuid: string }) => rotomPOST<number[]>('/mine/claim', params), // Returns an array of claimed reward ids
+  endGame: (params: { uuid: string, rewards: { value: number, id: number }[] }) => rotomPOST<{idPartida: number}>('/mine/endgame', params),
+  getEnergy: (uuid: string) => rotomGET<{energy: number, maxEnergy: number, lastCharge: string}>(`/mine/energy/${uuid}`),
+  getHistory: (uuid: string) => rotomGET<{[key: number]: HistoryEntry[]}>(`/mine/history/${uuid}`),
+  play: (params: { uuid: string }) => rotomPOST<PlayResponse>('/mine/play', params), // TODO: Define response type
+  getRanking: () => rotomGET<RankingEntry[]>('/mine/ranking'),
+  getRewards: () => rotomGET<RewardEntry[]>('/mine/rewards'),
+  getRewardsByType: () => rotomGET<{ drops: { [key: string]: { items: RewardEntry[], totalValue: number } }, totalValue: number }>('/mine/rewardsbytype'),
+  getUnclaimed: (uuid: string) => rotomGET<UnclaimedReward[]>(`/mine/unclaimed/${uuid}`),
+}
+

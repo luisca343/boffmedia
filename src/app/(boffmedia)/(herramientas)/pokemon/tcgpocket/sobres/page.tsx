@@ -18,9 +18,8 @@ export default function TCGPocket() {
   const trans = useTranslations("tcgpocket");
 
   useEffect(() => {
-    boffGET("/herramientas/ptcgp/boosterpacks").then((data: Card[]) => {
-      console.log(data);
-      setCards(data);
+    boffGET("/herramientas/ptcgp/boosterpacks").then((data) => {
+      setCards(data.data as Card[]);
     });
   }, []);
 

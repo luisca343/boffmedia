@@ -1,21 +1,35 @@
-import { useCallback, useEffect } from 'react';
-import { useRotomRequest } from '../useRotomRequest';
-import { minaService } from '@/services/api/smartrotom/minaService';
-import { useBoffSession } from '@/services/useBoffSession';
+import { useEffect, useState } from "react";
+import { useRotomRequest } from "../useRotomRequest";
+import { minaService } from "@/services/api/smartrotom/minaService";
 
-export const useGetEnergy = () => {
-  const { session } = useBoffSession();
-  const { loading, error, data: energy, handleRequest } = useRotomRequest<number>();
-
-  const getEnergy = useCallback((uuid: string) => {
-    return handleRequest(() => minaService.getEnergy(uuid));
-  }, [handleRequest]);
+export function useGetEnergy(uuid: string) {
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.getEnergy, uuid)
+  const [maxEnergy, setMaxEnergy] = useState<number>(0)
+  const [energy, setEnergy] = useState<number>(0)
+  const [ultimaRecarga, setUltimaRecarga] = useState<Date>(new Date())
+  const [diff, setDiff] = useState(1)
 
   useEffect(() => {
-    if (session) {
-      getEnergy(session?.user?.smartRotomUser?.uuid!);
-    }
-  }, [session, getEnergy]);
+    if(!data) return
+    setMaxEnergy(data.maxEnergy)
+    setEnergy(data.energy)
+  
+    let date = new Date(Date.parse(data.lastCharge))
+    setUltimaRecarga(date)
+  
+    const diffTime = date?.getTime() - new Date().getTime() + 3600000;
+    setDiff(diffTime)
+  }, [data])
 
-  return { getEnergy, loading, error, energy };
-};
+  return {
+    energy,
+    setEnergy,
+    maxEnergy,
+    ultimaRecarga,
+    diff,
+    error,
+    isLoading,
+    refetch,
+  }
+}
+

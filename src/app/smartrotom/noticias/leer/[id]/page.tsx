@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import dynamic from "next/dynamic";
-import { rotomGET } from "@/services/boffAPI";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { InternalLink } from "@/components/nav/Link";
 import Image from "next/image";
 import FurretHeader from "../../_components/Header";
 import FurretFooter from "../../_components/Footer";
+import { useGetNewsById } from "@/hooks/documents/useGetNewsById";
 
 const CustomEditor = dynamic(() => import("@/components/editor/TestEditor"), {
   ssr: false,
@@ -16,26 +16,7 @@ const CustomEditor = dynamic(() => import("@/components/editor/TestEditor"), {
 
 export default function ReadPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const [data, setData] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(true);
-    rotomGET(`/documents/news/${id}`)
-      .then((res) => {
-        console.log(res);
-        setData(res);
-      })
-      .catch(() => {
-        setError(
-          "¡Oh no! Hubo un error al cargar el documento. ¿Quizás Furret está jugando con los cables?"
-        );
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, [id]);
+  const { article, error, isLoading } = useGetNewsById(id);
 
   if (isLoading) {
     return (
@@ -76,7 +57,9 @@ export default function ReadPage({ params }: { params: { id: string } }) {
                 <span className="text-7xl">❓</span>
               </div>
             </div>
-            <p className="text-3xl font-comic mb-6">{error}</p>
+            <p className="text-3xl font-comic mb-6">
+              ¡Oh no! Hubo un error al cargar el documento. ¿Quizás Furret está jugando con los cables?
+            </p>
             <div className="flex justify-center space-x-4">
               <InternalLink
                 href="/noticias"
@@ -98,14 +81,14 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   }
 
   function getContent() {
-    const modifiedContent = data.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
+    const modifiedContent = article?.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
     console.log(modifiedContent);
     return modifiedContent;
   }
 
   function getModifiedData() {
     return {
-      ...data,
+      ...article,
       content: getContent(),
     };
   }
@@ -117,7 +100,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
           <Card>
             <CardContent className="p-8">
               <h1 className="text-6xl font-bold mb-6 text-red-500 pop-shadow text-center">
-                {data.title}
+                {article?.title}
               </h1>
               <CustomEditor
                 document={getModifiedData()}
@@ -172,3 +155,4 @@ export default function ReadPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
+

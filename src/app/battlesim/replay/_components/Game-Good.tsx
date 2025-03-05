@@ -10,7 +10,6 @@ import { PlayerDataBar } from "../../_components/BattleSideBar";
 import { BattleCanvas } from "../../_components/BattleCanvas";
 import { Scene } from "../../_components/Scene";
 import { Button } from "@/components/ui/button";
-import { rotomGET } from "@/services/boffAPI";
 import { time } from "console";
 
 export function Game({battleName = 'medalla_doku'}: {battleName?: string}) {

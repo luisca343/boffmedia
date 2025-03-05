@@ -2,14 +2,14 @@
 
 import React, { useState, useMemo } from "react"
 import { useGetRotomQuests } from "./_hooks/useGetRotomQuests"
-import { QuestData, IDialogue, INPC, ICategories, QuestStatus } from "./_types/questTypes"
+import { QuestData, ICategories, QuestStatus } from "./_types/questTypes"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { getStatusStyles, QuestDetails, DialogItem } from "./_utils/questLogUtils"
 import { Scroll, Book, MessageSquare, Search, MapPin, ListFilter } from "lucide-react"
 import Fuse from 'fuse.js'
 
-const statusOrder: { [key in QuestStatus]: number } = {
+const statusOrder: { [key in any]: number } = {
   [QuestStatus.ACTIVE]: 1,
   [QuestStatus.AVAILABLE]: 2,
   [QuestStatus.COMPLETED]: 3,
@@ -30,17 +30,22 @@ export default function QuestLog() {
 
   const filteredQuests = useMemo(() => {
     if (!searchTerm) return quests
-    return fuse.search(searchTerm).map(result => result.item)
+    return fuse.search(searchTerm).map(result => result.item) 
   }, [searchTerm, fuse, quests])
 
   const sortedQuests = useMemo(() => {
-    return [...filteredQuests].sort((a, b) => statusOrder[a.status] - statusOrder[b.status])
+    return [...filteredQuests].sort((a:any, b:any) =>  {
+      const statusA = statusOrder[a.status] 
+      const statusB = statusOrder[b.status] 
+      return statusA - statusB
+    }
+    )
   }, [filteredQuests])
 
   const filteredCategories = useMemo(() => {
     const result: ICategories = {}
-    Object.entries(categories).forEach(([category, questIds]) => {
-      const filteredIds = questIds.filter(id => 
+    Object.entries(categories).forEach(([category, questIds]:any) => {
+      const filteredIds = questIds.filter((id:any) => 
         sortedQuests.some(quest => quest.id === id)
       )
       if (filteredIds.length > 0) {
@@ -53,7 +58,7 @@ export default function QuestLog() {
   if (!quests) return <div className="min-h-screen flex items-center justify-center bg-stone-900 text-amber-400">Cargando tu aventura...</div>
 
   return (
-    <div className="quests w-full h-full bg-[url('/smartrotom/img/apps/misiones/fantasy-bg.jpg')] bg-cover bg-center flex items-center justify-center">
+    <div className="quests w-full h-full bg-[url('/smartrotom/img/apps/misiones/bg.jpg')] bg-cover bg-center flex items-center justify-center">
       <div className="w-full h-full bg-stone-900/90 overflow-hidden backdrop-blur-sm relative flex flex-col">
         <div className="relative z-10 flex-grow flex flex-col overflow-hidden p-4">
           <h1 className="text-5xl font-bold text-center mb-8 text-amber-400 font-rpg">Registro de Misiones</h1>
@@ -125,7 +130,7 @@ export default function QuestLog() {
                     <ul className="space-y-2">
                       {sortedQuests
                         .filter(quest => !selectedCategory || categories[selectedCategory].includes(quest.id))
-                        .map((quest) => (
+                        .map((quest:any) => (
                           <li
                             key={quest.id}
                             className={`cursor-pointer p-2 rounded-md transition-colors ${

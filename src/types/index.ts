@@ -34,3 +34,11 @@ export type App = {
   active: number
 }
 
+export type SuccessResponse = {
+  success: boolean
+}
+
+export type SuccessResponseWithId = {
+  success: boolean
+  id: number
+}
