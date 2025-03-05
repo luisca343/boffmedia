@@ -76,9 +76,9 @@ export async function getPokemonSprite(
   form: string,
   palette = "none",
   hide: boolean,
-  pokedexData: PokedexData,
+  pokedexData?: PokedexData,
 ) {
-  const pokedexStatus = getPokedexStatus(id, form, hide, pokedexData)
+  const pokedexStatus = pokedexData ? getPokedexStatus(id, form, hide, pokedexData) : 0
   const key = `${id}_${form}_${palette}`
   if (indexedSprites[key]) {
     return {

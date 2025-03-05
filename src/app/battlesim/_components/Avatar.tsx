@@ -11,10 +11,12 @@ export function Avatar({ side, pov} : { side: Side, pov: 0 | 1}) {
     const avatar = player.name.includes('npc:') ? player.name.split(':')[1] : Sprites.getAvatar(avatarId);
     const avatarNumber = parseInt(avatarId);
 
+    console.log('=====================')
     console.log(player.name)
-    console.log(uuid !== null)
-    console.log(avatarNumber >= 0)
-    
+    console.log(avatarId)
+    console.log(avatar)
+    console.log(avatarNumber)
+    console.log(uuid)
 
     const baseStyles: React.CSSProperties = {
         position: 'absolute',
