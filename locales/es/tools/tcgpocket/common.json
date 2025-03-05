@@ -6,12 +6,15 @@
     "promo-a": "Promo A",
     "mythicalisland": "Isla Singular",
     "space-timesmackdown": "Pugna Espaciotemporal",
+    "triumphantlight": "Luz Triunfal",
     "packs": {
       "mewtwo": "Mewtwo - Genes Formidables",
       "charizard": "Charizard - Genes Formidables",
       "pikachu": "Pikachu - Genes Formidables",
-
-      "mew": "Mew - Isla Singular"
+      "mew": "Mew - Isla Singular",
+      "dialga": "Dialga - Pugna Espaciotemporal",
+      "palkia": "Palkia - Pugna Espaciotemporal",
+      "arceus": "Arceus - Luz Triunfal"
     },
 
     "item": {
