@@ -1,3 +1,4 @@
+
 import { CommunitySection } from "./_components/CommunitySection";
 import { EventsSection } from "./_components/EventsSection";
 import { FeaturedGames } from "./_components/FeaturedGames";

@@ -1,108 +1,210 @@
+"use client"
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-const Table = React.forwardRef<
-  HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
-    <table
-      ref={ref}
-      className={cn("w-full caption-bottom text-sm", className)}
-      {...props}
-    />
-  </div>
-))
+type TableVariant = "default" | "wingull"
+
+const TableVariantContext = React.createContext<TableVariant>("default")
+
+interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
+  variant?: TableVariant;
+}
+
+const Table = React.forwardRef<HTMLTableElement, TableProps>(
+  ({ className, variant = "default", ...props }, ref) => {
+    const variantStyles = {
+      default: "bg-surface-800",
+      wingull: "bg-blue-900"
+    }
+    
+    return (
+      <TableVariantContext.Provider value={variant}>
+        <div className={cn("relative w-full overflow-auto rounded-md", variantStyles[variant])}>
+          <table
+            ref={ref}
+            className={cn("w-full caption-bottom text-sm", className)}
+            {...props}
+          />
+        </div>
+      </TableVariantContext.Provider>
+    )
+  }
+)
 Table.displayName = "Table"
+
+const useTableVariant = () => React.useContext(TableVariantContext)
 
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b border-surface-700", className)} {...props} />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "border-surface-700 bg-surface-800/80",
+    wingull: "border-blue-700 bg-blue-900/80"
+  }
+  
+  return (
+    <thead 
+      ref={ref} 
+      className={cn(
+        "[&_tr]:border-b", 
+        variantStyles[variant], 
+        className
+      )} 
+      {...props} 
+    />
+  )
+})
 TableHeader.displayName = "TableHeader"
 
 const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tbody
-    ref={ref}
-    className={cn("[&_tr:last-child]:border-0", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "bg-surface-800",
+    wingull: "bg-blue-900"
+  }
+  
+  return (
+    <tbody
+      ref={ref}
+      className={cn("[&_tr:last-child]:border-0", variantStyles[variant], className)}
+      {...props}
+    />
+  )
+})
 TableBody.displayName = "TableBody"
 
 const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn(
-      "border-t border-surface-700 bg-surface-800/50 font-medium [&>tr]:last:border-b-0",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "border-surface-700 bg-surface-700/50",
+    wingull: "border-blue-700 bg-blue-800/50"
+  }
+  
+  return (
+    <tfoot
+      ref={ref}
+      className={cn(
+        "border-t font-medium [&>tr]:last:border-b-0",
+        variantStyles[variant],
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TableFooter.displayName = "TableFooter"
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
-  <tr
-    ref={ref}
-    className={cn(
-      "border-b border-surface-700 transition-colors hover:bg-surface-800/50 data-[state=selected]:bg-surface-800",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "border-surface-700 hover:bg-surface-700/50 data-[state=selected]:bg-surface-700",
+    wingull: "border-blue-700 hover:bg-blue-800/50 data-[state=selected]:bg-blue-800"
+  }
+  
+  return (
+    <tr
+      ref={ref}
+      className={cn(
+        "border-b transition-colors",
+        variantStyles[variant],
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <th
-    ref={ref}
-    className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-primary-300 [&:has([role=checkbox])]:pr-0",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "text-primary-300",
+    wingull: "text-blue-300"
+  }
+  
+  return (
+    <th
+      ref={ref}
+      className={cn(
+        "h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0",
+        variantStyles[variant],
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TableHead.displayName = "TableHead"
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
-  <td
-    ref={ref}
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "text-primary-400",
+    wingull: "text-blue-300"
+  }
+  
+  return (
+    <td
+      ref={ref}
+      className={cn(
+        "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+        variantStyles[variant],
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TableCell.displayName = "TableCell"
 
 const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
->(({ className, ...props }, ref) => (
-  <caption
-    ref={ref}
-    className={cn("mt-4 text-sm text-surface-400", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useTableVariant()
+  
+  const variantStyles = {
+    default: "text-surface-400",
+    wingull: "text-blue-400"
+  }
+  
+  return (
+    <caption
+      ref={ref}
+      className={cn(
+        "mt-4 text-sm",
+        variantStyles[variant],
+        className
+      )}
+      {...props}
+    />
+  )
+})
 TableCaption.displayName = "TableCaption"
 
 export {
@@ -115,3 +217,4 @@ export {
   TableCell,
   TableCaption,
 }
+export type { TableVariant }

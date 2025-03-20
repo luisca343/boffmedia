@@ -19,6 +19,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+type ComboboxVariant = "default" | "wingull" | "orange"
+
 interface ComboboxProps {
   data: { label: string, value: any }[];
   value: string;
@@ -26,7 +28,7 @@ interface ComboboxProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
-  variant?: 'default' | 'blue' | 'orange';
+  variant?: ComboboxVariant;
 }
 
 export function Combobox({ 
@@ -48,25 +50,31 @@ export function Combobox({
 
   const variantStyles = {
     default: {
-      button: "bg-background text-foreground border-input",
-      content: "",
-      input: "",
-      item: "text-foreground",
-      itemSelected: "bg-accent",
+      button: "bg-surface-800 text-primary-400 border-surface-700 hover:bg-surface-700 focus:ring-primary-400",
+      content: "bg-surface-800 border-surface-700",
+      command: "bg-surface-800 rounded-md",
+      input: "bg-surface-800 text-primary-400 placeholder-surface-500 border-surface-700 focus:ring-primary-400",
+      item: "text-primary-400 bg-surface-800 hover:bg-surface-900",
+      itemSelected: "bg-surface-900 text-primary-300",
+      emptyText: "text-primary-300"
     },
-    blue: {
-      button: "bg-blue-500 text-white border-blue-600 hover:bg-blue-600 focus:ring-blue-500",
-      content: "bg-blue-50 border-blue-200",
-      input: "bg-blue-100 text-blue-900 placeholder-blue-400",
-      item: "text-blue-900 hover:bg-blue-200",
-      itemSelected: "bg-blue-300 text-blue-900",
+    wingull: {
+      button: "bg-blue-900 text-blue-300 border-blue-800 hover:bg-blue-800 focus:ring-blue-400",
+      content: "bg-blue-900 border-blue-800",
+      command: "bg-blue-900 rounded-md",
+      input: "bg-blue-900 text-blue-300 placeholder-blue-500 border-blue-800 focus:ring-blue-400",
+      item: "text-blue-300 bg-blue-900 hover:bg-blue-950",
+      itemSelected: "bg-blue-950 text-blue-300",
+      emptyText: "text-blue-300"
     },
     orange: {
       button: "bg-gray-800 text-orange-100 border-orange-600 hover:bg-gray-700 focus:ring-orange-500",
       content: "bg-gray-800 border-orange-600",
+      command: "bg-gray-800 rounded-md",
       input: "bg-gray-700 text-orange-100 placeholder-orange-300 border-orange-600 focus:ring-orange-500",
-      item: "text-orange-100 hover:bg-gray-700",
-      itemSelected: "bg-orange-900 text-orange-100",
+      item: "text-orange-100 bg-gray-800 hover:bg-gray-900",
+      itemSelected: "bg-gray-900 text-orange-100",
+      emptyText: "text-orange-300"
     },
   }
 
@@ -94,9 +102,9 @@ export function Combobox({
         "w-[200px] p-0",
         variantStyles[variant].content
       )}>
-        <Command className={variant === 'orange' ? 'bg-gray-800 rounded-md' : ''}>
+        <Command className={variantStyles[variant].command}>
           <CommandInput 
-            dark={variant === 'orange'}
+            dark={variant === 'orange' || variant === 'wingull'}
             placeholder={placeholder} 
             className={cn(
               variantStyles[variant].input,
@@ -104,7 +112,9 @@ export function Combobox({
             )}
           />
           <CommandList>
-            <CommandEmpty className={variant === 'orange' ? 'text-orange-300' : ''}>No element found.</CommandEmpty>
+            <CommandEmpty className={variantStyles[variant].emptyText}>
+              No element found.
+            </CommandEmpty>
             <CommandGroup>
               {data.map((element) => (
                 <CommandItem
@@ -121,7 +131,9 @@ export function Combobox({
                     className={cn(
                       "mr-2 h-4 w-4",
                       value === element.value ? "opacity-100" : "opacity-0",
-                      variant === 'orange' && "text-orange-500"
+                      variant === 'default' && "text-primary-400",
+                      variant === 'orange' && "text-orange-500",
+                      variant === 'wingull' && "text-blue-400"
                     )}
                   />
                   {element.label}
@@ -134,3 +146,5 @@ export function Combobox({
     </Popover>
   )
 }
+
+export type { ComboboxVariant }

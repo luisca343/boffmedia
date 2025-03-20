@@ -5,19 +5,22 @@ import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 
 import { cn } from "@/lib/utils"
 
+type HoverCardVariant = "default" | "info" | "warning" | "paper" | "wingull"
+
 const HoverCard = HoverCardPrimitive.Root
 
 const HoverCardTrigger = HoverCardPrimitive.Trigger
 
 const HoverCardContent = React.forwardRef<
   React.ElementRef<typeof HoverCardPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content> & { variant?: "default" | "info" | "warning"  | "paper" }
+  React.ComponentPropsWithoutRef<typeof HoverCardPrimitive.Content> & { variant?: HoverCardVariant }
 >(({ className, align = "center", sideOffset = 4, variant = "default", ...props }, ref) => {
   const variantClasses = {
-    default: "bg-surface-800 border-primary-600 text-surface-100",
+    default: "bg-surface-800 border-surface-600 text-primary-400",
     info: "bg-blue-900 border-blue-600 text-blue-100",
     warning: "bg-yellow-900 border-yellow-600 text-yellow-100",
-    paper: "page border-2 border-black"
+    paper: "page border-2 border-black",
+    wingull: "bg-blue-900 border-blue-600 text-blue-300"
   }
 
   return (
@@ -42,3 +45,4 @@ const HoverCardContent = React.forwardRef<
 HoverCardContent.displayName = HoverCardPrimitive.Content.displayName
 
 export { HoverCard, HoverCardTrigger, HoverCardContent }
+export type { HoverCardVariant }

@@ -7,13 +7,31 @@ import { X } from 'lucide-react'
 
 import { cn } from "@/lib/utils"
 
-const Sheet = SheetPrimitive.Root
+type SheetVariant = "default" | "wingull"
+
+const SheetVariantContext = React.createContext<SheetVariant>("default")
+
+interface SheetProps extends SheetPrimitive.DialogProps {
+  variant?: SheetVariant;
+}
+
+const Sheet = ({ children, variant = "default", ...props }: SheetProps) => {
+  return (
+    <SheetVariantContext.Provider value={variant}>
+      <SheetPrimitive.Root {...props}>
+        {children}
+      </SheetPrimitive.Root>
+    </SheetVariantContext.Provider>
+  )
+}
 
 const SheetTrigger = SheetPrimitive.Trigger
 
 const SheetClose = SheetPrimitive.Close
 
 const SheetPortal = SheetPrimitive.Portal
+
+const useSheetVariant = () => React.useContext(SheetVariantContext)
 
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
@@ -31,16 +49,14 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const sheetVariants = cva(
-  "fixed z-50 gap-4 bg-surface-800 p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
+  "fixed z-50 gap-4 p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
   {
     variants: {
       side: {
-        top: "inset-x-0 top-0 border-b border-surface-700 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
-        bottom:
-          "inset-x-0 bottom-0 border-t border-surface-700 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r border-surface-700 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-        right:
-          "inset-y-0 right-0 h-full w-3/4 border-l border-surface-700 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+        top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
+        bottom: "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
+        right: "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
       },
     },
     defaultVariants: {
@@ -56,22 +72,39 @@ interface SheetContentProps
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
->(({ side = "right", className, children, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content
-      ref={ref}
-      className={cn(sheetVariants({ side }), className)}
-      {...props}
-    >
-      {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-surface-900 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-surface-800">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </SheetPrimitive.Close>
-    </SheetPrimitive.Content>
-  </SheetPortal>
-))
+>(({ side = "right", className, children, ...props }, ref) => {
+  const variant = useSheetVariant()
+  
+  const variantStyles = {
+    default: "bg-surface-800 border-surface-700 text-surface-100",
+    wingull: "bg-blue-900 border-blue-700 text-blue-100"
+  }
+  
+  const closeButtonStyles = {
+    default: "ring-offset-surface-900 focus:ring-primary-300 data-[state=open]:bg-surface-800",
+    wingull: "ring-offset-blue-950 focus:ring-blue-300 data-[state=open]:bg-blue-900"
+  }
+  
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        className={cn(sheetVariants({ side }), variantStyles[variant], className)}
+        {...props}
+      >
+        {children}
+        <SheetPrimitive.Close className={cn(
+          "absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none",
+          closeButtonStyles[variant]
+        )}>
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({
@@ -105,25 +138,43 @@ SheetFooter.displayName = "SheetFooter"
 const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title
-    ref={ref}
-    className={cn("text-lg font-semibold text-surface-100", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useSheetVariant()
+  
+  const variantStyles = {
+    default: "text-primary-400",
+    wingull: "text-blue-300"
+  }
+  
+  return (
+    <SheetPrimitive.Title
+      ref={ref}
+      className={cn("text-lg font-semibold", variantStyles[variant], className)}
+      {...props}
+    />
+  )
+})
 SheetTitle.displayName = SheetPrimitive.Title.displayName
 
 const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Description
-    ref={ref}
-    className={cn("text-sm text-surface-400", className)}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useSheetVariant()
+  
+  const variantStyles = {
+    default: "text-surface-400",
+    wingull: "text-blue-400"
+  }
+  
+  return (
+    <SheetPrimitive.Description
+      ref={ref}
+      className={cn("text-sm", variantStyles[variant], className)}
+      {...props}
+    />
+  )
+})
 SheetDescription.displayName = SheetPrimitive.Description.displayName
 
 export {
@@ -138,3 +189,4 @@ export {
   SheetTitle,
   SheetDescription,
 }
+export type { SheetVariant }

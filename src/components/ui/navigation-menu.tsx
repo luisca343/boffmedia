@@ -5,23 +5,35 @@ import { ChevronDown } from 'lucide-react'
 
 import { cn } from "@/lib/utils"
 
+type NavigationMenuVariant = "default" | "wingull"
+
+const NavigationMenuVariantContext = React.createContext<NavigationMenuVariant>("default")
+
+interface NavigationMenuProps extends React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root> {
+  variant?: NavigationMenuVariant;
+}
+
 const NavigationMenu = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Root>
->(({ className, children, ...props }, ref) => (
-  <NavigationMenuPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative z-10 flex max-w-max flex-1 items-center justify-center",
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <NavigationMenuViewport />
-  </NavigationMenuPrimitive.Root>
+  NavigationMenuProps
+>(({ className, children, variant = "default", ...props }, ref) => (
+  <NavigationMenuVariantContext.Provider value={variant}>
+    <NavigationMenuPrimitive.Root
+      ref={ref}
+      className={cn(
+        "relative z-10 flex max-w-max flex-1 items-center justify-center",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <NavigationMenuViewport />
+    </NavigationMenuPrimitive.Root>
+  </NavigationMenuVariantContext.Provider>
 ))
 NavigationMenu.displayName = NavigationMenuPrimitive.Root.displayName
+
+const useNavigationMenuVariant = () => React.useContext(NavigationMenuVariantContext)
 
 const NavigationMenuList = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.List>,
@@ -48,6 +60,7 @@ const navigationMenuTriggerStyle = cva(
         default: "",
         boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-300 hover:text-primary-100 focus:text-primary-300  px-0 font-normal text-base h-auto relative",
         boffmedia2: "bg-transparent hover:bg-transparent focus:bg-transparent focus:text-primary-300 text-primary-300 hover:text-primary-100 px-0 font-normal text-base h-auto relative",
+        wingull: "bg-blue-900 hover:bg-blue-800 focus:bg-blue-800 data-[active]:bg-blue-800/50 data-[state=open]:bg-blue-800/50 text-blue-100 hover:text-blue-50 focus:text-blue-50",
       },
     },
     defaultVariants: {
@@ -58,43 +71,65 @@ const navigationMenuTriggerStyle = cva(
 
 const NavigationMenuTrigger = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger> & { variant?: "default" | "boffmedia" }
->(({ className, children, variant = "default", ...props }, ref) => (
-  <NavigationMenuPrimitive.Trigger
-    ref={ref}
-    className={cn(navigationMenuTriggerStyle({ variant }), "group", className)}
-    {...props}
-  >
-    {children}{""}
-    {variant === "default" && (
-      <ChevronDown
-        className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
-        aria-hidden="true"
-      />
-    )}
-    {variant === "boffmedia" && (
-      <span
-        className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
-        aria-hidden="true"
-      />
-    )}
-  </NavigationMenuPrimitive.Trigger>
-))
+  React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Trigger> & { 
+    variant?: "default" | "boffmedia" | "boffmedia2" | "wingull" 
+  }
+>(({ className, children, variant, ...props }, ref) => {
+  const contextVariant = useNavigationMenuVariant()
+  const effectiveVariant = variant || contextVariant
+  
+  return (
+    <NavigationMenuPrimitive.Trigger
+      ref={ref}
+      className={cn(navigationMenuTriggerStyle({ variant: effectiveVariant }), "group", className)}
+      {...props}
+    >
+      {children}{""}
+      {(effectiveVariant === "default" || effectiveVariant === "wingull") && (
+        <ChevronDown
+          className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
+          aria-hidden="true"
+        />
+      )}
+      {effectiveVariant === "boffmedia" && (
+        <span
+          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
+          aria-hidden="true"
+        />
+      )}
+      {effectiveVariant === "wingull" && (
+        <span
+          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
+          aria-hidden="true"
+        />
+      )}
+    </NavigationMenuPrimitive.Trigger>
+  )
+})
 NavigationMenuTrigger.displayName = NavigationMenuPrimitive.Trigger.displayName
 
 const NavigationMenuContent = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Content>
->(({ className, ...props }, ref) => (
-  <NavigationMenuPrimitive.Content
-    ref={ref}
-    className={cn(
-      "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto",
-      className
-    )}
-    {...props}
-  />
-))
+>(({ className, ...props }, ref) => {
+  const variant = useNavigationMenuVariant()
+  
+  const variantStyles = {
+    default: "bg-white dark:bg-surface-950 dark:text-surface-50 border-surface-700",
+    wingull: "bg-blue-900 text-blue-100 border-blue-800"
+  }
+  
+  return (
+    <NavigationMenuPrimitive.Content
+      ref={ref}
+      className={cn(
+        "left-0 top-0 w-full data-[motion^=from-]:animate-in data-[motion^=to-]:animate-out data-[motion^=from-]:fade-in data-[motion^=to-]:fade-out data-[motion=from-end]:slide-in-from-right-52 data-[motion=from-start]:slide-in-from-left-52 data-[motion=to-end]:slide-out-to-right-52 data-[motion=to-start]:slide-out-to-left-52 md:absolute md:w-auto",
+        className
+      )}
+      {...props}
+    />
+  )
+})
 NavigationMenuContent.displayName = NavigationMenuPrimitive.Content.displayName
 
 const NavigationMenuLink = NavigationMenuPrimitive.Link
@@ -102,35 +137,54 @@ const NavigationMenuLink = NavigationMenuPrimitive.Link
 const NavigationMenuViewport = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Viewport>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Viewport>
->(({ className, ...props }, ref) => (
-  <div className={cn("absolute left-0 top-full flex justify-center")}>
-    <NavigationMenuPrimitive.Viewport
-      className={cn(
-        "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border border-surface-700 bg-surface-800 text-primary-300 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
-        className
-      )}
-      ref={ref}
-      {...props}
-    />
-  </div>
-))
+>(({ className, ...props }, ref) => {
+  const variant = useNavigationMenuVariant()
+  
+  const variantStyles = {
+    default: "border-surface-700 bg-surface-800 text-primary-300",
+    wingull: "border-blue-800 bg-blue-900 text-blue-100"
+  }
+  
+  return (
+    <div className={cn("absolute left-0 top-full flex justify-center")}>
+      <NavigationMenuPrimitive.Viewport
+        className={cn(
+          "origin-top-center relative mt-1.5 h-[var(--radix-navigation-menu-viewport-height)] w-full overflow-hidden rounded-md border shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-90 md:w-[var(--radix-navigation-menu-viewport-width)]",
+          variantStyles[variant],
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    </div>
+  )
+})
 NavigationMenuViewport.displayName = NavigationMenuPrimitive.Viewport.displayName
 
 const NavigationMenuIndicator = React.forwardRef<
   React.ElementRef<typeof NavigationMenuPrimitive.Indicator>,
   React.ComponentPropsWithoutRef<typeof NavigationMenuPrimitive.Indicator>
->(({ className, ...props }, ref) => (
-  <NavigationMenuPrimitive.Indicator
-    ref={ref}
-    className={cn(
-      "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in",
-      className
-    )}
-    {...props}
-  >
-    <div className="relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-surface-800 shadow-md" />
-  </NavigationMenuPrimitive.Indicator>
-))
+>(({ className, ...props }, ref) => {
+  const variant = useNavigationMenuVariant()
+  
+  const indicatorStyles = {
+    default: "bg-surface-800",
+    wingull: "bg-blue-900"
+  }
+  
+  return (
+    <NavigationMenuPrimitive.Indicator
+      ref={ref}
+      className={cn(
+        "top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden data-[state=visible]:animate-in data-[state=hidden]:animate-out data-[state=hidden]:fade-out data-[state=visible]:fade-in",
+        className
+      )}
+      {...props}
+    >
+      <div className={cn("relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm shadow-md", indicatorStyles[variant])} />
+    </NavigationMenuPrimitive.Indicator>
+  )
+})
 NavigationMenuIndicator.displayName = NavigationMenuPrimitive.Indicator.displayName
 
 export {
@@ -144,3 +198,4 @@ export {
   NavigationMenuIndicator,
   NavigationMenuViewport,
 }
+export type { NavigationMenuVariant }
