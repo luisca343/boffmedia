@@ -4,8 +4,8 @@ import { MoveDataService } from './move-data.service';
 import { SpawnDataService } from './spawn-data.service';
 import { Pokemon, SpawnInfo } from './interfaces/pokemon.interface';
 import Fuse, { FuseResult, IFuseOptions } from 'fuse.js';
-import { desc, eq } from 'drizzle-orm';
-import { pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
+import { and, desc, eq } from 'drizzle-orm';
+import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { PokemonImageService } from './pokemon-image.service';
@@ -242,7 +242,175 @@ export class PokemonService {
   getBiomesByPokemon(name: string): string[] {
     return this.spawnDataService.getBiomesByPokemon(name);
   }
-  
+
+  async registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: number) {
+    const formId = form || 'base';
+    const paletteId = palette || 'none';
+    
+    const res = await this.db
+      .select({seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
+      .from(pokedexRegistry)
+      .where(and(
+        eq(pokedexRegistry.uuid, uuid),
+        eq(pokedexRegistry.pokemonId, pokemonId),
+        eq(pokedexRegistry.formId, formId),
+        eq(pokedexRegistry.paletteId, paletteId)
+      )).execute();
+    
+
+    if(res.length === 0) {
+      const caughtAt = status === 1 ? new Date() : null;
+      const result = await this.db
+        .insert(pokedexRegistry)
+        .values({uuid, pokemonId, formId, paletteId, seenAt: new Date(), caughtAt} as PokedexRegistry)
+        .execute();
+      
+      if(result[0].affectedRows === 1) {
+        const pokemon = this.getPokemonByDex(pokemonId);
+        const pokemonName = pokemon?.name || '';
+        return {success: true, type: 'pokedex_event', uuid, pokemonName, form, palette, status};
+      }
+    } else if(status === 1) {
+      console.log('UPDATING');
+      const registry = res[0];
+      if(registry.caughtAt !== null) return {success: false, message: 'Pokemon already caught'};
+      
+      const result = await this.db
+        .update(pokedexRegistry)
+        .set({caughtAt: new Date()} as PokedexRegistry)
+        .where(and(
+          eq(pokedexRegistry.uuid, uuid),
+          eq(pokedexRegistry.pokemonId, pokemonId),
+          eq(pokedexRegistry.formId, formId),
+          eq(pokedexRegistry.paletteId, paletteId)
+        )).execute();
+      
+      if(result[0].affectedRows === 1) {
+        const pokemon = this.getPokemonByDex(pokemonId);
+        const pokemonName = pokemon?.name || '';
+        return {success: true, type: 'pokedex_event', uuid, pokemonName, form, palette, status};
+      }
+    }
+    
+    return {success: false, message: 'Failed to register pokemon'};
+  }
+
+  async updateDex(uuid: string, data: { SEEN: number[], CAUGHT: number[] }) {
+    console.log('BULK UPDATING POKEDEX', uuid);
+    console.log(`Registering ${data.SEEN.length} seen and ${data.CAUGHT.length} caught Pokemon`);
+    
+    // First, get existing registries to avoid duplicates
+    const existingRegistries = await this.db
+      .select({
+        pokemonId: pokedexRegistry.pokemonId,
+        formId: pokedexRegistry.formId,
+        paletteId: pokedexRegistry.paletteId,
+        seenAt: pokedexRegistry.seenAt,
+        caughtAt: pokedexRegistry.caughtAt
+      })
+      .from(pokedexRegistry)
+      .where(eq(pokedexRegistry.uuid, uuid))
+      .execute();
+    
+    const existingByPokemonId = new Map();
+    existingRegistries.forEach(registry => {
+      const key = `${registry.pokemonId}:${registry.formId}:${registry.paletteId}`;
+      existingByPokemonId.set(key, registry);
+    });
+    
+    // Prepare bulk insert values for SEEN pokemon
+    const seenToInsert = [];
+    const currentDate = new Date();
+    
+    // Process SEEN pokemon
+    for (const pokemonId of data.SEEN) {
+      const key = `${pokemonId}:base:none`;
+      if (!existingByPokemonId.has(key)) {
+        seenToInsert.push({
+          uuid,
+          pokemonId,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: currentDate,
+          caughtAt: null
+        });
+      }
+    }
+    
+    // Process CAUGHT pokemon
+    const caughtToInsert = [];
+    const caughtToUpdate = [];
+    
+    for (const pokemonId of data.CAUGHT) {
+      const key = `${pokemonId}:base:none`;
+      const existing = existingByPokemonId.get(key);
+      
+      if (!existing) {
+        // New record, insert with both seen and caught
+        caughtToInsert.push({
+          uuid,
+          pokemonId,
+          formId: 'base',
+          paletteId: 'none',
+          seenAt: currentDate,
+          caughtAt: currentDate
+        });
+      } else if (existing.caughtAt === null) {
+        // Existing record but not caught, update
+        caughtToUpdate.push(pokemonId);
+      }
+    }
+    
+    // Execute bulk operations
+    const results = {
+      inserted: { seen: 0, caught: 0 },
+      updated: 0,
+      total: data.SEEN.length + data.CAUGHT.length
+    };
+    
+    // Insert SEEN records
+    if (seenToInsert.length > 0) {
+      const seenResult = await this.db
+        .insert(pokedexRegistry)
+        .values(seenToInsert as PokedexRegistry[])
+        .execute();
+      
+      results.inserted.seen = seenResult[0].affectedRows;
+    }
+    
+    // Insert CAUGHT records
+    if (caughtToInsert.length > 0) {
+      const caughtResult = await this.db
+        .insert(pokedexRegistry)
+        .values(caughtToInsert as PokedexRegistry[])
+        .execute();
+      
+      results.inserted.caught = caughtResult[0].affectedRows;
+    }
+    
+    // Update records that were seen but now caught
+    for (const pokemonId of caughtToUpdate) {
+      const updateResult = await this.db
+        .update(pokedexRegistry)
+        .set({ caughtAt: currentDate } as Partial<PokedexRegistry>)
+        .where(and(
+          eq(pokedexRegistry.uuid, uuid),
+          eq(pokedexRegistry.pokemonId, pokemonId),
+          eq(pokedexRegistry.formId, 'base'),
+          eq(pokedexRegistry.paletteId, 'none')
+        ))
+        .execute();
+      
+      results.updated += updateResult[0].affectedRows;
+    }
+    
+    console.log('POKEDEX UPDATE COMPLETED', results);
+    return {
+      success: true,
+      message: 'Pokedex updated successfully',
+      results
+    };
+  }
   
   private addMoveToDataSet(moveName: string, moveDataSet: any) {
     const moveData = this.moveDataService.getMove(moveName);

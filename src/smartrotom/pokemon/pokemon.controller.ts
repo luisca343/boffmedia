@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpStatus, Logger, Param, Post } from '@nestjs/
 import { PokemonService } from './pokemon.service';
 import { ResponseService } from '@/response/response.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import axios from 'axios';
 
 @ApiTags('smartrotom/pokemon')
 @Controller('smartrotom/pokemon')
@@ -338,6 +339,51 @@ export class PokemonController {
         }
     }
 
+    @Post('registry')
+    @ApiOperation({ summary: 'Register Pokémon' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon registered successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to register Pokémon.' })
+    async registerPokemon(@Body() body: { uuid: string, pokemonId: number, form: string, palette: string, status: number }) {
+        const action = 'register Pokémon';
+        try {
+            this.responseService.logRequest(action, body);
+            const result = await this.pokemonService.registerPokemon(body.uuid, body.pokemonId, body.form, body.palette, body.status);
+            this.responseService.logSuccess(action, result);
+            return this.responseService.createSuccessResponse('Pokémon registered successfully', result);
+        } catch (error) {
+            this.responseService.handleError(action, error, body);
+        }
+    }
+
+    @Post('updateDex')
+    @ApiOperation({ summary: 'Update Pokémon Dex in bulk' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon Dex updated successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update Pokémon Dex.' })
+    async updateDex(@Body() { uuid }: { uuid: string }) {
+        const action = 'update Pokémon Dex';
+        try {
+            this.responseService.logRequest(action, { uuid });
+            
+            // Get data from WINGULL API
+            const apiResponse = await axios.post(`${process.env.WINGULL_API}/updatedex`, { uuid });
+            const data = apiResponse.data as {
+                SEEN: number[];
+                CAUGHT: number[];
+            };
+            
+            // Process the data with our service
+            const result = await this.pokemonService.updateDex(uuid, data);
+            
+            this.responseService.logSuccess(action, result);
+            return this.responseService.createSuccessResponse('Pokémon Dex updated successfully', {
+                ...result,
+                apiData: data
+            });
+        } catch (error) {
+            this.responseService.handleError(action, error, { uuid });
+        }
+    }
+
     /*
     @Get('overallscoreranking')
     @ApiOperation({ summary: 'Get overall score ranking' })
@@ -595,22 +641,6 @@ export class PokemonController {
             return this.responseService.createSuccessResponse('Pokémon name palette retrieved successfully', palette);
         } catch (error) {
             this.responseService.handleError(action, error);
-        }
-    }
-    
-    @Post('registry')
-    @ApiOperation({ summary: 'Register Pokémon' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon registered successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to register Pokémon.' })
-    async registerPokemon(@Body() body: { uuid: string, pokemonId: number, form: string, palette: string, status: number }) {
-        const action = 'register Pokémon';
-        try {
-            this.responseService.logRequest(action, body);
-            const result = await this.pokemonService.registerPokemon(body.uuid, body.pokemonId, body.form, body.palette, body.status);
-            this.responseService.logSuccess(action, result);
-            return this.responseService.createSuccessResponse('Pokémon registered successfully', result);
-        } catch (error) {
-            this.responseService.handleError(action, error, body);
         }
     }
     
