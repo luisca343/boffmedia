@@ -53,7 +53,7 @@ export default function Transacciones() {
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: 12,
+        pageSize: 11,
       },
     },
     getPaginationRowModel: getPaginationRowModel(),

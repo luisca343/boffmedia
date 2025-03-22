@@ -24,7 +24,7 @@ export function AccountSelect({accounts, activeAccount, setActiveAccount, id, cl
 
     if(filteredAccounts.length === 0) return <></>
     return(
-        <Select onValueChange={(e) => setActiveAccount(e)} > 
+        <Select onValueChange={(e) => setActiveAccount(e)} variant="wingull"> 
         <SelectTrigger>
             <SelectValue placeholder={getCurrentAccount()} />
         </SelectTrigger>

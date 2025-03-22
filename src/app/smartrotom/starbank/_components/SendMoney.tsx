@@ -128,6 +128,7 @@ export function SendMoney() {
               className="pl-10 pr-12"
               onChange={(e) => setAmount(parseInt(e.target.value))}
               value={amount}
+              variant={"wingull"}
             />
           </div>
         </div>
@@ -146,6 +147,7 @@ export function SendMoney() {
             className="mt-1 block w-full"
             onChange={(e) => setConcept(e.target.value)}
             value={concept}
+            variant={"wingull"}
           />
         </div>
       </div>

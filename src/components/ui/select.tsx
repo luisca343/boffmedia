@@ -2,41 +2,45 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 
 import { cn } from "@/lib/utils"
 
 export type SelectVariant = "default" | "wingull"
 
+const SelectVariantContext = React.createContext<SelectVariant>("default")
+
+const useSelectVariant = () => React.useContext(SelectVariantContext)
+
 const getSelectStyles = (variant: SelectVariant = "default") => {
   return {
     trigger: {
       default: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-900 focus:ring-primary-300 placeholder:text-surface-400",
-      wingull: "border-blue-800 bg-blue-900 text-blue-300 ring-offset-blue-950 focus:ring-blue-400 placeholder:text-blue-500",
+      wingull: "border-blue-700 bg-blue-600 text-blue-100 ring-offset-blue-950 focus:ring-blue-300 placeholder:text-blue-200",
     }[variant],
     content: {
       default: "border-surface-700 bg-surface-800 text-primary-400",
-      wingull: "border-blue-800 bg-blue-900 text-blue-300",
+      wingull: "border-blue-700 bg-blue-600 text-blue-100",
     }[variant],
     label: {
       default: "text-surface-300",
-      wingull: "text-blue-200",
+      wingull: "text-blue-100",
     }[variant],
     item: {
       default: "focus:bg-surface-700 text-primary-400 focus:text-primary-300 data-[highlighted]:bg-surface-700 data-[highlighted]:text-primary-300",
-      wingull: "focus:bg-blue-800 text-blue-300 focus:text-blue-200 data-[highlighted]:bg-blue-800 data-[highlighted]:text-blue-200",
+      wingull: "focus:bg-blue-700 hover:bg-blue-700 text-blue-100 focus:text-blue-50 data-[highlighted]:bg-blue-700 data-[highlighted]:text-blue-50",
     }[variant],
     separator: {
       default: "bg-surface-700",
-      wingull: "bg-blue-800",
+      wingull: "bg-blue-700",
     }[variant],
     icon: {
       default: "text-primary-400",
-      wingull: "text-blue-400",
+      wingull: "text-blue-200",
     }[variant],
     checkIcon: {
       default: "text-primary-400",
-      wingull: "text-blue-400",
+      wingull: "text-blue-200",
     }[variant]
   }
 }
@@ -46,8 +50,10 @@ interface SelectProps extends React.ComponentPropsWithoutRef<typeof SelectPrimit
   variant?: SelectVariant;
 }
 
-const Select = ({ children, ...props }: SelectProps) => (
-  <SelectPrimitive.Root {...props}>{children}</SelectPrimitive.Root>
+const Select = ({ children, variant = "default", ...props }: SelectProps) => (
+  <SelectVariantContext.Provider value={variant}>
+    <SelectPrimitive.Root {...props}>{children}</SelectPrimitive.Root>
+  </SelectVariantContext.Provider>
 )
 
 const SelectGroup = SelectPrimitive.Group
@@ -57,8 +63,10 @@ const SelectValue = SelectPrimitive.Value
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & { variant?: SelectVariant }
->(({ className, children, variant = "default", ...props }, ref) => {
-  const styles = getSelectStyles(variant)
+>(({ className, children, variant, ...props }, ref) => {
+  const contextVariant = useSelectVariant()
+  const effectiveVariant = variant || contextVariant
+  const styles = getSelectStyles(effectiveVariant)
   
   return (
     <SelectPrimitive.Trigger
@@ -82,8 +90,10 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & { variant?: SelectVariant }
->(({ className, children, position = "popper", variant = "default", ...props }, ref) => {
-  const styles = getSelectStyles(variant)
+>(({ className, children, position = "popper", variant, ...props }, ref) => {
+  const contextVariant = useSelectVariant()
+  const effectiveVariant = variant || contextVariant
+  const styles = getSelectStyles(effectiveVariant)
   
   return (
     <SelectPrimitive.Portal>
@@ -117,8 +127,10 @@ SelectContent.displayName = SelectPrimitive.Content.displayName
 const SelectLabel = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label> & { variant?: SelectVariant }
->(({ className, variant = "default", ...props }, ref) => {
-  const styles = getSelectStyles(variant)
+>(({ className, variant, ...props }, ref) => {
+  const contextVariant = useSelectVariant()
+  const effectiveVariant = variant || contextVariant
+  const styles = getSelectStyles(effectiveVariant)
   
   return (
     <SelectPrimitive.Label
@@ -133,8 +145,10 @@ SelectLabel.displayName = SelectPrimitive.Label.displayName
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item> & { variant?: SelectVariant }
->(({ className, children, variant = "default", ...props }, ref) => {
-  const styles = getSelectStyles(variant)
+>(({ className, children, variant, ...props }, ref) => {
+  const contextVariant = useSelectVariant()
+  const effectiveVariant = variant || contextVariant
+  const styles = getSelectStyles(effectiveVariant)
   
   return (
     <SelectPrimitive.Item
@@ -161,8 +175,10 @@ SelectItem.displayName = SelectPrimitive.Item.displayName
 const SelectSeparator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator> & { variant?: SelectVariant }
->(({ className, variant = "default", ...props }, ref) => {
-  const styles = getSelectStyles(variant)
+>(({ className, variant, ...props }, ref) => {
+  const contextVariant = useSelectVariant()
+  const effectiveVariant = variant || contextVariant
+  const styles = getSelectStyles(effectiveVariant)
   
   return (
     <SelectPrimitive.Separator
