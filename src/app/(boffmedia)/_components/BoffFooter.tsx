@@ -5,7 +5,7 @@ import { Gamepad } from "lucide-react"
 
 export function BoffFooter() {
   return (
-    <footer className="bg-surface-800 h-72">
+    <footer className="border-t border-surface-700 bg-surface-800 h-72 z-10 relative">
       <div className="container mx-auto px-4 pt-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
