@@ -34,14 +34,31 @@ const gameToolsConfig = {
     bg: "bg-red-900",
     categories: [
       {
+        name: "TCG Pocket",
         tools: [
-          { name: "TCGPocket", href: "/pokemon/tcgpocket", icon: Diamond },
+          { name: "Galería", href: "/pokemon/tcgpocket/galeria", icon: Diamond },
+          { name: "Lista de Cartas", href: "/pokemon/tcgpocket/cartas", icon: Zap },
+          { name: "Combates", href: "/pokemon/tcgpocket/combates", icon: SwordIcon },
         ]
       }, 
       {
-        name: "Pokémon Mundo Misterioso",
+        name: "Otros",
         tools: [
            { name: "Sky Generator", href: "/pokemon/pmdsky", icon: Zap },
+        ]
+      }
+    ]
+  },
+  "mhwilds": {
+    name: "Monster Hunter Wilds",
+    icon: "/img/games/mhwilds-icon.webp",
+    color: "from-green-400 to-green-600",
+    bg: "bg-green-900",
+    categories: [
+      {
+        name: "Generador de Builds",
+        tools: [
+          { name: "Generador de Builds", href: "/mhwilds/builds", icon: SwordIcon },
         ]
       }
     ]
@@ -65,15 +82,11 @@ export default function GameToolsLayout({
   if (!gameSlug) gameSlug = pathname.split("/")[1];
 
   const gameConfig = gameToolsConfig[gameSlug as keyof typeof gameToolsConfig];
-  
-  if(gameSlug === "herramientas") {
+
+  if (!gameConfig) {
     return <>
       {children}
     </>
-  }
-  
-  if (!gameConfig) {
-    return <div>Game not found</div>;
   }
 
   // Determine if sidebar should be expanded based on collapsed state and hover

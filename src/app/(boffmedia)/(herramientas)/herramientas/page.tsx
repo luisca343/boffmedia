@@ -27,17 +27,27 @@ export default function ToolsLandingPage() {
 
   const gameTools = [
     {
-      title: "Pokemon",
+      title: "Pokémon",
       description: "Calculadoras, generadores y bases de datos",
       icon: "/img/games/pokemon-icon.webp",
       tools: [
         { name: "TCGPocket", count: 3 },
-        { name: "Sky Generator", count: 1 },
+        { name: "Pokémon Mundo Misterioso", count: 1 },
         { name: "Pokedex", count: 1 },
       ],
       href: "/pokemon",
       color: "from-yellow-400 to-red-500",
     },
+    {
+      title: "Monster Hunter Wilds",
+      description: "Planificadores y generadores de builds",
+      icon: "/img/games/mhwilds/icon.webp",
+      tools: [
+        { name: "Builds", count: 1 },
+      ],
+      href: "/mhwilds",
+      color: "from-green-400 to-green-600",
+    }
   ];
 
   return (
@@ -50,7 +60,7 @@ export default function ToolsLandingPage() {
             loop
             muted
             playsInline
-            className="absolute w-full h-full object-cover"
+            className="absolute w-full h-full object-cover object-center"
           >
             <source src="/uploads/looptest.mp4" type="video/mp4" />
             Your browser does not support the video tag.
@@ -62,16 +72,15 @@ export default function ToolsLandingPage() {
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8 relative z-10">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-surface-50">
-            Herramientas de <span className="text-primary-400">Gaming</span>
-          </h1>
-          <p className="text-xl text-surface-200 max-w-2xl mx-auto">
-            Maximiza tu experiencia de juego con nuestras herramientas profesionales. 
-            Desde builds hasta calculadoras especializadas para tus juegos favoritos.
-          </p>
-        </div>
-
+      <div className="text-center mb-12">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-surface-50">
+          Herramientas para <span className="text-primary-400">Gamers</span>
+        </h1>
+        <p className="text-xl text-surface-200 max-w-2xl mx-auto">
+          Recursos útiles para mejorar tu experiencia de juego. 
+          Todo lo que necesitas para tus juegos favoritos, creado por y para la comunidad.
+        </p>
+      </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {gameTools.map((game, index) => (
             <motion.div
@@ -81,19 +90,20 @@ export default function ToolsLandingPage() {
               transition={{ delay: index * 0.1 }}
             >
               <Card
-                className="bg-surface-800/90 backdrop-blur-sm border-surface-700 hover:bg-surface-700/90 transition-all cursor-pointer h-full overflow-hidden"
+                className="bg-surface-800 backdrop-blur-sm border-surface-700 hover:bg-surface-700/90 transition-all cursor-pointer h-full overflow-hidden"
                 onClick={() => router.push(game.href)}
               >
                 <div className={`h-2 bg-gradient-to-r ${game.color}`}></div>
                 <CardHeader className="flex flex-row items-start space-y-0 gap-4">
-                  <div className="w-16 h-16 rounded-lg overflow-hidden relative flex-shrink-0">
+                  <div className="w-16 h-16 rounded-lg overflow-hidden relative flex-shrink-0 flex items-center justify-center bg-surface-800">
                     {game.icon ? (
                       <Image 
                         src={game.icon} 
                         alt={game.title} 
-                        width={64} 
-                        height={64} 
-                        className="object-cover"
+                        width={48}
+                        height={48}
+                        className="object-contain"
+                        style={{ maxWidth: '100%', maxHeight: '100%' }}
                       />
                     ) : (
                       <div className="w-full h-full bg-surface-700 flex items-center justify-center">
@@ -106,7 +116,7 @@ export default function ToolsLandingPage() {
                     <CardDescription className="text-surface-300">{game.description}</CardDescription>
                   </div>
                 </CardHeader>
-                
+                                
                 <CardContent>
                   <div className="grid grid-cols-3 gap-2 text-sm mt-2">
                     {game.tools.map(tool => (
@@ -132,18 +142,6 @@ export default function ToolsLandingPage() {
               </Card>
             </motion.div>
           ))}
-        </div>
-        
-        <div className="mt-16 text-center">
-          <h2 className="text-2xl font-bold mb-6 text-surface-100">¿No encuentras lo que buscas?</h2>
-          <div className="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
-            <Button className="bg-primary-500 hover:bg-primary-600 text-white">
-              <Settings className="mr-2 h-4 w-4" /> Solicitar nueva herramienta
-            </Button>
-            <Button variant="outline" className="border-primary-500 text-primary-500 hover:bg-primary-500/10">
-              Ver todos los juegos
-            </Button>
-          </div>
         </div>
       </div>
     </div>

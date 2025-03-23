@@ -9,6 +9,12 @@ import {
 
 const HERRAMIENTAS_MENU = {
   triggerLabel: "Herramientas",
+  mainLink: { 
+    href: "/herramientas", 
+    label: "Herramientas", 
+    icon: <Gamepad2 className="h-5 w-5" />,
+    description: "Utilidades para jugadores y desarrolladores",
+  },
   sections: [
     {
       title: "Pokémon",
