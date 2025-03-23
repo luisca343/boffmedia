@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { 
   Card, 
   CardHeader, 
@@ -15,58 +14,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Skill } from "./types";
-
-// Define a type for the server-side skill data
-interface ServerSkill {
-  id: number;
-  name: string;
-  kind: string;
-  description: string;
-  ranks: {
-    skill: {
-      id: number;
-    };
-    level: number;
-    description: string;
-    id: number;
-  }[];
-  gameId: number;
-}
+import { useGameData } from "../_hooks/useGameData";
 
 interface SkillsListProps {
   skills: Skill[];
 }
 
 export function SkillsList({ skills }: SkillsListProps) {
-  const [skillsData, setSkillsData] = useState<Record<string, ServerSkill>>({});
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Fetch skills data from the server
-  useEffect(() => {
-    const fetchSkillsData = async () => {
-      try {
-        const response = await axios.get("https://api.ficuslab.es/data/mhwilds/skills.json");
-        
-        // Create a lookup map by both ID and name for faster access
-        const skillsMap: Record<string, ServerSkill> = {};
-        
-        response.data.forEach((skill: ServerSkill) => {
-          // Index by ID as string
-          skillsMap[String(skill.id)] = skill;
-          // Also index by name for name-based lookups
-          skillsMap[skill.name] = skill;
-        });
-        
-        setSkillsData(skillsMap);
-      } catch (error) {
-        console.error("Error fetching skills data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSkillsData();
-  }, []);
+  const { skills: skillsData, loadingSkills: loading } = useGameData();
 
   // Sort skills by level (highest first) and then by name for more user-friendly display
   const sortedSkills = [...skills].sort((a, b) => {
@@ -147,14 +102,15 @@ export function SkillsList({ skills }: SkillsListProps) {
 
 interface SkillItemProps {
   skill: Skill;
-  serverSkillData: Record<string, ServerSkill>;
+  serverSkillData: Record<string, any>;
   isOverallocated: boolean;
   isLast?: boolean;
 }
 
 function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = false }: SkillItemProps) {
+  // The rest of the CompactSkillItem component remains the same
   // Get skill data from server data if available
-  const getSkillData = (skill: Skill): ServerSkill | null => {
+  const getSkillData = (skill: Skill) => {
     // Try to find by ID first
     const idKey = String(skill.id);
     if (serverSkillData[idKey]) {
@@ -176,7 +132,7 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
     
     if (serverSkill) {
       // Find the rank that matches the current level
-      const rank = serverSkill.ranks.find(r => r.level === effectiveLevel);
+      const rank = serverSkill.ranks.find((r: any) => r.level === effectiveLevel);
       if (rank) {
         return rank.description;
       }
@@ -247,6 +203,7 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
   const skillDescription = getSkillDescription(skill);
   const borderClass = isLast ? "" : "border-b border-surface-700/30";
 
+  // The rest of the component remains the same...
   return (
     <div className={`py-1.5 px-2 ${borderClass} hover:bg-surface-700/30`}>
       <TooltipProvider>

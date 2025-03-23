@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Card,
   CardHeader,
@@ -18,6 +17,7 @@ import { getEquipmentDisplayName, getEquipmentIcon, getIconColor } from "./equip
 import { EquipmentFilters } from "./EquipmentFilters";
 import { EquipmentItem } from "./EquipmentItem";
 import { CurrentEquipment } from "./CurrentEquipment";
+import { useGameData } from "../_hooks/useGameData";
 
 interface EquipmentSelectorProps {
   slotType: EquipmentType;
@@ -26,8 +26,6 @@ interface EquipmentSelectorProps {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   onClose: () => void;
-  cachedData?: ArmorPiece[] | Weapon[];
-  updateCache: (data: ArmorPiece[] | Weapon[]) => void;
 }
 
 export function EquipmentSelector({ 
@@ -36,18 +34,36 @@ export function EquipmentSelector({
   setCurrentBuild,
   filters,
   setFilters,
-  onClose,
-  cachedData = [],
-  updateCache
+  onClose
 }: EquipmentSelectorProps) {
-  const [loading, setLoading] = useState(true);
-  const [equipment, setEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
+  // Use centralized game data
+  const { 
+    weapons, 
+    loadingWeapons, 
+    weaponsError, 
+    refreshWeapons,
+    getArmorBySlot, 
+    loadingArmor, 
+    armorError, 
+    refreshArmor 
+  } = useGameData();
+
   const [filteredEquipment, setFilteredEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const [initialFilterApplied, setInitialFilterApplied] = useState(false);
 
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
+  
+  // Determine current state based on slot type
+  const isWeapon = slotType === 'weapon';
+  const loading = isWeapon ? loadingWeapons : loadingArmor;
+  const error = isWeapon ? weaponsError : armorError;
+  const refreshData = isWeapon ? refreshWeapons : refreshArmor;
+  
+  // Get appropriate equipment based on slot type
+  const equipment = isWeapon 
+    ? weapons 
+    : getArmorBySlot(slotType);
 
   // Set default filter for high rank equipment (rarity 5+)
   useEffect(() => {
@@ -62,34 +78,6 @@ export function EquipmentSelector({
       setInitialFilterApplied(true);
     }
   }, [equipment, loading, filters.rarity, initialFilterApplied, setFilters]);
-
-  // Fetch equipment data from API
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      // Use cached data if available, regardless of search filter
-      if (cachedData.length > 0) {
-        setEquipment(cachedData);
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
-      try {
-        if (slotType === 'weapon') {
-          await fetchWeapons();
-        } else {
-          await fetchArmor();
-        }
-      } catch (err) {
-        console.error("Error fetching equipment:", err);
-        setError("Error al cargar el equipamiento. Por favor, inténtalo de nuevo.");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchEquipment();
-  }, [slotType, cachedData, updateCache]);
 
   // Apply filters whenever filters or equipment changes
   useEffect(() => {
@@ -155,43 +143,6 @@ export function EquipmentSelector({
     setFilteredEquipment(result as ArmorPiece[] | Weapon[]);
   }, [equipment, filters, slotType, loading, error]);
   
-  // Function to fetch weapons
-  const fetchWeapons = async () => {
-    const response = await axios.get("https://api.ficuslab.es/data/mhwilds/weapons.json");
-    let weapons = response.data;
-
-    // Add backward compatibility fields
-    weapons = weapons.map((weapon: Weapon) => ({
-      ...weapon,
-      type: weapon.kind,
-      attack: weapon.damage?.display || 0,
-      element: weapon.specials?.find(s => 
-        ["fire", "water", "thunder", "ice", "dragon"].includes(s.type)
-      ) ? {
-        type: weapon.specials.find(s => 
-          ["fire", "water", "thunder", "ice", "dragon"].includes(s.type)
-        )?.type || "",
-        damage: weapon.specials.find(s => 
-          ["fire", "water", "thunder", "ice", "dragon"].includes(s.type)
-        )?.damage || 0
-      } : undefined,
-    }));
-    
-    setEquipment(weapons);
-    updateCache(weapons);
-  };
-
-  // Function to fetch armor
-  const fetchArmor = async () => {
-    const data = await axios.get("https://api.ficuslab.es/data/mhwilds/armor.json");
-    
-    // Filter armor by the specified slot type
-    const filteredArmor = data.data.filter((item: ArmorPiece) => item.kind === slotType);
-    
-    setEquipment(filteredArmor);
-    updateCache(filteredArmor);
-  };
-
   // Sort equipment by rarity as default
   const sortedEquipment = [...filteredEquipment].sort((a, b) => a.rarity - b.rarity);
 
@@ -264,15 +215,7 @@ export function EquipmentSelector({
           <div className="text-red-400 mb-2">{error}</div>
           <Button 
             variant="outline" 
-            onClick={() => {
-              setLoading(true);
-              setError(null);
-              if (slotType === 'weapon') {
-                fetchWeapons();
-              } else {
-                fetchArmor();
-              }
-            }}
+            onClick={() => refreshData()}
           >
             Reintentar
           </Button>
