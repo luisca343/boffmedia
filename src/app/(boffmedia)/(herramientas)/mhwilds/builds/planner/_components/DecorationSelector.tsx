@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 import {
   Card,
   CardHeader,
@@ -13,6 +14,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   X, 
   ChevronLeft, 
+  Filter, 
+  ArrowUpDown,
   Gem,
   Check,
   Loader2
@@ -23,7 +26,6 @@ import {
   Decoration,
   Filters
 } from "./types";
-import { useGameData } from "../_hooks/useGameData";
 
 interface DecorationSelectorProps {
   equipmentType: EquipmentType;
@@ -46,14 +48,9 @@ export function DecorationSelector({
   setFilters,
   onClose
 }: DecorationSelectorProps) {
-  // Use the centralized game data hook
-  const { 
-    decorations,
-    loadingDecorations: loading,
-    decorationsError: error,
-    refreshDecorations
-  } = useGameData();
-  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [decorations, setDecorations] = useState<Decoration[]>([]);
   const [filteredDecorations, setFilteredDecorations] = useState<Decoration[]>([]);
   
   // Get the currently assigned decoration, if any
@@ -69,7 +66,25 @@ export function DecorationSelector({
         rarity: []
       }));
     }
-  }, [filters.rarity, setFilters]);
+  }, []);
+
+  // Fetch decorations data
+  useEffect(() => {
+    const fetchDecorations = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get("https://api.ficuslab.es/data/mhwilds/decorations.json");
+        setDecorations(response.data);
+      } catch (err) {
+        console.error("Error fetching decorations:", err);
+        setError("Error al cargar las decoraciones. Por favor, inténtalo de nuevo.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchDecorations();
+  }, []);
 
   // Apply filters and slot size constraint
   useEffect(() => {
@@ -224,7 +239,7 @@ export function DecorationSelector({
               <div className="text-red-400 mb-2">{error}</div>
               <Button 
                 variant="outline" 
-                onClick={() => refreshDecorations()}
+                onClick={() => window.location.reload()}
               >
                 Reintentar
               </Button>
