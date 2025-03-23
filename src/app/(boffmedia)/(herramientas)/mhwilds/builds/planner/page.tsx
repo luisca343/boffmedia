@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { BuildHeader } from "./_components/BuildHeader";
 import { EquipmentSelector } from "./_components/EquipmentSelector";
 import { DecorationSelector } from "./_components/DecorationSelector";
@@ -11,31 +11,44 @@ import { BuildActions } from "./_components/BuildActions";
 import { 
   ArmorPiece, 
   BuildData, 
-  Decoration, 
   DecorationAssignment,
   Filters, 
   Skill,
   StatsData, 
-  Weapon,
   EquipmentType,
-  SkillRank
+  SkillRank,
+  BuildDataWithIds
 } from "./_components/types";
 import { useGameData } from "./_hooks/useGameData";
+import { getAllWeaponElements } from "./_components/equipment-utils";
 
 export default function BuildPlanner() {
-  const {skills: skillData} = useGameData();
+  const {
+    skills: skillsData, 
+    weapons,
+    armor, 
+    decorations,
+    loadingWeapons,
+    loadingArmor,
+    loadingDecorations,
+    getWeaponById,
+    getArmorById,
+    getDecorationById
+  } = useGameData();
   
-  // State for the current build
-  const [currentBuild, setCurrentBuild] = useState<BuildData>({
+  // Store build data with just IDs
+  const [currentBuild, setCurrentBuild] = useState<BuildDataWithIds>({
     name: "Mi Build",
-    weapon: null,
-    head: null,
-    chest: null,
-    arms: null,
-    waist: null,
-    legs: null,
+    weaponId: null,
+    headId: null,
+    chestId: null,
+    armsId: null,
+    waistId: null,
+    legsId: null,
     decorations: [],
   });
+
+  console.log("Current Build:", currentBuild);
   
   // State for the currently selected equipment slot
   const [selectedSlot, setSelectedSlot] = useState<EquipmentType | null>(null);
@@ -54,39 +67,41 @@ export default function BuildPlanner() {
     skills: [],
     slots: [],
   });
+  
+  const isLoading = loadingWeapons || loadingArmor || loadingDecorations;
 
-  // Equipment cache to prevent repeated API calls
-  const [equipmentCache, setEquipmentCache] = useState<{
-    weapon: Weapon[];
-    head: ArmorPiece[];
-    chest: ArmorPiece[];
-    arms: ArmorPiece[];
-    waist: ArmorPiece[];
-    legs: ArmorPiece[];
-  }>({
-    weapon: [],
-    head: [],
-    chest: [],
-    arms: [],
-    waist: [],
-    legs: [],
-  });
-
-  // Decorations cache
-  const [decorationsCache, setDecorationsCache] = useState<Decoration[]>([]);
-
-  // Function to update the equipment cache
-  const updateEquipmentCache = useCallback((slotType: EquipmentType, data: ArmorPiece[] | Weapon[]) => {
-    setEquipmentCache(prev => ({
-      ...prev,
-      [slotType]: data
-    }));
-  }, []);
-
-  // Function to update the decorations cache
-  const updateDecorationsCache = useCallback((data: Decoration[]) => {
-    setDecorationsCache(data);
-  }, []);
+  // Get equipment by slot type for direct passing to EquipmentSelector
+  const getEquipmentBySlot = useCallback((slotType: EquipmentType) => {
+    if (slotType === 'weapon') {
+      return weapons;
+    } else {
+      return armor.filter(item => item.kind === slotType);
+    }
+  }, [armor, weapons]);
+  
+  // Convert the ID-based build to a full object build for components that need it
+  const buildWithFullObjects = useMemo<BuildData>(() => {
+    return {
+      name: currentBuild.name,
+      weapon: getWeaponById(currentBuild.weaponId),
+      head: getArmorById(currentBuild.headId),
+      chest: getArmorById(currentBuild.chestId),
+      arms: getArmorById(currentBuild.armsId),
+      waist: getArmorById(currentBuild.waistId),
+      legs: getArmorById(currentBuild.legsId),
+      decorations: currentBuild.decorations.map(decoAssign => ({
+        equipmentType: decoAssign.equipmentType,
+        slotIndex: decoAssign.slotIndex,
+        slotSize: decoAssign.slotSize,
+        decoration: getDecorationById(decoAssign.decorationId)
+      })).filter(d => d.decoration !== null) as DecorationAssignment[]
+    };
+  }, [
+    currentBuild, 
+    getWeaponById, 
+    getArmorById, 
+    getDecorationById
+  ]);
 
   const calculateTotalSkills = (): Skill[] => {
     // Use a Map to track skills by their name for proper merging
@@ -115,7 +130,7 @@ export default function BuildPlanner() {
             id: skillId, // Keep the original ID
             name: skillName,
             level: skillRank.level,
-            maxLevel: skillData[skillId]?.maxLevel || 0,
+            maxLevel: skillsData[skillId]?.maxLevel || 0,
             description: skillRank.description || '',
             kind: skillRank.skill?.kind
           });
@@ -125,20 +140,20 @@ export default function BuildPlanner() {
     
     // Add skills from armor pieces
     ['head', 'chest', 'arms', 'waist', 'legs'].forEach(slotType => {
-      const armor = currentBuild[slotType as keyof BuildData] as ArmorPiece | null;
+      const armor = buildWithFullObjects[slotType as keyof BuildData] as ArmorPiece | null;
       if (armor && armor.skills) {
         addSkillsFromItem(armor.skills);
       }
     });
     
     // Add skills from weapon if present
-    if (currentBuild.weapon?.skills) {
-      addSkillsFromItem(currentBuild.weapon.skills);
+    if (buildWithFullObjects.weapon?.skills) {
+      addSkillsFromItem(buildWithFullObjects.weapon.skills);
     }
     
     // Add skills from decorations
-    if (currentBuild.decorations && currentBuild.decorations.length > 0) {
-      currentBuild.decorations.forEach(decoAssign => {
+    if (buildWithFullObjects.decorations && buildWithFullObjects.decorations.length > 0) {
+      buildWithFullObjects.decorations.forEach(decoAssign => {
         if (decoAssign.decoration && decoAssign.decoration.skills) {
           // Convert decoration skills to SkillRank format for processing
           const skillRanks = decoAssign.decoration.skills.map(skill => ({
@@ -162,10 +177,10 @@ export default function BuildPlanner() {
     return Array.from(skillMap.values());
   };
 
-  // Placeholder function for calculating stats
+  // Calculate stats using the full objects
   const calculateStats = (): StatsData => {
-    // Base stats
     let stats: StatsData = {
+      weapon: buildWithFullObjects.weapon || null,
       defense: 0,
       fireRes: 0,
       waterRes: 0,
@@ -175,6 +190,7 @@ export default function BuildPlanner() {
       attack: 0,
       affinity: 0,
       element: undefined,
+      status: undefined,
       sharpness: {
         red: 0,
         orange: 0,
@@ -184,21 +200,41 @@ export default function BuildPlanner() {
         white: 0,
         purple: 0,
       },
-      //weapon: currentBuild.weapon || null,
     };
     
     // Add weapon stats
-    if (currentBuild.weapon) {
-      stats.attack = currentBuild.weapon.attack;
-      stats.affinity = currentBuild.weapon.affinity;
-      if (currentBuild.weapon.element) {
-        stats.element = {...currentBuild.weapon.element};
+    if (buildWithFullObjects.weapon) {
+      stats.attack = buildWithFullObjects.weapon.attack ?? 0;
+      stats.affinity = buildWithFullObjects.weapon.affinity;
+      
+      // Use getAllWeaponElements to get both elements and statuses
+      try {
+        const { elements, statuses } = getAllWeaponElements(buildWithFullObjects.weapon);
+        
+        // Set primary element (first one found)
+        if (elements.length > 0) {
+          stats.element = {
+            type: elements[0].type,
+            damage: elements[0].damage
+          };
+        }
+        
+        // Set primary status (first one found)
+        if (statuses.length > 0) {
+          stats.status = {
+            type: statuses[0].type,
+            damage: statuses[0].damage,
+            hidden: statuses[0].hidden
+          };
+        }
+      } catch (err) {
+        console.error("Error extracting weapon elements/statuses:", err);
       }
     }
     
     // Add armor stats
     ['head', 'chest', 'arms', 'waist', 'legs'].forEach(slot => {
-      const armor = currentBuild[slot as keyof BuildData] as ArmorPiece | null;
+      const armor = buildWithFullObjects[slot as keyof BuildData] as ArmorPiece | null;
       if (armor) {
         // Add defense
         stats.defense += typeof armor.defense === 'number' ? 
@@ -251,10 +287,12 @@ export default function BuildPlanner() {
 
   // Function to handle decoration slot selection
   const handleDecorationClick = (equipmentType: EquipmentType, slotIndex: number) => {
-    // First ensure we have the equipment with this slot
-    const equipment = currentBuild[equipmentType as keyof BuildData] as any;
+    // Use the buildWithFullObjects to get the correct equipment
+    const equipment = buildWithFullObjects[equipmentType];
     
-    if (equipment && equipment.slots && equipment.slots[slotIndex] !== undefined) {
+    // Check if equipment has slots and the specified slot exists
+    if (equipment && 'slots' in equipment && Array.isArray(equipment.slots) && 
+        equipment.slots[slotIndex] !== undefined) {
       setSelectedDecoration({
         equipmentType,
         slotIndex,
@@ -283,30 +321,77 @@ export default function BuildPlanner() {
           {selectedSlot ? (
             <EquipmentSelector 
               slotType={selectedSlot}
-              currentBuild={currentBuild}
-              setCurrentBuild={setCurrentBuild}
+              currentBuild={buildWithFullObjects}
+              setCurrentBuild={(updatedBuild) => {
+                // Extract the updated equipment and store its ID
+                const updatedEquipment = updatedBuild[selectedSlot];
+                setCurrentBuild({
+                  ...currentBuild,
+                  [`${selectedSlot}Id`]: updatedEquipment ? updatedEquipment.id : null
+                });
+              }}
               filters={filters}
               setFilters={setFilters}
               onClose={closeSelector}
-              cachedData={equipmentCache[selectedSlot]}
-              updateCache={(data) => updateEquipmentCache(selectedSlot, data)}
+              isLoading={isLoading}
+              equipmentData={getEquipmentBySlot(selectedSlot)}
             />
           ) : selectedDecoration ? (
             <DecorationSelector
+              decorations={decorations}
               equipmentType={selectedDecoration.equipmentType}
               slotIndex={selectedDecoration.slotIndex}
               slotSize={selectedDecoration.slotSize}
-              currentBuild={currentBuild}
-              setCurrentBuild={setCurrentBuild}
+              currentBuild={buildWithFullObjects}
+              setCurrentBuild={(updatedBuild) => {
+                // Extract the decoration assignment that was modified
+                const updatedDecorations = [...currentBuild.decorations];
+                
+                // Find if there's already a decoration at this slot
+                const existingIndex = updatedDecorations.findIndex(
+                  d => d.equipmentType === selectedDecoration.equipmentType && 
+                       d.slotIndex === selectedDecoration.slotIndex
+                );
+                
+                // Find the corresponding decoration in the updated build
+                const newDecoration = updatedBuild.decorations.find(
+                  d => d.equipmentType === selectedDecoration.equipmentType && 
+                       d.slotIndex === selectedDecoration.slotIndex
+                )?.decoration;
+                
+                // Update or remove the decoration
+                if (newDecoration) {
+                  // Add or update decoration
+                  const decorationAssignment = {
+                    equipmentType: selectedDecoration.equipmentType,
+                    slotIndex: selectedDecoration.slotIndex,
+                    slotSize: selectedDecoration.slotSize,
+                    decorationId: String(newDecoration.id)
+                  };
+                  
+                  if (existingIndex >= 0) {
+                    updatedDecorations[existingIndex] = decorationAssignment;
+                  } else {
+                    updatedDecorations.push(decorationAssignment);
+                  }
+                } else if (existingIndex >= 0) {
+                  // Remove decoration if it was deleted
+                  updatedDecorations.splice(existingIndex, 1);
+                }
+                
+                // Update the build with new decorations array
+                setCurrentBuild({
+                  ...currentBuild,
+                  decorations: updatedDecorations
+                });
+              }}
               filters={filters}
               setFilters={setFilters}
               onClose={closeSelector}
-              cachedData={decorationsCache}
-              updateCache={updateDecorationsCache}
             />
           ) : (
             <BuildDisplay 
-              currentBuild={currentBuild}
+              currentBuild={buildWithFullObjects}
               onSlotClick={handleSlotClick}
               onDecorationClick={handleDecorationClick}
             />
@@ -316,7 +401,7 @@ export default function BuildPlanner() {
         {/* Right panel - Stats and Skills */}
         <div className="lg:col-span-4 space-y-6">
           <StatsDisplay stats={stats} />
-          <SkillsList skills={totalSkills} skillsData={skillData}/>
+          <SkillsList skills={totalSkills} skillsData={skillsData}/>
           <BuildActions />
         </div>
       </div>

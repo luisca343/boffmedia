@@ -9,7 +9,8 @@ import {
   getRarityStyle,
   getWeaponElementInfo,
   getAllWeaponElements,
-  getWeaponTypeIcon
+  getWeaponTypeIcon,
+  getStatusColor
 } from "./equipment-utils";
 import { EyeOff } from "lucide-react";
 
@@ -110,29 +111,29 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
 
 // Enhanced component for weapon stats with better element display
 const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
-  // Get all elements in the weapon
-  const elements = getAllWeaponElements(weapon);
-  
+  // Extract elements and statuses from weapon
+  const { elements, statuses } = getAllWeaponElements(weapon);
+
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
-      <span className="text-red-400">
-        Ataque: {weapon.attack || weapon.damage?.display || 0}
+      <span className="text-red-400">Atk: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}</span>
+      <span className={`${weapon.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        Afinidad: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       
-      {weapon.affinity !== 0 && (
-        <span className={weapon.affinity > 0 ? "text-green-400" : "text-red-400"}>
-          Afinidad: {weapon.affinity > 0 ? "+" : ""}{weapon.affinity}%
+      {/* Show elements */}
+      {elements.length > 0 && elements.map((element, idx) => (
+        <span key={`element-${idx}`} className={`${getElementColor(element.type)}`}>
+          {element.type}: {element.damage}
+          {element.hidden && <span className="text-xs ml-1 opacity-70">(O)</span>}
         </span>
-      )}
+      ))}
       
-      {/* Display elements */}
-      {elements.map((element, idx) => (
-        <span 
-          key={idx} 
-          className={`${getElementColor(element.type)}`}
-        >
-          {element.type.charAt(0).toUpperCase() + element.type.slice(1)}: {element.damage}
-          {element.hidden && <EyeOff className="inline h-3 w-3 ml-1 opacity-70" />}
+      {/* Show status effects */}
+      {statuses.length > 0 && statuses.map((status, idx) => (
+        <span key={`status-${idx}`} className={`${getStatusColor(status.type)}`}>
+          {status.type}: {status.damage}
+          {status.hidden && <span className="text-xs ml-1 opacity-70">(O)</span>}
         </span>
       ))}
       

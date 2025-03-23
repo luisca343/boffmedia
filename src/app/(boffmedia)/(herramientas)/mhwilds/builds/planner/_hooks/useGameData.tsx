@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { Decoration, ArmorPiece, Weapon } from '../_components/types';
 
@@ -44,6 +44,31 @@ export function useGameData() {
   const [skills, setSkills] = useState<Record<string, EnhancedSkill>>({});
   const [loadingSkills, setLoadingSkills] = useState(true);
   const [skillsError, setSkillsError] = useState<string | null>(null);
+
+  // Create memoized lookup maps for equipment and decorations
+  const weaponsMap = useMemo(() => {
+    const map: Record<string, Weapon> = {};
+    weapons.forEach(weapon => {
+      map[weapon.id] = weapon;
+    });
+    return map;
+  }, [weapons]);
+  
+  const armorMap = useMemo(() => {
+    const map: Record<string, ArmorPiece> = {};
+    armor.forEach(piece => {
+      map[piece.id] = piece;
+    });
+    return map;
+  }, [armor]);
+  
+  const decorationsMap = useMemo(() => {
+    const map: Record<string, Decoration> = {};
+    decorations.forEach(deco => {
+      map[deco.id] = deco;
+    });
+    return map;
+  }, [decorations]);
 
   // Fetch decorations data
   const fetchDecorations = async () => {
@@ -138,6 +163,22 @@ export function useGameData() {
   const getArmorBySlot = (slotType: string): ArmorPiece[] => {
     return armor.filter(item => item.kind === slotType);
   };
+  
+  // Equipment lookup functions
+  const getWeaponById = (id: string | null): Weapon | null => {
+    if (!id) return null;
+    return weaponsMap[id] || null;
+  };
+  
+  const getArmorById = (id: string | null): ArmorPiece | null => {
+    if (!id) return null;
+    return armorMap[id] || null;
+  };
+  
+  const getDecorationById = (id: string | null): Decoration | null => {
+    if (!id) return null;
+    return decorationsMap[id] || null;
+  };
 
   return {
     // Decorations
@@ -164,6 +205,11 @@ export function useGameData() {
     loadingSkills,
     skillsError,
     refreshSkills: fetchSkills,
+    
+    // Lookup functions
+    getWeaponById,
+    getArmorById,
+    getDecorationById,
     
     // General loading state
     isLoading: loadingDecorations || loadingWeapons || loadingArmor || loadingSkills

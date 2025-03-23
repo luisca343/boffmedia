@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import {
   Card,
   CardHeader,
@@ -21,13 +20,13 @@ import { CurrentEquipment } from "./CurrentEquipment";
 
 interface EquipmentSelectorProps {
   slotType: EquipmentType;
-  currentBuild: BuildData;
-  setCurrentBuild: React.Dispatch<React.SetStateAction<BuildData>>;
+  currentBuild: BuildData; // This now receives the build with full objects
+  setCurrentBuild: (build: BuildData) => void; // This will be intercepted in page.tsx
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   onClose: () => void;
-  cachedData?: ArmorPiece[] | Weapon[];
-  updateCache: (data: ArmorPiece[] | Weapon[]) => void;
+  isLoading: boolean;
+  equipmentData: ArmorPiece[] | Weapon[];
 }
 
 export function EquipmentSelector({ 
@@ -37,10 +36,9 @@ export function EquipmentSelector({
   filters,
   setFilters,
   onClose,
-  cachedData = [],
-  updateCache
+  isLoading,
+  equipmentData
 }: EquipmentSelectorProps) {
-  const [loading, setLoading] = useState(true);
   const [equipment, setEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
   const [filteredEquipment, setFilteredEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -49,9 +47,17 @@ export function EquipmentSelector({
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
 
+  // Update equipment when equipmentData changes
+  useEffect(() => {
+    if (!isLoading && equipmentData.length > 0) {
+      setEquipment(equipmentData);
+      setError(null);
+    }
+  }, [equipmentData, isLoading]);
+
   // Set default filter for high rank equipment (rarity 5+)
   useEffect(() => {
-    if (!initialFilterApplied && !loading && equipment.length > 0) {
+    if (!initialFilterApplied && !isLoading && equipment.length > 0) {
       // Only apply if no filters are already set
       if (filters.rarity.length === 0) {
         setFilters(prev => ({
@@ -61,40 +67,12 @@ export function EquipmentSelector({
       }
       setInitialFilterApplied(true);
     }
-  }, [equipment, loading, filters.rarity, initialFilterApplied, setFilters]);
-
-  // Fetch equipment data from API
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      // Use cached data if available, regardless of search filter
-      if (cachedData.length > 0) {
-        setEquipment(cachedData);
-        setLoading(false);
-        return;
-      }
-      
-      setLoading(true);
-      try {
-        if (slotType === 'weapon') {
-          await fetchWeapons();
-        } else {
-          await fetchArmor();
-        }
-      } catch (err) {
-        console.error("Error fetching equipment:", err);
-        setError("Error al cargar el equipamiento. Por favor, inténtalo de nuevo.");
-      } finally {
-        setLoading(false);
-      }
-    };
-  
-    fetchEquipment();
-  }, [slotType, cachedData, updateCache]);
+  }, [equipment, isLoading, filters.rarity, initialFilterApplied, setFilters]);
 
   // Apply filters whenever filters or equipment changes
   useEffect(() => {
     // Skip if still loading or has error
-    if (loading || error) return;
+    if (isLoading || error) return;
     
     let result = [...equipment];
     
@@ -125,21 +103,17 @@ export function EquipmentSelector({
         
         // Check specials array for backward compatibility
         if (weapon.specials && Array.isArray(weapon.specials)) {
-          // Handle different possible structures in specials
           for (const special of weapon.specials) {
-            // Case 1: special has type property directly
             if (special.type && typeof special.type === 'string' && 
                 special.type.toLowerCase() === filters.element) {
               return true;
             }
             
-            // Case 2: special has element property (as seen in the error example)
             if (special.element && typeof special.element === 'string' && 
                 special.element.toLowerCase() === filters.element) {
               return true;
             }
             
-            // Case 3: special has kind="element" and element matches
             if (special.kind === 'element' && special.element && 
                 typeof special.element === 'string' && 
                 special.element.toLowerCase() === filters.element) {
@@ -153,49 +127,14 @@ export function EquipmentSelector({
     }
     
     setFilteredEquipment(result as ArmorPiece[] | Weapon[]);
-  }, [equipment, filters, slotType, loading, error]);
-  
-  // Function to fetch weapons
-  const fetchWeapons = async () => {
-    const response = await axios.get("https://api.ficuslab.es/data/mhwilds/weapons.json");
-    let weapons = response.data;
-
-    // Add backward compatibility fields
-    weapons = weapons.map((weapon: Weapon) => ({
-      ...weapon,
-      type: weapon.kind,
-      attack: weapon.damage?.display || 0,
-      element: weapon.specials?.find(s => 
-        ["fire", "water", "thunder", "ice", "dragon"].includes(s.type)
-      ) ? {
-        type: weapon.specials.find(s => 
-          ["fire", "water", "thunder", "ice", "dragon"].includes(s.type)
-        )?.type || "",
-        damage: weapon.specials.find(s => 
-          ["fire", "water", "thunder", "ice", "dragon"].includes(s.type)
-        )?.damage || 0
-      } : undefined,
-    }));
-    
-    setEquipment(weapons);
-    updateCache(weapons);
-  };
-
-  // Function to fetch armor
-  const fetchArmor = async () => {
-    const data = await axios.get("https://api.ficuslab.es/data/mhwilds/armor.json");
-    
-    // Filter armor by the specified slot type
-    const filteredArmor = data.data.filter((item: ArmorPiece) => item.kind === slotType);
-    
-    setEquipment(filteredArmor);
-    updateCache(filteredArmor);
-  };
+  }, [equipment, filters, slotType, isLoading, error]);
 
   // Sort equipment by rarity as default
   const sortedEquipment = [...filteredEquipment].sort((a, b) => a.rarity - b.rarity);
 
   const selectEquipment = (item: ArmorPiece | Weapon) => {
+    // Create a new build object with the selected equipment
+    // The parent component will extract just the ID
     setCurrentBuild({
       ...currentBuild,
       [slotType]: item
@@ -204,6 +143,8 @@ export function EquipmentSelector({
   };
 
   const removeEquipment = () => {
+    // Remove the equipment by setting it to null
+    // The parent component will handle setting the ID to null
     setCurrentBuild({
       ...currentBuild,
       [slotType]: null
@@ -249,7 +190,7 @@ export function EquipmentSelector({
 
   // Helper function to render equipment list with appropriate loading and error states
   function renderEquipmentList() {
-    if (loading) {
+    if (isLoading) {
       return (
         <div className="h-[400px] flex items-center justify-center bg-surface-800/50 rounded-md">
           <Loader2 className="h-8 w-8 text-primary-400 animate-spin" />
@@ -265,13 +206,7 @@ export function EquipmentSelector({
           <Button 
             variant="outline" 
             onClick={() => {
-              setLoading(true);
               setError(null);
-              if (slotType === 'weapon') {
-                fetchWeapons();
-              } else {
-                fetchArmor();
-              }
             }}
           >
             Reintentar

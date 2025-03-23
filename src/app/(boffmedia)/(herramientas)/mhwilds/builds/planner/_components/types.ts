@@ -116,6 +116,7 @@ export interface WeaponDamage {
 export interface WeaponSpecial {
   type?: string;
   element?: string;
+  status?: string;
   kind?: string;
   damage?: number | WeaponDamage;
   value?: number;
@@ -199,6 +200,53 @@ export interface Filters {
   skills: string[];
   slots: number[];
   element?: string;
+}
+
+// Add this to your types file
+
+export interface BuildDataWithIds {
+  name: string;
+  weaponId: string | null;
+  headId: string | null;
+  chestId: string | null;
+  armsId: string | null;
+  waistId: string | null;
+  legsId: string | null;
+  decorations: {
+    equipmentType: EquipmentType;
+    slotIndex: number;
+    slotSize: number;
+    decorationId: string;
+  }[];
+}
+export interface StatsData {
+  weapon: Weapon | null;
+  defense: number;
+  fireRes: number;
+  waterRes: number;
+  thunderRes: number;
+  iceRes: number;
+  dragonRes: number;
+  attack: number;
+  affinity: number;
+  element?: {
+    type: string;
+    damage: number;
+  };
+  status?: {
+    type: string;
+    damage: number;
+    hidden?: boolean;
+  };
+  sharpness: {
+    red: number;
+    orange: number;
+    yellow: number;
+    green: number;
+    blue: number;
+    white: number;
+    purple: number;
+  };
 }
 
 // Generic EquipmentComponent interface to represent any armor piece or weapon

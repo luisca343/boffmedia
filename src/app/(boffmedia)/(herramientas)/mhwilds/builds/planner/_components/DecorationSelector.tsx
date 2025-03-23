@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import {
   Card,
   CardHeader,
@@ -14,8 +13,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   X, 
   ChevronLeft, 
-  Filter, 
-  ArrowUpDown,
   Gem,
   Check,
   Loader2
@@ -31,14 +28,16 @@ interface DecorationSelectorProps {
   equipmentType: EquipmentType;
   slotIndex: number;
   slotSize: number;
-  currentBuild: BuildData;
-  setCurrentBuild: React.Dispatch<React.SetStateAction<BuildData>>;
+  currentBuild: BuildData; // Now receives the build with full objects
+  setCurrentBuild: (build: BuildData) => void; // This will be intercepted in page.tsx
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   onClose: () => void;
+  decorations: Decoration[];
 }
 
 export function DecorationSelector({
+  decorations,
   equipmentType,
   slotIndex,
   slotSize,
@@ -48,9 +47,7 @@ export function DecorationSelector({
   setFilters,
   onClose
 }: DecorationSelectorProps) {
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [decorations, setDecorations] = useState<Decoration[]>([]);
   const [filteredDecorations, setFilteredDecorations] = useState<Decoration[]>([]);
   
   // Get the currently assigned decoration, if any
@@ -68,27 +65,9 @@ export function DecorationSelector({
     }
   }, []);
 
-  // Fetch decorations data
-  useEffect(() => {
-    const fetchDecorations = async () => {
-      setLoading(true);
-      try {
-        const response = await axios.get("https://api.ficuslab.es/data/mhwilds/decorations.json");
-        setDecorations(response.data);
-      } catch (err) {
-        console.error("Error fetching decorations:", err);
-        setError("Error al cargar las decoraciones. Por favor, inténtalo de nuevo.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchDecorations();
-  }, []);
-
   // Apply filters and slot size constraint
   useEffect(() => {
-    if (loading) return;
+    if (!decorations) return;
     
     // Start with all decorations
     let filtered = [...decorations];
@@ -137,7 +116,7 @@ export function DecorationSelector({
     });
     
     setFilteredDecorations(filtered);
-  }, [decorations, filters, slotSize, loading, equipmentType]);
+  }, [decorations, filters, slotSize, equipmentType]);
   
   // Get color class based on decoration slot size
   const getSlotColorClass = (size: number) => {
@@ -169,6 +148,7 @@ export function DecorationSelector({
     }
     
     // Update build with new decorations
+    // Parent component will extract just the decoration IDs
     setCurrentBuild({
       ...currentBuild,
       decorations: updatedDecorations
@@ -229,7 +209,7 @@ export function DecorationSelector({
 
         {/* Decoration list */}
         <ScrollArea className="h-[350px]">
-          {loading ? (
+          {!decorations ? (
             <div className="h-full flex items-center justify-center">
               <Loader2 className="h-8 w-8 text-primary-400 animate-spin" />
               <span className="ml-2 text-surface-300">Cargando decoraciones...</span>

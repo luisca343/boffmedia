@@ -3,6 +3,7 @@ import {
   Plus,
   Info,
   EyeOff,
+  Pill,
 } from "lucide-react";
 import {
   Tooltip,
@@ -19,7 +20,7 @@ import {
 } from "./types";
 import { FC, ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
-import { getElementColor, getDefenseValue } from "./utils";
+import { getElementColor, getDefenseValue, getStatusColor } from "./equipment-utils";
 import { getAllWeaponElements } from "./equipment-utils";
 
 interface SlotConfig {
@@ -49,21 +50,21 @@ const isArmor = (component: EquipmentComponent | null): component is ArmorPiece 
 
 // Extracted component for weapon details
 const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
-    const elements = getAllWeaponElements(weapon);
+    const { elements, statuses } = getAllWeaponElements(weapon);
     const totalElementalDamage = elements.reduce((total, el) => total + el.damage, 0);
   
     return (
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span className="text-red-400">Ataque: {weapon.attack || weapon.damage?.display || 0}</span>
         <span className={weapon.affinity && weapon.affinity >= 0 ? "text-green-400" : "text-red-400"}>
           Afinidad: {weapon.affinity && weapon.affinity > 0 ? '+' : ''}{weapon.affinity || 0}%
         </span>
         
-        {/* Enhanced element display */}
+        {/* Elements display */}
         {elements.length > 0 && (
           <>
             {elements.map((element, idx) => (
-              <TooltipProvider key={idx}>
+              <TooltipProvider key={`element-${idx}`}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className={`flex items-center ${getElementColor(element.type)}`}>
@@ -81,16 +82,43 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
                 </Tooltip>
               </TooltipProvider>
             ))}
-            
-            {/* If multiple elements, show total */}
-            {elements.length > 1 && (
-              <span className="text-purple-300">Total: {totalElementalDamage}</span>
-            )}
           </>
+        )}
+
+        {/* Status effects display */}
+        {statuses.length > 0 && (
+          <>
+            {statuses.map((status, idx) => (
+              <TooltipProvider key={`status-${idx}`}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className={`flex items-center ${getStatusColor(status.type)}`}>
+                      <Pill className="h-3 w-3 mr-1" />
+                      {status.type.charAt(0).toUpperCase() + status.type.slice(1)}: {status.damage}
+                      {status.hidden && <EyeOff className="h-3 w-3 ml-1" />}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      {status.hidden 
+                        ? "Estado oculto: Requiere habilidad Elemento Libre" 
+                        : "Daño de estado"}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+          </>
+        )}
+        
+        {/* If multiple elements, show total */}
+        {elements.length > 1 && (
+          <span className="text-purple-300">Total elemental: {totalElementalDamage}</span>
         )}
       </div>
     );
-  };
+};
+
 // Extracted component for armor details
 const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => (
   <div className="flex gap-3">

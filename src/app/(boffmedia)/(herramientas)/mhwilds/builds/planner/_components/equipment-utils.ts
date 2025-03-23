@@ -91,16 +91,37 @@ export const getDefenseValue = (defense: number | { base: number, max?: number, 
 
 export const getWeaponElementInfo = (weapon: Weapon): { type: string, damage: number, hidden?: boolean } | null => {
   // Try to get all elements and return the first one
-  const elements = getAllWeaponElements(weapon);
-  return elements.length > 0 ? elements[0] : null;
+  try {
+    const { elements } = getAllWeaponElements(weapon);
+    return elements.length > 0 ? elements[0] : null;
+  } catch (err) {
+    console.error("Error getting weapon element info:", err);
+    return null;
+  }
 };
 
-export const getAllWeaponElements = (weapon: Weapon): { type: string, damage: number, hidden?: boolean }[] => {
-  if (!weapon) return [];
+// Add helper function to get status info
+export const getWeaponStatusInfo = (weapon: Weapon): { type: string, damage: number, hidden?: boolean } | null => {
+  // Try to get all statuses and return the first one
+  try {
+    const { statuses } = getAllWeaponElements(weapon);
+    return statuses.length > 0 ? statuses[0] : null;
+  } catch (err) {
+    console.error("Error getting weapon status info:", err);
+    return null;
+  }
+};
+
+export const getAllWeaponElements = (weapon: Weapon): { 
+  elements: { type: string; damage: number; hidden?: boolean }[],
+  statuses: { type: string; damage: number; hidden?: boolean }[]
+} => {
+  if (!weapon) return { elements: [], statuses: [] };
   
   console.log("Extracting elements from weapon:", weapon.id, weapon.name);
   
-  const elements: { type: string, damage: number, hidden?: boolean }[] = [];
+  const elements: { type: string; damage: number; hidden?: boolean }[] = [];
+  const statuses: { type: string; damage: number; hidden?: boolean }[] = [];
   
   // Case 1: Direct element property
   if (weapon.element && typeof weapon.element === 'object') {
@@ -121,62 +142,78 @@ export const getAllWeaponElements = (weapon: Weapon): { type: string, damage: nu
       console.log(`Processing special #${index}:`, special);
       
       try {
-        // Most important case: special with kind="element"
-        if (special.kind === 'element' && special.element) {
-          console.log("Found element special with kind=element:", special);
-          
-          let damage = 0;
-          
-          // Get damage from the complex damage object structure
-          if (special.damage && typeof special.damage === 'object' && 'display' in special.damage) {
-            damage = special.damage.display;
-            console.log("Got damage from damage.display:", damage);
-          } else if (special.damage && typeof special.damage === 'number') {
-            damage = special.damage;
-            console.log("Got damage from direct number:", damage);
-          }
-          
-          if (damage > 0) {
-            const elementInfo = {
-              type: special.element,
-              damage: damage,
-              hidden: !!special.hidden
-            };
-            console.log("Adding element:", elementInfo);
-            elements.push(elementInfo);
-          }
+        const type = special.type || special.element || special.status;
+        if (!type) return;
+        
+        let damage = 0;
+        
+        // Get damage from the complex damage object structure
+        if (special.damage && typeof special.damage === 'object' && 'display' in special.damage) {
+          damage = special.damage.display;
+        } else if (special.damage && typeof special.damage === 'number') {
+          damage = special.damage;
+        } else if (special.value && typeof special.value === 'number') {
+          damage = special.value;
         }
-        // Fallback for other element formats
-        else if (special.type && ['fire', 'water', 'thunder', 'ice', 'dragon'].includes(special.type.toLowerCase())) {
-          console.log("Found element special with element in type property:", special);
-          
-          let damage = 0;
-          
-          if (typeof special.damage === 'number') {
-            damage = special.damage;
-          } else if (special.damage && typeof special.damage === 'object') {
-            damage = special.damage.display || special.damage.raw || 0;
-          }
+        
+        // Determine if it's an element or status effect
+        if ((special.kind === 'element' || special.element) && 
+            ['fire', 'water', 'thunder', 'ice', 'dragon'].includes(type.toLowerCase())) {
+          console.log(`Found element ${type} with damage ${damage}`);
           
           if (damage > 0) {
-            const elementInfo = {
-              type: special.type,
-              damage: damage,
+            elements.push({
+              type,
+              damage,
               hidden: !!special.hidden
-            };
-            console.log("Adding element (fallback):", elementInfo);
-            elements.push(elementInfo);
+            });
+          }
+        } 
+        // Handle status effects
+        else if (special.kind === 'status' || 
+                special.status || 
+                ['poison', 'sleep', 'paralysis', 'blast', 'stun'].includes(type.toLowerCase())) {
+          console.log(`Found status ${type} with damage ${damage}`);
+          
+          if (damage > 0) {
+            statuses.push({
+              type,
+              damage,
+              hidden: !!special.hidden
+            });
           }
         }
       } catch (err) {
-        console.error("Error parsing weapon element special:", err);
+        console.error("Error parsing weapon special:", err);
       }
     });
   }
   
   console.log("Final extracted elements:", elements);
-  return elements;
+  console.log("Final extracted statuses:", statuses);
+  return { elements, statuses };
 };
+
+
+// Add a helper function to get status color
+export function getStatusColor(statusType: string | undefined): string {
+  if (!statusType) return 'text-surface-300';
+  
+  switch (statusType.toLowerCase()) {
+    case 'poison':
+      return 'text-purple-400';
+    case 'paralysis':
+      return 'text-yellow-300';
+    case 'sleep':
+      return 'text-blue-300';
+    case 'blast':
+      return 'text-orange-400';
+    case 'stun':
+      return 'text-amber-400';
+    default:
+      return 'text-surface-300';
+  }
+}
 
 export const getWeaponTypeIcon = (weaponType: string): string => {
   // Convert weapon type to kebab case (for file naming)
@@ -204,6 +241,8 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
     'heavy-bowgun': 'heavy-bowgun',
     'bow': 'bow',
   };
+
+  
   
   // Default to a generic weapon icon if not found
   return `/img/games/mhwilds/${iconMap[normalizedType] || 'great-sword'}.webp`;

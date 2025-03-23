@@ -7,28 +7,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SharpnessBar } from "./SharpnessBar";
 import { ElementalResistances } from "./ElementalResistances";
-import { Droplet, Zap, Snowflake, Skull, Flame, EyeOff, Shield, Swords, Target } from "lucide-react";
+import { Droplet, Zap, Snowflake, Skull, Flame, EyeOff, Shield, Swords, Target, Pill } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Weapon, ElementData, WeaponSpecial, BuildData } from "./types";
-import { getAllWeaponElements, getElementColor } from "./equipment-utils";
+import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "./types";
+import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";
 
-interface StatsDisplayProps {
-  stats: {
-    defense: number;
-    attack: number;
-    affinity: number;
-    resistances: {
-      fire: number;
-      water: number;
-      thunder: number;
-      ice: number;
-      dragon: number;
-    };
-    currentBuild?: BuildData;
-    weapon?: Weapon | null;
-  };
-}
 
 // Helper function to safely get attack value from weapon
 const getWeaponAttack = (weapon: Weapon | null | undefined): number => {
@@ -49,9 +33,10 @@ const getWeaponAttack = (weapon: Weapon | null | undefined): number => {
   return 0;
 };
 
-export function StatsDisplay({ stats }: StatsDisplayProps) {
-  // Add state for element data to ensure updates
+export function StatsDisplay({ stats }: {stats: StatsData}) {
+  // Add state for element and status data to ensure updates
   const [weaponElements, setWeaponElements] = useState<{ type: string; damage: number; hidden?: boolean; }[]>([]);
+  const [weaponStatuses, setWeaponStatuses] = useState<{ type: string; damage: number; hidden?: boolean; }[]>([]);
   
   // Element type icons mapping
   const elementIcons = {
@@ -61,25 +46,37 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
     ice: <Snowflake className="h-4 w-4 text-cyan-400" />,
     dragon: <Skull className="h-4 w-4 text-purple-400" />,
   };
+  
+  // Status type icons mapping
+  const statusIcons = {
+    poison: <Pill className="h-4 w-4 text-purple-400" />,
+    sleep: <Pill className="h-4 w-4 text-blue-300" />,
+    paralysis: <Pill className="h-4 w-4 text-yellow-300" />,
+    blast: <Pill className="h-4 w-4 text-orange-400" />,
+    stun: <Pill className="h-4 w-4 text-amber-400" />,
+  };
 
   // Get the weapon from different possible locations
-  const weapon = stats.weapon || (stats.currentBuild ? stats.currentBuild.weapon : null);
+  const weapon = stats.weapon;
 
   // Get weapon attack value
   const attackValue = getWeaponAttack(weapon);
   
-  // Effect to update elements when weapon changes
+  // Effect to update elements and statuses when weapon changes
   useEffect(() => {
     try {
       if (weapon) {
-        const elements = getAllWeaponElements(weapon);
+        const { elements, statuses } = getAllWeaponElements(weapon);
         setWeaponElements(elements);
+        setWeaponStatuses(statuses);
       } else {
         setWeaponElements([]);
+        setWeaponStatuses([]);
       }
     } catch (err) {
-      console.error("Error extracting weapon elements:", err);
+      console.error("Error extracting weapon effects:", err);
       setWeaponElements([]);
+      setWeaponStatuses([]);
     }
   }, [weapon]);
   
@@ -168,7 +165,49 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
                     ))}
                   </div>
                 ) : (
-                  <span className="text-surface-400 italic">Sin elemento</span>
+                  <span className="text-xs text-surface-400 italic">Sin elemento</span>
+                )}
+              </TooltipContent>
+            </Tooltip>
+            
+            {/* Status Effects - compact display */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
+                  {weaponStatuses.length > 0 ? (
+                    <div className="flex items-center gap-1">
+                      {weaponStatuses.map((status, idx) => (
+                        <React.Fragment key={`${weapon?.id || 'no-weapon'}-status-${idx}`}>
+                          {status.type && statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 
+                            <Pill className="h-4 w-4 text-surface-300" />}
+                          <span className={`text-sm font-medium ${getStatusColor(status.type)}`}>
+                            {status.damage}
+                          </span>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-surface-400 italic">Sin estado</span>
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="max-w-[200px]">
+                <p className="font-medium mb-1">Estado</p>
+                {weaponStatuses.length > 0 ? (
+                  <div className="space-y-1">
+                    {weaponStatuses.map((status, idx) => (
+                      <div key={idx} className="flex items-center gap-1">
+                        {status.type && statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 
+                            <Pill className="h-4 w-4 text-surface-300" />}
+                        <span className={`${getStatusColor(status.type)}`}>
+                          {status.damage} {status.type.charAt(0).toUpperCase() + status.type.slice(1)}
+                          {status.hidden && <span className="text-xs ml-1 opacity-70">(Oculto)</span>}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-xs text-surface-400 italic">Sin estado</span>
                 )}
               </TooltipContent>
             </Tooltip>
@@ -191,23 +230,7 @@ export function StatsDisplay({ stats }: StatsDisplayProps) {
         
         {/* Additional weapon details in compact row */}
         <div className="flex items-center gap-2 flex-wrap">
-          {weapon?.elderseal && (
-            <div className="px-2 py-1 bg-surface-700/30 rounded text-xs">
-              <span className="text-surface-400">Sello Antiguo:</span>{" "}
-              <span className="text-purple-400 font-medium">
-                {weapon.elderseal === "high" ? "Alto" :
-                 weapon.elderseal === "average" ? "Medio" :
-                 weapon.elderseal === "low" ? "Bajo" : "Ninguno"}
-              </span>
-            </div>
-          )}
-
-          {weapon?.defenseBonus && weapon.defenseBonus > 0 && (
-            <div className="px-2 py-1 bg-surface-700/30 rounded text-xs">
-              <span className="text-surface-400">Def.:</span>{" "}
-              <span className="text-blue-400 font-medium">+{weapon.defenseBonus}</span>
-            </div>
-          )}
+          {/* Display other weapon details... */}
         </div>
       </CardContent>
     </Card>
