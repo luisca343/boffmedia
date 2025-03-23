@@ -20,8 +20,11 @@ import {
   EquipmentType,
   SkillRank
 } from "./_components/types";
+import { useGameData } from "./_hooks/useGameData";
 
 export default function BuildPlanner() {
+  const {skills: skillData} = useGameData();
+  
   // State for the current build
   const [currentBuild, setCurrentBuild] = useState<BuildData>({
     name: "Mi Build",
@@ -107,14 +110,12 @@ export default function BuildPlanner() {
           // If skill already exists by name, add the levels
           existingSkill.level += skillRank.level;
         } else {
-          // Otherwise create a new skill entry
-          const maxLevel = getMaxLevelForSkill(String(skillId), skillName);
           
           skillMap.set(skillName, {
             id: skillId, // Keep the original ID
             name: skillName,
             level: skillRank.level,
-            maxLevel: maxLevel,
+            maxLevel: skillData[skillId]?.maxLevel || 0,
             description: skillRank.description || '',
             kind: skillRank.skill?.kind
           });
@@ -142,14 +143,14 @@ export default function BuildPlanner() {
           // Convert decoration skills to SkillRank format for processing
           const skillRanks = decoAssign.decoration.skills.map(skill => ({
             skill: {
-              id: skill.skill.id,
+              id: typeof skill.skill.id === 'string' ? parseInt(skill.skill.id) : skill.skill.id,
               gameId: 0, // Not needed for calculation
               name: skill.skill.name,
               kind: "decoration" 
             },
             level: skill.level,
             description: skill.description || "", 
-            id: skill.id || 0
+            id: typeof skill.id === 'string' ? parseInt(skill.id) : (skill.id || 0)
           }));
           
           addSkillsFromItem(skillRanks);
@@ -159,77 +160,6 @@ export default function BuildPlanner() {
     
     // Convert Map back to Array
     return Array.from(skillMap.values());
-  };
-  
-  // Helper to get max level for a given skill (in a real app, this would come from a database)
-  const getMaxLevelForSkill = (skillId: string, skillName: string): number => {
-    // Common skill name to max level mapping
-    const skillNameMap: Record<string, number> = {
-      "Ataque": 7,
-      "Ojo crítico": 7,
-      "Punto débil": 3, 
-      "Vitalidad": 3,
-      "Bendición divina": 3,
-      "Daño crítico": 3,
-      "Agitador": 5,
-      "Defensa": 7,
-      "Resistencia al fuego": 3,
-      "Resistencia al agua": 3,
-      "Resistencia al trueno": 3,
-      "Resistencia al hielo": 3,
-      "Resistencia al dragón": 3,
-      "Artesanía": 5,
-      "Afilado rápido": 3,
-      "Desuello": 5,       // Merged skill with multiple IDs
-      "Envainado veloz": 5,
-      "Bloqueo mejorado": 5,
-      "Coalescencia": 5,
-      "Convierte elemento": 2,
-      "Comida gratis": 3,
-      "Intimidador": 3,
-      "Maestro de elemento": 3,
-      "Elemento libre": 2,
-      "Potenciador de ataque": 3,
-      "Constitución": 3
-    };
-    
-    // ID-based max levels - fallback if name lookup fails
-    const maxLevelsById: Record<string, number> = {
-      "attack_boost": 7,
-      "critical_eye": 7,
-      "weakness_exploit": 3,
-      "health_boost": 3,
-      "divine_blessing": 3,
-      "critical_boost": 3,
-      "agitator": 5,
-      "defense_boost": 7,
-      "112": 5, // Artesanía (Handicraft)
-      "119": 3, // Afilado rápido (Speed Sharpening)
-      "37": 5,  // Desuello (first ID)
-      "86": 5,  // Desuello (second ID - same skill)
-      "32": 5,  // Envainado veloz
-      "55": 5,  // Bloqueo mejorado
-      "16": 5,  // Escudo 
-      "28": 5,  // Coalescencia
-      "144": 2, // Convierte elemento / Elemento libre
-      "104": 3, // Comida gratis / Potenciador de ataque
-      "123": 3, // Intimidador / Constitución
-      "53": 3,  // Punto débil
-      "125": 3, // Maestro de elemento
-    };
-    
-    // First try by name (more reliable for localized content)
-    if (skillName && skillNameMap[skillName]) {
-      return skillNameMap[skillName];
-    }
-    
-    // Then try by ID as fallback
-    if (skillId && maxLevelsById[skillId]) {
-      return maxLevelsById[skillId];
-    }
-    
-    // Default to 3 if max level isn't specified
-    return 3;
   };
 
   // Placeholder function for calculating stats
@@ -246,15 +176,15 @@ export default function BuildPlanner() {
       affinity: 0,
       element: undefined,
       sharpness: {
-        red: 10,
-        orange: 20,
-        yellow: 30,
-        green: 40,
-        blue: 50,
-        white: 60,
+        red: 0,
+        orange: 0,
+        yellow: 0,
+        green: 0,
+        blue: 0,
+        white: 0,
         purple: 0,
       },
-      weapon: currentBuild.weapon || null,
+      //weapon: currentBuild.weapon || null,
     };
     
     // Add weapon stats
@@ -386,7 +316,7 @@ export default function BuildPlanner() {
         {/* Right panel - Stats and Skills */}
         <div className="lg:col-span-4 space-y-6">
           <StatsDisplay stats={stats} />
-          <SkillsList skills={totalSkills} />
+          <SkillsList skills={totalSkills} skillsData={skillData}/>
           <BuildActions />
         </div>
       </div>

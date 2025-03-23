@@ -35,39 +35,10 @@ interface ServerSkill {
 
 interface SkillsListProps {
   skills: Skill[];
+  skillsData: Record<string, ServerSkill>;  
 }
 
-export function SkillsList({ skills }: SkillsListProps) {
-  const [skillsData, setSkillsData] = useState<Record<string, ServerSkill>>({});
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Fetch skills data from the server
-  useEffect(() => {
-    const fetchSkillsData = async () => {
-      try {
-        const response = await axios.get("https://api.ficuslab.es/data/mhwilds/skills.json");
-        
-        // Create a lookup map by both ID and name for faster access
-        const skillsMap: Record<string, ServerSkill> = {};
-        
-        response.data.forEach((skill: ServerSkill) => {
-          // Index by ID as string
-          skillsMap[String(skill.id)] = skill;
-          // Also index by name for name-based lookups
-          skillsMap[skill.name] = skill;
-        });
-        
-        setSkillsData(skillsMap);
-      } catch (error) {
-        console.error("Error fetching skills data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSkillsData();
-  }, []);
-
+export function SkillsList({ skills, skillsData }: SkillsListProps) {
   // Sort skills by level (highest first) and then by name for more user-friendly display
   const sortedSkills = [...skills].sort((a, b) => {
     // First sort by level (descending)
@@ -92,7 +63,7 @@ export function SkillsList({ skills }: SkillsListProps) {
         </div>
       </CardHeader>
       <CardContent className="px-2 pt-0 pb-1">
-        {loading ? (
+        {!skillsData ? (
           <div className="text-center py-6 text-surface-400">
             <HelpCircle className="h-6 w-6 mx-auto mb-1.5 opacity-50 animate-pulse" />
             <p className="text-xs">Cargando habilidades...</p>
