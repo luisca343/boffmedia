@@ -15,6 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Skill } from "./types";
+import { useTranslations } from "next-intl";
 
 // Define a type for the server-side skill data
 interface ServerSkill {
@@ -39,7 +40,7 @@ interface SkillsListProps {
 }
 
 export function SkillsList({ skills, skillsData }: SkillsListProps) {
-  // Sort skills by level (highest first) and then by name for more user-friendly display
+  const t = useTranslations("mhwilds");
   const sortedSkills = [...skills].sort((a, b) => {
     // First sort by level (descending)
     if (b.level !== a.level) return b.level - a.level;
@@ -56,7 +57,7 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
     <Card className="bg-surface-800 border-surface-700">
       <CardHeader className="py-2 px-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Habilidades Activas</CardTitle>
+          <CardTitle className="text-base">{t("build_planner.active_skills")}</CardTitle>
           <span className="text-xs text-surface-400">
             {skills.length} {skills.length === 1 ? 'habilidad' : 'habilidades'}
           </span>
@@ -66,7 +67,7 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
         {!skillsData ? (
           <div className="text-center py-6 text-surface-400">
             <HelpCircle className="h-6 w-6 mx-auto mb-1.5 opacity-50 animate-pulse" />
-            <p className="text-xs">Cargando habilidades...</p>
+            <p className="text-xs">{t("build_planner.loading", {item: t("skills").toLowerCase()})}</p>
           </div>
         ) : sortedSkills.length > 0 ? (
           <ScrollArea className="h-80 pr-1">
@@ -75,7 +76,7 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
               <div className="mb-2">
                 <div className="flex items-center gap-2 mb-0.5 pl-1">
                   <AlertCircle className="h-3 w-3 text-yellow-400" />
-                  <span className="text-xs font-medium text-yellow-400">Habilidades con puntos extra</span>
+                  <span className="text-xs font-medium text-yellow-400">{t("build_planner.overallocated_skills")}</span>
                 </div>
                 
                 <div className="rounded-md bg-yellow-900/10 border border-yellow-600/30 overflow-hidden">
@@ -107,8 +108,8 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
         ) : (
           <div className="text-center py-6 text-surface-400">
             <HelpCircle className="h-6 w-6 mx-auto mb-1.5 opacity-50" />
-            <p className="text-xs">No hay habilidades activas</p>
-            <p className="text-xs mt-0.5 opacity-70">Añade armas y armaduras con habilidades</p>
+            <p className="text-xs">{t("build_planner.no_active_skills")}</p>
+            <p className="text-xs mt-0.5 opacity-70">{t("build_planner.no_active_skills_description")}</p>
           </div>
         )}
       </CardContent>
@@ -124,7 +125,7 @@ interface SkillItemProps {
 }
 
 function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = false }: SkillItemProps) {
-  // Get skill data from server data if available
+  const t = useTranslations("mhwilds");
   const getSkillData = (skill: Skill): ServerSkill | null => {
     // Try to find by ID first
     const idKey = String(skill.id);
@@ -152,22 +153,8 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
         return rank.description;
       }
     }
-    
-    // Fallback to the hardcoded values if we don't have server data for this skill
-    const fallbackEffects: Record<string, string[]> = {
-      "Ataque": ["Ataque +3", "Ataque +6", "Ataque +9", "Ataque +12, Afinidad +5%", "Ataque +15, Afinidad +5%"],
-      "Ojo crítico": ["Afinidad +5%", "Afinidad +10%", "Afinidad +15%", "Afinidad +20%", "Afinidad +25%"],
-      "Punto débil": ["Afinidad +15% contra puntos débiles", "Afinidad +30% contra puntos débiles", "Afinidad +50% contra puntos débiles"],
-      "Vitalidad": ["Vida máxima +15", "Vida máxima +30", "Vida máxima +50"],
-      "Daño crítico": ["Daño crítico +30%", "Daño crítico +35%", "Daño crítico +40%"],
-      "Desuello": ["Aumento leve a la eficacia de desuello", "Aumento moderado a la eficacia de desuello", "Aumento notable a la eficacia de desuello"]
-    };
-    
-    if (fallbackEffects[skill.name] && effectiveLevel <= fallbackEffects[skill.name].length) {
-      return fallbackEffects[skill.name][effectiveLevel - 1];
-    }
-    
-    return `Nivel ${effectiveLevel}`;
+
+    return t("build_planner.skill_description_not_found");
   };
   
   // Get skill color based on type from server data or fallback to hardcoded categories
@@ -189,16 +176,6 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
       }
     }
     
-    // Fallback to hardcoded categories if server data unavailable
-    const attackSkills = ["Ataque", "Ojo crítico", "Punto débil", "Daño crítico", "Agitador"];
-    const defenseSkills = ["Defensa", "Bendición divina", "Vitalidad"];
-    const elementSkills = ["Resistencia al fuego", "Resistencia al agua", "Resistencia al trueno", 
-                          "Resistencia al hielo", "Resistencia al dragón", "Antidraco", "Convierte elemento"];
-    
-    if (attackSkills.includes(skill.name)) return "text-red-400";
-    if (defenseSkills.includes(skill.name)) return "text-blue-400";
-    if (elementSkills.includes(skill.name)) return "text-purple-400";
-    
     return "text-green-400";
   };
   
@@ -208,7 +185,7 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
     if (serverSkill) {
       return serverSkill.description;
     }
-    return `Descripción de ${skill.name}`;
+    return t("build_planner.skill_description_not_found");
   };
   
   const effectiveLevel = Math.min(skill.level, skill.maxLevel);
@@ -279,14 +256,14 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
             <div className="space-y-2">
               <p>{skillDescription}</p>
               <div>
-                <p className="text-sm font-medium mb-1">Nivel actual: {effectiveLevel}</p>
+                <p className="text-sm font-medium mb-1">{t("build_planner.current_level")}: {effectiveLevel}</p>
                 <p className={`text-sm ${skillColor}`}>{skillEffectDescription}</p>
                 
                 {isOverallocated && (
                   <div className="mt-1.5 text-yellow-400 text-xs flex items-center">
                     <AlertCircle className="h-3 w-3 mr-1" />
                     <span>
-                      {wastedPoints} punto{wastedPoints > 1 ? 's' : ''} sin efecto
+                      {t("build_planner.wasted_points", { count: wastedPoints })}
                     </span>
                   </div>
                 )}

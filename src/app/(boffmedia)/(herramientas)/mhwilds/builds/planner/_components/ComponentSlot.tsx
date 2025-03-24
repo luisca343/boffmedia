@@ -20,8 +20,10 @@ import {
 } from "./types";
 import { FC, ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
-import { getElementColor, getDefenseValue, getStatusColor } from "./equipment-utils";
+import { getElementColor, getDefenseValue, getStatusColor, getWeaponTypeIcon, getArmorImagePath } from "./equipment-utils";
 import { getAllWeaponElements } from "./equipment-utils";
+import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface SlotConfig {
   key: EquipmentType;
@@ -29,6 +31,7 @@ interface SlotConfig {
   icon: LucideIcon | any; // Using any to accommodate both Lucide and react-icons
   component: EquipmentComponent | null;
   iconColor: string;
+  hasCustomIcon?: boolean;
 }
 
 interface ComponentSlotProps {
@@ -36,6 +39,7 @@ interface ComponentSlotProps {
   onSlotClick: (slot: EquipmentType) => void;
   onDecorationClick: (equipmentType: EquipmentType, slotIndex: number) => void;
   renderDecorationSlots: (equipmentType: EquipmentType, slots?: number[]) => ReactNode;
+  hasCustomIcon?: boolean;
 }
 
 // Helper function to determine if a component is a weapon
@@ -50,14 +54,15 @@ const isArmor = (component: EquipmentComponent | null): component is ArmorPiece 
 
 // Extracted component for weapon details
 const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
+    const t = useTranslations("mhwilds");
     const { elements, statuses } = getAllWeaponElements(weapon);
     const totalElementalDamage = elements.reduce((total, el) => total + el.damage, 0);
   
     return (
       <div className="flex flex-wrap gap-x-4 gap-y-1">
-        <span className="text-red-400">Ataque: {weapon.attack || weapon.damage?.display || 0}</span>
+        <span className="text-red-400">{t("attack")}: {weapon.attack || weapon.damage?.display || 0}</span>
         <span className={weapon.affinity && weapon.affinity >= 0 ? "text-green-400" : "text-red-400"}>
-          Afinidad: {weapon.affinity && weapon.affinity > 0 ? '+' : ''}{weapon.affinity || 0}%
+          {t("affinity")}: {weapon.affinity && weapon.affinity > 0 ? '+' : ''}{weapon.affinity || 0}%
         </span>
         
         {/* Elements display */}
@@ -113,31 +118,36 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
         
         {/* If multiple elements, show total */}
         {elements.length > 1 && (
-          <span className="text-purple-300">Total elemental: {totalElementalDamage}</span>
+          <span className="text-purple-300">
+            {t("total_element")}: {totalElementalDamage}
+          </span>
         )}
       </div>
     );
 };
 
 // Extracted component for armor details
-const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => (
-  <div className="flex gap-3">
-    <span className="text-blue-400">Def: {getDefenseValue(armor.defense)}</span>
+const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
+  const t = useTranslations("mhwilds");
+  return <div className="flex gap-3">
+    <span className="text-blue-400">{t("def")}: {getDefenseValue(armor.defense)}</span>
     {armor.rarity !== undefined && (
-      <span className="text-amber-400">R{armor.rarity}</span>
+      <span className="text-amber-400">{t("rarity")} {armor.rarity}</span>
     )}
     {armor.armorSet && (
       <span className="text-primary-400">
-        Set: {armor.armorSet.name}
+        {t("build_planner.set")}: {armor.armorSet.name}
       </span>
     )}
   </div>
-);
+}
 
 // Extracted component for skills
-const SkillsList: FC<{ skills: SkillRank[] }> = ({ skills }) => (
-    <div className="mt-2 text-xs flex flex-wrap items-center gap-x-2">
-      <span className="text-surface-400 mr-1">Habilidades:</span>
+const SkillsList: FC<{ skills: SkillRank[] }> = ({ skills }) => {
+  const t = useTranslations("mhwilds");
+
+    return <div className="mt-2 text-xs flex flex-wrap items-center gap-x-2">
+      <span className="text-surface-400 mr-1">{t("skills")}:</span>
       {skills.map((skillRank, idx) => {
         const skillName = skillRank.skill?.name || skillRank.name || "Unknown Skill";
         return (
@@ -145,21 +155,23 @@ const SkillsList: FC<{ skills: SkillRank[] }> = ({ skills }) => (
             key={`${skillRank.id || `skill-${idx}`}`} 
             className="text-green-400"
           >
-            {skillName} Nv.{skillRank.level}
+            {skillName} {t("lv")}{skillRank.level}
             {idx < skills.length - 1 && <span className="text-surface-500 ml-1">/</span>}
           </span>
         );
       })}
     </div>
-  );
+}
 
 // Main ComponentSlot
 export const ComponentSlot: FC<ComponentSlotProps> = ({ 
   slot, 
   onSlotClick, 
   onDecorationClick, 
-  renderDecorationSlots 
+  renderDecorationSlots,
+  hasCustomIcon = false,
 }) => {
+  const t = useTranslations("mhwilds");
   return (
     <motion.div 
       className="bg-surface-700/30 rounded-lg p-3 hover:bg-surface-700/50 cursor-pointer"
@@ -171,16 +183,43 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
       <div className="flex items-center">
         <div className={`w-16 h-16 bg-surface-700 rounded-lg flex items-center justify-center mr-4 ${slot.component ? 'bg-surface-600/50' : 'bg-surface-700'}`}>
           <div className="flex flex-col items-center justify-center">
-            <slot.icon className={`h-8 w-8 ${slot.component ? slot.iconColor : 'text-surface-500'}`} />
-            {!slot.component && <Plus className="h-4 w-4 text-surface-400 mt-1" />}
+            {/* For weapons */}
+            {slot.key === 'weapon' ? (
+              <div className="relative w-10 h-10">
+                <Image 
+                  src={slot.component && isWeapon(slot.component) 
+                    ? getWeaponTypeIcon(slot.component.kind || slot.component.type || 'great-sword')
+                    : getWeaponTypeIcon('great-sword')} 
+                  alt={slot.component && isWeapon(slot.component) ? slot.component.kind || 'weapon' : 'weapon'}
+                  width={40}
+                  height={40}
+                  className={`object-contain ${!slot.component ? 'opacity-30' : ''}`}
+                />
+                {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
+              </div>
+            ) : (
+              /* For armor pieces */
+              <div className="relative w-10 h-10">
+                <Image 
+                  src={getArmorImagePath(slot.key)} 
+                  alt={slot.key}
+                  width={40}
+                  height={40}
+                  className={`object-contain ${!slot.component ? 'opacity-30' : ''}`}
+                />
+                {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
+              </div>
+            )}
           </div>
         </div>
         
         <div className="flex-1">
           <div className="flex items-center">
-            <span className="font-medium text-surface-100">
-              {slot.component ? slot.component.name : `Sin ${slot.name}`}
-            </span>
+          <span className="font-medium text-surface-100">
+            {slot.component 
+              ? slot.component.name 
+              : t("build_planner.no_equipment", { name: slot.name })}
+          </span>
             
             {slot.component && (
               <TooltipProvider>
@@ -191,7 +230,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="right" className="max-w-xs">
-                    <p>{slot.component.description || `Descripción de ${slot.component.name}`}</p>
+                    <p>{slot.component.description || (t('build_planner.no_description'))}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -211,7 +250,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
               
               {slot.component.slots && slot.component.slots.length > 0 && (
                 <div className="flex items-center gap-1">
-                  <span className="text-surface-400 mr-1">Decoraciones:</span>
+                  <span className="text-surface-400 mr-1">{t("build_planner.slots")}: {slot.component.slots.length}</span>
                   {renderDecorationSlots(slot.key, slot.component.slots)}
                 </div>
               )}
@@ -227,5 +266,4 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
   );
 };
 
-// Also export the types for use elsewhere
 export type { ComponentSlotProps, SlotConfig };

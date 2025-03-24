@@ -23,6 +23,7 @@ import {
   Decoration,
   Filters
 } from "./types";
+import { useTranslations } from "next-intl";
 
 interface DecorationSelectorProps {
   equipmentType: EquipmentType;
@@ -47,6 +48,7 @@ export function DecorationSelector({
   setFilters,
   onClose
 }: DecorationSelectorProps) {
+  const t = useTranslations("mhwilds");
   const [error, setError] = useState<string | null>(null);
   const [filteredDecorations, setFilteredDecorations] = useState<Decoration[]>([]);
   
@@ -164,7 +166,7 @@ export function DecorationSelector({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center text-xl">
             <Gem className="h-5 w-5 text-green-400 mr-2" />
-            Seleccionar Decoración
+            {t("build_planner.select_decoration")}
             <div className={`w-5 h-5 rounded-full ml-3 ${getSlotColorClass(slotSize)}`}>
               <span className="flex items-center justify-center text-xs text-surface-900">{slotSize}</span>
             </div>
@@ -179,7 +181,7 @@ export function DecorationSelector({
         <div className="flex space-x-2 mb-4">
           <div className="relative flex-1">
             <Input 
-              placeholder="Buscar..." 
+              placeholder={t("build_planner.search")} 
               className="bg-surface-700 border-surface-600 pl-8"
               value={filters.search}
               onChange={(e) => setFilters({...filters, search: e.target.value})}
@@ -192,17 +194,16 @@ export function DecorationSelector({
 
         {/* Show where this decoration is being placed */}
         <div className="bg-surface-700/20 p-3 rounded-md mb-4">
-          <div className="text-sm text-surface-400 mb-1">Asignando a:</div>
+          <div className="text-sm text-surface-400 mb-1">{t("build_planner.assigned_to")}</div>
           <div className="flex items-center text-surface-100">
             <span className="font-medium">
-              {equipmentType.charAt(0).toUpperCase() + equipmentType.slice(1)}
+              {t(equipmentType)}
             </span>
             <span className="mx-2">•</span>
-            <span>Ranura {slotIndex + 1}</span>
+            <span>{t("slot")} {slotIndex + 1}</span>
             <span className="mx-2">•</span>
             <span className="flex items-center">
-              Tamaño 
-              <div className={`w-4 h-4 rounded-full ml-1 ${getSlotColorClass(slotSize)}`}></div>
+              {t("build_planner.slot_size")} <div className={`w-4 h-4 rounded-full ml-1 ${getSlotColorClass(slotSize)}`}></div>
             </span>
           </div>
         </div>
@@ -212,7 +213,7 @@ export function DecorationSelector({
           {!decorations ? (
             <div className="h-full flex items-center justify-center">
               <Loader2 className="h-8 w-8 text-primary-400 animate-spin" />
-              <span className="ml-2 text-surface-300">Cargando decoraciones...</span>
+              <span className="ml-2 text-surface-300">{t("build_planner.loading", {item: t("build_planner.decorations")})}</span>
             </div>
           ) : error ? (
             <div className="h-full flex flex-col items-center justify-center">
@@ -221,7 +222,7 @@ export function DecorationSelector({
                 variant="outline" 
                 onClick={() => window.location.reload()}
               >
-                Reintentar
+                {t("build_planner.retry")}
               </Button>
             </div>
           ) : (
@@ -238,7 +239,7 @@ export function DecorationSelector({
                     className="w-full justify-between bg-red-900/20 hover:bg-red-900/30 text-red-300 p-3 h-auto"
                     onClick={() => assignDecoration(null)}
                   >
-                    <span>Quitar {currentDecoration.name}</span>
+                    <span>${t("build_planner.remove")} {currentDecoration.name}</span>
                     <X className="h-4 w-4" />
                   </Button>
                 </motion.div>
@@ -288,7 +289,7 @@ export function DecorationSelector({
                 ))
               ) : (
                 <div className="text-center p-8 text-surface-400">
-                  <p>No se encontró ninguna decoración con los filtros actuales</p>
+                  <p>{t("build_planner.no_decorations_found")}</p>
                 </div>
               )}
             </div>
@@ -297,7 +298,7 @@ export function DecorationSelector({
       </CardContent>
       <CardFooter className="pt-2 border-t border-surface-700 flex justify-between">
         <Button variant="ghost" size="sm" onClick={onClose} className="text-surface-300">
-          <ChevronLeft className="mr-1 h-4 w-4" /> Volver
+          <ChevronLeft className="mr-1 h-4 w-4" /> {t("build_planner.back")}
         </Button>
       </CardFooter>
     </Card>

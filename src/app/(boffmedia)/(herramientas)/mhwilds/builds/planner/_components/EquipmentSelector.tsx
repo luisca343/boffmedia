@@ -17,6 +17,7 @@ import { getEquipmentDisplayName, getEquipmentIcon, getIconColor } from "./equip
 import { EquipmentFilters } from "./EquipmentFilters";
 import { EquipmentItem } from "./EquipmentItem";
 import { CurrentEquipment } from "./CurrentEquipment";
+import { useTranslations } from "next-intl";
 
 interface EquipmentSelectorProps {
   slotType: EquipmentType;
@@ -39,6 +40,7 @@ export function EquipmentSelector({
   isLoading,
   equipmentData
 }: EquipmentSelectorProps) {
+  const t = useTranslations("mhwilds");
   const [equipment, setEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
   const [filteredEquipment, setFilteredEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -158,10 +160,10 @@ export function EquipmentSelector({
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center">
             <EquipmentIcon className={`mr-2 h-5 w-5 ${iconColor}`} />
-            Seleccionar {getEquipmentDisplayName(slotType)}
+            {t("build_planner.select")} {getEquipmentDisplayName(slotType)}
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4 mr-1" /> Cerrar
+            <X className="h-4 w-4 mr-1" /> {t("build_planner.close")}
           </Button>
         </div>
       </CardHeader>
@@ -194,7 +196,7 @@ export function EquipmentSelector({
       return (
         <div className="h-[400px] flex items-center justify-center bg-surface-800/50 rounded-md">
           <Loader2 className="h-8 w-8 text-primary-400 animate-spin" />
-          <span className="ml-2 text-surface-300">Cargando equipamiento...</span>
+          <span className="ml-2 text-surface-300">{t("build_planner.loading", {item: t("equipment").toLowerCase()})}</span>
         </div>
       );
     }
@@ -209,7 +211,7 @@ export function EquipmentSelector({
               setError(null);
             }}
           >
-            Reintentar
+            {t("build_planner.retry")}
           </Button>
         </div>
       );
@@ -230,7 +232,7 @@ export function EquipmentSelector({
             ))
           ) : (
             <div className="col-span-2 text-center p-8 text-surface-400">
-              <p>No se encontró ningún equipamiento con los filtros actuales</p>
+              <p>{t("build_planner.no_equipment_found")}</p>
             </div>
           )}
         </div>

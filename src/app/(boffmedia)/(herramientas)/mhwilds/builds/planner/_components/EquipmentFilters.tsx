@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Filters, EquipmentType } from "./types";
+import { useTranslations } from "next-intl";
 
 interface EquipmentFiltersProps {
   filters: Filters;
@@ -20,14 +21,15 @@ interface EquipmentFiltersProps {
 }
 
 export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFiltersProps) => {
+  const t = useTranslations("mhwilds");
   const hasActiveFilters = filters.rarity.length > 0 || filters.element;
   
   const elements = ["fire", "water", "thunder", "ice", "dragon"];
   
   // Simplified rank ranges
   const rankRanges = [
-    { label: "Low Rank", value: [1, 2, 3, 4], isActive: false },
-    { label: "High Rank", value: [5, 6, 7, 8, 9, 10], isActive: false },
+    { label: t("low_rank"), value: [1, 2, 3, 4], isActive: false },
+    { label: t("high_rank"), value: [5, 6, 7, 8, 9, 10], isActive: false },
   ];
   
   // Check which rank range is currently active
@@ -86,8 +88,8 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
   
   // Get the currently active rank label
   const getActiveRankLabel = () => {
-    if (rankRanges[0].isActive) return "Low Rank";
-    if (rankRanges[1].isActive) return "High Rank";
+    if (rankRanges[0].isActive) return t("low_rank");
+    if (rankRanges[1].isActive) return t("high_rank");
     
     // Check if it's a mix of rarities that don't exactly match any predefined range
     if (filters.rarity.length > 0) {
@@ -105,7 +107,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
         <div className="relative flex-1">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-surface-500" />
           <Input 
-            placeholder="Buscar..." 
+            placeholder={t("build_planner.search")}
             value={filters.search}
             onChange={(e) => setFilters({...filters, search: e.target.value})}
             className="bg-surface-700 border-surface-600 pl-8"
@@ -116,7 +118,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className={`${hasActiveFilters ? 'text-primary-300 border-primary-700' : 'text-surface-300'}`}>
               <Filter className="mr-1 h-4 w-4" />
-              Filtros
+              {t("build_planner.filters")}
               {hasActiveFilters && 
                 <Badge variant="secondary" className="ml-1 px-1 bg-primary-900 text-primary-300">
                   {(filters.rarity.length > 0 ? 1 : 0) + (filters.element ? 1 : 0)}
@@ -125,7 +127,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56 bg-surface-800 border-surface-700">
-            <DropdownMenuLabel>Filtros</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("build_planner.filters")}</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-surface-700" />
             
             <DropdownMenuLabel className="text-xs text-surface-400">Rango</DropdownMenuLabel>
@@ -145,7 +147,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
             {slotType === 'weapon' && (
               <>
                 <DropdownMenuSeparator className="bg-surface-700" />
-                <DropdownMenuLabel className="text-xs text-surface-400">Elemento</DropdownMenuLabel>
+                <DropdownMenuLabel className="text-xs text-surface-400">{t("element")}</DropdownMenuLabel>
                 {elements.map((element) => (
                   <DropdownMenuItem 
                     key={element} 
@@ -167,7 +169,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
               <>
                 <DropdownMenuSeparator className="bg-surface-700" />
                 <DropdownMenuItem onClick={clearFilters} className="text-red-400 cursor-pointer">
-                  <X className="h-4 w-4 mr-1" /> Limpiar filtros
+                  <X className="h-4 w-4 mr-1" /> {t("build_planner.clear_filters")}
                 </DropdownMenuItem>
               </>
             )}
@@ -175,14 +177,14 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
         </DropdownMenu>
         
         <Button variant="outline" className="text-surface-300">
-          <ArrowUpDown className="mr-1 h-4 w-4" /> Ordenar
+          <ArrowUpDown className="mr-1 h-4 w-4" /> {t("build_planner.sort")}
         </Button>
       </div>
       
       {/* Active filters display */}
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-surface-400">Filtros activos:</span>
+          <span className="text-xs text-surface-400">{t("build_planner.active_filters")}:</span>
           
           {activeRankLabel && (
             <Badge variant="outline" className="bg-surface-700 text-surface-200 border-surface-600">

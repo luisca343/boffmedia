@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Upload, AlertCircle } from "lucide-react";
 import { BuildDataWithIds } from "./types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useTranslations } from "next-intl";
 
 interface BuildImportProps {
   onImport: (build: BuildDataWithIds) => void;
 }
 
 export function BuildImport({ onImport }: BuildImportProps) {
+  const t = useTranslations("mhwilds");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   
@@ -19,20 +21,21 @@ export function BuildImport({ onImport }: BuildImportProps) {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        if (!event.target?.result) throw new Error("Error reading file");
+        if (!event.target?.result) throw new Error(t("build_planner.error_reading_file"));
         
         const buildData = JSON.parse(event.target.result as string) as BuildDataWithIds;
         
         // Basic validation
         if (!buildData.name || !Array.isArray(buildData.decorations)) {
-          throw new Error("Invalid build file format");
+          throw new Error(t("build_planner.error_invalid_file_format"));
         }
         
         onImport(buildData);
         setError(null);
       } catch (err) {
         console.error("Error parsing build file:", err);
-        setError("Formato de archivo inválido. Asegúrate de que sea un build JSON válido.");
+        setError(t("build_planner.error_invalid_file_format_full"));
+
       }
     };
     
@@ -54,7 +57,7 @@ export function BuildImport({ onImport }: BuildImportProps) {
         onClick={() => fileInputRef.current?.click()}
       >
         <Upload className="h-5 w-5 mr-2" />
-        Importar build desde archivo
+        {t("build_planner.import_build")}
       </Button>
       <input
         type="file"

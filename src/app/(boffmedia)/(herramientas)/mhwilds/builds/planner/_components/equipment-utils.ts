@@ -247,3 +247,18 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
   // Default to a generic weapon icon if not found
   return `/img/games/mhwilds/${iconMap[normalizedType] || 'great-sword'}.webp`;
 };
+
+export const getArmorImagePath = (armorType: EquipmentType): string => {
+  // Map equipment types to their image filenames
+  const imageMap: Record<EquipmentType, string> = {
+    'head': 'helmet',
+    'chest': 'chest',
+    'arms': 'gauntlets',
+    'waist': 'waist',
+    'legs': 'greaves',
+    'weapon': 'great-sword', // Fallback, but we use getWeaponTypeIcon for weapons
+  };
+  
+  // Return the path to the image
+  return `/img/games/mhwilds/${imageMap[armorType] || 'helmet'}.webp`;
+};

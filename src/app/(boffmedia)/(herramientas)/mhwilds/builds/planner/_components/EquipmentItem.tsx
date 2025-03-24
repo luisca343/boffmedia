@@ -10,9 +10,10 @@ import {
   getWeaponElementInfo,
   getAllWeaponElements,
   getWeaponTypeIcon,
-  getStatusColor
+  getStatusColor,
+  getArmorImagePath
 } from "./equipment-utils";
-import { EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface EquipmentItemProps {
   item: ArmorPiece | Weapon;
@@ -22,6 +23,7 @@ interface EquipmentItemProps {
 }
 
 export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItemProps) => {
+  const t = useTranslations("mhwilds");
   const isWeapon = 'attack' in item || 'damage' in item;
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
@@ -53,7 +55,15 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
                 />
               </div>
             ) : (
-              <EquipmentIcon className={`h-7 w-7 ${iconColor}`} />
+              <div className="relative w-10 h-10">
+                <Image 
+                  src={getArmorImagePath(slotType)} 
+                  alt={slotType}
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
+              </div>
             )}
           </div>
 
@@ -84,6 +94,7 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
 
 // Component for armor stats display
 const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
+  const t = useTranslations("mhwilds");
   const defenseValue = typeof armor.defense === 'number' 
     ? armor.defense 
     : armor.defense.base;
@@ -95,14 +106,14 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
       {/* Show decoration slots */}
       {armor.slots && armor.slots.length > 0 && (
         <span className="text-surface-300">
-          Ranuras: {armor.slots.map(size => `○${size}`).join(' ')}
+          {t("build_planner.slots")}: {armor.slots.map(size => `○${size}`).join(' ')}
         </span>
       )}
       
       {/* Show set name if available */}
       {armor.armorSet?.name && (
         <span className="text-purple-400 truncate max-w-[200px]">
-          Set: {armor.armorSet.name}
+          {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
     </div>
@@ -111,14 +122,14 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
 
 // Enhanced component for weapon stats with better element display
 const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
-  // Extract elements and statuses from weapon
+  const t = useTranslations("mhwilds");
   const { elements, statuses } = getAllWeaponElements(weapon);
 
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
       <span className="text-red-400">Atk: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}</span>
       <span className={`${weapon.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-        Afinidad: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
+        {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       
       {/* Show elements */}
@@ -140,7 +151,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
       {/* Show decoration slots */}
       {weapon.slots && weapon.slots.length > 0 && (
         <span className="text-surface-300">
-          Ranuras: {weapon.slots.map(size => `○${size}`).join(' ')}
+          {t("build_planner.slots")}: {weapon.slots.map(size => `○${size}`).join(' ')}
         </span>
       )}
     </div>

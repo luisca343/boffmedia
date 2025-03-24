@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { ArmorPiece, EquipmentType, Weapon } from "./types";
 import { getDefenseValue, getEquipmentIcon, getIconColor, getRarityStyle } from "./equipment-utils";
+import { useTranslations } from "next-intl";
 
 interface CurrentEquipmentProps {
   equipment: ArmorPiece | Weapon;
@@ -11,6 +12,7 @@ interface CurrentEquipmentProps {
 }
 
 export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquipmentProps) => {
+  const t = useTranslations("mhwilds");
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
   const isWeapon = 'attack' in equipment || 'damage' in equipment;
@@ -19,7 +21,7 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
     <div className="mb-4 p-3 bg-surface-700/30 rounded-md">
       <div className="flex justify-between items-center">
         <span className="text-surface-100 font-medium">
-          Equipado actualmente:
+          {t(`build_planner.currently_equiped`)}
         </span>
         <Button 
           variant="ghost" 
@@ -27,7 +29,7 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
           onClick={onRemove}
           className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
         >
-          <X className="h-4 w-4 mr-1" /> Quitar
+          <X className="h-4 w-4 mr-1" /> {t("build_planner.remove")}
         </Button>
       </div>
       <div className="mt-2 flex items-center">
@@ -38,11 +40,11 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
           <div className="text-surface-100">{equipment.name}</div>
           <div className="text-xs text-surface-400">
             <Badge variant="outline" className={`mr-2 py-0 px-1 ${getRarityStyle(equipment.rarity)}`}>
-              R{equipment.rarity}
+              {t("rarity")} {equipment.rarity}
             </Badge>
             {isWeapon 
-              ? `ATK: ${(equipment as Weapon).attack || (equipment as Weapon).damage?.display || 0}` 
-              : `DEF: ${getDefenseValue((equipment as ArmorPiece).defense)}`
+              ? `${t('attack')}: ${(equipment as Weapon).attack || (equipment as Weapon).damage?.display || 0}` 
+              : `${t("defense")}: ${getDefenseValue((equipment as ArmorPiece).defense)}`
             }
           </div>
         </div>

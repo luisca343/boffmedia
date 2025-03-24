@@ -3,7 +3,7 @@
     "files.exclude": {
         "node_modules": true,
     },
-    "i18n-ally.localesPaths": ["./web/locales"], // Ensure this path is correct
+    "i18n-ally.localesPaths": ["./locales"], // Ensure this path is correct
     "i18n-ally.keystyle": "nested",
     "i18n-ally.enabledFrameworks": ["next-intl"], // Enable the framework you are using
     "i18n-ally.sourceLanguage": "es", // Set the source language

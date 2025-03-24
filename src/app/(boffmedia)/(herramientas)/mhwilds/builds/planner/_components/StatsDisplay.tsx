@@ -12,6 +12,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "./types";
 import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 // Helper function to safely get attack value from weapon
 const getWeaponAttack = (weapon: Weapon | null | undefined): number => {
@@ -33,7 +34,7 @@ const getWeaponAttack = (weapon: Weapon | null | undefined): number => {
 };
 
 export function StatsDisplay({ stats }: {stats: StatsData}) {
-  // Add state for element and status data to ensure updates
+  const t = useTranslations("mhwilds");
   const [weaponElements, setWeaponElements] = useState<{ type: string; damage: number; hidden?: boolean; }[]>([]);
   const [weaponStatuses, setWeaponStatuses] = useState<{ type: string; damage: number; hidden?: boolean; }[]>([]);
   
@@ -82,7 +83,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
   return (
     <Card className="bg-surface-800 border-surface-700">
       <CardHeader className="py-2 px-4">
-        <CardTitle className="text-base">Estadísticas</CardTitle>
+        <CardTitle className="text-base">{t("stats")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 p-3">
         {/* Compact primary stats row */}
@@ -97,7 +98,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Defensa</p>
+                <p>{t("defense")}</p>
               </TooltipContent>
             </Tooltip>
             
@@ -110,7 +111,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Ataque</p>
+                <p>{t("attack")}</p>
               </TooltipContent>
             </Tooltip>
             
@@ -125,7 +126,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom">
-                <p>Afinidad</p>
+                <p>{t("affinity")}</p>
               </TooltipContent>
             </Tooltip>
             
@@ -147,14 +148,14 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-[200px]">
-                  <p className="font-medium mb-1">Elemento</p>
+                  <p className="font-medium mb-1">{t("element")}</p>
                   <div className="space-y-1">
                     {weaponElements.map((element, idx) => (
                       <div key={idx} className="flex items-center gap-1">
                         {element.type && elementIcons[element.type.toLowerCase() as keyof typeof elementIcons]}
                         <span className={`${getElementColor(element.type)}`}>
                           {element.damage} {element.type.charAt(0).toUpperCase() + element.type.slice(1)}
-                          {element.hidden && <span className="text-xs ml-1 opacity-70">(Oculto)</span>}
+                          {element.hidden && <span className="text-xs ml-1 opacity-70">({t("hidden")})</span>}
                         </span>
                       </div>
                     ))}
@@ -182,7 +183,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-[200px]">
-                  <p className="font-medium mb-1">Estado</p>
+                  <p className="font-medium mb-1">{t("status")}</p>
                   <div className="space-y-1">
                     {weaponStatuses.map((status, idx) => (
                       <div key={idx} className="flex items-center gap-1">
@@ -190,7 +191,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                             <Pill className="h-4 w-4 text-surface-300" />}
                         <span className={`${getStatusColor(status.type)}`}>
                           {status.damage} {status.type.charAt(0).toUpperCase() + status.type.slice(1)}
-                          {status.hidden && <span className="text-xs ml-1 opacity-70">(Oculto)</span>}
+                          {status.hidden && <span className="text-xs ml-1 opacity-70">({t("hidden")})</span>}
                         </span>
                       </div>
                     ))}
@@ -203,16 +204,13 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
         
         {/* Elemental Resistances */}
         <div>
-          <div className="text-xs text-surface-400 mb-1">Resistencias Elementales</div>
+          <div className="text-xs text-surface-400 mb-1">{t("build_planner.elemental_resistances")}</div>
           <ElementalResistances stats={stats} />
         </div>
 
         {/* Sharpness Bar - only show if weapon has sharpness */}
         {weapon?.sharpness && (
-          <div>
-            <div className="text-xs text-surface-400 mb-1">Filo</div>
-            <SharpnessBar sharpness={weapon.sharpness} />
-          </div>
+          <SharpnessBar sharpness={weapon.sharpness} />
         )}
         
         {/* Additional weapon details in compact row */}
@@ -220,17 +218,13 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
           {/* Display other weapon details... */}
           {weapon?.elderseal && weapon.elderseal !== null && (
             <span className="text-xs text-purple-400 bg-purple-900/20 px-2 py-0.5 rounded">
-              Sello Anciano: {
-                weapon.elderseal === "low" ? "Bajo" : 
-                weapon.elderseal === "average" ? "Medio" : 
-                weapon.elderseal === "high" ? "Alto" : ""
-              }
+              {t("elderseal")}: { t(weapon.elderseal) }
             </span>
           )}
           
           {weapon?.defenseBonus && weapon.defenseBonus > 0 && (
             <span className="text-xs text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded">
-              Bonificación de Defensa: +{weapon.defenseBonus}
+              {t("defense_bonus")}: +{weapon.defenseBonus}
             </span>
           )}
         </div>

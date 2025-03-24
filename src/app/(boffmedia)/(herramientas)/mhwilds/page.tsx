@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 
 export default function MHWildsPage() {
+  
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 

@@ -16,6 +16,8 @@ export default getRequestConfig(async () => {
       ...(await import(`../../locales/${locale}/tools/pmdsky/common.json`)).default,
       ...(await import(`../../locales/${locale}/tools/pmdsky/dungeons.json`)).default,
       ...(await import(`../../locales/${locale}/tools/tcgpocket/common.json`)).default,
+      
+      ...(await import(`../../locales/${locale}/tools/mhwilds/mhwilds.json`)).default,
     }
   };
 });
