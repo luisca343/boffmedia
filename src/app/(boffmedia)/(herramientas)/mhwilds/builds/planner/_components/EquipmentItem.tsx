@@ -11,7 +11,8 @@ import {
   getAllWeaponElements,
   getWeaponTypeIcon,
   getStatusColor,
-  getArmorImagePath
+  getArmorImagePath,
+  getRarityFilterStyle
 } from "./equipment-utils";
 import { useTranslations } from "next-intl";
 
@@ -51,7 +52,10 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
                   alt={weaponType}
                   width={40}
                   height={40}
-                  className="object-contain"
+                  className="object-contain" 
+                  style={{ 
+                    filter: getRarityFilterStyle(item.rarity)
+                  }} 
                 />
               </div>
             ) : (
@@ -62,6 +66,9 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
                   width={40}
                   height={40}
                   className="object-contain"
+                  style={{ 
+                    filter: getRarityFilterStyle(item.rarity)
+                  }}
                 />
               </div>
             )}
@@ -135,8 +142,8 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
       {/* Show elements */}
       {elements.length > 0 && elements.map((element, idx) => (
         <span key={`element-${idx}`} className={`${getElementColor(element.type)}`}>
-          {element.type}: {element.damage}
-          {element.hidden && <span className="text-xs ml-1 opacity-70">(O)</span>}
+          {t(element.type)}: {element.damage}
+          {element.hidden && <span className="text-xs ml-1 opacity-70">{t("build-planner.hidden")}</span>}
         </span>
       ))}
       
@@ -144,7 +151,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
       {statuses.length > 0 && statuses.map((status, idx) => (
         <span key={`status-${idx}`} className={`${getStatusColor(status.type)}`}>
           {status.type}: {status.damage}
-          {status.hidden && <span className="text-xs ml-1 opacity-70">(O)</span>}
+          {status.hidden && <span className="text-xs ml-1 opacity-70">{t("build-planner.hidden")}</span>}
         </span>
       ))}
       

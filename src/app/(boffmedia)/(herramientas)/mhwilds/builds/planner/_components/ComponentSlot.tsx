@@ -20,7 +20,7 @@ import {
 } from "./types";
 import { FC, ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
-import { getElementColor, getDefenseValue, getStatusColor, getWeaponTypeIcon, getArmorImagePath } from "./equipment-utils";
+import { getElementColor, getDefenseValue, getStatusColor, getWeaponTypeIcon, getArmorImagePath, getRarityFilterStyle } from "./equipment-utils";
 import { getAllWeaponElements } from "./equipment-utils";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -40,6 +40,7 @@ interface ComponentSlotProps {
   onDecorationClick: (equipmentType: EquipmentType, slotIndex: number) => void;
   renderDecorationSlots: (equipmentType: EquipmentType, slots?: number[]) => ReactNode;
   hasCustomIcon?: boolean;
+  rarity?: number;
 }
 
 // Helper function to determine if a component is a weapon
@@ -170,6 +171,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
   onDecorationClick, 
   renderDecorationSlots,
   hasCustomIcon = false,
+  rarity = 0,
 }) => {
   const t = useTranslations("mhwilds");
   return (
@@ -194,6 +196,9 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                   width={40}
                   height={40}
                   className={`object-contain ${!slot.component ? 'opacity-30' : ''}`}
+                  style={{ 
+                    filter: getRarityFilterStyle(rarity)
+                  }} 
                 />
                 {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
               </div>
@@ -206,6 +211,9 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                   width={40}
                   height={40}
                   className={`object-contain ${!slot.component ? 'opacity-30' : ''}`}
+                  style={{ 
+                    filter: getRarityFilterStyle(rarity)
+                  }} 
                 />
                 {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
               </div>

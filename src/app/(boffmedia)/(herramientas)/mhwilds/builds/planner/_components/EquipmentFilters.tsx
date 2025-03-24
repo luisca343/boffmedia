@@ -38,11 +38,11 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
   
   const getElementColor = (element: string) => {
     const colorMap: Record<string, string> = {
-      fire: "text-red-400 bg-red-950/50 border-red-500",
-      water: "text-blue-400 bg-blue-950/50 border-blue-500",
-      thunder: "text-yellow-400 bg-yellow-950/50 border-yellow-500",
-      ice: "text-cyan-400 bg-cyan-950/50 border-cyan-500",
-      dragon: "text-purple-400 bg-purple-950/50 border-purple-500",
+      fire: "text-red-400 border-red-500",
+      water: "text-blue-400 border-blue-500",
+      thunder: "text-yellow-400 border-yellow-500",
+      ice: "text-cyan-400 border-cyan-500",
+      dragon: "text-purple-400 border-purple-500",
     };
     
     return colorMap[element] || "text-surface-400";
@@ -155,7 +155,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
                     className="flex items-center justify-between cursor-pointer"
                   >
                     <span className={`capitalize ${element === filters.element ? getElementColor(element) : ''}`}>
-                      {element.charAt(0).toUpperCase() + element.slice(1)}
+                      {t(element)}
                     </span>
                     {element === filters.element && (
                       <Badge className="bg-primary-900 text-primary-300">✓</Badge>

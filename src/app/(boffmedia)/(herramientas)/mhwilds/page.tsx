@@ -7,9 +7,10 @@ import Image from "next/image";
 import { Sword, Shield, Hammer, ChevronRight, ArrowRight, Stars, Axe } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export default function MHWildsPage() {
-  
+  const t = useTranslations("mhwilds");
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
 
@@ -19,13 +20,13 @@ export default function MHWildsPage() {
 
   const mhTools = [
     {
-      title: "Planificador de Builds",
-      description: "Crea y optimiza tus builds de equipo y armaduras",
+      title: t("build_planner.title"),
+      description: t("build_planner.description"),
       icon: "/img/games/mhwilds/longsword.webp",
       iconFallback: <Shield className="h-8 w-8 text-green-400" />,
       href: "/mhwilds/builds",
       color: "from-green-400 to-emerald-600",
-      tools: ["Creador de Sets", "Calculadora de Stats"],
+      tools: [t("build_planner.title")],
       featured: true
     },
     {

@@ -55,18 +55,33 @@ export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
 // Get rarity style based on rarity level
 export const getRarityStyle = (rarity: number): string => {
   if (rarity >= 7) {
-    return "border-purple-500 text-purple-400 bg-purple-950/20";
+    return "border-purple-500 text-purple-400";
   } else if (rarity >= 5) {
-    return "border-amber-500 text-amber-400 bg-amber-950/20";
+    return "border-amber-500 text-amber-400";
   } else if (rarity >= 3) {
-    return "border-blue-500 text-blue-400 bg-blue-950/20";
+    return "border-blue-500 text-blue-400";
   } else {
-    return "border-green-500 text-green-400 bg-green-950/20";
+    return "border-green-500 text-green-400";
   }
 };
 
-// Helper function to get element color
-
+export const getRarityFilterStyle = (rarity: number): string => {
+  switch (true) {
+    case rarity === 3:return 'grayscale(1) brightness(0.8) sepia(0.5) hue-rotate(80deg) saturate(5)';
+    case rarity === 4:
+      return 'grayscale(1) brightness(0.6) sepia(0.5) hue-rotate(100deg) saturate(5)'; 
+    case rarity === 5:
+      return 'grayscale(1) brightness(0.7) sepia(0.5) hue-rotate(165deg) saturate(6)';
+    case rarity === 6:
+      return 'grayscale(1) brightness(0.5) sepia(1) hue-rotate(195deg) saturate(8)'; 
+    case rarity === 7:
+      return 'grayscale(1) brightness(0.3) sepia(1) hue-rotate(240deg) saturate(6)';
+    case rarity >= 8:
+      return 'grayscale(1) brightness(0.5) sepia(1) hue-rotate(330deg) saturate(6)';
+    default:
+      return '';
+  }
+};
 
 // Get element color class
 export const getElementColor = (elementType: string): string => {
@@ -228,7 +243,7 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
   const iconMap: Record<string, string> = {
     'great-sword': 'great-sword',
     'long-sword': 'long-sword',
-    'sword-and-shield': 'sword-and-shield',
+    'sword-shield': 'sword-shield',
     'dual-blades': 'dual-blades',
     'hammer': 'hammer',
     'hunting-horn': 'hunting-horn',

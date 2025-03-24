@@ -61,7 +61,8 @@
       "wasted_points": "\"wasted_points\": \"{count, plural, =1 {1 punto sin efecto} other {{count} puntos sin efecto}}\"",
       "current_level": "Nivel actual",
       "elemental_resistances": "Resistencias Elementales",
-      "sharpness": "Afilado"
+      "sharpness": "Afilado",
+      "description": "\"Crea y optimiza tus builds de equipo y armaduras\""
     },
     "equipment": "Equipamiento",
     "weapon": "Arma",
@@ -94,6 +95,9 @@
     "low": "Bajo",
     "average": "Promedio",
     "high": "Alto",
-    "defense_bonus": "Bonus de defensa"
+    "defense_bonus": "Bonus de defensa",
+    "build-planner": {
+      "hidden": "(O)"
+    }
   }
 }

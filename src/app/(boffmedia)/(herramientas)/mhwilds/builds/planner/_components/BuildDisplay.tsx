@@ -252,6 +252,7 @@ export function BuildDisplay({
               onDecorationClick={onDecorationClick}
               renderDecorationSlots={renderDecorationSlots}
               hasCustomIcon={slot.hasCustomIcon}
+              rarity={currentBuild[slot.key]?.rarity}
             />
           ))}
           
