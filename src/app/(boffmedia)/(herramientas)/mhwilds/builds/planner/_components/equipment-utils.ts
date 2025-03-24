@@ -52,19 +52,6 @@ export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
   return typeNames[slotType] || slotType.charAt(0).toUpperCase() + slotType.slice(1);
 };
 
-// Get rarity style based on rarity level
-export const getRarityStyle = (rarity: number): string => {
-  if (rarity >= 7) {
-    return "border-purple-500 text-purple-400";
-  } else if (rarity >= 5) {
-    return "border-amber-500 text-amber-400";
-  } else if (rarity >= 3) {
-    return "border-blue-500 text-blue-400";
-  } else {
-    return "border-green-500 text-green-400";
-  }
-};
-
 export const getRarityFilterStyle = (rarity: number): string => {
   switch (true) {
     case rarity === 3:return 'grayscale(1) brightness(0.8) sepia(0.5) hue-rotate(80deg) saturate(5)';
@@ -80,6 +67,25 @@ export const getRarityFilterStyle = (rarity: number): string => {
       return 'grayscale(1) brightness(0.5) sepia(1) hue-rotate(330deg) saturate(6)';
     default:
       return '';
+  }
+};
+
+export const getRarityStyle = (rarity: number): string => {
+  switch (true) {
+    case rarity === 3:
+      return "border-green-400 text-green-300";
+    case rarity === 4:
+      return "border-green-600 text-green-500";
+    case rarity === 5:
+      return "border-cyan-500 text-cyan-400";
+    case rarity === 6:
+      return "border-blue-500 text-blue-400";
+    case rarity === 7:
+      return "border-purple-500 text-purple-400";
+    case rarity >= 8:
+      return "border-orange-500 text-orange-400";
+    default:
+      return "border-surface-500 text-surface-400";
   }
 };
 
