@@ -252,26 +252,85 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
               </div>
             </div>
           </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-xs">
-            <div className="space-y-2">
-              <p>{skillDescription}</p>
-              <div>
-                <p className="text-sm font-medium mb-1">{t("build_planner.current_level")}: {effectiveLevel}</p>
-                <p className={`text-sm ${skillColor}`}>{skillEffectDescription}</p>
-                
-                {isOverallocated && (
-                  <div className="mt-1.5 text-yellow-400 text-xs flex items-center">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    <span>
-                      {t("build_planner.wasted_points", { count: wastedPoints })}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
+          <TooltipContent side="top" className="max-w-md">
+          <SkillTooltipContent
+            skill={skill}
+            skillDescription={skillDescription}
+            skillColor={skillColor}
+            skillEffectDescription={skillEffectDescription}
+            effectiveLevel={effectiveLevel}
+            isOverallocated={isOverallocated}
+            wastedPoints={wastedPoints}
+            skillData={getSkillData(skill)}
+          />
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
+    </div>
+  );
+}
+
+// Update the props interface first
+interface SkillTooltipContentProps {
+  skill: Skill;
+  skillDescription: string;
+  skillColor: string;
+  skillEffectDescription: string;
+  effectiveLevel: number;
+  isOverallocated: boolean;
+  wastedPoints: number;
+  skillData: ServerSkill | null;
+}
+
+function SkillTooltipContent({
+  skill,
+  skillDescription,
+  skillColor,
+  skillEffectDescription,
+  effectiveLevel,
+  isOverallocated,
+  wastedPoints,
+  skillData,
+}: SkillTooltipContentProps) {
+  const t = useTranslations("mhwilds");
+
+  return (
+    <div className="bg-surface-900 space-y-3 py-2 px-4">
+      {/* Skill Title */}
+      <div>
+        <h3 className="font-bold text-lg">{skill.name}</h3>
+        <p className="text-sm text-surface-400">{skillDescription}</p>
+      </div>
+
+      {/* Skill Levels */}
+      <div className="space-y-1.5">
+        <div className="grid gap-1">
+          {skillData?.ranks.map((rank) => (
+            <div 
+              key={rank.level}
+              className={`text-xs p-1.5 rounded ${
+                rank.level === effectiveLevel 
+                  ? 'text-primary-400' 
+                  : 'text-surface-400'
+              }`}
+            >
+              <span className="font-medium">
+                {t("lv")} {rank.level}:
+              </span> {rank.description}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Warning for overallocated points */}
+      {isOverallocated && (
+        <div className="mt-1.5 text-yellow-400 text-xs flex items-center bg-yellow-400/10 p-2 rounded">
+          <AlertCircle className="h-3 w-3 mr-1" />
+          <span>
+            {t("build_planner.wasted_points", { count: wastedPoints })}
+          </span>
+        </div>
+      )}
     </div>
   );
 }
