@@ -31,6 +31,7 @@ export function BuildHeader({ buildName, onBuildNameChange }: BuildHeaderProps) 
             placeholder="Nombre de la build"
           />
           
+          
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" className="text-green-400 border-green-500">
               <Save className="mr-1 h-4 w-4" /> Guardar

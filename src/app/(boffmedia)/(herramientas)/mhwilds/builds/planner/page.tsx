@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { BuildHeader } from "./_components/BuildHeader";
 import { EquipmentSelector } from "./_components/EquipmentSelector";
 import { DecorationSelector } from "./_components/DecorationSelector";
@@ -21,6 +21,7 @@ import {
 } from "./_components/types";
 import { useGameData } from "./_hooks/useGameData";
 import { getAllWeaponElements } from "./_components/equipment-utils";
+import { BuildImport } from "./_components/BuildImport";
 
 export default function BuildPlanner() {
   const {
@@ -36,6 +37,47 @@ export default function BuildPlanner() {
     getDecorationById
   } = useGameData();
   
+  const importBuildFromUrl = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    
+    try {
+      // Extract the build parameter from the URL
+      const params = new URLSearchParams(window.location.search);
+      const buildParam = params.get('build');
+      
+      if (buildParam) {
+        // Decode and parse the build data
+        const decodedData = decodeURIComponent(atob(buildParam));
+        const importedBuild = JSON.parse(decodedData) as BuildDataWithIds;
+        
+        // Validate the imported build has the correct structure
+        if (
+          importedBuild && 
+          typeof importedBuild === 'object' && 
+          'name' in importedBuild && 
+          'decorations' in importedBuild
+        ) {
+          // Replace the build with the imported one
+          setCurrentBuild(importedBuild);
+          console.log("Imported build from URL:", importedBuild);
+          
+          // Clean up the URL to avoid reimporting on refresh
+          if (window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to import build from URL:", error);
+    }
+  }, []);
+  
+  // Add this useEffect after your existing state declarations
+  useEffect(() => {
+    importBuildFromUrl();
+  }, [importBuildFromUrl]);
+  
+
   // Store build data with just IDs
   const [currentBuild, setCurrentBuild] = useState<BuildDataWithIds>({
     name: "Mi Build",
@@ -390,11 +432,18 @@ export default function BuildPlanner() {
               onClose={closeSelector}
             />
           ) : (
+            <>
             <BuildDisplay 
               currentBuild={buildWithFullObjects}
               onSlotClick={handleSlotClick}
               onDecorationClick={handleDecorationClick}
             />
+            <BuildImport 
+              onImport={(importedBuild) => {
+                setCurrentBuild(importedBuild);
+              }} 
+            />
+          </>
           )}
         </div>
 
@@ -402,7 +451,12 @@ export default function BuildPlanner() {
         <div className="lg:col-span-4 space-y-6">
           <StatsDisplay stats={stats} />
           <SkillsList skills={totalSkills} skillsData={skillsData}/>
-          <BuildActions />
+          <BuildActions 
+            buildData={currentBuild} 
+            completeData={buildWithFullObjects}
+            stats={stats}
+            skills={totalSkills}
+          />
         </div>
       </div>
     </div>

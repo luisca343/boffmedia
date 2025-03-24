@@ -13,7 +13,6 @@ import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "./type
 import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";
 
-
 // Helper function to safely get attack value from weapon
 const getWeaponAttack = (weapon: Weapon | null | undefined): number => {
   if (!weapon) return 0;
@@ -87,7 +86,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
       </CardHeader>
       <CardContent className="space-y-3 p-3">
         {/* Compact primary stats row */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 flex-wrap">
           <TooltipProvider>
             {/* Defense */}
             <Tooltip>
@@ -130,11 +129,11 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
               </TooltipContent>
             </Tooltip>
             
-            {/* Elements - compact display */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                  {weaponElements.length > 0 ? (
+            {/* Elements - only show if present */}
+            {weaponElements.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
                     <div className="flex items-center gap-1">
                       {weaponElements.map((element, idx) => (
                         <React.Fragment key={`${weapon?.id || 'no-weapon'}-element-${idx}`}>
@@ -145,14 +144,10 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                         </React.Fragment>
                       ))}
                     </div>
-                  ) : (
-                    <span className="text-xs text-surface-400 italic">Sin elemento</span>
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-[200px]">
-                <p className="font-medium mb-1">Elemento</p>
-                {weaponElements.length > 0 ? (
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-[200px]">
+                  <p className="font-medium mb-1">Elemento</p>
                   <div className="space-y-1">
                     {weaponElements.map((element, idx) => (
                       <div key={idx} className="flex items-center gap-1">
@@ -164,17 +159,15 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <span className="text-xs text-surface-400 italic">Sin elemento</span>
-                )}
-              </TooltipContent>
-            </Tooltip>
+                </TooltipContent>
+              </Tooltip>
+            )}
             
-            {/* Status Effects - compact display */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                  {weaponStatuses.length > 0 ? (
+            {/* Status Effects - only show if present */}
+            {weaponStatuses.length > 0 && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
                     <div className="flex items-center gap-1">
                       {weaponStatuses.map((status, idx) => (
                         <React.Fragment key={`${weapon?.id || 'no-weapon'}-status-${idx}`}>
@@ -186,14 +179,10 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                         </React.Fragment>
                       ))}
                     </div>
-                  ) : (
-                    <span className="text-xs text-surface-400 italic">Sin estado</span>
-                  )}
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="max-w-[200px]">
-                <p className="font-medium mb-1">Estado</p>
-                {weaponStatuses.length > 0 ? (
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-[200px]">
+                  <p className="font-medium mb-1">Estado</p>
                   <div className="space-y-1">
                     {weaponStatuses.map((status, idx) => (
                       <div key={idx} className="flex items-center gap-1">
@@ -206,11 +195,9 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <span className="text-xs text-surface-400 italic">Sin estado</span>
-                )}
-              </TooltipContent>
-            </Tooltip>
+                </TooltipContent>
+              </Tooltip>
+            )}
           </TooltipProvider>
         </div>
         
@@ -231,6 +218,21 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
         {/* Additional weapon details in compact row */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* Display other weapon details... */}
+          {weapon?.elderseal && weapon.elderseal !== null && (
+            <span className="text-xs text-purple-400 bg-purple-900/20 px-2 py-0.5 rounded">
+              Sello Anciano: {
+                weapon.elderseal === "low" ? "Bajo" : 
+                weapon.elderseal === "average" ? "Medio" : 
+                weapon.elderseal === "high" ? "Alto" : ""
+              }
+            </span>
+          )}
+          
+          {weapon?.defenseBonus && weapon.defenseBonus > 0 && (
+            <span className="text-xs text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded">
+              Bonificación de Defensa: +{weapon.defenseBonus}
+            </span>
+          )}
         </div>
       </CardContent>
     </Card>
