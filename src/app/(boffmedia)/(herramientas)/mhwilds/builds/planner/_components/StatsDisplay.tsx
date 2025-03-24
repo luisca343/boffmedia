@@ -210,7 +210,10 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
 
         {/* Sharpness Bar - only show if weapon has sharpness */}
         {weapon?.sharpness && (
-          <SharpnessBar sharpness={weapon.sharpness} />
+          <div>
+            <div className="text-xs text-surface-400 mb-1">{t("build_planner.sharpness")}</div>
+            <SharpnessBar sharpness={weapon.sharpness} />
+          </div>
         )}
         
         {/* Additional weapon details in compact row */}
@@ -221,12 +224,13 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
               {t("elderseal")}: { t(weapon.elderseal) }
             </span>
           )}
-          
+          {/* 
           {weapon?.defenseBonus && weapon.defenseBonus > 0 && (
             <span className="text-xs text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded">
-              {t("defense_bonus")}: +{weapon.defenseBonus}
+              Bonificación de Defensa: +{weapon.defenseBonus}
             </span>
           )}
+          */}
         </div>
       </CardContent>
     </Card>

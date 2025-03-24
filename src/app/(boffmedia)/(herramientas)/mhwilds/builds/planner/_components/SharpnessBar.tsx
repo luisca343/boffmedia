@@ -23,7 +23,6 @@ interface SharpnessProps {
   
     return (
       <div>
-        <div className="text-sm text-surface-300 mb-1">Filo</div>
         <div className="flex h-3 rounded overflow-hidden">
           {sharpnessSegments.map(segment => (
             segment.value > 0 && (
