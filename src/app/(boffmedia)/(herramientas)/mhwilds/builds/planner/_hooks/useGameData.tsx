@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
-import { Decoration, ArmorPiece, Weapon } from '../_components/types';
+import { Decoration, ArmorPiece, Weapon, Charm } from '../_components/types';
 
 // Define a type for the server-side skill data
 export interface ServerSkill {
@@ -44,6 +44,44 @@ export function useGameData() {
   const [skills, setSkills] = useState<Record<string, EnhancedSkill>>({});
   const [loadingSkills, setLoadingSkills] = useState(true);
   const [skillsError, setSkillsError] = useState<string | null>(null);
+  
+  // Charms state
+  const [charms, setCharms] = useState<Charm[]>([]);
+  const [loadingCharms, setLoadingCharms] = useState(true);
+  const [charmsError, setCharmsError] = useState<string | null>(null);
+
+  // Create memoized lookup maps for equipment and decorations
+  const weaponsMap = useMemo(() => {
+    const map: Record<string, Weapon> = {};
+    weapons.forEach(weapon => {
+      map[weapon.id] = weapon;
+    });
+    return map;
+  }, [weapons]);
+  
+  const armorMap = useMemo(() => {
+    const map: Record<string, ArmorPiece> = {};
+    armor.forEach(piece => {
+      map[piece.id] = piece;
+    });
+    return map;
+  }, [armor]);
+  
+  const decorationsMap = useMemo(() => {
+    const map: Record<string, Decoration> = {};
+    decorations.forEach(deco => {
+      map[deco.id] = deco;
+    });
+    return map;
+  }, [decorations]);
+  
+  const charmsMap = useMemo(() => {
+    const map: Record<string, Charm> = {};
+    charms.forEach(charm => {
+      map[charm.id] = charm;
+    });
+    return map;
+  }, [charms]);
 
   // Fetch decorations data
   const fetchDecorations = async () => {
@@ -125,6 +163,25 @@ export function useGameData() {
       setLoadingSkills(false);
     }
   };
+  
+  // Fetch charms data
+  const fetchCharms = async () => {
+    setLoadingCharms(true);
+    try {
+      const response = await axios.get("https://api.ficuslab.es/tools/mhwilds/ranks");
+      if (response.status === 200 && response.data.data) {
+        setCharms(response.data.data);
+        setCharmsError(null);
+      } else {
+        throw new Error("Invalid charm data format");
+      }
+    } catch (err) {
+      console.error("Error fetching charms:", err);
+      setCharmsError("Error al cargar los amuletos. Por favor, inténtalo de nuevo.");
+    } finally {
+      setLoadingCharms(false);
+    }
+  };
 
   // Initialize all data fetching on component mount
   useEffect(() => {
@@ -132,11 +189,33 @@ export function useGameData() {
     fetchWeapons();
     fetchArmor();
     fetchSkills();
+    fetchCharms();
   }, []);
 
   // Helper function to get armor by slot type
   const getArmorBySlot = (slotType: string): ArmorPiece[] => {
     return armor.filter(item => item.kind === slotType);
+  };
+  
+  // Equipment lookup functions
+  const getWeaponById = (id: string | null): Weapon | null => {
+    if (!id) return null;
+    return weaponsMap[id] || null;
+  };
+  
+  const getArmorById = (id: string | null): ArmorPiece | null => {
+    if (!id) return null;
+    return armorMap[id] || null;
+  };
+  
+  const getDecorationById = (id: string | null): Decoration | null => {
+    if (!id) return null;
+    return decorationsMap[id] || null;
+  };
+  
+  const getCharmById = (id: string | null): Charm | null => {
+    if (!id) return null;
+    return charmsMap[id] || null;
   };
 
   return {
@@ -165,7 +244,19 @@ export function useGameData() {
     skillsError,
     refreshSkills: fetchSkills,
     
+    // Charms
+    charms,
+    loadingCharms,
+    charmsError,
+    refreshCharms: fetchCharms,
+    
+    // Lookup functions
+    getWeaponById,
+    getArmorById,
+    getDecorationById,
+    getCharmById,
+    
     // General loading state
-    isLoading: loadingDecorations || loadingWeapons || loadingArmor || loadingSkills
+    isLoading: loadingDecorations || loadingWeapons || loadingArmor || loadingSkills || loadingCharms
   };
 }

@@ -1,0 +1,14 @@
+{
+  "mhwilds": {
+    "build_planner": {
+      "save": "Save",
+      "saved_local": "Build saved in local storage",
+      "decorations_equipped": "{count, plural, = 0 {There are no equipped decorations} = 1 {1 Equipped decoration} other {{count} Equipped decorations}}}}",
+      "overallocated_skills": "Overalocated skills"
+    },
+    "def": "Def",
+    "rarity": "Rarity",
+    "set": "Set",
+    "no_equipment": "No {name}"
+  }
+}

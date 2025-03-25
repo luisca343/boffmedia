@@ -24,46 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-
-// This would typically come from a configuration or API
-const gameToolsConfig = {
-  "pokemon": {
-    name: "Pokémon",
-    icon: "/img/games/pokemon-icon.webp",
-    color: "from-yellow-400 to-red-500",
-    bg: "bg-red-900",
-    categories: [
-      {
-        name: "TCG Pocket",
-        tools: [
-          { name: "Galería", href: "/pokemon/tcgpocket/galeria", icon: Diamond },
-          { name: "Lista de Cartas", href: "/pokemon/tcgpocket/cartas", icon: Zap },
-          { name: "Combates", href: "/pokemon/tcgpocket/combates", icon: SwordIcon },
-        ]
-      }, 
-      {
-        name: "Otros",
-        tools: [
-           { name: "Sky Generator", href: "/pokemon/pmdsky", icon: Zap },
-        ]
-      }
-    ]
-  },
-  "mhwilds": {
-    name: "Monster Hunter Wilds",
-    icon: "/img/games/mhwilds-icon.webp",
-    color: "from-green-400 to-green-600",
-    bg: "bg-green-900",
-    categories: [
-      {
-        name: "Generador de Builds",
-        tools: [
-          { name: "Generador de Builds", href: "/mhwilds/builds", icon: SwordIcon },
-        ]
-      }
-    ]
-  }
-};
+import { useTranslations } from "next-intl";
 
 export default function GameToolsLayout({ 
   children, 
@@ -77,9 +38,52 @@ export default function GameToolsLayout({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Set to true by default
   const [isHovering, setIsHovering] = useState(false);
+  const t = useTranslations("mhwilds");
 
 
   if (!gameSlug) gameSlug = pathname.split("/")[1];
+
+  
+// This would typically come from a configuration or API
+  const gameToolsConfig = {
+    "pokemon": {
+      name: "Pokémon",
+      icon: "/img/games/pokemon-icon.webp",
+      color: "from-yellow-400 to-red-500",
+      bg: "bg-red-900",
+      categories: [
+        {
+          name: "TCG Pocket",
+          tools: [
+            { name: "Galería", href: "/pokemon/tcgpocket/galeria", icon: Diamond },
+            { name: "Lista de Cartas", href: "/pokemon/tcgpocket/cartas", icon: Zap },
+            { name: "Combates", href: "/pokemon/tcgpocket/combates", icon: SwordIcon },
+          ]
+        }, 
+        {
+          name: "Otros",
+          tools: [
+            { name: "Sky Generator", href: "/pokemon/pmdsky", icon: Zap },
+          ]
+        }
+      ]
+    },
+    "mhwilds": {
+      name: "Monster Hunter Wilds",
+      icon: "/img/games/mhwilds-icon.webp",
+      color: "from-green-400 to-green-600",
+      bg: "bg-green-900",
+      categories: [
+        {
+          name: "Generador de Builds",
+          tools: [
+            { name: t("build_planner.title"), href: "/mhwilds/builds", icon: SwordIcon },
+          ]
+        }
+      ]
+    }
+  };
+
 
   const gameConfig = gameToolsConfig[gameSlug as keyof typeof gameToolsConfig];
 

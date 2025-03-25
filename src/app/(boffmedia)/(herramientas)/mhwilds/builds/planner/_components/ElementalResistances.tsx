@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { StatsData } from "./types";
 
 interface ElementalResistancesProps {
@@ -5,12 +6,13 @@ interface ElementalResistancesProps {
 }
 
 export function ElementalResistances({ stats }: ElementalResistancesProps) {
+  const t = useTranslations("mhwilds");
   const resistances = [
-    { name: "Fuego", value: stats.fireRes, color: "text-red-400" },
-    { name: "Agua", value: stats.waterRes, color: "text-blue-400" },
-    { name: "Trueno", value: stats.thunderRes, color: "text-yellow-400" },
-    { name: "Hielo", value: stats.iceRes, color: "text-cyan-400" },
-    { name: "Dragón", value: stats.dragonRes, color: "text-purple-400" }
+    { name: t("fire"), value: stats.fireRes, color: "text-red-400" },
+    { name: t("water"), value: stats.waterRes, color: "text-blue-400" },
+    { name: t("thunder"), value: stats.thunderRes, color: "text-yellow-400" },
+    { name: t("ice"), value: stats.iceRes, color: "text-cyan-400" },
+    { name: t("dragon"), value: stats.dragonRes, color: "text-purple-400" }
   ];
   
   return (

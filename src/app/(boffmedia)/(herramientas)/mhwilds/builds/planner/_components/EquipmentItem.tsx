@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArmorPiece, EquipmentType, Weapon } from "./types";
+import { ArmorPiece, Charm, EquipmentType, Weapon } from "./types";
 import Image from "next/image";
 import { 
   getElementColor, 
@@ -9,18 +9,22 @@ import {
   getRarityStyle,
   getWeaponElementInfo,
   getAllWeaponElements,
-  getWeaponTypeIcon
+  getWeaponTypeIcon,
+  getStatusColor,
+  getArmorImagePath,
+  getRarityFilterStyle
 } from "./equipment-utils";
-import { EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface EquipmentItemProps {
-  item: ArmorPiece | Weapon;
+  item: ArmorPiece | Weapon | Charm;
   slotType: EquipmentType;
   index: number;
-  onSelect: (item: ArmorPiece | Weapon) => void;
+  onSelect: (item: ArmorPiece | Weapon | Charm) => void;
 }
 
 export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItemProps) => {
+  const t = useTranslations("mhwilds");
   const isWeapon = 'attack' in item || 'damage' in item;
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
@@ -48,11 +52,25 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
                   alt={weaponType}
                   width={40}
                   height={40}
-                  className="object-contain"
+                  className="object-contain" 
+                  style={{ 
+                    filter: getRarityFilterStyle(item.rarity)
+                  }} 
                 />
               </div>
             ) : (
-              <EquipmentIcon className={`h-7 w-7 ${iconColor}`} />
+              <div className="relative w-10 h-10">
+                <Image 
+                  src={getArmorImagePath(slotType)} 
+                  alt={slotType}
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                  style={{ 
+                    filter: getRarityFilterStyle(item.rarity)
+                  }}
+                />
+              </div>
             )}
           </div>
 
@@ -83,6 +101,7 @@ export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItem
 
 // Component for armor stats display
 const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
+  const t = useTranslations("mhwilds");
   const defenseValue = typeof armor.defense === 'number' 
     ? armor.defense 
     : armor.defense.base;
@@ -94,14 +113,14 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
       {/* Show decoration slots */}
       {armor.slots && armor.slots.length > 0 && (
         <span className="text-surface-300">
-          Ranuras: {armor.slots.map(size => `○${size}`).join(' ')}
+          {t("build_planner.slots")}: {armor.slots.map(size => `○${size}`).join(' ')}
         </span>
       )}
       
       {/* Show set name if available */}
       {armor.armorSet?.name && (
         <span className="text-purple-400 truncate max-w-[200px]">
-          Set: {armor.armorSet.name}
+          {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
     </div>
@@ -110,36 +129,36 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
 
 // Enhanced component for weapon stats with better element display
 const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
-  // Get all elements in the weapon
-  const elements = getAllWeaponElements(weapon);
-  
+  const t = useTranslations("mhwilds");
+  const { elements, statuses } = getAllWeaponElements(weapon);
+
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
-      <span className="text-red-400">
-        Ataque: {weapon.attack || weapon.damage?.display || 0}
+      <span className="text-red-400">Atk: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}</span>
+      <span className={`${weapon.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       
-      {weapon.affinity !== 0 && (
-        <span className={weapon.affinity > 0 ? "text-green-400" : "text-red-400"}>
-          Afinidad: {weapon.affinity > 0 ? "+" : ""}{weapon.affinity}%
+      {/* Show elements */}
+      {elements.length > 0 && elements.map((element, idx) => (
+        <span key={`element-${idx}`} className={`${getElementColor(element.type)}`}>
+          {t(element.type)}: {element.damage}
+          {element.hidden && <span className="text-xs ml-1 opacity-70">{t("build-planner.hidden")}</span>}
         </span>
-      )}
+      ))}
       
-      {/* Display elements */}
-      {elements.map((element, idx) => (
-        <span 
-          key={idx} 
-          className={`${getElementColor(element.type)}`}
-        >
-          {element.type.charAt(0).toUpperCase() + element.type.slice(1)}: {element.damage}
-          {element.hidden && <EyeOff className="inline h-3 w-3 ml-1 opacity-70" />}
+      {/* Show status effects */}
+      {statuses.length > 0 && statuses.map((status, idx) => (
+        <span key={`status-${idx}`} className={`${getStatusColor(status.type)}`}>
+          {status.type}: {status.damage}
+          {status.hidden && <span className="text-xs ml-1 opacity-70">{t("build-planner.hidden")}</span>}
         </span>
       ))}
       
       {/* Show decoration slots */}
       {weapon.slots && weapon.slots.length > 0 && (
         <span className="text-surface-300">
-          Ranuras: {weapon.slots.map(size => `○${size}`).join(' ')}
+          {t("build_planner.slots")}: {weapon.slots.map(size => `○${size}`).join(' ')}
         </span>
       )}
     </div>

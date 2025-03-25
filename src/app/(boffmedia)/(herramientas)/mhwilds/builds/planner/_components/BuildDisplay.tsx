@@ -12,6 +12,7 @@ import {
   ArrowBigRight,
   CircleDot,
   Footprints,
+  Medal,
 } from "lucide-react";
 import { 
   BuildData, 
@@ -23,7 +24,8 @@ import { useMemo } from "react";
 import { getSlotColorClass } from "./utils";
 import { ComponentSlot } from "./ComponentSlot";
 import Image from "next/image";
-import { getWeaponTypeIcon } from "./equipment-utils";
+import { getArmorImagePath, getWeaponTypeIcon } from "./equipment-utils";
+import { useTranslations } from "next-intl";
 
 interface BuildDisplayProps {
   currentBuild: BuildData;
@@ -36,7 +38,7 @@ export function BuildDisplay({
   onSlotClick, 
   onDecorationClick 
 }: BuildDisplayProps) {
-  // Equipment slots configuration with unique icons for each slot
+  const t = useTranslations("mhwilds");
   const equipmentSlots = useMemo(() => {
     // Get weapon icon component if weapon is present
     const WeaponIconComponent = currentBuild.weapon ? 
@@ -54,20 +56,141 @@ export function BuildDisplay({
       ) : 
       Sword;
     
+    // Create custom icon components for each armor piece
+    const HelmetIconComponent = currentBuild.head ? 
+      (props: any) => (
+        <div className="relative w-6 h-6">
+          <Image 
+            src={getArmorImagePath('head')} 
+            alt={t("head")}
+            width={24}
+            height={24}
+            className="object-contain"
+            {...props}
+          />
+        </div>
+      ) : 
+      GiDwarfHelmet;
+    
+    const ChestIconComponent = currentBuild.chest ? 
+      (props: any) => (
+        <div className="relative w-6 h-6">
+          <Image 
+            src={getArmorImagePath('chest')} 
+            alt={t("chest")}
+            width={24}
+            height={24}
+            className="object-contain"
+            {...props}
+          />
+        </div>
+      ) : 
+      Shirt;
+    
+    const GauntletsIconComponent = currentBuild.arms ? 
+      (props: any) => (
+        <div className="relative w-6 h-6">
+          <Image 
+            src={getArmorImagePath('arms')} 
+            alt={t("arms")}
+            width={24}
+            height={24}
+            className="object-contain"
+            {...props}
+          />
+        </div>
+      ) : 
+      ArrowBigRight;
+    
+    const WaistIconComponent = currentBuild.waist ? 
+      (props: any) => (
+        <div className="relative w-6 h-6">
+          <Image 
+            src={getArmorImagePath('waist')} 
+            alt={t("waist")}
+            width={24}
+            height={24}
+            className="object-contain"
+            {...props}
+          />
+        </div>
+      ) : 
+      CircleDot;
+
+      const CharmIconComponent = Medal;
+    
+    const GreavesIconComponent = currentBuild.legs ? 
+      (props: any) => (
+        <div className="relative w-6 h-6">
+          <Image 
+            src={getArmorImagePath('legs')} 
+            alt={t("legs")}
+            width={24}
+            height={24}
+            className="object-contain"
+            {...props}
+          />
+        </div>
+      ) : 
+      Footprints;
+    
     return [
       { 
         key: 'weapon' as EquipmentType, 
-        name: 'Arma', 
+        name: t("weapon"),
         icon: WeaponIconComponent, 
         component: currentBuild.weapon, 
         iconColor: "text-red-400",
-        hasCustomIcon: !!currentBuild.weapon
+        hasCustomIcon: !!currentBuild.weapon 
       },
-      { key: 'head' as EquipmentType, name: 'Casco', icon: GiDwarfHelmet, component: currentBuild.head, iconColor: "text-blue-400" },
-      { key: 'chest' as EquipmentType, name: 'Pecho', icon: Shirt, component: currentBuild.chest, iconColor: "text-green-400" },
-      { key: 'arms' as EquipmentType, name: 'Brazos', icon: ArrowBigRight, component: currentBuild.arms, iconColor: "text-yellow-400" },
-      { key: 'waist' as EquipmentType, name: 'Cintura', icon: CircleDot, component: currentBuild.waist, iconColor: "text-purple-400" },
-      { key: 'legs' as EquipmentType, name: 'Piernas', icon: Footprints, component: currentBuild.legs, iconColor: "text-cyan-400" },
+      { 
+        key: 'head' as EquipmentType, 
+        name: t("head"),
+        icon: HelmetIconComponent, 
+        component: currentBuild.head, 
+        iconColor: "text-blue-400",
+        hasCustomIcon: !!currentBuild.head 
+      },
+      { 
+        key: 'chest' as EquipmentType, 
+        name: t("chest"),
+        icon: ChestIconComponent, 
+        component: currentBuild.chest, 
+        iconColor: "text-green-400",
+        hasCustomIcon: !!currentBuild.chest 
+      },
+      { 
+        key: 'arms' as EquipmentType, 
+        name: t("arms"),
+        icon: GauntletsIconComponent, 
+        component: currentBuild.arms, 
+        iconColor: "text-yellow-400",
+        hasCustomIcon: !!currentBuild.arms 
+      },
+      { 
+        key: 'waist' as EquipmentType, 
+        name: t("waist"),
+        icon: WaistIconComponent, 
+        component: currentBuild.waist, 
+        iconColor: "text-purple-400",
+        hasCustomIcon: !!currentBuild.waist 
+      },
+      { 
+        key: 'legs' as EquipmentType, 
+        name: t("legs"),
+        icon: GreavesIconComponent, 
+        component: currentBuild.legs, 
+        iconColor: "text-cyan-400",
+        hasCustomIcon: !!currentBuild.legs 
+      },
+      {
+        key: 'charm' as EquipmentType,
+        name: t("charm"),
+        icon: CharmIconComponent,
+        component: currentBuild.charm,
+        iconColor: "text-amber-400",
+        hasCustomIcon: !!currentBuild.charm
+      }
     ];
   }, [currentBuild]);
 
@@ -120,13 +243,13 @@ export function BuildDisplay({
     );
   };
 
-  return (
+   return (
     <Card className="bg-surface-800 border-surface-700 mb-6">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-xl">
-          Equipo Actual
-          <span className="text-sm font-normal text-surface-400 ml-2">
-            (Haz click para cambiar)
+          {t("build_planner.current_build")}
+          <span className="text-xs font-normal text-surface-400 ml-2">
+            ({t("build_planner.click_to_change")})
           </span>
         </CardTitle>
       </CardHeader>
@@ -140,6 +263,7 @@ export function BuildDisplay({
               onDecorationClick={onDecorationClick}
               renderDecorationSlots={renderDecorationSlots}
               hasCustomIcon={slot.hasCustomIcon}
+              rarity={currentBuild[slot.key]?.rarity}
             />
           ))}
           
@@ -148,10 +272,10 @@ export function BuildDisplay({
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-md font-medium text-surface-100 flex items-center">
                 <Gem className="mr-2 h-4 w-4 text-surface-300" />
-                Decoraciones Activas
+                {t("build_planner.active_decorations")}
               </h3>
               <span className="text-xs text-surface-400">
-                {currentBuild.decorations?.length || 0} decoraciones equipadas
+                {t("build_planner.decorations_equipped", { count: currentBuild.decorations?.length || 0 })}
               </span>
             </div>
             
@@ -184,9 +308,11 @@ export function BuildDisplay({
               </div>
             ) : (
               <div className="text-center py-3 text-surface-400 text-sm">
-                <p>No hay decoraciones equipadas</p>
+                <p>
+                  {t("build_planner.no_decorations")}
+                </p>
                 <p className="mt-1 text-xs">
-                  Haz click en una ranura de decoración para asignar una joya
+                  {t("build_planner.add_decorations")}
                 </p>
               </div>
             )}

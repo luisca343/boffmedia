@@ -1,4 +1,4 @@
-export type EquipmentType = 'weapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs';
+export type EquipmentType = 'weapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs' | 'charm';
 
 export interface SkillInfo {
   id: number;
@@ -116,6 +116,7 @@ export interface WeaponDamage {
 export interface WeaponSpecial {
   type?: string;
   element?: string;
+  status?: string;
   kind?: string;
   damage?: number | WeaponDamage;
   value?: number;
@@ -190,6 +191,7 @@ export interface BuildData {
   arms: ArmorPiece | null;
   waist: ArmorPiece | null;
   legs: ArmorPiece | null;
+  charm: Charm | null;
   decorations: DecorationAssignment[];
 }
 
@@ -201,5 +203,105 @@ export interface Filters {
   element?: string;
 }
 
+// Add this to your types file
+
+export interface BuildDataWithIds {
+  name: string;
+  weaponId: string | null;
+  headId: string | null;
+  chestId: string | null;
+  armsId: string | null;
+  waistId: string | null;
+  legsId: string | null;
+  charmId: string | null;
+  decorations: {
+    equipmentType: EquipmentType;
+    slotIndex: number;
+    slotSize: number;
+    decorationId: string;
+  }[];
+}
+export interface StatsData {
+  weapon: Weapon | null;
+  defense: number;
+  fireRes: number;
+  waterRes: number;
+  thunderRes: number;
+  iceRes: number;
+  dragonRes: number;
+  attack: number;
+  affinity: number;
+  element?: {
+    type: string;
+    damage: number;
+  };
+  status?: {
+    type: string;
+    damage: number;
+    hidden?: boolean;
+  };
+  sharpness: {
+    red: number;
+    orange: number;
+    yellow: number;
+    green: number;
+    blue: number;
+    white: number;
+    purple: number;
+  };
+}
+
+export interface CharmSkill {
+  skill: {
+    id: number;
+    name: string;
+  };
+  level: number;
+  description: string;
+  id: number;
+
+  name?: null;
+}
+
+export interface CharmMaterial {
+  item: {
+    id: number;
+    gameId: number;
+    rarity: number;
+    name: string;
+    description: string;
+    value: number;
+    carryLimit: number;
+    recipes: any[];
+  };
+  quantity: number;
+  id: number;
+}
+
+export interface CharmCrafting {
+  charmRank: {
+    id: number;
+  };
+  craftable: boolean;
+  materials: CharmMaterial[];
+  zennyCost: number;
+  id: number;
+}
+
+export interface Charm {
+  id: number;
+  charm: {
+    id: number;
+    gameId: number;
+  };
+  name: string;
+  description: string;
+  level: number;
+  rarity: number;
+  skills: CharmSkill[];
+  crafting?: CharmCrafting;
+  slots: number[];
+}
+
 // Generic EquipmentComponent interface to represent any armor piece or weapon
-export type EquipmentComponent = ArmorPiece | Weapon;
+export type EquipmentComponent = ArmorPiece | Weapon | Charm

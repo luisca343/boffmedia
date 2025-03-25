@@ -133,7 +133,7 @@ const DropdownMenuItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-gray-100 focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50",
+    default: "text-surface-50 focus:bg-gray-100 focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50",
     wingull: "focus:bg-blue-800/50 focus:text-blue-200"
   }
   
@@ -227,7 +227,7 @@ const DropdownMenuLabel = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "text-sm font-semibold",
+    default: "text-surface-50 text-sm font-semibold",
     wingull: "text-blue-300 font-semibold"
   }
   
