@@ -24,5 +24,16 @@ export class BaseDataService {
 
     return jsonData.filter(Boolean);
   }
+
+
+  protected async readJsonFile(filePath: string): Promise<any> {
+    try {
+      const data = await fsPromises.readFile(filePath, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.error(`Error reading JSON file at ${filePath}:`, error);
+      throw error;
+    }
+  }
 }
 
