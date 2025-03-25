@@ -69,15 +69,15 @@ export default function GameToolsLayout({
       ]
     },
     "mhwilds": {
-      name: "Monster Hunter Wilds",
+      name: t("title"),
       icon: "/img/games/mhwilds-icon.webp",
       color: "from-green-400 to-green-600",
       bg: "bg-green-900",
       categories: [
         {
-          name: "Generador de Builds",
+          name: t("title"),
           tools: [
-            { name: t("build_planner.title"), href: "/mhwilds/builds", icon: SwordIcon },
+            { name: t("build_planner.title"), href: "/mhwilds/builds/planner", icon: SwordIcon },
           ]
         }
       ]

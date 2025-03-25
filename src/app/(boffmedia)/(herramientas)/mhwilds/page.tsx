@@ -24,7 +24,7 @@ export default function MHWildsPage() {
       description: t("build_planner.description"),
       icon: "/img/games/mhwilds/longsword.webp",
       iconFallback: <Shield className="h-8 w-8 text-green-400" />,
-      href: "/mhwilds/builds",
+      href: "/mhwilds/builds/planner",
       color: "from-green-400 to-emerald-600",
       tools: [t("build_planner.title")],
       featured: true
@@ -138,7 +138,7 @@ export default function MHWildsPage() {
               </div>
               <div className="md:w-1/3 bg-gradient-to-br from-surface-800 to-surface-900 p-0 flex items-center justify-center relative overflow-hidden">
                 <Image
-                  src="/img/games/mhwilds-gemma.webp"
+                  src="/img/games/mhwilds/gemma.webp"
                   alt="Monster Hunter Wilds Armor"
                   fill
                   className="object-cover z-10"
