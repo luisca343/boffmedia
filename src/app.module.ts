@@ -74,6 +74,9 @@ import { EventsService } from './smartrotom/events/events.service';
 import { EventsModule } from './smartrotom/events/events.module';
 import { UploadController } from './util/upload/upload.controller';
 import { UploadModule } from './util/upload/upload.module';
+import { MhwildsController } from './tools/mhwilds/mhwilds.controller';
+import { MhwildsModule } from './tools/mhwilds/mhwilds.module';
+import { MhwildsService } from './tools/mhwilds/mhwilds.service';
 
 @Module({
   imports: [
@@ -114,15 +117,17 @@ import { UploadModule } from './util/upload/upload.module';
     SmartrotomModule,
     EventsModule,
     UploadModule,
+    MhwildsModule,
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController],
+  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService,
     {
     provide: ConfigService,
     useClass: ConfigService,
   },
-    EventsService
+    EventsService,
+    MhwildsService
 
 ],
   exports: [ConfigService]
