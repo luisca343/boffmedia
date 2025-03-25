@@ -144,7 +144,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
               </DropdownMenuItem>
             ))}
             
-            {slotType === 'weapon' && (
+            {slotType === 'weapon' || slotType === 'secondaryWeapon' && (
               <>
                 <DropdownMenuSeparator className="bg-surface-700" />
                 <DropdownMenuLabel className="text-xs text-surface-400">{t("element")}</DropdownMenuLabel>

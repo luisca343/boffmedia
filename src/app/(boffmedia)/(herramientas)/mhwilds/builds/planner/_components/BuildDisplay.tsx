@@ -236,7 +236,7 @@ export function BuildDisplay({
     if (!slots || slots.length === 0) return null;
     
     return (
-      <div className="flex gap-1 mt-1">
+      <div className="w-full flex flex-col gap-1 mt-1">
         {slots.map((size, idx) => {
           const decoration = getDecorationForSlot(equipmentType, idx);
           const slotSize = size || 1; // Default to 1 if size is undefined
@@ -244,13 +244,9 @@ export function BuildDisplay({
           return (
             <motion.div 
               key={idx} 
-              className={`w-5 h-5 rounded-full flex items-center justify-center cursor-pointer border-2 ${
-                decoration 
-                  ? `${getSlotColorClass(decoration.slot)} border-white/30` 
-                  : `${getSlotColorClass(slotSize)} border-transparent`
-              } hover:border-white/70 transition-all`}
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.9 }}
+              className="w-full h-5 rounded flex items-center justify-end cursor-pointer border border-transparent hover:border-white/70 transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
               onClick={(e) => {
                 e.stopPropagation();
                 onDecorationClick(equipmentType, idx);
@@ -261,7 +257,10 @@ export function BuildDisplay({
                 : `Empty decoration slot size ${slotSize}`
               }
             >
-              <span className="text-[10px] text-surface-900 font-medium">
+            <span className="mr-2 text-xs truncate text-surface-300">
+              {decoration ? decoration.name : t("empty_slot", { defaultValue: "Vacío" })}
+            </span>
+              <span className={`flex h-full items-center justify-center bg-surface-900/50 px-2 text-xs font-medium ${decoration ? getSlotColorClass(decoration.slot) : getSlotColorClass(slotSize)}`}>
                 {decoration ? decoration.slot : slotSize}
               </span>
             </motion.div>

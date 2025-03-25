@@ -100,6 +100,7 @@
       "hidden": "(O)"
     },
     "charm": "Amuleto",
-    "secondary_weapon": "Arma Secundaria"
+    "secondary_weapon": "Arma Secundaria",
+    "empty_slot": "Ranura vacía"
   }
 }

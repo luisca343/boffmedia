@@ -205,8 +205,9 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
       role="button"
       aria-label={`Select ${slot.name} equipment`}
     >
-      <div className="flex items-center">
-        <div className={`w-16 h-16 bg-surface-700 rounded-lg flex items-center justify-center mr-4 ${slot.component ? 'bg-surface-600/50' : 'bg-surface-700'}`}>
+      <div className="grid grid-cols-[auto_1fr_auto] gap-4">
+        {/* Column 1: Icon */}
+        <div className={`w-16 h-16 bg-surface-700 rounded-lg flex items-center justify-center ${slot.component ? 'bg-surface-600/50' : 'bg-surface-700'}`}>
           <div className="flex flex-col items-center justify-center">
             {/* For weapons */}
             {slot.key === 'weapon' || slot.key === 'secondaryWeapon' ? (
@@ -250,13 +251,14 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
           </div>
         </div>
         
+        {/* Column 2: Equipment details */}
         <div className="flex-1">
           <div className="flex items-center">
-          <span className="font-medium text-surface-100">
-            {slot.component 
-              ? slot.component.name 
-              : t("build_planner.no_equipment", { name: slot.name })}
-          </span>
+            <span className="font-medium text-surface-100">
+              {slot.component 
+                ? slot.component.name 
+                : t("build_planner.no_equipment", { name: slot.name })}
+            </span>
             
             {slot.component && (
               <TooltipProvider>
@@ -275,24 +277,15 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
           </div>
           
           {slot.component && (
-            <div className="text-xs text-surface-300 mt-1 flex items-center justify-between">
-              <div>
-                {/* Render different details based on equipment type */}
-                {isWeapon(slot.component) ? 
-                  <WeaponDetails weapon={slot.component} /> : 
-                  isArmor(slot.component) ? 
-                  <ArmorDetails armor={slot.component} /> :
-                  isCharm(slot.component) ?
-                  <CharmDetails charm={slot.component} /> : null
-                }
-              </div>
-              
-              {slot.component.slots && slot.component.slots.length > 0 && (
-                <div className="flex items-center gap-1">
-                  <span className="text-surface-400 mr-1">{t("build_planner.slots")}: {slot.component.slots.length}</span>
-                  {renderDecorationSlots(slot.key, slot.component.slots)}
-                </div>
-              )}
+            <div className="text-xs text-surface-300 mt-1">
+              {/* Render different details based on equipment type */}
+              {isWeapon(slot.component) ? 
+                <WeaponDetails weapon={slot.component} /> : 
+                isArmor(slot.component) ? 
+                <ArmorDetails armor={slot.component} /> :
+                isCharm(slot.component) ?
+                <CharmDetails charm={slot.component} /> : null
+              }
             </div>
           )}
           
@@ -300,6 +293,13 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
             <SkillsList skills={slot.component.skills} />
           )}
         </div>
+        
+        {/* Column 3: Decoration slots */}
+        {slot.component && slot.component.slots && slot.component.slots.length > 0 && (
+          <div className="flex flex-col justify-center items-end w-44">
+            {renderDecorationSlots(slot.key, slot.component.slots)}
+          </div>
+        )}
       </div>
     </motion.div>
   );
