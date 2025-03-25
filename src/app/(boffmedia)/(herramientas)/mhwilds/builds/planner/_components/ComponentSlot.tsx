@@ -199,13 +199,13 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
   const t = useTranslations("mhwilds");
   return (
     <motion.div 
-      className="bg-surface-700/30 rounded-lg p-3 hover:bg-surface-700/50 cursor-pointer"
+      className="bg-surface-700/30 rounded-lg p-2 hover:bg-surface-700/50 cursor-pointer"
       onClick={() => onSlotClick(slot.key)}
       whileHover={{ x: 5 }}
       role="button"
       aria-label={`Select ${slot.name} equipment`}
     >
-      <div className="grid grid-cols-[auto_1fr_auto] gap-4">
+      <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center">
         {/* Column 1: Icon */}
         <div className={`w-16 h-16 bg-surface-700 rounded-lg flex items-center justify-center ${slot.component ? 'bg-surface-600/50' : 'bg-surface-700'}`}>
           <div className="flex flex-col items-center justify-center">
