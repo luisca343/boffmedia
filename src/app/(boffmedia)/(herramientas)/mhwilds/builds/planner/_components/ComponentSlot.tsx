@@ -209,7 +209,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
         <div className={`w-16 h-16 bg-surface-700 rounded-lg flex items-center justify-center mr-4 ${slot.component ? 'bg-surface-600/50' : 'bg-surface-700'}`}>
           <div className="flex flex-col items-center justify-center">
             {/* For weapons */}
-            {slot.key === 'weapon' ? (
+            {slot.key === 'weapon' || slot.key === 'secondaryWeapon' ? (
               <div className="relative w-10 h-10">
                 <Image 
                   src={slot.component && isWeapon(slot.component) 

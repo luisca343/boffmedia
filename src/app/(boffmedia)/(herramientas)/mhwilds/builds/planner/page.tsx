@@ -82,16 +82,16 @@ export default function BuildPlanner() {
   }, [importBuildFromUrl]);
   
 
-  // Store build data with just IDs
   const [currentBuild, setCurrentBuild] = useState<BuildDataWithIds>({
     name: "Mi Build",
     weaponId: null,
+    secondaryWeaponId: null,
     headId: null,
     chestId: null,
     armsId: null,
     waistId: null,
     legsId: null,
-    charmId: null, // Add charmId
+    charmId: null,
     decorations: [],
   });
   
@@ -116,25 +116,26 @@ export default function BuildPlanner() {
   const isLoading = loadingWeapons || loadingArmor || loadingDecorations;
 
   const getEquipmentBySlot = useCallback((slotType: EquipmentType) => {
-    if (slotType === 'weapon') {
+    if (slotType === 'weapon' || slotType === 'secondaryWeapon') {
       return weapons;
     } else if (slotType === 'charm') {
-      return charms; // Return charms when charm slot is selected
+      return charms;
     } else {
       return armor.filter(item => item.kind === slotType);
     }
-  }, [armor, weapons, charms]); // Add charms to dependencies
+  }, [armor, weapons, charms]);
   
   const buildWithFullObjects = useMemo<BuildData>(() => {
     return {
       name: currentBuild.name,
       weapon: getWeaponById(currentBuild.weaponId),
+      secondaryWeapon: getWeaponById(currentBuild.secondaryWeaponId), // Add this line
       head: getArmorById(currentBuild.headId),
       chest: getArmorById(currentBuild.chestId),
       arms: getArmorById(currentBuild.armsId),
       waist: getArmorById(currentBuild.waistId),
       legs: getArmorById(currentBuild.legsId),
-      charm: getCharmById(currentBuild.charmId), // Add charm
+      charm: getCharmById(currentBuild.charmId),
       decorations: currentBuild.decorations.map(decoAssign => ({
         equipmentType: decoAssign.equipmentType,
         slotIndex: decoAssign.slotIndex,
@@ -147,7 +148,7 @@ export default function BuildPlanner() {
     getWeaponById, 
     getArmorById, 
     getDecorationById,
-    getCharmById // Add getCharmById to dependencies
+    getCharmById
   ]);
 
 
@@ -214,9 +215,12 @@ export default function BuildPlanner() {
       })));
     }
     
-    // Add skills from decorations
+    // Add skills from decorations - exclude those on the secondary weapon
     if (buildWithFullObjects.decorations && buildWithFullObjects.decorations.length > 0) {
       buildWithFullObjects.decorations.forEach(decoAssign => {
+        // Skip decorations on secondary weapon
+        if (decoAssign.equipmentType === 'secondaryWeapon') return;
+        
         if (decoAssign.decoration && decoAssign.decoration.skills) {
           // Convert decoration skills to SkillRank format for processing
           const skillRanks = decoAssign.decoration.skills.map(skill => ({
@@ -239,6 +243,14 @@ export default function BuildPlanner() {
     // Convert Map back to Array
     return Array.from(skillMap.values());
   };
+
+  const handleSwapWeapons = useCallback(() => {
+    setCurrentBuild(prev => ({
+      ...prev,
+      weaponId: prev.secondaryWeaponId,
+      secondaryWeaponId: prev.weaponId
+    }));
+  }, []);
 
   // Calculate stats using the full objects
   const calculateStats = (): StatsData => {
@@ -476,6 +488,7 @@ export default function BuildPlanner() {
                 currentBuild={buildWithFullObjects}
                 onSlotClick={handleSlotClick}
                 onDecorationClick={handleDecorationClick}
+                onSwapWeapons={handleSwapWeapons}
               />
               <BuildImport 
                 onImport={(importedBuild) => {

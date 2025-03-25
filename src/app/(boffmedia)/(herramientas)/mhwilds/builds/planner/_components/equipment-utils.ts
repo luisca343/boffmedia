@@ -11,10 +11,10 @@ import {
 } from "lucide-react";
 import { GiHelmet } from "react-icons/gi";
 
-// Get the appropriate icon for the equipment type
 export const getEquipmentIcon = (slotType: EquipmentType): LucideIcon | any => {
   const icons: Record<EquipmentType, LucideIcon | any> = {
     'weapon': SwordIcon,
+    'secondaryWeapon': SwordIcon,
     'head': GiHelmet,
     'chest': Shirt,
     'arms': ArrowBigRight,
@@ -30,6 +30,7 @@ export const getEquipmentIcon = (slotType: EquipmentType): LucideIcon | any => {
 export const getIconColor = (slotType: EquipmentType): string => {
   const colors: Record<EquipmentType, string> = {
     'weapon': "text-red-400",
+    'secondaryWeapon': "text-orange-400",
     'head': "text-blue-400",
     'chest': "text-green-400",
     'arms': "text-yellow-400",
@@ -40,16 +41,17 @@ export const getIconColor = (slotType: EquipmentType): string => {
   
   return colors[slotType] || "text-surface-400";
 };
-// Get display name for equipment type
+
 export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
   const typeNames: Record<EquipmentType, string> = {
     weapon: 'Arma',
+    secondaryWeapon: 'Arma secundaria',
     head: 'Casco',
     chest: 'Pecho',
     arms: 'Brazos',
     waist: 'Cintura',
     legs: 'Piernas',
-    charm: 'Amuleto' // Add charm display name
+    charm: 'Amuleto'
   };
   return typeNames[slotType] || slotType.charAt(0).toUpperCase() + slotType.slice(1);
 };
@@ -263,7 +265,6 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
 };
 
 export const getArmorImagePath = (armorType: EquipmentType): string => {
-  // Map equipment types to their image filenames
   const imageMap: Record<EquipmentType, string> = {
     'head': 'helmet',
     'chest': 'chest',
@@ -271,6 +272,7 @@ export const getArmorImagePath = (armorType: EquipmentType): string => {
     'waist': 'waist',
     'legs': 'greaves',
     'weapon': 'great-sword',
+    'secondaryWeapon': 'great-sword',
     'charm': 'charm',
   };
   

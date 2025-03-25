@@ -19,26 +19,31 @@ import {
   EquipmentType, 
   Decoration, 
 } from "./types";
-import { GiDwarfHelmet } from "react-icons/gi";
+import { GiDwarfHelmet, GiSwapBag } from "react-icons/gi";
 import { useMemo } from "react";
 import { getSlotColorClass } from "./utils";
 import { ComponentSlot } from "./ComponentSlot";
 import Image from "next/image";
 import { getArmorImagePath, getWeaponTypeIcon } from "./equipment-utils";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 
 interface BuildDisplayProps {
   currentBuild: BuildData;
   onSlotClick: (slot: EquipmentType) => void;
   onDecorationClick: (equipmentType: EquipmentType, slotIndex: number) => void;
+  onSwapWeapons?: () => void; // Add this prop
 }
+
 
 export function BuildDisplay({ 
   currentBuild, 
   onSlotClick, 
-  onDecorationClick 
+  onDecorationClick,
+  onSwapWeapons 
 }: BuildDisplayProps) {
   const t = useTranslations("mhwilds");
+  
   const equipmentSlots = useMemo(() => {
     // Get weapon icon component if weapon is present
     const WeaponIconComponent = currentBuild.weapon ? 
@@ -47,6 +52,21 @@ export function BuildDisplay({
           <Image 
             src={getWeaponTypeIcon(currentBuild.weapon?.kind || currentBuild.weapon?.type || 'great-sword')} 
             alt={currentBuild.weapon?.kind || 'weapon'}
+            width={24}
+            height={24}
+            className="object-contain"
+            {...props}
+          />
+        </div>
+      ) : 
+      Sword;
+
+      const SecondaryWeaponIconComponent = currentBuild.secondaryWeapon ? 
+      (props: any) => (
+        <div className="relative w-6 h-6">
+          <Image 
+            src={getWeaponTypeIcon(currentBuild.secondaryWeapon?.kind || currentBuild.secondaryWeapon?.type || 'great-sword')} 
+            alt={currentBuild.secondaryWeapon?.kind || 'secondary weapon'}
             width={24}
             height={24}
             className="object-contain"
@@ -142,6 +162,14 @@ export function BuildDisplay({
         component: currentBuild.weapon, 
         iconColor: "text-red-400",
         hasCustomIcon: !!currentBuild.weapon 
+      },
+      { 
+        key: 'secondaryWeapon' as EquipmentType, // Add the secondary weapon
+        name: t("secondary_weapon", {defaultValue: "Arma secundaria"}), // Add a translation with fallback
+        icon: SecondaryWeaponIconComponent, 
+        component: currentBuild.secondaryWeapon, 
+        iconColor: "text-orange-400",
+        hasCustomIcon: !!currentBuild.secondaryWeapon 
       },
       { 
         key: 'head' as EquipmentType, 
@@ -243,19 +271,52 @@ export function BuildDisplay({
     );
   };
 
-   return (
+  return (
     <Card className="bg-surface-800 border-surface-700 mb-6">
       <CardHeader className="pb-2">
-        <CardTitle className="flex items-center text-xl">
-          {t("build_planner.current_build")}
-          <span className="text-xs font-normal text-surface-400 ml-2">
-            ({t("build_planner.click_to_change")})
-          </span>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center text-xl">
+            {t("build_planner.current_build")}
+          </CardTitle>
+          
+          {/* Move swap weapons button to header if at least one weapon is equipped */}
+          {(currentBuild.weapon || currentBuild.secondaryWeapon) && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-xs flex items-center gap-1 text-surface-400 hover:text-primary-400"
+              onClick={onSwapWeapons}
+              title={t("build_planner.swap_weapons", {defaultValue: "Intercambiar armas"})}
+            >
+              <GiSwapBag className="h-4 w-4" />
+              {t("build_planner.swap_weapons", {defaultValue: "Intercambiar"})}
+            </Button>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {equipmentSlots.map(slot => (
+          <ComponentSlot
+            key={equipmentSlots[0].key}
+            slot={equipmentSlots[0]}
+            onSlotClick={onSlotClick}
+            onDecorationClick={onDecorationClick}
+            renderDecorationSlots={renderDecorationSlots}
+            hasCustomIcon={equipmentSlots[0].hasCustomIcon}
+            rarity={currentBuild[equipmentSlots[0].key]?.rarity}
+          />
+          
+          <ComponentSlot
+            key={equipmentSlots[1].key}
+            slot={equipmentSlots[1]}
+            onSlotClick={onSlotClick}
+            onDecorationClick={onDecorationClick}
+            renderDecorationSlots={renderDecorationSlots}
+            hasCustomIcon={equipmentSlots[1].hasCustomIcon}
+            rarity={currentBuild[equipmentSlots[1].key]?.rarity}
+          />
+          
+          {equipmentSlots.slice(2).map(slot => (
             <ComponentSlot
               key={slot.key}
               slot={slot}
@@ -275,36 +336,41 @@ export function BuildDisplay({
                 {t("build_planner.active_decorations")}
               </h3>
               <span className="text-xs text-surface-400">
-                {t("build_planner.decorations_equipped", { count: currentBuild.decorations?.length || 0 })}
+                {t("build_planner.decorations_equipped", { 
+                  count: currentBuild.decorations?.filter(d => d.equipmentType !== 'secondaryWeapon').length || 0 
+                })}
               </span>
             </div>
             
-            {currentBuild.decorations && currentBuild.decorations.length > 0 ? (
+            {currentBuild.decorations && currentBuild.decorations.filter(d => d.equipmentType !== 'secondaryWeapon').length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {currentBuild.decorations.map((decorationSlot, index) => (
-                  <div 
-                    key={`${decorationSlot.equipmentType}-${decorationSlot.slotIndex}-${index}`} 
-                    className="bg-surface-707/30 rounded p-2 flex items-center justify-between"
-                    role="listitem"
-                    aria-label={`${decorationSlot.decoration.name} decoration`}
-                  >
-                    <div className="flex items-center">
-                      <div 
-                        className={`w-4 h-4 rounded-full mr-2 ${getSlotColorClass(decorationSlot.decoration.slot)}`}
-                        aria-hidden="true"
-                      >
+                {currentBuild.decorations
+                  .filter(decorationSlot => decorationSlot.equipmentType !== 'secondaryWeapon')
+                  .map((decorationSlot, index) => (
+                    <div 
+                      key={`${decorationSlot.equipmentType}-${decorationSlot.slotIndex}-${index}`} 
+                      className="bg-surface-707/30 rounded p-2 flex items-center justify-between"
+                      role="listitem"
+                      aria-label={`${decorationSlot.decoration.name} decoration`}
+                    >
+                      <div className="flex items-center">
+                        <div 
+                          className={`w-4 h-4 rounded-full mr-2 ${getSlotColorClass(decorationSlot.decoration.slot)}`}
+                          aria-hidden="true"
+                        >
+                        </div>
+                        <span className="text-xs text-surface-200">{decorationSlot.decoration.name}</span>
                       </div>
-                      <span className="text-xs text-surface-200">{decorationSlot.decoration.name}</span>
+                      <div className="text-xs text-green-400">
+                        {decorationSlot.decoration.skills.map(skill => (
+                          <span key={skill.id || `skill-${skill.skill.name}`}>
+                            {skill.skill.name} +{skill.level}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                    <div className="text-xs text-green-400">
-                      {decorationSlot.decoration.skills.map(skill => (
-                        <span key={skill.id || `skill-${skill.skill.name}`}>
-                          {skill.skill.name} +{skill.level}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  ))
+                }
               </div>
             ) : (
               <div className="text-center py-3 text-surface-400 text-sm">

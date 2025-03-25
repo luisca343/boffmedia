@@ -23,7 +23,6 @@
       "back": "Volver",
       "details": "Detalles de la build",
       "current_build": "Equipamiento actual",
-      "click_to_change": "Haz click para cambiar",
       "active_decorations": "Decoraciones activas",
       "decorations_equipped": "{count, plural, =0 {No hay decoraciones equipadas} =1 {1 decoración equipada} other {{count} decoraciones equipadas}}",
       "no_decorations": "No hay adornos equipados",
@@ -62,7 +61,8 @@
       "current_level": "Nivel actual",
       "elemental_resistances": "Resistencias Elementales",
       "sharpness": "Afilado",
-      "description": "\"Crea y optimiza tus builds de equipo y armaduras\""
+      "description": "\"Crea y optimiza tus builds de equipo y armaduras\"",
+      "swap_weapons": "Intercambiar armas"
     },
     "equipment": "Equipamiento",
     "weapon": "Arma",
@@ -98,6 +98,7 @@
     "defense_bonus": "Bonus de defensa",
     "build-planner": {
       "hidden": "(O)"
-    }
+    },
+    "charm": "Amuleto"
   }
 }

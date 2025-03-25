@@ -1,4 +1,4 @@
-export type EquipmentType = 'weapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs' | 'charm';
+export type EquipmentType = 'weapon' | 'secondaryWeapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs' | 'charm';
 
 export interface SkillInfo {
   id: number;
@@ -186,6 +186,7 @@ export interface Skill {
 export interface BuildData {
   name: string;
   weapon: Weapon | null;
+  secondaryWeapon: Weapon | null;
   head: ArmorPiece | null;
   chest: ArmorPiece | null;
   arms: ArmorPiece | null;
@@ -195,19 +196,10 @@ export interface BuildData {
   decorations: DecorationAssignment[];
 }
 
-export interface Filters {
-  search: string;
-  rarity: number[];
-  skills: string[];
-  slots: number[];
-  element?: string;
-}
-
-// Add this to your types file
-
 export interface BuildDataWithIds {
   name: string;
   weaponId: string | null;
+  secondaryWeaponId: string | null;
   headId: string | null;
   chestId: string | null;
   armsId: string | null;
@@ -220,6 +212,14 @@ export interface BuildDataWithIds {
     slotSize: number;
     decorationId: string;
   }[];
+}
+
+export interface Filters {
+  search: string;
+  rarity: number[];
+  skills: string[];
+  slots: number[];
+  element?: string;
 }
 export interface StatsData {
   weapon: Weapon | null;
