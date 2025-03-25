@@ -95,8 +95,6 @@ export default function BuildPlanner() {
     decorations: [],
   });
   
-  console.log("Current Build:", currentBuild);
-  
   // State for the currently selected equipment slot
   const [selectedSlot, setSelectedSlot] = useState<EquipmentType | null>(null);
   

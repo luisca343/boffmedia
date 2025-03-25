@@ -141,14 +141,11 @@ export const getAllWeaponElements = (weapon: Weapon): {
 } => {
   if (!weapon) return { elements: [], statuses: [] };
   
-  console.log("Extracting elements from weapon:", weapon.id, weapon.name);
-  
   const elements: { type: string; damage: number; hidden?: boolean }[] = [];
   const statuses: { type: string; damage: number; hidden?: boolean }[] = [];
   
   // Case 1: Direct element property
   if (weapon.element && typeof weapon.element === 'object') {
-    console.log("Found direct element property:", weapon.element);
     elements.push({
       type: weapon.element.type,
       damage: weapon.element.damage,
@@ -158,11 +155,9 @@ export const getAllWeaponElements = (weapon: Weapon): {
   
   // Case 2: Elements in specials array
   if (weapon.specials && Array.isArray(weapon.specials)) {
-    console.log("Found specials array with", weapon.specials.length, "items");
     
     weapon.specials.forEach((special, index) => {
       if (!special) return;
-      console.log(`Processing special #${index}:`, special);
       
       try {
         const type = special.type || special.element || special.status;
@@ -182,7 +177,6 @@ export const getAllWeaponElements = (weapon: Weapon): {
         // Determine if it's an element or status effect
         if ((special.kind === 'element' || special.element) && 
             ['fire', 'water', 'thunder', 'ice', 'dragon'].includes(type.toLowerCase())) {
-          console.log(`Found element ${type} with damage ${damage}`);
           
           if (damage > 0) {
             elements.push({
@@ -196,7 +190,6 @@ export const getAllWeaponElements = (weapon: Weapon): {
         else if (special.kind === 'status' || 
                 special.status || 
                 ['poison', 'sleep', 'paralysis', 'blast', 'stun'].includes(type.toLowerCase())) {
-          console.log(`Found status ${type} with damage ${damage}`);
           
           if (damage > 0) {
             statuses.push({
@@ -212,8 +205,6 @@ export const getAllWeaponElements = (weapon: Weapon): {
     });
   }
   
-  console.log("Final extracted elements:", elements);
-  console.log("Final extracted statuses:", statuses);
   return { elements, statuses };
 };
 

@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArmorPiece, BuildData, EquipmentType, Filters, Weapon } from "./types";
+import { ArmorPiece, BuildData, Charm, EquipmentType, Filters, Weapon } from "./types";
 import { getEquipmentDisplayName, getEquipmentIcon, getIconColor } from "./equipment-utils";
 import { EquipmentFilters } from "./EquipmentFilters";
 import { EquipmentItem } from "./EquipmentItem";
@@ -27,7 +27,7 @@ interface EquipmentSelectorProps {
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   onClose: () => void;
   isLoading: boolean;
-  equipmentData: EquipmentType
+  equipmentData: ArmorPiece[] | Weapon[] | Charm[]
 }
 
 export function EquipmentSelector({ 
@@ -41,8 +41,8 @@ export function EquipmentSelector({
   equipmentData
 }: EquipmentSelectorProps) {
   const t = useTranslations("mhwilds");
-  const [equipment, setEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
-  const [filteredEquipment, setFilteredEquipment] = useState<ArmorPiece[] | Weapon[]>([]);
+  const [equipment, setEquipment] = useState<ArmorPiece[] | Weapon[] | Charm[]>([]);
+  const [filteredEquipment, setFilteredEquipment] = useState<ArmorPiece[] | Weapon[] | Charm[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [initialFilterApplied, setInitialFilterApplied] = useState(false);
 
@@ -134,9 +134,7 @@ export function EquipmentSelector({
   // Sort equipment by rarity as default
   const sortedEquipment = [...filteredEquipment].sort((a, b) => a.rarity - b.rarity);
 
-  const selectEquipment = (item: ArmorPiece | Weapon) => {
-    // Create a new build object with the selected equipment
-    // The parent component will extract just the ID
+  const selectEquipment = (item: ArmorPiece | Weapon | Charm) => {
     setCurrentBuild({
       ...currentBuild,
       [slotType]: item
@@ -145,8 +143,6 @@ export function EquipmentSelector({
   };
 
   const removeEquipment = () => {
-    // Remove the equipment by setting it to null
-    // The parent component will handle setting the ID to null
     setCurrentBuild({
       ...currentBuild,
       [slotType]: null

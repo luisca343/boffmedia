@@ -42,8 +42,6 @@ export function CharmSelector({
   const [filteredCharms, setFilteredCharms] = useState<Charm[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("CharmSelector - Charms:", charms);
-  
   // Apply filters whenever filters or charms changes
   useEffect(() => {
     if (isLoading || error) return;
