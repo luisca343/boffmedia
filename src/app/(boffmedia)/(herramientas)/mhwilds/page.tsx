@@ -22,7 +22,7 @@ export default function MHWildsPage() {
     {
       title: t("build_planner.title"),
       description: t("build_planner.description"),
-      icon: "/img/games/mhwilds/longsword.webp",
+      icon: "/img/games/mhwilds/long-sword.webp",
       iconFallback: <Shield className="h-8 w-8 text-green-400" />,
       href: "/mhwilds/builds/planner",
       color: "from-green-400 to-emerald-600",
@@ -32,7 +32,7 @@ export default function MHWildsPage() {
     {
       title: "Árboles de Armas",
       description: "Árboles de progresión y estadísticas de todas las armas",
-      icon: "/img/games/mhwilds/chargeblade.webp",
+      icon: "/img/games/mhwilds/charge-blade.webp",
       iconFallback: <Sword className="h-8 w-8 text-blue-400" />,
       href: "/mhwilds/armas",
       color: "from-blue-400 to-indigo-600",
