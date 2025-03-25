@@ -47,34 +47,60 @@ export default function BuildPlanner() {
     try {
       // Extract the build parameter from the URL
       const params = new URLSearchParams(window.location.search);
-      const buildParam = params.get('build');
+      const buildParam = params.get('b'); // Changed from 'build' to 'b'
       
       if (buildParam) {
         // Decode and parse the build data
         const decodedData = decodeURIComponent(atob(buildParam));
-        const importedBuild = JSON.parse(decodedData) as BuildDataWithIds;
+        const minimalBuild = JSON.parse(decodedData);
         
-        // Validate the imported build has the correct structure
-        if (
-          importedBuild && 
-          typeof importedBuild === 'object' && 
-          'name' in importedBuild && 
-          'decorations' in importedBuild
-        ) {
-          // Replace the build with the imported one
-          setCurrentBuild(importedBuild);
-          console.log("Imported build from URL:", importedBuild);
-          
-          // Clean up the URL to avoid reimporting on refresh
-          if (window.history.replaceState) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
+        // Convert the minimal build back to a full BuildDataWithIds
+        const importedBuild: BuildDataWithIds = {
+          name: minimalBuild.n || "Mi Build",
+          weaponId: minimalBuild.w || null,
+          secondaryWeaponId: minimalBuild.s || null,
+          headId: minimalBuild.h || null,
+          chestId: minimalBuild.c || null,
+          armsId: minimalBuild.a || null,
+          waistId: minimalBuild.v || null,
+          legsId: minimalBuild.l || null,
+          charmId: minimalBuild.m || null,
+          decorations: (minimalBuild.d || []).map((d: any) => ({
+            equipmentType: getFullEquipmentType(d.e),
+            slotIndex: d.i,
+            slotSize: d.s,
+            decorationId: d.d
+          }))
+        };
+        
+        // Replace the build with the imported one
+        setCurrentBuild(importedBuild);
+        console.log("Imported build from URL:", importedBuild);
+        
+        // Clean up the URL to avoid reimporting on refresh
+        if (window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
         }
       }
     } catch (error) {
       console.error("Failed to import build from URL:", error);
     }
   }, []);
+
+  const getFullEquipmentType = (shortType: string): EquipmentType => {
+    const typeMap: Record<string, EquipmentType> = {
+      'w': 'weapon',
+      's': 'secondaryWeapon',
+      'h': 'head',
+      'c': 'chest',
+      'a': 'arms',
+      'v': 'waist',
+      'l': 'legs',
+      'm': 'charm'
+    };
+    
+    return typeMap[shortType] || 'weapon';
+  };
   
   // Add this useEffect after your existing state declarations
   useEffect(() => {

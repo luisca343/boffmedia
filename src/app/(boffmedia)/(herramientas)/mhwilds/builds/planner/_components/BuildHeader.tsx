@@ -30,6 +30,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { exportBuildAsJson, generateShareableLink, saveBuildToLocalStorage } from "../_utils/buildUtils";
 
 interface BuildHeaderProps {
   buildName: string;
@@ -58,16 +59,11 @@ export function BuildHeader({
     message: string;
   }>({ type: null, message: "" });
 
-  // Save build to localStorage
   const handleSave = () => {
     try {
-      // Create a unique key using the name and timestamp
-      const key = `mhw-build-${Date.now()}`;
-      localStorage.setItem(key, JSON.stringify(buildData));
-      console.log("Saved build:", buildData);
+      const key = saveBuildToLocalStorage(buildData);
       showNotification("success", t("build_planner.saved_local", { key }));
     } catch (error) {
-      console.error("Error saving build:", error);
       showNotification("error", t("build_planner.error_saving"));
     }
   };
@@ -77,7 +73,6 @@ export function BuildHeader({
     try {
       const buildJson = JSON.stringify(buildData, null, 2);
       navigator.clipboard.writeText(buildJson);
-      console.log("Copied build to clipboard");
       showNotification("success", t("build_planner.copied_clipboard"));
     } catch (error) {
       console.error("Error copying build:", error);
@@ -85,17 +80,11 @@ export function BuildHeader({
     }
   };
 
-  // Generate shareable URL with encoded build data
-  const generateShareableLink = () => {
+  // Generate shareable URL using utility function
+  const handleShareableLink = () => {
     try {
-      // Compress build data to make URL shorter using base64 encoding
-      const compressedData = btoa(encodeURIComponent(JSON.stringify(buildData)));
-      
-      // Build the URL with the encoded data as a query parameter
-      const shareableUrl = `${window.location.origin}${window.location.pathname}?build=${compressedData}`;
+      const shareableUrl = generateShareableLink(buildData);
       setShareUrl(shareableUrl);
-      
-      // Copy to clipboard
       navigator.clipboard.writeText(shareableUrl);
       showNotification("success", t("build_planner.link_copied", { url: shareableUrl }));
       setShowDialog("share");
@@ -105,26 +94,18 @@ export function BuildHeader({
     }
   };
 
-  // Export build as JSON file
-  const exportAsJson = () => {
+  // Export build as JSON using utility function
+  const handleExportJson = () => {
     try {
-      // Prepare the build data as a JSON string
-      const dataStr = JSON.stringify(buildData, null, 2);
-      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-      
-      // Create a download link and trigger it
+      exportBuildAsJson(buildData);
       const fileName = `${buildData.name.replace(/\s+/g, "-")}-${Date.now()}.json`;
-      const linkElement = document.createElement("a");
-      linkElement.setAttribute("href", dataUri);
-      linkElement.setAttribute("download", fileName);
-      linkElement.click();
-      
       showNotification("success", t("build_planner.exported_json", { fileName }));
     } catch (error) {
       console.error("Error exporting build:", error);
       showNotification("error", t("build_planner.error_exporting"));
     }
   };
+
 
   // Generate a build summary image (placeholder)
   const generateImage = () => {
@@ -303,11 +284,11 @@ export function BuildHeader({
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-surface-800 border-surface-700 text-surface-100">
                 <DropdownMenuLabel>{t("build_planner.share_options")}</DropdownMenuLabel>
-                <DropdownMenuItem onClick={generateShareableLink} className="cursor-pointer">
+                <DropdownMenuItem onClick={handleShareableLink} className="cursor-pointer">
                   <Link className="h-4 w-4 mr-2" />
                   <span>{t("build_planner.share_link")}</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={exportAsJson} className="cursor-pointer">
+                <DropdownMenuItem onClick={handleExportJson} className="cursor-pointer">
                   <Download className="h-4 w-4 mr-2" />
                   <span>{t("build_planner.export_json")}</span>
                 </DropdownMenuItem>
