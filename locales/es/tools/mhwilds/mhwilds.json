@@ -99,6 +99,7 @@
     "build-planner": {
       "hidden": "(O)"
     },
-    "charm": "Amuleto"
+    "charm": "Amuleto",
+    "secondary_weapon": "Arma Secundaria"
   }
 }
