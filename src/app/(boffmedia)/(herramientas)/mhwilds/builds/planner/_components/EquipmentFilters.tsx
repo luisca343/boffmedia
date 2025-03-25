@@ -52,18 +52,14 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
     const isRankActive = range.every(r => filters.rarity.includes(r));
     
     if (isRankActive) {
-      // If the rank is already active, remove it
       setFilters({
         ...filters, 
         rarity: filters.rarity.filter(r => !range.includes(r))
       });
     } else {
-      // If selecting a new rank, toggle between ranks
-      // First, remove all rarity filters
       const otherRankValues = rankRanges.flatMap(r => r.value);
       const clearedRarity = filters.rarity.filter(r => !otherRankValues.includes(r));
       
-      // Then add the new rank values
       setFilters({
         ...filters,
         rarity: [...clearedRarity, ...range]
@@ -86,12 +82,10 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
     });
   };
   
-  // Get the currently active rank label
   const getActiveRankLabel = () => {
     if (rankRanges[0].isActive) return t("low_rank");
     if (rankRanges[1].isActive) return t("high_rank");
     
-    // Check if it's a mix of rarities that don't exactly match any predefined range
     if (filters.rarity.length > 0) {
       return `Rareza: ${filters.rarity.sort().join(', ')}`;
     }

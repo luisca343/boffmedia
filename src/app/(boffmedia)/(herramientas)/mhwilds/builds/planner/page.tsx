@@ -378,6 +378,21 @@ export default function BuildPlanner() {
     }
   };
 
+  const handleReset = () => {
+    setCurrentBuild({
+      name: "Mi Build",
+      weaponId: null,
+      secondaryWeaponId: null,
+      headId: null,
+      chestId: null,
+      armsId: null,
+      waistId: null,
+      legsId: null,
+      charmId: null,
+      decorations: [],
+    });
+  };
+
   // Function to close the equipment/decoration selector
   const closeSelector = () => {
     setSelectedSlot(null);
@@ -389,8 +404,12 @@ export default function BuildPlanner() {
       <BuildHeader 
         buildName={currentBuild.name} 
         onBuildNameChange={(name) => setCurrentBuild({...currentBuild, name})}
+        buildData={currentBuild}
+        completeData={buildWithFullObjects}
+        stats={stats}
+        skills={totalSkills}
+        onReset={handleReset}
       />
-
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left panel - Equipment Selection & Current Build */}
         <div className="lg:col-span-8">
@@ -405,7 +424,7 @@ export default function BuildPlanner() {
                     charmId: updatedBuild.charm ? updatedBuild.charm.id.toString() : null
                   });
                 }}
-                filters={filters}
+                filters={filters.rarity ? filters : { ...filters, rarity: [] }}
                 setFilters={setFilters}
                 onClose={closeSelector}
                 isLoading={loadingCharms}
@@ -503,12 +522,14 @@ export default function BuildPlanner() {
         <div className="lg:col-span-4 space-y-6">
           <StatsDisplay stats={stats} />
           <SkillsList skills={totalSkills} skillsData={skillsData}/>
+          {/* 
           <BuildActions 
             buildData={currentBuild} 
             completeData={buildWithFullObjects}
             stats={stats}
             skills={totalSkills}
           />
+          */}
         </div>
       </div>
     </div>

@@ -13,6 +13,7 @@ import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "./type
 import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 // Helper function to safely get attack value from weapon
 const getWeaponAttack = (weapon: Weapon | null | undefined): number => {
@@ -40,20 +41,20 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
   
   // Element type icons mapping
   const elementIcons = {
-    fire: <Flame className="h-4 w-4 text-red-400" />,
-    water: <Droplet className="h-4 w-4 text-blue-400" />,
-    thunder: <Zap className="h-4 w-4 text-yellow-400" />,
-    ice: <Snowflake className="h-4 w-4 text-cyan-400" />,
-    dragon: <Skull className="h-4 w-4 text-purple-400" />,
+    fire: "fire",
+    water: "water",
+    thunder: "thunder",
+    ice: "ice",
+    dragon: "dragon",
   };
   
   // Status type icons mapping
   const statusIcons = {
-    poison: <Pill className="h-4 w-4 text-purple-400" />,
-    sleep: <Pill className="h-4 w-4 text-blue-300" />,
-    paralysis: <Pill className="h-4 w-4 text-yellow-300" />,
-    blast: <Pill className="h-4 w-4 text-orange-400" />,
-    stun: <Pill className="h-4 w-4 text-amber-400" />,
+    poison: "poison",
+    sleep: "sleep",
+    paralysis: "paralysis",
+    blast: "blast",
+    stun: "stun",
   };
 
   // Get the weapon from different possible locations
@@ -86,118 +87,123 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
         <CardTitle className="text-base">{t("stats")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 p-3">
-        {/* Compact primary stats row */}
-        <div className="flex items-center gap-2 flex-wrap">
+        {/* Stats displayed vertically */}
+        <div className="grid grid-cols-1 gap-2">
           <TooltipProvider>
             {/* Defense */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                  <Shield className="h-3.5 w-3.5 text-blue-400 mr-1.5" />
-                  <span className="font-medium">{stats.defense || 0}</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{t("defense")}</p>
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
+              <div className="w-8 h-8 flex justify-center items-center">
+                <Image 
+                  src="/img/games/mhwilds/defense.webp" 
+                  alt="Defense"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-surface-300">{t("defense")}</span>
+                <span className="font-medium text-blue-400">{stats.defense || 0}</span>
+              </div>
+            </div>
             
             {/* Attack */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                  <Swords className="h-3.5 w-3.5 text-red-400 mr-1.5" />
-                  <span className="font-medium">{attackValue || stats.attack || 0}</span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{t("attack")}</p>
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
+              <div className="w-8 h-8 flex justify-center items-center">
+                <Image 
+                  src="/img/games/mhwilds/attack.webp" 
+                  alt="Attack"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-surface-300">{t("attack")}</span>
+                <span className="font-medium text-red-400">{attackValue || stats.attack || 0}</span>
+              </div>
+            </div>
             
             {/* Affinity */}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                  <Target className="h-3.5 w-3.5 text-green-400 mr-1.5" />
-                  <span className={`font-medium ${stats.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                    {stats.affinity >= 0 ? '+' : ''}{stats.affinity || 0}%
-                  </span>
-                </div>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">
-                <p>{t("affinity")}</p>
-              </TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
+              <div className="w-8 h-8 flex justify-center items-center">
+                <Image 
+                  src="/img/games/mhwilds/affinity.webp" 
+                  alt="Affinity"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-surface-300">{t("affinity")}</span>
+                <span className={`font-medium ${stats.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {stats.affinity >= 0 ? '+' : ''}{stats.affinity || 0}%
+                </span>
+              </div>
+            </div>
             
             {/* Elements - only show if present */}
-            {weaponElements.length > 0 && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                    <div className="flex items-center gap-1">
-                      {weaponElements.map((element, idx) => (
-                        <React.Fragment key={`${weapon?.id || 'no-weapon'}-element-${idx}`}>
-                          {element.type && elementIcons[element.type.toLowerCase() as keyof typeof elementIcons]}
-                          <span className={`text-sm font-medium ${getElementColor(element.type)}`}>
-                            {element.damage}
-                          </span>
-                        </React.Fragment>
-                      ))}
-                    </div>
+            {weaponElements.length > 0 && weaponElements.map((element, idx) => (
+              <div 
+                key={`element-${idx}`} 
+                className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2"
+              >
+                <div className="w-8 h-8 flex justify-center items-center">
+                  <Image 
+                    src={`/img/games/mhwilds/${elementIcons[element.type.toLowerCase() as keyof typeof elementIcons] || 'element'}.webp`}
+                    alt={element.type}
+                    width={24}
+                    height={24}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <span className="text-xs text-surface-300">{t(element.type)}</span>
+                    {element.hidden && <EyeOff className="h-3 w-3 ml-1 text-surface-400" />}
                   </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[200px]">
-                  <p className="font-medium mb-1">{t("element")}</p>
-                  <div className="space-y-1">
-                    {weaponElements.map((element, idx) => (
-                      <div key={idx} className="flex items-center gap-1">
-                        {element.type && elementIcons[element.type.toLowerCase() as keyof typeof elementIcons]}
-                        <span className={`${getElementColor(element.type)}`}>
-                          {element.damage} {element.type.charAt(0).toUpperCase() + element.type.slice(1)}
-                          {element.hidden && <span className="text-xs ml-1 opacity-70">({t("hidden")})</span>}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            )}
+                  <span className={`font-medium ${getElementColor(element.type)}`}>{element.damage}</span>
+                </div>
+              </div>
+            ))}
             
             {/* Status Effects - only show if present */}
-            {weaponStatuses.length > 0 && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center px-3 py-1.5 bg-surface-700/40 rounded-md">
-                    <div className="flex items-center gap-1">
-                      {weaponStatuses.map((status, idx) => (
-                        <React.Fragment key={`${weapon?.id || 'no-weapon'}-status-${idx}`}>
-                          {status.type && statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 
-                            <Pill className="h-4 w-4 text-surface-300" />}
-                          <span className={`text-sm font-medium ${getStatusColor(status.type)}`}>
-                            {status.damage}
-                          </span>
-                        </React.Fragment>
-                      ))}
-                    </div>
+            {weaponStatuses.length > 0 && weaponStatuses.map((status, idx) => (
+              <div 
+                key={`status-${idx}`} 
+                className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2"
+              >
+                <div className="w-8 h-8 flex justify-center items-center">
+                  <Image 
+                    src={`/img/games/mhwilds/${statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 'status'}.webp`}
+                    alt={status.type}
+                    width={24}
+                    height={24}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <span className="text-xs text-surface-300">{t(status.type)}</span>
+                    {status.hidden && <EyeOff className="h-3 w-3 ml-1 text-surface-400" />}
                   </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[200px]">
-                  <p className="font-medium mb-1">{t("status")}</p>
-                  <div className="space-y-1">
-                    {weaponStatuses.map((status, idx) => (
-                      <div key={idx} className="flex items-center gap-1">
-                        {status.type && statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 
-                            <Pill className="h-4 w-4 text-surface-300" />}
-                        <span className={`${getStatusColor(status.type)}`}>
-                          {status.damage} {status.type.charAt(0).toUpperCase() + status.type.slice(1)}
-                          {status.hidden && <span className="text-xs ml-1 opacity-70">({t("hidden")})</span>}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
+                  <span className={`font-medium ${getStatusColor(status.type)}`}>{status.damage}</span>
+                </div>
+              </div>
+            ))}
+
+            {/* Additional weapon details */}
+            {weapon?.elderseal && weapon.elderseal !== null && (
+              <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
+                <div className="w-8 h-8 flex justify-center items-center">
+                  <Image 
+                    src="/img/games/mhwilds/dragon.webp" 
+                    alt="Elderseal"
+                    width={24}
+                    height={24}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs text-surface-300">{t("elderseal")}</span>
+                  <span className="font-medium text-purple-400">{ t(weapon.elderseal) }</span>
+                </div>
+              </div>
             )}
           </TooltipProvider>
         </div>
@@ -215,23 +221,6 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
             <SharpnessBar sharpness={weapon.sharpness} />
           </div>
         )}
-        
-        {/* Additional weapon details in compact row */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* Display other weapon details... */}
-          {weapon?.elderseal && weapon.elderseal !== null && (
-            <span className="text-xs text-purple-400 bg-purple-900/20 px-2 py-0.5 rounded">
-              {t("elderseal")}: { t(weapon.elderseal) }
-            </span>
-          )}
-          {/* 
-          {weapon?.defenseBonus && weapon.defenseBonus > 0 && (
-            <span className="text-xs text-blue-400 bg-blue-900/20 px-2 py-0.5 rounded">
-              Bonificación de Defensa: +{weapon.defenseBonus}
-            </span>
-          )}
-          */}
-        </div>
       </CardContent>
     </Card>
   );

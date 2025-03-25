@@ -328,6 +328,7 @@ export function BuildDisplay({
           ))}
           
           {/* Summary of active decorations */}
+          {/* 
           <div className="mt-6 bg-surface-700/20 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-md font-medium text-surface-100 flex items-center">
@@ -381,7 +382,7 @@ export function BuildDisplay({
                 </p>
               </div>
             )}
-          </div>
+          </div>*/}
         </div>
       </CardContent>
     </Card>
