@@ -1,21 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
-import { ArmorPiece, EquipmentType, Weapon } from "./types";
+import { ArmorPiece, Charm, EquipmentType, Weapon } from "./types";
 import { getDefenseValue, getEquipmentIcon, getIconColor, getRarityStyle } from "./equipment-utils";
 import { useTranslations } from "next-intl";
 
 interface CurrentEquipmentProps {
-  equipment: ArmorPiece | Weapon;
+  equipment: ArmorPiece | Weapon | Charm;
   slotType: EquipmentType;
   onRemove: () => void;
 }
+
 
 export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquipmentProps) => {
   const t = useTranslations("mhwilds");
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
   const isWeapon = 'attack' in equipment || 'damage' in equipment;
+  const isCharm = 'charm' in equipment;
   
   return (
     <div className="mb-4 p-3 bg-surface-700/30 rounded-md">
@@ -44,7 +46,9 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
             </Badge>
             {isWeapon 
               ? `${t('attack')}: ${(equipment as Weapon).attack || (equipment as Weapon).damage?.display || 0}` 
-              : `${t("defense")}: ${getDefenseValue((equipment as ArmorPiece).defense)}`
+              : isCharm
+                ? `${(equipment as Charm).skills.map(s => `${s.skill.name} +${s.level}`).join(', ')}`
+                : `${t("defense")}: ${getDefenseValue((equipment as ArmorPiece).defense)}`
             }
           </div>
         </div>

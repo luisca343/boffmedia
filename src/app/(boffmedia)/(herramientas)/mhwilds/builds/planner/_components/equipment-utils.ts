@@ -1,5 +1,5 @@
 import { ArmorPiece, EquipmentType, Weapon } from "./types";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Medal } from "lucide-react";
 import { 
   Sword, 
   Shield, 
@@ -20,6 +20,7 @@ export const getEquipmentIcon = (slotType: EquipmentType): LucideIcon | any => {
     'arms': ArrowBigRight,
     'waist': CircleDot,
     'legs': Footprints,
+    'charm': Medal,
   };
   
   return icons[slotType] || Shield;
@@ -34,11 +35,11 @@ export const getIconColor = (slotType: EquipmentType): string => {
     'arms': "text-yellow-400",
     'waist': "text-purple-400",
     'legs': "text-cyan-400",
+    'charm': "text-amber-400",
   };
   
   return colors[slotType] || "text-surface-400";
 };
-
 // Get display name for equipment type
 export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
   const typeNames: Record<EquipmentType, string> = {
@@ -47,7 +48,8 @@ export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
     chest: 'Pecho',
     arms: 'Brazos',
     waist: 'Cintura',
-    legs: 'Piernas'
+    legs: 'Piernas',
+    charm: 'Amuleto' // Add charm display name
   };
   return typeNames[slotType] || slotType.charAt(0).toUpperCase() + slotType.slice(1);
 };
@@ -277,7 +279,8 @@ export const getArmorImagePath = (armorType: EquipmentType): string => {
     'arms': 'gauntlets',
     'waist': 'waist',
     'legs': 'greaves',
-    'weapon': 'great-sword', // Fallback, but we use getWeaponTypeIcon for weapons
+    'weapon': 'great-sword',
+    'charm': 'charm',
   };
   
   // Return the path to the image

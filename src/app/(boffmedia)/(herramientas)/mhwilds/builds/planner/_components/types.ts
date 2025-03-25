@@ -1,4 +1,4 @@
-export type EquipmentType = 'weapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs';
+export type EquipmentType = 'weapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs' | 'charm';
 
 export interface SkillInfo {
   id: number;
@@ -191,6 +191,7 @@ export interface BuildData {
   arms: ArmorPiece | null;
   waist: ArmorPiece | null;
   legs: ArmorPiece | null;
+  charm: Charm | null;
   decorations: DecorationAssignment[];
 }
 
@@ -212,6 +213,7 @@ export interface BuildDataWithIds {
   armsId: string | null;
   waistId: string | null;
   legsId: string | null;
+  charmId: string | null;
   decorations: {
     equipmentType: EquipmentType;
     slotIndex: number;
@@ -249,5 +251,57 @@ export interface StatsData {
   };
 }
 
+export interface CharmSkill {
+  skill: {
+    id: number;
+    name: string;
+  };
+  level: number;
+  description: string;
+  id: number;
+
+  name?: null;
+}
+
+export interface CharmMaterial {
+  item: {
+    id: number;
+    gameId: number;
+    rarity: number;
+    name: string;
+    description: string;
+    value: number;
+    carryLimit: number;
+    recipes: any[];
+  };
+  quantity: number;
+  id: number;
+}
+
+export interface CharmCrafting {
+  charmRank: {
+    id: number;
+  };
+  craftable: boolean;
+  materials: CharmMaterial[];
+  zennyCost: number;
+  id: number;
+}
+
+export interface Charm {
+  id: number;
+  charm: {
+    id: number;
+    gameId: number;
+  };
+  name: string;
+  description: string;
+  level: number;
+  rarity: number;
+  skills: CharmSkill[];
+  crafting?: CharmCrafting;
+  slots: number[];
+}
+
 // Generic EquipmentComponent interface to represent any armor piece or weapon
-export type EquipmentComponent = ArmorPiece | Weapon;
+export type EquipmentComponent = ArmorPiece | Weapon | Charm

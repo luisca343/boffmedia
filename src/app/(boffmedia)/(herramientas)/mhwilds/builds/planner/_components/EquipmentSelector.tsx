@@ -27,7 +27,7 @@ interface EquipmentSelectorProps {
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   onClose: () => void;
   isLoading: boolean;
-  equipmentData: ArmorPiece[] | Weapon[];
+  equipmentData: EquipmentType
 }
 
 export function EquipmentSelector({ 

@@ -22,19 +22,23 @@ import {
 import { useGameData } from "./_hooks/useGameData";
 import { getAllWeaponElements } from "./_components/equipment-utils";
 import { BuildImport } from "./_components/BuildImport";
+import { CharmSelector } from "./_components/CharmSelector";
 
 export default function BuildPlanner() {
   const {
     skills: skillsData, 
     weapons,
-    armor, 
+    armor,
+    charms,
     decorations,
     loadingWeapons,
     loadingArmor,
     loadingDecorations,
+    loadingCharms,
     getWeaponById,
     getArmorById,
-    getDecorationById
+    getDecorationById,
+    getCharmById
   } = useGameData();
   
   const importBuildFromUrl = useCallback(() => {
@@ -87,9 +91,10 @@ export default function BuildPlanner() {
     armsId: null,
     waistId: null,
     legsId: null,
+    charmId: null, // Add charmId
     decorations: [],
   });
-
+  
   console.log("Current Build:", currentBuild);
   
   // State for the currently selected equipment slot
@@ -112,16 +117,16 @@ export default function BuildPlanner() {
   
   const isLoading = loadingWeapons || loadingArmor || loadingDecorations;
 
-  // Get equipment by slot type for direct passing to EquipmentSelector
   const getEquipmentBySlot = useCallback((slotType: EquipmentType) => {
     if (slotType === 'weapon') {
       return weapons;
+    } else if (slotType === 'charm') {
+      return charms; // Return charms when charm slot is selected
     } else {
       return armor.filter(item => item.kind === slotType);
     }
-  }, [armor, weapons]);
+  }, [armor, weapons, charms]); // Add charms to dependencies
   
-  // Convert the ID-based build to a full object build for components that need it
   const buildWithFullObjects = useMemo<BuildData>(() => {
     return {
       name: currentBuild.name,
@@ -131,6 +136,7 @@ export default function BuildPlanner() {
       arms: getArmorById(currentBuild.armsId),
       waist: getArmorById(currentBuild.waistId),
       legs: getArmorById(currentBuild.legsId),
+      charm: getCharmById(currentBuild.charmId), // Add charm
       decorations: currentBuild.decorations.map(decoAssign => ({
         equipmentType: decoAssign.equipmentType,
         slotIndex: decoAssign.slotIndex,
@@ -142,8 +148,10 @@ export default function BuildPlanner() {
     currentBuild, 
     getWeaponById, 
     getArmorById, 
-    getDecorationById
+    getDecorationById,
+    getCharmById // Add getCharmById to dependencies
   ]);
+
 
   const calculateTotalSkills = (): Skill[] => {
     // Use a Map to track skills by their name for proper merging
@@ -191,6 +199,21 @@ export default function BuildPlanner() {
     // Add skills from weapon if present
     if (buildWithFullObjects.weapon?.skills) {
       addSkillsFromItem(buildWithFullObjects.weapon.skills);
+    }
+    
+    // Add skills from charm if present
+    if (buildWithFullObjects.charm?.skills) {
+      addSkillsFromItem(buildWithFullObjects.charm.skills.map(skill => ({
+        skill: {
+          id: skill.skill.id,
+          gameId: 0,
+          name: skill.skill.name,
+          kind: 'charm'
+        },
+        level: skill.level,
+        description: skill.description,
+        id: skill.id
+      })));
     }
     
     // Add skills from decorations
@@ -294,6 +317,7 @@ export default function BuildPlanner() {
     });
     
     // Apply skill effects (simplified example)
+    /*
     const skills = calculateTotalSkills();
     
     // Example: Attack Boost skill adds attack and affinity
@@ -313,7 +337,7 @@ export default function BuildPlanner() {
       // Approximation of Critical Eye skill effect
       const affinityBonus = [0, 5, 10, 15, 20, 25, 30, 40];
       stats.affinity += affinityBonus[criticalEye.level];
-    }
+    }*/
     
     return stats;
   };
@@ -361,23 +385,40 @@ export default function BuildPlanner() {
         {/* Left panel - Equipment Selection & Current Build */}
         <div className="lg:col-span-8">
           {selectedSlot ? (
-            <EquipmentSelector 
-              slotType={selectedSlot}
-              currentBuild={buildWithFullObjects}
-              setCurrentBuild={(updatedBuild) => {
-                // Extract the updated equipment and store its ID
-                const updatedEquipment = updatedBuild[selectedSlot];
-                setCurrentBuild({
-                  ...currentBuild,
-                  [`${selectedSlot}Id`]: updatedEquipment ? updatedEquipment.id : null
-                });
-              }}
-              filters={filters}
-              setFilters={setFilters}
-              onClose={closeSelector}
-              isLoading={isLoading}
-              equipmentData={getEquipmentBySlot(selectedSlot)}
-            />
+            selectedSlot === 'charm' ? (
+              <CharmSelector
+                charms={charms}
+                currentBuild={buildWithFullObjects}
+                setCurrentBuild={(updatedBuild) => {
+                  setCurrentBuild({
+                    ...currentBuild,
+                    charmId: updatedBuild.charm ? updatedBuild.charm.id.toString() : null
+                  });
+                }}
+                filters={filters}
+                setFilters={setFilters}
+                onClose={closeSelector}
+                isLoading={loadingCharms}
+              />
+            ) : (
+              <EquipmentSelector 
+                slotType={selectedSlot}
+                currentBuild={buildWithFullObjects}
+                setCurrentBuild={(updatedBuild) => {
+                  // Extract the updated equipment and store its ID
+                  const updatedEquipment = updatedBuild[selectedSlot];
+                  setCurrentBuild({
+                    ...currentBuild,
+                    [`${selectedSlot}Id`]: updatedEquipment ? updatedEquipment.id : null
+                  });
+                }}
+                filters={filters}
+                setFilters={setFilters}
+                onClose={closeSelector}
+                isLoading={isLoading}
+                equipmentData={getEquipmentBySlot(selectedSlot)}
+              />
+            )
           ) : selectedDecoration ? (
             <DecorationSelector
               decorations={decorations}
@@ -433,17 +474,17 @@ export default function BuildPlanner() {
             />
           ) : (
             <>
-            <BuildDisplay 
-              currentBuild={buildWithFullObjects}
-              onSlotClick={handleSlotClick}
-              onDecorationClick={handleDecorationClick}
-            />
-            <BuildImport 
-              onImport={(importedBuild) => {
-                setCurrentBuild(importedBuild);
-              }} 
-            />
-          </>
+              <BuildDisplay 
+                currentBuild={buildWithFullObjects}
+                onSlotClick={handleSlotClick}
+                onDecorationClick={handleDecorationClick}
+              />
+              <BuildImport 
+                onImport={(importedBuild) => {
+                  setCurrentBuild(importedBuild);
+                }} 
+              />
+            </>
           )}
         </div>
 

@@ -12,6 +12,7 @@ import {
   ArrowBigRight,
   CircleDot,
   Footprints,
+  Medal,
 } from "lucide-react";
 import { 
   BuildData, 
@@ -115,6 +116,8 @@ export function BuildDisplay({
         </div>
       ) : 
       CircleDot;
+
+      const CharmIconComponent = Medal;
     
     const GreavesIconComponent = currentBuild.legs ? 
       (props: any) => (
@@ -180,6 +183,14 @@ export function BuildDisplay({
         iconColor: "text-cyan-400",
         hasCustomIcon: !!currentBuild.legs 
       },
+      {
+        key: 'charm' as EquipmentType,
+        name: t("charm"),
+        icon: CharmIconComponent,
+        component: currentBuild.charm,
+        iconColor: "text-amber-400",
+        hasCustomIcon: !!currentBuild.charm
+      }
     ];
   }, [currentBuild]);
 
@@ -232,7 +243,7 @@ export function BuildDisplay({
     );
   };
 
-  return (
+   return (
     <Card className="bg-surface-800 border-surface-700 mb-6">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center text-xl">

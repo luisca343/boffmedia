@@ -4,6 +4,7 @@ import {
   Info,
   EyeOff,
   Pill,
+  Medal
 } from "lucide-react";
 import {
   Tooltip,
@@ -17,6 +18,8 @@ import {
   ArmorPiece,
   Weapon,
   SkillRank,
+  Charm,
+  CharmSkill
 } from "./types";
 import { FC, ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
@@ -45,12 +48,17 @@ interface ComponentSlotProps {
 
 // Helper function to determine if a component is a weapon
 const isWeapon = (component: EquipmentComponent | null): component is Weapon => {
-  return component !== null && 'damage' in component;
+  return component !== null && ('damage' in component || 'attack' in component);
 };
 
 // Helper function to determine if a component is armor
 const isArmor = (component: EquipmentComponent | null): component is ArmorPiece => {
   return component !== null && 'resistances' in component;
+};
+
+// Helper function to determine if a component is a charm
+const isCharm = (component: EquipmentComponent | null): component is Charm => {
+  return component !== null && 'charm' in component;
 };
 
 // Extracted component for weapon details
@@ -143,8 +151,23 @@ const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
   </div>
 }
 
+// Extracted component for charm details
+const CharmDetails: FC<{ charm: Charm }> = ({ charm }) => {
+  const t = useTranslations("mhwilds");
+  return <div className="flex gap-3">
+    <span className="text-amber-400">{t("rarity")} {charm.rarity}</span>
+    <div className="flex gap-2">
+      {charm.skills.map((skill, idx) => (
+        <span key={idx} className="text-green-400">
+          {skill.skill.name} +{skill.level}
+        </span>
+      ))}
+    </div>
+  </div>
+}
+
 // Extracted component for skills
-const SkillsList: FC<{ skills: SkillRank[] }> = ({ skills }) => {
+const SkillsList: FC<{ skills: SkillRank[] | CharmSkill[] }> = ({ skills }) => {
   const t = useTranslations("mhwilds");
 
     return <div className="mt-2 text-xs flex flex-wrap items-center gap-x-2">
@@ -202,6 +225,12 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                 />
                 {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
               </div>
+            ) : slot.key === 'charm' ? (
+              // For charms
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <Medal className={`h-8 w-8 ${!slot.component ? 'text-surface-500' : 'text-amber-400'}`} />
+                {!slot.component && <Plus className="h-4 w-4 text-surface-400 absolute bottom-0 right-0" />}
+              </div>
             ) : (
               /* For armor pieces */
               <div className="relative w-10 h-10">
@@ -252,7 +281,9 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
                 {isWeapon(slot.component) ? 
                   <WeaponDetails weapon={slot.component} /> : 
                   isArmor(slot.component) ? 
-                  <ArmorDetails armor={slot.component} /> : null
+                  <ArmorDetails armor={slot.component} /> :
+                  isCharm(slot.component) ?
+                  <CharmDetails charm={slot.component} /> : null
                 }
               </div>
               

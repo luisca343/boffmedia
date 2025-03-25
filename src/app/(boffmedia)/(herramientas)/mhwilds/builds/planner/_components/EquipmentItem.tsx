@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArmorPiece, EquipmentType, Weapon } from "./types";
+import { ArmorPiece, Charm, EquipmentType, Weapon } from "./types";
 import Image from "next/image";
 import { 
   getElementColor, 
@@ -17,10 +17,10 @@ import {
 import { useTranslations } from "next-intl";
 
 interface EquipmentItemProps {
-  item: ArmorPiece | Weapon;
+  item: ArmorPiece | Weapon | Charm;
   slotType: EquipmentType;
   index: number;
-  onSelect: (item: ArmorPiece | Weapon) => void;
+  onSelect: (item: ArmorPiece | Weapon | Charm) => void;
 }
 
 export const EquipmentItem = ({ item, slotType, index, onSelect }: EquipmentItemProps) => {
