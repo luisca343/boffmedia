@@ -18,7 +18,7 @@ import {
   EquipmentType,
   SkillRank,
   BuildDataWithIds
-} from "./_components/types";
+} from "../../../../../../types/tools/mhwilds";
 import { useGameData } from "./_hooks/useGameData";
 import { getAllWeaponElements } from "./_components/equipment-utils";
 import { BuildImport } from "./_components/BuildImport";

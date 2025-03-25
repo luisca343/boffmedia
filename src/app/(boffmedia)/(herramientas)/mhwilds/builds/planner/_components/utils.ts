@@ -1,4 +1,4 @@
-import { DefenseData, ElementData } from "./types";
+import { DefenseData, ElementData } from "../../../../../../../types/tools/mhwilds";
 
 // Utility function for decoration slots
 export const getSlotColorClass = (size: number): string => {

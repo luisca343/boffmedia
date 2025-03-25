@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Skill } from "./types";
+import { Skill } from "../../../../../../../types/tools/mhwilds";
 import { useTranslations } from "next-intl";
 
 // Define a type for the server-side skill data

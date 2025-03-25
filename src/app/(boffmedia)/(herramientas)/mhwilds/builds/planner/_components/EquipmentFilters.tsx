@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Filters, EquipmentType } from "./types";
+import { Filters, EquipmentType } from "../../../../../../../types/tools/mhwilds";
 import { useTranslations } from "next-intl";
 
 interface EquipmentFiltersProps {

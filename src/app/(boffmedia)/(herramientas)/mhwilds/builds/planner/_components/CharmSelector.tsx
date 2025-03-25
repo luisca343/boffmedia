@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { BuildData, Charm, Filters } from "./types";
+import { BuildData, Charm, Filters } from "../../../../../../../types/tools/mhwilds";
 import { CurrentEquipment } from "./CurrentEquipment";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";

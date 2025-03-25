@@ -9,7 +9,7 @@ import { SharpnessBar } from "./SharpnessBar";
 import { ElementalResistances } from "./ElementalResistances";
 import { Droplet, Zap, Snowflake, Skull, Flame, EyeOff, Shield, Swords, Target, Pill } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "./types";
+import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "../../../../../../../types/tools/mhwilds";
 import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";

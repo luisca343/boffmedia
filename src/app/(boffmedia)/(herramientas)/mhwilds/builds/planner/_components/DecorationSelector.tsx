@@ -22,7 +22,7 @@ import {
   EquipmentType, 
   Decoration,
   Filters
-} from "./types";
+} from "../../../../../../../types/tools/mhwilds";
 import { useTranslations } from "next-intl";
 
 interface DecorationSelectorProps {

@@ -14,7 +14,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
-import { BuildDataWithIds, BuildData, StatsData, Skill } from "./types";
+import { BuildDataWithIds, BuildData, StatsData, Skill } from "../../../../../../../types/tools/mhwilds";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,

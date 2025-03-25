@@ -20,7 +20,7 @@ import {
   SkillRank,
   Charm,
   CharmSkill
-} from "./types";
+} from "../../../../../../../types/tools/mhwilds";
 import { FC, ReactNode } from "react";
 import { LucideIcon } from "lucide-react";
 import { getElementColor, getDefenseValue, getStatusColor, getWeaponTypeIcon, getArmorImagePath, getRarityFilterStyle } from "./equipment-utils";

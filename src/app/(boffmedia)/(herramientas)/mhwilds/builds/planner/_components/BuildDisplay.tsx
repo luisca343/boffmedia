@@ -18,7 +18,7 @@ import {
   BuildData, 
   EquipmentType, 
   Decoration, 
-} from "./types";
+} from "../../../../../../../types/tools/mhwilds";
 import { GiDwarfHelmet, GiSwapBag } from "react-icons/gi";
 import { useMemo } from "react";
 import { getSlotColorClass } from "./utils";

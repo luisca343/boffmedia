@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
-import { Decoration, ArmorPiece, Weapon, Charm } from '../_components/types';
+import { Decoration, ArmorPiece, Weapon, Charm } from '../../../../../../../types/tools/mhwilds';
+import { mhWildsService } from '@/services/api/tools/mhWildsService';
 
 // Define a type for the server-side skill data
 export interface ServerSkill {
@@ -87,8 +87,8 @@ export function useGameData() {
   const fetchDecorations = async () => {
     setLoadingDecorations(true);
     try {
-      const response = await axios.get("https://api.ficuslab.es/data/mhwilds/decorations.json");
-      setDecorations(response.data);
+      const response = await mhWildsService.getDecorations();
+      setDecorations(response.data!);
       setDecorationsError(null);
     } catch (err) {
       console.error("Error fetching decorations:", err);
@@ -102,8 +102,8 @@ export function useGameData() {
   const fetchWeapons = async () => {
     setLoadingWeapons(true);
     try {
-      const response = await axios.get("https://api.ficuslab.es/data/mhwilds/weapons.json");
-      setWeapons(response.data);
+      const response = await mhWildsService.getWeapons();
+      setWeapons(response.data!);
       setWeaponsError(null);
     } catch (err) {
       console.error("Error fetching weapons:", err);
@@ -117,8 +117,8 @@ export function useGameData() {
   const fetchArmor = async () => {
     setLoadingArmor(true);
     try {
-      const response = await axios.get("https://api.ficuslab.es/data/mhwilds/armor.json");
-      setArmor(response.data);
+      const response = await mhWildsService.getArmor();
+      setArmor(response.data!);
       setArmorError(null);
     } catch (err) {
       console.error("Error fetching armor:", err);
@@ -132,12 +132,12 @@ export function useGameData() {
   const fetchSkills = async () => {
     setLoadingSkills(true);
     try {
-      const response = await axios.get("https://api.ficuslab.es/data/mhwilds/skills.json");
+      const response = await mhWildsService.getSkills();
       
       // Create a lookup map by both ID and name for faster access
       const skillsMap: Record<string, EnhancedSkill> = {};
       
-      response.data.forEach((skill: ServerSkill) => {
+      response.data!.forEach((skill: ServerSkill) => {
         // Calculate max level for each skill
         const maxLevel = skill.ranks.reduce((max, rank) => 
           rank.level > max ? rank.level : max, 0);
@@ -168,13 +168,9 @@ export function useGameData() {
   const fetchCharms = async () => {
     setLoadingCharms(true);
     try {
-      const response = await axios.get("https://api.ficuslab.es/tools/mhwilds/ranks");
-      if (response.status === 200 && response.data.data) {
-        setCharms(response.data.data);
-        setCharmsError(null);
-      } else {
-        throw new Error("Invalid charm data format");
-      }
+      const response = await mhWildsService.getCharms();
+      setCharms(response.data!);
+      setCharmsError(null);
     } catch (err) {
       console.error("Error fetching charms:", err);
       setCharmsError("Error al cargar los amuletos. Por favor, inténtalo de nuevo.");

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
-import { ArmorPiece, Charm, EquipmentType, Weapon } from "./types";
+import { ArmorPiece, Charm, EquipmentType, Weapon } from "../../../../../../../types/tools/mhwilds";
 import { getDefenseValue, getEquipmentIcon, getIconColor, getRarityStyle } from "./equipment-utils";
 import { useTranslations } from "next-intl";
 

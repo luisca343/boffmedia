@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { StatsData } from "./types";
+import { StatsData } from "../../../../../../../types/tools/mhwilds";
 import Image from "next/image";
 
 interface ElementalResistancesProps {

@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArmorPiece, BuildData, Charm, EquipmentType, Filters, Weapon } from "./types";
+import { ArmorPiece, BuildData, Charm, EquipmentType, Filters, Weapon } from "../../../../../../../types/tools/mhwilds";
 import { getEquipmentDisplayName, getEquipmentIcon, getIconColor } from "./equipment-utils";
 import { EquipmentFilters } from "./EquipmentFilters";
 import { EquipmentItem } from "./EquipmentItem";

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Copy, Save, Share, Download, Link, Camera, Info, ChevronLeft } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { BuildDataWithIds, BuildData, StatsData, Skill } from "./types";
+import { BuildDataWithIds, BuildData, StatsData, Skill } from "../../../../../../../types/tools/mhwilds";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,

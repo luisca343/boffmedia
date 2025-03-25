@@ -1,4 +1,4 @@
-import { ArmorPiece, EquipmentType, Weapon } from "./types";
+import { ArmorPiece, EquipmentType, Weapon } from "../../../../../../../types/tools/mhwilds";
 import { LucideIcon, Medal } from "lucide-react";
 import { 
   Sword, 
