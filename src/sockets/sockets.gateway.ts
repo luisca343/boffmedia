@@ -37,13 +37,14 @@ import {
   
       // If the user already has a connection, disconnect the old one
       const existingUser = this.users.get(smartRotomUser.uuid)
+      /*
       if (existingUser && existingUser.socketId !== client.id) {
         const oldSocket = this.server.sockets.sockets.get(existingUser.socketId)
         if (oldSocket) {
           console.log(`Disconnecting old socket for user ${smartRotomUser.uuid}`)
           oldSocket.disconnect(true)
         }
-      }
+      }*/
   
       // Update or add the new connection
       this.users.set(smartRotomUser.uuid, { uuid: smartRotomUser.uuid, socketId: client.id })
