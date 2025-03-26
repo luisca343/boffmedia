@@ -405,7 +405,7 @@ export class TgcpScraperService {
   }
 
   private async saveCardImage(imageUrl: string, setName: string, cardNumber: number): Promise<string> {
-    const localPath = `/tcgpocket/cards/${setName}/${cardNumber}.jpg`;
+    const localPath = `/games/tcgpocket/cards/${setName}/${cardNumber}.jpg`;
     
     if (await this.configService.imageExists(localPath)) {
       this.logger.debug(`Card image already exists: ${localPath}`);
