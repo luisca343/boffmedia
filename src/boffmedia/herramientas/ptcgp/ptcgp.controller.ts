@@ -8,6 +8,7 @@ import { TgcpPackService } from './pack.service';
 import { TgcpScraperService } from './scraper.service';
 import { PtcgpBattleService } from './battle.service';
 import { promises as fsPromises } from 'fs';
+import path from 'path';
 
 @ApiTags('/herramientas/ptcgp')
 @Controller('/herramientas/ptcgp')
@@ -245,7 +246,8 @@ export class PtcgpController {
     @ApiResponse({ status: 200, description: 'Battle data found successfully.' })
     @ApiResponse({ status: 500, description: 'Failed to find battle data.' })
     async getBattleData2(@Param('id') id: string): Promise<any> {
-      const data = await fsPromises.readFile(`public/data/tcgpocket/battles/${id}.json`, 'utf8');
+      const uri  = path.join(process.cwd(), `public/data/tcgpocket/battles/${id}.json`);
+      const data = await fsPromises.readFile(uri, 'utf8');
       const battleData = JSON.parse(data);
       return battleData;
         
@@ -264,7 +266,7 @@ export class PtcgpController {
     @ApiResponse({ status: 200, description: 'Solo battles found successfully.' })
     @ApiResponse({ status: 500, description: 'Failed to find solo battles.' })
     async getSoloBattles2(): Promise<any> {
-        const battles = await fsPromises.readFile('public/data/tcgpocket/solobattles.json', 'utf8');
+        const battles = await fsPromises.readFile(path.join(process.cwd(),'public/data/tcgpocket/solobattles.json'), 'utf8');
         return JSON.parse(battles);
     }
 }

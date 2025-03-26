@@ -80,6 +80,8 @@ export class TgcpScraperService {
     }
   }
 
+  
+
   async startFetch(): Promise<any> {
     this.updateFetchStatus('fetching', 'Cargando datos de Serebii...');
     try {

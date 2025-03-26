@@ -14,12 +14,12 @@ export class MhwildsController {
         private readonly wildsService: MhwildsService,
     ) {}
     
-    @Get("/weapons")
+    @Get("/weapons/:locale")
     @ApiOperation({ summary: 'Get all weapons' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Weapons found successfully.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to find weapons.' })
-    async findAllWeapons() {
-        const weapons = await this.wildsService.getWeapons();
+    async findAllWeapons(@Param('locale') locale: string) {
+        const weapons = await this.wildsService.getWeapons(locale);
         
         return {
             status: HttpStatus.OK,
@@ -28,12 +28,12 @@ export class MhwildsController {
         }
     }
 
-    @Get("/armor")
+    @Get("/armor/:locale")
     @ApiOperation({ summary: 'Get all armor' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Armor found successfully.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to find armor.' })
-    async findAllArmor() {
-        const armor = await this.wildsService.getArmor();
+    async findAllArmor(@Param('locale') locale: string) {
+        const armor = await this.wildsService.getArmor(locale);
         
         return {
             status: HttpStatus.OK,
@@ -42,12 +42,12 @@ export class MhwildsController {
         }
     }
 
-    @Get("/decorations")
+    @Get("/decorations/:locale")
     @ApiOperation({ summary: 'Get all decorations' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Decorations found successfully.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to find decorations.' })
-    async findAllDecorations() {
-        const decorations = await this.wildsService.getDecorations();
+    async findAllDecorations(@Param('locale') locale: string) {
+        const decorations = await this.wildsService.getDecorations(locale);
         
         return {
             status: HttpStatus.OK,
@@ -56,12 +56,12 @@ export class MhwildsController {
         }
     }
 
-    @Get("/charms")
+    @Get("/charms/:locale")
     @ApiOperation({ summary: 'Get all charms' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Charms found successfully.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to find charms.' })
-    async findAllCharms() {
-        const charms = await this.wildsService.getCharms();
+    async findAllCharms(@Param('locale') locale: string) {
+        const charms = await this.wildsService.getCharms(locale);
         return {
             status: HttpStatus.OK,
             message: "Charms found successfully",
@@ -69,12 +69,12 @@ export class MhwildsController {
         }
     }
 
-    @Get("/skills")
+    @Get("/skills/:locale")
     @ApiOperation({ summary: 'Get all skills' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Skills found successfully.' })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to find skills.' })
-    async findAllSkills() {
-        const skills = await this.wildsService.getSkills();
+    async findAllSkills(@Param('locale') locale: string) {
+        const skills = await this.wildsService.getSkills(locale);
         return {
             status: HttpStatus.OK,
             message: "Skills found successfully",
@@ -82,13 +82,13 @@ export class MhwildsController {
         }
     }
 
-    @Get("/ranks")
+    @Get("/ranks/:locale")
     @ApiOperation({ summary: 'Get all charm ranks' })
     @ApiResponse({status: HttpStatus.OK, description: 'Charm ranks found successfully.',  example: CharmRankExample })
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to find charm ranks.', example: { status: 500, message: "Failed to find charm ranks", error: "Error message" } })
-    async findAllCharmRanks() {
+    async findAllCharmRanks(@Param('locale') locale: string) {
         try {
-            const ranks = await this.wildsService.getAllCharmRanks();
+            const ranks = await this.wildsService.getAllCharmRanks(locale);
             return {
                 status: HttpStatus.OK,
                 message: "Charm ranks found successfully",
@@ -102,5 +102,4 @@ export class MhwildsController {
             };
         }
     }
-    
 }
