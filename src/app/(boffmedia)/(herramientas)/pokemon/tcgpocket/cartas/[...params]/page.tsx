@@ -31,8 +31,8 @@ export default function Expansions({
 
   useEffect(() => {
     boffGET(`/herramientas/ptcgp/cards/${expansion}/${id}`).then(
-      (data) => {
-        setCardData(data.data as Card);
+      (data: any) => {
+        setCardData(data as Card);
       }
     );
   }, [expansion, id]);

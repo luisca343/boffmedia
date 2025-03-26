@@ -244,7 +244,7 @@ export function BuildDisplay({
           return (
             <motion.div 
               key={idx} 
-              className="w-full h-5 rounded flex items-center justify-end cursor-pointer border border-transparent hover:border-white/70 transition-all"
+              className="w-full h-5 rounded flex items-center justify-start gap-2 cursor-pointer border border-surface-600/70 hover:border-surface-500/70 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               onClick={(e) => {
@@ -257,12 +257,12 @@ export function BuildDisplay({
                 : `Empty decoration slot size ${slotSize}`
               }
             >
+            <span className={`flex h-full items-center justify-center bg-surface-900/50 px-2 text-xs font-medium `}>
+              {decoration ? decoration.slot : slotSize}
+            </span>
             <span className="mr-2 text-xs truncate text-surface-300">
               {decoration ? decoration.name : t("empty_slot", { defaultValue: "Vacío" })}
             </span>
-              <span className={`flex h-full items-center justify-center bg-surface-900/50 px-2 text-xs font-medium ${decoration ? getSlotColorClass(decoration.slot) : getSlotColorClass(slotSize)}`}>
-                {decoration ? decoration.slot : slotSize}
-              </span>
             </motion.div>
           );
         })}

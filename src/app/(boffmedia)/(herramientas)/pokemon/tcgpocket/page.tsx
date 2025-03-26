@@ -4,28 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
-  Search, 
-  Users, 
-  CreditCard, 
-  ChevronRight, 
-  SwordIcon, 
-  Sparkles,
-  ArrowRight,
-  Database,
-  BookOpen,
-} from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Users, CreditCard, SwordIcon, Sparkles, ArrowRight } from "lucide-react";
 
 export default function TCGPocket() {
   const [username, setUsername] = useState("");

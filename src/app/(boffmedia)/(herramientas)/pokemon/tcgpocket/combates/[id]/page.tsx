@@ -9,14 +9,14 @@ import { getTranslations } from 'next-intl/server'
 
 export default async function Combates({params} : {params: {id: string}}) {
   const { id } = params
-  const data = (await boffGET(`/herramientas/ptcgp/combate2/${id}`)).data as QuestData
+  const data = (await boffGET(`/herramientas/ptcgp/combate2/${id}`)) as any as QuestData
   const totalRewards = calculateTotalRewards(data.quests, data.commonRewards)
   const trans = await getTranslations('tcgpocket')
   if(!data) return <div>loading...</div>
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">Combates Individuales</h1>
+      <h1 className="text-4xl font-bold mb-8 text-surface-200">Combates Individuales</h1>
       
       <Card className="mb-8">
         <CardHeader>

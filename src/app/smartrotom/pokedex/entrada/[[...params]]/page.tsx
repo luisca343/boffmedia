@@ -17,7 +17,7 @@ import  { getForm, getFormName, getPokemonCoverage, getPokemonDefense, getPokemo
 
 
 export default async function EntradaPokedex({params}: any){
-    const formsTranslation  = await getTranslations("");
+    const t = await getTranslations("pokedex");
     
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
     
@@ -65,7 +65,7 @@ export default async function EntradaPokedex({params}: any){
             <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next} />
             <section className="flex flex-col  bg-surface-800 overflow-auto p-4">
             <PokedexSection id='info' title="Información">
-            <BasicInfo pokemon={pokemon} formIndex={formIndex} formName={formName} formsTranslation={formsTranslation} />
+            <BasicInfo pokemon={pokemon} formIndex={formIndex} formName={formName} />
             </PokedexSection>
             
             <PokedexSection id='evotree' title="Árbol Evolutivo">
@@ -80,7 +80,7 @@ export default async function EntradaPokedex({params}: any){
                     href={`/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}>
                     <div className="flex flex-col p-2 justify-center items-center">
                     <PokemonSprite width={100} height={100} id={pokemonIndex} form={form.name || 'base'} palette='none'/>
-                    {getForm(form.name, formsTranslation) || 'Base'}
+                    {getForm(form.name, t) || 'Base'}
                     </div>
                     </InternalLink>
                 })}
@@ -114,7 +114,7 @@ export default async function EntradaPokedex({params}: any){
                     {palette.map((palette, index) => {
                         return <div key={index} className="flex flex-col p-2 justify-center items-center">
                         <PokemonSprite width={80} height={80} id={pokemonIndex} form={formName} palette={palette.name} hide={false} showStatus={false}/>
-                        <span>{formsTranslation(`palette_${palette.name}`)}</span>
+                        <span>{t(`palette_${palette.name}`)}</span>
                         </div>
                     })}
                     </div>

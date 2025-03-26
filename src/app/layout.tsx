@@ -24,7 +24,7 @@ export default async function RootLayout({
   } catch (error) {
     console.error("Error loading locale or messages:", error)
     // Fallback to default values if there's an error
-    locale = "es"
+    locale = "en"
     messages = {}
   }
 

@@ -8,10 +8,7 @@ import { ItemSprite, PokemonSpriteLink } from "../../../_components/PokemonSprit
 
 export async function EvoTree({params}: {params: {id: string}}){
     const {tree, depth} = (await pokemonService.getEvoTree(parseInt(params.id))).data!
-    const t  = await getTranslations("");
-    const evoTrans  = await getTranslations("");
-    const biomeTrans  = await getTranslations("");
-    const moveTrans  = await getTranslations("");
+    const t  = await getTranslations("pokedex");
 
     function renderTree(tree: SubTree){
         return <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
@@ -65,23 +62,23 @@ export async function EvoTree({params}: {params: {id: string}}){
                 let [modId, itemId] = evolution.item?.itemID.split(':') || []
                 conditions.push(
                     <div className="flex items-center justify-center">
-                        <span className='mx-1'>{evoTrans(`evolution_interact`, {item: evoTrans(`item_${itemId}`)})}</span>
+                        <span className='mx-1'>{t(`evolution_interact`, {item: t(`item_${itemId}`)})}</span>
                         <ItemSprite name={itemId} width={30} height={30}/>
                     </div>
                 )
                 break
             case "leveling":
-                if(evolution.level) conditions.push(evoTrans(`evolution_level`, {level: evolution.level}))
-                else conditions.push(evoTrans(`evolution_leveling`))
+                if(evolution.level) conditions.push(t(`evolution_level`, {level: evolution.level}))
+                else conditions.push(t(`evolution_leveling`))
                 break
             case "trade":
-                conditions.push(evoTrans(`evolution_trade`))
+                conditions.push(t(`evolution_trade`))
                 break
             case "ticking":
-                conditions.push(evoTrans(`evolution_ticking`))
+                conditions.push(t(`evolution_ticking`))
                 break
             case "emptyslot":
-                conditions.push(evoTrans(`evolution_emptyslot`))
+                conditions.push(t(`evolution_emptyslot`))
                 break
             default:
                 conditions.push(evolution.evoType)
@@ -92,36 +89,36 @@ export async function EvoTree({params}: {params: {id: string}}){
                 const conditionType = condition.evoConditionType
                 if(conditionType == "friendship") {
                     const value = condition.friendship
-                    conditions.push(evoTrans(`evolution_friendship`, {value}))
+                    conditions.push(t(`evolution_friendship`, {value}))
                 } 
                 else if(conditionType == "time") {
                     const value = condition.time
-                    conditions.push(evoTrans(`time_${value.toLowerCase()}`))
+                    conditions.push(t(`time_${value.toLowerCase()}`))
                 }
                 else if(conditionType == "moveType") {
                     const type = condition.type
-                    conditions.push(evoTrans(`evolution_moveType`, {type}))
+                    conditions.push(t(`evolution_moveType`, {type}))
                 }
                 else if(conditionType == "biome") {
                     const biomeStrs = condition.biomes as string[]
                     const biomes = [] as string[]
                     biomeStrs.forEach((biome) => {
                         if(biome.includes("biomesoplenty") || biome.includes("terraforged")) return
-                        biomes.push(biomeTrans(biome.replace(" ", "_").replace(':', '_')))
+                        biomes.push(t(biome.replace(" ", "_").replace(':', '_')))
                     })
                     conditions.push(<HoverCard>
                         <HoverCardTrigger className='underline hover:cursor-pointer'>En Biomas</HoverCardTrigger>
-                        <HoverCardContent className="w-96 bg-surface-800 text-surface-50">{biomes.map(biome => biomeTrans(biome)).join(', ')}</HoverCardContent>
+                        <HoverCardContent className="w-96 bg-surface-800 text-surface-50">{biomes.map(biome => t(biome)).join(', ')}</HoverCardContent>
                     </HoverCard>)
                 }
                 else if(conditionType == "evolutionRock") {
                     const evolutionRock = condition.evolutionRock
-                    conditions.push(evoTrans(`evolution_rock`, {evolutionRock: t(`${evolutionRock}`)}))
+                    conditions.push(t(`evolution_rock`, {evolutionRock: t(`${evolutionRock}`)}))
                 }
                 else if(conditionType == "nature" || conditionType == "evolution_nature") {
                     const natures = condition.natures
-                    const nature = natures.map((nature: string) => evoTrans(`nature_${nature.toLowerCase()}`)).join(", ")
-                    conditions.push(evoTrans(`evolution_nature`, {nature}))
+                    const nature = natures.map((nature: string) => t(`nature_${nature.toLowerCase()}`)).join(", ")
+                    conditions.push(t(`evolution_nature`, {nature}))
                 }
                 else if(conditionType == "party"){
                     const partyMembers = []
@@ -135,20 +132,20 @@ export async function EvoTree({params}: {params: {id: string}}){
                     partyMembers.push(...withForms)
                     partyMembers.push(...withPalettes)
                     
-                    conditions.push(evoTrans(`evolution_party`, {party: partyMembers.join(", ")}))
+                    conditions.push(t(`evolution_party`, {party: partyMembers.join(", ")}))
                 }
                 else if (conditionType == "heldItem") {
                     const [modId, itemId] = condition.item.itemID.split(':') || []
                     conditions.push(
                         <div className="flex items-center justify-center">
-                            <span className='mx-1'>{evoTrans(`evolution_heldItem`, {item: evoTrans(`item_${itemId}`)})}</span>
+                            <span className='mx-1'>{t(`evolution_heldItem`, {item: t(`item_${itemId}`)})}</span>
                             <ItemSprite name={itemId} width={30} height={30}/>
                         </div>
                     )
                 }
                 else if (conditionType == "critical") {
                     const critical = condition.critical
-                    conditions.push(evoTrans(`evolution_critical`, {critical}))
+                    conditions.push(t(`evolution_critical`, {critical}))
                 }
                 else if (conditionType == "statRatio") {
                     const stat1 = condition.stat1
@@ -156,37 +153,37 @@ export async function EvoTree({params}: {params: {id: string}}){
                     const ratio = condition.ratio
 
                     if(ratio === 1){
-                        conditions.push(evoTrans(`evolution_statRatio`, {stat1, stat2}))
+                        conditions.push(t(`evolution_statRatio`, {stat1, stat2}))
                     }                 
                 }
                 else if (conditionType == "move") {
                     const attackName = condition.attackName.toLowerCase().replace(" ", "_")
-                    conditions.push(evoTrans(`evolution_move`, {attackName: moveTrans(`attack_${attackName}`)}))
+                    conditions.push(t(`evolution_move`, {attackName: t(`attack_${attackName}`)}))
                 }
                 else if (conditionType == "status") {
                     const status = condition.type.toLowerCase()
-                    conditions.push(evoTrans(`evolution_status`, {status: evoTrans(`status_${status}`)}))
+                    conditions.push(t(`evolution_status`, {status: t(`status_${status}`)}))
                 }
                 else if(conditionType == "chance") {
                     const chance = condition.chance * 100
-                    conditions.push(evoTrans(`evolution_chance`, {chance}))
+                    conditions.push(t(`evolution_chance`, {chance}))
                 }
                 else if(conditionType == "moveUses") {
                     const move = condition.move.toLowerCase().replace(" ", "_") as string
                     const uses = condition.uses as number
-                    conditions.push(evoTrans(`evolution_moveuses`, {move: moveTrans(`attack_${move}`), uses}))
+                    conditions.push(t(`evolution_moveuses`, {move: t(`attack_${move}`), uses}))
                 }
                 else if(conditionType == "gender") {
                     const genders = condition.genders as string[]	
-                    conditions.push(evoTrans(`evolution_gender`, {genders: genders?.join(", ")}))
+                    conditions.push(t(`evolution_gender`, {genders: genders?.join(", ")}))
                 }
                 else if(conditionType == "recoil") {
                     const recoil = condition.recoil as number
-                    conditions.push(evoTrans(`evolution_recoil`, {recoil}))
+                    conditions.push(t(`evolution_recoil`, {recoil}))
                 }
                 else if(conditionType == "healthAbsence") {
                     const health = condition.health as number
-                    conditions.push(evoTrans(`evolution_healthAbsence`, {health}))
+                    conditions.push(t(`evolution_healthAbsence`, {health}))
                 }
                 else if(conditionType == "shiny") {
                     const shiny = condition.shiny as boolean
@@ -194,26 +191,26 @@ export async function EvoTree({params}: {params: {id: string}}){
                 }
                 else if(conditionType == "highAltitude") {
                     const minAltitude = condition.minAltitude as number
-                    conditions.push(evoTrans(`evolution_highAltitude`, {minAltitude}))
+                    conditions.push(t(`evolution_highAltitude`, {minAltitude}))
                 }
                 else if(conditionType == "weather") {
                     const weather = condition.weather as string
-                    conditions.push(evoTrans(`evolution_weather`, {weather: evoTrans(`weather_${weather.toLowerCase()}`)}))
+                    conditions.push(t(`evolution_weather`, {weather: t(`weather_${weather.toLowerCase()}`)}))
                 }
                 else if(conditionType == "nuggets") {
                     const nuggets = condition.nuggets as number
-                    conditions.push(evoTrans(`evolution_nuggets`, {nuggets}))
+                    conditions.push(t(`evolution_nuggets`, {nuggets}))
                 }
                 else if(conditionType == "evolutionScroll") {
                     const scroll = condition.evolutionScroll as string
-                    conditions.push(evoTrans(`evolution_scroll`, {scroll: t(`${scroll}`)}))
+                    conditions.push(t(`evolution_scroll`, {scroll: t(`${scroll}`)}))
                 }
                 else if(conditionType == "blocksWalkedOutsideBall") {
                     const blocks = condition.blocksToWalk as number
-                    conditions.push(evoTrans(`evolution_blocksWalkedOutsideBall`, {blocks}))
+                    conditions.push(t(`evolution_blocksWalkedOutsideBall`, {blocks}))
                 }
                 else if (conditionType == "insideBattle"){
-                    conditions.push(evoTrans(`evolution_insideBattle`))
+                    conditions.push(t(`evolution_insideBattle`))
                 }
 
                 else {

@@ -1,20 +1,26 @@
-
+"use client"
 import type { Abilities } from "@/types/Pokemon"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import TypeBadge from "./TypeBadge"
 import { Pokemon } from "../../../_types/pokemon"
+import { useTranslations } from "next-intl"
 
 interface BasicInfoProps {
   pokemon: Pokemon
   formIndex: number
   formName: string
-  formsTranslation: (key: string) => string
 }
 
-export function BasicInfo({ pokemon, formIndex, formName, formsTranslation }: BasicInfoProps) {
+export function BasicInfo({ pokemon, formIndex, formName}: BasicInfoProps) {
+  console.log("=========== RENDERING BASIC INFO ===========")
+  const t = useTranslations("pokedex")
+  console.log(t("pixelmon_bulbasaur_description"))
   const types = pokemon.forms[formIndex].types ? pokemon.forms[formIndex].types : (pokemon.forms[0].types as any)
-  const description = formsTranslation(`pixelmon_${pokemon.name.toLowerCase()}_description`).split("_").join(".")
+  console.log("t", t)
+  console.log("Pokemon name:", pokemon.name.toLowerCase());
+  console.log("Translation key:", `pixelmon_${pokemon.name.toLowerCase()}_description`);
+  const description = t(`pixelmon_${pokemon.name.toLowerCase()}_description`)
   const rank = pokemon.forms[formIndex].rank
     ? pokemon.forms[formIndex].rank
     : (pokemon.forms[0].rank as { ranking: number; type1: string; type2: string; tier: string })

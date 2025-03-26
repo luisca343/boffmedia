@@ -5,11 +5,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Home, Menu } from "lucide-react"
+import { useLocale } from "next-intl"
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
 import { InternalLink } from "./Link"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import LanguageSwitcher from "./LanguageSwitcher"
 
 const NotificationPopover = dynamic(() => import("./NotificationPopover"), {
   ssr: false,
@@ -39,6 +41,7 @@ export default function OptimizedFicusNav() {
   const [subdomain, setSubdomain] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const locale = useLocale()
 
   useEffect(() => {
     const app = pathname.split("/")[1] || "boffmedia"
@@ -100,6 +103,7 @@ export default function OptimizedFicusNav() {
         <div className="flex items-center gap-4">
           {mounted && currentApp && !HIDDEN_APPS.includes(currentApp) ? (
             <>
+              <LanguageSwitcher />
               <NotificationPopover />
               <UserAuthSection />
             </>
@@ -121,6 +125,9 @@ export default function OptimizedFicusNav() {
             </SheetTrigger>
             <SheetContent side="right" className="bg-surface-900">
               <nav className="flex flex-col gap-4">
+                {/* Language switcher with mobile variant */}
+                <LanguageSwitcher variant="mobile" />
+                
                 {NAV_LINKS.map(({ href, label, icon, override }) => (
                   <div key={href}>
                     {override ? (
@@ -148,4 +155,3 @@ export default function OptimizedFicusNav() {
     </nav>
   )
 }
-
