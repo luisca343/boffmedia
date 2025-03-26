@@ -69,9 +69,9 @@ function loadJsonFile(filePath: string): JsonContent {
 
 const locales = ['es', 'en']; // Add all your supported locales here
 
-export default getRequestConfig(async ({requestLocale}:any) => {
+export default getRequestConfig(async () => {
   const cookieStore = cookies();
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || requestLocale || 'es';
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es';
 
   const localeDir = path.join(process.cwd(), 'locales', locale ); 
   
