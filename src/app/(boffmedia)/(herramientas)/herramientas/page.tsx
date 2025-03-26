@@ -29,7 +29,7 @@ export default function ToolsLandingPage() {
     {
       title: "Pokémon",
       description: "Calculadoras, generadores y bases de datos",
-      icon: "/img/games/pokemon-icon.webp",
+      icon: "/img/games/pokemon/icon.webp",
       tools: [
         { name: "TCGPocket", count: 3 },
         { name: "Pokémon Mundo Misterioso", count: 1 },

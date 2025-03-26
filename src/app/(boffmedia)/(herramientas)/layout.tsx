@@ -48,7 +48,7 @@ export default function GameToolsLayout({
   const gameToolsConfig = {
     "pokemon": {
       name: "Pokémon",
-      icon: "/img/games/pokemon-icon.webp",
+      icon: "/img/games/pokemon/icon.webp",
       color: "from-yellow-400 to-red-500",
       bg: "bg-red-900",
       categories: [

@@ -75,13 +75,6 @@ export default function TCGPocket() {
     },
   ];
 
-  // Featured card packs
-  const featuredPacks = [
-    { name: "Horizonte Estelar", image: "/img/games/tcgpocket/packs/stellar-horizon.webp", cards: 182 },
-    { name: "Amanecer Dorado", image: "/img/games/tcgpocket/packs/golden-dawn.webp", cards: 165 },
-    { name: "Aventuras Sinnoh", image: "/img/games/tcgpocket/packs/sinnoh-adventures.webp", cards: 128 }
-  ];
-
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       {/* Header with Hero image */}
@@ -100,7 +93,7 @@ export default function TCGPocket() {
               <div>
                 <div className="mb-2">
                   <Image
-                    src="/img/games/tcgpocket-icon.webp"
+                    src="/img/games/tcgpocket/icon.webp"
                     alt="TCG Pocket Logo"
                     width={150}
                     height={100}
@@ -110,7 +103,7 @@ export default function TCGPocket() {
                 <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 drop-shadow-lg">
                   Herramientas para <span className="text-yellow-400">TCG Pocket</span>
                 </h1>
-                <p className="text-surface-200 mt-2 max-w-md text-sm sm:text-base">
+                <p className="text-surface-200 mt-2 text-sm sm:text-base">
                   Explora tu colección, consulta todas las cartas y optimiza tus combates
                 </p>
               </div>

@@ -65,7 +65,7 @@ export default function PokemonPage() {
               className="hidden md:block"
             >
               <Image
-                src="/img/games/pokemon-logo.webp"
+                src="/img/games/pokemon/logo.webp"
                 alt="Pokémon"
                 width={180}
                 height={80}
