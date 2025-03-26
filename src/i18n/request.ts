@@ -72,6 +72,7 @@ const locales = ['es', 'en']; // Add all your supported locales here
 export default getRequestConfig(async () => {
   const cookieStore = cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es';
+  console.log("Locale from cookie:", locale);
 
   const localeDir = path.join(process.cwd(), 'locales', locale ); 
   
