@@ -23,6 +23,7 @@ import { useGameData } from "./_hooks/useGameData";
 import { getAllWeaponElements } from "./_components/equipment-utils";
 import { BuildImport } from "./_components/BuildImport";
 import { CharmSelector } from "./_components/CharmSelector";
+import { importBuildFromUrl } from "./_utils/buildUtils";
 
 export default function BuildPlanner() {
   const {
@@ -41,71 +42,16 @@ export default function BuildPlanner() {
     getCharmById
   } = useGameData();
   
-  const importBuildFromUrl = useCallback(() => {
-    if (typeof window === 'undefined') return;
-    
-    try {
-      // Extract the build parameter from the URL
-      const params = new URLSearchParams(window.location.search);
-      const buildParam = params.get('b'); // Changed from 'build' to 'b'
-      
-      if (buildParam) {
-        // Decode and parse the build data
-        const decodedData = decodeURIComponent(atob(buildParam));
-        const minimalBuild = JSON.parse(decodedData);
-        
-        // Convert the minimal build back to a full BuildDataWithIds
-        const importedBuild: BuildDataWithIds = {
-          name: minimalBuild.n || "Mi Build",
-          weaponId: minimalBuild.w || null,
-          secondaryWeaponId: minimalBuild.s || null,
-          headId: minimalBuild.h || null,
-          chestId: minimalBuild.c || null,
-          armsId: minimalBuild.a || null,
-          waistId: minimalBuild.v || null,
-          legsId: minimalBuild.l || null,
-          charmId: minimalBuild.m || null,
-          decorations: (minimalBuild.d || []).map((d: any) => ({
-            equipmentType: getFullEquipmentType(d.e),
-            slotIndex: d.i,
-            slotSize: d.s,
-            decorationId: d.d
-          }))
-        };
-        
-        // Replace the build with the imported one
-        setCurrentBuild(importedBuild);
-        console.log("Imported build from URL:", importedBuild);
-        
-        // Clean up the URL to avoid reimporting on refresh
-        if (window.history.replaceState) {
-          window.history.replaceState({}, document.title, window.location.pathname);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to import build from URL:", error);
-    }
-  }, []);
 
-  const getFullEquipmentType = (shortType: string): EquipmentType => {
-    const typeMap: Record<string, EquipmentType> = {
-      'w': 'weapon',
-      's': 'secondaryWeapon',
-      'h': 'head',
-      'c': 'chest',
-      'a': 'arms',
-      'v': 'waist',
-      'l': 'legs',
-      'm': 'charm'
-    };
-    
-    return typeMap[shortType] || 'weapon';
-  };
   
   // Add this useEffect after your existing state declarations
   useEffect(() => {
-    importBuildFromUrl();
-  }, [importBuildFromUrl]);
+    const importedBuild = importBuildFromUrl();
+    if (importedBuild) {
+      setCurrentBuild(importedBuild);
+      console.log("Imported build from URL:", importedBuild);
+    }
+  }, []);
   
 
   const [currentBuild, setCurrentBuild] = useState<BuildDataWithIds>({
@@ -427,15 +373,16 @@ export default function BuildPlanner() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <BuildHeader 
-        buildName={currentBuild.name} 
-        onBuildNameChange={(name) => setCurrentBuild({...currentBuild, name})}
-        buildData={currentBuild}
-        completeData={buildWithFullObjects}
-        stats={stats}
-        skills={totalSkills}
-        onReset={handleReset}
-      />
+        <BuildHeader 
+          buildName={currentBuild.name} 
+          onBuildNameChange={(name) => setCurrentBuild({...currentBuild, name})}
+          buildData={currentBuild}
+          completeData={buildWithFullObjects}
+          stats={stats}
+          skills={totalSkills}
+          onReset={handleReset}
+          onLoadBuild={(loadedBuild) => setCurrentBuild(loadedBuild)}
+        />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left panel - Equipment Selection & Current Build */}
         <div className="lg:col-span-8">

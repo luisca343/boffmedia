@@ -17,6 +17,16 @@ const HERRAMIENTAS_MENU = {
   },
   sections: [
     {
+      items: [
+        { 
+          href: "/herramientas", 
+          label: "Herramientas", 
+          description: "Herramientas para desarrolladores de BOFF",
+          icon: <Cpu className="h-5 w-5" />
+        },
+      ]
+    },
+    {
       title: "Pokémon",
       description: "Herramientas relacionadas con juegos Pokémon",
       items: [
@@ -31,6 +41,18 @@ const HERRAMIENTAS_MENU = {
           label: "TCG Pocket", 
           description: "Herramientas para Pokémon Trading Card Game",
           icon: <Swords className="h-5 w-5" />
+        },
+      ],
+    },
+    {
+      title: "Monster Hunter Wilds",
+      description: "Herramientas para Monster Hunter Wilds",
+      items: [
+        { 
+          href: "/mhwilds/builds/planner", 
+          label: "Planificador de Builds", 
+          description: "Crea y comparte builds para Monster Hunter Wilds",
+          icon: <Gamepad2 className="h-5 w-5" />
         },
       ],
     },

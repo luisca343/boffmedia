@@ -59,7 +59,7 @@ export default function Expansions({
       .map((_, index) => (
         <Image
           key={index}
-          src={`/img/tcgpocket/image/${rarityType}.png`}
+          src={`/img/games/tcgpocket/image/${rarityType}.png`}
           alt={`${rarityType} rarity`}
           width={24}
           height={24}
@@ -92,7 +92,7 @@ export default function Expansions({
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-main via-surface-foreground to-main rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
             <Image
-              src={`/img/tcgpocket/cards/${expansion}/${id}.jpg`}
+              src={`/img/games/tcgpocket/cards/${expansion}/${id}.jpg`}
               alt={cardData.name}
               width={400}
               height={558}
@@ -136,7 +136,7 @@ export default function Expansions({
                   <div className="flex items-center gap-2">
                     <div className="p-1 bg-white/10 rounded-full">
                       <Image
-                        src={`/img/tcgpocket/image/${cardData.type}.png`}
+                        src={`/img/games/tcgpocket/image/${cardData.type}.png`}
                         alt={typeTranslations[cardData.type]}
                         width={24}
                         height={24}
@@ -159,7 +159,7 @@ export default function Expansions({
                   <div className="flex items-center gap-2">
                     <div className="p-1 bg-white/10 rounded-full">
                       <Image
-                        src={`/img/tcgpocket/image/${cardData.weakness}.png`}
+                        src={`/img/games/tcgpocket/image/${cardData.weakness}.png`}
                         alt={typeTranslations[cardData.weakness]}
                         width={24}
                         height={24}
@@ -181,7 +181,7 @@ export default function Expansions({
                     {[...Array(cardData.retreat_cost)].map((_, index) => (
                       <div key={index} className="p-1 bg-white/10 rounded-full">
                         <Image
-                          src="/img/tcgpocket/image/colorless.png"
+                          src="/img/games/tcgpocket/image/colorless.png"
                           alt="Energía Incolora"
                           width={24}
                           height={24}

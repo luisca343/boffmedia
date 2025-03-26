@@ -143,7 +143,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
       {elements.length > 0 && elements.map((element, idx) => (
         <span key={`element-${idx}`} className={`${getElementColor(element.type)}`}>
           {t(element.type)}: {element.damage}
-          {element.hidden && <span className="text-xs ml-1 opacity-70">{t("build-planner.hidden")}</span>}
+          {element.hidden && <span className="text-xs ml-1 opacity-70">{t("build_planner.hidden")}</span>}
         </span>
       ))}
       

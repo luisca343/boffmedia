@@ -27,7 +27,7 @@ export default async function Combates({params} : {params: {id: string}}) {
             {Object.entries(totalRewards).map(([id, quantity]) => (
               <div key={id} className="flex items-center">
                 <Image 
-                  src={`/img/tcgpocket/image/${id}.png`}
+                  src={`/img/games/tcgpocket/image/${id}.png`}
                   alt={id}
                   width={32}
                   height={32}

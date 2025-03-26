@@ -132,7 +132,7 @@ export default function PokemonPage() {
               </div>
               <div className="md:w-1/3 bg-gradient-to-br from-surface-800 to-surface-900 p-0 flex items-center justify-center relative overflow-hidden">
                 <Image
-                  src="/img/tcgpocket/hero.webp"
+                  src="/img/games/tcgpocket/hero.webp"
                   alt="TCG Pocket"
                   fill
                   className="object-cover z-10"

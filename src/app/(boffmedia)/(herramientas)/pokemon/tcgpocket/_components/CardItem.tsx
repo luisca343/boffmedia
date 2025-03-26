@@ -36,7 +36,7 @@ export function CardItem({
     <div className={`relative bg-surface-800 rounded-lg sm:rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${!allColored && isMissing ? 'grayscale' : ''}`}>
       <div className="aspect-[2.5/3.5] relative">
         <Image
-          src={`/img/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}
+          src={`/img/games/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}
           alt={card.name}
           layout="fill"
           objectFit="contain"

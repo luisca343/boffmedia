@@ -14,7 +14,7 @@ export function DeckDisplay({ deckListing }: DeckDisplayProps) {
           <CardContent className="p-0">
             <div className="relative aspect-[2.5/3.5]">
               <Image
-                src={`/img/tcgpocket/cards/${card.pack}/${card.cardNumber}.jpg`}
+                src={`/img/games/tcgpocket/cards/${card.pack}/${card.cardNumber}.jpg`}
                 alt={`Card ${card.pack}-${card.cardNumber}`}
                 fill
                 className="object-cover rounded-sm"

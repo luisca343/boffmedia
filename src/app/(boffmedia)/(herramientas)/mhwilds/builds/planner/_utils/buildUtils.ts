@@ -176,11 +176,95 @@ export const exportBuildAsJson = (buildData: BuildDataWithIds): void => {
 export const saveBuildToLocalStorage = (buildData: BuildDataWithIds): string => {
   try {
     // Create a unique key using the name and timestamp
-    const key = `mhw-build-${Date.now()}`;
-    localStorage.setItem(key, JSON.stringify(buildData));
+    const sanitizedName = buildData.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const key = `mhw-build-${sanitizedName}-${Date.now()}`;
+    
+    // Add metadata to help with listing builds later
+    const buildWithMetadata = {
+      ...buildData,
+      _meta: {
+        savedAt: new Date().toISOString(),
+        key
+      }
+    };
+    
+    localStorage.setItem(key, JSON.stringify(buildWithMetadata));
     return key;
   } catch (error) {
     console.error("Error saving build:", error);
     throw new Error("Failed to save build to local storage");
+  }
+};
+
+/**
+ * Get all saved builds from localStorage
+ */
+export const getSavedBuilds = (): Array<{
+  key: string;
+  name: string;
+  savedAt: string;
+  build: BuildDataWithIds;
+}> => {
+  try {
+    const savedBuilds = [];
+    
+    // Scan localStorage for saved builds
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      
+      if (key && key.startsWith('mhw-build-')) {
+        const buildJson = localStorage.getItem(key);
+        if (buildJson) {
+          const buildData = JSON.parse(buildJson);
+          savedBuilds.push({
+            key,
+            name: buildData.name,
+            savedAt: buildData._meta?.savedAt || new Date().toISOString(),
+            build: buildData
+          });
+        }
+      }
+    }
+    
+    // Sort by saved date, newest first
+    return savedBuilds.sort((a, b) => 
+      new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
+    );
+  } catch (error) {
+    console.error("Error loading saved builds:", error);
+    return [];
+  }
+};
+
+/**
+ * Load a build from localStorage by key
+ */
+export const loadBuildFromLocalStorage = (key: string): BuildDataWithIds | null => {
+  try {
+    const buildJson = localStorage.getItem(key);
+    if (buildJson) {
+      const buildData = JSON.parse(buildJson);
+      return buildData;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error loading build:", error);
+    return null;
+  }
+};
+
+/**
+ * Delete a build from localStorage by key
+ */
+export const deleteBuildFromLocalStorage = (key: string): boolean => {
+  try {
+    if (localStorage.getItem(key)) {
+      localStorage.removeItem(key);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("Error deleting build:", error);
+    return false;
   }
 };

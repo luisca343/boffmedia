@@ -1,36 +1,15 @@
 import { useState } from "react";
-import { 
-  Shield, 
-  Save, 
-  Share2, 
-  RefreshCw, 
-  Copy, 
-  Download, 
-  Link, 
-  Camera, 
-  Info, 
-  ChevronLeft 
-} from "lucide-react";
+import { Save, Share2, RefreshCw, Copy, Download, Link, Camera, ChevronLeft, FolderOpen } from "lucide-react";
+import { LuShield } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
-import { BuildDataWithIds, BuildData, StatsData, Skill } from "../../../../../../../types/tools/mhwilds";
+import { BuildDataWithIds, BuildData, StatsData, Skill } from "@/types/tools/mhwilds";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { exportBuildAsJson, generateShareableLink, saveBuildToLocalStorage } from "../_utils/buildUtils";
+import { SavedBuildsManager } from "./SavedBuildsManager";
 
 interface BuildHeaderProps {
   buildName: string;
@@ -40,19 +19,22 @@ interface BuildHeaderProps {
   stats: StatsData;
   skills: Skill[];
   onReset?: () => void;
+  onLoadBuild?: (build: BuildDataWithIds) => void;
 }
 
 export function BuildHeader({ 
   buildName, 
-  onBuildNameChange,
-  buildData,
-  completeData,
-  stats,
-  skills,
-  onReset
+  onBuildNameChange, 
+  buildData, 
+  completeData, 
+  stats, 
+  skills, 
+  onReset,
+  onLoadBuild 
 }: BuildHeaderProps) {
   const t = useTranslations("mhwilds");
   const [showDialog, setShowDialog] = useState<"share" | "details" | null>(null);
+  const [showSavedBuilds, setShowSavedBuilds] = useState(false);
   const [shareUrl, setShareUrl] = useState<string>("");
   const [notification, setNotification] = useState<{
     type: "success" | "error" | "info" | null;
@@ -86,11 +68,11 @@ export function BuildHeader({
       const shareableUrl = generateShareableLink(buildData);
       setShareUrl(shareableUrl);
       navigator.clipboard.writeText(shareableUrl);
-      showNotification("success", t("build_planner.link_copied", { url: shareableUrl }));
+      showNotification("success", t("build_planner.link_copied", { url: shareableUrl}));
       setShowDialog("share");
     } catch (error) {
       console.error("Error generating shareable link:", error);
-      showNotification("error", t("build_planner.error_link"));
+      showNotification("error", t("build_planner.error_link",));
     }
   };
 
@@ -106,6 +88,18 @@ export function BuildHeader({
     }
   };
 
+  // Function to handle loading a build from saved builds
+  const handleLoadBuild = (build: BuildDataWithIds) => {
+    if (onLoadBuild) {
+      onLoadBuild(build);
+      showNotification("success", t("build_planner.build_loaded", { name: build.name }));
+    }
+  };
+
+  // Open the saved builds manager
+  const openSavedBuildsManager = () => {
+    setShowSavedBuilds(true);
+  };
 
   // Generate a build summary image (placeholder)
   const generateImage = () => {
@@ -247,7 +241,7 @@ export function BuildHeader({
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center">
-          <Shield className="mr-2 h-6 w-6 text-green-400 hidden sm:block" />
+          <LuShield className="mr-2 h-6 w-6 text-green-400 hidden sm:block" />
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-surface-50">
               {t("build_planner.title")}
@@ -274,6 +268,15 @@ export function BuildHeader({
               onClick={handleSave}
             >
               <Save className="mr-1 h-4 w-4" /> {t("build_planner.save")}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-blue-400 border-blue-500"
+              onClick={openSavedBuildsManager}
+            >
+              <FolderOpen className="mr-1 h-4 w-4" /> {t("build_planner.open")}
             </Button>
 
             <DropdownMenu>
@@ -334,6 +337,13 @@ export function BuildHeader({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Saved Builds Manager */}
+      <SavedBuildsManager 
+        open={showSavedBuilds} 
+        onOpenChange={setShowSavedBuilds}
+        onLoadBuild={handleLoadBuild}
+      />
     </div>
   );
 }

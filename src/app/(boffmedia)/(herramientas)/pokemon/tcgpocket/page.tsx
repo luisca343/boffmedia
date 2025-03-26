@@ -77,9 +77,9 @@ export default function TCGPocket() {
 
   // Featured card packs
   const featuredPacks = [
-    { name: "Horizonte Estelar", image: "/img/tcgpocket/packs/stellar-horizon.webp", cards: 182 },
-    { name: "Amanecer Dorado", image: "/img/tcgpocket/packs/golden-dawn.webp", cards: 165 },
-    { name: "Aventuras Sinnoh", image: "/img/tcgpocket/packs/sinnoh-adventures.webp", cards: 128 }
+    { name: "Horizonte Estelar", image: "/img/games/tcgpocket/packs/stellar-horizon.webp", cards: 182 },
+    { name: "Amanecer Dorado", image: "/img/games/tcgpocket/packs/golden-dawn.webp", cards: 165 },
+    { name: "Aventuras Sinnoh", image: "/img/games/tcgpocket/packs/sinnoh-adventures.webp", cards: 128 }
   ];
 
   return (
@@ -89,7 +89,7 @@ export default function TCGPocket() {
         {isMounted && (
           <>
             <Image
-              src="/img/tcgpocket/hero.webp"
+              src="/img/games/tcgpocket/hero.webp"
               alt="Pokémon TCG Pocket"
               fill
               className="object-cover"

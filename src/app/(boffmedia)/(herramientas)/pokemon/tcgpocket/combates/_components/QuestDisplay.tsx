@@ -25,7 +25,7 @@ export function QuestDisplay({ quest, commonRewards }: QuestDisplayProps) {
               <span>{task.mission}</span>
               <div className="flex items-center">
                 <Image 
-                  src={`/img/tcgpocket/image/${task.reward.id}.png`}
+                  src={`/img/games/tcgpocket/image/${task.reward.id}.png`}
                   alt={task.reward.id}
                   width={24}
                   height={24}
@@ -43,7 +43,7 @@ export function QuestDisplay({ quest, commonRewards }: QuestDisplayProps) {
           {commonRewards.map((reward, index) => (
             <div key={index} className="flex items-center">
               <Image 
-                src={`/img/tcgpocket/image/${reward.id}.png`}
+                src={`/img/games/tcgpocket/image/${reward.id}.png`}
                 alt={reward.id}
                 width={24}
                 height={24}
