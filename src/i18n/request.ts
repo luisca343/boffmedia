@@ -1,95 +1,40 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies } from 'next/headers'; 
-import path from 'path';
-import fs from 'fs';
-
-// Custom deep merge function to properly combine nested translation objects
-interface DeepObject {
-  [key: string]: any;
-}
-
-function deepMerge(...objects: DeepObject[]): DeepObject {
-  const isObject = (obj: any): obj is DeepObject => obj && typeof obj === 'object' && !Array.isArray(obj);
-  
-  return objects.reduce((prev: DeepObject, obj: DeepObject) => {
-    if (!obj) return prev;
-    
-    Object.keys(obj).forEach(key => {
-      const pVal = prev[key];
-      const oVal = obj[key];
-      
-      if (isObject(pVal) && isObject(oVal)) {
-        prev[key] = deepMerge(pVal, oVal);
-      } else {
-        prev[key] = oVal;
-      }
-    });
-    
-    return prev;
-  }, {});
-}
-
-// Function to recursively find all JSON files in a directory
-interface FileSearchResult {
-  results: string[];
-}
-
-function findJsonFiles(dir: string): string[] {
-  let results: string[] = [];
-  const items: string[] = fs.readdirSync(dir);
-
-  items.forEach(item => {
-    const fullPath: string = path.join(dir, item);
-    const stat: fs.Stats = fs.statSync(fullPath);
-    
-    if (stat.isDirectory()) {
-      results = results.concat(findJsonFiles(fullPath));
-    } else if (item.endsWith('.json')) {
-      results.push(fullPath);
-    }
-  });
-
-  return results;
-}
-
-// Function to safely load JSON file contents
-interface JsonContent {
-  [key: string]: any;
-}
-
-function loadJsonFile(filePath: string): JsonContent {
-  try {
-    const content: string = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(content);
-  } catch (error: unknown) {
-    console.error(`Error loading file ${filePath}:`, error);
-    return {};
-  }
-}
-
-const locales = ['es', 'en']; // Add all your supported locales here
+import { cookies } from 'next/headers';
 
 export default getRequestConfig(async () => {
+  // Get locale from cookies or use default
   const cookieStore = cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es';
-  console.log("Locale from cookie:", locale);
-
-  const localeDir = path.join(process.cwd(), 'locales', locale ); 
   
-  try {
-    const jsonFiles = findJsonFiles(localeDir);
-    const translationModules = jsonFiles.map(file => loadJsonFile(file));
-    const messages = deepMerge({}, ...translationModules);
+  // Define paths to import
+  const paths = [
+    'smartrotom/pokedex/abilities.json',
+    'smartrotom/pokedex/common.json',
+    'smartrotom/pokedex/forms.json',
+    'smartrotom/pokedex/moves.json',
+    'smartrotom/pokedex/spawns.json',
+    'tools/pmdsky/common.json',
+    'tools/pmdsky/dungeons.json',
+    'tools/tcgpocket/common.json',
+    'tools/mhwilds/mhwilds.json',
+  ];
+  
+  // Import all translations
+  const imports = await Promise.all(
+    paths.map(path => import(`../../locales/${locale}/${path}`).catch(err => {
+      console.error(`Failed to load translation: ${path}`, err);
+      return { default: {} };
+    }))
+  );
+  
+  // Merge all translation objects
+  const messages = imports.reduce((acc, module) => ({
+    ...acc,
+    ...module.default
+  }), {});
 
-    return {
-      locale,
-      messages
-    };
-  } catch (error) {
-    console.error("Error loading translation files:", error);
-    return {
-      locale: 'es',
-      messages: {}
-    };
-  }
+  return {
+    locale,
+    messages
+  };
 });
