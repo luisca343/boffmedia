@@ -1,42 +1,40 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { MessageSquare, Users, Gamepad, Trophy } from "lucide-react"
+import { getTranslations } from "next-intl/server"
+import Link from "next/link"
 
-const features = [
-  {
-    title: "Chat en Tiempo Real",
-    description: "Comunícate con otros jugadores durante las partidas",
-    icon: MessageSquare,
-  },
-  {
-    title: "Equipos y Clanes",
-    description: "Únete a un equipo o crea el tuyo propio",
-    icon: Users,
-  },
-  {
-    title: "Eventos Especiales",
-    description: "Participa en eventos exclusivos de la comunidad",
-    icon: Gamepad,
-  },
-  {
-    title: "Sistema de Rangos",
-    description: "Sube de nivel y desbloquea recompensas únicas",
-    icon: Trophy,
-  },
-]
+export async function CommunitySection() {
+  const t = await getTranslations("boffmedia.communitySection");
 
-export function CommunitySection() {
+  const features = [
+    {
+      title: t("features.teams.title"),
+      description: t("features.teams.description"),
+      icon: Users,
+    },
+    {
+      title: t("features.events.title"),
+      description: t("features.events.description"),
+      icon: Gamepad,
+    },
+    {
+      title: t("features.ranks.title"),
+      description: t("features.ranks.description"),
+      icon: Trophy,
+    },
+  ]
+
   return (
     <section className="py-24 bg-surface-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 text-surface-50">Únete a la Comunidad</h2>
+          <h2 className="text-4xl font-bold mb-4 text-surface-50">{t("title")}</h2>
           <p className="text-xl text-surface-300 max-w-3xl mx-auto">
-            Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus
-            experiencias
+            {t("subtitle")}
           </p>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid sm:grid-cols-3 lg:grid-cols-3 gap-8">
           {features.map((feature) => (
             <Card key={feature.title} className="bg-surface-800 hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
@@ -50,12 +48,11 @@ export function CommunitySection() {
           ))}
         </div>
         <div className="flex justify-center mt-12">
-          <Button size="lg" className="text-lg bg-primary-500 hover:bg-primary-600 text-white">
-            Unirse Ahora
+          <Button size="lg" className="text-lg bg-primary-500 hover:bg-primary-600 text-white" asChild>
+            <Link href="/community">{t("joinNowButton")}</Link>
           </Button>
         </div>
       </div>
     </section>
   )
 }
-

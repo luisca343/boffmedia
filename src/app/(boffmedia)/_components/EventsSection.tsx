@@ -8,8 +8,10 @@ import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { InternalLink } from "@/components/nav/Link"
 import { LeaderboardEntry } from "@/types/events"
+import { useTranslations } from "next-intl"
 
 export function EventsSection() {
+  const t = useTranslations("boffmedia.eventsSection");
   const { events, error, isLoading, refetch } = useGetEvents()
   const { leaderboards, error: leaderboardError, isLoading: leaderboardLoading } = useGetLeaderboards()
   
@@ -19,7 +21,7 @@ export function EventsSection() {
         <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
         </div>
-        <p className="mt-4 text-surface-300">Cargando eventos...</p>
+        <p className="mt-4 text-surface-300">{t("loading")}</p>
       </div>
     </section>
   )
@@ -30,9 +32,9 @@ export function EventsSection() {
         <div className="text-warning-500 mb-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
         </div>
-        <p className="text-xl text-surface-300">Error al cargar eventos: {error}</p>
+        <p className="text-xl text-surface-300">{t("errorLoading")}: {error}</p>
         <Button onClick={refetch} className="mt-4 bg-primary-500 hover:bg-primary-600 text-white">
-          Reintentar
+          {t("retry")}
         </Button>
       </div>
     </section>
@@ -53,19 +55,19 @@ export function EventsSection() {
     <section className="py-24 bg-gradient-to-br from-surface-800 to-surface-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 text-surface-50">Próximos Eventos</h2>
-          <p className="text-xl text-surface-300">Participa en nuestros eventos y compite con la comunidad</p>
+          <h2 className="text-4xl font-bold mb-4 text-surface-50">{t("upcomingEvents")}</h2>
+          <p className="text-xl text-surface-300">{t("participateDescription")}</p>
         </div>
         <div className="grid lg:grid-cols-2 gap-8">
           <Card className="bg-surface-800">
             <CardHeader>
               <div className="flex items-center gap-2 mb-2">
                 <Trophy className="h-6 w-6 text-primary-500" />
-                <span className="text-lg font-semibold text-primary-500">Eventos Activos</span>
+                <span className="text-lg font-semibold text-primary-500">{t("activeEvents")}</span>
               </div>
-              <CardTitle className="text-2xl text-surface-50">Calendario de Eventos</CardTitle>
+              <CardTitle className="text-2xl text-surface-50">{t("eventCalendar")}</CardTitle>
               <CardDescription className="text-surface-300">
-                No te pierdas ningún evento de la comunidad
+                {t("dontMissEvents")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -74,8 +76,8 @@ export function EventsSection() {
                   {upcomingEvents.map((event) => {
                     const startDate = new Date(event.startDate);
                     const endDate = new Date(event.endDate);
-                    const formattedStartDate = startDate.toLocaleTimeString('es-ES', {day: '2-digit', month: 'short'});
-                    const formattedEndDate = endDate.toLocaleTimeString('es-ES', {day: '2-digit', month: 'short'});
+                    const formattedStartDate = startDate.toLocaleTimeString(t("locale"), {day: '2-digit', month: 'short'});
+                    const formattedEndDate = endDate.toLocaleTimeString(t("locale"), {day: '2-digit', month: 'short'});
                     
                     return (
                       <div
@@ -91,7 +93,7 @@ export function EventsSection() {
                             </p>
                           </div>
                         </div>
-                        <Badge variant="secondary">{event.type === 'event' ? 'Evento' : 'Servidor'}</Badge>
+                        <Badge variant="secondary">{event.type === 'event' ? t("eventType") : t("serverType")}</Badge>
                       </div>
                     );
                   })}
@@ -99,7 +101,7 @@ export function EventsSection() {
               ) : (
                 <div className="text-center py-8 text-surface-300">
                   <Calendar className="h-12 w-12 mx-auto mb-4 text-surface-500 opacity-50" />
-                  <p>No hay eventos próximos programados</p>
+                  <p>{t("noUpcomingEvents")}</p>
                 </div>
               )}
               
@@ -107,7 +109,7 @@ export function EventsSection() {
                 href="/events"
                 className="inline-block w-full text-center py-2 px-4 rounded-md bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors mt-6"
               >
-                Ver Todos los Eventos
+                {t("viewAllEvents")}
               </InternalLink>
             </CardContent>
           </Card>
@@ -116,11 +118,11 @@ export function EventsSection() {
             <CardHeader>
               <div className="flex items-center gap-2 mb-2">
                 <Users className="h-6 w-6 text-primary-500" />
-                <span className="text-lg font-semibold text-primary-500">Comunidad</span>
+                <span className="text-lg font-semibold text-primary-500">{t("community")}</span>
               </div>
-              <CardTitle className="text-2xl text-surface-50">Ranking de Jugadores</CardTitle>
+              <CardTitle className="text-2xl text-surface-50">{t("playerRanking")}</CardTitle>
               <CardDescription className="text-surface-300">
-                Los mejores jugadores de la temporada
+                {t("bestPlayers")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -130,7 +132,7 @@ export function EventsSection() {
                 </div>
               ) : leaderboardError ? (
                 <div className="text-center py-8 text-surface-300">
-                  <p>Error al cargar el ranking</p>
+                  <p>{t("errorLoadingRanking")}</p>
                 </div>
               ) : topPlayers.length > 0 ? (
                 <div className="space-y-4">
@@ -143,9 +145,9 @@ export function EventsSection() {
                         <span className="font-bold text-2xl text-primary-500">#{index + 1}</span>
                         <div>
                           <h4 className="font-semibold text-lg text-surface-50">
-                            {player.username || `Jugador ${player.userId}`}
+                            {player.username || t("playerPlaceholder", {id: player.userId})}
                           </h4>
-                          <p className="text-surface-300">{player.totalPoints?.toLocaleString() || 0} puntos</p>
+                          <p className="text-surface-300">{player.totalPoints?.toLocaleString() || 0} {t("points")}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-4">
@@ -164,7 +166,7 @@ export function EventsSection() {
               ) : (
                 <div className="text-center py-8 text-surface-300">
                   <Trophy className="h-12 w-12 mx-auto mb-4 text-surface-500 opacity-50" />
-                  <p>No hay clasificación disponible</p>
+                  <p>{t("noRankingAvailable")}</p>
                 </div>
               )}
               
@@ -172,7 +174,7 @@ export function EventsSection() {
                 href="/leaderboard"
                 className="inline-block w-full text-center py-2 px-4 rounded-md border border-primary-500 text-primary-500 hover:bg-primary-500/10 font-medium transition-colors mt-6"
               >
-                Ver Clasificación Completa
+                {t("viewFullRanking")}
               </InternalLink>
             </CardContent>
           </Card>

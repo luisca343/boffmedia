@@ -3,60 +3,64 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
+import { getTranslations } from "next-intl/server"
+import Link from "next/link"
 
-const games = [
-  {
-    title: "Pixelmon Wingull 2",
-    description: "La última aventura Pokémon en Minecraft. Explora, captura y combate.",
-    image: "/img/win-80.png",
-    status: "Popular",
-    link: "/wingull",
-  },
-  {
-    title: "SmartRotom",
-    description: "Accede a tu smartphone del juego desde cualquier lugar. Mantente conectado al mundo Pixelmon.",
-    image: "/img/smartrotom.png",
-    status: "Nuevo",
-    link: "/smartrotom",
-  },
-  {
-    title: "Herramientas de Juego",
-    description: "Mejora tu experiencia de juego con nuestra colección de herramientas útiles.",
-    image: "/img/tools.png",
-    status: "Nuevo",
-    link: "/herramientas",
-  }
-  /*
-  {
-    title: "Project ZomBOFF",
-    description: "Sobrevive al apocalipsis zombi con amigos en nuestros servidores personalizados.",
-    image: "/img/zomboff.png",
-    status: "Popular",
-    link: "/zomboff",
-  },
-  {
-    title: "Minecraft Bingo",
-    description: "Pon a prueba tu conocimiento y velocidad en Minecraft en eventos competitivos.",
-    image: "/img/bingo.png",
-    status: "Próximamente",
-    link: "/bingo",
-  },*/
-]
+export async function FeaturedGames() {
+  const t = await getTranslations("boffmedia");
 
-export function FeaturedGames() {
+  const games = [
+    {
+      title: t("featuredGames.games.wingull.title"),
+      description: t("featuredGames.games.wingull.description"),
+      image: "/img/win-80.png",
+      status: t("featuredGames.status.popular"),
+      link: "/wingull",
+    },
+    {
+      title: t("featuredGames.games.smartrotom.title"),
+      description: t("featuredGames.games.smartrotom.description"),
+      image: "/img/smartrotom.png",
+      status: t("featuredGames.status.new"),
+      link: "/smartrotom",
+    },
+    {
+      title: t("featuredGames.games.tools.title"),
+      description: t("featuredGames.games.tools.description"),
+      image: "/img/tools.png",
+      status: t("featuredGames.status.new"),
+      link: "/herramientas",
+    }
+    /*
+    {
+      title: t("featuredGames.games.zomboff.title"),
+      description: t("featuredGames.games.zomboff.description"),
+      image: "/img/zomboff.png",
+      status: t("featuredGames.status.popular"),
+      link: "/zomboff",
+    },
+    {
+      title: t("featuredGames.games.bingo.title"),
+      description: t("featuredGames.games.bingo.description"),
+      image: "/img/bingo.png",
+      status: t("featuredGames.status.comingSoon"),
+      link: "/bingo",
+    },*/
+  ]
+
   return (
     <section className="py-24 bg-surface-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 text-surface-50">Destacados</h2>
-          <p className="text-xl text-surface-300">Descubre las herramientas y juegos más populares de BoffMedia</p>
+          <h2 className="text-4xl font-bold mb-4 text-surface-50">{t("featuredGames.title")}</h2>
+          <p className="text-xl text-surface-300">{t("featuredGames.subtitle")}</p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {games.map((game, index) => (
             <Card key={game.title} className="group hover:shadow-xl transition-shadow duration-300 bg-surface-800">
               <CardHeader className="relative">
                 <div className="absolute top-4 right-4">
-                  <Badge variant={game.status === "Nuevo" ? "default" : "secondary"}>{game.status}</Badge>
+                  <Badge variant={game.status === t("featuredGames.status.new") ? "default" : "secondary"}>{game.status}</Badge>
                 </div>
                 <Image
                   src={game.image || "/placeholder.svg"}
@@ -72,10 +76,10 @@ export function FeaturedGames() {
               <CardContent>
                 <CardDescription className="text-surface-300 mb-6">{game.description}</CardDescription>
                 <Button className="w-full bg-primary-500 hover:bg-primary-600 text-white" asChild>
-                  <a href={game.link}>
-                    Ver más
+                  <Link href={game.link}>
+                    {t("featuredGames.viewMore")}
                     <ArrowRight className="ml-2 h-4 w-4" />
-                  </a>
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -85,4 +89,3 @@ export function FeaturedGames() {
     </section>
   )
 }
-

@@ -2,8 +2,12 @@ import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 
 // Helper function for deep merging objects
-const deepMerge = (target, source) => {
-  const output = { ...target };
+interface DeepMergeable {
+  [key: string]: any;
+}
+
+const deepMerge = <T extends DeepMergeable, S extends DeepMergeable>(target: T, source: S): T & S => {
+  const output = { ...target } as any;
   
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach(key => {
@@ -19,12 +23,11 @@ const deepMerge = (target, source) => {
     });
   }
   
-  return output;
+  return output as T & S;
 };
 
-// Helper to check if value is an object
-const isObject = (item) => {
-  return item && typeof item === 'object' && !Array.isArray(item);
+const isObject = (item: unknown): item is Record<string, any> => {
+  return item !== null && typeof item === 'object' && !Array.isArray(item);
 };
 
 export default getRequestConfig(async () => {
@@ -35,6 +38,7 @@ export default getRequestConfig(async () => {
   
   // Define paths to import
   const paths = [
+    'boffmedia.json',
     'smartrotom/pokedex/abilities.json',
     'smartrotom/pokedex/common.json',
     'smartrotom/pokedex/forms.json',

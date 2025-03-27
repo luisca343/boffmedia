@@ -105,7 +105,6 @@
     "attack_ember_description": "The target is attacked with small flames. This may also leave the target with a burn.",
     "attack_expanding_force": "Expanding Force",
     "attack_expanding_force_description": "The user attacks the target with its psychic power. This move's power goes up and damages all opposing Pokémon on Psychic Terrain.",
-    "attack_expanding_force.onpsychicterrain": "Expanding Force's range was increased due to the terrain!",
     "attack_explosion": "Explosion",
     "attack_explosion_description": "The user attacks everything around it by causing a tremendous explosion. The user faints upon using this move.",
     "attack_fire_blast": "Fire Blast",
