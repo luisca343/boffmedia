@@ -75,7 +75,10 @@
       "saved_builds": "Builds guardadas",
       "build_loaded": "Build \"{name}\" cargada",
       "open": "Abrir",
-      "hidden": "(O)"
+      "hidden": "(O)",
+      "select_charm": "Elegir amuleto",
+      "charms": "Amuletos",
+      "no_charms_found": "No se han encontrado amuletos"
     },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipamiento",

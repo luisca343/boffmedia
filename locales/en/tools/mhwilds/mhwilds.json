@@ -75,7 +75,10 @@
       "saved_builds": "Saved builds",
       "build_loaded": "Build \"{name}\" loaded",
       "open": "Open",
-      "hidden": "(H)"
+      "hidden": "(H)",
+      "select_charm": "Select charm",
+      "charms": "Charms",
+      "no_charms_found": "No charms found"
     },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipment",

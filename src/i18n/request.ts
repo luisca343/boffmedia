@@ -39,6 +39,7 @@ export default getRequestConfig(async () => {
   // Define paths to import
   const paths = [
     'boffmedia.json',
+    'nav.json',
     'smartrotom/pokedex/abilities.json',
     'smartrotom/pokedex/common.json',
     'smartrotom/pokedex/forms.json',

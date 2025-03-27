@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from "next/dynamic"
 import { Home, Menu } from "lucide-react"
-import { useLocale } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
 import { InternalLink } from "./Link"
@@ -29,11 +29,6 @@ const UserAuthSection = dynamic(() => import("./UserAuthSection"), {
 })
 
 const HIDDEN_APPS = ["smartrotom", "battlesim", "ciclosimitacion", "blog", "forum"]
-const NAV_LINKS = [
-  { href: "/", label: "Inicio", icon: <Home className="h-5 w-5" /> },
-  { href: "/herramientas", label: "Herramientas", override: <HerramientasMenu /> },
-  { href: "/wingull", label: "Pixelmon Wingull", override: <WingullMenu /> },
-]
 
 export default function OptimizedFicusNav() {
   const pathname = usePathname()
@@ -42,6 +37,13 @@ export default function OptimizedFicusNav() {
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const locale = useLocale()
+  const t = useTranslations("nav")
+
+  const NAV_LINKS = [
+    { href: "/", label: t("links.home"), icon: <Home className="h-5 w-5" /> },
+    { href: "/herramientas", label: t("links.tools"), override: <HerramientasMenu /> },
+    { href: "/wingull", label: t("links.pixelmonWingull"), override: <WingullMenu /> },
+  ]
 
   useEffect(() => {
     const app = pathname.split("/")[1] || "boffmedia"
@@ -65,7 +67,7 @@ export default function OptimizedFicusNav() {
   return (
     <nav
       className="bg-surface-900 border-b border-surface-700 shadow-lg fixed w-full z-20 h-16"
-      aria-label="Navegación Principal"
+      aria-label={t("ariaLabel")}
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
         <Link href="/" className="flex items-center space-x-2">
@@ -120,7 +122,7 @@ export default function OptimizedFicusNav() {
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Abrir menú</span>
+                <span className="sr-only">{t("openMenu")}</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="bg-surface-900">

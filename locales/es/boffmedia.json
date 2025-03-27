@@ -88,6 +88,36 @@
             "description": "Sube de nivel y desbloquea recompensas únicas"
           }
         }
+      },
+      "footer": {
+        "tagline": "Tu plataforma de gaming definitiva",
+        "sections": {
+          "platform": {
+            "title": "Plataforma",
+            "links": {
+              "games": "Juegos",
+              "events": "Eventos",
+              "community": "Comunidad"
+            }
+          },
+          "company": {
+            "title": "Compañía",
+            "links": {
+              "about": "Sobre Nosotros",
+              "blog": "Blog"
+            }
+          }
+        },
+        "newsletter": {
+          "title": "Suscríbete al Newsletter",
+          "emailPlaceholder": "Email",
+          "joinButton": "Unirse"
+        },
+        "copyright": "© {year} BoffMedia. Todos los derechos reservados.",
+        "legal": {
+          "privacy": "Privacidad",
+          "terms": "Términos"
+        }
       }
     }
   }

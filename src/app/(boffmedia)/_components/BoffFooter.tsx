@@ -2,8 +2,11 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Gamepad } from "lucide-react"
+import { getTranslations } from "next-intl/server"
 
-export function BoffFooter() {
+export async function BoffFooter() {
+  const t = await getTranslations("boffmedia.footer");
+  
   return (
     <footer className="border-t border-surface-700 bg-surface-800 h-72 z-10 relative">
       <div className="container mx-auto px-4 pt-12">
@@ -13,17 +16,17 @@ export function BoffFooter() {
               <Gamepad className="h-6 w-6 text-primary-500" />
               <span className="text-lg font-bold text-surface-50">BoffMedia</span>
             </div>
-            <p className="text-sm text-surface-300">Tu plataforma de gaming definitiva</p>
+            <p className="text-sm text-surface-300">{t("tagline")}</p>
           </div>
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-surface-50">Plataforma</h4>
+            <h4 className="text-sm font-semibold text-surface-50">{t("sections.platform.title")}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/games"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
-                  Juegos
+                  {t("sections.platform.links.games")}
                 </Link>
               </li>
               <li>
@@ -31,7 +34,7 @@ export function BoffFooter() {
                   href="/events"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
-                  Eventos
+                  {t("sections.platform.links.events")}
                 </Link>
               </li>
               <li>
@@ -39,20 +42,20 @@ export function BoffFooter() {
                   href="/community"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
-                  Comunidad
+                  {t("sections.platform.links.community")}
                 </Link>
               </li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-surface-50">Compañía</h4>
+            <h4 className="text-sm font-semibold text-surface-50">{t("sections.company.title")}</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   href="/about"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
-                  Sobre Nosotros
+                  {t("sections.company.links.about")}
                 </Link>
               </li>
               <li>
@@ -60,41 +63,41 @@ export function BoffFooter() {
                   href="/blog"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
-                  Blog
+                  {t("sections.company.links.blog")}
                 </Link>
               </li>
             </ul>
           </div>
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-surface-50">Suscríbete al Newsletter</h4>
+            <h4 className="text-sm font-semibold text-surface-50">{t("newsletter.title")}</h4>
             <div className="flex space-x-2">
               <Input
-                placeholder="Email"
+                placeholder={t("newsletter.emailPlaceholder")}
                 type="email"
                 className="bg-surface-700 border-surface-600"
               />
               <Button type="submit" className="bg-primary-500 hover:bg-primary-600 text-white">
-                Unirse
+                {t("newsletter.joinButton")}
               </Button>
             </div>
           </div>
         </div>
         <div className="border-t border-surface-700 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-sm text-surface-300">
-            © 2024 BoffMedia. Todos los derechos reservados.
+            {t("copyright", { year: new Date().getFullYear() })}
           </p>
           <div className="flex gap-4">
             <Link
               href="/privacidad"
               className="text-sm text-surface-300 hover:text-primary-400 transition-colors"
             >
-              Privacidad
+              {t("legal.privacy")}
             </Link>
             <Link
               href="/terminos"
               className="text-sm text-surface-300 hover:text-primary-400 transition-colors"
             >
-              Términos
+              {t("legal.terms")}
             </Link>
           </div>
         </div>
@@ -102,4 +105,3 @@ export function BoffFooter() {
     </footer>
   )
 }
-

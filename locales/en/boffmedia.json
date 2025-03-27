@@ -88,6 +88,36 @@
             "description": "Level up and unlock unique rewards"
           }
         }
+      },
+      "footer": {
+        "tagline": "Your ultimate gaming platform",
+        "sections": {
+          "platform": {
+            "title": "Platform",
+            "links": {
+              "games": "Games",
+              "events": "Events",
+              "community": "Community"
+            }
+          },
+          "company": {
+            "title": "Company",
+            "links": {
+              "about": "About Us",
+              "blog": "Blog"
+            }
+          }
+        },
+        "newsletter": {
+          "title": "Subscribe to Newsletter",
+          "emailPlaceholder": "Email",
+          "joinButton": "Join"
+        },
+        "copyright": "© {year} BoffMedia. All rights reserved.",
+        "legal": {
+          "privacy": "Privacy",
+          "terms": "Terms"
+        }
       }
     }
   }

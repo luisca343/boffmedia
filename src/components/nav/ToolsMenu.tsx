@@ -6,78 +6,81 @@ import {
   Cpu, 
   Gift, 
 } from 'lucide-react'
-
-const HERRAMIENTAS_MENU = {
-  triggerLabel: "Herramientas",
-  mainLink: { 
-    href: "/herramientas", 
-    label: "Herramientas", 
-    icon: <Gamepad2 className="h-5 w-5" />,
-    description: "Utilidades para jugadores y desarrolladores",
-  },
-  sections: [
-    {
-      items: [
-        { 
-          href: "/herramientas", 
-          label: "Herramientas", 
-          description: "Herramientas para desarrolladores de BOFF",
-          icon: <Cpu className="h-5 w-5" />
-        },
-      ]
-    },
-    {
-      title: "Pokémon",
-      description: "Herramientas relacionadas con juegos Pokémon",
-      items: [
-        { 
-          href: "/pokemon/pmdsky", 
-          label: "Exploradores del Cielo", 
-          description: "Generador de correos para Pokémon Mystery Dungeon",
-          icon: <Gamepad2 className="h-5 w-5" />
-        },
-        { 
-          href: "/pokemon/tcgpocket", 
-          label: "TCG Pocket", 
-          description: "Herramientas para Pokémon Trading Card Game",
-          icon: <Swords className="h-5 w-5" />
-        },
-      ],
-    },
-    {
-      title: "Monster Hunter Wilds",
-      description: "Herramientas para Monster Hunter Wilds",
-      items: [
-        { 
-          href: "/mhwilds/builds/planner", 
-          label: "Planificador de Builds", 
-          description: "Crea y comparte builds para Monster Hunter Wilds",
-          icon: <Gamepad2 className="h-5 w-5" />
-        },
-      ],
-    },
-    {
-      title: "Gaming",
-      description: "Utilidades para jugadores",
-      items: [
-        { 
-          href: "/otros/keys", 
-          label: "Claves de Steam", 
-          description: "Gestiona y comparte tus claves de juegos",
-          icon: <FaSteam className="h-5 w-5" />,
-          roles: ["BOFF_ADMIN"]
-        },
-        { 
-          href: "/otros/sorteos", 
-          label: "Sorteos", 
-          description: "Participa en sorteos de juegos y más",
-          icon: <Gift className="h-5 w-5" />
-        },
-      ],
-    },
-  ] as MenuSectionProps[],
-}
+import { useTranslations } from 'next-intl'
 
 export function HerramientasMenu() {
+  const t = useTranslations('nav.menus.tools')
+  
+  const HERRAMIENTAS_MENU = {
+    triggerLabel: t("triggerLabel"),
+    mainLink: { 
+      href: "/herramientas", 
+      label: t("mainLink.label"), 
+      icon: <Gamepad2 className="h-5 w-5" />,
+      description: t("mainLink.description"),
+    },
+    sections: [
+      {
+        items: [
+          { 
+            href: "/herramientas", 
+            label: t("sections.main.items.tools.label"), 
+            description: t("sections.main.items.tools.description"),
+            icon: <Cpu className="h-5 w-5" />
+          },
+        ]
+      },
+      {
+        title: t("sections.pokemon.title"),
+        description: t("sections.pokemon.description"),
+        items: [
+          { 
+            href: "/pokemon/pmdsky", 
+            label: t("sections.pokemon.items.pmdsky.label"), 
+            description: t("sections.pokemon.items.pmdsky.description"),
+            icon: <Gamepad2 className="h-5 w-5" />
+          },
+          { 
+            href: "/pokemon/tcgpocket", 
+            label: t("sections.pokemon.items.tcgpocket.label"), 
+            description: t("sections.pokemon.items.tcgpocket.description"),
+            icon: <Swords className="h-5 w-5" />
+          },
+        ],
+      },
+      {
+        title: t("sections.mhwilds.title"),
+        description: t("sections.mhwilds.description"),
+        items: [
+          { 
+            href: "/mhwilds/builds/planner", 
+            label: t("sections.mhwilds.items.buildPlanner.label"), 
+            description: t("sections.mhwilds.items.buildPlanner.description"),
+            icon: <Gamepad2 className="h-5 w-5" />
+          },
+        ],
+      },
+      {
+        title: t("sections.gaming.title"),
+        description: t("sections.gaming.description"),
+        items: [
+          { 
+            href: "/otros/keys", 
+            label: t("sections.gaming.items.steamKeys.label"), 
+            description: t("sections.gaming.items.steamKeys.description"),
+            icon: <FaSteam className="h-5 w-5" />,
+            roles: ["BOFF_ADMIN"]
+          },
+          { 
+            href: "/otros/sorteos", 
+            label: t("sections.gaming.items.giveaways.label"), 
+            description: t("sections.gaming.items.giveaways.description"),
+            icon: <Gift className="h-5 w-5" />
+          },
+        ],
+      },
+    ] as MenuSectionProps[],
+  }
+
   return <CustomDropdownMenu {...HERRAMIENTAS_MENU} />
 }
