@@ -8,7 +8,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 
 export default function MoveDataElement({id} : {id: string}){
-    const movesTrans  = useTranslations("");
+    const t  = useTranslations("pokedex");
     const [move, setMove] = useState() as [MoveData, any]
 
     useEffect(() => {
@@ -22,7 +22,7 @@ export default function MoveDataElement({id} : {id: string}){
     return(
         <div>
         <div className="text-center mb-4">
-                    <span className="text-3xl font-bold">{movesTrans(`attack_${move.attackName.toLowerCase().replaceAll(" ","_")}`)}</span>
+                    <span className="text-3xl font-bold">{t(`attack_${move.attackName.toLowerCase().replaceAll(" ","_")}`)}</span>
                     </div>
                     <div className="flex justify-center space-x-4 mb-4">
                         <TypeBadge type={move.attackType.toLowerCase()} />

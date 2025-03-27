@@ -12,7 +12,7 @@ interface Move {
 
 export default function Movimientos() {
     const [moves, setMoves] = useState<Move[] | null>(null);
-    const t  = useTranslations("");
+    const t  = useTranslations("pokedex");
 
     useEffect(() => {
         rotomGET('/pokemon/moves').then((res:any) => {

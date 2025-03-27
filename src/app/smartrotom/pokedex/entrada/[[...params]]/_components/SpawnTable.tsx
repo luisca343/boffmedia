@@ -7,8 +7,7 @@ import { useTranslations } from "next-intl";
 
 export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
   console.log(spawns)
-    const t  = useTranslations("");
-    const formsTrans  = useTranslations("");
+    const t  = useTranslations("pokedex");
     if(spawns.length == 0) return <div className="  text-surface-50 text-shadow-border1 flex justify-center ">
     <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
         Este Pokémon no spawnea
@@ -127,8 +126,8 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
             )
 
     function getFormPalette(spawn: SpawnInfo){
-        const form = spawn.pokemonForm === 'base' ? '' : formsTrans(`form_${spawn.pokemonForm}`)
-        const palette = spawn.pokemonPalette ? formsTrans(`palette_${spawn.pokemonPalette}`) : ''
+        const form = spawn.pokemonForm === 'base' ? '' : t(`form_${spawn.pokemonForm}`)
+        const palette = spawn.pokemonPalette ? t(`palette_${spawn.pokemonPalette}`) : ''
 
         return <div>
             <span>{palette || form ? form : 'Base'}</span>

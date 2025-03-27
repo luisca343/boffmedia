@@ -1,10 +1,9 @@
 import { InternalLink } from "@/components/nav/Link"
 import { rotomGET } from "@/services/boffAPI"
-import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 export default async function Biomas(){
-    const spawnsTranslation  = await getTranslations("");
+    const t  = await getTranslations("pokedex");
     const biomes = (await rotomGET('/pokemon/biomes')).data as Record<string, number>
     //<h3>{biome.name} - {biome.amount}</h3>
     return(
@@ -14,7 +13,7 @@ export default async function Biomas(){
             if(biome.includes("biomesoplenty") || biome.includes("terraforged")) return null
             return <InternalLink href={`pokedex/localizacion/${biome}`} key={index}>
                 <div className=" flex flex-col p-2 text-center items-center justify-center hover:text-surface-800 hover:bg-surface-400 w-64 h-32 border rounded-lg my-1">
-                    <span>{spawnsTranslation(biome.replace(":","_").replace(" ","_"))}</span>  
+                    <span>{t(biome.replace(":","_").replace(" ","_"))}</span>  
                     <span>{amount}</span>
                 </div>
             </InternalLink>

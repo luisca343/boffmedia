@@ -43,7 +43,7 @@ const TableHeader = React.forwardRef<
   const variant = useTableVariant()
   
   const variantStyles = {
-    default: "border-surface-700 bg-surface-800/80",
+    default: "border-surface-700 bg-surface-900",
     wingull: "border-blue-700 bg-blue-900/80"
   }
   
@@ -68,8 +68,8 @@ const TableBody = React.forwardRef<
   const variant = useTableVariant()
   
   const variantStyles = {
-    default: "bg-surface-800",
-    wingull: "bg-blue-900"
+    default: "bg-surface-700",
+    wingull: "bg-blue-800"
   }
   
   return (

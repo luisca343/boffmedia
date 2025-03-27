@@ -9,7 +9,7 @@ import MoveDataElement from "../../../movimientos/_components/MoveData";
 import { useTranslations } from "next-intl";
 
 export function MovesTable({moves, sort = false, moveData}: {moves: Moves, sort?: boolean, moveData?: any}){
-    const t  = useTranslations("");
+    const t  = useTranslations("pokedex");
     let sortedMoves = {} as {[key: string]: any[]}
     Object.entries(moves).forEach(([key, value]: [string, any]) => {
         if(key === 'levelUpMoves') {

@@ -27,7 +27,7 @@ const colors = {
 } as {[key: string]: {backgroundColor: string, textColor: string}}
 
 export default function TypeBadge({type}: {type: string}){
-    const t  = useTranslations("");
+    const t  = useTranslations("pokedex");
     if(!type) return null
     const typeColors = colors[type.toLowerCase()];
     return <div className={` m-1 h-8 w-32 font-bold text-xl 2xl:text-base min-w-28 flex flex-row items-center  text-surface-50 bg-${type.toLowerCase()} pl-2 pr-2 rounded text-shadow-border2 2xl:text-shadow-border1`} 
@@ -39,7 +39,7 @@ export default function TypeBadge({type}: {type: string}){
 
 
 export function TypeBadgeSmall({type}: {type: string}){
-    const t  = useTranslations("");
+    const t  = useTranslations("pokedex");
     if(!type) return null
     const typeColors = colors[type.toLowerCase().trim()];
     return <div className={` m-1 h-6 font-bold text-xs w-16 flex flex-row items-center  text-surface-50 bg-${type.toLowerCase().trim()} pl-1 pr-1 rounded text-shadow-border1`} 

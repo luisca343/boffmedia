@@ -17,8 +17,7 @@
       "tmMoves9": "MT Gen 9",
       "transferMoves": "Tutor de Transferencia",
       
-
-      "attack_absorb": "Absorber",
+    "attack_absorb": "Absorber",
     "attack_absorb_description": "Los PS del usuario son restaurados a la mitad el daño recibido por el objetivo.",
     "attack_acid": "Ácido",
     "attack_acid_description": "El equipo contrario es rociado con ácido corrosivo. El ácido disminuye la Defensa Especial del objetivo.",

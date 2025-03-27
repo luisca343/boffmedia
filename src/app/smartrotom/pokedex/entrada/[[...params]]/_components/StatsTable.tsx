@@ -4,7 +4,7 @@ import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader,PokedexRow } from
 import { useTranslations } from "next-intl";
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number }){
-  const t  = useTranslations("");
+  const t  = useTranslations("pokedex");
     const stats = pokemon.forms[formIndex].battleStats ? pokemon.forms[formIndex].battleStats : pokemon.forms[0].battleStats as BattleStats
     if(!stats) return <h1>Stats not found</h1>
     let evYields = pokemon.forms[formIndex].evYields ? pokemon.forms[formIndex].evYields : pokemon.forms[0].evYields as EvYields 

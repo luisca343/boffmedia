@@ -1,10 +1,37 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
 
+// Helper function for deep merging objects
+const deepMerge = (target, source) => {
+  const output = { ...target };
+  
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key] });
+        } else {
+          output[key] = deepMerge(target[key], source[key]);
+        }
+      } else {
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+  }
+  
+  return output;
+};
+
+// Helper to check if value is an object
+const isObject = (item) => {
+  return item && typeof item === 'object' && !Array.isArray(item);
+};
+
 export default getRequestConfig(async () => {
   // Get locale from cookies or use default
   const cookieStore = cookies();
   const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es';
+  const defaultLocale = 'es';
   
   // Define paths to import
   const paths = [
@@ -19,19 +46,41 @@ export default getRequestConfig(async () => {
     'tools/mhwilds/mhwilds.json',
   ];
   
-  // Import all translations
+  // Load translations for the current locale
   const imports = await Promise.all(
     paths.map(path => import(`../../locales/${locale}/${path}`).catch(err => {
-      console.error(`Failed to load translation: ${path}`, err);
+      console.error(`Failed to load translation: ${path} for locale ${locale}`, err);
       return { default: {} };
     }))
   );
   
-  // Merge all translation objects
-  const messages = imports.reduce((acc, module) => ({
-    ...acc,
-    ...module.default
-  }), {});
+  // Deep merge current locale messages
+  let currentLocaleMessages = {};
+  imports.forEach(module => {
+    currentLocaleMessages = deepMerge(currentLocaleMessages, module.default);
+  });
+
+  // If current locale is not the default, load default locale as fallback
+  let messages = currentLocaleMessages;
+  
+  if (locale !== defaultLocale) {
+    // Load default locale translations
+    const defaultImports = await Promise.all(
+      paths.map(path => import(`../../locales/${defaultLocale}/${path}`).catch(err => {
+        console.error(`Failed to load translation: ${path} for default locale ${defaultLocale}`, err);
+        return { default: {} };
+      }))
+    );
+    
+    // Deep merge default locale messages
+    let defaultMessages = {};
+    defaultImports.forEach(module => {
+      defaultMessages = deepMerge(defaultMessages, module.default);
+    });
+    
+    // Deep merge default messages with current locale messages (current locale takes precedence)
+    messages = deepMerge(defaultMessages, currentLocaleMessages);
+  }
 
   return {
     locale,

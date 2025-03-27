@@ -26,7 +26,7 @@ export default function Localizacion({params} : {params: {id: string}}){
     }, [id])
 
 
-    const spawnsTranslation  = useTranslations("");
+    const t  = useTranslations("pokedex");
     
     if(!pokemon) return <h1>404</h1>
     return(
@@ -40,7 +40,7 @@ export default function Localizacion({params} : {params: {id: string}}){
             <div className="flex  flex-wrap justify-center items-start">
                 {Object.entries(pokemon).map(([biome, spawn]) => (
                     <div key={1} className="flex flex-col  mb-4 rounded-xl p-2 w-[95%] m-auto">
-                        <PossibleSpawnsSection pokemonSpawns={spawn} hideCaught={hideCaught} hideSeen={hideSeen} title={spawnsTranslation(biome.replace(":", "_").replace("%3A","_").replace("%20","_"))}/>
+                        <PossibleSpawnsSection pokemonSpawns={spawn} hideCaught={hideCaught} hideSeen={hideSeen} title={t(biome.replace(":", "_").replace("%3A","_").replace("%20","_"))}/>
                     </div>
                 ))}
             </div>

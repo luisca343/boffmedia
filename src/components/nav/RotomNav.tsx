@@ -18,6 +18,7 @@ import { useNotificationCenter } from "react-toastify/addons/use-notification-ce
 import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useSocketStore from "@/stores/useSocketStore";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function RotomNav({
   setTema,
@@ -154,7 +155,17 @@ export default function RotomNav({
           <SheetHeader>
             <SheetTitle className="text-surface-50">Ajustes</SheetTitle>
             <SheetDescription>
-              <SettingsPage setTema={setTema} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                <div>
+                  <SettingsPage setTema={setTema} />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-surface-50 text-lg font-medium mb-2">Idioma</h3>
+                  <div className="bg-surface-700 p-4 rounded-lg">
+                    <LanguageSwitcher variant="mobile" />
+                  </div>
+                </div>
+              </div>
             </SheetDescription>
           </SheetHeader>
         </SheetContent>

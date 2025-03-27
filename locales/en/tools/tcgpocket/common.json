@@ -1,0 +1,29 @@
+{
+  "tcgpocket": {
+    "geneticapex": "Genetic Apex",
+    "promo-a": "Promo A",
+    "mythicalisland": "Mythical Island",
+    "space-timesmackdown": "Space-Time Smackdown",
+    "triumphantlight": "Triumphant Light",
+    "shiningrevelry": "Shining Revelry",
+    "packs": {
+      "mewtwo": "Mewtwo - Genetic Apex",
+      "charizard": "Charizard - Genetic Apex",
+      "pikachu": "Pikachu - Genetic Apex",
+      "mew": "Mew - Mythical Island",
+      "dialga": "Dialga - Space-Time Smackdown",
+      "palkia": "Palkia - Space-Time Smackdown",
+      "arceus": "Arceus - Triumphant Light"
+    },
+
+    "item": {
+      "xp": "XP",
+      "packhourglass": "Pack Hourglass",
+      "wonderhourglass": "Wonder Hourglass",
+      "shopticket": "Shop Ticket",
+      "shinedust": "Shine Dust"
+    },
+
+    "mewQuest": "Immersive Mew"
+  }
+}

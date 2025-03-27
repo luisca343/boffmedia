@@ -9,7 +9,7 @@ interface PokedexTableProps {
 
 export function PokedexTable({ children, className }: PokedexTableProps) {
   return (
-    <div className="w-full overflow-x-auto rounded-xl shadow-lg bg-surface-700 my-4">
+    <div className="w-full overflow-x-auto rounded-xl shadow-lg my-4">
       <Table className={cn("w-full text-sm border-separate border-spacing-0", className)}>
         {children}
       </Table>
@@ -37,7 +37,7 @@ interface PokedexHeaderProps {
 
 export function PokedexHeader({ children, className }: PokedexHeaderProps) {
   return (
-    <TableHeader className={cn("bg-surface-900 sticky top-0 z-10 pointer-events-none", className)}>
+    <TableHeader className={cn("sticky top-0 z-10 pointer-events-none", className)}>
       {children}
     </TableHeader>
   )

@@ -297,6 +297,8 @@
     "ability_Multitype_description": "Cambia el tipo al de la Tabla que lleve.",
     "ability_Mummy": "Momia",
     "ability_Mummy_description": "Contagia Momia al rival que lo toque.",
+    "ability_MyceliumMight": "Poder fúngico",
+    "ability_MyceliumMight_description": "El Pokémon siempre actuará más lentamente al usar movimientos de estado, pero estos movimientos no se verán impedidos por la Habilidad del objetivo.",
     "ability_NaturalCure": "Cura Natural",
     "ability_NaturalCure_description": "Cura problemas de estado al cambiar de Pokémon.",
     "ability_NoGuard": "Indefenso",
