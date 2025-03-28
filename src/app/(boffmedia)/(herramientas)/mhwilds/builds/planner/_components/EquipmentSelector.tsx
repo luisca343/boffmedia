@@ -92,8 +92,16 @@ export function EquipmentSelector({
       result = result.filter(item => filters.rarity.includes(item.rarity));
     }
     
+    // Apply weapon type filter (only for weapons)
+    if (filters.weaponType && (slotType === 'weapon' || slotType === 'secondaryWeapon')) {
+      result = result.filter(item => {
+        const weapon = item as Weapon;
+        return weapon.kind?.toLowerCase() === filters.weaponType?.toLowerCase();
+      });
+    }
+    
     // Apply element filter (only for weapons)
-    if (filters.element && slotType === 'weapon') {
+    if (filters.element && (slotType === 'weapon' || slotType === 'secondaryWeapon')) {
       result = result.filter(item => {
         // Check both standard element and backward compatibility
         const weapon = item as Weapon;

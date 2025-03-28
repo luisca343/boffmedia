@@ -1,5 +1,22 @@
 {
   "mhwilds": {
+    "weapons":{
+      "great-sword": "Great Sword",
+      "long-sword": "Long Sword",
+      "sword-shield": "Sword and Shield",
+      "dual-blades": "Dual Blades",
+      "hammer": "Hammer",
+      "hunting-horn": "Hunting Horn",
+      "lance": "Lance",
+      "gunlance": "Gunlance",
+      "switch-axe": "Switch Axe",
+      "charge-blade": "Charge Blade",
+      "insect-glaive": "Insect Glaive",
+      "light-bowgun": "Light Bowgun",
+      "heavy-bowgun": "Heavy Bowgun",
+      "bow": "Bow"
+    },
+    "weapon_type": "Weapon Type",
     "build_planner": {
       "title": "Build Planner",
       "subtitle": "Create and optimize your builds for Monster Hunter Wilds",

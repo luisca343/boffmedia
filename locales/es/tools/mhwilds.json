@@ -1,5 +1,22 @@
 {
   "mhwilds": {
+    "weapons":{
+      "great-sword": "Gran Espada",
+      "long-sword": "Espada Larga",
+      "sword-shield": "Espada y Escudo",
+      "dual-blades": "Espadas Duales",
+      "hammer": "Martillo",
+      "hunting-horn": "Cornamusa",
+      "lance": "Lanza",
+      "gunlance": "Lanza Pistola",
+      "switch-axe": "Hacha Espada",
+      "charge-blade": "Hacha Cargada",
+      "insect-glaive": "Glaive Insecto",
+      "light-bowgun": "Ballesta Ligera",
+      "heavy-bowgun": "Ballesta Pesada",
+      "bow": "Arco"
+    },
+    "weapon_type": "Tipo de Arma",
     "build_planner": {
       "title": "Planificador de Builds",
       "subtitle": "Crea y optimiza tus builds para Monster Hunter Wilds",

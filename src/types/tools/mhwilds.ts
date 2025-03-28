@@ -219,6 +219,7 @@ export interface Filters {
   skills: string[];
   slots: number[];
   element?: string;
+  weaponType?: string;
 }
 export interface StatsData {
   weapon: Weapon | null;
