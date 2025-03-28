@@ -111,7 +111,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
       <CardContent className="space-y-2 p-3">
         {/* Primary stats in a row */}
         <div className="grid grid-cols-3 gap-2">
-          {renderStatItem("defense", "defense", stats.defense || 0, "text-blue-400")}
+          {renderStatItem("defense", "defense", `${stats.defenseMin} - ${stats.defenseMax}`, "text-blue-400")}
           {renderStatItem("attack", "attack", attackValue || stats.attack || 0, "text-red-400")}
           {renderStatItem(
             "affinity", 

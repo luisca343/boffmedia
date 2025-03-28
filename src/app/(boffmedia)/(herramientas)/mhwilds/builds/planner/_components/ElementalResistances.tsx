@@ -17,19 +17,17 @@ export function ElementalResistances({ stats }: ElementalResistancesProps) {
   ];
   
   return (
-    <div className="grid grid-cols-5 gap-1">
+    <div className="flex gap-2">
       {resistances.map(res => (
-        <div key={res.name} className="flex flex-col items-center bg-surface-700/40 rounded-md p-1.5">
-          <div className="w-6 h-6 flex justify-center items-center">
-            <Image 
-              src={`/img/games/mhwilds/${res.icon}.webp`}
-              alt={res.name}
-              width={18}
-              height={18}
-            />
-          </div>
-          <span className={`font-medium text-sm ${res.value >= 0 ? res.color : 'text-red-400'}`}>
-            {res.value}
+        <div key={res.name} className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1">
+          <Image 
+            src={`/img/games/mhwilds/${res.icon}.webp`}
+            alt={res.name}
+            width={18}
+            height={18}
+          />
+          <span className={`font-medium ${res.value >= 0 ? res.color : 'text-red-400'}`}>
+            {res.value >= 0 ? `+${res.value}` : res.value}
           </span>
         </div>
       ))}

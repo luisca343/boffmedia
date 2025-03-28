@@ -59,7 +59,7 @@ export interface ArmorPiece {
   kind: string;
   rank: string;
   rarity: number;
-  defense: DefenseData | number;
+  defense: DefenseData;
   resistances: {
     fire: number;
     water: number;
@@ -222,7 +222,8 @@ export interface Filters {
 }
 export interface StatsData {
   weapon: Weapon | null;
-  defense: number;
+  defenseMin: number;
+  defenseMax: number;
   fireRes: number;
   waterRes: number;
   thunderRes: number;

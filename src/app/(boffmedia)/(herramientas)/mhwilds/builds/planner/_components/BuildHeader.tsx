@@ -170,7 +170,7 @@ export function BuildHeader({
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-surface-700/30 p-2 rounded flex justify-between">
             <span>{t("defense")}</span>
-            <span className="text-blue-400">{stats.defense}</span>
+            <span className="text-blue-400">{stats.defenseMin}</span>
           </div>
           <div className="bg-surface-700/30 p-2 rounded flex justify-between">
             <span>{t("attack")}</span>

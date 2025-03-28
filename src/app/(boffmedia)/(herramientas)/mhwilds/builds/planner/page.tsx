@@ -227,7 +227,8 @@ export default function BuildPlanner() {
   const calculateStats = (): StatsData => {
     let stats: StatsData = {
       weapon: buildWithFullObjects.weapon || null,
-      defense: 0,
+      defenseMin: 0,
+      defenseMax: 0,
       fireRes: 0,
       waterRes: 0,
       thunderRes: 0,
@@ -283,8 +284,8 @@ export default function BuildPlanner() {
       const armor = buildWithFullObjects[slot as keyof BuildData] as ArmorPiece | null;
       if (armor) {
         // Add defense
-        stats.defense += typeof armor.defense === 'number' ? 
-          armor.defense : armor.defense.base;
+        stats.defenseMin += armor.defense.base
+        stats.defenseMax += armor.defense.max || 0;
         
         // Add resistances
         if (armor.resistances) {

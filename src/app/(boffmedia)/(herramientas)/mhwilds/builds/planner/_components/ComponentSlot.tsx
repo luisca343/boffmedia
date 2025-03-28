@@ -139,7 +139,7 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
 const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
   const t = useTranslations("mhwilds");
   return <div className="flex gap-3">
-    <span className="text-blue-400">{t("def")}: {getDefenseValue(armor.defense)}</span>
+    <span className="text-blue-400">{t("def")}: {armor.defense.base} - {armor.defense.max}</span>
     {armor.rarity !== undefined && (
       <span className="text-amber-400">{t("rarity")} {armor.rarity}</span>
     )}
@@ -147,7 +147,7 @@ const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
       <span className="text-primary-400">
         {t("build_planner.set")}: {armor.armorSet.name || (armor.name.split(" ").length > 2 ? 
           armor.name.split(" ").slice(-2).join(" ") : 
-          armor.name)} {armor.rank}
+          armor.name)}
       </span>
     )}
   </div>
