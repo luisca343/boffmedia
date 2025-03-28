@@ -78,8 +78,9 @@
       "hidden": "(O)",
       "select_charm": "Elegir amuleto",
       "charms": "Amuletos",
-      "no_charms_found": "No se han encontrado amuletos"
-    },
+      "no_charms_found": "No se han encontrado amuletos",
+      "skill_count": "{count, plural, =1 {# habilidad} other {# habilidades}}"
+  },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipamiento",
     "weapon": "Arma",

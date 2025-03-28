@@ -7,9 +7,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { SharpnessBar } from "./SharpnessBar";
 import { ElementalResistances } from "./ElementalResistances";
-import { Droplet, Zap, Snowflake, Skull, Flame, EyeOff, Shield, Swords, Target, Pill } from "lucide-react";
+import { EyeOff } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Weapon, ElementData, WeaponSpecial, BuildData, StatsData } from "../../../../../../../types/tools/mhwilds";
+import { Weapon, StatsData } from "../../../../../../../types/tools/mhwilds";
 import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
@@ -80,144 +80,137 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
       setWeaponStatuses([]);
     }
   }, [weapon]);
+
+  const renderStatItem = (
+    icon: string, 
+    label: string, 
+    value: string | number, 
+    color: string, 
+    extra?: React.ReactNode
+  ) => (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1.5">
+            <Image src={`/img/games/mhwilds/${icon}.webp`} alt={label} width={18} height={18} />
+            <span className={`font-medium ${color}`}>{value}{extra}</span>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <span>{t(label)}</span>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
   
   return (
     <Card className="bg-surface-800 border-surface-700">
       <CardHeader className="py-2 px-4">
         <CardTitle className="text-base">{t("stats")}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3 p-3">
-        {/* Stats displayed vertically */}
-        <div className="grid grid-cols-1 gap-2">
-          <TooltipProvider>
-            {/* Defense */}
-            <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
-              <div className="w-8 h-8 flex justify-center items-center">
-                <Image 
-                  src="/img/games/mhwilds/defense.webp" 
-                  alt="Defense"
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-surface-300">{t("defense")}</span>
-                <span className="font-medium text-blue-400">{stats.defense || 0}</span>
-              </div>
-            </div>
-            
-            {/* Attack */}
-            <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
-              <div className="w-8 h-8 flex justify-center items-center">
-                <Image 
-                  src="/img/games/mhwilds/attack.webp" 
-                  alt="Attack"
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-surface-300">{t("attack")}</span>
-                <span className="font-medium text-red-400">{attackValue || stats.attack || 0}</span>
-              </div>
-            </div>
-            
-            {/* Affinity */}
-            <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
-              <div className="w-8 h-8 flex justify-center items-center">
-                <Image 
-                  src="/img/games/mhwilds/affinity.webp" 
-                  alt="Affinity"
-                  width={24}
-                  height={24}
-                />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs text-surface-300">{t("affinity")}</span>
-                <span className={`font-medium ${stats.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  {stats.affinity >= 0 ? '+' : ''}{stats.affinity || 0}%
-                </span>
-              </div>
-            </div>
-            
-            {/* Elements - only show if present */}
-            {weaponElements.length > 0 && weaponElements.map((element, idx) => (
-              <div 
-                key={`element-${idx}`} 
-                className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2"
-              >
-                <div className="w-8 h-8 flex justify-center items-center">
-                  <Image 
-                    src={`/img/games/mhwilds/${elementIcons[element.type.toLowerCase() as keyof typeof elementIcons] || 'element'}.webp`}
-                    alt={element.type}
-                    width={24}
-                    height={24}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <span className="text-xs text-surface-300">{t(element.type)}</span>
-                    {element.hidden && <EyeOff className="h-3 w-3 ml-1 text-surface-400" />}
-                  </div>
-                  <span className={`font-medium ${getElementColor(element.type)}`}>{element.damage}</span>
-                </div>
-              </div>
-            ))}
-            
-            {/* Status Effects - only show if present */}
-            {weaponStatuses.length > 0 && weaponStatuses.map((status, idx) => (
-              <div 
-                key={`status-${idx}`} 
-                className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2"
-              >
-                <div className="w-8 h-8 flex justify-center items-center">
-                  <Image 
-                    src={`/img/games/mhwilds/${statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 'status'}.webp`}
-                    alt={status.type}
-                    width={24}
-                    height={24}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <span className="text-xs text-surface-300">{t(status.type)}</span>
-                    {status.hidden && <EyeOff className="h-3 w-3 ml-1 text-surface-400" />}
-                  </div>
-                  <span className={`font-medium ${getStatusColor(status.type)}`}>{status.damage}</span>
-                </div>
-              </div>
-            ))}
-
-            {/* Additional weapon details */}
-            {weapon?.elderseal && weapon.elderseal !== null && (
-              <div className="flex items-center gap-2 bg-surface-700/40 rounded-md p-2">
-                <div className="w-8 h-8 flex justify-center items-center">
-                  <Image 
-                    src="/img/games/mhwilds/dragon.webp" 
-                    alt="Elderseal"
-                    width={24}
-                    height={24}
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-xs text-surface-300">{t("elderseal")}</span>
-                  <span className="font-medium text-purple-400">{ t(weapon.elderseal) }</span>
-                </div>
-              </div>
-            )}
-          </TooltipProvider>
+      <CardContent className="space-y-2 p-3">
+        {/* Primary stats in a row */}
+        <div className="grid grid-cols-3 gap-2">
+          {renderStatItem("defense", "defense", stats.defense || 0, "text-blue-400")}
+          {renderStatItem("attack", "attack", attackValue || stats.attack || 0, "text-red-400")}
+          {renderStatItem(
+            "affinity", 
+            "affinity", 
+            stats.affinity >= 0 ? `+${stats.affinity || 0}` : stats.affinity || 0, 
+            stats.affinity >= 0 ? 'text-green-400' : 'text-red-400',
+            <span>%</span>
+          )}
         </div>
         
-        {/* Elemental Resistances */}
+        {/* Elements and status effects in a grid */}
+        {(weaponElements.length > 0 || weaponStatuses.length > 0 || weapon?.elderseal) && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {/* Elements */}
+            {weaponElements.map((element, idx) => (
+              <TooltipProvider key={`element-${idx}`}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1.5">
+                      <Image 
+                        src={`/img/games/mhwilds/${elementIcons[element.type.toLowerCase() as keyof typeof elementIcons] || 'element'}.webp`}
+                        alt={element.type}
+                        width={18}
+                        height={18}
+                      />
+                      <span className={`font-medium ${getElementColor(element.type)}`}>
+                        {element.damage}
+                      </span>
+                      {element.hidden && <EyeOff className="h-3 w-3 text-surface-400" />}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <span>{element.hidden ? `${t("hidden")} ` : ""}{t(element.type)}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+            
+            {/* Status Effects */}
+            {weaponStatuses.map((status, idx) => (
+              <TooltipProvider key={`status-${idx}`}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1.5">
+                      <Image 
+                        src={`/img/games/mhwilds/${statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 'status'}.webp`}
+                        alt={status.type}
+                        width={18}
+                        height={18}
+                      />
+                      <span className={`font-medium ${getStatusColor(status.type)}`}>
+                        {status.damage}
+                      </span>
+                      {status.hidden && <EyeOff className="h-3 w-3 text-surface-400" />}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <span>{status.hidden ? `${t("hidden")} ` : ""}{t(status.type)}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))}
+            
+            {/* Elderseal */}
+            {weapon?.elderseal && weapon.elderseal !== null && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1.5">
+                      <Image 
+                        src="/img/games/mhwilds/dragon.webp" 
+                        alt="Elderseal"
+                        width={18}
+                        height={18}
+                      />
+                      <span className="font-medium text-purple-400">
+                        {t(weapon.elderseal)}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <span>{t("elderseal")}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        )}
+        
+        {/* Elemental Resistances - more compact */}
         <div>
-          <div className="text-xs text-surface-400 mb-1">{t("build_planner.elemental_resistances")}</div>
+          <div className="text-xs text-surface-400 mb-0.5">{t("build_planner.elemental_resistances")}</div>
           <ElementalResistances stats={stats} />
         </div>
 
         {/* Sharpness Bar - only show if weapon has sharpness */}
         {weapon?.sharpness && (
           <div>
-            <div className="text-xs text-surface-400 mb-1">{t("build_planner.sharpness")}</div>
+            <div className="text-xs text-surface-400 mb-0.5">{t("build_planner.sharpness")}</div>
             <SharpnessBar sharpness={weapon.sharpness} />
           </div>
         )}

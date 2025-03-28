@@ -78,7 +78,8 @@
       "hidden": "(H)",
       "select_charm": "Select charm",
       "charms": "Charms",
-      "no_charms_found": "No charms found"
+      "no_charms_found": "No charms found",
+      "skill_count": "{count, plural, =1 {# skill} other {# skills}}"
     },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipment",

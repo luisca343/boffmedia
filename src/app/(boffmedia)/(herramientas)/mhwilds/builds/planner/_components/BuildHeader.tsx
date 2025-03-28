@@ -295,10 +295,12 @@ export function BuildHeader({
                   <Download className="h-4 w-4 mr-2" />
                   <span>{t("build_planner.export_json")}</span>
                 </DropdownMenuItem>
+                {/* 
                 <DropdownMenuItem onClick={generateImage} className="cursor-pointer">
                   <Camera className="h-4 w-4 mr-2" />
                   <span>{t("build_planner.generate_image")}</span>
                 </DropdownMenuItem>
+                */}
                 <DropdownMenuItem onClick={handleCopy} className="cursor-pointer">
                   <Copy className="h-4 w-4 mr-2" />
                   <span>Copiar JSON</span>

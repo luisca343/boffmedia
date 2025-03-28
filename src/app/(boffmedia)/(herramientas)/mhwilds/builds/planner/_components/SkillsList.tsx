@@ -59,7 +59,7 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="text-base">{t("build_planner.active_skills")}</CardTitle>
           <span className="text-xs text-surface-400">
-            {skills.length} {skills.length === 1 ? 'habilidad' : 'habilidades'}
+            {t("build_planner.skill_count", { count: skills.length })}
           </span>
         </div>
       </CardHeader>
@@ -70,7 +70,7 @@ export function SkillsList({ skills, skillsData }: SkillsListProps) {
             <p className="text-xs">{t("build_planner.loading", {item: t("skills").toLowerCase()})}</p>
           </div>
         ) : sortedSkills.length > 0 ? (
-          <ScrollArea className="h-80 pr-1">
+          <ScrollArea className="pr-1">
             {/* Display overallocated skills first with warning */}
             {overallocatedSkills.length > 0 && (
               <div className="mb-2">
