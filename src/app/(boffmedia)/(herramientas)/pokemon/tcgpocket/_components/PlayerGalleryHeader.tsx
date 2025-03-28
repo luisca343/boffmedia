@@ -40,7 +40,7 @@ export function PlayerGalleryHeader({
   setShowAmounts,
   onRecentUpdatesClick
 }: PlayerGalleryHeaderProps) {
-  const t = useTranslations('tools.tcgpocket')
+  const t = useTranslations('tcgpocket')
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="text-center">
