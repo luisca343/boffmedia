@@ -38,32 +38,10 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
   const t = useTranslations("mhwilds");
   const [weaponElements, setWeaponElements] = useState<{ type: string; damage: number; hidden?: boolean; }[]>([]);
   const [weaponStatuses, setWeaponStatuses] = useState<{ type: string; damage: number; hidden?: boolean; }[]>([]);
-  
-  // Element type icons mapping
-  const elementIcons = {
-    fire: "fire",
-    water: "water",
-    thunder: "thunder",
-    ice: "ice",
-    dragon: "dragon",
-  };
-  
-  // Status type icons mapping
-  const statusIcons = {
-    poison: "poison",
-    sleep: "sleep",
-    paralysis: "paralysis",
-    blast: "blast",
-    stun: "stun",
-  };
 
-  // Get the weapon from different possible locations
   const weapon = stats.weapon;
-
-  // Get weapon attack value
   const attackValue = getWeaponAttack(weapon);
   
-  // Effect to update elements and statuses when weapon changes
   useEffect(() => {
     try {
       if (weapon) {
@@ -132,7 +110,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1.5">
                       <Image 
-                        src={`/img/games/mhwilds/${elementIcons[element.type.toLowerCase() as keyof typeof elementIcons] || 'element'}.webp`}
+                        src={`/img/games/mhwilds/${element.type.toLowerCase() || 'element'}.webp`}
                         alt={element.type}
                         width={18}
                         height={18}
@@ -157,7 +135,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-1.5 bg-surface-700/40 rounded px-2 py-1.5">
                       <Image 
-                        src={`/img/games/mhwilds/${statusIcons[status.type.toLowerCase() as keyof typeof statusIcons] || 'status'}.webp`}
+                        src={`/img/games/mhwilds/${status.type.toLowerCase() || 'status'}.webp`}
                         alt={status.type}
                         width={18}
                         height={18}
