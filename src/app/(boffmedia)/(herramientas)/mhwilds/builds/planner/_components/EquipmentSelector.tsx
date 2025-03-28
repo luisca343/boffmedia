@@ -7,6 +7,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
+  ArrowDown,
+  ArrowUp,
   ChevronLeft, 
   Loader2,
   X,
@@ -45,9 +47,14 @@ export function EquipmentSelector({
   const [filteredEquipment, setFilteredEquipment] = useState<ArmorPiece[] | Weapon[] | Charm[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [initialFilterApplied, setInitialFilterApplied] = useState(false);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   const EquipmentIcon = getEquipmentIcon(slotType);
   const iconColor = getIconColor(slotType);
+
+  const toggleSortDirection = () => {
+    setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+  };
 
   // Update equipment when equipmentData changes
   useEffect(() => {
@@ -140,7 +147,11 @@ export function EquipmentSelector({
   }, [equipment, filters, slotType, isLoading, error]);
 
   // Sort equipment by rarity as default
-  const sortedEquipment = [...filteredEquipment].sort((a, b) => a.rarity - b.rarity);
+  const sortedEquipment = [...filteredEquipment].sort((a, b) => {
+    return sortDirection === 'asc' 
+      ? a.rarity - b.rarity 
+      : b.rarity - a.rarity;
+  });
 
   const selectEquipment = (item: ArmorPiece | Weapon | Charm) => {
     setCurrentBuild({
@@ -185,9 +196,10 @@ export function EquipmentSelector({
         <EquipmentFilters 
           filters={filters} 
           setFilters={setFilters} 
-          slotType={slotType} 
+          slotType={slotType}
+          sortDirection={sortDirection}
+          toggleSortDirection={toggleSortDirection}
         />
-
         {/* Equipment list */}
         {renderEquipmentList()}
       </CardContent>

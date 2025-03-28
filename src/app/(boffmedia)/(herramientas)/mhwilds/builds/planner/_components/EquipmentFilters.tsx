@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, ArrowUpDown, Filter } from "lucide-react";
+import { Search, ArrowUpDown, Filter, ArrowUp, ArrowDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { 
@@ -17,9 +17,11 @@ interface EquipmentFiltersProps {
   filters: Filters;
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
   slotType: EquipmentType;
+  sortDirection: 'asc' | 'desc';
+  toggleSortDirection: () => void;
 }
 
-export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFiltersProps) => {
+export const EquipmentFilters = ({ filters, setFilters, slotType, sortDirection, toggleSortDirection }: EquipmentFiltersProps) => {
   const t = useTranslations("mhwilds");
   const hasActiveFilters = filters.rarity.length > 0 || filters.element || filters.weaponType;
   
@@ -218,8 +220,17 @@ export const EquipmentFilters = ({ filters, setFilters, slotType }: EquipmentFil
           </DropdownMenuContent>
         </DropdownMenu>
         
-        <Button variant="outline" className="text-surface-300">
-          <ArrowUpDown className="mr-1 h-4 w-4" /> {t("build_planner.sort")}
+        <Button 
+          variant="outline" 
+          className="text-surface-300"
+          onClick={toggleSortDirection}
+        >
+          {sortDirection === 'asc' ? (
+            <ArrowUp className="mr-1 h-4 w-4" />
+          ) : (
+            <ArrowDown className="mr-1 h-4 w-4" />
+          )}
+          {t("build_planner.sort")}
         </Button>
       </div>
       
