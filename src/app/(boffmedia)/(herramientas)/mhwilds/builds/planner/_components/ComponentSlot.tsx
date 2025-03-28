@@ -145,7 +145,9 @@ const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
     )}
     {armor.armorSet && (
       <span className="text-primary-400">
-        {t("build_planner.set")}: {armor.armorSet.name}
+        {t("build_planner.set")}: {armor.armorSet.name || (armor.name.split(" ").length > 2 ? 
+          armor.name.split(" ").slice(-2).join(" ") : 
+          armor.name)} {armor.rank}
       </span>
     )}
   </div>

@@ -111,7 +111,6 @@ export default function BuildPlanner() {
       decorations: currentBuild.decorations.map(decoAssign => ({
         equipmentType: decoAssign.equipmentType,
         slotIndex: decoAssign.slotIndex,
-        slotSize: decoAssign.slotSize,
         decoration: getDecorationById(decoAssign.decorationId)
       })).filter(d => d.decoration !== null) as DecorationAssignment[]
     };

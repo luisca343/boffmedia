@@ -66,16 +66,13 @@ export function BuildHeader({
   const handleShareableLink = () => {
     try {
       const shareableUrl = generateShareableLink(buildData);
-      setShareUrl(shareableUrl);
       navigator.clipboard.writeText(shareableUrl);
       showNotification("success", t("build_planner.link_copied", { url: shareableUrl}));
-      setShowDialog("share");
     } catch (error) {
       console.error("Error generating shareable link:", error);
       showNotification("error", t("build_planner.error_link",));
     }
   };
-
   // Export build as JSON using utility function
   const handleExportJson = () => {
     try {

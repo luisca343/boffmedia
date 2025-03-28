@@ -132,7 +132,6 @@ export const generateShareableLink = (buildData: BuildDataWithIds): string => {
         d: buildData.decorations.map(d => ({
           e: getShortEquipmentType(d.equipmentType),
           i: d.slotIndex,
-          s: d.slotSize,
           d: d.decorationId
         }))
       };

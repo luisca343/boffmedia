@@ -209,7 +209,6 @@ export interface BuildDataWithIds {
   decorations: {
     equipmentType: EquipmentType;
     slotIndex: number;
-    slotSize: number;
     decorationId: string;
   }[];
 }
