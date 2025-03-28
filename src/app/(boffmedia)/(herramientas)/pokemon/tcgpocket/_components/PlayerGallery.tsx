@@ -38,7 +38,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
   const [showAmounts, setShowAmounts] = useState(true)
   const [isRecentUpdatesOpen, setIsRecentUpdatesOpen] = useState(false)
-  const trans = useTranslations('tcgpocket')
+  const t = useTranslations('tcgpocket')
   const [nameFilter, setNameFilter] = useState("")
   const [expansionFilter, setExpansionFilter] = useState("")
 
@@ -69,8 +69,8 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       }
     } catch (error) {
       console.error('Error fetching recent updates:', error)
-      setRecentUpdatesError('Failed to fetch recent updates. Please try again later.')
-      toast.error('Failed to fetch recent updates')
+      setRecentUpdatesError(t('gallery.errors.recentUpdates'))
+      toast.error(t('gallery.errors.recentUpdates'))
     } finally {
       setRecentUpdatesLoading(false)
     }
@@ -107,7 +107,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       cardNumber: update.cardNumber,
       count: update.change,
       updatedAt: new Date().toISOString(),
-      cardName: allCards.find(card => card.expansion === update.expansion && card.number === update.cardNumber)?.name || 'Unknown Card'
+      cardName: allCards.find(card => card.expansion === update.expansion && card.number === update.cardNumber)?.name || t('gallery.unknownCard')
     }));
 
     setRecentUpdates(prevUpdates => [...newUpdates, ...prevUpdates]);
@@ -139,7 +139,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       }
     } catch (error) {
       console.error('Error getting best pack:', error)
-      toast.error('No se pudo obtener el mejor pack. Por favor, intenta de nuevo.')
+      toast.error(t('gallery.errors.bestPack'))
     } finally {
       setBestPackLoading(false)
     }
@@ -149,8 +149,8 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
     <div className="min-h-screen text-white">
       {Object.keys(userCards).length === 0 ? (
         <div className="container mx-auto px-4 py-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Gallería no encontrada</h2>
-          <p>Esta galería no existe o todavía no tiene cartas.</p>
+          <h2 className="text-2xl font-bold mb-4">{t('gallery.notFound.title')}</h2>
+          <p>{t('gallery.notFound.description')}</p>
         </div>
       ) : (
         <div className="container mx-auto px-4 py-8">
@@ -175,7 +175,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                 setNameFilter(name)
                 setExpansionFilter(expansion)
               }}
-              trans={trans}
+              t={t}
             />
           </div>
           <div className="mt-8">
@@ -184,7 +184,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                 <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
               </div>
             ) : allCards.length === 0 ? (
-              <p className="text-center text-surface-300">No se encontraron cartas.</p>
+              <p className="text-center text-surface-300">{t('gallery.noCards')}</p>
             ) : (
               <div>
                 {Object.entries(
@@ -213,7 +213,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                     loading={loading}
                     handleAddCard={handleAddCard}
                     handleRemoveCard={handleRemoveCard}
-                    trans={trans}
+                    trans={t}
                     showAmounts={showAmounts}
                   />
                 ))}
@@ -228,7 +228,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
             >
               <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" disabled={loading}>
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                Guardar Cambios
+                {t('gallery.saveChanges')}
               </Button>
             </motion.div>
           )}
@@ -244,7 +244,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       <Dialog open={isRecentUpdatesOpen} onOpenChange={setIsRecentUpdatesOpen}>
         <DialogContent className="bg-surface-800 text-white max-h-[70vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Cartas Recientes</DialogTitle>
+            <DialogTitle>{t('gallery.recentCards')}</DialogTitle>
           </DialogHeader>
           <RecentUpdates
             recentUpdates={recentUpdates}
@@ -257,4 +257,3 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
     </div>
   )
 }
-

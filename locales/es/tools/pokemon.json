@@ -1,0 +1,62 @@
+{
+  "pokemon": {
+    "title": "Pokémon",
+    "categories": {
+      "tcgpocket": {
+        "name": "TCG Pocket",
+        "tools": {
+          "gallery": "Galería",
+          "cardList": "Lista de Cartas",
+          "battles": "Combates"
+        }
+      },
+      "others": {
+        "name": "Otros",
+        "tools": {
+          "skyGenerator": "Generador Exploradores del Cielo"
+        }
+      }
+    },
+    "header": {
+      "title": {
+        "prefix": "Herramientas de",
+        "highlight": "Pokémon"
+      },
+      "subtitle": "Todo lo que necesitas para tus juegos de Pokémon favoritos"
+    },
+    "featuredTool": "Herramienta destacada",
+    "accessButton": "Acceder a {tool}",
+    "explore": "Explorar",
+    "tools": {
+      "tcgpocket": {
+        "title": "TCG Pocket",
+        "description": "Colección, galerías y guía para TCG Pocket",
+        "features": {
+          "gallery": "Galería",
+          "cardList": "Lista de Cartas",
+          "battles": "Combates"
+        }
+      },
+      "pmdsky": {
+        "title": "Mundo Misterioso",
+        "description": "Generador de correos secretos para Exploradores del Cielo",
+        "features": {
+          "skyGenerator": "Sky Generator"
+        }
+      },
+      "pokedex": {
+        "title": "Pokédex",
+        "description": "Base de datos completa de todos los Pokémon",
+        "features": {
+          "pokedex": "Pokédex"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "Enlaces externos",
+      "officialWebsite": "Web Oficial Pokémon",
+      "pokemonDatabase": "Pokémon Database",
+      "bulbapedia": "Bulbapedia"
+    }
+  }
+}

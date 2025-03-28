@@ -13,13 +13,8 @@ interface BasicInfoProps {
 }
 
 export function BasicInfo({ pokemon, formIndex, formName}: BasicInfoProps) {
-  console.log("=========== RENDERING BASIC INFO ===========")
   const t = useTranslations("pokedex")
-  console.log(t("pixelmon_bulbasaur_description"))
   const types = pokemon.forms[formIndex].types ? pokemon.forms[formIndex].types : (pokemon.forms[0].types as any)
-  console.log("t", t)
-  console.log("Pokemon name:", pokemon.name.toLowerCase());
-  console.log("Translation key:", `pixelmon_${pokemon.name.toLowerCase()}_description`);
   const description = t(`pixelmon_${pokemon.name.toLowerCase()}_description`)
   const rank = pokemon.forms[formIndex].rank
     ? pokemon.forms[formIndex].rank

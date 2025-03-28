@@ -16,12 +16,11 @@ export function RecentUpdates({
   recentUpdatesLoading,
   fetchRecentUpdates
 }: RecentUpdatesProps) {
-    const trans = useTranslations('tcgpocket')
-
+  const t = useTranslations('tcgpocket')
 
   return (
     <div className="bg-surface-800 rounded-xl p-6 h-[50vh] overflow-auto">
-      <h2 className="text-2xl font-bold mb-4 text-primary-300">Actualizaciones Recientes</h2>
+      <h2 className="text-2xl font-bold mb-4 text-primary-300">{t('gallery.recentUpdates.title')}</h2>
       <div className="space-y-4">
         {recentUpdatesError ? (
           <div className="flex items-center justify-center text-red-500 bg-red-100 rounded-lg p-4">
@@ -29,14 +28,14 @@ export function RecentUpdates({
             <span>{recentUpdatesError}</span>
           </div>
         ) : recentUpdates.length === 0 ? (
-          <p className="text-surface-400 text-center">No hay actualizaciones recientes</p>
+          <p className="text-surface-400 text-center">{t('gallery.recentUpdates.noUpdates')}</p>
         ) : (
           <>
             {recentUpdates.map((update) => (
               <div key={update.id} className="flex items-center justify-between py-2 border-b border-surface-700 last:border-b-0">
                 <div>
                   <span className="text-white font-medium">{update.cardName}</span>
-                  <span className="text-surface-400 ml-2 text-sm">({trans(update.expansion)})</span>
+                  <span className="text-surface-400 ml-2 text-sm">({t(update.expansion)})</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className={`font-bold ${update.count > 0 ? 'text-green-500' : 'text-red-500'}`}>
@@ -56,7 +55,7 @@ export function RecentUpdates({
               ) : (
                 <ChevronDown className="mr-2 h-4 w-4" />
               )}
-              Cargar Más
+              {t('gallery.recentUpdates.loadMore')}
             </Button>
           </>
         )}

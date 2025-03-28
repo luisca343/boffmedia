@@ -11,7 +11,7 @@ export default function CartasPage() {
   const [cards, setCards] = useState<Card[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [expansionFilter, setExpansionFilter] = useState("");
-  const dungeonsTrans = useTranslations("tcgpocket");
+  const t = useTranslations("tcgpocket");
 
   useEffect(() => {
     boffGET("/herramientas/ptcgp/cards").then((data) => {
@@ -39,7 +39,7 @@ export default function CartasPage() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4 text-primary-300">
-          Todas las Cartas
+          {t("cardsList.pageTitle")}
         </h1>
         <FilterComponent
           expansions={Array.from(new Set(cards.map((card) => card.expansion)))}
@@ -47,20 +47,20 @@ export default function CartasPage() {
             setSearchTerm(name);
             setExpansionFilter(expansion);
           }}
-          trans={dungeonsTrans}
+          t={t}
         />
       </div>
 
       {Object.entries(groupedCards).map(([expansion, expansionCards]) => (
         <div key={expansion} className="mb-12">
           <h2 className="text-3xl font-bold mb-6 text-primary-300">
-            {dungeonsTrans(expansion)}
+            {t(expansion)}
           </h2>
           <CardGrid
             cards={expansionCards}
-            trans={dungeonsTrans}
+            trans={t}
             linkTo={(card) =>
-              `/tcgpocket/cartas/${card.expansion}/${card.number}`
+              `/pokemon/tcgpocket/cartas/${card.expansion}/${card.number}`
             }
             allColored={true}
           />
@@ -69,7 +69,7 @@ export default function CartasPage() {
 
       {Object.keys(groupedCards).length === 0 && (
         <p className="text-center text-surface-300 text-xl mt-8">
-          No se encontraron cartas que coincidan con la búsqueda.
+          {t("cardsList.noResults")}
         </p>
       )}
     </div>

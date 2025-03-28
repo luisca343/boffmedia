@@ -38,8 +38,7 @@ export default function GameToolsLayout({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Set to true by default
   const [isHovering, setIsHovering] = useState(false);
-  const t = useTranslations("mhwilds");
-
+  const t = useTranslations();
 
   if (!gameSlug) gameSlug = pathname.split("/")[1];
 
@@ -47,37 +46,37 @@ export default function GameToolsLayout({
 // This would typically come from a configuration or API
   const gameToolsConfig = {
     "pokemon": {
-      name: "Pokémon",
+      name: t("pokemon.title"),
       icon: "/img/games/pokemon/icon.webp",
       color: "from-yellow-400 to-red-500",
       bg: "bg-red-900",
       categories: [
         {
-          name: "TCG Pocket",
+          name: t("pokemon.categories.tcgpocket.name"),
           tools: [
-            { name: "Galería", href: "/pokemon/tcgpocket/galeria", icon: Diamond },
-            { name: "Lista de Cartas", href: "/pokemon/tcgpocket/cartas", icon: Zap },
-            { name: "Combates", href: "/pokemon/tcgpocket/combates", icon: SwordIcon },
+            { name: t("pokemon.categories.tcgpocket.tools.gallery"), href: "/pokemon/tcgpocket/galeria", icon: Diamond },
+            { name: t("pokemon.categories.tcgpocket.tools.cardList"), href: "/pokemon/tcgpocket/cartas", icon: Zap },
+            { name: t("pokemon.categories.tcgpocket.tools.battles"), href: "/pokemon/tcgpocket/combates", icon: SwordIcon },
           ]
         }, 
         {
-          name: "Otros",
+          name: t("pokemon.categories.others.name"),
           tools: [
-            { name: "Sky Generator", href: "/pokemon/pmdsky", icon: Zap },
+            { name: t("pokemon.categories.others.tools.skyGenerator"), href: "/pokemon/pmdsky", icon: Zap },
           ]
         }
       ]
     },
     "mhwilds": {
-      name: t("title"),
+      name: t("mhwilds.title"),
       icon: "/img/games/mhwilds-icon.webp",
       color: "from-green-400 to-green-600",
       bg: "bg-green-900",
       categories: [
         {
-          name: t("title"),
+          name: t("mhwilds.title"),
           tools: [
-            { name: t("build_planner.title"), href: "/mhwilds/builds/planner", icon: SwordIcon },
+            { name: t("mhwilds.build_planner.title"), href: "/mhwilds/builds/planner", icon: SwordIcon },
           ]
         }
       ]

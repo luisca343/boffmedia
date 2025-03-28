@@ -40,6 +40,8 @@ export default getRequestConfig(async () => {
   const paths = [
     'boffmedia.json',
     'nav.json',
+    'tools/mhwilds.json',
+    'tools/pokemon.json',
     'smartrotom/pokedex/abilities.json',
     'smartrotom/pokedex/common.json',
     'smartrotom/pokedex/forms.json',
@@ -48,7 +50,6 @@ export default getRequestConfig(async () => {
     'tools/pmdsky/common.json',
     'tools/pmdsky/dungeons.json',
     'tools/tcgpocket/common.json',
-    'tools/mhwilds/mhwilds.json',
   ];
   
   // Load translations for the current locale

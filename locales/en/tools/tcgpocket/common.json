@@ -24,6 +24,107 @@
       "shinedust": "Shinedust"
     },
 
-    "mewQuest": "Immersive Mew"
+    "mewQuest": "Immersive Mew",
+    
+    "heroAlt": "Pokémon TCG Pocket",
+    "logoAlt": "TCG Pocket Logo",
+    "heading": {
+      "title": "Tools for",
+      "highlight": "TCG Pocket",
+      "subtitle": "Explore your collection, check all cards and optimize your battles"
+    },
+    "quickSearch": {
+      "title": "Quick Search",
+      "description": "Enter a username to see their card gallery",
+      "placeholder": "Username",
+      "searchButton": "Search"
+    },
+    "viewGallery": {
+      "title": "View Gallery",
+      "description": "Explore your card collection"
+    },
+    "cardsList": {
+      "title": "Card List",
+      "description": "Browse all available cards",
+      "pageTitle": "All Cards",
+      "noResults": "No cards found matching your search criteria."
+    },
+    "battles": {
+      "title": "Individual Battles",
+      "description": "Check teams and rewards"
+    },
+    "common": {
+      "access": "Access"
+    },
+    "types": {
+      "grass": "Grass",
+      "fire": "Fire",
+      "water": "Water",
+      "electric": "Electric",
+      "psychic": "Psychic",
+      "fighting": "Fighting",
+      "darkness": "Darkness",
+      "metal": "Metal",
+      "dragon": "Dragon",
+      "colorless": "Colorless"
+    },
+    "cardDetail": {
+      "loading": "Loading...",
+      "number": "Number",
+      "expansion": "Expansion",
+      "rarity": "Rarity",
+      "type": "Type",
+      "hp": "HP",
+      "weakness": "Weakness",
+      "retreatCost": "Retreat Cost"
+    },
+    "gallery": {
+      "notFound": {
+        "title": "Gallery not found",
+        "description": "This gallery doesn't exist or doesn't have any cards yet."
+      },
+      "recentCards": "Recent Cards",
+      "noCards": "No cards found.",
+      "saveChanges": "Save Changes",
+      "unknownCard": "Unknown Card",
+      "errors": {
+        "recentUpdates": "Failed to fetch recent updates. Please try again later.",
+        "bestPack": "Couldn't get the best pack. Please try again."
+      },
+      "header": {
+        "title": "{username}'s Gallery",
+        "cardCount": "{count} cards in collection"
+      },
+      "options": {
+        "hideMissing": "Hide missing cards",
+        "showAmounts": "Show amounts",
+        "selectEvent": "Select event",
+        "allCards": "All cards",
+        "bestPack": "Recommend Best Pack"
+      },
+      "recentUpdates": {
+        "title": "Recent Updates",
+        "noUpdates": "No recent updates",
+        "loadMore": "Load More"
+      }
+    },
+    "filter": {
+      "searchPlaceholder": "Search cards by name or number",
+      "expansionPlaceholder": "Filter by expansion",
+      "allExpansions": "All expansions"
+    },
+    "bestPack": {
+      "dialogTitle": "New Card Probabilities by Pack",
+      "bestPackGeneral": "The best pack to get new cards is: {packName}",
+      "bestPackEvent": "The best pack to get new cards from '{eventName}' is: {packName}",
+      "missingCardsCount": "Missing cards: {missing} of {total}",
+      "missingCardsList": "List of missing cards:",
+      "availableIn": "Available in:",
+      "table": {
+        "packName": "Pack Name",
+        "card": "Card {number}",
+        "total": "Total"
+      }
+    }
   }
 }

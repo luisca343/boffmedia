@@ -6,10 +6,10 @@ import { Search } from 'lucide-react'
 interface FilterComponentProps {
   expansions: string[]
   onFilterChange: (name: string, expansion: string) => void
-  trans: (key: string) => string
+  t: any
 }
 
-export function FilterComponent({ expansions, onFilterChange, trans }: FilterComponentProps) {
+export function FilterComponent({ expansions, onFilterChange, t: t }: FilterComponentProps) {
   const [nameFilter, setNameFilter] = useState("")
   const [expansionFilter, setExpansionFilter] = useState("")
 
@@ -22,7 +22,7 @@ export function FilterComponent({ expansions, onFilterChange, trans }: FilterCom
       <div className="relative flex-grow">
         <Input
           type="text"
-          placeholder="Buscar cartas por nombre"
+          placeholder={t('filter.searchPlaceholder')}
           value={nameFilter}
           onChange={(e) => setNameFilter(e.target.value)}
           className="w-full pl-10 pr-4 py-2 rounded-lg bg-surface-700 text-white border-surface-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
@@ -31,13 +31,13 @@ export function FilterComponent({ expansions, onFilterChange, trans }: FilterCom
       </div>
       <Select value={expansionFilter} onValueChange={setExpansionFilter}>
         <SelectTrigger className="w-full sm:w-[200px] bg-surface-700 text-white border-surface-600 focus:border-primary-500 focus:ring-2 focus:ring-primary-500">
-          <SelectValue placeholder="Filtrar por expansión" />
+          <SelectValue placeholder={t('filter.expansionPlaceholder')} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">Todas las expansiones</SelectItem>
+          <SelectItem value="all">{t('filter.allExpansions')}</SelectItem>
           {expansions.map((expansion) => (
             <SelectItem key={expansion} value={expansion}>
-              {trans(expansion)}
+              {t(expansion)}
             </SelectItem>
           ))}
         </SelectContent>

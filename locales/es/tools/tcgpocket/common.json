@@ -24,6 +24,107 @@
       "shinedust": "Polvo Iris"
     },
 
-    "mewQuest": "Mew Inmersivo"
+    "mewQuest": "Mew Inmersivo",
+    
+    "heroAlt": "Pokémon TCG Pocket",
+    "logoAlt": "Logo de TCG Pocket",
+    "heading": {
+      "title": "Herramientas para",
+      "highlight": "TCG Pocket",
+      "subtitle": "Explora tu colección, consulta todas las cartas y optimiza tus combates"
+    },
+    "quickSearch": {
+      "title": "Consulta rápida",
+      "description": "Ingresa un nombre de usuario para ver su galería de cartas",
+      "placeholder": "Nombre de usuario",
+      "searchButton": "Buscar"
+    },
+    "viewGallery": {
+      "title": "Ver Galería",
+      "description": "Explora tu colección de cartas"
+    },
+    "cardsList": {
+      "title": "Lista de Cartas",
+      "description": "Navega por todas las cartas disponibles",
+      "pageTitle": "Todas las Cartas",
+      "noResults": "No se encontraron cartas que coincidan con la búsqueda."
+    },
+    "battles": {
+      "title": "Combates individuales",
+      "description": "Comprueba los equipos y recompensas"
+    },
+    "common": {
+      "access": "Acceder"
+    },
+    "types": {
+      "grass": "Planta",
+      "fire": "Fuego",
+      "water": "Agua",
+      "electric": "Eléctrico",
+      "psychic": "Psíquico",
+      "fighting": "Lucha",
+      "darkness": "Oscuridad",
+      "metal": "Metal",
+      "dragon": "Dragón",
+      "colorless": "Incoloro"
+    },
+    "cardDetail": {
+      "loading": "Cargando...",
+      "number": "Número",
+      "expansion": "Expansión",
+      "rarity": "Rareza",
+      "type": "Tipo",
+      "hp": "PS",
+      "weakness": "Debilidad",
+      "retreatCost": "Coste de Retirada"
+    },
+    "gallery": {
+      "notFound": {
+        "title": "Galería no encontrada",
+        "description": "Esta galería no existe o todavía no tiene cartas."
+      },
+      "recentCards": "Cartas Recientes",
+      "noCards": "No se encontraron cartas.",
+      "saveChanges": "Guardar Cambios",
+      "unknownCard": "Carta Desconocida",
+      "errors": {
+        "recentUpdates": "No se pudieron obtener las actualizaciones recientes. Inténtalo de nuevo más tarde.",
+        "bestPack": "No se pudo obtener el mejor pack. Por favor, intenta de nuevo."
+      },
+      "header": {
+        "title": "Galería de {username}",
+        "cardCount": "{count} cartas en la colección"
+      },
+      "options": {
+        "hideMissing": "Ocultar cartas faltantes",
+        "showAmounts": "Mostrar cantidades",
+        "selectEvent": "Seleccionar evento",
+        "allCards": "Todas las cartas",
+        "bestPack": "Recomendar Mejor Sobre"
+      },
+      "recentUpdates": {
+        "title": "Actualizaciones Recientes",
+        "noUpdates": "No hay actualizaciones recientes",
+        "loadMore": "Cargar Más"
+      }
+    },
+    "filter": {
+      "searchPlaceholder": "Buscar cartas por nombre o número",
+      "expansionPlaceholder": "Filtrar por expansión",
+      "allExpansions": "Todas las expansiones"
+    },
+    "bestPack": {
+      "dialogTitle": "Probabilidades de Nuevas Cartas por Pack",
+      "bestPackGeneral": "El mejor sobre para obtener nuevas cartas es: {packName}",
+      "bestPackEvent": "El mejor sobre para obtener nuevas cartas de '{eventName}' es: {packName}",
+      "missingCardsCount": "Cartas faltantes: {missing} de {total}",
+      "missingCardsList": "Lista de cartas faltantes:",
+      "availableIn": "Disponible en:",
+      "table": {
+        "packName": "Nombre del Sobre",
+        "card": "Carta {number}",
+        "total": "Total"
+      }
+    }
   }
 }

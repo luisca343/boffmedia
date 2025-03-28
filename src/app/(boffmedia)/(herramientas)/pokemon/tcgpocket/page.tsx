@@ -8,11 +8,13 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Users, CreditCard, SwordIcon, Sparkles, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function TCGPocket() {
   const [username, setUsername] = useState("");
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const t = useTranslations("tcgpocket");
 
   useEffect(() => {
     setIsMounted(true);
@@ -32,24 +34,24 @@ export default function TCGPocket() {
 
   const menuItems = [
     {
-      title: "Ver Galería",
-      description: "Explora tu colección de cartas",
+      title: t("viewGallery.title"),
+      description: t("viewGallery.description"),
       icon: Users,
       href: "/pokemon/tcgpocket/galeria",
       color: "from-amber-400 to-yellow-500",
       bg: "bg-gradient-to-br from-amber-900/20 to-yellow-900/30"
     },
     {
-      title: "Lista de Cartas",
-      description: "Navega por todas las cartas disponibles",
+      title: t("cardsList.title"),
+      description: t("cardsList.description"),
       icon: CreditCard,
       href: "/pokemon/tcgpocket/cartas",
       color: "from-blue-400 to-cyan-500",
       bg: "bg-gradient-to-br from-blue-900/20 to-cyan-900/30"
     },
     {
-      title: "Combates individuales",
-      description: "Comprueba los equipos y recompensas",
+      title: t("battles.title"),
+      description: t("battles.description"),
       icon: SwordIcon,
       href: "/pokemon/tcgpocket/combates",
       color: "from-red-400 to-rose-500",
@@ -65,7 +67,7 @@ export default function TCGPocket() {
           <>
             <Image
               src="/img/games/tcgpocket/hero.webp"
-              alt="Pokémon TCG Pocket"
+              alt={t("heroAlt")}
               fill
               className="object-cover"
               priority
@@ -76,17 +78,17 @@ export default function TCGPocket() {
                 <div className="mb-2">
                   <Image
                     src="/img/games/tcgpocket/icon.webp"
-                    alt="TCG Pocket Logo"
+                    alt={t("logoAlt")}
                     width={150}
                     height={100}
                     className="object-contain"
                   />
                 </div>
                 <h1 className="text-3xl sm:text-4xl font-bold text-surface-50 drop-shadow-lg">
-                  Herramientas para <span className="text-yellow-400">TCG Pocket</span>
+                  {t("heading.title")} <span className="text-yellow-400">{t("heading.highlight")}</span>
                 </h1>
                 <p className="text-surface-200 mt-2 text-sm sm:text-base">
-                  Explora tu colección, consulta todas las cartas y optimiza tus combates
+                  {t("heading.subtitle")}
                 </p>
               </div>
             </div>
@@ -103,17 +105,17 @@ export default function TCGPocket() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-yellow-400" /> 
-              Consulta rápida
+              {t("quickSearch.title")}
             </CardTitle>
             <CardDescription>
-              Ingresa un nombre de usuario para ver su galería de cartas
+              {t("quickSearch.description")}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex space-x-2">
               <Input
                 type="text"
-                placeholder="Nombre de usuario"
+                placeholder={t("quickSearch.placeholder")}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -124,7 +126,7 @@ export default function TCGPocket() {
                 disabled={!username.trim()}
                 className="bg-primary-500 hover:bg-primary-600"
               >
-                <Search className="mr-2 h-4 w-4" /> Buscar
+                <Search className="mr-2 h-4 w-4" /> {t("quickSearch.searchButton")}
               </Button>
             </div>
           </CardContent>
@@ -159,7 +161,7 @@ export default function TCGPocket() {
                     <Button 
                       variant="ghost" 
                       className={`ml-auto p-0 text-${item.color.split('-')[3]}-400 hover:text-${item.color.split('-')[3]}-300`}>
-                      Acceder <ArrowRight className="ml-1 h-4 w-4" />
+                      {t("common.access")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   </CardFooter>
                 </Card>

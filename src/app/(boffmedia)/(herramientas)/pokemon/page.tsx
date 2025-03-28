@@ -7,10 +7,12 @@ import Image from "next/image";
 import { Diamond, Zap, ChevronRight, Database, ArrowRight, Stars } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 export default function PokemonPage() {
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const t = useTranslations("pokemon");
 
   useEffect(() => {
     setIsMounted(true);
@@ -18,33 +20,33 @@ export default function PokemonPage() {
 
   const pokemonTools = [
     {
-      title: "TCG Pocket",
-      description: "Colección, galerías y guía para TCG Pocket",
+      title: t("tools.tcgpocket.title"),
+      description: t("tools.tcgpocket.description"),
       icon: "/img/games/tcgpocket-icon.webp",
       iconFallback: <Diamond className="h-8 w-8 text-yellow-400" />,
       href: "/pokemon/tcgpocket",
       color: "from-yellow-300 to-yellow-500",
-      tools: ["Galería", "Lista de Cartas", "Combates"],
+      tools: [t("tools.tcgpocket.features.gallery"), t("tools.tcgpocket.features.cardList"), t("tools.tcgpocket.features.battles")],
       featured: true
     },
     {
-      title: "Mundo Misterioso",
-      description: "Generador de correos secretos para Exploradores del Cielo",
+      title: t("tools.pmdsky.title"),
+      description: t("tools.pmdsky.description"),
       icon: "/img/games/pmdsky-icon.webp",
       iconFallback: <Zap className="h-8 w-8 text-blue-400" />,
       href: "/pokemon/pmdsky",
       color: "from-blue-400 to-cyan-600",
-      tools: ["Sky Generator"],
+      tools: [t("tools.pmdsky.features.skyGenerator")],
       featured: false
     },
     {
-      title: "Pokédex",
-      description: "Base de datos completa de todos los Pokémon",
+      title: t("tools.pokedex.title"),
+      description: t("tools.pokedex.description"),
       icon: "/img/games/pokedex-icon.webp",
       iconFallback: <Database className="h-8 w-8 text-red-500" />,
       href: "/pokemon/pokedex",
       color: "from-red-500 to-rose-600",
-      tools: ["Pokédex"],
+      tools: [t("tools.pokedex.features.pokedex")],
       featured: false
     }
   ];
@@ -55,8 +57,10 @@ export default function PokemonPage() {
       <div className="mb-10">
         <div className="flex items-center justify-center md:justify-between">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-surface-50 mb-2">Herramientas de <span className="text-yellow-400">Pokémon</span></h1>
-            <p className="text-xl text-surface-300">Todo lo que necesitas para tus juegos de Pokémon favoritos</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-surface-50 mb-2">
+              {t("header.title.prefix")} <span className="text-yellow-400">{t("header.title.highlight")}</span>
+            </h1>
+            <p className="text-xl text-surface-300">{t("header.subtitle")}</p>
           </div>
           {isMounted && (
             <motion.div 
@@ -107,7 +111,7 @@ export default function PokemonPage() {
                     <h2 className="text-2xl font-bold text-surface-50">
                       {featuredTool.title}
                     </h2>
-                    <p className="text-primary-300 text-sm">Herramienta destacada</p>
+                    <p className="text-primary-300 text-sm">{t("featuredTool")}</p>
                   </div>
                 </div>
                 
@@ -127,7 +131,7 @@ export default function PokemonPage() {
                   onClick={() => router.push(featuredTool.href)}
                   className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-medium px-6"
                 >
-                  Acceder a TCG Pocket <ArrowRight className="ml-2 h-4 w-4" />
+                  {t("accessButton", { tool: "TCG Pocket" })} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
               <div className="md:w-1/3 bg-gradient-to-br from-surface-800 to-surface-900 p-0 flex items-center justify-center relative overflow-hidden">
@@ -192,7 +196,7 @@ export default function PokemonPage() {
               
               <CardFooter className="border-t border-surface-700 pt-3">
                 <Button variant="ghost" size="sm" className="text-primary-400 hover:text-primary-300 p-0 ml-auto">
-                  Explorar <ChevronRight className="ml-1 h-4 w-4" />
+                  {t("explore")} <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
               </CardFooter>
             </Card>
@@ -204,7 +208,7 @@ export default function PokemonPage() {
       <div className="mt-16 bg-surface-800/50 rounded-lg p-6 backdrop-blur-sm">
         <h3 className="text-xl font-medium text-surface-100 mb-4 flex items-center">
           <Stars className="mr-2 h-5 w-5 text-primary-400" />
-          Enlaces externos
+          {t("externalLinks.title")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <a 
@@ -213,7 +217,7 @@ export default function PokemonPage() {
             rel="noopener noreferrer"
             className="bg-surface-700/30 hover:bg-surface-700/50 p-4 rounded-md transition-colors flex items-center justify-between"
           >
-            <span className="text-surface-100">Web Oficial Pokémon</span>
+            <span className="text-surface-100">{t("externalLinks.officialWebsite")}</span>
             <ArrowRight className="h-4 w-4 text-primary-400" />
           </a>
           <a 
@@ -222,7 +226,7 @@ export default function PokemonPage() {
             rel="noopener noreferrer"
             className="bg-surface-700/30 hover:bg-surface-700/50 p-4 rounded-md transition-colors flex items-center justify-between"
           >
-            <span className="text-surface-100">Pokémon Database</span>
+            <span className="text-surface-100">{t("externalLinks.pokemonDatabase")}</span>
             <ArrowRight className="h-4 w-4 text-primary-400" />
           </a>
           <a 
@@ -231,7 +235,7 @@ export default function PokemonPage() {
             rel="noopener noreferrer"
             className="bg-surface-700/30 hover:bg-surface-700/50 p-4 rounded-md transition-colors flex items-center justify-between"
           >
-            <span className="text-surface-100">Bulbapedia</span>
+            <span className="text-surface-100">{t("externalLinks.bulbapedia")}</span>
             <ArrowRight className="h-4 w-4 text-primary-400" />
           </a>
         </div>

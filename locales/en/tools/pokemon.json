@@ -1,0 +1,62 @@
+{
+  "pokemon": {
+    "title": "Pokémon",
+    "categories": {
+      "tcgpocket": {
+        "name": "TCG Pocket",
+        "tools": {
+          "gallery": "Gallery",
+          "cardList": "Card List",
+          "battles": "Battles"
+        }
+      },
+      "others": {
+        "name": "Others",
+        "tools": {
+          "skyGenerator": "Explorers of Sky Generator"
+        }
+      }
+    },
+    "header": {
+      "title": {
+        "prefix": "Tools for",
+        "highlight": "Pokémon"
+      },
+      "subtitle": "Everything you need for your favorite Pokémon games"
+    },
+    "featuredTool": "Featured tool",
+    "accessButton": "Access {tool}",
+    "explore": "Explore",
+    "tools": {
+      "tcgpocket": {
+        "title": "TCG Pocket",
+        "description": "Collection, galleries and guide for TCG Pocket",
+        "features": {
+          "gallery": "Gallery",
+          "cardList": "Card List",
+          "battles": "Battles"
+        }
+      },
+      "pmdsky": {
+        "title": "Mystery Dungeon",
+        "description": "Secret mail generator for Explorers of Sky",
+        "features": {
+          "skyGenerator": "Sky Generator"
+        }
+      },
+      "pokedex": {
+        "title": "Pokédex",
+        "description": "Complete database of all Pokémon",
+        "features": {
+          "pokedex": "Pokédex"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "External Links",
+      "officialWebsite": "Official Pokémon Website",
+      "pokemonDatabase": "Pokémon Database",
+      "bulbapedia": "Bulbapedia"
+    }
+  }
+}

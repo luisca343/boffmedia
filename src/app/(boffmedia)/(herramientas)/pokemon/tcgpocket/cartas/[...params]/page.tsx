@@ -27,7 +27,7 @@ export default function Expansions({
 }) {
   const [expansion, id] = params.params;
   const [cardData, setCardData] = useState<Card | null>(null);
-  const trans = useTranslations("tcgpocket");
+  const t = useTranslations("tcgpocket");
 
   useEffect(() => {
     boffGET(`/herramientas/ptcgp/cards/${expansion}/${id}`).then(
@@ -36,19 +36,6 @@ export default function Expansions({
       }
     );
   }, [expansion, id]);
-
-  const typeTranslations: { [key: string]: string } = {
-    grass: "Planta",
-    fire: "Fuego",
-    water: "Agua",
-    electric: "Eléctrico",
-    psychic: "Psíquico",
-    fighting: "Lucha",
-    darkness: "Oscuridad",
-    metal: "Metal",
-    dragon: "Dragón",
-    colorless: "Incoloro",
-  };
 
   const getRarityImages = (rarity: string) => {
     const [rarityType, rarityNumber] =
@@ -71,7 +58,7 @@ export default function Expansions({
   if (!cardData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse text-xl">Cargando...</div>
+        <div className="animate-pulse text-xl">{t("cardDetail.loading")}</div>
       </div>
     );
   }
@@ -112,17 +99,17 @@ export default function Expansions({
               {/* Basic Info */}
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">Número</p>
+                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.number")}</p>
                   <p className="text-xl text-white">{cardData.number}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">Expansión</p>
+                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.expansion")}</p>
                   <p className="text-xl text-white">
-                    {trans(cardData.expansion)}
+                    {t(cardData.expansion)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">Rareza</p>
+                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.rarity")}</p>
                   <div className="flex items-center">
                     {getRarityImages(cardData.rarity)}
                   </div>
@@ -132,42 +119,42 @@ export default function Expansions({
               {/* Stats */}
               <div className="space-y-6">
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">Tipo</p>
+                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.type")}</p>
                   <div className="flex items-center gap-2">
                     <div className="p-1 bg-white/10 rounded-full">
                       <Image
                         src={`/img/games/tcgpocket/image/${cardData.type}.png`}
-                        alt={typeTranslations[cardData.type]}
+                        alt={t(`types.${cardData.type}`)}
                         width={24}
                         height={24}
                         className="rounded-full"
                       />
                     </div>
                     <span className="text-xl text-white">
-                      {typeTranslations[cardData.type]}
+                      {t(`types.${cardData.type}`)}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">PS</p>
+                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.hp")}</p>
                   <p className="text-xl text-white">{cardData.hp}</p>
                 </div>
 
                 <div>
-                  <p className="text-sm text-surface-400 mb-1">Debilidad</p>
+                  <p className="text-sm text-surface-400 mb-1">{t("cardDetail.weakness")}</p>
                   <div className="flex items-center gap-2">
                     <div className="p-1 bg-white/10 rounded-full">
                       <Image
                         src={`/img/games/tcgpocket/image/${cardData.weakness}.png`}
-                        alt={typeTranslations[cardData.weakness]}
+                        alt={t(`types.${cardData.weakness}`)}
                         width={24}
                         height={24}
                         className="rounded-full"
                       />
                     </div>
                     <span className="text-xl text-white">
-                      {typeTranslations[cardData.weakness]} (
+                      {t(`types.${cardData.weakness}`)} (
                       {cardData.weakness_value})
                     </span>
                   </div>
@@ -175,14 +162,14 @@ export default function Expansions({
 
                 <div>
                   <p className="text-sm text-surface-400 mb-1">
-                    Coste de Retirada
+                    {t("cardDetail.retreatCost")}
                   </p>
                   <div className="flex items-center gap-2">
                     {[...Array(cardData.retreat_cost)].map((_, index) => (
                       <div key={index} className="p-1 bg-white/10 rounded-full">
                         <Image
                           src="/img/games/tcgpocket/image/colorless.png"
-                          alt="Energía Incolora"
+                          alt={t("types.colorless")}
                           width={24}
                           height={24}
                           className="rounded-full"
