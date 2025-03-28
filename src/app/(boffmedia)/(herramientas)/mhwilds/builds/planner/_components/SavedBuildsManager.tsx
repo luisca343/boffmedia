@@ -177,45 +177,6 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
                     <Clock className="h-3 w-3 mr-1" />
                     {formatDate(build.savedAt)}
                   </div>
-                  
-                  {/* Simple equipment summary */}
-                  <div className="mt-3 grid grid-cols-4 gap-1 text-xs">
-                    {build.build.weaponId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-red-300">
-                        {t("weapon", { defaultValue: "Arma" })}
-                      </div>
-                    )}
-                    {build.build.headId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-blue-300">
-                        {t("head", { defaultValue: "Cabeza" })}
-                      </div>
-                    )}
-                    {build.build.chestId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-green-300">
-                        {t("chest", { defaultValue: "Pecho" })}
-                      </div>
-                    )}
-                    {build.build.armsId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-yellow-300">
-                        {t("arms", { defaultValue: "Brazos" })}
-                      </div>
-                    )}
-                    {build.build.waistId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-purple-300">
-                        {t("waist", { defaultValue: "Cintura" })}
-                      </div>
-                    )}
-                    {build.build.legsId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-cyan-300">
-                        {t("legs", { defaultValue: "Piernas" })}
-                      </div>
-                    )}
-                    {build.build.charmId && (
-                      <div className="bg-surface-600/30 p-1 rounded text-amber-300">
-                        {t("charm", { defaultValue: "Amuleto" })}
-                      </div>
-                    )}
-                  </div>
                 </div>
               ))}
             </div>
