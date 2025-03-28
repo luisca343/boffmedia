@@ -55,7 +55,7 @@ export class MhwildsService extends BaseDataService {
                 // Construct API URL based on whether locale is provided
                 const apiUrl = locale 
                     ? `${this.API_BASE_URL}/${locale}/${resourceType}`
-                    : `${this.API_BASE_URL}/${resourceType}`;
+                    : `${this.API_BASE_URL}/en/${resourceType}`;
                 
                 this.logger.log(`Fetching ${resourceType} data from: ${apiUrl}`);
                 
@@ -86,7 +86,7 @@ export class MhwildsService extends BaseDataService {
         }
     }
     
-    async getWeapons(locale: string) {
+    async getWeapons(locale?: string) {
         return this.getResourceData('weapons', locale);
     }
 
