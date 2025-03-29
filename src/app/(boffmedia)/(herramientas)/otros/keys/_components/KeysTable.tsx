@@ -146,7 +146,7 @@ export default function KeysTable() {
                     <TableCell className="text-surface-300">{key.source}</TableCell>
                     <TableCell>
                       <motion.div
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full ${
+                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-black ${
                           key.claimed === "s" ? "bg-red-500" : "bg-green-500"
                         }`}
                         whileHover={{ scale: 1.05 }}
