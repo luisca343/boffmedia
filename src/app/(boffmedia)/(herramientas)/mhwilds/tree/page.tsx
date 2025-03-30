@@ -3,31 +3,60 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWeaponTreeData } from './_hooks/useWeaponTreeData';
+import { useTranslations } from 'next-intl';
 
 export function WeaponElement({ weapon }: { weapon: any }) {
-    // Extract element information
-    const elementInfo = weapon.specials?.find((special: any) => special.kind === "element");
-    const elementType = elementInfo?.element || "none";
-    
-    return (
-      <div className="bg-white shadow-md rounded-lg p-4 cursor-pointer w-32 h-32 overflow-hidden flex flex-col">
-        <h2 className="text-xs font-bold">{weapon.name}</h2>
-        {elementInfo && (
-          <span className="text-xs text-gray-500">{elementType}: {elementInfo.damage.display}</span>
-        )}
-        {/*
-        <p className="text-xs line-clamp-2">{weapon.description}</p>
-        <div className="mt-auto">
-          <p className="text-xs text-gray-500">Type: {weapon.type}</p>
-          <p className="text-xs text-gray-500">Attack: {weapon.attack}</p>
-          <p className="text-xs text-gray-500">Element: {weapon.element}</p>
-          <p className="text-xs text-gray-500">Rarity: {weapon.rarity}</p>
-        </div> */}
+  // Extract element information
+  const elementInfo = weapon.specials?.find((special: any) => special.kind === "element");
+  const elementType = elementInfo?.element || "none";
+  
+  return (
+    <div className="bg-surface-800 shadow-md rounded-lg p-2.5 cursor-pointer min-w-32 h-22 overflow-hidden flex flex-col border border-surface-700 hover:bg-surface-700 hover:border-surface-600 transition-colors relative">
+      {/* Rarity badge */}
+      <span className="absolute top-0 right-0 bg-surface-700 text-xs px-1 rounded-bl text-surface-300">
+        R{weapon.rarity}
+      </span>
+      
+      {/* Weapon name */}
+      <h2 className="text-xs font-bold text-surface-100 mb-1" title={weapon.name}>
+        {weapon.name}
+      </h2>
+      
+      {/* Damage display with icon */}
+      <div className="flex items-center gap-1.5 text-xs text-surface-200 mt-0.5">
+        <div className="w-3.5 h-3.5 relative flex-shrink-0">
+          <img 
+            src="/img/games/mhwilds/attack.webp" 
+            alt="Attack" 
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <span>{weapon.damage?.display || 0}</span>
       </div>
-    );
+      
+      {/* Element display with icon */}
+      {elementInfo && elementType !== "none" && (
+        <div className="flex items-center gap-1.5 text-xs text-surface-300 mt-1">
+          <div className="w-3.5 h-3.5 relative flex-shrink-0">
+            <img 
+              src={`/img/games/mhwilds/${elementType}.webp`} 
+              alt={elementType} 
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <span>{elementInfo.damage.display}</span>
+          {elementInfo.hidden && (
+            <span className="text-[8px] text-surface-400">(hidden)</span>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function WeaponTree() {
+  const t = useTranslations('mhwilds');
+  
   const {
     weaponTypes,
     filteredTree,
@@ -65,7 +94,7 @@ export default function WeaponTree() {
           onClick={() => refreshData()}
           className="mt-2 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
         >
-          Try Again
+          {t('build_planner.retry')}
         </button>
       </div>
     );
@@ -224,7 +253,7 @@ export default function WeaponTree() {
     };
     
     return (
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto bg-surface-800/30 rounded-lg p-4 border border-surface-700">
         <table className="min-w-full border-collapse">
           <tbody>
             {tableRows.map((row, rowIndex) => (
@@ -238,7 +267,7 @@ export default function WeaponTree() {
                           onClick={() => handleWeaponClick(weapon)}
                         >
                           <WeaponElement weapon={weapon} />
-                          <span className="absolute top-0 right-0 bg-gray-200 text-xs px-1 rounded-bl">R{weapon.rarity}</span>
+                          <span className="absolute top-0 right-0 bg-surface-700 text-xs px-1 rounded-bl text-surface-300">R{weapon.rarity}</span>
                         </div>
                         
                         {/* Draw lines from this weapon to its direct children */}
@@ -260,11 +289,11 @@ export default function WeaponTree() {
                                   
                                   return (
                                     <div key={`${child.id}-same-row`} className="absolute inset-0 pointer-events-none">
-                                      {/* Horizontal line from parent to child */}
+                                      {/* Horizontal dashed line from parent to child */}
                                       <div 
-                                        className="absolute bg-primary-400"
+                                        className="absolute border-t-2 border-dashed border-primary-400"
                                         style={{
-                                          height: '2px',
+                                          height: '0',
                                           left: '50%',
                                           width: `${distance * 100}%`,
                                           top: '50%',
@@ -274,36 +303,35 @@ export default function WeaponTree() {
                                     </div>
                                   );
                                 }
-                                // Different row connection (new code)
+                                // Different row connection - update to dashed lines
                                 else {
                                   // Calculate positions and dimensions for the connection
                                   const rowDifference = childRowIdx - rowIndex;
                                   const colDifference = childColIdx - colIndex;
                                   
-                                  // We'll make a curved connection using multiple divs
                                   return (
                                     <div key={`${child.id}-diff-row`} className="absolute inset-0 pointer-events-none">
-                                      {/* Vertical line going down from parent */}
+                                      {/* Vertical dashed line going down from parent */}
                                       <div 
-                                        className="absolute bg-primary-400"
+                                        className="absolute border-l-2 border-dashed border-primary-400"
                                         style={{
                                           left: '50%',
                                           top: '50%',
-                                          width: '2px',
+                                          width: '0',
                                           height: `${rowDifference * 144}px`,
                                           transform: 'translateX(-50%)',
                                           zIndex: 2
                                         }}
                                       />
                                       
-                                      {/* Horizontal line connecting to child */}
+                                      {/* Horizontal dashed line connecting to child */}
                                       <div 
-                                        className="absolute bg-primary-400"
+                                        className="absolute border-t-2 border-dashed border-primary-400"
                                         style={{
                                           left: colDifference > 0 ? '50%' : `calc(50% + ${colDifference * 144}px)`,
-                                          top: `calc(50% + ${rowDifference * 144}px - 1px)`,
+                                          top: `calc(50% + ${rowDifference * 144}px)`,
                                           width: `${Math.abs(colDifference) * 144}px`,
-                                          height: '2px',
+                                          height: '0',
                                           zIndex: 2
                                         }}
                                       />
@@ -330,12 +358,35 @@ export default function WeaponTree() {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="mx-auto p-4">
+      <h1 className="text-3xl md:text-4xl font-bold text-surface-50 mb-6">
+        {t('weapon_type')} - {t(`weapons.${activeWeaponType.toLowerCase().replace(' ', '-')}`)}
+      </h1>
+      
+      {/* Weapon Type Filter */}
+      <div className="mb-6 bg-surface-800 border border-surface-700 rounded-lg p-4">
+        <h2 className="text-lg font-medium text-surface-100 mb-3">{t('weapon_type')}</h2>
+        <div className="flex flex-wrap gap-2">
+          {weaponTypes.map((type) => (
+            <button
+              key={type}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
+                ${activeWeaponType === type 
+                  ? 'bg-primary-500 text-white' 
+                  : 'bg-surface-700/50 hover:bg-surface-700 text-surface-200'}`}
+              onClick={() => setActiveWeaponType(type)}
+            >
+              {t(`weapons.${type.toLowerCase().replace(' ', '-')}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {filteredTree.length > 0 ? (
         renderWeaponTable()
       ) : (
-        <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded my-4">
-          <p>No weapons found for the selected type.</p>
+        <div className="bg-surface-800/30 border border-surface-700 text-surface-300 px-4 py-6 rounded-lg my-4 text-center">
+          <p>{t('build_planner.no_equipment_found')}</p>
         </div>
       )}
     </div>
