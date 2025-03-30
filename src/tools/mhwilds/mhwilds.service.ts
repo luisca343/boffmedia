@@ -121,4 +121,97 @@ export class MhwildsService extends BaseDataService {
 
         return allRanks;
     }
+
+        /**
+     * Creates a weapon tree structure and saves it as a JSON file
+     * @param locale Locale for the weapons data
+     * @returns The created weapon tree structure
+     */
+        async createWeaponTree(locale?: string): Promise<any> {
+            try {
+                const weapons = await this.getWeapons(locale);
+                
+                const weaponsById = weapons.reduce((map, weapon) => {
+                    map[weapon.id] = weapon;
+                    return map;
+                }, {});
+                
+                const rootWeapons = weapons.filter(weapon => 
+                    weapon.crafting?.craftable === true && 
+                    !weapon.crafting?.previous
+                );
+                
+                const weaponTree = rootWeapons.map(rootWeapon => 
+                    this.buildWeaponBranch(rootWeapon, weaponsById)
+                );
+                
+                const weaponTreeByKind = weapons.reduce((tree, weapon) => {
+                    const kind = weapon.kind;
+                    if (!tree[kind]) {
+                        tree[kind] = [];
+                    }
+                    
+                    if (weapon.crafting?.craftable === true && !weapon.crafting?.previous) {
+                        tree[kind].push(this.buildWeaponBranch(weapon, weaponsById));
+                    }
+                    
+                    return tree;
+                }, {});
+                
+                const treeFilePath = path.join(process.cwd(), `public/data/mhwilds/${locale || 'en'}/weapon-tree.json`);
+                const treeByKindFilePath = path.join(process.cwd(), `public/data/mhwilds/${locale || 'en'}/weapon-tree-by-kind.json`);
+                
+                await fs.writeFile(treeFilePath, JSON.stringify(weaponTree, null, 2), 'utf8');
+                await fs.writeFile(treeByKindFilePath, JSON.stringify(weaponTreeByKind, null, 2), 'utf8');
+                
+                this.logger.log(`Successfully created and saved weapon trees for locale ${locale || 'en'}`);
+                
+                return {
+                    tree: weaponTree,
+                    treeByKind: weaponTreeByKind
+                };
+            } catch (error) {
+                this.logger.error(`Error creating weapon tree: ${error.message}`);
+                throw error;
+            }
+        }
+        
+        /**
+         * Recursively builds a weapon branch starting from a given weapon
+         * @param weapon The current weapon node
+         * @param weaponsById Map of all weapons by their id
+         * @returns A tree structure for the current weapon and its branches
+         */
+        private buildWeaponBranch(weapon, weaponsById): any {
+            if (!weapon) return null;
+            
+            // Create node with essential weapon information
+            const node = {
+                id: weapon.id,
+                name: weapon.name,
+                rarity: weapon.rarity,
+                kind: weapon.kind,
+                damage: weapon.damage,
+                specials: weapon.specials,
+                craftingMaterials: weapon.crafting.craftingMaterials,
+                craftingZennyCost: weapon.crafting.craftingZennyCost,
+                upgradeMaterials: weapon.crafting.upgradeMaterials,
+                upgradeZennyCost: weapon.crafting.upgradeZennyCost,
+                
+                children: []
+            };
+            
+            
+            // Add all branches as children
+            if (weapon.crafting?.branches && weapon.crafting.branches.length > 0) {
+                node.children = weapon.crafting.branches
+                    .map(branch => {
+                        const branchWeapon = weaponsById[branch.id];
+                        return this.buildWeaponBranch(branchWeapon, weaponsById);
+                    })
+                    .filter(Boolean); // Remove null entries
+            }
+            
+            return node;
+        }
 }

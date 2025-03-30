@@ -102,4 +102,27 @@ export class MhwildsController {
             };
         }
     }
+
+    @Get("/weapon-tree/:locale")
+    @ApiOperation({ summary: 'Get weapon tree structure' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Weapon tree created successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create weapon tree.' })
+    async getWeaponTree(@Param('locale') locale: string) {
+        try {
+            const weaponTree = await this.wildsService.createWeaponTree(locale);
+            return {
+                status: HttpStatus.OK,
+                message: "Weapon tree created successfully",
+                data: weaponTree
+            };
+        } catch (error) {
+            this.logger.error(`Failed to create weapon tree: ${error.message}`);
+            return {
+                status: HttpStatus.INTERNAL_SERVER_ERROR,
+                message: "Failed to create weapon tree",
+                error: error.message
+            };
+        }
+    }
+
 }
