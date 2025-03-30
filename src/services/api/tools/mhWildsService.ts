@@ -7,4 +7,5 @@ export const mhWildsService = {
     getCharms: (locale: string) => apiGET<Charm[]>(`/tools/mhwilds/ranks/${locale}`),
     getDecorations: (locale: string) => apiGET<Decoration[]>(`/tools/mhwilds/decorations/${locale}`),
     getSkills: (locale: string) => apiGET<any[]>(`/tools/mhwilds/skills/${locale}`),
+    getWeaponTree: (locale: string) => apiGET<any>(`/tools/mhwilds/weapon-tree/${locale}`),
 };

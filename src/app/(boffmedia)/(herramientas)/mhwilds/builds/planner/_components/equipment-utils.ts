@@ -58,7 +58,8 @@ export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
 
 export const getRarityFilterStyle = (rarity: number): string => {
   switch (true) {
-    case rarity === 3:return 'grayscale(1) brightness(0.8) sepia(0.5) hue-rotate(80deg) saturate(5)';
+    case rarity === 3: 
+      return 'grayscale(1) brightness(0.8) sepia(0.5) hue-rotate(80deg) saturate(5)';
     case rarity === 4:
       return 'grayscale(1) brightness(0.6) sepia(0.5) hue-rotate(100deg) saturate(5)'; 
     case rarity === 5:
