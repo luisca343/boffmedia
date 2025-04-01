@@ -1,6 +1,6 @@
 {
   "mhwilds": {
-    "weapons":{
+    "weapons": {
       "great-sword": "Great Sword",
       "long-sword": "Long Sword",
       "sword-shield": "Sword and Shield",
@@ -96,7 +96,10 @@
       "select_charm": "Select charm",
       "charms": "Charms",
       "no_charms_found": "No charms found",
-      "skill_count": "{count, plural, =1 {# skill} other {# skills}}"
+      "skill_count": "{count, plural, =1 {# skill} other {# skills}}",
+      "tools": {
+        "weapon_tree": "Weapon Tree"
+      }
     },
     "title": "Monster Hunter Wilds",
     "equipment": "Equipment",
