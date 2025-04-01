@@ -3,6 +3,7 @@ import Link from "next/link";
 import { HiChevronRight } from "react-icons/hi";
 import { cn } from "@/lib/utils";
 import { GameConfig } from "@/config/gameTools";
+import { useTranslations } from "next-intl";
 
 interface SidebarProps {
   gameConfig: GameConfig;
@@ -19,6 +20,8 @@ const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const pathname = usePathname();
   const sidebarWidth = isSidebarExpanded ? "w-64" : "w-16";
+  // Use the useTranslations hook to access translations
+  const t = useTranslations();
 
   return (
     <div 
@@ -29,15 +32,30 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className={`p-2 space-y-6 ${isSidebarExpanded ? "" : "overflow-hidden"}`}>
         {gameConfig.categories.map((category) => (
           <div key={category.name}>
-            <div className={cn(
-              "text-sm font-medium mb-2 uppercase tracking-wider px-2",
-              "transition-all duration-300 ease-in-out",
-              isSidebarExpanded 
-                ? "opacity-100 h-auto text-surface-400" 
-                : "opacity-0 h-0 overflow-hidden"
-            )}>
-              {category.name}
-            </div>
+            {category.href ? (
+              <Link
+                href={category.href}
+                className={cn(
+                  "text-sm font-medium mb-2 uppercase tracking-wider px-2 block",
+                  "transition-all duration-300 ease-in-out",
+                  isSidebarExpanded 
+                    ? "opacity-100 h-auto text-surface-400 hover:text-surface-200" 
+                    : "opacity-0 h-0 overflow-hidden"
+                )}
+              >
+                {t(category.name)}
+              </Link>
+            ) : (
+              <div className={cn(
+                "text-sm font-medium mb-2 uppercase tracking-wider px-2",
+                "transition-all duration-300 ease-in-out",
+                isSidebarExpanded 
+                  ? "opacity-100 h-auto text-surface-400" 
+                  : "opacity-0 h-0 overflow-hidden"
+              )}>
+                {t(category.name)}
+              </div>
+            )}
             <ul className="space-y-1">
               {category.tools.map((tool) => {
                 const isActive = pathname === tool.href;
@@ -54,15 +72,16 @@ const Sidebar: React.FC<SidebarProps> = ({
                           ? "bg-primary-500/10 text-primary-400" 
                           : "text-surface-300 hover:text-surface-50 hover:bg-surface-700"
                       )}
-                      title={!isSidebarExpanded ? tool.name : undefined}
+                      title={!isSidebarExpanded ? t(tool.name) : undefined}
                     >
-                        <Icon 
-                          className={cn(
-                            "mr-2 h-5 w-5",
-                            isActive ? "text-primary-400" : "text-surface-400 group-hover:text-surface-300"
-                          )}
-                          {...tool.iconProps} 
-                        />
+                      <Icon 
+                        className={cn(
+                          "h-5 w-5 transition-all duration-300 ease-in-out",
+                          isSidebarExpanded ? "mr-2" : "mx-auto",
+                          isActive ? "text-primary-400" : "text-surface-400 group-hover:text-surface-300"
+                        )}
+                        {...tool.iconProps}
+                      />
                       
                       <div className={cn(
                         "flex-1 whitespace-nowrap",
@@ -71,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                           ? "opacity-100 max-w-full" 
                           : "opacity-0 max-w-0 overflow-hidden"
                       )}>
-                        {tool.name}
+                        {t(tool.name)}
                       </div>
                       
                       {isActive && (

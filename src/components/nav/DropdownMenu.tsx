@@ -13,10 +13,13 @@ interface MenuItemProps {
   icon?: React.ReactNode
   description?: string
   roles?: string[]
+  isExternal?: boolean
 }
 
 export interface MenuSectionProps {
   title: string
+  href?: string // Add optional href for making the section title clickable
+  icon?: React.ReactNode // Optional icon for the section header
   items: MenuItemProps[]
   description?: string
 }
@@ -65,7 +68,30 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
             {sections.map((section, index) => (
               <React.Fragment key={section.title}>
                 {index > 0 && <div className="bg-surface-800 h-px"/>}
-                {section.title && <h3 className="px-3 py-1 text-xs font-semibold text-amber-400/90 uppercase tracking-wider">{section.title}</h3>}
+                
+                {section.title && (
+                  section.href ? (
+                    // Clickable section title with link
+                    <Link 
+                      href={section.href}
+                      className="px-3 py-1 text-xs font-semibold text-amber-400/90 uppercase tracking-wider flex items-center justify-between group hover:bg-surface-800/30"
+                      onClick={closeMenu}
+                    >
+                      <span className="flex items-center gap-2">
+                        {section.icon && <span className="text-amber-400/90">{section.icon}</span>}
+                        {section.title}
+                      </span>
+                      <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </Link>
+                  ) : (
+                    // Non-clickable section title
+                    <h3 className="px-3 py-1 text-xs font-semibold text-amber-400/90 uppercase tracking-wider flex items-center gap-2">
+                      {section.icon && <span>{section.icon}</span>}
+                      {section.title}
+                    </h3>
+                  )
+                )}
+                
                 <div className="space-y-0.5">
                   {section.items
                     .filter(item => !item.roles || hasRole(item.roles))
@@ -78,6 +104,8 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                         transition={{ duration: 0.15, delay: itemIndex * 0.03 }}
                         key={item.href}
                         onClick={closeMenu}
+                        target={item.isExternal ? "_blank" : undefined}
+                        rel={item.isExternal ? "noopener noreferrer" : undefined}
                       >
                         <span className="flex items-center gap-2">
                           {item.icon && <span className="text-primary-400 text-sm">{item.icon}</span>}

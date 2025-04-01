@@ -1,0 +1,27 @@
+{
+    "games": {
+        "pokemon": {
+        "name": "Pokémon",
+        "categories": {
+            "tcgpocket": "TCG Pocket",
+            "others": "Otros"
+        },
+        "tools": {
+            "gallery": "Galería",
+            "cardList": "Lista de Cartas",
+            "battles": "Combates",
+            "skyGenerator": "Generador Sky"
+        }
+        },
+        "mhwilds": {
+        "name": "Monster Hunter Wilds",
+        "categories": {
+            "buildPlanner": "Planificador de Builds"
+        },
+        "tools": {
+            "planner": "Planificador",
+            "weaponTree": "Árbol de Armas"
+        }
+        }
+    }
+  }

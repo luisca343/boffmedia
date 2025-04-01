@@ -9,19 +9,20 @@ import {
 import { FaStar } from "react-icons/fa";
 
 export interface ToolConfig {
-  name: string;
+  name: string; // This will be a translation key
   href: string;
   icon: IconType;
   iconProps?: React.SVGProps<SVGSVGElement>;
 }
 
 export interface CategoryConfig {
-  name: string;
+  name: string; // This will be a translation key
+  href?: string;
   tools: ToolConfig[];
 }
 
 export interface GameConfig {
-  name: string;
+  name: string; // This will be a translation key
   icon: string;
   color: string;
   bg: string;
@@ -41,9 +42,11 @@ const iconMap: Record<string, IconType> = {
   "FamilyTree": GiFamilyTree
 };
 
+// The base config now uses translation keys instead of hard-coded strings
 const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
   categories: Array<{
     name: string;
+    href?: string;
     tools: Array<{
       name: string;
       href: string;
@@ -53,39 +56,42 @@ const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
   }>;
 }> = {
   "pokemon": {
-    name: "Pokémon",
+    name: "games.pokemon.name",
     icon: "/img/games/pokemon/icon.webp",
     color: "from-yellow-400 to-red-500",
     bg: "bg-red-900",
     categories: [
       {
-        name: "TCG Pocket",
+        name: "games.pokemon.categories.tcgpocket",
+        href: "/pokemon/tcgpocket",
         tools: [
-          { name: "Gallery", href: "/pokemon/tcgpocket/galeria", icon: "Diamond" },
-          { name: "Card List", href: "/pokemon/tcgpocket/cartas", icon: "Zap" },
-          { name: "Battles", href: "/pokemon/tcgpocket/combates", icon: "SwordIcon" }
+          { name: "games.pokemon.tools.gallery", href: "/pokemon/tcgpocket/galeria", icon: "Diamond" },
+          { name: "games.pokemon.tools.cardList", href: "/pokemon/tcgpocket/cartas", icon: "Zap" },
+          { name: "games.pokemon.tools.battles", href: "/pokemon/tcgpocket/combates", icon: "SwordIcon" }
         ]
       },
       {
-        name: "Others",
+        name: "games.pokemon.categories.others",
+        href: "/pokemon/pmdsky",
         tools: [
-          { name: "Sky Generator", href: "/pokemon/pmdsky", icon: "Star" }
+          { name: "games.pokemon.tools.skyGenerator", href: "/pokemon/pmdsky", icon: "Star" }
         ]
       }
     ]
   },
   "mhwilds": {
-    name: "Monster Hunter Wilds",
+    name: "games.mhwilds.name",
     icon: "/img/games/mhwilds-icon.webp",
     color: "from-green-400 to-green-600",
     bg: "bg-green-900",
     categories: [
       {
-        name: "Build Planner",
+        name: "games.mhwilds.categories.buildPlanner",
+        href: "/mhwilds/builds",
         tools: [
-          { name: "Planner", href: "/mhwilds/builds/planner", icon: "SwordIcon" },
+          { name: "games.mhwilds.tools.planner", href: "/mhwilds/builds/planner", icon: "SwordIcon" },
           { 
-            name: "Weapon Tree", 
+            name: "games.mhwilds.tools.weaponTree", 
             href: "/mhwilds/tree", 
             icon: "FamilyTree",
             iconProps: { 

@@ -33,6 +33,8 @@ export function HerramientasMenu() {
       {
         title: t("sections.pokemon.title"),
         description: t("sections.pokemon.description"),
+        href: "/pokemon", // Added href to make the section title clickable
+        icon: <Gamepad2 className="h-4 w-4" />, // Added icon for section
         items: [
           { 
             href: "/pokemon/pmdsky", 
@@ -51,6 +53,8 @@ export function HerramientasMenu() {
       {
         title: t("sections.mhwilds.title"),
         description: t("sections.mhwilds.description"),
+        href: "/mhwilds", // Added href to make the section title clickable
+        icon: <Swords className="h-4 w-4" />, // Added icon for section
         items: [
           { 
             href: "/mhwilds/builds/planner", 
@@ -63,6 +67,8 @@ export function HerramientasMenu() {
       {
         title: t("sections.gaming.title"),
         description: t("sections.gaming.description"),
+        href: "/otros", // Added href to make the section title clickable
+        icon: <Gift className="h-4 w-4" />, // Added icon for section
         items: [
           { 
             href: "/otros/keys", 

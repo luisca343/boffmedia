@@ -7,6 +7,7 @@ import { GiGamepad } from "react-icons/gi";
 import { HiChevronRight } from "react-icons/hi";
 import { GameConfig } from "@/config/gameTools";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface MobileSidebarProps {
   mobileSidebarOpen: boolean;
@@ -20,6 +21,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
   gameConfig 
 }) => {
   const pathname = usePathname();
+  // Use the useTranslations hook to access translations
+  const t = useTranslations();
 
   if (!mobileSidebarOpen) return null;
 
@@ -35,7 +38,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
             {gameConfig.icon ? (
               <Image
                 src={gameConfig.icon}
-                alt={gameConfig.name}
+                alt={t(gameConfig.name)}
                 width={32}
                 height={32}
                 className="mr-2 rounded"
@@ -43,7 +46,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
             ) : (
               <GiGamepad className="mr-2 h-6 w-6 text-primary-400" />
             )}
-            <span className="font-bold text-lg text-surface-50">{gameConfig.name}</span>
+            <span className="font-bold text-lg text-surface-50">{t(gameConfig.name)}</span>
           </div>
           <Button 
             variant="ghost" 
@@ -58,9 +61,20 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
         <div className="space-y-6 mt-6">
           {gameConfig.categories.map((category) => (
             <div key={category.name}>
-              <h3 className="text-sm font-medium text-surface-400 mb-2 uppercase tracking-wider px-2">
-                {category.name}
-              </h3>
+              {category.href ? (
+                <Link 
+                  href={category.href}
+                  className="block text-sm font-medium text-surface-400 mb-2 uppercase tracking-wider px-2 hover:text-surface-200"
+                  onClick={() => setMobileSidebarOpen(false)}
+                >
+                  {t(category.name)}
+                </Link>
+              ) : (
+                <h3 className="text-sm font-medium text-surface-400 mb-2 uppercase tracking-wider px-2">
+                  {t(category.name)}
+                </h3>
+              )}
+              
               <ul className="space-y-1">
                 {category.tools.map((tool) => {
                   const isActive = pathname === tool.href;
@@ -79,13 +93,13 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
                         onClick={() => setMobileSidebarOpen(false)}
                       >
                         <Icon 
-                        className={cn(
+                          className={cn(
                             "mr-2 h-5 w-5",
                             isActive ? "text-primary-400" : "text-surface-400 group-hover:text-surface-300"
-                        )}
-                        {...tool.iconProps} 
+                          )}
+                          {...tool.iconProps}
                         />
-                        {tool.name}
+                        {t(tool.name)}
                         {isActive && <HiChevronRight className="ml-auto h-4 w-4 text-primary-400" />}
                       </Link>
                     </li>
