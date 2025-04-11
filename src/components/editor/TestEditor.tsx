@@ -99,12 +99,13 @@ function createSaveButton (data: any, props: {
 
 // @ts-ignore
 function CustomEditor(props) {
+    if(!props.document) return null;
     return (
         <CKEditor
             // @ts-ignore
             editor={Editor.Editor}
             config={editorConfiguration}
-            data={props.document.content}
+            data={props.document.content || ''}
 
             onReady={editor => {
                 console.log('Editor is ready to use!', editor);
