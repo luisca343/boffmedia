@@ -1,5 +1,6 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 
 // Helper function for deep merging objects
 interface DeepMergeable {
@@ -30,11 +31,34 @@ const isObject = (item: unknown): item is Record<string, any> => {
   return item !== null && typeof item === 'object' && !Array.isArray(item);
 };
 
+// Get system locale from Accept-Language header
+const getSystemLocale = (): string => {
+  const headersList = headers();
+  const acceptLanguage = headersList.get('Accept-Language') || '';
+  
+  // Parse the Accept-Language header to get the preferred language
+  const languages = acceptLanguage.split(',')
+    .map(lang => {
+      const [language, priority = '1.0'] = lang.trim().split(';q=');
+      return { language: language.split('-')[0], priority: parseFloat(priority) };
+    })
+    .sort((a, b) => b.priority - a.priority);
+  
+  // If we have a preferred language, use it
+  if (languages.length > 0) {
+    return languages[0].language;
+  }
+  
+  // Fallback to 'en' if no language preference is detected
+  return 'en';
+};
+
 export default getRequestConfig(async () => {
-  // Get locale from cookies or use default
+  // Get locale from cookies or use system locale
   const cookieStore = cookies();
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || 'es';
-  const defaultLocale = 'es';
+  const systemLocale = getSystemLocale();
+  const locale = cookieStore.get('NEXT_LOCALE')?.value || systemLocale;
+  const defaultLocale = 'en';
   
   // Define paths to import
   const paths = [
