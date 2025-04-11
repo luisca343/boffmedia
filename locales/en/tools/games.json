@@ -1,27 +1,27 @@
 {
   "games": {
-      "pokemon": {
-        "name": "Pokémon",
-        "categories": {
-          "tcgpocket": "TCG Pocket",
-          "others": "Others"
-        },
-        "tools": {
-          "gallery": "Gallery",
-          "cardList": "Card List",
-          "battles": "Battles",
-          "skyGenerator": "Sky Generator"
-        }
+    "pokemon": {
+      "name": "Pokémon",
+      "categories": {
+        "tcgpocket": "TCG Pocket",
+        "others": "Others"
       },
-      "mhwilds": {
-        "name": "Monster Hunter Wilds",
-        "categories": {
-          "buildPlanner": "Build Planner"
-        },
-        "tools": {
-          "planner": "Planner",
-          "weaponTree": "Weapon Tree"
-        }
+      "tools": {
+        "gallery": "Gallery",
+        "cardList": "Card List",
+        "battles": "Battles",
+        "skyGenerator": "Wonder Mail Generator"
+      }
+    },
+    "mhwilds": {
+      "name": "Monster Hunter Wilds",
+      "categories": {
+        "buildPlanner": "Build Planner"
+      },
+      "tools": {
+        "planner": "Planner",
+        "weaponTree": "Weapon Tree"
       }
     }
   }
+}
