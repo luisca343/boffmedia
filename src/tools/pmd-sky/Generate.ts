@@ -140,8 +140,6 @@ type StructType = {
 }
 
 export function generateWonderMail(formData: SkyFormData){
-    console.log("Generating quest");
-    console.log(formData.clientPokemon);
 
     const struct = {} as StructType;
     
@@ -152,7 +150,6 @@ export function generateWonderMail(formData: SkyFormData){
 		struct.mailType = 4;
 		struct.restriction = 0;
 		struct.restrictionType = 0;
-        console.log("REWARD TYPE "+formData.rewardType)
 		struct.rewardType = formData.rewardType;
 
         // Client
@@ -300,8 +297,6 @@ export function generateWonderMail(formData: SkyFormData){
 		
 		console.info("enc: %o, packed: %o, scrambled: %o, prettified: %o", encBitStream, bitpacked, scrambled, prettified);
 		
-        console.log(struct)
-        console.log(prettified);
 		return prettified;
 
 
