@@ -143,7 +143,7 @@ export async function getPokemonSprite(
 }
 
 export function getDisplayStatus(pokemonId: number, form: string, hide: boolean): boolean {
-  if (!hide || pokemonId < 2000) return true
+  if (!hide && pokemonId < 2000) return true
   const pokedexData = usePokemonStore.getState().pokedexData;
   if (!pokedexData) return false
   const seen = pokedexData?.seenPokemon
