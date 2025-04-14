@@ -257,4 +257,13 @@ export class StarbankService {
 
         return res
     }
+
+    async transferFromMain(uuid: string, to: number, amount: number, concept: string) {
+        const mainAccount = await this.getMainAccount(uuid);
+        if (!mainAccount) {
+            return { success: false, message: "Main account not found" };
+        }
+        
+        return await this.transfer(mainAccount.id, to, amount, concept);
+    }
 }

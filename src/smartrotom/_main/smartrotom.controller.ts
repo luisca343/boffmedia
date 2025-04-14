@@ -1,12 +1,9 @@
 
-import axios from 'axios';
-import { NpcImageDto } from '../_dto/npc-image-dto';
 import { SmartrotomService } from './smartrotom.service';
-import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { ResponseService } from '@/response/response.service';
-import { BattleAchievementDto } from '../_dto/battle-achievement-dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Body, Controller, Get, Param, Post, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 
 export class ParticipanteCarreraDto {
   uuid: string;
@@ -97,6 +94,45 @@ export class SmartrotomController {
     } catch (error) {
       this.logger.error('Failed to create or update character:', error);
       throw new HttpException('Failed to create or update character', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Get('taxi/stops')
+  @ApiOperation({ summary: 'Get all taxi stops' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Taxi stops retrieved successfully.'
+  })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve taxi stops.' })
+  async getTaxiStops() {
+    try {
+      const taxiStops = await this.smartrotomService.getTaxiStops();
+      return {
+        data: taxiStops,
+        statusCode: 200,
+        message: 'Taxi stops retrieved successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to retrieve taxi stops:', error);
+      throw new HttpException('Failed to retrieve taxi stops', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('taxi/teleport')
+  @ApiOperation({ summary: 'Teleport a player to a destination' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player teleported successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to teleport player.' })
+  async teleportPlayer(@Body() body: TeleportPlayerDto) {
+    try {
+      const result = await this.smartrotomService.teleportPlayer(body.id, body.uuid);
+      return {
+        data: { success: result },
+        statusCode: 200,
+        message: result ? 'Player teleported successfully' : 'Failed to teleport player',
+      };
+    } catch (error) {
+      this.logger.error('Failed to teleport player:', error);
+      throw new HttpException('Failed to teleport player', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

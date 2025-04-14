@@ -6,6 +6,7 @@ import { CreateAccountDto } from './dto/create-account-dto';
 import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money-dto';
 import { CreateShopTransactionDto } from './dto/create-shop-transaction-dto';
 import { CreateTransferDto } from './dto/create-transfer-dto';
+import { TransferFromMainDto } from './dto/transfer-from-main-dto';
 
 @ApiTags('smartrotom/starbank')
 @Controller('smartrotom/starbank')
@@ -158,6 +159,22 @@ export class StarbankController {
       return this.responseService.createSuccessResponse('Transfers retrieved successfully', transfers);
     } catch (error) {
       this.responseService.handleError(action, error, { account });
+    }
+  }
+  
+  @Post('transfer/from-main')
+  @ApiOperation({ summary: 'Transfer money from user main account' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Transfer handled successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to handle transfer.' })
+  async transferFromMain(@Body() body: TransferFromMainDto) {
+    const action = 'transfer money from main account';
+    try {
+      this.responseService.logRequest(action, body);
+      const result = await this.starbankService.transferFromMain(body.uuid, body.to, body.amount, body.concept);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Transfer handled successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, body);
     }
   }
 }
