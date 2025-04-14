@@ -27,6 +27,7 @@ import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
 import { FullTransaction, Transaction } from "@/types/starbank";
+import { InternalLink } from "@/components/nav/Link";
 
 export default function StarBank() {
   const router = useRouter();
@@ -177,15 +178,15 @@ export default function StarBank() {
           </BankSectionFooter>
         </BankSection>
         <div className="md:col-span-2 flex justify-around w-full h-16">
-          <button className="flex flex-1 m-2 items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
+          <InternalLink href="/starbank/enviar" className="flex flex-1 m-2 items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
             <DollarSign className="mr-2" /> Transferir Dinero
-          </button>
-          <button className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
+          </InternalLink>
+          <InternalLink href="/starbank/cuentas"  className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
             <CreditCard className="mr-2" /> Administrar Cuentas
-          </button>
-          <button className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
+          </InternalLink>
+          <InternalLink href="/starbank/facturas" className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
             <Send className="mr-2" /> Pagar Facturas
-          </button>
+          </InternalLink>
         </div>
       </section>
     </div>
@@ -249,7 +250,6 @@ export function TablaTransacciones({
   transactions: any;
   activeAccount: any;
 }) {
-  console.log(transactions);
   return (
     <div className="relative overflow-x-auto">
       <table className="min-w-full divide-y divide-surface-200">

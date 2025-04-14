@@ -3,6 +3,7 @@ import { CreateAccountDto } from '@/types/dto/create-account-dto';
 import { TrainerDefeatMoneyDto } from '@/types/dto/trainer-defeat-money-dto';
 import { CreateShopTransactionDto } from '@/types/dto/create-shop-transaction-dto';
 import { CreateTransferDto } from '@/types/dto/create-transfer-dto';
+import { TransferFromMainDto } from '@/types/dto/transfer-from-main-dto';
 import { Balance, FullTransaction, StarBankAccount } from '@/types/starbank';
 import { SuccessResponse } from '@/types';
 
@@ -17,6 +18,6 @@ export const starbankService = {
   trainerDefeat: (data: TrainerDefeatMoneyDto) => rotomPOST<SuccessResponse>('/starbank/trainerdefeat', data),
   getTransactions: (account: number, limit?: number) => rotomGET<FullTransaction[]>(`/starbank/transactions/${account}${limit ? `?limit=${limit}` : ''}`),
   transfer: (data: CreateTransferDto) => rotomPOST<SuccessResponse>('/starbank/transfer', data),
+  transferFromMain: (data: TransferFromMainDto) => rotomPOST<SuccessResponse>('/starbank/transfer/from-main', data),
   getTransfers: (account: number) => rotomGET<Transfer[]>(`/starbank/transfers/${account}`),
 };
-

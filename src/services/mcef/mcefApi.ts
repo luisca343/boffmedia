@@ -1,7 +1,7 @@
 import { PossibleSpawn } from '@/app/smartrotom/pokedex/_components/PossibleSpawns';
 import { QueryResult, mcefQuery } from './mcefHelper';
 import { getSpawnsPlaceholder } from './mcefPlaceholders';
-import { CallData } from '@/components/smartrotom/calls/CallStatus';
+import { CallData } from '@/components/smartrotom/types/call';
 
 export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string }>> {
     const result = await mcefQuery<{ username: string; uuid: string; world: string }>('GET_USER_DATA');
@@ -50,6 +50,14 @@ export async function sendChatMessage(message: string): Promise<QueryResult<any>
     const result = await mcefQuery<any>('CHAT_MESSAGE', { message });
     if (result.error) {
         console.error('Error sending chat message:', result.error);
+    }
+    return result;
+}
+
+export async function taxiTeleport(destination: { id: string }): Promise<QueryResult<any>> {
+    const result = await mcefQuery<any>('TAXI_TELEPORT', destination);
+    if (result.error) {
+        console.error('Error teleporting via taxi:', result.error);
     }
     return result;
 }

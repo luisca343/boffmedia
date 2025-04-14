@@ -153,9 +153,9 @@ export function TransactionsTable({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id} className="hover:bg-blue-50">
+            <TableRow key={row.id} className="hover:bg-blue-50 h-11">
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
+                <TableCell key={cell.id} className="py-1">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}
