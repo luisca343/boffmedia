@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 import { formatMoney, getValidAccountId } from "../bankUtils";
-import { ArrowRight, DollarSign } from 'lucide-react';
+import { ArrowRight, JapaneseYen } from 'lucide-react';
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetAllAccounts } from "@/hooks/starbank/useGetAllAccounts";
@@ -117,7 +117,7 @@ export function SendMoney() {
           </label>
           <div className="mt-1 relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <DollarSign className="h-5 w-5 text-surface-400" />
+              <JapaneseYen className="h-5 w-5 text-blue-900" />
             </div>
             <Input
               id="amount"
@@ -125,7 +125,7 @@ export function SendMoney() {
               min={1}
               max={myAccounts?.find((account: Account) => account.id === myActiveAccount)?.balance}
               placeholder="0.00"
-              className="pl-10 pr-12"
+              className="pl-10"
               onChange={(e) => setAmount(parseInt(e.target.value))}
               value={amount}
               variant={"wingull"}
