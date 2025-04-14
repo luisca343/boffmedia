@@ -53,7 +53,7 @@ export default function Transacciones() {
     initialState: {
       pagination: {
         pageIndex: 0,
-        pageSize: 11,
+        pageSize: 8,
       },
     },
     getPaginationRowModel: getPaginationRowModel(),
@@ -107,7 +107,6 @@ export default function Transacciones() {
           updateFilters={updateFilters}
         />
       </BankSection>
-      {/* Pagination (simplified for this example) */}
       <div className="flex justify-between items-center bg-white p-4 shadow-md max-h-[15%] rounded-md border border-blue-200">
         <BankSectionButton onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
           Anterior

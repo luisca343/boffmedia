@@ -10,11 +10,21 @@ import {
   filterDate,
   filterReason,
 } from "../../_util/TransactionFilter";
-import { CellDefProps } from "../page"; // Adjust the import path as needed
+import { CellDefProps } from "../page";
 import { Input } from "@/components/ui/input";
 import { strToDate } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
 import { Transaction } from "@/types/starbank";
+
+// Import shadcn table components
+import {
+  Table as ShadcnTable,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export const columns: ColumnDef<Transaction>[] = [
   {
@@ -91,73 +101,68 @@ export function TransactionsTable({
   className?: string;
 }) {
   return (
-    <table className={`min-w-full divide-y divide-surface-200`}>
-      <thead className="bg-blue-950 text-white">
-        {table.getHeaderGroups().map((headerGroup) => (
-          <tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
-              <th
-                key={header.id}
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-              >
-                {flexRender(
-                  header.column.columnDef.header,
-                  header.getContext()
-                )}
-              </th>
-            ))}
-          </tr>
-        ))}
-        <tr>
-          <th colSpan={2}>
-            <Input
-              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
-              placeholder="Filtrar Transacciones"
-              value={(columnFilters.find((f) => f.id === "reason")?.value as string) || ""}
-              onChange={(e) => updateFilters("reason", e.target.value)}
-            />
-          </th>
-          <th>
-            <Input
-              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
-              placeholder="Filtrar Cantidad"
-              value={(columnFilters.find((f) => f.id === "amount")?.value as string) || ""}
-              onChange={(e) => updateFilters("amount", e.target.value)}
-            />
-          </th>
-          <th>
-            <Input
-              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
-              placeholder="Filtrar Saldo"
-              value={(columnFilters.find((f) => f.id === "balance")?.value as string) || ""}
-              onChange={(e) => updateFilters("balance", e.target.value)}
-            />
-          </th>
-          <th>
-            <Input
-              className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
-              placeholder="Filtrar Fecha"
-              value={(columnFilters.find((f) => f.id === "date")?.value as string) || ""}
-              onChange={(e) => updateFilters("date", e.target.value)}
-            />
-          </th>
-        </tr>
-      </thead>
-      <tbody className="bg-white divide-y divide-surface-200 ">
-        {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className="hover:bg-blue-50">
-            {row.getVisibleCells().map((cell) => (
-              <td
-                key={cell.id}
-                className="px-6 py-2 whitespace-nowrap text-sm text-surface-900 "
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className={className}>
+      <ShadcnTable variant="wingull">
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                </TableHead>
+              ))}
+            </TableRow>
+          ))}
+          <TableRow>
+            <TableHead colSpan={2}>
+              <Input
+                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                placeholder="Filtrar Transacciones"
+                value={(columnFilters.find((f) => f.id === "reason")?.value as string) || ""}
+                onChange={(e) => updateFilters("reason", e.target.value)}
+              />
+            </TableHead>
+            <TableHead>
+              <Input
+                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                placeholder="Filtrar Cantidad"
+                value={(columnFilters.find((f) => f.id === "amount")?.value as string) || ""}
+                onChange={(e) => updateFilters("amount", e.target.value)}
+              />
+            </TableHead>
+            <TableHead>
+              <Input
+                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                placeholder="Filtrar Saldo"
+                value={(columnFilters.find((f) => f.id === "balance")?.value as string) || ""}
+                onChange={(e) => updateFilters("balance", e.target.value)}
+              />
+            </TableHead>
+            <TableHead>
+              <Input
+                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                placeholder="Filtrar Fecha"
+                value={(columnFilters.find((f) => f.id === "date")?.value as string) || ""}
+                onChange={(e) => updateFilters("date", e.target.value)}
+              />
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows.map((row) => (
+            <TableRow key={row.id} className="hover:bg-blue-50">
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </ShadcnTable>
+    </div>
   );
 }

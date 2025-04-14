@@ -16,7 +16,7 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variantStyles = {
       default: "bg-surface-800",
-      wingull: "bg-blue-900"
+      wingull: "border-0"
     }
     
     return (
@@ -44,7 +44,7 @@ const TableHeader = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-900",
-    wingull: "border-blue-700 bg-blue-900/80"
+    wingull: "border-blue-900 bg-blue-950"
   }
   
   return (
@@ -69,7 +69,7 @@ const TableBody = React.forwardRef<
   
   const variantStyles = {
     default: "bg-surface-700",
-    wingull: "bg-blue-800"
+    wingull: "bg-white"
   }
   
   return (
@@ -90,7 +90,7 @@ const TableFooter = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-700/50",
-    wingull: "border-blue-700 bg-blue-800/50"
+    wingull: "border-blue-200 bg-blue-50"
   }
   
   return (
@@ -115,7 +115,7 @@ const TableRow = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 hover:bg-surface-700/50 data-[state=selected]:bg-surface-700",
-    wingull: "border-blue-700 hover:bg-blue-800/50 data-[state=selected]:bg-blue-800"
+    wingull: "border-blue-100 data-[state=selected]:bg-blue-100"
   }
   
   return (
@@ -140,7 +140,7 @@ const TableHead = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-300",
-    wingull: "text-blue-300"
+    wingull: "text-white font-semibold"
   }
   
   return (
@@ -165,7 +165,7 @@ const TableCell = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-400",
-    wingull: "text-blue-300"
+    wingull: "text-blue-950"
   }
   
   return (
@@ -190,7 +190,7 @@ const TableCaption = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-400"
+    wingull: "text-blue-500"
   }
   
   return (

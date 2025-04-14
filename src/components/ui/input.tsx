@@ -11,7 +11,7 @@ const inputVariants = cva(
         default: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-950 placeholder:text-surface-500 focus-visible:ring-primary-400",
         dark: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-950 placeholder:text-surface-500 focus-visible:ring-primary-400",
         neutral: "border-neutral-700 bg-neutral-800 text-neutral-100 ring-offset-neutral-950 placeholder:text-neutral-500 focus-visible:ring-primary-300",
-        wingull: "border-blue-700 bg-blue-600 text-blue-100 ring-offset-blue-950 placeholder:text-blue-300 focus-visible:ring-blue-400",
+        wingull: "border-0 bg-blue-500 text-white ring-offset-blue-900 focus-visible:ring-blue-300 placeholder:text-blue-200 hover:bg-blue-400",
       },
     },
     defaultVariants: {

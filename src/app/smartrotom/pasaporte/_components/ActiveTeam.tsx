@@ -4,8 +4,7 @@ import { useTranslations } from "next-intl"
 import { Pokemon } from "@/services/api/smartrotom/playerService";
 
 export default function ActiveTeam({ team, className }: { team: Pokemon[]; className?: string }) {
-  const movesTrans = useTranslations("")
-  const abilitiesTrans = useTranslations("")
+  const t = useTranslations("pokedex")
 
   return (
     <div className={`font-vinque flex flex-col justify-around space-y-4 h-[90%] w-full ${className}`}>
@@ -24,14 +23,16 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
                 palette={pokemon.palette || "none"}
               />
               <span className="text-xs font-medium text-center">
-                {pokemon.name} Nv. {pokemon.level}
+                {pokemon.name.toLowerCase().replace(" ", "") !== pokemon.species.toLowerCase().replace(" ", "") 
+                  ? pokemon.name 
+                  : t(`pixelmon_${pokemon.species.toLowerCase().replace(" ", "_")}`)} Nv. {pokemon.level} 
               </span>
             </div>
 
             {/* Ability and Item */}
             <div className="w-[20%] px-4 border-l border-dashed border-gray-600/50 min-h-[80px] flex flex-col justify-center">
               <div className="space-y-2 text-sm">
-                <p className="font-medium">{abilitiesTrans(`ability_${pokemon.ability.replace(" ", "")}`)}</p>
+                <p className="font-medium">{t(`ability_${pokemon.ability.replace(" ", "")}`)}</p>
                 {pokemon.item !== "item.minecraft.air" && <p className="text-gray-700">{pokemon.item}</p>}
               </div>
             </div>
@@ -41,7 +42,7 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
               <div className="space-y-1 text-sm">
                 {pokemon.moves.map((move, idx) => (
                   <p key={idx} className="font-medium">
-                    {move ? movesTrans(`attack_${move.toLowerCase().replace(" ", "_")}`) : "-"}
+                    {move ? t(`attack_${move.toLowerCase().replace(" ", "_")}`) : "-"}
                   </p>
                 ))}
               </div>
