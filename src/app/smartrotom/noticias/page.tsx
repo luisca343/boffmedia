@@ -28,7 +28,7 @@ export default function FurretTodayPopArtEspanol() {
         <PopArtWallpaper />
       </div>
       <div className="relative z-10 min-h-full text-black font-sans p-4 md:p-8">
-        <div className="max-w-6xl mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)]">
+        <div className="max-w-7xl mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)]">
           <FurretHeader />
           <nav className="bg-blue-500 p-4 flex justify-center space-x-4">
             <InternalLink href="/noticias/editar" className="bg-yellow-300 text-blue-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow">

@@ -92,7 +92,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-full bg-yellow-200 text-black font-sans p-4 md:p-8 overflow-auto">
+    <div className="min-h-full bg-yellow-200 text-black font-sans p-4 md:p-8 overflow-auto font-comic text-xl">
       <div className="w-[80%] mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] ">
         <FurretHeader />
             <div className="p-8">
