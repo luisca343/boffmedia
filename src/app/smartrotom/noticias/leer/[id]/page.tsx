@@ -41,8 +41,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   if (error) {
     return (
       <div className="min-h-full bg-yellow-300 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-white border-8 border-black">
-          <CardContent className="p-6 text-center">
+          <div className="p-6 text-center">
             <h2 className="text-6xl font-bold mb-4 pop-shadow text-red-500">
               ¡OOPS!
             </h2>
@@ -74,8 +73,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
                 ¡Intentar de Nuevo!
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
       </div>
     );
   }
@@ -94,11 +92,10 @@ export default function ReadPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-full bg-yellow-200 text-black font-sans p-4 md:p-8 overflow-hidden">
+    <div className="min-h-full bg-yellow-200 text-black font-sans p-4 md:p-8 overflow-auto">
       <div className="w-[80%] mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] ">
         <FurretHeader />
-          <Card>
-            <CardContent className="p-8">
+            <div className="p-8">
               <h1 className="text-6xl font-bold mb-6 text-red-500 pop-shadow text-center">
                 {article?.title}
               </h1>
@@ -108,8 +105,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
                 documentType={1}
                 readonly={true}
               />
-            </CardContent>
-          </Card>
+            </div>
           <div className="text-center  py-4">
             <InternalLink
               href="/noticias"

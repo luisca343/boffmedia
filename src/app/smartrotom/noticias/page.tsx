@@ -23,11 +23,11 @@ export default function FurretTodayPopArtEspanol() {
   const {featured, published} = useGetAllNews();
 
   return (
-    <div className="min-h-full relative">
+    <div className="min-h-full relative  overflow-auto">
       <div className="absolute inset-0">
         <PopArtWallpaper />
       </div>
-      <div className="relative z-10 min-h-full text-black font-sans p-4 md:p-8 overflow-hidden">
+      <div className="relative z-10 min-h-full text-black font-sans p-4 md:p-8">
         <div className="max-w-6xl mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)]">
           <FurretHeader />
           <nav className="bg-blue-500 p-4 flex justify-center space-x-4">

@@ -51,7 +51,7 @@ const MainCard: React.FC<MainCardProps> = ({ news }) => {
         </div>
       </div>
       <CardContent className="p-6 relative">
-        <p className="text-2xl mb-4 font-comic leading-relaxed">
+        <p className="text-2xl mb-4 font-comic leading-relaxed text-black">
           {getPreview(news, 300)}
         </p>
         <InternalLink
