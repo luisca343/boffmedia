@@ -3,10 +3,11 @@ import { QueryResult, mcefQuery } from './mcefHelper';
 import { getSpawnsPlaceholder } from './mcefPlaceholders';
 import { CallData } from '@/components/smartrotom/types/call';
 
-export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string }>> {
-    const result = await mcefQuery<{ username: string; uuid: string; world: string }>('GET_USER_DATA');
+export async function getMcUserData(): Promise<QueryResult<{ username: string; uuid: string; world: string, x: number, y: number, z: number }>> {
+    const result = await mcefQuery<{ username: string; uuid: string; world: string, x: number, y: number, z: number }>('GET_USER_DATA');
     if (result.error) {
         console.error('Error fetching user data:', result.error);
+        return { data: { username: '', uuid: '', world: '', x: 0, y: 0, z: 0 }, status: 500 };
     } else {
         console.log('getDatosUsuarioMC', result.data);
     }

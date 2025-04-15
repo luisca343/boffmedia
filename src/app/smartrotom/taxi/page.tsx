@@ -51,10 +51,11 @@ export default function TaxiApp() {
         // Fetch player position and money
         const userData = await getMcUserData()
         if (userData.status === 200 && userData.data) {
-          // In a real implementation, you would parse coordinates from userData
-          // For now, using placeholder values
-          setPlayerPosition({ x: 50, z: 50 })
-        }
+          setPlayerPosition({ 
+            x: Math.floor(userData.data.x), 
+            z: Math.floor(userData.data.z) 
+          })
+        } 
 
         // Get player balance if session exists
         if (session?.user?.smartRotomUser?.uuid) {
