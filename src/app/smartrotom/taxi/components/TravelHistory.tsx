@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FaHistory, FaMapMarkedAlt, FaCoins, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaHistory, FaMapMarkedAlt, FaCoins, FaChevronDown, FaChevronUp, FaTaxi } from 'react-icons/fa';
+import { formatMoney } from '../../starbank/bankUtils';
 
 interface TripRecord {
   id: string;
@@ -24,52 +25,53 @@ export default function TravelHistory({ trips }: TravelHistoryProps) {
   // Calculate total spent on taxi
   const totalSpent = trips.reduce((sum, trip) => sum + trip.price, 0);
   
+  if (trips.length === 0) return null;
+  
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-4">
+    <div className="bg-white/10 backdrop-blur-sm rounded-lg shadow-md overflow-hidden mb-4 border border-white/20">
       <div 
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
+        className="flex items-center justify-between p-4 cursor-pointer hover:bg-blue-800/30 bg-gradient-to-r from-blue-600/70 to-blue-800/70"
         onClick={toggleExpansion}
       >
         <div className="flex items-center">
-          <FaHistory className="text-yellow-600 mr-3 text-xl" />
+          <div className="bg-yellow-500 p-2 rounded-full mr-3">
+            <FaTaxi className="text-white text-sm" />
+          </div>
           <div>
-            <h3 className="font-bold">Historial de viajes</h3>
-            <p className="text-sm text-gray-600">{trips.length} viajes - ${totalSpent} gastados</p>
+            <h3 className="font-bold text-white">Historial de viajes</h3>
+            <p className="text-sm text-blue-200">{trips.length} viajes - {formatMoney(totalSpent)} gastados</p>
           </div>
         </div>
-        {isExpanded ? <FaChevronUp className="text-gray-500" /> : <FaChevronDown className="text-gray-500" />}
+        {isExpanded ? 
+          <FaChevronUp className="text-blue-300" /> : 
+          <FaChevronDown className="text-blue-300" />
+        }
       </div>
       
       {isExpanded && (
-        <div className="border-t border-gray-200 p-4">
-          {trips.length > 0 ? (
-            <div className="space-y-3">
-              {trips.slice(0, 5).map((trip) => (
-                <div key={trip.id} className="border-b border-gray-100 pb-2">
-                  <div className="flex justify-between">
-                    <div className="font-medium">{trip.destination}</div>
-                    <div className="text-green-600 font-medium">${trip.price}</div>
-                  </div>
-                  <div className="flex justify-between text-sm text-gray-500">
-                    <div>{new Date(trip.date).toLocaleDateString()}</div>
-                    <div className="flex items-center">
-                      <FaMapMarkedAlt className="mr-1" />
-                      ({trip.fromX}, {trip.fromZ}) → ({trip.toX}, {trip.toZ})
-                    </div>
-                  </div>
+        <div className="border-t border-white/10 divide-y divide-white/10">
+          {trips.map((trip) => (
+            <div key={trip.id} className="p-3 hover:bg-blue-800/20">
+              <div className="flex justify-between items-center">
+                <div className="font-medium text-white">{trip.destination}</div>
+                <div className="text-green-400 font-medium">{formatMoney(trip.price)}</div>
+              </div>
+              <div className="flex justify-between text-sm text-blue-200 mt-1">
+                <div>{new Date(trip.date).toLocaleDateString()}</div>
+                <div className="flex items-center">
+                  <FaMapMarkedAlt className="mr-1 text-blue-300" />
+                  <span>({trip.fromX}, {trip.fromZ}) → ({trip.toX}, {trip.toZ})</span>
                 </div>
-              ))}
-              
-              {trips.length > 5 && (
-                <div className="text-center">
-                  <button className="text-yellow-600 hover:text-yellow-700 font-medium">
-                    Ver más viajes
-                  </button>
-                </div>
-              )}
+              </div>
             </div>
-          ) : (
-            <p className="text-center text-gray-500 py-4">No has realizado ningún viaje todavía</p>
+          ))}
+          
+          {trips.length > 5 && (
+            <div className="text-center p-3 border-t border-white/10">
+              <button className="text-yellow-400 hover:text-yellow-300 font-medium">
+                Ver historial completo
+              </button>
+            </div>
           )}
         </div>
       )}

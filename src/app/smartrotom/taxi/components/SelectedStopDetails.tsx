@@ -1,4 +1,4 @@
-import { FaMapMarkerAlt, FaWalking, FaTimes } from 'react-icons/fa'
+import { FaMapMarkerAlt, FaWalking, FaTimes, FaTaxi, FaCoins } from 'react-icons/fa'
 import { TaxiStop } from "@/types/dto/taxi-stop.dto"
 import { formatMoney } from '../../starbank/bankUtils';
 
@@ -16,7 +16,7 @@ interface SelectedStopDetailsProps {
   formatDistance: (distance: number) => string;
   teleportPlayer: (stop: TaxiStop) => Promise<void>;
   isLoading: boolean;
-  onClose: () => void; // New prop for closing the details
+  onClose: () => void;
 }
 
 export default function SelectedStopDetails({
@@ -35,45 +35,84 @@ export default function SelectedStopDetails({
   const canAfford = playerMoney >= price;
   
   return (
-    <div className="absolute left-4 right-4 bottom-4 bg-white rounded-lg shadow-lg overflow-hidden border-2 border-blue-400 z-30">
-      <div className="p-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h3 className="text-xl font-bold text-gray-800">{selectedStop.id}</h3>
-            <p className="text-gray-600 mb-2">{selectedStop.description}</p>
-          </div>
+    <div className="absolute left-4 right-4 bottom-4 bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden border-2 border-yellow-400 z-30 animate-appear">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-3 text-white">
+        <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <div className="bg-blue-100 px-3 py-1 rounded-full mr-2">
-              <span className="text-blue-800 font-medium">{formatMoney(price)}</span>
+            <div className="p-2 rounded-full bg-yellow-400 mr-3">
+              <FaMapMarkerAlt className="text-white" />
             </div>
-            <button 
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 p-2 rounded-full"
-              aria-label="Close details"
-            >
-              <FaTimes />
-            </button>
+            <h3 className="text-xl font-bold">{selectedStop.id}</h3>
           </div>
+          <button 
+            onClick={onClose}
+            className="text-white hover:bg-white/20 p-2 rounded-full transition-colors"
+            aria-label="Close details"
+          >
+            <FaTimes />
+          </button>
         </div>
+      </div>
+      
+      <div className="p-4">
+        <p className="text-blue-100 mb-4">{selectedStop.description || "Sin descripción disponible"}</p>
         
-        <div className="flex items-center text-sm text-gray-500 mb-4">
-          <FaMapMarkerAlt className="mr-1" /> 
-          X: {selectedStop.x}, Z: {selectedStop.z} 
-          <span className="mx-2">•</span> 
-          <FaWalking className="mr-1" /> 
-          {formatDistance(distance)} bloques
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20">
+            <div className="flex items-center justify-center mb-1 text-blue-300">
+              <FaMapMarkerAlt className="mr-1" />
+              <span className="font-medium">Ubicación</span>
+            </div>
+            <div className="text-white">
+              X: {selectedStop.x}, Z: {selectedStop.z}
+            </div>
+          </div>
+          
+          <div className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20">
+            <div className="flex items-center justify-center mb-1 text-blue-300">
+              <FaWalking className="mr-1" /> 
+              <span className="font-medium">Distancia</span>
+            </div>
+            <div className="text-white">
+              {formatDistance(distance)} bloques
+            </div>
+          </div>
+          
+          <div className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20">
+            <div className="flex items-center justify-center mb-1 text-yellow-400">
+              <FaCoins className="mr-1" /> 
+              <span className="font-medium">Precio</span>
+            </div>
+            <div className={`font-bold ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
+              {formatMoney(price)}
+            </div>
+          </div>
         </div>
         
         <button
           onClick={() => teleportPlayer(selectedStop)}
           disabled={!canAfford || isLoading}
-          className={`w-full py-3 rounded-md font-medium ${
-            canAfford && !isLoading
-              ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-          }`}
+          className={`
+            w-full py-3 rounded-lg font-medium flex items-center justify-center
+            ${canAfford && !isLoading
+              ? 'bg-yellow-500 hover:bg-yellow-600 text-[#041F4E] shadow-md' // Changed from text-white to text-[#041F4E]
+              : 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
+            }
+          `}
         >
-          {isLoading ? 'Viajando...' : 'Viajar a este destino'}
+          {isLoading ? (
+            <span className="flex items-center">
+              <svg className="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-white">Viajando...</span> {/* Keep this white since it appears during loading state with different bg */}
+            </span>
+          ) : (
+            <span className="flex items-center">
+              <FaTaxi className="mr-2" /> {canAfford ? 'Viajar a este destino' : 'Fondos insuficientes'}
+            </span>
+          )}
         </button>
       </div>
     </div>
