@@ -14,6 +14,9 @@ import MapView from './components/MapView'
 import ListView from './components/ListView'
 import LoadingOverlay from './components/LoadingOverlay'
 import SelectedStopDetails from './components/SelectedStopDetails'
+import RecentDestinations from './components/RecentDestinations'
+import TravelHistory from './components/TravelHistory'
+import { FaTimes } from 'react-icons/fa'
 
 const MINIMUM_FARE = 100
 const PRICE_PER_BLOCK = 0.5
@@ -25,6 +28,17 @@ interface Position {
   z: number
 }
 
+interface TripRecord {
+  id: string;
+  destination: string;
+  date: Date;
+  price: number;
+  fromX: number;
+  fromZ: number;
+  toX: number;
+  toZ: number;
+}
+
 export default function TaxiApp() {
   const { session } = useBoffSession()
   const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, z: 0 })
@@ -33,6 +47,7 @@ export default function TaxiApp() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'map' | 'list'>('map')
   const [taxiStops, setTaxiStops] = useState<TaxiStop[]>([])
+  const [showRecentDrawer, setShowRecentDrawer] = useState(false)
   const isInitialLoad = useRef(true)
   
   const updatePlayerPosition = async () => {
@@ -130,6 +145,7 @@ export default function TaxiApp() {
       
       setPlayerPosition({ x: stop.x, z: stop.z })
       setPlayerMoney(playerMoney - price)
+      
       toast.success(`¡Has llegado a ${stop.id}!`)
       setSelectedStop(null)
     } catch (error) {
@@ -144,22 +160,35 @@ export default function TaxiApp() {
     return Math.round(distance).toLocaleString()
   }
 
+  // Handler for selecting a recent stop
+  const handleSelectRecentStop = (stop: TaxiStop) => {
+    setSelectedStop(stop)
+    setShowRecentDrawer(false)
+    if (activeTab !== 'list') {
+      setActiveTab('list')
+    }
+  }
+
   return (
-    <div className="relative h-full w-full bg-gradient-to-b from-yellow-400 to-yellow-600 overflow-hidden">
-      <TaxiHeader playerPosition={playerPosition} playerMoney={playerMoney} />
+    <div className="relative h-full w-full bg-gradient-to-b from-blue-400 to-blue-600 overflow-hidden">
+      <TaxiHeader 
+        playerPosition={playerPosition} 
+        playerMoney={playerMoney} 
+        onHistoryClick={() => setShowRecentDrawer(!showRecentDrawer)} 
+      />
       
       <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Content Area */}
       <div className="absolute top-28 bottom-0 left-0 right-0 p-4 overflow-y-auto">
-      {activeTab === 'map' && (
-        <MapView 
-          taxiStops={taxiStops} 
-          playerPosition={playerPosition} 
-          selectedStop={selectedStop} 
-          setSelectedStop={setSelectedStop} 
-        />
-      )}
+        {activeTab === 'map' && (
+          <MapView 
+            taxiStops={taxiStops} 
+            playerPosition={playerPosition} 
+            selectedStop={selectedStop} 
+            setSelectedStop={setSelectedStop} 
+          />
+        )}
         {activeTab === 'list' && (
           <ListView
             taxiStops={taxiStops}

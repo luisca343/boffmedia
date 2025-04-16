@@ -1,5 +1,6 @@
 import { FaMapMarkerAlt, FaWalking, FaTimes } from 'react-icons/fa'
 import { TaxiStop } from "@/types/dto/taxi-stop.dto"
+import { formatMoney } from '../../starbank/bankUtils';
 
 interface Position {
   x: number;
@@ -34,7 +35,7 @@ export default function SelectedStopDetails({
   const canAfford = playerMoney >= price;
   
   return (
-    <div className="absolute left-4 right-4 bottom-4 bg-white rounded-lg shadow-lg overflow-hidden border-2 border-yellow-400 z-30">
+    <div className="absolute left-4 right-4 bottom-4 bg-white rounded-lg shadow-lg overflow-hidden border-2 border-blue-400 z-30">
       <div className="p-4">
         <div className="flex justify-between items-start">
           <div>
@@ -42,8 +43,8 @@ export default function SelectedStopDetails({
             <p className="text-gray-600 mb-2">{selectedStop.description}</p>
           </div>
           <div className="flex items-center">
-            <div className="bg-yellow-100 px-3 py-1 rounded-full mr-2">
-              <span className="text-yellow-800 font-medium">${price}</span>
+            <div className="bg-blue-100 px-3 py-1 rounded-full mr-2">
+              <span className="text-blue-800 font-medium">{formatMoney(price)}</span>
             </div>
             <button 
               onClick={onClose}
@@ -68,7 +69,7 @@ export default function SelectedStopDetails({
           disabled={!canAfford || isLoading}
           className={`w-full py-3 rounded-md font-medium ${
             canAfford && !isLoading
-              ? 'bg-yellow-500 hover:bg-yellow-600 text-white' 
+              ? 'bg-blue-500 hover:bg-blue-600 text-white' 
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
           }`}
         >

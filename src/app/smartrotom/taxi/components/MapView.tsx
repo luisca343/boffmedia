@@ -87,14 +87,14 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
   };
 
   return (
-    <div className="relative bg-yellow-100 rounded-xl shadow-lg h-full flex flex-col">
-      <div className="p-4 bg-yellow-200 rounded-t-xl">
-        <h2 className="text-xl font-semibold text-yellow-800 mb-2">Mapa de Destinos</h2>
-        <p className="text-yellow-700">Selecciona un destino en el mapa para viajar</p>
+    <div className="relative bg-blue-100 rounded-xl shadow-lg h-full flex flex-col">
+      <div className="p-4 bg-blue-200 rounded-t-xl">
+        <h2 className="text-xl font-semibold text-blue-800 mb-2">Mapa de Destinos</h2>
+        <p className="text-blue-700">Selecciona un destino en el mapa para viajar</p>
       </div>
-      <div className="flex-grow relative bg-yellow-50 p-4">
+      <div className="flex-grow relative bg-blue-50 p-4">
         {/* Simulated Map View */}
-        <div className="absolute inset-0 bg-[#2C8C99] overflow-hidden">
+        <div className="absolute inset-0 bg-[#2062A5] overflow-hidden">
           {/* Map Grid Lines */}
           <div className="absolute inset-0" style={{
             backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)',
@@ -130,14 +130,14 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
                   style={{ 
                     left: `${position.isWithinView ? position.actualX : position.edgeX}%`, 
                     top: `${position.isWithinView ? position.actualZ : position.edgeZ}%`,
-                    filter: isSelected ? 'drop-shadow(0 0 8px yellow)' : 'none'
+                    filter: isSelected ? 'drop-shadow(0 0 8px lightblue)' : 'none'
                   }}
                   onClick={() => centerMapOnStop(stop)}
                 >
                   {position.isWithinView ? (
                     // Standard marker for stops within view
                     <>
-                      <FaMapMarkerAlt className={`text-3xl ${isSelected ? 'text-yellow-400' : 'text-red-500'}`} />
+                      <FaMapMarkerAlt className={`text-3xl ${isSelected ? 'text-blue-400' : 'text-red-500'}`} />
                       <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 bg-black/70 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
                         {stop.id}
                       </div>
@@ -145,51 +145,51 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
                   ) : (
                     // Edge indicator for stops outside view
                     <div className="relative">
-                    <div 
-                        className={`flex items-center justify-center w-8 h-8 rounded-full ${isSelected ? 'bg-yellow-400' : 'bg-red-500'} border-2 border-white`}
+                      <div 
+                        className={`flex items-center justify-center w-8 h-8 rounded-full ${isSelected ? 'bg-blue-400' : 'bg-red-500'} border-2 border-white`}
                         title={stop.id}
-                    >
+                      >
                         <div 
-                        className="w-4 h-4"
-                        style={{ transform: `rotate(${position.angle}deg)` }}
+                          className="w-4 h-4"
+                          style={{ transform: `rotate(${position.angle}deg)` }}
                         >
-                        <FaArrowRight className="text-white" />
+                          <FaArrowRight className="text-white" />
                         </div>
-                    </div>
-                    
-                    {/* Smart positioning for labels based on edge position */}
-                    {(() => {
+                      </div>
+                      
+                      {/* Smart positioning for labels based on edge position */}
+                      {(() => {
                         // Determine label position based on marker location
                         let labelClasses = "absolute bg-black/70 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap";
                         let labelStyle = {};
                         
                         // Bottom edge
                         if (position.edgeZ > 85) {
-                        labelClasses += " -top-8 left-1/2 transform -translate-x-1/2";
+                          labelClasses += " -top-8 left-1/2 transform -translate-x-1/2";
                         }
                         // Top edge
                         else if (position.edgeZ < 15) {
-                        labelClasses += " top-full mt-1 left-1/2 transform -translate-x-1/2";
+                          labelClasses += " top-full mt-1 left-1/2 transform -translate-x-1/2";
                         }
                         // Right edge
                         else if (position.edgeX > 85) {
-                        labelClasses += " top-1/2 right-full mr-2 transform -translate-y-1/2";
+                          labelClasses += " top-1/2 right-full mr-2 transform -translate-y-1/2";
                         }
                         // Left edge
                         else if (position.edgeX < 15) {
-                        labelClasses += " top-1/2 left-full ml-2 transform -translate-y-1/2";
+                          labelClasses += " top-1/2 left-full ml-2 transform -translate-y-1/2";
                         }
                         // Default (below)
                         else {
-                        labelClasses += " top-full mt-1 left-1/2 transform -translate-x-1/2";
+                          labelClasses += " top-full mt-1 left-1/2 transform -translate-x-1/2";
                         }
                         
                         return (
-                        <div className={labelClasses} style={labelStyle}>
+                          <div className={labelClasses} style={labelStyle}>
                             {stop.id}
-                        </div>
+                          </div>
                         );
-                    })()}
+                      })()}
                     </div>
                   )}
                 </div>
@@ -203,7 +203,7 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
                         y1={`${calculateStopPosition({ id: 'player', x: playerPosition.x, z: playerPosition.z }).actualZ}%`}
                         x2={`${position.isWithinView ? position.actualX : position.edgeX}%`}
                         y2={`${position.isWithinView ? position.actualZ : position.edgeZ}%`}
-                        stroke="#FFD700"
+                        stroke="#60A5FA"
                         strokeWidth="2"
                         strokeDasharray="5,5"
                         opacity="0.7"
@@ -221,14 +221,14 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
             <div className="flex">
               <button 
                 onClick={() => setZoomLevel(prev => Math.max(prev - 2, 4))}
-                className="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 rounded text-yellow-800 mr-2"
+                className="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded text-blue-800 mr-2"
                 title="Zoom in"
               >
                 +
               </button>
               <button 
                 onClick={() => setZoomLevel(prev => Math.min(prev + 2, 20))}
-                className="px-3 py-1 bg-yellow-100 hover:bg-yellow-200 rounded text-yellow-800"
+                className="px-3 py-1 bg-blue-100 hover:bg-blue-200 rounded text-blue-800"
                 title="Zoom out"
               >
                 -
