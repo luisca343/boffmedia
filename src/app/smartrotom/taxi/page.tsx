@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useBoffSession } from "@/services/useBoffSession"
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -18,6 +18,7 @@ import SelectedStopDetails from './components/SelectedStopDetails'
 const MINIMUM_FARE = 100
 const PRICE_PER_BLOCK = 0.5
 const TAXI_SERVICE_ACCOUNT = 0;
+const POSITION_REFRESH_INTERVAL = 5000;
 
 interface Position {
   x: number
@@ -32,41 +33,47 @@ export default function TaxiApp() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'map' | 'list'>('map')
   const [taxiStops, setTaxiStops] = useState<TaxiStop[]>([])
-
+  const isInitialLoad = useRef(true)
+  
+  const updatePlayerPosition = async () => {
+    try {
+      const userData = await getMcUserData()
+      if (userData.status === 200 && userData.data) {
+        setPlayerPosition({ 
+          x: Math.floor(userData.data.x), 
+          z: Math.floor(userData.data.z) 
+        })
+      }
+    } catch (error) {
+      console.error('Error updating player position:', error)
+    }
+  }
+  
   useEffect(() => {
     const fetchData = async () => {
+      if (!isInitialLoad.current) return;
+      
       setIsLoading(true)
       try {
-        // Fetch taxi stops from the API
         const stopsResponse = await smartrotomService.getTaxiStops()
         
         if (stopsResponse.data) {
-          // Convert Record<string, TaxiStop> to TaxiStop[]
           const stopsArray = Object.values(stopsResponse.data)
           setTaxiStops(stopsArray)
         } else {
           toast.error('Error al cargar las paradas de taxi')
         }
 
-        // Fetch player position and money
-        const userData = await getMcUserData()
-        if (userData.status === 200 && userData.data) {
-          setPlayerPosition({ 
-            x: Math.floor(userData.data.x), 
-            z: Math.floor(userData.data.z) 
-          })
-        } 
+        await updatePlayerPosition()
 
-        // Get player balance if session exists
         if (session?.user?.smartRotomUser?.uuid) {
           const balanceResponse = await starbankService.getBalance(session.user.smartRotomUser.uuid)
           if (balanceResponse.data) {
             setPlayerMoney(balanceResponse.data.balance)
           }
-        } else {
-          // Placeholder for testing
-          setPlayerMoney(10000)
-        }
+        } 
+        
+        isInitialLoad.current = false;
       } catch (error) {
         console.error('Error fetching data:', error)
         toast.error('No se pudieron cargar los datos')
@@ -77,6 +84,16 @@ export default function TaxiApp() {
     
     fetchData()
   }, [session])
+  
+  useEffect(() => {
+    updatePlayerPosition();
+    
+    const intervalId = setInterval(() => {
+      updatePlayerPosition();
+    }, POSITION_REFRESH_INTERVAL);
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   const calculateDistance = (x1: number, z1: number, x2: number, z2: number) => {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(z2 - z1, 2))
@@ -98,7 +115,6 @@ export default function TaxiApp() {
     setIsLoading(true)
     try {
       if (session?.user?.smartRotomUser?.uuid) {
-        // Process payment through StarBank
         await starbankService.transferFromMain({
           uuid: session.user.smartRotomUser.uuid,
           to: TAXI_SERVICE_ACCOUNT,
@@ -112,7 +128,6 @@ export default function TaxiApp() {
         })
       }
       
-      // Update local state
       setPlayerPosition({ x: stop.x, z: stop.z })
       setPlayerMoney(playerMoney - price)
       toast.success(`¡Has llegado a ${stop.id}!`)
