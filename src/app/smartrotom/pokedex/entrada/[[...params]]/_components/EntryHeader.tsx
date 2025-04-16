@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import { PokemonSprite } from "../../../_components/PokemonSprite";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
