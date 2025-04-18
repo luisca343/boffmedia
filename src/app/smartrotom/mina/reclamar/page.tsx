@@ -5,10 +5,13 @@ import { rotomPOST } from "@/services/boffAPI";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
-import { isMinecraft } from "@/services/mcef/mcefHelper";
+import { isMinecraft, mcefQuery } from "@/services/mcef/mcefHelper";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
 import { UnclaimedReward } from "@/types/mina";
+import { minaService } from "@/services/api/smartrotom/minaService";
+import { darCaja } from "@/services/mcef/mcefApi";
+import { ItemImage } from "@/lib/ItemImage";
 
 export default function Reclamar() {
   const { session } = useBoffSession();
@@ -21,18 +24,25 @@ export default function Reclamar() {
       return;
     }
 
-    try {
-      const response = await rotomPOST("/claim-rewards", {
-        rewards: unclaimed,
-      });
-      if (response.data) {
-        toast.success("Recompensas reclamadas con éxito");
-        setUnclaimed([]);
-      } else {
-        toast.error("Error al reclamar recompensas");
+    const response = await minaService.claim({ uuid: session.user.smartRotomUser?.uuid! });
+    if (response) {  
+      
+      const objetosMC = unclaimed.map(reward => ({
+        id: reward.itemId,
+        cantidad: reward.amount
+      }));
+      const cajaResult = await darCaja(objetosMC);
+      
+      if (cajaResult.error) {
+        toast.error("Error al dar la caja");
+        return;
       }
-    } catch (error) {
-      toast.error("Error al reclamar recompensas");
+  
+      toast.success("Recompensas reclamadas correctamente");
+      setUnclaimed([]);
+    }
+    else {
+      toast.error("Error al reclamar las recompensas");
     }
   }
 
@@ -59,16 +69,12 @@ export default function Reclamar() {
               <div className="flex space-x-2">
                 {groupedRewards[type].map((reward, index) => (
                   <div key={index} className="relative group flex space-x-2">
-                    <Image
-                      key={index}
-                      alt={reward.itemId}
-                      width={32}
-                      height={32}
-                      src={`/smartrotom/img/apps/mina/recompensas/${
-                        reward.itemId?.split(":")[1]
-                      }.png`}
-                      style={{ imageRendering: "pixelated" }}
-                    />
+                      <ItemImage 
+                        key={index}
+                        type="mina"
+                        itemId={reward.itemId}
+                        amount={reward.amount}
+                      />
                     <span className="ml-2">x{reward.amount}</span>
                   </div>
                 ))}
