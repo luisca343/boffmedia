@@ -64,6 +64,7 @@ export default getRequestConfig(async () => {
   const paths = [
     'boffmedia.json',
     'nav.json',
+    'items.json',
     'tools/games.json',
     'tools/mhwilds.json',
     'tools/pokemon.json',
