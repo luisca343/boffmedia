@@ -16,10 +16,11 @@ export interface ArceuSpeak {
 }
 
 export const smartrotomService = {
+  // Existing methods
   getPerformance: () => rotomGET<Performance>("/performance"),
   getArceuSpeak: () => rotomGET<ArceuSpeak[]>("/arceuspeak"),
   postArceuSpeak: ({name, value, format}: ArceuSpeak) => rotomPOST<ApiResponse>('/arceuspeak', {name, value, format}),
   getTaxiStops: () => rotomGET<Record<string, TaxiStop>>("/taxi/stops"),
   teleportPlayer: (data: TeleportPlayerDto) => rotomPOST<ApiResponse>("/taxi/teleport", data),
+    
 }
-

@@ -1,0 +1,67 @@
+{
+    "items": {
+        "rarity": {
+            "all": "Todo",
+            "common": "Común",
+            "uncommon": "Poco común",
+            "rare": "Raro",
+            "very_rare": "Muy raro",
+            "epic": "Épico",
+            "legendary": "Legendario"
+        },
+        "teras": {
+            "gema_roja_name": "Gema roja",
+            "gema_roja_description": "Gema roja que brilla como el fuego.",
+            "gema_azul_name": "Gema azul",
+            "gema_azul_description": "Gema azul que brilla como el hielo.",
+            "gema_verde_name": "Gema verde",
+            "gema_verde_description": "Gema verde que brilla como la hierba.",
+            "gema_prisma_name": "Gema prisma",
+            "gema_prisma_description": "Gema maciza y transparente.",
+            "gema_blanca_name": "Gema blanca",
+            "gema_blanca_description": "Gema blanca. Brilla con siete colores."
+        },
+        "pixelmon": {
+
+            "poke_ball_name": "Poké Ball",
+            "poke_ball_description": "Objeto que se utiliza para atrapar Pokémon. Ratio de captura: 1x.",
+            "great_ball_name": "Súper Ball",
+            "great-_ball_description": "Objeto que se utiliza para atrapar Pokémon. Ratio de captura: 1.5x.",
+            "ultra_ball_name": "Ultra Ball",
+            "ultra_ball_description": "Objeto que se utiliza para atrapar Pokémon. Ratio de captura: 2x.",
+            "master_ball_name": "Master Ball",
+            "master_ball_description": "Objeto que se utiliza para atrapar Pokémon. Ratio de captura: 255x.",
+
+            "sky_plate_name": "Tabla cielo",
+            "sky_plate_description": "La tabla cielo es un objeto que aumenta el poder de los ataques de tipo volador en un 20%.",
+            "iron_plate_name": "Tabla acero",
+            "iron_plate_description": "La tabla acero es un objeto que aumenta el poder de los ataques de tipo acero en un 20%.",
+            "flame_plate_name": "Tabla llama",
+            "flame_plate_description": "La tabla llama es un objeto que aumenta el poder de los ataques de tipo fuego en un 20%.",
+            "toxic_plate_name": "Tabla tóxica",
+            "toxic_plate_description": "La tabla tóxica es un objeto que aumenta el poder de los ataques de tipo veneno en un 20%.",
+            "earth_plate_name": "Tabla terrax",
+            "earth_plate_description": "La tabla terrax es un objeto que aumenta el poder de los ataques de tipo tierra en un 20%.",
+            "fist_plate_name": "Tabla fuerte",
+            "fist_plate_description": "La tabla fuerte es un objeto que aumenta el poder de los ataques de tipo lucha en un 20%.",
+            "splash_plate_name": "Tabla linfa",
+            "splash_plate_description": "La tabla linfa es un objeto que aumenta el poder de los ataques de tipo agua en un 20%.",
+            "meadow_plate_name": "Tabla pradal",
+            "meadow_plate_description": "La tabla pradal es un objeto que aumenta el poder de los ataques de tipo planta en un 20%.",
+            "icicle_plate_name": "Tabla helada",
+            "icicle_plate_description": "La tabla helada es un objeto que aumenta el poder de los ataques de tipo hielo en un 20%.",
+            "zap_plate_name": "Tabla trueno",
+            "zap_plate_description": "La tabla trueno es un objeto que aumenta el poder de los ataques de tipo eléctrico en un 20%.",
+            "dread_plate_name": "Tabla terror",
+            "dread_plate_description": "La tabla terror es un objeto que aumenta el poder de los ataques de tipo fantasma en un 20%.",
+            "pixie_plate_name": "Tabla hada",
+            "pixie_plate_description": "La tabla hada es un objeto que aumenta el poder de los ataques de tipo hada en un 20%.",
+            "stone_plate_name": "Tabla pétrea",
+            "stone_plate_description": "La tabla pétrea es un objeto que aumenta el poder de los ataques de tipo roca en un 20%.",
+            "spooky_plate_name": "Tabla terror",
+            "spooky_plate_description": "La tabla terror es un objeto que aumenta el poder de los ataques de tipo siniestro en un 20%.",
+            "draco_plate_name": "Tabla draco",
+            "draco_plate_description": "La tabla draco es un objeto que aumenta el poder de los ataques de tipo dragón en un 20%."
+        }
+    }
+}

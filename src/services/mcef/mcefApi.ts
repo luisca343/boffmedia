@@ -62,3 +62,16 @@ export async function taxiTeleport(destination: { id: string }): Promise<QueryRe
     }
     return result;
 }
+
+type ObjetoMC = {
+    id: string;
+    cantidad: number;
+}
+
+export async function darCaja(objetos: ObjetoMC[]): Promise<QueryResult<any>> {
+    const result = await mcefQuery<any>('DAR_CAJA', { objetos });
+    if (result.error) {
+        console.error('Error giving box:', result.error);
+    }
+    return result;
+}
