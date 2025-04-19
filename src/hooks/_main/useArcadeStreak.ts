@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
-import { smartrotomService} from '@/services/api/smartrotom/smartrotomService';
 import { toast } from 'react-toastify';
-import { se } from 'date-fns/locale';
 import { arcadeService, ArcadeStreak, ClaimRewardResponse } from '@/services/api/smartrotom/arcadeService';
 
 interface UseArcadeStreakReturn {
@@ -14,6 +12,14 @@ interface UseArcadeStreakReturn {
   rewardAmount: number;
   claimReward: () => Promise<ClaimRewardResponse | null>;
   error: string | null;
+  nextReward: any | null;
+  currentDay: number;
+  totalDays: number;
+  lastClaimed: Date | null;
+  currentBanner: string | null;
+  lastBanner: string | null;
+  nextResetTime: Date | null;
+  bannerChanged: boolean;
 }
 
 export function useArcadeStreak(): UseArcadeStreakReturn {
@@ -24,19 +30,31 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
     streak: number;
     claimed: boolean;
     rewardAmount: number;
+    nextReward: any | null;
+    currentDay: number;
+    totalDays: number;
+    lastClaimed: Date | null;
+    currentBanner: string | null;
+    lastBanner: string | null;
+    nextResetTime: Date;
+    bannerChanged: boolean;
   }>({
     streak: 0,
     claimed: false,
-    rewardAmount: 50
+    rewardAmount: 50,
+    nextReward: null,
+    currentDay: 1,
+    totalDays: 7,
+    lastClaimed: null,
+    currentBanner: null,
+    lastBanner: null,
+    nextResetTime: new Date(),
+    bannerChanged: false
   });
-
-  // Calculate reward amount based on streak
-  const calculateRewardAmount = (streak: number) => {
-    return 50 + (Math.floor(streak / 5) * 25);
-  };
 
   // Fetch streak data on component mount
   useEffect(() => {
+    console.log("Fetching streak data...");
     const fetchStreak = async () => {
       if (!session) {
         setLoading(false);
@@ -45,16 +63,21 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
 
       try {
         setLoading(true);
-        const response = (await arcadeService.getArcadeStreak()).data as ArcadeStreak;
-        
-        // Check if the streak was claimed today
-        const today = new Date().toISOString().split('T')[0];
-        const claimed = response.lastClaimed === today;
-        
+        const response = (await arcadeService.getArcadeStreak(session.user.smartRotomUser?.uuid!)).data as ArcadeStreak;
+
+        // Use the claimedToday property directly from the server response
         setStreakData({
           streak: response.streak,
-          claimed,
-          rewardAmount: calculateRewardAmount(response.streak)
+          claimed: response.claimedToday || false,
+          rewardAmount: response.nextReward?.amount || 50,
+          nextReward: response.nextReward,
+          currentDay: response.currentDay || 1,
+          totalDays: response.totalDays || 7,
+          lastClaimed: response.lastClaimed || null,
+          currentBanner: response.currentBanner || null,
+          lastBanner: response.lastBanner || null,
+          nextResetTime: response.nextResetTime || new Date(),
+          bannerChanged: response.bannerChanged || false
         });
       } catch (err) {
         console.error("Failed to fetch streak data:", err);
@@ -66,11 +89,11 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
         const today = new Date().toISOString().split('T')[0];
         
         if (localLastClaimed) {
-          setStreakData({
+          setStreakData(prev => ({
+            ...prev,
             streak: localStreak,
             claimed: localLastClaimed === today,
-            rewardAmount: calculateRewardAmount(localStreak)
-          });
+          }));
           
           toast.error('Usando datos locales. La próxima vez que te conectes, tus datos de racha se sincronizarán', {
             position: "top-right",
@@ -103,35 +126,28 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
       return null;
     }
 
-    if (streakData.claimed) {
-      toast.info('Ya has reclamado tu recompensa diaria hoy', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true
-      });
-      return null;
-    }
-
     try {
       const result = await arcadeService.claimDailyReward(session.user.smartRotomUser?.uuid!);
-      const newStreak = result.data?.newStreak || 0;
       
       if (result.statusCode === 200 && result.data) {
-        // Update local state
-        setStreakData(prev => ({
-          ...prev,
-          streak: newStreak,
+        setStreakData({
+          streak: result.data.newStreak,
           claimed: true,
-          rewardAmount: calculateRewardAmount(newStreak)
-        }));
+          rewardAmount: result.data.rewardGiven.amount,
+          nextReward: result.data.nextReward,
+          currentDay: result.data.currentDay || 1,
+          totalDays: result.data.totalDays || 7,
+          lastClaimed: new Date(),
+          currentBanner: result.data.bannerName || streakData.currentBanner,
+          lastBanner: streakData.currentBanner,
+          nextResetTime: result.data.nextResetTime,
+          bannerChanged: result.data.bannerChanged || false
+        });
         
         // Also save to localStorage as fallback
         const today = new Date().toISOString().split('T')[0];
         localStorage.setItem("arcadeDailyBonus", today);
-        localStorage.setItem("arcadeBonusStreak", newStreak.toString());
+        localStorage.setItem("arcadeBonusStreak", result.data.newStreak.toString());
         
         toast.success(`¡Recompensa obtenida: +${result.data.rewardGiven.amount} ${result.data.rewardGiven.type}!`, {
           position: "top-center",
@@ -175,6 +191,14 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
     claimed: streakData.claimed,
     rewardAmount: streakData.rewardAmount,
     claimReward,
-    error
+    error,
+    nextReward: streakData.nextReward,
+    currentDay: streakData.currentDay,
+    totalDays: streakData.totalDays,
+    lastClaimed: streakData.lastClaimed,
+    currentBanner: streakData.currentBanner,
+    lastBanner: streakData.lastBanner,
+    nextResetTime: streakData.nextResetTime,
+    bannerChanged: streakData.bannerChanged
   };
 }

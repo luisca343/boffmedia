@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { arcadeService, InventoryItem } from "@/services/api/smartrotom/arcadeService";
+import { arcadeService, InventoryItem, RarityRanges } from "@/services/api/smartrotom/arcadeService";
 import { Item, LootBox, Rarity } from "../types";
 import { useTranslations } from 'next-intl';
 import { getItemDescription, getItemName } from "@/lib/intlUtils";
+import { Weight } from "lucide-react";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {
@@ -26,7 +27,6 @@ export function useLootBoxInventory(uuid?: string) {
     try {
       setLoadingInventory(true);
       const response = await arcadeService.getInventory(userId, '');
-      console.log("Fetched inventory:", response.data);
       if (response.data && response.data.items) {
         const serverItems = response.data.items
           .filter(item => item.used === 0) // Only include unused items
@@ -35,6 +35,7 @@ export function useLootBoxInventory(uuid?: string) {
             name: t(`items.${item.itemId.replace(":", ".")}_name`),
             source: item.sourceType,
             image: getItemName(t, item.itemId),
+            weight: 0,
             rarity: item.rarity as Rarity,
             count: item.amount,
             description: getItemDescription(t, item.itemId),
@@ -64,24 +65,30 @@ export function useLootBoxInventory(uuid?: string) {
       setLoadingInventory(false);
     }
   };
-
+  
+  function getRarityFromWeight(rarityRanges: RarityRanges, weight: number): string {
+    for (const [rarity, range] of Object.entries(rarityRanges)) {
+      if (weight >= range.min && weight <= range.max) {
+        return rarity;
+      }
+    }
+    return 'common';
+  }
   const fetchLootBoxConfig = async () => {
     try {
       setLoadingLootBoxes(true);
-      const response = await arcadeService.getLootboxConfig();
-      console.log("Fetched loot box config:", response.data);
+      const {rarityRanges, lootboxConfig} = (await arcadeService.getLootboxConfig()).data!
       
-      if (response.data && response.data.boxes) {
-        // Map the response to match the LootBox type
-        const lootBoxes: LootBox[] = response.data.boxes.map(box => ({
+      if (lootboxConfig && lootboxConfig.boxes) {
+        const lootBoxes: LootBox[] = lootboxConfig.boxes.map(box => ({
           id: box.id,
           name: box.name,
           description: box.description,
           image: box.image,
           items: box.items.map(item => ({
             id: item.id,
-            image: item.image,
-            rarity: item.rarity as Rarity,
+            weight: item.weight,
+            rarity: getRarityFromWeight(rarityRanges, item.weight) as Rarity,
           })),
           theme: box.theme || "default"
         }));
@@ -129,7 +136,7 @@ export function useLootBoxInventory(uuid?: string) {
       // Return the won item
       const item: Item = {
         id: response.data.item!.id,
-        image: response.data.item!.image,
+        weight: response.data.item!.weight,
         rarity: response.data.item!.rarity as Rarity,
       };
       

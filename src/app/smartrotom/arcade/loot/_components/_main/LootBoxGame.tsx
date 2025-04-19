@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { LootBox, Item } from "../../types";
 import LootBoxSelector from "../selector/LootBoxSelector";
@@ -40,6 +40,16 @@ export default function LootBoxGame() {
   const [showCollection, setShowCollection] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Add useEffect to set first loot box as selected when availableLootBoxes are loaded
+  useEffect(() => {
+    if (availableLootBoxes.length > 0 && !selectedBox) {
+      const firstValidBox = availableLootBoxes.find(box => box.items && box.items.length > 0);
+      if (firstValidBox) {
+        setSelectedBox(firstValidBox);
+      }
+    }
+  }, [availableLootBoxes, selectedBox]);
 
   const handleSelectBox = (box: LootBox) => {
     if (!box.items || box.items.length === 0) {

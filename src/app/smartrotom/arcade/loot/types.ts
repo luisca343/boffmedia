@@ -2,7 +2,7 @@ export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
 export type Item = {
   id: string;
-  image: string;
+  weight: number;
   rarity: Rarity;
   source?: string;
   count?: number;

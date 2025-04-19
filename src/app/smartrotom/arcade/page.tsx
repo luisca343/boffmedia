@@ -1,25 +1,48 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { WholeWord, Pickaxe, Package, Box } from "lucide-react";
+import { WholeWord, Pickaxe, Package, Box, Star } from "lucide-react";
 import { InternalLink } from "@/components/nav/Link";
 import StarsBackground from "./_components/StarsBackground";
-import WeeklyStreak from "./_components/WeeklyStreak";
+import WeeklyStreak from "./_components/daily/WeeklyStreak";
 import ArcadeGameCard from "./_components/ArcadeGameCard";
 import VoltorbImage from "./voltorb/_components/VoltorbIcon";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useArcadeStreak } from "@/hooks/_main/useArcadeStreak";
 import { ToastContainer } from "react-toastify";
+import { useTranslations } from "next-intl";
+import { getItemName } from "@/lib/intlUtils";
+import { isNamedReward } from "./_util/rewardIcons";
+import { ItemImage } from "@/lib/ItemImage";
 
 export default function CentroArcade() {
   const { session } = useBoffSession();
-  const { loading, streak, claimed, rewardAmount, claimReward, error } = useArcadeStreak();
+  const t = useTranslations();
+  const { 
+    loading, 
+    streak, 
+    claimed, 
+    rewardAmount, 
+    claimReward, 
+    error,
+    nextReward,
+    currentDay,
+    totalDays,
+    currentBanner,
+    lastBanner,
+    nextResetTime,
+    bannerChanged,
+  } = useArcadeStreak();
   const [showBonusAnimation, setShowBonusAnimation] = useState(false);
-
+  const [claimedReward, setClaimedReward] = useState<any>(null);
+  
   const handleClaimDailyBonus = async () => {
     const result = await claimReward();
     
     if (result && result.success) {
+      // Store the claimed reward details
+      setClaimedReward(result.rewardGiven);
+      
       // Show animation
       setShowBonusAnimation(true);
       
@@ -29,9 +52,7 @@ export default function CentroArcade() {
       }, 3000);
     }
   };
-
-
-
+  
   return (
     <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-purple-950 to-violet-950 flex flex-col items-center p-4 relative overflow-auto font-mono">
       <StarsBackground />
@@ -64,29 +85,68 @@ export default function CentroArcade() {
       </div>
       
       {/* Animated reward overlay */}
-      {showBonusAnimation && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-          <div className="relative animate-bounce flex flex-col items-center">
-            {/* Animated stars around the reward */}
-            {[...Array(12)].map((_, i) => (
-              <div 
-                key={i}
-                className="absolute animate-ping text-yellow-400"
-                style={{
-                  fontSize: `${Math.random() * 24 + 16}px`,
-                  transform: `rotate(${i * 30}deg) translate(${80 + Math.random() * 20}px)`,
-                  animation: `ping ${1 + Math.random()}s infinite`
-                }}
-              >
-                ★
+      {showBonusAnimation && claimedReward && (
+      <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none bg-indigo-950/50 backdrop-blur-sm">
+        <div className="relative flex flex-col items-center">
+          {/* Animated background effects */}
+          <div className="absolute inset-0 animate-pulse-slow -z-10">
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 rounded-full scale-150 blur-3xl"></div>
+          </div>
+          
+          {/* Animated stars around the reward */}
+          {[...Array(12)].map((_, i) => (
+            <div 
+              key={i}
+              className="absolute animate-ping text-yellow-400"
+              style={{
+                fontSize: `${Math.random() * 24 + 16}px`,
+                transform: `rotate(${i * 30}deg) translate(${80 + Math.random() * 40}px)`,
+                animation: `ping ${1 + Math.random() * 0.5}s infinite ease-in-out`
+              }}
+            >
+              ★
+            </div>
+          ))}
+          
+          {/* Main reward container with improved visuals */}
+          <div className="animate-bounce-gentle flex flex-col items-center">
+            <div className="text-center bg-gradient-to-b from-indigo-900/80 to-purple-900/80 px-10 py-6 rounded-2xl backdrop-blur-md shadow-xl shadow-indigo-500/30 border-2 border-indigo-400/30">
+              {/* Item icon with improved display - centered */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="absolute -inset-4 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-full blur-md"></div>
+                {isNamedReward(claimedReward.type) && claimedReward.description ? (
+                  <div className="relative z-10 p-2 flex items-center justify-center">
+                    <ItemImage 
+                      type={claimedReward.type.toLowerCase() === 'box' ? 'box' : 'item'} 
+                      itemId={claimedReward.description} 
+                      size={96}
+                    />
+                  </div>
+                ) : (
+                  <div className="relative z-10 h-24 w-24 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-full flex items-center justify-center border-4 border-yellow-300 shadow-lg shadow-yellow-500/50">
+                    <Star className="h-12 w-12 text-yellow-100" />
+                  </div>
+                )}
               </div>
-            ))}
-            <div className="text-6xl text-yellow-400 font-bold animate-pulse bg-indigo-900/40 px-8 py-4 rounded-2xl backdrop-blur-sm shadow-lg shadow-indigo-500/30 border-2 border-yellow-300/30">+{rewardAmount}</div>
-            <div className="text-3xl text-white font-bold mt-2 text-shadow-lg">¡Estrellas!</div>
+              
+              {/* Reward amount with improved text */}
+              <div className="text-4xl font-bold text-yellow-300 mb-2">
+                {isNamedReward(claimedReward.type) ? '¡1× Obtenido!' : `+${claimedReward.amount}`}
+              </div>
+              
+              {/* Reward name with improved styling */}
+              <div className="text-3xl text-white font-bold text-shadow-lg">
+                {isNamedReward(claimedReward.type) && claimedReward.description
+                  ? getItemName(t, claimedReward.description)
+                  : claimedReward.type.toLowerCase() === 'currency' 
+                    ? '¡Estrellas!' 
+                    : `¡${claimedReward.type}!`}
+              </div>
+            </div>
           </div>
         </div>
-      )}
-      
+      </div>
+    )}
       <div className="w-full max-w-7xl mx-auto flex flex-col items-center z-10 pt-24 pb-10 px-4">
         {/* Weekly Streak Progress */}
         <WeeklyStreak 
@@ -97,6 +157,14 @@ export default function CentroArcade() {
           isLoggedIn={!!session}
           isLoading={loading}
           error={error}
+          currentBanner={currentBanner}
+          lastBanner={lastBanner}
+          nextReward={nextReward}
+          currentDay={currentDay}
+          totalDays={totalDays}
+          uuid={session?.user?.smartRotomUser?.uuid}
+          nextResetTime={nextResetTime}
+          bannerChanged={bannerChanged}
         />
         
         {/* Inventory Banner */}
@@ -129,13 +197,6 @@ export default function CentroArcade() {
                   <span>VER INVENTARIO</span>
                   <span className="bg-yellow-500 text-yellow-900 text-xs px-2 py-0.5 rounded-full font-bold">NUEVO</span>
                 </div>
-              </div>
-              
-              {/* Decorative elements */}
-              <div className="hidden md:flex flex-shrink-0 ml-4 gap-3">
-                <div className="h-16 w-10 bg-yellow-500/20 border-2 border-yellow-400/30 rounded-lg"></div>
-                <div className="h-16 w-10 bg-purple-500/20 border-2 border-purple-400/30 rounded-lg"></div>
-                <div className="h-16 w-10 bg-green-500/20 border-2 border-green-400/30 rounded-lg"></div>
               </div>
             </div>
           </InternalLink>
@@ -260,6 +321,14 @@ export default function CentroArcade() {
           --blue-rgb: 59, 130, 246;
           --purple-rgb: 168, 85, 247;
           --green-rgb: 16, 185, 129;
+        }
+  
+        @keyframes bounce-gentle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-gentle {
+          animation: bounce-gentle 2s infinite ease-in-out;
         }
       `}</style>
     </div>

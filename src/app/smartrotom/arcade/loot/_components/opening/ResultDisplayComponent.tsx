@@ -5,6 +5,7 @@ import { getRarityConfig } from "../../_utils/rarityConfig";
 import { getItemDescription, getItemName } from "@/lib/intlUtils";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { ItemImage } from "@/lib/ItemImage";
 
 interface ResultDisplayProps {
   wonItem: Item;
@@ -39,12 +40,10 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         </h3>
         
         <div className="relative w-32 h-32 mb-4">
-          <Image
-            src={wonItem.image || "/smartrotom/img/apps/arcade/lootbox/items/pokeball.png"}
-            alt={getItemName(t, wonItem.id)}
-            width={128}
-            height={128}
-            className="object-contain"
+          <ItemImage
+            type={wonItem.source}
+            itemId={wonItem.id}
+            size={128}
           />
           
           {/* Special effects for legendary items */}

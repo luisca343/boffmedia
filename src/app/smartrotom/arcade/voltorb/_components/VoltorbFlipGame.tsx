@@ -276,13 +276,8 @@ export default function VoltorbFlipGame() {
   }
 
   function calculateLevelRegression() {
-    console.log("== LEVEL REGRESSION ==");
-    console.log("Level:", level);
-    console.log("Flipped Multipliers:", flippedMultipliers);
     const regressedLevel = Math.min(level, flippedMultipliers);
-    console.log("Regressed Level:", regressedLevel);
     const nextLevel = Math.max(regressedLevel, 1);
-    console.log("Next Level:", nextLevel);
     return nextLevel;
   }
 

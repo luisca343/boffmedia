@@ -1,5 +1,7 @@
 {
     "items": {
+        "trainer_box_name": "Caja de Entrenador",
+        "trainer_box_description": "Caja de Entrenador que contiene objetos para el viaje.",
         "rarity": {
             "all": "Todo",
             "common": "Común",

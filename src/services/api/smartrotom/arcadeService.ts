@@ -8,16 +8,23 @@ export interface DailyReward {
   day: number
   type: string
   amount: number
-  description?: string
+  description: string
 }
 
+// Update the ArcadeStreak interface to include banner information
 export interface ArcadeStreak {
-  lastClaimed: string
+  lastClaimed: Date
   streak: number
   totalClaims: number
   currentDay?: number
   totalDays?: number
   nextReward?: DailyReward
+  lastBanner?: string | null
+  currentBanner?: string
+  claimedToday?: boolean
+  nextResetTime?: Date
+  bannerChanged?: boolean
+  
 }
 
 export interface ClaimRewardResponse {
@@ -28,14 +35,18 @@ export interface ClaimRewardResponse {
   totalDays?: number
   nextReward?: DailyReward
   message?: string
+  bannerName?: string
+  nextResetTime: Date
+  claimedToday?: boolean
+  bannerChanged?: boolean
 }
 
 export interface DailyRewardsConfig {
   totalDays: number;
+  bannerName: string;
   rewards: DailyReward[];
 }
 
-// New interfaces for inventory management
 export interface InventoryItem {
   id: number;
   itemId: string;
@@ -84,25 +95,41 @@ export interface OpenLootBoxResponse {
   item?: {
     id: string;
     name: string;
-    image: string;
+    weight: number;
     rarity: string;
     description: string;
     serverId?: number;
   };
 }
+
+export interface RarityRanges {
+  [key: string]: {
+    min: number;
+    max: number;
+  };
+}
+
 export interface LootBoxConfigResponse {
-  boxes: Array<{
-    id: string;
-    name: string;
-    image: string;
-    description: string;
-    items: Array<{
+  rarityRanges: {
+    [key: string]: {
+      min: number;
+      max: number;
+    };
+  }
+  lootboxConfig: {
+    boxes: Array<{
       id: string;
+      name: string;
       image: string;
-      rarity: string;
+      description: string;
+      items: Array<{
+        id: string;
+        rarity: string;
+        weight: number;
+      }>;
+      theme: string;
     }>;
-    theme: string;
-  }>;
+  }
 }
 
 
@@ -112,7 +139,7 @@ export const arcadeService = {
 
     openLootBox: (data: OpenLootBoxRequest) => rotomPOST<OpenLootBoxResponse>("/arcade/lootbox/open", data),
     getRewardsBanner: () => rotomGET<DailyRewardsConfig>("/arcade/banner"),
-    getArcadeStreak: () => rotomGET<ArcadeStreak>("/arcade/streak"),
+    getArcadeStreak: (uuid: string) => rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`),
     claimDailyReward: (uuid: string) => rotomPOST<ClaimRewardResponse>("/arcade/streak/claim", {uuid}),
     getInventory: (uuid: string, sourceType?: string) => rotomGET<GetInventoryResponse>(`/arcade/inventory/${uuid}${sourceType ? `?sourceType=${sourceType}` : ''}`),
     claimInventoryItems: (uuid: string, itemIds: number[]) => rotomPOST<ClaimItemsResponse>("/arcade/inventory/claim", { uuid, itemIds }),

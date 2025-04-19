@@ -5,6 +5,7 @@ import { getItemName } from "@/lib/intlUtils";
 import { Sparkles } from "lucide-react";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
+import { ItemImage } from "@/lib/ItemImage";
 
 interface SpinnerItemProps {
   item: Item;
@@ -29,14 +30,9 @@ export function SpinnerItem({ item, index, isWinningItem, winningIndex }: Spinne
       }}
     >
       <div className="relative w-32 h-32 mb-2">
-        <Image
-          src={item.image || "/smartrotom/img/apps/arcade/lootbox/items/pokeball.png"}
-          alt={getItemName(t, item.id)}
-          width={128}
-          height={128}
-          className="object-contain"
-          priority={index < 20} // Prioritize loading images that appear first
-          style={{ imageRendering: "pixelated" }}
+        <ItemImage
+          itemId={item.id}
+          size={128}
         />
         
         {/* Special effects for rare items */}

@@ -22,7 +22,6 @@ export function useGetWordlePokemon(){
         rotomGET(`/pokemon/wordle`).then((res:any) => {
             setPokemon(res.data);
             const randomIndex = Math.floor(Math.random() * res.data.length);
-            console.log(res.data[randomIndex]);
             setTargetPokemon(res.data[randomIndex]);
         });
     }, []);

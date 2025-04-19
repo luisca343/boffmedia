@@ -1,13 +1,13 @@
 import Image from "next/image";
 
 interface ItemImageProps {
-  type: string;
+  type?: string;
   itemId: string;
-  amount: number;
+  amount?: number;
   size?: number;
 }
 
-export const ItemImage = ({ type, itemId, amount, size = 32 }: ItemImageProps) => {
+export const ItemImage = ({ type = "", itemId, amount = 0, size = 32 }: ItemImageProps) => {
   let itemName = itemId?.split(":")[1] || itemId;
   
   let imagePath: string;

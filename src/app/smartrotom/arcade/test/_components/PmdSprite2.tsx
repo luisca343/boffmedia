@@ -148,8 +148,6 @@ export const PmdSprite = forwardRef<PmdSpriteRef, PmdSpriteProps>(
     };
 
     async function loadAnimations(animData: AnimData, anims: string[]) {
-      console.log("=== loadAnimations 2 ===", anims);
-      console.log(animData);
       const animations = [] as AnimData[];
       await anims.forEach(async (anim) => {
         try {
