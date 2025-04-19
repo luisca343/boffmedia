@@ -5,6 +5,7 @@ import { getThemeColors } from "../../_utils/getThemeColors";
 import { BoxCarousel } from "./BoxCarousel";
 import { BoxInfo } from "./BoxInfo";
 import { OpenBoxButton } from "./OpenBoxButton";
+import { LootBoxOdds } from "../opening/LootBoxOdds";
 
 interface LootBoxSelectorProps {
   lootBoxes: LootBox[];
@@ -22,6 +23,7 @@ export default function LootBoxSelector({
   ownedBoxes
 }: LootBoxSelectorProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isOddsModalOpen, setIsOddsModalOpen] = useState(false);
   
   // If no selection yet, select first box
   useEffect(() => {
@@ -59,6 +61,16 @@ export default function LootBoxSelector({
         />
       )}
       
+      {/* View Odds Button */}
+      {selectedBox && (
+        <button
+          onClick={() => setIsOddsModalOpen(true)}
+          className={`mt-3 text-sm px-4 py-1 rounded-full border ${currentBoxTheme.text} ${currentBoxTheme.border} transition-colors`}
+        >
+          Ver Probabilidades
+        </button>
+      )}
+      
       {/* Open Box Button */}
       <div className="mt-6">
         <OpenBoxButton
@@ -68,6 +80,15 @@ export default function LootBoxSelector({
           onOpenBox={onOpenBox}
         />
       </div>
+      
+      {/* Odds Modal */}
+      {isOddsModalOpen && selectedBox && (
+        <LootBoxOdds
+          lootBox={selectedBox}
+          currentBoxTheme={currentBoxTheme}
+          onClose={() => setIsOddsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
