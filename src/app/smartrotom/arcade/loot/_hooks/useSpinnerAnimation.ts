@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Item } from "../types";
+import { useAudio } from "@/hooks/useAudio";
 
 interface UseSpinnerAnimationProps {
   lootBox: {
@@ -32,11 +33,18 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
   const [spinComplete, setSpinComplete] = useState(false);
   const [winningIndex, setWinningIndex] = useState<number | null>(null);
   
+  // Audio effects
+  const tickSound = useAudio('/audio/spinner-tick.wav', 0.25);
+  const winSound = useAudio('/audio/spinner-win.wav', 0.8);
+  
   const spinnerRef = useRef<HTMLDivElement>(null);
   const itemsContainerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>(0);
   const targetPosition = useRef<number>(0);
   const animationStarted = useRef<boolean>(false);
+  const lastTickedItem = useRef<number>(-1);
+  const animationPhase = useRef<'fast' | 'slow'>('fast');
+  const soundCounter = useRef<number>(0);
   
   const ITEM_WIDTH = 180; // width of each item + margin
   
@@ -86,6 +94,38 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
       cancelAnimationFrame(animationRef.current);
     };
   }, [lootBox, wonItem]);
+
+  // Function to play tick sound based on item position, with frequency control
+  const playTickForPosition = (position: number, progress: number) => {
+    if (!spinnerRef.current) return;
+    
+    const containerWidth = spinnerRef.current.offsetWidth;
+    const centerItem = Math.floor(position / ITEM_WIDTH) + Math.floor(containerWidth / (2 * ITEM_WIDTH));
+    
+    // Update the animation phase based on progress
+    if (progress < 0.3) {
+      animationPhase.current = 'fast';
+    } else {
+      animationPhase.current = 'slow';
+    }
+    
+    // Only play sound when center item changes
+    if (centerItem !== lastTickedItem.current) {
+      // In fast phase, play sound every 2 items
+      if (animationPhase.current === 'fast') {
+        soundCounter.current = (soundCounter.current + 1) % 2;
+        if (soundCounter.current === 0) {
+          tickSound.play();
+        }
+      } 
+      // In slow phase, play sound for every item
+      else {
+        tickSound.play();
+      }
+      
+      lastTickedItem.current = centerItem;
+    }
+  };
 
   const startScrollingAnimation = (items: Item[], winningPosition: number) => {
     if (!spinnerRef.current) return;
@@ -162,6 +202,8 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
       // Avoid DOM updates if position hasn't changed significantly
       if (Math.abs(newPosition - lastPosition) > 0.1) {
         setScrollPosition(newPosition);
+        // Play tick sound based on position and current progress
+        playTickForPosition(newPosition, progress);
         lastPosition = newPosition;
       }
       
@@ -173,6 +215,9 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
         setScrollPosition(targetPosition.current);
         setIsSpinning(false);
         setSpinComplete(true);
+        
+        // Play winning sound
+        winSound.play();
         
         // Use a single state update for animation completion
         setTimeout(() => {
