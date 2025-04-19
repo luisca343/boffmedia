@@ -1,29 +1,28 @@
-import {
-  SmartRotomReplay,
-  SmartRotomUserAchievement,
-  SmartRotomUserReplay,
-  smartRotomAchievements,
-  smartRotomArceuSpeak,
-  smartRotomReplays,
-  smartRotomUserAchievements,
-  smartRotomUserReplays,
-} from '@/_db/schema/SmartRotom';
-
-import { Inject, Injectable } from '@nestjs/common';
-import axios from 'axios';
-
-
+import { StarbankService } from '../starbank/starbank.service';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { DailyRewardsConfig, loadRewardsConfig } from './_config/daily-rewards.config';
+import { DailyRewardItem } from './_config/daily-rewards.config';
+import { smartRotomArcadeStreaks, smartRotomArceuSpeak } from '@/_db/schema/SmartRotom';
+import { ArcadeStreak, ClaimRewardResponse } from '../_dto/arcade-streak.dto';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
+import { eq } from 'drizzle-orm';
 import { TaxiStop } from '../_dto/taxi-stop.dto';
+import axios from 'axios';
 
 @Injectable()
-export class SmartrotomService {
+export class SmartrotomService implements OnModuleInit {
+  private rewardsConfig: DailyRewardsConfig;
+
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private starbankService: StarbankService
   ) {}
 
-  
+  onModuleInit() {
+    this.rewardsConfig = loadRewardsConfig();
+    console.log(`Loaded daily rewards configuration: ${this.rewardsConfig.totalDays} total days`);
+  }
 
   async getPerformance() {
     const performance = await axios.get(`${process.env.WINGULL_API}/performance`);

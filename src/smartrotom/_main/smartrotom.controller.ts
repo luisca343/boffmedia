@@ -1,8 +1,8 @@
 
 import { SmartrotomService } from './smartrotom.service';
 import { ResponseService } from '@/response/response.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { Body, Controller, Get, Param, Post, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse} from '@nestjs/swagger';
+import { Body, Controller, Get, Post, HttpException, HttpStatus, Logger, Headers } from '@nestjs/common';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 
 export class ParticipanteCarreraDto {

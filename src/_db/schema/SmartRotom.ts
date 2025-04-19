@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { char, int, mysqlTable, primaryKey, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { char, datetime, int, mysqlTable, primaryKey, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
 export const smartrotomUsers = mysqlTable("rotom_users", {
     id: int("id").primaryKey().autoincrement(),
@@ -90,3 +90,28 @@ export const smartRotomArceuSpeak = mysqlTable("rotom_arceuspeak", {
 });
 
 export type SmartRotomArceuSpeak = typeof smartRotomArceuSpeak.$inferSelect;
+
+export const smartRotomArcadeStreaks = mysqlTable('rotom_arcade_streaks', {
+    id: int('id').primaryKey().autoincrement(),
+    uuid: varchar('uuid', { length: 36 }).notNull(),
+    lastClaimed: timestamp('last_claimed'),
+    lastBanner: varchar("last_banner", { length: 100 }),
+    streak: int('streak').default(0),
+    totalClaims: int('total_claims').default(0),
+  });
+
+export type SmartRotomArcadeStreak = typeof smartRotomArcadeStreaks.$inferSelect;
+
+export const smartRotomInventory = mysqlTable("rotom_inventory", {
+    id: int("id").primaryKey().autoincrement(),
+    uuid: char("uuid", { length: 36 }).notNull().references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
+    itemId: varchar("item_id", { length: 32 }).notNull(),
+    itemType: varchar("item_type", { length: 32 }).notNull(),
+    amount: int("amount").default(1),
+    sourceType: varchar("source_type", { length: 32 }),
+    used: int("used").default(0),
+    rarity: varchar("rarity", { length: 20 }).default("common"),
+    createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
+});
+
+export type SmartRotomInventoryItem = typeof smartRotomInventory.$inferSelect;

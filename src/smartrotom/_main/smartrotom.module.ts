@@ -5,9 +5,10 @@ import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { LoggerModule } from '@/logger/logger.module';
 import { ResponseModule } from '@/response/response.module';
 import { DrizzleModule } from '@/drizzle/drizzle.module';
+import { StarbankModule } from '../starbank/starbank.module';
 
 @Module({
-  imports: [LoggerModule, ResponseModule, DrizzleModule],
+  imports: [LoggerModule, ResponseModule, DrizzleModule, StarbankModule],
   controllers: [SmartrotomController],
   providers: [SmartrotomService],
   exports: [SmartrotomService]
