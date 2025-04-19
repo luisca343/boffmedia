@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
-import { smartrotomService, ArcadeStreak, ClaimRewardResponse } from '@/services/api/smartrotom/smartrotomService';
+import { smartrotomService} from '@/services/api/smartrotom/smartrotomService';
 import { toast } from 'react-toastify';
 import { se } from 'date-fns/locale';
+import { arcadeService, ArcadeStreak, ClaimRewardResponse } from '@/services/api/smartrotom/arcadeService';
 
 interface UseArcadeStreakReturn {
   loading: boolean;
@@ -44,7 +45,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
 
       try {
         setLoading(true);
-        const response = (await smartrotomService.getArcadeStreak()).data as ArcadeStreak;
+        const response = (await arcadeService.getArcadeStreak()).data as ArcadeStreak;
         
         // Check if the streak was claimed today
         const today = new Date().toISOString().split('T')[0];
@@ -115,7 +116,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
     }
 
     try {
-      const result = await smartrotomService.claimDailyReward(session.user.smartRotomUser?.uuid!);
+      const result = await arcadeService.claimDailyReward(session.user.smartRotomUser?.uuid!);
       const newStreak = result.data?.newStreak || 0;
       
       if (result.statusCode === 200 && result.data) {

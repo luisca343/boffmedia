@@ -39,25 +39,21 @@ export const ItemDisplay = ({
           size={size}
         />
         
-        {/* Count badge, separate from the ItemImage component */}
         {count > 1 && showCountBadge && (
           <span className="absolute bottom-0 right-0 bg-gray-900/80 text-white text-xs px-1.5 py-0.5 rounded-md border border-gray-700">
             x{count}
           </span>
         )}
         
-        {/* Special effects by rarity can be added here */}
         {rarity === 'legendary' && (
           <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/10 to-transparent rounded-md animate-pulse pointer-events-none" />
         )}
       </div>
       
-      {/* Optional item name display */}
       {name && (
         <p className="text-sm text-center mt-1 truncate w-full">{name}</p>
       )}
       
-      {/* Any additional content */}
       {children}
     </div>
   );

@@ -62,7 +62,6 @@ export interface AddInventoryItemRequest {
   uuid: string;
   itemId: string;
   itemType: string;
-  name: string;
   amount?: number;
   sourceType?: string;
   sourceId?: number;
@@ -74,17 +73,52 @@ export interface AddInventoryItemResponse {
   itemId?: number;
 }
 
+export interface OpenLootBoxRequest {
+  uuid: string;
+  boxId: string;
+}
+
+export interface OpenLootBoxResponse {
+  success: boolean;
+  message?: string;
+  item?: {
+    id: string;
+    name: string;
+    image: string;
+    rarity: string;
+    description: string;
+    serverId?: number;
+  };
+}
+export interface LootBoxConfigResponse {
+  boxes: Array<{
+    id: string;
+    name: string;
+    image: string;
+    description: string;
+    items: Array<{
+      id: string;
+      image: string;
+      rarity: string;
+    }>;
+    theme: string;
+  }>;
+}
+
 
 export const arcadeService = {
   getInfo: () => rotomGET<ArcadeInfoResponse>('/arcade'),
   getWordle: (uuid: string) => rotomGET<WordleResponse>(`/arcade/wordle/${uuid}`),
 
+    openLootBox: (data: OpenLootBoxRequest) => rotomPOST<OpenLootBoxResponse>("/arcade/lootbox/open", data),
     getRewardsBanner: () => rotomGET<DailyRewardsConfig>("/arcade/banner"),
     getArcadeStreak: () => rotomGET<ArcadeStreak>("/arcade/streak"),
     claimDailyReward: (uuid: string) => rotomPOST<ClaimRewardResponse>("/arcade/streak/claim", {uuid}),
-    getInventory: (uuid: string, sourceType?: string) => rotomGET<GetInventoryResponse>(`/inventory/${uuid}${sourceType ? `?sourceType=${sourceType}` : ''}`),
-    claimInventoryItems: (uuid: string, itemIds: number[]) => rotomPOST<ClaimItemsResponse>("/inventory/claim", { uuid, itemIds }),
-    addInventoryItem: (data: AddInventoryItemRequest) => rotomPOST<AddInventoryItemResponse>("/inventory/add", data),
-    consumeInventoryItem: (uuid: string, itemId: string) => rotomPOST<ApiResponse>("/inventory/consume", { uuid, itemId }),
+    getInventory: (uuid: string, sourceType?: string) => rotomGET<GetInventoryResponse>(`/arcade/inventory/${uuid}${sourceType ? `?sourceType=${sourceType}` : ''}`),
+    claimInventoryItems: (uuid: string, itemIds: number[]) => rotomPOST<ClaimItemsResponse>("/arcade/inventory/claim", { uuid, itemIds }),
+    addInventoryItem: (data: AddInventoryItemRequest) => rotomPOST<AddInventoryItemResponse>("/arcade/inventory/add", data),
+    consumeInventoryItem: (uuid: string, itemId: string) => rotomPOST<ApiResponse>("/arcade/inventory/consume", { uuid, itemId }),
+    getLootboxConfig: () => rotomGET<LootBoxConfigResponse>("/arcade/lootbox/config"),
+  
 };
 

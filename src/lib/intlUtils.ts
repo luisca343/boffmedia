@@ -13,7 +13,7 @@ export const getItemName = (t: (key: string) => string, itemId: string): string 
     try {
       // Convert item ID to the right format for translation keys
       const normalizedId = itemId.replace(":", ".");
-      return t(`items.${normalizedId}`);
+      return t(`items.${normalizedId}_name`);
     } catch (error) {
       console.warn(`Translation not found for item name: ${itemId}`);
       // Fallback: extract and format the item name from its ID
@@ -36,7 +36,7 @@ export const getItemName = (t: (key: string) => string, itemId: string): string 
     try {
       // Convert item ID to the right format for translation keys
       const normalizedId = itemId.replace(":", ".");
-      return t(`items.${normalizedId}.description`);
+      return t(`items.${normalizedId}_description`);
     } catch (error) {
       console.warn(`Translation not found for item description: ${itemId}`);
       // Return a generic description as fallback

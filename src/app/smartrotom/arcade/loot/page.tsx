@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Package, ArrowLeft } from "lucide-react";
 import { InternalLink } from "@/components/nav/Link";
 import StarsBackground from "../_components/StarsBackground";
-import LootBoxGame from "./_components/LootBoxGame";
+import LootBoxGame from "./_components/_main/LootBoxGame";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
