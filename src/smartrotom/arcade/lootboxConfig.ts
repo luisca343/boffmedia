@@ -1,6 +1,6 @@
 interface LootBoxItem {
   id: string;
-  weight: number; // Changed from rarity to weight
+  weight: number;
 }
 
 export const rarityRanges = {
@@ -34,7 +34,6 @@ interface LootBoxConfig {
   boxes: LootBox[];
 }
 
-// This should mirror the client_side config but now it's on the server
 export const lootboxConfig: LootBoxConfig = {
   boxes: [
     {

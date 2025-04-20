@@ -165,19 +165,24 @@ export class ArcadeService implements OnModuleInit {
         // If banner changed, reset streak to 1
         newStreak = 1;
         console.log(`Banner changed from ${currentStreak.lastBanner} to ${this.rewardsConfig.name}. Resetting streak.`);
-      } else if (!lastClaimed || this.isDayAfterReset(lastClaimed, now, resetTime)) {
-        // Continue streak
+      } else {
+        newStreak += 1;
+      }
+
+      /*
+      else if (!lastClaimed || this.isDayAfterReset(lastClaimed, now, resetTime)) {
         newStreak += 1;
       } else {
-        // Reset streak as it's not consecutive
         newStreak = 1;
-      }
+      }*/
       
       // Calculate which day in the cycle we're on
       const dayInCycle = ((newStreak - 1) % this.rewardsConfig.totalDays) + 1;
       
       // Get reward from configuration
       const reward = this.getRewardForDay(dayInCycle);
+
+      console.log(`Current streak: ${currentStreak.streak}, New streak: ${newStreak}, Reward: ${reward.amount} ${reward.type}`);
       
       // Update database
       await this.updateStreak(uuid, {
@@ -190,8 +195,12 @@ export class ArcadeService implements OnModuleInit {
       // Award the reward to player
       if (reward.type === "CURRENCY" && reward.amount > 0) {
         await this.awardCurrency(uuid, reward.amount);
+      } else if (reward.type === "ITEM") {
+        // Handle item rewards if needed
+        console.log(`Item reward: ${reward.amount} of type ${reward.type}`);
+      } else if(reward.type === "box") {
+        this.giveLootbox(uuid, reward.description, reward.amount);
       }
-      
       // Calculate next day's reward
       const nextDayInCycle = (dayInCycle % this.rewardsConfig.totalDays) + 1;
       const nextReward = this.getRewardForDay(nextDayInCycle);
@@ -270,13 +279,6 @@ export class ArcadeService implements OnModuleInit {
     return date1.getDate() === date2.getDate() &&
     date1.getMonth() === date2.getMonth() &&
     date1.getFullYear() === date2.getFullYear();
-  }
-  
-  private isDayAfter(previous: Date, current: Date): boolean {
-    // Check if the current date is the day after previous date
-    const oneDayMs = 24 * 60 * 60 * 1000;
-    const dayDiff = Math.round((current.getTime() - previous.getTime()) / oneDayMs);
-    return dayDiff === 1;
   }
   
   private async updateStreak(uuid: string, data: { 
@@ -732,6 +734,33 @@ export class ArcadeService implements OnModuleInit {
       return {rarityRanges, lootboxConfig};
     } catch (error) {
       console.error('Error getting lootbox config:', error);
+      throw error;
+    }
+  }
+
+  async giveLootbox(uuid: string, boxId: string, amount: number) {
+    try {
+      const lootbox = lootboxConfig.boxes.find(box => box.id === boxId);
+      if (!lootbox) {
+        throw new Error('Lootbox not found');
+      }
+      
+      // Add the lootbox to the user's inventory
+      await this.db.insert(smartRotomInventory).values({
+        uuid,
+        itemId: boxId,
+        itemType: 'lootbox',
+        amount,
+        sourceType: 'arcade',
+        used: 0,
+      } as SmartRotomInventoryItem).execute();
+      
+      return {
+        success: true,
+        message: `Successfully added ${amount} ${boxId} to inventory`,
+      };
+    } catch (error) {
+      console.error('Error giving lootbox:', error);
       throw error;
     }
   }

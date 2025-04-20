@@ -316,4 +316,44 @@ export class ArcadeController {
       throw new HttpException('Failed to retrieve lootbox configuration', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @Post('lootbox/give')
+  @ApiOperation({ summary: 'Give lootbox to player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Lootbox given successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to give lootbox.' })
+  @ApiBody({
+    description: 'Player UUID and lootbox type',
+    schema: {
+      properties: {
+        uuid: { type: 'string', example: '550e8400-e29b-41d4-a716-446655440000' },
+        lootboxType: { type: 'string', example: 'trainer-box' },
+        amount: { type: 'number', example: 1 }
+      }
+    }
+  })
+  async giveLootbox(
+    @Body() data: { uuid: string; lootboxType: string, amount?: number }
+  ) {
+    try {
+      const result = await this.arcadeService.giveLootbox(data.uuid, data.lootboxType, data.amount);
+      
+      if (!result.success) {
+        return {
+          data: result,
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: result.message,
+        };
+      }
+      
+      return {
+        data: result,
+        statusCode: HttpStatus.OK,
+        message: 'Lootbox given successfully',
+      };
+    } catch (error) {
+      this.logger.error('Failed to give lootbox:', error);
+      throw new HttpException('Failed to give lootbox', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
