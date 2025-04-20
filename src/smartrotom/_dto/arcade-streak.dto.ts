@@ -63,7 +63,7 @@ export class ArcadeStreak {
     description: 'Next reset time (6:00 AM)',
     example: '2025-04-20T06:00:00Z'
   })
-  nextResetTime?: Date;
+  nextResetTime?: string;
 
   @ApiProperty({
     description: 'Whether the banner has changed',

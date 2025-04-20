@@ -66,11 +66,27 @@ export class ArcadeService implements OnModuleInit {
         bannerChangedMessage = `The rewards banner has changed from "${streak.lastBanner}" to "${this.rewardsConfig.name}". Your streak will reset on next claim.`;
       }
       
-      // Check if claimed today after reset
-      const claimedToday = streak.lastClaimed ? 
-        this.isSameDay(streak.lastClaimed, now) && 
-        new Date(streak.lastClaimed) >= resetTime : 
-        false;
+      let claimedToday = false;
+      if (streak.lastClaimed) {
+        const lastClaimDate = new Date(streak.lastClaimed);
+        
+        const currentResetTime = this.getDailyResetTime(now);
+        
+        if (now < currentResetTime) {
+          const yesterdayDate = new Date(now);
+          yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+          const yesterdayResetTime = this.getDailyResetTime(yesterdayDate);
+          
+          claimedToday = lastClaimDate >= yesterdayResetTime;
+        } 
+        else {
+          if (this.isSameDay(lastClaimDate, now)) {
+            claimedToday = lastClaimDate >= currentResetTime;
+          } else {
+            claimedToday = false;
+          }
+        }
+      }
       
       // Calculate current position in the reward cycle
       let currentDay = effectiveStreak % this.rewardsConfig.totalDays;
@@ -90,7 +106,7 @@ export class ArcadeService implements OnModuleInit {
         nextReward,
         currentBanner: this.rewardsConfig.name,
         claimedToday,
-        nextResetTime,
+        nextResetTime: nextResetTime.toISOString(),
         bannerChanged,
       };
     } catch (error) {
