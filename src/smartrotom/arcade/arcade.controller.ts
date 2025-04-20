@@ -176,12 +176,12 @@ export class ArcadeController {
     schema: {
       properties: {
         uuid: { type: 'string', example: '550e8400-e29b-41d4-a716-446655440000' },
-        itemIds: { type: 'array', items: { type: 'number' }, example: [1, 2, 3] }
+        itemIds: { type: 'array', items: { type: 'string' }, example: ['item1', 'item2'] }
       }
     } 
   })
   async claimInventoryItems(
-    @Body() data: { uuid: string; itemIds: number[] }
+    @Body() data: { uuid: string; itemIds: string[] }
   ) {
     try {
       const result = await this.arcadeService.claimInventoryItems(data.uuid, data.itemIds);
@@ -197,7 +197,7 @@ export class ArcadeController {
       return {
         data: result,
         statusCode: HttpStatus.OK,
-        message: `Successfully claimed ${result.claimedIds.length} items`
+        message: `Successfully claimed ${result.claimedItems.length} items`,
       };
     } catch (error) {
       this.logger.error('Failed to claim inventory items:', error);

@@ -570,39 +570,64 @@ export class ArcadeService implements OnModuleInit {
     }
   }
   
-  async claimInventoryItems(uuid: string, itemIds: number[]) {
+  async claimInventoryItems(uuid: string, itemIds: string[]) {
     try {
-      // Verify the items belong to the user
+      // Check if itemIds is an array and not empty
+      if (!Array.isArray(itemIds) || itemIds.length === 0) {
+        return {
+          success: false,
+          message: 'No items to claim'
+        };
+      }
+
+      console.log('Claiming inventory items for UUID:', uuid, 'Item IDs:', itemIds);
+      
+      // Find all items in the inventory that match the provided IDs
       const items = await this.db.select({
-        id: smartRotomInventory.id
+        id: smartRotomInventory.id,
+        itemId: smartRotomInventory.itemId,
+        itemType: smartRotomInventory.itemType,
+        amount: smartRotomInventory.amount,
+        used: smartRotomInventory.used,
+        createdAt: smartRotomInventory.createdAt
       })
       .from(smartRotomInventory)
       .where(and(
         eq(smartRotomInventory.uuid, uuid),
-        inArray(smartRotomInventory.id, itemIds),
-        eq(smartRotomInventory.used, 0)
-      ));
+        inArray(smartRotomInventory.itemId, itemIds)
+      ))
+      .execute();
       
-      // Get valid IDs (only those that match the user and are unused)
-      const validIds = items.map(item => item.id);
-      
-      if (validIds.length === 0) {
+      if (!items || items.length === 0) {
         return {
           success: false,
-          message: 'No valid items to claim',
-          claimedIds: []
+          message: 'No items found for the provided IDs'
         };
       }
       
-      // Update the items to mark as used
-      await this.db.update(smartRotomInventory)
-      .set({ used: 1 } as SmartRotomInventoryItem)
-      .where(inArray(smartRotomInventory.id, validIds));
+      // Process each item and update the database accordingly
+      for (const item of items) {
+        const consumableTypes = ['crate', 'consumable', 'potion', 'food'];
+        
+        if (consumableTypes.includes(item.itemType)) {
+          // For consumables, we can claim them directly
+          await this.db.update(smartRotomInventory)
+          .set({ used: 1 } as SmartRotomInventoryItem)
+          .where(eq(smartRotomInventory.id, item.id))
+          .execute();
+        } else {
+          // For non-consumables, we can just mark them as claimed (used=1)
+          await this.db.update(smartRotomInventory)
+          .set({ used: 1 } as SmartRotomInventoryItem)
+          .where(eq(smartRotomInventory.id, item.id))
+          .execute();
+        }
+      }
       
       return {
         success: true,
-        message: `Successfully claimed ${validIds.length} items`,
-        claimedIds: validIds
+        message: 'Items claimed successfully',
+        claimedItems: items.map(item => ({ id: item.id, itemId: item.itemId }))
       };
     } catch (error) {
       console.error('Error claiming inventory items:', error);
