@@ -19,6 +19,7 @@ interface ItemCollectionProps {
 export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate }: ItemCollectionProps) {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
+  const [localItems, setLocalItems] = useState<Item[]>(items);
   
   const {
     searchTerm,
@@ -31,10 +32,10 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
     handleNextPage,
     handleRarityFilter,
     handleSearchChange
-  } = useCollectionFilters(items);
+  } = useCollectionFilters(localItems);
 
   // Filter claimable items (not chests or boxes)
-  const claimableItems = items.filter(item => 
+  const claimableItems = localItems.filter(item => 
     !item.id.toLowerCase().includes('chest') && 
     !item.id.toLowerCase().includes('box')
   );
@@ -43,7 +44,13 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
     setSelectedItem(item);
   };
 
-  const handleClaimSuccess = () => {
+  const handleClaimSuccess = (claimedItemIds: string[]) => {
+    // Update local state by removing claimed items
+    setLocalItems(prevItems => 
+      prevItems.filter(item => !claimedItemIds.includes(item.id))
+    );
+    
+    // Also call parent update function if provided
     if (onInventoryUpdate) {
       onInventoryUpdate();
     }
@@ -84,7 +91,7 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
       
       {/* Item count */}
       <CollectionStats 
-        totalCount={items.length}
+        totalCount={localItems.length}
         filteredCount={filteredItems.length}
         displayedCount={paginatedItems.length}
         selectedRarity={selectedRarity}
@@ -94,7 +101,7 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
       <div className="overflow-y-auto flex-grow bg-gray-950/50 p-4 rounded-lg border border-gray-800">
         <CollectionGrid 
           items={paginatedItems} 
-          totalItems={items.length}
+          totalItems={localItems.length}
           onItemClick={handleItemClick} 
         />
       </div>
@@ -118,7 +125,7 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
       {/* Claim rewards modal */}
       {showClaimModal && (
         <ClaimRewardsModal 
-          items={items} 
+          items={claimableItems} 
           onClose={() => setShowClaimModal(false)} 
           onClaimSuccess={handleClaimSuccess}
           uuid={uuid}

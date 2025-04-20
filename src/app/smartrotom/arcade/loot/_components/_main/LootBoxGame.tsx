@@ -22,6 +22,12 @@ export default function LootBoxGame() {
   const { session } = useBoffSession();
   const uuid = session?.user.smartRotomUser?.uuid!;
   
+  const handleInventoryUpdate = async () => {
+    if (uuid) {
+      await fetchInventory(uuid);
+    }
+  };
+
   const {
     collection,
     ownedBoxes,
@@ -157,7 +163,8 @@ export default function LootBoxGame() {
             <ItemCollection 
               uuid={uuid}
               items={collection} 
-              onClose={() => setShowCollection(false)} 
+              onClose={() => setShowCollection(false)}
+              onInventoryUpdate={handleInventoryUpdate}
             />
           </motion.div>
         ) : isOpening && selectedBox && wonItem ? (

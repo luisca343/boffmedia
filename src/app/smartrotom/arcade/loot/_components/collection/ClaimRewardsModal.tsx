@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Item } from '../../types';
-import { X, Check, AlertCircle } from 'lucide-react';
+import { X, Check, AlertCircle, Box } from 'lucide-react';
 import { ItemDisplay } from '../ItemDisplay';
 import { useTranslations } from 'next-intl';
 import { getItemName } from '@/lib/intlUtils';
@@ -8,55 +8,88 @@ import { arcadeService } from '@/services/api/smartrotom/arcadeService';
 import { toast } from 'react-toastify';
 
 interface ClaimRewardsModalProps {
-    items: Item[];
-    onClose: () => void;
-    onClaimSuccess: (claimedItemIds: string[]) => void;
-    uuid: string;
-  }
-  
-  export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: ClaimRewardsModalProps) {
-    const t = useTranslations("");
-    const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-    const [isClaiming, setIsClaiming] = useState(false);
-  
-    // Filter out chests
-    const claimableItems = items.filter(item => 
-      !item.id.toLowerCase().includes('chest') && 
-      !item.id.toLowerCase().includes('box')
-    );
-  
-    const toggleItemSelection = (item: Item) => {
-      if (selectedItems.some(i => i.id === item.id)) {
-        setSelectedItems(selectedItems.filter(i => i.id !== item.id));
-      } else {
-        setSelectedItems([...selectedItems, item]);
-      }
-    };
-  
-    const handleClaim = async () => {
-      if (selectedItems.length === 0) return;
-  
-      try {
-        setIsClaiming(true);
-        const itemIds = selectedItems.map(item => item.id);
-        const response = await (await arcadeService.claimInventoryItems(uuid, itemIds)).data
-  
-        if (response?.success) {
-          toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente!`);
-          // Pass the claimed item IDs to update the local state
-          onClaimSuccess(itemIds);
-        } else {
-          toast.error(response!.message || 'Error al reclamar los objetos');
-        }
-      } catch (error) {
-        console.error('Error claiming rewards:', error);
-        toast.error('Ocurrió un error al reclamar los objetos');
-      } finally {
-        setIsClaiming(false);
-        onClose();
-      }
-    };
+  items: Item[];
+  onClose: () => void;
+  onClaimSuccess: (claimedItemIds: string[]) => void;
+  uuid: string;
+}
 
+export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: ClaimRewardsModalProps) {
+  const t = useTranslations("");
+  const [selectedItems, setSelectedItems] = useState<Item[]>([]);
+  const [isClaiming, setIsClaiming] = useState(false);
+  
+  // Filter out chests and boxes
+  const claimableItems = items.filter(item => 
+    !item.id.toLowerCase().includes('chest') && 
+    !item.id.toLowerCase().includes('box')
+  );
+  
+  // Separate Pokémon from non-Pokémon items
+  const pokemonItems = claimableItems.filter(item => item.source === 'pokemon');
+  const nonPokemonItems = claimableItems.filter(item => item.source !== 'pokemon');
+  
+  // Calculate required chests for Minecraft items
+  const chestCalculation = useMemo(() => {
+    if (selectedItems.length === 0) return { slots: 0, chests: 0 };
+    
+    const selectedNonPokemon = selectedItems.filter(item => item.source !== 'pokemon');
+    
+    // Calculate slots needed
+    const requiredSlots = selectedNonPokemon.reduce((total, item) => {
+      // Each item type uses at least one slot
+      // If count is more than 64, calculate additional slots needed
+      const itemSlots = Math.ceil((item.count || 1) / 64);
+      return total + itemSlots;
+    }, 0);
+    
+    // Each chest has 27 slots in Minecraft
+    const chestsNeeded = Math.ceil(requiredSlots / 27);
+    
+    return { slots: requiredSlots, chests: chestsNeeded };
+  }, [selectedItems]);
+  
+  const toggleItemSelection = (item: Item) => {
+    if (selectedItems.some(i => i.id === item.id)) {
+      setSelectedItems(selectedItems.filter(i => i.id !== item.id));
+    } else {
+      setSelectedItems([...selectedItems, item]);
+    }
+  };
+  
+  const handleClaim = async () => {
+    if (selectedItems.length === 0) return;
+    
+    try {
+      setIsClaiming(true);
+      const itemIds = selectedItems.map(item => item.id);
+      const response = await (await arcadeService.claimInventoryItems(uuid, itemIds)).data;
+      
+      if (response?.success) {
+        // Different messages based on what was claimed
+        if (selectedItems.some(item => item.source === 'pokemon') && 
+            selectedItems.some(item => item.source !== 'pokemon')) {
+          toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente! Se te entregarán ${chestCalculation.chests} cofre(s) en Minecraft.`);
+        } else if (selectedItems.every(item => item.source === 'pokemon')) {
+          toast.success(`¡Has reclamado ${selectedItems.length} Pokémon correctamente!`);
+        } else {
+          toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente! Se te entregarán ${chestCalculation.chests} cofre(s) en Minecraft.`);
+        }
+        
+        // Pass the claimed item IDs to update the local state
+        onClaimSuccess(itemIds);
+      } else {
+        toast.error(response!.message || 'Error al reclamar los objetos');
+      }
+    } catch (error) {
+      console.error('Error claiming rewards:', error);
+      toast.error('Ocurrió un error al reclamar los objetos');
+    } finally {
+      setIsClaiming(false);
+      onClose();
+    }
+  };
+  
   if (claimableItems.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
@@ -86,6 +119,9 @@ interface ClaimRewardsModalProps {
       </div>
     );
   }
+  
+  const selectedNonPokemon = selectedItems.filter(item => item.source !== 'pokemon');
+  const selectedPokemon = selectedItems.filter(item => item.source === 'pokemon');
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
@@ -104,37 +140,93 @@ interface ClaimRewardsModalProps {
           Selecciona las recompensas que deseas reclamar. Los cofres no se pueden reclamar.
         </p>
 
-        <div className="bg-gray-800/60 rounded-lg p-4 max-h-[400px] overflow-y-auto">
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {claimableItems.map(item => {
-              const isSelected = selectedItems.some(i => i.id === item.id);
-              const isChest = item.id.toLowerCase().includes('chest') || item.id.toLowerCase().includes('box');
-              
-              return (
-                <div key={item.id} className="flex flex-col items-center">
-                  <ItemDisplay
-                    type={item.source!}
-                    itemId={item.id}
-                    count={item.count}
-                    size={64}
-                    rarity={item.rarity}
-                    name={getItemName(t, item.id, item.source)}
-                    selectable={true}
-                    selected={isSelected}
-                    isChest={isChest}
-                    onClick={() => toggleItemSelection(item)}
-                  />
-                </div>
-              );
-            })}
+        {/* Display chest calculation info if we have selected non-Pokémon items */}
+        {selectedNonPokemon.length > 0 && (
+          <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-3 mb-4 flex items-center">
+            <Box size={20} className="text-blue-400 mr-2" />
+            <div>
+              <p className="text-blue-300">
+                <span className="font-semibold">{selectedNonPokemon.length}</span> {selectedNonPokemon.length === 1 ? 'objeto' : 'objetos'} de Minecraft seleccionados
+              </p>
+              <p className="text-blue-300 text-sm">
+                Ocuparán <span className="font-semibold">{chestCalculation.slots}</span> {chestCalculation.slots === 1 ? 'espacio' : 'espacios'} en 
+                <span className="font-semibold"> {chestCalculation.chests}</span> {chestCalculation.chests === 1 ? 'cofre' : 'cofres'}
+              </p>
+            </div>
           </div>
+        )}
+
+        {/* Display Pokémon count if any selected */}
+        {selectedPokemon.length > 0 && (
+          <div className="bg-green-900/30 border border-green-700/50 rounded-lg p-3 mb-4">
+            <p className="text-green-300">
+              <span className="font-semibold">{selectedPokemon.length}</span> {selectedPokemon.length === 1 ? 'Pokémon' : 'Pokémon'} seleccionados
+            </p>
+          </div>
+        )}
+
+        {/* Split display into two sections: Pokémon and non-Pokémon */}
+        <div className="bg-gray-800/60 rounded-lg p-4 max-h-[400px] overflow-y-auto">
+          {pokemonItems.length > 0 && (
+            <div className="mb-4">
+              <h4 className="text-cyan-300 font-medium mb-2 border-b border-gray-700 pb-1">Pokémon</h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                {pokemonItems.map(item => {
+                  const isSelected = selectedItems.some(i => i.id === item.id);
+                  return (
+                    <div key={item.id} className="flex flex-col items-center text-surface-100">
+                      <ItemDisplay
+                        type={item.source!}
+                        itemId={item.id}
+                        count={item.count}
+                        size={64}
+                        rarity={item.rarity}
+                        name={getItemName(t, item.id, item.source)}
+                        selectable={true}
+                        selected={isSelected}
+                        isChest={false}
+                        onClick={() => toggleItemSelection(item)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {nonPokemonItems.length > 0 && (
+            <div>
+              <h4 className="text-amber-300 font-medium mb-2 border-b border-gray-700 pb-1">Objetos de Minecraft</h4>
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                {nonPokemonItems.map(item => {
+                  const isSelected = selectedItems.some(i => i.id === item.id);
+                  return (
+                    <div key={item.id} className="flex flex-col items-center text-surface-100">
+                      <ItemDisplay
+                        type={item.source!}
+                        itemId={item.id}
+                        count={item.count}
+                        size={64}
+                        rarity={item.rarity}
+                        name={getItemName(t, item.id, item.source)}
+                        selectable={true}
+                        selected={isSelected}
+                        isChest={false}
+                        onClick={() => toggleItemSelection(item)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between items-center mt-4">
           <span className="text-gray-300">
             {selectedItems.length === 0 
               ? 'No has seleccionado objetos' 
-              : `${selectedItems.length} objeto(s) seleccionado(s)`
+              : `${selectedItems.length} ${selectedItems.length === 1 ? 'objeto' : 'objetos'} seleccionado${selectedItems.length === 1 ? '' : 's'}`
             }
           </span>
           
