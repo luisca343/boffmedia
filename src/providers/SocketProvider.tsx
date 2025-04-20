@@ -15,8 +15,6 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    console.log("Socket in SocketProvider changed", { socketExists: !!socket })
-    console.log("New socket", socket?.id)
   }, [socket])
 
   return <>{children}</>

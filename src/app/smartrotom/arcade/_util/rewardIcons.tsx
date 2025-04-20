@@ -1,6 +1,7 @@
 import React from "react";
 import { Star, Package, Award, Gift } from "lucide-react";
 import { ItemImage } from "@/lib/ItemImage";
+import { PokemonImage } from "@/lib/PokemonImage";
 
 export type RewardIconProps = {
   type: string;
@@ -23,9 +24,7 @@ export function getRewardIcon({ type, description = "", size = 24, className = "
     case 'currency':
       return <Star className={`h-${size/4} w-${size/4} text-yellow-300 ${className}`} />;
     case 'box':
-    case 'boxes':
     case 'crate':
-    case 'crates':
       // For boxes/crates, use ItemImage with the description as the itemId
       return <ItemImage type="box" itemId={description} size={size} />;
     case 'item':
@@ -34,6 +33,8 @@ export function getRewardIcon({ type, description = "", size = 24, className = "
         return <ItemImage type="item" itemId={description} size={size} />;
       }
       return <Award className={`h-${size/4} w-${size/4} text-blue-300 ${className}`} />;
+    case 'pokemon':
+      return <PokemonImage itemId={description} size={size} />;
     default:
       return <Gift className={`h-${size/4} w-${size/4} text-green-300 ${className}`} />;
   }

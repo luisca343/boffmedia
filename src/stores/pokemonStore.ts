@@ -17,6 +17,7 @@ interface PokemonState {
 }
 
 export const usePokemonStore = create<PokemonState>((set, get) => ({
+  console: "PokemonStore initialized",
   pokedexData: null,
   allPokemon: [],
   pokemonByDex: {},

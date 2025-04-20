@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { PokemonImage } from "./PokemonImage";
 
 interface ItemImageProps {
   type?: string;
@@ -9,7 +10,6 @@ interface ItemImageProps {
 
 export const ItemImage = ({ type = "", itemId, amount = 0, size = 32 }: ItemImageProps) => {
   let itemName = itemId?.split(":")[1] || itemId;
-  
   let imagePath: string;
 
   if (itemId.includes("box")) {
@@ -23,13 +23,11 @@ export const ItemImage = ({ type = "", itemId, amount = 0, size = 32 }: ItemImag
   
   return (
     <div className="relative group flex space-x-2">
-      <Image
-        alt={itemId}
-        width={size}
-        height={size}
-        src={imagePath}
-        style={{ imageRendering: "pixelated" }}
-      />
+      {type === "pokemon" ? 
+        <PokemonImage itemId={itemId} size={size} /> :
+        <Image alt={itemId} width={size} height={size} src={imagePath} style={{ imageRendering: "pixelated" }} />
+      }
+
       {amount > 0 && <span className="ml-2">x{amount}</span>}
     </div>
   );

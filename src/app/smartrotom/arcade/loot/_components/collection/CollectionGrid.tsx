@@ -13,12 +13,7 @@ interface CollectionGridProps {
 
 export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGridProps) {
   const t = useTranslations("");
-  
-  // Get the type based on item source
-  const getItemType = (item: Item) => {
-    return item.source === "arcade" ? "arcade" : "mina";
-  };
-  
+
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center text-gray-400 py-12">
@@ -47,7 +42,6 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
       {items.map(item => {
         const config = getRarityConfig(item.rarity);
-        const itemType = getItemType(item);
         
         return (
           <div
@@ -57,7 +51,7 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
           >
             <div className="w-full aspect-square mb-2 flex items-center justify-center">
               <ItemDisplay
-                type={itemType}
+                type={item.source!}
                 itemId={item.id}
                 count={item.count}
                 size={96}
@@ -66,7 +60,7 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
             </div>
             
             <h3 className={`${config.textColor} font-medium text-center text-sm truncate w-full`}>
-              {getItemName(t, item.id)}
+              {getItemName(t, item.id, item.source)}
             </h3>
             <p className={`${config.textColor} text-xs mt-1`}>
               {getItemRarity(t, item.rarity)}

@@ -18,6 +18,7 @@ export function useCollectionFilters(items: Item[]) {
       return rarityOrder[a.rarity] - rarityOrder[b.rarity];
     });
   }, [items, selectedRarity, searchTerm]);
+  
 
   const pageCount = Math.max(1, Math.ceil(filteredItems.length / ITEMS_PER_PAGE));
   

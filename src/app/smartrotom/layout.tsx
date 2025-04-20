@@ -3,6 +3,7 @@ import "../globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GlobalProviders } from "../GlobalProviders";
 import AppWrapper from "@/components/smartrotom/AppWrapper";
+import { SmartRotomProviders } from "./SmartRotomProviders";
 
 export const metadata: Metadata = {
   title: "SmartRotom",
@@ -16,9 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <GlobalProviders>
-      <TooltipProvider>
+      <SmartRotomProviders>
         <AppWrapper>{children}</AppWrapper>
-      </TooltipProvider>
+      </SmartRotomProviders>
     </GlobalProviders>
   );
 }

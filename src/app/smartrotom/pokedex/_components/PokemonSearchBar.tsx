@@ -3,9 +3,7 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
-import { InternalLink } from "@/components/nav/Link"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
-import { usePokemonStore } from "@/stores/pokemonStore"
 
 export default function PokemonSearchBar(){
     const [text, setText] = useState("")
