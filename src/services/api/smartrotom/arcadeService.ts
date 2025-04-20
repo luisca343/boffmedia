@@ -142,7 +142,7 @@ export const arcadeService = {
     getArcadeStreak: (uuid: string) => rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`),
     claimDailyReward: (uuid: string) => rotomPOST<ClaimRewardResponse>("/arcade/streak/claim", {uuid}),
     getInventory: (uuid: string, sourceType?: string) => rotomGET<GetInventoryResponse>(`/arcade/inventory/${uuid}${sourceType ? `?sourceType=${sourceType}` : ''}`),
-    claimInventoryItems: (uuid: string, itemIds: number[]) => rotomPOST<ClaimItemsResponse>("/arcade/inventory/claim", { uuid, itemIds }),
+    claimInventoryItems: (uuid: string, itemIds: string[]) => rotomPOST<ClaimItemsResponse>("/arcade/inventory/claim", { uuid, itemIds }),
     addInventoryItem: (data: AddInventoryItemRequest) => rotomPOST<AddInventoryItemResponse>("/arcade/inventory/add", data),
     consumeInventoryItem: (uuid: string, itemId: string) => rotomPOST<ApiResponse>("/arcade/inventory/consume", { uuid, itemId }),
     getLootboxConfig: () => rotomGET<LootBoxConfigResponse>("/arcade/lootbox/config"),

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { ItemImage } from "@/lib/ItemImage";
+import { Check } from "lucide-react";
 
 interface ItemDisplayProps {
   type: string;
@@ -12,6 +13,9 @@ interface ItemDisplayProps {
   className?: string;
   children?: ReactNode;
   onClick?: () => void;
+  selectable?: boolean;
+  selected?: boolean;
+  isChest?: boolean;
 }
 
 export const ItemDisplay = ({ 
@@ -24,12 +28,15 @@ export const ItemDisplay = ({
   showCountBadge = true,
   className = "",
   children,
-  onClick
+  onClick,
+  selectable = false,
+  selected = false,
+  isChest = false
 }: ItemDisplayProps) => {
   return (
     <div 
-      className={`relative flex flex-col items-center ${className}`}
-      onClick={onClick}
+      className={`relative flex flex-col items-center ${selectable && !isChest ? 'cursor-pointer' : ''} ${isChest ? 'cursor-not-allowed opacity-80' : ''} ${className}`}
+      onClick={selectable && !isChest ? onClick : undefined}
     >
       <div className="relative flex justify-center items-center">
         <ItemImage
@@ -47,6 +54,20 @@ export const ItemDisplay = ({
         
         {rarity === 'legendary' && (
           <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/10 to-transparent rounded-md animate-pulse pointer-events-none" />
+        )}
+
+        {selectable && selected && (
+          <div className="absolute inset-0 bg-cyan-500/30 rounded-md flex items-center justify-center">
+            <div className="bg-cyan-500 rounded-full p-1">
+              <Check size={16} className="text-black" />
+            </div>
+          </div>
+        )}
+
+        {selectable && isChest && (
+          <div className="absolute inset-0 bg-gray-800/60 rounded-md flex items-center justify-center">
+            <span className="text-xs text-white bg-black/70 px-2 py-1 rounded">No seleccionable</span>
+          </div>
         )}
       </div>
       

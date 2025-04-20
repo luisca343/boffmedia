@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react";
 export default function LootBoxGame() {
   const t = useTranslations("");
   const { session } = useBoffSession();
-  const uuid = session?.user.smartRotomUser?.uuid;
+  const uuid = session?.user.smartRotomUser?.uuid!;
   
   const {
     collection,
@@ -155,6 +155,7 @@ export default function LootBoxGame() {
             transition={{ duration: 0.3 }}
           >
             <ItemCollection 
+              uuid={uuid}
               items={collection} 
               onClose={() => setShowCollection(false)} 
             />

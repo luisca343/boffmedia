@@ -1,20 +1,24 @@
 import { useState } from "react";
 import { Item, Rarity } from "../../types";
-import { X } from "lucide-react";
+import { Gift, X } from "lucide-react";
 import { CollectionFilters } from "./CollectionFilters";
 import { CollectionStats } from "./CollectionStats";
 import { CollectionGrid } from "./CollectionGrid";
 import { CollectionPagination } from "./CollectionPagination";
 import { ItemDetailModal } from "./ItemDetailModal";
+import { ClaimRewardsModal } from "./ClaimRewardsModal";
 import { useCollectionFilters } from "../../_hooks/useCollectionFilter";
 
 interface ItemCollectionProps {
   items: Item[];
   onClose: () => void;
+  uuid: string;
+  onInventoryUpdate?: () => void;
 }
 
-export default function ItemCollection({ items, onClose }: ItemCollectionProps) {
+export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate }: ItemCollectionProps) {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [showClaimModal, setShowClaimModal] = useState(false);
   
   const {
     searchTerm,
@@ -29,8 +33,20 @@ export default function ItemCollection({ items, onClose }: ItemCollectionProps) 
     handleSearchChange
   } = useCollectionFilters(items);
 
+  // Filter claimable items (not chests or boxes)
+  const claimableItems = items.filter(item => 
+    !item.id.toLowerCase().includes('chest') && 
+    !item.id.toLowerCase().includes('box')
+  );
+
   const handleItemClick = (item: Item) => {
     setSelectedItem(item);
+  };
+
+  const handleClaimSuccess = () => {
+    if (onInventoryUpdate) {
+      onInventoryUpdate();
+    }
   };
 
   return (
@@ -39,12 +55,23 @@ export default function ItemCollection({ items, onClose }: ItemCollectionProps) 
         <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">
           Tu Colección
         </h2>
-        <button 
-          onClick={onClose}
-          className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-full border border-gray-700 transition-colors"
-        >
-          <X size={20} />
-        </button>
+        <div className="flex space-x-3">
+          {claimableItems.length > 0 && (
+            <button 
+              onClick={() => setShowClaimModal(true)}
+              className="bg-cyan-900/60 hover:bg-cyan-800 text-cyan-300 py-2 px-3 rounded-lg border border-cyan-700/50 flex items-center"
+            >
+              <Gift size={16} className="mr-1" />
+              <span>Reclamar ({claimableItems.length})</span>
+            </button>
+          )}
+          <button 
+            onClick={onClose}
+            className="bg-gray-800 hover:bg-gray-700 text-white p-2 rounded-full border border-gray-700 transition-colors"
+          >
+            <X size={20} />
+          </button>
+        </div>
       </div>
       
       {/* Filters and search */}
@@ -81,10 +108,22 @@ export default function ItemCollection({ items, onClose }: ItemCollectionProps) 
       />
       
       {/* Item detail modal */}
-      <ItemDetailModal 
-        item={selectedItem} 
-        onClose={() => setSelectedItem(null)} 
-      />
+      {selectedItem && (
+        <ItemDetailModal 
+          item={selectedItem} 
+          onClose={() => setSelectedItem(null)} 
+        />
+      )}
+
+      {/* Claim rewards modal */}
+      {showClaimModal && (
+        <ClaimRewardsModal 
+          items={items} 
+          onClose={() => setShowClaimModal(false)} 
+          onClaimSuccess={handleClaimSuccess}
+          uuid={uuid}
+        />
+      )}
     </div>
   );
 }
