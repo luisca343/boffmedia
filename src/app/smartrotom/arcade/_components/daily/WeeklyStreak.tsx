@@ -26,7 +26,6 @@ interface WeeklyStreakProps {
 }
 
 export default function WeeklyStreak({ 
-  streak,
   claimed, 
   onClaim, 
   rewardAmount, 
@@ -34,7 +33,6 @@ export default function WeeklyStreak({
   isLoading = false,
   error = null,
   currentBanner,
-  lastBanner,
   nextReward,
   currentDay = 1,
   totalDays = 7,
