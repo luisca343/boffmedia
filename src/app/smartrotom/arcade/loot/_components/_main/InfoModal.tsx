@@ -29,43 +29,23 @@ export function InfoModal({ isOpen, onClose, hasSession }: InfoModalProps) {
           </p>
           <p className="flex items-start">
             <span className="text-yellow-400 font-bold mr-2 bg-yellow-900/30 w-6 h-6 flex items-center justify-center rounded-full">3</span>
-            <span>Los objetos tienen diferentes niveles de rareza:</span>
+            <span>Cada caja contiene diferentes objetos con distintos niveles de rareza, desde comunes hasta legendarios.</span>
           </p>
-          <div className="bg-gray-950/50 rounded-lg p-4 border border-gray-800">
-            <ul className="space-y-2">
-              <li className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-gray-400 mr-2"></div>
-                <span className="text-gray-400">Común - 60% de probabilidad</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-green-400 mr-2"></div>
-                <span className="text-green-400">Poco común - 25% de probabilidad</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-blue-400 mr-2"></div>
-                <span className="text-blue-400">Raro - 10% de probabilidad</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-purple-400 mr-2"></div>
-                <span className="text-purple-400">Épico - 4% de probabilidad</span>
-              </li>
-              <li className="flex items-center">
-                <div className="w-3 h-3 rounded-full bg-yellow-400 mr-2"></div>
-                <span className="text-yellow-400">Legendario - 1% de probabilidad</span>
-              </li>
-            </ul>
-          </div>
           <p className="flex items-start">
             <span className="text-yellow-400 font-bold mr-2 bg-yellow-900/30 w-6 h-6 flex items-center justify-center rounded-full">4</span>
-            <span>Abre cajas para coleccionar todos los objetos posibles.</span>
+            <span>Abre cajas para coleccionar todos los objetos posibles y completar tu colección.</span>
           </p>
           <p className="flex items-start">
             <span className="text-yellow-400 font-bold mr-2 bg-yellow-900/30 w-6 h-6 flex items-center justify-center rounded-full">5</span>
             <span>Puedes conseguir cajas completando desafíos en el juego.</span>
           </p>
+          <p className="flex items-start">
+            <span className="text-yellow-400 font-bold mr-2 bg-yellow-900/30 w-6 h-6 flex items-center justify-center rounded-full">6</span>
+            <span>Consulta las probabilidades de cada objeto pulsando el botón &quot;Ver probabilidades&quot; en la caja.</span>
+          </p>
           {hasSession && (
             <p className="flex items-start">
-              <span className="text-cyan-400 font-bold mr-2 bg-cyan-900/30 w-6 h-6 flex items-center justify-center rounded-full">6</span>
+              <span className="text-cyan-400 font-bold mr-2 bg-cyan-900/30 w-6 h-6 flex items-center justify-center rounded-full">7</span>
               <span>Los objetos que obtengas se guardan en tu inventario permanente.</span>
             </p>
           )}
