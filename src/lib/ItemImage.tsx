@@ -12,12 +12,13 @@ export const ItemImage = ({ type = "", itemId, amount = 0, size = 32 }: ItemImag
   let itemName = itemId?.split(":")[1] || itemId;
   let imagePath: string;
 
+  console.log("itemName", itemName, itemId, type, amount, size);
+
   if (itemId.includes("box")) {
     imagePath = `/smartrotom/img/apps/arcade/lootbox/${itemName}.png`;
   } else if (type === "mina") {
     imagePath = `/smartrotom/img/apps/mina/recompensas/${itemName}.png`;
   } else {
-    itemName = itemId?.split(".")[1] || itemId;
     imagePath = `/smartrotom/img/sprites/items/${itemName.replace("_", "").toUpperCase()}.png`;
   }
   

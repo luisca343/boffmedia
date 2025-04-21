@@ -14,6 +14,12 @@ interface ClaimRewardsModalProps {
   uuid: string;
 }
 
+// Define an interface for the item claim data
+interface ClaimItemData {
+  id: string;
+  type: string;
+}
+
 export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: ClaimRewardsModalProps) {
   const t = useTranslations("");
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
@@ -62,8 +68,15 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
     
     try {
       setIsClaiming(true);
-      const itemIds = selectedItems.map(item => item.id);
-      const response = await (await arcadeService.claimInventoryItems(uuid, itemIds)).data;
+      
+      // Create an array of item IDs and types for claiming
+      const claimItems: ClaimItemData[] = selectedItems.map(item => ({
+        id: item.id,
+        type: item.source || 'minecraft' // Default to 'minecraft' if source is not specified
+      }));
+      
+      // Send both item IDs and types to the server
+      const response = await (await arcadeService.claimInventoryItems(uuid, claimItems)).data;
       
       if (response?.success) {
         // Different messages based on what was claimed
@@ -77,7 +90,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
         }
         
         // Pass the claimed item IDs to update the local state
-        onClaimSuccess(itemIds);
+        onClaimSuccess(selectedItems.map(item => item.id));
       } else {
         toast.error(response!.message || 'Error al reclamar los objetos');
       }
@@ -89,6 +102,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
       onClose();
     }
   };
+
   
   if (claimableItems.length === 0) {
     return (

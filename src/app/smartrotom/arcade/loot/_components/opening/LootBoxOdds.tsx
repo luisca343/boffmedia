@@ -31,6 +31,13 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
     return [...itemsWithOdds].sort((a, b) => b.percentage - a.percentage);
   }, [itemsWithOdds]);
 
+  // Calculate fraction representation (1/X format)
+  const getFractionRepresentation = (percentage: number): string => {
+    if (percentage === 0) return "N/A";
+    const denominator = Math.round(100 / percentage);
+    return denominator === 1 ? "1/1" : `1/${denominator}`;
+  };
+
   // Handle clicks outside the modal content
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -76,16 +83,26 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
                 />
                 <span className="text-white">{getItemName(t, item.id)}</span>
               </div>
-              <span className={`font-mono font-medium ${currentBoxTheme.highlight}`}>
-                {item.percentage.toFixed(2)}%
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`font-mono font-medium ${currentBoxTheme.highlight}`}>
+                  {item.percentage.toFixed(2)}%
+                </span>
+                <span className="text-gray-400 text-sm bg-black/30 px-2 py-0.5 rounded">
+                  {getFractionRepresentation(item.percentage)}
+                </span>
+              </div>
             </div>
           ))}
         </div>
         
-        <p className="text-gray-400 text-sm mt-4">
-          Las probabilidades son calculadas basadas en los pesos de cada item dentro de la caja.
-        </p>
+        <div className="text-gray-400 text-sm mt-4 bg-gray-800/50 p-3 rounded-lg border border-gray-700">
+          <p>
+            Las probabilidades son calculadas basadas en los pesos de cada item dentro de la caja.
+          </p>
+          <p className="mt-1">
+            El formato <span className="font-mono">1/X</span> indica cuántas cajas se necesitan abrir en promedio para obtener cada item.
+          </p>
+        </div>
       </div>
     </div>
   );

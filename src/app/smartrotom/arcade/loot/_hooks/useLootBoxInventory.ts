@@ -55,12 +55,6 @@ export function useLootBoxInventory(uuid?: string) {
         
         setOwnedBoxes(boxes);
       }
-    } catch (err) {
-      console.error("Failed to fetch inventory:", err);
-      toast.error("No se pudo cargar tu inventario. Usando solo datos locales.", {
-        position: "top-right",
-        autoClose: 5000
-      });
     } finally {
       setLoadingInventory(false);
     }
@@ -155,13 +149,13 @@ export function useLootBoxInventory(uuid?: string) {
   useEffect(() => {
     if (uuid) {
       fetchInventory(uuid);
-      
-      // Auto-refresh inventory periodically if user is logged in
+      /*
       const intervalId = setInterval(() => {
         fetchInventory(uuid);
       }, 60000); // Refresh every minute
       
       return () => clearInterval(intervalId);
+      */
     }
   }, [uuid]);
 
