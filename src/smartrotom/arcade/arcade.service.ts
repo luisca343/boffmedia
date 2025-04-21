@@ -677,17 +677,11 @@ export class ArcadeService implements OnModuleInit {
           }
         });
         
-        console.log('======================');
-        console.log('Optimized regular items to give:', regularItemsToGive);
-        console.log('Original item count:', regularItems.length, 'Optimized stack count:', regularItemsToGive.length);
       }
       
       // Process Pokémon items
       const pokemonGiveResults = [];
       if (pokemonItems.length > 0) {
-        console.log('======================');
-        console.log('Pokémon items to process:', pokemonItems.length);
-        
         // Process each Pokémon item
         for (const pokemonItem of pokemonItems) {
           try {
@@ -720,13 +714,24 @@ export class ArcadeService implements OnModuleInit {
         regularItemsGiveResult = await this.wingullService.giveItems(uuid, regularItemsToGive);
       }
       
+      if (!regularItemsGiveResult || !regularItemsGiveResult.success) {
+        return {
+          success: false,
+          message: 'Failed to give regular items to player',
+          error: regularItemsGiveResult.error || 'Unknown error'
+        };
+      }
+      
       // Mark all items as used in the database after delivery attempt
       for (const item of inventoryItems) {
+
         console.log(`Marking item as used: ${item.itemId} for UUID: ${uuid}`);
+        /*
         await this.db.update(smartRotomInventory)
           .set({ used: item.amount } as SmartRotomInventoryItem)
           .where(eq(smartRotomInventory.id, item.id))
           .execute();
+        */
       }
       
       return {
@@ -804,7 +809,7 @@ export class ArcadeService implements OnModuleInit {
   
   async consumeInventoryItem(uuid: string, itemId: string) {
     try {
-      // Find all instances of this item for the user, ordered by creation date (oldest first)
+
       const items = await this.db.select({
         id: smartRotomInventory.id,
         itemId: smartRotomInventory.itemId,
@@ -833,7 +838,7 @@ export class ArcadeService implements OnModuleInit {
       const currentItem = items[0];
       
       // Check if it's a consumable item type
-      const consumableTypes = ['crate', 'consumable', 'potion', 'food'];
+      const consumableTypes = ['crate', 'lootbox'];
       if (!consumableTypes.includes(currentItem.itemType)) {
         return {
           success: false,

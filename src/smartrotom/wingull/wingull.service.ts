@@ -170,7 +170,7 @@ export class WingullService {
       return response.data;
     } catch (error) {
       console.error('Error giving items to player:', error);
-      throw error;
+      return { success: false, error: 'Failed to give items' };
     }
   }
 
