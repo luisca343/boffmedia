@@ -3,6 +3,7 @@ import { PokemonService } from './pokemon.service';
 import { ResponseService } from '@/response/response.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import axios from 'axios';
+import { WingullService } from '../wingull/wingull.service';
 
 @ApiTags('smartrotom/pokemon')
 @Controller('smartrotom/pokemon')
@@ -12,6 +13,7 @@ export class PokemonController {
     constructor(
         private readonly pokemonService: PokemonService,
         private readonly responseService: ResponseService,
+        private readonly wingullService: WingullService,
     ) {}
     
     
@@ -364,12 +366,8 @@ export class PokemonController {
         try {
             this.responseService.logRequest(action, { uuid });
             
-            // Get data from WINGULL API
-            const apiResponse = await axios.post(`${process.env.WINGULL_API}/updatedex`, { uuid });
-            const data = apiResponse.data as {
-                SEEN: number[];
-                CAUGHT: number[];
-            };
+            // Get data from WingullService instead of directly from API
+            const data = await this.wingullService.updateDex(uuid);
             
             // Process the data with our service
             const result = await this.pokemonService.updateDex(uuid, data);

@@ -14,6 +14,7 @@ export class ResponseService {
 
   createSuccessResponse(message: string, data: any) {
     return {
+      success: true,
       statusCode: HttpStatus.CREATED,
       message,
       data,
@@ -24,6 +25,7 @@ export class ResponseService {
     this.logger.error(`Failed to ${action}:`, error.message);
     throw new HttpException(
       {
+        success: false,
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Failed to ${action}`,
         error: error.message,

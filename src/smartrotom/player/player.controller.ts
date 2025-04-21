@@ -3,12 +3,13 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger"
 import { ResponseService } from "@/response/response.service"
 import { UuidDto } from "../_dto/smartrotom-request-dto"
 import { PlayerService } from "./player.service"
+import { WingullService } from "../wingull/wingull.service"
 
 @ApiTags("smartrotom/player")
 @Controller("smartrotom/player")
 export class PlayerController {
     constructor(
-        @Inject(PlayerService) private readonly playerService: PlayerService,
+        @Inject(PlayerService) private readonly wingullService: WingullService,
         @Inject(ResponseService) private readonly responseService: ResponseService,
     ) {}
     
@@ -21,7 +22,7 @@ export class PlayerController {
         const action = 'get stats';
         try {
             this.responseService.logRequest(action, { uuid });
-            const stats = await this.playerService.getStats(uuid);
+            const stats = await this.wingullService.getStats(uuid);
             this.responseService.logSuccess(action, stats);
             return this.responseService.createSuccessResponse('Stats retrieved successfully', stats);
         } catch (error) {
@@ -38,7 +39,7 @@ export class PlayerController {
         const action = 'get team';
         try {
             this.responseService.logRequest(action, { uuid });
-            const team = await this.playerService.getTeam(uuid);
+            const team = await this.wingullService.getTeam(uuid);
             this.responseService.logSuccess(action, team);
             return this.responseService.createSuccessResponse('Team retrieved successfully', team);
         } catch (error) {

@@ -2,12 +2,14 @@ import { Controller, Get, HttpStatus, Inject } from "@nestjs/common"
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger"
 import { ResponseService } from "@/response/response.service"
 import { RegionService } from "./region.service"
+import { WingullService } from "../wingull/wingull.service"
 
 @ApiTags("smartrotom/regions")
 @Controller("smartrotom/regions")
 export class RegionController {
     constructor(
         @Inject(RegionService) private readonly regionService: RegionService,
+        @Inject(WingullService) private readonly wingullService: WingullService,
         @Inject(ResponseService) private readonly responseService: ResponseService,
     ) {}
 
@@ -19,7 +21,7 @@ export class RegionController {
     const action = "get regions"
     try {
       this.responseService.logRequest(action, {})
-      const regions = await this.regionService.getRegions()
+      const regions = await this.wingullService.getRegions(this.regionService.townColors)
       this.responseService.logSuccess(action, regions)
       return this.responseService.createSuccessResponse("Regions retrieved successfully", regions)
     } catch (error) {

@@ -77,6 +77,7 @@ import { UploadModule } from './util/upload/upload.module';
 import { MhwildsController } from './tools/mhwilds/mhwilds.controller';
 import { MhwildsModule } from './tools/mhwilds/mhwilds.module';
 import { MhwildsService } from './tools/mhwilds/mhwilds.service';
+import { WingullModule } from './smartrotom/wingull/wingull.module';
 
 @Module({
   imports: [
@@ -118,6 +119,7 @@ import { MhwildsService } from './tools/mhwilds/mhwilds.service';
     EventsModule,
     UploadModule,
     MhwildsModule,
+    WingullModule,
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 

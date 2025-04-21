@@ -8,6 +8,17 @@ import { StarbankService } from '../starbank/starbank.service';
 import { ArcadeStreak, ClaimRewardResponse } from '../_dto/arcade-streak.dto';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
 import { getRarityFromWeight, lootboxConfig, rarityRanges } from './lootboxConfig';
+import { WingullService } from '../wingull/wingull.service';
+
+export interface ClaimItemData {
+  id: string;
+  type?: string;
+}
+
+export interface ClaimItemsWithTypesRequest {
+  uuid: string;
+  items: ClaimItemData[];
+}
 
 @Injectable()
 export class ArcadeService implements OnModuleInit {
@@ -15,7 +26,8 @@ export class ArcadeService implements OnModuleInit {
   
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-    private starbankService: StarbankService
+    private starbankService: StarbankService,
+    private wingullService: WingullService,
   ) {}
   
   onModuleInit() {
@@ -495,7 +507,7 @@ export class ArcadeService implements OnModuleInit {
       
       // Aggregate items with the same itemId and combine their amounts/used counts
       const aggregatedItems = rawItems.reduce((acc, item) => {
-        const consumableTypes = ['crate', 'consumable', 'potion', 'food'];
+        const consumableTypes = ['crate', 'lootbox'];
         const isConsumable = consumableTypes.includes(item.itemType);
         
         // For consumables, we group only by itemId and sourceType
@@ -533,7 +545,7 @@ export class ArcadeService implements OnModuleInit {
       // Process the aggregated items to calculate remaining amounts for consumables
       for (const key in aggregatedItems) {
         const item = aggregatedItems[key];
-        const consumableTypes = ['crate', 'consumable', 'potion', 'food'];
+        const consumableTypes = ['crate', 'lootbox'];
         
         if (consumableTypes.includes(item.itemType)) {
           // For consumables, calculate remaining amount and update amount field
@@ -570,20 +582,23 @@ export class ArcadeService implements OnModuleInit {
     }
   }
   
-  async claimInventoryItems(uuid: string, itemIds: string[]) {
+  async claimInventoryItems(uuid: string, items: ClaimItemData[]) {
     try {
-      // Check if itemIds is an array and not empty
-      if (!Array.isArray(itemIds) || itemIds.length === 0) {
+      // Check if items is an array and not empty
+      if (!Array.isArray(items) || items.length === 0) {
         return {
           success: false,
           message: 'No items to claim'
         };
       }
-
-      console.log('Claiming inventory items for UUID:', uuid, 'Item IDs:', itemIds);
+  
+      console.log('Claiming inventory items for UUID:', uuid, 'Items:', items);
+      
+      // Extract just the itemIds for the query
+      const itemIds = items.map(item => item.id);
       
       // Find all items in the inventory that match the provided IDs
-      const items = await this.db.select({
+      const inventoryItems = await this.db.select({
         id: smartRotomInventory.id,
         itemId: smartRotomInventory.itemId,
         itemType: smartRotomInventory.itemType,
@@ -598,36 +613,142 @@ export class ArcadeService implements OnModuleInit {
       ))
       .execute();
       
-      if (!items || items.length === 0) {
+      if (!inventoryItems || inventoryItems.length === 0) {
         return {
           success: false,
           message: 'No items found for the provided IDs'
         };
       }
       
-      // Process each item and update the database accordingly
-      for (const item of items) {
-        const consumableTypes = ['crate', 'consumable', 'potion', 'food'];
-        
-        if (consumableTypes.includes(item.itemType)) {
-          // For consumables, we can claim them directly
-          await this.db.update(smartRotomInventory)
-          .set({ used: 1 } as SmartRotomInventoryItem)
-          .where(eq(smartRotomInventory.id, item.id))
-          .execute();
-        } else {
-          // For non-consumables, we can just mark them as claimed (used=1)
-          await this.db.update(smartRotomInventory)
-          .set({ used: 1 } as SmartRotomInventoryItem)
-          .where(eq(smartRotomInventory.id, item.id))
-          .execute();
+      console.log('Inventory items found:', inventoryItems.length);
+      
+
+      
+      if (inventoryItems.length === 0) {
+        return {
+          success: false,
+          message: 'No items match the specified types'
+        };
+      }
+      
+      // Separate Pokémon items and regular items
+      const pokemonItems: typeof inventoryItems = [];
+      const regularItems = inventoryItems.filter(item => {
+        if (item.itemType.toLowerCase() === 'pokemon') {
+          pokemonItems.push(item);
+          return false;
         }
+        return true;
+      });
+  
+      console.log(`Regular items to give: ${regularItems.length}, Pokémon items to give: ${pokemonItems.length}`);
+      
+      // Process regular items for giving to player
+      const regularItemsToGive: Array<{id: string, amount: number}> = [];
+      
+      if (regularItems.length > 0) {
+        const itemsMap = new Map<string, number>();
+        
+        // First sum up all regular items by itemId
+        for (const item of regularItems) {
+          console.log(`Processing regular item: ${item.itemId}, amount: ${item.amount}`);
+          const currentAmount = itemsMap.get(item.itemId) || 0;
+          itemsMap.set(item.itemId, currentAmount + item.amount);
+        }
+        
+        // Then create stacks of up to 64 items each
+        itemsMap.forEach((totalAmount, itemId) => {
+          // Create full stacks of 64
+          const fullStacks = Math.floor(totalAmount / 64);
+          for (let i = 0; i < fullStacks; i++) {
+            regularItemsToGive.push({
+              id: itemId,
+              amount: 64
+            });
+          }
+          
+          // Add the remainder if any
+          const remainder = totalAmount % 64;
+          if (remainder > 0) {
+            regularItemsToGive.push({
+              id: itemId,
+              amount: remainder
+            });
+          }
+        });
+        
+        console.log('======================');
+        console.log('Optimized regular items to give:', regularItemsToGive);
+        console.log('Original item count:', regularItems.length, 'Optimized stack count:', regularItemsToGive.length);
+      }
+      
+      // Process Pokémon items
+      const pokemonGiveResults = [];
+      if (pokemonItems.length > 0) {
+        console.log('======================');
+        console.log('Pokémon items to process:', pokemonItems.length);
+        
+        // Process each Pokémon item
+        for (const pokemonItem of pokemonItems) {
+          try {
+            // The itemId should contain the pokemon specification string
+            const pokespec = pokemonItem.itemId;
+            console.log(`Giving Pokémon to player: ${uuid}, Spec: ${pokespec}`);
+            
+            // Call the givePokemon method
+            const giveResult = await this.wingullService.givePokemon(uuid, pokespec, true);
+            
+            pokemonGiveResults.push({
+              id: pokemonItem.id,
+              itemId: pokemonItem.itemId,
+              result: giveResult
+            });
+          } catch (error) {
+            console.error(`Error giving Pokémon ${pokemonItem.itemId} to player:`, error);
+            pokemonGiveResults.push({
+              id: pokemonItem.id,
+              itemId: pokemonItem.itemId,
+              error: error.message || 'Unknown error'
+            });
+          }
+        }
+      }
+      
+      // Give regular items if there are any
+      let regularItemsGiveResult = null;
+      if (regularItemsToGive.length > 0) {
+        regularItemsGiveResult = await this.wingullService.giveItems(uuid, regularItemsToGive);
+      }
+      
+      // Mark all items as used in the database after delivery attempt
+      for (const item of inventoryItems) {
+        console.log(`Marking item as used: ${item.itemId} for UUID: ${uuid}`);
+        await this.db.update(smartRotomInventory)
+          .set({ used: item.amount } as SmartRotomInventoryItem)
+          .where(eq(smartRotomInventory.id, item.id))
+          .execute();
       }
       
       return {
         success: true,
-        message: 'Items claimed successfully',
-        claimedItems: items.map(item => ({ id: item.id, itemId: item.itemId }))
+        message: 'Items claimed and sent to player successfully',
+        claimedItems: inventoryItems.map(item => ({ 
+          id: item.id, 
+          itemId: item.itemId,
+          itemType: item.itemType
+        })),
+        regularItems: {
+          count: regularItems.length,
+          optimizedStackCount: regularItemsToGive.length,
+          giveResult: regularItemsGiveResult
+        },
+        pokemonItems: {
+          count: pokemonItems.length,
+          processedItems: pokemonGiveResults,
+          message: pokemonItems.length > 0 
+            ? "Pokémon items processed and sent to player" 
+            : "No Pokémon items to process"
+        }
       };
     } catch (error) {
       console.error('Error claiming inventory items:', error);

@@ -3,7 +3,10 @@ import axios from "axios"
 
 @Injectable()
 export class RegionService {
-    private townColors = {
+    constructor() {}
+
+
+    townColors = {
         ARRECIFE_WINGULL: { fill: 0x5500bfff, border: 0x00bfff },
         PUERTO_WINGULL: { fill: 0x550077be, border: 0x0077be },
         PUEBLO_TULIPAN: { fill: 0x5532cd32, border: 0x32cd32 },
@@ -28,19 +31,5 @@ export class RegionService {
         FUKITSU: { fill: 0x55000000, border: 0x000000 },
         GANSOLIA: { fill: 0x55deb887, border: 0xdeb887 },
     };
-    
-    
-    async getRegions() {
-        const regions = await axios.get(`${process.env.WINGULL_API}/regions`)
-        
-        return regions.data.map((region: any) => {
-            const color = this.townColors[region.name.toUpperCase()]
-            if (color) {
-                region.fillColor = color.fill & 0xffffffff
-                region.strokeColor = color.border & 0xffffffff
-            }
-            return region
-        })
-    }
 }
 

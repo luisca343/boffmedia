@@ -4,6 +4,7 @@ import { ResponseService } from '@/response/response.service';
 import { ApiTags, ApiOperation, ApiResponse} from '@nestjs/swagger';
 import { Body, Controller, Get, Post, HttpException, HttpStatus, Logger, Headers } from '@nestjs/common';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
+import { WingullService } from '../wingull/wingull.service';
 
 export class ParticipanteCarreraDto {
   uuid: string;
@@ -26,6 +27,7 @@ export class SmartrotomController {
 
   constructor(
     private smartrotomService: SmartrotomService,
+    private wingullService: WingullService,
     private readonly responseService: ResponseService,
   ) {}
 
@@ -34,7 +36,7 @@ export class SmartrotomController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Performance retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve performance.' })
   async getPerformance() {
-    const performance = await this.smartrotomService.getPerformance();
+    const performance = await this.wingullService.getPerformance();
     return {
       data: performance,
       statusCode: 200,
@@ -106,7 +108,7 @@ export class SmartrotomController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve taxi stops.' })
   async getTaxiStops() {
     try {
-      const taxiStops = await this.smartrotomService.getTaxiStops();
+      const taxiStops = await this.wingullService.getTaxiStops();
       return {
         data: taxiStops,
         statusCode: 200,
@@ -124,7 +126,7 @@ export class SmartrotomController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to teleport player.' })
   async teleportPlayer(@Body() body: TeleportPlayerDto) {
     try {
-      const result = await this.smartrotomService.teleportPlayer(body.id, body.uuid);
+      const result = await this.wingullService.teleportPlayer(body.id, body.uuid);
       return {
         data: { success: result },
         statusCode: 200,

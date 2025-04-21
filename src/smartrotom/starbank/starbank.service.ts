@@ -8,11 +8,13 @@ import { alias } from 'drizzle-orm/mysql-core';
 import { RowDataPacket } from 'mysql2';
 import axios from 'axios';
 import { StarBankAccount as StarBankAccountType } from './types';
+import { WingullService } from '../wingull/wingull.service';
 
 @Injectable()
 export class StarbankService {
     constructor(
-        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+        @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+        private readonly wingullService: WingullService
     ) {}
 
     async getMainAccount(uuid: string) {
@@ -99,23 +101,23 @@ export class StarbankService {
     }
     
 
-    updateBalance(account: {balance: number, type: string, uuid: string}) {
-        axios.post(`${process.env.WINGULL_API}/updateBalance`, account)
-            .catch(error => {
-                console.log(error);
-        });
+    async updateBalance(account: {balance: number, type: string, uuid: string}) {
+        try {
+            return await this.wingullService.updateBalance(account);
+        } catch (error) {
+            console.error('Error updating balance:', error);
+            throw error;
+        }
     }
 
     async trainerDefeat(amount: number, uuid: string) {
         const account = await this.getMainAccount(uuid);
-        const test = await axios.post(`${process.env.WINGULL_API}/getCurrentBalance`, {uuid, amount})
-        const money = test.data as number
+        const money = await this.wingullService.getCurrentBalance(uuid, amount);
         const prevBalance = account.balance;
         const diff = money - prevBalance;
 
         if(diff !== 0) return this.transaction(0, account.id, diff, "Derrota de entrenador", "ENTRENADOR");
         return {success: true}
-
     }
 
     async shop(body: {uuid: string, npcName: string, itemName: string, operation: string, unitPrice: number, count: number}) {

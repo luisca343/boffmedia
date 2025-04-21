@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Logger, Param, Post, Body, Headers, HttpException, Query } from '@nestjs/common';
-import { ArcadeService } from './arcade.service';
+import { ArcadeService, ClaimItemsWithTypesRequest } from './arcade.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ResponseService } from '@/response/response.service';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
@@ -172,19 +172,32 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'No valid items to claim.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to claim items.' })
   @ApiBody({ 
-    description: 'Player UUID and item IDs to claim',
+    description: 'Player UUID and items to claim with types',
     schema: {
       properties: {
         uuid: { type: 'string', example: '550e8400-e29b-41d4-a716-446655440000' },
-        itemIds: { type: 'array', items: { type: 'string' }, example: ['item1', 'item2'] }
+        items: { 
+          type: 'array', 
+          items: { 
+            type: 'object',
+            properties: {
+              id: { type: 'string', example: 'pixelmon:poke_ball' },
+              type: { type: 'string', example: 'COMMON' }
+            }
+          },
+          example: [
+            { id: 'pixelmon:poke_ball', type: 'COMMON' },
+            { id: 'pixelmon:great_ball', type: 'UNCOMMON' }
+          ] 
+        }
       }
     } 
   })
   async claimInventoryItems(
-    @Body() data: { uuid: string; itemIds: string[] }
+    @Body() data: ClaimItemsWithTypesRequest
   ) {
     try {
-      const result = await this.arcadeService.claimInventoryItems(data.uuid, data.itemIds);
+      const result = await this.arcadeService.claimInventoryItems(data.uuid, data.items);
       
       if (!result.success) {
         return {

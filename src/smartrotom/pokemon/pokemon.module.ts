@@ -9,9 +9,10 @@ import { PokemonDataService } from './pokemon-data.service';
 import { MoveDataService } from './move-data.service';
 import { SpawnDataService } from './spawn-data.service';
 import { PokemonImageService } from './pokemon-image.service';
+import { WingullModule } from '../wingull/wingull.module';
 
 @Module({
-  imports: [LoggerModule, ResponseModule, DrizzleModule],
+  imports: [LoggerModule, ResponseModule, DrizzleModule, WingullModule],
   providers: [PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService],
   controllers: [PokemonController],
   exports: [PokemonService],
