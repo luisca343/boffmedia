@@ -21,7 +21,7 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="z-20 absolute mb-10 w-full max-w-md bg-gray-900/90 rounded-xl p-6 border-4 border-cyan-500/50 shadow-xl"
+      className="z-50 absolute mb-10 w-full max-w-md bg-gray-900/90 rounded-xl p-6 border-4 border-cyan-500/50 shadow-xl"
     >
       {/* Cabinet top */}
       <div className="bg-gradient-to-r from-gray-800 to-gray-900 -mt-6 -mx-6 mb-6 py-2 px-4 border-b-2 border-gray-700 flex justify-center">
@@ -81,7 +81,6 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
       <motion.button
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 10, delay: 1 }}
         onClick={onComplete}

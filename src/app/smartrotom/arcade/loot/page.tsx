@@ -1,22 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Package, ArrowLeft, Info } from "lucide-react";
 import StarsBackground from "../_components/StarsBackground";
 import LootBoxGame from "./_components/_main/LootBoxGame";
 import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import ArcadeTopBar from "../_components/ArcadeTopBar";
 import ArcadeFooter from "../_components/ArcadeFooter";
-import InstructionsModal from "../_components/InstructionsModal";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function LootBoxPage() {
-  const [showInstructions, setShowInstructions] = useState(false);
-
-  const handleShowInstructions = () => {
-    setShowInstructions(!showInstructions);
-  };
-
   return (
     <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-purple-950 to-violet-950 flex flex-col relative overflow-hidden font-mono">
       <StarsBackground />
@@ -38,22 +29,7 @@ export default function LootBoxPage() {
       {/* Use common ArcadeTopBar component */}
       <ArcadeTopBar 
         title="Poké Cajas & Colección" 
-        onShowInstructions={handleShowInstructions}
       />
-
-      {/* Instructions Modal */}
-      <InstructionsModal
-        title="¿Cómo jugar?"
-        isOpen={showInstructions}
-        onClose={() => setShowInstructions(false)}
-      >
-        <ul className="list-disc pl-5 space-y-2">
-          <li>Compra cajas sorpresa con diferentes raridades.</li>
-          <li>Abre las cajas para descubrir objetos y coleccionables.</li>
-          <li>Completa tu colección para desbloquear recompensas.</li>
-          <li>¡Las cajas más raras contienen objetos más valiosos!</li>
-        </ul>
-      </InstructionsModal>
 
       <main className="flex-grow p-6 overflow-auto container mx-auto max-w-7xl relative z-10">
         {/* Main content */}

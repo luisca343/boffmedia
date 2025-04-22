@@ -41,13 +41,6 @@ export function OpenBoxButton({
         <Box size={24} />
         <span>Abrir Caja</span>
       </motion.button>
-      
-      {/* Error message if box not available */}
-      {selectedBox && !hasCurrentBox && (
-        <p className="text-red-400 mt-4 bg-red-900/20 px-4 py-2 rounded-md border border-red-800/50">
-          No tienes esta caja en tu inventario.
-        </p>
-      )}
     </div>
   );
 }
