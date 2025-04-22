@@ -251,7 +251,7 @@ export class WingullService {
    */
   async getWeather() {
     try {
-      const response = await axios.get(`${process.env.WINGULL_API}/weather`);
+      const response = (await axios.get(`${process.env.WINGULL_API}/weather`)).data;
       return response.data;
     } catch (error) {
       console.error('Error getting weather:', error);
