@@ -19,7 +19,6 @@ export default function useGetWeather() {
   const fetchWeatherData = useCallback(async () => {
     try {
       const data = (await rotomGET("/wingull/weather")).data as any;
-      console.log("Weather data:", data);
       setWeatherData(data);
       setChangeTime(data.changeTime);
       setMinecraftTime(data.minecraftTime);
