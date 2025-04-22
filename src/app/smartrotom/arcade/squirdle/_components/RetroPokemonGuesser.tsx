@@ -27,6 +27,9 @@ import { useGetWordlePokemon } from "../_hooks/useGetWordlePokemon";
 import StarsBackground from "../../_components/StarsBackground";
 import { RainbowText } from "../../_components/RainbowText";
 import { useTranslations } from 'next-intl';
+import ArcadeTopBar from "../../_components/ArcadeTopBar";
+import ArcadeFooter from "../../_components/ArcadeFooter";
+import InstructionsModal from "../../_components/InstructionsModal";
 
 type Pokemon = {
   name: string;
@@ -95,8 +98,9 @@ export default function RetroPokemonGuesser() {
   const [suggestions, setSuggestions] = useState<Pokemon[]>([]);
   const [gameOver, setGameOver] = useState(false);
   const [isDoubleType, setIsDoubleType] = useState<boolean | null>(null);
-  const t = useTranslations("pokedex");
+  const t = useTranslations("pokedex");  
   const [showInstructions, setShowInstructions] = useState(false);
+
 
   const { pokemonData, allTypes, targetPokemon } = useGetWordlePokemon();
 
@@ -319,75 +323,34 @@ export default function RetroPokemonGuesser() {
     );
   };
 
-  const resetGame = () => {
-    window.location.reload();
+  const handleShowInstructions = () => {
+    setShowInstructions(!showInstructions);
   };
 
   return (
     <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-purple-950 to-violet-950 text-white font-mono flex flex-col relative overflow-hidden">
       <StarsBackground />
 
-      {/* Arcade Cabinet Header */}
-      <div className="relative z-10 bg-indigo-950 border-b-4 border-cyan-400 shadow-lg shadow-cyan-500/20 p-4">
-        <InternalLink
-          href="/arcade"
-          className="inline-flex items-center text-cyan-300 hover:text-cyan-200 mb-6"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Volver a Arcade
-        </InternalLink>
-        
-        <div className="flex justify-between items-center">
-          <div className="flex-1">
-            <div className="flex items-center">
-              <Joystick className="h-8 w-8 text-cyan-400 mr-3" />
-              <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-yellow-300 to-cyan-400 animate-text-shine">
-                Retro Pokémon Guesser
-              </h1>
-            </div>
-            <p className="text-gray-300 mt-1 ml-11">¡Adivina el Pokémon misterioso en menos de {MAX_GUESSES} intentos!</p>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => setShowInstructions(!showInstructions)}
-              className="bg-indigo-700 hover:bg-indigo-600 text-white"
-            >
-              <Info className="h-4 w-4 mr-1" /> Instrucciones
-            </Button>
-            
-            {gameOver && (
-              <Button 
-                onClick={resetGame}
-                className="bg-cyan-600 hover:bg-cyan-500 text-white"
-              >
-                <RefreshCw className="h-4 w-4 mr-1" /> Nueva Partida
-              </Button>
-            )}
-          </div>
-        </div>
-      </div>
+      <ArcadeTopBar 
+        title="Retro Pokémon Guesser" 
+        onShowInstructions={handleShowInstructions}
+      />
 
       <main className="flex-grow p-6 overflow-auto container mx-auto max-w-4xl relative z-10">
-        {showInstructions && (
-          <div className="mb-6 p-4 bg-indigo-900/80 rounded-lg border-2 border-indigo-700/50 shadow-xl">
-            <h2 className="text-xl font-bold text-yellow-300 mb-3">¿Cómo jugar?</h2>
-            <ul className="list-disc pl-5 space-y-2 text-gray-200">
-              <li>Adivina cuál es el Pokémon misterioso en menos de {MAX_GUESSES} intentos.</li>
-              <li>Con cada intento, recibirás pistas sobre las características del Pokémon.</li>
-              <li>✓ indica que la característica es correcta.</li>
-              <li>↑ indica que el valor debería ser mayor.</li>
-              <li>↓ indica que el valor debería ser menor.</li>
-              <li>→ en un tipo indica que ese tipo está presente pero en la otra posición.</li>
-            </ul>
-            <Button 
-              onClick={() => setShowInstructions(false)}
-              className="mt-4 bg-indigo-700 hover:bg-indigo-600 text-white"
-            >
-              Cerrar
-            </Button>
-          </div>
-        )}
+      <InstructionsModal
+        title="¿Cómo jugar?"
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+      >
+        <ul className="list-disc pl-5 space-y-2">
+          <li>Adivina cuál es el Pokémon misterioso en menos de {MAX_GUESSES} intentos.</li>
+          <li>Con cada intento, recibirás pistas sobre las características del Pokémon.</li>
+          <li>✓ indica que la característica es correcta.</li>
+          <li>↑ indica que el valor debería ser mayor.</li>
+          <li>↓ indica que el valor debería ser menor.</li>
+          <li>→ en un tipo indica que ese tipo está presente pero en la otra posición.</li>
+        </ul>
+      </InstructionsModal>
 
         <form onSubmit={handleGuess} className="mb-8 relative">
           <div className="flex space-x-2">
@@ -498,22 +461,10 @@ export default function RetroPokemonGuesser() {
               Intentos restantes: {Math.max(0, MAX_GUESSES - guesses.length)}
             </div>
         
-        {/* Retro cabinet footer */}
-        <div className="bg-indigo-950/80 rounded-lg border border-indigo-800 p-4 text-center mt-10">
-          <p className="text-cyan-400 font-bold mb-1">
-            Retro Pokémon Guesser v1.0 • Arcade Edition
-          </p>
-          <p className="text-gray-400 text-sm">
-            ¡Adivina el Pokémon misterioso y pon a prueba tus conocimientos!
-          </p>
-          
-          {/* Pixel art decoration */}
-          <div className="flex justify-center gap-6 mt-4">
-            {['bg-red-500', 'bg-blue-500', 'bg-yellow-500', 'bg-green-500', 'bg-purple-500'].map((color, index) => (
-              <div key={index} className={`h-4 w-4 ${color}`}></div>
-            ))}
-          </div>
-        </div>
+        <ArcadeFooter 
+          title="Retro Pokémon Guesser" 
+          description="¡Adivina el Pokémon misterioso y pon a prueba tus conocimientos!" 
+        />
       </main>
       
       {/* Add custom styles for animations */}

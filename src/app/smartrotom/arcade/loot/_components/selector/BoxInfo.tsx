@@ -7,6 +7,7 @@ interface BoxInfoProps {
   ownedBoxes: Record<string, InventoryItem>;
   currentBoxTheme: {
     text: string;
+    border: string;
   };
 }
 
@@ -16,7 +17,7 @@ export function BoxInfo({ selectedBox, ownedBoxes, currentBoxTheme }: BoxInfoPro
   const ownedCount = ownedBoxes[selectedBox.id] ? ownedBoxes[selectedBox.id].amount : 0;
 
   return (
-    <div className={`mt-3 px-4 py-2 bg-black/30 rounded-lg ${currentBoxTheme.text} flex items-center gap-2`}>
+    <div className={`text-sm px-4 py-2 bg-black/30 rounded-lg border ${currentBoxTheme.text} ${currentBoxTheme.border}  flex items-center gap-2`}>
       <Box size={16} />
       <span>Disponibles: <strong>{ownedCount}</strong></span>
     </div>

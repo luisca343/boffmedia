@@ -192,7 +192,7 @@ export default function VoltorbFlipGame() {
 
   function handleQuit() {
     if (gameOver) {
-      router.push("/arcade");
+      router.push("/smartrotom/arcade");
     } else {
       setShowConfirmQuit(true);
     }
@@ -200,7 +200,7 @@ export default function VoltorbFlipGame() {
 
   function handleConfirmQuit() {
     alert(`Has obtenido ${totalCoins} monedas en total.`);
-    router.push("/arcade");
+    router.push("/smartrotom/arcade");
   }
 
   function handleCancelQuit() {
@@ -311,142 +311,115 @@ export default function VoltorbFlipGame() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4">
-      <div className="flex flex-col w-fit mx-auto">
-        <div className="flex flex-col lg:flex-row lg:items-stretch justify-center space-y-4 lg:space-y-0 lg:space-x-4">
-          {/* Left Side Container */}
-          <div className="flex flex-col space-y-4 w-full lg:w-64">
-            <div className="flex-grow flex flex-col justify-between space-y-4">
-              {/* Scoreboard Container */}
-              <div className="flex-shrink-0  bg-surface-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
-                <RainbowText text="Puntuación" size="md" />
-                <Scoreboard
-                  roundScore={roundScore}
-                  totalCoins={totalCoins}
-                  level={level}
-                />
-              </div>
-
-              {/* Memo Panel Container */}
-              <div className="flex-shrink-0 flex flex-col justify-center items-center  bg-surface-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
-                <RainbowText text="Notas" size="md" />
-                <MemoPanel
-                  memoMode={memoMode}
-                  selectedMark={selectedMark}
-                  onToggleMemoMode={handleToggleMemoMode}
-                  onSelectMark={setSelectedMark}
-                />
-              </div>
-
-              {/* Buttons Container */}
-              <div className="mt-auto  bg-surface-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg pt-2 p-4">
-                <RainbowText text="Botones" size="md" />
-                <div className="flex flex-col space-y-2">
-                  <button
-                    className="bg-green-500 hover:bg-green-400 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2"
-                    onClick={handleStopOrRestart}
-                  >
-                    {getActionButtonText()}
-                  </button>
-
-                  <button
-                    className="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2"
-                    onClick={handleQuit}
-                  >
-                    <X className="w-5 h-5" />
-                    <span>Salir</span>
-                  </button>
-
-                  <button
-                    className="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 rounded flex items-center justify-center space-x-2"
-                    onClick={() => setShowRulesModal(true)}
-                  >
-                    <Info className="w-5 h-5" />
-                    <span>Info</span>
-                  </button>
-                </div>
-              </div>
+    <div className="w-full max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
+        {/* Main game grid - takes most space */}
+        <div className="col-span-5 bg-indigo-900/30 rounded-lg p-2 border border-indigo-700/40">
+          <GameGrid 
+            grid={grid} 
+            rowInfo={rowInfo} 
+            colInfo={colInfo} 
+            onCellClick={handleCellClick} 
+          />
+        </div>
+        
+        {/* Side panel with controls and info */}
+        <div className="md:col-span-2 flex flex-col gap-2">
+          {/* Score display */}
+          <div className="bg-indigo-900/30 rounded-lg p-2 border border-indigo-700/40">
+            <Scoreboard 
+              roundScore={roundScore} 
+              totalCoins={totalCoins} 
+              level={level} 
+            />
+          </div>
+          
+          {/* Memo controls */}
+          <div className="bg-indigo-900/30 rounded-lg p-2 border border-indigo-700/40">
+            <MemoPanel 
+              memoMode={memoMode} 
+              selectedMark={selectedMark} 
+              onToggleMemoMode={handleToggleMemoMode} 
+              onSelectMark={setSelectedMark} 
+            />
+          </div>
+          
+          {/* Action buttons */}
+          <div className="bg-indigo-900/30 rounded-lg p-2 border border-indigo-700/40">
+            <div className="flex flex-col space-y-2">
+              <button
+                onClick={handleStopOrRestart}
+                className={`w-full py-1.5 rounded-md flex items-center justify-center text-sm font-medium ${
+                  gameOver || gameWon 
+                    ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white' 
+                    : 'bg-gradient-to-r from-amber-500 to-amber-600 text-white'
+                }`}
+              >
+                {gameOver ? 'Volver a jugar' : gameWon ? 'Siguiente nivel' : 'Cobrar monedas'}
+              </button>
+              
+              <button
+                onClick={() => setShowRulesModal(true)}
+                className="w-full py-1.5 rounded-md bg-purple-800 hover:bg-purple-700 text-white flex items-center justify-center text-sm font-medium"
+              >
+                <Info className="w-3 h-3 mr-1" /> Ver reglas
+              </button>
             </div>
           </div>
-
-          {/* Game Grid Container */}
-          <div className="bg-surface-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg p-6">
-            <GameGrid
-              grid={grid}
-              rowInfo={rowInfo}
-              colInfo={colInfo}
-              onCellClick={handleCellClick}
-            />
-          </div>
         </div>
-
-        {/* Messages Container */}
-        {(gameOver || gameWon || showLevelComplete) && (
-          <div className="bg-surface-800 bg-opacity-80 border-4 border-yellow-500 rounded-lg p-4 mt-4 w-full">
-            <Messages
-              gameOver={gameOver}
-              gameWon={gameWon}
-              showLevelComplete={showLevelComplete}
-              onNextLevel={handleNextLevel}
-              onQuit={handleKeepCoins}
-              lostCoins={lostCoins}
-            />
-          </div>
-        )}
       </div>
-      <AnimatePresence>
-        {showCoinLossAnimation && (
-          <motion.div
-            initial={{ opacity: 1, y: 0 }}
-            animate={{ opacity: 0, y: 50 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 2 }}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-yellow-500 text-4xl font-bold flex items-center justify-center"
-          >
-            <VoltorbImage size="xl" className="mr-2" />
-            <span className="ml-2">-{lostCoins}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      
+      {/* Game status messages - positioned statically but with enough space */}
+      <div className="mt-3 min-h-[100px] flex items-center justify-center">
+        <Messages
+          gameOver={gameOver}
+          gameWon={gameWon}
+          showLevelComplete={showLevelComplete}
+          onNextLevel={handleNextLevel}
+          onQuit={handleKeepCoins}
+          lostCoins={lostCoins}
+        />
+      </div>
+      
+      {/* Make dialogs and modals more compact */}
       <ConfirmationDialog
         isOpen={showConfirmQuit}
         onClose={() => setShowConfirmQuit(false)}
         onConfirm={handleConfirmQuit}
-        title="¿Estás seguro que quieres salir?"
-        description={`Te llevarás ${totalCoins} monedas en total.`}
-        confirmText="Sí, salir"
-        cancelText="No, seguir jugando"
+        title="¿Salir del juego?"
+        description={`Te llevarás ${totalCoins} monedas.`}
+        confirmText="Salir"
+        cancelText="Seguir"
         variant="quit"
       />
-
+  
       <ConfirmationDialog
         isOpen={showConfirmNew}
-        onClose={() => setShowConfirmNew(false)}
+        onClose={handleCancelNewGame}
         onConfirm={handleConfirmNewGame}
-        title="¿Estás seguro que quieres empezar un nuevo juego?"
-        description="Perderás tu progreso actual y volverás al nivel 1."
-        confirmText="Sí, nuevo juego"
-        cancelText="No, seguir jugando"
+        title="¿Nuevo juego?"
+        description="Perderás tu progreso actual."
+        confirmText="Nuevo"
+        cancelText="Seguir"
         variant="new"
       />
-
+  
       <ConfirmationDialog
         isOpen={showConfirmStop}
         onClose={handleCancelStop}
         onConfirm={handleConfirmStop}
-        title="¿Estás seguro que quieres parar?"
-        description={`Ganarás ${roundScore} monedas y comenzarás una nueva ronda en el nivel ${calculateLevelRegression()}.`}
-        confirmText="Sí, parar"
-        cancelText="No, seguir jugando"
+        title="¿Cobrar monedas?"
+        description={`Ganarás ${roundScore} monedas.`}
+        confirmText="Cobrar"
+        cancelText="Seguir"
         variant="new"
       />
-
+  
       <RulesModal
         isOpen={showRulesModal}
         onClose={() => setShowRulesModal(false)}
       />
-
+  
       <ScorePopup scoreIncrease={lastScoreIncrease} />
     </div>
   );

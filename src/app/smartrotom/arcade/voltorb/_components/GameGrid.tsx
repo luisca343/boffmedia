@@ -20,39 +20,39 @@ function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGridProps) {
               <CellComponent cell={cell} onClick={() => onCellClick(rowIndex, colIndex)} rowIndex={rowIndex} colIndex={colIndex} />
             </div>
           ))}
-          <div className="w-20 h-20 flex flex-col items-center justify-center bg-surface-700 rounded-md">
+          <div className="w-20 h-20 flex flex-col items-center justify-center bg-indigo-900/70 rounded-md border-2 border-indigo-700/50">
             <div className="flex items-center">
-              <Coins className="w-6 h-6 text-yellow-500 mr-1" />
-              <span className="text-yellow-500 text-md font-bold">{rowInfo[rowIndex]?.coins}</span>
+              <Coins className="w-4 h-4 text-yellow-500 mr-1" />
+              <span className="text-yellow-300 text-sm font-bold">{rowInfo[rowIndex]?.coins}</span>
             </div>
             <div className="flex items-center">
               <Image
                 src="/smartrotom/img/apps/arcade/voltorb.png"
                 alt="Voltorb"
-                width={24}
-                height={24}
+                width={20}
+                height={20}
                 className="mr-1"
               />
-              <span className="text-red-500 text-md font-bold">{rowInfo[rowIndex]?.voltorbs}</span>
+              <span className="text-red-500 text-sm font-bold">{rowInfo[rowIndex]?.voltorbs}</span>
             </div>
           </div>
         </>
       ))}
       {colInfo.map((info, index) => (
-        <div key={index} className="w-20 h-20 flex flex-col items-center justify-center bg-surface-700 rounded-md">
+        <div key={index} className="w-20 h-20 flex flex-col items-center justify-center bg-indigo-900/70 rounded-md border-2 border-indigo-700/50">
           <div className="flex items-center">
-            <Coins className="w-6 h-6 text-yellow-500 mr-1" />
-            <span className="text-yellow-500 text-md font-bold">{info.coins}</span>
+            <Coins className="w-4 h-4 text-yellow-500 mr-1" />
+            <span className="text-yellow-300 text-sm font-bold">{info.coins}</span>
           </div>
           <div className="flex items-center">
             <Image
               src="/smartrotom/img/apps/arcade/voltorb.png"
               alt="Voltorb"
-              width={24}
-              height={24}
+              width={20}
+              height={20}
               className="mr-1"
             />
-            <span className="text-red-500 text-md font-bold">{info.voltorbs}</span>
+            <span className="text-red-500 text-sm font-bold">{info.voltorbs}</span>
           </div>
         </div>
       ))}

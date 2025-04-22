@@ -27,6 +27,9 @@ export default function LootBoxOpening({ lootBox, wonItem, onComplete }: LootBox
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[600px] py-8">
+      {/* Result display - Arcade Cabinet Style */}
+      {animationCompleted && <ResultDisplay wonItem={wonItem} onComplete={onComplete} />}
+      
       {/* Box Animation */}
       {showBox && <BoxAnimation lootBox={lootBox} />}
       
@@ -45,9 +48,6 @@ export default function LootBoxOpening({ lootBox, wonItem, onComplete }: LootBox
           ITEM_WIDTH={ITEM_WIDTH}
         />
       )}
-      
-      {/* Result display - Arcade Cabinet Style */}
-      {animationCompleted && <ResultDisplay wonItem={wonItem} onComplete={onComplete} />}
     </div>
   );
 }

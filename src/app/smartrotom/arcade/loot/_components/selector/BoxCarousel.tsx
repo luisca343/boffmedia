@@ -2,6 +2,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LootBox } from "../../types";
 import { BoxDisplay } from "./BoxDisplay";
+import { BoxInfo } from "./BoxInfo";
+import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
 
 interface BoxCarouselProps {
   lootBoxes: LootBox[];
@@ -17,6 +19,8 @@ interface BoxCarouselProps {
     buttonGradient: string;
     buttonHover: string;
   };
+  onShowOdds: () => void;
+  ownedBoxes: Record<string, InventoryItem>;
 }
 
 export function BoxCarousel({ 
@@ -25,7 +29,10 @@ export function BoxCarousel({
   setCurrentIndex,
   onSelect,
   selectedBox,
-  currentBoxTheme
+  currentBoxTheme,
+  onShowOdds,
+  ownedBoxes,
+
 }: BoxCarouselProps) {
   const handlePrevious = () => {
     const newIndex = currentIndex === 0 ? lootBoxes.length - 1 : currentIndex - 1;
@@ -41,6 +48,26 @@ export function BoxCarousel({
 
   return (
     <div className="relative w-full max-w-xl mb-8 p-4 bg-gray-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl">
+      {/* Probabilities button - Added at the top of the carousel */}
+      <div className="absolute top-8 right-8 z-20">
+        <button
+          onClick={onShowOdds}
+          className={`px-4 py-2 rounded-lg border ${currentBoxTheme.text} ${currentBoxTheme.border} transition-colors hover:bg-gray-800/50 text-sm`}
+        >
+          Ver Probabilidades
+        </button>
+      </div>
+      
+      <div className="absolute top-8 left-8 z-20">
+        {selectedBox && (
+          <BoxInfo
+            selectedBox={selectedBox}
+            ownedBoxes={ownedBoxes}
+            currentBoxTheme={currentBoxTheme}
+          />
+        )}
+      </div>
+
       <div className="flex justify-center items-center">
         <button 
           className="absolute left-0 z-10 bg-gray-800/80 hover:bg-gray-700/80 text-white rounded-full p-2 shadow-md border border-gray-700"

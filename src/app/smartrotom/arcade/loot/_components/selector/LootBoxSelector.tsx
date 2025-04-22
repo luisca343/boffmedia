@@ -46,30 +46,13 @@ export default function LootBoxSelector({
       <BoxCarousel
         lootBoxes={lootBoxes}
         currentIndex={currentIndex}
+        ownedBoxes={ownedBoxes}
         setCurrentIndex={setCurrentIndex}
         onSelect={onSelect}
         selectedBox={selectedBox || lootBoxes[0]}
         currentBoxTheme={currentBoxTheme}
+        onShowOdds={() => setIsOddsModalOpen(true)}
       />
-      
-      {/* Box Info */}
-      {selectedBox && (
-        <BoxInfo
-          selectedBox={selectedBox}
-          ownedBoxes={ownedBoxes}
-          currentBoxTheme={currentBoxTheme}
-        />
-      )}
-      
-      {/* View Odds Button */}
-      {selectedBox && (
-        <button
-          onClick={() => setIsOddsModalOpen(true)}
-          className={`mt-3 text-sm px-4 py-1 rounded-full border ${currentBoxTheme.text} ${currentBoxTheme.border} transition-colors`}
-        >
-          Ver Probabilidades
-        </button>
-      )}
       
       {/* Open Box Button */}
       <div className="mt-6">
