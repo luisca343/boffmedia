@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { terasGET } from "@/services/boffAPI";
+import { rotomGET } from "@/services/boffAPI";
 
 interface WeatherData {
   weather: string;
@@ -18,7 +18,8 @@ export default function useGetWeather() {
 
   const fetchWeatherData = useCallback(async () => {
     try {
-      const data = (await terasGET("/weather")) as any;
+      const data = (await rotomGET("/wingull/weather")).data as any;
+      console.log("Weather data:", data);
       setWeatherData(data);
       setChangeTime(data.changeTime);
       setMinecraftTime(data.minecraftTime);
