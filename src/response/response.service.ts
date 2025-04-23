@@ -15,7 +15,7 @@ export class ResponseService {
   createSuccessResponse(message: string, data: any) {
     return {
       success: true,
-      statusCode: HttpStatus.CREATED,
+      statusCode: HttpStatus.OK,
       message,
       data,
     };

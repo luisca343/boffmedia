@@ -9,7 +9,7 @@ import { WingullService } from "../wingull/wingull.service"
 @Controller("smartrotom/player")
 export class PlayerController {
     constructor(
-        @Inject(PlayerService) private readonly wingullService: WingullService,
+        @Inject(WingullService) private readonly wingullService: WingullService,
         @Inject(ResponseService) private readonly responseService: ResponseService,
     ) {}
     

@@ -23,7 +23,7 @@ export class WingullService {
     try {
       console.log('Updating balance for player:', account.uuid, 'New balance:', account.balance);
       const response = await axios.post(`${process.env.WINGULL_API}/updateBalance`, account);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error updating balance:', error);
       throw error;
@@ -43,7 +43,7 @@ export class WingullService {
         uuid,
         amount
       });
-      return response.data as number;
+      return response.data.data as number;
     } catch (error) {
       console.error('Error getting current balance:', error);
       throw error;
@@ -58,7 +58,7 @@ export class WingullService {
   async getMoney(uuid: string): Promise<number> {
     try {
       const response = await axios.post(`${process.env.WINGULL_API}/dinero`, { uuid });
-      return response.data as number;
+      return response.data.data as number;
     } catch (error) {
       console.error('Error getting player money:', error);
       throw error;
@@ -77,7 +77,7 @@ export class WingullService {
   async getStats(uuid: string) {
     try {
       const response = await axios.post(`${process.env.WINGULL_API}/stats`, { uuid });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error getting player stats:', error);
       throw error;
@@ -92,7 +92,7 @@ export class WingullService {
   async getTeam(uuid: string) {
     try {
       const response = await axios.post(`${process.env.WINGULL_API}/equipo`, { uuid });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error getting player team:', error);
       throw error;
@@ -108,7 +108,7 @@ export class WingullService {
     try {
       console.log('Updating Pokédex for player:', uuid);
       const response = await axios.post(`${process.env.WINGULL_API}/updatedex`, { uuid });
-      return response.data as { SEEN: number[], CAUGHT: number[] };
+      return response.data.data as { SEEN: number[], CAUGHT: number[] };
     } catch (error) {
       console.error('Error updating Pokédex:', error);
       throw error;
@@ -123,7 +123,7 @@ export class WingullService {
   async getQuests(uuid: string) {
     try {
       const response = await axios.post(`${process.env.WINGULL_API}/quests`, { uuid });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error getting player quests:', error);
       throw error;
@@ -142,7 +142,7 @@ export class WingullService {
         uuid, 
         mensaje: message 
       });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error sending message to player:', error);
       throw error;
@@ -162,43 +162,42 @@ export class WingullService {
     lore?: string[]
   }>): Promise<any> {
     try {
-      console.log('Giving items to player:', uuid, 'Items count:', items.length);
       const response = await axios.post(`${process.env.WINGULL_API}/giveitems`, {
         uuid,
         items
       });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error giving items to player:', error);
       return { success: false, error: 'Failed to give items' };
     }
   }
 
-    /**
+  /**
    * Gives a Pokémon to a player using specific parameters
    * @param uuid The player's UUID
    * @param pokespec The Pokémon specification string
    * @param sendMessage Whether to send a message to the player
    * @returns Response indicating success or failure
    */
-    async givePokemon(
-        uuid: string, 
-        pokespec: string, 
-        sendMessage: boolean = true
-      ): Promise<any> {
-        try {
-          console.log('Giving Pokémon to player:', uuid, 'Spec:', pokespec);
-          const response = await axios.post(`${process.env.WINGULL_API}/givepokemon`, {
-            uuid,
-            pokespec,
-            sendMessage
-          });
-          return response.data;
-        } catch (error) {
-          console.error('Error giving Pokémon to player:', error);
-          throw error;
-        }
-      }
+  async givePokemon(
+    uuid: string, 
+    pokespec: string, 
+    sendMessage: boolean = true
+  ): Promise<any> {
+    try {
+      console.log('Giving Pokémon to player:', uuid, 'Spec:', pokespec);
+      const response = await axios.post(`${process.env.WINGULL_API}/givepokemon`, {
+        uuid,
+        pokespec,
+        sendMessage
+      });
+      return response.data.data;
+    } catch (error) {
+      console.error('Error giving Pokémon to player:', error);
+      throw error;
+    }
+  }
 
   //=====================================================
   // World endpoints
@@ -211,7 +210,7 @@ export class WingullService {
   async getPerformance() {
     try {
       const response = await axios.get(`${process.env.WINGULL_API}/performance`);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error getting server performance:', error);
       throw error;
@@ -225,10 +224,11 @@ export class WingullService {
    */
   async getRegions(townColors?: any) {
     try {
-      const regions = await axios.get(`${process.env.WINGULL_API}/regions`);
+      const response = await axios.get(`${process.env.WINGULL_API}/regions`);
+      const regions = response.data.data;
       
       if (townColors) {
-        return regions.data.map((region: any) => {
+        return regions.map((region: any) => {
           const color = townColors[region.name.toUpperCase()];
           if (color) {
             region.fillColor = color.fill & 0xffffffff;
@@ -238,7 +238,7 @@ export class WingullService {
         });
       }
       
-      return regions.data;
+      return regions;
     } catch (error) {
       console.error('Error getting regions:', error);
       throw error;
@@ -267,7 +267,7 @@ export class WingullService {
   async updateNPCs(data: any) {
     try {
       const response = await axios.post(`${process.env.WINGULL_API}/updateNPCs`, data);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Error updating NPCs:', error);
       throw error;
@@ -286,7 +286,7 @@ export class WingullService {
     try {
       const response = await axios.get(`${process.env.WINGULL_API}/taxi/stops`);
       console.log('Taxi stops retrieved');
-      return response.data as Record<string, TaxiStop>;
+      return response.data.data as Record<string, TaxiStop>;
     } catch (error) {
       console.error('Error fetching taxi stops:', error);
       throw error;
@@ -306,7 +306,7 @@ export class WingullService {
         id,
         uuid
       });
-      return response.data as boolean;
+      return response.data.data as boolean;
     } catch (error) {
       console.error('Error teleporting player:', error);
       throw error;
