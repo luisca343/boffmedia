@@ -32,7 +32,7 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
             <Popover>
               <PopoverTrigger className="text-sm hover:text-primary transition-colors">Ver Repetición</PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Game battleName={achievement.id} />
+                <Game/>
               </PopoverContent>
             </Popover>
           )}
