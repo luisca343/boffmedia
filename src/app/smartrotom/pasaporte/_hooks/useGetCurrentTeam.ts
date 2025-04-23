@@ -7,7 +7,8 @@ export function useGetCurrentTeam(uuid: string) {
 
     useEffect(() => {
         rotomPOST('/team',{uuid}).then((res:any)=>{
-            setCurrentTeam(res)
+            console.log(res.data)
+            setCurrentTeam(res.data)
           })
     }, [])
 
