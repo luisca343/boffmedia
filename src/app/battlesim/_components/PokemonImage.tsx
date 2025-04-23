@@ -21,10 +21,6 @@ export function PokemonImage(
     if(!battle) battle = null;
     let {url, w, h, pixelated} = Sprites.getPokemon(pokemon.speciesForme, {gen: 'ani', shiny: pokemon.shiny, side});
     
-    
-
-
-
     const battleType = battle?.gameType || 'singles';
     //const battleType = 'horde'
     const z = side === 'p1' ? 150 : 125;
