@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowLeftCircle } from 'lucide-react';
 import GlitchStyles from './GlitchStyles';
 import TerminalDecorations from './TerminalDecorations';
+import { isMinecraft } from '@/services/mcef/mcefHelper';
 
 interface AdminPageLayoutProps {
   children: ReactNode;
@@ -22,7 +23,7 @@ export default function AdminPageLayout({
   addBackgroundEffects = false
 }: AdminPageLayoutProps) {
   return (
-    <div className={`${addBackgroundEffects && 'bg-black'} w-full min-h-screen text-green-400 font-mono p-4 flex flex-col relative overflow-auto`}>
+    <div className={`${(addBackgroundEffects || !isMinecraft()) && 'bg-black'} w-full min-h-screen text-green-400 font-mono p-4 flex flex-col relative overflow-auto`}>
       <div className='z-10'>
       
       {/* Header with Back Button */}
