@@ -65,6 +65,7 @@ export default getRequestConfig(async () => {
     'boffmedia.json',
     'nav.json',
     'items.json',
+    'youtube.json',
     'tools/games.json',
     'tools/mhwilds.json',
     'tools/pokemon.json',

@@ -4,6 +4,10 @@ import { useBoffSession } from "@/services/useBoffSession";
 
 export default function Youtube() {
   const { session } = useBoffSession();
-  console.log(session);
-  return <YoutubeResults />;
+  
+  return (
+    <div className="min-h-full bg-surface-900 overflow-auto">
+      <YoutubeResults />
+    </div>
+  );
 }
