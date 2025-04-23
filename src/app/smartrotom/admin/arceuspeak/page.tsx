@@ -77,6 +77,7 @@ export default function ArceuSpeak() {
         <TerminalCard 
           title="Sistema de Comunicación" 
           roundedTop={false}
+          className="bg-black"
         >
           <>
             <div className="space-y-4">

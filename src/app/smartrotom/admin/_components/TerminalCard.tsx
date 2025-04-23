@@ -27,7 +27,7 @@ export default function TerminalCard({
     <>
       {terminalTitle && <TerminalHeader title={terminalTitle} username={username} showDate={showDate} />}
       
-      <Card className={`bg-black border-green-500 border ${!roundedTop && "rounded-t-none"} ${className}`}>
+      <Card className={`bg-transparent border-green-500 border ${!roundedTop && "rounded-t-none"} ${className}`}>
         <CardHeader className="border-b border-green-700/50 pb-3">
           <CardTitle className="text-green-400 flex items-center">
             <span className="text-green-600 mr-2">&gt;</span>

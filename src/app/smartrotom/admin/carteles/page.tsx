@@ -63,7 +63,7 @@ export default function CartelesAutopista() {
   }
 
   return (
-    <AdminPageLayout title="Generador de Señales" version="2.3.4">
+    <AdminPageLayout title="Generador de Señales" version="2.3.4" addBackgroundEffects={true}>
       {/* Main Configuration Card */}
       <TerminalCard 
         title="Configuración de Señal" 

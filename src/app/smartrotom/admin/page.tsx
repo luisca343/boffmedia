@@ -9,6 +9,7 @@ import MatrixRain from './_components/MatrixRain'
 import Scanline from './_components/ScanLine'
 import Vignette from './_components/Vignette'
 import GridBackground from './_components/GridBackground'
+import TerminalDecorations from './_components/TerminalDecorations'
 
 const appsAdmin = [
   {
@@ -92,7 +93,7 @@ export default function PanelControlAdmin() {
       </pre>
       
       {/* Terminal Window */}
-      <div className="border border-green-700 rounded-md mb-6">
+      <div className="border border-green-700 rounded-md mb-6 p-4">
         <div className="bg-green-900/30 px-4 py-1 border-b border-green-700 flex justify-between items-center">
           <div className="flex space-x-2 items-center">
             <div className="w-3 h-3 rounded-full bg-red-500"></div>
@@ -126,7 +127,7 @@ export default function PanelControlAdmin() {
             </div>
           )}
         </div>
-      </div>
+
       
       {/* Apps Grid */}
       {loaded && (
@@ -147,7 +148,7 @@ export default function PanelControlAdmin() {
                   </CardHeader>
                   <CardContent className="px-3 py-2">
                     <CardDescription className="text-green-600/80 text-sm">
-                      <span className="text-green-600/60">// </span>
+                      <span className="text-green-600/60">{"//"} </span>
                       {app.descripcion}
                     </CardDescription>
                     <div className="mt-3 text-xs text-green-700">
@@ -209,21 +210,10 @@ export default function PanelControlAdmin() {
           </div>
         </>
       )}
-      
-      {/* Decoration Elements */}
-      <div className="fixed top-0 left-0 w-full h-screen pointer-events-none overflow-hidden">
-        {/* Grid background - lowest z-index */}
-        <GridBackground />
-        
-        {/* Matrix rain columns - middle z-index */}
-        <MatrixRain />
-        
-        {/* Enhanced visual effects */}
-        <Scanline />
-        <Vignette />
+
       </div>
       
-      <GlitchStyles />
+      <TerminalDecorations />
     </div>
   )
 }

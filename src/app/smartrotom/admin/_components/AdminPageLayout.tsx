@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import { ArrowLeftCircle } from 'lucide-react';
 import GlitchStyles from './GlitchStyles';
+import TerminalDecorations from './TerminalDecorations';
 
 interface AdminPageLayoutProps {
   children: ReactNode;
@@ -21,8 +22,8 @@ export default function AdminPageLayout({
   addBackgroundEffects = false
 }: AdminPageLayoutProps) {
   return (
-    <div className="w-full min-h-screen text-green-400 font-mono p-4 flex flex-col relative overflow-auto">
-      <GlitchStyles />
+    <div className={`${addBackgroundEffects && 'bg-black'} w-full min-h-screen text-green-400 font-mono p-4 flex flex-col relative overflow-auto`}>
+      <div className='z-10'>
       
       {/* Header with Back Button */}
       <div className="flex items-center mb-6">
@@ -41,11 +42,11 @@ export default function AdminPageLayout({
       <div className="text-xs text-green-700 mt-4 text-center">
         Ficus Labs | Sistema de Administración | Acceso Restringido
       </div>
+      </div>
       
       {addBackgroundEffects && (
         <div className="fixed top-0 left-0 w-full h-screen pointer-events-none overflow-hidden z-0">
-          {/* These imports should be added through the component using the layout */}
-          {/* See usage example below */}
+          <TerminalDecorations />
         </div>
       )}
     </div>

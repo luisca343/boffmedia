@@ -129,7 +129,7 @@ export default function PlayerAppManagement() {
   }
 
   return (
-    <AdminPageLayout title="Gestor de Apps" version="3.1.2">
+    <AdminPageLayout title="Gestor de Apps" version="3.1.2" addBackgroundEffects={true}>
       {/* Player Selection */}
       <TerminalHeader title="app-manager" username="ficus-labs" />
       <TerminalCard 
