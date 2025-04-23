@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import GlitchStyles from "../_components/GlitchStyles"
 import CharacterCreator from "./_components/CharacterCreator"
 import { sendChatMessage } from "@/services/mcef/mcefApi"
 import { useGetArceuSpeak } from "@/hooks/_main/useGetArceuSpeak"
+import { Send, UserPlus } from "lucide-react"
+import AdminPageLayout from "../_components/AdminPageLayout"
+import TerminalCard from "../_components/TerminalCard"
+import TerminalHeader from "../_components/TerminalHeader"
+import TerminalLabel from "../_components/TerminalLabel"
 
 const formatToHtml = (format: string) => {
   return format.replace(/§([0-9a-fk-or])/g, (match, p1) => {
@@ -36,6 +39,7 @@ export default function ArceuSpeak() {
   const { speakers } = useGetArceuSpeak()
   const [speaker, setSpeaker] = useState("")
   const [message, setMessage] = useState("")
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     if (speakers && speakers.length > 0) {
@@ -46,74 +50,126 @@ export default function ArceuSpeak() {
   const sendMessage = () => {
     if (!speakers) return
     const selectedSpeaker = speakers.find((s) => s.value === speaker)
-    if (!selectedSpeaker) return
+    if (!selectedSpeaker || !message.trim()) return
+    
+    setSending(true)
     console.log(`Enviando mensaje como ${selectedSpeaker.format}: ${message}`)
     sendChatMessage(selectedSpeaker.format + ":§r " + message)
+    
+    // Simulate a sent message and reset the form
+    setTimeout(() => {
+      setMessage("")
+      setSending(false)
+    }, 800)
   }
 
-  if (!speakers) return <div>Loading...</div>
-
-  return (
-    <div className="w-full min-h-full text-green-400 font-mono p-8 flex flex-col relative">
-      <GlitchStyles />
-      <div className="z-10 relative">
-        <h1 className="text-3xl font-bold mb-6 text-center text-green-500 uppercase tracking-widest glitch">
-          ArceuSpeak
-        </h1>
-        <Card className="bg-surface-900 border-green-500 border">
-          <CardHeader>
-            <CardTitle className="text-green-400">Enviar Mensaje</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Select onValueChange={setSpeaker} value={speaker}>
-              <SelectTrigger className="w-full bg-surface-800 text-green-400 border-green-500">
-                <SelectValue placeholder="Seleccionar emisor" />
-              </SelectTrigger>
-              <SelectContent className="bg-surface-800 text-green-400 border-green-500">
-                {speakers.map((s) => (
-                  <SelectItem key={s.value} value={s.value} className="hover:bg-surface-700">
-                    <span dangerouslySetInnerHTML={{ __html: formatToHtml(s.format) }} />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Textarea
-              placeholder="Escribe tu mensaje aquí"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="bg-surface-800 text-green-400 border-green-500"
-            />
-            <div className="flex space-x-4">
-              <Button onClick={sendMessage} className="flex-1 bg-green-700 hover:bg-green-600 text-black">
-                Enviar Mensaje
-              </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="bg-blue-700 hover:bg-blue-600 text-black">Crear Personaje</Button>
-                </DialogTrigger>
-                <DialogContent className="bg-surface-900 border-green-500 border">
-                  <DialogHeader>
-                    <DialogTitle className="text-green-400">Crear Nuevo Personaje</DialogTitle>
-                  </DialogHeader>
-                  <CharacterCreator />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-      <div className="absolute inset-0 bg-gradient pointer-events-none" />
-      <style jsx>{`
-        .bg-gradient {
-          background: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 50%, rgba(0, 0, 0, 1) 100%);
-        }
-        @media (min-width: 1281px) and (min-height: 721px) {
-          .bg-gradient {
-          background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.3) 100%);
-          }
-        }
-      `}</style>
+  if (!speakers) return (
+    <div className="w-full h-screen flex items-center justify-center">
+      <div className="text-green-400 animate-pulse font-mono">Cargando sistema de comunicación...</div>
     </div>
   )
-}
 
+  return (
+    <AdminPageLayout title="ArceuSpeak" version="1.2.7">
+      <div className="z-10 relative">
+        {/* Terminal Card with Header */}
+        <TerminalHeader title="communication" username="ficus-labs" />
+        <TerminalCard 
+          title="Sistema de Comunicación" 
+          roundedTop={false}
+        >
+          <>
+            <div className="space-y-4">
+              <div>
+                <TerminalLabel htmlFor="speaker-select" indicator="comment">
+                  Selecciona un emisor para enviar mensaje
+                </TerminalLabel>
+                
+                <Select onValueChange={setSpeaker} value={speaker}>
+                  <SelectTrigger id="speaker-select" className="w-full bg-black text-green-400 border-green-700">
+                    <SelectValue placeholder="Seleccionar emisor" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-black text-green-400 border-green-700">
+                    {speakers.map((s) => (
+                      <SelectItem key={s.value} value={s.value} className="hover:bg-green-900/30">
+                        <span dangerouslySetInnerHTML={{ __html: formatToHtml(s.format) }} />
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div>
+                <TerminalLabel htmlFor="message-text" indicator="comment">
+                  Mensaje para transmitir
+                </TerminalLabel>
+                
+                <Textarea
+                  id="message-text"
+                  placeholder="Escribe tu mensaje aquí"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="bg-black text-green-400 border-green-700 min-h-[100px]"
+                />
+              </div>
+              
+              <div className="flex space-x-4">
+                <Button 
+                  onClick={sendMessage} 
+                  disabled={sending || !message.trim()} 
+                  className="flex-1 bg-green-700 hover:bg-green-600 text-black hover:shadow-neon transition-all duration-300 flex items-center justify-center"
+                >
+                  {sending ? 
+                    <span className="animate-pulse flex items-center">Transmitiendo...</span> : 
+                    <>
+                      <Send className="mr-2 w-4 h-4" />
+                      Enviar Mensaje
+                    </>
+                  }
+                </Button>
+                
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button 
+                      className="bg-blue-700 hover:bg-blue-600 text-black hover:shadow-neon transition-all duration-300 flex items-center"
+                    >
+                      <UserPlus className="mr-2 w-4 h-4" />
+                      Crear Personaje
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="bg-black border-green-500 border">
+                    <DialogHeader>
+                      <DialogTitle className="text-green-400">
+                        <span className="text-green-600 mr-2">&gt;</span>
+                        Crear Nuevo Personaje
+                      </DialogTitle>
+                    </DialogHeader>
+                    <CharacterCreator />
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              <div className="mt-4 border-t border-green-700/30 pt-2">
+                <div className="flex justify-between text-xs text-green-700">
+                  <span>ESTADO:</span>
+                  <span className="text-green-400 flex items-center">
+                    CONECTADO
+                    <span className="w-2 h-2 bg-green-500 animate-pulse rounded-full ml-2"></span>
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs text-green-700">
+                  <span>PERMISOS:</span>
+                  <span className="text-green-400">ROOT</span>
+                </div>
+              </div>
+            </div>
+          </>
+        </TerminalCard>
+        
+        <div className="text-xs text-green-700 mt-2 text-center">
+          ArceuSpeak | Sistema de Comunicación Remota | Acceso Restringido
+        </div>
+      </div>
+    </AdminPageLayout>
+  )
+}
