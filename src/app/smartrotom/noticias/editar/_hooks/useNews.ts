@@ -59,7 +59,6 @@ export function useNews() {
       published: publishedNewsIds,
       featured: featuredNewsId,
     }
-
     updateNewsStatus(statusData)
       .then(() => {
         setHasUnsavedChanges(false)

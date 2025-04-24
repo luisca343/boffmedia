@@ -5,6 +5,8 @@ import Editor from "./ckeditor.js"
 import './styles.css'
 import { sendToast } from '@/lib/toast';
 import { rotomPOST } from '@/services/boffAPI';
+import { documentsService } from '@/services/api/smartrotom/documentsService';
+import { CreateNewsDto } from '@/types/dto/create-news-dto';
 
 const editorConfiguration = {
     toolbar: {
@@ -85,10 +87,21 @@ function createSaveButton (data: any, props: {
         const documentId = props.documentId;
         const h1 = data.match(/<h1>(.*?)<\/h1>/);
         let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
-        rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, type: props.documentType })
+        
+        if(props.documentType === 1) {
+            documentsService.updateActiveNews(documentId, {
+                content: data,
+                id: documentId,
+                title: title || "Sin título",
+              } as CreateNewsDto)
             .then(() => {
-                console.log("SAVED SAVED SAVED");
-                console.log({ id: props.documentId, title, data });
+                if(props.refresh) props.refresh();
+                if(props.updateNews) props.updateNews(props.documentId, data);
+            }).catch((error) => {
+                console.error("Error updating news content:", error);
+            });
+        } else rotomPOST(`/documents/${endpoint}/${documentId}`, { title, content: data, type: props.documentType })
+            .then(() => {
                 sendToast(`Cambios guardados en ${title}`);
                 if(props.refresh) props.refresh();
                 if(props.updateNews) props.updateNews(props.documentId, data);
