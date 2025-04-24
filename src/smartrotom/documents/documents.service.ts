@@ -22,30 +22,27 @@ export class DocumentsService {
 
   async updateNewsStatus(published: number[], featured: number): Promise<{ success: boolean }> {
     await this.db
-      
       .update(rotomNews)
       .set({ published: 0 } as RotomNews)
       .execute();
 
     await this.db
-      
       .update(rotomNews)
       .set({ published: 1 } as RotomNews)
       .where(inArray(rotomNews.id, published))
       .execute();
 
+
     await this.db
-      
       .update(rotomNews)
       .set({ featured: 0 } as RotomNews)
       .execute();
 
     await this.db
-      
       .update(rotomNews)
       .set({ featured: 1 } as RotomNews)
       .where(eq(rotomNews.id, featured));
-
+      
     return { success: true };
   }
 
@@ -87,8 +84,10 @@ export class DocumentsService {
   }
 
   async saveNote(id: number, title: string, content: string, documentType: number): Promise<{ success: boolean; id: number }> {
+
+
+
     const exists = await this.db
-      
       .select()
       .from(rotomDocuments)
       .where(eq(rotomDocuments.id, id));
@@ -96,7 +95,6 @@ export class DocumentsService {
     let result;
     if (exists.length === 0 || id === 0) {
       result = await this.db
-        
         .insert(rotomDocuments)
         .values({
           title,
@@ -110,14 +108,14 @@ export class DocumentsService {
         .execute();
     } else {
       result = await this.db
-        
         .update(rotomDocuments)
         .set({ title, content, type: documentType, updatedAt: new Date() })
         .where(eq(rotomDocuments.id, id))
         .execute();
+
     }
 
-    return { success: true, id: result[0].insertId };
+    return { success: true, id: result[0].insertId || exists[0].id };
   }
 
   async saveNews(news: CreateNewsDto, newsId: number): Promise<{ success: boolean; id: number }> {
@@ -131,7 +129,6 @@ export class DocumentsService {
 
     if (exists.length === 0) {
       result = await this.db
-        
         .insert(rotomNews)
         .values({
           title: news.title,
@@ -145,7 +142,6 @@ export class DocumentsService {
         } as RotomNews)
         .execute();
     } else {
-      console.log(news);
       result = await this.db
         
         .update(rotomNews)
