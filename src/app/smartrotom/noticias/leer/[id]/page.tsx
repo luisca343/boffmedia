@@ -120,7 +120,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
         <PopArtWallpaper />
       </div>
       <div className="relative z-10 min-h-full p-4 md:p-8 overflow-auto">
-        <div className="w-full max-w-5xl mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] border-8 border-black flex flex-col">
+        <div className="w-full max-w-7xl mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] border-8 border-black flex flex-col">
           <FurretHeader />
           
           {/* Navigation breadcrumbs */}
