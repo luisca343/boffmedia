@@ -125,6 +125,7 @@ export class DocumentsController {
     try {
       this.responseService.logRequest(action, { id, body });
       const result = await this.documentsService.saveNote(id, body.title, body.content, body.type);
+      console.log('Save note result:', result);
       this.responseService.logSuccess(action, result);
       return this.responseService.createSuccessResponse('Note saved successfully', result);
     } catch (error) {
