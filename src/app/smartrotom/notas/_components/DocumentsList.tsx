@@ -14,13 +14,11 @@ const CustomEditor = dynamic( () => {
     return import( '@/components/editor/TestEditor' );
   }, { ssr: false } );
 
-export function DocumentsList() {
+  export function DocumentsList() {
     const { notes, newNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
     const [searchTerm, setSearchTerm] = useState("")
     const [filteredDocuments, setFilteredDocuments] = useState(notes)
     const { data: selectedNote } = useGetDocument(selectedNoteId)
-
-    
 
     useEffect(() => {
         if(!notes) return
@@ -39,58 +37,81 @@ export function DocumentsList() {
 
     return (
         <div className="h-full flex">
-            <div className="w-[15%] py-4 h-full bg-surface-100 border-r border-surface-200 flex flex-col">
-                <div className="p-4">
+            <div className="w-[240px] py-4 h-full bg-surface-50 border-r border-surface-200 flex flex-col shadow-sm">
+                <div className="px-4 mb-6">
+                    <h2 className="text-lg font-semibold mb-4 text-center">Mis Notas</h2>
                     <Button onClick={newNote} className="w-full" variant="default">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Nueva Nota
                     </Button>
                 </div>
-                <div className="px-4 mb-4">
-                    <Input 
-                        placeholder="Buscar notas..." 
-                        className="w-full"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+                <div className="px-4 mb-6">
+                    <div className="relative">
+                        <Input 
+                            placeholder="Buscar notas..." 
+                            className="w-full pl-8 bg-surface-100"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                        <div className="absolute left-2 top-2.5 text-surface-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </div>
+                    </div>
                 </div>
-                <ScrollArea className="flex-grow">
+                <ScrollArea className="flex-grow px-2">
                     {filteredDocuments.length > 0 ? (
-                        <div className="px-2">
+                        <div className="space-y-1">
                             {filteredDocuments.map((doc: any) => (
                                 <div 
                                     key={doc.uuid} 
                                     onClick={() => handleNoteClick(doc.id)}
-                                    className="p-2 rounded-lg hover:bg-surface-200 transition-colors mb-2 cursor-pointer"
+                                    className={`p-3 rounded-md transition-colors cursor-pointer flex flex-col ${
+                                        selectedNoteId === doc.id 
+                                        ? "bg-primary/10 border-l-2 border-primary" 
+                                        : "hover:bg-surface-100"
+                                    }`}
                                 >
                                     <div className="flex items-center">
-                                        <FileText className="h-4 w-4 mr-2 text-surface-500" />
-                                        <h3 className="font-medium text-sm truncate">{doc.title}</h3>
+                                        <FileText className={`h-4 w-4 mr-2 ${selectedNoteId === doc.id ? "text-primary" : "text-surface-500"}`} />
+                                        <h3 className={`font-medium text-sm truncate ${selectedNoteId === doc.id ? "text-primary" : ""}`}>
+                                            {doc.title || "Untitled Note"}
+                                        </h3>
                                     </div>
-                                    <p className="text-xs text-surface-500 mt-1">{strToDate(doc.updatedAt)}</p>
+                                    <p className="text-xs text-surface-500 mt-1 ml-6">{strToDate(doc.updatedAt)}</p>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="text-surface-500 text-sm p-4">No notes found</p>
+                        <div className="flex flex-col items-center justify-center h-32 text-center">
+                            <FileText className="h-10 w-10 text-surface-300 mb-2" />
+                            <p className="text-surface-500 text-sm">No se encontraron notas</p>
+                        </div>
                     )}
                 </ScrollArea>
             </div>
-            <div className="w-[85%]  bg-white p-6 overflow-hidden">
-                {selectedNoteId !="" ? (
+            
+            <div className="flex-1 bg-white overflow-hidden flex flex-col">
+                {selectedNoteId !== "" ? (
                     <div className="w-full h-full">
-                            <CustomEditor
+                        <CustomEditor
                             document={selectedNote}
                             documentId={selectedNoteId}
                             documentType={0}
                             refresh={fetchDocuments}
-    />
+                        />
                     </div>
                 ) : (
-                    <>
-                        <h1 className="text-2xl font-bold mb-4">Welcome to Your Notes</h1>
-                        <p className="text-surface-600">Select a note from the sidebar or create a new one to get started.</p>
-                    </>
+                    <div className="flex flex-col items-center justify-center h-full p-6 bg-surface-50">
+                        <div className="max-w-md text-center">
+                            <FileText className="h-16 w-16 mx-auto mb-4 text-surface-300" />
+                            <h1 className="text-2xl font-bold mb-3">Notas SmartRotom</h1>
+                            <p className="text-surface-600 mb-6">Selecciona una nota desde el panel lateral o crea una nueva para comenzar.</p>
+                            <Button onClick={newNote} variant="default" size="lg">
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Crear Nueva Nota
+                            </Button>
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

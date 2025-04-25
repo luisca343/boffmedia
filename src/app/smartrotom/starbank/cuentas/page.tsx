@@ -1,122 +1,350 @@
 "use client";
-import {  rotomPOST } from "@/services/boffAPI";
-import {  useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BankSection,
   BankSectionContent,
   BankSectionHeader,
+  BankSectionButton
 } from "../_components/BankSection";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
-import { changeActiveAccount, formatMoney, getValidAccountId } from "../bankUtils";
+import { changeActiveAccount, formatMoney } from "../bankUtils";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
+  DialogTitle,
+  DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DialogDescription } from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import { AccountImage } from "../_components/AccountImage";
 import useStarBank from "../_hooks/useStarBank";
 import { useBoffSession } from "@/services/useBoffSession";
 import { starbankService } from "@/services/api/smartrotom/starbankService";
+import { useCreateAccount } from "@/hooks/starbank/useCreateAccount";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  PlusCircleIcon, 
+  CreditCardIcon, 
+  BanknotesIcon, 
+  ArrowPathIcon,
+  InformationCircleIcon
+} from "@heroicons/react/24/outline";
+import { SummaryCard } from "../_components/SummaryCard";
+import { Label } from "@/components/ui/label";
 
 export default function Cuentas() {
   const { session } = useBoffSession();
-  const {accounts, setAccounts, activeAccount, setActiveAccount} = useStarBank();
+  const { accounts, setAccounts, activeAccount, setActiveAccount, fetchAccounts } = useStarBank();
+  const [isCreating, setIsCreating] = useState(false);
+  const [newAccountName, setNewAccountName] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { createAccount, isLoading: createLoading } = useCreateAccount();
+
+  // Calculate account statistics
+  const totalBalance = accounts?.reduce((sum: number, account: any) => sum + account.balance, 0) || 0;
+  const primaryAccounts = accounts?.filter((acc: any) => acc.type === "MAIN") || [];
+  const secondaryAccounts = accounts?.filter((acc: any) => acc.type === "SECONDARY") || [];
+
+  // Check if user already has a MAIN account
+  const hasMainAccount = primaryAccounts.length > 0;
+
+  // Create new account handler
+  const handleCreateAccount = async () => {
+    if (!newAccountName.trim()) {
+      toast.error("Por favor, ingrese un nombre para la cuenta");
+      return;
+    }
+    
+    setIsCreating(true);
+    
+    try {
+      await createAccount({
+        name: newAccountName.trim(),
+        uuid: session?.user.smartRotomUser?.uuid!,
+        type: "SECONDARY" // Always create SECONDARY accounts
+      });
+      
+      toast.success("Cuenta secundaria creada exitosamente");
+      setNewAccountName("");
+      fetchAccounts(session); // Refresh accounts list
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error creating account:", error);
+      toast.error("Error al crear la cuenta");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Select account handler
+  const handleSelectAccount = (accountId: number) => {
+    setActiveAccount(changeActiveAccount(accountId));
+  };
 
   return (
-    <div className="flex flex-col w-full h-full p-4">
-      <section className="w-1/2 mx-auto  h-full">
-        <BankSection className="bg-white overflow-hidden max-h-[80%]">
-          <BankSectionHeader>Your Accounts</BankSectionHeader>
-          <BankSectionContent>
-            <ul className="divide-y divide-surface-200 overflow-auto">
-              {accounts.map((account: any) => (
-                <li
-                  key={account.id}
-                  className="p-4 hover:bg-blue-50 transition duration-150 ease-in-out"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <AccountImage type={account.type} name={account.name} />
-                      <div>
-                        <h3 className="text-lg font-medium text-blue-950">
-                          {account.name}
-                        </h3>
-                        <p className="text-sm text-blue-700">
-                          Balance:{" "}
-                          <span className="font-semibold">
-                            {formatMoney(account.balance)}
-                          </span>
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() =>
-                        setActiveAccount(changeActiveAccount(account.id))
-                      }
-                      className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
-                        activeAccount?.id === account.id
-                          ? "bg-blue-950 text-white"
-                          : "bg-blue-100 text-blue-950 hover:bg-blue-200"
-                      }`}
-                    >
-                      {activeAccount?.id === account.id ? "Selected" : "Select"}
-                    </button>
+    <div className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
+      {/* Header with summary stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <BankSection className="md:col-span-3">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-blue-900">Mis Cuentas</h1>
+              <p className="text-blue-600">Administra tus cuentas bancarias</p>
+            </div>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <BankSectionButton className="flex items-center">
+                  <PlusCircleIcon className="h-5 w-5 mr-2" />
+                  Nueva Cuenta Secundaria
+                </BankSectionButton>
+              </DialogTrigger>
+              
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Crear Nueva Cuenta Secundaria</DialogTitle>
+                  <DialogDescription>
+                    Ingresa los datos para crear una nueva cuenta secundaria.
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="space-y-4 py-4">
+                  {/* Info Alert */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3 flex">
+                    <InformationCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 mr-2" />
+                    <p className="text-sm text-blue-700">
+                      Las cuentas secundarias te permiten organizar tu dinero para diferentes propósitos como ahorros, gastos diarios, viajes, etc.
+                    </p>
                   </div>
-                </li>
-              ))}
-            </ul>
-          </BankSectionContent>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="account-name">Nombre de la cuenta</Label>
+                    <Input
+                      id="account-name"
+                      placeholder="Ej: Ahorros, Gastos, etc."
+                      value={newAccountName}
+                      onChange={(e) => setNewAccountName(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center p-3 rounded-lg border border-blue-200 bg-blue-50">
+                    <BanknotesIcon className="h-8 w-8 text-blue-700 mr-3" />
+                    <div>
+                      <h4 className="font-medium text-blue-900">Cuenta Secundaria</h4>
+                      <p className="text-xs text-blue-600">
+                        Ideal para ahorrar o separar fondos para fines específicos
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                    disabled={isCreating}
+                    className="border-blue-200"
+                  >
+                    Cancelar
+                  </Button>
+                  <BankSectionButton
+                    onClick={handleCreateAccount}
+                    disabled={isCreating || !newAccountName.trim()}
+                  >
+                    {isCreating ? (
+                      <>
+                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                        Creando...
+                      </>
+                    ) : (
+                      "Crear cuenta secundaria"
+                    )}
+                  </BankSectionButton>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
         </BankSection>
-        <div className="flex justify-end mt-4">
-          <NewAccountDialog />
+        
+        <SummaryCard 
+          title="Balance Total"
+          value={formatMoney(totalBalance)}
+          icon={<CreditCardIcon className="h-6 w-6" />}
+          className="md:col-span-1"
+        />
+        
+        <SummaryCard 
+          title="Cuenta Principal"
+          value={primaryAccounts.length > 0 ? primaryAccounts[0].name : "No disponible"}
+          icon={<CreditCardIcon className="h-6 w-6" />}
+          className="md:col-span-1"
+        />
+        
+        <SummaryCard 
+          title="Cuentas Secundarias"
+          value={`${secondaryAccounts.length} ${secondaryAccounts.length === 1 ? 'cuenta' : 'cuentas'}`}
+          icon={<BanknotesIcon className="h-6 w-6" />}
+          className="md:col-span-1"
+        />
+      </div>
+
+      {/* Main Account Card */}
+      {primaryAccounts.length > 0 && (
+        <BankSection className="bg-gradient-to-r from-blue-800 to-blue-600 text-white">
+          <BankSectionHeader>Cuenta Principal</BankSectionHeader>
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="flex-shrink-0">
+                  <AccountImage 
+                    type={primaryAccounts[0].type} 
+                    name={primaryAccounts[0].name} 
+                    width={64} 
+                    height={64} 
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">
+                    {primaryAccounts[0].name}
+                  </h3>
+                  <div className="flex items-center">
+                    <p className="text-lg text-blue-100">
+                      Balance: <span className="font-bold">{formatMoney(primaryAccounts[0].balance)}</span>
+                    </p>
+                    <span className="mx-2 text-blue-300">•</span>
+                    <p className="text-sm text-blue-100">
+                      Cuenta Principal
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <button
+                onClick={() => handleSelectAccount(primaryAccounts[0].id)}
+                className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                  activeAccount?.id === primaryAccounts[0].id
+                    ? "bg-white text-blue-700"
+                    : "bg-blue-700 text-white border border-blue-300 hover:bg-blue-800"
+                }`}
+              >
+                {activeAccount?.id === primaryAccounts[0].id ? "Seleccionada" : "Seleccionar"}
+              </button>
+            </div>
+          </div>
+        </BankSection>
+      )}
+
+      {/* Secondary Accounts List */}
+      <BankSection className="min-h-[400px]">
+        <div className="flex justify-between items-center mb-4">
+          <BankSectionHeader>Cuentas Secundarias</BankSectionHeader>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => fetchAccounts(session)}
+              className="text-blue-700 hover:text-blue-900 flex items-center"
+            >
+              <ArrowPathIcon className="h-4 w-4 mr-1" />
+              Actualizar
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsDialogOpen(true)}
+              className="text-blue-700 border-blue-200 hover:bg-blue-50 flex items-center"
+            >
+              <PlusCircleIcon className="h-4 w-4 mr-1" />
+              Agregar
+            </Button>
+          </div>
         </div>
-      </section>
+        
+        <AccountsList 
+          accounts={secondaryAccounts} 
+          activeAccount={activeAccount} 
+          onSelect={handleSelectAccount} 
+        />
+        
+        {secondaryAccounts.length === 0 && (
+          <div className="py-12 flex flex-col items-center justify-center text-center bg-blue-50 rounded-lg border border-dashed border-blue-200">
+            <BanknotesIcon className="h-12 w-12 text-blue-300 mb-3" />
+            <h3 className="text-lg font-medium text-blue-800 mb-1">No tienes cuentas secundarias</h3>
+            <p className="text-sm text-blue-600 max-w-md mb-4">
+              Crea cuentas secundarias para organizar tu dinero según tus necesidades.
+            </p>
+            <BankSectionButton
+              onClick={() => setIsDialogOpen(true)}
+              className="flex items-center"
+            >
+              <PlusCircleIcon className="h-5 w-5 mr-2" />
+              Crear Cuenta Secundaria
+            </BankSectionButton>
+          </div>
+        )}
+      </BankSection>
     </div>
   );
+}
 
-  function createAccount(name: string = "Nueva Cuenta") {
-    starbankService.createAccount({
-      name,
-      uuid: session?.user.smartRotomUser?.uuid!,
-    }).then(() => {
-      alert("Cuenta creada");
-    });
+function AccountsList({ 
+  accounts, 
+  activeAccount, 
+  onSelect 
+}: { 
+  accounts: any[], 
+  activeAccount: any, 
+  onSelect: (id: number) => void 
+}) {
+  if (!accounts || accounts.length === 0) {
+    return null;
   }
 
-  function NewAccountDialog() {
-    const [accountName, setAccountName] = useState("");
-    return (
-      <Dialog>
-        <DialogTrigger>
-          <span
-            onClick={() => toast.info("Creando cuenta")}
-            className="flex items-center px-6 py-3 bg-blue-950 text-white rounded-md hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Crear cuenta
-          </span>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>Crear cuenta</DialogHeader>
-          <DialogDescription>
-            <Input
-              type="text"
-              placeholder="Nombre de la cuenta"
-              value={accountName}
-              onChange={(e) => setAccountName(e.target.value)}
-            />
-            <Button
-              className="bg-blue-900 hover:bg-blue-700 text-surface-50 mt-2 p-2 rounded-md"
-              onClick={() => createAccount(accountName)}
+  return (
+    <div className="divide-y divide-blue-100 rounded-md border border-blue-200 overflow-hidden bg-white">
+      {accounts.map((account: any) => (
+        <div
+          key={account.id}
+          className="p-4 hover:bg-blue-50 transition duration-150 ease-in-out"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <AccountImage type={account.type} name={account.name} width={56} height={56} />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-blue-950">
+                  {account.name}
+                </h3>
+                <div className="flex items-center">
+                  <p className="text-sm text-blue-700">
+                    Balance: <span className="font-semibold">{formatMoney(account.balance)}</span>
+                  </p>
+                  <span className="mx-2 text-blue-300">•</span>
+                  <p className="text-xs text-blue-500">
+                    Cuenta Secundaria
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => onSelect(account.id)}
+              className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
+                activeAccount?.id === account.id
+                  ? "bg-blue-700 text-white"
+                  : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+              }`}
             >
-              Crear
-            </Button>
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+              {activeAccount?.id === account.id ? "Seleccionada" : "Seleccionar"}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }

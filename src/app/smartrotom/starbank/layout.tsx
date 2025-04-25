@@ -25,7 +25,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
       }}
     >
       <SideMenu currentPage={currentPage}/>
-      <div className="h-full w-full overflow-hidden">
+      <div className="h-full w-full overflow-auto">
         <TopBar  currentPage={currentPage}/>
         <div className="h-full w-full">{children}</div>
       </div>

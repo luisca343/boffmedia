@@ -1,16 +1,33 @@
+"use client";
 import { useEffect, useState } from "react";
+import { useGetAllAccounts } from "@/hooks/starbank/useGetAllAccounts";
+import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
+import { useBoffSession } from "@/services/useBoffSession";
+import { useTransfer } from "@/hooks/starbank/useTransfer";
 import { AccountSelect } from "./AccountSelect";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { toast } from "react-toastify";
-import { formatMoney, getValidAccountId } from "../bankUtils";
-import { ArrowRight, JapaneseYen } from 'lucide-react';
-import { useBoffSession } from "@/services/useBoffSession";
-import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
-import { useGetAllAccounts } from "@/hooks/starbank/useGetAllAccounts";
-import { useTransfer } from "@/hooks/starbank/useTransfer";
-import { CreateTransferDto } from "@/types/dto/create-transfer-dto";
-import { Account } from "@/services/api/smartrotom/usersService";
+import { AccountImage } from "./AccountImage";
+import { formatMoney } from "../bankUtils";
+import { ExclamationTriangleIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { BankSectionButton } from "./BankSection";
+import { ArrowRightIcon } from "@heroicons/react/24/solid";
+import { TransactionSuccess } from "./TransactionSuccess";
+
+interface Account {
+  id: number;
+  name: string;
+  balance: number;
+  type: string;
+}
+
+interface CreateTransferDto {
+  from: number;
+  to: number;
+  amount: number;
+  concept: string;
+}
 
 export function SendMoney() {
   const { session } = useBoffSession();
@@ -18,6 +35,11 @@ export function SendMoney() {
   const [activeAccount, setActiveAccount] = useState(-1);
   const [amount, setAmount] = useState(0);
   const [concept, setConcept] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const { accounts: allAccounts, error: allAccountsError, isLoading: allAccountsLoading } = useGetAllAccounts();
   const { accounts: myAccounts, error: myAccountsError, isLoading: myAccountsLoading } = useGetAccounts(session?.user?.smartRotomUser?.uuid!);
@@ -25,172 +47,298 @@ export function SendMoney() {
 
   useEffect(() => {
     if (myAccounts && myAccounts.length > 0) {
-      setMyActiveAccount(getValidAccountId(myAccounts));
+      setMyActiveAccount(myAccounts[0].id);
     }
   }, [myAccounts]);
 
-  async function sendMoney() {
+  useEffect(() => {
+    console.log("TRANSFER:", transferLoading);
+    console.log(transfer)
+    if (transferError) {
+      console.error("Error en transferencia:", transferError);
+      setError(transferError);
+      setIsSending(false);
+      setIsConfirming(false);
+    }
+  }, [transferError]);
+
+  function validateTransfer() {
     if (activeAccount === -1 || myActiveAccount === -1) {
-      toast.error("Selecciona una cuenta");
-      return;
+      setError("Selecciona ambas cuentas");
+      return false;
     }
+    
     if (activeAccount === myActiveAccount) {
-      toast.error("No puedes enviar dinero a la misma cuenta");
-      return;
+      setError("No puedes transferir dinero a la misma cuenta");
+      return false;
     }
+    
     if (amount <= 0) {
-      toast.error("Ingresa una cantidad válida");
-      return;
+      setError("El monto debe ser mayor a cero");
+      return false;
     }
+    
     const myAccount = myAccounts?.find((account: Account) => account.id === myActiveAccount);
     if (!myAccount || amount > myAccount.balance) {
-      toast.error("No tienes suficiente saldo");
-      return;
+      setError("No tienes suficiente saldo para esta transferencia");
+      return false;
     }
+    
+    setError("");
+    return true;
+  }
 
-    const transferData: CreateTransferDto = {
-      from: myActiveAccount,
-      to: activeAccount,
-      amount: amount,
-      concept: concept,
-    };
+  function handleConfirm() {
+    if (validateTransfer()) {
+      setIsConfirming(true);
+    }
+  }
 
+  async function sendMoney() {
+    if (!validateTransfer()) return;
+    
+    setIsSending(true);
+    
     try {
+      const transferData: CreateTransferDto = {
+        from: myActiveAccount,
+        to: activeAccount,
+        amount: amount,
+        concept: concept || "Transferencia",
+      };
+      
       await transfer(transferData);
-      toast.success("Transferencia realizada");
-      setAmount(0);
-      setConcept("");
-    } catch (error) {
-      toast.error("Error al realizar la transferencia");
+      setIsSuccess(true);
+    } catch (err) {
+      console.error("Error en transferencia:", err);
+      setError("Ocurrió un error al realizar la transferencia");
+    } finally {
+      setIsSending(false);
+      setIsConfirming(false);
     }
+  }
+
+  function resetForm() {
+    setAmount(0);
+    setConcept("");
+    setActiveAccount(-1);
+    setIsSuccess(false);
+    setError("");
+  }
+  
+
+  function handleCancel() {
+    setIsConfirming(false);
   }
 
   if (allAccountsLoading || myAccountsLoading) {
-    return <div>Cargando...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
+        <p className="mt-4 text-blue-800">Cargando información de cuentas...</p>
+      </div>
+    );
   }
 
   if (allAccountsError || myAccountsError) {
-    return <div>Error al cargar las cuentas</div>;
+    return (
+      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        <strong className="font-bold">Error: </strong>
+        <span className="block sm:inline">{allAccountsError || myAccountsError}</span>
+      </div>
+    );
   }
 
+
+  const myAccount = myAccounts?.find((account: Account) => account.id === myActiveAccount);
+  const targetAccount = allAccounts?.find((account: Account) => account.id === activeAccount);
+
+  if (isSuccess) {
+    return (
+      <TransactionSuccess
+        amount={amount}
+        recipientName={targetAccount?.name || "Usuario"}
+        concept={concept}
+        onClose={resetForm}
+      />
+    );
+  }
+
+
   return (
-    <div className="p-6 space-y-6">
-      <div className="space-y-4">
-        <div>
-          <label
-            htmlFor="fromAccount"
-            className="block text-sm font-medium text-blue-950"
-          >
-            Desde
-          </label>
-          <AccountSelect
-            id="fromAccount"
-            accounts={myAccounts || []}
-            activeAccount={myActiveAccount}
-            setActiveAccount={setMyActiveAccount}
-            className="mt-1 block w-full"
-          />
+    <div className="w-full max-w-2xl mx-auto">
+      {success && (
+        <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-center" role="alert">
+          <CheckIcon className="h-5 w-5 mr-2" />
+          <span>{success}</span>
         </div>
-
-        <div>
-          <label
-            htmlFor="toAccount"
-            className="block text-sm font-medium text-blue-950"
-          >
-            Hacia
-          </label>
-          <AccountSelect
-            id="toAccount"
-            accounts={allAccounts || []}
-            activeAccount={activeAccount}
-            setActiveAccount={setActiveAccount}
-            className="mt-1 block w-full"
-          />
+      )}
+      
+      {error && (
+        <div className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative flex items-center" role="alert">
+          <ExclamationTriangleIcon className="h-5 w-5 mr-2" />
+          <span>{error}</span>
         </div>
+      )}
 
-        <div>
-          <label
-            htmlFor="amount"
-            className="block text-sm font-medium text-blue-950"
-          >
-            Cantidad
-          </label>
-          <div className="mt-1 relative rounded-md shadow-sm">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <JapaneseYen className="h-5 w-5 text-blue-900" />
+      {isConfirming ? (
+        // Confirmation view
+        <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+          <h3 className="text-lg font-medium text-blue-900 mb-4">Confirmar Transferencia</h3>
+          
+          <div className="space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center">
+                <AccountImage 
+                  width={40} 
+                  height={40} 
+                  type={myAccount?.type || ""} 
+                  name={myAccount?.name || ""} 
+                />
+                <div className="ml-3">
+                  <p className="text-sm font-medium">{myAccount?.name}</p>
+                  <p className="text-xs text-blue-500">Mi cuenta</p>
+                </div>
+              </div>
+              
+              <ArrowRightIcon className="h-5 w-5 text-blue-500" />
+              
+              <div className="flex items-center">
+                <AccountImage 
+                  width={40} 
+                  height={40} 
+                  type={targetAccount?.type || ""} 
+                  name={targetAccount?.name || ""} 
+                />
+                <div className="ml-3">
+                  <p className="text-sm font-medium">{targetAccount?.name}</p>
+                  <p className="text-xs text-blue-500">Destinatario</p>
+                </div>
+              </div>
             </div>
+            
+            <div className="bg-white p-4 rounded border border-blue-100">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-blue-500">Monto</p>
+                  <p className="font-medium">{formatMoney(amount)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-blue-500">Concepto</p>
+                  <p className="font-medium">{concept || "Transferencia"}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-4 justify-end mt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleCancel}
+                disabled={transferLoading}
+                className="border-blue-200"
+              >
+                Cancelar
+              </Button>
+              
+              <BankSectionButton 
+                onClick={sendMoney} 
+                disabled={transferLoading}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {transferLoading ? (
+                  <>
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                    Procesando...
+                  </>
+                ) : 'Confirmar Transferencia'}
+              </BankSectionButton>
+            </div>
+          </div>
+        </div>
+      ) : (
+        // Form view
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="from-account" className="mb-2 block text-blue-800">
+                Desde mi cuenta
+              </Label>
+              <div className="space-y-2">
+                <AccountSelect
+                  accounts={myAccounts}
+                  activeAccount={myActiveAccount}
+                  setActiveAccount={setMyActiveAccount}
+                  id="from-account"
+                  className="w-full"
+                />
+                {myAccount && (
+                  <div className="text-sm text-blue-600">
+                    Balance disponible: {formatMoney(myAccount.balance)}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="to-account" className="mb-2 block text-blue-800">
+                Para cuenta
+              </Label>
+              <AccountSelect
+                accounts={allAccounts}
+                activeAccount={activeAccount}
+                setActiveAccount={setActiveAccount}
+                id="to-account"
+                className="w-full"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="amount" className="mb-2 block text-blue-800">
+              Monto a transferir
+            </Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500">¥</span>
+              <Input
+                id="amount"
+                type="number"
+                min={0}
+                step={1}
+                value={amount || ""}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                className="pl-8"
+                placeholder="0"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="concept" className="mb-2 block text-blue-800">
+              Concepto de la transferencia
+            </Label>
             <Input
-              id="amount"
-              type="number"
-              min={1}
-              max={myAccounts?.find((account: Account) => account.id === myActiveAccount)?.balance}
-              placeholder="0.00"
-              className="pl-10"
-              onChange={(e) => setAmount(parseInt(e.target.value))}
-              value={amount}
-              variant={"wingull"}
+              id="concept"
+              value={concept}
+              onChange={(e) => setConcept(e.target.value)}
+              placeholder="Ej: Pago de factura, Regalo, etc."
+              maxLength={50}
             />
+            <p className="text-xs text-blue-500 mt-1">
+              {concept.length}/50 caracteres
+            </p>
           </div>
-        </div>
-
-        <div>
-          <label
-            htmlFor="concept"
-            className="block text-sm font-medium text-blue-950"
-          >
-            Concepto
-          </label>
-          <Input
-            id="concept"
-            type="text"
-            placeholder="Concepto"
-            className="mt-1 block w-full"
-            onChange={(e) => setConcept(e.target.value)}
-            value={concept}
-            variant={"wingull"}
-          />
-        </div>
-      </div>
-
-      {myActiveAccount !== -1 && (
-        <div className="bg-blue-50 p-4 rounded-md">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium text-blue-950">
-              Saldo actual
-            </span>
-            <span className="text-sm font-bold text-blue-950">
-              {formatMoney(
-                myAccounts?.find(
-                  (account: Account) => account.id === myActiveAccount
-                )?.balance!
-              )}
-            </span>
-          </div>
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-sm font-medium text-blue-950">
-              Saldo Nuevo
-            </span>
-            <span className="text-sm font-bold text-blue-950">
-              {formatMoney(
-                (myAccounts?.find(
-                  (account: Account) => account.id === myActiveAccount
-                )?.balance || 0) - (amount || 0)
-              )}
-            </span>
+          
+          <div className="pt-4">
+            <BankSectionButton
+              onClick={handleConfirm}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={isSending}
+            >
+              Continuar
+            </BankSectionButton>
           </div>
         </div>
       )}
-      <div className="px-6 py-4 bg-surface-50 border-t border-surface-200">
-        <Button
-          onClick={sendMoney}
-          disabled={transferLoading}
-          className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-950 hover:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-        >
-          {transferLoading ? 'Enviando...' : 'Enviar Dinero'}
-          <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
-        </Button>
-      </div>
     </div>
   );
 }
-

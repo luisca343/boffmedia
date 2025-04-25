@@ -23,5 +23,5 @@ export function changeActiveAccount(activeAccount: number): number {
 }
 
 export function formatMoney(amount: number): string {
-    return `${Number(amount).toLocaleString('de-DE')} ¥`;
+    return `${Number(amount.toFixed(0)).toLocaleString('es-ES')} ¥`;
 }

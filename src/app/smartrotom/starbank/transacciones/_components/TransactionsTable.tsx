@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { strToDate } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
 import { Transaction } from "@/types/starbank";
+import { ArrowDownIcon, ArrowUpIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
 
 // Import shadcn table components
 import {
@@ -28,37 +29,76 @@ import {
 
 export const columns: ColumnDef<Transaction>[] = [
   {
-    header: "Razón",
+    header: "Cuenta",
     accessorKey: "isPayer",
+    enableSorting: false,
     cell: (props: CellDefProps<Transaction>) => {
-      const { row, table } = props;
-      const meta = table.options.meta as { activeAccount: number };
+      const { row } = props;
       return (
-        <AccountImage
-          height={32}
-          width={32}
-          // @ts-ignore
-          account={row.original}
-          activeAccount={meta.activeAccount}
-        />
+        <div className="flex items-center gap-2">
+          <AccountImage
+            height={40}
+            width={40}
+            type={row.original.type}
+            name={row.original.name}
+          />
+          <div className="hidden md:block">
+            <p className="text-sm font-medium text-blue-900">{row.original.name}</p>
+            <p className="text-xs text-blue-600">{row.original.isPayer ? 'Salida' : 'Entrada'}</p>
+          </div>
+        </div>
       );
     },
   },
-  { header: "", accessorKey: "reason", filterFn: filterReason },
+  { 
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+          Concepto
+          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+        </div>
+      );
+    }, 
+    accessorKey: "reason", 
+    filterFn: filterReason 
+  },
   {
-    header: "Cantidad",
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+          Cantidad
+          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+        </div>
+      );
+    },
     accessorKey: "amount",
     filterFn: filterAmount,
     cell: renderMoney,
+    sortingFn: "alphanumeric",
   },
   {
-    header: "Saldo",
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+          Saldo
+          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+        </div>
+      );
+    },
     accessorKey: "balance",
     filterFn: filterAmount,
-    cell: renderMoney,
+    cell: renderBalance,
+    sortingFn: "alphanumeric",
   },
   {
-    header: "Fecha",
+    header: ({ column }) => {
+      return (
+        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+          Fecha
+          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+        </div>
+      );
+    },
     accessorKey: "date",
     filterFn: filterDate,
     cell: renderDate,
@@ -66,27 +106,39 @@ export const columns: ColumnDef<Transaction>[] = [
 ];
 
 function renderMoney(props: CellDefProps<Transaction>) {
-  const { cell, row, column } = props;
+  const { cell, row } = props;
   const isPayer = row.original.isPayer;
-  const isAmount = column.id === "amount";
+  const amount = cell.getValue() as number;
+  
   return (
-    <div
-      className={
-        isAmount
-          ? isPayer
-            ? "text-red-500 flex items-center"
-            : "text-green-500 flex items-center"
-          : "font-bold flex items-center text-lg text-blue-950"
-      }
-    >
-      <span className="mr-2">{formatMoney(cell.getValue() as number)}</span>
+    <div className={`flex items-center font-medium ${isPayer ? "text-red-600" : "text-emerald-600"}`}>
+      {isPayer ? (
+        <ArrowDownIcon className="h-4 w-4 mr-1" />
+      ) : (
+        <ArrowUpIcon className="h-4 w-4 mr-1" />
+      )}
+      {isPayer ? "- " : "+ "}
+      {formatMoney(amount)}
+    </div>
+  );
+}
+
+function renderBalance(props: CellDefProps<Transaction>) {
+  const { cell } = props;
+  return (
+    <div className="font-medium text-blue-900">
+      {formatMoney(cell.getValue() as number)}
     </div>
   );
 }
 
 function renderDate(props: CellDefProps<Transaction>) {
   const { cell } = props;
-  return strToDate(cell.getValue() as string);
+  return (
+    <div className="text-sm text-blue-700">
+      {strToDate(cell.getValue() as string)}
+    </div>
+  );
 }
 
 export function TransactionsTable({
@@ -103,11 +155,11 @@ export function TransactionsTable({
   return (
     <div className={className}>
       <ShadcnTable variant="wingull">
-        <TableHeader>
+        <TableHeader className="bg-blue-50 sticky top-0">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead key={header.id} className="text-blue-800 font-medium py-4">
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
@@ -117,17 +169,20 @@ export function TransactionsTable({
             </TableRow>
           ))}
           <TableRow>
-            <TableHead colSpan={2}>
+            <TableHead className="p-2">
+              {/* Account filter intentionally left empty */}
+            </TableHead>
+            <TableHead>
               <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
-                placeholder="Filtrar Transacciones"
+                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
+                placeholder="Filtrar Conceptos"
                 value={(columnFilters.find((f) => f.id === "reason")?.value as string) || ""}
                 onChange={(e) => updateFilters("reason", e.target.value)}
               />
             </TableHead>
             <TableHead>
               <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
                 placeholder="Filtrar Cantidad"
                 value={(columnFilters.find((f) => f.id === "amount")?.value as string) || ""}
                 onChange={(e) => updateFilters("amount", e.target.value)}
@@ -135,7 +190,7 @@ export function TransactionsTable({
             </TableHead>
             <TableHead>
               <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
                 placeholder="Filtrar Saldo"
                 value={(columnFilters.find((f) => f.id === "balance")?.value as string) || ""}
                 onChange={(e) => updateFilters("balance", e.target.value)}
@@ -143,7 +198,7 @@ export function TransactionsTable({
             </TableHead>
             <TableHead>
               <Input
-                className="mb-1 mx-auto w-[95%] h-8 bg-opacity-80 bg-blue-400 text-white placeholder:text-white border-none font-thin"
+                className="mb-1 mx-auto w-[95%] h-8 bg-blue-100 bg-opacity-80 placeholder:text-blue-900 border-blue-200"
                 placeholder="Filtrar Fecha"
                 value={(columnFilters.find((f) => f.id === "date")?.value as string) || ""}
                 onChange={(e) => updateFilters("date", e.target.value)}
@@ -152,15 +207,23 @@ export function TransactionsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow key={row.id} className="hover:bg-blue-50 h-11">
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className="py-1">
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+          {table.getRowModel().rows.length > 0 ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow key={row.id} className="hover:bg-blue-50 transition-colors">
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id} className="py-2">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="py-8 text-center text-blue-800">
+                No se encontraron transacciones
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </ShadcnTable>
     </div>

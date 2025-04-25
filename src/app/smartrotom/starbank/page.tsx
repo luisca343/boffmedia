@@ -28,6 +28,7 @@ import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
 import { FullTransaction, Transaction } from "@/types/starbank";
 import { InternalLink } from "@/components/nav/Link";
+import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
 
 export default function StarBank() {
   const router = useRouter();
@@ -119,7 +120,7 @@ export default function StarBank() {
   }
 
   if (accountsLoading || transactionsLoading || transfersLoading) {
-    return <div>Loading...</div>;
+    return <DashboardSkeleton />;
   }
 
   if (accountsError || transactionsError || transfersError) {
@@ -128,16 +129,22 @@ export default function StarBank() {
 
   return (
     <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-8 h-full flex flex-col">
-      <section className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-        <BankSection className="h-64 max-w-1/3">
+      <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Balance Card */}
+        <BankSection className="h-64 md:col-span-1">
           <BankSectionHeader>Balance de cuenta</BankSectionHeader>
           <BankSectionContent>
-            <div className="text-4xl 2xl:text-5xl font-bold text-blue-700 ">
-              {formatMoney(getActiveAccountBalance(accounts!, activeAccount))}
+            <div className="flex flex-col h-full justify-center">
+              <div className="text-4xl 2xl:text-5xl font-bold text-blue-700">
+                {formatMoney(getActiveAccountBalance(accounts!, activeAccount))}
+              </div>
+              <div className="text-sm text-blue-500 mt-2">
+                Cuenta {accounts?.find((acc: any) => acc.id === activeAccount)?.name || "Principal"}
+              </div>
             </div>
           </BankSectionContent>
           <BankSectionFooter>
-            <div className="flex flex-col w-full justify-center ">
+            <div className="flex flex-col w-full justify-center">
               <span className="text-xs xl:text-lg text-blue-800">
                 Cambiar de Cuenta
               </span>
@@ -149,16 +156,39 @@ export default function StarBank() {
             </div>
           </BankSectionFooter>
         </BankSection>
-
-        <BankSection className="h-64">
-          <BankSectionHeader> Grafica </BankSectionHeader>
+  
+        {/* Chart Card */}
+        <BankSection className="h-64 md:col-span-2">
+          <BankSectionHeader>Movimientos Recientes</BankSectionHeader>
           <BankSectionContent>
             <GraficaYTal />
           </BankSectionContent>
         </BankSection>
-
-        <BankSection className="h-96 overflow-auto md:col-span-2 ">
-          <BankSectionHeader> Transacciones </BankSectionHeader>
+  
+        {/* Quick Actions */}
+        <BankSection className="md:col-span-3">
+          <BankSectionHeader>Acciones Rápidas</BankSectionHeader>
+          <BankSectionContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <InternalLink href="/starbank/enviar" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
+                <DollarSign className="mr-2 text-blue-700" /> 
+                <span className="text-blue-900 font-medium">Transferir Dinero</span>
+              </InternalLink>
+              <InternalLink href="/starbank/cuentas" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
+                <CreditCard className="mr-2 text-blue-700" /> 
+                <span className="text-blue-900 font-medium">Administrar Cuentas</span>
+              </InternalLink>
+              <InternalLink href="/starbank/facturas" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
+                <Send className="mr-2 text-blue-700" /> 
+                <span className="text-blue-900 font-medium">Pagar Facturas</span>
+              </InternalLink>
+            </div>
+          </BankSectionContent>
+        </BankSection>
+  
+        {/* Recent Transactions */}
+        <BankSection className="h-96 overflow-auto md:col-span-3">
+          <BankSectionHeader>Transacciones Recientes</BankSectionHeader>
           <BankSectionContent>
             <Transactions
               trans={transactions}
@@ -173,21 +203,10 @@ export default function StarBank() {
                 router.push("/smartrotom/starbank/transacciones");
               }}
             >
-              Ir a Transacciones <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
+              Ver todas las transacciones <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
             </BankSectionButton>
           </BankSectionFooter>
         </BankSection>
-        <div className="md:col-span-2 flex justify-around w-full h-16">
-          <InternalLink href="/starbank/enviar" className="flex flex-1 m-2 items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
-            <DollarSign className="mr-2" /> Transferir Dinero
-          </InternalLink>
-          <InternalLink href="/starbank/cuentas"  className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
-            <CreditCard className="mr-2" /> Administrar Cuentas
-          </InternalLink>
-          <InternalLink href="/starbank/facturas" className="flex flex-1 m-2  items-center justify-center px-4 py-6 border border-transparent text-base font-medium rounded-md text-white bg-blue-950 hover:bg-blue-900 md:py-4 md:text-lg md:px-10">
-            <Send className="mr-2" /> Pagar Facturas
-          </InternalLink>
-        </div>
       </section>
     </div>
   );
@@ -251,11 +270,11 @@ export function TablaTransacciones({
   activeAccount: any;
 }) {
   return (
-    <div className="relative overflow-x-auto">
+    <div className="relative overflow-x-auto shadow-sm rounded-lg">
       <table className="min-w-full divide-y divide-surface-200">
-        <thead className="sticky top-0 z-10 bg-white">
+        <thead className="sticky top-0 z-10 bg-blue-50">
           <tr>
-            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Razón</th>
+            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Información</th>
             <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
               Cantidad
             </th>
@@ -265,28 +284,31 @@ export function TablaTransacciones({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-surface-200">
-          {transactions.map((transaction: any) => (
-            <tr key={transaction.id}>
-              <td className="py-2 whitespace-nowrap text-sm text-black flex justify-center">
-                <AccountImage type={transaction.type} name={transaction.name} />
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
-                {transaction.reason}
-              </td>
-              <td
-                className={`px-6 py-4 whitespace-nowrap text-sm ${
-                  esPagador(transaction, activeAccount)
-                    ? "text-red-800"
-                    : "text-green-700"
-                }`}
-              >
-                ¥{transaction.amount}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
-                {strToDate(transaction.date)}
-              </td>
-            </tr>
-          ))}
+          {transactions.map((transaction: any) => {
+            const isPayer = esPagador(transaction, activeAccount);
+            return (
+              <tr key={transaction.id} className="hover:bg-blue-50 transition-colors">
+                <td className="py-4 pl-6 whitespace-nowrap">
+                  <AccountImage type={transaction.type} name={transaction.name} />
+                </td>
+                <td className="pr-6 py-4">
+                  <div className="text-sm font-medium text-blue-900">{transaction.reason}</div>
+                  <div className="text-xs text-blue-500">{transaction.name}</div>
+                </td>
+                <td className={`px-6 py-4 whitespace-nowrap font-medium ${
+                  isPayer ? "text-red-600" : "text-emerald-600"
+                }`}>
+                  <div className="flex items-center">
+                    {isPayer ? "- " : "+ "}
+                    {formatMoney(transaction.amount)}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
+                  {strToDate(transaction.date)}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

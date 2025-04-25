@@ -3,7 +3,12 @@ import { CreateSmartrotomUserDto } from '@/types/dto/create-user.dto';
 import { UpdateUserDto } from '@/types/dto/update-user.dto';
 
 export type User = any; // Replace 'any' with the actual User type
-export type Account = any; // Replace 'any' with the actual Account type
+export type Account = {
+  id: number;
+  balance: number;
+  name: string;
+  type: string;
+}
 
 export const usersService = {
   findAll: () => rotomGET<User[]>('/users'),
