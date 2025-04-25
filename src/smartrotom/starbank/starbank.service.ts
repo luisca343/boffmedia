@@ -106,7 +106,7 @@ export class StarbankService {
             return await this.wingullService.updateBalance(account);
         } catch (error) {
             console.error('Error updating balance:', error);
-            throw error;
+            return {success: false}
         }
     }
 
