@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonProps } from "@/components/ui/button"; 
 import { ReactNode } from "react";
 
-export function BankSectionHeader({ children = 'Test' }: { children?: string }) {
+export function BankSectionHeader({ children = 'Test' }: { children?: string | ReactNode }) {
     return (
         <div className="text-2xl font-semibold text-blue-800 mb-4">{children}</div>
     );

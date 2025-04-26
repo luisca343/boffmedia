@@ -64,7 +64,7 @@ export default function Cuentas() {
       await createAccount({
         name: newAccountName.trim(),
         uuid: session?.user.smartRotomUser?.uuid!,
-        type: "SECONDARY" // Always create SECONDARY accounts
+        type: "SECONDARY"
       });
       
       toast.success("Cuenta secundaria creada exitosamente");

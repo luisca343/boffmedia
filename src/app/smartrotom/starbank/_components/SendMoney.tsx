@@ -52,8 +52,6 @@ export function SendMoney() {
   }, [myAccounts]);
 
   useEffect(() => {
-    console.log("TRANSFER:", transferLoading);
-    console.log(transfer)
     if (transferError) {
       console.error("Error en transferencia:", transferError);
       setError(transferError);
@@ -308,6 +306,7 @@ export function SendMoney() {
                 onChange={(e) => setAmount(Number(e.target.value))}
                 className="pl-8"
                 placeholder="0"
+                variant={"wingull"}
               />
             </div>
           </div>
@@ -322,6 +321,7 @@ export function SendMoney() {
               onChange={(e) => setConcept(e.target.value)}
               placeholder="Ej: Pago de factura, Regalo, etc."
               maxLength={50}
+              variant={"wingull"}
             />
             <p className="text-xs text-blue-500 mt-1">
               {concept.length}/50 caracteres
