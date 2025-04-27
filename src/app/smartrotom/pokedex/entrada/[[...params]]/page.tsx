@@ -113,7 +113,7 @@ export default async function EntradaPokedex({params}: any){
                     return <div key={index} className="flex flex-wrap justify-center">
                     {palette.map((palette, index) => {
                         return <div key={index} className="flex flex-col p-2 justify-center items-center">
-                        <PokemonSprite width={80} height={80} id={pokemonIndex} form={formName} palette={palette.name} hide={false} showStatus={false}/>
+                        <PokemonSprite width={80} height={80} id={pokemonIndex} form={formName} palette={palette.name} hide={true} showStatus={false}/>
                         <span>{t(`palette_${palette.name}`)}</span>
                         </div>
                     })}

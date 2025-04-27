@@ -17,14 +17,13 @@ export async function getPokemonImage(
   hide: boolean,
   pokedexData: PokedexData,
 ) {
-  const displayStatus = await getDisplayStatus(id, form, hide)
+  const status = getPokedexStatus(id, form, hide, pokedexData)
   const key = `${id}_${form}_${palette}`
   if (indexedImages[key]) {
     return {
       url: indexedImages[key],
       type: "image",
-      showImg: displayStatus,
-      status: 0,
+      status
     }
   }
 
@@ -44,15 +43,14 @@ export async function getPokemonImage(
       return {
         url: image,
         type: "image",
-        showImg: displayStatus,
-        status: 0,
+        status,
       }
     } else {
       // If image doesn't exist, fall back to sprite
       const spriteData = await getPokemonSprite(id, form, palette, hide, pokedexData)
       return {
         ...spriteData,
-        showImg: displayStatus,
+        status
       }
     }
   } catch (error) {
@@ -61,7 +59,7 @@ export async function getPokemonImage(
     const spriteData = await getPokemonSprite(id, form, palette, hide, pokedexData)
     return {
       ...spriteData,
-      showImg: displayStatus,
+      status
     }
   }
 }
