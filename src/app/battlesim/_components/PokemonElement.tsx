@@ -32,7 +32,7 @@ export type PokemonRefType = {
                     top: getOffset(battle, position, getScaleMultiplier()).top,
                     width: getImageSize(),
                     height: getImageSize(),
-                    zIndex: 45,
+                    zIndex: 100,
                 }}
             >
             <div className="w-full h-full relative">

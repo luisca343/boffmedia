@@ -107,6 +107,8 @@ export class SceneEffects {
   ): Promise<void> {
     const effectData = BattleEffects[effect];
     if (!effectData) return;
+
+    console.log('showEffect', effect, start, end, transition, after, additionalCss, callback);
     
     const startTime = start.time || 0;
     const endTime = end.time || 500;
@@ -146,7 +148,7 @@ export class SceneEffects {
     // Special case for pokeball
     if (effect === 'pokeball') {
       halfWidth = getImageSize() / 2;
-      halfHeight = getImageSize();
+      halfHeight = 3 * getImageSize() / 4;
     }
     
     // Apply any additional CSS
@@ -167,12 +169,6 @@ export class SceneEffects {
     const endOpacity = end.opacity !== undefined ? end.opacity : start.opacity;
     const endScale = end.scale !== undefined ? end.scale : start.scale;
     const endZ = end.z !== undefined ? end.z : start.z;
-    
-    // Special case for pokeball
-    if (effect === 'pokeball') {
-      halfWidth = 0;
-      halfHeight = 0;
-    }
 
     // Start the animation after a slight delay
     setTimeout(() => {
