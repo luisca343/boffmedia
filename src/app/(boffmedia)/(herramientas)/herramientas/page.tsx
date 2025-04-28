@@ -47,6 +47,17 @@ export default function ToolsLandingPage() {
       ],
       href: "/mhwilds",
       color: "from-green-400 to-green-600",
+    },
+    {
+      title: "Otros",
+      description: "Herramientas generales y recursos",
+      icon: "/img/games/other/icon.webp",
+      tools: [
+        { name: "Sorteos", count: 1 },
+        { name: "Claves de Steam", count: 1 },
+      ],
+      href: "/otros",
+      color: "from-blue-400 to-blue-600",
     }
   ];
 

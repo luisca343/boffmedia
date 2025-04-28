@@ -15,7 +15,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ className, variant = "default", ...props }, ref) => {
     const variantStyles = {
       default: "border-surface-700 bg-surface-800 text-surface-100",
-      wingull: "border-blue-800 bg-blue-900 text-blue-100",
+      wingull: "border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 text-blue-900",
     }
 
     return (
@@ -57,7 +57,7 @@ const CardTitle = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-400",
-    wingull: "text-blue-300",
+    wingull: "text-blue-700",
   }
 
   return (
@@ -82,7 +82,7 @@ const CardDescription = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-300",
-    wingull: "text-blue-200",
+    wingull: "text-blue-600",
   }
 
   return (

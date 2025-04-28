@@ -26,6 +26,7 @@ export interface Video {
 }
 
 export interface SteamGame {
+  steamID: string;
   name: string;
   normalPrice: string;
   currentPrice: string;
@@ -56,7 +57,7 @@ const useFetchSteamData = () => {
 
   const fetchGameData = async (steamID: string) => {
     try {
-      const response = (await apiGET(`/steamdata/${steamID}`)).data;
+      const response = (await apiGET(`/steamdata/${steamID}`)) as any as SteamGame;
       const gameData = response as SteamGame;
 
       setSelectedGame(gameData);

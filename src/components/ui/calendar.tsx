@@ -33,14 +33,14 @@ function Calendar({
       navButtonColor: "text-surface-600",
     },
     wingull: {
-      daySelected: "bg-blue-700 text-blue-50 hover:bg-blue-600 hover:text-blue-50 focus:bg-blue-700 focus:text-blue-50",
-      dayToday: "bg-blue-100 text-blue-900",
-      headCell: "text-blue-500 rounded-md w-9 font-normal text-[0.8rem]",
-      dayOutside: "day-outside text-blue-400 aria-selected:bg-blue-100/50 aria-selected:text-blue-500",
-      dayDisabled: "text-blue-400 opacity-50",
-      dayRangeMiddle: "aria-selected:bg-blue-100 aria-selected:text-blue-900",
-      cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-blue-100/50 [&:has([aria-selected])]:bg-blue-100 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-      captionLabel: "text-sm font-medium text-blue-300",
+      daySelected: "bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-900 focus:bg-blue-100 focus:text-blue-800",
+      dayToday: "bg-blue-50 text-blue-900 border-2 border-blue-400",
+      headCell: "text-blue-700 rounded-md w-9 font-medium text-[0.8rem]",
+      dayOutside: "day-outside text-blue-300 aria-selected:bg-blue-50/80 aria-selected:text-blue-400",
+      dayDisabled: "text-blue-200 opacity-50",
+      dayRangeMiddle: "aria-selected:bg-blue-50 aria-selected:text-blue-800",
+      cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-blue-50/80 [&:has([aria-selected])]:bg-blue-50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+      captionLabel: "text-sm font-medium text-blue-700",
       navButtonColor: "text-blue-500",
     }
   }

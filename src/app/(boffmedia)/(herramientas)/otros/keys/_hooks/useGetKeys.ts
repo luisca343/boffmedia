@@ -25,7 +25,7 @@ function useGetKeys(): useGetKeysReturnType {
 
   const fetchKeys = useCallback(async () => {
     try {
-      const res = ((await apiGET("/steamkeys")).data) as KeyData[];
+      const res = (await apiGET("/steamkeys")) as any as KeyData[];
       setKeys(res);
     } catch (error) {
       console.error("Failed to fetch keys:", error);

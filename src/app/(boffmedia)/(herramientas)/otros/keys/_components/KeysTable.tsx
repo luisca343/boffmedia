@@ -1,19 +1,12 @@
 "use client";
 
 import { useState, Suspense, lazy } from "react";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { motion, AnimatePresence } from "framer-motion";
-import { Gift, Key, ExternalLink } from "lucide-react";
 import useGetKeys from "../_hooks/useGetKeys";
 import useFetchSteamData from "../_hooks/useFetchSteamData";
+import { KeysHeader } from "./KeysHeader";
+import { KeysControls } from "./KeysControls";
+import { KeysDataTable } from "./KeysDataTable";
+
 const SteamDialog = lazy(() => import("./SteamDialog"));
 
 export default function KeysTable() {
@@ -22,13 +15,19 @@ export default function KeysTable() {
   const [showClaimed, setShowClaimed] = useState<boolean>(false);
   const { selectedGame, isModalVisible, setIsModalVisible, fetchGameData } = useFetchSteamData();
 
-  if (!filteredKeys) return <div>Loading...</div>;
+  if (!filteredKeys) return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex flex-col items-center gap-2">
+        <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"></div>
+        <p className="text-surface-300">Cargando claves...</p>
+      </div>
+    </div>
+  );
 
   const displayedKeys = showClaimed
     ? filteredKeys
     : filteredKeys.filter((key) => key.claimed !== "s");
 
-  // Aggregate keys by game name and activation state
   const aggregatedKeys = displayedKeys.reduce((acc: { [key: string]: any }, key) => {
     const keyIdentifier = `${key.name}-${key.claimed}`;
     if (!acc[keyIdentifier]) {
@@ -42,129 +41,29 @@ export default function KeysTable() {
   const aggregatedKeysArray = Object.values(aggregatedKeys);
 
   return (
-    <div className="min-h-screen text-surface-100 p-8">
-      <div className="max-w-4xl mx-auto">
-        <motion.h1
-          className="text-5xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-600 flex items-center justify-center gap-4"
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          Claves de Steam
-        </motion.h1>
-        <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <Input
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            placeholder="Buscar claves..."
-            className="mb-6 bg-surface-800 border-surface-700 text-surface-100 placeholder-surface-400 focus:ring-primary-400 focus:border-primary-400"
-          />
-        </motion.div>
-        <motion.div
-          className="flex items-center justify-between mb-6"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={showClaimed}
-                onChange={() => setShowClaimed(!showClaimed)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-surface-600 rounded-full transition peer-checked:bg-primary-400 peer-focus:ring-4 peer-focus:ring-primary-400/25"></div>
-              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-5 peer-checked:bg-surface-900"></div>
-            </div>
-            <span className="text-lg font-medium text-primary-300 group-hover:text-primary-400 transition">
-              Mostrar reclamados
-            </span>
-          </label>
-        </motion.div>
-        <motion.div
-          className="bg-surface-700 rounded-lg shadow-lg overflow-hidden border border-surface-600"
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-surface-900">
-                <TableHead className="text-primary-400">#</TableHead>
-                <TableHead className="text-primary-400">Image</TableHead>
-                <TableHead className="text-primary-400">Juego</TableHead>
-                <TableHead className="text-primary-400">Bundle</TableHead>
-                <TableHead className="text-primary-400">Estado</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <AnimatePresence>
-                {aggregatedKeysArray.map((key, index) => (
-                  <motion.tr
-                    key={`${key.name}-${key.claimed}`}
-                    className="hover:bg-surface-700 transition-colors duration-200 cursor-pointer"
-                    onMouseEnter={() => setHoveredRow(key.name)}
-                    onMouseLeave={() => setHoveredRow(null)}
-                    onClick={() => fetchGameData(key.steamID)}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <TableCell className="font-medium text-surface-300">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell>
-                      <img
-                        src={key.imageUrl}
-                        alt={`Imagen de ${key.name}`}
-                        className="w-10 h-10 object-cover rounded-lg"
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      <div className="flex items-center gap-2">
-                        <Gift className="w-5 h-5 text-primary-400" />
-                        <span className="flex items-center gap-1 text-surface-100">
-                          {key.name} {key.count > 1 && `x${key.count}`}
-                        </span>
-                        <a
-                          href={`https://store.steampowered.com/app/${key.steamID}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-primary-400 hover:text-primary-300"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-surface-300">{key.source}</TableCell>
-                    <TableCell>
-                      <motion.div
-                        className={`flex items-center gap-2 px-3 py-1 rounded-full text-black ${
-                          key.claimed === "s" ? "bg-red-500" : "bg-green-500"
-                        }`}
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <Key className="w-4 h-4" />
-                        {key.claimed === "s" ? "Reclamado" : "Disponible"}
-                      </motion.div>
-                    </TableCell>
-                  </motion.tr>
-                ))}
-              </AnimatePresence>
-            </TableBody>
-          </Table>
-        </motion.div>
+    <div className="min-h-screen text-surface-100 px-4 py-8 md:p-8">
+      <div className="max-w-5xl mx-auto">
+        <KeysHeader />
+        
+        <KeysControls 
+          filter={filter}
+          setFilter={setFilter}
+          showClaimed={showClaimed}
+          setShowClaimed={setShowClaimed}
+          availableCount={filteredKeys.filter(k => k.claimed !== "s").length}
+          claimedCount={filteredKeys.filter(k => k.claimed === "s").length}
+          totalCount={filteredKeys.length}
+        />
+
+        <KeysDataTable 
+          keys={aggregatedKeysArray}
+          hoveredRow={hoveredRow}
+          setHoveredRow={setHoveredRow}
+          fetchGameData={fetchGameData}
+        />
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<div className="fixed inset-0 bg-surface-900/70 flex items-center justify-center">Cargando...</div>}>
         <SteamDialog
           isModalVisible={isModalVisible}
           setIsModalVisible={setIsModalVisible}
