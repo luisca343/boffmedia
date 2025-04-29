@@ -19,7 +19,6 @@ export function BattlePreviewAvatar({
   const avatarId = player?.avatar || 'unknown';
   const uuid = player.name.includes('player:') ? player.name.split(':')[1] : null;
   const avatar = player.name.includes('npc:') ? player.name.split(':')[1] : Sprites.getAvatar(avatarId);
-  const avatarNumber = parseInt(avatarId);
 
   // Size mappings for responsive design
   const sizeMap = {
@@ -46,7 +45,7 @@ export function BattlePreviewAvatar({
   const minecraftSkinClasses = "w-full h-full object-contain";
   
   // Avatar image styles
-  const avatarImageClasses = "w-full h-full object-contain";
+  const avatarImageClasses = `w-full h-full object-contain`;
 
   // NPC styles
   const npcClasses = "w-full h-full object-contain";
@@ -62,7 +61,7 @@ export function BattlePreviewAvatar({
             src={`https://crafatar.com/renders/body/${uuid}`}
           />
         </div>
-      ) : avatarNumber >= 0 ? (
+      ) : !player.name.includes('npc:') ? (
         // Standard avatar image
         <div className="relative w-full h-full" style={{ transform: selectedSize.transform }}>
           <img
