@@ -12,36 +12,43 @@ type PokemonElementProps = {
     pokemon: Pokemon;
     side: Side;
     position: string;
+    showFullInfo?: boolean; // Single prop for showing full info (replays or special views)
 };
-
 
 export type PokemonRefType = {
     bounce: () => void;
     moveTo: (xTo: number, yYo: number) => void;
 }
-
     
-    export const PokemonElement = forwardRef(({ battle, pokemon, side, position }: PokemonElementProps, ref: any) => {
-        const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
-        return (
-            <animated.div
-                id={position}
-                className="absolute"
-                style={{
-                    left:  getOffset(battle, position, getScaleMultiplier()).left,
-                    top: getOffset(battle, position, getScaleMultiplier()).top,
-                    width: getImageSize(),
-                    height: getImageSize(),
-                    zIndex: 100,
-                }}
-            >
+export const PokemonElement = forwardRef(({ 
+    battle, 
+    pokemon, 
+    side, 
+    position,
+    showFullInfo = false
+}: PokemonElementProps, ref: any) => {
+    const sideId = side.n % 2 === 0 ? 'p1' : 'p2';
+    return (
+        <animated.div
+            id={position}
+            className="absolute"
+            style={{
+                left: getOffset(battle, position, getScaleMultiplier()).left,
+                top: getOffset(battle, position, getScaleMultiplier()).top,
+                width: getImageSize(),
+                height: getImageSize(),
+            }}
+        >
             <div className="w-full h-full relative">
-                <PokemonDetail pokemon={pokemon} >
+                <PokemonDetail 
+                    pokemon={pokemon} 
+                    showFullInfo={showFullInfo}
+                >
                     <PokemonImage id={`${position}-pkm`} side={sideId} pokemon={pokemon} />
                 </PokemonDetail>
             </div>
-            </animated.div>
-        );
-    });
+        </animated.div>
+    );
+});
     
-    PokemonElement.displayName = "PokemonElement";
+PokemonElement.displayName = "PokemonElement";

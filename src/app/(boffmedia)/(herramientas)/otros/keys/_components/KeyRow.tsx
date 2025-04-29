@@ -28,7 +28,7 @@ export const KeyRow = ({
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0 }}
-    transition={{ duration: 0.3, delay: index * 0.05 }}
+    transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.5) }}
   >
     <TableCell className="font-medium text-surface-400 py-3 px-4">
       {index + 1}
@@ -83,7 +83,7 @@ export const KeyRow = ({
         </div>
       )}
     </TableCell>
-    <TableCell className="text-surface-300 py-3 px-4">{key.source}</TableCell>
+    {/*<TableCell className="text-surface-300 py-3 px-4">{key.source}</TableCell>*/}
     <TableCell className="py-3 px-4">
       <motion.div
         className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-full  ${

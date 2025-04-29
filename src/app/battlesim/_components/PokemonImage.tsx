@@ -53,7 +53,6 @@ export function PokemonImage(
                 position: 'absolute',
                 bottom: '0px', // Position at the bottom
                 filter: 'brightness(0) blur(5px)', // Black color and blur for shadow effect
-                zIndex: 0,
                 transform: `
                         scaleY(-.75)
                         translateY(-${ h * 1.1}px)
@@ -70,13 +69,11 @@ export function PokemonImage(
             </div>
             <div className="pokemon-container" style={{
                 position: 'absolute',
-                zIndex: 100
             }}>
                 <img
                     className={className} src={url} width={w} height={h}
                     style={{
                         imageRendering: 'pixelated',
-                        zIndex: z
                     }}
                     alt={pokemon.speciesForme}
                 />

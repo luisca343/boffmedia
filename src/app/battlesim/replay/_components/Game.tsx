@@ -139,6 +139,7 @@ export function Game({battleName = 'medalla_doku', replayData}: {battleName?: st
         setIsPlaying={setIsPlaying}
         currentAction={currentAction}
         battleLog={battleLog}
+        showFullInfo={false}
       />
 
       <ReplayControls 

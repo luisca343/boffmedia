@@ -45,7 +45,7 @@ export const KeysDataTable = ({
             <TableHead className="text-blue-400 font-medium w-[60px]">#</TableHead>
             <TableHead className="text-blue-400 font-medium w-[80px]">Imagen</TableHead>
             <TableHead className="text-blue-400 font-medium">Juego</TableHead>
-            <TableHead className="text-blue-400 font-medium">Bundle</TableHead>
+            {/*<TableHead className="text-blue-400 font-medium">Bundle</TableHead>*/}
             <TableHead className="text-blue-400 font-medium w-[120px]">Estado</TableHead>
           </TableRow>
         </TableHeader>

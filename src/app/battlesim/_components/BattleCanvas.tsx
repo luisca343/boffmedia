@@ -35,9 +35,27 @@ function getParticipantName(name:string){
     return name;
 }
 
-export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOverlay, setBattleStarted, setIsPlaying, currentAction, battleLog }: 
-        { battle: Battle, pov: 0 | 1 | any, messageBar?: string[], showPreviewOverlay: boolean, setBattleStarted: (started: boolean) => void, setIsPlaying: (playing: boolean) => void, currentAction: number, battleLog: string | null
-         }, ref: React.Ref<BattleCanvasRefProps>) => {
+export const BattleCanvas = forwardRef(({ 
+    battle, 
+    pov, 
+    messageBar, 
+    showPreviewOverlay, 
+    setBattleStarted, 
+    setIsPlaying, 
+    currentAction, 
+    battleLog,
+    showFullInfo = false // Single prop for full info display mode
+}: { 
+    battle: Battle, 
+    pov: 0 | 1 | any, 
+    messageBar?: string[], 
+    showPreviewOverlay: boolean, 
+    setBattleStarted: (started: boolean) => void, 
+    setIsPlaying: (playing: boolean) => void, 
+    currentAction: number, 
+    battleLog: string | null,
+    showFullInfo?: boolean // For replays or debug modes
+}, ref: React.Ref<BattleCanvasRefProps>) => {
     const pokemonRefs = useRef<{ [key: string]: PokemonRefType }>({});
     const [, canvasWidth] = useViewportWidth();
 
@@ -131,14 +149,15 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOv
                 ref={(el: PokemonRefType | null) => { if (el) pokemonRefs.current[position] = el; }}
                 side={battle.p1}
                 position={position}
-                />
-            ))}
+                showFullInfo={showFullInfo}
+            />
+        ))}
 
             {Object.entries(battle.p1.sideConditions).map((entry) => {
                 return <Hazard key={entry[0]} hazard={entry} side="p1" />
             })}
 
-            {positionsP2.map((position, index) => (
+        {positionsP2.map((position, index) => (
                 <PokemonElement
                     key={position}
                     battle={battle}
@@ -146,6 +165,7 @@ export const BattleCanvas = forwardRef(({ battle, pov, messageBar, showPreviewOv
                     ref={(el: PokemonRefType | null) => { if (el) pokemonRefs.current[position] = el; }}
                     side={battle.p2}
                     position={position}
+                    showFullInfo={showFullInfo}
                 />
             ))}
             <div id='overlay' className="absolute w-full h-full pointer-events-none">

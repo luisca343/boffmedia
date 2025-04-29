@@ -19,7 +19,6 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
         <div className={`flex flex-col mx-2 px-1 justify-around  rounded-md overflow-hidden bg-surface-800  bg-opacity-90 h-18  ${className}`}
             style={{
                 fontSize: `${ 11 *getScaleMultiplier()}px`,
-                zIndex: 40
             }}
         >
             <div className="flex items-center">

@@ -164,7 +164,6 @@ export class PokemonSprite {
     this.element.style.transform = 'none';
     this.element.style.opacity = '1';
     this.element.style.borderColor = 'white';
-    this.element.style.zIndex = '1';
   }
   
   /**
