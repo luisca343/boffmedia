@@ -1,6 +1,6 @@
 import { SmartRotomReplay, SmartRotomUserAchievement, SmartRotomUserReplay, smartRotomAchievements, smartRotomReplays, smartRotomUserAchievements, smartRotomUserReplays } from '@/_db/schema/SmartRotom';
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, asc, sql } from 'drizzle-orm';
+import { and, eq, asc, sql, desc } from 'drizzle-orm';
 import { BattleAchievementDto } from '../_dto/battle-achievement-dto';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
@@ -177,4 +177,33 @@ export class AchievementService {
       } as SmartRotomUserAchievement)
       .execute();
   }
+
+  
+  
+    async getReplay(uuid: string, replayId: number) {
+      const replay = await this.db
+        .select({
+          id: smartRotomReplays.id,
+          team1: smartRotomReplays.team1,
+          team2: smartRotomReplays.team2,
+          replay: smartRotomReplays.replay,
+          winner: smartRotomReplays.winner,
+          side1: smartRotomReplays.side1,
+          side2: smartRotomReplays.side2,
+          date: smartRotomReplays.createdAt,
+        })
+        .from(smartRotomReplays)
+        .leftJoin(
+          smartRotomUserReplays,
+          and(
+            eq(smartRotomUserReplays.replayId, smartRotomReplays.id),
+            eq(smartRotomUserReplays.uuid, uuid),
+          ))
+        .where(
+          eq(smartRotomReplays.id, replayId),
+        )
+        
+        return replay.length > 0 ? replay[0] : null;
+      }
+  
 }

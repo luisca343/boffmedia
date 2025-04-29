@@ -62,5 +62,23 @@ export class AchievementController {
       this.responseService.handleError(action, error, battleAchievement);
     }
   }
+
+  
+
+  @Get('replays/:uuid/:replayId')
+  @ApiOperation({ summary: 'Get replay for a player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Replay retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve replay.' })
+  async getReplay(@Param('uuid') uuid: string, @Param('replayId') replayId: number) {
+    const action = 'get replay';
+    try {
+      this.responseService.logRequest(action, { uuid, replayId });
+      const replay = await this.achievementService.getReplay(uuid, replayId);
+      this.responseService.logSuccess(action, replay);
+      return this.responseService.createSuccessResponse('Replay retrieved successfully', replay);
+    } catch (error) {
+      this.responseService.handleError(action, error, { uuid, replayId });
+    }
+  }
 }
 

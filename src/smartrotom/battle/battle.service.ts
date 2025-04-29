@@ -36,6 +36,7 @@ export class BattleService {
       .where(eq(smartRotomUserReplays.uuid, uuid))
       .orderBy(desc(smartRotomReplays.id));
   }
+      
 
   async getBattleConfig(npcConfigName: string) {
     const dir = path.join(
