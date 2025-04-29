@@ -68,6 +68,7 @@ export class PokemonData {
         ) as Pokemon;
         defaultCounter++;
       }
+      if (data.dex === 0) continue;
 
       this.pokemonList.push(file.split('.')[0].split('_')[1]);
       this.species.push(data);

@@ -51,6 +51,7 @@ export class PokemonDataService extends BaseDataService {
   }
 
   private processSpecies(data: Pokemon) {
+    if (!data.dex) return;
     this.species.push(data);
     this.speciesByDex[data.dex] = data;
     this.speciesByName[data.name.toLowerCase()] = data;
