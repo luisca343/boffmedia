@@ -144,6 +144,7 @@ export class AppService {
     const media = [...trailers, ...screenshots] as (Video | Image)[];
 
     const data = {
+      steamID,
       name: gameData.name,
       normalPrice: initialFormatted,
       currentPrice: finalFormatted,
