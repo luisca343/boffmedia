@@ -115,7 +115,7 @@ export const EnhancedBattlePreview = ({
             className={`flex flex-col items-center transition-all duration-700 delay-400 
               ${isLoaded ? "opacity-100 transform-none" : "opacity-0 translate-y-10"}`}
           >
-            <BattlePreviewAvatar side={p2} pov={pov === 0 ? 1 : 0} size="large" 
+            <BattlePreviewAvatar side={p2} pov={pov} size="large" 
               className={`drop-shadow-2xl transition-transform duration-300 ${isHovering ? 'scale-105' : ''}`} />
             <div className="mt-3 bg-black bg-opacity-60 px-4 py-1 rounded-full backdrop-blur-sm">
               <p className="text-white font-bold text-lg">{p2Name}</p>

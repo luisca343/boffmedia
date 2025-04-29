@@ -14,66 +14,91 @@ export function BattlePreviewAvatar({
   className?: string,
   size?: "small" | "medium" | "large"
 }) {
-  const povCentered = pov === side.n;
+  
+  const povCentered = pov === 0;
   const player = side;
   const avatarId = player?.avatar || 'unknown';
   const uuid = player.name.includes('player:') ? player.name.split(':')[1] : null;
   const avatar = player.name.includes('npc:') ? player.name.split(':')[1] : Sprites.getAvatar(avatarId);
 
-  // Size mappings for responsive design
+  // Size mappings converted to dimensions rather than classes
   const sizeMap = {
     small: {
-      container: "w-20 h-20",
-      transform: povCentered ? "scale(1.2) scaleX(-1)" : "scale(0.8)"
+      width: 80,
+      height: 80,
+      scale: povCentered ? 1.2 : 0.8,
     },
     medium: {
-      container: "w-28 h-28 md:w-32 md:h-32",
-      transform: povCentered ? "scale(1.5) scaleX(-1)" : "scale(1)"
+      width: 128,
+      height: 128,
+      scale: povCentered ? 1.5 : 1,
     },
     large: {
-      container: "w-36 h-36 md:w-40 md:h-40 lg:w-48 lg:h-48",
-      transform: povCentered ? "scale(2) scaleX(-1)" : "scale(1.2)"
+      width: 192,
+      height: 192,
+      scale: 2,
     }
   };
 
   const selectedSize = sizeMap[size];
 
-  // Common container styles
-  const containerClasses = `relative ${selectedSize.container} ${className}`;
+  // Container style - common for all avatar types
+  const containerStyles: React.CSSProperties = {
+    position: 'relative',
+    width: selectedSize.width,
+    height: selectedSize.height,
+    margin: '0 auto'
+  };
 
-  // Minecraft skin styles
-  const minecraftSkinClasses = "w-full h-full object-contain";
+  // Minecraft skin style
+  const minecraftSkinStyles: React.CSSProperties = {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    transform: `scale(${selectedSize.scale}) scaleX(${povCentered ? 1 : -1})`,
+    objectFit: 'contain'
+  };
   
-  // Avatar image styles
-  const avatarImageClasses = `w-full h-full object-contain`;
+  // Standard avatar style
+  const avatarImageStyles: React.CSSProperties = {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    transform: `scale(${selectedSize.scale}) scaleX(${povCentered ? -1 : 1})`,
+    objectFit: 'contain',
+    imageRendering: 'pixelated'
+  };
 
-  // NPC styles
-  const npcClasses = "w-full h-full object-contain";
+  // NPC style
+  const npcStyles: React.CSSProperties = {
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    transform: `scale(${selectedSize.scale}) scaleX(${povCentered ? -1 : 1}) translateY(-${selectedSize.height / 5}px)`,
+    objectFit: 'contain'
+  };
 
   return (
-    <div className={containerClasses}>
+    <div className={className} style={containerStyles}>
       {uuid !== null ? (
         // Minecraft skin for player
-        <div className="relative w-full h-full" style={{ transform: selectedSize.transform }}>
+        <div style={minecraftSkinStyles}>
           <img
-            className={minecraftSkinClasses}
+            style={{width: '100%', height: '100%', objectFit: 'contain'}}
             alt={`${player.name} avatar`}
             src={`https://crafatar.com/renders/body/${uuid}`}
           />
         </div>
       ) : !player.name.includes('npc:') ? (
         // Standard avatar image
-        <div className="relative w-full h-full" style={{ transform: selectedSize.transform }}>
-          <img
-            className={avatarImageClasses}
-            src={avatar || "/placeholder.svg"}
-            alt={`${player.name} avatar`}
-            style={{ imageRendering: 'pixelated' }}
-          />
-        </div>
+        <img
+          style={avatarImageStyles}
+          src={avatar || "/placeholder.svg"}
+          alt={`${player.name} avatar`}
+        />
       ) : (
         // NPC skin
-        <div className="relative w-full h-full" style={{ transform: selectedSize.transform }}>
+        <div style={npcStyles}>
           <NpcSkin
             npcName={avatar}
           />
