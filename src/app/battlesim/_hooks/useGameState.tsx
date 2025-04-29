@@ -78,7 +78,6 @@ export function useGameState(replayData?: ReplayData) {
     
     // Initialize battle data
     useEffect(() => {
-        
         if(replayData) {
             setBattleLog(replayData.replay);
             loadScene();

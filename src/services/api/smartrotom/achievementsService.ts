@@ -20,11 +20,9 @@ export interface Achievement {
 
 export const achievementService = {
   getAchievementForPlayer: (uuid: string, achievementId: string) =>
-    rotomGET<Achievement>(`/achievements/${uuid}/${achievementId}`),
-
+  rotomGET<Achievement>(`/achievements/${uuid}/${achievementId}`),
   getAchievements: (uuid: string) => rotomPOST<Achievement[]>("/achievements", { uuid }),
-
-  addBattleAchievement: (battleAchievement: BattleAchievementDto) =>
-    rotomPOST<SuccessResponse>("/achievements/battle", battleAchievement),
+  addBattleAchievement: (battleAchievement: BattleAchievementDto) => rotomPOST<SuccessResponse>("/achievements/battle", battleAchievement),
+  getReplay: (uuid: string, replayId: number) => rotomGET<ApiResponse>(`/achievements/replays/${uuid}/${replayId}`),
 }
 

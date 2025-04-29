@@ -4,14 +4,15 @@ import { Protocol } from "@pkmn/protocol";
 import { Dex } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
 import { Game } from './_components/Game';
+import { achievementService } from '@/services/api/smartrotom/achievementsService';
 
 const battle = new Battle(new Generations(Dex as any)); // Use const if battle is not reassigned
 
-export default function Test(): JSX.Element { // Explicitly type the return value
-
+export default async function Test() { // Explicitly type the return value
+  const replayData = (await achievementService.getReplay("67d9b543-5ac9-41e1-a8a5-20d7689e24a4", 58)).data as any
   return (
     <section className="flex flex-col">
-      <Game/>
+      <Game replayData={replayData} />
     </section>
   );
 }
