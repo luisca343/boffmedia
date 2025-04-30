@@ -21,8 +21,8 @@ export const BattleEndScreen = ({ battle, pov, onRestart }: {
   const p1 = pov === 0 ? battle.p1 : battle.p2;
   const p2 = pov === 0 ? battle.p2 : battle.p1;
   
-  const p1Name = getParticipantName(p1.id).trim();
-  const p2Name = getParticipantName(p2.id).trim();
+  const p1Name = getParticipantName(p1.name)
+  const p2Name = getParticipantName(p2.name)
   
   let winner: string;
   let resultText: string;
