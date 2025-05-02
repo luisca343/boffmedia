@@ -1,8 +1,10 @@
 import type { SmartRotomAchievement } from "../_types/Achievement"
 import { parseDate } from "@/lib/utils"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Game } from "@/app/battlesim/replay/_components/Game"
 import ActiveTeam from "./ActiveTeam"
+import { achievementService } from "@/services/api/smartrotom/achievementsService"
+import { useEffect, useState } from "react"
 
 interface BadgePageProps {
   achievement: SmartRotomAchievement
@@ -10,6 +12,22 @@ interface BadgePageProps {
 }
 
 export function BadgePage({ achievement, team }: BadgePageProps) {
+  const [replayData, setReplayData] = useState<any>(null)
+
+  useEffect(() => {
+    const fetchReplayData = async () => {
+      try {
+        const response = await achievementService.getReplay(achievement.uuid, achievement.battleId)
+        setReplayData(response.data)
+      } catch (error) {
+        console.error("Error fetching replay data:", error)
+      }
+    }
+
+    fetchReplayData()
+  }, [achievement.uuid, achievement.battleId])
+
+
   return (
     <div className="flex flex-col h-full font-vinque">
       <div className="flex justify-between items-end border-b border-black/20 pb-4 mt-2">
@@ -29,12 +47,14 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
         <div className="flex items-center gap-4 text-sm">
           <span className="font-medium">Obtenida: {parseDate(achievement.completedAt)}</span>
           {achievement.replay && (
-            <Popover>
-              <PopoverTrigger className="text-sm hover:text-primary transition-colors">Ver Repetición</PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Game/>
-              </PopoverContent>
-            </Popover>
+            <Dialog>
+              <DialogTrigger className="text-sm hover:text-primary transition-colors">
+                Ver Repetición
+              </DialogTrigger>
+              <DialogContent className="max-w-4xl p-0 flex items-center justify-center">
+                <Game replayData={replayData}/>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
       </div>
@@ -47,4 +67,3 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
     </div>
   )
 }
-

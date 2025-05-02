@@ -1,5 +1,6 @@
 export interface SmartRotomAchievement {
     id: string;
+    battleId: number;
     name: string;
     description: string;
     icon: string;
