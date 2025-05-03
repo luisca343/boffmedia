@@ -7,22 +7,24 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
   const t = useTranslations("pokedex")
 
   return (
-    <div className={`font-vinque flex flex-col justify-around space-y-4 h-[90%] w-full ${className}`}>
+    <div className={`font-vinque flex flex-col justify-around h-[90%] w-full ${className}`}>
       {team?.map((pokemon, index) => {
         if (!pokemon) return <div className="w-32" key={index}></div>
         return (
-          <div key={index} className="flex items-center min-h-[100px] w-full">
+          <div key={index} className="flex items-center min-h-[100px] w-full border-b border-gray-500/30 pb-2">
             {/* Pokemon Sprite and Basic Info */}
             <div className="w-[20%] flex flex-col items-center space-y-1">
-              <PokemonSprite
-                showStatus={false}
-                width={60}
-                height={60}
-                id={pokemon.dex}
-                form={pokemon.form || "base"}
-                palette={pokemon.palette || "none"}
-              />
-              <span className="text-xs font-medium text-center">
+              <div className="bg-stone-200/50 rounded-full p-1 border border-gray-400/30">
+                <PokemonSprite
+                  showStatus={false}
+                  width={60}
+                  height={60}
+                  id={pokemon.dex}
+                  form={pokemon.form || "base"}
+                  palette={pokemon.palette || "none"}
+                />
+              </div>
+              <span className="text-xs font-medium text-center mt-1">
                 {pokemon.name.toLowerCase().replace(" ", "") !== pokemon.species.toLowerCase().replace(" ", "") 
                   ? pokemon.name 
                   : t(`pixelmon_${pokemon.species.toLowerCase().replace(" ", "_")}`)} Nv. {pokemon.level} 
@@ -32,7 +34,7 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
             {/* Ability and Item */}
             <div className="w-[20%] px-4 border-l border-dashed border-gray-600/50 min-h-[80px] flex flex-col justify-center">
               <div className="space-y-2 text-sm">
-                <p className="font-medium">{t(`ability_${pokemon.ability.replace(" ", "")}`)}</p>
+                <p className="font-bold">{t(`ability_${pokemon.ability.replace(" ", "")}`)}</p>
                 {pokemon.item !== "item.minecraft.air" && <p className="text-gray-700">{pokemon.item}</p>}
               </div>
             </div>
@@ -51,34 +53,34 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
             {/* Stats Grid */}
             <div className="w-[40%] px-4 border-l border-dashed border-gray-600/50 min-h-[80px]">
               <div className="w-full text-xs">
-                <div className="grid grid-cols-7 gap-2 mb-1 text-center">
-                  <div className="font-medium">-</div>
-                  <div className="font-medium">PS</div>
-                  <div className="font-medium">At</div>
-                  <div className="font-medium">Def</div>
-                  <div className="font-medium">AtS</div>
-                  <div className="font-medium">DefS</div>
-                  <div className="font-medium">Vel</div>
+                <div className="grid grid-cols-7 gap-2 mb-2 text-center">
+                  <div className="font-bold">-</div>
+                  <div className="font-bold">PS</div>
+                  <div className="font-bold">At</div>
+                  <div className="font-bold">Def</div>
+                  <div className="font-bold">AtS</div>
+                  <div className="font-bold">DefS</div>
+                  <div className="font-bold">Vel</div>
                 </div>
 
-                <div className="grid grid-cols-7 gap-2 mb-1 text-center">
-                  <div className="font-medium">Stats</div>
+                <div className="grid grid-cols-7 gap-2 mb-2 text-center">
+                  <div className="font-bold">Stats</div>
                   {pokemon.stats.map((stat, idx) => (
-                    <div key={idx} className="font-medium">
+                    <div key={idx} className="font-bold">
                       {stat}
                     </div>
                   ))}
                 </div>
 
-                <div className="grid grid-cols-7 gap-2 mb-1 text-center">
-                  <div className="font-medium">IVs</div>
+                <div className="grid grid-cols-7 gap-2 mb-2 text-center">
+                  <div className="font-bold">IVs</div>
                   {pokemon.ivs.map((iv, idx) => (
                     <div key={idx}>{iv}</div>
                   ))}
                 </div>
 
                 <div className="grid grid-cols-7 gap-2 text-center">
-                  <div className="font-medium">EVs</div>
+                  <div className="font-bold">EVs</div>
                   {pokemon.evs.map((ev, idx) => (
                     <div key={idx}>{ev}</div>
                   ))}
@@ -91,4 +93,3 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
     </div>
   )
 }
-

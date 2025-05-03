@@ -7,7 +7,11 @@ export function IndexPage({ book, badgePage, achievements, obtainedBadges }: { b
         <BookLink book={book} page={1}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">1. Índice</BookLink>
         <BookLink book={book} page={2}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">2. Datos Jugador</BookLink>
         <BookLink book={book} page={3}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">3. Equipo Actual</BookLink>
-        <BookLink book={book} page={badgePage}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">4. Medallas</BookLink>
+        <div className="flex gap-4">
+            <BookLink book={book} page={badgePage++}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">4. Medallas</BookLink>
+            <BookLink book={book} page={badgePage++}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">5. Gimnasios</BookLink>
+            <BookLink book={book} page={badgePage}  className="text-2xl hover:text-gray-700 transition-colors duration-200 font-medieval block">6. Competiciones</BookLink>
+        </div>
         <div className="ml-6 flex flex-wrap">
         {
             achievements && achievements.map((achievement: any, index: number)=>{

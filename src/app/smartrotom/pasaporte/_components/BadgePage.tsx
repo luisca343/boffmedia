@@ -31,9 +31,9 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
   return (
     <div className="flex flex-col h-full font-vinque">
       <div className="flex justify-between items-end border-b border-black/20 pb-4 mt-2">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 ">
           <div className="relative">
-            <div className="w-12 h-12 2xl:w-16 2xl:h-16 relative">
+            <div className="w-12 h-12 2xl:w-16 2xl:h-16 ml-4 mt-2 relative">
               <img
                 src={`https://api.boffmedia.es/smartrotom/img/logros/${achievement.icon}.webp`}
                 alt={achievement.name}
@@ -41,14 +41,14 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
               />
             </div>
           </div>
-          <h2 className="text-3xl font-bold self-end tracking-tight">{achievement.name}</h2>
+          <h2 className="text-2xl 2xl:text-4xl font-bold 2xl:m-2 font-vinque underline pt-4">{achievement.name}</h2>
         </div>
 
         <div className="flex items-center gap-4 text-sm">
           <span className="font-medium">Obtenida: {parseDate(achievement.completedAt)}</span>
           {achievement.replay && (
             <Dialog>
-              <DialogTrigger className="text-sm hover:text-primary transition-colors">
+              <DialogTrigger className="text-sm hover:text-primary-500 transition-colors">
                 Ver Repetición
               </DialogTrigger>
               <DialogContent className="max-w-4xl p-0 flex items-center justify-center">
@@ -60,9 +60,7 @@ export function BadgePage({ achievement, team }: BadgePageProps) {
       </div>
 
       <div className="flex-1 relative">
-        <div className="relative z-10">
-          <ActiveTeam team={team} className="h-[95%]" />
-        </div>
+        <ActiveTeam team={team} className="h-[95%]" />
       </div>
     </div>
   )

@@ -50,9 +50,23 @@ export default function Pasaporte(){
               <PageTitle title="Equipo Actual"/>
               {playerTeam && <ActiveTeam team={playerTeam} />}
             </Page>
-            <Page book={book} number={page++} >
-              <PageTitle title="Medallas"/>
-              <Badges book={book} achievementData={achievements}></Badges>
+            <Page book={book} number={page++}>
+              <PageTitle title="Medallas - Resumen" />
+              <div className="p-4 font-vinque">
+                {achievements && <Badges book={book} achievementData={achievements} pageType={0} />}
+              </div>
+            </Page>
+            <Page book={book} number={page++}>
+              <PageTitle title="Medallas - Circuitos Regionales" />
+              <div className="p-4 font-vinque">
+                {achievements && <Badges book={book} achievementData={achievements} pageType={1} />}
+              </div>
+            </Page>
+            <Page book={book} number={page++}>
+              <PageTitle title="Medallas - Competiciones" />
+              <div className="p-4 font-vinque">
+                {achievements && <Badges book={book} achievementData={achievements} pageType={2} />}
+              </div>
             </Page>
             {
               achievements &&

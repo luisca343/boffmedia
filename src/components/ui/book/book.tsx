@@ -111,6 +111,7 @@ export function BookLink({children, book, page, className}: {children: React.Rea
 
 
 export function turnPage(book: any, page: number, e: any){
+  console.log(`Turning page to ${page}`)
   book.flip(page)
   e.preventDefault()
   e.stopPropagation()
@@ -118,5 +119,5 @@ export function turnPage(book: any, page: number, e: any){
 
 
 export function PageTitle({title, children}: {title: string, children?: React.ReactNode}){
-  return <div className="text-2xl 2xl:text-4xl font-bold 2xl:m-2 font-vinque underline">{title}</div>
+  return <div className="text-2xl 2xl:text-4xl font-bold 2xl:m-2 font-vinque underline pl-4 pt-2">{title}</div>
 }
