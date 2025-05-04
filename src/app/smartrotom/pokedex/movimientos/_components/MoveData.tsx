@@ -1,22 +1,16 @@
 "use client"
-import { useEffect, useState } from "react";
 import TypeBadge from "../../entrada/[[...params]]/_components/TypeBadge";
-import { MoveData, MoveEffect } from "./MoveEffect";
-import { rotomGET } from "@/services/boffAPI";
+import { MoveEffect } from "./MoveEffect";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
+import { useGetMove } from "@/hooks/pokemon/useGetMove";
 
 export default function MoveDataElement({id} : {id: string}){
     const t  = useTranslations("pokedex");
-    const [move, setMove] = useState() as [MoveData, any]
+    const { move } = useGetMove(id) 
 
-    useEffect(() => {
-        rotomGET(`/pokemon/move/${id}`)
-            .then((res) => {
-                setMove(res.data)
-            })
-    }, [id])
+
 
     if(!move) return <div>Loading...</div>
     return(

@@ -3,12 +3,12 @@
 import { useState, useEffect } from "react"
 import { strToDate } from "@/lib/utils"
 import { useGetDocuments } from "../_hooks/useGetDocuments"
-import { useGetDocument } from "../_hooks/useGetDocumentDeprecated"
 import { Button } from "@/components/ui/button"
 import { FileText, PlusCircle } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import dynamic from "next/dynamic"
+import { useGetDocument } from "@/hooks/documents/useGetDocument"
 
 const CustomEditor = dynamic( () => {
     return import( '@/components/editor/TestEditor' );
@@ -18,7 +18,7 @@ const CustomEditor = dynamic( () => {
     const { notes, newNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
     const [searchTerm, setSearchTerm] = useState("")
     const [filteredDocuments, setFilteredDocuments] = useState(notes)
-    const { data: selectedNote } = useGetDocument(selectedNoteId)
+    const { document: selectedNote } = useGetDocument(parseInt(selectedNoteId))
 
     useEffect(() => {
         if(!notes) return

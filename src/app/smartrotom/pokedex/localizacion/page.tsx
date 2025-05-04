@@ -1,11 +1,10 @@
 import { InternalLink } from "@/components/nav/Link"
-import { rotomGET } from "@/services/boffAPI"
+import { pokemonService } from "@/services/api/smartrotom/pokemonService";
 import { getTranslations } from "next-intl/server";
 
 export default async function Biomas(){
     const t  = await getTranslations("pokedex");
-    const biomes = (await rotomGET('/pokemon/biomes')).data as Record<string, number>
-    //<h3>{biome.name} - {biome.amount}</h3>
+    const biomes = await (await pokemonService.getBiomes()).data as Record<string, number>;
     return(
     <div className="bg-surface-800  flex flex-wrap text-surface-100 w-full justify-between p-2">
         {     

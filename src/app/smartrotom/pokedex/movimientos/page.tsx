@@ -1,29 +1,19 @@
 "use client"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { rotomGET } from "@/services/boffAPI";
 import MoveDataElement from "./_components/MoveData";
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useGetAllMoves } from "@/hooks/pokemon/useGetAllMoves";
+import { MoveCount } from "@/services/api/smartrotom/pokemonService";
 
-interface Move {
-    name: string;
-    count: number;
-}
 
 export default function Movimientos() {
-    const [moves, setMoves] = useState<Move[] | null>(null);
+    const { moves } = useGetAllMoves()
     const t  = useTranslations("pokedex");
-
-    useEffect(() => {
-        rotomGET('/pokemon/moves').then((res:any) => {
-            setMoves(res.data);
-        });
-    }, []);
 
     if (!moves) return <div>loading...</div>;
     return (
         <div className="bg-surface-800 flex flex-wrap text-surface-100 w-full justify-between p-2">
-            {moves.map((move: Move) => (
+            {moves.map((move: MoveCount) => (
                 <HoverCard key={move.name}>
                     <HoverCardTrigger 
                         onClick={() => window.location.href = `/smartrotom/pokedex/movimientos/${move.name}`} 

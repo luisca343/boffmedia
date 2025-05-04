@@ -5,9 +5,9 @@ import { Note, NoteBase } from "@/types/documents";
 import { CreateDocumentDtoWithUuid } from "@/types/dto/create-document.dto";
 import { useState } from "react"
 
-export function useGetDocuments(){
+export function useGetDocuments() {
     const { session } = useBoffSession();
-    const {notes, setNotes, refetch } = useGetNotes('67d9b543-5ac9-41e1-a8a5-20d7689e24a4');
+    const {notes, setNotes, refetch } = useGetNotes(session?.user.smartRotomUser?.uuid as string);
     const { createNote } = useCreateNote();
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>("")
 
