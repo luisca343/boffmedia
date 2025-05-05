@@ -7,6 +7,8 @@ export type Registry = {
     paletteId: string
     caughtAt: string
     seenAt: string
+
+    spriteUrl: string
 }
 
 export type PokedexData = {
