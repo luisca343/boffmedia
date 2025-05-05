@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { MoveDataService } from './move-data.service';
-import { Pokemon, PokemonForm } from './interfaces/pokemon.interface';
+import { Pokemon, PokemonForm, SpeciesMoveEntry } from './interfaces/pokemon.interface';
+import * as fs from 'fs';
 import * as path from 'path';
 
 
@@ -33,7 +34,7 @@ export class PokemonDataService extends BaseDataService {
   private speciesByEggGroup: { [key: string]: PokemonForm[] } = {};
   private speciesByAbility: { [key: string]: PokemonForm[] } = {};
   private finalForms: { [key: string]: PokemonForm } = {};
-  private speciesByMove: { [key: string]: { speciesID: number; form: string }[] } = {};
+  private speciesByMove: { [key: string]: SpeciesMoveEntry[] } = {};
   private wordleData: any[] = [];
 
   async loadPokemonData() {
@@ -48,6 +49,8 @@ export class PokemonDataService extends BaseDataService {
     this.sortByDex(this.species);
     this.sortMovesByCount();
     this.logStatistics(startingTime);
+    
+    await this.enrichWithSprites();
   }
 
   private processSpecies(data: Pokemon) {
@@ -286,57 +289,103 @@ export class PokemonDataService extends BaseDataService {
   getEvoTree(id: number) {
     const pkm = this.getSpeciesByDex(id)
     let preEvo = pkm
+    
+    // Find base pre-evolution
     while(preEvo.forms[0].preEvolutions?.length > 0){
         const preEvoName = preEvo.forms[0].preEvolutions[0].toLowerCase()
         preEvo = this.getSpeciesByName(preEvoName)
     }
+    
+    // Get evolution tree with sprites
     const evoTree = this.getEvos(preEvo, 'all')
+    
+    // Recursively add sprite URLs to the entire tree
+    this.addSpritesToEvoTree(evoTree.tree);
+    
     return evoTree
 }
 
+private addSpritesToEvoTree(evoTree: any) {
+  // Process each evolution node in the tree
+  for (const key in evoTree) {
+      const node = evoTree[key];
+      
+      // Skip non-object entries or special properties like "depth"
+      if (!node || typeof node !== 'object' || !node.dex) {
+          continue;
+      }
+      
+      // Extract form name from the key (format is "pokemon_form")
+      const [pokemonName, formName] = key.split('_');
+      
+      // Add sprite URL to the current node
+      node.spriteUrl = this.getSimpleSpriteUrl(node.dex, formName || 'base');
+      
+      // Recursively process child evolutions
+      if (node.evos && Object.keys(node.evos).length > 0) {
+          this.addSpritesToEvoTree(node.evos);
+      }
+  }
+}
+
 getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
-    if(currentForm === '') currentForm = 'base'
-    let index = 0
-    for(const form of pokemon.forms){
-        const formName = form.name || 'base'
-        const pkmId = `${pokemon.name}_${formName}`
-        let currentPokemon = evos[pkmId]
-        if((currentForm !='all' || formName.includes('gmax')) && formName !== currentForm )  continue;
-        
+  if(currentForm === '') currentForm = 'base'
+  let index = 0
+  for(const form of pokemon.forms){
+      const formName = form.name || 'base'
+      const pkmId = `${pokemon.name}_${formName}`
+      let currentPokemon = evos[pkmId]
+      if((currentForm !='all' || formName.includes('gmax')) && formName !== currentForm )  continue;
+      
 
-        if(Object.keys(evos).length === 0 || ! evos.pkm){
-            evos[pkmId] = {pkm: pokemon.name, evos: {}, dex: pokemon.dex, index: form.index + 1}
-            currentPokemon = evos[pkmId]
-        } else {
-            currentPokemon = evos
-        }
+      if(Object.keys(evos).length === 0 || ! evos.pkm){
+          evos[pkmId] = {
+              pkm: pokemon.name, 
+              evos: {}, 
+              dex: pokemon.dex, 
+              index: form.index + 1,
+              // Add sprite URL directly during tree construction
+              spriteUrl: this.getSimpleSpriteUrl(pokemon.dex, formName)
+          }
+          currentPokemon = evos[pkmId]
+      } else {
+          currentPokemon = evos
+      }
 
-        if(!form.evolutions) {
-            continue;
-        }
+      if(!form.evolutions) {
+          continue;
+      }
 
-        for (const evo of form.evolutions){
-            const [evoPokemonName, evoFormName] = this.getFormName(evo.to)
-            const evoId = `${evoPokemonName}_${evoFormName}`
-            if(!currentPokemon.evos) currentPokemon.evos = {}
-            const evoArray = currentPokemon.evos
-            const evoFormIndex = this.getSpeciesByName(evoPokemonName).forms?.findIndex((f) => f.name === evoFormName) > -1 ? this.getSpeciesByName(evoPokemonName).forms?.findIndex((f) => f.name === evoFormName) : 0
-            if(!evoArray[evoId]){
-                evoArray[evoId] = {pkm: evoPokemonName, evos: {}, dex: this.getSpeciesByName(evoPokemonName).dex, index: evoFormIndex + 1}
-            }
-            
-            const thisEvo = evoArray[evoId]
-            if(! evoArray[evoId].methods){
-                evoArray[evoId].methods = []
-            }
-            evoArray[evoId].methods.push(evo)
+      for (const evo of form.evolutions){
+          const [evoPokemonName, evoFormName] = this.getFormName(evo.to)
+          const evoId = `${evoPokemonName}_${evoFormName}`
+          if(!currentPokemon.evos) currentPokemon.evos = {}
+          const evoArray = currentPokemon.evos
+          const evoFormIndex = this.getSpeciesByName(evoPokemonName).forms?.findIndex((f) => f.name === evoFormName) > -1 ? this.getSpeciesByName(evoPokemonName).forms?.findIndex((f) => f.name === evoFormName) : 0
+          if(!evoArray[evoId]){
+              const evoPkmDex = this.getSpeciesByName(evoPokemonName).dex;
+              evoArray[evoId] = {
+                  pkm: evoPokemonName, 
+                  evos: {}, 
+                  dex: evoPkmDex, 
+                  index: evoFormIndex + 1,
+                  // Add sprite URL directly during tree construction
+                  spriteUrl: this.getSimpleSpriteUrl(evoPkmDex, evoFormName)
+              }
+          }
+          
+          const thisEvo = evoArray[evoId]
+          if(! evoArray[evoId].methods){
+              evoArray[evoId].methods = []
+          }
+          evoArray[evoId].methods.push(evo)
 
-            const evoPkm = this.getSpeciesByName(evoPokemonName)
-            let evoEvo = this.getEvos(evoPkm, evoFormName, evoArray[evoId]) as any
-        }
-        index++
-    }
-    return {depth: this.getEvoTreeDepth(evos), tree:evos }
+          const evoPkm = this.getSpeciesByName(evoPokemonName)
+          let evoEvo = this.getEvos(evoPkm, evoFormName, evoArray[evoId]) as any
+      }
+      index++
+  }
+  return {depth: this.getEvoTreeDepth(evos), tree:evos }
 }
 
 getEvoTreeDepth(evos: any, depth = 0){
@@ -362,6 +411,107 @@ getFormName(nombre:string){
   }
 
   return [nombrePkm, forma]
+}
+
+async enrichWithSprites() {
+  console.time('Enriching Pokemon data with sprites');
+  
+  // Add sprites to species objects
+  for (const pokemon of this.species) {
+    // Add base sprite to Pokemon object
+    pokemon.spriteUrl = this.getSimpleSpriteUrl(pokemon.dex);
+    
+    // Add sprites to all forms
+    for (const form of pokemon.forms) {
+      form.spriteUrl = this.getSimpleSpriteUrl(pokemon.dex, form.name);
+      
+      // Add sprites for different palettes
+      form.paletteSprites = {};
+      
+      // Add null check before using Object.values
+      if (form.genderProperties) {
+        for (const genderProps of Object.values(form.genderProperties)) {
+          // Also check if palettes exist
+          if (genderProps && genderProps.palettes) {
+            for (const palette of genderProps.palettes) {
+              if (palette && palette.name) {
+                form.paletteSprites[palette.name] = this.getSimpleSpriteUrl(
+                  pokemon.dex, form.name, palette.name
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Add sprites to the lookup tables
+  Object.values(this.speciesByMove).forEach(pokemonList => {
+    pokemonList.forEach(entry => {
+      entry.spriteUrl = this.getSimpleSpriteUrl(entry.speciesID, entry.form);
+    });
+  });
+  
+  console.timeEnd('Enriching Pokemon data with sprites');
+}
+
+// Sprite calculation method similar to PokemonImageService.getSimpleSprite but without external dependencies
+private getSimpleSpriteUrl(pokemonId: number, formName: string = 'base', paletteName: string = 'none'): string {
+  try {
+    const pokemon = this.getSpeciesByDex(pokemonId);
+    if (!pokemon) {
+      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+    }
+    
+    const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0];
+    
+    // Try to find the image file first (better quality)
+    /*
+    if (paletteName === 'none' || paletteName === 'shiny') {
+      const imageFolder = paletteName === 'shiny' ? 'Front Shiny' : 'Front';
+      const pokemonImageName = formName == "base" ? 
+        pokemon.name.toUpperCase() : 
+        `${pokemon.name.toUpperCase()}_${form.name.toUpperCase()}`;
+      
+      const imagePath = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
+      if (fs.existsSync(imagePath)) {
+        return path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
+      }
+    }*/
+    
+    // Fall back to sprite from resource pack
+    let palette;
+    Object.values(form.genderProperties).forEach((genderProperty) => {
+      genderProperty.palettes.forEach((p) => {
+        if (p.name === paletteName) palette = p;
+      });
+    });
+    
+    if (!palette) {
+      palette = form.genderProperties[0].palettes[0];
+    }
+    
+    // Handle special case for Minior
+    let spriteResource = pokemonId === 774 ? 
+      'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png' : 
+      (palette?.sprite?.resource || palette?.sprite);
+      
+    const url = `assets/pixelmon/textures/${spriteResource.split(':')[1]}`;
+    const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
+    const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
+    
+    if (fs.existsSync(defaultDirDef)) {
+      return path.join('/smartrotom/packs/default_resourcepack', url);
+    }
+    if (fs.existsSync(publicDir)) {
+      return path.join('/smartrotom/packs/resourcepack', url);
+    }
+    
+    return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+  } catch (error) {
+    return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+  }
 }
 
 

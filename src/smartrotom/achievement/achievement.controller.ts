@@ -54,6 +54,7 @@ export class AchievementController {
   async addBattleAchievement(@Body() battleAchievement: BattleAchievementDto) {
     const action = 'add battle achievement';
     try {
+      console.log('addBattleAchievement', battleAchievement);
       this.responseService.logRequest(action, battleAchievement);
       const result = await this.achievementService.addBattleAchievement(battleAchievement);
       this.responseService.logSuccess(action, result);

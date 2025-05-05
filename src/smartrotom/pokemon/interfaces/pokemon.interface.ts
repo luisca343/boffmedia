@@ -5,6 +5,7 @@ export interface Pokemon {
     name: string;
     forms: PokemonForm[];
     generation: number;
+    spriteUrl?: string;
   }
   
   export interface PokemonForm {
@@ -30,6 +31,9 @@ export interface Pokemon {
     battleStats?: BattleStats;
     eggGroups?: string[];
     gender?: string;
+    
+    spriteUrl?: string;
+    paletteSprites?: Record<string, string>;
   }
   
   export interface GenderProperties {
@@ -64,6 +68,7 @@ export interface Pokemon {
     gender?: string;
     pokemonDex?: number;
     rarity?: number;
+    spriteUrl?: string;
   }
   
   export interface SpawnInfos {
@@ -78,6 +83,13 @@ export interface Pokemon {
     ppBase: number;
     ppMax: number;
     accuracy: number;
+  }
+
+  export interface SpeciesMoveEntry {
+    speciesID: number;
+    form: string;
+    speciesName?: string;
+    spriteUrl?: string;
   }
   
   
