@@ -33,7 +33,7 @@
 
         "status_burn": "Quemadura",
         
-        
+        "evolution_ticking": " ",
         "evolution_friendship": "Amistad > {value}",
         "evolution_interact": "Usar {item}",
         "evolution_moveType": "Aprender {type}",

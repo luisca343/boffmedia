@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 
 
-const colors = {
+export const colors = {
     normal: { backgroundColor: "#9fa19f", textColor: "black" },
     fire: { backgroundColor: "#e62829", textColor: "white" },
     water: { backgroundColor: "#2980ef", textColor: "white" },

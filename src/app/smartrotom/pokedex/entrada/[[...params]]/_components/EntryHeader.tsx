@@ -8,33 +8,81 @@ import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
 
 export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}}) {
+    const t = useTranslations("pokedex");
     
-    const t  = useTranslations("pokedex");
-    return <header className="flex flex-col bg-surface-950 text-surface-50 h-24 z-10 p-2 text-xl 2xl:text-lg" >
-        <div className="w-full flex flex-1 justify-between items-center">
-            <InternalLink className="flex flex-row  items-center hover:text-primary-400" 
-                href={`/pokedex/entrada/${prev.dex}`}>
-                <PokemonSprite id={prev.dex} form="base" palette='none' width={50} height={50} hide={true} inverted={true}/>
-                <ChevronLeftIcon className="w-6"/>#{prev.dex} - {getDisplayStatus(prev.dex, 'base', true) ? prev.name : '???'}
-            </InternalLink>
-            <div className="flex items-center justify-center text-4xl 2xl:text-2xl">
-                #{pokemon.dex} - {getDisplayStatus(pokemon.dex, formName, true) ? getPokemonNameAndForm(pokemon.name, formName, t) : '???'}
-                <PokemonSprite id={pokemon.dex} form={formName} palette='none' width={50} height={50} hide={true} inverted={true}/>
+    return (
+        <header className="flex flex-col bg-surface-950 text-surface-50 sm:h-24 z-10 p-2 shadow-md">
+            {/* Navigation row */}
+            <div className="w-full flex flex-1 justify-between items-center">
+                {/* Previous Pokemon */}
+                <InternalLink className="flex items-center hover:text-primary-400 transition-colors group" 
+                    href={`/pokedex/entrada/${prev.dex}`}>
+                    <div className="flex items-center">
+                        <PokemonSprite 
+                            id={prev.dex} 
+                            form="base" 
+                            palette='none' 
+                            width={50} 
+                            height={50} 
+                            hide={true} 
+                            inverted={true}
+                            className="transform group-hover:scale-110 transition-transform"
+                        />
+                        <ChevronLeftIcon className="w-6 h-6"/>
+                    </div>
+                    <div className="hidden md:block">#{prev.dex} - {getDisplayStatus(prev.dex, 'base', true) ? prev.name : '???'}</div>
+                </InternalLink>
+                
+                {/* Current Pokemon */}
+                <div className="flex items-center justify-center text-2xl sm:text-3xl md:text-4xl font-bold">
+                    <span className="hidden xs:block">#{pokemon.dex} - </span>
+                    <span className="truncate max-w-[200px] sm:max-w-none">
+                        {getDisplayStatus(pokemon.dex, formName, true) ? getPokemonNameAndForm(pokemon.name, formName, t) : '???'}
+                    </span>
+                    <PokemonSprite 
+                        id={pokemon.dex} 
+                        form={formName} 
+                        palette='none' 
+                        width={50} 
+                        height={50} 
+                        hide={true} 
+                        inverted={true}
+                    />
+                </div>
+                
+                {/* Next Pokemon */}
+                <InternalLink className="flex items-center hover:text-primary-400 transition-colors group" 
+                    href={`/pokedex/entrada/${next.dex}`}>
+                    <div className="hidden md:block text-right">#{next.dex} - {getDisplayStatus(next.dex, 'base', true) ? next.name : '???'}</div>
+                    <div className="flex items-center">
+                        <ChevronRightIcon className="w-6 h-6"/>
+                        <PokemonSprite 
+                            id={next.dex} 
+                            form="base" 
+                            palette='none' 
+                            width={50} 
+                            height={50} 
+                            hide={true} 
+                            inverted={true}
+                            className="transform group-hover:scale-110 transition-transform"
+                        />
+                    </div>
+                </InternalLink>
             </div>
-            <InternalLink className="flex flex-row items-center hover:text-primary-400" href={`/pokedex/entrada/${next.dex}`}>#{next.dex} - {getDisplayStatus(next.dex, 'base', true) ? next.name : '???'}
-                <ChevronRightIcon className="w-6"/>
-                <PokemonSprite id={next.dex} form="base" palette='none' width={50} height={50} hide={true} inverted={true}/>
-            </InternalLink>
-        </div>
-        <div className="w-full flex justify-evenly items-center scroll-smooth">
-            <Link className=" hover:text-primary-400" href={`#info`}>Info</Link>
-            <Link className=" hover:text-primary-400" href={`#evotree`}>Árbol evolutivo</Link>
-            {pokemon.forms.length > 1 && <Link className=" hover:text-primary-400" href={`#forms`}>Formas</Link>}
-            <Link className=" hover:text-primary-400" href={`#typedata`}>Fortalezas y debilidades</Link>
-            <Link className=" hover:text-primary-400" href={`#stats`}>Estadísticas</Link>
-            <Link className=" hover:text-primary-400" href={`#spawns`}>Localizaciones</Link>
-            <Link className=" hover:text-primary-400" href={`#moves`}>Movimientos</Link>
-            <Link className=" hover:text-primary-400" href={`#palettes`}>Variantes</Link>
-        </div>
-    </header>
+            
+            {/* Navigation tabs */}
+            <div className="w-full flex justify-evenly items-center scroll-smooth mt-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-primary-600 scrollbar-track-surface-800">
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#info`}>Info</Link>
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#evotree`}>Árbol evolutivo</Link>
+                {pokemon.forms.length > 1 && 
+                    <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#forms`}>Formas</Link>
+                }
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#typedata`}>Tipos</Link>
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#stats`}>Estadísticas</Link>
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#spawns`}>Localizaciones</Link>
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#moves`}>Movimientos</Link>
+                <Link className="px-2 py-1 hover:text-primary-400 transition-colors whitespace-nowrap" href={`#palettes`}>Variantes</Link>
+            </div>
+        </header>
+    );
 }

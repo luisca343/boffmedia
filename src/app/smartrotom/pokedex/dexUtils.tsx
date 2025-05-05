@@ -143,12 +143,10 @@ export async function getPokemonSprite(
 export function getDisplayStatus(pokemonId: number, form: string, hide: boolean): boolean {
   if (!hide && pokemonId < 2000) return true
   const pokedexData = usePokemonStore.getState().pokedexData;
-  if (!pokedexData) return false
-  const seen = pokedexData?.seenPokemon
+  const seen = pokedexData?.seenPokemon || []
   const key = `${pokemonId}:${form}`
   return seen.includes(key)
 }
-
 export enum PokedexStatus {
   UNSEEN = 0,
   SEEN = 1,
@@ -200,7 +198,7 @@ export function getFormIndex(pokemon: Pokemon, formName: string) {
 }
 
 // Damage dealt by a move of a certain type to a pokemon of a certain type
-const typeChart = {
+export const typeChart = {
   normal: { ghost: 0, rock: 0.5, steel: 0.5 },
   fire: { fire: 0.5, water: 0.5, grass: 2, ice: 2, bug: 2, rock: 0.5, dragon: 0.5, steel: 2 },
   water: { fire: 2, water: 0.5, grass: 0.5, ground: 2, rock: 2, dragon: 0.5 },

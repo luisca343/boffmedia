@@ -1,22 +1,74 @@
 import { InternalLink } from "@/components/nav/Link"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService";
 import { getTranslations } from "next-intl/server";
+import { MapPinIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
 
 export default async function Biomas(){
-    const t  = await getTranslations("pokedex");
+    const t = await getTranslations("pokedex");
     const biomes = await (await pokemonService.getBiomes()).data as Record<string, number>;
+    
+    // Format the biome name for display
+    const formatBiomeTitle = (rawBiome: string) => {
+        return t(rawBiome.replace(":", "_").replace(" ", "_"))
+            || rawBiome.replace(/:/g, " ");
+    };
+    
     return(
-    <div className="bg-surface-800  flex flex-wrap text-surface-100 w-full justify-between p-2">
-        {     
-        Object.entries(biomes).map(([biome, amount]: [string, number], index: number) => {
-            if(biome.includes("biomesoplenty") || biome.includes("terraforged")) return null
-            return <InternalLink href={`pokedex/localizacion/${biome}`} key={index}>
-                <div className=" flex flex-col p-2 text-center items-center justify-center hover:text-surface-800 hover:bg-surface-400 w-64 h-32 border rounded-lg my-1">
-                    <span>{t(biome.replace(":","_").replace(" ","_"))}</span>  
-                    <span>{amount}</span>
+        <div className="bg-surface-800 min-h-full overflow-auto">
+            <div className="mt-4 p-4 max-w-7xl mx-auto">
+                <div className="bg-surface-700/30 rounded-lg p-4 border border-surface-600/50 mb-4">
+                    <div className="flex items-center mb-3">
+                        <MapPinIcon className="h-6 w-6 text-primary-400 mr-2" />
+                        <h1 className="text-xl font-bold text-surface-50">Localización de Pokémon</h1>
+                    </div>
+                    
+                    <p className="text-surface-200 mb-4">
+                        Explora diferentes biomas y descubre qué Pokémon puedes encontrar en cada uno. 
+                        Selecciona un bioma para ver los Pokémon disponibles.
+                    </p>
                 </div>
-            </InternalLink>
-})}
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {Object.entries(biomes)
+                        .filter(([biome]) => !biome.includes("biomesoplenty") && !biome.includes("terraforged"))
+                        .sort((a, b) => {
+                            // Sort by number of Pokémon in descending order
+                            return b[1] - a[1];
+                        })
+                        .map(([biome, amount], index) => {
+                            const biomeName = formatBiomeTitle(biome);
+                            
+                            return (
+                                <InternalLink href={`/pokedex/localizacion/${biome}`} key={index}>
+                                    <div className="flex flex-col items-center justify-center text-center p-4 h-36 
+                                                rounded-lg border border-surface-600 bg-surface-700/50
+                                                hover:bg-surface-600/80 hover:border-surface-500 hover:text-surface-50 transition-all
+                                                shadow-md hover:shadow-lg group">
+                                        <div className="mb-2 opacity-70 group-hover:opacity-100 transition-opacity">
+                                            <MapPinIcon className="h-6 w-6 text-primary-300 mx-auto" />
+                                        </div>
+                                        <span className="text-lg font-bold text-surface-100 mb-2 group-hover:text-surface-50 transition-colors line-clamp-2">
+                                            {biomeName}
+                                        </span>
+                                        <div className="flex items-center justify-center space-x-2">
+                                            <ArchiveBoxIcon className="h-4 w-4 text-amber-400" />
+                                            <span className="text-xl text-amber-400 font-medium">
+                                                {amount}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </InternalLink>
+                            );
+                        })}
+                </div>
+                
+                {/* If there are no valid biomes to display */}
+                {Object.entries(biomes).filter(([biome]) => !biome.includes("biomesoplenty") && !biome.includes("terraforged")).length === 0 && (
+                    <div className="bg-surface-700/30 rounded-lg p-8 text-center border border-surface-600/50">
+                        <p className="text-surface-300 text-lg">No se encontraron biomas disponibles</p>
+                    </div>
+                )}
+            </div>
         </div>
-    )
+    );
 }

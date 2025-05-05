@@ -1,244 +1,54 @@
 import React from "react"
-import { SubTree } from "@/types/pokedex"
-import { Evolution } from "@/types/Pokemon"
 import { getTranslations } from "next-intl/server"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { ItemSprite, PokemonSpriteLink } from "../../../_components/PokemonSprite"
+import { InformationCircleIcon } from "@heroicons/react/24/outline"
+import { TreeRenderer } from "./TreeRenderer"
+import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 
-export async function EvoTree({params}: {params: {id: string}}){
-    const {tree, depth} = (await pokemonService.getEvoTree(parseInt(params.id))).data!
-    const t  = await getTranslations("pokedex");
+export async function EvoTree({params}: {params: {id: string}}) {
+  const {tree, depth} = (await pokemonService.getEvoTree(parseInt(params.id))).data!
+  const t = await getTranslations("pokedex");
+  
+  let baseForm = null;
+  const firstKey = Object.keys(tree)[0];
+  if (firstKey) {
+    const node = tree[firstKey];
+    baseForm = {
+      key: firstKey,
+      dex: node.dex,
+      form: firstKey.split('_')[1] || 'base'
+    };
+  }
+  
+  const hasEvolutions = depth > 1;
 
-    function renderTree(tree: SubTree){
-        return <div className=" h-full flex-col justify-center items-center rounded-lg m-2" >
-          {Object.keys(tree).map((key:string) => {
-            const [pkmName, form] = key.split('_')
-            const subTree = tree[key]
-            const evos = subTree.evos
-            if(Object.keys(subTree).length == 0) return null
-            if(!subTree.pkm) return null
-                return <div key={key} className='w-full flex flex-row items-center ' style={{height:`${100/Object.keys(tree).length}%`}}>
-                        <PokemonSpriteLink id={subTree.dex} form={form} palette='none' width={100} height={100} hide={true} displayName={true}/>
-                    <div className="flex flex-col ">
-                        {Object.keys(evos)?.length > 0 && Object.keys(evos).map((evo: any, index: number) => {
-                            const opacity = index % 2 == 0 ? 0.5 : 1
-                            const thisEvos = evos[evo]
-                            
-                            return (
-                            <div key={`${evo}`} className="flex items-center justify-center p-2" >
-                                <div className="flex flex-col items-center " >
-                                    {thisEvos.methods?.map(
-                                        (method: Evolution) => {
-                                            return getEvolutionMethod(method)
-                                        })}
-                                </div>
-                                {renderTree({[evo]:thisEvos})}
-                            </div>)
-                        }
-                    )}
-                    </div>
-                </div>
-        })}
-        </div>
-    }
-
-    return <div className="  text-surface-50 text-shadow-border1 flex justify-center ">
-            {depth > 1 ? renderTree(tree) : 
-                <div className=" h-full flex-col justify-center items-center text-center rounded-lg m-2" >
-                        <div className="flex justify-center">{renderTree(tree)}</div>
-                        <span className="text-xl">Este Pokémon no tiene evoluciones</span>
-                </div>
-            }
-        </div>
-   
-
-
-    function getEvolutionMethod(evolution: Evolution){
-        const conditions = [] as React.ReactNode[]
-
-        switch(evolution.evoType){
-            case "interact":
-                let [modId, itemId] = evolution.item?.itemID.split(':') || []
-                conditions.push(
-                    <div className="flex items-center justify-center">
-                        <span className='mx-1'>{t(`evolution_interact`, {item: t(`item_${itemId}`)})}</span>
-                        <ItemSprite name={itemId} width={30} height={30}/>
-                    </div>
-                )
-                break
-            case "leveling":
-                if(evolution.level) conditions.push(t(`evolution_level`, {level: evolution.level}))
-                else conditions.push(t(`evolution_leveling`))
-                break
-            case "trade":
-                conditions.push(t(`evolution_trade`))
-                break
-            case "ticking":
-                conditions.push(t(`evolution_ticking`))
-                break
-            case "emptyslot":
-                conditions.push(t(`evolution_emptyslot`))
-                break
-            default:
-                conditions.push(evolution.evoType)
-        }
-
-        if(evolution.conditions?.length > 0) {
-            evolution.conditions.forEach((condition) => {
-                const conditionType = condition.evoConditionType
-                if(conditionType == "friendship") {
-                    const value = condition.friendship
-                    conditions.push(t(`evolution_friendship`, {value}))
-                } 
-                else if(conditionType == "time") {
-                    const value = condition.time
-                    conditions.push(t(`time_${value.toLowerCase()}`))
-                }
-                else if(conditionType == "moveType") {
-                    const type = condition.type
-                    conditions.push(t(`evolution_moveType`, {type}))
-                }
-                else if(conditionType == "biome") {
-                    const biomeStrs = condition.biomes as string[]
-                    const biomes = [] as string[]
-                    biomeStrs.forEach((biome) => {
-                        if(biome.includes("biomesoplenty") || biome.includes("terraforged")) return
-                        biomes.push(t(biome.replace(" ", "_").replace(':', '_')))
-                    })
-                    conditions.push(<HoverCard>
-                        <HoverCardTrigger className='underline hover:cursor-pointer'>En Biomas</HoverCardTrigger>
-                        <HoverCardContent className="w-96 bg-surface-800 text-surface-50">{biomes.map(biome => t(biome)).join(', ')}</HoverCardContent>
-                    </HoverCard>)
-                }
-                else if(conditionType == "evolutionRock") {
-                    const evolutionRock = condition.evolutionRock
-                    conditions.push(t(`evolution_rock`, {evolutionRock: t(`${evolutionRock}`)}))
-                }
-                else if(conditionType == "nature" || conditionType == "evolution_nature") {
-                    const natures = condition.natures
-                    const nature = natures.map((nature: string) => t(`nature_${nature.toLowerCase()}`)).join(", ")
-                    conditions.push(t(`evolution_nature`, {nature}))
-                }
-                else if(conditionType == "party"){
-                    const partyMembers = []
-                    const withPokemon = condition.withPokemon as string[] || []
-                    const withTypes = condition.withTypes as string[] || []
-                    const withForms = condition.withForms as string[] || [] 
-                    const withPalettes = condition.withPalettes as string[] || []
-
-                    partyMembers.push(...withPokemon)
-                    partyMembers.push(...withTypes)
-                    partyMembers.push(...withForms)
-                    partyMembers.push(...withPalettes)
-                    
-                    conditions.push(t(`evolution_party`, {party: partyMembers.join(", ")}))
-                }
-                else if (conditionType == "heldItem") {
-                    const [modId, itemId] = condition.item.itemID.split(':') || []
-                    conditions.push(
-                        <div className="flex items-center justify-center">
-                            <span className='mx-1'>{t(`evolution_heldItem`, {item: t(`item_${itemId}`)})}</span>
-                            <ItemSprite name={itemId} width={30} height={30}/>
-                        </div>
-                    )
-                }
-                else if (conditionType == "critical") {
-                    const critical = condition.critical
-                    conditions.push(t(`evolution_critical`, {critical}))
-                }
-                else if (conditionType == "statRatio") {
-                    const stat1 = condition.stat1
-                    const stat2 = condition.stat2
-                    const ratio = condition.ratio
-
-                    if(ratio === 1){
-                        conditions.push(t(`evolution_statRatio`, {stat1, stat2}))
-                    }                 
-                }
-                else if (conditionType == "move") {
-                    const attackName = condition.attackName.toLowerCase().replace(" ", "_")
-                    conditions.push(t(`evolution_move`, {attackName: t(`attack_${attackName}`)}))
-                }
-                else if (conditionType == "status") {
-                    const status = condition.type.toLowerCase()
-                    conditions.push(t(`evolution_status`, {status: t(`status_${status}`)}))
-                }
-                else if(conditionType == "chance") {
-                    const chance = condition.chance * 100
-                    conditions.push(t(`evolution_chance`, {chance}))
-                }
-                else if(conditionType == "moveUses") {
-                    const move = condition.move.toLowerCase().replace(" ", "_") as string
-                    const uses = condition.uses as number
-                    conditions.push(t(`evolution_moveuses`, {move: t(`attack_${move}`), uses}))
-                }
-                else if(conditionType == "gender") {
-                    const genders = condition.genders as string[]	
-                    conditions.push(t(`evolution_gender`, {genders: genders?.join(", ")}))
-                }
-                else if(conditionType == "recoil") {
-                    const recoil = condition.recoil as number
-                    conditions.push(t(`evolution_recoil`, {recoil}))
-                }
-                else if(conditionType == "healthAbsence") {
-                    const health = condition.health as number
-                    conditions.push(t(`evolution_healthAbsence`, {health}))
-                }
-                else if(conditionType == "shiny") {
-                    const shiny = condition.shiny as boolean
-                    if(shiny) conditions.push(t(`palette_shiny`))
-                }
-                else if(conditionType == "highAltitude") {
-                    const minAltitude = condition.minAltitude as number
-                    conditions.push(t(`evolution_highAltitude`, {minAltitude}))
-                }
-                else if(conditionType == "weather") {
-                    const weather = condition.weather as string
-                    conditions.push(t(`evolution_weather`, {weather: t(`weather_${weather.toLowerCase()}`)}))
-                }
-                else if(conditionType == "nuggets") {
-                    const nuggets = condition.nuggets as number
-                    conditions.push(t(`evolution_nuggets`, {nuggets}))
-                }
-                else if(conditionType == "evolutionScroll") {
-                    const scroll = condition.evolutionScroll as string
-                    conditions.push(t(`evolution_scroll`, {scroll: t(`${scroll}`)}))
-                }
-                else if(conditionType == "blocksWalkedOutsideBall") {
-                    const blocks = condition.blocksToWalk as number
-                    conditions.push(t(`evolution_blocksWalkedOutsideBall`, {blocks}))
-                }
-                else if (conditionType == "insideBattle"){
-                    conditions.push(t(`evolution_insideBattle`))
-                }
-
-                else {
-                    conditions.push(condition.evoConditionType)
-                }
-            })
-        }
-
-
-        return   <div
-                    className="flex flex-col text-center  w-[300px] h-[100px] justify-center"
-                    style={{
-                    backgroundImage: 'url(/smartrotom/img/apps/pokedex/arrow.webp)',
-                    backgroundSize: 'contain',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center',
-                    }}
-                >
-                {conditions?.map((condition) => {
-                    return <span key={`${condition?.toString()}`}>{condition}</span>
-                })
-                }
+  return (
+    <div className="text-surface-50 flex justify-center overflow-x-auto pb-4">
+      <div className="min-w-[700px]">
+        {hasEvolutions ? (
+          <TreeRenderer tree={tree} t={t} />
+        ) : (
+          <div className="h-full flex-col justify-center items-center text-center rounded-lg m-2 bg-surface-700/20 p-6 border border-surface-600/30">
+            {baseForm && (
+              <div className="flex justify-center mb-4">
+                <PokemonSpriteLink
+                  id={baseForm.dex}
+                  form={baseForm.form}
+                  palette="none"
+                  width={120}
+                  height={120}
+                  hide={true}
+                  displayName={true}
+                />
+              </div>
+            )}
+            <div className="flex items-center justify-center gap-2 text-xl text-surface-300">
+              <InformationCircleIcon className="h-6 w-6" />
+              <span className="text-shadow-border1">Este Pokémon no tiene evoluciones</span>
             </div>
-    }
-
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
-
-
-
-
-//{Object.keys(evos)?.length > 0 &&  <ArrowRightCircleIcon width={50}/>}

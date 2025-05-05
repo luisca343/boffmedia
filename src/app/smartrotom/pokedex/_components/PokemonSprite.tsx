@@ -23,6 +23,8 @@ export type PokemonSpriteProps = {
   hideCaught?: boolean
   hideSeen?: boolean
   inverted?: boolean
+
+  className?: string
 }
 
 export type PokemonSpriteLinkProps = PokemonSpriteProps & {
@@ -53,7 +55,7 @@ export function PokemonSpriteLink({children, id, form, palette, width = 80, heig
   )
 }
 
-export function PokemonSprite({ children, id, form, palette, width = 100, height = 100, pixelated = true, hide = false, showStatus = false, forceBlack = false, displayName = false, hideCaught = false, hideSeen = false, inverted = false }: PokemonSpriteProps) {
+export function PokemonSprite({ children, id, form, palette, width = 100, height = 100, pixelated = true, hide = false, showStatus = false, forceBlack = false, displayName = false, hideCaught = false, hideSeen = false, inverted = false, className }: PokemonSpriteProps) {
   const spriteData = usePokemonSprite(id, form, palette, hide, pixelated)
 
   if (!spriteData) return <Loading width={width} height={height} />
@@ -63,7 +65,7 @@ export function PokemonSprite({ children, id, form, palette, width = 100, height
     <>
       <div
         style={{ width, maxHeight: height }}
-        className={`relative ${spriteData?.type === "sprite" ? "mb-2 mt-[-0.5rem]" : ""}`}
+        className={`relative ${spriteData?.type === "sprite" ? "mb-2 mt-[-0.5rem]" : ""} ${className}`}
       >
         <img
           width={width}

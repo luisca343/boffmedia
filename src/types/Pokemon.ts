@@ -4,6 +4,7 @@ export interface Pokemon {
     defaultForms: string[];
     forms: Form[];
     generation: number;
+    spriteUrl?: string;
 }
 
 export interface Form {
@@ -38,6 +39,9 @@ export interface Form {
     malePercentage?: number;
     evolutions?: Evolution[];
     evYields?: EvYields;
+
+    spriteUrl?: string;
+    paletteSprites?: Record<string, string>;
 }
 
 export interface Dimensions {
@@ -188,3 +192,10 @@ export type ActivePokemon = {
     evs: string[];
     stats: string[];
 };
+
+  export interface SpeciesMoveEntry {
+    speciesID: number;
+    form: string;
+    speciesName?: string;
+    spriteUrl?: string;
+  }

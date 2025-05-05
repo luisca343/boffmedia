@@ -15,7 +15,7 @@ export function PokedexSection({
     btn?: React.ReactNode
   }) {
     return (
-      <Collapsible defaultOpen={true} className={`w-full max-w-[95%] 2xl:max-w-[90%] mx-auto my-2 py-2 ${className}`} id={id}>
+      <Collapsible defaultOpen={true} className={`w-full max-w-[95vw] 2xl:max-w-[90vw] mx-auto my-2 py-2 ${className}`} id={id}>
         <CollapsibleTrigger className="flex w-full items-center justify-between border-b-2 border-slate-700 pb-2 text-start text-xl font-semibold text-slate-100">
           {title}
           <div className="flex items-center">
