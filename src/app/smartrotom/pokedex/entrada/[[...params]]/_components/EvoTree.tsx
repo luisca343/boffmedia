@@ -7,7 +7,7 @@ import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 
 export async function EvoTree({params}: {params: {id: string}}) {
   const {tree, depth} = (await pokemonService.getEvoTree(parseInt(params.id))).data!
-  const t = await getTranslations("pokedex");
+  const t = await getTranslations("");
   
   let baseForm = null;
   const firstKey = Object.keys(tree)[0];
