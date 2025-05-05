@@ -25,7 +25,7 @@ export async function openPC(): Promise<void> {
 export async function getSpawns(): Promise<QueryResult<PossibleSpawn[]>> {
     const result = await mcefQuery<PossibleSpawn[]>('GET_SPAWNS');
     if (result.error) {
-        return { data: getSpawnsPlaceholder, status: 200 };
+        return { data: getSpawnsPlaceholder, status: 200 } as QueryResult<PossibleSpawn[]>;
     } 
     
     return result;

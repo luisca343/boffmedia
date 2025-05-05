@@ -1,9 +1,8 @@
 "use client"
-import type { Abilities } from "@/types/Pokemon"
+import type { Abilities, Pokemon } from "@/types/Pokemon"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import TypeBadge from "./TypeBadge"
-import { Pokemon } from "../../../_types/pokemon"
 import { useTranslations } from "next-intl"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { getDisplayStatus } from "../../../dexUtils"
@@ -39,10 +38,11 @@ export function BasicInfo({ pokemon, formIndex, formName}: BasicInfoProps) {
             palette="none"
             width={200}
             height={200}
-            pixelated={false}
+            pixelated={true}
             showStatus={false}
             hide={true}
             className="drop-shadow-lg"
+            url={pokemon.forms[formIndex].spriteUrl}
           />
         </div>
         <HoverCard>

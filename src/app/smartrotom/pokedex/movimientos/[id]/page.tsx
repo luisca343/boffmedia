@@ -11,7 +11,6 @@ import { useTranslations } from "next-intl"
 export default function Movimiento({params} : {params: {id: string}}){
   const { id } = params
   const { pokemon } = useGetPokemonByMove(id)
-  console.log(pokemon)
   const { move } = useGetMove(id)
   const t = useTranslations("pokedex")
   const [showAll, setShowAll] = useState(false)
@@ -71,8 +70,8 @@ export default function Movimiento({params} : {params: {id: string}}){
             {pokemon && pokemon.length > 0 ? (
               <div className="bg-surface-700/20 rounded-lg p-3 border border-surface-600/30">
               <div className="flex flex-wrap gap-2 justify-center">
-                {displayedPokemon?.map((poke) => (
-                  <div key={poke.speciesID + poke.form} className="transition-transform hover:scale-110">
+                {displayedPokemon?.map((poke) => {
+                  return <div key={poke.speciesID + poke.form} className="transition-transform hover:scale-110">
                     <PokemonSpriteLink 
                       id={poke.speciesID} 
                       form={poke.form} 
@@ -80,9 +79,10 @@ export default function Movimiento({params} : {params: {id: string}}){
                       width={56} 
                       height={56} 
                       hide={true}
+                      url={poke.spriteUrl}
                     />
                   </div>
-                ))}
+            })}
               </div>
                 
                 {hasMoreToShow && (

@@ -80,7 +80,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                     return (
                       <PokedexRow key={`${spawn.spawnType}-${index}`}>
                         <PokedexCell hard className="w-16">
-                          <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50} hide={true}/>
+                          <PokemonSprite id={spawn.pokemonDex} form={spawn.pokemonForm} palette={spawn.pokemonPalette || 'none'} width={50} height={50} hide={true} url={spawn.spriteUrl} />
                         </PokedexCell>
                         <PokedexCell className="text-center">{getFormPalette(spawn)}</PokedexCell>
                         <PokedexCell className="text-center">{t(spawn.spawnType)}</PokedexCell>

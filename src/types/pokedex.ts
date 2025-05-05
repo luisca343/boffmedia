@@ -1,4 +1,5 @@
-import { Evolution } from "@/app/smartrotom/pokedex/_types/pokemon"
+import { Evolution } from "./Pokemon"
+
 
 export type Registry = {
     pokemonId: number
@@ -41,6 +42,7 @@ export type PokemonMove = {
     dex: number;
     index: number | null;
     methods?: Evolution[];
+    spriteUrl: string;
   };
 
   export type SubTree = {

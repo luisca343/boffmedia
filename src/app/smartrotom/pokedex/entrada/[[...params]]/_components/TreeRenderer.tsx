@@ -30,6 +30,7 @@ export function TreeRenderer({ tree, t }: TreeRendererProps) {
               hide={true} 
               displayName={true}
               className="transition-transform hover:scale-105"
+                url={subTree.spriteUrl}
             />
             
             <div className="flex flex-col">
