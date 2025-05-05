@@ -7,6 +7,12 @@ export interface Pokemon {
     spriteUrl?: string;
 }
 
+export interface NextPrev {
+    dex: number
+    name: string;
+    spriteUrl: string;
+}
+
 export interface Form {
     pkmName?: string;
     pkmDex?: number;

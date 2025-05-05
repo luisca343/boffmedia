@@ -8,7 +8,7 @@ import { getDisplayStatus } from "../../../dexUtils";
 import { PokemonSprite } from "../../../_components/PokemonSprite";
 
 export default function PokemonList() {
-  const [pokemonList, setPokemonList] = useState<Array<{dex: number, name: string}>>([]);
+  const [pokemonList, setPokemonList] = useState<Array<{dex: number, name: string, spriteUrl: string}>>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const t = useTranslations("pokedex");
@@ -17,7 +17,7 @@ export default function PokemonList() {
     async function fetchPokemonList() {
       try {
         const response = await pokemonService.getAllPokemon();
-        setPokemonList(response.data || []);
+        setPokemonList(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch Pokemon list:", error);
       } finally {
@@ -91,6 +91,7 @@ export default function PokemonList() {
                     width={80} 
                     height={80}
                     hide={true}
+                    url={pokemon.spriteUrl}
                   />
                   <div className="text-center mt-1">
                     <div className="text-xs text-surface-400">#{pokemon.dex.toString().padStart(3, '0')}</div>

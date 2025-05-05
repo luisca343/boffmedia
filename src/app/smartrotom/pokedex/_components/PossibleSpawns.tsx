@@ -12,6 +12,7 @@ export type PossibleSpawn = {
   palette: string;
   rarity: number;
   percentage: number;
+  spriteUrl: string;
 };
 
 export function PossibleSpawnsSection({pokemonSpawns, hideCaught = true, hideSeen = true, title, }: { pokemonSpawns?: any; hideCaught?: boolean; hideSeen?: boolean; title: string; }) {
@@ -108,6 +109,7 @@ export function PossibleSpawns({ pokemonSpawns, hideCaught = true, hideSeen = tr
           palette={spawn.palette}
           hide={true}
           displayName={true}
+          url={spawn.spriteUrl}
         >
           <div className="font-bold text-xl 2xl:text-base">
             {formatPercentage(spawn.percentage)} %

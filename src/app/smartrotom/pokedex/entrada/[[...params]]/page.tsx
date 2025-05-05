@@ -1,7 +1,6 @@
-import { Pokemon } from "../../_types/pokemon"
 import { EvoTree } from "./_components/EvoTree"
 import { SpawnInfo } from "../../_types/spawnInfo"
-import { GenderProperties } from "@/types/Pokemon"
+import { GenderProperties, Pokemon } from "@/types/Pokemon"
 import { getTranslations } from "next-intl/server"
 import { InternalLink } from "@/components/nav/Link"
 import { StatsTable } from "./_components/StatsTable"
@@ -48,6 +47,8 @@ export default async function EntradaPokedex({params}: any){
     const formName = getFormName(pokemon, formIndex)
     
     const spawns = (await pokemonService.getSpawnByPokemon(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
+
+
     
     const type1 = pokemon.forms[formIndex]?.types?.[0] ?? pokemon.forms[0]?.types?.[0] as string
     const type2 = pokemon.forms[formIndex]?.types?.[1] ?? pokemon.forms[0]?.types?.[1] as string

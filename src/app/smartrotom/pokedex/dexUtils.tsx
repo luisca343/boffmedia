@@ -2,7 +2,7 @@ import type { PokedexData } from "@/types/pokedex"
 import type { Palette, Pokemon } from "@/types/Pokemon"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
-import type { Pokemon as PokemonType } from "@/app/smartrotom/pokedex/_types/pokemon"
+import type { Pokemon as PokemonType } from "@/types/Pokemon"
 
 const SPRITES_BASE_URL = "/smartrotom/packs"
 const IMAGES_BASE_URL = "/smartrotom/img/sprites"

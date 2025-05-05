@@ -26,6 +26,8 @@ export interface SpawnInfo {
   pokemonPalette: string;
   pokemonDex: number;
   gender: string;
+
+  spriteUrl: string;
 }
 
 export interface Pokemon {

@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import type { PokedexData } from "@/types/pokedex"
-import type { Pokemon } from "@/app/smartrotom/pokedex/_types/pokemon"
 import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { Pokemon } from "@/types/Pokemon"
 
 interface PokemonState {
   pokedexData: PokedexData | null

@@ -10,6 +10,7 @@ import { Loading } from "@/components/smartrotom/Loading"
 export function LastRegistries() {
     const { session } = useBoffSession();
     const { registries, isLoading } = useGetRegistries(session.user.smartRotomUser?.uuid!);
+    
 
     if (isLoading) {
         return (

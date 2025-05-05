@@ -1,10 +1,10 @@
 "use client"
-import { Pokemon } from "../../../_types/pokemon"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { InternalLink } from "@/components/nav/Link"
 import { getForm, getDisplayStatus } from "../../../dexUtils"
 import { useTranslations } from "next-intl"
 import { PokedexSection } from "../../../_components/PokedexSection"
+import { Pokemon } from "@/types/Pokemon"
 
 interface FormsSectionProps {
   pokemon: Pokemon
@@ -26,7 +26,7 @@ export function FormsSection({ pokemon, pokemonIndex, formIndex }: FormsSectionP
           const isCurrentForm = index === formIndex
           const formName = form.name || 'base'
           const isVisible = getDisplayStatus(pokemonIndex, formName, true)
-          
+
           return (
             <InternalLink key={formName} 
               href={`/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}
@@ -45,6 +45,7 @@ export function FormsSection({ pokemon, pokemonIndex, formIndex }: FormsSectionP
                   palette='none'
                   hide={!isVisible}
                   className={isCurrentForm ? 'drop-shadow-glow-primary' : ''}
+                  url={form.spriteUrl}
                 />
                 <span className="mt-2 font-medium text-center">
                   {isVisible ? (getForm(formName, t) || 'Base') : '???'}

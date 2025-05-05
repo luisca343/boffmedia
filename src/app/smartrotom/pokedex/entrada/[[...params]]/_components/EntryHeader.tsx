@@ -7,7 +7,7 @@ import { Pokemon } from "@/types/Pokemon";
 import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
 
-export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string}, next: {dex: number, name: string}}) {
+export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string, spriteUrl: string}, next: {dex: number, name: string, spriteUrl: string}}) {
     const t = useTranslations("pokedex");
     
     return (
@@ -27,6 +27,7 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
                             hide={true} 
                             inverted={true}
                             className="transform group-hover:scale-110 transition-transform"
+                            url={prev.spriteUrl}
                         />
                         <ChevronLeftIcon className="w-6 h-6"/>
                     </div>
@@ -47,6 +48,7 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
                         height={50} 
                         hide={true} 
                         inverted={true}
+                        url={pokemon.forms[0].spriteUrl}
                     />
                 </div>
                 
@@ -65,6 +67,7 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
                             hide={true} 
                             inverted={true}
                             className="transform group-hover:scale-110 transition-transform"
+                            url={next.spriteUrl}
                         />
                     </div>
                 </InternalLink>
