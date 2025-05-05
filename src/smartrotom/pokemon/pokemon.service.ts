@@ -103,17 +103,45 @@ export class PokemonService {
     return this.spawnDataService.getPokemonByBiome(name);
   }
   
-  async getRegistries(uuid: string){
+  async getRegistries(uuid: string) {
+    // Get registry data from the database
     const dex = await this.db
-    .select({pokemonId: pokedexRegistry.pokemonId, formId: pokedexRegistry.formId, paletteId: pokedexRegistry.paletteId, seenAt: pokedexRegistry.seenAt, caughtAt: pokedexRegistry.caughtAt})
-    .from(pokedexRegistry)
-    .where(eq(pokedexRegistry.uuid, uuid))
-    .orderBy(desc(pokedexRegistry.id))
-    .limit(20)
-    .execute()
-    return dex
+      .select({
+        pokemonId: pokedexRegistry.pokemonId, 
+        formId: pokedexRegistry.formId, 
+        paletteId: pokedexRegistry.paletteId, 
+        seenAt: pokedexRegistry.seenAt, 
+        caughtAt: pokedexRegistry.caughtAt
+      })
+      .from(pokedexRegistry)
+      .where(eq(pokedexRegistry.uuid, uuid))
+      .orderBy(desc(pokedexRegistry.id))
+      .limit(20)
+      .execute();
+      
+    // Enhance each registry with Pokemon data and sprite URL
+    const enhancedDex = dex.map(entry => {
+      // Get the Pokemon data
+      const pokemon = this.pokemonDataService.getSpeciesByDex(entry.pokemonId);
+      const pokemonName = pokemon?.name || 'Unknown';
+      
+      // Get sprite URL directly from image service
+      const spriteUrl = this.pokemonImageService.getSimpleSprite(
+        entry.pokemonId,
+        entry.formId || 'base',
+        entry.paletteId || 'none'
+      );
+      
+      // Return enhanced registry with sprite and name
+      return {
+        ...entry,
+        pokemonName,
+        spriteUrl
+      };
+    });
+    
+    return enhancedDex;
   }
-
   
   async getPokedex(uuid: string) {
     const dex = await this.db

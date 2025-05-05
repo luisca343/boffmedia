@@ -21,12 +21,12 @@
     "allowJs": true,
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
   },
   "watchOptions": {
     "watchFile": "fixedPollingInterval",
   }
   ,
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": ["./src", "./src/**/*.ts", "./src/**/*.js"],
   "exclude": ["node_modules, public"]
 }

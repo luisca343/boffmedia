@@ -15,6 +15,7 @@ export class AchievementService {
     return await this.db
       .select({
         id: smartRotomAchievements.id,
+        battleId: smartRotomUserAchievements.dataId,
         name: smartRotomAchievements.name,
         description: smartRotomAchievements.description,
         icon: smartRotomAchievements.icon,

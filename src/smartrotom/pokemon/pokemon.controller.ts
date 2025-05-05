@@ -105,7 +105,6 @@ export class PokemonController {
     async getSpawns(@Param('name') name: string) {
         const action = 'get spawns by Pokémon name';
         try {
-            console.log("GET SPAWNS")
             this.responseService.logRequest(action, { name });
             const spawns = await this.pokemonService.getSpawnByPokemon(name);
             console.log(spawns)

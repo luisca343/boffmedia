@@ -108,5 +108,64 @@ export class PokemonImageService {
     if(pokemonId == 774) return 'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png'
     return palette?.sprite?.resource ? palette.sprite.resource : palette.sprite
   }
+
+  getSimpleSprite(pokemonId: number, formName: string = 'base', paletteName: string = 'none'): string {
+    try {
+      const pokemon = this.pokemonDataService.getSpeciesByDex(pokemonId);
+      if (!pokemon) {
+        return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+      }
+      
+      const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0];
+      
+      // Get palette
+      let palette;
+      if (form.genderProperties) {
+        for (const genderProperty of Object.values(form.genderProperties)) {
+          if (genderProperty && genderProperty.palettes) {
+            for (const p of genderProperty.palettes) {
+              if (p && p.name === paletteName) {
+                palette = p;
+                break;
+              }
+            }
+            if (palette) break;
+          }
+        }
+      }
+      
+      if (!palette && form.genderProperties && form.genderProperties[0] && form.genderProperties[0].palettes) {
+        palette = form.genderProperties[0].palettes[0];
+      }
+      
+      if (!palette) {
+        return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+      }
+      
+      // Handle special case for Minior
+      const spriteResource = pokemonId === 774 ? 
+        'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png' : 
+        (palette.sprite?.resource || palette.sprite);
+        
+      if (!spriteResource) {
+        return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+      }
+      
+      const url = `assets/pixelmon/textures/${spriteResource.split(':')[1]}`;
+      const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
+      const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
+      
+      if (fs.existsSync(defaultDirDef)) {
+        return path.join('/smartrotom/packs/default_resourcepack', url);
+      }
+      if (fs.existsSync(publicDir)) {
+        return path.join('/smartrotom/packs/resourcepack', url);
+      }
+      
+      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+    } catch (error) {
+      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+    }
+  }
 }
 
