@@ -9,7 +9,13 @@ import CalculatorForm from "./_components/CalculatorForm";
 export default function DamageCalculator() {
   const [moddedDex, setModdedDex] = useState<ModdedDex | null>(null);
   const [genInstance, setGenInstance] = useState(null);
-  const [pokemon, setPokemon] = useState([]);
+  const [pokemon, setPokemon] = useState<{ 
+    id: string; 
+    name: string; 
+    num: number; 
+    types: string[]; 
+    baseStats: Record<string, number>; 
+  }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +25,7 @@ export default function DamageCalculator() {
       setModdedDex(dex);
       
       // Get the Gen 9 instance from Generations (which is already an instance)
-      const gen = Generations.get(9);
+      const gen = Generations.get(9) as any;
       setGenInstance(gen);
       
       const pokemonList = Object.entries(dex.species.all())

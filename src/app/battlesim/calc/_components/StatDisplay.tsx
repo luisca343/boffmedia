@@ -1,5 +1,7 @@
 'use client';
 
+type NatureType = keyof typeof NATURE_MODIFIERS;
+
 interface StatDisplayProps {
   baseStats: {
     hp: number;
@@ -25,13 +27,13 @@ interface StatDisplayProps {
     spd: number;
     spe: number;
   };
-  nature: string;
+  nature: NatureType;
   level: number;
   onStatChange: (stat: string, value: number, isEV: boolean) => void;
 }
 
 // Nature modifiers lookup
-const NATURE_MODIFIERS = {
+const NATURE_MODIFIERS: Record<string, {atk?: number, def?: number, spa?: number, spd?: number, spe?: number}> = {
   Adamant: { atk: 1.1, spa: 0.9 },
   Bashful: {},
   Bold: { def: 1.1, atk: 0.9 },
@@ -112,8 +114,10 @@ export default function StatDisplay({
         </thead>
         <tbody>
           {Object.entries(statLabels).map(([stat, label]) => {
-            const hasNatureBuff = natureModifiers[stat] === 1.1;
-            const hasNatureNerf = natureModifiers[stat] === 0.9;
+            // Exclude 'hp' as it's not affected by nature
+            const statKey = stat as 'atk' | 'def' | 'spa' | 'spd' | 'spe';
+            const hasNatureBuff = stat !== 'hp' && natureModifiers[statKey] === 1.1;
+            const hasNatureNerf = stat !== 'hp' && natureModifiers[statKey] === 0.9;
             
             return (
               <tr key={stat} className="border-b">
@@ -122,7 +126,7 @@ export default function StatDisplay({
                     {label}
                   </span>
                 </td>
-                <td className="p-1 text-center">{baseStats[stat]}</td>
+                <td className="p-1 text-center">{baseStats[stat as keyof typeof baseStats]}</td>
                 <td className="p-1">
                   <input
                     type="number"
@@ -130,8 +134,8 @@ export default function StatDisplay({
                     min="0"
                     max="252"
                     step="4"
-                    value={evs[stat]}
-                    onChange={(e) => onStatChange(stat, e.target.value, true)}
+                    value={evs[stat as keyof typeof evs]}
+                    onChange={(e) => onStatChange(stat, parseInt(e.target.value), true)}
                   />
                 </td>
                 <td className="p-1">
@@ -140,11 +144,11 @@ export default function StatDisplay({
                     className="w-full p-1 border rounded text-center"
                     min="0"
                     max="31"
-                    value={ivs[stat]}
-                    onChange={(e) => onStatChange(stat, e.target.value, false)}
+                    value={ivs[stat as keyof typeof ivs]}
+                    onChange={(e) => onStatChange(stat, parseInt(e.target.value), false)}
                   />
                 </td>
-                <td className="p-1 text-center font-semibold">{calculatedStats[stat]}</td>
+                <td className="p-1 text-center font-semibold">{calculatedStats[stat as keyof typeof calculatedStats]}</td>
               </tr>
             );
           })}

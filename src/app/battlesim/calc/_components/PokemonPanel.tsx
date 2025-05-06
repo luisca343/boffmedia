@@ -46,46 +46,56 @@ export default function PokemonPanel({
     }
   }, [pokemonState.pokemonId, pokemon]);
 
-  const handlePokemonChange = (e) => {
+const handlePokemonChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setPokemonState({
-      ...pokemonState,
-      pokemonId: e.target.value,
-      moveIds: ["", "", "", ""] // Reset moves when changing Pokémon
+        ...pokemonState,
+        pokemonId: e.target.value,
+        moveIds: ["", "", "", ""] // Reset moves when changing Pokémon
     });
-  };
+};
 
-  const handleMoveChange = (index, moveId) => {
+interface MoveChangeHandler {
+    (index: number, moveId: string): void;
+}
+
+const handleMoveChange: MoveChangeHandler = (index, moveId) => {
     const newMoveIds = [...pokemonState.moveIds];
     newMoveIds[index] = moveId;
     setPokemonState({
-      ...pokemonState,
-      moveIds: newMoveIds
+        ...pokemonState,
+        moveIds: newMoveIds
     });
-  };
+};
 
-  const handleNatureChange = (e) => {
+const handleNatureChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
     setPokemonState({
-      ...pokemonState,
-      nature: e.target.value
+        ...pokemonState,
+        nature: e.target.value
     });
-  };
+};
 
-  const handleLevelChange = (e) => {
+const handleLevelChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setPokemonState({
-      ...pokemonState,
-      level: parseInt(e.target.value) || 100
+        ...pokemonState,
+        level: parseInt(e.target.value) || 100
     });
-  };
+};
 
-  const handleStatChange = (statType, value, isEV = true) => {
-    setPokemonState({
-      ...pokemonState,
-      [isEV ? 'evs' : 'ivs']: {
-        ...pokemonState[isEV ? 'evs' : 'ivs'],
-        [statType]: parseInt(value) || 0
-      }
-    });
-  };
+const handleStatChange = (
+    stat: string,
+    value: number,
+    isEV: boolean
+): void => {
+    if (stat === 'hp' || stat === 'atk' || stat === 'def' || stat === 'spa' || stat === 'spd' || stat === 'spe') {
+        setPokemonState({
+            ...pokemonState,
+            [isEV ? 'evs' : 'ivs']: {
+                ...pokemonState[isEV ? 'evs' : 'ivs'],
+                [stat]: value
+            }
+        });
+    }
+};
 
   return (
     <div className="border rounded p-4 bg-gray-50">
@@ -113,7 +123,7 @@ export default function PokemonPanel({
             <div>
               <label className="block text-sm font-medium mb-1">Type</label>
               <div className="flex space-x-1">
-                {selectedPokemon.types.map(type => (
+                {selectedPokemon.types.map((type: string) => (
                   <div key={type} className="px-2 py-1 rounded bg-gray-200 text-sm">
                     {type}
                   </div>

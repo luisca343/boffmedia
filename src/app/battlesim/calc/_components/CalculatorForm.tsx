@@ -9,7 +9,7 @@ import { calculate, Pokemon, Move, Field } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
 
 interface CalculatorFormProps {
-  moddedDex: ModdedDex;
+  moddedDex: ModdedDex | null;
   genInstance: any;
   pokemon: any[];
 }
@@ -33,8 +33,17 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
     level: 100
   });
   
-  const [moves, setMoves] = useState([]);
-  const [damageResults, setDamageResults] = useState([]);
+  const [moves, setMoves] = useState<Array<{ id: string; name: string; type: string; basePower: number; category: string }>>([]);
+  const [damageResults, setDamageResults] = useState<Array<{
+    direction: string;
+    gen: any; // Replace 'any' with the actual type of 'gen' if known
+    attacker: Pokemon;
+    defender: Pokemon;
+    move: Move;
+    field: Field;
+    damage: number | number[] | [number[], number[]];
+    rawDesc: any; // Replace 'any' with the actual type of 'rawDesc' if known
+  }>>([]);
   const [selectedResultIndex, setSelectedResultIndex] = useState(0);
   const [calculationError, setCalculationError] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
@@ -171,7 +180,7 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
       }
     } catch (error) {
       console.error("Calculation error:", error);
-      setCalculationError(`Error: ${error.message || "Failed to calculate damage"}`);
+      setCalculationError(`Error: ${error instanceof Error ? error.message : "Failed to calculate damage"}`);
       setDamageResults([]);
     } finally {
       setIsCalculating(false);
@@ -202,12 +211,40 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
   ]);
 
   // Wrapper functions for state updates to maintain type safety
-  const updateAttackerState = (newState) => {
-    setAttackerState(prevState => ({...prevState, ...newState}));
+  interface UpdateAttackerStatePayload {
+    pokemonId?: string;
+    moveIds?: string[];
+    nature?: string;
+    evs?: Record<string, number>;
+    ivs?: Record<string, number>;
+    level?: number;
+  }
+
+  const updateAttackerState = (newState: UpdateAttackerStatePayload) => {
+    setAttackerState(prevState => ({
+        ...prevState,
+        ...newState,
+        evs: { ...prevState.evs, ...newState.evs },
+        ivs: { ...prevState.ivs, ...newState.ivs }
+    }));
   };
   
-  const updateDefenderState = (newState) => {
-    setDefenderState(prevState => ({...prevState, ...newState}));
+  interface UpdateStatePayload {
+    pokemonId?: string;
+    moveIds?: string[];
+    nature?: string;
+    evs?: Record<string, number>;
+    ivs?: Record<string, number>;
+    level?: number;
+  }
+
+  const updateDefenderState = (newState: Partial<typeof defenderState>) => {
+      setDefenderState(prevState => ({
+          ...prevState,
+          ...newState,
+          evs: { ...prevState.evs, ...newState.evs },
+          ivs: { ...prevState.ivs, ...newState.ivs }
+      }));
   };
 
   return (
