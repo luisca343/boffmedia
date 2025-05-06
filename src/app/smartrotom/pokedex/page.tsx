@@ -4,7 +4,7 @@ import { LastRegistries } from "./_components/LastRegistries";
 import { PokedexSection } from "./_components/PokedexSection";
 import PokemonSearchBar from "./_components/PokemonSearchBar";
 import { PossibleSpawns } from "./_components/PossibleSpawns";
-import { ChevronRightIcon, BookOpenIcon, MapIcon, BoltIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, BookOpenIcon, MapIcon, BoltIcon, SparklesIcon } from "@heroicons/react/24/outline";
 
 export default function PokedexMenu(){
     return (
@@ -15,7 +15,7 @@ export default function PokedexMenu(){
                     <PokemonSearchBar />
                 </PokedexSection>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 my-6">
                     <QuickAccessCard 
                         title="Explorar Pokédex" 
                         description="Visualiza todos los Pokémon registrados"
@@ -35,6 +35,12 @@ export default function PokedexMenu(){
                         icon={<BoltIcon className="h-6 w-6" />}
                     />
                     <QuickAccessCard 
+                        title="Habilidades" 
+                        description="Explora las habilidades Pokémon"
+                        href="/pokedex/habilidades"
+                        icon={<SparklesIcon className="h-6 w-6" />}
+                    />
+                    <QuickAccessCard 
                         title="Tipos" 
                         description="Explora las ventajas y desventajas de tipos"
                         href="/pokedex/tipos"
@@ -42,6 +48,8 @@ export default function PokedexMenu(){
                             <img src="/smartrotom/img/types/dragon.png" alt="Tipos" className="h-5 w-5" />
                         </div>}
                     />
+                    {/* Empty div for proper grid alignment on large screens when there's an odd number of cards */}
+                    <div className="hidden xl:block"></div>
                 </div>
                 
                 <PokedexSection title="Últimos Registros" btn={

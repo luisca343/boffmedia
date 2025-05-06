@@ -68,6 +68,16 @@ export interface MoveCount {
     count: number;
 }
 
+export type AbilityCount = {
+  name: string;
+  count: number;
+};
+
+export type Ability = {
+  name: string;
+  isHidden?: boolean;
+};
+
 export const pokemonService = {
   getAllPokemon: () => rotomGET("/pokemon"),
   getPokemonByDex: (dex: number) => rotomGET<Pokemon>(`/pokemon/dex/${dex}`),
@@ -93,5 +103,10 @@ export const pokemonService = {
   searchPokemonByName: (name: string) => rotomGET(`/pokemon/search/species/${name}`),
   getRegistries: (uuid: string) => rotomGET<Registry[]>(`/pokemon/registries/${uuid}`),
   getPokedexStatus:  (uuid: string) => rotomGET<PokedexData>(`/pokemon/pokedex-status/${uuid}`),
+  getAllAbilities: () => rotomGET<AbilityCount[]>("/pokemon/abilities"),
+  getAbility: (name: string) => rotomGET<Ability>(`/pokemon/ability/${name}`),
+  getPokemonByAbility: (name: string) => rotomGET<SpeciesMoveEntry[]>(`/pokemon/ability/${name}/pokemon`),
+  
+  
 }
 

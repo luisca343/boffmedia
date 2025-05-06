@@ -128,6 +128,8 @@
 
         "item_linking_cord": "Cable Unión",
         
+        "nature_neutral": "Neutral",
+
         "nature_hardy": "Fuerte",
         "nature_brave": "Audaz",
         "nature_adamant": "Afable",
@@ -148,7 +150,7 @@
         "nature_timid": "Miedoso",
         "nature_serious": "Serio",
         "nature_modest": "Modesto",
-        "nature:mild": "Afable",
+        "nature_mild": "Afable",
         "nature_quiet": "Manso",
         "nature_bashful": "Tímido",
         "nature_calm": "Sereno",

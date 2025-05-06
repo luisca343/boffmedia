@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
 import { ChartBarIcon, InformationCircleIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number}) {
   const t = useTranslations("pokedex")
@@ -156,44 +157,98 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
           {viewMode === "nature" && (
             <div className="flex items-center">
               <label htmlFor="nature-select" className="mr-2 text-surface-200">Naturaleza:</label>
-              <select
-                id="nature-select"
-                value={nature}
-                onChange={(e) => setNature(e.target.value)}
-                className="bg-surface-700 text-surface-100 border border-surface-600 rounded px-2 py-1"
-              >
-                <option value="neutral">Neutral</option>
-                <optgroup label="+ Ataque">
-                  <option value="adamant">Firme (+ Atq, - AtqEsp)</option>
-                  <option value="brave">Audaz (+ Atq, - Vel)</option>
-                  <option value="lonely">Solitaria (+ Atq, - Def)</option>
-                  <option value="naughty">Pícara (+ Atq, - DefEsp)</option>
-                </optgroup>
-                <optgroup label="+ Defensa">
-                  <option value="bold">Osada (+ Def, - Atq)</option>
-                  <option value="relaxed">Relajada (+ Def, - Vel)</option>
-                  <option value="impish">Agitada (+ Def, - AtqEsp)</option>
-                  <option value="lax">Floja (+ Def, - DefEsp)</option>
-                </optgroup>
-                <optgroup label="+ Atq. Especial">
-                  <option value="modest">Modesta (+ AtqEsp, - Atq)</option>
-                  <option value="mild">Afable (+ AtqEsp, - Def)</option>
-                  <option value="quiet">Mansa (+ AtqEsp, - Vel)</option>
-                  <option value="rash">Alocada (+ AtqEsp, - DefEsp)</option>
-                </optgroup>
-                <optgroup label="+ Def. Especial">
-                  <option value="calm">Serena (+ DefEsp, - Atq)</option>
-                  <option value="gentle">Amable (+ DefEsp, - Def)</option>
-                  <option value="sassy">Grosera (+ DefEsp, - Vel)</option>
-                  <option value="careful">Cauta (+ DefEsp, - AtqEsp)</option>
-                </optgroup>
-                <optgroup label="+ Velocidad">
-                  <option value="hasty">Activa (+ Vel, - Def)</option>
-                  <option value="jolly">Alegre (+ Vel, - AtqEsp)</option>
-                  <option value="naive">Ingenua (+ Vel, - DefEsp)</option>
-                  <option value="timid">Miedosa (+ Vel, - Atq)</option>
-                </optgroup>
-              </select>
+              <Select value={nature} onValueChange={setNature}>
+                <SelectTrigger className="bg-surface-700 text-surface-100 border border-surface-600 w-[200px]">
+                  <SelectValue placeholder={t(`nature_${nature}`)} />
+                </SelectTrigger>
+                <SelectContent 
+                    className="bg-surface-700 text-surface-100 border border-surface-600 max-h-[300px] overflow-y-auto"
+                    position="popper"
+                    sideOffset={5}
+                  >
+                  <SelectItem value="neutral">{t('nature_neutral')}</SelectItem>
+                  
+                  <SelectGroup>
+                    <SelectLabel>+ {t('stat_attack')}</SelectLabel>
+                    <SelectItem value="adamant">
+                      {t('nature_adamant')} (+ {t('stat_attack').split(' ')[0]}, - {t('stat_specialattack').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="brave">
+                      {t('nature_brave')} (+ {t('stat_attack').split(' ')[0]}, - {t('stat_speed')})
+                    </SelectItem>
+                    <SelectItem value="lonely">
+                      {t('nature_lonely')} (+ {t('stat_attack').split(' ')[0]}, - {t('stat_defense')})
+                    </SelectItem>
+                    <SelectItem value="naughty">
+                      {t('nature_naughty')} (+ {t('stat_attack').split(' ')[0]}, - {t('stat_specialdefense').split(' ')[0]})
+                    </SelectItem>
+                  </SelectGroup>
+                  
+                  <SelectGroup>
+                    <SelectLabel>+ {t('stat_defense')}</SelectLabel>
+                    <SelectItem value="bold">
+                      {t('nature_bold')} (+ {t('stat_defense')}, - {t('stat_attack').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="relaxed">
+                      {t('nature_relaxed')} (+ {t('stat_defense')}, - {t('stat_speed')})
+                    </SelectItem>
+                    <SelectItem value="impish">
+                      {t('nature_impish')} (+ {t('stat_defense')}, - {t('stat_specialattack').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="lax">
+                      {t('nature_lax')} (+ {t('stat_defense')}, - {t('stat_specialdefense').split(' ')[0]})
+                    </SelectItem>
+                  </SelectGroup>
+                  
+                  <SelectGroup>
+                    <SelectLabel>+ {t('stat_specialattack')}</SelectLabel>
+                    <SelectItem value="modest">
+                      {t('nature_modest')} (+ {t('stat_specialattack').split(' ')[0]}, - {t('stat_attack').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="mild">
+                      {t('nature_mild')} (+ {t('stat_specialattack').split(' ')[0]}, - {t('stat_defense')})
+                    </SelectItem>
+                    <SelectItem value="quiet">
+                      {t('nature_quiet')} (+ {t('stat_specialattack').split(' ')[0]}, - {t('stat_speed')})
+                    </SelectItem>
+                    <SelectItem value="rash">
+                      {t('nature_rash')} (+ {t('stat_specialattack').split(' ')[0]}, - {t('stat_specialdefense').split(' ')[0]})
+                    </SelectItem>
+                  </SelectGroup>
+                  
+                  <SelectGroup>
+                    <SelectLabel>+ {t('stat_specialdefense')}</SelectLabel>
+                    <SelectItem value="calm">
+                      {t('nature_calm')} (+ {t('stat_specialdefense').split(' ')[0]}, - {t('stat_attack').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="gentle">
+                      {t('nature_gentle')} (+ {t('stat_specialdefense').split(' ')[0]}, - {t('stat_defense')})
+                    </SelectItem>
+                    <SelectItem value="sassy">
+                      {t('nature_sassy')} (+ {t('stat_specialdefense').split(' ')[0]}, - {t('stat_speed')})
+                    </SelectItem>
+                    <SelectItem value="careful">
+                      {t('nature_careful')} (+ {t('stat_specialdefense').split(' ')[0]}, - {t('stat_specialattack').split(' ')[0]})
+                    </SelectItem>
+                  </SelectGroup>
+                  
+                  <SelectGroup>
+                    <SelectLabel>+ {t('stat_speed')}</SelectLabel>
+                    <SelectItem value="hasty">
+                      {t('nature_hasty')} (+ {t('stat_speed')}, - {t('stat_defense')})
+                    </SelectItem>
+                    <SelectItem value="jolly">
+                      {t('nature_jolly')} (+ {t('stat_speed')}, - {t('stat_specialattack').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="naive">
+                      {t('nature_naive')} (+ {t('stat_speed')}, - {t('stat_specialdefense').split(' ')[0]})
+                    </SelectItem>
+                    <SelectItem value="timid">
+                      {t('nature_timid')} (+ {t('stat_speed')}, - {t('stat_attack').split(' ')[0]})
+                    </SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           )}
         </div>
