@@ -9,6 +9,7 @@ import { calculate, Pokemon, Move, Field } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
 import { AlertCircle } from "lucide-react";
 import { processDamageResult } from "../_utils/damageUtils";
+import { GenderName, StatusName, TypeName } from "@smogon/calc/dist/data/interface";
 
 interface CalculatorFormProps {
   moddedDex: ModdedDex | null;
@@ -25,12 +26,13 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
     ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
     boosts: { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     level: 100,
-    teraType: "Water",
+    teraType: "Water" as TypeName,
+    isTerastallized: false,
     forme: "",
-    gender: "Male",
+    gender: "Male" as GenderName,
     ability: "Snow Warning",
     item: "Heavy-Duty Boots",
-    status: "Healthy",
+    status: "Healthy" as StatusName,
     currentHp: 383,
     currentHpPercent: 100
   });
@@ -43,12 +45,13 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
     ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
     boosts: { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     level: 100,
-    teraType: "Water",
+    teraType: "Water" as TypeName,
+    isTerastallized: false,
     forme: "",
-    gender: "Male",
+    gender: "Male" as GenderName,
     ability: "",
     item: "",
-    status: "Healthy",
+    status: "Healthy" as StatusName,
     currentHp: 383,
     currentHpPercent: 100
   });
@@ -137,8 +140,8 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
         ability: attackerState.ability,
         item: attackerState.item,
         status: attackerState.status,
-        teraType: attackerState.teraType,
-        gender: attackerState.gender.toLowerCase(),
+        teraType: attackerState.isTerastallized ? attackerState.teraType : undefined,
+        gender: attackerState.gender,
         curHP: attackerState.currentHp,
         isDynamaxed: false
       });
@@ -152,8 +155,8 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
         ability: defenderState.ability,
         item: defenderState.item,
         status: defenderState.status,
-        teraType: defenderState.teraType,
-        gender: defenderState.gender.toLowerCase(),
+        teraType: defenderState.isTerastallized ? defenderState.teraType : undefined,
+        gender: defenderState.gender,
         curHP: defenderState.currentHp,
         isDynamaxed: false
       });

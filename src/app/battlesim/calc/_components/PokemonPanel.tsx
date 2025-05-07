@@ -24,6 +24,7 @@ interface PokemonPanelProps {
     boosts: { atk: number, def: number, spa: number, spd: number, spe: number };
     level: number;
     teraType: string;
+    isTerastallized: boolean;
     forme: string;
     gender: string;
     ability: string;
@@ -33,8 +34,10 @@ interface PokemonPanelProps {
     currentHpPercent: number;
   };
   setPokemonState: (state: any) => void;
+  
   side: 'attacker' | 'defender';
 }
+
 
 export default function PokemonPanel({
   title,
@@ -273,6 +276,13 @@ export default function PokemonPanel({
     }
   };
 
+  const handleTerastallizedChange = (isTerastallized: boolean): void => {
+    setPokemonState({
+      ...pokemonState,
+      isTerastallized
+    });
+  };
+
   // Calculate stat function for HP calculations
   function calculateStat(base: number, ev: number, iv: number, level: number, nature: number, isHP: boolean) {
     if (isHP) {
@@ -314,7 +324,9 @@ export default function PokemonPanel({
             <TypeDisplay
               types={selectedPokemon.types || []}
               teraType={pokemonState.teraType}
+              isTerastallized={pokemonState.isTerastallized}
               onTeraTypeChange={handleTeraTypeChange}
+              onTerastallizedChange={handleTerastallizedChange}
             />
             
             <BasicInfo
