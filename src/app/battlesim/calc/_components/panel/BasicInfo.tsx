@@ -1,5 +1,7 @@
 'use client';
 
+import { GENDER_OPTIONS } from '../../_utils/pokemonData';
+
 interface BasicInfoProps {
   level: number;
   forme: string;
@@ -15,8 +17,6 @@ export default function BasicInfo({
   onLevelChange,
   onGenderChange
 }: BasicInfoProps) {
-  const genderOptions = ['Male', 'Female', 'Genderless'];
-  
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
       <div>
@@ -37,7 +37,7 @@ export default function BasicInfo({
           value={gender}
           onChange={(e) => onGenderChange(e.target.value)}
         >
-          {genderOptions.map(g => (
+          {GENDER_OPTIONS.map(g => (
             <option key={g} value={g}>{g}</option>
           ))}
         </select>

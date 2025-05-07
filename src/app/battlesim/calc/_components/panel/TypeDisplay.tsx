@@ -1,5 +1,7 @@
 'use client';
 
+import { TYPE_OPTIONS } from '../../_utils/pokemonData';
+
 interface TypeDisplayProps {
   types: string[];
   teraType: string;
@@ -15,12 +17,6 @@ export default function TypeDisplay({
   onTeraTypeChange,
   onTerastallizedChange
 }: TypeDisplayProps) {
-  const typeOptions = [
-    'Normal', 'Fire', 'Water', 'Electric', 'Grass', 'Ice', 'Fighting', 'Poison',
-    'Ground', 'Flying', 'Psychic', 'Bug', 'Rock', 'Ghost', 'Dragon',
-    'Dark', 'Steel', 'Fairy'
-  ];
-
   return (
     <div className="grid grid-cols-2 gap-2">
       <div>
@@ -43,7 +39,7 @@ export default function TypeDisplay({
             value={teraType}
             onChange={(e) => onTeraTypeChange(e.target.value)}
           >
-            {typeOptions.map(type => (
+            {TYPE_OPTIONS.map(type => (
               <option key={type} value={type}>{type}</option>
             ))}
           </select>

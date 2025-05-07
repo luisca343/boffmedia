@@ -1,5 +1,7 @@
 'use client';
 
+import { NATURE_MODIFIERS } from '../../_utils/pokemonData';
+
 type NatureType = string;
 
 interface StatDisplayProps {
@@ -39,35 +41,6 @@ interface StatDisplayProps {
   onStatChange: (stat: string, value: number, isEV: boolean) => void;
   onBoostChange: (stat: string, value: number) => void;
 }
-
-// Nature modifiers lookup - simplified to just extract the nature name
-const NATURE_MODIFIERS: Record<string, {atk?: number, def?: number, spa?: number, spd?: number, spe?: number}> = {
-  Adamant: { atk: 1.1, spa: 0.9 },
-  Bashful: {},
-  Bold: { def: 1.1, atk: 0.9 },
-  Brave: { atk: 1.1, spe: 0.9 },
-  Calm: { spd: 1.1, atk: 0.9 },
-  Careful: { spd: 1.1, spa: 0.9 },
-  Docile: {},
-  Gentle: { spd: 1.1, def: 0.9 },
-  Hardy: {},
-  Hasty: { spe: 1.1, def: 0.9 },
-  Impish: { def: 1.1, spa: 0.9 },
-  Jolly: { spe: 1.1, spa: 0.9 },
-  Lax: { def: 1.1, spd: 0.9 },
-  Lonely: { atk: 1.1, def: 0.9 },
-  Mild: { spa: 1.1, def: 0.9 },
-  Modest: { spa: 1.1, atk: 0.9 },
-  Naive: { spe: 1.1, spd: 0.9 },
-  Naughty: { atk: 1.1, spd: 0.9 },
-  Quiet: { spa: 1.1, spe: 0.9 },
-  Quirky: {},
-  Rash: { spa: 1.1, spd: 0.9 },
-  Relaxed: { def: 1.1, spe: 0.9 },
-  Sassy: { spd: 1.1, spe: 0.9 },
-  Serious: {},
-  Timid: { spe: 1.1, atk: 0.9 }
-};
 
 // Calculate actual stats based on base, EVs, IVs, nature and level
 function calculateStat(base: number, ev: number, iv: number, level: number, nature: number, isHP: boolean) {
