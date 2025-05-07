@@ -6,6 +6,7 @@ import { Generations } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
 import CalculatorForm from "./_components/CalculatorForm";
 
+
 export default function DamageCalculator() {
   const [moddedDex, setModdedDex] = useState<ModdedDex | null>(null);
   const [genInstance, setGenInstance] = useState(null);
@@ -17,7 +18,7 @@ export default function DamageCalculator() {
     baseStats: Record<string, number>; 
   }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  moddedDex
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -47,12 +48,18 @@ export default function DamageCalculator() {
   }, []);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Damage Calculator</h1>
+    <div className="p-4 bg-surface-900 min-h-full text-surface-100 overflow-auto">
+      <h1 className="text-3xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400">
+        Damage Calculator
+      </h1>
       
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <p className="text-gray-500">Loading calculator data...</p>
+          <div className="relative">
+            <div className="w-12 h-12 rounded-full absolute border-4 border-solid border-surface-200 opacity-20"></div>
+            <div className="w-12 h-12 rounded-full animate-spin absolute border-4 border-solid border-primary-500 border-t-transparent"></div>
+          </div>
+          <p className="ml-4 text-surface-300">Loading calculator data...</p>
         </div>
       ) : (
         <CalculatorForm 

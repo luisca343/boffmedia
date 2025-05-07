@@ -1,3 +1,4 @@
+import { ModdedDex } from '@pkmn/dex';
 import { calculate, Pokemon, Move, Field } from '@smogon/calc';
 
 interface PokemonData {
@@ -52,4 +53,10 @@ export function calculateDamage(
         console.error("Calculation error:", error);
         throw error;
     }
+
 }
+
+
+
+
+

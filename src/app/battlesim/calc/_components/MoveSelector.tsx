@@ -17,9 +17,9 @@ export default function MoveSelector({
 }: MoveSelectorProps) {
   return (
     <div>
-      <label className="block text-sm font-medium mb-1">{label}</label>
+      <label className="block text-xs font-medium mb-1 text-surface-200">{label}</label>
       <select 
-        className="w-full p-2 border rounded"
+        className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 focus:ring-primary-500 focus:border-primary-500 text-xs"
         value={selectedMove} 
         onChange={(e) => setSelectedMove(e.target.value)}
         disabled={isDisabled}

@@ -7,6 +7,8 @@ import DamageResults from "./DamageResults";
 import MovesResultsOverview from "./MovesResultsOverview";
 import { calculate, Pokemon, Move, Field } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
+import { AlertCircle } from "lucide-react";
+import { processDamageResult } from "../_utils/damageUtils";
 
 interface CalculatorFormProps {
   moddedDex: ModdedDex | null;
@@ -21,7 +23,16 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
     nature: "Modest",
     evs: { hp: 252, atk: 0, def: 0, spa: 252, spd: 0, spe: 4 },
     ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
-    level: 100
+    boosts: { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+    level: 100,
+    teraType: "Water",
+    forme: "",
+    gender: "Male",
+    ability: "Snow Warning",
+    item: "Heavy-Duty Boots",
+    status: "Healthy",
+    currentHp: 383,
+    currentHpPercent: 100
   });
   
   const [defenderState, setDefenderState] = useState({
@@ -30,27 +41,29 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
     nature: "Bold",
     evs: { hp: 252, atk: 0, def: 252, spa: 0, spd: 4, spe: 0 },
     ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
-    level: 100
+    boosts: { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+    level: 100,
+    teraType: "Water",
+    forme: "",
+    gender: "Male",
+    ability: "",
+    item: "",
+    status: "Healthy",
+    currentHp: 383,
+    currentHpPercent: 100
   });
   
   const [moves, setMoves] = useState<Array<{ id: string; name: string; type: string; basePower: number; category: string }>>([]);
-  const [damageResults, setDamageResults] = useState<Array<{
-    direction: string;
-    gen: any; // Replace 'any' with the actual type of 'gen' if known
-    attacker: Pokemon;
-    defender: Pokemon;
-    move: Move;
-    field: Field;
-    damage: number | number[] | [number[], number[]];
-    rawDesc: any; // Replace 'any' with the actual type of 'rawDesc' if known
-  }>>([]);
+  const [items, setItems] = useState<Array<{ id: string; name: string }>>([]);
+  const [abilities, setAbilities] = useState<Array<{ id: string; name: string }>>([]);
+  const [damageResults, setDamageResults] = useState<ReturnType<typeof processDamageResult>[]>([]);
   const [selectedResultIndex, setSelectedResultIndex] = useState(0);
   const [calculationError, setCalculationError] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
 
-  // Load moves when dex is available
   useEffect(() => {
     if (moddedDex) {
+      // Load moves
       const movesList = Object.values(moddedDex.moves.all())
         .filter(move => move.name && move.basePower > 0)
         .map(move => ({
@@ -61,10 +74,30 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
           category: move.category
         }));
       setMoves(movesList);
+      
+      // Load items
+      const itemsList = Object.values(moddedDex.items.all())
+        .filter(item => item.name && !item.isNonstandard)
+        .map(item => ({
+          id: item.id,
+          name: item.name
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      setItems(itemsList);
+      
+      // Load abilities
+      const abilitiesList = Object.values(moddedDex.abilities.all())
+        .filter(ability => ability.name && !ability.isNonstandard)
+        .map(ability => ({
+          id: ability.id,
+          name: ability.name
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+      setAbilities(abilitiesList);
     }
   }, [moddedDex]);
+  
 
-  // Define calculateDamage as a regular function rather than using useCallback
   const calculateDamage = () => {
     if (!attackerState.pokemonId || !defenderState.pokemonId || !moddedDex || !genInstance) {
       setCalculationError("Please select both Pokémon");
@@ -94,19 +127,35 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
         return;
       }
       
-      // Create the Pokémon objects
-      const attackerPokemon = new Pokemon(genInstance, attackerData.name, {
+      // Create the Pokémon objects with the new fields
+      const attackerPokemon = new Pokemon(moddedDex as any, attackerData.name, {
         level: attackerState.level,
         nature: attackerState.nature,
         evs: attackerState.evs,
-        ivs: attackerState.ivs
+        ivs: attackerState.ivs,
+        boosts: attackerState.boosts,
+        ability: attackerState.ability,
+        item: attackerState.item,
+        status: attackerState.status,
+        teraType: attackerState.teraType,
+        gender: attackerState.gender.toLowerCase(),
+        curHP: attackerState.currentHp,
+        isDynamaxed: false
       });
       
-      const defenderPokemon = new Pokemon(genInstance, defenderData.name, {
+      const defenderPokemon = new Pokemon(moddedDex as any, defenderData.name, {
         level: defenderState.level,
         nature: defenderState.nature,
         evs: defenderState.evs,
-        ivs: defenderState.ivs
+        ivs: defenderState.ivs,
+        boosts: defenderState.boosts,
+        ability: defenderState.ability,
+        item: defenderState.item,
+        status: defenderState.status,
+        teraType: defenderState.teraType,
+        gender: defenderState.gender.toLowerCase(),
+        curHP: defenderState.currentHp,
+        isDynamaxed: false
       });
       
       // Calculate results for all selected moves
@@ -128,10 +177,9 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
                 move,
                 field
               );
-              results.push({
-                ...result,
-                direction: 'attacker-to-defender'
-              });
+              
+              const processedResult = processDamageResult(result, 'attacker-to-defender');
+              results.push(processedResult);
             } catch (error) {
               console.error(`Error calculating with move ${moveData.name}:`, error);
             }
@@ -155,10 +203,9 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
                 move,
                 field
               );
-              results.push({
-                ...result,
-                direction: 'defender-to-attacker'
-              });
+              
+              const processedResult = processDamageResult(result, 'defender-to-attacker');
+              results.push(processedResult);
             } catch (error) {
               console.error(`Error calculating with move ${moveData.name}:`, error);
             }
@@ -174,7 +221,6 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
       
       setDamageResults(results);
       
-      // Keep the selected index if it's still valid, otherwise reset to 0
       if (selectedResultIndex >= results.length) {
         setSelectedResultIndex(0);
       }
@@ -189,9 +235,7 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
 
   // Trigger calculation whenever relevant state changes
   useEffect(() => {
-    // Only calculate if both Pokémon are selected
     if (attackerState.pokemonId && defenderState.pokemonId && !isCalculating) {
-      // Small delay to avoid excessive calculations during rapid changes
       const timer = setTimeout(() => {
         calculateDamage();
       }, 300);
@@ -199,10 +243,8 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
       return () => clearTimeout(timer);
     }
   }, [
-    // Use JSON.stringify to track all changes in the complex objects
     JSON.stringify(attackerState),
     JSON.stringify(defenderState),
-    // Other dependencies
     isCalculating,
     moddedDex,
     genInstance,
@@ -210,45 +252,28 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
     selectedResultIndex
   ]);
 
-  // Wrapper functions for state updates to maintain type safety
-  interface UpdateAttackerStatePayload {
-    pokemonId?: string;
-    moveIds?: string[];
-    nature?: string;
-    evs?: Record<string, number>;
-    ivs?: Record<string, number>;
-    level?: number;
-  }
-
-  const updateAttackerState = (newState: UpdateAttackerStatePayload) => {
+  const updateAttackerState = (newState: Partial<typeof attackerState>) => {
     setAttackerState(prevState => ({
-        ...prevState,
-        ...newState,
-        evs: { ...prevState.evs, ...newState.evs },
-        ivs: { ...prevState.ivs, ...newState.ivs }
+      ...prevState,
+      ...newState,
+      evs: { ...prevState.evs, ...newState.evs },
+      ivs: { ...prevState.ivs, ...newState.ivs },
+      boosts: { ...prevState.boosts, ...newState.boosts }
     }));
   };
-  
-  interface UpdateStatePayload {
-    pokemonId?: string;
-    moveIds?: string[];
-    nature?: string;
-    evs?: Record<string, number>;
-    ivs?: Record<string, number>;
-    level?: number;
-  }
 
   const updateDefenderState = (newState: Partial<typeof defenderState>) => {
-      setDefenderState(prevState => ({
-          ...prevState,
-          ...newState,
-          evs: { ...prevState.evs, ...newState.evs },
-          ivs: { ...prevState.ivs, ...newState.ivs }
-      }));
+    setDefenderState(prevState => ({
+      ...prevState,
+      ...newState,
+      evs: { ...prevState.evs, ...newState.evs },
+      ivs: { ...prevState.ivs, ...newState.ivs },
+      boosts: { ...prevState.boosts, ...newState.boosts }
+    }));
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       {damageResults.length > 0 && (
         <>
           <MovesResultsOverview 
@@ -261,11 +286,13 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
         </>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <PokemonPanel 
           title="Pokémon 1"
           pokemon={pokemon}
           moves={moves}
+          items={items}
+          abilities={abilities}
           pokemonState={attackerState}
           setPokemonState={updateAttackerState}
           side="attacker"
@@ -277,6 +304,8 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
           title="Pokémon 2"
           pokemon={pokemon}
           moves={moves}
+          items={items}
+          abilities={abilities}
           pokemonState={defenderState}
           setPokemonState={updateDefenderState}
           side="defender"
@@ -284,7 +313,8 @@ export default function CalculatorForm({ moddedDex, genInstance, pokemon }: Calc
       </div>
       
       {calculationError && (
-        <div className="p-4 border rounded bg-red-50 text-red-700 mt-4">
+        <div className="p-4 border rounded-lg bg-red-900/30 border-red-800 text-red-300 mt-4 flex items-center">
+          <AlertCircle className="w-5 h-5 mr-2" />
           {calculationError}
         </div>
       )}

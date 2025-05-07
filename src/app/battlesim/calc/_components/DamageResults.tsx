@@ -1,5 +1,7 @@
 'use client';
 
+import { getDamageText } from '../_utils/damageUtils';
+
 interface DamageResultsProps {
   result: any;
 }
@@ -7,39 +9,25 @@ interface DamageResultsProps {
 export default function DamageResults({ result }: DamageResultsProps) {
   if (!result) return null;
   
-  // Calculate damage range
-  const minDamage = Math.min(...result.damage);
-  const maxDamage = Math.max(...result.damage);
-  
-  // Calculate percentages
-  const defenderHP = result.defender.stats.hp;
-  const minPercent = ((minDamage / defenderHP) * 100).toFixed(1);
-  const maxPercent = ((maxDamage / defenderHP) * 100).toFixed(1);
-  
-  // Get relevant stats for display
-  const attackerName = result.attacker.name;
-  const defenderName = result.defender.name;
-  const moveName = result.move.name;
-  
-  // Get the relevant attacker stat based on move category
-  const attackerRelevantStat = result.move.category === "Physical" ? "atk" : "spa";
-  const attackerStatValue = result.attacker.stats[attackerRelevantStat];
-  const attackerEVs = result.attacker.evs[attackerRelevantStat];
-  
-  // Calculate KO chance if available
-  let koChanceText = "";
-  if (result.kochance) {
-    koChanceText = result.kochance().text;
-  }
-  
-  // Format the title like in the screenshot
-  const title = `${attackerRelevantStat === 'spa' ? attackerEVs + ' SpA' : attackerEVs + ' Atk'} ${attackerName} ${moveName} vs. ${defenderHP} HP / ${result.defender.evs.spd} SpD ${defenderName}: ${minDamage}-${maxDamage} (${minPercent}-${maxPercent}%) -- ${koChanceText}`;
+  const { 
+    title,
+    damageAmounts,
+    minPercent,
+    maxPercent
+  } = getDamageText(result);
   
   return (
-    <div className="p-3 mb-4 rounded">
-      <div className="font-medium">{title}</div>
-      <div className="text-xs  mt-1">
-        Possible damage amounts: ({result.damage.join(", ")})
+    <div className="border border-surface-700 rounded px-2 py-1.5 bg-surface-700 text-xs">
+      <h3 className="font-medium text-primary-300 mb-0.5">{title}</h3>
+      
+      <div className="mb-0.5 text-surface-400">
+        <span className="mr-1">Damage:</span>
+        <span className="font-medium text-surface-200">{minPercent}% - {maxPercent}%</span>
+      </div>
+      
+      <div className="text-surface-400 text-xs">
+        <span className="mr-1">Possible damage:</span>
+        <span className="font-medium text-surface-200">{damageAmounts}</span>
       </div>
     </div>
   );
