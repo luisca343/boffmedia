@@ -4,62 +4,36 @@ import PokemonPanel from "./PokemonPanel";
 import FieldSelector from "./FieldSelector";
 import DamageResults from "./DamageResults";
 import MovesResultsOverview from "./MovesResultsOverview";
-import { ModdedDex } from "@pkmn/dex";
 import { AlertCircle } from "lucide-react";
-import { usePokedexData } from "../_hooks/usePokedexData";
-import { usePokemonState } from "../_hooks/usePokemonState";
-import { useDamageCalculation } from "../_hooks/useDamageCalculation";
+import { useCalcContext } from "../_context/CalcContext";
 
-interface CalculatorFormProps {
-  moddedDex: ModdedDex | null;
-  genInstance: any;
-  pokemon: any[];
-}
-
-export default function CalculatorForm({ moddedDex, genInstance, pokemon }: CalculatorFormProps) {
+export default function CalculatorForm() {
   const { 
-    state: attackerState, 
-    updateState: updateAttackerState,
-  } = usePokemonState({ role: "attacker" });
-  
-  const { 
-    state: defenderState, 
-    updateState: updateDefenderState,
-  } = usePokemonState({ role: "defender" });
-  
-  const { 
-    moves, 
-    items, 
-    abilities, 
-    getPokemonAbilities 
-  } = usePokedexData(moddedDex);
-  
-  const { 
-    damageResults, 
-    selectedResultIndex, 
-    setSelectedResultIndex, 
-    calculationError 
-  } = useDamageCalculation({
-    moddedDex,
-    genInstance,
-    pokemonList: pokemon,
+    pokemon,
+    moves,
+    items,
+    abilities,
     attackerState,
-    defenderState
-  });
+    updateAttackerState,
+    defenderState,
+    updateDefenderState,
+    damageResults,
+    selectedResultIndex,
+    setSelectedResultIndex,
+    calculationError,
+    getPokemonAbilities
+  } = useCalcContext();
 
   return (
     <div className="flex flex-col gap-6">
-      {damageResults.length > 0 && (
-        <>
-          <MovesResultsOverview 
-            results={damageResults}
-            selectedResultIndex={selectedResultIndex}
-            onSelectResult={setSelectedResultIndex}
-          />
+      <MovesResultsOverview 
+        results={damageResults}
+        selectedResultIndex={selectedResultIndex}
+        onSelectResult={setSelectedResultIndex}
+      />
           
-          <DamageResults result={damageResults[selectedResultIndex]} />
-        </>
-      )}
+      <DamageResults result={damageResults[selectedResultIndex]} />
+
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <PokemonPanel 

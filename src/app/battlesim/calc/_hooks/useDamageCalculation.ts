@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { calculate, Pokemon, Move, Field } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
 import { processDamageResult } from "../_utils/damageUtils";
@@ -25,6 +25,32 @@ export function useDamageCalculation({
   const [selectedResultIndex, setSelectedResultIndex] = useState(0);
   const [calculationError, setCalculationError] = useState("");
   const [isCalculating, setIsCalculating] = useState(false);
+  
+  // Track previous Pokémon IDs to detect which one changed
+  const prevAttackerIdRef = useRef(attackerState.pokemonId);
+  const prevDefenderIdRef = useRef(defenderState.pokemonId);
+
+  // Selectively clear results when a Pokémon changes
+  useEffect(() => {
+    // Check if attacker changed
+    if (attackerState.pokemonId !== prevAttackerIdRef.current) {
+      // Only remove results from this attacker
+      setDamageResults(prev => prev.filter(result => result.direction !== 'attacker-to-defender'));
+      prevAttackerIdRef.current = attackerState.pokemonId;
+    }
+    
+    // Check if defender changed
+    if (defenderState.pokemonId !== prevDefenderIdRef.current) {
+      // Only remove results from this attacker
+      setDamageResults(prev => prev.filter(result => result.direction !== 'defender-to-attacker'));
+      prevDefenderIdRef.current = defenderState.pokemonId;
+    }
+    
+    // Reset selected index if we cleared results
+    if (damageResults.length === 0) {
+      setSelectedResultIndex(0);
+    }
+  }, [attackerState.pokemonId, defenderState.pokemonId]);
 
   const calculateDamage = () => {
     if (!attackerState.pokemonId || !defenderState.pokemonId || !moddedDex || !genInstance) {
@@ -86,76 +112,81 @@ export function useDamageCalculation({
         isDynamaxed: false
       });
       
-      // Calculate results for all selected moves
-      const results = [];
+      // Keep track of new results from this calculation
+      let newResults: ReturnType<typeof processDamageResult>[] = [];
       
       // Calculate attacker's moves against defender
-      for (const moveId of attackerState.moveIds) {
-        if (moveId) {
-          const moveData = moddedDex.moves.get(moveId);
-          if (moveData) {
-            const move = new Move(genInstance, moveData.name);
-            const field = new Field();
-            
-            try {
-              const result = calculate(
-                genInstance,
-                attackerPokemon,
-                defenderPokemon,
-                move,
-                field
-              );
+      if (attackerHasMoves) {
+        for (const moveId of attackerState.moveIds) {
+          if (moveId) {
+            const moveData = moddedDex.moves.get(moveId);
+            if (moveData) {
+              const move = new Move(genInstance, moveData.name);
+              const field = new Field();
               
-              const processedResult = processDamageResult(result, 'attacker-to-defender');
-              results.push(processedResult);
-            } catch (error) {
-              console.error(`Error calculating with move ${moveData.name}:`, error);
+              try {
+                const result = calculate(
+                  genInstance,
+                  attackerPokemon,
+                  defenderPokemon,
+                  move,
+                  field
+                );
+                
+                const processedResult = processDamageResult(result, 'attacker-to-defender');
+                newResults.push(processedResult);
+              } catch (error) {
+                console.error(`Error calculating with move ${moveData.name}:`, error);
+              }
             }
           }
         }
       }
       
       // Calculate defender's moves against attacker
-      for (const moveId of defenderState.moveIds) {
-        if (moveId) {
-          const moveData = moddedDex.moves.get(moveId);
-          if (moveData) {
-            const move = new Move(genInstance, moveData.name);
-            const field = new Field();
-            
-            try {
-              const result = calculate(
-                genInstance,
-                defenderPokemon,
-                attackerPokemon,
-                move,
-                field
-              );
+      if (defenderHasMoves) {
+        for (const moveId of defenderState.moveIds) {
+          if (moveId) {
+            const moveData = moddedDex.moves.get(moveId);
+            if (moveData) {
+              const move = new Move(genInstance, moveData.name);
+              const field = new Field();
               
-              const processedResult = processDamageResult(result, 'defender-to-attacker');
-              results.push(processedResult);
-            } catch (error) {
-              console.error(`Error calculating with move ${moveData.name}:`, error);
+              try {
+                const result = calculate(
+                  genInstance,
+                  defenderPokemon,
+                  attackerPokemon,
+                  move,
+                  field
+                );
+                
+                const processedResult = processDamageResult(result, 'defender-to-attacker');
+                newResults.push(processedResult);
+              } catch (error) {
+                console.error(`Error calculating with move ${moveData.name}:`, error);
+              }
             }
           }
         }
       }
       
-      if (results.length === 0) {
+      if (newResults.length === 0) {
         setCalculationError("No valid moves found for calculation");
-        setIsCalculating(false);
-        return;
-      }
-      
-      setDamageResults(results);
-      
-      if (selectedResultIndex >= results.length) {
-        setSelectedResultIndex(0);
+      } else {
+        // Merge new results with existing ones, replacing any with the same direction
+        setDamageResults(prev => {
+          // Filter out results that match the directions we're recalculating
+          const directionsToUpdate = [...new Set(newResults.map(r => r.direction))];
+          const filteredPrev = prev.filter(r => !directionsToUpdate.includes(r.direction));
+          
+          // Combine with new results
+          return [...filteredPrev, ...newResults];
+        });
       }
     } catch (error) {
       console.error("Calculation error:", error);
       setCalculationError(`Error: ${error instanceof Error ? error.message : "Failed to calculate damage"}`);
-      setDamageResults([]);
     } finally {
       setIsCalculating(false);
     }

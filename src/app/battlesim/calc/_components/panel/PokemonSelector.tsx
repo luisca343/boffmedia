@@ -22,11 +22,11 @@ export default function PokemonSelector({
         onChange={(e) => onChange(e.target.value)}
       >
         <option value="">Select Pokémon</option>
-        {pokemon.map(poke => (
-          <option key={poke.id} value={poke.id}>
+        {pokemon.map(poke => {
+          return <option key={poke.id} value={poke.id}>
             {poke.name}
           </option>
-        ))}
+})}
       </select>
     </div>
   );

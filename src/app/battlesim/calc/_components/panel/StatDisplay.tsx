@@ -1,61 +1,17 @@
 'use client';
 
-import { NATURE_MODIFIERS } from '../../_utils/pokemonData';
-
-type NatureType = string;
+import { StatsTable, BoostsTable } from "../../types";
+import { StatCalculator } from "../../_utils/statCalculator";
 
 interface StatDisplayProps {
-  baseStats: {
-    hp: number;
-    atk: number;
-    def: number;
-    spa: number;
-    spd: number;
-    spe: number;
-  };
-  evs: {
-    hp: number;
-    atk: number;
-    def: number;
-    spa: number;
-    spd: number;
-    spe: number;
-  };
-  ivs: {
-    hp: number;
-    atk: number;
-    def: number;
-    spa: number;
-    spd: number;
-    spe: number;
-  };
-  boosts: {
-    atk: number;
-    def: number;
-    spa: number;
-    spd: number;
-    spe: number;
-  };
-  nature: NatureType;
+  baseStats: StatsTable;
+  evs: StatsTable;
+  ivs: StatsTable;
+  boosts: BoostsTable;
+  nature: string;
   level: number;
   onStatChange: (stat: string, value: number, isEV: boolean) => void;
   onBoostChange: (stat: string, value: number) => void;
-}
-
-// Calculate actual stats based on base, EVs, IVs, nature and level
-function calculateStat(base: number, ev: number, iv: number, level: number, nature: number, isHP: boolean) {
-  if (isHP) {
-    return Math.floor(((2 * base + iv + Math.floor(ev / 4)) * level) / 100) + level + 10;
-  } else {
-    return Math.floor((Math.floor(((2 * base + iv + Math.floor(ev / 4)) * level) / 100) + 5) * nature);
-  }
-}
-
-// Calculate boosted stat
-function applyBoosts(stat: number, boost: number): number {
-  const numerator = boost > 0 ? (2 + boost) : 2;
-  const denominator = boost > 0 ? 2 : (2 - boost);
-  return Math.floor(stat * (numerator / denominator));
 }
 
 export default function StatDisplay({
@@ -68,7 +24,7 @@ export default function StatDisplay({
   onStatChange,
   onBoostChange
 }: StatDisplayProps) {
-  const natureModifiers = NATURE_MODIFIERS[nature] || {};
+  const natureModifiers = StatCalculator.getNatureMultipliers(nature);
   
   const statLabels = {
     hp: "HP",
@@ -80,24 +36,10 @@ export default function StatDisplay({
   };
 
   // Calculate stats
-  const calculatedStats = {
-    hp: calculateStat(baseStats.hp, evs.hp, ivs.hp, level, 1, true),
-    atk: calculateStat(baseStats.atk, evs.atk, ivs.atk, level, natureModifiers.atk || 1, false),
-    def: calculateStat(baseStats.def, evs.def, ivs.def, level, natureModifiers.def || 1, false),
-    spa: calculateStat(baseStats.spa, evs.spa, ivs.spa, level, natureModifiers.spa || 1, false),
-    spd: calculateStat(baseStats.spd, evs.spd, ivs.spd, level, natureModifiers.spd || 1, false),
-    spe: calculateStat(baseStats.spe, evs.spe, ivs.spe, level, natureModifiers.spe || 1, false),
-  };
+  const calculatedStats = StatCalculator.calculateAllStats(baseStats, evs, ivs, level, nature);
   
   // Apply boosts to stats (except HP)
-  const boostedStats = {
-    hp: calculatedStats.hp,
-    atk: applyBoosts(calculatedStats.atk, boosts.atk),
-    def: applyBoosts(calculatedStats.def, boosts.def),
-    spa: applyBoosts(calculatedStats.spa, boosts.spa),
-    spd: applyBoosts(calculatedStats.spd, boosts.spd),
-    spe: applyBoosts(calculatedStats.spe, boosts.spe)
-  };
+  const boostedStats = StatCalculator.applyAllBoosts(calculatedStats, boosts);
 
   return (
     <div className="mb-2">

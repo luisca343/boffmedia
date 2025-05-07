@@ -5,20 +5,16 @@ import { useState, useEffect } from "react";
 import { Generations } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
 import CalculatorForm from "./_components/CalculatorForm";
-
+import { CalcProvider } from "./_context/CalcContext";
+import { PokemonData } from "./types";
+import { a } from "@react-spring/web";
 
 export default function DamageCalculator() {
   const [moddedDex, setModdedDex] = useState<ModdedDex | null>(null);
   const [genInstance, setGenInstance] = useState(null);
-  const [pokemon, setPokemon] = useState<{ 
-    id: string; 
-    name: string; 
-    num: number; 
-    types: string[]; 
-    baseStats: Record<string, number>; 
-  }[]>([]);
+  const [pokemon, setPokemon] = useState<PokemonData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  moddedDex
+
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
@@ -28,14 +24,15 @@ export default function DamageCalculator() {
       // Get the Gen 9 instance from Generations (which is already an instance)
       const gen = Generations.get(9) as any;
       setGenInstance(gen);
-      
+      console.log(dex.species.all());
       const pokemonList = Object.entries(dex.species.all())
         .map(([id, species]) => ({
-          id,
+          id: species.id,
           name: species.name,
           num: species.num,
           types: species.types || [],
           baseStats: species.baseStats || {},
+          abilities: species.abilities || {},
         }))
         .filter(poke => poke.num > 0)
         .sort((a, b) => a.num - b.num);
@@ -62,11 +59,9 @@ export default function DamageCalculator() {
           <p className="ml-4 text-surface-300">Loading calculator data...</p>
         </div>
       ) : (
-        <CalculatorForm 
-          moddedDex={moddedDex} 
-          genInstance={genInstance} 
-          pokemon={pokemon} 
-        />
+        <CalcProvider moddedDex={moddedDex} genInstance={genInstance} pokemon={pokemon}>
+          <CalculatorForm />
+        </CalcProvider>
       )}
     </div>
   );

@@ -16,6 +16,7 @@ export default function DamageResults({ result }: DamageResultsProps) {
     maxPercent
   } = getDamageText(result);
   
+  
   return (
     <div className="border border-surface-700 rounded px-2 py-1.5 bg-surface-700 text-xs">
       <h3 className="font-medium text-primary-300 mb-0.5">{title}</h3>
