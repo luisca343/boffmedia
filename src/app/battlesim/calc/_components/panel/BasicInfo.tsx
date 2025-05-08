@@ -4,7 +4,6 @@ import { GENDER_OPTIONS } from '../../_utils/pokemonData';
 
 interface BasicInfoProps {
   level: number;
-  forme: string;
   gender: string;
   onLevelChange: (level: number) => void;
   onGenderChange: (gender: string) => void;
@@ -12,24 +11,12 @@ interface BasicInfoProps {
 
 export default function BasicInfo({
   level,
-  forme,
   gender,
   onLevelChange,
   onGenderChange
 }: BasicInfoProps) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-      <div>
-        <label className="block text-xs font-medium mb-1 text-surface-200">Forme</label>
-        <select
-          className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
-          value={forme}
-          disabled={true}
-        >
-          <option value={forme}>{forme}</option>
-        </select>
-      </div>
-      
       <div>
         <label className="block text-xs font-medium mb-1 text-surface-200">Gender</label>
         <select

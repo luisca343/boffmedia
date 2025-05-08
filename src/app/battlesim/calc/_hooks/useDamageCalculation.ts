@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { calculate, Pokemon, Move, Field } from '@smogon/calc';
+import { calculate, Pokemon, Move, Field, Side } from '@smogon/calc';
 import { ModdedDex } from "@pkmn/dex";
 import { processDamageResult } from "../_utils/damageUtils";
 import { PokemonState } from "./usePokemonState";
@@ -10,6 +10,7 @@ interface UseDamageCalculationProps {
   pokemonList: any[];
   attackerState: PokemonState;
   defenderState: PokemonState;
+  fieldState: Field;
   debounceMs?: number;
 }
 
@@ -19,6 +20,7 @@ export function useDamageCalculation({
   pokemonList,
   attackerState,
   defenderState,
+  fieldState,
   debounceMs = 300
 }: UseDamageCalculationProps) {
   const [damageResults, setDamageResults] = useState<ReturnType<typeof processDamageResult>[]>([]);
@@ -112,6 +114,15 @@ export function useDamageCalculation({
         isDynamaxed: false
       });
       
+      // Create field with settings from fieldState
+      const field = new Field({
+        gameType: fieldState.gameType,
+        terrain: fieldState.terrain || undefined,
+        weather: fieldState.weather || undefined,
+        isGravity: fieldState.isGravity,
+        // Add other field conditions as needed
+      });
+      
       // Keep track of new results from this calculation
       let newResults: ReturnType<typeof processDamageResult>[] = [];
       
@@ -122,15 +133,20 @@ export function useDamageCalculation({
             const moveData = moddedDex.moves.get(moveId);
             if (moveData) {
               const move = new Move(genInstance, moveData.name);
-              const field = new Field();
-              
+
+              const fieldForCalc = new Field({
+                ...field,
+                attackerSide: new Side({ ...field.attackerSide }),
+                defenderSide: new Side({ ...field.defenderSide })
+              });
+
               try {
                 const result = calculate(
                   genInstance,
                   attackerPokemon,
                   defenderPokemon,
                   move,
-                  field
+                  fieldForCalc
                 );
                 
                 const processedResult = processDamageResult(result, 'attacker-to-defender');
@@ -150,7 +166,12 @@ export function useDamageCalculation({
             const moveData = moddedDex.moves.get(moveId);
             if (moveData) {
               const move = new Move(genInstance, moveData.name);
-              const field = new Field();
+
+              const fieldForCalc = new Field({
+                ...field,
+                attackerSide: new Side({ ...field.defenderSide }),
+                defenderSide: new Side({ ...field.attackerSide })
+              });
               
               try {
                 const result = calculate(
@@ -158,7 +179,7 @@ export function useDamageCalculation({
                   defenderPokemon,
                   attackerPokemon,
                   move,
-                  field
+                  fieldForCalc
                 );
                 
                 const processedResult = processDamageResult(result, 'defender-to-attacker');
@@ -177,7 +198,7 @@ export function useDamageCalculation({
         // Merge new results with existing ones, replacing any with the same direction
         setDamageResults(prev => {
           // Filter out results that match the directions we're recalculating
-          const directionsToUpdate = [...new Set(newResults.map(r => r.direction))];
+          const directionsToUpdate = Array.from(new Set(newResults.map(r => r.direction)));
           const filteredPrev = prev.filter(r => !directionsToUpdate.includes(r.direction));
           
           // Combine with new results
@@ -204,6 +225,7 @@ export function useDamageCalculation({
   }, [
     JSON.stringify(attackerState),
     JSON.stringify(defenderState),
+    JSON.stringify(fieldState),
     moddedDex,
     genInstance,
     pokemonList,

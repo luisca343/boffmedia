@@ -25,6 +25,8 @@ export default function HpControl({
           type="number"
           className="w-full p-1 h-6 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
           value={currentHp}
+          min={0}
+          max={maxHp}
           onChange={(e) => onHpChange(parseInt(e.target.value) || 0)}
         />
         <span className="text-surface-400">/</span>

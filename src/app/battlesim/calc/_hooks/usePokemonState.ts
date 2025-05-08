@@ -11,7 +11,6 @@ export interface PokemonState {
   level: number;
   teraType: TypeName;
   isTerastallized: boolean;
-  forme: string;
   gender: GenderName;
   ability: string;
   item: string;
@@ -38,7 +37,6 @@ export function usePokemonState({ initialState, role }: UsePokemonStateProps) {
     level: 100,
     teraType: "Water" as TypeName,
     isTerastallized: false,
-    forme: "",
     gender: "Male" as GenderName,
     ability: "",
     item: role === "attacker" ? "Heavy-Duty Boots" : "",

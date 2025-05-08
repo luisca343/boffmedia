@@ -10,7 +10,6 @@ export const DEFAULT_ATTACKER = {
       level: 100,
       teraType: "Water" as TypeName,
       isTerastallized: false,
-      forme: "Wungill",
       gender: "Male" as GenderName,
       ability: "Intimidate",
       item: "Choice Specs",

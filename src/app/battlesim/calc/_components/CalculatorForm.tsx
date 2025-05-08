@@ -9,23 +9,14 @@ import { useCalcContext } from "../_context/CalcContext";
 
 export default function CalculatorForm() {
   const { 
-    pokemon,
-    moves,
-    items,
-    abilities,
-    attackerState,
-    updateAttackerState,
-    defenderState,
-    updateDefenderState,
     damageResults,
     selectedResultIndex,
     setSelectedResultIndex,
-    calculationError,
-    getPokemonAbilities
+    calculationError
   } = useCalcContext();
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 max-w-[80%] mx-auto">
       <MovesResultsOverview 
         results={damageResults}
         selectedResultIndex={selectedResultIndex}
@@ -38,13 +29,6 @@ export default function CalculatorForm() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <PokemonPanel 
           title="Pokémon 1"
-          pokemon={pokemon}
-          moves={moves}
-          items={items}
-          abilities={abilities}
-          pokemonState={attackerState}
-          setPokemonState={updateAttackerState}
-          getPokemonAbilities={getPokemonAbilities}
           side="attacker"
         />
         
@@ -52,13 +36,6 @@ export default function CalculatorForm() {
         
         <PokemonPanel 
           title="Pokémon 2"
-          pokemon={pokemon}
-          moves={moves}
-          items={items}
-          abilities={abilities}
-          pokemonState={defenderState}
-          setPokemonState={updateDefenderState}
-          getPokemonAbilities={getPokemonAbilities}
           side="defender"
         />
       </div>

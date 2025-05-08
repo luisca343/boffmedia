@@ -42,17 +42,14 @@ export default function StatDisplay({
   const boostedStats = StatCalculator.applyAllBoosts(calculatedStats, boosts);
 
   return (
-    <div className="mb-2">
-      <h3 className="text-xs font-medium text-primary-400">Stats</h3>
-      <div className="flex justify-between items-center mb-1">
-        <div className="grid grid-cols-6 gap-1 text-xs text-surface-400">
-          <div className="text-center">Stat</div>
-          <div className="text-center">Base</div>
-          <div className="text-center">IVs</div>
-          <div className="text-center">EVs</div>
-          <div className="text-center">Total</div>
-          <div className="text-center">Boost</div>
-        </div>
+    <div className="mb-2 max-w-[75%] ml-1">
+      <div className="grid grid-cols-6 gap-2 mb-1 text-xs text-surface-400">
+        <div className="text-left pl-1">Stat</div>
+        <div className="text-center">Base</div>
+        <div className="text-center">IVs</div>
+        <div className="text-center">EVs</div>
+        <div className="text-center">Total</div>
+        <div className="text-center">Boost</div>
       </div>
       
       {Object.entries(statLabels).map(([stat, label]) => {
@@ -63,19 +60,19 @@ export default function StatDisplay({
         return (
           <div 
             key={stat} 
-            className="flex items-center mb-1 text-xs"
+            className="grid grid-cols-6 gap-2 mb-1 text-xs items-center"
           >
-            <div className="w-10">
+            <div>
               <span className={`${hasNatureBuff ? 'text-red-500 font-medium' : ''} ${hasNatureNerf ? 'text-blue-400 font-medium' : ''} text-surface-200`}>
                 {label}
               </span>
             </div>
             
-            <div className="w-8 text-center text-surface-300">
+            <div className="text-center text-surface-300">
               {baseStats[statKey]}
             </div>
             
-            <div className="w-12">
+            <div className="text-center">
               <input
                 type="number"
                 className="w-full py-0 px-1 h-6 border rounded text-center bg-surface-700 border-surface-600 text-surface-100 text-xs"
@@ -86,7 +83,7 @@ export default function StatDisplay({
               />
             </div>
             
-            <div className="w-12">
+            <div className="text-center">
               <input
                 type="number"
                 className="w-full py-0 px-1 h-6 border rounded text-center bg-surface-700 border-surface-600 text-surface-100 text-xs"
@@ -98,15 +95,15 @@ export default function StatDisplay({
               />
             </div>
             
-            <div className="w-16 text-center font-medium text-primary-300">
+            <div className="text-center font-medium text-primary-300">
               {stat !== 'hp' && boosts[stat as keyof typeof boosts] !== 0 
                 ? `${calculatedStats[statKey]} → ${boostedStats[statKey]}`
                 : calculatedStats[statKey]
               }
             </div>
             
-            {stat !== 'hp' ? (
-              <div className="w-12">
+            <div className="text-center">
+              {stat !== 'hp' ? (
                 <select
                   className="w-full py-0 px-0 h-6 border rounded text-center bg-surface-700 border-surface-600 text-surface-100 text-xs"
                   value={boosts[stat as keyof typeof boosts]}
@@ -116,10 +113,10 @@ export default function StatDisplay({
                     <option key={boost} value={boost}>{boost > 0 ? `+${boost}` : boost}</option>
                   ))}
                 </select>
-              </div>
-            ) : (
-              <div className="w-12 text-center">—</div>
-            )}
+              ) : (
+                "—"
+              )}
+            </div>
           </div>
         );
       })}

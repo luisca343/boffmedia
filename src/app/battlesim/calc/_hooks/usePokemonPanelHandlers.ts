@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PokemonState } from './usePokemonState';
 
 interface UsePokemonPanelHandlersProps {
@@ -16,31 +16,44 @@ export function usePokemonPanelHandlers({
 }: UsePokemonPanelHandlersProps) {
   const [selectedPokemon, setSelectedPokemon] = useState<any>(null);
   const [pokemonAbilities, setPokemonAbilities] = useState<string[]>([]);
-
-  // Synchronize selected pokemon with pokemonState
+  const initialAbilitySetRef = useRef<{[key: string]: boolean}>({});
+  const prevPokemonIdRef = useRef<string>(pokemonState.pokemonId);
+  
   useEffect(() => {
-    if (pokemonState.pokemonId) {
-      const selected = pokemon.find(p => p.id === pokemonState.pokemonId);
-      setSelectedPokemon(selected || null);
+    // Only run this effect when the pokemonId actually changes
+    if (pokemonState.pokemonId !== prevPokemonIdRef.current) {
+      prevPokemonIdRef.current = pokemonState.pokemonId;
       
-      // Set the available abilities for this Pokémon
-      if (selected) {
-        const availableAbilities = getPokemonAbilities(pokemonState.pokemonId, pokemon);
-        setPokemonAbilities(availableAbilities);
+      if (pokemonState.pokemonId) {
+        const selected = pokemon.find(p => p.id === pokemonState.pokemonId);
+        setSelectedPokemon(selected || null);
         
-        // If current ability isn't in the list, set to first available
-        if (availableAbilities.length > 0 && !availableAbilities.includes(pokemonState.ability)) {
-          setPokemonState({
-            ability: availableAbilities[0]
-          });
+        // Set the available abilities for this Pokémon
+        if (selected) {
+          const availableAbilities = getPokemonAbilities(pokemonState.pokemonId, pokemon);
+          setPokemonAbilities(availableAbilities);
+          
+          // Only set default ability once per Pokemon selection to avoid infinite loops
+          if (availableAbilities.length > 0 && !initialAbilitySetRef.current[pokemonState.pokemonId]) {
+            // If current ability isn't in the list, set to first available
+            if (!availableAbilities.includes(pokemonState.ability)) {
+              setPokemonState({
+                ability: availableAbilities[0]
+              });
+            }
+            initialAbilitySetRef.current[pokemonState.pokemonId] = true;
+          }
         }
+      } else {
+        setSelectedPokemon(null);
+        setPokemonAbilities([]);
       }
-    } else {
-      setSelectedPokemon(null);
-      setPokemonAbilities([]);
     }
-  }, [pokemonState.pokemonId, pokemon, getPokemonAbilities, setPokemonState]);
+  }, [pokemonState.pokemonId, pokemon]);
+  // Remove getPokemonAbilities and setPokemonState from dependencies
 
+  // Rest of the code remains the same
+  
   // Stat calculation utility
   const calculateStat = (base: number, ev: number, iv: number, level: number, nature: number, isHP: boolean) => {
     if (isHP) {
@@ -66,6 +79,11 @@ export function usePokemonPanelHandlers({
 
   // All handlers below
   const handlePokemonChange = (pokemonId: string) => {
+    // Reset the ability initialization tracking when Pokemon changes
+    if (pokemonId !== pokemonState.pokemonId) {
+      initialAbilitySetRef.current = {};
+    }
+    
     const selected = pokemon.find(p => p.id === pokemonId);
     
     // Find the default ability for this Pokémon
@@ -77,7 +95,6 @@ export function usePokemonPanelHandlers({
     setPokemonState({
       pokemonId,
       moveIds: ["", "", "", ""], // Reset moves when changing Pokémon
-      forme: selected?.name || "",
       ability: defaultAbility,
       // Set default HP to max when changing Pokémon
       currentHp: selected ? calculateStat(
@@ -92,6 +109,7 @@ export function usePokemonPanelHandlers({
     });
   };
 
+  // Keep all handlers the same
   const handleMoveChange = (index: number, moveId: string) => {
     const newMoveIds = [...pokemonState.moveIds];
     newMoveIds[index] = moveId;

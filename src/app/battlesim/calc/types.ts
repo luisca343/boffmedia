@@ -1,4 +1,5 @@
-import { GenderName, StatusName, TypeName } from "@smogon/calc/dist/data/interface";
+import { SpeciesAbility } from "@pkmn/dex-types";
+import { AbilityName, GenderName, StatusName, TypeName } from "@smogon/calc/dist/data/interface";
 
 // Pokemon data structure
 export interface PokemonData {
@@ -14,7 +15,7 @@ export interface PokemonData {
     spd: number;
     spe: number;
   };
-  abilities?: Record<string, string>;
+  abilities?: SpeciesAbility<string | AbilityName>
 }
 
 // Stats interfaces
@@ -46,7 +47,6 @@ export interface PokemonState {
   level: number;
   teraType: TypeName;
   isTerastallized: boolean;
-  forme: string;
   gender: GenderName;
   ability: string;
   item: string;
