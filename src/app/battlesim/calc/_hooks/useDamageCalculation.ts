@@ -135,10 +135,23 @@ export function useDamageCalculation({
               const move = new Move(genInstance, moveData.name);
 
               const fieldForCalc = new Field({
-                ...field,
-                attackerSide: new Side({ ...field.attackerSide }),
-                defenderSide: new Side({ ...field.defenderSide })
+                gameType: fieldState.gameType,
+                weather: fieldState.weather,
+                terrain: fieldState.terrain,
+                isMagicRoom: fieldState.isMagicRoom,
+                isWonderRoom: fieldState.isWonderRoom,
+                isGravity: fieldState.isGravity,
+                isAuraBreak: fieldState.isAuraBreak,
+                isFairyAura: fieldState.isFairyAura,
+                isDarkAura: fieldState.isDarkAura,
+                isBeadsOfRuin: fieldState.isBeadsOfRuin,
+                isSwordOfRuin: fieldState.isSwordOfRuin,
+                isTabletsOfRuin: fieldState.isTabletsOfRuin,
+                isVesselOfRuin: fieldState.isVesselOfRuin,
+                attackerSide: new Side(fieldState.attackerSide),
+                defenderSide: new Side(fieldState.defenderSide)
               });
+
 
               try {
                 const result = calculate(
@@ -168,11 +181,23 @@ export function useDamageCalculation({
               const move = new Move(genInstance, moveData.name);
 
               const fieldForCalc = new Field({
-                ...field,
-                attackerSide: new Side({ ...field.defenderSide }),
-                defenderSide: new Side({ ...field.attackerSide })
+                gameType: fieldState.gameType,
+                weather: fieldState.weather,
+                terrain: fieldState.terrain,
+                isMagicRoom: fieldState.isMagicRoom,
+                isWonderRoom: fieldState.isWonderRoom,
+                isGravity: fieldState.isGravity,
+                isAuraBreak: fieldState.isAuraBreak,
+                isFairyAura: fieldState.isFairyAura,
+                isDarkAura: fieldState.isDarkAura,
+                isBeadsOfRuin: fieldState.isBeadsOfRuin,
+                isSwordOfRuin: fieldState.isSwordOfRuin,
+                isTabletsOfRuin: fieldState.isTabletsOfRuin,
+                isVesselOfRuin: fieldState.isVesselOfRuin,
+                attackerSide: new Side(fieldState.defenderSide),
+                defenderSide: new Side(fieldState.attackerSide)
               });
-              
+
               try {
                 const result = calculate(
                   genInstance,
