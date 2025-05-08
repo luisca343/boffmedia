@@ -21,7 +21,7 @@ export function useDamageCalculation({
   attackerState,
   defenderState,
   fieldState,
-  debounceMs = 300
+  debounceMs = 50
 }: UseDamageCalculationProps) {
   const [damageResults, setDamageResults] = useState<ReturnType<typeof processDamageResult>[]>([]);
   const [selectedResultIndex, setSelectedResultIndex] = useState(0);
