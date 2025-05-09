@@ -121,24 +121,28 @@ export default function MovesResultsOverview({
   const pokemon2Results = results.filter(r => r.direction === 'defender-to-attacker');
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
-      {/* Pokémon 1's Moves */}
-      <MovesResultsList
-        results={pokemon1Results}
-        direction="attacker-to-defender"
-        allResults={results}
-        selectedResultIndex={selectedResultIndex}
-        onSelectResult={onSelectResult}
-      />
+    <div className="flex flex-col md:flex-row md:justify-between gap-2 mb-2">
+      {/* Pokémon 1's Moves - On mobile: full width, On desktop: half width and aligned left */}
+      <div className="w-full md:w-[33%]">
+        <MovesResultsList
+          results={pokemon1Results}
+          direction="attacker-to-defender"
+          allResults={results}
+          selectedResultIndex={selectedResultIndex}
+          onSelectResult={onSelectResult}
+        />
+      </div>
       
-      {/* Pokémon 2's Moves */}
-      <MovesResultsList
-        results={pokemon2Results}
-        direction="defender-to-attacker"
-        allResults={results}
-        selectedResultIndex={selectedResultIndex}
-        onSelectResult={onSelectResult}
-      />
+      {/* Pokémon 2's Moves - On mobile: full width, On desktop: half width and aligned right */}
+      <div className="w-full md:w-[33%]">
+        <MovesResultsList
+          results={pokemon2Results}
+          direction="defender-to-attacker"
+          allResults={results}
+          selectedResultIndex={selectedResultIndex}
+          onSelectResult={onSelectResult}
+        />
+      </div>
     </div>
   );
 }

@@ -59,13 +59,21 @@ export default React.memo(function FieldSelector() {
       {/* Game Type Toggle */}
       <div className="flex justify-center gap-1 mb-2.5">
         <button
-          className={`px-4 py-1 text-xs rounded-md ${fieldState.gameType === 'Singles' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-4 py-1 text-xs rounded-md transition-colors ${
+            fieldState.gameType === 'Singles' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleGameTypeChange('Singles')}
         >
           Singles
         </button>
         <button
-          className={`px-4 py-1 text-xs rounded-md ${fieldState.gameType === 'Doubles' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-4 py-1 text-xs rounded-md transition-colors ${
+            fieldState.gameType === 'Doubles' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleGameTypeChange('Doubles')}
         >
           Doubles
@@ -74,33 +82,55 @@ export default React.memo(function FieldSelector() {
       
       {/* Level Buttons */}
       <div className="flex justify-center gap-1 mb-2.5">
-        <button className="bg-surface-700 hover:bg-surface-600 text-xs px-4 py-1 rounded">Level 100</button>
-        <button className="bg-surface-700 hover:bg-surface-600 text-xs px-4 py-1 rounded">Level 50</button>
-        <button className="bg-surface-700 hover:bg-surface-600 text-xs px-4 py-1 rounded">Level 5</button>
+        <button className="bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50 transition-colors text-xs px-4 py-1 rounded">
+          Level 100
+        </button>
+        <button className="bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50 transition-colors text-xs px-4 py-1 rounded">
+          Level 50
+        </button>
+        <button className="bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50 transition-colors text-xs px-4 py-1 rounded">
+          Level 5
+        </button>
       </div>
       
       {/* Terrain Buttons */}
       <div className="flex flex-wrap justify-center gap-1 mb-2.5">
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Electric' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.terrain === 'Electric' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleTerrainChange('Electric')}
         >
           Electric
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Grassy' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.terrain === 'Grassy' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleTerrainChange('Grassy')}
         >
           Grassy
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Misty' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.terrain === 'Misty' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleTerrainChange('Misty')}
         >
           Misty
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Psychic' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.terrain === 'Psychic' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleTerrainChange('Psychic')}
         >
           Psychic Terrain
@@ -110,31 +140,51 @@ export default React.memo(function FieldSelector() {
       {/* Weather Buttons - First Row */}
       <div className="flex justify-center gap-1 mb-1">
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === undefined ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === undefined 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange(undefined)}
         >
           None
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Sun' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Sun' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Sun')}
         >
           Sun
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Rain' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Rain' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Rain')}
         >
           Rain
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Sand' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Sand' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Sand')}
         >
           Sand
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Snow' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Snow' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Snow')}
         >
           Snow
@@ -144,19 +194,31 @@ export default React.memo(function FieldSelector() {
       {/* Weather Buttons - Second Row */}
       <div className="flex justify-center gap-1 mb-2.5">
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Harsh Sunshine' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Harsh Sunshine' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Harsh Sunshine')}
         >
           Harsh Sunshine
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Heavy Rain' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Heavy Rain' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Heavy Rain')}
         >
           Heavy Rain
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Strong Winds' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.weather === 'Strong Winds' 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleWeatherChange('Strong Winds')}
         >
           Strong Winds
@@ -166,19 +228,31 @@ export default React.memo(function FieldSelector() {
       {/* Room Buttons */}
       <div className="flex justify-center gap-1 mb-3">
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.isMagicRoom ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.isMagicRoom 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleRoomChange('magicRoom', !fieldState.isMagicRoom)}
         >
           Magic Room
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.isWonderRoom ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.isWonderRoom 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleRoomChange('wonderRoom', !fieldState.isWonderRoom)}
         >
           Wonder Room
         </button>
         <button 
-          className={`px-3 py-1 text-xs rounded ${fieldState.isGravity ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          className={`px-3 py-1 text-xs rounded transition-colors ${
+            fieldState.isGravity 
+              ? 'bg-primary-500 text-white shadow-md' 
+              : 'bg-surface-700 hover:bg-surface-600 active:bg-primary-800/50'
+          }`}
           onClick={() => handleRoomChange('gravity', !fieldState.isGravity)}
         >
           Gravity
