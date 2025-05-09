@@ -1,5 +1,5 @@
 import type { ActiveTeam as ActiveTeamType } from "@/types/Pokemon"
-import { PokemonSprite } from "../../pokedex/_components/PokemonSprite"
+import { PokemonSprite, PokemonSpriteOld } from "../../pokedex/_components/PokemonSprite"
 import { useTranslations } from "next-intl"
 import { Pokemon } from "@/services/api/smartrotom/playerService";
 
@@ -15,7 +15,7 @@ export default function ActiveTeam({ team, className }: { team: Pokemon[]; class
             {/* Pokemon Sprite and Basic Info */}
             <div className="w-[20%] flex flex-col items-center space-y-1">
               <div className="bg-stone-200/50 rounded-full p-1 border border-gray-400/30">
-                <PokemonSprite
+                <PokemonSpriteOld
                   showStatus={false}
                   width={60}
                   height={60}
