@@ -1,0 +1,207 @@
+'use client';
+
+import React from 'react';
+import { useCalcContext } from '../_context/CalcContext';
+import { Field, Side } from '@smogon/calc';
+import { Terrain, Weather } from '@smogon/calc/dist/data/interface';
+import SideConditions from './SideConditions';
+
+export default React.memo(function FieldSelector() {
+  const { fieldState, updateFieldState } = useCalcContext();
+  
+  // Handle changes for main field settings
+  const handleGameTypeChange = (gameType: 'Singles' | 'Doubles') => {
+    updateFieldState({ gameType });
+  };
+  
+  const handleWeatherChange = (weather?: Weather) => {
+    updateFieldState({ weather });
+  };
+  
+  const handleTerrainChange = (terrain?: Terrain) => {
+    updateFieldState({ terrain });
+  };
+  
+  const handleRoomChange = (room: string, value: boolean) => {
+    if (room === 'magicRoom') {
+      updateFieldState({ isMagicRoom: value });
+    } else if (room === 'wonderRoom') {
+      updateFieldState({ isWonderRoom: value });
+    } else if (room === 'gravity') {
+      updateFieldState({ isGravity: value });
+    }
+  };
+
+  // Handle changes for attacker side
+  const handleAttackerSideChange = (field: keyof Side, value: any) => {
+    updateFieldState({
+      attackerSide: new Side({
+        ...fieldState.attackerSide,
+        [field]: value
+      })
+    });
+  };
+
+  // Handle changes for defender side
+  const handleDefenderSideChange = (field: keyof Side, value: any) => {
+    updateFieldState({
+      defenderSide: new Side({
+        ...fieldState.defenderSide,
+        [field]: value
+      })
+    });
+  };
+
+  return (
+    <div className="border border-surface-700 rounded-lg p-4 bg-surface-800 shadow-lg">
+      <h2 className="text-sm font-bold mb-3 text-center text-primary-400">Field</h2>
+      
+      {/* Game Type Toggle */}
+      <div className="flex justify-center gap-1 mb-2.5">
+        <button
+          className={`px-4 py-1 text-xs rounded-md ${fieldState.gameType === 'Singles' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleGameTypeChange('Singles')}
+        >
+          Singles
+        </button>
+        <button
+          className={`px-4 py-1 text-xs rounded-md ${fieldState.gameType === 'Doubles' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleGameTypeChange('Doubles')}
+        >
+          Doubles
+        </button>
+      </div>
+      
+      {/* Level Buttons */}
+      <div className="flex justify-center gap-1 mb-2.5">
+        <button className="bg-surface-700 hover:bg-surface-600 text-xs px-4 py-1 rounded">Level 100</button>
+        <button className="bg-surface-700 hover:bg-surface-600 text-xs px-4 py-1 rounded">Level 50</button>
+        <button className="bg-surface-700 hover:bg-surface-600 text-xs px-4 py-1 rounded">Level 5</button>
+      </div>
+      
+      {/* Terrain Buttons */}
+      <div className="flex flex-wrap justify-center gap-1 mb-2.5">
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Electric' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleTerrainChange('Electric')}
+        >
+          Electric
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Grassy' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleTerrainChange('Grassy')}
+        >
+          Grassy
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Misty' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleTerrainChange('Misty')}
+        >
+          Misty
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.terrain === 'Psychic' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleTerrainChange('Psychic')}
+        >
+          Psychic Terrain
+        </button>
+      </div>
+      
+      {/* Weather Buttons - First Row */}
+      <div className="flex justify-center gap-1 mb-1">
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === undefined ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange(undefined)}
+        >
+          None
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Sun' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Sun')}
+        >
+          Sun
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Rain' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Rain')}
+        >
+          Rain
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Sand' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Sand')}
+        >
+          Sand
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Snow' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Snow')}
+        >
+          Snow
+        </button>
+      </div>
+      
+      {/* Weather Buttons - Second Row */}
+      <div className="flex justify-center gap-1 mb-2.5">
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Harsh Sunshine' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Harsh Sunshine')}
+        >
+          Harsh Sunshine
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Heavy Rain' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Heavy Rain')}
+        >
+          Heavy Rain
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.weather === 'Strong Winds' ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleWeatherChange('Strong Winds')}
+        >
+          Strong Winds
+        </button>
+      </div>
+      
+      {/* Room Buttons */}
+      <div className="flex justify-center gap-1 mb-3">
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.isMagicRoom ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleRoomChange('magicRoom', !fieldState.isMagicRoom)}
+        >
+          Magic Room
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.isWonderRoom ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleRoomChange('wonderRoom', !fieldState.isWonderRoom)}
+        >
+          Wonder Room
+        </button>
+        <button 
+          className={`px-3 py-1 text-xs rounded ${fieldState.isGravity ? 'bg-surface-600' : 'bg-surface-700 hover:bg-surface-600'}`}
+          onClick={() => handleRoomChange('gravity', !fieldState.isGravity)}
+        >
+          Gravity
+        </button>
+      </div>
+      
+      {/* Horizontal divider */}
+      <div className="border-t border-surface-700 mb-3"></div>
+      
+      {/* Side conditions - two columns layout */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Attacker side */}
+        <SideConditions 
+          side={fieldState.attackerSide} 
+          onSideChange={handleAttackerSideChange} 
+        />
+        
+        {/* Defender side */}
+        <SideConditions 
+          side={fieldState.defenderSide} 
+          onSideChange={handleDefenderSideChange} 
+        />
+      </div>
+    </div>
+  );
+});

@@ -45,7 +45,7 @@ export function PokemonImage(
         pixelated = true;
     }
     return (
-        <div className={`w-full h-full flex items-end justify-center relative ${className}`} id={id}>
+        <div className={`w-full h-full flex items-end justify-center relative z-50 ${className}`} id={id}>
             {pokemon && Object.keys(pokemon.volatiles).includes("protect") &&
                 <div className={`h-[75px] w-[100px] bg-purple-400 opacity-30 self-center bottom-8 absolute ${side === 'p1' ? 'z-0' : 'z-50'}`} />
             }

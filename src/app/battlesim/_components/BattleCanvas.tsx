@@ -182,6 +182,7 @@ export const BattleCanvas = forwardRef(({
                     backgroundImage: 'url(/battlesim/fx/trickroom.png)',
                     backgroundSize: '100% 100%',
                     opacity: 0.6,
+                    zIndex: 5,
                 }}>
                 </div>
                 <div className={`weather w-full h-full absolute top-0 left-0 `} style={{
