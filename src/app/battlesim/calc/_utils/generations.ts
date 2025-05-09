@@ -1,4 +1,4 @@
-import { Generations } from '@smogon/calc';
+import { GenerationNum, Generations } from '@smogon/calc';
 import { TerasDex } from '../../TerasDex';
 import { Dex } from '@pkmn/dex';
 
@@ -30,7 +30,7 @@ export async function getDexAndGen(generationId: GenerationId) {
   if (generationId !== 'teras') {
     // Find the generation number based on the ID
     const generation = GENERATIONS.find(gen => gen.id === generationId);
-    const genNumber = generation ? generation.number : 9; // Default to Gen 9 if not found
+    const genNumber = generation ? generation.number as GenerationNum : 9 as GenerationNum
     
     // Get the standard generation instance from Generations
     const genInstance = Generations.get(genNumber);

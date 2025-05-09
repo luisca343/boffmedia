@@ -61,14 +61,16 @@ export function CalcProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       
       try {
-        // Get the appropriate dex and gen instance
         const { dex: newDex, genInstance: newGenInstance } = await getDexAndGen(currentGeneration);
+        
         setDex(newDex);
         setGenInstance(newGenInstance);
         
-        // Get Pokemon list from the dex
-        const pokemonList = Object.entries(newDex.species.all())
-          .map(([id, species]: [string, any]) => ({
+        const pokemonList = Object.values(newDex.species.all())
+          .filter((species: any) => {
+            return species.num > 0 && !species.isNonstandard;
+          })
+          .map((species: any) => ({
             id: species.id,
             name: species.name,
             num: species.num,
@@ -76,7 +78,6 @@ export function CalcProvider({ children }: { children: React.ReactNode }) {
             baseStats: species.baseStats || {},
             abilities: species.abilities || {},
           }))
-          .filter((poke: any) => poke.num > 0)
           .sort((a: any, b: any) => a.num - b.num);
         
         setPokemon(pokemonList);

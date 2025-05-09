@@ -12,7 +12,7 @@ export function usePokedexData(moddedDex: ModdedDex | null) {
     if (moddedDex) {
       // Load moves
       const movesList = Object.values(moddedDex.moves.all())
-        .filter(move => move.name && move.basePower > 0)
+        .filter(move => move.name && move.basePower > 0 && !move.isNonstandard)
         .map(move => ({
           id: move.id,
           name: move.name,
