@@ -458,5 +458,87 @@ export class PokemonService {
       };
     }
   }
+
+  getAllAbilities(): { name: string; count: number }[] {
+    // Create a map to store ability counts
+    const abilityCounts: { [key: string]: number } = {};
+    
+    // Get counts for each ability
+    for (const ability in this.pokemonDataService.getAllSpeciesByAbility()) {
+      if (this.pokemonDataService.getAllSpeciesByAbility().hasOwnProperty(ability)) {
+        abilityCounts[ability] = this.pokemonDataService.getAllSpeciesByAbility()[ability].length;
+      }
+    }
+    
+    // Convert to array and sort by count (descending)
+    const sortedAbilities = Object.entries(abilityCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+    
+    return sortedAbilities;
+  }
+  
+  /**
+   * Get details about a specific ability
+   * @param name The ability name
+   * @returns The ability details
+   */
+  getAbility(name: string): any {
+    const forms = this.pokemonDataService.getSpeciesByAbility(name) || [];
+    
+    // Count unique Pokemon species with this ability
+    const uniqueSpeciesWithAbility = new Set();
+    forms.forEach(form => {
+      const pokemon = this.pokemonDataService.getAllSpecies().find(
+        species => species.forms.includes(form)
+      );
+      if (pokemon) {
+        uniqueSpeciesWithAbility.add(pokemon.dex);
+      }
+    });
+    
+    return {
+      name,
+      count: forms.length,
+      uniqueSpecies: uniqueSpeciesWithAbility.size,
+    };
+  }
+  
+  /**
+   * Get Pokemon that have a specific ability
+   * @param name The ability name
+   * @returns Array of Pokemon with the specified ability
+   */
+  getPokemonByAbility(name: string): { speciesID: number; form: string; speciesName: string; spriteUrl: string }[] {
+    // Get forms with this ability
+    const forms = this.pokemonDataService.getSpeciesByAbility(name) || [];
+    const result = [];
+    
+    // Process each form to create the response
+    forms.forEach(form => {
+      // Find the species this form belongs to
+      const pokemon = this.pokemonDataService.getAllSpecies().find(
+        species => species.forms.some(f => f === form)
+      );
+      
+      if (pokemon) {
+        // Add the Pokemon to the result
+        result.push({
+          speciesID: pokemon.dex,
+          form: form.name || 'base',
+          speciesName: pokemon.name,
+          // Add sprite URL directly
+          spriteUrl: this.pokemonImageService.getSimpleSprite(
+            pokemon.dex,
+            form.name || 'base'
+          )
+        });
+      }
+    });
+    
+    // Sort by Pokedex number
+    return this.pokemonDataService.sortByDex(result, 'speciesID');
+  }
+
 }
 

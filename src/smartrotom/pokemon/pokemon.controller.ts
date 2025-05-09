@@ -4,6 +4,7 @@ import { ResponseService } from '@/response/response.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import axios from 'axios';
 import { WingullService } from '../wingull/wingull.service';
+import { PokemonShowdownService } from './pokemon-showdown.service';
 
 @ApiTags('smartrotom/pokemon')
 @Controller('smartrotom/pokemon')
@@ -14,6 +15,7 @@ export class PokemonController {
         private readonly pokemonService: PokemonService,
         private readonly responseService: ResponseService,
         private readonly wingullService: WingullService,
+        private readonly pokemonShowdownService: PokemonShowdownService,
     ) {}
     
     
@@ -378,6 +380,70 @@ export class PokemonController {
             });
         } catch (error) {
             this.responseService.handleError(action, error, { uuid });
+        }
+    }
+
+    @Get('abilities')
+    @ApiOperation({ summary: 'Get all Pokémon abilities with counts' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Abilities retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve abilities.' })
+    async getAllAbilities() {
+    const action = 'get all Pokémon abilities';
+    try {
+        this.responseService.logRequest(action, null);
+        const abilities = await this.pokemonService.getAllAbilities();
+        this.responseService.logSuccess(action, abilities);
+        return this.responseService.createSuccessResponse('Abilities retrieved successfully', abilities);
+    } catch (error) {
+        this.responseService.handleError(action, error);
+    }
+    }
+
+    @Get('ability/:name')
+    @ApiOperation({ summary: 'Get ability by name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Ability retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve ability.' })
+    async getAbility(@Param('name') name: string) {
+    const action = 'get ability by name';
+    try {
+        this.responseService.logRequest(action, { name });
+        const ability = await this.pokemonService.getAbility(name);
+        this.responseService.logSuccess(action, ability);
+        return this.responseService.createSuccessResponse('Ability retrieved successfully', ability);
+    } catch (error) {
+        this.responseService.handleError(action, error, { name });
+    }
+    }
+
+    @Get('ability/:name/pokemon')
+    @ApiOperation({ summary: 'Get Pokémon by ability name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
+    async getPokemonByAbility(@Param('name') name: string) {
+    const action = 'get Pokémon by ability name';
+    try {
+        this.responseService.logRequest(action, { name });
+        const pokemon = await this.pokemonService.getPokemonByAbility(name);
+        this.responseService.logSuccess(action, pokemon);
+        return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
+    } catch (error) {
+        this.responseService.handleError(action, error, { name });
+    }
+    }
+
+    @Get('showdown/teras')
+    @ApiOperation({ summary: 'Get all Teras Pokemon (dex > 1025) in Showdown format' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Teras Pokemon data retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Teras Pokemon data.' })
+    async getTerasPokemonShowdownData() {
+        const action = 'get all Teras Pokemon in Showdown format';
+        try {
+            this.responseService.logRequest(action, null);
+            const terasData = await this.pokemonShowdownService.getTerasPokemonShowdownData();
+            this.responseService.logSuccess(action, { count: Object.keys(terasData).length });
+            return this.responseService.createSuccessResponse('Teras Pokemon data retrieved successfully', terasData);
+        } catch (error) {
+            return this.responseService.handleError(action, error);
         }
     }
 

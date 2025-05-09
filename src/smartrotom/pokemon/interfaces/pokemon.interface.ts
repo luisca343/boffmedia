@@ -3,9 +3,12 @@ import { index } from "drizzle-orm/mysql-core";
 export interface Pokemon {
     dex: number;
     name: string;
+    defaultForms: string[];
     forms: PokemonForm[];
     generation: number;
     spriteUrl?: string;
+
+    isCustom: boolean;
   }
   
   export interface PokemonForm {
@@ -52,7 +55,12 @@ export interface Pokemon {
   }
   
   export interface BattleStats {
-    // Add battle stats properties
+    hp: number;
+    attack: number;
+    defense: number;
+    specialAttack: number;
+    specialDefense: number;
+    speed: number;
   }
   
   export interface SpawnInfo {

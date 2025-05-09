@@ -78,6 +78,7 @@ import { MhwildsController } from './tools/mhwilds/mhwilds.controller';
 import { MhwildsModule } from './tools/mhwilds/mhwilds.module';
 import { MhwildsService } from './tools/mhwilds/mhwilds.service';
 import { WingullModule } from './smartrotom/wingull/wingull.module';
+import { PokemonShowdownService } from './smartrotom/pokemon/pokemon-showdown.service';
 
 @Module({
   imports: [
@@ -123,7 +124,7 @@ import { WingullModule } from './smartrotom/wingull/wingull.module';
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
-     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService,
+     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService, PokemonShowdownService,
     {
     provide: ConfigService,
     useClass: ConfigService,

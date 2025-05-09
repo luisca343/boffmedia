@@ -4,6 +4,7 @@ import { MoveDataService } from './move-data.service';
 import { Pokemon, PokemonForm, SpeciesMoveEntry } from './interfaces/pokemon.interface';
 import * as fs from 'fs';
 import * as path from 'path';
+import { promises as fsPromises } from 'fs';
 
 
 export interface EvoTreeNode {
@@ -37,14 +38,31 @@ export class PokemonDataService extends BaseDataService {
   private speciesByMove: { [key: string]: SpeciesMoveEntry[] } = {};
   private wordleData: any[] = [];
 
+  private customSpeciesFiles: Set<string> = new Set();
+
   async loadPokemonData() {
     const startingTime = Date.now();
     const defaultDir = path.join(__dirname, '../../../public/smartrotom/packs/default_datapack/data/pixelmon/species');
     const publicDir = path.join(__dirname, '../../../public/smartrotom/packs/datapack/data/pixelmon/species');
 
+    try {
+      const publicFiles = await fsPromises.readdir(publicDir);
+      publicFiles.forEach(file => {
+        if (file.endsWith('.json')) {
+          this.customSpeciesFiles.add(file.split('_')[1]);
+        }
+      });
+    } catch (error) {
+      console.warn('No custom species directory found or error reading it:', error.message);
+    }
+
     const pokemonData = await this.readJsonFiles(defaultDir, publicDir);
 
-    pokemonData.forEach((data: Pokemon) => this.processSpecies(data));
+    pokemonData.forEach((data: Pokemon) => {
+      const isCustom = this.isFileCustom(`${data.name.toLowerCase()}.json`);
+      this.processSpecies(data, isCustom);
+    });
+    
 
     this.sortByDex(this.species);
     this.sortMovesByCount();
@@ -53,13 +71,25 @@ export class PokemonDataService extends BaseDataService {
     await this.enrichWithSprites();
   }
 
-  private processSpecies(data: Pokemon) {
+  private isFileCustom(fileName: string): boolean {
+    return this.customSpeciesFiles.has(fileName);
+  }
+
+  private processSpecies(data: Pokemon, isCustom: boolean) {
     if (!data.dex) return;
+    
+    // Add isCustom field
+    data.isCustom = isCustom;
+    
     this.species.push(data);
     this.speciesByDex[data.dex] = data;
     this.speciesByName[data.name.toLowerCase()] = data;
 
     data.forms?.forEach((form, index) => this.processForm(data, form, index));
+  }
+
+  getCustomSpecies(): Pokemon[] {
+    return this.species.filter(pokemon => pokemon.isCustom);
   }
 
   private processForm(species: Pokemon, form: PokemonForm, index: number) {
@@ -244,6 +274,10 @@ export class PokemonDataService extends BaseDataService {
 
   getSpeciesByEggGroup(eggGroup: string): PokemonForm[] | undefined {
     return this.speciesByEggGroup[eggGroup];
+  }
+
+  getAllSpeciesByAbility(): { [key: string]: PokemonForm[] } {
+    return this.speciesByAbility;
   }
 
   getSpeciesByAbility(ability: string): PokemonForm[] | undefined {
