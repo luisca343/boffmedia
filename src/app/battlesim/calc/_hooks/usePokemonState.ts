@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GenderName, StatusName, TypeName } from "@smogon/calc/dist/data/interface";
+import { useCalcContext } from "../_context/CalcContext";
+import { getDefaultAttacker } from "../_utils/initialState";
 
 export interface PokemonState {
   pokemonId: string;
@@ -25,28 +27,27 @@ interface UsePokemonStateProps {
 }
 
 export function usePokemonState({ initialState, role }: UsePokemonStateProps) {
-  const defaultState: PokemonState = {
+  // Use the empty default initially, actual defaults will be set when generation is known
+  const emptyDefaultState: PokemonState = {
     pokemonId: "",
     moveIds: ["", "", "", ""],
-    nature: role === "attacker" ? "Modest" : "Bold",
-    evs: role === "attacker" 
-      ? { hp: 252, atk: 0, def: 0, spa: 252, spd: 0, spe: 4 }
-      : { hp: 252, atk: 0, def: 252, spa: 0, spd: 4, spe: 0 },
+    nature: "",
+    evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
     boosts: { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
     level: 100,
-    teraType: "Water" as TypeName,
+    teraType: "Normal" as TypeName,
     isTerastallized: false,
     gender: "Male" as GenderName,
     ability: "",
-    item: role === "attacker" ? "Heavy-Duty Boots" : "",
+    item: "",
     status: "Healthy" as StatusName,
-    currentHp: 383,
+    currentHp: 100,
     currentHpPercent: 100
   };
 
   const [state, setState] = useState<PokemonState>({
-    ...defaultState,
+    ...emptyDefaultState,
     ...initialState
   });
 

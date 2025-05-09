@@ -12,8 +12,21 @@ export default function CalculatorForm() {
     damageResults,
     selectedResultIndex,
     setSelectedResultIndex,
-    calculationError
+    calculationError,
+    isLoading
   } = useCalcContext();
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="relative">
+          <div className="w-12 h-12 rounded-full absolute border-4 border-solid border-surface-200 opacity-20"></div>
+          <div className="w-12 h-12 rounded-full animate-spin absolute border-4 border-solid border-primary-500 border-t-transparent"></div>
+        </div>
+        <p className="ml-4 text-surface-300">Loading calculator data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 max-w-[80%] mx-auto">
@@ -25,7 +38,6 @@ export default function CalculatorForm() {
           
       <DamageResults result={damageResults[selectedResultIndex]} />
 
-      
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <PokemonPanel 
           title="Pokémon 1"

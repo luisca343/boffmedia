@@ -1,18 +1,24 @@
 'use client';
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { ModdedDex } from "@pkmn/dex";
 import { PokemonData, PokemonState } from "../types";
 import { usePokedexData } from "../_hooks/usePokedexData";
 import { usePokemonState } from "../_hooks/usePokemonState";
 import { useDamageCalculation } from "../_hooks/useDamageCalculation";
 import { useFieldState } from "../_hooks/useFieldState";
-import { DEFAULT_ATTACKER } from '../_utils/initialState';
+import { DEFAULT_ATTACKER, getDefaultAttacker } from '../_utils/initialState';
 import { Field } from '@smogon/calc';
+import { GENERATIONS, GenerationId, getDexAndGen } from '../_utils/generations';
 
 interface CalcContextValue {
+  // Generation selection
+  currentGeneration: GenerationId;
+  setGeneration: (genId: GenerationId) => void;
+  isLoading: boolean;
+  
   // Dex data
-  moddedDex: ModdedDex | null;
+  dex: any;
   genInstance: any;
   pokemon: PokemonData[];
   moves: any[];
@@ -41,46 +47,99 @@ interface CalcContextValue {
 
 const CalcContext = createContext<CalcContextValue | null>(null);
 
-export function CalcProvider({ 
-  children,
-  moddedDex,
-  genInstance,
-  pokemon
-}: { 
-  children: React.ReactNode,
-  moddedDex: ModdedDex | null,
-  genInstance: any,
-  pokemon: PokemonData[] 
-}) {
+export function CalcProvider({ children }: { children: React.ReactNode }) {
+  // Generation state
+  const [currentGeneration, setCurrentGeneration] = useState<GenerationId>('sv');
+  const [dex, setDex] = useState<any>(null);
+  const [genInstance, setGenInstance] = useState<any>(null);
+  const [pokemon, setPokemon] = useState<PokemonData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Load dex and generation data when generation changes
+  useEffect(() => {
+    async function loadGeneration() {
+      setIsLoading(true);
+      
+      try {
+        // Get the appropriate dex and gen instance
+        const { dex: newDex, genInstance: newGenInstance } = await getDexAndGen(currentGeneration);
+        setDex(newDex);
+        setGenInstance(newGenInstance);
+        
+        // Get Pokemon list from the dex
+        const pokemonList = Object.entries(newDex.species.all())
+          .map(([id, species]: [string, any]) => ({
+            id: species.id,
+            name: species.name,
+            num: species.num,
+            types: species.types || [],
+            baseStats: species.baseStats || {},
+            abilities: species.abilities || {},
+          }))
+          .filter((poke: any) => poke.num > 0)
+          .sort((a: any, b: any) => a.num - b.num);
+        
+        setPokemon(pokemonList);
+      } catch (error) {
+        console.error("Error loading generation data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    
+    loadGeneration();
+  }, [currentGeneration]);
+
+  // Change generation handler
+  const setGeneration = (genId: GenerationId) => {
+    setCurrentGeneration(genId);
+  };
+
   // Initialize with empty states first
   const { state: attackerState, updateState: updateAttackerState } = usePokemonState({ role: "attacker" });
   const { state: defenderState, updateState: updateDefenderState } = usePokemonState({ role: "defender" });
   const { state: fieldState, updateState: updateFieldState } = useFieldState();
-  const { moves, items, abilities, getPokemonAbilities, isLoaded } = usePokedexData(moddedDex);
+  const { moves, items, abilities, getPokemonAbilities, isLoaded } = usePokedexData(dex);
 
   // Set default data after moves and Pokemon are loaded
   useEffect(() => {
     if (isLoaded && moves.length > 0 && pokemon.length > 0) {
-      // Set default attacker
-      const moveIds = DEFAULT_ATTACKER.moveIds.map(moveName => {
+      // Get default attacker configuration for current generation
+      const defaultAttacker = getDefaultAttacker(currentGeneration);
+      
+      // Map move names to move IDs if possible (fallback to empty strings)
+      const attackerMoveIds = defaultAttacker.moveIds.map(moveName => {
         const move = moves.find(m => m.name === moveName);
         return move ? move.id : "";
+      }).filter(Boolean);
+      
+      // Fill remaining move slots with empty strings
+      while (attackerMoveIds.length < 4) {
+        attackerMoveIds.push("");
+      }
+      
+      // Apply different defaults for attacker and defender
+      updateAttackerState({
+        ...defaultAttacker,
+        moveIds: attackerMoveIds
       });
       
-      updateAttackerState({
-        ...DEFAULT_ATTACKER,
-        moveIds: moveIds
-      });
-
+      // For defender, use similar config but with defensive EVs
+      const defenderEvs = currentGeneration === 'rb' || currentGeneration === 'gs' 
+        ? defaultAttacker.evs // Keep same EVs for early gens
+        : { hp: 252, atk: 0, def: 252, spa: 0, spd: 4, spe: 0 }; // Defensive spread for modern gens
+        
       updateDefenderState({
-        ...DEFAULT_ATTACKER,
-        moveIds: moveIds
+        ...defaultAttacker,
+        moveIds: attackerMoveIds,
+        evs: defenderEvs,
+        nature: currentGeneration === 'rb' || currentGeneration === 'gs' ? "" : "Bold", // No natures in early gens
       });
     }
-  }, [isLoaded, moves, pokemon]);
+  }, [isLoaded, moves, pokemon, currentGeneration]);
 
   const { damageResults, selectedResultIndex, setSelectedResultIndex, calculationError } = useDamageCalculation({
-    moddedDex,
+    moddedDex: dex,
     genInstance,
     pokemonList: pokemon,
     attackerState,
@@ -89,7 +148,10 @@ export function CalcProvider({
   });
 
   const value = {
-    moddedDex,
+    currentGeneration,
+    setGeneration,
+    isLoading,
+    dex,
     genInstance,
     pokemon,
     moves,
