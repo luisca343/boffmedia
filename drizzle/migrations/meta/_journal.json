@@ -43,6 +43,20 @@
       "when": 1740140921254,
       "tag": "0005_nostalgic_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1745012514799,
+      "tag": "0006_cynical_mongoose",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1745065022797,
+      "tag": "0007_strong_santa_claus",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,1 @@
+ALTER TABLE `rotom_arcade_streaks` ADD `last_banner` varchar(100);
