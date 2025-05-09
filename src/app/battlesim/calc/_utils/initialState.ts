@@ -6,8 +6,8 @@ export const DEFAULT_ATTACKER_EARLY = {
   pokemonId: "alakazam",
   moveIds: ["Psychic", "Thunder Wave", "Recover", "Seismic Toss"],
   nature: "", // No natures in Gen 1-2
-  evs: { hp: 252, atk: 0, def: 0, spa: 252, spd: 0, spe: 4 }, // DVs in early gens
-  ivs: { hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31 },
+  evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+  ivs: { hp: 15, atk: 15, def: 15, spa: 15, spd: 15, spe: 15 },
   boosts: { atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
   level: 100,
   teraType: "Psychic" as TypeName, // Not used in early gens

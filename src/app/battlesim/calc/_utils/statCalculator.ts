@@ -1,17 +1,16 @@
+import { GenerationNum } from "@pkmn/dex";
 import { StatsTable, BoostsTable } from "../types";
 import { NATURE_MODIFIERS } from "./pokemonData";
+import { calcStat } from "@smogon/calc";
 
 export class StatCalculator {
   /**
-   * Calculate a Pokémon's actual stat based on base stat, EVs, IVs, nature and level
+   * Calculate a Pokémon's actual stat using the @smogon/calc calcStat function
    */
-  static calculateStat(base: number, ev: number, iv: number, level: number, nature: number, isHP: boolean): number {
-    if (isHP) {
-      return Math.floor(((2 * base + iv + Math.floor(ev / 4)) * level) / 100) + level + 10;
-    } else {
-      return Math.floor((Math.floor(((2 * base + iv + Math.floor(ev / 4)) * level) / 100) + 5) * nature);
-    }
+  static calculateStat(base: number, ev: number, iv: number, level: number, nature: string, statId: keyof StatsTable, gen: GenerationNum = 9): number {
+    return calcStat(gen, statId, base, iv, ev, level, nature);
   }
+  
 
   /**
    * Apply stat boosts to a base stat value
@@ -30,24 +29,23 @@ export class StatCalculator {
   }
 
   /**
-   * Calculate all stats for a Pokémon
+   * Calculate all stats for a Pokémon using @smogon/calc calcStat
    */
   static calculateAllStats(
     baseStats: StatsTable, 
     evs: StatsTable, 
     ivs: StatsTable, 
     level: number, 
-    nature: string
+    nature: string,
+    gen: GenerationNum = 9
   ): StatsTable {
-    const natureModifiers = this.getNatureMultipliers(nature);
-    
     return {
-      hp: this.calculateStat(baseStats.hp, evs.hp, ivs.hp, level, 1, true),
-      atk: this.calculateStat(baseStats.atk, evs.atk, ivs.atk, level, natureModifiers.atk || 1, false),
-      def: this.calculateStat(baseStats.def, evs.def, ivs.def, level, natureModifiers.def || 1, false),
-      spa: this.calculateStat(baseStats.spa, evs.spa, ivs.spa, level, natureModifiers.spa || 1, false),
-      spd: this.calculateStat(baseStats.spd, evs.spd, ivs.spd, level, natureModifiers.spd || 1, false),
-      spe: this.calculateStat(baseStats.spe, evs.spe, ivs.spe, level, natureModifiers.spe || 1, false),
+      hp: this.calculateStat(baseStats.hp, evs.hp, ivs.hp, level, nature, 'hp', gen),
+      atk: this.calculateStat(baseStats.atk, evs.atk, ivs.atk, level, nature, 'atk', gen),
+      def: this.calculateStat(baseStats.def, evs.def, ivs.def, level, nature, 'def', gen),
+      spa: this.calculateStat(baseStats.spa, evs.spa, ivs.spa, level, nature, 'spa', gen),
+      spd: this.calculateStat(baseStats.spd, evs.spd, ivs.spd, level, nature, 'spd', gen),
+      spe: this.calculateStat(baseStats.spe, evs.spe, ivs.spe, level, nature, 'spe', gen),
     };
   }
   

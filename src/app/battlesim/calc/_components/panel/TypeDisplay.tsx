@@ -1,6 +1,7 @@
 'use client';
 
 import { TYPE_OPTIONS } from '../../_utils/pokemonData';
+import { useCalcContext } from '../../_context/CalcContext';
 
 interface TypeDisplayProps {
   types: string[];
@@ -17,6 +18,13 @@ export default function TypeDisplay({
   onTeraTypeChange,
   onTerastallizedChange
 }: TypeDisplayProps) {
+  // Get the current generation to determine if Terastallization is available
+  const { genInstance } = useCalcContext();
+  const genNumber = genInstance?.num || 9; // Default to Gen 9 if not available
+  
+  // Terastallization is only available in Gen 9 (Scarlet/Violet)
+  const showTeraOptions = genNumber === 9;
+
   return (
     <div className="grid grid-cols-2 gap-2">
       <div>
@@ -31,30 +39,32 @@ export default function TypeDisplay({
         </div>
       </div>
 
-      <div>
-        <label className="block text-xs font-medium mb-1 text-surface-200">Tera Type</label>
-        <div className="flex flex-col space-y-1">
-          <select
-            className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
-            value={teraType}
-            onChange={(e) => onTeraTypeChange(e.target.value)}
-          >
-            {TYPE_OPTIONS.map(type => (
-              <option key={type} value={type}>{type}</option>
-            ))}
-          </select>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="terastallized"
-              className="w-3 h-3 mr-1"
-              checked={isTerastallized}
-              onChange={(e) => onTerastallizedChange(e.target.checked)}
-            />
-            <label htmlFor="terastallized" className="text-xs text-surface-200">Terastallized</label>
+      {showTeraOptions && (
+        <div>
+          <label className="block text-xs font-medium mb-1 text-surface-200">Tera Type</label>
+          <div className="flex flex-col space-y-1">
+            <select
+              className="w-full p-1 border rounded bg-surface-700 border-surface-600 text-surface-100 text-xs"
+              value={teraType}
+              onChange={(e) => onTeraTypeChange(e.target.value)}
+            >
+              {TYPE_OPTIONS.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="terastallized"
+                className="w-3 h-3 mr-1"
+                checked={isTerastallized}
+                onChange={(e) => onTerastallizedChange(e.target.checked)}
+              />
+              <label htmlFor="terastallized" className="text-xs text-surface-200">Terastallized</label>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
