@@ -10,7 +10,6 @@ export function usePokedexData(moddedDex: ModdedDex | null) {
 
   useEffect(() => {
     if (moddedDex) {
-      // Load moves
       const movesList = Object.values(moddedDex.moves.all())
         .filter(move => move.name && move.basePower > 0 && !move.isNonstandard)
         .map(move => ({
@@ -22,7 +21,6 @@ export function usePokedexData(moddedDex: ModdedDex | null) {
         }));
       setMoves(movesList);
       
-      // Load items
       const itemsList = Object.values(moddedDex.items.all())
         .filter(item => item.name && !item.isNonstandard)
         .map(item => ({
@@ -32,7 +30,6 @@ export function usePokedexData(moddedDex: ModdedDex | null) {
         .sort((a, b) => a.name.localeCompare(b.name));
       setItems(itemsList);
       
-      // Load abilities
       const abilitiesList = Object.values(moddedDex.abilities.all())
         .filter(ability => ability.name && !ability.isNonstandard)
         .map(ability => ({
@@ -46,7 +43,6 @@ export function usePokedexData(moddedDex: ModdedDex | null) {
     }
   }, [moddedDex]);
 
-  // Get abilities for a specific Pokémon
   const getPokemonAbilities = (pokemonId: string, pokemonList: any[]): string[] => {
     if (pokemonAbilities[pokemonId]) {
       return pokemonAbilities[pokemonId];
