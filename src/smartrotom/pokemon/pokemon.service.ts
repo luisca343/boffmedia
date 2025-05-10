@@ -213,8 +213,20 @@ export class PokemonService {
     const caughtPokemon = new Set<string>()
     const shinyPokemon = new Set<string>()
 
+
     registries.forEach((registry) => {
-      console.log(registry.formId)
+      const pokemon = this.getPokemonByDex(registry.pokemonId);
+      if(registry.formId === "base" && !pokemon.forms.some((f) => f.name === "")) {
+        const baseFormId = `${registry.pokemonId}:${pokemon.forms[0].name}`
+        if (registry.seenAt) {
+          seenPokemon.add(baseFormId)
+        }
+        if (registry.caughtAt) {
+          caughtPokemon.add(baseFormId)
+        }
+      }
+
+      
       const pokemonFormId = `${registry.pokemonId}:${registry.formId}`
       if (registry.seenAt) {
         seenPokemon.add(pokemonFormId)
