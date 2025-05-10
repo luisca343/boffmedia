@@ -123,7 +123,7 @@ export function PokemonSprite({
           height={height}
           src={imageUrl || "/placeholder.svg"}
           alt="pokemon"
-          style={{ imageRendering: pixelated ? "pixelated" : "auto" }}
+          style={{ imageRendering: pixelated ? "pixelated" : "auto",  height: 'auto' }}
           className={`${(status === PokedexStatus.UNSEEN && hide) || forceBlack ? `brightness-0 ${inverted ? "invert" : ""}` : ""}`}
         />
         {showStatus && (
