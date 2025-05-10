@@ -9,6 +9,7 @@ import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { PokemonImageService } from './pokemon-image.service';
+import { SpriteManifestService } from './sprite-manifest.service';
 
 @Injectable()
 export class PokemonService {
@@ -19,6 +20,7 @@ export class PokemonService {
     private readonly moveDataService: MoveDataService,
     private readonly spawnDataService: SpawnDataService,
     private readonly pokemonImageService: PokemonImageService,
+    private readonly spriteManifestService: SpriteManifestService,
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
   
@@ -34,6 +36,7 @@ export class PokemonService {
     await this.pokemonDataService.loadPokemonData();
     await this.moveDataService.loadMoveData();
     await this.spawnDataService.loadSpawnData();
+    await this.spriteManifestService.loadSpriteManifest();
     this.initializeFuse();
   }
   
@@ -124,19 +127,10 @@ export class PokemonService {
       // Get the Pokemon data
       const pokemon = this.pokemonDataService.getSpeciesByDex(entry.pokemonId);
       const pokemonName = pokemon?.name || 'Unknown';
-      
-      // Get sprite URL directly from image service
-      const spriteUrl = this.pokemonImageService.getSimpleSprite(
-        entry.pokemonId,
-        entry.formId || 'base',
-        entry.paletteId || 'none'
-      );
-      
-      // Return enhanced registry with sprite and name
+
       return {
         ...entry,
-        pokemonName,
-        spriteUrl
+        pokemonName
       };
     });
     
@@ -220,6 +214,7 @@ export class PokemonService {
     const shinyPokemon = new Set<string>()
 
     registries.forEach((registry) => {
+      console.log(registry.formId)
       const pokemonFormId = `${registry.pokemonId}:${registry.formId}`
       if (registry.seenAt) {
         seenPokemon.add(pokemonFormId)
@@ -509,29 +504,20 @@ export class PokemonService {
    * @param name The ability name
    * @returns Array of Pokemon with the specified ability
    */
-  getPokemonByAbility(name: string): { speciesID: number; form: string; speciesName: string; spriteUrl: string }[] {
-    // Get forms with this ability
+  getPokemonByAbility(name: string): { speciesID: number; form: string; speciesName: string }[] {
     const forms = this.pokemonDataService.getSpeciesByAbility(name) || [];
     const result = [];
     
-    // Process each form to create the response
     forms.forEach(form => {
-      // Find the species this form belongs to
       const pokemon = this.pokemonDataService.getAllSpecies().find(
         species => species.forms.some(f => f === form)
       );
       
       if (pokemon) {
-        // Add the Pokemon to the result
         result.push({
           speciesID: pokemon.dex,
           form: form.name || 'base',
           speciesName: pokemon.name,
-          // Add sprite URL directly
-          spriteUrl: this.pokemonImageService.getSimpleSprite(
-            pokemon.dex,
-            form.name || 'base'
-          )
         });
       }
     });

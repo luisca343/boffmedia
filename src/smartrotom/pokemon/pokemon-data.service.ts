@@ -67,8 +67,6 @@ export class PokemonDataService extends BaseDataService {
     this.sortByDex(this.species);
     this.sortMovesByCount();
     this.logStatistics(startingTime);
-    
-    await this.enrichWithSprites();
   }
 
   private isFileCustom(fileName: string): boolean {
@@ -333,34 +331,9 @@ export class PokemonDataService extends BaseDataService {
     // Get evolution tree with sprites
     const evoTree = this.getEvos(preEvo, 'all')
     
-    // Recursively add sprite URLs to the entire tree
-    this.addSpritesToEvoTree(evoTree.tree);
-    
     return evoTree
 }
 
-private addSpritesToEvoTree(evoTree: any) {
-  // Process each evolution node in the tree
-  for (const key in evoTree) {
-      const node = evoTree[key];
-      
-      // Skip non-object entries or special properties like "depth"
-      if (!node || typeof node !== 'object' || !node.dex) {
-          continue;
-      }
-      
-      // Extract form name from the key (format is "pokemon_form")
-      const [pokemonName, formName] = key.split('_');
-      
-      // Add sprite URL to the current node
-      node.spriteUrl = this.getSimpleSpriteUrl(node.dex, formName || 'base');
-      
-      // Recursively process child evolutions
-      if (node.evos && Object.keys(node.evos).length > 0) {
-          this.addSpritesToEvoTree(node.evos);
-      }
-  }
-}
 
 getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
   if(currentForm === '') currentForm = 'base'
@@ -378,8 +351,6 @@ getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
               evos: {}, 
               dex: pokemon.dex, 
               index: form.index + 1,
-              // Add sprite URL directly during tree construction
-              spriteUrl: this.getSimpleSpriteUrl(pokemon.dex, formName)
           }
           currentPokemon = evos[pkmId]
       } else {
@@ -403,8 +374,6 @@ getEvos(pokemon: Pokemon, currentForm: string, evos = {} as any ){
                   evos: {}, 
                   dex: evoPkmDex, 
                   index: evoFormIndex + 1,
-                  // Add sprite URL directly during tree construction
-                  spriteUrl: this.getSimpleSpriteUrl(evoPkmDex, evoFormName)
               }
           }
           
@@ -446,108 +415,6 @@ getFormName(nombre:string){
 
   return [nombrePkm, forma]
 }
-
-async enrichWithSprites() {
-  console.time('Enriching Pokemon data with sprites');
-  
-  // Add sprites to species objects
-  for (const pokemon of this.species) {
-    // Add base sprite to Pokemon object
-    pokemon.spriteUrl = this.getSimpleSpriteUrl(pokemon.dex);
-    
-    // Add sprites to all forms
-    for (const form of pokemon.forms) {
-      form.spriteUrl = this.getSimpleSpriteUrl(pokemon.dex, form.name);
-      
-      // Add sprites for different palettes
-      form.paletteSprites = {};
-      
-      // Add null check before using Object.values
-      if (form.genderProperties) {
-        for (const genderProps of Object.values(form.genderProperties)) {
-          // Also check if palettes exist
-          if (genderProps && genderProps.palettes) {
-            for (const palette of genderProps.palettes) {
-              if (palette && palette.name) {
-                form.paletteSprites[palette.name] = this.getSimpleSpriteUrl(
-                  pokemon.dex, form.name, palette.name
-                );
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  // Add sprites to the lookup tables
-  Object.values(this.speciesByMove).forEach(pokemonList => {
-    pokemonList.forEach(entry => {
-      entry.spriteUrl = this.getSimpleSpriteUrl(entry.speciesID, entry.form);
-    });
-  });
-  
-  console.timeEnd('Enriching Pokemon data with sprites');
-}
-
-// Sprite calculation method similar to PokemonImageService.getSimpleSprite but without external dependencies
-private getSimpleSpriteUrl(pokemonId: number, formName: string = 'base', paletteName: string = 'none'): string {
-  try {
-    const pokemon = this.getSpeciesByDex(pokemonId);
-    if (!pokemon) {
-      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
-    }
-    
-    const form = pokemon.forms.find((f) => f.name === formName) || pokemon.forms[0];
-    
-    // Try to find the image file first (better quality)
-    /*
-    if (paletteName === 'none' || paletteName === 'shiny') {
-      const imageFolder = paletteName === 'shiny' ? 'Front Shiny' : 'Front';
-      const pokemonImageName = formName == "base" ? 
-        pokemon.name.toUpperCase() : 
-        `${pokemon.name.toUpperCase()}_${form.name.toUpperCase()}`;
-      
-      const imagePath = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
-      if (fs.existsSync(imagePath)) {
-        return path.join('/smartrotom/img/sprites', imageFolder, `${pokemonImageName}.png`);
-      }
-    }*/
-    
-    // Fall back to sprite from resource pack
-    let palette;
-    Object.values(form.genderProperties).forEach((genderProperty) => {
-      genderProperty.palettes.forEach((p) => {
-        if (p.name === paletteName) palette = p;
-      });
-    });
-    
-    if (!palette) {
-      palette = form.genderProperties[0].palettes[0];
-    }
-    
-    // Handle special case for Minior
-    let spriteResource = pokemonId === 774 ? 
-      'pixelmon:pokemon/774_minior/all/meteor/none/sprite.png' : 
-      (palette?.sprite?.resource || palette?.sprite);
-      
-    const url = `assets/pixelmon/textures/${spriteResource.split(':')[1]}`;
-    const defaultDirDef = path.join(__dirname, '../../../', 'public/smartrotom/packs/default_resourcepack', url);
-    const publicDir = path.join(__dirname, '../../../', 'public/smartrotom/packs/resourcepack', url);
-    
-    if (fs.existsSync(defaultDirDef)) {
-      return path.join('/smartrotom/packs/default_resourcepack', url);
-    }
-    if (fs.existsSync(publicDir)) {
-      return path.join('/smartrotom/packs/resourcepack', url);
-    }
-    
-    return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
-  } catch (error) {
-    return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
-  }
-}
-
 
 }
 

@@ -11,10 +11,11 @@ import { SpawnDataService } from './spawn-data.service';
 import { PokemonImageService } from './pokemon-image.service';
 import { WingullModule } from '../wingull/wingull.module';
 import { PokemonShowdownService } from './pokemon-showdown.service';
+import { SpriteManifestService } from './sprite-manifest.service';
 
 @Module({
   imports: [LoggerModule, ResponseModule, DrizzleModule, WingullModule],
-  providers: [PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, PokemonShowdownService],
+  providers: [PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, PokemonShowdownService, SpriteManifestService],
   controllers: [PokemonController],
   exports: [PokemonService],
 })

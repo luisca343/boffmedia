@@ -5,6 +5,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import axios from 'axios';
 import { WingullService } from '../wingull/wingull.service';
 import { PokemonShowdownService } from './pokemon-showdown.service';
+import { SpriteManifestService } from './sprite-manifest.service';
 
 @ApiTags('smartrotom/pokemon')
 @Controller('smartrotom/pokemon')
@@ -16,6 +17,7 @@ export class PokemonController {
         private readonly responseService: ResponseService,
         private readonly wingullService: WingullService,
         private readonly pokemonShowdownService: PokemonShowdownService,
+        private readonly spriteManifestService: SpriteManifestService,
     ) {}
     
     
@@ -442,6 +444,39 @@ export class PokemonController {
             const terasData = await this.pokemonShowdownService.getTerasPokemonShowdownData();
             this.responseService.logSuccess(action, { count: Object.keys(terasData).length });
             return this.responseService.createSuccessResponse('Teras Pokemon data retrieved successfully', terasData);
+        } catch (error) {
+            return this.responseService.handleError(action, error);
+        }
+    }
+
+    @Get('sprite-manifest')
+    @ApiOperation({ summary: 'Get the sprite manifest' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Sprite manifest retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve sprite manifest.' })
+    async getSpriteManifest() {
+    const action = 'get sprite manifest';
+        try {
+            this.responseService.logRequest(action, null);
+            const manifest = this.spriteManifestService.getManifest();
+            this.responseService.logSuccess(action, { count: manifest.count });
+            return this.responseService.createSuccessResponse('Sprite manifest retrieved successfully', manifest);
+        } catch (error) {
+            return this.responseService.handleError(action, error);
+        }
+    }
+
+    @Post('sprite-manifest/refresh')
+    @ApiOperation({ summary: 'Refresh the sprite manifest' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Sprite manifest refreshed successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to refresh sprite manifest.' })
+    async refreshSpriteManifest() {
+    const action = 'refresh sprite manifest';
+        try {
+            this.responseService.logRequest(action, null);
+            await this.spriteManifestService.refreshManifest();
+            const manifest = this.spriteManifestService.getManifest();
+            this.responseService.logSuccess(action, { count: manifest.count });
+            return this.responseService.createSuccessResponse('Sprite manifest refreshed successfully', { count: manifest.count });
         } catch (error) {
             return this.responseService.handleError(action, error);
         }
