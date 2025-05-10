@@ -41,7 +41,6 @@ export function LastRegistries() {
                         showStatus={false} 
                         hide={true}
                         displayName={true}
-                        url={reg.spriteUrl}
                     />
                     <div className="absolute top-1 right-1">
                         <StatusIcon caughtAt={reg.caughtAt} seenAt={reg.seenAt} palette={reg.paletteId} />

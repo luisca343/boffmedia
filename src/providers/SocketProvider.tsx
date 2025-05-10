@@ -8,7 +8,6 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   const socket = useSocketAuth()
 
   useEffect(() => {
-    console.log("SocketProvider mounted")
     return () => {
       console.log("SocketProvider unmounted")
     }

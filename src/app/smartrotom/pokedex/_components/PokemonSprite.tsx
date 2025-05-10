@@ -9,6 +9,8 @@ import { getItemSprite, getPokemonNameFromIdAndForm, getVisibility, PokedexStatu
 import { usePokemonSprite } from "../_hooks/usePokemonSprite"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import Image from "next/image"
+import { useSpriteManifestStore } from "@/stores/spriteManifestStore"
+import { getSpriteUrl } from "@/utils/spriteUtils"
 
 export type PokemonSpriteProps = {
   children?: any
@@ -35,17 +37,18 @@ export type PokemonSpriteLinkProps = PokemonSpriteProps & {
   link?: boolean
 }
 
-export function PokemonSpriteLink({children, id, form, palette, width = 80, height = 80, url, pixelated = true, hide = false, showStatus = true, displayName = false, hideCaught = false, hideSeen = false }: PokemonSpriteLinkProps) {
+export function PokemonSpriteLink({children, id, form, palette, width = 80, height = 80, pixelated = true, hide = false, showStatus = true, displayName = false, hideCaught = false, hideSeen = false }: PokemonSpriteLinkProps) {
   const {getPokemonStatus, getVisibility} = usePokedexData()
   const status = getPokemonStatus(id, form)
   const isVisible = getVisibility(id, form, hideCaught, hideSeen)
 
   if (!isVisible) return null
 
-  let spriteContent = null
-
-  if (url) {
-    spriteContent = (
+  return (
+    <InternalLink
+      className="flex flex-col items-center hover:bg-surface-400 rounded-sm text-center w-24 2xl:w-20 text-surface-50"
+      href={`/pokedex/entrada/${id}/${form}`}
+    >
       <PokemonSprite
         id={id}
         form={form}
@@ -59,41 +62,29 @@ export function PokemonSpriteLink({children, id, form, palette, width = 80, heig
         displayName={displayName}
         hideCaught={hideCaught}
         hideSeen={hideSeen}
-        url={url}
       />
-    )
-  } else {
-    spriteContent = (
-      <PokemonSpriteOld
-        id={id}
-        form={form}
-        palette={palette}
-        width={width}
-        height={height}
-        pixelated={pixelated}
-        hide={hide}
-        showStatus={showStatus}
-        forceBlack={false}
-        displayName={displayName}
-        hideCaught={hideCaught}
-        hideSeen={hideSeen}
-      />
-    )
-  }
-
-  return (
-    <InternalLink
-      className="flex flex-col items-center hover:bg-surface-400 rounded-sm text-center w-24 2xl:w-20 text-surface-50"
-      href={`/pokedex/entrada/${id}/${form}`}
-    >
-      {spriteContent}
     </InternalLink>
   )
 }
 
-
-
-export function PokemonSprite({ children, id, form, palette, width = 100, height = 100, url, pixelated = true, hide = false, showStatus = false, forceBlack = false, displayName = false, hideCaught = false, hideSeen = false, inverted = false, className }: PokemonSpriteProps) {
+export function PokemonSprite({ 
+  children, 
+  id, 
+  form, 
+  palette, 
+  width = 100, 
+  height = 100, 
+  url, 
+  pixelated = true, 
+  hide = false, 
+  showStatus = false, 
+  forceBlack = false, 
+  displayName = false, 
+  hideCaught = false, 
+  hideSeen = false, 
+  inverted = false, 
+  className 
+}: PokemonSpriteProps) {
   const { getPokemonStatus, getVisibility } = usePokedexData()
   const status = getPokemonStatus(id, form)
   const isVisible = getVisibility(id, form, hideCaught, hideSeen)
@@ -101,19 +92,22 @@ export function PokemonSprite({ children, id, form, palette, width = 100, height
   const [isLoading, setIsLoading] = useState(true)
   
   useEffect(() => {
+    // If URL is directly provided, use it
     if (url) {
       const formattedUrl = url.startsWith('http') || url.startsWith('/') 
         ? url 
         : `${url.replace(/\\/g, '/')}`;
       
-      setImageUrl(formattedUrl)
-      setIsLoading(false)
-      return
+      setImageUrl(formattedUrl);
+      setIsLoading(false);
+      return;
     }
     
-    setImageUrl("/placeholder.svg")
-    setIsLoading(false)
-}, [id, form, palette, url])
+    // Get sprite URL using the utility function
+    const spriteUrl = getSpriteUrl({ id, form, palette });
+    setImageUrl(spriteUrl || "/placeholder.svg");
+    setIsLoading(false);
+  }, [id, form, palette, url]);
 
   if (isLoading) return <Loading width={width} height={height} />
   if (!isVisible) return null
@@ -139,38 +133,6 @@ export function PokemonSprite({ children, id, form, palette, width = 100, height
         )}
       </div>
       {displayName && <PokemonNameElement id={id} form={form} palette={palette} hide={status === PokedexStatus.UNSEEN && hide} />}
-      {children && <div className="text-xs hidden 2xl:block">{children}</div>}
-    </>
-  )
-}
-
-export function PokemonSpriteOld({ children, id, form, palette, width = 100, height = 100, url, pixelated = true, hide = false, showStatus = false, forceBlack = false, displayName = false, hideCaught = false, hideSeen = false, inverted = false, className }: PokemonSpriteProps) {
-  const spriteData = usePokemonSprite(id, form, palette, hide, pixelated)
-
-  if (!spriteData) return <Loading width={width} height={height} />
-  if (!getVisibility(spriteData.status, hideCaught, hideSeen)) return null
-
-  return (
-    <>
-      <div
-        style={{ width, maxHeight: height }}
-        className={`relative ${spriteData?.type === "sprite" ? "mb-2 mt-[-0.5rem]" : ""} ${className}`}
-      >
-        <img
-          width={width}
-          height={height}
-          src={spriteData?.url || "/placeholder.svg"}
-          alt="pokemon"
-          style={{ imageRendering: "pixelated" }}
-          className={`${(spriteData.status === PokedexStatus.UNSEEN && hide) || forceBlack ? `brightness-0 ${inverted ? "invert" : ""}` : ""}`}
-        />
-        {showStatus && (
-          <div className="absolute top-1 right-1">
-            <StatusIconv2 status={spriteData.status} palette={palette} width={width} height={height} />
-          </div>
-        )}
-      </div>
-      {displayName && <PokemonNameElement id={id} form={form} palette={palette} hide={spriteData.status === PokedexStatus.UNSEEN && hide} />}
       {children && <div className="text-xs hidden 2xl:block">{children}</div>}
     </>
   )

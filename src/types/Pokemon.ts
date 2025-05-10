@@ -199,9 +199,24 @@ export type ActivePokemon = {
     stats: string[];
 };
 
-  export interface SpeciesMoveEntry {
+export interface SpeciesMoveEntry {
     speciesID: number;
     form: string;
     speciesName?: string;
     spriteUrl?: string;
-  }
+}
+
+export interface SpriteInfo {
+    path: string;
+    isDefault: boolean;
+}
+
+export interface SpriteManifest {
+    sprites: Record<string, SpriteInfo>;
+    count: {
+        total: number;
+        default: number;
+        custom: number;
+    };
+    lastUpdated: string;
+}

@@ -1,7 +1,7 @@
 
 import { rotomGET } from "@/services/boffAPI"
 import { EvolutionTree, PokedexData, PokemonMove, Registry } from "@/types/pokedex";
-import { NextPrev, Pokemon, SpeciesMoveEntry } from "@/types/Pokemon";
+import { NextPrev, Pokemon, SpeciesMoveEntry, SpriteManifest } from "@/types/Pokemon";
 
 type ImageResult = {
   url: string;
@@ -106,7 +106,8 @@ export const pokemonService = {
   getAllAbilities: () => rotomGET<AbilityCount[]>("/pokemon/abilities"),
   getAbility: (name: string) => rotomGET<Ability>(`/pokemon/ability/${name}`),
   getPokemonByAbility: (name: string) => rotomGET<SpeciesMoveEntry[]>(`/pokemon/ability/${name}/pokemon`),
-  
+  getSpriteManifest: () => rotomGET<SpriteManifest>("/pokemon/sprite-manifest"),
+  refreshSpriteManifest: () => rotomGET<{ count: number }>("/pokemon/sprite-manifest/refresh"),
   
 }
 

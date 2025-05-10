@@ -1,6 +1,6 @@
 "use client"
 import { PokedexSection } from "../../../_components/PokedexSection"
-import { PokemonSprite, PokemonSpriteOld } from "../../../_components/PokemonSprite"
+import { PokemonSprite } from "../../../_components/PokemonSprite"
 import { useTranslations } from "next-intl"
 
 interface PaletteInfo {
@@ -32,7 +32,7 @@ export function PalettesSection({ palettes, pokemonIndex, formName }: PalettesSe
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 justify-items-center">
           {uniquePalettes.map((palette, idx) => {
             return <div key={idx} className="flex flex-col justify-center items-center p-3 bg-surface-800/50 rounded-lg border border-surface-700/50 hover:border-surface-600 transition-colors">
-              <PokemonSpriteOld
+              <PokemonSprite
                 width={80} 
                 height={80} 
                 id={pokemonIndex} 
