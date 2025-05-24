@@ -18,6 +18,8 @@ import { EventRegistrationButton } from "../_components/EventRegistrationButton"
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import emoji from 'remark-emoji';
+import { Markdown } from "@/components/Markdown";
+import { getEventStatus } from "@/lib/events"; // Import the shared utility function
 
 // Extend the Event interface to include child events
 interface EventWithChildren extends Event {
@@ -54,23 +56,9 @@ export default function EventPage() {
     }
   }, [eventId]);
 
-  const getEventStatus = () => {
-    if (!event) return { label: "Desconocido", class: "" };
-    
-    const now = new Date();
-    const startDate = new Date(event.startDate);
-    const endDate = event.endDate ? new Date(event.endDate) : null;
-
-    if (now < startDate) {
-      return { label: "Próximo", class: "bg-primary-500/20 text-primary-400 border-primary-500/30" };
-    } else if (endDate && now > endDate) {
-      return { label: "Finalizado", class: "bg-surface-500/20 text-surface-400 border-surface-500/30" };
-    } else {
-      return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" };
-    }
-  };
-
-  const status = getEventStatus();
+  // Remove the duplicate getEventStatus function and use the imported one instead
+  const status = event ? getEventStatus(event.startDate, event.endDate) : { label: "Desconocido", class: "" };
+  
   const game = event ? games?.find((g: Game) => g.id === event.game) : null;
 
   const formatDate = (dateString?: string | null) => {
@@ -169,28 +157,7 @@ export default function EventPage() {
           
           {/* Rich Content Section - Render markdown content */}
           {event.description && (
-              <div className="prose prose-invert prose-headings:text-surface-50 prose-a:text-primary-400 hover:prose-a:text-primary-300 prose-strong:text-surface-100 prose-code:text-primary-300 prose-blockquote:border-primary-500 max-w-none">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm, emoji]}
-                  components={{
-                    h1: ({node, ...props}) => <h1 className="text-2xl font-bold mb-4 text-surface-50" {...props} />,
-                    h2: ({node, ...props}) => <h2 className="text-xl font-semibold mb-3 text-surface-50 flex items-center gap-2" {...props} />,
-                    h3: ({node, ...props}) => <h3 className="text-lg font-medium mb-2 text-surface-100" {...props} />,
-                    a: ({node, ...props}) => <a className="text-primary-400 hover:text-primary-300 hover:underline" {...props} />,
-                    ul: ({node, ...props}) => <ul className="list-disc pl-5 space-y-1 mb-4" {...props} />,
-                    ol: ({node, ...props}) => <ol className="list-decimal pl-5 space-y-1 mb-4" {...props} />,
-                    li: ({node, ...props}) => <li className="text-surface-300" {...props} />,
-                    p: ({node, ...props}) => <p className="mb-4 text-surface-300" {...props} />,
-                    blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary-500 pl-4 italic text-surface-400" {...props} />,
-                    code: ({node, inline, ...props}) => 
-                      inline ? 
-                        <code className="bg-surface-700 px-1.5 py-0.5 rounded text-primary-300 text-sm" {...props} /> :
-                        <pre className="bg-surface-700 p-4 rounded-md overflow-x-auto" {...props} />
-                  }}
-                >
-                  {event.description}
-                </ReactMarkdown>
-              </div>
+              <Markdown>{event.description}</Markdown>
           )}
           </div>
 
@@ -221,9 +188,9 @@ export default function EventPage() {
                               {formatDate(childEvent.startDate)}
                             </div>
                           </div>
-                          <Badge className="ml-2" variant="outline">
-                            {childEvent.status === "upcoming" ? "Próximo" : 
-                            childEvent.status === "active" ? "En Curso" : "Finalizado"}
+                          {/* Use the shared utility function here as well */}
+                          <Badge className={`ml-2 ${getEventStatus(childEvent.startDate, childEvent.endDate).class}`}>
+                            {getEventStatus(childEvent.startDate, childEvent.endDate).label}
                           </Badge>
                         </div>
                       </Link>

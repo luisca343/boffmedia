@@ -2,7 +2,7 @@ export interface Event {
   id: number
   parentId: number
   title: string
-  game: number
+  gameId: number
   gameName: string
   description: string | null
   icon: string

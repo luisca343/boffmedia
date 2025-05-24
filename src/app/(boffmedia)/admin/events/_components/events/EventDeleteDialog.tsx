@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "react-toastify"
 import { Calendar, RefreshCw } from "lucide-react"
 import type { Event } from "@/types/events"
+import { eventsService } from "@/services/api/smartrotom/eventsService"
 
 interface EventDeleteDialogProps {
   open: boolean
@@ -27,8 +28,7 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
-      // Note: Delete endpoint needs to be implemented
-      // await eventsService.deleteEvent(event.id)
+      //await eventsService.deleteEvent(event.id)
       toast.success(`El evento "${event.title}" ha sido eliminado con éxito.`)
       onSuccess()
     } catch (error) {

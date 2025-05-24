@@ -21,12 +21,14 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
     return dateString?.split('.')[0] || dateString?.split('T')[0] || ""
   }
 
+  console.log("EventEditDialog", event)
+
   const formDefaultValues = {
     title: event.title,
     parentId: event.parentId,
     description: event.description || undefined,
     icon: event.icon || undefined,
-    game: event.game,
+    gameId: event.gameId,
     startDate: formatDateForInput(event.startDate),
     endDate: formatDateForInput(event.endDate),
     type: event.type,

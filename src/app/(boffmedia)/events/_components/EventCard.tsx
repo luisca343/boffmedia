@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { cn } from "@/lib/utils";
+import { getEventStatus } from "@/lib/events"; // Import the new utility function
 import type { Event } from "@/types/events";
+import { Markdown } from "@/components/Markdown";
 
 interface EventCardProps {
   event: Event;
@@ -16,21 +18,8 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
   const { games } = useGetGames();
   const game = games?.find((g) => g.id === event.game);
   
-  const getEventStatus = () => {
-    const now = new Date();
-    const startDate = new Date(event.startDate);
-    const endDate = new Date(event.endDate);
-
-    if (now < startDate) {
-      return { label: "Próximo", class: "bg-primary-500/20 text-primary-400 border-primary-500/30" };
-    } else if (now > endDate) {
-      return { label: "Finalizado", class: "bg-surface-500/20 text-surface-400 border-surface-500/30" };
-    } else {
-      return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" };
-    }
-  };
-
-  const status = getEventStatus();
+  // Use the utility function
+  const status = getEventStatus(event.startDate, event.endDate);
   const isListLayout = layout === "list";
 
   const formatDate = (dateString: string) => {
@@ -89,10 +78,6 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
           </div>
           
           <h3 className="text-xl font-semibold text-surface-50 mb-2 line-clamp-1">{event.title}</h3>
-          
-          {event.description && (
-            <p className="text-surface-300 mb-4 line-clamp-2">{event.description}</p>
-          )}
           
           <div className="space-y-2 text-sm text-surface-400">
             <div className="flex items-center">

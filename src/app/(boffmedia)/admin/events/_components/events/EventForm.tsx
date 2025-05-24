@@ -17,7 +17,7 @@ const eventSchema = z.object({
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
   icon: z.string().optional(),
   banner: z.string().optional(),
-  game: z.number(),
+  gameId: z.number(),
   startDate: z.string(),
   endDate: z.string().optional(),
   type: z.enum(["event", "server"]),
@@ -45,7 +45,7 @@ export function EventForm({
 }: EventFormProps) {
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { games, isLoading: isLoadingGames } = useGetGames()
-
+  
   // Filter out events that can be parents (only server type events)
   const parentEvents =
     events?.filter(
@@ -73,7 +73,7 @@ export function EventForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-        {!parentEvent && ( // Only show parent selection if not creating from a parent
+        {!parentEvent && ( 
           <FormField
             control={form.control}
             name="parentId"
@@ -150,7 +150,7 @@ export function EventForm({
 
         <FormField
           control={form.control}
-          name="game"
+          name="gameId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Juego</FormLabel>

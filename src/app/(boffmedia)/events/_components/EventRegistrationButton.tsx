@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import type { Event } from "@/types/events";
 import { eventsService } from "@/services/api/smartrotom/eventsService";
+import { getEventStatus } from "@/lib/events";
 
 interface EventRegistrationButtonProps {
   event: Event;
@@ -33,9 +34,9 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
         
         // Check if user is already registered
         const userIsRegistered = result.data?.some(
-          (participant) => participant.userId === session.user.id
+          (participant) => participant.userId === parseInt(session.user.id)
         );
-        setIsRegistered(userIsRegistered);
+        setIsRegistered(!!userIsRegistered);
       } catch (error) {
         console.error("Error checking registration status:", error);
       } finally {
@@ -66,8 +67,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
       
       // Register for the event
       const joinEventData = {
-        userId: session.user.id,
-        nickname: session.user.username || session.user.name,
+        userId: parseInt(session.user.id),
+        nickname: session.user.username || session.user.name || "",
         avatar: session.user.image || undefined,
         // Optional comment can be added if needed
       };
@@ -95,17 +96,12 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
     }
   };
   
-  const now = new Date();
-  const startDate = new Date(event.startDate);
-  const hasValidEndDate = event.endDate && !isNaN(new Date(event.endDate).getTime());
-  const endDate = hasValidEndDate ? new Date(event.endDate) : null;
+  const status = getEventStatus(event.startDate, event.endDate);
+  const isUpcoming = status.label === "Próximo";
+  const isActive = status.label === "En Curso";
+  
+  const canRegister = isUpcoming || (event.type === "server" && isActive);
 
-  const isServerEvent = event.type === "server";
-
-  const canRegister = 
-    (isServerEvent && (!hasValidEndDate || now < endDate!)) || 
-    (now < startDate && (!hasValidEndDate || now < endDate!));
-    
   if (!canRegister) {
     return (
       <Button disabled className="w-full bg-surface-700 text-surface-300 cursor-not-allowed">

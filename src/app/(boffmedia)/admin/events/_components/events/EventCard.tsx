@@ -5,6 +5,7 @@ import { Pencil, Trash2, Calendar, ChevronRight, Plus } from "lucide-react"
 import type { Event } from "@/types/events"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { cn } from "@/lib/utils"
+import { getEventStatus } from "@/lib/events" // Import the new utility function
 
 interface EventCardProps {
   event: Event
@@ -19,32 +20,10 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
   const { games } = useGetGames()
 
   // Find the game name
-  const gameDisplay = event.name || `Juego #${event.game}`
+  const gameDisplay = event.gameName || `Juego #${event.gameId}`
 
-const getEventStatus = () => {
-  const now = new Date()
-  const startDate = new Date(event.startDate)
-  
-  // Handle invalid endDate more gracefully
-  const hasValidEndDate = event.endDate && !isNaN(new Date(event.endDate).getTime())
-  const endDate = hasValidEndDate ? new Date(event.endDate) : null
-  
-  // First check if the end date is invalid or missing
-  if (!hasValidEndDate) {
-    return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" }
-  }
-  
-  // Then check the event's timeline status
-  if (now < startDate) {
-    return { label: "Próximo", class: "bg-primary-500/20 text-primary-400 border-primary-500/30" }
-  } else if (now > endDate!) {
-    return { label: "Finalizado", class: "bg-surface-500/20 text-surface-400 border-surface-500/30" }
-  } else {
-    return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" }
-  }
-}
-
-  const status = getEventStatus()
+  // Use the utility function
+  const status = getEventStatus(event.startDate, event.endDate)
 
   return (
     <TableRow className={cn("border-surface-700 hover:bg-surface-700/50", isChild && "bg-surface-800/50")}>
