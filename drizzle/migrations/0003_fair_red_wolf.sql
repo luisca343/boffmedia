@@ -1,3 +1,0 @@
-ALTER TABLE `boffmedia_user_roles` ADD CONSTRAINT `boffmedia_user_roles_userId_boffmedia_users_id_fk` FOREIGN KEY (`userId`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `boffmedia_user_roles` ADD CONSTRAINT `boffmedia_user_roles_roleId_boffmedia_roles_id_fk` FOREIGN KEY (`roleId`) REFERENCES `boffmedia_roles`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `ficus_quotes` ADD CONSTRAINT `ficus_quotes_discord_id_discord_users_user_id_fk` FOREIGN KEY (`discord_id`) REFERENCES `discord_users`(`user_id`) ON DELETE cascade ON UPDATE cascade;

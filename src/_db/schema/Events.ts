@@ -42,7 +42,7 @@ export const boffMediaEvents = mysqlTable("boffmedia_events", {
   icon: varchar("icon", { length: 255 }).notNull(),
   banner: varchar("banner", { length: 255 }),
   startDate: datetime("start_date").notNull(),
-  endDate: datetime("end_date").notNull(),
+  endDate: datetime("end_date"),
   status: mysqlEnum("status", [EVENT_STATUS.UPCOMING, EVENT_STATUS.ACTIVE, EVENT_STATUS.COMPLETED]).notNull().default(EVENT_STATUS.UPCOMING),
   visibility: mysqlEnum("visibility", [VISIBILITY_STATUS.PUBLIC, VISIBILITY_STATUS.PRIVATE]).notNull().default(VISIBILITY_STATUS.PRIVATE),
   type: mysqlEnum("type", ["event", "server"]).notNull(),
@@ -57,6 +57,28 @@ export const boffMediaEvents = mysqlTable("boffmedia_events", {
 });
 
 export type Event = typeof boffMediaEvents.$inferSelect;
+
+export const boffMediaParticipants = mysqlTable("boffmedia_participants", {
+  id: int("id").primaryKey().autoincrement(),
+  userId: int("user_id"), // May be null for anonymous participants
+  nickname: varchar("nickname", { length: 32 }),
+  avatar: varchar("avatar", { length: 255 }),
+  createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP()`),
+  updatedAt: datetime("updated_at")
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+}, (table) => {
+  return {
+    userIdx: index("p_user_idx").on(table.userId),
+    userFk: foreignKey({
+      columns: [table.userId],
+      foreignColumns: [boffMediaUsers.id],
+      name: "p_user_fk"
+    }).onDelete("set null").onUpdate("cascade")
+  };
+});
+
+export type Participant = typeof boffMediaParticipants.$inferSelect;
 
 // Teams table with role-based leadership
 export const boffMediaEventTeams = mysqlTable("boffmedia_event_teams", {
@@ -79,14 +101,13 @@ export const boffMediaEventTeams = mysqlTable("boffmedia_event_teams", {
 
 export type EventTeam = typeof boffMediaEventTeams.$inferSelect;
 
-// Team members with leadership role
 export const boffMediaEventTeamMembers = mysqlTable("boffmedia_event_team_members", {
   teamId: int("team_id").references(
     () => boffMediaEventTeams.id, 
     { onDelete: "cascade", onUpdate: "cascade" }
   ),
-  userId: int("user_id").references(
-    () => boffMediaUsers.id, 
+  participantId: int("participant_id").references(
+    () => boffMediaParticipants.id, 
     { onDelete: "cascade", onUpdate: "cascade" }
   ),
   role: mysqlEnum("role", ["leader", "member"]).notNull().default("member"),
@@ -96,16 +117,18 @@ export const boffMediaEventTeamMembers = mysqlTable("boffmedia_event_team_member
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
 }, (table) => {
   return {
-      pk: primaryKey({ columns: [table.teamId, table.userId] }),
+      pk: primaryKey({ columns: [table.teamId, table.participantId] }),
       roleIdx: index("etm_role_idx").on(table.teamId, table.role),
   };
 });
 
 export type EventTeamMember = typeof boffMediaEventTeamMembers.$inferSelect;
 
+
 export const boffMediaEventParticipants = mysqlTable("boffmedia_event_participants", {
-    userId: int("user_id").notNull(),
-    eventId: int("event_id"),
+    id: int("id").primaryKey().autoincrement(),
+    participantId: int("participant_id").notNull(),
+    eventId: int("event_id").notNull(),
     status: mysqlEnum("status", [PARTICIPANT_STATUS.REGISTERED, PARTICIPANT_STATUS.CONFIRMED, PARTICIPANT_STATUS.DECLINED, PARTICIPANT_STATUS.REMOVED])
       .notNull().default(PARTICIPANT_STATUS.REGISTERED),
     comment: text("comment"),
@@ -115,12 +138,12 @@ export const boffMediaEventParticipants = mysqlTable("boffmedia_event_participan
         .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
 }, (table) => {
     return {
-        pk: primaryKey({ columns: [table.userId, table.eventId] }),
         eventIdx: index("ep_event_idx").on(table.eventId),
-        userFk: foreignKey({
-          columns: [table.userId],
-          foreignColumns: [boffMediaUsers.id],
-          name: "ep_user_fk"
+        participantIdx: index("ep_participant_idx").on(table.participantId),
+        participantFk: foreignKey({
+          columns: [table.participantId],
+          foreignColumns: [boffMediaParticipants.id],
+          name: "ep_participant_fk"
         }).onDelete("cascade").onUpdate("cascade"),
         eventFk: foreignKey({
           columns: [table.eventId],
@@ -131,6 +154,7 @@ export const boffMediaEventParticipants = mysqlTable("boffmedia_event_participan
 });
 
 export type EventParticipant = typeof boffMediaEventParticipants.$inferSelect;
+
 
 // Unified achievements table
 export const boffMediaAchievements = mysqlTable("boffmedia_achievements", {
@@ -170,8 +194,8 @@ export const boffMediaAchievements = mysqlTable("boffmedia_achievements", {
 export type Achievement = typeof boffMediaAchievements.$inferSelect;
 
 // Unified user progress tracking
-export const boffMediaUserProgress = mysqlTable("boffmedia_user_progress", {
-  userId: int("user_id").notNull(),
+export const boffMediaParticipantProgress = mysqlTable("boffmedia_participant_progress", {
+  participantId: int("participant_id").notNull(),
   achievementId: int("achievement_id").notNull(),
   currentProgress: int("current_progress").notNull().default(0),
   isCompleted: int("is_completed").notNull().default(0),
@@ -180,32 +204,37 @@ export const boffMediaUserProgress = mysqlTable("boffmedia_user_progress", {
   createdAt: datetime("created_at").notNull().default(sql`CURRENT_TIMESTAMP()`),
 }, (table) => {
   return {
-    pk: primaryKey({ columns: [table.userId, table.achievementId] }),
-    achievementIdx: index("up_achievement_idx").on(table.achievementId),
-    userFk: foreignKey({
-      columns: [table.userId],
-      foreignColumns: [boffMediaUsers.id],
-      name: "up_user_fk"
+    pk: primaryKey({ columns: [table.participantId, table.achievementId] }),
+    achievementIdx: index("pp_achievement_idx").on(table.achievementId),
+    participantFk: foreignKey({
+      columns: [table.participantId],
+      foreignColumns: [boffMediaParticipants.id],
+      name: "pp_participant_fk"
     }).onDelete("cascade").onUpdate("cascade"),
     achievementFk: foreignKey({
       columns: [table.achievementId],
       foreignColumns: [boffMediaAchievements.id],
-      name: "up_achievement_fk"
+      name: "pp_achievement_fk"
     }).onDelete("cascade").onUpdate("cascade"),
-    userIdx: index("up_user_idx").on(table.userId),
+    participantIdx: index("pp_participant_idx").on(table.participantId),
   };
 });
 
-export type UserProgress = typeof boffMediaUserProgress.$inferSelect;
+export type ParticipantProgress = typeof boffMediaParticipantProgress.$inferSelect;
+
 
 
 /**
- * Helper function to validate user participation before awarding progress
- * @param userId User ID to validate
+ * Helper function to validate participant before awarding progress
+ * @param participantId Participant ID to validate
  * @param achievementId Achievement ID 
- * @returns Boolean indicating if user can receive progress for this achievement
+ * @returns Boolean indicating if participant can receive progress for this achievement
  */
-export async function validateUserCanReceiveAchievement(userId: number, achievementId: number, db: any): Promise<boolean> {
+export async function validateParticipantCanReceiveAchievement(
+  participantId: number, 
+  achievementId: number, 
+  db: any
+): Promise<boolean> {
   // 1. Get the event ID for the achievement
   const achievement = await db.query.boffMediaAchievements.findFirst({
     where: (achievements, { eq }) => eq(achievements.id, achievementId)
@@ -213,13 +242,14 @@ export async function validateUserCanReceiveAchievement(userId: number, achievem
   
   if (!achievement) return false;
   
-  // 2. Check if user is a participant in this event
-  const participant = await db.query.boffMediaEventParticipants.findFirst({
+  // 2. Check if participant is registered for this event
+  const eventParticipant = await db.query.boffMediaEventParticipants.findFirst({
     where: (p, { eq, and }) => and(
-      eq(p.userId, userId),
-      eq(p.eventId, achievement.eventId)
+      eq(p.participantId, participantId),
+      eq(p.eventId, achievement.eventId),
+      eq(p.status, PARTICIPANT_STATUS.CONFIRMED)
     )
   });
   
-  return !!participant;
+  return !!eventParticipant;
 }

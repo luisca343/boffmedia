@@ -8,7 +8,7 @@ export class CreateEventDto {
   description: string;
 
   @ApiProperty({ description: 'The game ID' })
-  gameId: number;
+  game: number;
 
   @ApiProperty({ description: 'The start date of the event' })
   startDate: string;

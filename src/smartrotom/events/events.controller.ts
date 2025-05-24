@@ -8,6 +8,7 @@ import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { JoinTeamDto } from './dto/join-team.dto';
 import { UpdateProgressDto } from './dto/update-progress.dto';
 import { CreateGameDto } from './dto/create-game.dto';
+import { JoinEventDto } from './dto/join-event.dto';
 
 @ApiTags('boffmedia/events')
 @Controller('boffmedia/events')
@@ -219,7 +220,7 @@ export class EventsController {
     const action = 'join team';
     try {
       this.responseService.logRequest(action, { eventId, teamId, ...joinTeamDto });
-      const result = await this.eventsService.joinTeam(eventId, teamId, joinTeamDto.userId);
+      const result = await this.eventsService.joinTeam(eventId, teamId, joinTeamDto.participantId);
       this.responseService.logSuccess(action, result);
       return this.responseService.createSuccessResponse('Joined team successfully', result);
     } catch (error) {
@@ -326,7 +327,7 @@ export class EventsController {
       this.responseService.logRequest(action, { eventId, ...updateProgressDto });
       const result = await this.eventsService.updateProgress(
         eventId,
-        updateProgressDto.userId,
+        updateProgressDto.participantId,
         updateProgressDto.achievementId,
         updateProgressDto.progress,
         updateProgressDto.teamId
@@ -383,4 +384,38 @@ export class EventsController {
       this.responseService.handleError(action, error, { eventId });
     }
   }
+
+  @Post(':eventId/join')
+  @ApiOperation({ summary: 'Join an event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Joined event successfully.' })
+  async joinEvent(
+    @Param('eventId') eventId: number,
+    @Body() joinEventDto: JoinEventDto
+  ) {
+    const action = 'join event';
+    try {
+      this.responseService.logRequest(action, { eventId, ...joinEventDto });
+      const result = await this.eventsService.joinEvent(eventId, joinEventDto);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Joined event successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { eventId, ...joinEventDto });
+    }
+  }
+
+  @Get(':eventId/participants')
+  @ApiOperation({ summary: 'Get all participants in an event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Participants retrieved successfully.' })
+  async getEventParticipants(@Param('eventId') eventId: number) {
+    const action = 'get event participants';
+    try {
+      this.responseService.logRequest(action, { eventId });
+      const result = await this.eventsService.getEventParticipants(eventId);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Participants retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { eventId });
+    }
+  }
+
 }

@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateProgressDto {
-  @ApiProperty({ description: 'The ID of the user' })
-  userId: number;
+  @ApiProperty({ description: 'The ID of the participant' })
+  participantId: number;
 
   @ApiProperty({ description: 'The ID of the achievement' })
   achievementId: number;
