@@ -19,21 +19,30 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
   const { games } = useGetGames()
 
   // Find the game name
-  const gameDisplay = event.gameName || `Juego #${event.game}`
+  const gameDisplay = event.name || `Juego #${event.game}`
 
-  const getEventStatus = () => {
-    const now = new Date()
-    const startDate = new Date(event.startDate)
-    const endDate = new Date(event.endDate)
-
-    if (now < startDate) {
-      return { label: "Próximo", class: "bg-primary-500/20 text-primary-400 border-primary-500/30" }
-    } else if (now > endDate) {
-      return { label: "Finalizado", class: "bg-surface-500/20 text-surface-400 border-surface-500/30" }
-    } else {
-      return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" }
-    }
+const getEventStatus = () => {
+  const now = new Date()
+  const startDate = new Date(event.startDate)
+  
+  // Handle invalid endDate more gracefully
+  const hasValidEndDate = event.endDate && !isNaN(new Date(event.endDate).getTime())
+  const endDate = hasValidEndDate ? new Date(event.endDate) : null
+  
+  // First check if the end date is invalid or missing
+  if (!hasValidEndDate) {
+    return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" }
   }
+  
+  // Then check the event's timeline status
+  if (now < startDate) {
+    return { label: "Próximo", class: "bg-primary-500/20 text-primary-400 border-primary-500/30" }
+  } else if (now > endDate!) {
+    return { label: "Finalizado", class: "bg-surface-500/20 text-surface-400 border-surface-500/30" }
+  } else {
+    return { label: "En Curso", class: "bg-success-500/20 text-success-400 border-success-500/30" }
+  }
+}
 
   const status = getEventStatus()
 
@@ -49,7 +58,7 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
           <div className="w-10 h-10 rounded bg-surface-700 flex items-center justify-center overflow-hidden">
             {event.icon ? (
               <img
-                src={event.icon ? `/img/${event.icon}` : "/placeholder.svg"}
+                src={event.icon ? `${event.icon}` : "/placeholder.svg"}
                 alt={event.title}
                 className="w-full h-full object-cover"
               />
@@ -76,7 +85,7 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
         <span className="text-surface-300">{new Date(event.startDate).toLocaleString()}</span>
       </TableCell>
       <TableCell>
-        <span className="text-surface-300">{new Date(event.endDate).toLocaleString()}</span>
+        <span className="text-surface-300">{event.endDate ? new Date(event.endDate).toLocaleString() : "Sin fecha"}</span>
       </TableCell>
       <TableCell>
         <Badge className={status.class}>{status.label}</Badge>

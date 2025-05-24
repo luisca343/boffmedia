@@ -18,7 +18,7 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const formatDateForInput = (dateString: string) => {
-    return dateString.split('.')[0] // Remove milliseconds and timezone
+    return dateString?.split('.')[0] || dateString?.split('T')[0] || ""
   }
 
   const formDefaultValues = {

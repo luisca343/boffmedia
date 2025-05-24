@@ -1,25 +1,60 @@
 "use client"
-import React, { useState, useEffect } from 'react';
-import { Event } from './types';
-import { boffGET } from '@/services/boffAPI';
-import { EventCard } from './_components/EventCard';
+
+import { useState } from 'react';
 import { useGetEvents } from '@/hooks/events/useGetEvents';
+import { EventsHeader } from './_components/EventsHeader';
+import { EventsGrid } from './_components/EventsGrid';
+import { EventsList } from './_components/EventsList';
+import { EventsEmpty } from './_components/EventsEmpty';
+import { EventsLoading } from './_components/EventsLoading';
+import { EventsError } from './_components/EventsError';
+import type { Event } from '@/types/events';
 
 export default function EventsPage() {
-  const { events, error, isLoading, refetch } = useGetEvents()
+  const { events, error, isLoading, refetch } = useGetEvents();
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState<string | null>(null);
 
+  // Filter events based on search and filter
+  const filteredEvents = events
+    ? events.filter((event: Event) => {
+        // Search filter
+        const matchesSearch = searchTerm 
+          ? event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (event.description?.toLowerCase() || '').includes(searchTerm.toLowerCase())
+          : true;
+        
+        // Game type filter
+        const matchesFilter = filter ? event.game === parseInt(filter) : true;
+        
+        return matchesSearch && matchesFilter;
+      })
+    : [];
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (isLoading) return <EventsLoading />;
+  if (error) return <EventsError error={error} onRetry={refetch} />;
+  if (!events || events.length === 0) return <EventsEmpty />;
 
   return (
-    <>
-      <h1 className="text-3xl font-bold mb-6">Próximos eventos</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
-          <EventCard key={event.id} event={event} />
-        ))}
-      </div>
-    </>
+    <div className="container mx-auto p-6 max-w-7xl">
+      <EventsHeader 
+        totalEvents={filteredEvents.length}
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
+        filter={filter}
+        onFilterChange={setFilter}
+      />
+      
+      {filteredEvents.length === 0 ? (
+        <EventsEmpty searchTerm={searchTerm} onClearSearch={() => setSearchTerm('')} />
+      ) : viewMode === 'grid' ? (
+        <EventsGrid events={filteredEvents} />
+      ) : (
+        <EventsList events={filteredEvents} />
+      )}
+    </div>
   );
-};
+}

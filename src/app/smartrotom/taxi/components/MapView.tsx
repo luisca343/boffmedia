@@ -18,6 +18,7 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
   // Initial zoom level set to medium (50), with range now from 5 (very zoomed in) to 500 (shows 10000+ blocks)
   const [zoomLevel, setZoomLevel] = useState(50);
   const [mapCenter, setMapCenter] = useState<Position>(playerPosition);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // Update map center when a stop is selected
   useEffect(() => {
@@ -27,6 +28,21 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
       setMapCenter(playerPosition);
     }
   }, [selectedStop, playerPosition]);
+
+  // Handle mouse wheel zoom
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    // Calculate zoom factor - smaller value for smoother zooming
+    const zoomFactor = 1.1;
+    
+    // Determine zoom direction and calculate new zoom value
+    const newZoom = e.deltaY > 0 
+      ? Math.min(500, zoomLevel * zoomFactor) // Zoom out (increase value)
+      : Math.max(5, zoomLevel / zoomFactor);  // Zoom in (decrease value)
+    
+    setZoomLevel(newZoom);
+  };
 
   // Calculate if a stop is within viewport and get its position
   const calculateStopPosition = (stop: TaxiStop | Position & { id: string }) => {
@@ -124,7 +140,11 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
       
       <div className="flex-grow relative bg-gray-50">
         {/* Map container with enhanced styling */}
-        <div className="absolute inset-0 bg-[#041F4E] overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-[#041F4E] overflow-hidden"
+          ref={mapContainerRef}
+          onWheel={handleWheel}
+        >
           {/* Map Grid Lines with improved visibility */}
           <div className="absolute inset-0" style={{
           backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px)',
@@ -327,6 +347,11 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
               >
                 --
               </button>
+            </div>
+            
+            {/* Scroll wheel hint */}
+            <div className="text-xs text-center text-blue-200 mb-3">
+              <span className="bg-blue-800/70 px-2 py-1 rounded-md">Usa la rueda del ratón para hacer zoom</span>
             </div>
             
             {/* Reset view button */}
