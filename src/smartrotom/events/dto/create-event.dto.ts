@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEventDto {
+  @ApiProperty({ description: 'The ID of the parent event, if any', required: false })
+  parentId?: number;
+
   @ApiProperty({ description: 'The title of the event' })
   title: string;
 
@@ -8,7 +11,7 @@ export class CreateEventDto {
   description: string;
 
   @ApiProperty({ description: 'The game ID' })
-  game: number;
+  gameId: number;
 
   @ApiProperty({ description: 'The start date of the event' })
   startDate: string;

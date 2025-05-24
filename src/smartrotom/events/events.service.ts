@@ -42,7 +42,7 @@ export class EventsService {
       parentId: boffMediaEvents.parentId,
       title: boffMediaEvents.title,
       description: boffMediaEvents.description,
-      game: boffMediaEvents.game,
+      gameId: boffMediaEvents.game,
       gameName: boffMediaGames.title,
       icon: boffMediaEvents.icon,
       banner: boffMediaEvents.banner,
@@ -52,7 +52,7 @@ export class EventsService {
       visibility: boffMediaEvents.visibility,
       type: boffMediaEvents.type,
       createdAt: boffMediaEvents.createdAt,
-      updatedAt: boffMediaEvents.updatedAt
+      updatedAt: boffMediaEvents.updatedAt,
     })
     .from(boffMediaEvents)
     .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.game))
@@ -76,7 +76,7 @@ export class EventsService {
       parentId: boffMediaEvents.parentId,
       title: boffMediaEvents.title,
       description: boffMediaEvents.description,
-      game: boffMediaEvents.game,
+      gameId: boffMediaEvents.game,
       gameName: boffMediaGames.title,
       icon: boffMediaEvents.icon,
       banner: boffMediaEvents.banner,
@@ -94,20 +94,33 @@ export class EventsService {
     
     // Return the event with its children
     return {
-      ...event,
+      id: event.id,
+      parentId: event.parentId,
+      title: event.title,
+      description: event.description,
+      game: event.game,
+      icon: event.icon,
+      banner: event.banner,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      status: event.status,
+      visibility: event.visibility,
+      type: event.type,
+      createdAt: event.createdAt,
+      updatedAt: event.updatedAt,
       childEvents: childEvents.length > 0 ? childEvents : []
     };
   }
   
   async createEvent(createEventDto: CreateEventDto): Promise<Event> {
-    console.log('Creating event', createEventDto);
 
 
     const result = await this.db.insert(boffMediaEvents)
       .values({
+        parentId: createEventDto.parentId || null,
         title: createEventDto.title,
         description: createEventDto.description,
-        game: createEventDto.game,
+        game: createEventDto.gameId,
         startDate: new Date(createEventDto.startDate),
         endDate: createEventDto.endDate ? new Date(createEventDto.endDate) : null,
         visibility: createEventDto.visibility,
@@ -123,11 +136,13 @@ export class EventsService {
   }
 
   async updateEvent(id: number, createEventDto: CreateEventDto): Promise<Event> {
+
     await this.db.update(boffMediaEvents)
       .set({
+        parentId: createEventDto.parentId || null,
         title: createEventDto.title,
         description: createEventDto.description,
-        game: createEventDto.game,
+        game: createEventDto.gameId,
         startDate: new Date(createEventDto.startDate),
         endDate: createEventDto.endDate ? new Date(createEventDto.endDate) : null,
         visibility: createEventDto.visibility,
@@ -142,7 +157,7 @@ export class EventsService {
   }
 
   async getGames(): Promise<Game[]> {
-    return this.db.select().from(boffMediaGames);
+    return await this.db.select().from(boffMediaGames);
   }
 
   async getGame(id: number): Promise<Game> {
