@@ -29,7 +29,7 @@ export const authOptions: NextAuthOptions = {
           }
           const response = (await boffPOST(`/users/login`, credentials)).data as any;
           if (response && !response.error) {
-            return response;
+            return response.data as User;
           }
           throw new AuthError("Invalid credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
         } catch (error) {
@@ -52,11 +52,12 @@ export const authOptions: NextAuthOptions = {
           }
           const response = (await boffPOST(`/users/loginmc`, credentials)).data as any;
           if (response && !response.error) {
+            const responseData = response.data as any;
             const user: User = {
-              id: response.id,
-              name: response.name,
-              email: response.email,
-              image: response.image,
+              id: responseData.id,
+              name: responseData.name,
+              email: responseData.email,
+              image: responseData.image,
               smartRotomUser: {
                 username: credentials.username,
                 uuid: credentials.uuid,
@@ -83,10 +84,6 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log('==== SIGN IN ====');
-      console.log('User:', user);
-      console.log('Account:', account);
-      console.log('Profile:', profile);
       if (account?.provider === 'google') {
         console.log('Sending Google callback to backend: ', {
           email: profile?.email,
@@ -107,7 +104,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error('Failed to authenticate with backend');
           }
 
-          const userData = await response.user;
+          const userData = await response.data.user;
           user.id = userData.id;
           user.roles = userData.roles;
           user.smartRotomUser = userData.smartRotomUser;
