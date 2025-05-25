@@ -80,6 +80,21 @@ export class EventsController {
     }
   }
 
+  @Delete('/event/:id')
+  @ApiOperation({ summary: 'Delete event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Event deleted successfully.' })
+  async deleteEvent(@Param('id') id: number) {
+    const action = 'delete event';
+    try {
+      this.responseService.logRequest(action, { id });
+      const result = await this.eventsService.deleteEvent(id);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Event deleted successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { id });
+    }
+  }
+
   @Get('/games')
   @ApiOperation({ summary: 'Get all games' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Games retrieved successfully.' })
@@ -105,6 +120,21 @@ export class EventsController {
       const result = await this.eventsService.getGame(id);
       this.responseService.logSuccess(action, result);
       return this.responseService.createSuccessResponse('Game retrieved successfully', result);
+    } catch (error) {
+      this.responseService.handleError(action, error, { id });
+    }
+  }
+
+  @Delete('/games/:id')
+  @ApiOperation({ summary: 'Delete game' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Game deleted successfully.' })
+  async deleteGame(@Param('id') id: number) {
+    const action = 'delete game';
+    try {
+      this.responseService.logRequest(action, { id });
+      const result = await this.eventsService.deleteGame(id);
+      this.responseService.logSuccess(action, result);
+      return this.responseService.createSuccessResponse('Game deleted successfully', result);
     } catch (error) {
       this.responseService.handleError(action, error, { id });
     }

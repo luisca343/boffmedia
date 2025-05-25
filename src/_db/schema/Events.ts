@@ -29,6 +29,7 @@ export const boffMediaGames = mysqlTable("boffmedia_games", {
     updatedAt: datetime("updated_at")
         .notNull()
         .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+    deletedAt: datetime("deleted_at").default(null),
 });
 
 export type Game = typeof boffMediaGames.$inferSelect;
@@ -50,6 +51,7 @@ export const boffMediaEvents = mysqlTable("boffmedia_events", {
   updatedAt: datetime("updated_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  deletedAt: datetime("deleted_at").default(null),
 }, (table) => {
   return {
     gameIdx: index("game_idx").on(table.game),
@@ -93,6 +95,7 @@ export const boffMediaEventTeams = mysqlTable("boffmedia_event_teams", {
   updatedAt: datetime("updated_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  deletedAt: datetime("deleted_at").default(null),
 }, (table) => {
   return {
     eventIdx: index("et_event_idx").on(table.eventId),
@@ -179,6 +182,7 @@ export const boffMediaAchievements = mysqlTable("boffmedia_achievements", {
   updatedAt: datetime("updated_at")
       .notNull()
       .default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
+  deletedAt: datetime("deleted_at").default(null),
 }, (table) => {
   return {
     eventIdx: index("a_event_idx").on(table.eventId),
@@ -237,16 +241,28 @@ export async function validateParticipantCanReceiveAchievement(
 ): Promise<boolean> {
   // 1. Get the event ID for the achievement
   const achievement = await db.query.boffMediaAchievements.findFirst({
-    where: (achievements, { eq }) => eq(achievements.id, achievementId)
+    where: (achievements, { eq, and, isNull }) => and(
+      eq(achievements.id, achievementId),
+      isNull(achievements.deletedAt) // Ensure achievement is not soft-deleted
+    )
   });
   
-  if (!achievement) return false;
+  if (!achievement || !achievement.eventId) return false; // Achievement might be server-wide (no eventId) or deleted
   
+  // Check if the event itself is soft-deleted
+  const event = await db.query.boffMediaEvents.findFirst({
+    where: (events, { eq, and, isNull }) => and(
+        eq(events.id, achievement.eventId),
+        isNull(events.deletedAt)
+    )
+  });
+  if (!event) return false; // Event is soft-deleted
+
   // 2. Check if participant is registered for this event
   const eventParticipant = await db.query.boffMediaEventParticipants.findFirst({
     where: (p, { eq, and }) => and(
       eq(p.participantId, participantId),
-      eq(p.eventId, achievement.eventId),
+      eq(p.eventId, achievement.eventId), // Use achievement.eventId safely now
       eq(p.status, PARTICIPANT_STATUS.CONFIRMED)
     )
   });

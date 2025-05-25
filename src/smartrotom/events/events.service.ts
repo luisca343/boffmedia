@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Inject } from '@nestjs/common';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull } from 'drizzle-orm';
 import { 
   boffMediaEvents,
   boffMediaAchievements,
@@ -56,59 +56,70 @@ export class EventsService {
     })
     .from(boffMediaEvents)
     .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.game))
+    .where(and(isNull(boffMediaEvents.deletedAt), isNull(boffMediaGames.deletedAt)));
   }
 
   async getEvent(id: number): Promise<Event & { childEvents?: Event[] }> {
     // First, get the main event
     const result = await this.db.select()
       .from(boffMediaEvents)
-      .where(eq(boffMediaEvents.id, id));
+      .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.game))
+      .where(and(
+        eq(boffMediaEvents.id, id), 
+        isNull(boffMediaEvents.deletedAt),
+        isNull(boffMediaGames.deletedAt)
+      ));
       
     if (!result.length) {
       return null;
     }
     
-    const event = result[0];
+    const eventData = result[0].boffmedia_events;
+    const gameData = result[0].boffmedia_games;
     
     // Then get child events that have this event as a parent
-    const childEvents = await this.db.select({
-      id: boffMediaEvents.id,
-      parentId: boffMediaEvents.parentId,
-      title: boffMediaEvents.title,
-      description: boffMediaEvents.description,
-      gameId: boffMediaEvents.game,
-      gameName: boffMediaGames.title,
-      icon: boffMediaEvents.icon,
-      banner: boffMediaEvents.banner,
-      startDate: boffMediaEvents.startDate,
-      endDate: boffMediaEvents.endDate,
-      status: boffMediaEvents.status,
-      visibility: boffMediaEvents.visibility,
-      type: boffMediaEvents.type,
-      createdAt: boffMediaEvents.createdAt,
-      updatedAt: boffMediaEvents.updatedAt
-    })
-    .from(boffMediaEvents)
-    .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.game))
-    .where(eq(boffMediaEvents.parentId, id));
+    const childEventsResults = await this.db.select({
+        id: boffMediaEvents.id,
+        parentId: boffMediaEvents.parentId,
+        title: boffMediaEvents.title,
+        description: boffMediaEvents.description,
+        gameId: boffMediaEvents.game,
+        gameName: boffMediaGames.title,
+        icon: boffMediaEvents.icon,
+        banner: boffMediaEvents.banner,
+        startDate: boffMediaEvents.startDate,
+        endDate: boffMediaEvents.endDate,
+        status: boffMediaEvents.status,
+        visibility: boffMediaEvents.visibility,
+        type: boffMediaEvents.type,
+        createdAt: boffMediaEvents.createdAt,
+        updatedAt: boffMediaEvents.updatedAt
+      })
+      .from(boffMediaEvents)
+      .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.game))
+      .where(and(
+        eq(boffMediaEvents.parentId, id), 
+        isNull(boffMediaEvents.deletedAt),
+        isNull(boffMediaGames.deletedAt)
+      ));
     
-    // Return the event with its children
     return {
-      id: event.id,
-      parentId: event.parentId,
-      title: event.title,
-      description: event.description,
-      game: event.game,
-      icon: event.icon,
-      banner: event.banner,
-      startDate: event.startDate,
-      endDate: event.endDate,
-      status: event.status,
-      visibility: event.visibility,
-      type: event.type,
-      createdAt: event.createdAt,
-      updatedAt: event.updatedAt,
-      childEvents: childEvents.length > 0 ? childEvents : []
+      id: eventData.id,
+      parentId: eventData.parentId,
+      title: eventData.title,
+      description: eventData.description,
+      game: eventData.game,
+      gameName: gameData?.title, // gameData might be null if leftJoin didn't match
+      icon: eventData.icon,
+      banner: eventData.banner,
+      startDate: eventData.startDate,
+      endDate: eventData.endDate,
+      status: eventData.status,
+      visibility: eventData.visibility,
+      type: eventData.type,
+      createdAt: eventData.createdAt,
+      updatedAt: eventData.updatedAt,
+      childEvents: childEventsResults.length > 0 ? childEventsResults : []
     };
   }
   
@@ -156,14 +167,27 @@ export class EventsService {
     return this.getEvent(id);
   }
 
+async deleteEvent(id: number): Promise<void> {
+    const now = new Date();
+    // First, soft delete all child events
+    await this.db.update(boffMediaEvents)
+      .set({ deletedAt: now } as Event)
+      .where(eq(boffMediaEvents.parentId, id));
+    
+    // Then soft delete the main event
+    await this.db.update(boffMediaEvents)
+      .set({ deletedAt: now } as Event)
+      .where(eq(boffMediaEvents.id, id));
+  }
+
   async getGames(): Promise<Game[]> {
-    return await this.db.select().from(boffMediaGames);
+    return await this.db.select().from(boffMediaGames).where(isNull(boffMediaGames.deletedAt));
   }
 
   async getGame(id: number): Promise<Game> {
     const result = await this.db.select()
       .from(boffMediaGames)
-      .where(eq(boffMediaGames.id, id));
+      .where(and(eq(boffMediaGames.id, id), isNull(boffMediaGames.deletedAt)));
     return result[0];
   }
 
@@ -193,6 +217,17 @@ export class EventsService {
     return this.getGame(id);
   }
 
+async deleteGame(id: number): Promise<void> {
+    const now = new Date();
+    await this.db.update(boffMediaEvents)
+      .set({ deletedAt: now } as Event)
+      .where(eq(boffMediaEvents.game, id));
+
+    await this.db.update(boffMediaGames)
+      .set({ deletedAt: now } as Game)
+      .where(eq(boffMediaGames.id, id));
+  }
+  
   async getAchievements(): Promise<Achievement[]> {
     return this.db.select({
       id: boffMediaAchievements.id,
@@ -209,17 +244,24 @@ export class EventsService {
       category: boffMediaAchievements.category,
       rarity: boffMediaAchievements.rarity,
       hidden: boffMediaAchievements.hidden,
-      order: boffMediaAchievements.order
+      order: boffMediaAchievements.order,
+      deletedAt: boffMediaAchievements.deletedAt
     })
       .from(boffMediaAchievements)
       .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
+      .where(isNull(boffMediaEvents.deletedAt));
   }
 
   async getAchievement(id: number): Promise<Achievement> {
     const result = await this.db.select()
       .from(boffMediaAchievements)
-      .where(eq(boffMediaAchievements.id, id));
-    return result[0];
+      .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
+      .where(and(
+        eq(boffMediaAchievements.id, id),
+        isNull(boffMediaEvents.deletedAt)
+      ));
+    if (!result.length) return null;
+    return result[0].boffmedia_achievements as Achievement;
   }
 
   async updateAchievement(eventId: number, id: number, createAchievementDto: CreateAchievementDto): Promise<Achievement> {
@@ -241,9 +283,18 @@ export class EventsService {
   }
     
   async getEventAchievements(eventId: number): Promise<Achievement[]> {
+    // Ensure the event itself is not deleted
+    const eventCheck = await this.db.select({id: boffMediaEvents.id})
+      .from(boffMediaEvents)
+      .where(and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)));
+
+    if(eventCheck.length === 0) {
+      return []; // Event is deleted or does not exist
+    }
+
     return this.db.select()
       .from(boffMediaAchievements)
-      .where(eq(boffMediaAchievements.eventId, eventId));
+      .where(eq(boffMediaAchievements.eventId, eventId)); // Achievements for the validated non-deleted event
   }
 
   async createAchievement(eventId: number, createAchievementDto: CreateAchievementDto): Promise<Achievement> {
@@ -442,16 +493,33 @@ export class EventsService {
       totalScore: boffMediaEventTeams.totalScore,
       status: boffMediaEventTeams.status,
       createdAt: boffMediaEventTeams.createdAt,
-      updatedAt: boffMediaEventTeams.updatedAt
+      updatedAt: boffMediaEventTeams.updatedAt,
+      deletedAt: boffMediaEventTeams.deletedAt,
     })
     .from(boffMediaEventTeams)
-    .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaEventTeams.eventId));
+    .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaEventTeams.eventId))
+    .where(and(
+      isNull(boffMediaEventTeams.deletedAt),
+      isNull(boffMediaEvents.deletedAt)
+    ));
   }
 
+
   async getEventTeams(eventId: number): Promise<EventTeam[]> {
-    return this.db.select()
+    const eventCheck = await this.db.select({id: boffMediaEvents.id})
+      .from(boffMediaEvents)
+      .where(and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)));
+
+    if(eventCheck.length === 0) {
+      return [];
+    }
+
+    return this.db.select() // Selects all fields from boffMediaEventTeams
       .from(boffMediaEventTeams)
-      .where(eq(boffMediaEventTeams.eventId, eventId))
+      .where(and(
+        eq(boffMediaEventTeams.eventId, eventId),
+        isNull(boffMediaEventTeams.deletedAt)
+      ))
       .orderBy(desc(boffMediaEventTeams.totalScore));
   }
   
@@ -503,10 +571,26 @@ export class EventsService {
   }
 
   async getTeam(teamId: number): Promise<EventTeam> {
-    const teams = await this.db.select()
+    const result = await this.db.select({
+        id: boffMediaEventTeams.id,
+        eventId: boffMediaEventTeams.eventId,
+        name: boffMediaEventTeams.name,
+        tag: boffMediaEventTeams.tag,
+        icon: boffMediaEventTeams.icon,
+        totalScore: boffMediaEventTeams.totalScore,
+        status: boffMediaEventTeams.status,
+        createdAt: boffMediaEventTeams.createdAt,
+        updatedAt: boffMediaEventTeams.updatedAt,
+        deletedAt: boffMediaEventTeams.deletedAt,
+      })
       .from(boffMediaEventTeams)
-      .where(eq(boffMediaEventTeams.id, teamId));
-    return teams[0];
+      .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaEventTeams.eventId))
+      .where(and(
+        eq(boffMediaEventTeams.id, teamId),
+        isNull(boffMediaEventTeams.deletedAt),
+        isNull(boffMediaEvents.deletedAt) 
+      ));
+    return result[0];
   }
   
   async getTeamMembers(teamId: number): Promise<EventTeamMember[]> {
@@ -580,10 +664,17 @@ export class EventsService {
         eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
       )
       .leftJoin(
+        boffMediaEvents,
+        eq(boffMediaEvents.id, boffMediaAchievements.eventId)
+      )
+      .leftJoin(
         boffMediaParticipants,
         eq(boffMediaParticipants.id, boffMediaParticipantProgress.participantId)
       )
-      .where(eq(boffMediaParticipantProgress.isCompleted, 1))
+      .where(and(
+        eq(boffMediaParticipantProgress.isCompleted, 1),
+        isNull(boffMediaEvents.deletedAt) 
+      ))
       .groupBy(boffMediaParticipantProgress.participantId, boffMediaParticipants.nickname, boffMediaParticipants.avatar, boffMediaParticipants.userId)
       .orderBy(desc(sql<number>`total_points`));
   
@@ -591,6 +682,14 @@ export class EventsService {
   }
 
   async getLeaderboard(eventId: number) {
+    const eventCheck = await this.db.select({ id: boffMediaEvents.id })
+      .from(boffMediaEvents)
+      .where(and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)));
+
+    if (eventCheck.length === 0) {
+      return []; 
+    }
+
     return this.db
       .select({
         participantId: boffMediaParticipantProgress.participantId,
@@ -621,6 +720,14 @@ export class EventsService {
   }
 
   async getTeamLeaderboard(eventId: number) {
+    const eventCheck = await this.db.select({ id: boffMediaEvents.id })
+      .from(boffMediaEvents)
+      .where(and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)));
+
+    if (eventCheck.length === 0) {
+      return [];
+    }
+
     return this.db
       .select({
         teamId: boffMediaEventTeams.id,
@@ -634,7 +741,10 @@ export class EventsService {
         boffMediaEventTeamMembers,
         eq(boffMediaEventTeamMembers.teamId, boffMediaEventTeams.id)
       )
-      .where(eq(boffMediaEventTeams.eventId, eventId))
+      .where(and(
+        eq(boffMediaEventTeams.eventId, eventId),
+        isNull(boffMediaEventTeams.deletedAt)
+      ))
       .groupBy(boffMediaEventTeams.id, boffMediaEventTeams.name, boffMediaEventTeams.tag, boffMediaEventTeams.totalScore)
       .orderBy(desc(boffMediaEventTeams.totalScore));
   }
@@ -750,6 +860,14 @@ export class EventsService {
     avatar: string,
     userId: number 
   })[]> {
+    
+    const eventCheck = await this.db.select({ id: boffMediaEvents.id })
+      .from(boffMediaEvents)
+      .where(and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)));
+
+    if (eventCheck.length === 0) {
+      return []; 
+    }
     
     return this.db.select({
       id: boffMediaEventParticipants.id,
