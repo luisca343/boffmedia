@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Sse } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Sse, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -9,9 +9,11 @@ import { TgcpScraperService } from './scraper.service';
 import { PtcgpBattleService } from './battle.service';
 import { promises as fsPromises } from 'fs';
 import path from 'path';
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
 @ApiTags('/herramientas/ptcgp')
 @Controller('/herramientas/ptcgp')
+@UseInterceptors(ResponseInterceptor)
 export class PtcgpController {
     constructor(
         private cardService: TgcpCardService,
@@ -109,15 +111,11 @@ export class PtcgpController {
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
     @ApiResponse({ status: 500, description: 'Failed to find best pack.' })
     async getBestPack(@Body() user: { username: string }) {
-      try {
         const result = await this.packService.getBestPackToPull(user.username);
         if (result.message) {
-          return { message: result.message };
+            return { message: result.message };
         }
         return result;
-      } catch (error) {
-        throw new HttpException('Failed to get best pack', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
     }
     
     @Post("best-pack-for-expansion")
@@ -126,15 +124,11 @@ export class PtcgpController {
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
     @ApiResponse({ status: 500, description: 'Failed to find best pack for expansion.' })
     async getBestPackForExpansion(@Body() data: { username: string, eventName: string }) {
-      try {
         const result = await this.packService.getBestPackForExpansion(data.username, data.eventName);
         if (result.message) {
-          return { message: result.message };
+            return { message: result.message };
         }
         return result;
-      } catch (error) {
-        throw new HttpException('Failed to get best pack for expansion', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
     }
   
     @Post("best-pack-for-event")
@@ -143,53 +137,49 @@ export class PtcgpController {
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
     @ApiResponse({ status: 500, description: 'Failed to find best pack for event.' })
     async getBestPackForEvent(@Body() data: { username: string, eventName: string }) {
-      try {
         const events = {
-          mewQuest: {
-            cards: [
-              "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard", 
-              "Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", "Butterfree", 
-              "Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot", 
-              "Rattata", "Raticate", "Spearow", "Fearow", "Ekans", "Arbok", 
-              "Pikachu", "Raichu", "Sandshrew", "Sandslash", "Nidoran♀", "Nidorina", 
-              "Nidoqueen", "Nidoran♂", "Nidorino", "Nidoking", "Clefairy", "Clefable", 
-              "Vulpix", "Ninetales", "Jigglypuff", "Wigglytuff", "Zubat", "Golbat", 
-              "Oddish", "Gloom", "Vileplume", "Paras", "Parasect", "Venonat", 
-              "Venomoth", "Diglett", "Dugtrio", "Meowth", "Persian", "Psyduck", 
-              "Golduck", "Mankey", "Primeape", "Growlithe", "Arcanine", "Poliwag", 
-              "Poliwhirl", "Poliwrath", "Abra", "Kadabra", "Alakazam", "Machop", 
-              "Machoke", "Machamp", "Bellsprout", "Weepinbell", "Victreebel", "Tentacool", 
-              "Tentacruel", "Geodude", "Graveler", "Golem", "Ponyta", "Rapidash", 
-              "Slowpoke", "Slowbro", "Magnemite", "Magneton", "Farfetch'd", "Doduo", 
-              "Dodrio", "Seel", "Dewgong", "Grimer", "Muk", "Shellder", 
-              "Cloyster", "Gastly", "Haunter", "Gengar", "Onix", "Drowzee", 
-              "Hypno", "Krabby", "Kingler", "Voltorb", "Electrode", "Exeggcute", 
-              "Exeggutor", "Cubone", "Marowak", "Hitmonlee", "Hitmonchan", "Lickitung", 
-              "Koffing", "Weezing", "Rhyhorn", "Rhydon", "Chansey", "Tangela", 
-              "Kangaskhan", "Horsea", "Seadra", "Goldeen", "Seaking", "Staryu", 
-              "Starmie", "Mr. Mime", "Scyther", "Jynx", "Electabuzz", "Magmar", 
-              "Pinsir", "Tauros", "Magikarp", "Gyarados", "Lapras", "Ditto", 
-              "Eevee", "Vaporeon", "Jolteon", "Flareon", "Porygon", "Omanyte", 
-              "Omastar", "Kabuto", "Kabutops", "Aerodactyl", "Snorlax", "Articuno", 
-              "Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", "Mewtwo"
-            ],
-            expansion: "geneticapex"
-          }
+            mewQuest: {
+                cards: [
+                    "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard", 
+                    "Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", "Butterfree", 
+                    "Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot", 
+                    "Rattata", "Raticate", "Spearow", "Fearow", "Ekans", "Arbok", 
+                    "Pikachu", "Raichu", "Sandshrew", "Sandslash", "Nidoran♀", "Nidorina", 
+                    "Nidoqueen", "Nidoran♂", "Nidorino", "Nidoking", "Clefairy", "Clefable", 
+                    "Vulpix", "Ninetales", "Jigglypuff", "Wigglytuff", "Zubat", "Golbat", 
+                    "Oddish", "Gloom", "Vileplume", "Paras", "Parasect", "Venonat", 
+                    "Venomoth", "Diglett", "Dugtrio", "Meowth", "Persian", "Psyduck", 
+                    "Golduck", "Mankey", "Primeape", "Growlithe", "Arcanine", "Poliwag", 
+                    "Poliwhirl", "Poliwrath", "Abra", "Kadabra", "Alakazam", "Machop", 
+                    "Machoke", "Machamp", "Bellsprout", "Weepinbell", "Victreebel", "Tentacool", 
+                    "Tentacruel", "Geodude", "Graveler", "Golem", "Ponyta", "Rapidash", 
+                    "Slowpoke", "Slowbro", "Magnemite", "Magneton", "Farfetch'd", "Doduo", 
+                    "Dodrio", "Seel", "Dewgong", "Grimer", "Muk", "Shellder", 
+                    "Cloyster", "Gastly", "Haunter", "Gengar", "Onix", "Drowzee", 
+                    "Hypno", "Krabby", "Kingler", "Voltorb", "Electrode", "Exeggcute", 
+                    "Exeggutor", "Cubone", "Marowak", "Hitmonlee", "Hitmonchan", "Lickitung", 
+                    "Koffing", "Weezing", "Rhyhorn", "Rhydon", "Chansey", "Tangela", 
+                    "Kangaskhan", "Horsea", "Seadra", "Goldeen", "Seaking", "Staryu", 
+                    "Starmie", "Mr. Mime", "Scyther", "Jynx", "Electabuzz", "Magmar", 
+                    "Pinsir", "Tauros", "Magikarp", "Gyarados", "Lapras", "Ditto", 
+                    "Eevee", "Vaporeon", "Jolteon", "Flareon", "Porygon", "Omanyte", 
+                    "Omastar", "Kabuto", "Kabutops", "Aerodactyl", "Snorlax", "Articuno", 
+                    "Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", "Mewtwo"
+                ],
+                expansion: "geneticapex"
+            }
         };
-  
+
         const event = events[data.eventName];
         if (!event) {
-          return { message: "Event not found." };
+            return { message: "Event not found." };
         }
-  
+
         const result = await this.packService.getBestPackForEvent(data.username, event.cards, event.expansion);
         if (result.message) {
-          return { message: result.message };
+            return { message: result.message };
         }
         return result;
-      } catch (error) {
-        throw new HttpException('Failed to get best pack for event', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
     }
 
     @Get("pack-probabilities/:expansionId/:packId")
@@ -198,20 +188,12 @@ export class PtcgpController {
     @ApiResponse({ status: 404, description: 'Pack not found.' })
     @ApiResponse({ status: 500, description: 'Failed to calculate pack probabilities.' })
     async getPackProbabilities(@Param('expansionId') expansionId: string, @Param('packId') packId: string) {
-      try {
         const result = await this.packService.calculateIndividualProbabilities(expansionId, packId);
         if ('message' in result) {
-          throw new HttpException(result.message, HttpStatus.NOT_FOUND);
+            throw new HttpException(result.message, HttpStatus.NOT_FOUND);
         }
         return result;
-      } catch (error) {
-        if (error instanceof HttpException) {
-          throw error;
-        }
-        throw new HttpException('Failed to calculate pack probabilities', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
     }
-
 
     @Get("recent-updates")
     @ApiOperation({ summary: 'Get recent card updates for the user' })
@@ -219,18 +201,13 @@ export class PtcgpController {
     @ApiResponse({ status: 401, description: 'Unauthorized.' })
     @ApiResponse({ status: 500, description: 'Failed to find recent updates.' })
     async getRecentUpdates(
-      @Query('username') username: string,
-      @Query('limit') limit: string = "10",
-      @Query('offset') offset: string = "0"
+        @Query('username') username: string,
+        @Query('limit') limit: string = "10",
+        @Query('offset') offset: string = "0"
     ) {
-      try {
         console.log('Getting recent updates for user:', username);
-        const updates =  await this.userCardService.getRecentCardUpdates(username, parseInt(limit), parseInt(offset));
+        const updates = await this.userCardService.getRecentCardUpdates(username, parseInt(limit), parseInt(offset));
         return updates;
-      } catch (error) {
-        console.log('Failed to get recent updates:', error);
-        throw new HttpException('Failed to get recent updates', HttpStatus.INTERNAL_SERVER_ERROR);
-      }
     }
 
     @Get("battle-data/:id")
@@ -246,11 +223,10 @@ export class PtcgpController {
     @ApiResponse({ status: 200, description: 'Battle data found successfully.' })
     @ApiResponse({ status: 500, description: 'Failed to find battle data.' })
     async getBattleData2(@Param('id') id: string): Promise<any> {
-      const uri  = path.join(process.cwd(), `public/data/tcgpocket/battles/${id}.json`);
-      const data = await fsPromises.readFile(uri, 'utf8');
-      const battleData = JSON.parse(data);
-      return battleData;
-        
+        const uri = path.join(process.cwd(), `public/data/tcgpocket/battles/${id}.json`);
+        const data = await fsPromises.readFile(uri, 'utf8');
+        const battleData = JSON.parse(data);
+        return battleData;
     }
 
     @Get("scrapesolobattles")

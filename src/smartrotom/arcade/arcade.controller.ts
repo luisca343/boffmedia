@@ -1,17 +1,15 @@
-import { Controller, Get, HttpStatus, Logger, Param, Post, Body, Headers, HttpException, Query } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Param, Post, Body, Query, UseInterceptors } from '@nestjs/common';
 import { ArcadeService, ClaimItemsWithTypesRequest } from './arcade.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { ResponseService } from '@/response/response.service';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/arcade')
 @Controller('smartrotom/arcade')
+@UseInterceptors(ResponseInterceptor)
 export class ArcadeController {
-  private readonly logger = new Logger(ArcadeController.name);
-
   constructor(
     private readonly arcadeService: ArcadeService,
-    private readonly responseService: ResponseService,
   ) {}
 
   @Get()
@@ -19,15 +17,7 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Arcade information retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve arcade information.' })
   async getArcade() {
-    const action = 'get arcade information';
-    try {
-      this.responseService.logRequest(action, null);
-      const result = "Arcade Controller";
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Arcade information retrieved successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error);
-    }
+    return "Arcade Controller";
   }
 
   @Get('wordle/:uuid')
@@ -35,15 +25,7 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Wordle game retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Wordle game.' })
   async getWordle(@Param('uuid') uuid: string) {
-    const action = 'get Wordle game';
-    try {
-      this.responseService.logRequest(action, null);
-      const result = await this.arcadeService.getWordle();
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Wordle game retrieved successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error);
-    }
+    return await this.arcadeService.getWordle();
   }
 
   @Get('streak/:uuid')
@@ -51,18 +33,7 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Streak status retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve streak status.' })
   async getArcadeStreak(@Param('uuid') uuid: string) {
-    try {
-      console.log('Retrieving streak status for UUID:', uuid);
-      const streak = await this.arcadeService.getArcadeStreak(uuid);
-      return {
-        data: streak,
-        statusCode: 200,
-        message: 'Streak status retrieved successfully',
-      };
-    } catch (error) {
-      this.logger.error('Failed to retrieve streak status:', error);
-      throw new Error('Failed to retrieve streak status');
-    }
+    return await this.arcadeService.getArcadeStreak(uuid);
   }
 
   @Post('streak/claim')
@@ -71,27 +42,7 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Already claimed today.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to claim daily reward.' })
   async claimDailyReward(@Body() body: { uuid: string }) {
-    try {
-      console.log('Claiming daily reward for UUID:', body);
-      const result = await this.arcadeService.claimDailyReward(body.uuid);
-      
-      if (!result.success) {
-        return {
-          data: result,
-          statusCode: 400,
-          message: result.message,
-        };
-      }
-      
-      return {
-        data: result,
-        statusCode: 200,
-        message: 'Daily reward claimed successfully',
-      };
-    } catch (error) {
-      this.logger.error('Failed to claim daily reward:', error);
-      throw new Error('Failed to claim daily reward');
-    }
+    return await this.arcadeService.claimDailyReward(body.uuid);
   }
 
   @Get('banner')
@@ -99,17 +50,7 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Banner configuration retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve banner configuration.' })
   async getRewardsBanner() {
-    try {
-      const banner = await this.arcadeService.getRewardsBanner();
-      return {
-        data: banner,
-        statusCode: 200,
-        message: 'Banner configuration retrieved successfully',
-      };
-    } catch (error) {
-      this.logger.error('Failed to retrieve banner configuration:', error);
-      throw new Error('Failed to retrieve banner configuration');
-    }
+    return await this.arcadeService.getRewardsBanner();
   }
 
   @Post('lootbox/open')
@@ -118,28 +59,8 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid request or missing box.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to open loot box.' })
   @ApiBody({ type: OpenLootBoxDto })
-  async openLootBox(@Body() openLootBoxDto: OpenLootBoxDto): Promise<{ data: OpenLootBoxResponseDto, statusCode: number, message: string }> {
-    try {
-      const result = await this.arcadeService.openLootBox(openLootBoxDto);
-      
-      return {
-        data: result,
-        statusCode: 200,
-        message: 'Loot box opened successfully'
-      };
-    } catch (error) {
-      this.logger.error('Failed to open loot box:', error);
-      
-      if (error.message === 'Box not found' || error.message === 'No boxes available') {
-        return {
-          data: { success: false, message: error.message },
-          statusCode: 400,
-          message: error.message
-        };
-      }
-      
-      throw new Error('Failed to open loot box');
-    }
+  async openLootBox(@Body() openLootBoxDto: OpenLootBoxDto): Promise<OpenLootBoxResponseDto> {
+    return await this.arcadeService.openLootBox(openLootBoxDto);
   }
   
   @Get('inventory/:uuid')
@@ -153,17 +74,7 @@ export class ArcadeController {
     @Param('uuid') uuid: string,
     @Query('sourceType') sourceType?: string
   ) {
-    try {
-      const inventory = await this.arcadeService.getInventory(uuid, sourceType);
-      return {
-        data: inventory,
-        statusCode: HttpStatus.OK,
-        message: 'Inventory retrieved successfully'
-      };
-    } catch (error) {
-      this.logger.error('Failed to retrieve inventory:', error);
-      throw new HttpException('Failed to retrieve inventory', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await this.arcadeService.getInventory(uuid, sourceType);
   }
   
   @Post('inventory/claim')
@@ -193,31 +104,9 @@ export class ArcadeController {
       }
     } 
   })
-  async claimInventoryItems(
-    @Body() data: ClaimItemsWithTypesRequest
-  ) {
-    try {
-      const result = await this.arcadeService.claimInventoryItems(data.uuid, data.items);
-      
-      if (!result.success) {
-        return {
-          data: result,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: result.message
-        };
-      }
-      
-      return {
-        data: result,
-        statusCode: HttpStatus.OK,
-        message: `Successfully claimed ${result.claimedItems.length} items`,
-      };
-    } catch (error) {
-      this.logger.error('Failed to claim inventory items:', error);
-      throw new HttpException('Failed to claim inventory items', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  async claimInventoryItems(@Body() data: ClaimItemsWithTypesRequest) {
+    return await this.arcadeService.claimInventoryItems(data.uuid, data.items);
   }
-  
 
   @Post('inventory/add')
   @ApiOperation({ summary: 'Add item to player inventory' })
@@ -248,29 +137,10 @@ export class ArcadeController {
       amount?: number;
       sourceType?: string;
       sourceId?: number;
-      rarity?: string; // Add rarity field
+      rarity?: string;
     }
   ) {
-    try {
-      const result = await this.arcadeService.addInventoryItem(data);
-      
-      if (!result.success) {
-        return {
-          data: result,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: result.message,
-        };
-      }
-      
-      return {
-        data: result,
-        statusCode: HttpStatus.OK,
-        message: 'Item added to inventory successfully',
-      };
-    } catch (error) {
-      this.logger.error('Failed to add inventory item:', error);
-      throw new HttpException('Failed to add inventory item', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return await this.arcadeService.addInventoryItem(data);
   }
 
   @Post('inventory/consume')
@@ -287,29 +157,8 @@ export class ArcadeController {
       }
     }
   })
-  async consumeInventoryItem(
-    @Body() data: { uuid: string; itemId: string }
-  ) {
-    try {
-      const result = await this.arcadeService.consumeInventoryItem(data.uuid, data.itemId);
-      
-      if (!result.success) {
-        return {
-          data: result,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: result.message,
-        };
-      }
-      
-      return {
-        data: result,
-        statusCode: HttpStatus.OK,
-        message: 'Item consumed successfully',
-      };
-    } catch (error) {
-      this.logger.error('Failed to consume inventory item:', error);
-      throw new HttpException('Failed to consume inventory item', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  async consumeInventoryItem(@Body() data: { uuid: string; itemId: string }) {
+    return await this.arcadeService.consumeInventoryItem(data.uuid, data.itemId);
   }
 
   @Get('lootbox/config')
@@ -317,17 +166,7 @@ export class ArcadeController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Lootbox configuration retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve lootbox configuration.' })
   async getLootboxConfig() {
-    try {
-      const config = this.arcadeService.getLootboxConfig();
-      return {
-        data: config,
-        statusCode: HttpStatus.OK,
-        message: 'Lootbox configuration retrieved successfully'
-      };
-    } catch (error) {
-      this.logger.error('Failed to retrieve lootbox configuration:', error);
-      throw new HttpException('Failed to retrieve lootbox configuration', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.arcadeService.getLootboxConfig();
   }
 
   @Post('lootbox/give')
@@ -345,28 +184,7 @@ export class ArcadeController {
       }
     }
   })
-  async giveLootbox(
-    @Body() data: { uuid: string; lootboxType: string, amount?: number }
-  ) {
-    try {
-      const result = await this.arcadeService.giveLootbox(data.uuid, data.lootboxType, data.amount);
-      
-      if (!result.success) {
-        return {
-          data: result,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: result.message,
-        };
-      }
-      
-      return {
-        data: result,
-        statusCode: HttpStatus.OK,
-        message: 'Lootbox given successfully',
-      };
-    } catch (error) {
-      this.logger.error('Failed to give lootbox:', error);
-      throw new HttpException('Failed to give lootbox', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+  async giveLootbox(@Body() data: { uuid: string; lootboxType: string, amount?: number }) {
+    return await this.arcadeService.giveLootbox(data.uuid, data.lootboxType, data.amount);
   }
 }

@@ -1,32 +1,24 @@
-import { Controller, Get, Post, Body, Param, HttpStatus } from "@nestjs/common"
+import { Controller, Get, Post, Body, Param, HttpStatus, UseInterceptors } from "@nestjs/common"
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger"
-import { ResponseService } from "@/response/response.service"
 import { UuidDto } from "../_dto/smartrotom-request-dto"
 import { BattleAchievementDto } from "../_dto/battle-achievement-dto"
 import { AchievementService } from "./achievement.service"
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor'
 
 @ApiTags("smartrotom/achievements")
 @Controller("/smartrotom/achievements")
+@UseInterceptors(ResponseInterceptor)
 export class AchievementController {
   constructor(
     private achievementService: AchievementService,
-    private readonly responseService: ResponseService,
   ) {}
 
   @Get(":uuid/:achievementId")
   @ApiOperation({ summary: "Get a specific achievement for a player" })
-  @ApiResponse({ status: HttpStatus.OK, description: "Battle achievement retrieved successfully." })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Failed to retrieve battle achievement." })
+  @ApiResponse({ status: HttpStatus.OK, description: "Achievement retrieved successfully." })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Failed to retrieve achievement." })
   async getAchievementForPlayer(@Param('uuid') uuid: string, @Param('achievementId') achievementId: string) {
-    const action = "get achievement for player"
-    try {
-      this.responseService.logRequest(action, { uuid, achievementId })
-      const achievement = await this.achievementService.getAchievementForPlayer(uuid, achievementId)
-      this.responseService.logSuccess(action, achievement)
-      return this.responseService.createSuccessResponse("Achievement retrieved successfully", achievement)
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid, achievementId })
-    }
+    return await this.achievementService.getAchievementForPlayer(uuid, achievementId);
   }
 
   @Post()
@@ -35,51 +27,23 @@ export class AchievementController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle achievements.' })
   @ApiBody({ type: UuidDto })
   async getAchievements(@Body() { uuid }: UuidDto) {
-    const action = 'get battle achievements';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const achievements = await this.achievementService.getAchievements(uuid);
-      this.responseService.logSuccess(action, achievements);
-      return this.responseService.createSuccessResponse('Battle achievements retrieved successfully', achievements);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
+    return await this.achievementService.getAchievements(uuid);
   }
 
   @Post('battle')
-  @ApiOperation({ summary: 'Saves a Battle, and registers its achievement if any' })
+  @ApiOperation({ summary: 'Save a battle and register its achievement' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Battle saved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to save battle.' })
   @ApiBody({ type: BattleAchievementDto })
   async addBattleAchievement(@Body() battleAchievement: BattleAchievementDto) {
-    const action = 'add battle achievement';
-    try {
-      console.log('addBattleAchievement', battleAchievement);
-      this.responseService.logRequest(action, battleAchievement);
-      const result = await this.achievementService.addBattleAchievement(battleAchievement);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Battle saved successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, battleAchievement);
-    }
+    return await this.achievementService.addBattleAchievement(battleAchievement);
   }
-
-  
 
   @Get('replays/:uuid/:replayId')
   @ApiOperation({ summary: 'Get replay for a player' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Replay retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve replay.' })
   async getReplay(@Param('uuid') uuid: string, @Param('replayId') replayId: number) {
-    const action = 'get replay';
-    try {
-      this.responseService.logRequest(action, { uuid, replayId });
-      const replay = await this.achievementService.getReplay(uuid, replayId);
-      this.responseService.logSuccess(action, replay);
-      return this.responseService.createSuccessResponse('Replay retrieved successfully', replay);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid, replayId });
-    }
+    return await this.achievementService.getReplay(uuid, replayId);
   }
 }
-

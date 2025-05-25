@@ -1,16 +1,15 @@
-import { Controller, Post, Body, HttpStatus, Inject } from "@nestjs/common"
+import { Controller, Post, Body, HttpStatus, UseInterceptors } from "@nestjs/common"
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger"
-import { ResponseService } from "@/response/response.service"
 import { UuidDto } from "../_dto/smartrotom-request-dto"
-import { PlayerService } from "./player.service"
 import { WingullService } from "../wingull/wingull.service"
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor'
 
 @ApiTags("smartrotom/player")
 @Controller("smartrotom/player")
+@UseInterceptors(ResponseInterceptor)
 export class PlayerController {
     constructor(
-        @Inject(WingullService) private readonly wingullService: WingullService,
-        @Inject(ResponseService) private readonly responseService: ResponseService,
+        private readonly wingullService: WingullService,
     ) {}
     
     @Post('stats')
@@ -19,15 +18,7 @@ export class PlayerController {
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve stats.' })
     @ApiBody({ type: UuidDto })
     async getStats(@Body() { uuid }: UuidDto) {
-        const action = 'get stats';
-        try {
-            this.responseService.logRequest(action, { uuid });
-            const stats = await this.wingullService.getStats(uuid);
-            this.responseService.logSuccess(action, stats);
-            return this.responseService.createSuccessResponse('Stats retrieved successfully', stats);
-        } catch (error) {
-            this.responseService.handleError(action, error, { uuid });
-        }
+        return await this.wingullService.getStats(uuid);
     }
     
     @Post('team')
@@ -36,15 +27,6 @@ export class PlayerController {
     @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve team.' })
     @ApiBody({ type: UuidDto })
     async getTeam(@Body() { uuid }: UuidDto) {
-        const action = 'get team';
-        try {
-            this.responseService.logRequest(action, { uuid });
-            const team = await this.wingullService.getTeam(uuid);
-            this.responseService.logSuccess(action, team);
-            return this.responseService.createSuccessResponse('Team retrieved successfully', team);
-        } catch (error) {
-            this.responseService.handleError(action, error, { uuid });
-        }
+        return await this.wingullService.getTeam(uuid);
     }
 }
-

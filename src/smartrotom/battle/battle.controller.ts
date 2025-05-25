@@ -1,14 +1,14 @@
-import { Controller, Get, Param, HttpStatus } from "@nestjs/common"
+import { Controller, Get, Param, HttpStatus, UseInterceptors } from "@nestjs/common"
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger"
-import type { ResponseService } from "@/response/response.service"
 import { BattleService } from "./battle.service";
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
 @ApiTags("smartrotom/battle")
 @Controller("smartrotom/battle")
+@UseInterceptors(ResponseInterceptor)
 export class BattleController {
   constructor(
     private battleService: BattleService,
-    private readonly responseService: ResponseService,
   ) {}
 
   @Get('repetitions/:uuid')
@@ -16,15 +16,7 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Repetitions retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve repetitions.' })
   async getRepetitions(@Param('uuid') uuid: string) {
-    const action = 'get repetitions';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const repetitions = await this.battleService.getRepeticiones(uuid);
-      this.responseService.logSuccess(action, repetitions);
-      return this.responseService.createSuccessResponse('Repetitions retrieved successfully', repetitions);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
+    return await this.battleService.getRepeticiones(uuid);
   }
 
   @Get('config/:npcConfigName')
@@ -32,15 +24,6 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Battle configuration retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle configuration.' })
   async getBattleConfig(@Param('npcConfigName') npcConfigName: string) {
-    const action = 'get battle configuration';
-    try {
-      this.responseService.logRequest(action, { npcConfigName });
-      const config = await this.battleService.getBattleConfig(npcConfigName);
-      this.responseService.logSuccess(action, config);
-      return this.responseService.createSuccessResponse('Battle configuration retrieved successfully', config);
-    } catch (error) {
-      this.responseService.handleError(action, error, { npcConfigName });
-    }
+    return await this.battleService.getBattleConfig(npcConfigName);
   }
 }
-

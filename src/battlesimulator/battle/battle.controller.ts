@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { getRandomTeam } from '../_utils/teams';
 import { Dex, PRNG, TeamValidator, Teams as DTeams, BattleStreams, RandomPlayerAI } from '@pkmn/sim';
 import { GenerationNum, Generations } from '@pkmn/data';
@@ -6,7 +7,7 @@ import { Battle, Pokemon } from '@pkmn/client';
 import { LogFormatter } from '@pkmn/view';
 import { Sprites } from '@pkmn/img';
 import { Protocol } from '@pkmn/protocol';
-
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
 function getPokemonTeam(team: Pokemon[]) {
   const pokemonTeam = [] as any[]
@@ -23,12 +24,17 @@ function getPokemonTeam(team: Pokemon[]) {
   return pokemonTeam
 }
 
+@ApiTags('battlesimulator/battle')
 @Controller('battlesimulator/battle')
+@UseInterceptors(ResponseInterceptor)
 export class BattleController {
     constructor() {}
 
     @Get()
-    getBattle() {
+    @ApiOperation({ summary: 'Simulate a Pokémon battle' })
+    @ApiResponse({ status: 200, description: 'Battle simulated successfully.' })
+    @ApiResponse({ status: 500, description: 'Failed to simulate battle.' })
+    async getBattle() {
         let equipo1
         let equipo2
         let log = {} as { [turn: number]: { 
@@ -139,10 +145,6 @@ export class BattleController {
               battle.update();
             }
           })();
-        }
-        );
-
-
-
+        });
     }
 }

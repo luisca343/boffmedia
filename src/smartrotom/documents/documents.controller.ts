@@ -1,37 +1,25 @@
-import { Body, Controller, Get, Param, Post, HttpStatus, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { DocumentsService } from './documents.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseService } from '@/response/response.service';
 import { CreateNewsDto } from './dto/create-news-dto';
 import { NewsStatusDto } from './dto/news-status-dto';
 import { CreateDocumentDto, CreateDocumentDtoWithUuid } from './dto/create-document.dto';
+import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/documents')
 @Controller('smartrotom/documents')
+@UseInterceptors(ResponseInterceptor)
 export class DocumentsController {
-  private readonly logger = new Logger(DocumentsController.name);
-
   constructor(
     private readonly documentsService: DocumentsService,
-    private readonly responseService: ResponseService,
   ) {}
-
-  
 
   @Get('all/:uuid')
   @ApiOperation({ summary: 'Get notes for a player' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Notes retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve notes.' })
   async getNotes(@Param('uuid') uuid: string) {
-    const action = 'get notes';
-    try {
-      this.responseService.logRequest(action, { uuid });
-      const notes = await this.documentsService.getNotes(uuid);
-      this.responseService.logSuccess(action, notes);
-      return this.responseService.createSuccessResponse('Notes retrieved successfully', notes);
-    } catch (error) {
-      this.responseService.handleError(action, error, { uuid });
-    }
+    return await this.documentsService.getNotes(uuid);
   }
 
   @Post('create')
@@ -39,17 +27,9 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Note created successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create note.' })
   async createNote(@Body() body: CreateDocumentDtoWithUuid) {
-    const action = 'create note';
-    try {
-      this.responseService.logRequest(action, body);
-      const noteInsert = await this.documentsService.saveNote(0, body.title, body.content, body.type);
-      await this.documentsService.addNoteToUser(noteInsert.id, body.uuid);
-      const result = { id: noteInsert.id, success: true };
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Note created successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, body);
-    }
+    const noteInsert = await this.documentsService.saveNote(0, body.title, body.content, body.type);
+    await this.documentsService.addNoteToUser(noteInsert.id, body.uuid);
+    return { id: noteInsert.id, success: true };
   }
 
   @Get('news')
@@ -57,15 +37,7 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve news.' })
   async getNews() {
-    const action = 'get all news';
-    try {
-      this.responseService.logRequest(action, null);
-      const news = await this.documentsService.getNews();
-      this.responseService.logSuccess(action, news);
-      return this.responseService.createSuccessResponse('News retrieved successfully', news);
-    } catch (error) {
-      this.responseService.handleError(action, error);
-    }
+    return await this.documentsService.getNews();
   }
 
   @Get('news/:newsId')
@@ -73,15 +45,7 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve news.' })
   async getNewsById(@Param('newsId') newsId: number) {
-    const action = 'get news by ID';
-    try {
-      this.responseService.logRequest(action, { newsId });
-      const news = await this.documentsService.getNewsById(newsId);
-      this.responseService.logSuccess(action, news);
-      return this.responseService.createSuccessResponse('News retrieved successfully', news);
-    } catch (error) {
-      this.responseService.handleError(action, error, { newsId });
-    }
+    return await this.documentsService.getNewsById(newsId);
   }
 
   @Post('news/:newsId')
@@ -89,15 +53,7 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News updated successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update news.' })
   async updateActiveNews(@Body() news: CreateNewsDto, @Param('newsId') newsId: number) {
-    const action = 'update active news';
-    try {
-      this.responseService.logRequest(action, { news, newsId });
-      const result = await this.documentsService.saveNews(news, newsId);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('News updated successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, { news, newsId });
-    }
+    return await this.documentsService.saveNews(news, newsId);
   }
 
   @Post('newsstatus')
@@ -105,15 +61,7 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News status updated successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update news status.' })
   async updateNewsStatus(@Body() news: NewsStatusDto) {
-    const action = 'update news status';
-    try {
-      this.responseService.logRequest(action, news);
-      const result = await this.documentsService.updateNewsStatus(news.published, news.featured);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('News status updated successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, news);
-    }
+    return await this.documentsService.updateNewsStatus(news.published, news.featured);
   }
 
   @Post('save/:id')
@@ -121,16 +69,7 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Note saved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to save note.' })
   async saveNote(@Param('id') id: number, @Body() body: CreateDocumentDto) {
-    const action = 'save note';
-    try {
-      this.responseService.logRequest(action, { id, body });
-      const result = await this.documentsService.saveNote(id, body.title, body.content, body.type);
-      console.log('Save note result:', result);
-      this.responseService.logSuccess(action, result);
-      return this.responseService.createSuccessResponse('Note saved successfully', result);
-    } catch (error) {
-      this.responseService.handleError(action, error, { id, body });
-    }
+    return await this.documentsService.saveNote(id, body.title, body.content, body.type);
   }
 
   @Get(':id')
@@ -138,14 +77,6 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Document retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve document.' })
   async getDocument(@Param('id') id: number) {
-    const action = 'get document by ID';
-    try {
-      this.responseService.logRequest(action, { id });
-      const document = await this.documentsService.getDocument(id);
-      this.responseService.logSuccess(action, document);
-      return this.responseService.createSuccessResponse('Document retrieved successfully', document);
-    } catch (error) {
-      this.responseService.handleError(action, error, { id });
-    }
+    return await this.documentsService.getDocument(id);
   }
 }
