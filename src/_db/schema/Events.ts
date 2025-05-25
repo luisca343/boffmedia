@@ -38,7 +38,7 @@ export const boffMediaEvents = mysqlTable("boffmedia_events", {
   id: int("id").primaryKey().autoincrement(),
   parentId: int("parent_id").references(() => boffMediaEvents.id, { onDelete: "cascade", onUpdate: "cascade" }),
   title: varchar("title", { length: 255 }).notNull(),
-  game: int("game").references(() => boffMediaGames.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  gameId: int("game").references(() => boffMediaGames.id, { onDelete: "cascade", onUpdate: "cascade" }),
   description: text("description"),
   icon: varchar("icon", { length: 255 }).notNull(),
   banner: varchar("banner", { length: 255 }),
@@ -54,7 +54,7 @@ export const boffMediaEvents = mysqlTable("boffmedia_events", {
   deletedAt: datetime("deleted_at").default(null),
 }, (table) => {
   return {
-    gameIdx: index("game_idx").on(table.game),
+    gameIdx: index("game_idx").on(table.gameId),
   };
 });
 
