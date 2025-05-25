@@ -20,11 +20,9 @@ export class ResponseInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const response = context.switchToHttp().getResponse();
     const handler = context.getHandler();
-    const controller = context.getClass();
 
-    // Get action name from metadata or generate from method name
-    const action = this.reflector.get<string>('action', handler) || 
-                   this.generateActionName(handler.name);
+    // Get action name and success message from ApiOperation
+    const { action, successMessage } = this.extractSwaggerMetadata(handler);
 
     // Log request
     this.logRequest(action, request.body, request.params, request.query);
@@ -32,7 +30,7 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         this.logSuccess(action, data);
-        return this.createSuccessResponse(this.getSuccessMessage(action), data);
+        return this.createSuccessResponse(successMessage, data);
       }),
       catchError((error) => {
         this.handleError(action, error, { 
@@ -44,12 +42,59 @@ export class ResponseInterceptor implements NestInterceptor {
     );
   }
 
+  private extractSwaggerMetadata(handler: Function) {
+    // Get ApiOperation metadata
+    const apiOperation = this.reflector.get('swagger/apiOperation', handler);
+    
+    // Use summary as action and generate success message from it
+    const action = apiOperation?.summary || this.generateActionName(handler.name);
+    const successMessage = this.generateSuccessMessage(action);
+
+    return { action, successMessage };
+  }
+
+  private generateSuccessMessage(action: string): string {
+    const actionLower = action.toLowerCase();
+    
+    if (actionLower.startsWith('get ')) {
+      return action.replace(/^get /i, '') + ' retrieved successfully';
+    } else if (actionLower.startsWith('create ')) {
+      return action.replace(/^create /i, '') + ' created successfully';
+    } else if (actionLower.startsWith('update ')) {
+      return action.replace(/^update /i, '') + ' updated successfully';
+    } else if (actionLower.startsWith('delete ')) {
+      return action.replace(/^delete /i, '') + ' deleted successfully';
+    } 
+    
+    return action + ' completed successfully';
+  }
+
   private logRequest(action: string, body: any, params: any, query: any) {
-    // Implement your logging logic
+    // Log with different levels based on content sensitivity
+    if (this.hasSensitiveData(body)) {
+      this.logger.log(`[REQUEST] ${action} - Request received (body hidden for security)`);
+    } else {
+      this.logger.log(`[REQUEST] ${action}`, { 
+        body: body || 'empty', 
+        params: params || 'none', 
+        query: query || 'none' 
+      });
+    }
   }
 
   private logSuccess(action: string, data: any) {
-    // Implement your success logging
+    // Log success with data size info instead of full data for performance
+    const dataInfo = this.getDataInfo(data);
+    this.logger.log(`[SUCCESS] ${action} - ${dataInfo}`);
+  }
+
+  private logError(action: string, error: any, context?: any) {
+    this.logger.error(`[ERROR] Failed to ${action}: ${error.message}`, error.stack);
+    
+    // Log context separately if available
+    if (context) {
+      this.logger.debug(`[ERROR CONTEXT] ${action}`, context);
+    }
   }
 
   private createSuccessResponse(message: string, data: any) {
@@ -62,22 +107,29 @@ export class ResponseInterceptor implements NestInterceptor {
   }
 
   private handleError(action: string, error: any, context?: any) {
-    this.logger.error(`Failed to ${action}:`, error.message);
-    throw error; // Re-throw to maintain error flow
+    this.logError(action, error, context);
+    throw error;
   }
 
   private generateActionName(methodName: string): string {
-    // Convert camelCase to readable action names
     return methodName.replace(/([A-Z])/g, ' $1').toLowerCase().trim();
   }
 
-  private getSuccessMessage(action: string): string {
-    const actionMap = {
-      'get events': 'Events retrieved successfully',
-      'get event': 'Event retrieved successfully',
-      'create event': 'Event created successfully',
-      // Add more mappings as needed
-    };
-    return actionMap[action] || `${action} completed successfully`;
+  // Helper methods for better logging
+  private hasSensitiveData(body: any): boolean {
+    if (!body || typeof body !== 'object') return false;
+    
+    const sensitiveFields = ['password', 'token', 'secret', 'key', 'credentials'];
+    const bodyStr = JSON.stringify(body).toLowerCase();
+    
+    return sensitiveFields.some(field => bodyStr.includes(field));
+  }
+
+  private getDataInfo(data: any): string {
+    if (data === null || data === undefined) return 'No data';
+    if (Array.isArray(data)) return `Array with ${data.length} items`;
+    if (typeof data === 'object') return `Object with ${Object.keys(data).length} properties`;
+    if (typeof data === 'string') return `String (${data.length} chars)`;
+    return `${typeof data} value`;
   }
 }
