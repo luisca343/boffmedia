@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class JoinEventDto {
-  @ApiProperty({ description: 'The user ID trying to join the event' })
-  userId: number;
+  @ApiProperty({ description: 'The participant ID trying to join the event' })
+  participantId: number;
 
   @ApiProperty({ description: 'Optional nickname for the participant', required: false })
   nickname?: string;

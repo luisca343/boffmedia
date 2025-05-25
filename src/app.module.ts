@@ -70,7 +70,7 @@ import { UsersService } from './boffmedia/users/users.service';
 import { SmartrotomService } from './smartrotom/_main/smartrotom.service';
 //import { EventsModule } from './boffmedia/events/events.module';
 import { EventsController } from './smartrotom/events/events.controller';
-import { EventsService } from './smartrotom/events/events.service';
+import { EventsFacadeService } from './smartrotom/events/events.facade.service';
 import { EventsModule } from './smartrotom/events/events.module';
 import { UploadController } from './util/upload/upload.controller';
 import { UploadModule } from './util/upload/upload.module';
@@ -130,7 +130,7 @@ import { SpriteManifestService } from './smartrotom/pokemon/sprite-manifest.serv
     provide: ConfigService,
     useClass: ConfigService,
   },
-    EventsService,
+    EventsFacadeService,
     MhwildsService
 
 ],
