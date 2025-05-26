@@ -54,37 +54,39 @@ export class LeaderboardsService {
   async getGlobalLeaderboard(): Promise<LeaderboardEntry[]> {
     const results = await this.db
       .select({
-        participantId: boffMediaParticipantProgress.participantId,
+        participantId: boffMediaParticipants.id,
         nickname: boffMediaParticipants.nickname,
         avatar: boffMediaParticipants.avatar,
         userId: boffMediaParticipants.userId,
-        achievementPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('achievement_points'),
-        medalPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('medal_points'),
-        totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('total_points'),
-        achievementCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('achievement_count'),
-        medalCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('medal_count')
+        achievementPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('achievement_points'),
+        medalPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('medal_points'),
+        totalPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('total_points'),
+        achievementCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('achievement_count'),
+        medalCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('medal_count')
       })
-      .from(boffMediaParticipantProgress)
-      .innerJoin(
+      .from(boffMediaParticipants)
+      .leftJoin(
+        boffMediaParticipantProgress,
+        eq(boffMediaParticipantProgress.participantId, boffMediaParticipants.id)
+      )
+      .leftJoin(
         boffMediaAchievements,
-        eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId)
+        and(
+          eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId),
+          isNull(boffMediaAchievements.deletedAt)
+        )
       )
       .leftJoin(
         boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaAchievements.eventId)
+        and(
+          eq(boffMediaEvents.id, boffMediaAchievements.eventId),
+          isNull(boffMediaEvents.deletedAt)
+        )
       )
-      .leftJoin(
-        boffMediaParticipants,
-        eq(boffMediaParticipants.id, boffMediaParticipantProgress.participantId)
-      )
-      .where(and(
-        eq(boffMediaParticipantProgress.isCompleted, 1),
-        isNull(boffMediaEvents.deletedAt) 
-      ))
       .groupBy(
-        boffMediaParticipantProgress.participantId, 
-        boffMediaParticipants.nickname, 
-        boffMediaParticipants.avatar, 
+        boffMediaParticipants.id,
+        boffMediaParticipants.nickname,
+        boffMediaParticipants.avatar,
         boffMediaParticipants.userId
       )
       .orderBy(desc(sql<number>`total_points`));
