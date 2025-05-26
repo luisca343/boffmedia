@@ -98,7 +98,7 @@ export interface Game {
 
 export type LeaderboardEntry = {
   userId: number
-  username: string
+  nickname: string
   achievementPoints: number
   medalPoints: number
   totalPoints: number

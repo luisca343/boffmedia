@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import Link from "next/link"
+import { FloatingBackground } from "../layout/FloatingBackground"
 
 export async function FeaturedGames() {
   const t = await getTranslations("boffmedia");
@@ -35,6 +36,7 @@ export async function FeaturedGames() {
 
   return (
     <section className="relative pt-16 pb-32 bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden">
+      <FloatingBackground variant="warm" />
       <div className="relative container mx-auto px-4 z-10 mb-8">
         <div className="text-center mb-16">
           <div className="inline-block">

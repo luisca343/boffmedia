@@ -75,17 +75,17 @@
         "subtitle": "Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus experiencias",
         "joinNowButton": "Unirse Ahora",
         "features": {
-          "teams": {
-            "title": "Equipos y Clanes",
-            "description": "Únete a un equipo o crea el tuyo propio"
-          },
           "events": {
             "title": "Eventos Especiales",
             "description": "Participa en eventos exclusivos de la comunidad"
           },
-          "ranks": {
-            "title": "Sistema de Rangos",
-            "description": "Sube de nivel y desbloquea recompensas únicas"
+          "ranking": {
+            "title": "Ranking de Jugadores",
+            "description": "Compite por el primer lugar en nuestro ranking de jugadores"
+          },
+          "achievements": {
+            "title": "Logros",
+            "description": "Desbloquea logros únicos y muestra tus habilidades"
           }
         }
       },

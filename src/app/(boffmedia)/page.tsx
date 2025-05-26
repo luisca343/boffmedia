@@ -1,8 +1,8 @@
 
-import { CommunitySection } from "./_components/CommunitySection";
-import { EventsSection } from "./_components/EventsSection";
-import { FeaturedGames } from "./_components/FeaturedGames";
-import { HeroSection } from "./_components/HeroSection";
+import { CommunitySection } from "./_components/sections/CommunitySection";
+import { EventsSection } from "./_components/sections/EventsSection";
+import { FeaturedGames } from "./_components/sections/FeaturedGames";
+import { HeroSection } from "./_components/sections/HeroSection";
 
 export default function Home() {
   return (

@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { AlertTriangle } from "lucide-react"
-import BoffLayout from "@/app/(boffmedia)/_components/BoffLayout"
+import BoffLayout from "@/app/(boffmedia)/_components/layout/BoffLayout"
 
 export default function UnauthorizedPage() {
   const router = useRouter()

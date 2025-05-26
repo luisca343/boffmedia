@@ -42,7 +42,7 @@ export function EventsSection() {
 
   // Filter for upcoming events
   const upcomingEvents = events
-    .filter(event => new Date(event.endDate) >= new Date())
+    //.filter(event => new Date(event.endDate) >= new Date())
     .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
     .slice(0, 5)
 
@@ -93,6 +93,8 @@ export function EventsSection() {
                     const formattedStartDate = startDate.toLocaleDateString(t("locale"), {day: '2-digit', month: 'short'});
                     const formattedEndDate = endDate.toLocaleDateString(t("locale"), {day: '2-digit', month: 'short'});
                     
+                    console.log(`Rendering event: ${event.title} (${formattedStartDate} - ${formattedEndDate})`);
+
                     return (
                       <div
                         key={event.id}
@@ -100,7 +102,11 @@ export function EventsSection() {
                       >
                         <div className="flex items-center gap-4">
                           <div className="relative">
-                            <Calendar className="h-8 w-8 text-green-500" />
+                            { event.icon ? 
+                              <img src={event.icon} alt={event.title} className="h-12 w-12 rounded-full object-cover" /> : 
+                              <Calendar className="h-8 w-8 text-green-500"/>
+                            }
+                            
                             <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full animate-pulse"></div>
                           </div>
                           <div>
@@ -168,11 +174,10 @@ export function EventsSection() {
                       <div className="flex items-center gap-4">
                         <div className="relative">
                           <span className="font-bold text-2xl text-purple-500">#{index + 1}</span>
-                          {index === 0 && <div className="absolute -top-1 -right-1 h-3 w-3 bg-yellow-500 rounded-full animate-pulse"></div>}
                         </div>
                         <div>
                           <h4 className="font-semibold text-lg text-surface-50">
-                            {player.username || t("playerPlaceholder", {id: player.userId})}
+                            {player.nickname || t("playerPlaceholder", {id: player.userId})}
                           </h4>
                           <p className="text-surface-300">{player.totalPoints?.toLocaleString() || 0} {t("points")}</p>
                         </div>

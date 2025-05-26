@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import BoffLayout from "@/app/(boffmedia)/_components/BoffLayout"
+import BoffLayout from "@/app/(boffmedia)/_components/layout/BoffLayout"
 import GiveawayHeader from "./_components/GiveawayHeader"
 import ParticipantsList from "./_components/ParticipantsList"
 import GiveawayControls from "./_components/GiveawayControls"
