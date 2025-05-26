@@ -66,17 +66,6 @@ export default function Page() {
                 Fukitsu-Gansolia. Desvela Pokémon ancestrales y enfrenta desafíos
                 épicos forjados en la historia.
               </p>
-              
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="border-blue-400/50 text-blue-300">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  Región Antigua
-                </Badge>
-                <Badge variant="outline" className="border-blue-400/50 text-blue-300">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Pokémon Legendarios
-                </Badge>
-              </div>
             </div>
           </div>
 
@@ -102,17 +91,6 @@ export default function Page() {
                 entrenamiento Pokémon y reta a la élite tecnológica en combates
                 legendarios.
               </p>
-              
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="border-cyan-400/50 text-cyan-300">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  Región Futurista
-                </Badge>
-                <Badge variant="outline" className="border-cyan-400/50 text-cyan-300">
-                  <Users className="h-3 w-3 mr-1" />
-                  Élite Tecnológica
-                </Badge>
-              </div>
             </div>
           </div>
         </div>
