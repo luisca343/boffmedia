@@ -7,6 +7,7 @@ import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { eq, or } from 'drizzle-orm';
 import { BoffMediaUser, boffMediaRoles, boffMediaUserRoles, boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { boffMediaParticipants } from '@/_db/schema/Events';
 
 type FullUser = {
   boff_name: string,
@@ -31,7 +32,6 @@ export class UsersService {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(boffMediaUser.password, salt);
 
-
       const user = {
         email: boffMediaUser.email,
         username: boffMediaUser.username,
@@ -39,12 +39,15 @@ export class UsersService {
         uuid: boffMediaUser.uuid
       };
 
-
       const result = await this.db.insert(boffMediaUsers).values(user as BoffMediaUser).execute();
+      const userId = result[0].insertId;
+
+      // Create or find participant for the new user
+      await this.createOrFindParticipant(userId, user.username);
 
       // Remove the password from the returned user object
       const { password, ...userWithoutPassword } = user;
-      return { ...userWithoutPassword, id: result[0].insertId, ok: true };
+      return { ...userWithoutPassword, id: userId, ok: true };
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         return { error: 'Nombre de usuario o email ya en uso' };
@@ -53,6 +56,27 @@ export class UsersService {
         throw error;
       }
       throw new Error('Error creating user: ' + error.message);
+    }
+  }
+
+  private async createOrFindParticipant(userId: number, username: string): Promise<void> {
+    try {
+      const existingParticipant = await this.db.select()
+        .from(boffMediaParticipants)
+        .where(eq(boffMediaParticipants.nickname, username))
+        .execute();
+
+      if (existingParticipant.length === 0) {
+        await this.db.insert(boffMediaParticipants).values({
+          userId,
+          nickname: username,
+          avatar: null,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }).execute();
+      }
+    } catch (error) {
+      console.error('Error creating participant:', error);
     }
   }
 
@@ -149,6 +173,7 @@ export class UsersService {
         id: null,
         name: null,
         email: null,
+        mcUUid: null,
         roles: [],
         smartRotomUser: {
           username: rotom_users?.username,
@@ -163,6 +188,7 @@ export class UsersService {
       id: boffmedia_users?.id,
       name: boffmedia_users?.username,
       email: boffmedia_users?.email,
+      mcUUid: boffmedia_users?.uuid,
       roles,
       smartRotomUser: {
         username: rotom_users?.username,
