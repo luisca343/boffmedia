@@ -256,6 +256,13 @@ export class PokemonController {
         return { count: manifest.count };
     }
 
+    @Get('pmd/:name')
+    @ApiOperation({ summary: 'Get Pokémon by PMD name' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
+    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
+    async getPokemonByPMD(@Param('name') name: string) {
+        return await this.pokemonService.getPmdPortrait(name);
+    }   
     /*
     @Get('overallscoreranking')
     @ApiOperation({ summary: 'Get overall score ranking' })
@@ -519,19 +526,6 @@ export class PokemonController {
 
     
     
-    @Get('pmd/:name')
-    @ApiOperation({ summary: 'Get Pokémon by PMD name' })
-    @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon retrieved successfully.' })
-    @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve Pokémon.' })
-    async getPokemonByPMD(@Param('name') name: string) {
-        const action = 'get Pokémon by PMD name';
-        try {
-            this.responseService.logRequest(action, { name });
-            const pokemon = await this.pokemonService.getPmdSprite(name);
-            this.responseService.logSuccess(action, pokemon);
-            return this.responseService.createSuccessResponse('Pokémon retrieved successfully', pokemon);
-        } catch (error) {
-            this.responseService.handleError(action, error, { name });
-        }
+
     }*/
 }

@@ -10,6 +10,8 @@ import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { PokemonImageService } from './pokemon-image.service';
 import { SpriteManifestService } from './sprite-manifest.service';
+import { join } from 'path';
+import { promises as fs } from 'fs';
 
 @Injectable()
 export class PokemonService {
@@ -538,5 +540,41 @@ export class PokemonService {
     return this.pokemonDataService.sortByDex(result, 'speciesID');
   }
 
+  async getPmdPortrait(name: string): Promise<{ url: string }> {
+    try {
+      // Search for the Pokemon by name
+      const searchResults = this.searchPokemonByName(name, 1);
+      
+      if (searchResults.length === 0) {
+        console.log('Pokemon not found:', name);
+        return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
+      }
+      
+      const pokemon = searchResults[0].item;
+      console.log('Found Pokemon:', pokemon.name, 'Dex:', pokemon.dex);
+      
+      // Format dex number with leading zeros (4 digits)
+      const dex = pokemon.dex.toString().padStart(4, '0');
+      
+      // Construct the PMD sprite paths
+      const pmdSpritePath = join(__dirname, '../../../', 'public/smartrotom/img/pmd/portrait', dex, 'Normal.png');
+      const spriteUrl = `/smartrotom/img/pmd/portrait/${dex}/Normal.png`;
+      
+      console.log('Checking PMD sprite path:', spriteUrl);
+      
+      // Check if the sprite file exists
+      try {
+        await fs.access(pmdSpritePath);
+        console.log('PMD sprite found:', spriteUrl);
+        return { url: spriteUrl };
+      } catch (error) {
+        console.log('PMD sprite not found, using default');
+        return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
+      }
+      
+    } catch (error) {
+      console.error('Error in getPokemonByPMD:', error);
+      return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
+    }
+  }
 }
-
