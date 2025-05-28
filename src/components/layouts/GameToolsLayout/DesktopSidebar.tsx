@@ -39,7 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   "text-sm font-medium mb-2 uppercase tracking-wider px-2 block",
                   "transition-all duration-300 ease-in-out",
                   isSidebarExpanded 
-                    ? "opacity-100 h-auto text-surface-400 hover:text-surface-200" 
+                    ? "opacity-100 h-auto text-surface-100 hover:text-primary-200" 
                     : "opacity-0 h-0 overflow-hidden"
                 )}
               >

@@ -24,10 +24,11 @@ export function useGalleryData(username: string) {
     try {
       const [allCardsData, userCardsData] = await Promise.all([
         /* @ts-ignore */
-        (await boffGET('/herramientas/ptcgp/cards')) as Card[],
+        (await boffGET('/herramientas/ptcgp/cards')).data as Card[],
         /* @ts-ignore */
-        (await boffPOST('/herramientas/ptcgp/user-cards', { username })) as Card[],
+        (await boffPOST('/herramientas/ptcgp/user-cards', { username })).data as Card[],
       ])
+
       if(!allCardsData || !userCardsData) return  
       setAllCards(allCardsData)
       const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: any) => {
@@ -37,9 +38,7 @@ export function useGalleryData(username: string) {
       setUserCards(userCardsMap)
       setError(null)
     } catch (error) {
-      console.error('Error fetching data:', error)
-      setError('No se pudieron cargar los datos. Por favor, intenta de nuevo.')
-      toast.error('No se pudieron cargar los datos. Por favor, intenta de nuevo.')
+      setError('No se pudieron cargar los datos. Por favor, inténtalo de nuevo.')
     } finally {
       setLoading(false)
     }

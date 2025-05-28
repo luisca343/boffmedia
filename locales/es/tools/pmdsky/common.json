@@ -44,5 +44,7 @@
     "REWARD_ITEM": "Objeto recompensa",
     "EUROPEAN": "Version Europea",
     "GENERATE_WONDER_MAIL": "Generar",
-    "WONDERMAIL": "Correo Secreto"
+    "WONDERMAIL": "Correo Secreto",
+    "WONDER_MAIL_CREATOR": "Generador de correos secretos",
+    "WONDER_MAIL_CREATOR_DESCRIPTION": "Genera correos secretos para PMM Exploradores del Cielo."
 }

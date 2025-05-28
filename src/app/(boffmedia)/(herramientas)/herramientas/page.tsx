@@ -65,19 +65,19 @@ export default function ToolsLandingPage() {
     <div className="relative min-h-full">
       {/* Background video with overlay */}
       {isMounted && (
-        <div className="fixed inset-0 z-0 overflow-hidden">
+        <div className="fixed inset-0  z-10 overflow-hidden">
           <video
             autoPlay
             loop
             muted
             playsInline
-            className="absolute w-full h-full object-cover object-center"
+            className="absolute w-full h-full object-cover object-center z-10"
           >
             <source src="/uploads/looptest.mp4" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
           {/* Dark overlay */}
-          <div className="absolute inset-0 bg-surface-900/75"></div>
+          <div className="absolute inset-0 bg-surface-900/75 z-20"></div>
         </div>
       )}
 

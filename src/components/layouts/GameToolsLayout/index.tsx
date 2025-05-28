@@ -6,6 +6,7 @@ import { gameToolsConfig } from "@/config/gameTools";
 import MobileSidebar from "./MobileSidebar";
 import Sidebar from "./DesktopSidebar";
 import MobileHeader from "./MobileHeader";
+import { FloatingSection } from "@/app/(boffmedia)/_components/layout/FloatingSection";
 
 interface GameToolsLayoutProps {
   children: React.ReactNode;
@@ -63,11 +64,11 @@ export default function GameToolsLayout({
         />
         
         {/* Main Content */}
-        <div className={`flex-1 bg-surface-900 overflow-auto w-full ${mainContentMargin} transition-all duration-300 ease-in-out md:pt-0 pt-16`}>
+        <FloatingSection className={`flex-1 bg-surface-900 overflow-auto w-full ${mainContentMargin} transition-all duration-300 ease-in-out md:pt-0 pt-16`}>
           <main className="container mx-auto px-4 py-6">
             {children}
           </main>
-        </div>
+        </FloatingSection>
       </div>
     </div>
   );

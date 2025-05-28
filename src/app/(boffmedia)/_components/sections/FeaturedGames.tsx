@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { FloatingBackground } from "../layout/FloatingBackground"
+import { FloatingSection } from "../layout/FloatingSection"
 
 export async function FeaturedGames() {
   const t = await getTranslations("boffmedia");
@@ -35,8 +36,7 @@ export async function FeaturedGames() {
   ]
 
   return (
-    <section className="relative pt-16 pb-32 bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden">
-      <FloatingBackground variant="warm" />
+    <FloatingSection mainPage={true} className="relative pt-16 pb-32 bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden">
       <div className="relative container mx-auto px-4 z-10 mb-8">
         <div className="text-center mb-16">
           <div className="inline-block">
@@ -98,6 +98,6 @@ export async function FeaturedGames() {
           <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" className="fill-surface-800"></path>
         </svg>
       </div>
-    </section>
+    </FloatingSection>
   )
 }

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Users, Calendar, Trophy, Award } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 import Link from "next/link"
-import { FloatingBackground } from "../layout/FloatingBackground"
+import { FloatingSection } from "../layout/FloatingSection"
 
 export async function CommunitySection() {
   const t = await getTranslations("boffmedia.communitySection");
@@ -36,7 +36,7 @@ export async function CommunitySection() {
   ]
 
   return (
-    <section className="relative py-24 bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden">
+    <FloatingSection  mainPage={true} className="relative py-24 bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden ">
       {/* Top SVG Divider */}
       <div className="absolute top-0 left-0 w-full overflow-hidden">
         <svg className="relative block w-full h-16" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -44,8 +44,6 @@ export async function CommunitySection() {
         </svg>
       </div>
 
-      {/* Background Elements */}
-      <FloatingBackground variant="warm" />
 
       <div className="relative container mx-auto px-4 z-10">
         <div className="text-center mb-16">
@@ -106,6 +104,6 @@ export async function CommunitySection() {
           </div>
         </div>
       </div>
-    </section>
+    </FloatingSection>
   )
 }

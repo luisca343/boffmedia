@@ -9,7 +9,7 @@ import { BoffFooter } from "./_components/layout/BoffFooter";
 
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
-  description: "BoffMedia",
+  description: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab"
 };
 
 export default async function RootLayout({

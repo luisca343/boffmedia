@@ -91,7 +91,7 @@ export default function MHWildsPage() {
           transition={{ delay: 0.1 }}
           className="mb-12"
         >
-          <Card className="bg-surface-800/90 border-surface-700 overflow-hidden">
+          <Card className="bg-surface-800 border-surface-700 overflow-hidden">
             <div className={`h-2 bg-gradient-to-r ${featuredTool.color}`}></div>
             <div className="md:flex">
               <div className="md:w-2/3 p-6">
