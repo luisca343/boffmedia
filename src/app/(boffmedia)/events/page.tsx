@@ -26,7 +26,7 @@ export default function EventsPage() {
           : true;
         
         // Game type filter
-        const matchesFilter = filter ? event.game === parseInt(filter) : true;
+        const matchesFilter = filter ? event.gameId === parseInt(filter) : true;
         
         return matchesSearch && matchesFilter;
       })

@@ -15,11 +15,9 @@ import Link from "next/link";
 import { Event, Game } from "@/types/events";
 import { eventsService } from "@/services/api/smartrotom/eventsService";
 import { EventRegistrationButton } from "../_components/EventRegistrationButton";
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import emoji from 'remark-emoji';
 import { Markdown } from "@/components/Markdown";
-import { getEventStatus } from "@/lib/events"; // Import the shared utility function
+import { getEventStatus } from "@/lib/events";
+import { AchievementsSummary } from "./_components/AchievementsSummary";
 
 // Extend the Event interface to include child events
 interface EventWithChildren extends Event {
@@ -56,10 +54,9 @@ export default function EventPage() {
     }
   }, [eventId]);
 
-  // Remove the duplicate getEventStatus function and use the imported one instead
   const status = event ? getEventStatus(event.startDate, event.endDate) : { label: "Desconocido", class: "" };
   
-  const game = event ? games?.find((g: Game) => g.id === event.game) : null;
+  const game = event ? games?.find((g: Game) => g.id === event.gameId) : null;
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return "No definida";
@@ -93,7 +90,7 @@ export default function EventPage() {
         </Button>
       </Link>
 
-{/* Event Banner remains the same */}
+      {/* Event Banner */}
       <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden mb-8">
         {event.banner ? (
           <img 
@@ -114,10 +111,10 @@ export default function EventPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Event Details */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Improved header with repositioned game icon */}
+          {/* Header */}
           <div>
             <div className="flex items-center gap-4 mb-6">
-              {/* Game Icon - Repositioned with more space */}
+              {/* Game Icon */}
               <div className="relative mt-1">
                 <div className="w-12 h-12 rounded-full bg-surface-700 flex items-center justify-center overflow-hidden border-2 border-surface-600">
                   {game?.icon ? (
@@ -155,13 +152,13 @@ export default function EventPage() {
               </div>
             </div>
           
-          {/* Rich Content Section - Render markdown content */}
+          {/* Rich Content Section */}
           {event.description && (
               <Markdown>{event.description}</Markdown>
           )}
           </div>
 
-          {/* Child Events Section - Remain unchanged */}
+          {/* Child Events Section */}
           {event.type === "server" && hasChildEvents && (
             <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
               <h3 className="text-xl font-semibold text-surface-50 mb-4 flex items-center">
@@ -188,7 +185,6 @@ export default function EventPage() {
                               {formatDate(childEvent.startDate)}
                             </div>
                           </div>
-                          {/* Use the shared utility function here as well */}
                           <Badge className={`ml-2 ${getEventStatus(childEvent.startDate, childEvent.endDate).class}`}>
                             {getEventStatus(childEvent.startDate, childEvent.endDate).label}
                           </Badge>
@@ -249,6 +245,9 @@ export default function EventPage() {
             </div>
           </div>
 
+          {/* Achievements Summary */}
+          <AchievementsSummary eventId={parseInt(eventId)} />
+
           <EventRegistrationButton event={event} />
           
           <div className="flex justify-center">
@@ -257,7 +256,6 @@ export default function EventPage() {
               className="w-full border-surface-600"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
-                // You could add a toast notification here
               }}
             >
               <Share2 className="mr-2 h-4 w-4" />

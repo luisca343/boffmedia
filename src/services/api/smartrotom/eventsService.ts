@@ -4,7 +4,7 @@ import { CreateGameDto } from "@/types/dto/create-game.dto"
 import { CreateAchievementDto } from "@/types/dto/create-achievement.dto"
 import { CreateTeamDto } from "@/types/dto/create-team.dto"
 import { UpdateProgressDto } from "@/types/dto/update-progress.dto"
-import { Event, Achievement, EventTeam, Game, LeaderboardEntry, TeamLeaderboardEntry } from "@/types/events"
+import { Event, Achievement, EventTeam, Game, LeaderboardEntry, TeamLeaderboardEntry, UserProgress } from "@/types/events"
 import { SuccessResponse } from "@/types"
 
 interface JoinEventDto {
@@ -37,7 +37,6 @@ export const eventsService = {
   joinEvent: (eventId: number, joinEventDto: JoinEventDto) => apiPOST<ApiResponse>(`/boffmedia/events/${eventId}/join`, joinEventDto),
   getEventParticipants: (eventId: number) => apiGET<EventParticipant[]>(`/boffmedia/events/${eventId}/participants`),
 
-
   // Game Management
   getGames: () => apiGET<Game[]>("/boffmedia/events/games"),
   getGame: (id: number) => apiGET<Game>(`/boffmedia/events/games/${id}`),
@@ -58,6 +57,10 @@ export const eventsService = {
   updateAchievement: (eventId: number, achievementId: number, createAchievementDto: CreateAchievementDto) => apiPATCH<ApiResponse>(`/boffmedia/events/${eventId}/achievements/${achievementId}`, createAchievementDto),
   getEventAchievements: (eventId: number) => apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`),
   updateProgress: (eventId: number, updateProgressDto: UpdateProgressDto) => apiPATCH<ApiResponse>(`/boffmedia/events/${eventId}/progress`, updateProgressDto),
+
+  // Progress Management
+  getParticipantProgress: (participantId: number) => apiGET<UserProgress[]>(`/boffmedia/events/participants/${participantId}/progress`),
+  getParticipantProgressByEvent: (eventId: number, participantId: number) => apiGET<UserProgress[]>(`/boffmedia/events/${eventId}/participants/${participantId}/progress`),
 
   // Leaderboards
   getLeaderboards: () => apiGET<LeaderboardEntry[]>("/boffmedia/events/leaderboards"),

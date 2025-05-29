@@ -16,14 +16,14 @@ export async function FeaturedGames() {
       title: t("featuredGames.games.wingull.title"),
       description: t("featuredGames.games.wingull.description"),
       image: "/img/win-80.png",
-      status: t("featuredGames.status.popular"),
+      status: t("featuredGames.status.comingSoon"),
       link: "/wingull",
     },
     {
       title: t("featuredGames.games.smartrotom.title"),
       description: t("featuredGames.games.smartrotom.description"),
       image: "/img/smartrotom.png",
-      status: t("featuredGames.status.new"),
+      status: t("featuredGames.status.comingSoon"),
       link: "/smartrotom",
     },
     {

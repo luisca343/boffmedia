@@ -16,7 +16,7 @@ interface EventCardProps {
 
 export function EventCard({ event, layout = "grid" }: EventCardProps) {
   const { games } = useGetGames();
-  const game = games?.find((g) => g.id === event.game);
+  const game = games?.find((g) => g.id === event.gameId);
   
   // Use the utility function
   const status = getEventStatus(event.startDate, event.endDate);
@@ -74,7 +74,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
                 <Calendar className="h-3 w-3 text-surface-500" />
               )}
             </div>
-            <span className="text-sm text-surface-300">{game?.title || `Juego #${event.game}`}</span>
+            <span className="text-sm text-surface-300">{game?.title || `Juego #${event.gameId}`}</span>
           </div>
           
           <h3 className="text-xl font-semibold text-surface-50 mb-2 line-clamp-1">{event.title}</h3>
