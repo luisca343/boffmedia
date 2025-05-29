@@ -63,8 +63,8 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       </Button>
       
       {isOpen && (
-        <div className="absolute pt-2 z-10 w-72 bg-surface-900 shadow-lg rounded-md overflow-hidden">
-          <div className="border border-surface-800 border-t-surface-900">
+        <div className="absolute pt-3 z-10 w-72  bg-surface-900 shadow-lg  overflow-hidden">
+          <div className="border border-surface-700 border-t-surface-900 rounded-b-md">
             {sections.map((section, index) => (
               <React.Fragment key={section.title}>
                 {index > 0 && <div className="bg-surface-800 h-px"/>}
