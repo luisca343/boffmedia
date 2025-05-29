@@ -69,7 +69,6 @@ export default function Sorteo() {
   return (
     <>
       <div className="flex flex-col w-full max-w-5xl mx-auto gap-8">
-        <GiveawayHeader />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
