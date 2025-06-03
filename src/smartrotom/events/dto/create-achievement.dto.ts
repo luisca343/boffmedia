@@ -13,6 +13,9 @@ export class CreateAchievementDto {
   @ApiProperty({ description: 'The points awarded for completion' })
   points: number;
 
+  @ApiProperty({ description: 'Type of item' , default: 'achievement'})
+  itemType: 'achievement' | 'medal';
+
   @ApiProperty({ 
     description: 'Category of the achievement',
     enum: ['competition', 'challenge', 'participation', 'achievement']

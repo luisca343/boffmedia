@@ -239,7 +239,180 @@ export class UsersService {
       throw error;
     }
   }
+
+  async createMinecraftUser(registerData: {
+    username: string;
+    email: string;
+    password: string;
+    minecraft: {
+      username: string;
+      uuid: string;
+      world: string;
+    };
+  }) {
+    if (!registerData.password || registerData.password.trim() === '') {
+      throw new BadRequestException('Password is required');
+    }
+
+    try {
+      // Check if user already exists
+      const existingBoffUser = await this.db.select().from(boffMediaUsers)
+        .where(or(
+          eq(boffMediaUsers.username, registerData.username),
+          eq(boffMediaUsers.email, registerData.email),
+          eq(boffMediaUsers.uuid, registerData.minecraft.uuid)
+        )).execute();
+
+      if (existingBoffUser.length > 0) {
+        return { error: 'Username, email, or Minecraft UUID already in use' };
+      }
+
+      const existingMcUser = await this.db.select().from(smartrotomUsers)
+        .where(or(
+          eq(smartrotomUsers.username, registerData.minecraft.username),
+          eq(smartrotomUsers.uuid, registerData.minecraft.uuid)
+        )).execute();
+
+      if (existingMcUser.length > 0) {
+        return { error: 'Minecraft username or UUID already in use' };
+      }
+
+      // Hash password
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(registerData.password, salt);
+
+      // Create SmartRotom user first
+      const smartrotomUser = {
+        username: registerData.minecraft.username,
+        uuid: registerData.minecraft.uuid,
+        world: registerData.minecraft.world
+      };
+
+      await this.db.insert(smartrotomUsers).values(smartrotomUser as SmartRotomUser).execute();
+
+      // Create BoffMedia user
+      const boffMediaUser = {
+        email: registerData.email,
+        username: registerData.username,
+        password: hash,
+        uuid: registerData.minecraft.uuid
+      };
+
+      const result = await this.db.insert(boffMediaUsers).values(boffMediaUser as BoffMediaUser).execute();
+      const userId = result[0].insertId;
+
+      // Create participant for the new user
+      await this.createOrFindParticipant(userId, registerData.username);
+
+      // Get the full user data
+      const fullUser = await this.findFullUserWithUUID(registerData.minecraft.uuid);
+
+      return { user: fullUser, ok: true };
+    } catch (error) {
+      console.error('Error creating Minecraft user:', error);
+      
+      if (error.code === 'ER_DUP_ENTRY') {
+        return { error: 'Username, email, or Minecraft data already in use' };
+      }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new Error('Error creating user: ' + error.message);
+    }
+  }
+
+    async linkMinecraftAccount(linkData: {
+    username: string;
+    email: string;
+    password: string;
+    minecraft: {
+      username: string;
+      uuid: string;
+      world: string;
+    };
+  }) {
+    if (!linkData.password || linkData.password.trim() === '') {
+      throw new BadRequestException('Password is required');
+    }
+
+    try {
+      // Find existing BoffMedia user and validate credentials
+      const existingUser = await this.db.select().from(boffMediaUsers)
+        .where(or(
+          eq(boffMediaUsers.username, linkData.username),
+          eq(boffMediaUsers.email, linkData.email)
+        )).execute();
+
+      if (existingUser.length === 0) {
+        return { error: 'BoffMedia account not found. Please register first.' };
+      }
+
+      const user = existingUser[0];
+
+      // Validate password
+      const match = await bcrypt.compare(linkData.password, user.password);
+      if (!match) {
+        return { error: 'Invalid credentials' };
+      }
+
+      // Check if user already has a Minecraft account linked
+      if (user.uuid) {
+        return { error: 'This account already has a Minecraft account linked' };
+      }
+
+      // Check if Minecraft account is already in use
+      const existingMcUser = await this.db.select().from(smartrotomUsers)
+        .where(or(
+          eq(smartrotomUsers.username, linkData.minecraft.username),
+          eq(smartrotomUsers.uuid, linkData.minecraft.uuid)
+        )).execute();
+
+      if (existingMcUser.length > 0) {
+        return { error: 'Minecraft username or UUID already in use' };
+      }
+
+      const existingBoffUserWithUuid = await this.db.select().from(boffMediaUsers)
+        .where(eq(boffMediaUsers.uuid, linkData.minecraft.uuid))
+        .execute();
+
+      if (existingBoffUserWithUuid.length > 0) {
+        return { error: 'Minecraft UUID already linked to another account' };
+      }
+
+      // Create SmartRotom user
+      const smartrotomUser = {
+        username: linkData.minecraft.username,
+        uuid: linkData.minecraft.uuid,
+        world: linkData.minecraft.world
+      };
+
+      await this.db.insert(smartrotomUsers).values(smartrotomUser as SmartRotomUser).execute();
+
+      // Update BoffMedia user with Minecraft UUID
+      await this.db.update(boffMediaUsers)
+        .set({ uuid: linkData.minecraft.uuid } as Partial<BoffMediaUser>)
+        .where(eq(boffMediaUsers.id, user.id))
+        .execute();
+
+      // Get the full user data with linked accounts
+      const fullUser = await this.findFullUserWithUUID(linkData.minecraft.uuid);
+
+      return { user: fullUser, ok: true };
+    } catch (error) {
+      console.error('Error linking Minecraft account:', error);
+      
+      if (error.code === 'ER_DUP_ENTRY') {
+        return { error: 'Minecraft data already in use' };
+      }
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new Error('Error linking account: ' + error.message);
+    }
+  }
 }
+
+
 
 type SessionUser = {
   name: string,

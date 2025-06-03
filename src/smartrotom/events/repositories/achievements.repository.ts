@@ -5,7 +5,8 @@ import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { 
   boffMediaAchievements, 
   boffMediaEvents, 
-  Achievement 
+  Achievement, 
+  boffMediaParticipantProgress
 } from '@/_db/schema/Events';
 
 @Injectable()
@@ -83,5 +84,59 @@ export class AchievementsRepository {
       .where(and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)));
 
     return eventCheck.length > 0;
+  }
+
+  async getParticipantProgress(participantId: number): Promise<any[]> {
+    return this.db.select({
+      participantId: boffMediaParticipantProgress.participantId,
+      achievementId: boffMediaParticipantProgress.achievementId,
+      currentProgress: boffMediaParticipantProgress.currentProgress,
+      isCompleted: boffMediaParticipantProgress.isCompleted,
+      completedAt: boffMediaParticipantProgress.completedAt,
+      lastUpdated: boffMediaParticipantProgress.lastUpdated,
+      achievement: {
+        id: boffMediaAchievements.id,
+        name: boffMediaAchievements.name,
+        description: boffMediaAchievements.description,
+        icon: boffMediaAchievements.icon,
+        maxProgress: boffMediaAchievements.maxProgress,
+        points: boffMediaAchievements.points,
+        category: boffMediaAchievements.category,
+        rarity: boffMediaAchievements.rarity,
+        itemType: boffMediaAchievements.itemType
+      }
+    })
+    .from(boffMediaParticipantProgress)
+    .innerJoin(boffMediaAchievements, eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId))
+    .where(eq(boffMediaParticipantProgress.participantId, participantId));
+  }
+
+  async getParticipantProgressByEvent(participantId: number, eventId: number): Promise<any[]> {
+    return this.db.select({
+      participantId: boffMediaParticipantProgress.participantId,
+      achievementId: boffMediaParticipantProgress.achievementId,
+      currentProgress: boffMediaParticipantProgress.currentProgress,
+      isCompleted: boffMediaParticipantProgress.isCompleted,
+      completedAt: boffMediaParticipantProgress.completedAt,
+      lastUpdated: boffMediaParticipantProgress.lastUpdated,
+      achievement: {
+        id: boffMediaAchievements.id,
+        name: boffMediaAchievements.name,
+        description: boffMediaAchievements.description,
+        icon: boffMediaAchievements.icon,
+        maxProgress: boffMediaAchievements.maxProgress,
+        points: boffMediaAchievements.points,
+        category: boffMediaAchievements.category,
+        rarity: boffMediaAchievements.rarity,
+        itemType: boffMediaAchievements.itemType,
+        eventId: boffMediaAchievements.eventId
+      }
+    })
+    .from(boffMediaParticipantProgress)
+    .innerJoin(boffMediaAchievements, eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId))
+    .where(and(
+      eq(boffMediaParticipantProgress.participantId, participantId),
+      eq(boffMediaAchievements.eventId, eventId)
+    ));
   }
 }

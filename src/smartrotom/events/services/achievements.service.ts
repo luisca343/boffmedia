@@ -35,7 +35,7 @@ export class AchievementsService {
       icon: createAchievementDto.icon,
       maxProgress: createAchievementDto.maxProgress || 1,
       points: createAchievementDto.points,
-      itemType: 'achievement' as const,
+      itemType: createAchievementDto.itemType,
       category: createAchievementDto.category,
       rarity: createAchievementDto.rarity,
       order: createAchievementDto.order || 0,
@@ -68,5 +68,18 @@ export class AchievementsService {
 
   async validateEventExists(eventId: number): Promise<boolean> {
     return this.achievementsRepository.checkEventExists(eventId);
+  }
+
+  async getParticipantProgress(participantId: number): Promise<any[]> {
+    return this.achievementsRepository.getParticipantProgress(participantId);
+  }
+
+  async getParticipantProgressByEvent(participantId: number, eventId: number): Promise<any[]> {
+    const eventExists = await this.achievementsRepository.checkEventExists(eventId);
+    if (!eventExists) {
+      return [];
+    }
+
+    return this.achievementsRepository.getParticipantProgressByEvent(participantId, eventId);
   }
 }

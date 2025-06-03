@@ -136,6 +136,23 @@ export class EventsController {
     return await this.eventsFacadeService.updateAchievement(eventId, achievementId, createAchievementDto);
   }
 
+  @Get('/participants/:participantId/progress')
+  @ApiOperation({ summary: 'Get all achievement progress for a participant' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Participant progress retrieved successfully.' })
+  async getParticipantProgress(@Param('participantId') participantId: number) {
+    return await this.eventsFacadeService.getParticipantProgress(participantId);
+  }
+
+  @Get(':eventId/participants/:participantId/progress')
+  @ApiOperation({ summary: 'Get achievement progress for a participant in a specific event' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Participant event progress retrieved successfully.' })
+  async getParticipantProgressByEvent(
+    @Param('eventId') eventId: number,
+    @Param('participantId') participantId: number
+  ) {
+    return await this.eventsFacadeService.getParticipantProgressByEvent(participantId, eventId);
+  }
+
   // ==================== TEAM MANAGEMENT ====================
   @Get('/teams')
   @ApiOperation({ summary: 'Get all teams' })

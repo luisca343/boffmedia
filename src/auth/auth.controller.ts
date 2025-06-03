@@ -30,6 +30,40 @@ export class AuthController {
     return this.authService.loginMC(loginMC);
   }
 
+  @Post('register-minecraft')
+  @ApiOperation({ summary: 'Register user with Minecraft account' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'User registered successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data.' })
+  async registerMinecraft(@Body() registerDto: {
+    username: string;
+    email: string;
+    password: string;
+    minecraft: {
+      username: string;
+      uuid: string;
+      world: string;
+    };
+  }) {
+    return this.authService.registerMinecraft(registerDto);
+  }
+
+  @Post('link-minecraft')
+  @ApiOperation({ summary: 'Link existing BoffMedia account to Minecraft' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Minecraft account linked successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data.' })
+  async linkMinecraft(@Body() linkDto: {
+    username: string;
+    email: string;
+    password: string;
+    minecraft: {
+      username: string;
+      uuid: string;
+      world: string;
+    };
+  }) {
+    return this.authService.linkMinecraft(linkDto);
+  }
+
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh JWT token' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Token refreshed successfully.' })

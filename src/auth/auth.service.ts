@@ -35,7 +35,8 @@ export class AuthService {
         username: user.name,
         email: user.email,
         roles: user.roles,
-        mcUuid: user.mcUUid
+        mcUuid: user.mcUUid,
+        smartRotomUser: user.smartRotomUser || {}
       }
     };
   }
@@ -46,11 +47,65 @@ export class AuthService {
     }
 
     const user = await this.usersService.findFullUserWithUUID(loginData.uuid);
+    console.log('Login Minecraft user:', loginData.username, 'with UUID:', loginData.uuid);
+    console.log('Found user:', user);
     if (!user) {
       return { error: 'User not found in BoffMedia system' };
     }
 
     return this.login(user);
+  }
+
+    async registerMinecraft(registerData: {
+    username: string;
+    email: string;
+    password: string;
+    minecraft: {
+      username: string;
+      uuid: string;
+      world: string;
+    };
+  }) {
+    // Validate world
+    if (registerData.minecraft.world !== process.env.MC_WORLD) {
+      throw new UnauthorizedException('Invalid world');
+    }
+
+    // Create the user accounts
+    const result = await this.usersService.createMinecraftUser(registerData);
+    
+    if (result.error) {
+      return { error: result.error };
+    }
+
+    // Login the newly created user
+    return this.login(result.user);
+  }
+
+  async linkMinecraft(linkData: {
+    username: string;
+    email: string;
+    password: string;
+    minecraft: {
+      username: string;
+      uuid: string;
+      world: string;
+    };
+  }) {
+    // Validate world
+    if (linkData.minecraft.world !== process.env.MC_WORLD) {
+      throw new UnauthorizedException('Invalid world');
+    }
+
+    // Link the Minecraft account to existing BoffMedia account
+    const result = await this.usersService.linkMinecraftAccount(linkData);
+    
+    if (result.error) {
+      return { error: result.error };
+    }
+
+    // Login the user with linked account
+    return this.login(result.user);
   }
 
   async refreshToken(tokenData: any) {

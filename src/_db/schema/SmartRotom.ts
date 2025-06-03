@@ -5,7 +5,7 @@ export const smartrotomUsers = mysqlTable("rotom_users", {
     id: int("id").primaryKey().autoincrement(),
     uuid: char("uuid", { length: 36 }).notNull().unique(),
     username: varchar("username", { length: 32 }).notNull(),
-    world: varchar("world", { length: 8 }),
+    world: varchar("world", { length: 36 }),
     energy: int("energy").default(10),
     lastCharge: timestamp("last_charge").default(sql`CURRENT_TIMESTAMP()`),
 });

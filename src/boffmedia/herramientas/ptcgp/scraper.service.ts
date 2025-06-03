@@ -128,6 +128,7 @@ export class TgcpScraperService {
           $(element).find('tr').slice(1).each((i, row) => {
             const cells = $(row).find('td');
             if (cells.length >= 4) {
+              
               const packData = {
                 logo: $(cells[0]).find('img').attr('src') || '',
                 icon: $(cells[1]).find('img').attr('src') || '',
@@ -148,6 +149,9 @@ export class TgcpScraperService {
               if (packData.setName) {
                 result[currentSection].push(packData);
               }
+
+              console.log(`Processing set: ${packData.setName}`);
+              console.log(packData)
             }
           });
         }

@@ -180,6 +180,14 @@ export class EventsFacadeService {
     return this.achievementsService.updateAchievement(id, createAchievementDto);
   }
 
+  async getParticipantProgress(participantId: number) {
+    return this.achievementsService.getParticipantProgress(participantId);
+  }
+
+  async getParticipantProgressByEvent(participantId: number, eventId: number) {
+    return this.achievementsService.getParticipantProgressByEvent(participantId, eventId);
+  }
+
   // ==================== TEAM MANAGEMENT ====================
   async getTeams(): Promise<EventTeam[]> {
     return this.teamsService.getAllTeams();
