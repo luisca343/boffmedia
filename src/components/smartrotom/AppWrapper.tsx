@@ -2,7 +2,7 @@
 import type { Session } from "next-auth"
 import RotomNav from "../nav/RotomNav"
 import { motion } from "framer-motion"
-import { signIn } from "next-auth/react"
+import { signIn, signOut } from "next-auth/react"
 import { LoadingScreen } from "./Loading"
 import { CallStatus } from "./calls/CallStatus"
 import { useEffect, useState } from "react"
@@ -13,6 +13,7 @@ import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify"
 import { getMcUserData } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
+import { MinecraftAuthForm } from "./MinecraftAuthForm"
 
 export default function AppWrapper({
   children,
@@ -46,6 +47,7 @@ export default function AppWrapper({
 
   useEffect(() => {
     const isSmart = isMinecraft()
+    
     setIsMC(isSmart)
 
     const fetchDatosUsuario = async () => {
@@ -65,11 +67,6 @@ export default function AppWrapper({
             world: data.world,
           })
 
-          if (response?.error) {
-            setDatosUsuario(null)
-            return
-          }
-
           setDatosUsuario(data)
         }
       } else {
@@ -84,9 +81,7 @@ export default function AppWrapper({
   }
 
   if (status === "unauthenticated" && isMC) {
-    if (!datosUsuario) return <LoadingScreen />
-
-    return <p>{Object.values(datosUsuario)}</p>
+    return <MinecraftAuthForm mcUserData={datosUsuario} />
   }
 
   if (status === "unauthenticated" && !isMC) {
@@ -104,11 +99,18 @@ export default function AppWrapper({
   if (status === "authenticated" && !smartRotomLinked()) {
     if (!isMC)
       return <RotomErrorPage error="Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web." />
-    return <AuthForm url="smartrotom" redirect="/smartrotom" />
+    return <div>
+      <button
+        className="bg-red-500 text-white px-4 py-2 rounded"
+        onClick={() => signOut({ callbackUrl: "/" })}
+      >
+        Cerrar sesión
+      </button>
+    </div>
   }
 
   if (status === "authenticated" && !boffMediaLinked()) {
-    //return <RotomError error="Usuario de BoffMedia no vinculado"/>
+    <RotomError error="Usuario de BoffMedia no vinculado"/>
   }
 
   return (

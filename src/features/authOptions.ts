@@ -50,7 +50,7 @@ export const authOptions: NextAuthOptions = {
           }
           const response = (await boffPOST(`/auth/loginmc`, credentials)).data as any;
           if (response && !response.error) {
-            const responseData = response.data as any;
+            const responseData = response.user as any;
             const user: User = {
               id: responseData.id,
               name: responseData.name,
