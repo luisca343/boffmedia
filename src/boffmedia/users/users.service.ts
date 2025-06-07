@@ -8,6 +8,7 @@ import { eq, or } from 'drizzle-orm';
 import { BoffMediaUser, boffMediaRoles, boffMediaUserRoles, boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
+import { StarbankService } from '@/smartrotom/starbank/starbank.service';
 
 type FullUser = {
   boff_name: string,
@@ -20,7 +21,8 @@ type FullUser = {
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly starbankService: StarbankService
   ) {}
 
   async createFromBoffMedia(boffMediaUser: Partial<BoffMediaUser>) {
@@ -240,6 +242,7 @@ export class UsersService {
     }
   }
 
+
   async createMinecraftUser(registerData: {
     username: string;
     email: string;
@@ -304,6 +307,15 @@ export class UsersService {
       // Create participant for the new user
       await this.createOrFindParticipant(userId, registerData.username);
 
+      // Create StarBank main account for the new user
+      try {
+        await this.starbankService.createMainAccount(registerData.minecraft.uuid, registerData.minecraft.username);
+        console.log('StarBank account created for user:', registerData.minecraft.username);
+      } catch (error) {
+        console.error('Error creating StarBank account:', error);
+        // Don't fail the entire registration if StarBank account creation fails
+      }
+
       // Get the full user data
       const fullUser = await this.findFullUserWithUUID(registerData.minecraft.uuid);
 
@@ -321,7 +333,7 @@ export class UsersService {
     }
   }
 
-    async linkMinecraftAccount(linkData: {
+  async linkMinecraftAccount(linkData: {
     username: string;
     email: string;
     password: string;
@@ -393,6 +405,15 @@ export class UsersService {
         .set({ uuid: linkData.minecraft.uuid } as Partial<BoffMediaUser>)
         .where(eq(boffMediaUsers.id, user.id))
         .execute();
+
+      // Create StarBank main account for the linked user
+      try {
+        await this.starbankService.createMainAccount(linkData.minecraft.uuid, linkData.minecraft.username);
+        console.log('StarBank account created for linked user:', linkData.minecraft.username);
+      } catch (error) {
+        console.error('Error creating StarBank account:', error);
+        // Don't fail the entire linking process if StarBank account creation fails
+      }
 
       // Get the full user data with linked accounts
       const fullUser = await this.findFullUserWithUUID(linkData.minecraft.uuid);
