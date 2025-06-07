@@ -3,12 +3,12 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { SmartRotomUsersService } from '@/smartrotom/users/users.service';
 import { DrizzleModule } from '@/drizzle/drizzle.module';
-import { StarbankService } from '@/smartrotom/starbank/starbank.service';
+import { StarbankModule } from '@/smartrotom/starbank/starbank.module';
 
 @Module({
-  imports: [DrizzleModule],
+  imports: [DrizzleModule, StarbankModule],
   controllers: [UsersController],
-  providers: [UsersService, SmartRotomUsersService, StarbankService],
+  providers: [UsersService, SmartRotomUsersService],
   exports: [UsersService],
 })
 export class UsersModule {}

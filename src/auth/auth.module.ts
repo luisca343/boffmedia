@@ -7,11 +7,13 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DrizzleModule } from '@/drizzle/drizzle.module';
 import { UsersService } from '@/boffmedia/users/users.service';
+import { StarbankModule } from '@/smartrotom/starbank/starbank.module';
 
 @Module({
   imports: [
     PassportModule,
     DrizzleModule,
+    StarbankModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your-secret-key',
       signOptions: { expiresIn: '1h' },
