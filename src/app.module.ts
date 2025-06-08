@@ -53,7 +53,7 @@ import { TgcpCardService } from './boffmedia/herramientas/ptcgp/card.service';
 import { TgcpUserCardService } from './boffmedia/herramientas/ptcgp/user-card.service';
 import { TgcpPackService } from './boffmedia/herramientas/ptcgp/pack.service';
 import { TgcpScraperService } from './boffmedia/herramientas/ptcgp/scraper.service';
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './api/auth/auth.module';
 import { ShowdownGateway } from './battlesimulator/showdown.gateway';
 import { PtcgpBattleService } from './boffmedia/herramientas/ptcgp/battle.service';
 import { DrizzleModule } from './drizzle/drizzle.module';

@@ -6,7 +6,7 @@ import { SmartRotomUsersService } from '@/smartrotom/users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
-import { JwtAuthGuard } from '@/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '@/api/auth/jwt-auth.guard';
 
 @ApiTags('users')
 @Controller('users')
