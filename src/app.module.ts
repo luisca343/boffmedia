@@ -74,9 +74,9 @@ import { EventsFacadeService } from '@api/smartrotom/events/events.facade.servic
 import { EventsModule } from '@api/smartrotom/events/events.module';
 import { UploadController } from './util/upload/upload.controller';
 import { UploadModule } from './util/upload/upload.module';
-import { MhwildsController } from './tools/mhwilds/mhwilds.controller';
-import { MhwildsModule } from './tools/mhwilds/mhwilds.module';
-import { MhwildsService } from './tools/mhwilds/mhwilds.service';
+import { MhwildsController } from './api/boffmedia/tools/mhwilds/mhwilds.controller';
+import { MhwildsModule } from './api/boffmedia/tools/mhwilds/mhwilds.module';
+import { MhwildsService } from './api/boffmedia/tools/mhwilds/mhwilds.service';
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/sprite-manifest.service';
