@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateInviteDto } from './dto/create-invite.dto';
 import { UpdateInviteDto } from './dto/update-invite.dto';
 import { RegisterDataDto } from './dto/register-data.dto';
-import { UsersService } from '../../boffmedia/users/users.service';
+import { UsersService } from '@api/boffmedia/users/users.service';
 import { shortToLongUUID } from '../../_utils/stringUtils';
 import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';

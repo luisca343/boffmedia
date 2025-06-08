@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpStatus, UseInterceptors } from '@nestjs/com
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
-import { CreateUserDto } from '@/boffmedia/users/dto/create-user.dto';
+import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 
 @ApiTags('auth')
 @Controller('auth')

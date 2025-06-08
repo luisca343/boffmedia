@@ -1,4 +1,4 @@
-import { UsersService } from '@/boffmedia/users/users.service';
+import { UsersService } from '@api/boffmedia/users/users.service';
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';

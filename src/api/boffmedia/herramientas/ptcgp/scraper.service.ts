@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { ConfigService } from '@/config.service';
+import { ConfigService } from '@api/config.service';
 import { Observable, Subject } from 'rxjs';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { tcgpBoosterPacks, tcgpCards, tcgpCardsPacks, tcgpExpansions } from '@/_db/schema/TCGP';

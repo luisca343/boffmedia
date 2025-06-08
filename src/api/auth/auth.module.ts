@@ -6,7 +6,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DrizzleModule } from '@/drizzle/drizzle.module';
-import { UsersService } from '@/boffmedia/users/users.service';
+import { UsersService } from '@api/boffmedia/users/users.service';
 import { StarbankModule } from '@/smartrotom/starbank/starbank.module';
 
 @Module({
