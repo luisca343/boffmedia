@@ -4,7 +4,8 @@ module.exports = {
     rootDir: './',
     modulePaths: ['<rootDir>'],
     moduleNameMapper: {
-      '^@/(.*)$': '<rootDir>/src/$1', // Update this line to map the '@' alias correctly
+      '^@/(.*)$': '<rootDir>/src/$1',
+      '^@api/(.*)$': '<rootDir>/src/api/$1',
     },
     modulePathIgnorePatterns: ['src/typings'],
     testPathIgnorePatterns: [

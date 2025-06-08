@@ -69,7 +69,7 @@ async function bootstrap() {
         sortedPaths[key] = document.paths[key];
   
         // Sort methods within each path
-        const methods = ['get', 'post', 'put', 'delete'];
+        const methods = ['get', 'post', 'put', 'delete', 'patch'];
         const sortedMethods = {};
         methods.forEach((method) => {
           if (sortedPaths[key][method]) {
