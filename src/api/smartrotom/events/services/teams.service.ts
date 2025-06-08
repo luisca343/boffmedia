@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { TeamsRepository } from '../repositories/teams.repository';
+import { TeamsRepository } from '../../../_repositories/teams.repository';
 import { ParticipantsService } from './participants.service';
 import { EventTeam, EventTeamMember } from '@/_db/schema/Events';
 import { CreateTeamDto } from '../dto/create-team.dto';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { GamesRepository } from '../repositories/games.repository';
+import { GamesRepository } from '../../../_repositories/games.repository';
 import { Game } from '@/_db/schema/Events';
 import { CreateGameDto } from '../dto/create-game.dto';
 

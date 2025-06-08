@@ -5,11 +5,11 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import all repositories
-import { EventsRepository } from './repositories/events.repository';
-import { GamesRepository } from './repositories/games.repository';
-import { AchievementsRepository } from './repositories/achievements.repository';
-import { ParticipantsRepository } from './repositories/participants.repository';
-import { TeamsRepository } from './repositories/teams.repository';
+import { EventsRepository } from '../../_repositories/events.repository';
+import { GamesRepository } from '../../_repositories/games.repository';
+import { AchievementsRepository } from '../../_repositories/achievements.repository';
+import { ParticipantsRepository } from '../../_repositories/participants.repository';
+import { TeamsRepository } from '../../_repositories/teams.repository';
 
 // Import all domain services
 import { EventsService } from './services/events.service';
