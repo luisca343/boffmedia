@@ -20,6 +20,7 @@
     "esModuleInterop": true,
     "allowJs": true,
     "paths": {
+      "@repositories/*": ["src/api/_repositories/*"],
       "@api/*": ["src/api/*"],
       "@/*": ["src/*"]
     },

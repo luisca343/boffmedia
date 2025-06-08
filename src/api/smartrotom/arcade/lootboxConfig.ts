@@ -30,7 +30,7 @@ interface LootBox {
   theme: string;
 }
 
-interface LootBoxConfig {
+export interface LootBoxConfig {
   boxes: LootBox[];
 }
 

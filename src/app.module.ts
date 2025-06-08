@@ -36,7 +36,6 @@ import { BattleModule } from './api/battlesimulator/battle/battle.module';
 import { SharexModule } from './util/sharex/sharex.module';
 import { ArcadeModule } from '@api/smartrotom/arcade/arcade.module';
 import { ArcadeController } from '@api/smartrotom/arcade/arcade.controller';
-import { ArcadeService } from '@api/smartrotom/arcade/arcade.service';
 import { PokemonService } from '@api/smartrotom/pokemon/pokemon.service';
 import { DiscordService } from './discord/_main/discord.service';
 import { DiscordModule } from './discord/_main/discord.module';
@@ -124,7 +123,7 @@ import { SpriteManifestService } from '@api/smartrotom/pokemon/sprite-manifest.s
     WingullModule,
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, ArcadeService, DiscordService, CommandsService, 
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
