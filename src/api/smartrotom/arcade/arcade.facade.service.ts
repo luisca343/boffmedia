@@ -8,7 +8,7 @@ import { StarbankService } from '../starbank/starbank.service';
 import { WingullService } from '../wingull/wingull.service';
 import { ArcadeStreak, ClaimRewardResponse } from '../_dto/arcade-streak.dto';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
-import { rarityRanges } from './lootboxConfig';
+import { rarityRanges } from './_config/lootboxConfig';
 import { DailyRewardsConfig, loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 
 @Injectable()
