@@ -33,7 +33,7 @@ export class ReplayService {
     team1: string;
     team2: string;
     replay: string;
-    winner: number;
+    winner: string;
     side1: string;
     side2: string;
   }): Promise<BattleReplay> {
@@ -64,7 +64,7 @@ export class ReplayService {
     team1: string;
     team2: string;
     replay: string;
-    winner: number;
+    winner: string;
     side1: string;
     side2: string;
   }>): Promise<BattleReplay> {

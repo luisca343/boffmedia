@@ -1,14 +1,40 @@
 import { Module } from '@nestjs/common';
-import { LigaController } from './liga.controller';
-import { LigaService } from './liga.service';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
+// Import repository
+import { LigaRepository } from '@repositories/smartrotom/liga.repository';
+
+// Import domain services
+import { ReplayService } from './services/replay.service';
+import { StatisticsService } from './services/statistics.service';
+import { TournamentService } from './services/tournament.service';
+
+// Import facade service
+import { LigaFacadeService } from './liga.facade.service';
+
+// Import controller
+import { LigaController } from './liga.controller';
+
 @Module({
-  imports: [ResponseModule, LoggerModule, DrizzleModule],
+  imports: [LoggerModule, ResponseModule, DrizzleModule],
   controllers: [LigaController],
-  providers: [LigaService],
+  providers: [
+    LigaRepository,
+    
+    ReplayService,
+    StatisticsService,
+    TournamentService,
+    
+    LigaFacadeService,
+  ],
+  exports: [
+    LigaFacadeService,
+    
+    ReplayService,
+    StatisticsService,
+    TournamentService,
+  ],
 })
 export class LigaModule {}

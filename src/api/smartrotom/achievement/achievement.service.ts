@@ -145,7 +145,7 @@ export class AchievementService {
         team1: JSON.stringify(battleAchievement.team1),
         team2: JSON.stringify(battleAchievement.team2),
         replay: battleAchievement.replay,
-        winner: battleAchievement.victoria ? 1 : 2,
+        winner: battleAchievement.victoria ? battleAchievement.name1 : battleAchievement.name2,
       } as SmartRotomReplay)
       .execute();
 

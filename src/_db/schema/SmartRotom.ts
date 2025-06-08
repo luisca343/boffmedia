@@ -64,8 +64,9 @@ export const smartRotomReplays = mysqlTable("rotom_replays", {
     team1: text("team1"),
     team2: text("team2"),
     replay: text("replay").notNull(),
-    winner: int("winner").default(0),
+    winner: varchar("winner", { length: 36 }),
     createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP()`),
+    updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP()`),
 });
 
 export type SmartRotomReplay = typeof smartRotomReplays.$inferSelect;
