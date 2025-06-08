@@ -3,7 +3,7 @@ import { DRIZZLE } from '@/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { asc, desc, eq, max, min } from 'drizzle-orm';
-import { SocketsGateway } from '../../sockets/sockets.gateway';
+import { SocketsGateway } from '../../../sockets/sockets.gateway';
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { ResultSetHeader } from 'mysql2';
 

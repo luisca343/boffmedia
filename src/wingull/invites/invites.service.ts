@@ -4,7 +4,7 @@ import { UpdateInviteDto } from './dto/update-invite.dto';
 import { RegisterDataDto } from './dto/register-data.dto';
 import { UsersService } from '@api/boffmedia/users/users.service';
 import { shortToLongUUID } from '../../_utils/stringUtils';
-import { SmartRotomUsersService } from '../../smartrotom/users/users.service';
+import { SmartRotomUsersService } from '@api/smartrotom/users/users.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';

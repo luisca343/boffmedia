@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MySQL2Service } from './_utils/MySQL2Service';
-import { PokemonService } from './smartrotom/pokemon/pokemon.service';
+import { PokemonService } from '@api/smartrotom/pokemon/pokemon.service';
 import { LoggingUtil } from './_utils/LoggingUtils';
 
 import { google, sheets_v4 } from 'googleapis';

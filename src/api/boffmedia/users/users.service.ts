@@ -8,7 +8,7 @@ import { eq, or } from 'drizzle-orm';
 import { BoffMediaUser, boffMediaRoles, boffMediaUserRoles, boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
-import { StarbankService } from '@/smartrotom/starbank/starbank.service';
+import { StarbankService } from '@api/smartrotom/starbank/starbank.service';
 
 type FullUser = {
   boff_name: string,

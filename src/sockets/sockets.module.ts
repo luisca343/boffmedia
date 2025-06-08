@@ -1,6 +1,6 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { SocketsGateway } from './sockets.gateway';
-import { ChatappModule } from '../smartrotom/chatapp/chatapp.module';
+import { ChatappModule } from '@api/smartrotom/chatapp/chatapp.module';
 
 @Module({
   providers: [SocketsGateway],

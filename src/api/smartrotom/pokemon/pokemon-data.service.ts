@@ -42,8 +42,8 @@ export class PokemonDataService extends BaseDataService {
 
   async loadPokemonData() {
     const startingTime = Date.now();
-    const defaultDir = path.join(__dirname, '../../../public/smartrotom/packs/default_datapack/data/pixelmon/species');
-    const publicDir = path.join(__dirname, '../../../public/smartrotom/packs/datapack/data/pixelmon/species');
+    const defaultDir = path.join(__dirname, '../../../../public/smartrotom/packs/default_datapack/data/pixelmon/species');
+    const publicDir = path.join(__dirname, '../../../../public/smartrotom/packs/datapack/data/pixelmon/species');
 
     try {
       const publicFiles = await fsPromises.readdir(publicDir);

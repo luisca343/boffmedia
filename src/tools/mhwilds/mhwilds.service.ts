@@ -1,4 +1,4 @@
-import { BaseDataService } from '@/smartrotom/pokemon/base-data.service';
+import { BaseDataService } from '@api/smartrotom/pokemon/base-data.service';
 import { Injectable, Logger } from '@nestjs/common';
 import * as path from 'path';
 import * as fs from 'fs/promises';

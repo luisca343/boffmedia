@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DrizzleModule } from '@/drizzle/drizzle.module';
 import { UsersService } from '@api/boffmedia/users/users.service';
-import { StarbankModule } from '@/smartrotom/starbank/starbank.module';
+import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 
 @Module({
   imports: [

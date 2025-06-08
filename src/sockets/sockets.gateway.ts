@@ -8,7 +8,7 @@ import {
     type OnGatewayConnection,
   } from "@nestjs/websockets"
   import type { Server, Socket } from "socket.io"
-  import { ChatappService } from "../smartrotom/chatapp/chatapp.service"
+  import { ChatappService } from "@api/smartrotom/chatapp/chatapp.service"
   import { Inject, forwardRef } from "@nestjs/common"
   
   @WebSocketGateway(34304, {
