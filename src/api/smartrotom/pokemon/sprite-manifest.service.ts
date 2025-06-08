@@ -85,7 +85,7 @@ async generateManifest(): Promise<void> {
     }
     
     // Check if the Pokemon has a 'base' form
-    let hasBaseForm = pokemon.forms.some(form => form && form.name === 'base');
+    let hasBaseForm = pokemon.forms.some(form => form && form.name === 'base' || form.name === '');
     let firstFormName = '';
     
     // Process all forms
