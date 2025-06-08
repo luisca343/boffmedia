@@ -8,8 +8,8 @@ import {
     type OnGatewayConnection,
   } from "@nestjs/websockets"
   import type { Server, Socket } from "socket.io"
-  import { ChatappService } from "@api/smartrotom/chatapp/chatapp.service"
   import { Inject, forwardRef } from "@nestjs/common"
+import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.service";
   
   @WebSocketGateway(34304, {
     cors: {
@@ -22,8 +22,8 @@ import {
     users: Map<string, { uuid: string; socketId: string }> = new Map();
   
     constructor(
-      @Inject(forwardRef(() => ChatappService))
-      private chatAppService: ChatappService
+      @Inject(forwardRef(() => ChatappFacadeService))
+      private chatAppService: ChatappFacadeService
     ) {}
   
     handleConnection(client: Socket) {

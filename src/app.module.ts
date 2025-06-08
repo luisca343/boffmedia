@@ -24,7 +24,6 @@ import { NetfluisModule } from '@api/smartrotom/netfluis/netfluis.module';
 import { MinecraftMiddleware } from './minecraft.middleware';
 import { DocumentsModule } from '@api/smartrotom/documents/documents.module';
 import { ChatappController } from '@api/smartrotom/chatapp/chatapp.controller';
-import { ChatappService } from '@api/smartrotom/chatapp/chatapp.service';
 import { ChatappModule } from '@api/smartrotom/chatapp/chatapp.module';
 import { SocketsModule } from './api/_utils/sockets/sockets.module';
 import { MisionesModule } from '@api/smartrotom/misiones/misiones.module';
@@ -123,7 +122,7 @@ import { SpriteManifestService } from '@api/smartrotom/pokemon/sprite-manifest.s
     WingullModule,
   ],
   controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, ChatappService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
