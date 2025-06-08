@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, isNull } from 'drizzle-orm';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { 
   boffMediaEvents, 
   boffMediaGames, 

@@ -1,7 +1,7 @@
 import { BadRequestException, ConflictException, Inject, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { eq, or } from 'drizzle-orm';

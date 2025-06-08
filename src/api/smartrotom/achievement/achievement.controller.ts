@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger"
 import { UuidDto } from "../_dto/smartrotom-request-dto"
 import { BattleAchievementDto } from "../_dto/battle-achievement-dto"
 import { AchievementService } from "./achievement.service"
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor'
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor'
 
 @ApiTags("smartrotom/achievements")
 @Controller("/smartrotom/achievements")

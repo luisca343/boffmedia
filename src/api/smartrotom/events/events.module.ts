@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { EventsController } from './events.controller';
-import { ResponseModule } from '@/response/response.module';
-import { LoggerModule } from '@/logger/logger.module';
-import { DrizzleModule } from '@/drizzle/drizzle.module';
+import { ResponseModule } from '@api/_utils/response/response.module';
+import { LoggerModule } from '@api/_utils/logger/logger.module';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import all repositories
 import { EventsRepository } from './repositories/events.repository';

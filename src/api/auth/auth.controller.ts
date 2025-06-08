@@ -1,7 +1,7 @@
 import { Controller, Post, Body, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 
 @ApiTags('auth')

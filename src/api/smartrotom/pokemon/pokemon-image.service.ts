@@ -5,7 +5,7 @@ import { PokemonDataService } from './pokemon-data.service';
 
 import { and, eq } from 'drizzle-orm';
 import { pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 
 @Injectable()

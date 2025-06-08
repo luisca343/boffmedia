@@ -6,7 +6,7 @@ import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money-dto';
 import { CreateShopTransactionDto } from './dto/create-shop-transaction-dto';
 import { CreateTransferDto } from './dto/create-transfer-dto';
 import { TransferFromMainDto } from './dto/transfer-from-main-dto';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/starbank')
 @Controller('smartrotom/starbank')

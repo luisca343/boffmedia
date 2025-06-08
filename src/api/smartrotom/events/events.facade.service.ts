@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
 import { EventsService } from './services/events.service';
 import { GamesService } from './services/games.service';

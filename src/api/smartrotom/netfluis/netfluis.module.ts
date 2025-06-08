@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { NetfluisController } from './netfluis.controller';
 import { NetfluisService } from './netfluis.service';
-import { DrizzleModule } from '@/drizzle/drizzle.module';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 @Module({
   controllers: [NetfluisController],

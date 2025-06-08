@@ -4,7 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WingullService } from '../wingull/wingull.service';
 import { PokemonShowdownService } from './pokemon-showdown.service';
 import { SpriteManifestService } from './sprite-manifest.service';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/pokemon')
 @Controller('smartrotom/pokemon')

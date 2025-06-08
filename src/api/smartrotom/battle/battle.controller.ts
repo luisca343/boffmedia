@@ -1,7 +1,7 @@
 import { Controller, Get, Param, HttpStatus, UseInterceptors } from "@nestjs/common"
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger"
 import { BattleService } from "./battle.service";
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags("smartrotom/battle")
 @Controller("smartrotom/battle")

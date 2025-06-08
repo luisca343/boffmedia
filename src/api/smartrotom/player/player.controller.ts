@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpStatus, UseInterceptors } from "@nestjs/com
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger"
 import { UuidDto } from "../_dto/smartrotom-request-dto"
 import { WingullService } from "../wingull/wingull.service"
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor'
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor'
 
 @ApiTags("smartrotom/player")
 @Controller("smartrotom/player")

@@ -18,7 +18,7 @@ import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { JoinEventDto } from './dto/join-event.dto';
 import { UpdateProgressDto, JoinTeamDto } from './events.facade.service';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('boffmedia/events')
 @Controller('boffmedia/events')

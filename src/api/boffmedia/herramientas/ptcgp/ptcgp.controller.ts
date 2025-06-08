@@ -9,7 +9,7 @@ import { TgcpScraperService } from './scraper.service';
 import { PtcgpBattleService } from './battle.service';
 import { promises as fsPromises } from 'fs';
 import path from 'path';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('/herramientas/ptcgp')
 @Controller('/herramientas/ptcgp')

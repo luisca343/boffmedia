@@ -1,7 +1,7 @@
 import { Controller, Get, Param, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { LigaService } from './liga.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/liga')
 @Controller('/smartrotom/liga')

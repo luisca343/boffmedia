@@ -5,7 +5,7 @@ import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { DrizzleModule } from '@/drizzle/drizzle.module';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { UsersService } from '@api/boffmedia/users/users.service';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 

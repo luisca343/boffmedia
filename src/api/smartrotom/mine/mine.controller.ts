@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { MinaService } from './mine.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/mine')
 @Controller('smartrotom/mine')

@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse} from '@nestjs/swagger';
 import { Body, Controller, Get, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { WingullService } from '../wingull/wingull.service';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 export class ParticipanteCarreraDto {
   uuid: string;

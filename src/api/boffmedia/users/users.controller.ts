@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { SmartRotomUsersService } from '@api/smartrotom/users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@/api/auth/jwt-auth.guard';
 
 @ApiTags('users')

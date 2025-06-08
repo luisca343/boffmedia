@@ -4,7 +4,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { CreateChatDto } from './dto/create-chat-dto';
 import { CreateChatMessageDto } from './dto/create-chat-message-dto';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/chatapp')
 @Controller('smartrotom/chatapp')

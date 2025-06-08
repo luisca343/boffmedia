@@ -2,7 +2,7 @@ import { Controller, Get, HttpStatus, Param, Post, Body, Query, UseInterceptors 
 import { ArcadeService, ClaimItemsWithTypesRequest } from './arcade.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/arcade')
 @Controller('smartrotom/arcade')

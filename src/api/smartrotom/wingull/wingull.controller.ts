@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { WingullService } from './wingull.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/wingull')
 @Controller('smartrotom/wingull')

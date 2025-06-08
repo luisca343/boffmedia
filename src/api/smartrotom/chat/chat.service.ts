@@ -3,7 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import OpenAI from 'openai';
 import { PokemonService } from '../pokemon/pokemon.service';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';

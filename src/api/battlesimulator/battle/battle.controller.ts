@@ -7,7 +7,7 @@ import { Battle, Pokemon } from '@pkmn/client';
 import { LogFormatter } from '@pkmn/view';
 import { Sprites } from '@pkmn/img';
 import { Protocol } from '@pkmn/protocol';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 function getPokemonTeam(team: Pokemon[]) {
   const pokemonTeam = [] as any[]

@@ -3,7 +3,7 @@ import { Body, Controller, Get, Post, Query, HttpStatus, Param, HttpException, U
 import { MisionesService } from './misiones.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { NpcImageDto } from '../_dto/npc-image-dto';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/misiones')
 @Controller('/smartrotom/misiones')

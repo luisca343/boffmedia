@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common"
-import { DRIZZLE } from "@/drizzle/drizzle.module"
+import { DRIZZLE } from "@api/_utils/drizzle/drizzle.module"
 import type { MySql2Database } from "drizzle-orm/mysql2"
 import axios from "axios";
 

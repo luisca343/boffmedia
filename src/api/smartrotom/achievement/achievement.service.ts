@@ -2,7 +2,7 @@ import { SmartRotomReplay, SmartRotomUserAchievement, SmartRotomUserReplay, smar
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, asc, sql, desc } from 'drizzle-orm';
 import { BattleAchievementDto } from '../_dto/battle-achievement-dto';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 
 @Injectable()

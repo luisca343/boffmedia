@@ -1,5 +1,5 @@
 import { RotomDocument, RotomNews, rotomDocuments, rotomDocumentsUsers, rotomNews } from '@/_db/schema/SmartRotomDocuments';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, inArray } from 'drizzle-orm';

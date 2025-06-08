@@ -6,7 +6,7 @@ import { Pokemon, SpawnInfo } from './interfaces/pokemon.interface';
 import Fuse, { FuseResult, IFuseOptions } from 'fuse.js';
 import { and, desc, eq } from 'drizzle-orm';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
-import { DRIZZLE } from '@/drizzle/drizzle.module';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { PokemonImageService } from './pokemon-image.service';
 import { SpriteManifestService } from './sprite-manifest.service';

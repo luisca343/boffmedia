@@ -4,7 +4,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CreateNewsDto } from './dto/create-news-dto';
 import { NewsStatusDto } from './dto/news-status-dto';
 import { CreateDocumentDto, CreateDocumentDtoWithUuid } from './dto/create-document.dto';
-import { ResponseInterceptor } from '@/common/interceptors/response.interceptor';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 @ApiTags('smartrotom/documents')
 @Controller('smartrotom/documents')
