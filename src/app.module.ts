@@ -14,7 +14,6 @@ import { PokemonController } from '@api/smartrotom/pokemon/pokemon.controller';
 import { PokemonModule } from '@api/smartrotom/pokemon/pokemon.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { MinaService } from '@api/smartrotom/mine/mine.service';
 import { MinaController } from '@api/smartrotom/mine/mine.controller';
 import { StarbankController } from '@api/smartrotom/starbank/starbank.controller';
 import { StarbankService } from '@api/smartrotom/starbank/starbank.service';
@@ -78,6 +77,7 @@ import { MhwildsService } from './api/boffmedia/tools/mhwilds/mhwilds.service';
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/sprite-manifest.service';
+import { MineModule } from '@api/smartrotom/mine/mine.module';
 
 @Module({
   imports: [
@@ -120,9 +120,10 @@ import { SpriteManifestService } from '@api/smartrotom/pokemon/sprite-manifest.s
     UploadModule,
     MhwildsModule,
     WingullModule,
+    MineModule,
   ],
-  controllers: [AppController, ChatController, PokemonController, MinaController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, MinaService, StarbankService, NetfluisService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
+  controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, StarbankService, NetfluisService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
