@@ -9,53 +9,115 @@ import {
   boffMediaParticipantProgress
 } from '@/_db/schema/Events';
 
+export interface AchievementWithEventName extends Achievement {
+  eventName?: string;
+}
+
+export interface ParticipantProgressWithAchievement {
+  participantId: number;
+  achievementId: number;
+  currentProgress: number;
+  isCompleted: number;
+  completedAt: Date | null;
+  lastUpdated: Date;
+  achievement: {
+    id: number;
+    name: string;
+    description: string | null;
+    icon: string;
+    maxProgress: number;
+    points: number;
+    category: string;
+    rarity: string | null;
+    itemType: string;
+    eventId?: number;
+  };
+}
+
 @Injectable()
 export class AchievementsRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  async findAll(): Promise<Achievement[]> {
-    return this.db.select({
-      id: boffMediaAchievements.id,
-      description: boffMediaAchievements.description,
-      name: boffMediaAchievements.name,
-      icon: boffMediaAchievements.icon,
-      createdAt: boffMediaAchievements.createdAt,
-      updatedAt: boffMediaAchievements.updatedAt,
-      itemType: boffMediaAchievements.itemType,
-      maxProgress: boffMediaAchievements.maxProgress,
-      points: boffMediaAchievements.points,
-      eventId: boffMediaAchievements.eventId,
-      eventName: boffMediaEvents.title,
-      category: boffMediaAchievements.category,
-      rarity: boffMediaAchievements.rarity,
-      hidden: boffMediaAchievements.hidden,
-      order: boffMediaAchievements.order,
-      deletedAt: boffMediaAchievements.deletedAt
-    })
-    .from(boffMediaAchievements)
-    .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
-    .where(isNull(boffMediaEvents.deletedAt));
+    private readonly achievementSelect = {
+    id: boffMediaAchievements.id,
+    description: boffMediaAchievements.description,
+    name: boffMediaAchievements.name,
+    icon: boffMediaAchievements.icon,
+    createdAt: boffMediaAchievements.createdAt,
+    updatedAt: boffMediaAchievements.updatedAt,
+    itemType: boffMediaAchievements.itemType,
+    maxProgress: boffMediaAchievements.maxProgress,
+    points: boffMediaAchievements.points,
+    eventId: boffMediaAchievements.eventId,
+    category: boffMediaAchievements.category,
+    rarity: boffMediaAchievements.rarity,
+    hidden: boffMediaAchievements.hidden,
+    order: boffMediaAchievements.order,
+    deletedAt: boffMediaAchievements.deletedAt
+  };
+
+  private readonly achievementWithEventSelect = {
+    ...this.achievementSelect,
+    eventName: boffMediaEvents.title
+  };
+
+  private readonly achievementProgressSelect = {
+    participantId: boffMediaParticipantProgress.participantId,
+    achievementId: boffMediaParticipantProgress.achievementId,
+    currentProgress: boffMediaParticipantProgress.currentProgress,
+    isCompleted: boffMediaParticipantProgress.isCompleted,
+    completedAt: boffMediaParticipantProgress.completedAt,
+    lastUpdated: boffMediaParticipantProgress.lastUpdated
+  };
+
+  private readonly nestedAchievementSelect = {
+    id: boffMediaAchievements.id,
+    name: boffMediaAchievements.name,
+    description: boffMediaAchievements.description,
+    icon: boffMediaAchievements.icon,
+    maxProgress: boffMediaAchievements.maxProgress,
+    points: boffMediaAchievements.points,
+    category: boffMediaAchievements.category,
+    rarity: boffMediaAchievements.rarity,
+    itemType: boffMediaAchievements.itemType
+  };
+
+  private readonly nestedAchievementWithEventSelect = {
+    ...this.nestedAchievementSelect,
+    eventId: boffMediaAchievements.eventId
+  };
+
+  async findAll(): Promise<AchievementWithEventName[]> {
+    return this.db.select(this.achievementWithEventSelect)
+      .from(boffMediaAchievements)
+      .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
+      .where(isNull(boffMediaEvents.deletedAt));
   }
 
-  async findById(id: number): Promise<Achievement> {
-    const result = await this.db.select()
+
+  async findById(id: number): Promise<Achievement | null> {
+    const result = await this.db.select(this.achievementSelect)
       .from(boffMediaAchievements)
       .leftJoin(boffMediaEvents, eq(boffMediaEvents.id, boffMediaAchievements.eventId))
       .where(and(
         eq(boffMediaAchievements.id, id),
+        isNull(boffMediaAchievements.deletedAt),
         isNull(boffMediaEvents.deletedAt)
       ));
     
     if (!result.length) return null;
-    return result[0].boffmedia_achievements as Achievement;
+    return result[0];
   }
 
   async findByEventId(eventId: number): Promise<Achievement[]> {
-    return this.db.select()
+    return this.db.select(this.achievementSelect)
       .from(boffMediaAchievements)
-      .where(eq(boffMediaAchievements.eventId, eventId));
+    .where(and(
+      eq(boffMediaAchievements.eventId, eventId),
+      isNull(boffMediaAchievements.deletedAt)
+    ));
   }
 
   async create(achievementData: Partial<Achievement>): Promise<{ insertId: number }> {
@@ -86,51 +148,20 @@ export class AchievementsRepository {
     return eventCheck.length > 0;
   }
 
-  async getParticipantProgress(participantId: number): Promise<any[]> {
+  async getParticipantProgress(participantId: number): Promise<ParticipantProgressWithAchievement[]> {
     return this.db.select({
-      participantId: boffMediaParticipantProgress.participantId,
-      achievementId: boffMediaParticipantProgress.achievementId,
-      currentProgress: boffMediaParticipantProgress.currentProgress,
-      isCompleted: boffMediaParticipantProgress.isCompleted,
-      completedAt: boffMediaParticipantProgress.completedAt,
-      lastUpdated: boffMediaParticipantProgress.lastUpdated,
-      achievement: {
-        id: boffMediaAchievements.id,
-        name: boffMediaAchievements.name,
-        description: boffMediaAchievements.description,
-        icon: boffMediaAchievements.icon,
-        maxProgress: boffMediaAchievements.maxProgress,
-        points: boffMediaAchievements.points,
-        category: boffMediaAchievements.category,
-        rarity: boffMediaAchievements.rarity,
-        itemType: boffMediaAchievements.itemType
-      }
+      ...this.achievementProgressSelect,
+      achievement: this.nestedAchievementSelect
     })
     .from(boffMediaParticipantProgress)
     .innerJoin(boffMediaAchievements, eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId))
     .where(eq(boffMediaParticipantProgress.participantId, participantId));
   }
 
-  async getParticipantProgressByEvent(participantId: number, eventId: number): Promise<any[]> {
+  async getParticipantProgressByEvent(participantId: number, eventId: number): Promise<ParticipantProgressWithAchievement[]> {
     return this.db.select({
-      participantId: boffMediaParticipantProgress.participantId,
-      achievementId: boffMediaParticipantProgress.achievementId,
-      currentProgress: boffMediaParticipantProgress.currentProgress,
-      isCompleted: boffMediaParticipantProgress.isCompleted,
-      completedAt: boffMediaParticipantProgress.completedAt,
-      lastUpdated: boffMediaParticipantProgress.lastUpdated,
-      achievement: {
-        id: boffMediaAchievements.id,
-        name: boffMediaAchievements.name,
-        description: boffMediaAchievements.description,
-        icon: boffMediaAchievements.icon,
-        maxProgress: boffMediaAchievements.maxProgress,
-        points: boffMediaAchievements.points,
-        category: boffMediaAchievements.category,
-        rarity: boffMediaAchievements.rarity,
-        itemType: boffMediaAchievements.itemType,
-        eventId: boffMediaAchievements.eventId
-      }
+      ...this.achievementProgressSelect,
+      achievement: this.nestedAchievementWithEventSelect
     })
     .from(boffMediaParticipantProgress)
     .innerJoin(boffMediaAchievements, eq(boffMediaAchievements.id, boffMediaParticipantProgress.achievementId))
