@@ -6,7 +6,7 @@ import { MhwildsDataService } from './services/mhwilds-data.service';
 import { MhwildsCacheService } from './services/mhwilds-cache.service';
 import { MhwildsFacadeService } from './mhwilds.facade.service';
 import { MhwildsController } from './mhwilds.controller';
-import { MhwildsRepository } from '@repositories/mhwilds.repository';
+import { MhwildsRepository } from '@repositories/boffmedia/mhwilds.repository';
 
 @Module({
   imports: [

@@ -6,7 +6,7 @@ import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 
 // Repository
-import { BoffMediaUsersRepository } from '@repositories/users.repository';
+import { BoffMediaUsersRepository } from '@repositories/boffmedia/users.repository';
 
 // Services
 import { BoffMediaUsersManagementService } from './services/users-management.service';

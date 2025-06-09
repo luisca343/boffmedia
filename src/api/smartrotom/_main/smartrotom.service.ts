@@ -9,7 +9,7 @@ import axios from 'axios';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 
 @Injectable()
-export class SmartrotomService implements OnModuleInit {
+export class SmartrotomService {
   private rewardsConfig: DailyRewardsConfig;
 
   constructor(
@@ -17,10 +17,6 @@ export class SmartrotomService implements OnModuleInit {
     private starbankService: StarbankFacadeService
   ) {}
 
-  onModuleInit() {
-    this.rewardsConfig = loadRewardsConfig();
-    console.log(`Loaded daily rewards configuration: ${this.rewardsConfig.totalDays} total days`);
-  }
 
   async processRaceResult(result: any) {
     console.log(result);

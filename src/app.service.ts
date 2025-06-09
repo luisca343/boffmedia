@@ -25,7 +25,7 @@ export class AppService {
     private pokemonService: PokemonDataManagementService,
   ) {
     db.migrar();
-    pokemonService.initializeData();
+    //pokemonService.initializeData();
     this.loadCache();
   }
 

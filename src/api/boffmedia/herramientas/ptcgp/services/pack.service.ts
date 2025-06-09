@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PtcgpRepository } from '@api/_repositories/ptcgp.repository';
+import { PtcgpRepository } from '@repositories/boffmedia/ptcgp.repository';
 import { TcgpBoosterPack } from '@/_db/schema/TCGP';
 
 export interface RarityProbabilities {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InviteManagementService, InviteCreationResult, InviteStatistics } from './services/invite-management.service';
 import { RegistrationService, RegistrationData, RegistrationResult } from './services/registration.service';
-import { CreateInviteData, InviteResult } from '@repositories/invites.repository';
+import { CreateInviteData, InviteResult } from '@repositories/boffmedia/invites.repository';
 
 @Injectable()
 export class InvitesFacadeService {

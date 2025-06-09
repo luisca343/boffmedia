@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BoffMediaUsersManagementService, UserCreationResult, SessionUser, GoogleUserData, MinecraftRegistrationData, MinecraftLinkData } from './services/users-management.service';
 import { UsersFacadeService as SmartRotomUsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { StarbankFacadeService } from '@api/smartrotom/starbank/starbank.facade.service';
-import { CreateUserData, UpdateUserData, FullUserData } from '@repositories/users.repository';
+import { CreateUserData, UpdateUserData, FullUserData } from '@repositories/boffmedia/users.repository';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 

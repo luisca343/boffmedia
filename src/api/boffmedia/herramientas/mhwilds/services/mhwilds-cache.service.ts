@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MhwildsRepository } from '@repositories/mhwilds.repository';
+import { MhwildsRepository } from '@repositories/boffmedia/mhwilds.repository';
 
 export interface CacheOperationResult {
   success: boolean;

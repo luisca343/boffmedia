@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PtcgpController } from './ptcgp.controller';
 import { ConfigService } from '@api/config.service';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
-import { PtcgpRepository } from '@api/_repositories/ptcgp.repository';
+import { PtcgpRepository } from '@repositories/boffmedia/ptcgp.repository';
 import { CardService } from './services/card.service';
 import { PackService } from './services/pack.service';
 import { UserCardService } from './services/user-card.service';

@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { BoffMediaUsersRepository, CreateUserData, UpdateUserData, FullUserData } from '@repositories/users.repository';
+import { BoffMediaUsersRepository, CreateUserData, UpdateUserData, FullUserData } from '@repositories/boffmedia/users.repository';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 
 export interface UserCreationResult {

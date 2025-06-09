@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AchievementsRepository } from '../../../_repositories/achievements.repository';
+import { AchievementsRepository } from '../../../_repositories/boffmedia/achievements.repository';
 import { Achievement } from '@/_db/schema/Events';
 import { CreateAchievementDto } from '../dto/create-achievement.dto';
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MhwildsRepository, ResourceFetchResult, WeaponTreeNode } from '@repositories/mhwilds.repository';
+import { MhwildsRepository, ResourceFetchResult, WeaponTreeNode } from '@repositories/boffmedia/mhwilds.repository';
 
 export interface WeaponTreeResult {
   tree: WeaponTreeNode[];

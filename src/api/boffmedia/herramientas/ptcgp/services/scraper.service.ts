@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Subject, Observable } from 'rxjs';
-import { PtcgpRepository } from '@api/_repositories/ptcgp.repository';
+import { PtcgpRepository } from '@repositories/boffmedia/ptcgp.repository';
 import { ConfigService } from '@api/config.service';
 import * as cheerio from 'cheerio';
 import axios from 'axios';

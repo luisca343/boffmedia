@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { InvitesRepository, CreateInviteData, InviteResult } from '@repositories/invites.repository';
+import { InvitesRepository, CreateInviteData, InviteResult } from '@repositories/boffmedia/invites.repository';
 
 export interface InviteCreationResult {
   success: boolean;

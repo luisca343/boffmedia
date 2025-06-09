@@ -5,7 +5,7 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 
 // Import repository
-import { InvitesRepository } from '@repositories/invites.repository';
+import { InvitesRepository } from '@repositories/boffmedia/invites.repository';
 
 // Import domain services
 import { InviteManagementService } from './services/invite-management.service';
