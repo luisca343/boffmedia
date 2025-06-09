@@ -4,12 +4,12 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { StreakService } from './services/streak.service';
 import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
-import { StarbankService } from '../starbank/starbank.service';
 import { ArcadeStreak, ClaimRewardResponse } from '../_dto/arcade-streak.dto';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
 import { rarityRanges } from './_config/lootboxConfig';
 import { DailyRewardsConfig, loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
+import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
@@ -20,7 +20,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     private readonly streakService: StreakService,
     private readonly inventoryService: InventoryService,
     private readonly lootboxService: LootboxService,
-    private readonly starbankService: StarbankService,
+    private readonly starbankService: StarbankFacadeService,
     private readonly wingullService: WingullFacadeService,
   ) {}
   
@@ -260,12 +260,11 @@ export class ArcadeFacadeService implements OnModuleInit {
       throw new Error("No account found for user");
     }
     
-    await this.starbankService.transaction(
+    await this.starbankService.transfer(
       0,
       account.id,
       amount,
       "Daily bonus reward",
-      "BONUS" 
     );
   }
 

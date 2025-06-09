@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { UsersManagementService, UserCreationResult } from './services/users-management.service';
-import { StarbankService } from '../starbank/starbank.service';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { CreateUserData, UpdateUserData } from '@repositories/smartrotom/users.repository';
+import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 
 export interface UserInitializationData {
   uuid: string;
@@ -26,7 +26,7 @@ export interface UserWithAccounts {
 export class UsersFacadeService {
   constructor(
     private readonly usersManagementService: UsersManagementService,
-    private readonly starbankService: StarbankService,
+    private readonly starbankService: StarbankFacadeService,
   ) {}
 
   // ==================== USER OPERATIONS ====================

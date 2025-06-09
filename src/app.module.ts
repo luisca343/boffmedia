@@ -16,7 +16,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MinaController } from '@api/smartrotom/mine/mine.controller';
 import { StarbankController } from '@api/smartrotom/starbank/starbank.controller';
-import { StarbankService } from '@api/smartrotom/starbank/starbank.service';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { NetfluisService } from '@api/smartrotom/netfluis/netfluis.service';
 import { NetfluisModule } from '@api/smartrotom/netfluis/netfluis.module';
@@ -121,7 +120,7 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
     MineModule,
   ],
   controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, MySQL2Service, ResponseService, ChatService, StarbankService, NetfluisService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
+  providers: [AppService, MySQL2Service, ResponseService, ChatService, NetfluisService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
      TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,

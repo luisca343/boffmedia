@@ -8,7 +8,7 @@ import { eq, or } from 'drizzle-orm';
 import { BoffMediaUser, boffMediaRoles, boffMediaUserRoles, boffMediaUsers } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
-import { StarbankService } from '@api/smartrotom/starbank/starbank.service';
+import { StarbankFacadeService } from '@api/smartrotom/starbank/starbank.facade.service';
 
 type FullUser = {
   boff_name: string,
@@ -22,7 +22,7 @@ type FullUser = {
 export class UsersService {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-    private readonly starbankService: StarbankService
+    private readonly starbankService: StarbankFacadeService
   ) {}
 
   async createFromBoffMedia(boffMediaUser: Partial<BoffMediaUser>) {
