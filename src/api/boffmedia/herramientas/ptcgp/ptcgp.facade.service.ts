@@ -313,12 +313,7 @@ export class PtcgpFacadeService {
 
   async getBattleData(battleUrl: string) {
     try {
-      // This would use the existing battle service logic
-      // For now, return a placeholder
-      return {
-        commonRewards: [],
-        quests: []
-      };
+      return await this.scraperService.getBattleData(battleUrl);
     } catch (error) {
       this.logger.error('Error getting battle data:', error);
       throw new Error(`Failed to get battle data: ${error.message}`);
