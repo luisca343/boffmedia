@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PokemonDataService } from './pokemon-data.service';
-import { ShowdownPokemon, ShowdownPokemonData } from './interfaces/showdown.interface';
+import { PokemonDataService } from './data/pokemon-data.service';
+import { ShowdownPokemon, ShowdownPokemonData } from '../interfaces/showdown.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-import { standardizeFormDisplayName, standardizeFormIdSegment } from './utils/ShowdownHelper';
+import { standardizeFormDisplayName, standardizeFormIdSegment } from '../utils/ShowdownHelper';
 
 @Injectable()
 export class PokemonShowdownService {

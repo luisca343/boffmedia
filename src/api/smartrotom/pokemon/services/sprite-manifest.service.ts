@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { SpriteLocation, SpriteManifest } from './interfaces/sprite-manifest.interface';
-import { PokemonDataService } from './pokemon-data.service';
+import { SpriteLocation, SpriteManifest } from '../interfaces/sprite-manifest.interface';
+import { PokemonDataService } from './data/pokemon-data.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-import { BaseDataService } from './base-data.service';
+import { BaseDataService } from './data/base-data.service';
 
 @Injectable()
 export class SpriteManifestService extends BaseDataService {
@@ -12,11 +12,10 @@ export class SpriteManifestService extends BaseDataService {
   private manifest: SpriteManifest;
   
   // Base paths for resourcepacks
-  private readonly DEFAULT_RESOURCEPACK_PATH = path.join(__dirname, '../../../public/smartrotom/packs/default_resourcepack');
-  private readonly CUSTOM_RESOURCEPACK_PATH = path.join(__dirname, '../../../public/smartrotom/packs/resourcepack');
-  
-  // Path to store the manifest
-  private readonly MANIFEST_PATH = path.join(__dirname, '../../../public/smartrotom/packs/sprite-manifest.json');
+  private readonly DEFAULT_RESOURCEPACK_PATH = path.join(process.cwd(), 'public/smartrotom/packs/default_resourcepack');
+  private readonly CUSTOM_RESOURCEPACK_PATH = path.join(process.cwd(), 'public/smartrotom/packs/resourcepack');
+  private readonly MANIFEST_PATH = path.join(process.cwd(), 'public/smartrotom/packs/sprite-manifest.json');
+
 
   constructor(private readonly pokemonDataService: PokemonDataService) {
     super();

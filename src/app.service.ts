@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MySQL2Service } from './_utils/MySQL2Service';
-import { PokemonService } from '@api/smartrotom/pokemon/pokemon.service';
 import { LoggingUtil } from './_utils/LoggingUtils';
 
 import { google, sheets_v4 } from 'googleapis';
@@ -9,6 +8,7 @@ import { google, sheets_v4 } from 'googleapis';
 import fs from 'fs/promises';
 import path from 'path';
 import axios from 'axios';
+import { PokemonDataManagementService } from '@api/smartrotom/pokemon/services/pokemon-data-management.service';
 
 @Injectable()
 export class AppService {
@@ -22,10 +22,10 @@ export class AppService {
   constructor(
     private configService: ConfigService,
     private db: MySQL2Service,
-    private pokemonService: PokemonService,
+    private pokemonService: PokemonDataManagementService,
   ) {
     db.migrar();
-    pokemonService.loadData();
+    pokemonService.initializeData();
     this.loadCache();
   }
 

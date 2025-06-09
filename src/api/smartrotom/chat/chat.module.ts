@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PokemonService } from '../pokemon/pokemon.service';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { PokemonFacadeService } from '../pokemon/pokemon.facade.service';
 
 @Module({})
 export class ChatModule {
-    imports: [PokemonService, DrizzleModule]
+    imports: [PokemonFacadeService, DrizzleModule]
 }

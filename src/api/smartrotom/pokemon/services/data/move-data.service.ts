@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
-import { Attack } from './interfaces/pokemon.interface';
+import { Attack } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 
 @Injectable()
@@ -12,8 +12,8 @@ export class MoveDataService extends BaseDataService {
 
   async loadMoveData() {
     const startingTime = Date.now();
-    const defaultDir = path.join(__dirname, '../../../../public/smartrotom/packs/default_datapack/data/pixelmon/moves');
-    const publicDir = path.join(__dirname, '../../../../public/smartrotom/packs/datapack/data/pixelmon/moves');
+    const defaultDir = path.join(process.cwd(), 'public/smartrotom/packs/default_datapack/data/pixelmon/moves');
+    const publicDir = path.join(process.cwd(), 'public/smartrotom/packs/datapack/data/pixelmon/moves');
 
     const moves = await this.readJsonFiles(defaultDir, publicDir);
 

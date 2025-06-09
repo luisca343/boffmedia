@@ -19,8 +19,8 @@ export class PokemonImageService {
   getItemSprite(name: string) {
     const itemFileName1 = name.replaceAll('_', '').toUpperCase();
     const itemFileName2 = name;
-    const sprite = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items', itemFileName1 + '.png');
-    const sprite2 = path.join(__dirname, '../../../', 'public/smartrotom/img/sprites/items/other', itemFileName2 + '.png');
+    const sprite = path.join(process.cwd(), 'public/smartrotom/img/sprites/items', itemFileName1 + '.png');
+    const sprite2 = path.join(process.cwd(), 'public/smartrotom/img/sprites/items/other', itemFileName2 + '.png');
     if (fs.existsSync(sprite)) return { url: path.join('/smartrotom/img/sprites/items', itemFileName1 + '.png') };
     if (fs.existsSync(sprite2)) return { url: path.join('/smartrotom/img/sprites/items/other', itemFileName2 + '.png') };
     return { url: '/smartrotom/img/sprites/items/000.png' };

@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 
 import OpenAI from 'openai';
-import { PokemonService } from '../pokemon/pokemon.service';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';
+import { PokemonFacadeService } from '../pokemon/pokemon.facade.service';
 
 let openai: OpenAI;
 export type FicusMessage = {
@@ -20,7 +20,7 @@ export type FicusMessage = {
 @Injectable()
 export class ChatService {
   constructor(
-    private pokemonService: PokemonService,
+    private pokemonService: PokemonFacadeService,
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
   async start() {

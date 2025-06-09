@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { MoveDataService } from './move-data.service';
-import { Pokemon, PokemonForm, SpeciesMoveEntry } from './interfaces/pokemon.interface';
+import { Pokemon, PokemonForm, SpeciesMoveEntry } from '../../interfaces/pokemon.interface';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
@@ -42,8 +42,8 @@ export class PokemonDataService extends BaseDataService {
 
   async loadPokemonData() {
     const startingTime = Date.now();
-    const defaultDir = path.join(__dirname, '../../../../public/smartrotom/packs/default_datapack/data/pixelmon/species');
-    const publicDir = path.join(__dirname, '../../../../public/smartrotom/packs/datapack/data/pixelmon/species');
+    const defaultDir = path.join(process.cwd(), 'public/smartrotom/packs/default_datapack/data/pixelmon/species');
+    const publicDir = path.join(process.cwd(), 'public/smartrotom/packs/datapack/data/pixelmon/species');
 
     try {
       const publicFiles = await fsPromises.readdir(publicDir);

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { PokemonDataService } from './pokemon-data.service';
-import { SpawnInfo, SpawnInfos } from './interfaces/pokemon.interface';
+import { SpawnInfo, SpawnInfos } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -23,8 +23,8 @@ export class SpawnDataService extends BaseDataService {
     const folders = ['caverock', 'fishing', 'forage', 'grass', 'headbutt', 'legendaries', 'megas', 'npcs', 'rocksmash', 'standard', 'sweetscent'];
 
     for (const folder of folders) {
-      const defaultDir = path.join(__dirname, '../../../../public/smartrotom/packs/default_datapack/data/pixelmon/spawning', folder);
-      const publicDir = path.join(__dirname, '../../../../public/smartrotom/packs/datapack/data/pixelmon/spawning', folder);
+      const defaultDir = path.join(process.cwd(), 'public/smartrotom/packs/default_datapack/data/pixelmon/spawning', folder);
+      const publicDir = path.join(process.cwd(), 'public/smartrotom/packs/datapack/data/pixelmon/spawning', folder);
 
       const spawnData = await this.readJsonFiles(defaultDir, publicDir);
 
