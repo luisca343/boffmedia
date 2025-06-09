@@ -1,27 +1,5 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "5",
-      "when": 1748087592748,
-      "tag": "0000_short_nitro",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1748109386873,
-      "tag": "0001_stormy_hairball",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1748951309161,
-      "tag": "0002_tired_imperial_guard",
-      "breakpoints": true
-    }
-  ]
+  "entries": []
 }

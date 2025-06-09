@@ -6,21 +6,23 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
-import { UsersService } from '@api/boffmedia/users/users.service';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
+import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
+import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 
 @Module({
   imports: [
     PassportModule,
     DrizzleModule,
     StarbankModule,
+    BoffMediaUsersModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'your-secret-key',
       signOptions: { expiresIn: '1h' },
     }),
   ],
   controllers: [AuthController],
-  providers: [GoogleStrategy, JwtStrategy, AuthService, UsersService],
+  providers: [GoogleStrategy, JwtStrategy, AuthService ],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

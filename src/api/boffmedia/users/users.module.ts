@@ -1,14 +1,38 @@
 import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UsersController } from './users.controller';
+import { LoggerModule } from '@api/_utils/logger/logger.module';
+import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 
+// Repository
+import { BoffMediaUsersRepository } from '@repositories/users.repository';
+
+// Services
+import { BoffMediaUsersManagementService } from './services/users-management.service';
+import { BoffMediaUsersFacadeService } from './users.facade.service';
+
+// Controller
+import { BoffMediaUsersController } from './users.controller';
+
 @Module({
-  imports: [DrizzleModule, StarbankModule, SmartRotomUsersModule],
-  controllers: [UsersController],
-  providers: [UsersService],
-  exports: [UsersService],
+  imports: [
+    LoggerModule,
+    ResponseModule,
+    DrizzleModule,
+    StarbankModule,
+    SmartRotomUsersModule,
+  ],
+  controllers: [BoffMediaUsersController],
+  providers: [
+    BoffMediaUsersRepository,
+    BoffMediaUsersManagementService,
+    BoffMediaUsersFacadeService,
+  ],
+  exports: [
+    BoffMediaUsersFacadeService,
+    BoffMediaUsersManagementService,
+    BoffMediaUsersRepository,
+  ],
 })
-export class UsersModule {}
+export class BoffMediaUsersModule {}

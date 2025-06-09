@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { SmartRotomAppsModule } from '@api/smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 import { InvitesModule } from './api/wingull/invites/invites.module';
-import { UsersModule } from '@api/boffmedia/users/users.module';
+import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { MySQL2Service } from './_utils/MySQL2Service';
 import { ChatController } from '@api/smartrotom/chat/chat.controller';
 import { ChatService } from '@api/smartrotom/chat/chat.service';
@@ -60,7 +60,6 @@ import { AchievementModule } from '@api/smartrotom/achievement/achievement.modul
 import { AchievementService } from '@api/smartrotom/achievement/achievement.service';
 import { PlayerModule } from '@api/smartrotom/player/player.module';
 import { PlayerService } from '@api/smartrotom/player/player.service';
-import { UsersService } from '@api/boffmedia/users/users.service';
 import { SmartrotomService } from '@api/smartrotom/_main/smartrotom.service';
 //import { EventsModule } from './boffmedia/events/events.module';
 import { EventsController } from '@api/smartrotom/events/events.controller';
@@ -83,7 +82,7 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
     }),
     SmartRotomAppsModule,
     SmartRotomUsersModule,
-    UsersModule,
+    BoffMediaUsersModule,
     InvitesModule,
     ChatModule,
     PokemonModule,
@@ -109,7 +108,6 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
     AchievementModule,
     BattleModule,
     PlayerModule,
-    UsersModule,
     SmartrotomModule,
     EventsModule,
     UploadModule,
@@ -120,7 +118,7 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
   ],
   controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
-     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
+     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
     useClass: ConfigService,

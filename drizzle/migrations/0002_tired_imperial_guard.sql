@@ -1,1 +1,0 @@
-ALTER TABLE `rotom_users` MODIFY COLUMN `world` varchar(36);

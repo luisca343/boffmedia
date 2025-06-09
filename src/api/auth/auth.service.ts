@@ -1,11 +1,11 @@
+import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '@api/boffmedia/users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly usersService: BoffMediaUsersFacadeService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -46,7 +46,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid world');
     }
 
-    const user = await this.usersService.findFullUserWithUUID(loginData.uuid);
+    const user = await this.usersService.getUserWithIntegrations(loginData.uuid, "uuid");
     console.log('Login Minecraft user:', loginData.username, 'with UUID:', loginData.uuid);
     console.log('Found user:', user);
     if (!user) {
@@ -56,7 +56,7 @@ export class AuthService {
     return this.login(user);
   }
 
-    async registerMinecraft(registerData: {
+  async registerMinecraft(registerData: {
     username: string;
     email: string;
     password: string;
@@ -71,15 +71,35 @@ export class AuthService {
       throw new UnauthorizedException('Invalid world');
     }
 
-    // Create the user accounts
-    const result = await this.usersService.createMinecraftUser(registerData);
-    
-    if (result.error) {
-      return { error: result.error };
-    }
+    try {
+      // Create the user accounts
+      const result = await this.usersService.createMinecraftUser(registerData);
+      
+      // Get the created user with all integrations for login
+      const userWithIntegrations = await this.usersService.getUserWithIntegrations(
+        result.boffMediaUser.id.toString(), 
+        'id'
+      );
 
-    // Login the newly created user
-    return this.login(result.user);
+      if (!userWithIntegrations) {
+        return { error: 'Failed to retrieve created user' };
+      }
+
+      // Convert to the format expected by login
+      const loginUser = {
+        id: userWithIntegrations.boffMediaUser.id,
+        name: userWithIntegrations.boffMediaUser.username,
+        email: userWithIntegrations.boffMediaUser.email,
+        roles: userWithIntegrations.roles,
+        mcUUid: userWithIntegrations.boffMediaUser.uuid,
+        smartRotomUser: userWithIntegrations.smartRotomUser
+      };
+
+      return this.login(loginUser);
+    } catch (error) {
+      console.error('Minecraft registration error:', error);
+      return { error: error.message || 'Registration failed' };
+    }
   }
 
   async linkMinecraft(linkData: {
@@ -97,15 +117,35 @@ export class AuthService {
       throw new UnauthorizedException('Invalid world');
     }
 
-    // Link the Minecraft account to existing BoffMedia account
-    const result = await this.usersService.linkMinecraftAccount(linkData);
-    
-    if (result.error) {
-      return { error: result.error };
-    }
+    try {
+      // Link the Minecraft account to existing BoffMedia account
+      const result = await this.usersService.linkMinecraftAccount(linkData);
+      
+      // Get the user with all integrations for login
+      const userWithIntegrations = await this.usersService.getUserWithIntegrations(
+        result.boffMediaUser.id.toString(), 
+        'id'
+      );
 
-    // Login the user with linked account
-    return this.login(result.user);
+      if (!userWithIntegrations) {
+        return { error: 'Failed to retrieve linked user' };
+      }
+
+      // Convert to the format expected by login
+      const loginUser = {
+        id: userWithIntegrations.boffMediaUser.id,
+        name: userWithIntegrations.boffMediaUser.username,
+        email: userWithIntegrations.boffMediaUser.email,
+        roles: userWithIntegrations.roles,
+        mcUUid: userWithIntegrations.boffMediaUser.uuid,
+        smartRotomUser: userWithIntegrations.smartRotomUser
+      };
+
+      return this.login(loginUser);
+    } catch (error) {
+      console.error('Minecraft linking error:', error);
+      return { error: error.message || 'Linking failed' };
+    }
   }
 
   async refreshToken(tokenData: any) {
@@ -124,7 +164,7 @@ export class AuthService {
       }
 
       // Get fresh user data
-      const user = await this.usersService.findOne(payload.sub || payload.id);
+      const user = await this.usersService.getUserById(payload.sub || payload.id);
       
       if (!user) {
         throw new UnauthorizedException('User not found');

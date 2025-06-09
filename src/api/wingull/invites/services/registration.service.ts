@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InviteManagementService } from './invite-management.service';
-import { UsersService } from '@api/boffmedia/users/users.service';
 import { UsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { shortToLongUUID } from '@/_utils/stringUtils';
-import { BoffMediaUser } from '@/_db/schema/BoffMedia';
-import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 
 export interface RegistrationData {
   username: string;
@@ -33,7 +31,7 @@ export interface MinecraftUser {
 export class RegistrationService {
   constructor(
     private readonly inviteManagementService: InviteManagementService,
-    private readonly boffMediaUsersService: UsersService,
+    private readonly boffMediaUsersService: BoffMediaUsersFacadeService,
     private readonly smartRotomUsersService: UsersFacadeService,
   ) {}
 
@@ -67,44 +65,29 @@ export class RegistrationService {
       const uuid = shortToLongUUID(minecraftUser.id);
       console.log(`Minecraft UUID: ${minecraftUser.id} -> ${uuid}`);
 
-      // 4. Create SmartRotom user first
-      const smartRotomUser: SmartRotomUser = {
-        uuid,
-        username: registrationData.username,
-      } as SmartRotomUser;
-
-      const smartRotomResult = await this.smartRotomUsersService.createUser(smartRotomUser);
-      if ('error' in smartRotomResult) {
-        console.error('Error creating SmartRotom user:', smartRotomResult.error);
-        return {
-          success: false,
-          message: 'Failed to create SmartRotom user',
-          error: 'SMARTROTOM_USER_CREATION_FAILED'
-        };
-      }
-
-      // 5. Create BoffMedia user
-      const boffMediaUser: BoffMediaUser = {
+      // 4. Create user with full Minecraft integration using the new facade service
+      const registrationDataForFacade = {
         email: registrationData.email,
-        password: registrationData.password,
         username: registrationData.username,
-        uuid: uuid,
-      } as BoffMediaUser;
+        password: registrationData.password,
+        minecraft: {
+          username: registrationData.mc_username,
+          uuid: uuid,
+          world: 'world' // Default world, you can adjust this
+        }
+      };
 
-      const boffMediaResult = await this.boffMediaUsersService.create(boffMediaUser, smartRotomResult);
-      if ('error' in boffMediaResult) {
-        console.error('Error creating BoffMedia user:', boffMediaResult.error);
-        
-        // TODO: Rollback SmartRotom user creation if needed
-        
-        return {
-          success: false,
-          message: 'Failed to create BoffMedia user',
-          error: 'BOFFMEDIA_USER_CREATION_FAILED'
-        };
-      }
+      const creationResult = await this.boffMediaUsersService.createMinecraftUser(registrationDataForFacade);
 
-      // 6. Mark invite as used
+      console.log('User creation completed:', {
+        boffMediaUserId: creationResult.boffMediaUser.id,
+        smartRotomUserId: creationResult.smartRotomUser?.id,
+        hasStarbank: creationResult.starbankAccounts.length > 0,
+        isNewBoffMediaUser: creationResult.isNewBoffMediaUser,
+        isNewSmartRotomUser: creationResult.isNewSmartRotomUser
+      });
+
+      // 5. Mark invite as used
       const markUsedResult = await this.inviteManagementService.markInviteAsUsed(inviteId);
       if (!markUsedResult.success) {
         console.error('Error marking invite as used:', markUsedResult.message);
