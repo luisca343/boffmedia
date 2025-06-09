@@ -105,14 +105,8 @@ export const boffMediaEventTeams = mysqlTable("boffmedia_event_teams", {
 export type EventTeam = typeof boffMediaEventTeams.$inferSelect;
 
 export const boffMediaEventTeamMembers = mysqlTable("boffmedia_event_team_members", {
-  teamId: int("team_id").references(
-    () => boffMediaEventTeams.id, 
-    { onDelete: "cascade", onUpdate: "cascade" }
-  ),
-  participantId: int("participant_id").references(
-    () => boffMediaParticipants.id, 
-    { onDelete: "cascade", onUpdate: "cascade" }
-  ),
+  teamId: int("team_id"),
+  participantId: int("participant_id"),
   role: mysqlEnum("role", ["leader", "member"]).notNull().default("member"),
   joinedAt: datetime("joined_at").notNull().default(sql`CURRENT_TIMESTAMP()`),
   updatedAt: datetime("updated_at")
@@ -122,6 +116,16 @@ export const boffMediaEventTeamMembers = mysqlTable("boffmedia_event_team_member
   return {
       pk: primaryKey({ columns: [table.teamId, table.participantId] }),
       roleIdx: index("etm_role_idx").on(table.teamId, table.role),
+      teamFk: foreignKey({
+        columns: [table.teamId],
+        foreignColumns: [boffMediaEventTeams.id],
+        name: "etm_team_fk"
+      }).onDelete("cascade").onUpdate("cascade"),
+      participantFk: foreignKey({
+        columns: [table.participantId],
+        foreignColumns: [boffMediaParticipants.id],
+        name: "etm_participant_fk"
+      }).onDelete("cascade").onUpdate("cascade"),
   };
 });
 
