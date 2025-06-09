@@ -19,7 +19,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "generate": "drizzle-kit generate"
+    "generate": "drizzle-kit generate",
+    "push": "drizzle-kit push"
   },
   "dependencies": {
     "@discordjs/voice": "^0.17.0",
@@ -48,6 +49,7 @@
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "cheerio": "^1.0.0",
+    "class-transformer": "^0.5.1",
     "discord.js": "^14.14.1",
     "drizzle-kit": "^0.23.2",
     "drizzle-orm": "^0.32.2",

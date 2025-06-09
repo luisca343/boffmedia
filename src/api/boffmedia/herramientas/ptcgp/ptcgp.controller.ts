@@ -1,248 +1,318 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, Query, Sse, UseInterceptors } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Body, 
+  Param, 
+  Query, 
+  ValidationPipe, 
+  UsePipes,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Sse
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { TgcpCardService } from './card.service';
-import { TgcpUserCardService } from './user-card.service';
-import { TgcpPackService } from './pack.service';
-import { TgcpScraperService } from './scraper.service';
-import { PtcgpBattleService } from './battle.service';
-import { promises as fsPromises } from 'fs';
-import path from 'path';
-import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { PtcgpFacadeService } from './ptcgp.facade.service';
+import {
+  GetCardsDto,
+  GetCardDto,
+  BatchUpdateCardsDto,
+  GetUserCardsDto,
+  GetRecentUpdatesDto,
+  GetMissingCardsDto,
+  GetBestPackDto,
+  CalculateProbabilitiesDto,
+  GetBattleDataDto,
+  CardResponseDto,
+  UserCardResponseDto,
+  CollectionStatsResponseDto,
+  BestPackResponseDto,
+  HealthCheckResponseDto,
+  BatchUpdateResponseDto
+} from './dto/ptcgp.dto';
 
-@ApiTags('/herramientas/ptcgp')
-@Controller('/herramientas/ptcgp')
-@UseInterceptors(ResponseInterceptor)
+@ApiTags('Pokemon TCG Pocket')
+@Controller('ptcgp')
 export class PtcgpController {
-    constructor(
-        private cardService: TgcpCardService,
-        private userCardService: TgcpUserCardService,
-        private packService: TgcpPackService,
-        private scraperService: TgcpScraperService,
-        private battleService: PtcgpBattleService
-    ) {}
+  private readonly logger = new Logger(PtcgpController.name);
 
-    @Get("/serebii")
-    @ApiOperation({ summary: 'Get data from Serebii' })
-    @ApiResponse({ status: 200, description: 'Data from Serebii found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find data from Serebii.' })
-    async getFromSerebii() {
-        return this.scraperService.getSets();
-    }
+  constructor(
+    private readonly ptcgpFacadeService: PtcgpFacadeService,
+  ) {}
 
-    @Post("/fetch")
-    @ApiOperation({ summary: 'Manually trigger data fetch from Serebii' })
-    @ApiResponse({ status: 200, description: 'Fetch operation started successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to start fetch operation.' })
-    async triggerFetch() {
-        return this.scraperService.startFetch();
-    }
+  // ==================== HEALTH CHECK ====================
 
-    @Sse('fetch-status')
-    @ApiOperation({ summary: 'Get real-time updates on fetch status' })
-    fetchStatus(): Observable<MessageEvent> {
-        return this.scraperService.getFetchStatus().pipe(
-            map(statusData => {
-                return {
-                    data: JSON.stringify(statusData),
-                    type: 'message',
-                    lastEventId: '',
-                    origin: '',
-                } as MessageEvent;
-            })
-        );
+  @Get('health')
+  @ApiOperation({ summary: 'Check service health' })
+  @ApiResponse({ status: 200, description: 'Service health status', type: HealthCheckResponseDto })
+  async healthCheck(): Promise<HealthCheckResponseDto> {
+    try {
+      return await this.ptcgpFacadeService.healthCheck();
+    } catch (error) {
+      this.logger.error('Health check failed:', error);
+      throw new HttpException('Service health check failed', HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
 
-    @Get("boosterpacks")
-    @ApiOperation({ summary: 'Get all booster packs' })
-    @ApiResponse({ status: 200, description: 'Booster packs found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find booster packs.' })
-    async getCollections() {
-        return this.packService.getBoosterPacks();
-    }
+  // ==================== CARD MANAGEMENT ====================
 
-    @Get("cards")
-    @ApiOperation({ summary: 'Get all cards' })
-    @ApiResponse({ status: 200, description: 'Cards found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find cards.' })
-    async getCards() {
-        return this.cardService.getCards();
+  @Get('cards')
+  @ApiOperation({ summary: 'Get all cards or cards from specific expansion' })
+  @ApiQuery({ name: 'expansion', required: false, description: 'Expansion ID' })
+  @ApiResponse({ status: 200, description: 'List of cards', type: [CardResponseDto] })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getCards(@Query() query: GetCardsDto): Promise<CardResponseDto[]> {
+    try {
+      return await this.ptcgpFacadeService.getCards(query.expansion);
+    } catch (error) {
+      this.logger.error('Error getting cards:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("cards/:pack")
-    @ApiOperation({ summary: 'Get cards by pack' })
-    @ApiResponse({ status: 200, description: 'Cards found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find cards.' })
-    async getCardsByPack(@Param('pack') pack: string) {
-        return this.cardService.getCards(pack);
+  @Get('cards/:expansion/:number')
+  @ApiOperation({ summary: 'Get specific card' })
+  @ApiParam({ name: 'expansion', description: 'Expansion ID' })
+  @ApiParam({ name: 'number', description: 'Card number' })
+  @ApiResponse({ status: 200, description: 'Card details', type: CardResponseDto })
+  @ApiResponse({ status: 404, description: 'Card not found' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getCard(@Param() params: GetCardDto): Promise<CardResponseDto> {
+    try {
+      const card = await this.ptcgpFacadeService.getCard(params.expansion, params.number);
+      if (!card) {
+        throw new HttpException('Card not found', HttpStatus.NOT_FOUND);
+      }
+      return card;
+    } catch (error) {
+      this.logger.error('Error getting card:', error);
+      if (error.status === HttpStatus.NOT_FOUND) {
+        throw error;
+      }
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("cards/:pack/:number")
-    @ApiOperation({ summary: 'Get card by pack and number' })
-    @ApiResponse({ status: 200, description: 'Card found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find card.' })
-    async getCardByNumber(@Param('pack') pack: string, @Param('number') number: number) {
-        return this.cardService.getCard(pack, number);
-    }
+  // ==================== PACK MANAGEMENT ====================
 
-    @Post("user-cards")
-    @ApiOperation({ summary: 'Get all cards for the authenticated user' })
-    @ApiResponse({ status: 200, description: 'User cards found successfully.' })
-    @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    @ApiResponse({ status: 500, description: 'Failed to find user cards.' })
-    async getUserCards(@Body() user: { username: string }) {
-        return await this.userCardService.getUserCards(user.username);
+  @Get('packs')
+  @ApiOperation({ summary: 'Get all booster packs or packs from specific expansion' })
+  @ApiQuery({ name: 'expansion', required: false, description: 'Expansion ID' })
+  @ApiResponse({ status: 200, description: 'List of booster packs' })
+  async getBoosterPacks(@Query('expansion') expansion?: string) {
+    try {
+      return await this.ptcgpFacadeService.getBoosterPacks(expansion);
+    } catch (error) {
+      this.logger.error('Error getting booster packs:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Post("update-cards")
-    @ApiOperation({ summary: 'Update multiple cards in the user\'s collection' })
-    @ApiResponse({ status: 200, description: 'Cards updated successfully.' })
-    @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    @ApiResponse({ status: 500, description: 'Failed to update cards.' })
-    async updateUserCards(@Body() updateData: { username: string, updates: { expansion: string, cardNumber: number, packId: string, change: number }[] }) {
-        console.log('Updating cards for user:', updateData);
-        return this.userCardService.batchUpdateUserCards(updateData.username, updateData.updates);
+  @Post('packs/probabilities')
+  @ApiOperation({ summary: 'Calculate pack opening probabilities' })
+  @ApiResponse({ status: 200, description: 'Pack opening probabilities' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async calculateProbabilities(@Body() dto: CalculateProbabilitiesDto) {
+    try {
+      return await this.ptcgpFacadeService.calculatePackProbabilities(dto.expansionID, dto.packId);
+    } catch (error) {
+      this.logger.error('Error calculating probabilities:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Post("best-pack")
-    @ApiOperation({ summary: 'Get the best pack to pull for a new card' })
-    @ApiResponse({ status: 200, description: 'Best pack found successfully.' })
-    @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    @ApiResponse({ status: 500, description: 'Failed to find best pack.' })
-    async getBestPack(@Body() user: { username: string }) {
-        const result = await this.packService.getBestPackToPull(user.username);
-        if (result.message) {
-            return { message: result.message };
-        }
-        return result;
-    }
-    
-    @Post("best-pack-for-expansion")
-    @ApiOperation({ summary: 'Get the best pack to pull for a specific expansion' })
-    @ApiResponse({ status: 200, description: 'Best pack for expansion found successfully.' })
-    @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    @ApiResponse({ status: 500, description: 'Failed to find best pack for expansion.' })
-    async getBestPackForExpansion(@Body() data: { username: string, eventName: string }) {
-        const result = await this.packService.getBestPackForExpansion(data.username, data.eventName);
-        if (result.message) {
-            return { message: result.message };
-        }
-        return result;
-    }
-  
-    @Post("best-pack-for-event")
-    @ApiOperation({ summary: 'Get the best pack to pull for a specific event' })
-    @ApiResponse({ status: 200, description: 'Best pack for event found successfully.' })
-    @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    @ApiResponse({ status: 500, description: 'Failed to find best pack for event.' })
-    async getBestPackForEvent(@Body() data: { username: string, eventName: string }) {
-        const events = {
-            mewQuest: {
-                cards: [
-                    "Bulbasaur", "Ivysaur", "Venusaur", "Charmander", "Charmeleon", "Charizard", 
-                    "Squirtle", "Wartortle", "Blastoise", "Caterpie", "Metapod", "Butterfree", 
-                    "Weedle", "Kakuna", "Beedrill", "Pidgey", "Pidgeotto", "Pidgeot", 
-                    "Rattata", "Raticate", "Spearow", "Fearow", "Ekans", "Arbok", 
-                    "Pikachu", "Raichu", "Sandshrew", "Sandslash", "Nidoran♀", "Nidorina", 
-                    "Nidoqueen", "Nidoran♂", "Nidorino", "Nidoking", "Clefairy", "Clefable", 
-                    "Vulpix", "Ninetales", "Jigglypuff", "Wigglytuff", "Zubat", "Golbat", 
-                    "Oddish", "Gloom", "Vileplume", "Paras", "Parasect", "Venonat", 
-                    "Venomoth", "Diglett", "Dugtrio", "Meowth", "Persian", "Psyduck", 
-                    "Golduck", "Mankey", "Primeape", "Growlithe", "Arcanine", "Poliwag", 
-                    "Poliwhirl", "Poliwrath", "Abra", "Kadabra", "Alakazam", "Machop", 
-                    "Machoke", "Machamp", "Bellsprout", "Weepinbell", "Victreebel", "Tentacool", 
-                    "Tentacruel", "Geodude", "Graveler", "Golem", "Ponyta", "Rapidash", 
-                    "Slowpoke", "Slowbro", "Magnemite", "Magneton", "Farfetch'd", "Doduo", 
-                    "Dodrio", "Seel", "Dewgong", "Grimer", "Muk", "Shellder", 
-                    "Cloyster", "Gastly", "Haunter", "Gengar", "Onix", "Drowzee", 
-                    "Hypno", "Krabby", "Kingler", "Voltorb", "Electrode", "Exeggcute", 
-                    "Exeggutor", "Cubone", "Marowak", "Hitmonlee", "Hitmonchan", "Lickitung", 
-                    "Koffing", "Weezing", "Rhyhorn", "Rhydon", "Chansey", "Tangela", 
-                    "Kangaskhan", "Horsea", "Seadra", "Goldeen", "Seaking", "Staryu", 
-                    "Starmie", "Mr. Mime", "Scyther", "Jynx", "Electabuzz", "Magmar", 
-                    "Pinsir", "Tauros", "Magikarp", "Gyarados", "Lapras", "Ditto", 
-                    "Eevee", "Vaporeon", "Jolteon", "Flareon", "Porygon", "Omanyte", 
-                    "Omastar", "Kabuto", "Kabutops", "Aerodactyl", "Snorlax", "Articuno", 
-                    "Zapdos", "Moltres", "Dratini", "Dragonair", "Dragonite", "Mewtwo"
-                ],
-                expansion: "geneticapex"
-            }
-        };
+  // ==================== USER CARD MANAGEMENT ====================
 
-        const event = events[data.eventName];
-        if (!event) {
-            return { message: "Event not found." };
-        }
-
-        const result = await this.packService.getBestPackForEvent(data.username, event.cards, event.expansion);
-        if (result.message) {
-            return { message: result.message };
-        }
-        return result;
+  @Get('users/:username/cards')
+  @ApiOperation({ summary: 'Get user card collection' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiResponse({ status: 200, description: 'User card collection', type: [UserCardResponseDto] })
+  async getUserCards(@Param('username') username: string): Promise<UserCardResponseDto[]> {
+    try {
+      return await this.ptcgpFacadeService.getUserCards(username);
+    } catch (error) {
+      this.logger.error('Error getting user cards:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("pack-probabilities/:expansionId/:packId")
-    @ApiOperation({ summary: 'Get individual probabilities for a specific pack' })
-    @ApiResponse({ status: 200, description: 'Pack probabilities calculated successfully.' })
-    @ApiResponse({ status: 404, description: 'Pack not found.' })
-    @ApiResponse({ status: 500, description: 'Failed to calculate pack probabilities.' })
-    async getPackProbabilities(@Param('expansionId') expansionId: string, @Param('packId') packId: string) {
-        const result = await this.packService.calculateIndividualProbabilities(expansionId, packId);
-        if ('message' in result) {
-            throw new HttpException(result.message, HttpStatus.NOT_FOUND);
-        }
-        return result;
+  @Post('users/cards/batch-update')
+  @ApiOperation({ summary: 'Update multiple user cards in batch' })
+  @ApiResponse({ status: 200, description: 'Batch update result', type: BatchUpdateResponseDto })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async batchUpdateUserCards(@Body() dto: BatchUpdateCardsDto): Promise<BatchUpdateResponseDto> {
+    try {
+      return await this.ptcgpFacadeService.batchUpdateUserCards(dto.username, dto.cardUpdates);
+    } catch (error) {
+      this.logger.error('Error updating user cards:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("recent-updates")
-    @ApiOperation({ summary: 'Get recent card updates for the user' })
-    @ApiResponse({ status: 200, description: 'Recent updates found successfully.' })
-    @ApiResponse({ status: 401, description: 'Unauthorized.' })
-    @ApiResponse({ status: 500, description: 'Failed to find recent updates.' })
-    async getRecentUpdates(
-        @Query('username') username: string,
-        @Query('limit') limit: string = "10",
-        @Query('offset') offset: string = "0"
-    ) {
-        console.log('Getting recent updates for user:', username);
-        const updates = await this.userCardService.getRecentCardUpdates(username, parseInt(limit), parseInt(offset));
-        return updates;
+  @Get('users/:username/cards/recent')
+  @ApiOperation({ summary: 'Get recent card updates for user' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of records to return', type: Number })
+  @ApiQuery({ name: 'offset', required: false, description: 'Number of records to skip', type: Number })
+  @ApiResponse({ status: 200, description: 'Recent card updates' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getRecentCardUpdates(
+    @Param('username') username: string,
+    @Query('limit') limit?: number,
+    @Query('offset') offset?: number
+  ) {
+    try {
+      return await this.ptcgpFacadeService.getRecentCardUpdates(username, limit, offset);
+    } catch (error) {
+      this.logger.error('Error getting recent updates:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("battle-data/:id")
-    @ApiOperation({ summary: 'Get battle data' })
-    @ApiResponse({ status: 200, description: 'Battle data found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find battle data.' })
-    async getBattleData(@Param('id') id: string): Promise<any> {
-        return this.battleService.getBattleData(`https://www.serebii.net/tcgpocket/solobattles/${id}.shtml`);
+  @Get('users/:username/cards/missing')
+  @ApiOperation({ summary: 'Get missing cards for user' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiQuery({ name: 'expansion', required: false, description: 'Expansion ID' })
+  @ApiResponse({ status: 200, description: 'Missing cards' })
+  async getMissingCards(
+    @Param('username') username: string,
+    @Query('expansion') expansion?: string
+  ) {
+    try {
+      return await this.ptcgpFacadeService.getMissingCards(username, expansion);
+    } catch (error) {
+      this.logger.error('Error getting missing cards:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("combate2/:id")
-    @ApiOperation({ summary: 'Get battle data 2' })
-    @ApiResponse({ status: 200, description: 'Battle data found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find battle data.' })
-    async getBattleData2(@Param('id') id: string): Promise<any> {
-        const uri = path.join(process.cwd(), `public/data/tcgpocket/battles/${id}.json`);
-        const data = await fsPromises.readFile(uri, 'utf8');
-        const battleData = JSON.parse(data);
-        return battleData;
+  @Get('users/:username/stats')
+  @ApiOperation({ summary: 'Get user collection statistics' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiQuery({ name: 'expansion', required: false, description: 'Expansion ID' })
+  @ApiResponse({ status: 200, description: 'Collection statistics', type: CollectionStatsResponseDto })
+  async getCollectionStats(
+    @Param('username') username: string,
+    @Query('expansion') expansion?: string
+  ): Promise<CollectionStatsResponseDto> {
+    try {
+      return await this.ptcgpFacadeService.getCollectionStats(username, expansion);
+    } catch (error) {
+      this.logger.error('Error getting collection stats:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
 
-    @Get("scrapesolobattles")
-    @ApiOperation({ summary: 'Scrape solo battles' })
-    @ApiResponse({ status: 200, description: 'Solo battles scraped successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to scrape solo battles.' })
-    async getSoloBattles(): Promise<any> {
-        return this.scraperService.scrapeSoloBattles();
-    }
+  // ==================== PACK RECOMMENDATIONS ====================
 
-    @Get("solobattles")
-    @ApiOperation({ summary: 'Get solo battles' })
-    @ApiResponse({ status: 200, description: 'Solo battles found successfully.' })
-    @ApiResponse({ status: 500, description: 'Failed to find solo battles.' })
-    async getSoloBattles2(): Promise<any> {
-        const battles = await fsPromises.readFile(path.join(process.cwd(),'public/data/tcgpocket/solobattles.json'), 'utf8');
-        return JSON.parse(battles);
+  @Get('users/:username/best-pack')
+  @ApiOperation({ summary: 'Get best pack recommendation for user' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiQuery({ name: 'expansion', required: false, description: 'Expansion ID' })
+  @ApiResponse({ status: 200, description: 'Best pack recommendation', type: BestPackResponseDto })
+  async getBestPack(
+    @Param('username') username: string,
+    @Query('expansion') expansion?: string
+  ): Promise<BestPackResponseDto> {
+    try {
+      if (expansion) {
+        return await this.ptcgpFacadeService.getBestPackForExpansion(username, expansion);
+      }
+      return await this.ptcgpFacadeService.getBestPackToPull(username);
+    } catch (error) {
+      this.logger.error('Error getting best pack:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @Get('users/:username/pack-analytics')
+  @ApiOperation({ summary: 'Get detailed pack analytics for user' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiQuery({ name: 'expansion', required: false, description: 'Expansion ID' })
+  @ApiResponse({ status: 200, description: 'Pack analytics' })
+  async getPackAnalytics(
+    @Param('username') username: string,
+    @Query('expansion') expansion?: string
+  ): Promise<any> {
+    try {
+      return await this.ptcgpFacadeService.getPackAnalytics(username, expansion);
+    } catch (error) {
+      this.logger.error('Error getting pack analytics:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('users/:username/expansion-progress')
+  @ApiOperation({ summary: 'Get expansion completion progress for user' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  @ApiResponse({ status: 200, description: 'Expansion progress' })
+  async getExpansionProgress(@Param('username') username: string) {
+    try {
+      return await this.ptcgpFacadeService.getExpansionProgress(username);
+    } catch (error) {
+      this.logger.error('Error getting expansion progress:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // ==================== DATA MANAGEMENT ====================
+
+  @Get('sets')
+  @ApiOperation({ summary: 'Get all card sets data' })
+  @ApiResponse({ status: 200, description: 'Card sets data' })
+  async getSets() {
+    try {
+      return await this.ptcgpFacadeService.getSets();
+    } catch (error) {
+      this.logger.error('Error getting sets:', error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Post('scrape/refresh')
+  @ApiOperation({ summary: 'Refresh data from Serebii' })
+  @ApiResponse({ status: 200, description: 'Data refresh initiated' })
+  async refreshData() {
+    try {
+      return await this.ptcgpFacadeService.refreshDataFromSerebii();
+    } catch (error) {
+      this.logger.error('Error refreshing data:', error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Sse('scrape/status')
+  @ApiOperation({ summary: 'Get real-time scraping status via Server-Sent Events' })
+  getFetchStatus(): Observable<any> {
+    return this.ptcgpFacadeService.getFetchStatus();
+  }
+
+  @Get('scrape/solo-battles')
+  @ApiOperation({ summary: 'Scrape solo battle data' })
+  @ApiResponse({ status: 200, description: 'Solo battle data' })
+  async scrapeSoloBattles() {
+    try {
+      return await this.ptcgpFacadeService.scrapeSoloBattles();
+    } catch (error) {
+      this.logger.error('Error scraping solo battles:', error);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  // ==================== BATTLE UTILITIES ====================
+
+  @Post('battles/data')
+  @ApiOperation({ summary: 'Get battle data from Serebii URL' })
+  @ApiResponse({ status: 200, description: 'Battle data' })
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async getBattleData(@Body() dto: GetBattleDataDto) {
+    try {
+      return await this.ptcgpFacadeService.getBattleData(dto.battleUrl);
+    } catch (error) {
+      this.logger.error('Error getting battle data:', error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 }

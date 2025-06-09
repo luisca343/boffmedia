@@ -2,24 +2,40 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { PtcgpController } from './ptcgp.controller';
 import { ConfigService } from '@api/config.service';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
-import { TgcpCardService } from './card.service';
-import { TgcpUserCardService } from './user-card.service';
-import { TgcpPackService } from './pack.service';
-import { TgcpScraperService } from './scraper.service';
-import { PtcgpBattleService } from './battle.service';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { PtcgpRepository } from '@api/_repositories/ptcgp.repository';
+import { CardService } from './services/card.service';
+import { PackService } from './services/pack.service';
+import { UserCardService } from './services/user-card.service';
+import { ScraperService } from './services/scraper.service';
+import { PtcgpFacadeService } from './ptcgp.facade.service';
 
 @Module({
-  imports: [ConfigModule],
+  imports: [
+    ConfigModule,
+    DrizzleModule,
+  ],
   controllers: [PtcgpController],
   providers: [
-    TgcpCardService,
-    TgcpUserCardService,
-    TgcpPackService,
-    TgcpScraperService,
+    PtcgpRepository,
+    
+    // Service Layer
+    CardService,
+    PackService,
+    UserCardService,
+    ScraperService,
+    
+    PtcgpFacadeService,
+    
     ConfigService,
-    PtcgpBattleService,
-    MySQL2Service
+  ],
+  exports: [
+    PtcgpFacadeService,
+    
+    CardService,
+    PackService,
+    UserCardService,
+    ScraperService,
   ],
 })
 export class PtcgpModule {}

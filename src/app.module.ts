@@ -44,13 +44,8 @@ import { LoggerModule } from './api/_utils/logger/logger.module';
 import { PtcgpController } from '@api/boffmedia/herramientas/ptcgp/ptcgp.controller';
 import { PtcgpModule } from '@api/boffmedia/herramientas/ptcgp/ptcgp.module';
 import { ConfigService } from './api/config.service';
-import { TgcpCardService } from '@api/boffmedia/herramientas/ptcgp/card.service';
-import { TgcpUserCardService } from '@api/boffmedia/herramientas/ptcgp/user-card.service';
-import { TgcpPackService } from '@api/boffmedia/herramientas/ptcgp/pack.service';
-import { TgcpScraperService } from '@api/boffmedia/herramientas/ptcgp/scraper.service';
 import { AuthModule } from './api/auth/auth.module';
 import { ShowdownGateway } from './api/battlesimulator/showdown.gateway';
-import { PtcgpBattleService } from '@api/boffmedia/herramientas/ptcgp/battle.service';
 import { DrizzleModule } from './api/_utils/drizzle/drizzle.module';
 import { PokemonDataService } from '@api/smartrotom/pokemon/services/data/pokemon-data.service';
 import { MoveDataService } from '@api/smartrotom/pokemon/services/data/move-data.service';
@@ -67,8 +62,8 @@ import { EventsFacadeService } from '@api/smartrotom/events/events.facade.servic
 import { EventsModule } from '@api/smartrotom/events/events.module';
 import { UploadController } from './util/upload/upload.controller';
 import { UploadModule } from './util/upload/upload.module';
-import { MhwildsController } from './api/boffmedia/tools/mhwilds/mhwilds.controller';
-import { MhwildsModule } from './api/boffmedia/tools/mhwilds/mhwilds.module';
+import { MhwildsController } from './api/boffmedia/herramientas/mhwilds/mhwilds.controller';
+import { MhwildsModule } from './api/boffmedia/herramientas/mhwilds/mhwilds.module';
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/services/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-manifest.service';
@@ -118,7 +113,7 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
   ],
   controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
-     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
+     ShowdownGateway, AchievementService, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
     useClass: ConfigService,
