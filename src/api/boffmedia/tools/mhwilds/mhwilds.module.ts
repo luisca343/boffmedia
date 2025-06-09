@@ -1,13 +1,28 @@
+import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
-import { Module } from '@nestjs/common';
+import { ResponseModule } from '@api/_utils/response/response.module';
+import { MhwildsDataService } from './services/mhwilds-data.service';
+import { MhwildsCacheService } from './services/mhwilds-cache.service';
+import { MhwildsFacadeService } from './mhwilds.facade.service';
 import { MhwildsController } from './mhwilds.controller';
-import { MhwildsService } from './mhwilds.service';
-import { ResponseService } from '@api/_utils/response/response.service';
+import { MhwildsRepository } from '@repositories/mhwilds.repository';
 
 @Module({
-  imports: [LoggerModule, DrizzleModule],
+  imports: [
+    LoggerModule,
+    DrizzleModule,
+    ResponseModule
+  ],
   controllers: [MhwildsController],
-  providers: [MhwildsService, ResponseService],
+  providers: [
+    MhwildsRepository,
+    MhwildsDataService,
+    MhwildsCacheService,
+    MhwildsFacadeService,
+  ],
+  exports: [
+    MhwildsFacadeService,
+  ],
 })
 export class MhwildsModule {}

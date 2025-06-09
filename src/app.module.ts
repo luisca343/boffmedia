@@ -70,7 +70,6 @@ import { UploadController } from './util/upload/upload.controller';
 import { UploadModule } from './util/upload/upload.module';
 import { MhwildsController } from './api/boffmedia/tools/mhwilds/mhwilds.controller';
 import { MhwildsModule } from './api/boffmedia/tools/mhwilds/mhwilds.module';
-import { MhwildsService } from './api/boffmedia/tools/mhwilds/mhwilds.service';
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/services/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-manifest.service';
@@ -127,7 +126,6 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
     useClass: ConfigService,
   },
     EventsFacadeService,
-    MhwildsService
 
 ],
   exports: [ConfigService]
