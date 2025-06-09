@@ -8,13 +8,13 @@ import { alias } from 'drizzle-orm/mysql-core';
 import { RowDataPacket } from 'mysql2';
 import axios from 'axios';
 import { StarBankAccount as StarBankAccountType } from './types';
-import { WingullService } from '../wingull/wingull.service';
+import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @Injectable()
 export class StarbankService {
     constructor(
         @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-        private readonly wingullService: WingullService
+        private readonly wingullService: WingullFacadeService
     ) {}
 
     async getMainAccount(uuid: string) {

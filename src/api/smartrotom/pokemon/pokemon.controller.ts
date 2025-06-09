@@ -1,10 +1,10 @@
 import { Body, Controller, Get, HttpStatus, Param, Post, UseInterceptors } from '@nestjs/common';
 import { PokemonService } from './pokemon.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { WingullService } from '../wingull/wingull.service';
 import { PokemonShowdownService } from './pokemon-showdown.service';
 import { SpriteManifestService } from './sprite-manifest.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @ApiTags('smartrotom/pokemon')
 @Controller('smartrotom/pokemon')
@@ -12,7 +12,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 export class PokemonController {  
     constructor(
         private readonly pokemonService: PokemonService,
-        private readonly wingullService: WingullService,
+        private readonly wingullService: WingullFacadeService,
         private readonly pokemonShowdownService: PokemonShowdownService,
         private readonly spriteManifestService: SpriteManifestService,
     ) {}

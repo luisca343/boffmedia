@@ -2,11 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Http
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { SmartRotomUsersService } from '@api/smartrotom/users/users.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from '@/api/auth/jwt-auth.guard';
+import { UsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 
 @ApiTags('users')
 @Controller('users')
@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '@/api/auth/jwt-auth.guard';
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly smartrotomUsersService: SmartRotomUsersService,
+    private readonly smartrotomUsersService: UsersFacadeService,
   ) {}
 
   @Post('register')

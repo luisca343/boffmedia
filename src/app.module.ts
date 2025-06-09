@@ -62,7 +62,6 @@ import { AchievementModule } from '@api/smartrotom/achievement/achievement.modul
 import { AchievementService } from '@api/smartrotom/achievement/achievement.service';
 import { PlayerModule } from '@api/smartrotom/player/player.module';
 import { PlayerService } from '@api/smartrotom/player/player.service';
-import { RegionModule } from '@api/smartrotom/region/region.module';
 import { UsersService } from '@api/boffmedia/users/users.service';
 import { SmartrotomService } from '@api/smartrotom/_main/smartrotom.service';
 //import { EventsModule } from './boffmedia/events/events.module';
@@ -113,7 +112,6 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
     AchievementModule,
     BattleModule,
     PlayerModule,
-    RegionModule,
     UsersModule,
     SmartrotomModule,
     EventsModule,
@@ -124,7 +122,7 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
   ],
   controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, StarbankService, NetfluisService, BattleService, PokemonService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
-     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, RegionModule, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
+     TgcpCardService, TgcpUserCardService, TgcpPackService, TgcpScraperService, PtcgpBattleService, ShowdownGateway, AchievementService, BattleService, PlayerService, UsersService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
     useClass: ConfigService,

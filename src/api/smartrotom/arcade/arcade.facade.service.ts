@@ -5,11 +5,11 @@ import { StreakService } from './services/streak.service';
 import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
 import { StarbankService } from '../starbank/starbank.service';
-import { WingullService } from '../wingull/wingull.service';
 import { ArcadeStreak, ClaimRewardResponse } from '../_dto/arcade-streak.dto';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
 import { rarityRanges } from './_config/lootboxConfig';
 import { DailyRewardsConfig, loadRewardsConfig } from '../_main/_config/daily-rewards.config';
+import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
@@ -21,7 +21,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     private readonly inventoryService: InventoryService,
     private readonly lootboxService: LootboxService,
     private readonly starbankService: StarbankService,
-    private readonly wingullService: WingullService,
+    private readonly wingullService: WingullFacadeService,
   ) {}
   
   onModuleInit() {

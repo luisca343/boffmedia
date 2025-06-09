@@ -4,18 +4,18 @@ import { UpdateInviteDto } from './dto/update-invite.dto';
 import { RegisterDataDto } from './dto/register-data.dto';
 import { UsersService } from '@api/boffmedia/users/users.service';
 import { shortToLongUUID } from '../../../_utils/stringUtils';
-import { SmartRotomUsersService } from '@api/smartrotom/users/users.service';
 import { MySQL2Service } from '@/_utils/MySQL2Service';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { Invite } from '@/_db/schema/Wingull';
+import { UsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 
 @Injectable()
 export class InvitesService {
   constructor(
     private db: MySQL2Service,
     private usersService: UsersService,
-    private smartRotomUsersService: SmartRotomUsersService
+    private smartRotomUsersService: UsersFacadeService
   ) {}
   
 
@@ -68,7 +68,7 @@ export class InvitesService {
       username: createInviteDto.username,
     } as SmartRotomUser
 
-    const smart = await this.smartRotomUsersService.create(smartRotomUser);
+    const smart = await this.smartRotomUsersService.createUser(smartRotomUser);
       if ('error' in smart) {
         console.log("Error creating user in SmartRotom");
         return smart;

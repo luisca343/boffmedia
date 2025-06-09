@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { WingullService } from './wingull.service';
+import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
@@ -10,8 +10,35 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 @UseInterceptors(ResponseInterceptor)
 export class WingullController {
   constructor(
-    private readonly wingullService: WingullService,
+    private readonly wingullFacadeService: WingullFacadeService,
   ) {}
+
+  // Town colors configuration
+  private readonly townColors = {
+    ARRECIFE_WINGULL: { fill: 0x5500bfff, border: 0x00bfff },
+    PUERTO_WINGULL: { fill: 0x550077be, border: 0x0077be },
+    PUEBLO_TULIPAN: { fill: 0x5532cd32, border: 0x32cd32 },
+    PUEBLO_SHIROI: { fill: 0x55ffffff, border: 0xffffff },
+    PUEBLO_TAKAI: { fill: 0x55e0ffff, border: 0xe0ffff },
+    PUEBLO_HAGANE: { fill: 0x55808080, border: 0x808080 },
+    PUEBLO_DENTO: { fill: 0x556a5acd, border: 0x6a5acd },
+    PUEBLO_IWA: { fill: 0x55a9a9a9, border: 0xa9a9a9 },
+    PUEBLO_TSUCHI: { fill: 0x55d2691e, border: 0xd2691e },
+    PUEBLO_OASIS: { fill: 0x55f4a460, border: 0xf4a460 },
+    PUEBLO_SENSHI: { fill: 0x55b22222, border: 0xb22222 },
+    PUEBLO_KINOKO: { fill: 0x55ff69b4, border: 0xff69b4 },
+    PUEBLO_SAKURA: { fill: 0xffffb7c5, border: 0xffb7c5 },
+    PUEBLO_DOKU: { fill: 0x55800080, border: 0x800080 },
+    PUEBLO_GAKU: { fill: 0x55f4a460, border: 0xf4a460 },
+    PUEBLO_LAVANDA: { fill: 0x55483d8b, border: 0x483d8b },
+    PUEBLO_DENKI: { fill: 0x55ffff00, border: 0xffff00 },
+    PUEBLO_MIZU: { fill: 0x554169e1, border: 0x4169e1 },
+    PUEBLO_OLIVO: { fill: 0x55556b2f, border: 0x556b2f },
+    NARUKAMI: { fill: 0x55ffd700, border: 0xffd700 },
+    AKINA: { fill: 0x55ff4500, border: 0xff4500 },
+    FUKITSU: { fill: 0x55000000, border: 0x000000 },
+    GANSOLIA: { fill: 0x55deb887, border: 0xdeb887 },
+  };
 
   //=====================================================
   // Economy endpoints
@@ -22,7 +49,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Balance updated successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update balance.' })
   async updateBalance(@Body() account: {balance: number, type: string, uuid: string}) {
-    return await this.wingullService.updateBalance(account);
+    return await this.wingullFacadeService.updateBalance(account);
   }
 
   @Post('getCurrentBalance')
@@ -30,7 +57,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Current balance retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve current balance.' })
   async getCurrentBalance(@Body() { uuid, amount }: { uuid: string, amount?: number }) {
-    const balance = await this.wingullService.getCurrentBalance(uuid, amount);
+    const balance = await this.wingullFacadeService.getCurrentBalance(uuid, amount);
     return { balance };
   }
 
@@ -40,7 +67,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve money amount.' })
   @ApiBody({ type: UuidDto })
   async getMoney(@Body() { uuid }: UuidDto) {
-    const money = await this.wingullService.getMoney(uuid);
+    const money = await this.wingullFacadeService.getMoney(uuid);
     return { money };
   }
 
@@ -54,7 +81,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player stats.' })
   @ApiBody({ type: UuidDto })
   async getStats(@Body() { uuid }: UuidDto) {
-    return await this.wingullService.getStats(uuid);
+    return await this.wingullFacadeService.getStats(uuid);
   }
 
   @Post('team')
@@ -63,7 +90,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player team.' })
   @ApiBody({ type: UuidDto })
   async getTeam(@Body() { uuid }: UuidDto) {
-    return await this.wingullService.getTeam(uuid);
+    return await this.wingullFacadeService.getTeam(uuid);
   }
 
   @Post('updateDex')
@@ -72,7 +99,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update player Pokédex.' })
   @ApiBody({ type: UuidDto })
   async updateDex(@Body() { uuid }: UuidDto) {
-    return await this.wingullService.updateDex(uuid);
+    return await this.wingullFacadeService.updateDex(uuid);
   }
 
   @Post('quests')
@@ -81,7 +108,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player quests.' })
   @ApiBody({ type: UuidDto })
   async getQuests(@Body() { uuid }: UuidDto) {
-    return await this.wingullService.getQuests(uuid);
+    return await this.wingullFacadeService.getQuests(uuid);
   }
 
   @Post('message')
@@ -89,7 +116,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Message sent successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to send message.' })
   async sendMessage(@Body() { uuid, message }: { uuid: string, message: string }) {
-    return await this.wingullService.sendMessage(uuid, message);
+    return await this.wingullFacadeService.sendMessage(uuid, message);
   }
   
   @Post('givePokemon')
@@ -100,7 +127,7 @@ export class WingullController {
     @Body() { uuid, pokespec, sendMessage = true }: 
     { uuid: string, pokespec: string, sendMessage?: boolean }
   ) {
-    return await this.wingullService.givePokemon(uuid, pokespec, sendMessage);
+    return await this.wingullFacadeService.givePokemon(uuid, pokespec, sendMessage);
   }
 
   //=====================================================
@@ -112,7 +139,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Performance data retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve performance data.' })
   async getPerformance() {
-    return await this.wingullService.getPerformance();
+    return await this.wingullFacadeService.getPerformance();
   }
 
   @Get('regions')
@@ -120,7 +147,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Regions data retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve regions data.' })
   async getRegions() {
-    return await this.wingullService.getRegions();
+    return await this.wingullFacadeService.getRegions(this.townColors);
   }
 
   @Get('weather')
@@ -128,7 +155,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Weather information retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve weather information.' })
   async getWeather() {
-    return await this.wingullService.getWeather();
+    return await this.wingullFacadeService.getWeather();
   }
 
   @Post('updateNPCs')
@@ -136,7 +163,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'NPCs updated successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update NPCs.' })
   async updateNPCs(@Body() data: any) {
-    return await this.wingullService.updateNPCs(data);
+    return await this.wingullFacadeService.updateNPCs(data);
   }
 
   //=====================================================
@@ -148,7 +175,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve taxi stops.' })
   async getTaxiStops() {
-    return await this.wingullService.getTaxiStops();
+    return await this.wingullFacadeService.getTaxiStops();
   }
 
   @Post('taxi/teleport')
@@ -156,7 +183,7 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Player teleported successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to teleport player.' })
   async teleportPlayer(@Body() { id, uuid }: TeleportPlayerDto) {
-    const result = await this.wingullService.teleportPlayer(id, uuid);
+    const result = await this.wingullFacadeService.teleportPlayer(id, uuid);
     return { success: result };
   }
 }
