@@ -1,56 +1,167 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
-import { InvitesService } from './invites.service';
-import { CreateInviteDto } from './dto/create-invite.dto';
-import { UpdateInviteDto } from './dto/update-invite.dto';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { InvitesFacadeService } from './invites.facade.service';
+import { RegistrationData } from './services/registration.service';
 
-import { Response } from 'express';
-import { RegisterDataDto } from './dto/register-data.dto';
-
+@ApiTags('wingull/invites')
 @Controller('wingull/invites')
+@UseInterceptors(ResponseInterceptor)
 export class InvitesController {
-  constructor(private readonly invitesService: InvitesService) {}
+  constructor(private readonly invitesFacadeService: InvitesFacadeService) {}
+
+  // ==================== INVITE OPERATIONS ====================
 
   @Post()
-  create(@Body() createInviteDto: CreateInviteDto) {
-    return this.invitesService.create(createInviteDto);
+  @ApiOperation({ summary: 'Create a new invite' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Invite created successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid invite data.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create invite.' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        uuid: { type: 'string', description: 'User UUID' },
+        username: { type: 'string', description: 'Username' }
+      },
+      required: ['uuid', 'username']
+    }
+  })
+  async createInvite(@Body() body: { uuid: string; username: string }) {
+    return await this.invitesFacadeService.createInvite(body.uuid, body.username);
   }
 
   @Get()
-  findAll() {
-    return this.invitesService.findAll();
+  @ApiOperation({ summary: 'Get all invites' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Invites retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve invites.' })
+  async getAllInvites() {
+    return await this.invitesFacadeService.getAllInvites();
+  }
+
+  @Get('statistics')
+  @ApiOperation({ summary: 'Get invite statistics' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Statistics retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve statistics.' })
+  async getStatistics() {
+    return await this.invitesFacadeService.getInviteStatistics();
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string, @Res() res: Response){
-    console.log("ID: " + id);
-    let invite = await this.invitesService.findOne(id);
+  @ApiOperation({ summary: 'Get invite by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Invite retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invite not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve invite.' })
+  @ApiParam({ name: 'id', description: 'Invite ID' })
+  async getInviteById(@Param('id') id: string) {
+    const invite = await this.invitesFacadeService.getInviteById(id);
+    
+    if (!invite) {
+      return {
+        statusCode: HttpStatus.NOT_FOUND,
+        error: 'Not Found',
+        message: 'Invite not found'
+      };
+    }
 
-    if(invite) return res.status(200).send({
-      "statusCode": 200,
-      "data": invite
-      
-    });
-    return res.status(200).send(
-      {
-        "statusCode": 404,
-        "error": "Not Found",
-        "message": "Invite not found"
-      }
-    );
+    return {
+      statusCode: HttpStatus.OK,
+      data: invite
+    };
   }
+
+  @Get(':id/validate')
+  @ApiOperation({ summary: 'Validate invite by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Invite validation result.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to validate invite.' })
+  @ApiParam({ name: 'id', description: 'Invite ID' })
+  async validateInvite(@Param('id') id: string) {
+    return await this.invitesFacadeService.validateInvite(id);
+  }
+
+  @Get(':id/can-register')
+  @ApiOperation({ summary: 'Check if invite can be used for registration' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Registration eligibility checked.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to check registration eligibility.' })
+  @ApiParam({ name: 'id', description: 'Invite ID' })
+  async canRegister(@Param('id') id: string) {
+    return await this.invitesFacadeService.canRegisterWithInvite(id);
+  }
+
+  // ==================== REGISTRATION OPERATIONS ====================
 
   @Post(':id/register')
-  register(@Body('values') registerData: RegisterDataDto, @Body('id') id: string){
-    return this.invitesService.register(id, registerData);
+  @ApiOperation({ summary: 'Register a new user with invite' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'User registered successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid registration data.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invite not found or invalid.' })
+  @ApiResponse({ status: HttpStatus.CONFLICT, description: 'User already exists.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to register user.' })
+  @ApiParam({ name: 'id', description: 'Invite ID' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        values: {
+          type: 'object',
+          properties: {
+            username: { type: 'string', description: 'Username' },
+            mc_username: { type: 'string', description: 'Minecraft username' },
+            email: { type: 'string', description: 'Email address' },
+            password: { type: 'string', description: 'Password' }
+          },
+          required: ['username', 'mc_username', 'email', 'password']
+        }
+      },
+      required: ['values']
+    }
+  })
+  async registerUser(
+    @Param('id') id: string,
+    @Body('values') registrationData: RegistrationData
+  ) {
+    return await this.invitesFacadeService.registerWithInvite(id, registrationData);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateInviteDto: UpdateInviteDto) {
-    return this.invitesService.update(+id, updateInviteDto);
-  }
+  // ==================== INVITE MANAGEMENT ====================
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.invitesService.remove(+id);
+  @ApiOperation({ summary: 'Soft delete invite by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Invite deleted successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invite not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to delete invite.' })
+  @ApiParam({ name: 'id', description: 'Invite ID' })
+  async deleteInvite(@Param('id') id: string) {
+    return await this.invitesFacadeService.deleteInvite(id);
+  }
+
+  @Delete(':id/permanent')
+  @ApiOperation({ summary: 'Permanently delete invite by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Invite permanently deleted successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invite not found.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to permanently delete invite.' })
+  @ApiParam({ name: 'id', description: 'Invite ID' })
+  async permanentlyDeleteInvite(@Param('id') id: string) {
+    return await this.invitesFacadeService.permanentlyDeleteInvite(id);
+  }
+
+  // ==================== USER INVITE OPERATIONS ====================
+
+  @Get('user/:uuid')
+  @ApiOperation({ summary: 'Get invites by user UUID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User invites retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve user invites.' })
+  @ApiParam({ name: 'uuid', description: 'User UUID' })
+  async getUserInvites(@Param('uuid') uuid: string) {
+    return await this.invitesFacadeService.getUserInvites(uuid);
+  }
+
+  @Get('username/:username')
+  @ApiOperation({ summary: 'Get invites by username' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Username invites retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve username invites.' })
+  @ApiParam({ name: 'username', description: 'Username' })
+  async getUserInvitesByUsername(@Param('username') username: string) {
+    return await this.invitesFacadeService.getUserInvitesByUsername(username);
   }
 }

@@ -1,13 +1,45 @@
 import { Module } from '@nestjs/common';
-import { InvitesService } from './invites.service';
-import { InvitesController } from './invites.controller';
+import { LoggerModule } from '@api/_utils/logger/logger.module';
+import { ResponseModule } from '@api/_utils/response/response.module';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { UsersModule } from '@api/boffmedia/users/users.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
-import { MySQL2Service } from '@/_utils/MySQL2Service';
+
+// Import repository
+import { InvitesRepository } from '@repositories/invites.repository';
+
+// Import domain services
+import { InviteManagementService } from './services/invite-management.service';
+import { RegistrationService } from './services/registration.service';
+
+// Import facade service
+import { InvitesFacadeService } from './invites.facade.service';
+
+// Import controller
+import { InvitesController } from './invites.controller';
 
 @Module({
-  imports: [UsersModule, SmartRotomUsersModule],
+  imports: [
+    LoggerModule,
+    ResponseModule,
+    DrizzleModule,
+    UsersModule,
+    SmartRotomUsersModule
+  ],
   controllers: [InvitesController],
-  providers: [InvitesService, MySQL2Service],
+  providers: [
+    // Repository
+    InvitesRepository,
+    
+    // Domain services
+    InviteManagementService,
+    RegistrationService,
+    
+    // Facade service
+    InvitesFacadeService,
+  ],
+  exports: [
+    InvitesFacadeService,
+  ],
 })
 export class InvitesModule {}
