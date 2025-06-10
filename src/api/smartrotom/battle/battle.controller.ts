@@ -4,7 +4,7 @@ import { BattleFacadeService, CreateReplayDto, UpdateReplayDto } from './battle.
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { BattleConfig } from './services/config.service';
 
-@ApiTags('smartrotom/battle')
+@ApiTags('SmartRotom | Battle')
 @Controller('smartrotom/battle')
 @UseInterceptors(ResponseInterceptor)
 export class BattleController {

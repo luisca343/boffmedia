@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 
-@ApiTags('auth')
+@ApiTags('Authentication')
 @Controller('auth')
 @UseInterceptors(ResponseInterceptor)
 export class AuthController {

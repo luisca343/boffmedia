@@ -8,7 +8,7 @@ import axios from 'axios';
 import { join } from 'path';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('boffmedia')
+@ApiTags('Boffmedia')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}

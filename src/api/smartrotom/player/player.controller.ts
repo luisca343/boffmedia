@@ -4,7 +4,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { PlayerFacadeService } from './player.facade.service';
 
-@ApiTags('smartrotom/player')
+@ApiTags('SmartRotom | Player')
 @Controller('smartrotom/player')
 @UseInterceptors(ResponseInterceptor)
 export class PlayerController {

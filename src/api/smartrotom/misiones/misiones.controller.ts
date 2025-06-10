@@ -5,7 +5,7 @@ import { MisionesFacadeService } from './misiones.facade.service';
 import { NPCUpdateRequest } from './services/npc.service';
 import { ImageUploadRequest } from './services/image.service';
 
-@ApiTags('smartrotom/misiones')
+@ApiTags('SmartRotom | Misiones')
 @Controller('smartrotom/misiones')
 @UseInterceptors(ResponseInterceptor)
 export class MisionesController {

@@ -4,7 +4,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { UsersFacadeService, UserInitializationData } from './users.facade.service';
 import { CreateUserData, UpdateUserData } from '@repositories/smartrotom/users.repository';
 
-@ApiTags('smartrotom/users')
+@ApiTags('SmartRotom | Users')
 @Controller('smartrotom/users')
 @UseInterceptors(ResponseInterceptor)
 export class UsersController {

@@ -18,7 +18,7 @@ export class ResultadoCarreraDto {
   participantes: ParticipanteCarreraDto[];
 }
 
-@ApiTags('smartrotom')
+@ApiTags('Smartrotom')
 @Controller('smartrotom')
 @UseInterceptors(ResponseInterceptor)
 export class SmartrotomController {

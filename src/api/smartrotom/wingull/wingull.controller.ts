@@ -5,7 +5,7 @@ import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
-@ApiTags('smartrotom/wingull')
+@ApiTags('SmartRotom | Wingull')
 @Controller('smartrotom/wingull')
 @UseInterceptors(ResponseInterceptor)
 export class WingullController {

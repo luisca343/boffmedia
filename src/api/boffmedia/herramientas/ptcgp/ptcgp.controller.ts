@@ -33,7 +33,7 @@ import {
   BatchUpdateResponseDto
 } from './dto/ptcgp.dto';
 
-@ApiTags('Pokemon TCG Pocket')
+@ApiTags('Tools | Pokemon TCG Pocket')
 @Controller('ptcgp')
 export class PtcgpController {
   private readonly logger = new Logger(PtcgpController.name);

@@ -58,7 +58,7 @@ export class LoginDto {
   password: string;
 }
 
-@ApiTags('BoffMedia Users')
+@ApiTags('BoffMedia | Users')
 @Controller('boffmedia/users')
 export class BoffMediaUsersController {
   constructor(

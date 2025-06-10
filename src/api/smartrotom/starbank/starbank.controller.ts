@@ -9,7 +9,7 @@ import { CreateTransferDto } from './dto/create-transfer-dto';
 import { TransferFromMainDto } from './dto/transfer-from-main-dto';
 import { ShopTransactionData } from './services/starbank-account.service';
 
-@ApiTags('smartrotom/starbank')
+@ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')
 @UseInterceptors(ResponseInterceptor)
 export class StarbankController {

@@ -7,7 +7,7 @@ import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { CreateChatDto } from './dto/create-chat-dto';
 import { CreateChatMessageDto } from './dto/create-chat-message-dto';
 
-@ApiTags('smartrotom/chatapp')
+@ApiTags('SmartRotom | ChatApp')
 @Controller('smartrotom/chatapp')
 @UseInterceptors(ResponseInterceptor)
 export class ChatappController {

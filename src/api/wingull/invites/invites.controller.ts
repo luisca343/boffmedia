@@ -4,7 +4,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { InvitesFacadeService } from './invites.facade.service';
 import { RegistrationData } from './services/registration.service';
 
-@ApiTags('wingull/invites')
+@ApiTags('Wingull | Invites')
 @Controller('wingull/invites')
 @UseInterceptors(ResponseInterceptor)
 export class InvitesController {

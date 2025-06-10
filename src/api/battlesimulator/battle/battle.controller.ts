@@ -24,7 +24,7 @@ function getPokemonTeam(team: Pokemon[]) {
   return pokemonTeam
 }
 
-@ApiTags('battlesimulator/battle')
+@ApiTags('Battle Simulator')
 @Controller('battlesimulator/battle')
 @UseInterceptors(ResponseInterceptor)
 export class BattleController {

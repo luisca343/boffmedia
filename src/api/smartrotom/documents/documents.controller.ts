@@ -8,7 +8,7 @@ import { CreateNewsDto } from './dto/create-news-dto';
 import { NewsStatusDto } from './dto/news-status-dto';
 import { CreateDocumentDto, CreateDocumentDtoWithUuid } from './dto/create-document.dto';
 
-@ApiTags('smartrotom/documents')
+@ApiTags('SmartRotom | Documents')
 @Controller('smartrotom/documents')
 @UseInterceptors(ResponseInterceptor)
 export class DocumentsController {

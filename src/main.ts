@@ -36,16 +36,6 @@ async function bootstrap() {
   console.log('EL PUERTO ES: ' + configService.get('PORT'));
 
   if (process.env.NODE_ENV !== 'production') {
-    /*
-    const config = new DocumentBuilder()
-      .setTitle('BoffMedia API')
-      .setDescription('The BoffMedia API description')
-      .setVersion('1.0')
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);*/
-
-    
     const config = new DocumentBuilder()
       .setTitle('BoffMedia API')
       .setDescription('The BoffMedia API description')
@@ -54,46 +44,33 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
   
     // Sort tags alphabetically
-
-    
-    if (document.tags) {
-      document.tags = document.tags.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    
-  
-    // Sort paths alphabetically
-    const sortedPaths = {};
-    Object.keys(document.paths)
-      .sort()
-      .forEach((key) => {
-        sortedPaths[key] = document.paths[key];
-  
-        // Sort methods within each path
-        const methods = ['get', 'post', 'put', 'delete', 'patch'];
-        const sortedMethods = {};
-        methods.forEach((method) => {
-          if (sortedPaths[key][method]) {
-            sortedMethods[method] = sortedPaths[key][method];
+    if (document.tags && document.tags.length > 0) {
+      document.tags.sort((a, b) => a.name.localeCompare(b.name));
+      console.log('Tags sorted alphabetically:', document.tags.map(tag => tag.name));
+    } else {
+      // Extract tags from paths if they're not in the document.tags array
+      const tagsSet = new Set<string>();
+      
+      Object.values(document.paths).forEach((pathItem: any) => {
+        Object.values(pathItem).forEach((operation: any) => {
+          if (operation.tags && Array.isArray(operation.tags)) {
+            operation.tags.forEach((tag: string) => tagsSet.add(tag));
           }
         });
-        sortedPaths[key] = sortedMethods;
       });
-    document.paths = sortedPaths;
-
-
-    // Sort schemas alphabetically
-    if (document.components && document.components.schemas) {
-      const sortedSchemas = {};
-      Object.keys(document.components.schemas)
-        .sort()
-        .forEach((key) => {
-          sortedSchemas[key] = document.components.schemas[key];
-        });
-      document.components.schemas = sortedSchemas;
+      
+      // Convert to sorted array and add to document
+      document.tags = Array.from(tagsSet)
+        .sort((a, b) => a.localeCompare(b))
+        .map(tag => ({ name: tag }));
+      
+      console.log('Tags extracted and sorted:', document.tags.map(tag => tag.name));
     }
-  
-    //SwaggerModule.setup('api', app, document);
-  
+
+    console.log('Final document structure check:');
+    console.log('Tags count:', document.tags?.length || 0);
+    console.log('Paths count:', Object.keys(document.paths).length);
+    
     app.use(
       '/reference',
       apiReference({

@@ -9,7 +9,7 @@ export interface ClaimItemsWithTypesRequest {
   items: Array<{ id: string; type?: string; }>;
 }
 
-@ApiTags('smartrotom/arcade')
+@ApiTags('SmartRotom | Arcade')
 @Controller('smartrotom/arcade')
 @UseInterceptors(ResponseInterceptor)
 export class ArcadeController {

@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery } from '@nestjs/
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MhwildsFacadeService } from './mhwilds.facade.service';
 
-@ApiTags('boffmedia/tools/mhwilds')
+@ApiTags('Tools | MHWilds')
 @Controller('tools/mhwilds')
 @UseInterceptors(ResponseInterceptor)
 export class MhwildsController {

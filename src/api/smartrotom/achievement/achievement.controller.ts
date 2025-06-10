@@ -5,7 +5,7 @@ import { BattleAchievementDto } from "../_dto/battle-achievement-dto"
 import { AchievementFacadeService } from "./achievement.facade.service"
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor'
 
-@ApiTags("smartrotom/achievements")
+@ApiTags("SmartRotom | Achievements")
 @Controller("/smartrotom/achievements")
 @UseInterceptors(ResponseInterceptor)
 export class AchievementController {

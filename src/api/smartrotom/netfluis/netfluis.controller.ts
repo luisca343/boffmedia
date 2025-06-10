@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { NetfluisService } from './netfluis.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
-@ApiTags('smartrotom/netfluis')
+@ApiTags('SmartRotom | Netfluis')
 @Controller('smartrotom/netfluis')
 @UseInterceptors(ResponseInterceptor)
 export class NetfluisController {

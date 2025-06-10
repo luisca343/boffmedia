@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from 
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MineFacadeService, PlayGameRequest, EndGameRequest, ClaimRequest } from './mine.facade.service';
 
-@ApiTags('smartrotom/mine')
+@ApiTags('SmartRotom | Mine')
 @Controller('smartrotom/mine')
 @UseInterceptors(ResponseInterceptor)
 export class MinaController {

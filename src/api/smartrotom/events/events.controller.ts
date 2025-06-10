@@ -20,7 +20,7 @@ import { JoinEventDto } from './dto/join-event.dto';
 import { UpdateProgressDto, JoinTeamDto } from './events.facade.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
-@ApiTags('boffmedia/events')
+@ApiTags('BoffMedia | Events')
 @Controller('boffmedia/events')
 @UseInterceptors(ResponseInterceptor)
 export class EventsController {

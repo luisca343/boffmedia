@@ -17,7 +17,7 @@ export class UploadDto {
     file: Express.Multer.File;
   }
   
-  @ApiTags("upload")
+  @ApiTags("Upload")
   @Controller("upload")
   export class UploadController {
     constructor(private readonly uploadService: UploadService) {}

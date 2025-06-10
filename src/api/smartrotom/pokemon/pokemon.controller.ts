@@ -3,7 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from 
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { PokemonFacadeService } from './pokemon.facade.service';
 
-@ApiTags('smartrotom/pokemon')
+@ApiTags('SmartRotom | Pokémon')
 @Controller('smartrotom/pokemon')
 @UseInterceptors(ResponseInterceptor)
 export class PokemonController {  

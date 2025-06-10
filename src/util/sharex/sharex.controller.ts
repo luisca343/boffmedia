@@ -4,7 +4,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import *  as  path from 'path';
 import { SharexService } from './sharex.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('ShareX')
 @Controller('sharex')
 export class SharexController {
     constructor(private readonly sharexService: SharexService) {}

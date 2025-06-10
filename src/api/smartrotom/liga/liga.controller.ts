@@ -4,7 +4,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { LigaFacadeService } from './liga.facade.service';
 import { TournamentCreationRequest, TournamentRegistration } from './services/tournament.service';
 
-@ApiTags('smartrotom/liga')
+@ApiTags('SmartRotom | Liga')
 @Controller('smartrotom/liga')
 @UseInterceptors(ResponseInterceptor)
 export class LigaController {

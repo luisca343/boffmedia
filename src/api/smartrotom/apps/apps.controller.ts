@@ -8,7 +8,7 @@ import { PlayerAppDto } from './dto/player-app-dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { AppsExamples } from './examples/apps.examples';
 
-@ApiTags('smartrotom/apps')
+@ApiTags('SmartRotom | Apps')
 @Controller('/smartrotom/apps')
 @UseInterceptors(ResponseInterceptor)
 export class AppsController {
