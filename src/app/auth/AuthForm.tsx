@@ -46,11 +46,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
     setIsLoading(true)
     if (isRegister) {
       try {
-        const response = await boffPOST('/users/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
-        })
+        const response = await boffPOST('/users', values)
         if (response.statusCode === 200) {
           router.push('/auth?mode=login&message=Registration successful. Please log in.')
         } else {
