@@ -36,6 +36,15 @@ export class StarbankController {
     return await this.starbankFacadeService.createAccount(body.uuid, body.name);
   }
 
+  @Post('accounts/main')
+  @ApiOperation({ summary: 'Create a main account for a user' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Main account created successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid user data.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to create main account.' })
+  async createMainAccount(@Body() body: CreateAccountDto) {
+    return await this.starbankFacadeService.createMainAccount(body.uuid, body.name);
+  }
+  
   @Get('accounts/:uuid')
   @ApiOperation({ summary: 'Get accounts for a user' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Accounts retrieved successfully.' })

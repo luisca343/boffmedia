@@ -14,6 +14,7 @@ export interface UserValidationResult {
 }
 
 export interface SessionUser {
+  id: number;
   name: string;
   email: string;
   smartRotomUser: {
@@ -452,6 +453,7 @@ export class BoffMediaUsersManagementService {
 
   private createSessionUser(fullUser: FullUserData): SessionUser {
     return {
+      id: fullUser.boffmedia_users.id,
       name: fullUser.boffmedia_users.username,
       email: fullUser.boffmedia_users.email,
       smartRotomUser: fullUser.rotom_users ? {
@@ -476,6 +478,8 @@ export class BoffMediaUsersManagementService {
 
   private validateUserData(userData: CreateUserData): UserValidationResult {
     const errors: string[] = [];
+
+    console.log('Validating user data:', userData);
 
     if (!userData.email || userData.email.trim() === '') {
       errors.push('Email is required');

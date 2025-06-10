@@ -17,7 +17,8 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async login(fullUser: any) {
+    const user = fullUser.sessionUser;
     const payload = {
       username: user.name,
       sub: user.id,
@@ -26,7 +27,6 @@ export class AuthService {
       mcUuid: user.mcUUid
     };
 
-    
     return {
       access_token: this.jwtService.sign(payload),
       refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
@@ -47,8 +47,6 @@ export class AuthService {
     }
 
     const user = await this.usersService.getUserWithIntegrations(loginData.uuid, "uuid");
-    console.log('Login Minecraft user:', loginData.username, 'with UUID:', loginData.uuid);
-    console.log('Found user:', user);
     if (!user) {
       return { error: 'User not found in BoffMedia system' };
     }
@@ -172,8 +170,6 @@ export class AuthService {
 
       // Get fresh roles
       const roles = await this.usersService.getUserRoles(user.id);
-
-      console.log('Refreshing token for user:', user.username, 'with roles:', roles);
 
       const newPayload = {
         username: user.username,

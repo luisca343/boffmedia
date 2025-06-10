@@ -9,7 +9,8 @@ import {
   Query,
   ParseIntPipe,
   HttpStatus,
-  HttpException
+  HttpException,
+  UseInterceptors
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,6 +23,7 @@ import {
 import { BoffMediaUsersFacadeService } from './users.facade.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 
 // Additional DTOs for specialized endpoints
 export class MinecraftRegistrationDto {
@@ -59,7 +61,8 @@ export class LoginDto {
 }
 
 @ApiTags('BoffMedia | Users')
-@Controller('boffmedia/users')
+@Controller('users')
+@UseInterceptors(ResponseInterceptor)
 export class BoffMediaUsersController {
   constructor(
     private readonly usersFacadeService: BoffMediaUsersFacadeService,
@@ -74,6 +77,7 @@ export class BoffMediaUsersController {
   @ApiResponse({ status: 409, description: 'User already exists' })
   @ApiBody({ type: CreateUserDto })
   async create(@Body() createUserDto: CreateUserDto) {
+    console.log('Creating user with data:', createUserDto);
     try {
       const user = await this.usersFacadeService.createUser({
         email: createUserDto.email,

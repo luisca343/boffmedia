@@ -269,6 +269,7 @@ export class BoffMediaUsersFacadeService {
   async validateUser(username: string, password: string): Promise<AuthenticationResult | null> {
     try {
       const sessionUser = await this.usersManagementService.validateUser(username, password);
+      
       if (!sessionUser) {
         return null;
       }
@@ -298,6 +299,7 @@ export class BoffMediaUsersFacadeService {
       }
 
       return {
+        id: fullUser.boffmedia_users.id,
         name: fullUser.boffmedia_users.username,
         email: fullUser.boffmedia_users.email,
         smartRotomUser: fullUser.rotom_users ? {
@@ -506,6 +508,7 @@ export class BoffMediaUsersFacadeService {
 
   async getSessionUser(fullUser: FullUserData): Promise<SessionUser> {
     return {
+      id: fullUser.boffmedia_users.id,
       name: fullUser.boffmedia_users.username,
       email: fullUser.boffmedia_users.email,
       smartRotomUser: fullUser.rotom_users ? {
