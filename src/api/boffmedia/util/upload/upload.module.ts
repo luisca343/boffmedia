@@ -1,9 +1,26 @@
 import { Module } from '@nestjs/common';
+
+import { UploadRepository } from '@repositories/boffmedia/upload.repository';
+import { FileUploadService } from './services/file-upload.service';
+import { ImageUploadService } from './services/image-upload.service';
+import { UploadFacadeService } from './upload.facade.service';
 import { UploadController } from './upload.controller';
-import { UploadService } from './upload.service';
+
 @Module({
   controllers: [UploadController],
-  providers: [UploadService],
-  exports: [UploadService],
+  providers: [
+    UploadRepository,
+    
+    FileUploadService,
+    ImageUploadService,
+    
+    UploadFacadeService,
+  ],
+  exports: [
+    UploadFacadeService,
+    
+    FileUploadService,
+    ImageUploadService,
+  ],
 })
 export class UploadModule {}
