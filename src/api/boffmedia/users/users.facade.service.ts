@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BoffMediaUsersManagementService, UserCreationResult, SessionUser, GoogleUserData, MinecraftRegistrationData, MinecraftLinkData } from './services/users-management.service';
 import { UsersFacadeService as SmartRotomUsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { StarbankFacadeService } from '@api/smartrotom/starbank/starbank.facade.service';
-import { CreateUserData, UpdateUserData, FullUserData } from '@repositories/boffmedia/users.repository';
+import { CreateUserData, UpdateUserData, FullUserData, BoffMediaUserSafe, FullUserDataSafe } from '@repositories/boffmedia/users.repository';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 
@@ -22,7 +22,7 @@ export interface BoffMediaUserInitializationData {
 }
 
 export interface IntegratedUserCreationResult {
-  boffMediaUser: BoffMediaUser;
+  boffMediaUser: BoffMediaUserSafe;
   smartRotomUser: SmartRotomUser | null;
   starbankAccounts: any[];
   isNewBoffMediaUser: boolean;
@@ -30,7 +30,7 @@ export interface IntegratedUserCreationResult {
 }
 
 export interface UserWithIntegrations {
-  boffMediaUser: BoffMediaUser;
+  boffMediaUser: BoffMediaUserSafe;
   smartRotomUser: SmartRotomUser | null;
   starbankAccounts: any[];
   roles: string[];
@@ -55,7 +55,7 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== USER CREATION & INITIALIZATION ====================
 
-  async createUser(userData: CreateUserData): Promise<BoffMediaUser> {
+  async createUser(userData: CreateUserData): Promise<BoffMediaUserSafe> {
     try {
       return await this.usersManagementService.createUser(userData);
     } catch (error) {
@@ -131,7 +131,7 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== USER RETRIEVAL ====================
 
-  async getAllUsers(): Promise<BoffMediaUser[]> {
+  async getAllUsers(): Promise<BoffMediaUserSafe[]> {
     try {
       return await this.usersManagementService.getAllUsers();
     } catch (error) {
@@ -140,7 +140,7 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async getUserById(id: number): Promise<BoffMediaUser | null> {
+  async getUserById(id: number): Promise<BoffMediaUserSafe | null> {
     try {
       return await this.usersManagementService.getUserById(id);
     } catch (error) {
@@ -149,7 +149,7 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async getUserByUsername(username: string): Promise<BoffMediaUser | null> {
+  async getUserByUsername(username: string): Promise<BoffMediaUserSafe | null> {
     try {
       return await this.usersManagementService.getUserByUsername(username);
     } catch (error) {
@@ -158,7 +158,7 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async getUserByEmail(email: string): Promise<BoffMediaUser | null> {
+  async getUserByEmail(email: string): Promise<BoffMediaUserSafe | null> {
     try {
       return await this.usersManagementService.getUserByEmail(email);
     } catch (error) {
@@ -171,7 +171,7 @@ export class BoffMediaUsersFacadeService {
 
   async getUserWithIntegrations(identifier: string, type: 'id' | 'username' | 'email' | 'uuid'): Promise<UserWithIntegrations | null> {
     try {
-      let fullUser: FullUserData | null = null;
+      let fullUser: FullUserDataSafe | null = null;
 
       switch (type) {
         case 'id':
@@ -221,7 +221,7 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async getFullUserByUsername(username: string): Promise<FullUserData | null> {
+  async getFullUserByUsername(username: string): Promise<FullUserDataSafe | null> {
     try {
       return await this.usersManagementService.getFullUserByUsername(username);
     } catch (error) {
@@ -230,7 +230,7 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async getFullUserByEmail(email: string): Promise<FullUserData | null> {
+  async getFullUserByEmail(email: string): Promise<FullUserDataSafe | null> {
     try {
       return await this.usersManagementService.getFullUserByEmail(email);
     } catch (error) {
@@ -241,7 +241,7 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== USER UPDATE ====================
 
-  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUser> {
+  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUserSafe> {
     try {
       return await this.usersManagementService.updateUser(id, updateData);
     } catch (error) {
@@ -357,7 +357,7 @@ export class BoffMediaUsersFacadeService {
   }
 
   async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<{ 
-    boffMediaUser: BoffMediaUser; 
+    boffMediaUser: BoffMediaUserSafe; 
     smartRotomUser: SmartRotomUser;
     starbankAccounts: any[];
   }> {
@@ -520,7 +520,7 @@ export class BoffMediaUsersFacadeService {
   }
 
   // Support for the original createFromBoffMedia method
-  async createFromBoffMedia(boffMediaUser: Partial<BoffMediaUser>): Promise<BoffMediaUser> {
+  async createFromBoffMedia(boffMediaUser: Partial<BoffMediaUser>): Promise<BoffMediaUserSafe> {
     if (!boffMediaUser.email || !boffMediaUser.username || !boffMediaUser.password) {
       throw new Error('Email, username, and password are required');
     }

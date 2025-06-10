@@ -14,6 +14,7 @@ import { BoffMediaUsersFacadeService } from './users.facade.service';
 
 // Controller
 import { BoffMediaUsersController } from './users.controller';
+import { PasswordModule } from '@api/auth/password.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { BoffMediaUsersController } from './users.controller';
     DrizzleModule,
     StarbankModule,
     SmartRotomUsersModule,
+    PasswordModule
   ],
   controllers: [BoffMediaUsersController],
   providers: [

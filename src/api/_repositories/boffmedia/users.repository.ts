@@ -11,6 +11,8 @@ import {
 import { smartrotomUsers, SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
 
+export type BoffMediaUserSafe = Omit<BoffMediaUser, 'password'>;
+
 export interface CreateUserData {
   email: string;
   username: string;
@@ -31,12 +33,17 @@ export interface UpdateUserData {
   discordId?: string;
 }
 
-export interface UserWithRoles extends BoffMediaUser {
+export interface UserWithRoles extends BoffMediaUserSafe {
   roles: string[];
 }
 
 export interface FullUserData {
   boffmedia_users: BoffMediaUser;
+  rotom_users: SmartRotomUser | null;
+}
+
+export interface FullUserDataSafe {
+  boffmedia_users: BoffMediaUserSafe;
   rotom_users: SmartRotomUser | null;
 }
 
@@ -46,9 +53,39 @@ export class BoffMediaUsersRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
 
+  // ==================== SELECT CLAUSES ====================
+
+  private readonly userSelectWithoutPassword = {
+    id: boffMediaUsers.id,
+    email: boffMediaUsers.email,
+    username: boffMediaUsers.username,
+    uuid: boffMediaUsers.uuid,
+    profilePicture: boffMediaUsers.profilePicture,
+    googleId: boffMediaUsers.googleId,
+    discordId: boffMediaUsers.discordId,
+    twitchId: boffMediaUsers.twitchId,
+    createdAt: boffMediaUsers.createdAt,
+    updatedAt: boffMediaUsers.updatedAt
+  };
+
+  private readonly userSelectWithPassword = {
+    ...this.userSelectWithoutPassword,
+    password: boffMediaUsers.password
+  };
+
+  private readonly fullUserSelectWithoutPassword = {
+    boffmedia_users: this.userSelectWithoutPassword,
+    rotom_users: smartrotomUsers
+  };
+
+  private readonly fullUserSelectWithPassword = {
+    boffmedia_users: this.userSelectWithPassword,
+    rotom_users: smartrotomUsers
+  };
+
   // ==================== CREATE OPERATIONS ====================
 
-  async createUser(userData: CreateUserData): Promise<BoffMediaUser> {
+  async createUser(userData: CreateUserData): Promise<BoffMediaUserSafe> {
     try {
       const result = await this.db.insert(boffMediaUsers)
         .values(userData as BoffMediaUser)
@@ -92,23 +129,26 @@ export class BoffMediaUsersRepository {
 
   // ==================== READ OPERATIONS ====================
 
-  async findAllUsers(): Promise<BoffMediaUser[]> {
+  async findAllUsers(): Promise<BoffMediaUserSafe[]> {
     try {
-      return await this.db.select().from(boffMediaUsers).execute();
+      return await this.db
+        .select(this.userSelectWithoutPassword)
+        .from(boffMediaUsers)
+        .execute();
     } catch (error) {
       console.error('Failed to retrieve all users:', error);
       throw new Error(`Failed to retrieve users: ${error.message}`);
     }
   }
 
-  async findUserById(id: number): Promise<BoffMediaUser | null> {
+  async findUserById(id: number): Promise<BoffMediaUserSafe | null> {
     if (!id || id <= 0) {
       throw new Error('Valid ID is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(eq(boffMediaUsers.id, id))
         .execute();
@@ -120,14 +160,14 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async findUserByUsername(username: string): Promise<BoffMediaUser | null> {
+  async findUserByUsername(username: string): Promise<BoffMediaUserSafe | null> {
     if (!username || username.trim() === '') {
       throw new Error('Username is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(eq(boffMediaUsers.username, username))
         .execute();
@@ -139,14 +179,14 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async findUserByEmail(email: string): Promise<BoffMediaUser | null> {
+  async findUserByEmail(email: string): Promise<BoffMediaUserSafe | null> {
     if (!email || email.trim() === '') {
       throw new Error('Email is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(eq(boffMediaUsers.email, email))
         .execute();
@@ -158,14 +198,14 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async findUserByUuid(uuid: string): Promise<BoffMediaUser | null> {
+  async findUserByUuid(uuid: string): Promise<BoffMediaUserSafe | null> {
     if (!uuid || uuid.trim() === '') {
       throw new Error('UUID is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(eq(boffMediaUsers.uuid, uuid))
         .execute();
@@ -177,14 +217,14 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async findUserByGoogleId(googleId: string): Promise<BoffMediaUser | null> {
+  async findUserByGoogleId(googleId: string): Promise<BoffMediaUserSafe | null> {
     if (!googleId || googleId.trim() === '') {
       throw new Error('Google ID is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(eq(boffMediaUsers.googleId, googleId))
         .execute();
@@ -198,14 +238,14 @@ export class BoffMediaUsersRepository {
 
   // ==================== COMPLEX QUERIES ====================
 
-  async findFullUserByUsername(username: string): Promise<FullUserData | null> {
+  async findFullUserByUsernameWithPassword(username: string): Promise<FullUserData | null> {
     if (!username || username.trim() === '') {
       throw new Error('Username is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.fullUserSelectWithPassword)
         .from(boffMediaUsers)
         .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
         .where(eq(boffMediaUsers.username, username))
@@ -223,14 +263,42 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async findFullUserByUuid(uuid: string): Promise<FullUserData | null> {
+  async findFullUserByUsername(username: string): Promise<FullUserDataSafe | null> {
+    if (!username || username.trim() === '') {
+      throw new Error('Username is required');
+    }
+
+    try {
+      const rows = await this.db
+        .select(this.fullUserSelectWithoutPassword)
+        .from(boffMediaUsers)
+        .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
+        .where(eq(boffMediaUsers.username, username))
+        .execute();
+
+      if (rows.length === 0) return null;
+
+      return {
+        boffmedia_users: rows[0].boffmedia_users,
+        rotom_users: rows[0].rotom_users
+      };
+    } catch (error) {
+      console.error(`Failed to find full user by username ${username}:`, error);
+      throw new Error(`Failed to find full user: ${error.message}`);
+    }
+  }
+
+  async findFullUserByUuid(uuid: string): Promise<FullUserDataSafe | null> {
     if (!uuid || uuid.trim() === '') {
       throw new Error('UUID is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select({
+          boffmedia_users: this.userSelectWithoutPassword,
+          rotom_users: smartrotomUsers
+        })
         .from(smartrotomUsers)
         .leftJoin(boffMediaUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
         .where(eq(smartrotomUsers.uuid, uuid))
@@ -248,14 +316,14 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async findFullUserByEmail(email: string): Promise<FullUserData | null> {
+  async findFullUserByEmail(email: string): Promise<FullUserDataSafe | null> {
     if (!email || email.trim() === '') {
       throw new Error('Email is required');
     }
 
     try {
       const rows = await this.db
-        .select()
+        .select(this.fullUserSelectWithoutPassword)
         .from(boffMediaUsers)
         .leftJoin(smartrotomUsers, eq(boffMediaUsers.uuid, smartrotomUsers.uuid))
         .where(eq(boffMediaUsers.email, email))
@@ -295,7 +363,7 @@ export class BoffMediaUsersRepository {
 
   // ==================== UPDATE OPERATIONS ====================
 
-  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUser> {
+  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new Error('Valid ID is required');
     }
@@ -358,7 +426,7 @@ export class BoffMediaUsersRepository {
 
   async checkUserExists(identifier: string, type: 'id' | 'username' | 'email' | 'uuid'): Promise<boolean> {
     try {
-      let user: BoffMediaUser | null = null;
+      let user: BoffMediaUserSafe | null = null;
       
       switch (type) {
         case 'id':
@@ -382,7 +450,7 @@ export class BoffMediaUsersRepository {
     }
   }
 
-  async checkMultipleFieldsExist(fields: { username?: string; email?: string; uuid?: string }): Promise<BoffMediaUser[]> {
+  async checkMultipleFieldsExist(fields: { username?: string; email?: string; uuid?: string }): Promise<BoffMediaUserSafe[]> {
     try {
       const conditions = [];
       
@@ -401,7 +469,7 @@ export class BoffMediaUsersRepository {
       }
 
       return await this.db
-        .select()
+        .select(this.userSelectWithoutPassword)
         .from(boffMediaUsers)
         .where(or(...conditions))
         .execute();

@@ -1,10 +1,11 @@
 import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { BoffMediaUsersRepository, CreateUserData, UpdateUserData, FullUserData } from '@repositories/boffmedia/users.repository';
+import { BoffMediaUsersRepository, CreateUserData, UpdateUserData, FullUserData, BoffMediaUserSafe, FullUserDataSafe } from '@repositories/boffmedia/users.repository';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
+import { PasswordService } from '@api/auth/password.service';
 
 export interface UserCreationResult {
-  user: BoffMediaUser;
+  user: BoffMediaUserSafe;
   isNew: boolean;
 }
 
@@ -59,11 +60,12 @@ export class BoffMediaUsersManagementService {
 
   constructor(
     private readonly usersRepository: BoffMediaUsersRepository,
+    private readonly passwordService: PasswordService
   ) {}
 
   // ==================== USER CREATION ====================
 
-  async createUser(userData: CreateUserData): Promise<BoffMediaUser> {
+  async createUser(userData: CreateUserData): Promise<BoffMediaUserSafe> {
     // Validate input
     const validation = this.validateUserData(userData);
     if (!validation.isValid) {
@@ -92,8 +94,8 @@ export class BoffMediaUsersManagementService {
         throw new ConflictException(`User already exists with: ${conflicts.join(', ')}`);
       }
 
-      // Hash password
-      const hashedPassword = await this.hashPassword(userData.password);
+      // Hash password using PasswordService
+      const hashedPassword = await this.passwordService.hashPassword(userData.password);
       
       // Create user with hashed password
       const userDataWithHashedPassword = {
@@ -142,7 +144,7 @@ export class BoffMediaUsersManagementService {
 
   // ==================== USER RETRIEVAL ====================
 
-  async getAllUsers(): Promise<BoffMediaUser[]> {
+  async getAllUsers(): Promise<BoffMediaUserSafe[]> {
     try {
       return await this.usersRepository.findAllUsers();
     } catch (error) {
@@ -151,7 +153,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getUserById(id: number): Promise<BoffMediaUser | null> {
+  async getUserById(id: number): Promise<BoffMediaUserSafe | null> {
     if (!id || id <= 0) {
       throw new BadRequestException('Valid ID is required');
     }
@@ -164,7 +166,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getUserByUsername(username: string): Promise<BoffMediaUser | null> {
+  async getUserByUsername(username: string): Promise<BoffMediaUserSafe | null> {
     if (!username || username.trim() === '') {
       throw new BadRequestException('Username is required');
     }
@@ -177,7 +179,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getUserByEmail(email: string): Promise<BoffMediaUser | null> {
+  async getUserByEmail(email: string): Promise<BoffMediaUserSafe | null> {
     if (!email || email.trim() === '') {
       throw new BadRequestException('Email is required');
     }
@@ -190,7 +192,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getUserByUuid(uuid: string): Promise<BoffMediaUser | null> {
+  async getUserByUuid(uuid: string): Promise<BoffMediaUserSafe | null> {
     if (!uuid || uuid.trim() === '') {
       throw new BadRequestException('UUID is required');
     }
@@ -203,7 +205,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getUserByGoogleId(googleId: string): Promise<BoffMediaUser | null> {
+  async getUserByGoogleId(googleId: string): Promise<BoffMediaUserSafe | null> {
     if (!googleId || googleId.trim() === '') {
       throw new BadRequestException('Google ID is required');
     }
@@ -217,8 +219,20 @@ export class BoffMediaUsersManagementService {
   }
 
   // ==================== FULL USER RETRIEVAL ====================
+  async getFullUserByUsernameWithPassword(username: string): Promise<FullUserData | null> {
+    if (!username || username.trim() === '') {
+      throw new BadRequestException('Username is required');
+    }
 
-  async getFullUserByUsername(username: string): Promise<FullUserData | null> {
+    try {
+      return await this.usersRepository.findFullUserByUsernameWithPassword(username);
+    } catch (error) {
+      console.error(`Failed to get full user by username ${username}:`, error);
+      throw new Error(`Failed to retrieve full user: ${error.message}`);
+    }
+  }
+
+  async getFullUserByUsername(username: string): Promise<FullUserDataSafe | null> {
     if (!username || username.trim() === '') {
       throw new BadRequestException('Username is required');
     }
@@ -231,7 +245,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getFullUserByEmail(email: string): Promise<FullUserData | null> {
+  async getFullUserByEmail(email: string): Promise<FullUserDataSafe | null> {
     if (!email || email.trim() === '') {
       throw new BadRequestException('Email is required');
     }
@@ -244,7 +258,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async getFullUserByUuid(uuid: string): Promise<FullUserData | null> {
+  async getFullUserByUuid(uuid: string): Promise<FullUserDataSafe | null> {
     if (!uuid || uuid.trim() === '') {
       throw new BadRequestException('UUID is required');
     }
@@ -259,7 +273,7 @@ export class BoffMediaUsersManagementService {
 
   // ==================== USER UPDATE ====================
 
-  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUser> {
+  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new BadRequestException('Valid ID is required');
     }
@@ -274,9 +288,13 @@ export class BoffMediaUsersManagementService {
     }
 
     try {
-      // If password is being updated, hash it
+      // If password is being updated, validate and hash it
       if (updateData.password) {
-        updateData.password = await this.hashPassword(updateData.password);
+        const passwordValidation = this.passwordService.validatePassword(updateData.password);
+        if (!passwordValidation.isValid) {
+          throw new BadRequestException(`Password validation failed: ${passwordValidation.errors.join(', ')}`);
+        }
+        updateData.password = await this.passwordService.hashPassword(updateData.password);
       }
 
       return await this.usersRepository.updateUser(id, updateData);
@@ -317,12 +335,13 @@ export class BoffMediaUsersManagementService {
     }
 
     try {
-      const fullUser = await this.getFullUserByUsername(username);
+      const fullUser = await this.getFullUserByUsernameWithPassword(username);
       if (!fullUser) {
         return null;
       }
 
-      const isValidPassword = await bcrypt.compare(password, fullUser.boffmedia_users.password);
+      // Use PasswordService for verification
+      const isValidPassword = await this.passwordService.verifyPassword(password, fullUser.boffmedia_users.password);
       if (!isValidPassword) {
         return null;
       }
@@ -352,11 +371,11 @@ export class BoffMediaUsersManagementService {
             profilePicture: googleUser.profilePicture || existingUser.profilePicture
           });
         } else {
-          // Create new user
+          // Create new user with secure random password
           const userData: CreateUserData = {
             email: googleUser.email,
             username: this.generateUsernameFromEmail(googleUser.email),
-            password: this.generateRandomPassword(), // Generate random password for Google users
+            password: this.passwordService.generateOAuthPassword(), // Use PasswordService
             googleId: googleUser.googleId,
             profilePicture: googleUser.profilePicture || "https://cdn.boffmedia.com/default-profile.png"
           };
@@ -365,7 +384,7 @@ export class BoffMediaUsersManagementService {
         }
       }
 
-      const fullUser = await this.getFullUserByUsername(existingUser.username);
+      const fullUser = await this.getFullUserByUsernameWithPassword(existingUser.username);
       if (!fullUser) {
         throw new Error('Failed to retrieve full user data after Google authentication');
       }
@@ -379,7 +398,7 @@ export class BoffMediaUsersManagementService {
 
   // ==================== MINECRAFT INTEGRATION ====================
 
-  async createMinecraftUser(registerData: MinecraftRegistrationData): Promise<BoffMediaUser> {
+  async createMinecraftUser(registerData: MinecraftRegistrationData): Promise<BoffMediaUserSafe> {
     try {
       const userData: CreateUserData = {
         email: registerData.email,
@@ -395,7 +414,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<BoffMediaUser> {
+  async linkMinecraftAccount(linkData: MinecraftLinkData): Promise<BoffMediaUserSafe> {
     try {
       // Validate user credentials first
       const sessionUser = await this.validateUser(linkData.username, linkData.password);
@@ -446,11 +465,6 @@ export class BoffMediaUsersManagementService {
 
   // ==================== PRIVATE HELPER METHODS ====================
 
-  private async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(this.saltRounds);
-    return bcrypt.hash(password, salt);
-  }
-
   private createSessionUser(fullUser: FullUserData): SessionUser {
     return {
       id: fullUser.boffmedia_users.id,
@@ -468,10 +482,6 @@ export class BoffMediaUsersManagementService {
     const baseUsername = email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
     const randomSuffix = Math.floor(Math.random() * 10000);
     return `${baseUsername}${randomSuffix}`;
-  }
-
-  private generateRandomPassword(): string {
-    return Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12);
   }
 
   // ==================== VALIDATION METHODS ====================
