@@ -52,7 +52,6 @@ import { MoveDataService } from '@api/smartrotom/pokemon/services/data/move-data
 import { SpawnDataService } from '@api/smartrotom/pokemon/services/data/spawn-data.service';
 import { PokemonImageService } from '@api/smartrotom/pokemon/services/data/pokemon-image.service';
 import { AchievementModule } from '@api/smartrotom/achievement/achievement.module';
-import { AchievementService } from '@api/smartrotom/achievement/achievement.service';
 import { PlayerModule } from '@api/smartrotom/player/player.module';
 import { PlayerService } from '@api/smartrotom/player/player.service';
 import { SmartrotomService } from '@api/smartrotom/_main/smartrotom.service';
@@ -113,7 +112,7 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
   ],
   controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, ChatService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
-     ShowdownGateway, AchievementService, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
+     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
     useClass: ConfigService,

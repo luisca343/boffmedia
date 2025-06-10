@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Param, HttpStatus, UseInterceptors } from 
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from "@nestjs/swagger"
 import { UuidDto } from "../_dto/smartrotom-request-dto"
 import { BattleAchievementDto } from "../_dto/battle-achievement-dto"
-import { AchievementService } from "./achievement.service"
+import { AchievementFacadeService } from "./achievement.facade.service"
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor'
 
 @ApiTags("smartrotom/achievements")
@@ -10,7 +10,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 @UseInterceptors(ResponseInterceptor)
 export class AchievementController {
   constructor(
-    private achievementService: AchievementService,
+    private readonly achievementFacadeService: AchievementFacadeService,
   ) {}
 
   @Get(":uuid/:achievementId")
@@ -18,7 +18,7 @@ export class AchievementController {
   @ApiResponse({ status: HttpStatus.OK, description: "Achievement retrieved successfully." })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Failed to retrieve achievement." })
   async getAchievementForPlayer(@Param('uuid') uuid: string, @Param('achievementId') achievementId: string) {
-    return await this.achievementService.getAchievementForPlayer(uuid, achievementId);
+    return await this.achievementFacadeService.getUserAchievementById(uuid, achievementId);
   }
 
   @Post()
@@ -27,7 +27,7 @@ export class AchievementController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle achievements.' })
   @ApiBody({ type: UuidDto })
   async getAchievements(@Body() { uuid }: UuidDto) {
-    return await this.achievementService.getAchievements(uuid);
+    return await this.achievementFacadeService.getUserAchievements(uuid);
   }
 
   @Post('battle')
@@ -36,7 +36,7 @@ export class AchievementController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to save battle.' })
   @ApiBody({ type: BattleAchievementDto })
   async addBattleAchievement(@Body() battleAchievement: BattleAchievementDto) {
-    return await this.achievementService.addBattleAchievement(battleAchievement);
+    return await this.achievementFacadeService.addBattleAchievement(battleAchievement);
   }
 
   @Get('replays/:uuid/:replayId')
@@ -44,6 +44,6 @@ export class AchievementController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Replay retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve replay.' })
   async getReplay(@Param('uuid') uuid: string, @Param('replayId') replayId: number) {
-    return await this.achievementService.getReplay(uuid, replayId);
+    return await this.achievementFacadeService.getUserReplay(uuid, replayId);
   }
 }
