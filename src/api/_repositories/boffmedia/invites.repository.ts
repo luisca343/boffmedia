@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { wingullInvites, Invite } from '@/_db/schema/Wingull';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, isNotNull, count } from 'drizzle-orm';
 
 export interface CreateInviteData {
   id: string;
@@ -29,6 +29,15 @@ export class InvitesRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
+
+  private readonly inviteSelect = {
+    id: wingullInvites.id,
+    uuid: wingullInvites.uuid,
+    username: wingullInvites.username,
+    createdAt: wingullInvites.createdAt,
+    usedAt: wingullInvites.usedAt,
+    deletedAt: wingullInvites.deletedAt
+  };
 
   // ==================== CREATE OPERATIONS ====================
 
@@ -67,19 +76,12 @@ export class InvitesRepository {
 
   // ==================== READ OPERATIONS ====================
 
-  async findAllInvites(): Promise<InviteResult[]> {
+  async findAllInvites(limit?: number, offset?: number): Promise<InviteResult[]> {
     try {
-      return await this.db
-        .select({
-          id: wingullInvites.id,
-          uuid: wingullInvites.uuid,
-          username: wingullInvites.username,
-          createdAt: wingullInvites.createdAt,
-          usedAt: wingullInvites.usedAt,
-          deletedAt: wingullInvites.deletedAt
-        })
-        .from(wingullInvites)
-        .execute();
+      let query = this.db
+        .select(this.inviteSelect)
+        .from(wingullInvites);
+      return await query.execute();
     } catch (error) {
       console.error('Failed to get all invites:', error);
       throw new Error(`Invites retrieval failed: ${error.message}`);
@@ -89,14 +91,7 @@ export class InvitesRepository {
   async findInviteById(id: string): Promise<InviteResult | null> {
     try {
       const result = await this.db
-        .select({
-          id: wingullInvites.id,
-          uuid: wingullInvites.uuid,
-          username: wingullInvites.username,
-          createdAt: wingullInvites.createdAt,
-          usedAt: wingullInvites.usedAt,
-          deletedAt: wingullInvites.deletedAt
-        })
+        .select(this.inviteSelect)
         .from(wingullInvites)
         .where(eq(wingullInvites.id, id))
         .execute();
@@ -111,14 +106,7 @@ export class InvitesRepository {
   async findActiveInviteById(id: string): Promise<InviteResult | null> {
     try {
       const result = await this.db
-        .select({
-          id: wingullInvites.id,
-          uuid: wingullInvites.uuid,
-          username: wingullInvites.username,
-          createdAt: wingullInvites.createdAt,
-          usedAt: wingullInvites.usedAt,
-          deletedAt: wingullInvites.deletedAt
-        })
+        .select(this.inviteSelect)
         .from(wingullInvites)
         .where(and(
           eq(wingullInvites.id, id),
@@ -137,14 +125,7 @@ export class InvitesRepository {
   async findInvitesByUuid(uuid: string): Promise<InviteResult[]> {
     try {
       return await this.db
-        .select({
-          id: wingullInvites.id,
-          uuid: wingullInvites.uuid,
-          username: wingullInvites.username,
-          createdAt: wingullInvites.createdAt,
-          usedAt: wingullInvites.usedAt,
-          deletedAt: wingullInvites.deletedAt
-        })
+        .select(this.inviteSelect)
         .from(wingullInvites)
         .where(eq(wingullInvites.uuid, uuid))
         .execute();
@@ -157,14 +138,7 @@ export class InvitesRepository {
   async findInvitesByUsername(username: string): Promise<InviteResult[]> {
     try {
       return await this.db
-        .select({
-          id: wingullInvites.id,
-          uuid: wingullInvites.uuid,
-          username: wingullInvites.username,
-          createdAt: wingullInvites.createdAt,
-          usedAt: wingullInvites.usedAt,
-          deletedAt: wingullInvites.deletedAt
-        })
+        .select(this.inviteSelect)
         .from(wingullInvites)
         .where(eq(wingullInvites.username, username))
         .execute();
@@ -275,8 +249,12 @@ export class InvitesRepository {
 
   async getInviteCount(): Promise<number> {
     try {
-      const invites = await this.findAllInvites();
-      return invites.length;
+      const result = await this.db
+        .select({ count: count() })
+        .from(wingullInvites)
+        .execute();
+
+      return result[0].count;
     } catch (error) {
       console.error('Failed to get invite count:', error);
       return 0;
@@ -286,9 +264,7 @@ export class InvitesRepository {
   async getActiveInviteCount(): Promise<number> {
     try {
       const result = await this.db
-        .select({
-          id: wingullInvites.id
-        })
+        .select({ count: count() })
         .from(wingullInvites)
         .where(and(
           isNull(wingullInvites.usedAt),
@@ -296,7 +272,7 @@ export class InvitesRepository {
         ))
         .execute();
 
-      return result.length;
+      return result[0].count;
     } catch (error) {
       console.error('Failed to get active invite count:', error);
       return 0;
@@ -306,17 +282,15 @@ export class InvitesRepository {
   async getUsedInviteCount(): Promise<number> {
     try {
       const result = await this.db
-        .select({
-          id: wingullInvites.id
-        })
+        .select({ count: count() })
         .from(wingullInvites)
         .where(and(
-          eq(wingullInvites.usedAt, wingullInvites.usedAt), // Not null check
+          isNotNull(wingullInvites.usedAt),
           isNull(wingullInvites.deletedAt)
         ))
         .execute();
 
-      return result.length;
+      return result[0].count;
     } catch (error) {
       console.error('Failed to get used invite count:', error);
       return 0;

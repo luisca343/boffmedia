@@ -2,11 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, isNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
-  boffMediaGames, 
-  boffMediaEvents, 
-  Game 
-} from '@/_db/schema/Events';
+import { boffMediaGames, boffMediaEvents, Game, Event } from '@/_db/schema/Events';
 
 @Injectable()
 export class GamesRepository {
@@ -14,16 +10,31 @@ export class GamesRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
+  private readonly gameSelect = {
+    id: boffMediaGames.id,
+    title: boffMediaGames.title,
+    description: boffMediaGames.description,
+    icon: boffMediaGames.icon,
+    createdAt: boffMediaGames.createdAt,
+    updatedAt: boffMediaGames.updatedAt,
+    deletedAt: boffMediaGames.deletedAt,
+  };
+
   async findAll(): Promise<Game[]> {
-    return this.db.select()
+    return this.db.select(this.gameSelect)
       .from(boffMediaGames)
       .where(isNull(boffMediaGames.deletedAt));
   }
 
-  async findById(id: number): Promise<Game> {
-    const result = await this.db.select()
+  async findById(id: number): Promise<Game | null> {
+    const result = await this.db.select(this.gameSelect)
       .from(boffMediaGames)
-      .where(and(eq(boffMediaGames.id, id), isNull(boffMediaGames.deletedAt)));
+      .where(and(
+        eq(boffMediaGames.id, id), 
+        isNull(boffMediaGames.deletedAt)
+      ));
+      
+    if (!result.length) return null;
     return result[0];
   }
 
@@ -57,7 +68,18 @@ export class GamesRepository {
   async softDeleteEventsByGame(gameId: number): Promise<void> {
     const now = new Date();
     await this.db.update(boffMediaEvents)
-      .set({ deletedAt: now } as any)
-      .where(eq(boffMediaEvents.game, gameId));
+      .set({ deletedAt: now } as Event)
+      .where(eq(boffMediaEvents.gameId, gameId)); // Fixed field reference
+  }
+
+  async checkGameExists(gameId: number): Promise<boolean> {
+    const gameCheck = await this.db.select({ id: boffMediaGames.id })
+      .from(boffMediaGames)
+      .where(and(
+        eq(boffMediaGames.id, gameId), 
+        isNull(boffMediaGames.deletedAt)
+      ));
+
+    return gameCheck.length > 0;
   }
 }

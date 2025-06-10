@@ -2,11 +2,11 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, isNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
-  boffMediaEvents, 
-  boffMediaGames, 
-  Event 
-} from '@/_db/schema/Events';
+import { boffMediaEvents, boffMediaGames, Event } from '@/_db/schema/Events';
+
+export interface EventWithGameName extends Event {
+  gameName?: string;
+}
 
 @Injectable()
 export class EventsRepository {
@@ -14,32 +14,41 @@ export class EventsRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  async findAll(): Promise<Event[]> {
-    return this.db.select({
-      id: boffMediaEvents.id,
-      parentId: boffMediaEvents.parentId,
-      title: boffMediaEvents.title,
-      description: boffMediaEvents.description,
-      gameId: boffMediaEvents.gameId,
-      gameName: boffMediaGames.title,
-      icon: boffMediaEvents.icon,
-      banner: boffMediaEvents.banner,
-      startDate: boffMediaEvents.startDate,
-      endDate: boffMediaEvents.endDate,
-      status: boffMediaEvents.status,
-      visibility: boffMediaEvents.visibility,
-      type: boffMediaEvents.type,
-      createdAt: boffMediaEvents.createdAt,
-      updatedAt: boffMediaEvents.updatedAt,boffMediaEvents,
-      deletedAt: boffMediaEvents.deletedAt,
-    })
-    .from(boffMediaEvents)
-    .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
-    .where(and(isNull(boffMediaEvents.deletedAt), isNull(boffMediaGames.deletedAt)));
+  private readonly eventSelect = {
+    id: boffMediaEvents.id,
+    parentId: boffMediaEvents.parentId,
+    title: boffMediaEvents.title,
+    description: boffMediaEvents.description,
+    gameId: boffMediaEvents.gameId,
+    icon: boffMediaEvents.icon,
+    banner: boffMediaEvents.banner,
+    startDate: boffMediaEvents.startDate,
+    endDate: boffMediaEvents.endDate,
+    status: boffMediaEvents.status,
+    visibility: boffMediaEvents.visibility,
+    type: boffMediaEvents.type,
+    createdAt: boffMediaEvents.createdAt,
+    updatedAt: boffMediaEvents.updatedAt,
+    deletedAt: boffMediaEvents.deletedAt,
+  };
+
+  private readonly eventWithGameSelect = {
+    ...this.eventSelect,
+    gameName: boffMediaGames.title
+  };
+
+  async findAll(): Promise<EventWithGameName[]> {
+    return this.db.select(this.eventWithGameSelect)
+      .from(boffMediaEvents)
+      .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
+      .where(and(
+        isNull(boffMediaEvents.deletedAt), 
+        isNull(boffMediaGames.deletedAt)
+      ));
   }
 
-  async findById(id: number): Promise<Event> {
-    const result = await this.db.select()
+  async findById(id: number): Promise<EventWithGameName | null> {
+    const result = await this.db.select(this.eventWithGameSelect)
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .where(and(
@@ -49,56 +58,18 @@ export class EventsRepository {
       ));
       
     if (!result.length) return null;
-    
-    const eventData = result[0].boffmedia_events;
-    const gameData = result[0].boffmedia_games;
-    
-    return {
-      id: eventData.id,
-      parentId: eventData.parentId,
-      title: eventData.title,
-      description: eventData.description,
-      gameId: eventData.gameId,
-      gameName: gameData?.title,
-      icon: eventData.icon,
-      banner: eventData.banner,
-      startDate: eventData.startDate,
-      endDate: eventData.endDate,
-      status: eventData.status,
-      visibility: eventData.visibility,
-      type: eventData.type,
-      createdAt: eventData.createdAt,
-      updatedAt: eventData.updatedAt,
-      deletedAt: eventData.deletedAt,
-    } as Event;
+    return result[0];
   }
 
-  async findChildEvents(parentId: number): Promise<Event[]> {
-    return this.db.select({
-      id: boffMediaEvents.id,
-      parentId: boffMediaEvents.parentId,
-      title: boffMediaEvents.title,
-      description: boffMediaEvents.description,
-      gameId: boffMediaEvents.gameId,
-      gameName: boffMediaGames.title,
-      icon: boffMediaEvents.icon,
-      banner: boffMediaEvents.banner,
-      startDate: boffMediaEvents.startDate,
-      endDate: boffMediaEvents.endDate,
-      status: boffMediaEvents.status,
-      visibility: boffMediaEvents.visibility,
-      type: boffMediaEvents.type,
-      createdAt: boffMediaEvents.createdAt,
-      updatedAt: boffMediaEvents.updatedAt,
-      deletedAt: boffMediaEvents.deletedAt,
-    })
-    .from(boffMediaEvents)
-    .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
-    .where(and(
-      eq(boffMediaEvents.parentId, parentId), 
-      isNull(boffMediaEvents.deletedAt),
-      isNull(boffMediaGames.deletedAt)
-    ));
+  async findChildEvents(parentId: number): Promise<EventWithGameName[]> {
+    return this.db.select(this.eventWithGameSelect)
+      .from(boffMediaEvents)
+      .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
+      .where(and(
+        eq(boffMediaEvents.parentId, parentId), 
+        isNull(boffMediaEvents.deletedAt),
+        isNull(boffMediaGames.deletedAt)
+      ));
   }
 
   async create(eventData: Partial<Event>): Promise<{ insertId: number }> {
