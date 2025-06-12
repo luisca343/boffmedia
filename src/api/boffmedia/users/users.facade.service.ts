@@ -367,15 +367,21 @@ export class BoffMediaUsersFacadeService {
         mcUuid: linkData.minecraft.uuid
       });
 
-      // Update BoffMedia user with UUID
-      const boffMediaUser = await this.usersManagementService.linkMinecraftAccount(linkData);
+      // Validate user credentials first
+      const sessionUser = await this.usersManagementService.validateUser(linkData.username, linkData.password);
+      if (!sessionUser) {
+        throw new Error('Invalid credentials');
+      }
 
-      // Create/find SmartRotom user
+      // Create/find SmartRotom user FIRST (this creates the UUID in rotom_users table)
       const smartRotomResult = await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
         uuid: linkData.minecraft.uuid,
         username: linkData.minecraft.username,
         world: linkData.minecraft.world
       });
+
+      // Now update BoffMedia user with UUID (the UUID exists in rotom_users now)
+      const boffMediaUser = await this.usersManagementService.linkMinecraftAccount(linkData);
 
       console.log('Minecraft account linking completed:', {
         boffMediaUserId: boffMediaUser.id,
