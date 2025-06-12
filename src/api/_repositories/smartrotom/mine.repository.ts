@@ -230,7 +230,6 @@ export class MineRepository {
     .orderBy(desc(sql`COALESCE(SUM(${mineGamesDetail.value}), 0)`))
     .limit(limit);
 
-    // Add rank
     return result.map((entry, index) => ({
       ...entry,
       rank: index + 1,
