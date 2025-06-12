@@ -73,6 +73,8 @@ import { MineModule } from '@api/smartrotom/mine/mine.module';
     ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public',
+      exclude: ['/api*'],
     }),
     SmartRotomAppsModule,
     SmartRotomUsersModule,

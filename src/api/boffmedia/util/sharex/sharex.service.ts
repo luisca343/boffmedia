@@ -9,7 +9,6 @@ export class SharexService {
     ) {}
 
     createImage(app: string, name: string, extension: string, key: string) {
-        console.log(app, name, extension, key);
         this.db.getDrizzle().insert(sharexImages).values({app, name, extension, key}).execute();
     }
 }

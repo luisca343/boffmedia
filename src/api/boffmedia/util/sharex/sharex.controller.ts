@@ -1,5 +1,5 @@
 import { randomString } from '@/_utils/stringUtils';
-import { Body, Controller, Get, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, InternalServerErrorException, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as fs from 'fs';
 import *  as  path from 'path';
@@ -10,41 +10,48 @@ import { ApiTags } from '@nestjs/swagger';
 @Controller('sharex')
 export class SharexController {
     constructor(private readonly sharexService: SharexService) {}
-    @Get()
-    get() {
-        return 'ShareX';
-    }
-
     @Post()
     @UseInterceptors(FileInterceptor('file'))
-    post(@UploadedFile() file: Express.Multer.File, @Body() body) {
-        // Write the file to disk
+    async post(@UploadedFile() file: Express.Multer.File, @Body() body) {
+        if (!file) {
+            throw new BadRequestException('No file uploaded');
+        }
+        if (!body.key) {
+            throw new BadRequestException('Key is required');
+        }
 
-        const fileName = file.originalname
-
+        const fileName = file.originalname;
         const app = fileName.split(".")[0].slice(0, -11);
         const extension = fileName.split('.').pop();
-        let newName = randomString(10)
-
-        const key = body.key;
-
-        this.sharexService.createImage(app, newName, extension, key);
-
-        while(fs.existsSync(path.join(__dirname, '../../../../', 'public/smartrotom/img/sharex/' + newName + '.' + extension))) {
+        
+        let newName = randomString(10);
+        const dir = path.join(process.cwd(), 'public/smartrotom/img/sharex');
+        
+        while(fs.existsSync(path.join(dir, newName + '.' + extension))) {
             newName = randomString(10);
         }
 
-        
-        const dir = path.join(__dirname, '../../../../', 'public/smartrotom/img/sharex');
-        const filePath = path.join(dir, newName + '.' + extension);
-        fs.writeFileSync(filePath, file.buffer);
+        try {
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
 
-        return { file: {
-            url: 'http://localhost:3000/smartrotom/img/sharex/' + newName + '.' + extension,
-            name: newName + '.' + extension,
-            size: file.size,
-            type: file.mimetype
-        }}
+            const filePath = path.join(dir, newName + '.' + extension);
+            fs.writeFileSync(filePath, file.buffer);
+
+            await this.sharexService.createImage(app, newName, extension, body.key);
+
+            return { 
+                file: {
+                    url: `${process.env.PUBLIC_DIR}/smartrotom/img/sharex/${newName}.${extension}`,
+                    name: newName + '.' + extension,
+                    size: file.size,
+                    type: file.mimetype
+                }
+            };
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to save file');
+        }
     }
 
 }
