@@ -106,8 +106,8 @@ export const pokemonService = {
   getAllAbilities: () => rotomGET<AbilityCount[]>("/pokemon/abilities"),
   getAbility: (name: string) => rotomGET<Ability>(`/pokemon/ability/${name}`),
   getPokemonByAbility: (name: string) => rotomGET<SpeciesMoveEntry[]>(`/pokemon/ability/${name}/pokemon`),
-  getSpriteManifest: () => rotomGET<SpriteManifest>("/pokemon/sprite-manifest"),
-  refreshSpriteManifest: () => rotomGET<{ count: number }>("/pokemon/sprite-manifest/refresh"),
+  getSpriteManifest: () => rotomGET<SpriteManifest>("/pokemon/sprites/manifest"),
+  refreshSpriteManifest: () => rotomGET<{ count: number }>("/pokemon/sprites/refresh"),
   
 }
 
