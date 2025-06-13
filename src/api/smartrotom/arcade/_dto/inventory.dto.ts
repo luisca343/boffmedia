@@ -5,7 +5,7 @@ import { Type } from 'class-transformer';
 export class GetInventoryDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '12345678-1234-5678-1234-567812345678'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
   })
   @IsNotEmpty()
   @IsString()
@@ -24,7 +24,7 @@ export class GetInventoryDto {
 export class AddInventoryItemDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '12345678-1234-5678-1234-567812345678'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
   })
   @IsNotEmpty()
   @IsString()
@@ -69,7 +69,7 @@ export class AddInventoryItemDto {
 export class ConsumeInventoryItemDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '12345678-1234-5678-1234-567812345678'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
   })
   @IsNotEmpty()
   @IsString()
@@ -96,7 +96,7 @@ export class ClaimItemDto {
 export class ClaimInventoryItemsDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '12345678-1234-5678-1234-567812345678'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
   })
   @IsNotEmpty()
   @IsString()

@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class OpenLootBoxDto {
-  @ApiProperty({ description: 'Player UUID', example: '12345678-1234-5678-1234-567812345678' })
+  @ApiProperty({ description: 'Player UUID', example: '007d1a64-661c-4396-8844-e27856f2ddfa' })
   @IsNotEmpty()
   @IsString()
   uuid: string;
