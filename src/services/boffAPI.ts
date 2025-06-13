@@ -54,8 +54,8 @@ export async function PATCH<T>(url: string, data: any): Promise<ApiResponse<T>> 
   return request<T>("PATCH", url, data);
 }
 
-export async function DELETE<T>(url: string): Promise<ApiResponse<T>> {
-  return request<T>("DELETE", url);
+export async function DELETE<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return request<T>("DELETE", url, data);
 }
 
 const getApiUrl = (): string => {
@@ -98,8 +98,8 @@ export async function apiPATCH<T>(url: string, data: any): Promise<ApiResponse<T
   return PATCH<T>(`${getApiUrl()}${url}`, data);
 }
 
-export async function apiDELETE<T>(url: string): Promise<ApiResponse<T>> {
-  return DELETE<T>(`${getApiUrl()}${url}`);
+export async function apiDELETE<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return DELETE<T>(`${getApiUrl()}${url}`, data);
 }
 
 
@@ -126,8 +126,8 @@ export async function rotomPATCH<T>(url: string, data: any): Promise<ApiResponse
   return apiPATCH<T>(`/smartrotom${url}`, data);
 }
 
-export async function rotomDELETE<T>(url: string): Promise<ApiResponse<T>> {
-  return apiDELETE<T>(`/smartrotom${url}`);
+export async function rotomDELETE<T>(url: string, data: any): Promise<ApiResponse<T>> {
+  return apiDELETE<T>(`/smartrotom${url}`, data);
 }
 
 export async function wingullPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
