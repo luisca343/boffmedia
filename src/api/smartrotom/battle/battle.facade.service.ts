@@ -1,23 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { ReplayService } from './services/replay.service';
-import { ConfigService } from './services/config.service';
-import {
-  BattleReplayResponse,
-  CreateReplayRequest,
-  UpdateReplayRequest,
-  DeleteReplayResponse,
-  ShareReplayResponse,
-  BattleConfigResponse,
-  CreateBattleConfigResponse,
-  UpdateBattleConfigResponse,
-  DeleteBattleConfigResponse,
-  GetAllBattleConfigsResponse,
-  ValidateBattleConfigResponse,
-  BattleConfig,
-  CreateReplayDto,
-  UpdateReplayDto,
-  ShareReplayDto
-} from './types/battle.types';
+import { BattleReplay } from '@repositories/smartrotom/battle.repository';
+import { BattleConfig, ConfigService } from './services/config.service';
+
+export interface CreateReplayDto {
+  team1: string;
+  team2: string;
+  replay: string;
+  winner: string;
+  side1: string;
+  side2: string;
+  userUuid: string;
+}
+
+export interface UpdateReplayDto {
+  team1?: string;
+  team2?: string;
+  replay?: string;
+  winner?: string;
+  side1?: string;
+  side2?: string;
+}
 
 @Injectable()
 export class BattleFacadeService {
@@ -28,7 +31,7 @@ export class BattleFacadeService {
 
   // ==================== REPLAY MANAGEMENT ====================
 
-  async getUserReplays(uuid: string): Promise<BattleReplayResponse[]> {
+  async getUserReplays(uuid: string): Promise<BattleReplay[]> {
     try {
       return await this.replayService.getUserReplays(uuid);
     } catch (error) {
@@ -37,7 +40,7 @@ export class BattleFacadeService {
     }
   }
 
-  async getReplayById(replayId: number, uuid?: string): Promise<BattleReplayResponse> {
+  async getReplayById(replayId: number, uuid?: string): Promise<BattleReplay> {
     try {
       const replay = await this.replayService.getReplayById(replayId);
 
@@ -56,7 +59,7 @@ export class BattleFacadeService {
     }
   }
 
-  async createReplay(createReplayDto: CreateReplayDto): Promise<BattleReplayResponse> {
+  async createReplay(createReplayDto: CreateReplayDto): Promise<BattleReplay> {
     try {
       // Create the replay
       const replay = await this.replayService.createReplay({
@@ -78,7 +81,7 @@ export class BattleFacadeService {
     }
   }
 
-  async updateReplay(replayId: number, updateReplayDto: UpdateReplayDto, uuid?: string): Promise<BattleReplayResponse> {
+  async updateReplay(replayId: number, updateReplayDto: UpdateReplayDto, uuid?: string): Promise<BattleReplay> {
     try {
       // If UUID is provided, validate access
       if (uuid) {
@@ -95,7 +98,7 @@ export class BattleFacadeService {
     }
   }
 
-  async deleteReplay(replayId: number, uuid?: string): Promise<DeleteReplayResponse> {
+  async deleteReplay(replayId: number, uuid?: string): Promise<{ success: boolean; message: string }> {
     try {
       // If UUID is provided, validate access
       if (uuid) {
@@ -117,7 +120,7 @@ export class BattleFacadeService {
     }
   }
 
-  async shareReplayWithUser(replayId: number, targetUuid: string, sourceUuid?: string): Promise<ShareReplayResponse> {
+  async shareReplayWithUser(replayId: number, targetUuid: string, sourceUuid?: string): Promise<{ success: boolean; message: string }> {
     try {
       // If source UUID is provided, validate they have access to share
       if (sourceUuid) {
@@ -141,7 +144,7 @@ export class BattleFacadeService {
 
   // ==================== CONFIG MANAGEMENT ====================
 
-  async getBattleConfig(npcConfigName: string): Promise<BattleConfigResponse> {
+  async getBattleConfig(npcConfigName: string): Promise<BattleConfig> {
     try {
       return await this.configService.getBattleConfig(npcConfigName);
     } catch (error) {
@@ -150,17 +153,16 @@ export class BattleFacadeService {
     }
   }
 
-  async getAllBattleConfigs(): Promise<GetAllBattleConfigsResponse> {
+  async getAllBattleConfigs(): Promise<string[]> {
     try {
-      const configs = await this.configService.getAllAvailableConfigs();
-      return { configs };
+      return await this.configService.getAllAvailableConfigs();
     } catch (error) {
       console.error('Error getting all battle configs:', error);
       throw new Error(`Failed to retrieve battle configs: ${error.message}`);
     }
   }
 
-  async createBattleConfig(npcConfigName: string, config: BattleConfig): Promise<CreateBattleConfigResponse> {
+  async createBattleConfig(npcConfigName: string, config: BattleConfig): Promise<{ success: boolean; message: string }> {
     try {
       await this.configService.createConfig(npcConfigName, config);
 
@@ -174,7 +176,7 @@ export class BattleFacadeService {
     }
   }
 
-  async updateBattleConfig(npcConfigName: string, config: Partial<BattleConfig>): Promise<UpdateBattleConfigResponse> {
+  async updateBattleConfig(npcConfigName: string, config: Partial<BattleConfig>): Promise<BattleConfig> {
     try {
       return await this.configService.updateConfig(npcConfigName, config);
     } catch (error) {
@@ -183,7 +185,7 @@ export class BattleFacadeService {
     }
   }
 
-  async deleteBattleConfig(npcConfigName: string): Promise<DeleteBattleConfigResponse> {
+  async deleteBattleConfig(npcConfigName: string): Promise<{ success: boolean; message: string }> {
     try {
       await this.configService.deleteConfig(npcConfigName);
 
@@ -197,19 +199,12 @@ export class BattleFacadeService {
     }
   }
 
-  async validateBattleConfig(npcConfigName: string): Promise<ValidateBattleConfigResponse> {
+  async validateBattleConfig(npcConfigName: string): Promise<boolean> {
     try {
-      const exists = await this.configService.validateConfigExists(npcConfigName);
-      return {
-        exists,
-        valid: exists
-      };
+      return await this.configService.validateConfigExists(npcConfigName);
     } catch (error) {
       console.error(`Error validating battle config for ${npcConfigName}:`, error);
-      return {
-        exists: false,
-        valid: false
-      };
+      return false;
     }
   }
 }

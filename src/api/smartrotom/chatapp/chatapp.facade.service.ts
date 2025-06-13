@@ -1,37 +1,14 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
-import { ChatService } from './services/chat.service';
-import { MessageService } from './services/message.service';
-import { GroupService } from './services/group.service';
-import { CallService } from './services/call.service';
-import {
-  CreateChatRequest,
-  CreateChatResponse,
-  GetChatsResponse,
-  GroupResponse,
-  GetMessagesResponse,
-  ChatMessageResponse,
-  CreateChatMessageRequest,
-  CreateChatMessageResponse,
-  UpdateChatMessageRequest,
-  UpdateChatMessageResponse,
-  DeleteChatMessageRequest,
-  DeleteChatMessageResponse,
-  AddMemberToGroupRequest,
-  AddMemberToGroupResponse,
-  RemoveMemberFromGroupRequest,
-  RemoveMemberFromGroupResponse,
-  InitiateCallRequest,
-  CallSessionResponse,
-  EndCallRequest,
-  EndCallResponse,
-  UpdateChatRequest,
-  ChatResponse,
-  SocketChatMessageEvent,
-  SocketCallEvent
-} from '@api/smartrotom/chatapp/types/chatapp.types';
+import { ChatService, CreateChatRequest } from './services/chat.service';
+import { MessageService, RotomMessage } from './services/message.service';
+import { GroupService, Group } from './services/group.service';
+import { CallService, CallSession } from './services/call.service';
+import { SocketsGateway } from '../../_utils/sockets/sockets.gateway';
 
-// Import the socket gateway (assuming it exists)
-// import { SocketsGateway } from '@api/sockets/sockets.gateway';
+export interface CreateChatMessageRequest {
+  uuid: string;
+  message: string;
+}
 
 @Injectable()
 export class ChatappFacadeService {
@@ -40,33 +17,31 @@ export class ChatappFacadeService {
     private readonly messageService: MessageService,
     private readonly groupService: GroupService,
     private readonly callService: CallService,
-    // @Inject(forwardRef(() => SocketsGateway))
-    // private readonly socketGateway: SocketsGateway,
+    @Inject(forwardRef(() => SocketsGateway))
+    private readonly socketGateway: SocketsGateway,
   ) {}
 
   // ==================== CHAT MANAGEMENT ====================
 
-  async createChat(createChatRequest: CreateChatRequest): Promise<CreateChatResponse> {
+  async createChat(createChatRequest: CreateChatRequest): Promise<number> {
     try {
-      const chatId = await this.chatService.createChat(createChatRequest);
-      return { chatId };
+      return await this.chatService.createChat(createChatRequest);
     } catch (error) {
       console.error('Error creating chat:', error);
       throw new Error(`Failed to create chat: ${error.message}`);
     }
   }
 
-  async getUserChats(uuid: string): Promise<GetChatsResponse> {
+  async getChats(uuid: string): Promise<Group[]> {
     try {
-      const groups = await this.groupService.getUserGroups(uuid);
-      return { groups };
+      return await this.groupService.getUserGroups(uuid);
     } catch (error) {
       console.error(`Error getting chats for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve chats: ${error.message}`);
     }
   }
 
-  async getChatById(chatId: number, requestingUserUuid: string): Promise<GroupResponse> {
+  async getChatById(chatId: number, requestingUserUuid: string): Promise<Group> {
     try {
       return await this.groupService.getGroupById(chatId, requestingUserUuid);
     } catch (error) {
@@ -75,271 +50,214 @@ export class ChatappFacadeService {
     }
   }
 
-  async updateChat(updateChatRequest: UpdateChatRequest): Promise<ChatResponse> {
-    try {
-      return await this.chatService.updateChat(
-        updateChatRequest.chatId,
-        {
-          name: updateChatRequest.name,
-          description: updateChatRequest.description,
-          image: updateChatRequest.image
-        }
-      );
-    } catch (error) {
-      console.error(`Error updating chat ${updateChatRequest.chatId}:`, error);
-      throw new Error(`Failed to update chat: ${error.message}`);
-    }
-  }
-
-  async deleteChat(chatId: number, requestingUserUuid: string): Promise<{ success: boolean; message: string }> {
-    try {
-      // Validate user has access to delete (could be admin check)
-      const hasAccess = await this.chatService.validateUserAccessToChat(chatId, requestingUserUuid);
-      if (!hasAccess) {
-        throw new Error('User does not have permission to delete this chat');
-      }
-
-      await this.chatService.deleteChat(chatId);
-      return {
-        success: true,
-        message: 'Chat deleted successfully'
-      };
-    } catch (error) {
-      console.error(`Error deleting chat ${chatId}:`, error);
-      throw new Error(`Failed to delete chat: ${error.message}`);
-    }
-  }
-
   // ==================== MESSAGE MANAGEMENT ====================
 
-  async getChatMessages(chatId: number, requestingUserUuid: string): Promise<GetMessagesResponse> {
+  async getMessages(chatId: number): Promise<RotomMessage[]> {
     try {
-      // Validate user has access to chat
-      const hasAccess = await this.chatService.validateUserAccessToChat(chatId, requestingUserUuid);
-      if (!hasAccess) {
-        throw new Error('User does not have access to this chat');
-      }
-
-      const messages = await this.messageService.getMessages(chatId);
-      return { messages };
+      return await this.messageService.getMessages(chatId);
     } catch (error) {
       console.error(`Error getting messages for chat ${chatId}:`, error);
       throw new Error(`Failed to retrieve messages: ${error.message}`);
     }
   }
 
-  async createChatMessage(chatId: number, createMessageRequest: CreateChatMessageRequest): Promise<CreateChatMessageResponse> {
+  async createMessage(
+    chatId: number, 
+    createMessageRequest: CreateChatMessageRequest
+  ): Promise<RotomMessage> {
     try {
-      const result = await this.messageService.createMessage(
+      const { messageId, message } = await this.messageService.createMessage(
         chatId,
         createMessageRequest.message,
         createMessageRequest.uuid
       );
 
-      // Emit socket event for real-time messaging
-      const socketEvent: SocketChatMessageEvent = {
-        chatId,
-        id: result.message.id,
-        content: result.message.text,
-        createdAt: result.message.date,
-        uuid: result.message.uuid
-      };
+      // Emit message to all chat members via WebSocket
+      await this.emitMessageToChat(chatId, messageId, createMessageRequest);
 
-      // this.socketGateway.emitToChatRoom(chatId, 'new_message', socketEvent);
-
-      return result.message;
+      return message;
     } catch (error) {
       console.error(`Error creating message in chat ${chatId}:`, error);
       throw new Error(`Failed to create message: ${error.message}`);
     }
   }
 
-  async updateChatMessage(updateMessageRequest: UpdateChatMessageRequest): Promise<UpdateChatMessageResponse> {
+  async updateMessage(
+    messageId: number, 
+    content: string, 
+    senderUuid: string
+  ): Promise<RotomMessage> {
     try {
-      const updatedMessage = await this.messageService.updateMessage(
-        updateMessageRequest.messageId,
-        updateMessageRequest.content,
-        updateMessageRequest.senderUuid
-      );
-
-      // Emit socket event for real-time updates
-      // this.socketGateway.emitToChatRoom(chatId, 'message_updated', updatedMessage);
-
-      return updatedMessage;
+      return await this.messageService.updateMessage(messageId, content, senderUuid);
     } catch (error) {
-      console.error(`Error updating message ${updateMessageRequest.messageId}:`, error);
+      console.error(`Error updating message ${messageId}:`, error);
       throw new Error(`Failed to update message: ${error.message}`);
     }
   }
 
-  async deleteChatMessage(deleteMessageRequest: DeleteChatMessageRequest): Promise<DeleteChatMessageResponse> {
+  async deleteMessage(messageId: number, senderUuid: string): Promise<{ success: boolean; message: string }> {
     try {
-      await this.messageService.deleteMessage(
-        deleteMessageRequest.messageId,
-        deleteMessageRequest.senderUuid
-      );
-
-      // Emit socket event for real-time updates
-      // this.socketGateway.emitToChatRoom(chatId, 'message_deleted', { messageId: deleteMessageRequest.messageId });
-
+      await this.messageService.deleteMessage(messageId, senderUuid);
       return {
         success: true,
         message: 'Message deleted successfully'
       };
     } catch (error) {
-      console.error(`Error deleting message ${deleteMessageRequest.messageId}:`, error);
+      console.error(`Error deleting message ${messageId}:`, error);
       throw new Error(`Failed to delete message: ${error.message}`);
     }
   }
 
-  // ==================== GROUP MEMBER MANAGEMENT ====================
-
-  async addMemberToGroup(addMemberRequest: AddMemberToGroupRequest): Promise<AddMemberToGroupResponse> {
+  async markMessageAsRead(messageId: number, uuid: string): Promise<{ success: boolean; message: string }> {
     try {
-      // Validate requesting user has access to the group
-      const hasAccess = await this.chatService.validateUserAccessToChat(
-        addMemberRequest.groupId,
-        addMemberRequest.requestingUserUuid
-      );
-      if (!hasAccess) {
-        throw new Error('User does not have permission to add members to this group');
-      }
+      await this.messageService.markMessageAsRead(messageId, uuid);
+      return {
+        success: true,
+        message: 'Message marked as read'
+      };
+    } catch (error) {
+      console.error(`Error marking message ${messageId} as read:`, error);
+      throw new Error(`Failed to mark message as read: ${error.message}`);
+    }
+  }
 
-      await this.chatService.addMemberToChat(addMemberRequest.groupId, addMemberRequest.uuid);
+  // ==================== GROUP MANAGEMENT ====================
 
-      // Emit socket event for real-time updates
-      // this.socketGateway.emitToChatRoom(addMemberRequest.groupId, 'member_added', { uuid: addMemberRequest.uuid });
-
+  async addMemberToGroup(
+    groupId: number, 
+    uuid: string, 
+    requestingUserUuid: string
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      await this.groupService.addMemberToGroup(groupId, uuid, requestingUserUuid);
       return {
         success: true,
         message: 'Member added to group successfully'
       };
     } catch (error) {
-      console.error(`Error adding member to group ${addMemberRequest.groupId}:`, error);
-      throw new Error(`Failed to add member: ${error.message}`);
+      console.error(`Error adding member to group ${groupId}:`, error);
+      throw new Error(`Failed to add member to group: ${error.message}`);
     }
   }
 
-  async removeMemberFromGroup(removeMemberRequest: RemoveMemberFromGroupRequest): Promise<RemoveMemberFromGroupResponse> {
+  async removeMemberFromGroup(
+    groupId: number, 
+    uuid: string, 
+    requestingUserUuid: string
+  ): Promise<{ success: boolean; message: string }> {
     try {
-      // Validate requesting user has access to the group
-      const hasAccess = await this.chatService.validateUserAccessToChat(
-        removeMemberRequest.groupId,
-        removeMemberRequest.requestingUserUuid
-      );
-      if (!hasAccess) {
-        throw new Error('User does not have permission to remove members from this group');
-      }
-
-      await this.chatService.removeMemberFromChat(removeMemberRequest.groupId, removeMemberRequest.uuid);
-
-      // Emit socket event for real-time updates
-      // this.socketGateway.emitToChatRoom(removeMemberRequest.groupId, 'member_removed', { uuid: removeMemberRequest.uuid });
-
+      await this.groupService.removeMemberFromGroup(groupId, uuid, requestingUserUuid);
       return {
         success: true,
         message: 'Member removed from group successfully'
       };
     } catch (error) {
-      console.error(`Error removing member from group ${removeMemberRequest.groupId}:`, error);
-      throw new Error(`Failed to remove member: ${error.message}`);
+      console.error(`Error removing member from group ${groupId}:`, error);
+      throw new Error(`Failed to remove member from group: ${error.message}`);
     }
   }
 
   // ==================== CALL MANAGEMENT ====================
 
-  async initiateCall(initiateCallRequest: InitiateCallRequest): Promise<CallSessionResponse> {
+  async initiateCall(chatId: number, callerUuid: string): Promise<CallSession> {
     try {
-      const callSession = await this.callService.initializeCall(
-        initiateCallRequest.chatId,
-        initiateCallRequest.callerUuid
-      );
+      const callSession = await this.callService.initializeCall(chatId, callerUuid);
+      
+      // Emit call signal to all chat members
+      await this.emitCallToChat(callSession);
 
-      // Emit socket event for real-time call notifications
-      const socketEvent: SocketCallEvent = callSession;
-      // this.socketGateway.emitToChatRoom(initiateCallRequest.chatId, 'call_initiated', socketEvent);
-
-      return {
-        chatId: callSession.chatId,
-        caller: callSession.caller,
-        users: callSession.users
-      };
+      return callSession;
     } catch (error) {
-      console.error(`Error initiating call in chat ${initiateCallRequest.chatId}:`, error);
+      console.error(`Error initiating call in chat ${chatId}:`, error);
       throw new Error(`Failed to initiate call: ${error.message}`);
     }
   }
 
-  async endCall(endCallRequest: EndCallRequest): Promise<EndCallResponse> {
+  async endCall(chatId: number, startTime: number): Promise<RotomMessage> {
     try {
-      const result = await this.callService.endCall(endCallRequest.chatId, endCallRequest.startTime);
-
-      // Get the call end message
-      const message = await this.messageService.getMessages(endCallRequest.chatId);
-      const callEndMessage = message.find(m => m.id === result.messageId);
-
-      if (!callEndMessage) {
-        throw new Error('Failed to retrieve call end message');
-      }
-
-      // Emit socket event for call end
-      // this.socketGateway.emitToChatRoom(endCallRequest.chatId, 'call_ended', { duration: result.duration });
-
-      return callEndMessage;
+      const { messageId, duration } = await this.callService.endCall(chatId, startTime);
+      
+      return {
+        id: messageId,
+        text: duration.toString(),
+        date: new Date(),
+        uuid: 'system'
+      };
     } catch (error) {
-      console.error(`Error ending call in chat ${endCallRequest.chatId}:`, error);
+      console.error(`Error ending call in chat ${chatId}:`, error);
       throw new Error(`Failed to end call: ${error.message}`);
     }
   }
 
-  async getActiveCall(chatId: number): Promise<CallSessionResponse | null> {
+  // ==================== PRIVATE HELPER METHODS ====================
+
+  private async emitMessageToChat(
+    chatId: number, 
+    messageId: number, 
+    messageRequest: CreateChatMessageRequest
+  ): Promise<void> {
     try {
-      const activeCall = this.callService.getActiveCall(chatId);
+      // Get chat members for targeted message sending
+      const chatMembers = chatId === 1 
+        ? Array.from(this.socketGateway.users.values()) 
+        : await this.getChatMembersForSocket(chatId);
+
+      let sentToSelf = false;
+
+      for (const member of chatMembers) {
+        const socket = this.socketGateway.users.get(member.uuid);
+        
+        if (socket && (member.uuid !== messageRequest.uuid || !sentToSelf)) {
+          this.socketGateway.server.to(socket.socketId).emit('chat:message', {
+            chatId,
+            id: messageId,
+            content: messageRequest.message,
+            createdAt: new Date(),
+            uuid: messageRequest.uuid
+          });
+
+          if (member.uuid === messageRequest.uuid) {
+            sentToSelf = true;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error emitting message to chat:', error);
+      // Don't throw error here as message was already saved
+    }
+  }
+
+  private async emitCallToChat(callSession: CallSession): Promise<void> {
+    try {
+      const { chatId, caller, users } = callSession;
       
-      if (!activeCall) {
-        return null;
+      // Get caller socket
+      const callerSocket = this.socketGateway.users.get(caller);
+      if (callerSocket) {
+        this.socketGateway.server.to(callerSocket.socketId).emit('chat:call', callSession);
       }
 
-      return {
-        chatId: activeCall.chatId,
-        caller: activeCall.caller,
-        users: activeCall.users
-      };
+      // Emit to all other call participants
+      for (const user of users) {
+        if (user.uuid !== caller) {
+          const userSocket = this.socketGateway.users.get(user.uuid);
+          if (userSocket) {
+            this.socketGateway.server.to(userSocket.socketId).emit('chat:call', callSession);
+          }
+        }
+      }
     } catch (error) {
-      console.error(`Error getting active call for chat ${chatId}:`, error);
-      throw new Error(`Failed to get active call: ${error.message}`);
+      console.error('Error emitting call to chat:', error);
+      // Don't throw error here as call was already initialized
     }
   }
 
-  async updateCallUserStatus(chatId: number, uuid: string, status: 'RINGING' | 'IN_CALL' | 'DECLINED' | 'BUSY'): Promise<void> {
+  private async getChatMembersForSocket(chatId: number): Promise<{ uuid: string }[]> {
     try {
-      await this.callService.updateCallUserStatus(chatId, uuid, status);
-
-      // Emit socket event for call status updates
-      // this.socketGateway.emitToChatRoom(chatId, 'call_status_updated', { uuid, status });
+      return await this.groupService.getGroupById(chatId, 'system').then(group => group.members);
     } catch (error) {
-      console.error(`Error updating call status for user ${uuid} in chat ${chatId}:`, error);
-      throw new Error(`Failed to update call status: ${error.message}`);
-    }
-  }
-
-  // ==================== VALIDATION METHODS ====================
-
-  async validateChatAccess(chatId: number, uuid: string): Promise<boolean> {
-    try {
-      return await this.chatService.validateUserAccessToChat(chatId, uuid);
-    } catch (error) {
-      console.error(`Error validating chat access for user ${uuid} in chat ${chatId}:`, error);
-      return false;
-    }
-  }
-
-  async validateMessageAccess(messageId: number, uuid: string): Promise<boolean> {
-    try {
-      return await this.messageService.validateMessageAccess(messageId, uuid);
-    } catch (error) {
-      console.error(`Error validating message access for user ${uuid} and message ${messageId}:`, error);
-      return false;
+      console.error('Error getting chat members for socket:', error);
+      return [];
     }
   }
 }

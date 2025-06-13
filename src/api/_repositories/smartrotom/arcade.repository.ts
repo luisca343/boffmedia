@@ -8,11 +8,6 @@ import {
   smartrotomUsers,
   SmartRotomInventoryItem 
 } from '@/_db/schema/SmartRotom';
-import {
-  BaseArcadeStreak,
-  RawInventoryItem,
-  StreakUpdateData
-} from '@api/smartrotom/arcade/types/arcade.types';
 
 @Injectable()
 export class ArcadeRepository {
@@ -20,9 +15,7 @@ export class ArcadeRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  // ==================== STREAK OPERATIONS ====================
-
-  async findStreakByUuid(uuid: string): Promise<Partial<BaseArcadeStreak> | null> {
+  async findStreakByUuid(uuid: string) {
     const result = await this.db.select({
       lastClaimed: smartRotomArcadeStreaks.lastClaimed,
       streak: smartRotomArcadeStreaks.streak,
@@ -35,20 +28,28 @@ export class ArcadeRepository {
     return result[0] || null;
   }
 
-  async createStreak(uuid: string, data: StreakUpdateData): Promise<any> {
+  async createStreak(uuid: string, data: {
+    lastClaimed: Date;
+    streak: number;
+    totalClaims: number;
+    lastBanner: string;
+  }) {
     return this.db.insert(smartRotomArcadeStreaks)
       .values({ uuid, ...data });
   }
 
-  async updateStreak(uuid: string, data: StreakUpdateData): Promise<any> {
+  async updateStreak(uuid: string, data: {
+    lastClaimed: Date;
+    streak: number;
+    totalClaims: number;
+    lastBanner: string;
+  }) {
     return this.db.update(smartRotomArcadeStreaks)
       .set(data as any)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid));
   }
 
-  // ==================== INVENTORY OPERATIONS ====================
-
-  async findInventoryByUuid(uuid: string, sourceType?: string): Promise<RawInventoryItem[]> {
+  async findInventoryByUuid(uuid: string, sourceType?: string) {
     let condition = eq(smartRotomInventory.uuid, uuid);
     
     if (sourceType) {
@@ -57,7 +58,6 @@ export class ArcadeRepository {
     
     return this.db.select({
       id: smartRotomInventory.id,
-      uuid: smartRotomInventory.uuid,
       itemId: smartRotomInventory.itemId,
       itemType: smartRotomInventory.itemType,
       amount: smartRotomInventory.amount,
@@ -70,7 +70,7 @@ export class ArcadeRepository {
     .where(condition);
   }
 
-  async findAvailableBoxes(uuid: string, boxId: string): Promise<Partial<RawInventoryItem>[]> {
+  async findAvailableBoxes(uuid: string, boxId: string) {
     return this.db.select({
       id: smartRotomInventory.id,
       itemId: smartRotomInventory.itemId,
@@ -86,7 +86,7 @@ export class ArcadeRepository {
     .orderBy(smartRotomInventory.createdAt);
   }
 
-  async findConsumableItems(uuid: string, itemId: string): Promise<Partial<RawInventoryItem>[]> {
+  async findConsumableItems(uuid: string, itemId: string) {
     return this.db.select({
       id: smartRotomInventory.id,
       itemId: smartRotomInventory.itemId,
@@ -104,25 +104,22 @@ export class ArcadeRepository {
     .orderBy(smartRotomInventory.createdAt);
   }
 
-  async addInventoryItem(data: Partial<SmartRotomInventoryItem>): Promise<{ insertId: number }> {
-    const result = await this.db.insert(smartRotomInventory)
+  async addInventoryItem(data: Partial<SmartRotomInventoryItem>) {
+    return this.db.insert(smartRotomInventory)
       .values({
         ...data,
         createdAt: new Date(),
+        updatedAt: new Date()
       } as SmartRotomInventoryItem);
-    
-    return { insertId: result[0].insertId };
   }
 
-  async updateInventoryItemUsage(id: number, used: number): Promise<any> {
+  async updateInventoryItemUsage(id: number, used: number) {
     return this.db.update(smartRotomInventory)
       .set({ used } as SmartRotomInventoryItem)
       .where(eq(smartRotomInventory.id, id));
   }
 
-  // ==================== USER OPERATIONS ====================
-
-  async findUserByUuid(uuid: string): Promise<{ id: number } | null> {
+  async findUserByUuid(uuid: string) {
     const result = await this.db.select({ id: smartrotomUsers.id })
       .from(smartrotomUsers)
       .where(eq(smartrotomUsers.uuid, uuid))

@@ -1,15 +1,34 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentsRepository } from '@api/_repositories/smartrotom/documents.repository';
-import {
-  CreateNewsRequest,
-  UpdateNewsRequest,
-  NewsResponse,
-  GetAllNewsResponse,
-  GetPublishedNewsResponse,
-  NewsCreationData,
-  NewsUpdateData,
-  UpdateNewsStatusRequest
-} from '@api/smartrotom/documents/types/documents.types';
+import { DocumentsRepository, NewsDetails } from '@repositories/smartrotom/documents.repository';
+
+export interface CreateNewsRequest {
+  title: string;
+  subtitle?: string;
+  category?: string;
+  subcategory?: string;
+  published?: number;
+  featured?: number;
+  content: string;
+  buttonText?: string;
+  imageUrl?: string;
+}
+
+export interface UpdateNewsRequest {
+  title?: string;
+  subtitle?: string;
+  category?: string;
+  subcategory?: string;
+  published?: number;
+  featured?: number;
+  content?: string;
+  buttonText?: string;
+  imageUrl?: string;
+}
+
+export interface NewsResponse {
+  featured: NewsDetails | null;
+  news: NewsDetails[];
+}
 
 @Injectable()
 export class NewsService {
@@ -17,236 +36,151 @@ export class NewsService {
     private readonly documentsRepository: DocumentsRepository,
   ) {}
 
-  async getAllNews(): Promise<GetAllNewsResponse> {
+  async getAllNews(): Promise<NewsResponse> {
     const allNews = await this.documentsRepository.findAllNews();
-    const featured = await this.documentsRepository.findFeaturedNews();
+    const featured = allNews.find(item => item.featured === 1) || null;
 
-    const newsResponses: NewsResponse[] = allNews.map(news => ({
-      id: news.id,
-      title: news.title,
-      subtitle: news.subtitle,
-      category: news.category,
-      subcategory: news.subcategory,
-      published: news.published,
-      featured: news.featured,
-      content: news.content,
-      buttonText: news.buttonText,
-      imageUrl: news.imageUrl,
-      createdAt: news.createdAt,
-      updatedAt: news.updatedAt
-    }));
-
-    const featuredResponse: NewsResponse | null = featured ? {
-      id: featured.id,
-      title: featured.title,
-      subtitle: featured.subtitle,
-      category: featured.category,
-      subcategory: featured.subcategory,
-      published: featured.published,
-      featured: featured.featured,
-      content: featured.content,
-      buttonText: featured.buttonText,
-      imageUrl: featured.imageUrl,
-      createdAt: featured.createdAt,
-      updatedAt: featured.updatedAt
-    } : null;
-
-    return {
-      featured: featuredResponse,
-      news: newsResponses
-    };
+    return { featured, news: allNews };
   }
 
-  async getPublishedNews(): Promise<GetPublishedNewsResponse> {
+  async getPublishedNews(): Promise<NewsResponse> {
     const publishedNews = await this.documentsRepository.findPublishedNews();
-    const featured = await this.documentsRepository.findFeaturedNews();
+    const featured = publishedNews.find(item => item.featured === 1) || null;
 
-    const newsResponses: NewsResponse[] = publishedNews.map(news => ({
-      id: news.id,
-      title: news.title,
-      subtitle: news.subtitle,
-      category: news.category,
-      subcategory: news.subcategory,
-      published: news.published,
-      featured: news.featured,
-      content: news.content,
-      buttonText: news.buttonText,
-      imageUrl: news.imageUrl,
-      createdAt: news.createdAt,
-      updatedAt: news.updatedAt
-    }));
-
-    const featuredResponse: NewsResponse | null = featured && featured.published === 1 ? {
-      id: featured.id,
-      title: featured.title,
-      subtitle: featured.subtitle,
-      category: featured.category,
-      subcategory: featured.subcategory,
-      published: featured.published,
-      featured: featured.featured,
-      content: featured.content,
-      buttonText: featured.buttonText,
-      imageUrl: featured.imageUrl,
-      createdAt: featured.createdAt,
-      updatedAt: featured.updatedAt
-    } : null;
-
-    return {
-      featured: featuredResponse,
-      news: newsResponses
-    };
+    return { featured, news: publishedNews };
   }
 
-  async getNewsById(newsId: number): Promise<NewsResponse | null> {
+  async getNewsById(newsId: number): Promise<NewsDetails> {
+    if (!newsId || newsId <= 0) {
+      throw new Error('Valid news ID is required');
+    }
+
     const news = await this.documentsRepository.findNewsById(newsId);
     if (!news) {
-      return null;
-    }
-
-    return {
-      id: news.id,
-      title: news.title,
-      subtitle: news.subtitle,
-      category: news.category,
-      subcategory: news.subcategory,
-      published: news.published,
-      featured: news.featured,
-      content: news.content,
-      buttonText: news.buttonText,
-      imageUrl: news.imageUrl,
-      createdAt: news.createdAt,
-      updatedAt: news.updatedAt
-    };
-  }
-
-  async getFeaturedNews(): Promise<NewsResponse | null> {
-    const featured = await this.documentsRepository.findFeaturedNews();
-    if (!featured) {
-      return null;
-    }
-
-    return {
-      id: featured.id,
-      title: featured.title,
-      subtitle: featured.subtitle,
-      category: featured.category,
-      subcategory: featured.subcategory,
-      published: featured.published,
-      featured: featured.featured,
-      content: featured.content,
-      buttonText: featured.buttonText,
-      imageUrl: featured.imageUrl,
-      createdAt: featured.createdAt,
-      updatedAt: featured.updatedAt
-    };
-  }
-
-  async createNews(createNewsRequest: CreateNewsRequest): Promise<NewsResponse> {
-    const newsData: NewsCreationData = {
-      title: createNewsRequest.title,
-      subtitle: createNewsRequest.subtitle || '',
-      category: createNewsRequest.category || '',
-      subcategory: createNewsRequest.subcategory || '',
-      published: createNewsRequest.published || 0,
-      featured: createNewsRequest.featured || 0,
-      content: createNewsRequest.content,
-      buttonText: createNewsRequest.buttonText || '',
-      imageUrl: createNewsRequest.imageUrl || ''
-    };
-
-    const result = await this.documentsRepository.createNews(newsData);
-    const createdNews = await this.getNewsById(result.insertId);
-
-    if (!createdNews) {
-      throw new Error('Failed to retrieve created news');
-    }
-
-    return createdNews;
-  }
-
-  async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsResponse> {
-    const newsExists = await this.documentsRepository.newsExists(newsId);
-    if (!newsExists) {
       throw new Error('News not found');
     }
 
-    const updateData: NewsUpdateData = {
-      title: updateNewsRequest.title,
-      subtitle: updateNewsRequest.subtitle,
-      category: updateNewsRequest.category,
-      subcategory: updateNewsRequest.subcategory,
-      published: updateNewsRequest.published,
-      featured: updateNewsRequest.featured,
-      content: updateNewsRequest.content,
-      buttonText: updateNewsRequest.buttonText,
-      imageUrl: updateNewsRequest.imageUrl
-    };
+    return news;
+  }
 
-    await this.documentsRepository.updateNews(newsId, updateData);
-    
-    const updatedNews = await this.getNewsById(newsId);
-    if (!updatedNews) {
-      throw new Error('Failed to retrieve updated news');
+  async getFeaturedNews(): Promise<NewsDetails | null> {
+    return this.documentsRepository.findFeaturedNews();
+  }
+
+  async createNews(createNewsRequest: CreateNewsRequest): Promise<NewsDetails> {
+    const { title, content } = createNewsRequest;
+
+    if (!title || !content) {
+      throw new Error('Title and content are required');
     }
 
-    return updatedNews;
+    // Validate URL if provided
+    if (createNewsRequest.imageUrl && !this.isValidUrl(createNewsRequest.imageUrl)) {
+      throw new Error('Invalid image URL format');
+    }
+
+    const result = await this.documentsRepository.createNews({
+      ...createNewsRequest,
+      title: title.trim(),
+      content: content.trim()
+    });
+
+    return this.getNewsById(result.insertId);
+  }
+
+  async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
+    const existingNews = await this.documentsRepository.findNewsById(newsId);
+    if (!existingNews) {
+      throw new Error('News not found');
+    }
+
+    // Validate URL if provided
+    if (updateNewsRequest.imageUrl && !this.isValidUrl(updateNewsRequest.imageUrl)) {
+      throw new Error('Invalid image URL format');
+    }
+
+    const updateData: any = {};
+    
+    Object.keys(updateNewsRequest).forEach(key => {
+      const value = updateNewsRequest[key as keyof UpdateNewsRequest];
+      if (value !== undefined) {
+        if (typeof value === 'string') {
+          updateData[key] = value.trim();
+        } else {
+          updateData[key] = value;
+        }
+      }
+    });
+
+    await this.documentsRepository.updateNews(newsId, updateData);
+    return this.getNewsById(newsId);
   }
 
   async deleteNews(newsId: number): Promise<void> {
-    const newsExists = await this.documentsRepository.newsExists(newsId);
-    if (!newsExists) {
+    const existingNews = await this.documentsRepository.findNewsById(newsId);
+    if (!existingNews) {
       throw new Error('News not found');
     }
 
     await this.documentsRepository.deleteNews(newsId);
   }
 
-  async updateNewsStatus(updateStatusRequest: UpdateNewsStatusRequest): Promise<{ success: boolean }> {
-    try {
-      // First, set all news as unpublished and unfeatured
-      await this.documentsRepository.updateAllNewsPublishedStatus(0);
-      await this.documentsRepository.updateAllNewsFeaturedStatus(0);
+  async updateNewsStatus(publishedIds: number[], featuredId: number): Promise<{ success: boolean }> {
+    // Validate published IDs
+    if (!Array.isArray(publishedIds)) {
+      throw new Error('Published IDs must be an array');
+    }
 
-      // Set specified news as published
-      if (updateStatusRequest.publishedIds.length > 0) {
-        await this.documentsRepository.updateNewsPublishedStatus(updateStatusRequest.publishedIds, 1);
+    if (!featuredId || featuredId <= 0) {
+      throw new Error('Valid featured ID is required');
+    }
+
+    // Check if featured news exists
+    const featuredNews = await this.documentsRepository.findNewsById(featuredId);
+    if (!featuredNews) {
+      throw new Error('Featured news not found');
+    }
+
+    // Validate all published news exist
+    for (const id of publishedIds) {
+      const news = await this.documentsRepository.findNewsById(id);
+      if (!news) {
+        throw new Error(`News with ID ${id} not found`);
       }
+    }
 
-      // Set featured news
-      if (updateStatusRequest.featuredId) {
-        await this.documentsRepository.updateNewsFeaturedStatus(updateStatusRequest.featuredId, 1);
-      }
+    // Reset all news to unpublished and unfeatured
+    await this.documentsRepository.updateAllNewsPublishedStatus(0);
+    await this.documentsRepository.updateAllNewsFeaturedStatus(0);
 
-      return { success: true };
-    } catch (error) {
-      console.error('Error updating news status:', error);
-      throw new Error(`Failed to update news status: ${error.message}`);
+    // Set published status for specified news
+    if (publishedIds.length > 0) {
+      await this.documentsRepository.updateNewsPublishedStatus(publishedIds, 1);
+    }
+
+    // Set featured status
+    await this.documentsRepository.updateNewsFeaturedStatus(featuredId, 1);
+
+    return { success: true };
+  }
+
+  async saveNews(news: CreateNewsRequest, newsId: number): Promise<{ success: boolean; id: number }> {
+    // Legacy method for backward compatibility
+    if (newsId === 0) {
+      const newNews = await this.createNews(news);
+      return { success: true, id: newNews.id };
+    } else {
+      const updatedNews = await this.updateNews(newsId, news);
+      return { success: true, id: updatedNews.id };
     }
   }
 
-  async saveNews(newsData: CreateNewsRequest, newsId?: number): Promise<{ success: boolean; id: number }> {
+  private isValidUrl(url: string): boolean {
     try {
-      if (newsId) {
-        // Update existing news
-        const newsExists = await this.documentsRepository.newsExists(newsId);
-        if (!newsExists) {
-          throw new Error('News not found');
-        }
-
-        await this.documentsRepository.updateNews(newsId, newsData);
-        return { success: true, id: newsId };
-      } else {
-        // Create new news
-        const result = await this.documentsRepository.createNews(newsData);
-        return { success: true, id: result.insertId };
-      }
-    } catch (error) {
-      console.error('Error saving news:', error);
-      throw new Error(`Failed to save news: ${error.message}`);
+      new URL(url);
+      return true;
+    } catch {
+      return false;
     }
-  }
-
-  async validateNewsExists(newsId: number): Promise<boolean> {
-    return this.documentsRepository.newsExists(newsId);
   }
 }

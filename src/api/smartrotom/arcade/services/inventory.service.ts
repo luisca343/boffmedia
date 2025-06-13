@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
-import {
-  ClaimItemData,
-  InventoryResponse,
-  AddInventoryItemRequest,
-  ConsumedItemDetails
-} from '../types/arcade.types';
+
+export interface ClaimItemData {
+  id: string;
+  type?: string;
+}
 
 @Injectable()
 export class InventoryService {
@@ -13,7 +12,7 @@ export class InventoryService {
     private readonly arcadeRepository: ArcadeRepository,
   ) {}
 
-  async getInventory(uuid: string, sourceType?: string): Promise<InventoryResponse> {
+  async getInventory(uuid: string, sourceType?: string) {
     const rawItems = await this.arcadeRepository.findInventoryByUuid(uuid, sourceType);
     
     // Aggregate items with the same itemId
@@ -74,7 +73,14 @@ export class InventoryService {
     };
   }
 
-  async addInventoryItem(data: AddInventoryItemRequest): Promise<{ insertId: number }> {
+  async addInventoryItem(data: {
+    uuid: string;
+    itemId: string;
+    itemType: string;
+    amount?: number;
+    sourceType?: string;
+    rarity?: string;
+  }) {
     const userExists = await this.arcadeRepository.findUserByUuid(data.uuid);
     
     if (!userExists) {
@@ -91,10 +97,10 @@ export class InventoryService {
       rarity: data.rarity
     });
     
-    return { insertId: result.insertId };
+    return { insertId: result[0].insertId };
   }
 
-  async consumeInventoryItem(uuid: string, itemId: string): Promise<ConsumedItemDetails> {
+  async consumeInventoryItem(uuid: string, itemId: string) {
     const items = await this.arcadeRepository.findConsumableItems(uuid, itemId);
     
     if (!items || items.length === 0) {
@@ -122,6 +128,6 @@ export class InventoryService {
       used: newUsedCount,
       remainingAmount,
       totalRemaining
-    } as ConsumedItemDetails;
+    };
   }
 }

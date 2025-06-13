@@ -10,15 +10,39 @@ import {
   RotomNews,
   RotomDocumentUser
 } from '@/_db/schema/SmartRotomDocuments';
-import {
-  DocumentDetails,
-  NewsDetails,
-  NotePreview,
-  DocumentCreationData,
-  DocumentUpdateData,
-  NewsCreationData,
-  NewsUpdateData
-} from '@api/smartrotom/documents/types/documents.types';
+
+export interface DocumentDetails {
+  id: number;
+  title: string;
+  content: string;
+  type: number;
+  public: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface NewsDetails {
+  id: number;
+  title: string;
+  subtitle: string;
+  category: string;
+  subcategory: string;
+  published: number;
+  featured: number;
+  content: string;
+  buttonText: string;
+  imageUrl: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface NotePreview {
+  id: number;
+  title: string;
+  type: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 @Injectable()
 export class DocumentsRepository {
@@ -34,6 +58,7 @@ export class DocumentsRepository {
       title: rotomDocuments.title,
       content: rotomDocuments.content,
       type: rotomDocuments.type,
+      //public: rotomDocuments.public,
       createdAt: rotomDocuments.createdAt,
       updatedAt: rotomDocuments.updatedAt
     })
@@ -61,40 +86,40 @@ export class DocumentsRepository {
     .orderBy(desc(rotomDocuments.updatedAt));
   }
 
-  async createDocument(documentData: DocumentCreationData): Promise<{ insertId: number }> {
+  async createDocument(documentData: {
+    title: string;
+    content: string;
+    type: number;
+    public?: number;
+  }): Promise<{ insertId: number }> {
     const result = await this.db.insert(rotomDocuments)
       .values({
-        title: documentData.title,
-        content: documentData.content,
-        type: documentData.type,
+        ...documentData,
+        public: documentData.public || 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as RotomDocument);
+      } as any);
     
     return { insertId: result[0].insertId };
   }
 
-  async updateDocument(id: number, documentData: DocumentUpdateData): Promise<void> {
+  async updateDocument(id: number, documentData: {
+    title?: string;
+    content?: string;
+    type?: number;
+    public?: number;
+  }): Promise<void> {
     await this.db.update(rotomDocuments)
       .set({
         ...documentData,
         updatedAt: new Date()
-      } as Partial<RotomDocument>)
+      } as RotomDocument)
       .where(eq(rotomDocuments.id, id));
   }
 
   async deleteDocument(id: number): Promise<void> {
     await this.db.delete(rotomDocuments)
       .where(eq(rotomDocuments.id, id));
-  }
-
-  async documentExists(id: number): Promise<boolean> {
-    const result = await this.db.select()
-      .from(rotomDocuments)
-      .where(eq(rotomDocuments.id, id))
-      .limit(1);
-
-    return result.length > 0;
   }
 
   // ==================== DOCUMENT-USER ASSOCIATION OPERATIONS ====================
@@ -115,7 +140,9 @@ export class DocumentsRepository {
     const result = await this.db.insert(rotomDocumentsUsers)
       .values({
         documentId,
-        uuid
+        uuid,
+        createdAt: new Date(),
+        updatedAt: new Date()
       } as RotomDocumentUser);
     
     return { insertId: result[0].insertId };
@@ -214,7 +241,17 @@ export class DocumentsRepository {
     return result[0] || null;
   }
 
-  async createNews(newsData: NewsCreationData): Promise<{ insertId: number }> {
+  async createNews(newsData: {
+    title: string;
+    subtitle?: string;
+    category?: string;
+    subcategory?: string;
+    published?: number;
+    featured?: number;
+    content: string;
+    buttonText?: string;
+    imageUrl?: string;
+  }): Promise<{ insertId: number }> {
     const result = await this.db.insert(rotomNews)
       .values({
         ...newsData,
@@ -227,12 +264,22 @@ export class DocumentsRepository {
     return { insertId: result[0].insertId };
   }
 
-  async updateNews(newsId: number, newsData: NewsUpdateData): Promise<void> {
+  async updateNews(newsId: number, newsData: {
+    title?: string;
+    subtitle?: string;
+    category?: string;
+    subcategory?: string;
+    published?: number;
+    featured?: number;
+    content?: string;
+    buttonText?: string;
+    imageUrl?: string;
+  }): Promise<void> {
     await this.db.update(rotomNews)
       .set({
         ...newsData,
         updatedAt: new Date()
-      } as Partial<RotomNews>)
+      } as RotomNews)
       .where(eq(rotomNews.id, newsId));
   }
 
@@ -243,32 +290,23 @@ export class DocumentsRepository {
 
   async updateAllNewsPublishedStatus(published: number): Promise<void> {
     await this.db.update(rotomNews)
-      .set({ published } as Partial<RotomNews>);
+      .set({ published } as RotomNews);
   }
 
   async updateNewsPublishedStatus(newsIds: number[], published: number): Promise<void> {
     await this.db.update(rotomNews)
-      .set({ published } as Partial<RotomNews>)
+      .set({ published } as RotomNews)
       .where(inArray(rotomNews.id, newsIds));
   }
 
   async updateAllNewsFeaturedStatus(featured: number): Promise<void> {
     await this.db.update(rotomNews)
-      .set({ featured } as Partial<RotomNews>);
+      .set({ featured } as RotomNews);
   }
 
   async updateNewsFeaturedStatus(newsId: number, featured: number): Promise<void> {
     await this.db.update(rotomNews)
-      .set({ featured } as Partial<RotomNews>)
+      .set({ featured } as RotomNews)
       .where(eq(rotomNews.id, newsId));
-  }
-
-  async newsExists(newsId: number): Promise<boolean> {
-    const result = await this.db.select()
-      .from(rotomNews)
-      .where(eq(rotomNews.id, newsId))
-      .limit(1);
-
-    return result.length > 0;
   }
 }

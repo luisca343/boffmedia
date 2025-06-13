@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { AchievementRepository } from '@repositories/smartrotom/achievement.repository';
-import {
-  CreateReplayRequest,
-  CreateReplayResponse,
-  CreateUserReplayResponse,
-  ReplayDetailsResponse
-} from '../types/achievement.types';
+import { AchievementRepository, ReplayDetails } from '@repositories/smartrotom/achievement.repository';
+
+export interface CreateReplayRequest {
+  side1: string;
+  side2: string;
+  team1: string;
+  team2: string;
+  replay: string;
+  winner: string;
+}
 
 @Injectable()
 export class ReplayService {
@@ -13,7 +16,7 @@ export class ReplayService {
     private readonly achievementRepository: AchievementRepository,
   ) {}
 
-  async createReplay(replayData: CreateReplayRequest): Promise<CreateReplayResponse> {
+  async createReplay(replayData: CreateReplayRequest): Promise<{ replayId: number }> {
     const { side1, side2, team1, team2, replay, winner } = replayData;
 
     if (!side1 || !side2 || !team1 || !team2 || !replay || !winner) {
@@ -32,7 +35,7 @@ export class ReplayService {
     return { replayId: result.insertId };
   }
 
-  async createUserReplay(replayId: number, uuid: string, side: number): Promise<CreateUserReplayResponse> {
+  async createUserReplay(replayId: number, uuid: string, side: number): Promise<{ relationId: number }> {
     if (!replayId || replayId <= 0) {
       throw new Error('Valid replay ID is required');
     }
@@ -54,7 +57,7 @@ export class ReplayService {
     return { relationId: result.insertId };
   }
 
-  async getUserReplay(uuid: string, replayId: number): Promise<ReplayDetailsResponse> {
+  async getUserReplay(uuid: string, replayId: number): Promise<ReplayDetails> {
     if (!uuid) {
       throw new Error('UUID is required');
     }

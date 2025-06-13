@@ -1,11 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BattleRepository } from '@repositories/smartrotom/battle.repository';
-import {
-  BattleReplayResponse,
-  ReplayData,
-  UserReplayData,
-  ReplayUpdateData
-} from '../types/battle.types';
+import { BattleRepository, BattleReplay } from '@repositories/smartrotom/battle.repository';
 
 @Injectable()
 export class ReplayService {
@@ -13,7 +7,7 @@ export class ReplayService {
     private readonly battleRepository: BattleRepository,
   ) {}
 
-  async getUserReplays(uuid: string): Promise<BattleReplayResponse[]> {
+  async getUserReplays(uuid: string): Promise<BattleReplay[]> {
     if (!uuid) {
       throw new Error('UUID is required');
     }
@@ -21,7 +15,7 @@ export class ReplayService {
     return this.battleRepository.findReplaysByUser(uuid);
   }
 
-  async getReplayById(replayId: number): Promise<BattleReplayResponse> {
+  async getReplayById(replayId: number): Promise<BattleReplay> {
     if (!replayId || replayId <= 0) {
       throw new Error('Valid replay ID is required');
     }
@@ -35,12 +29,19 @@ export class ReplayService {
     return replay;
   }
 
-  async createReplay(replayData: ReplayData): Promise<BattleReplayResponse> {
+  async createReplay(replayData: {
+    team1: string;
+    team2: string;
+    replay: string;
+    winner: string;
+    side1: string;
+    side2: string;
+  }): Promise<BattleReplay> {
     const result = await this.battleRepository.createReplay(replayData);
     return this.getReplayById(result.insertId);
   }
 
-  async associateReplayWithUser(uuid: string, replayId: number, side?: number): Promise<void> {
+  async associateReplayWithUser(uuid: string, replayId: number): Promise<void> {
     // Check if replay exists
     const replay = await this.battleRepository.findReplayById(replayId);
     if (!replay) {
@@ -53,16 +54,20 @@ export class ReplayService {
       throw new Error('User is already associated with this replay');
     }
 
-    const userReplayData: UserReplayData = {
+    await this.battleRepository.createUserReplay({
       uuid,
-      replayId,
-      side: side || 1
-    };
-
-    await this.battleRepository.createUserReplay(userReplayData);
+      replayId
+    });
   }
 
-  async updateReplay(replayId: number, replayData: ReplayUpdateData): Promise<BattleReplayResponse> {
+  async updateReplay(replayId: number, replayData: Partial<{
+    team1: string;
+    team2: string;
+    replay: string;
+    winner: string;
+    side1: string;
+    side2: string;
+  }>): Promise<BattleReplay> {
     const existingReplay = await this.battleRepository.findReplayById(replayId);
     if (!existingReplay) {
       throw new Error('Replay not found');

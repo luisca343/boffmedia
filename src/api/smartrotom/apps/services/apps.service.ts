@@ -1,9 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { AppsRepository } from '@api/_repositories/smartrotom/apps.repository';
+import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 import { CreateAppDto } from '../dto/create-app.dto';
 import { UpdateAppDto } from '../dto/update-app.dto';
-import { AppResponse } from '../types/app.types';
-import { SuccessResponse } from '@/types/request';
 
 @Injectable()
 export class AppsService {
@@ -11,11 +10,11 @@ export class AppsService {
     private readonly appsRepository: AppsRepository,
   ) {}
 
-  async getAllApps(): Promise<AppResponse[]> {
+  async getAllApps(): Promise<SmartRotomApp[]> {
     return this.appsRepository.findAll();
   }
 
-  async getAppById(id: number): Promise<AppResponse> {
+  async getAppById(id: number): Promise<SmartRotomApp> {
     const app = await this.appsRepository.findById(id);
     if (!app) {
       throw new NotFoundException(`App with ID ${id} not found`);
@@ -23,12 +22,12 @@ export class AppsService {
     return app;
   }
 
-  async createApp(createAppDto: CreateAppDto): Promise<AppResponse> {
+  async createApp(createAppDto: CreateAppDto): Promise<SmartRotomApp> {
     const result = await this.appsRepository.create(createAppDto);
     return this.getAppById(result.insertId);
   }
 
-  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<AppResponse> {
+  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
     const existingApp = await this.getAppById(id);
     if (!existingApp) {
       throw new NotFoundException(`App with ID ${id} not found`);
@@ -38,7 +37,7 @@ export class AppsService {
     return this.getAppById(id);
   }
 
-  async deleteApp(id: number): Promise<SuccessResponse> {
+  async deleteApp(id: number): Promise<{ success: boolean }> {
     const result = await this.appsRepository.delete(id);
     if (result.affectedRows === 0) {
       throw new NotFoundException(`App with ID ${id} not found`);

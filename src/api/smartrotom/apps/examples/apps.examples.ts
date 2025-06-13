@@ -130,11 +130,6 @@ export const AppsExamples = {
   },
   
   requests: {
-    createApp: {
-      name: 'Mina',
-      url: 'mina',
-      active: 1
-    },
     orderApps: {
       newOrder: [
         { id: 1, order: 1 },

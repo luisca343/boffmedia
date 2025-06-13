@@ -2,7 +2,15 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promises as fsPromises } from 'fs';
-import { BattleConfig } from '../types/battle.types';
+
+export interface BattleConfig {
+  name?: string;
+  description?: string;
+  difficulty?: string;
+  pokemon?: any[];
+  rewards?: any[];
+  [key: string]: any;
+}
 
 @Injectable()
 export class ConfigService {

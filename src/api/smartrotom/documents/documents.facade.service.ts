@@ -1,36 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentService } from './services/document.service';
+import { DocumentService, CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
 import { NoteService } from './services/note.service';
-import { NewsService } from './services/news.service';
-import {
-  CreateDocumentRequest,
-  CreateDocumentResponse,
-  UpdateDocumentRequest,
-  UpdateDocumentResponse,
-  DeleteDocumentResponse,
-  DocumentResponse,
-  SaveDocumentResponse,
-  CreateNoteWithUserRequest,
-  CreateNoteWithUserResponse,
-  GetUserNotesRequest,
-  GetUserNotesResponse,
-  AddNoteToUserRequest,
-  AddNoteToUserResponse,
-  RemoveNoteFromUserRequest,
-  RemoveNoteFromUserResponse,
-  CreateNewsRequest,
-  CreateNewsResponse,
-  UpdateNewsRequest,
-  UpdateNewsResponse,
-  DeleteNewsResponse,
-  GetAllNewsResponse,
-  GetPublishedNewsResponse,
-  NewsResponse,
-  UpdateNewsStatusRequest,
-  UpdateNewsStatusResponse,
-  SaveNewsRequest,
-  SaveNewsResponse
-} from '@api/smartrotom/documents/types/documents.types';
+import { NewsService, CreateNewsRequest, UpdateNewsRequest, NewsResponse } from './services/news.service';
+import { DocumentDetails, NotePreview, NewsDetails } from '@repositories/smartrotom/documents.repository';
+
+export interface CreateNoteWithUserRequest {
+  title: string;
+  content: string;
+  type: number;
+  uuid: string;
+}
 
 @Injectable()
 export class DocumentsFacadeService {
@@ -42,7 +21,7 @@ export class DocumentsFacadeService {
 
   // ==================== DOCUMENT MANAGEMENT ====================
 
-  async getDocumentById(id: number): Promise<DocumentResponse | null> {
+  async getDocumentById(id: number): Promise<Partial<DocumentDetails>> {
     try {
       return await this.documentService.getDocumentById(id);
     } catch (error) {
@@ -51,7 +30,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<CreateDocumentResponse> {
+  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<Partial<DocumentDetails>> {
     try {
       return await this.documentService.createDocument(createDocumentRequest);
     } catch (error) {
@@ -60,7 +39,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<UpdateDocumentResponse> {
+  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<Partial<DocumentDetails>> {
     try {
       return await this.documentService.updateDocument(id, updateDocumentRequest);
     } catch (error) {
@@ -69,7 +48,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async deleteDocument(id: number): Promise<DeleteDocumentResponse> {
+  async deleteDocument(id: number): Promise<{ success: boolean; message: string }> {
     try {
       await this.documentService.deleteDocument(id);
       return {
@@ -82,80 +61,73 @@ export class DocumentsFacadeService {
     }
   }
 
-  async saveDocument(id: number, title: string, content: string, type: number): Promise<SaveDocumentResponse> {
+  async saveDocument(id: number, title: string, content: string, type: number): Promise<{ success: boolean; id: number }> {
     try {
-      const documentId = await this.documentService.saveDocument(id, title, content, type);
-      return {
-        success: true,
-        id: documentId
-      };
+      return await this.documentService.saveDocument(id, title, content, type);
     } catch (error) {
-      console.error(`Error saving document ${id}:`, error);
+      console.error(`Error saving document:`, error);
       throw new Error(`Failed to save document: ${error.message}`);
     }
   }
 
   // ==================== NOTE MANAGEMENT ====================
 
-  async getUserNotes(getUserNotesRequest: GetUserNotesRequest): Promise<GetUserNotesResponse> {
+  async getUserNotes(uuid: string): Promise<NotePreview[]> {
     try {
-      const notes = await this.noteService.getUserNotes(getUserNotesRequest.uuid);
-      return { notes };
+      return await this.documentService.getUserDocuments(uuid);
     } catch (error) {
-      console.error(`Error getting notes for user ${getUserNotesRequest.uuid}:`, error);
-      throw new Error(`Failed to retrieve user notes: ${error.message}`);
+      console.error(`Error getting notes for user ${uuid}:`, error);
+      throw new Error(`Failed to retrieve notes: ${error.message}`);
     }
   }
 
-  async createNoteWithUser(createNoteRequest: CreateNoteWithUserRequest): Promise<CreateNoteWithUserResponse> {
+  async createNoteWithUser(createNoteRequest: CreateNoteWithUserRequest): Promise<{ id: number; success: boolean }> {
     try {
-      const result = await this.noteService.createNoteForUser(
-        createNoteRequest.title,
-        createNoteRequest.content,
-        createNoteRequest.type,
-        createNoteRequest.uuid
-      );
+      const document = await this.documentService.createDocument({
+        title: createNoteRequest.title,
+        content: createNoteRequest.content,
+        type: createNoteRequest.type
+      });
 
-      return {
-        id: result.id,
-        success: result.success
-      };
+      await this.noteService.addNoteToUser(document.id, createNoteRequest.uuid);
+
+      return { id: document.id, success: true };
     } catch (error) {
-      console.error(`Error creating note for user ${createNoteRequest.uuid}:`, error);
-      throw new Error(`Failed to create note with user: ${error.message}`);
+      console.error('Error creating note with user:', error);
+      throw new Error(`Failed to create note: ${error.message}`);
     }
   }
 
-  async addNoteToUser(addNoteRequest: AddNoteToUserRequest): Promise<AddNoteToUserResponse> {
+  async addNoteToUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
     try {
-      return await this.noteService.addNoteToUser(addNoteRequest.documentId, addNoteRequest.uuid);
+      return await this.noteService.addNoteToUser(documentId, uuid);
     } catch (error) {
-      console.error(`Error adding note ${addNoteRequest.documentId} to user ${addNoteRequest.uuid}:`, error);
+      console.error(`Error adding note ${documentId} to user ${uuid}:`, error);
       throw new Error(`Failed to add note to user: ${error.message}`);
     }
   }
 
-  async removeNoteFromUser(removeNoteRequest: RemoveNoteFromUserRequest): Promise<RemoveNoteFromUserResponse> {
+  async removeNoteFromUser(documentId: number, uuid: string): Promise<{ success: boolean }> {
     try {
-      return await this.noteService.removeNoteFromUser(removeNoteRequest.documentId, removeNoteRequest.uuid);
+      return await this.noteService.removeNoteFromUser(documentId, uuid);
     } catch (error) {
-      console.error(`Error removing note ${removeNoteRequest.documentId} from user ${removeNoteRequest.uuid}:`, error);
+      console.error(`Error removing note ${documentId} from user ${uuid}:`, error);
       throw new Error(`Failed to remove note from user: ${error.message}`);
     }
   }
 
   // ==================== NEWS MANAGEMENT ====================
 
-  async getAllNews(): Promise<GetAllNewsResponse> {
+  async getAllNews(): Promise<NewsResponse> {
     try {
       return await this.newsService.getAllNews();
     } catch (error) {
       console.error('Error getting all news:', error);
-      throw new Error(`Failed to retrieve all news: ${error.message}`);
+      throw new Error(`Failed to retrieve news: ${error.message}`);
     }
   }
 
-  async getPublishedNews(): Promise<GetPublishedNewsResponse> {
+  async getPublishedNews(): Promise<NewsResponse> {
     try {
       return await this.newsService.getPublishedNews();
     } catch (error) {
@@ -164,7 +136,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async getNewsById(newsId: number): Promise<NewsResponse | null> {
+  async getNewsById(newsId: number): Promise<NewsDetails> {
     try {
       return await this.newsService.getNewsById(newsId);
     } catch (error) {
@@ -173,7 +145,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async getFeaturedNews(): Promise<NewsResponse | null> {
+  async getFeaturedNews(): Promise<NewsDetails | null> {
     try {
       return await this.newsService.getFeaturedNews();
     } catch (error) {
@@ -182,7 +154,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async createNews(createNewsRequest: CreateNewsRequest): Promise<CreateNewsResponse> {
+  async createNews(createNewsRequest: CreateNewsRequest): Promise<NewsDetails> {
     try {
       return await this.newsService.createNews(createNewsRequest);
     } catch (error) {
@@ -191,7 +163,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<UpdateNewsResponse> {
+  async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
     try {
       return await this.newsService.updateNews(newsId, updateNewsRequest);
     } catch (error) {
@@ -200,7 +172,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async deleteNews(newsId: number): Promise<DeleteNewsResponse> {
+  async deleteNews(newsId: number): Promise<{ success: boolean; message: string }> {
     try {
       await this.newsService.deleteNews(newsId);
       return {
@@ -213,54 +185,40 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateNewsStatus(updateStatusRequest: UpdateNewsStatusRequest): Promise<UpdateNewsStatusResponse> {
+  async updateNewsStatus(publishedIds: number[], featuredId: number): Promise<{ success: boolean }> {
     try {
-      const result = await this.newsService.updateNewsStatus(updateStatusRequest);
-      return { success: result.success };
+      return await this.newsService.updateNewsStatus(publishedIds, featuredId);
     } catch (error) {
       console.error('Error updating news status:', error);
       throw new Error(`Failed to update news status: ${error.message}`);
     }
   }
 
-  async saveNews(saveNewsRequest: SaveNewsRequest): Promise<SaveNewsResponse> {
+  async saveNews(news: CreateNewsRequest, newsId: number): Promise<{ success: boolean; id: number }> {
     try {
-      const result = await this.newsService.saveNews(saveNewsRequest.news, saveNewsRequest.newsId);
-      return {
-        success: result.success,
-        id: result.id
-      };
+      return await this.newsService.saveNews(news, newsId);
     } catch (error) {
-      console.error(`Error saving news:`, error);
+      console.error('Error saving news:', error);
       throw new Error(`Failed to save news: ${error.message}`);
     }
   }
 
   // ==================== VALIDATION METHODS ====================
 
-  async validateDocumentExists(id: number): Promise<boolean> {
-    try {
-      return await this.documentService.validateDocumentExists(id);
-    } catch (error) {
-      console.error(`Error validating document existence for ${id}:`, error);
-      return false;
-    }
-  }
-
-  async validateNewsExists(newsId: number): Promise<boolean> {
-    try {
-      return await this.newsService.validateNewsExists(newsId);
-    } catch (error) {
-      console.error(`Error validating news existence for ${newsId}:`, error);
-      return false;
-    }
-  }
-
-  async validateUserHasNoteAccess(documentId: number, uuid: string): Promise<boolean> {
+  async validateDocumentAccess(documentId: number, uuid: string): Promise<boolean> {
     try {
       return await this.noteService.validateUserHasAccess(documentId, uuid);
     } catch (error) {
-      console.error(`Error validating user note access for document ${documentId} and user ${uuid}:`, error);
+      console.error(`Error validating document access:`, error);
+      return false;
+    }
+  }
+
+  async validateDocumentExists(documentId: number): Promise<boolean> {
+    try {
+      return await this.documentService.validateDocumentExists(documentId);
+    } catch (error) {
+      console.error(`Error validating document exists:`, error);
       return false;
     }
   }

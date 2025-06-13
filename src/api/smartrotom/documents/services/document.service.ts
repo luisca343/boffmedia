@@ -1,13 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentsRepository } from '@api/_repositories/smartrotom/documents.repository';
-import {
-  CreateDocumentRequest,
-  UpdateDocumentRequest,
-  DocumentResponse,
-  DocumentDetails,
-  DocumentCreationData,
-  DocumentUpdateData
-} from '@api/smartrotom/documents/types/documents.types';
+import { DocumentsRepository, DocumentDetails, NotePreview } from '@repositories/smartrotom/documents.repository';
+
+export interface CreateDocumentRequest {
+  title: string;
+  content: string;
+  type: number;
+  public?: number;
+}
+
+export interface UpdateDocumentRequest {
+  title?: string;
+  content?: string;
+  type?: number;
+  public?: number;
+}
 
 @Injectable()
 export class DocumentService {
@@ -15,96 +21,102 @@ export class DocumentService {
     private readonly documentsRepository: DocumentsRepository,
   ) {}
 
-  async getDocumentById(id: number): Promise<DocumentResponse | null> {
+  async getDocumentById(id: number): Promise<Partial<DocumentDetails>> {
+    if (!id || id <= 0) {
+      throw new Error('Valid document ID is required');
+    }
+
     const document = await this.documentsRepository.findDocumentById(id);
     if (!document) {
-      return null;
-    }
-
-    return {
-      id: document.id!,
-      title: document.title!,
-      type: document.type!,
-      content: document.content!,
-      createdAt: document.createdAt!,
-      updatedAt: document.updatedAt!,
-      public: 0 // Default value since not in original schema
-    };
-  }
-
-  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<DocumentResponse> {
-    const documentData: DocumentCreationData = {
-      title: createDocumentRequest.title,
-      content: createDocumentRequest.content,
-      type: createDocumentRequest.type,
-      public: createDocumentRequest.public || 0
-    };
-
-    const result = await this.documentsRepository.createDocument(documentData);
-    const createdDocument = await this.getDocumentById(result.insertId);
-
-    if (!createdDocument) {
-      throw new Error('Failed to retrieve created document');
-    }
-
-    return createdDocument;
-  }
-
-  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<DocumentResponse> {
-    const documentExists = await this.documentsRepository.documentExists(id);
-    if (!documentExists) {
       throw new Error('Document not found');
     }
 
-    const updateData: DocumentUpdateData = {
-      title: updateDocumentRequest.title,
-      content: updateDocumentRequest.content,
-      type: updateDocumentRequest.type,
-      public: updateDocumentRequest.public
-    };
+    return document;
+  }
 
-    await this.documentsRepository.updateDocument(id, updateData);
-    
-    const updatedDocument = await this.getDocumentById(id);
-    if (!updatedDocument) {
-      throw new Error('Failed to retrieve updated document');
+  async getUserDocuments(uuid: string): Promise<NotePreview[]> {
+    if (!uuid) {
+      throw new Error('UUID is required');
     }
 
-    return updatedDocument;
+    return this.documentsRepository.findUserDocuments(uuid);
+  }
+
+  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<Partial<DocumentDetails>> {
+    const { title, content, type, public: isPublic } = createDocumentRequest;
+
+    if (!title || !content) {
+      throw new Error('Title and content are required');
+    }
+
+    if (type === undefined || type === null) {
+      throw new Error('Document type is required');
+    }
+
+    const result = await this.documentsRepository.createDocument({
+      title: title.trim(),
+      content: content.trim(),
+      type,
+      public: isPublic || 0
+    });
+
+    return this.getDocumentById(result.insertId);
+  }
+
+  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<Partial<DocumentDetails>> {
+    const existingDocument = await this.documentsRepository.findDocumentById(id);
+    if (!existingDocument) {
+      throw new Error('Document not found');
+    }
+
+    const updateData: any = {};
+    
+    if (updateDocumentRequest.title !== undefined) {
+      updateData.title = updateDocumentRequest.title.trim();
+    }
+    
+    if (updateDocumentRequest.content !== undefined) {
+      updateData.content = updateDocumentRequest.content.trim();
+    }
+    
+    if (updateDocumentRequest.type !== undefined) {
+      updateData.type = updateDocumentRequest.type;
+    }
+    
+    if (updateDocumentRequest.public !== undefined) {
+      updateData.public = updateDocumentRequest.public;
+    }
+
+    await this.documentsRepository.updateDocument(id, updateData);
+    return this.getDocumentById(id);
   }
 
   async deleteDocument(id: number): Promise<void> {
-    const documentExists = await this.documentsRepository.documentExists(id);
-    if (!documentExists) {
+    const existingDocument = await this.documentsRepository.findDocumentById(id);
+    if (!existingDocument) {
       throw new Error('Document not found');
     }
 
     await this.documentsRepository.deleteDocument(id);
   }
 
-  async saveDocument(id: number, title: string, content: string, type: number): Promise<number> {
-    const documentExists = await this.documentsRepository.documentExists(id);
-    
-    if (documentExists) {
-      // Update existing document
-      await this.documentsRepository.updateDocument(id, {
-        title,
-        content,
-        type
-      });
-      return id;
+  async saveDocument(id: number, title: string, content: string, type: number): Promise<{ success: boolean; id: number }> {
+    // Legacy method for backward compatibility
+    if (id === 0) {
+      const newDocument = await this.createDocument({ title, content, type });
+      return { success: true, id: newDocument.id };
     } else {
-      // Create new document
-      const result = await this.documentsRepository.createDocument({
-        title,
-        content,
-        type
-      });
-      return result.insertId;
+      const updatedDocument = await this.updateDocument(id, { title, content, type });
+      return { success: true, id: updatedDocument.id };
     }
   }
 
   async validateDocumentExists(id: number): Promise<boolean> {
-    return this.documentsRepository.documentExists(id);
+    try {
+      await this.getDocumentById(id);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

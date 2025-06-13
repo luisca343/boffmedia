@@ -2,27 +2,12 @@ import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { StreakService } from './services/streak.service';
-import { InventoryService } from './services/inventory.service';
+import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
-import {
-  ArcadeStreakResponse,
-  ClaimRewardResponse,
-  InventoryResponse,
-  AddInventoryItemRequest,
-  AddInventoryItemResponse,
-  ConsumeInventoryItemResponse,
-  ClaimInventoryItemsResponse,
-  ClaimItemData,
-  OpenLootBoxRequest,
-  OpenLootBoxResponse,
-  GiveLootboxResponse,
-  LootBoxConfigResponse,
-  DailyRewardItem,
-  OptimizedItemStack,
-  DailyRewardsConfig
-} from './types/arcade.types';
+import { ArcadeStreak, ClaimRewardResponse } from '../_dto/arcade-streak.dto';
+import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
 import { rarityRanges } from './_config/lootboxConfig';
-import { loadRewardsConfig } from '../_main/_config/daily-rewards.config';
+import { DailyRewardsConfig, loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 
@@ -46,7 +31,7 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   // ==================== STREAK MANAGEMENT ====================
   
-  async getArcadeStreak(uuid: string): Promise<ArcadeStreakResponse> {
+  async getArcadeStreak(uuid: string): Promise<ArcadeStreak> {
     return this.streakService.getArcadeStreak(uuid, this.rewardsConfig);
   }
 
@@ -110,11 +95,20 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   // ==================== INVENTORY MANAGEMENT ====================
   
-  async getInventory(uuid: string, sourceType?: string): Promise<InventoryResponse> {
+  async getInventory(uuid: string, sourceType?: string) {
     return this.inventoryService.getInventory(uuid, sourceType);
   }
 
-  async addInventoryItem(data: AddInventoryItemRequest): Promise<AddInventoryItemResponse> {
+  async addInventoryItem(data: {
+    uuid: string;
+    itemId: string;
+    itemType: string;
+    name: string;
+    amount?: number;
+    sourceType?: string;
+    sourceId?: number;
+    rarity?: string;
+  }) {
     try {
       const result = await this.inventoryService.addInventoryItem(data);
       return {
@@ -130,7 +124,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
   }
 
-  async consumeInventoryItem(uuid: string, itemId: string): Promise<ConsumeInventoryItemResponse> {
+  async consumeInventoryItem(uuid: string, itemId: string) {
     try {
       const result = await this.inventoryService.consumeInventoryItem(uuid, itemId);
       return {
@@ -148,7 +142,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
   }
 
-  async claimInventoryItems(uuid: string, items: ClaimItemData[]): Promise<ClaimInventoryItemsResponse> {
+  async claimInventoryItems(uuid: string, items: ClaimItemData[]) {
     try {
       if (!Array.isArray(items) || items.length === 0) {
         return {
@@ -217,15 +211,15 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   // ==================== LOOTBOX MANAGEMENT ====================
   
-  async openLootBox(openLootBoxDto: OpenLootBoxRequest): Promise<OpenLootBoxResponse> {
+  async openLootBox(openLootBoxDto: OpenLootBoxDto): Promise<OpenLootBoxResponseDto> {
     return this.lootboxService.openLootBox(openLootBoxDto);
   }
 
-  async giveLootbox(uuid: string, lootboxType: string, amount?: number): Promise<GiveLootboxResponse> {
+  async giveLootbox(uuid: string, lootboxType: string, amount?: number) {
     return this.lootboxService.giveLootbox(uuid, lootboxType, amount || 1);
   }
 
-  async getLootboxConfig(): Promise<LootBoxConfigResponse> {
+  async getLootboxConfig() {
     return { 
       rarityRanges, 
       lootboxConfig: this.lootboxService.getLootboxConfig() 
@@ -234,13 +228,13 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   // ==================== GAME FEATURES ====================
   
-  getWordle(): string {
+  getWordle() {
     return 'wordle';
   }
 
   // ==================== PRIVATE HELPER METHODS ====================
   
-  private getRewardForDay(day: number): DailyRewardItem {
+  private getRewardForDay(day: number) {
     const dayInCycle = ((day - 1) % this.rewardsConfig.totalDays) + 1;
     const rewardConfig = this.rewardsConfig.rewards.find(r => r.day === dayInCycle);
     
@@ -252,7 +246,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     };
   }
 
-  private async awardReward(uuid: string, reward: DailyRewardItem): Promise<void> {
+  private async awardReward(uuid: string, reward: any) {
     if (reward.type === "CURRENCY" && reward.amount > 0) {
       await this.awardCurrency(uuid, reward.amount);
     } else if (reward.type === "box") {
@@ -260,7 +254,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
   }
 
-  private async awardCurrency(uuid: string, amount: number): Promise<void> {
+  private async awardCurrency(uuid: string, amount: number) {
     const account = await this.starbankService.getMainAccount(uuid);
     if (!account) {
       throw new Error("No account found for user");
@@ -286,8 +280,8 @@ export class ArcadeFacadeService implements OnModuleInit {
     }
   }
 
-  private processRegularItems(items: any[]): OptimizedItemStack[] {
-    const itemsToGive: OptimizedItemStack[] = [];
+  private processRegularItems(items: any[]): Array<{id: string, amount: number}> {
+    const itemsToGive: Array<{id: string, amount: number}> = [];
     const itemsMap = new Map<string, number>();
     
     for (const item of items) {

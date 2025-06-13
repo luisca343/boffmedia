@@ -1,13 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
-import { 
-  OpenLootBoxRequest, 
-  OpenLootBoxResponse,
-  SpinnerItem,
-  LootBoxRewardItem 
-} from '../types/arcade.types';
 
-export class OpenLootBoxDto implements OpenLootBoxRequest {
+export class OpenLootBoxDto {
   @ApiProperty({ description: 'Player UUID', example: '12345678-1234-5678-1234-567812345678' })
   @IsNotEmpty()
   @IsString()
@@ -24,7 +18,7 @@ export class OpenLootBoxDto implements OpenLootBoxRequest {
   itemId: number;
 }
 
-class SpinnerItemDto implements SpinnerItem {
+class SpinnerItemDto {
   @ApiProperty({ description: 'Item ID', example: 'pixelmon.master_ball' })
   id: string;
 
@@ -35,7 +29,7 @@ class SpinnerItemDto implements SpinnerItem {
   isWinningItem: boolean;
 }
 
-class LootItemDto implements LootBoxRewardItem {
+class LootItemDto {
   @ApiProperty({ description: 'Item ID', example: 'pixelmon.master_ball' })
   id: string;
 
@@ -46,7 +40,7 @@ class LootItemDto implements LootBoxRewardItem {
   serverId?: number;
 }
 
-export class OpenLootBoxResponseDto implements OpenLootBoxResponse {
+export class OpenLootBoxResponseDto {
   @ApiProperty({ description: 'Whether the operation was successful', example: true })
   success: boolean;
 
@@ -54,14 +48,14 @@ export class OpenLootBoxResponseDto implements OpenLootBoxResponse {
   message?: string;
 
   @ApiProperty({ description: 'The item obtained from the loot box', required: false, type: LootItemDto })
-  item?: LootBoxRewardItem;
+  item?: LootItemDto;
 
   @ApiProperty({ 
     description: 'Array of items to display in the spinner animation', 
     type: [SpinnerItemDto],
     required: false
   })
-  spinnerItems?: SpinnerItem[];
+  spinnerItems?: SpinnerItemDto[];
 
   @ApiProperty({ 
     description: 'Position of the winning item in the spinner array',

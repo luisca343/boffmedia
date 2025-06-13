@@ -1,17 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseInterceptors, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AppsFacadeService } from './apps.facade.service';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { CreateAppDto } from './dto/create-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
-import { PlayerAppDto, PlayerAppsDto } from './dto/player-app.dto';
+import { PlayerAppDto } from './dto/player-app-dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { AppsExamples } from './examples/apps.examples';
-import {
-  AppResponse,
-  PlayerAppResponse
-} from './types/app.types';
-import { SuccessResponse } from '@/types/request';
 
 @ApiTags('SmartRotom | Apps')
 @Controller('/smartrotom/apps')
@@ -28,7 +23,7 @@ export class AppsController {
     description: 'Apps found successfully.',
     example: AppsExamples.responses.findAll
   })
-  async findAll(): Promise<AppResponse[]> {
+  async findAll() {
     return this.appsFacadeService.getApps();
   }
 
@@ -39,16 +34,8 @@ export class AppsController {
     description: 'App created successfully.',
     example: AppsExamples.responses.create
   })
-  @ApiBody({ 
-    type: CreateAppDto,
-    examples: {
-      createApp: {
-        summary: 'Create a new app',
-        value: AppsExamples.requests.createApp
-      }
-    }
-  })
-  async create(@Body() createAppDto: CreateAppDto): Promise<AppResponse> {
+  @ApiBody({ type: CreateAppDto })
+  async create(@Body() createAppDto: CreateAppDto) {
     return this.appsFacadeService.createApp(createAppDto);
   }
 
@@ -68,7 +55,7 @@ export class AppsController {
       }
     }
   })
-  async order(@Body() order: OrderAppDto): Promise<SuccessResponse> {
+  async order(@Body() order: OrderAppDto) {
     return this.appsFacadeService.orderApps(order.newOrder, order.uuid);
   }
 
@@ -79,8 +66,13 @@ export class AppsController {
     description: 'Apps found for player successfully.',
     example: AppsExamples.responses.getForPlayer
   })
-  @ApiBody({ 
-    type: PlayerAppsDto,
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        uuid: { type: 'string', description: 'Player UUID', example: 'player-uuid-123' }
+      }
+    },
     examples: {
       getPlayerApps: {
         summary: 'Get apps for a specific player',
@@ -88,7 +80,7 @@ export class AppsController {
       }
     }
   })
-  async getForPlayer(@Body() { uuid }: PlayerAppsDto): Promise<PlayerAppResponse[]> {
+  async getForPlayer(@Body() { uuid }: { uuid: string }) {
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }
 
@@ -108,7 +100,7 @@ export class AppsController {
       }
     }
   })
-  async addAppToPlayer(@Body() { uuid, id }: PlayerAppDto): Promise<SuccessResponse> {
+  async addAppToPlayer(@Body() { uuid, id }: PlayerAppDto) {
     return this.appsFacadeService.addAppToPlayer(uuid, id);
   }
 
@@ -128,7 +120,7 @@ export class AppsController {
       }
     }
   })
-  async removeAppFromPlayer(@Body() { uuid, id }: PlayerAppDto): Promise<SuccessResponse> {
+  async removeAppFromPlayer(@Body() { uuid, id }: PlayerAppDto) {
     return this.appsFacadeService.removeAppFromPlayer(uuid, id);
   }
 
@@ -144,7 +136,7 @@ export class AppsController {
     description: 'App not found.',
     example: AppsExamples.responses.notFound
   })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<AppResponse> {
+  async findOne(@Param('id') id: number) {
     return this.appsFacadeService.getApp(id);
   }
 
@@ -169,10 +161,7 @@ export class AppsController {
       }
     }
   })
-  async update(
-    @Param('id', ParseIntPipe) id: number, 
-    @Body() updateAppDto: UpdateAppDto
-  ): Promise<AppResponse> {
+  async update(@Param('id') id: number, @Body() updateAppDto: UpdateAppDto) {
     return this.appsFacadeService.updateApp(id, updateAppDto);
   }
 
@@ -188,7 +177,7 @@ export class AppsController {
     description: 'App not found.',
     example: AppsExamples.responses.notFound
   })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<SuccessResponse> {
+  async remove(@Param('id') id: number) {
     return this.appsFacadeService.deleteApp(id);
   }
 }

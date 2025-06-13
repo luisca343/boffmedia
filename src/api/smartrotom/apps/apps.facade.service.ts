@@ -3,13 +3,9 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { AppsService } from './services/apps.service';
 import { UserAppsService } from './services/user-apps.service';
+import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
-import {
-  AppResponse,
-  PlayerAppResponse,
-} from './types/app.types';
-import { SuccessResponse } from '@/types/request';
 
 @Injectable()
 export class AppsFacadeService {
@@ -20,43 +16,43 @@ export class AppsFacadeService {
   ) {}
 
   // ==================== APP MANAGEMENT ====================
-  async getApps(): Promise<AppResponse[]> {
+  async getApps(): Promise<SmartRotomApp[]> {
     return this.appsService.getAllApps();
   }
 
-  async getApp(id: number): Promise<AppResponse> {
+  async getApp(id: number): Promise<SmartRotomApp> {
     return this.appsService.getAppById(id);
   }
 
-  async createApp(createAppDto: CreateAppDto): Promise<AppResponse> {
+  async createApp(createAppDto: CreateAppDto): Promise<SmartRotomApp> {
     return this.appsService.createApp(createAppDto);
   }
 
-  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<AppResponse> {
+  async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
     return this.appsService.updateApp(id, updateAppDto);
   }
 
-  async deleteApp(id: number): Promise<SuccessResponse> {
+  async deleteApp(id: number): Promise<{ success: boolean }> {
     return this.appsService.deleteApp(id);
   }
 
   // ==================== USER APP MANAGEMENT ====================
-  async getAppsForPlayer(uuid: string): Promise<PlayerAppResponse[]> {
+  async getAppsForPlayer(uuid: string): Promise<SmartRotomApp[]> {
     return this.userAppsService.getAppsForPlayer(uuid);
   }
 
-  async addAppToPlayer(uuid: string, appId: number): Promise<SuccessResponse> {
+  async addAppToPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
     return this.userAppsService.addAppToPlayer(uuid, appId);
   }
 
-  async removeAppFromPlayer(uuid: string, appId: number): Promise<SuccessResponse> {
+  async removeAppFromPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
     return this.userAppsService.removeAppFromPlayer(uuid, appId);
   }
 
   async orderApps(
     order: { id: number | string; order: number }[], 
     uuid: string
-  ): Promise<SuccessResponse> {
+  ): Promise<{ success: boolean }> {
     return this.db.transaction(async (tx) => {
       return this.userAppsService.orderAppsForPlayer(order, uuid);
     });

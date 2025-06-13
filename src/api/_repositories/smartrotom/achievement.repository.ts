@@ -11,14 +11,38 @@ import {
   smartRotomUserAchievements,
   smartRotomUserReplays
 } from '@/_db/schema/SmartRotom';
-import {
-  AchievementDetailsResponse,
-  UserAchievementStatusResponse,
-  ReplayDetailsResponse,
-  CreateReplayRequest,
-  CreateUserReplayRequest,
-  CreateUserAchievementRequest
-} from '@api/smartrotom/achievement/types/achievement.types';
+
+export interface AchievementDetails {
+  id: string;
+  battleId: number;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  subcategory: string;
+  progress: number;
+  completed: number;
+  completedAt: Date;
+  uuid: string;
+  team: string;
+  replay: string;
+}
+
+export interface UserAchievementStatus {
+  id: string;
+  completed: number;
+}
+
+export interface ReplayDetails {
+  id: number;
+  team1: string;
+  team2: string;
+  replay: string;
+  winner: string;
+  side1: string;
+  side2: string;
+  date: Date;
+}
 
 @Injectable()
 export class AchievementRepository {
@@ -28,7 +52,7 @@ export class AchievementRepository {
 
   // ==================== ACHIEVEMENT OPERATIONS ====================
 
-  async findUserAchievements(uuid: string): Promise<AchievementDetailsResponse[]> {
+  async findUserAchievements(uuid: string): Promise<AchievementDetails[]> {
     return this.db
       .select({
         id: smartRotomAchievements.id,
@@ -76,7 +100,7 @@ export class AchievementRepository {
       );
   }
 
-  async findUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetailsResponse | null> {
+  async findUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetails | null> {
     const result = await this.db
       .select({
         id: smartRotomAchievements.id,
@@ -118,7 +142,7 @@ export class AchievementRepository {
     return result[0] || null;
   }
 
-  async findUserAchievementStatus(uuid: string, achievementId: string): Promise<UserAchievementStatusResponse | null> {
+  async findUserAchievementStatus(uuid: string, achievementId: string): Promise<UserAchievementStatus | null> {
     const result = await this.db
       .select({
         id: smartRotomAchievements.id,
@@ -138,7 +162,14 @@ export class AchievementRepository {
     return result[0] || null;
   }
 
-  async createUserAchievement(achievementData: CreateUserAchievementRequest): Promise<{ insertId: number }> {
+  async createUserAchievement(achievementData: {
+    dataId: number;
+    uuid: string;
+    achievementId: string;
+    progress: number;
+    completed: number;
+    completedAt: Date;
+  }): Promise<{ insertId: number }> {
     const result = await this.db
       .insert(smartRotomUserAchievements)
       .values(achievementData as SmartRotomUserAchievement);
@@ -148,7 +179,14 @@ export class AchievementRepository {
 
   // ==================== REPLAY OPERATIONS ====================
 
-  async createReplay(replayData: CreateReplayRequest): Promise<{ insertId: number }> {
+  async createReplay(replayData: {
+    side1: string;
+    side2: string;
+    team1: string;
+    team2: string;
+    replay: string;
+    winner: string;
+  }): Promise<{ insertId: number }> {
     const result = await this.db
       .insert(smartRotomReplays)
       .values(replayData as SmartRotomReplay);
@@ -156,7 +194,11 @@ export class AchievementRepository {
     return { insertId: result[0].insertId };
   }
 
-  async createUserReplay(userReplayData: CreateUserReplayRequest): Promise<{ insertId: number }> {
+  async createUserReplay(userReplayData: {
+    replayId: number;
+    uuid: string;
+    side: number;
+  }): Promise<{ insertId: number }> {
     const result = await this.db
       .insert(smartRotomUserReplays)
       .values(userReplayData as SmartRotomUserReplay);
@@ -164,7 +206,7 @@ export class AchievementRepository {
     return { insertId: result[0].insertId };
   }
 
-  async findUserReplay(uuid: string, replayId: number): Promise<ReplayDetailsResponse | null> {
+  async findUserReplay(uuid: string, replayId: number): Promise<ReplayDetails | null> {
     const result = await this.db
       .select({
         id: smartRotomReplays.id,

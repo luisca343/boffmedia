@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
-import {
-  ArcadeStreakResponse,
-  DailyRewardItem,
-  StreakUpdateData,
-  DailyRewardsConfig
-} from '../types/arcade.types';
+import { ArcadeStreak, ClaimRewardResponse } from '../../_dto/arcade-streak.dto';
+import { DailyRewardItem, DailyRewardsConfig } from '@api/smartrotom/_main/_config/daily-rewards.config';
 
 @Injectable()
 export class StreakService {
@@ -13,7 +9,7 @@ export class StreakService {
     private readonly arcadeRepository: ArcadeRepository,
   ) {}
 
-  async getArcadeStreak(uuid: string, rewardsConfig: DailyRewardsConfig): Promise<ArcadeStreakResponse> {
+  async getArcadeStreak(uuid: string, rewardsConfig: DailyRewardsConfig): Promise<ArcadeStreak> {
     const now = new Date();
     const resetTime = this.getDailyResetTime(now);
     const nextResetTime = this.getNextResetTime(now, resetTime);
@@ -68,7 +64,12 @@ export class StreakService {
     };
   }
 
-  async updateStreak(uuid: string, data: StreakUpdateData): Promise<any> {
+  async updateStreak(uuid: string, data: {
+    lastClaimed: Date;
+    streak: number;
+    totalClaims: number;
+    lastBanner: string;
+  }) {
     const existing = await this.arcadeRepository.findStreakByUuid(uuid);
     
     if (existing) {

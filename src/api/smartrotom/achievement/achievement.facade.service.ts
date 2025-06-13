@@ -1,13 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { AchievementService } from './services/achievement.service';
 import { ReplayService } from './services/replay.service';
-import { BattleAchievementService } from './services/battle-achievement.service';
-import {
-  AchievementDetailsResponse,
-  ReplayDetailsResponse,
-  BattleAchievementRequest,
-  BattleAchievementResponse
-} from './types/achievement.types';
+import { BattleAchievementService, BattleAchievementRequest } from './services/battle-achievement.service';
+import { AchievementDetails, ReplayDetails } from '@repositories/smartrotom/achievement.repository';
 
 @Injectable()
 export class AchievementFacadeService {
@@ -19,7 +14,7 @@ export class AchievementFacadeService {
 
   // ==================== ACHIEVEMENT MANAGEMENT ====================
 
-  async getUserAchievements(uuid: string): Promise<AchievementDetailsResponse[]> {
+  async getUserAchievements(uuid: string): Promise<AchievementDetails[]> {
     try {
       return await this.achievementService.getUserAchievements(uuid);
     } catch (error) {
@@ -28,7 +23,7 @@ export class AchievementFacadeService {
     }
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetailsResponse> {
+  async getUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetails> {
     try {
       return await this.achievementService.getUserAchievementById(uuid, achievementId);
     } catch (error) {
@@ -39,7 +34,7 @@ export class AchievementFacadeService {
 
   // ==================== BATTLE ACHIEVEMENT MANAGEMENT ====================
 
-  async addBattleAchievement(battleData: BattleAchievementRequest): Promise<BattleAchievementResponse> {
+  async addBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; error?: string }> {
     try {
       return await this.battleAchievementService.addBattleAchievement(battleData);
     } catch (error) {
@@ -50,7 +45,7 @@ export class AchievementFacadeService {
 
   // ==================== REPLAY MANAGEMENT ====================
 
-  async getUserReplay(uuid: string, replayId: number): Promise<ReplayDetailsResponse> {
+  async getUserReplay(uuid: string, replayId: number): Promise<ReplayDetails> {
     try {
       return await this.replayService.getUserReplay(uuid, replayId);
     } catch (error) {
