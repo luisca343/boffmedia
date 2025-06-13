@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsOptional, IsInt, Min } from 'class-validator';
 export class GiveLootboxDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsNotEmpty()
   @IsString()

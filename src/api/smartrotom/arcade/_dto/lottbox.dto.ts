@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
 
 export class OpenLootBoxDto {
-  @ApiProperty({ description: 'Player UUID', example: '007d1a64-661c-4396-8844-e27856f2ddfa' })
+  @ApiProperty({ description: 'Player UUID', example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
   @IsNotEmpty()
   @IsString()
   uuid: string;
 
-  @ApiProperty({ description: 'Box type ID', example: 'trainer-box' })
+  @ApiProperty({ description: 'Box type ID', example: 'trainer_box' })
   @IsNotEmpty()
   @IsString()
   boxId: string;
@@ -19,7 +19,7 @@ export class OpenLootBoxDto {
 }
 
 class SpinnerItemDto {
-  @ApiProperty({ description: 'Item ID', example: 'pixelmon.master_ball' })
+  @ApiProperty({ description: 'Item ID', example: 'pixelmon:master_ball' })
   id: string;
 
   @ApiProperty({ description: 'Item weight for probability', example: 2 })
@@ -30,7 +30,7 @@ class SpinnerItemDto {
 }
 
 class LootItemDto {
-  @ApiProperty({ description: 'Item ID', example: 'pixelmon.master_ball' })
+  @ApiProperty({ description: 'Item ID', example: 'pixelmon:master_ball' })
   id: string;
 
   @ApiProperty({ description: 'Item rarity', example: 'legendary' })

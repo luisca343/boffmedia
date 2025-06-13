@@ -41,7 +41,21 @@ export class LootboxConfig {
 
   @ApiProperty({ 
     description: 'Items that can be obtained from this lootbox', 
-    type: [LootboxItem] 
+    type: [LootboxItem],
+    example: [
+      {
+        "id": "pixelmon:poke_ball",
+        "weight": 90
+      },
+      {
+        "id": "pixelmon:potion",
+        "weight": 90
+      },
+      {
+        "id": "pixelmon:master_ball",
+        "weight": 2
+      }
+    ]
   })
   items: LootboxItem[];
 
@@ -64,14 +78,72 @@ export class LootboxConfigResponse {
   @ApiProperty({ 
     description: 'Rarity weight ranges', 
     example: { 
-      common: { min: 50, max: 100 }, 
-      uncommon: { min: 20, max: 49 } 
+      "common": { "min": 50, "max": 100 },
+      "uncommon": { "min": 20, "max": 49 },
+      "rare": { "min": 10, "max": 19 },
+      "epic": { "min": 3, "max": 9 },
+      "legendary": { "min": 1, "max": 2 }
     } 
   })
   rarityRanges: Record<string, RarityRange>;
 
   @ApiProperty({ 
-    description: 'Available lootbox configurations' 
+    description: 'Available lootbox configurations',
+    example: {
+      "boxes": [
+        {
+          "id": "trainer_box",
+          "name": "Caja de Entrenador",
+          "image": "/smartrotom/img/apps/arcade/lootbox/trainer_box.png",
+          "description": "Una caja básica con objetos esenciales para entrenadores principiantes.",
+          "items": [
+            {
+              "id": "pixelmon:poke_ball",
+              "weight": 90
+            },
+            {
+              "id": "pixelmon:master_ball",
+              "weight": 2
+            }
+          ],
+          "theme": "blue"
+        },
+        {
+          "id": "evolution_box",
+          "name": "Caja de Evolución",
+          "image": "/smartrotom/img/apps/arcade/lootbox/evolution_box.png",
+          "description": "Contiene objetos que ayudan a tus Pokémon a evolucionar.",
+          "items": [
+            {
+              "id": "leaf_stone",
+              "weight": 100
+            },
+            {
+              "id": "prism_scale",
+              "weight": 1
+            }
+          ],
+          "theme": "green"
+        },
+        {
+          "id": "battle_box",
+          "name": "Caja de Combate",
+          "image": "/smartrotom/img/apps/arcade/lootbox/battle_box.png",
+          "description": "Objetos avanzados para dar ventaja a tus Pokémon en combates competitivos.",
+          "items": [
+            {
+              "id": "x_attack",
+              "weight": 100
+            },
+            {
+              "id": "dynamax_band",
+              "weight": 1
+            }
+          ],
+          "theme": "red"
+        }
+      ]
+    }
   })
   lootboxConfig: {
     boxes: LootboxConfig[];
