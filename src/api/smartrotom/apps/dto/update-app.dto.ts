@@ -7,7 +7,7 @@ export class UpdateAppDto extends PartialType(CreateAppDto) {
   @ApiProperty({ 
     description: 'The name of the app', 
     required: false,
-    example: 'Chess Master Pro'
+    example: 'StarBank'
   })
   @IsOptional()
   @IsString()
@@ -17,7 +17,7 @@ export class UpdateAppDto extends PartialType(CreateAppDto) {
   @ApiProperty({ 
     description: 'The description of the app', 
     required: false,
-    example: 'Advanced chess game with AI opponents'
+    example: 'Banking application for managing virtual currency'
   })
   @IsOptional()
   @IsString()
@@ -26,7 +26,7 @@ export class UpdateAppDto extends PartialType(CreateAppDto) {
   @ApiProperty({ 
     description: 'The URL of the app', 
     required: false,
-    example: 'https://example.com/chess-app-v2'
+    example: 'starbank'
   })
   @IsOptional()
   @IsString()
@@ -35,7 +35,7 @@ export class UpdateAppDto extends PartialType(CreateAppDto) {
   @ApiProperty({ 
     description: 'The icon of the app', 
     required: false,
-    example: '/icons/chess-master-icon.png'
+    example: '/icons/starbank-icon.png'
   })
   @IsOptional()
   @IsString()

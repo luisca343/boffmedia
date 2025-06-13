@@ -8,13 +8,13 @@ export class App {
   id: number;
 
   @ApiProperty({ 
-    example: 'Chess Master', 
+    example: 'Mina', 
     description: 'Name of the app' 
   })
   name: string;
 
   @ApiProperty({ 
-    example: 'https://example.com/chess-app', 
+    example: 'mina', 
     description: 'URL or path to the app' 
   })
   url: string;

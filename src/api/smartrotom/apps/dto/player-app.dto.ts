@@ -4,7 +4,7 @@ import { IsInt, IsUUID, IsString, Min } from 'class-validator';
 export class PlayerAppDto {
   @ApiProperty({ 
     description: 'The id of the app',
-    example: 1
+    example: 12
   })
   @IsInt()
   @Min(1)
@@ -12,7 +12,7 @@ export class PlayerAppDto {
 
   @ApiProperty({ 
     description: 'The uuid of the player',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsString()
   @IsUUID()

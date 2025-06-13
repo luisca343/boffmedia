@@ -4,7 +4,7 @@ import { IsString, IsOptional, IsInt, Min, Max, Length } from 'class-validator';
 export class CreateAppDto {
   @ApiProperty({ 
     description: 'The name of the app',
-    example: 'Chess Master'
+    example: 'Pokedex'
   })
   @IsString()
   @Length(1, 32)
@@ -13,7 +13,7 @@ export class CreateAppDto {
   @ApiProperty({ 
     description: 'The URL of the app', 
     required: false,
-    example: 'https://example.com/chess-app'
+    example: 'pokedex'
   })
   @IsOptional()
   @IsString()

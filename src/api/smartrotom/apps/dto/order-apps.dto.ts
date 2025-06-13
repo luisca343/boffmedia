@@ -20,7 +20,7 @@ const IsNumberOrString = () => {
 class OrderItemDto {
   @ApiProperty({ 
     description: 'App ID',
-    example: 1
+    example: 12
   })
   @IsNumberOrString()
   id: number | string;
@@ -36,7 +36,7 @@ class OrderItemDto {
 export class OrderAppDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsString()
   @IsUUID()
@@ -45,9 +45,9 @@ export class OrderAppDto {
   @ApiProperty({ 
     description: 'Array of apps with their new order',
     example: [
-      { id: 1, order: 1 },
-      { id: 2, order: 2 },
-      { id: 3, order: 3 }
+      { id: 12, order: 1 },
+      { id: 13, order: 2 },
+      { id: 15, order: 3 }
     ],
     type: [OrderItemDto]
   })
