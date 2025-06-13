@@ -7,14 +7,10 @@ import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 import { InvitesModule } from './api/wingull/invites/invites.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { MySQL2Service } from './_utils/MySQL2Service';
-import { ChatController } from '@api/smartrotom/chat/chat.controller';
-import { ChatService } from '@api/smartrotom/chat/chat.service';
-import { ChatModule } from '@api/smartrotom/chat/chat.module';
 import { PokemonController } from '@api/smartrotom/pokemon/pokemon.controller';
 import { PokemonModule } from '@api/smartrotom/pokemon/pokemon.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-import { MinaController } from '@api/smartrotom/mine/mine.controller';
 import { StarbankController } from '@api/smartrotom/starbank/starbank.controller';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { NetfluisService } from '@api/smartrotom/netfluis/netfluis.service';
@@ -67,6 +63,9 @@ import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/services/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-manifest.service';
 import { MineModule } from '@api/smartrotom/mine/mine.module';
+import { ChatModule } from '@api/deprecated/chat/chat.module';
+import { ChatController } from '@api/deprecated/chat/chat.controller';
+import { ChatService } from '@api/deprecated/chat/chat.service';
 
 @Module({
   imports: [
