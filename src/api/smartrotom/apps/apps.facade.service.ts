@@ -49,12 +49,12 @@ export class AppsFacadeService {
     return this.userAppsService.removeAppFromPlayer(uuid, appId);
   }
 
-  async orderApps(
-    order: { id: number | string; order: number }[], 
-    uuid: string
-  ): Promise<{ success: boolean }> {
-    return this.db.transaction(async (tx) => {
-      return this.userAppsService.orderAppsForPlayer(order, uuid);
-    });
-  }
+async orderApps(
+  order: { id: number | string; order: number }[], 
+  uuid: string
+): Promise<{ success: boolean }> {
+  return this.db.transaction(async (tx) => {
+    return this.userAppsService.orderAppsForPlayer(order, uuid, tx);
+  });
+}
 }

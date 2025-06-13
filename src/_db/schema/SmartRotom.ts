@@ -35,7 +35,7 @@ export const smartRotomAchievements = mysqlTable("rotom_achievements", {
     description: varchar("description", { length: 255 }).notNull(),
     icon: varchar("icon", { length: 255 }),
     category: varchar("category", { length: 32 }).notNull(),
-    subcatecory: varchar("subcategory", { length: 32 }),
+    subcategory: varchar("subcategory", { length: 32 }),
     target: int("target").default(1),
     order: int("order").default(0),
 });
