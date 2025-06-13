@@ -61,7 +61,7 @@ export class AchievementRepository {
         description: smartRotomAchievements.description,
         icon: smartRotomAchievements.icon,
         category: smartRotomAchievements.category,
-        subcategory: smartRotomAchievements.subcatecory,
+        subcategory: smartRotomAchievements.subcategory,
         progress: smartRotomUserAchievements.progress,
         completed: smartRotomUserAchievements.completed,
         completedAt: smartRotomUserAchievements.completedAt,
@@ -95,7 +95,7 @@ export class AchievementRepository {
         asc(smartRotomUserAchievements.completedAt),
         asc(smartRotomAchievements.order),
         asc(smartRotomAchievements.category),
-        asc(smartRotomAchievements.subcatecory),
+        asc(smartRotomAchievements.subcategory),
         asc(smartRotomAchievements.name),
       );
   }
@@ -109,7 +109,7 @@ export class AchievementRepository {
         description: smartRotomAchievements.description,
         icon: smartRotomAchievements.icon,
         category: smartRotomAchievements.category,
-        subcategory: smartRotomAchievements.subcatecory,
+        subcategory: smartRotomAchievements.subcategory,
         progress: smartRotomUserAchievements.progress,
         completed: smartRotomUserAchievements.completed,
         completedAt: smartRotomUserAchievements.completedAt,

@@ -54,7 +54,7 @@ async orderApps(
   uuid: string
 ): Promise<{ success: boolean }> {
   return this.db.transaction(async (tx) => {
-    return this.userAppsService.orderAppsForPlayer(order, uuid, tx);
+    return this.userAppsService.orderAppsForPlayer(order, uuid);
   });
 }
 }

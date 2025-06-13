@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
-import { ArcadeStreak, ClaimRewardResponse } from '../../_dto/arcade-streak.dto';
-import { DailyRewardItem, DailyRewardsConfig } from '@api/smartrotom/_main/_config/daily-rewards.config';
+import { ArcadeStreak, DailyRewardItem } from '../_dto/arcade-streak.dto';
+import { DailyRewardsConfig } from '@api/smartrotom/_main/_config/daily-rewards.config';
 
 @Injectable()
 export class StreakService {

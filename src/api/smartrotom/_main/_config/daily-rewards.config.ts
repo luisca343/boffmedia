@@ -1,11 +1,5 @@
 import { FileUtils } from '@/_utils/fileUtils';
-
-export interface DailyRewardItem {
-  day: number;
-  type: string;
-  amount: number;
-  description?: string;
-}
+import { DailyRewardItem } from '@api/smartrotom/arcade/_dto/arcade-streak.dto';
 
 export interface DailyRewardsConfig {
   totalDays: number;
