@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID, IsBoolean, IsObject } from 'class-validator';
-
+import { IsNotEmpty, IsString, IsUUID, IsBoolean, IsArray } from 'class-validator';
 export class BattleAchievementDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsNotEmpty()
   @IsString()
@@ -13,7 +12,7 @@ export class BattleAchievementDto {
 
   @ApiProperty({ 
     description: 'Achievement ID to unlock',
-    example: 'first_battle_win'
+    example: 'medalla_denki'
   })
   @IsNotEmpty()
   @IsString()
@@ -21,7 +20,7 @@ export class BattleAchievementDto {
 
   @ApiProperty({ 
     description: 'Player 1 name',
-    example: 'PlayerOne'
+    example: 'Luisca343'
   })
   @IsNotEmpty()
   @IsString()
@@ -29,7 +28,7 @@ export class BattleAchievementDto {
 
   @ApiProperty({ 
     description: 'Player 2 name',
-    example: 'PlayerTwo'
+    example: 'Aquiles'
   })
   @IsNotEmpty()
   @IsString()
@@ -37,23 +36,55 @@ export class BattleAchievementDto {
 
   @ApiProperty({ 
     description: 'Player 1 team data',
-    example: { pokemon: ['pikachu', 'charizard'] }
+    example: [
+      {
+        "dex": 777,
+        "nature": "Serious",
+        "species": "Togedemaru",
+        "form": "",
+        "palette": "none",
+        "name": "Togedemaru",
+        "level": 100,
+        "item": "item.minecraft.air",
+        "ability": "Lightning Rod",
+        "moves": ["Fake Out", "Nuzzle", "Thunderbolt", "Spiky Shield"],
+        "ivs": [17, 10, 19, 30, 9, 23],
+        "evs": [252, 0, 3, 252, 3, 0],
+        "stats": [320, 211, 150, 178, 160, 220]
+      }
+    ]
   })
   @IsNotEmpty()
-  @IsObject()
-  team1: any;
+  @IsArray()
+  team1: any[];
 
   @ApiProperty({ 
     description: 'Player 2 team data',
-    example: { pokemon: ['blastoise', 'venusaur'] }
+    example: [
+      {
+        "dex": 272,
+        "nature": "Modest",
+        "species": "Ludicolo",
+        "form": "",
+        "palette": "none",
+        "name": "Ludicolo",
+        "level": 1,
+        "item": "Assault Vest",
+        "ability": "Swift Swim",
+        "moves": ["Bubble Beam", "Energy Ball", "Mist", "Water Gun"],
+        "ivs": [31, 31, 31, 31, 31, 31],
+        "evs": [236, 0, 0, 252, 0, 0],
+        "stats": [13, 5, 6, 7, 7, 6]
+      }
+    ]
   })
   @IsNotEmpty()
-  @IsObject()
-  team2: any;
+  @IsArray()
+  team2: any[];
 
   @ApiProperty({ 
     description: 'Battle replay data',
-    example: 'replay-data-string'
+    example: '|player|p1|player:67d9b543-5ac9-41e1-a8a5-20d7689e24a4:Luisca343\n|player|p2|npc:Aquiles\n|teamsize|p1|6\n|teamsize|p2|6\n|gametype|doubles\n|gen|9\n|tier|Circuito de Gimnasios de Teras\n|start\n|switch|p1a: Togedemaru|Togedemaru, L100|320\\/320\n|switch|p2a: Ludicolo|Ludicolo, L1|13\\/13\n|turn|1\n|win|Luisca343\n'
   })
   @IsNotEmpty()
   @IsString()
@@ -66,7 +97,16 @@ export class BattleAchievementDto {
   @IsNotEmpty()
   @IsBoolean()
   victoria: boolean;
+
+  @ApiProperty({ 
+    description: 'Server identifier',
+    example: '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365'
+  })
+  @IsNotEmpty()
+  @IsString()
+  server: string;
 }
+
 
 export class BattleAchievementResponse {
   @ApiProperty({ 

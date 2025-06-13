@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
 export class GetAchievementsDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsNotEmpty()
   @IsString()
@@ -15,7 +15,7 @@ export class GetAchievementsDto {
 export class GetAchievementByIdDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsNotEmpty()
   @IsString()
@@ -24,7 +24,7 @@ export class GetAchievementByIdDto {
 
   @ApiProperty({ 
     description: 'Achievement ID',
-    example: 'medalla_tulipan'
+    example: 'medalla_denki'
   })
   @IsNotEmpty()
   @IsString()
@@ -34,7 +34,7 @@ export class GetAchievementByIdDto {
 export class CheckAchievementDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsNotEmpty()
   @IsString()
@@ -43,7 +43,7 @@ export class CheckAchievementDto {
 
   @ApiProperty({ 
     description: 'Achievement ID to check',
-    example: 'medalla_tulipan'
+    example: 'medalla_denki'
   })
   @IsNotEmpty()
   @IsString()
