@@ -6,7 +6,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';
-import { PokemonFacadeService } from '../pokemon/pokemon.facade.service';
+import { PokemonFacadeService } from '@api/smartrotom/pokemon/pokemon.facade.service';
 
 let openai: OpenAI;
 export type FicusMessage = {

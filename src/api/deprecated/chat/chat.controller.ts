@@ -2,8 +2,8 @@ import { Body, Controller, Get, Param, Post, HttpStatus, UseInterceptors } from 
 import { ChatService } from './chat.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { SendMessageDto } from './dto/send-message.dto';
-import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { UuidDto } from '@api/smartrotom/_dto/smartrotom-request-dto';
 
 @ApiTags('SmartRotom | AI Test')
 @Controller('smartrotom/chat')
