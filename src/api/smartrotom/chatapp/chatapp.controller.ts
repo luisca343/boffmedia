@@ -3,9 +3,17 @@ import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from 
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ChatappFacadeService, CreateChatMessageRequest } from './chatapp.facade.service';
 import { CreateChatRequest } from './services/chat.service';
-import { UuidDto } from '../_dto/smartrotom-request-dto';
-import { CreateChatDto } from './dto/create-chat-dto';
-import { CreateChatMessageDto } from './dto/create-chat-message-dto';
+
+// Import DTOs
+import { CreateChatDto, GetChatsDto, GetChatByIdDto } from './_dto/chat.dto';
+import { CreateMessageDto, GetMessagesDto, UpdateMessageDto, DeleteMessageDto, MarkMessageReadDto } from './_dto/message.dto';
+import { AddMemberDto, RemoveMemberDto } from './_dto/group.dto';
+import { InitiateCallDto, EndCallDto } from './_dto/call.dto';
+
+// Import Entities
+import { Chat, CreateChatResponse } from './entities/chat.entity';
+import { RotomMessage, CreateMessageResponse, MessageResponse } from './entities/message.entity';
+import { CallSession, CallResponse } from './entities/call.entity';
 
 @ApiTags('SmartRotom | ChatApp')
 @Controller('smartrotom/chatapp')
@@ -19,10 +27,10 @@ export class ChatappController {
 
   @Post('chat')
   @ApiOperation({ summary: 'Create a new chat' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Chat created successfully.' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Chat created successfully.', type: CreateChatResponse })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid chat data.' })
   @ApiBody({ type: CreateChatDto })
-  async createChat(@Body() createChatDto: CreateChatDto) {
+  async createChat(@Body() createChatDto: CreateChatDto): Promise<number> {
     const createChatRequest: CreateChatRequest = {
       player: createChatDto.player,
       users: createChatDto.users,
@@ -33,23 +41,23 @@ export class ChatappController {
 
   @Get('chats/:uuid')
   @ApiOperation({ summary: 'Get chats for a player' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Chats retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Chats retrieved successfully.', type: [Chat] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve chats.' })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getChats(@Param('uuid') uuid: string) {
+  async getChats(@Param('uuid') uuid: string): Promise<Chat[]> {
     return await this.chatappFacadeService.getChats(uuid);
   }
 
   @Get('chat/:chatId')
   @ApiOperation({ summary: 'Get a specific chat by ID' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Chat retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Chat retrieved successfully.', type: Chat })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Chat not found.' })
   @ApiParam({ name: 'chatId', description: 'Chat ID' })
   @ApiQuery({ name: 'uuid', description: 'Requesting user UUID' })
   async getChatById(
     @Param('chatId') chatId: string,
     @Query('uuid') uuid: string
-  ) {
+  ): Promise<Chat> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
@@ -61,10 +69,14 @@ export class ChatappController {
 
   @Get('messages/:chatId')
   @ApiOperation({ summary: 'Get messages for a chat' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Messages retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Messages retrieved successfully.', type: [RotomMessage] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve messages.' })
   @ApiParam({ name: 'chatId', description: 'Chat ID' })
-  async getMessages(@Param('chatId') chatId: string) {
+  @ApiQuery({ name: 'limit', description: 'Maximum number of messages', required: false })
+  async getMessages(
+    @Param('chatId') chatId: string,
+    @Query('limit') limit?: string
+  ): Promise<RotomMessage[]> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
@@ -74,22 +86,22 @@ export class ChatappController {
 
   @Post('messages/:chatId')
   @ApiOperation({ summary: 'Create a new message in a chat' })
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Message created successfully.' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Message created successfully.', type: CreateMessageResponse })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid message data.' })
   @ApiParam({ name: 'chatId', description: 'Chat ID' })
-  @ApiBody({ type: CreateChatMessageDto })
+  @ApiBody({ type: CreateMessageDto })
   async createMessage(
     @Param('chatId') chatId: string, 
-    @Body() createChatMessageDto: CreateChatMessageDto
-  ) {
+    @Body() createMessageDto: CreateMessageDto
+  ): Promise<RotomMessage> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
     }
 
     const createMessageRequest: CreateChatMessageRequest = {
-      uuid: createChatMessageDto.uuid,
-      message: createChatMessageDto.message
+      uuid: createMessageDto.uuid,
+      message: createMessageDto.message
     };
 
     return await this.chatappFacadeService.createMessage(chatIdNum, createMessageRequest);
@@ -97,151 +109,134 @@ export class ChatappController {
 
   @Put('message/:messageId')
   @ApiOperation({ summary: 'Update a message' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Message updated successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Message updated successfully.', type: RotomMessage })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Message not found.' })
   @ApiParam({ name: 'messageId', description: 'Message ID' })
-  @ApiBody({ 
-    schema: { 
-      type: 'object', 
-      properties: { 
-        content: { type: 'string' },
-        uuid: { type: 'string' }
-      } 
-    } 
-  })
+  @ApiBody({ type: UpdateMessageDto })
   async updateMessage(
     @Param('messageId') messageId: string,
-    @Body() body: { content: string; uuid: string }
-  ) {
+    @Body() updateMessageDto: UpdateMessageDto
+  ): Promise<RotomMessage> {
     const messageIdNum = parseInt(messageId, 10);
     if (isNaN(messageIdNum)) {
       throw new Error('Invalid message ID');
     }
-    return await this.chatappFacadeService.updateMessage(messageIdNum, body.content, body.uuid);
+    return await this.chatappFacadeService.updateMessage(
+      messageIdNum, 
+      updateMessageDto.content, 
+      updateMessageDto.uuid
+    );
   }
 
   @Delete('message/:messageId')
   @ApiOperation({ summary: 'Delete a message' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Message deleted successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Message deleted successfully.', type: MessageResponse })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Message not found.' })
   @ApiParam({ name: 'messageId', description: 'Message ID' })
-  @ApiQuery({ name: 'uuid', description: 'User UUID' })
+  @ApiBody({ type: DeleteMessageDto })
   async deleteMessage(
     @Param('messageId') messageId: string,
-    @Query('uuid') uuid: string
-  ) {
+    @Body() deleteMessageDto: DeleteMessageDto
+  ): Promise<MessageResponse> {
     const messageIdNum = parseInt(messageId, 10);
     if (isNaN(messageIdNum)) {
       throw new Error('Invalid message ID');
     }
-    return await this.chatappFacadeService.deleteMessage(messageIdNum, uuid);
+    return await this.chatappFacadeService.deleteMessage(messageIdNum, deleteMessageDto.uuid);
   }
 
   @Post('message/:messageId/read')
   @ApiOperation({ summary: 'Mark a message as read' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Message marked as read successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Message marked as read successfully.', type: MessageResponse })
   @ApiParam({ name: 'messageId', description: 'Message ID' })
-  @ApiBody({ type: UuidDto })
+  @ApiBody({ type: MarkMessageReadDto })
   async markMessageAsRead(
     @Param('messageId') messageId: string,
-    @Body() body: UuidDto
-  ) {
+    @Body() markReadDto: MarkMessageReadDto
+  ): Promise<MessageResponse> {
     const messageIdNum = parseInt(messageId, 10);
     if (isNaN(messageIdNum)) {
       throw new Error('Invalid message ID');
     }
-    return await this.chatappFacadeService.markMessageAsRead(messageIdNum, body.uuid);
+    return await this.chatappFacadeService.markMessageAsRead(messageIdNum, markReadDto.uuid);
   }
 
   // ==================== GROUP MANAGEMENT ENDPOINTS ====================
 
   @Post('group/:groupId/member')
   @ApiOperation({ summary: 'Add a member to a group' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Member added successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Member added successfully.', type: MessageResponse })
   @ApiParam({ name: 'groupId', description: 'Group ID' })
-  @ApiBody({ 
-    schema: { 
-      type: 'object', 
-      properties: { 
-        uuid: { type: 'string' },
-        requestingUserUuid: { type: 'string' }
-      } 
-    } 
-  })
+  @ApiBody({ type: AddMemberDto })
   async addMemberToGroup(
     @Param('groupId') groupId: string,
-    @Body() body: { uuid: string; requestingUserUuid: string }
-  ) {
+    @Body() addMemberDto: AddMemberDto
+  ): Promise<MessageResponse> {
     const groupIdNum = parseInt(groupId, 10);
     if (isNaN(groupIdNum)) {
       throw new Error('Invalid group ID');
     }
-    return await this.chatappFacadeService.addMemberToGroup(groupIdNum, body.uuid, body.requestingUserUuid);
+    return await this.chatappFacadeService.addMemberToGroup(
+      groupIdNum, 
+      addMemberDto.uuid, 
+      addMemberDto.requestingUserUuid
+    );
   }
 
   @Delete('group/:groupId/member/:uuid')
   @ApiOperation({ summary: 'Remove a member from a group' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Member removed successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Member removed successfully.', type: MessageResponse })
   @ApiParam({ name: 'groupId', description: 'Group ID' })
   @ApiParam({ name: 'uuid', description: 'Member UUID to remove' })
-  @ApiQuery({ name: 'requestingUserUuid', description: 'UUID of user making the request' })
+  @ApiBody({ type: RemoveMemberDto })
   async removeMemberFromGroup(
     @Param('groupId') groupId: string,
     @Param('uuid') uuid: string,
-    @Query('requestingUserUuid') requestingUserUuid: string
-  ) {
+    @Body() removeMemberDto: RemoveMemberDto
+  ): Promise<MessageResponse> {
     const groupIdNum = parseInt(groupId, 10);
     if (isNaN(groupIdNum)) {
       throw new Error('Invalid group ID');
     }
-    return await this.chatappFacadeService.removeMemberFromGroup(groupIdNum, uuid, requestingUserUuid);
+    return await this.chatappFacadeService.removeMemberFromGroup(
+      groupIdNum, 
+      uuid, 
+      removeMemberDto.requestingUserUuid
+    );
   }
 
   // ==================== CALL ENDPOINTS ====================
 
   @Post('call/:chatId')
   @ApiOperation({ summary: 'Initiate a call in a chat' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Call initiated successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Call initiated successfully.', type: CallResponse })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to initiate call.' })
   @ApiParam({ name: 'chatId', description: 'Chat ID' })
-  @ApiBody({ type: UuidDto })
-  async initiateCall(@Param('chatId') chatId: string, @Body() body: UuidDto) {
+  @ApiBody({ type: InitiateCallDto })
+  async initiateCall(
+    @Param('chatId') chatId: string, 
+    @Body() initiateCallDto: InitiateCallDto
+  ): Promise<CallSession> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
     }
-    return await this.chatappFacadeService.initiateCall(chatIdNum, body.uuid);
+    return await this.chatappFacadeService.initiateCall(chatIdNum, initiateCallDto.uuid);
   }
 
   @Post('call/:chatId/end')
   @ApiOperation({ summary: 'End a call in a chat' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Call ended successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Call ended successfully.', type: RotomMessage })
   @ApiParam({ name: 'chatId', description: 'Chat ID' })
-  @ApiBody({ 
-    schema: { 
-      type: 'object', 
-      properties: { 
-        startTime: { type: 'number' }
-      } 
-    } 
-  })
+  @ApiBody({ type: EndCallDto })
   async endCall(
     @Param('chatId') chatId: string,
-    @Body() body: { startTime: number }
-  ) {
+    @Body() endCallDto: EndCallDto
+  ): Promise<RotomMessage> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
     }
-    return await this.chatappFacadeService.endCall(chatIdNum, body.startTime);
-  }
-
-  // ==================== LEGACY ENDPOINTS (for backward compatibility) ====================
-
-  @Post('call/:chatId')
-  @ApiOperation({ summary: 'Initiate a call in a chat (legacy endpoint)' })
-  async call(@Param('chatId') chatId: number, @Body() body: UuidDto) {
-    // This maintains backward compatibility with the original endpoint
-    return await this.chatappFacadeService.initiateCall(chatId, body.uuid);
+    return await this.chatappFacadeService.endCall(chatIdNum, endCallDto.startTime);
   }
 }
