@@ -26,6 +26,8 @@ export interface AchievementDetails {
   uuid: string;
   team: string;
   replay: string;
+  target: number;
+  order: number;
 }
 
 export interface UserAchievementStatus {
@@ -50,6 +52,42 @@ export class AchievementRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
+  // ==================== COMMON SELECTS ====================
+
+  private readonly achievementDetailsSelect = {
+    id: smartRotomAchievements.id,
+    battleId: smartRotomUserAchievements.dataId,
+    name: smartRotomAchievements.name,
+    description: smartRotomAchievements.description,
+    icon: smartRotomAchievements.icon,
+    category: smartRotomAchievements.category,
+    subcategory: smartRotomAchievements.subcategory,
+    progress: smartRotomUserAchievements.progress,
+    completed: smartRotomUserAchievements.completed,
+    completedAt: smartRotomUserAchievements.completedAt,
+    uuid: smartRotomUserAchievements.uuid,
+    team: smartRotomReplays.team1,
+    replay: smartRotomReplays.replay,
+    target: smartRotomAchievements.target,
+    order: smartRotomAchievements.order,
+  };
+
+  private readonly achievementStatusSelect = {
+    id: smartRotomAchievements.id,
+    completed: smartRotomUserAchievements.completed,
+  };
+
+  private readonly replayDetailsSelect = {
+    id: smartRotomReplays.id,
+    team1: smartRotomReplays.team1,
+    team2: smartRotomReplays.team2,
+    replay: smartRotomReplays.replay,
+    winner: smartRotomReplays.winner,
+    side1: smartRotomReplays.side1,
+    side2: smartRotomReplays.side2,
+    date: smartRotomReplays.createdAt,
+  };
+
   // ==================== ACHIEVEMENT OPERATIONS ====================
 
   async findUserAchievements(uuid: string): Promise<AchievementDetails[]> {
@@ -68,6 +106,8 @@ export class AchievementRepository {
         uuid: smartRotomUserAchievements.uuid,
         team: smartRotomReplays.team1,
         replay: smartRotomReplays.replay,
+        target: smartRotomAchievements.target,
+        order: smartRotomAchievements.order,
       })
       .from(smartRotomAchievements)
       .leftJoin(
@@ -116,6 +156,8 @@ export class AchievementRepository {
         uuid: smartRotomUserAchievements.uuid,
         team: smartRotomReplays.team1,
         replay: smartRotomReplays.replay,
+        target: smartRotomAchievements.target,
+        order: smartRotomAchievements.order,
       })
       .from(smartRotomAchievements)
       .leftJoin(

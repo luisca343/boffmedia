@@ -3,6 +3,8 @@ import { AchievementService } from './services/achievement.service';
 import { ReplayService } from './services/replay.service';
 import { BattleAchievementService, BattleAchievementRequest } from './services/battle-achievement.service';
 import { AchievementDetails, ReplayDetails } from '@repositories/smartrotom/achievement.repository';
+import { UserAchievement } from './entities/achievement.entity';
+import { AchievementStatusResponse } from './_dto/achievement.dto';
 
 @Injectable()
 export class AchievementFacadeService {
@@ -29,6 +31,22 @@ export class AchievementFacadeService {
     } catch (error) {
       console.error(`Error getting achievement ${achievementId} for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve achievement: ${error.message}`);
+    }
+  }
+
+  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<AchievementStatusResponse> {
+    try {
+      const result = await this.achievementService.checkUserHasAchievement(uuid, achievementId);
+      return {
+        completed: result.completed,
+        error: result.error
+      };
+    } catch (error) {
+      console.error(`Error checking achievement ${achievementId} for user ${uuid}:`, error);
+      return {
+        completed: null,
+        error: `Failed to check achievement status: ${error.message}`
+      };
     }
   }
 
