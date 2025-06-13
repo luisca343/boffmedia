@@ -4,9 +4,11 @@ import { AppsFacadeService } from './apps.facade.service';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { CreateAppDto } from './dto/create-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
-import { PlayerAppDto } from './dto/player-app-dto';
+import { PlayerAppDto } from './dto/player-app.dto';
+import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { AppsExamples } from './examples/apps.examples';
+import { App } from './entities/app.entity';
+import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 @ApiTags('SmartRotom | Apps')
 @Controller('/smartrotom/apps')
@@ -21,9 +23,9 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Apps found successfully.',
-    example: AppsExamples.responses.findAll
+    type: [App]
   })
-  async findAll() {
+  async findAll(): Promise<App[]> {
     return this.appsFacadeService.getApps();
   }
 
@@ -32,10 +34,10 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.CREATED, 
     description: 'App created successfully.',
-    example: AppsExamples.responses.create
+    type: App
   })
   @ApiBody({ type: CreateAppDto })
-  async create(@Body() createAppDto: CreateAppDto) {
+  async create(@Body() createAppDto: CreateAppDto): Promise<App> {
     return this.appsFacadeService.createApp(createAppDto);
   }
 
@@ -44,19 +46,15 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Apps ordered successfully.',
-    example: AppsExamples.responses.order
+    type: SuccessResponse
   })
-  @ApiBody({ 
-    type: OrderAppDto,
-    examples: {
-      orderApps: {
-        summary: 'Order apps for a player',
-        value: AppsExamples.requests.orderApps
-      }
-    }
-  })
-  async order(@Body() order: OrderAppDto) {
-    return this.appsFacadeService.orderApps(order.newOrder, order.uuid);
+  @ApiBody({ type: OrderAppDto })
+  async order(@Body() orderDto: OrderAppDto): Promise<SuccessResponse> {
+    const result = await this.appsFacadeService.orderApps(orderDto.order, orderDto.uuid);
+    return {
+      success: result.success,
+      message: 'Apps ordered successfully'
+    };
   }
 
   @Post('player')
@@ -64,23 +62,10 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Apps found for player successfully.',
-    example: AppsExamples.responses.getForPlayer
+    type: [App]
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        uuid: { type: 'string', description: 'Player UUID', example: 'player-uuid-123' }
-      }
-    },
-    examples: {
-      getPlayerApps: {
-        summary: 'Get apps for a specific player',
-        value: AppsExamples.requests.getPlayerApps
-      }
-    }
-  })
-  async getForPlayer(@Body() { uuid }: { uuid: string }) {
+  @ApiBody({ type: GetPlayerAppsDto })
+  async getForPlayer(@Body() { uuid }: GetPlayerAppsDto): Promise<App[]> {
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }
 
@@ -89,18 +74,10 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'App added to player successfully.',
-    example: AppsExamples.responses.addAppToPlayer
+    type: SuccessResponse
   })
-  @ApiBody({ 
-    type: PlayerAppDto,
-    examples: {
-      addApp: {
-        summary: 'Add app to player',
-        value: AppsExamples.requests.addAppToPlayer
-      }
-    }
-  })
-  async addAppToPlayer(@Body() { uuid, id }: PlayerAppDto) {
+  @ApiBody({ type: PlayerAppDto })
+  async addAppToPlayer(@Body() { uuid, id }: PlayerAppDto): Promise<SuccessResponse> {
     return this.appsFacadeService.addAppToPlayer(uuid, id);
   }
 
@@ -109,18 +86,10 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'App removed from player successfully.',
-    example: AppsExamples.responses.removeAppFromPlayer
+    type: SuccessResponse
   })
-  @ApiBody({ 
-    type: PlayerAppDto,
-    examples: {
-      removeApp: {
-        summary: 'Remove app from player',
-        value: AppsExamples.requests.removeAppFromPlayer
-      }
-    }
-  })
-  async removeAppFromPlayer(@Body() { uuid, id }: PlayerAppDto) {
+  @ApiBody({ type: PlayerAppDto })
+  async removeAppFromPlayer(@Body() { uuid, id }: PlayerAppDto): Promise<SuccessResponse> {
     return this.appsFacadeService.removeAppFromPlayer(uuid, id);
   }
 
@@ -129,14 +98,13 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'App found successfully.',
-    example: AppsExamples.responses.findOne
+    type: App
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'App not found.',
-    example: AppsExamples.responses.notFound
+    description: 'App not found.'
   })
-  async findOne(@Param('id') id: number) {
+  async findOne(@Param('id') id: number): Promise<App> {
     return this.appsFacadeService.getApp(id);
   }
 
@@ -145,23 +113,14 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'App updated successfully.',
-    example: AppsExamples.responses.update
+    type: App
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'App not found.',
-    example: AppsExamples.responses.notFound
+    description: 'App not found.'
   })
-  @ApiBody({
-    type: UpdateAppDto,
-    examples: {
-      updateApp: {
-        summary: 'Update app details',
-        value: AppsExamples.requests.updateApp
-      }
-    }
-  })
-  async update(@Param('id') id: number, @Body() updateAppDto: UpdateAppDto) {
+  @ApiBody({ type: UpdateAppDto })
+  async update(@Param('id') id: number, @Body() updateAppDto: UpdateAppDto): Promise<App> {
     return this.appsFacadeService.updateApp(id, updateAppDto);
   }
 
@@ -170,14 +129,13 @@ export class AppsController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'App deleted successfully.',
-    example: AppsExamples.responses.remove
+    type: SuccessResponse
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: 'App not found.',
-    example: AppsExamples.responses.notFound
+    description: 'App not found.'
   })
-  async remove(@Param('id') id: number) {
+  async remove(@Param('id') id: number): Promise<SuccessResponse> {
     return this.appsFacadeService.deleteApp(id);
   }
 }

@@ -1,9 +1,57 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsArray, ValidateNested, IsNumber, ValidateBy, ValidationArguments } from 'class-validator';
+import { Type } from 'class-transformer';
+
+// Custom validator for number or string
+const IsNumberOrString = () => {
+  return ValidateBy({
+    name: 'isNumberOrString',
+    validator: {
+      validate: (value: any, args: ValidationArguments) => {
+        return typeof value === 'number' || typeof value === 'string';
+      },
+      defaultMessage: (args: ValidationArguments) => {
+        return `${args.property} must be a number or string`;
+      },
+    },
+  });
+};
+
+class OrderItemDto {
+  @ApiProperty({ 
+    description: 'App ID',
+    example: 1
+  })
+  @IsNumberOrString()
+  id: number | string;
+
+  @ApiProperty({ 
+    description: 'Display order position',
+    example: 1
+  })
+  @IsNumber()
+  order: number;
+}
 
 export class OrderAppDto {
-  @ApiProperty({ description: 'The new order of the apps' })
-  newOrder: { id: number; order: number }[];
-
-  @ApiProperty({ description: 'The UUID of the user' })
+  @ApiProperty({ 
+    description: 'Player UUID',
+    example: 'player-uuid-123'
+  })
+  @IsString()
   uuid: string;
+
+  @ApiProperty({ 
+    description: 'Array of apps with their new order',
+    example: [
+      { id: 1, order: 1 },
+      { id: 2, order: 2 },
+      { id: 3, order: 3 }
+    ],
+    type: [OrderItemDto]
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
+  order: { id: number | string; order: number }[];
 }

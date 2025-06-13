@@ -5,56 +5,56 @@ import { AppsFacadeService } from './apps.facade.service';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
-import { PlayerAppDto } from './dto/player-app-dto';
+import { PlayerAppDto } from './dto/player-app.dto';
+import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
+import { App } from './entities/app.entity';
+import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 describe('AppsController', () => {
   let controller: AppsController;
   let facadeService: AppsFacadeService;
 
-  const mockAppsData = [
+  const mockAppsData: App[] = [
     {
       id: 1,
       name: 'ChatApp',
       url: 'chatapp',
-      active: 1,
-      createdAt: new Date('2024-01-01'),
-      updatedAt: new Date('2024-01-01')
+      active: 1
     },
     {
       id: 2,
       name: 'Admin',
       url: 'admin',
-      active: 0,
-      createdAt: new Date('2024-01-02'),
-      updatedAt: new Date('2024-01-02')
+      active: 0
     }
   ];
 
-  const mockAppData = {
+  const mockAppData: App = {
     id: 1,
     name: 'ChatApp',
     url: 'chatapp',
-    active: 1,
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01')
+    active: 1
   };
 
-  const mockPlayerAppsData = [
+  const mockPlayerAppsData: App[] = [
     {
       id: 2,
-      url: 'admin',
       name: 'Admin',
-      orden: 16,
-      is_user_app: 1
+      url: 'admin',
+      active: 1
     },
     {
       id: 3,
-      url: 'arcade',
       name: 'Arcade',
-      orden: 999,
-      is_user_app: 0
+      url: 'arcade',
+      active: 0
     }
   ];
+
+  const mockSuccessResponse: SuccessResponse = {
+    success: true,
+    message: 'Operation completed successfully'
+  };
 
   const mockAppsFacadeService = {
     getApps: jest.fn(),
@@ -150,7 +150,7 @@ describe('AppsController', () => {
 
   describe('order', () => {
     const orderDto: OrderAppDto = {
-      newOrder: [
+      order: [
         { id: 1, order: 1 },
         { id: 2, order: 2 }
       ],
@@ -158,19 +158,19 @@ describe('AppsController', () => {
     };
 
     it('should order apps successfully', async () => {
-      const expectedResult = { success: true };
-      mockAppsFacadeService.orderApps.mockResolvedValue(expectedResult);
+      const expectedResult: SuccessResponse = { success: true, message: 'Apps ordered successfully' };
+      mockAppsFacadeService.orderApps.mockResolvedValue({ success: true });
 
       const result = await controller.order(orderDto);
 
       expect(result).toEqual(expectedResult);
-      expect(facadeService.orderApps).toHaveBeenCalledWith(orderDto.newOrder, orderDto.uuid);
+      expect(facadeService.orderApps).toHaveBeenCalledWith(orderDto.order, orderDto.uuid);
       expect(facadeService.orderApps).toHaveBeenCalledTimes(1);
     });
 
     it('should handle invalid order data', async () => {
       const invalidOrderDto: OrderAppDto = {
-        newOrder: [],
+        order: [],
         uuid: ''
       };
       mockAppsFacadeService.orderApps.mockRejectedValue(
@@ -178,36 +178,40 @@ describe('AppsController', () => {
       );
 
       await expect(controller.order(invalidOrderDto)).rejects.toThrow(BadRequestException);
-      expect(facadeService.orderApps).toHaveBeenCalledWith(invalidOrderDto.newOrder, invalidOrderDto.uuid);
+      expect(facadeService.orderApps).toHaveBeenCalledWith(invalidOrderDto.order, invalidOrderDto.uuid);
     });
   });
 
   describe('getForPlayer', () => {
-    const uuid = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
+    const getPlayerAppsDto: GetPlayerAppsDto = {
+      uuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
+    };
 
     it('should return apps for a player', async () => {
       mockAppsFacadeService.getAppsForPlayer.mockResolvedValue(mockPlayerAppsData);
 
-      const result = await controller.getForPlayer({ uuid });
+      const result = await controller.getForPlayer(getPlayerAppsDto);
 
       expect(result).toEqual(mockPlayerAppsData);
-      expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith(uuid);
+      expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith(getPlayerAppsDto.uuid);
       expect(facadeService.getAppsForPlayer).toHaveBeenCalledTimes(1);
     });
 
     it('should return empty array for non-existent player', async () => {
+      const nonExistentDto: GetPlayerAppsDto = { uuid: 'non-existent-uuid' };
       mockAppsFacadeService.getAppsForPlayer.mockResolvedValue([]);
 
-      const result = await controller.getForPlayer({ uuid: 'non-existent-uuid' });
+      const result = await controller.getForPlayer(nonExistentDto);
 
       expect(result).toEqual([]);
       expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith('non-existent-uuid');
     });
 
     it('should handle empty uuid', async () => {
+      const emptyDto: GetPlayerAppsDto = { uuid: '' };
       mockAppsFacadeService.getAppsForPlayer.mockResolvedValue([]);
 
-      const result = await controller.getForPlayer({ uuid: '' });
+      const result = await controller.getForPlayer(emptyDto);
 
       expect(result).toEqual([]);
       expect(facadeService.getAppsForPlayer).toHaveBeenCalledWith('');
@@ -221,7 +225,7 @@ describe('AppsController', () => {
     };
 
     it('should add app to player successfully', async () => {
-      const expectedResult = { success: true };
+      const expectedResult: SuccessResponse = { success: true, message: 'App added to player successfully' };
       mockAppsFacadeService.addAppToPlayer.mockResolvedValue(expectedResult);
 
       const result = await controller.addAppToPlayer(playerAppDto);
@@ -267,7 +271,7 @@ describe('AppsController', () => {
     };
 
     it('should remove app from player successfully', async () => {
-      const expectedResult = { success: true };
+      const expectedResult: SuccessResponse = { success: true, message: 'App removed from player successfully' };
       mockAppsFacadeService.removeAppFromPlayer.mockResolvedValue(expectedResult);
 
       const result = await controller.removeAppFromPlayer(playerAppDto);
@@ -378,7 +382,7 @@ describe('AppsController', () => {
 
   describe('remove', () => {
     it('should delete app successfully', async () => {
-      const expectedResult = { success: true };
+      const expectedResult: SuccessResponse = { success: true, message: 'App deleted successfully' };
       mockAppsFacadeService.deleteApp.mockResolvedValue(expectedResult);
 
       const result = await controller.remove(1);
@@ -416,7 +420,8 @@ describe('AppsController', () => {
 
       // Add to player
       const playerDto: PlayerAppDto = { uuid: 'test-uuid', id: 3 };
-      mockAppsFacadeService.addAppToPlayer.mockResolvedValue({ success: true });
+      const successResult: SuccessResponse = { success: true, message: 'App added to player successfully' };
+      mockAppsFacadeService.addAppToPlayer.mockResolvedValue(successResult);
 
       // Update app
       const updateDto: UpdateAppDto = { name: 'Updated Test App' };
@@ -430,7 +435,7 @@ describe('AppsController', () => {
 
       // Verify results
       expect(createResult).toEqual(createdApp);
-      expect(addResult).toEqual({ success: true });
+      expect(addResult).toEqual(successResult);
       expect(updateResult).toEqual(updatedApp);
 
       // Verify calls
