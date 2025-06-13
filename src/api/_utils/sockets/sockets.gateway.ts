@@ -94,7 +94,7 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
       })
 
       if (currentUsers.length === 0) {
-        this.chatAppService.endCall(data.call.chatId, data.startTime)
+        this.chatAppService.endCall({chatId: data.call.chatId, startTime: data.startTime})
         return
       }
     }

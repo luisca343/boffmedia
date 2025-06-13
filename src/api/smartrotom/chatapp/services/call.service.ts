@@ -1,55 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository } from '@repositories/smartrotom/chatapp.repository';
-
-export interface CallUser {
-  uuid: string;
-  status: 'RINGING' | 'IN_CALL' | 'DECLINED' | 'BUSY';
-}
-
-export interface CallSession {
-  chatId: number;
-  caller: string;
-  users: CallUser[];
-}
+import { ChatappRepository } from '@api/_repositories/smartrotom/chatapp.repository';
+import {
+  CallUser,
+  CallSession,
+  EndCallResult,
+  MessageCreationData
+} from '@api/smartrotom/chatapp/types/chatapp.types';
 
 @Injectable()
 export class CallService {
+  private activeCalls: Map<number, CallSession> = new Map();
+
   constructor(
     private readonly chatappRepository: ChatappRepository,
   ) {}
 
   async initializeCall(chatId: number, callerUuid: string): Promise<CallSession> {
-    // Validate chat exists
-    const chat = await this.chatappRepository.findChatById(chatId);
-    if (!chat) {
+    const chatExists = await this.chatappRepository.chatExists(chatId);
+    if (!chatExists) {
       throw new Error('Chat not found');
     }
 
-    // Validate caller is in the chat
-    const callerInChat = await this.chatappRepository.findUserInChat(chatId, callerUuid);
-    if (!callerInChat) {
-      throw new Error('Caller is not a member of this chat');
+    const isUserInChat = await this.chatappRepository.isUserInChat(chatId, callerUuid);
+    if (!isUserInChat) {
+      throw new Error('User is not a member of this chat');
     }
 
-    // Get all chat members except the caller
-    const allMembers = await this.chatappRepository.findChatMembers(chatId);
-    const otherMembers = allMembers.filter(member => member.uuid !== callerUuid);
-
-    if (otherMembers.length === 0) {
-      throw new Error('No other users in chat to call');
+    // Check if there's already an active call
+    if (this.activeCalls.has(chatId)) {
+      throw new Error('There is already an active call in this chat');
     }
 
-    // Build call users list
-    const callUsers: CallUser[] = [
-      { uuid: callerUuid, status: 'IN_CALL' },
-      ...otherMembers.map(member => ({ uuid: member.uuid, status: 'RINGING' as const }))
-    ];
+    // Get all chat members
+    const members = await this.chatappRepository.findChatMembers(chatId);
+    
+    const callUsers: CallUser[] = members.map(member => ({
+      uuid: member.uuid,
+      status: member.uuid === callerUuid ? 'IN_CALL' : 'RINGING'
+    }));
 
-    return {
+    const callSession: CallSession = {
       chatId,
       caller: callerUuid,
       users: callUsers
     };
+
+    this.activeCalls.set(chatId, callSession);
+
+    return callSession;
   }
 
   async updateCallUserStatus(
@@ -57,36 +55,69 @@ export class CallService {
     uuid: string, 
     status: CallUser['status']
   ): Promise<void> {
-    // Validate user is in the chat
-    const userInChat = await this.chatappRepository.findUserInChat(chatId, uuid);
-    if (!userInChat) {
-      throw new Error('User is not a member of this chat');
+    const callSession = this.activeCalls.get(chatId);
+    if (!callSession) {
+      throw new Error('No active call found for this chat');
     }
 
-    // Note: In a real implementation, you'd want to store call state in database
-    // For now, this is just validation
+    const user = callSession.users.find(u => u.uuid === uuid);
+    if (!user) {
+      throw new Error('User is not part of this call');
+    }
+
+    user.status = status;
+
+    // If all users have declined or left, end the call
+    const activeUsers = callSession.users.filter(u => 
+      u.status === 'IN_CALL' || u.status === 'RINGING'
+    );
+
+    if (activeUsers.length === 0) {
+      this.activeCalls.delete(chatId);
+    }
   }
 
-  async endCall(chatId: number, startTime: number): Promise<{ messageId: number; duration: number }> {
-    const endTime = new Date().getTime();
-    const callDuration = Math.floor((endTime - startTime) / 1000);
+  async endCall(chatId: number, startTime: number): Promise<EndCallResult> {
+    const callSession = this.activeCalls.get(chatId);
+    if (!callSession) {
+      throw new Error('No active call found for this chat');
+    }
 
-    // Create call duration message
-    const result = await this.chatappRepository.createMessage({
+    const endTime = Date.now();
+    const duration = Math.floor((endTime - startTime) / 1000); // Duration in seconds
+
+    // Create a call end message
+    const messageData: MessageCreationData = {
       chatId,
-      content: callDuration.toString(),
+      content: `Call ended. Duration: ${this.formatDuration(duration)}`,
       senderUUID: 'system',
-      type: 'call'
-    });
+      type: 'call_end'
+    };
+
+    const result = await this.chatappRepository.createMessage(messageData);
+
+    // Remove the call from active calls
+    this.activeCalls.delete(chatId);
 
     return {
       messageId: result.insertId,
-      duration: callDuration
+      duration
     };
   }
 
-  async validateCallPermissions(chatId: number, uuid: string): Promise<boolean> {
-    const userInChat = await this.chatappRepository.findUserInChat(chatId, uuid);
-    return !!userInChat;
+  getActiveCall(chatId: number): CallSession | null {
+    return this.activeCalls.get(chatId) || null;
+  }
+
+  private formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
   }
 }

@@ -1,5 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { AchievementRepository, AchievementDetails, UserAchievementStatus } from '@repositories/smartrotom/achievement.repository';
+import { AchievementRepository } from '@repositories/smartrotom/achievement.repository';
+import {
+  AchievementDetailsResponse,
+  AchievementValidationResult
+} from '../types/achievement.types';
 
 @Injectable()
 export class AchievementService {
@@ -7,7 +11,7 @@ export class AchievementService {
     private readonly achievementRepository: AchievementRepository,
   ) {}
 
-  async getUserAchievements(uuid: string): Promise<AchievementDetails[]> {
+  async getUserAchievements(uuid: string): Promise<AchievementDetailsResponse[]> {
     if (!uuid) {
       throw new Error('UUID is required');
     }
@@ -15,7 +19,7 @@ export class AchievementService {
     return this.achievementRepository.findUserAchievements(uuid);
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetails> {
+  async getUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetailsResponse> {
     if (!uuid) {
       throw new Error('UUID is required');
     }
@@ -32,7 +36,7 @@ export class AchievementService {
     return achievement;
   }
 
-  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<{ completed: number | null; error?: string }> {
+  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<AchievementValidationResult> {
     if (!uuid) {
       throw new Error('UUID is required');
     }

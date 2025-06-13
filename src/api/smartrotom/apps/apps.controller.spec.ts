@@ -5,7 +5,7 @@ import { AppsFacadeService } from './apps.facade.service';
 import { CreateAppDto } from './dto/create-app.dto';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
-import { PlayerAppDto } from './dto/player-app-dto';
+import { PlayerAppDto } from './dto/player-app.dto';
 
 describe('AppsController', () => {
   let controller: AppsController;

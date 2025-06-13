@@ -8,17 +8,12 @@ import {
   SmartRotomReplay,
   SmartRotomUserReplay
 } from '@/_db/schema/SmartRotom';
-
-export interface BattleReplay {
-  id: number;
-  team1: string;
-  team2: string;
-  replay: string;
-  winner: string;
-  side1: string;
-  side2: string;
-  date: Date;
-}
+import {
+  BattleReplayResponse,
+  ReplayData,
+  UserReplayData,
+  ReplayUpdateData
+} from '@api/smartrotom/battle/types/battle.types';
 
 @Injectable()
 export class BattleRepository {
@@ -26,7 +21,7 @@ export class BattleRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  async findReplaysByUser(uuid: string): Promise<BattleReplay[]> {
+  async findReplaysByUser(uuid: string): Promise<BattleReplayResponse[]> {
     return this.db.select({
       id: smartRotomReplays.id,
       team1: smartRotomReplays.team1,
@@ -49,7 +44,7 @@ export class BattleRepository {
     .orderBy(desc(smartRotomReplays.id));
   }
 
-  async findReplayById(replayId: number): Promise<BattleReplay | null> {
+  async findReplayById(replayId: number): Promise<BattleReplayResponse | null> {
     const result = await this.db.select({
       id: smartRotomReplays.id,
       team1: smartRotomReplays.team1,
@@ -67,7 +62,7 @@ export class BattleRepository {
     return result[0] || null;
   }
 
-  async createReplay(replayData: Partial<SmartRotomReplay>): Promise<{ insertId: number }> {
+  async createReplay(replayData: ReplayData): Promise<{ insertId: number }> {
     const result = await this.db.insert(smartRotomReplays)
       .values({
         ...replayData,
@@ -78,12 +73,12 @@ export class BattleRepository {
     return { insertId: result[0].insertId };
   }
 
-  async createUserReplay(userReplayData: Partial<SmartRotomUserReplay>): Promise<{ insertId: number }> {
+  async createUserReplay(userReplayData: UserReplayData): Promise<{ insertId: number }> {
     const result = await this.db.insert(smartRotomUserReplays)
       .values({
-        ...userReplayData,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        uuid: userReplayData.uuid,
+        replayId: userReplayData.replayId,
+        side: userReplayData.side || 1
       } as SmartRotomUserReplay);
     
     return { insertId: result[0].insertId };
@@ -101,12 +96,12 @@ export class BattleRepository {
     return result[0] || null;
   }
 
-  async updateReplay(replayId: number, replayData: Partial<SmartRotomReplay>): Promise<void> {
+  async updateReplay(replayId: number, replayData: ReplayUpdateData): Promise<void> {
     await this.db.update(smartRotomReplays)
       .set({
         ...replayData,
         updatedAt: new Date()
-      } as SmartRotomReplay)
+      } as Partial<SmartRotomReplay>)
       .where(eq(smartRotomReplays.id, replayId));
   }
 

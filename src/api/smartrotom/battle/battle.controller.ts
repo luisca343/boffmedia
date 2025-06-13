@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, HttpStatus, UseInterceptors, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
-import { BattleFacadeService, CreateReplayDto, UpdateReplayDto } from './battle.facade.service';
+import { BattleFacadeService } from './battle.facade.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { BattleConfig } from './services/config.service';
+import {
+  BattleReplayResponse,
+  CreateReplayDto,
+  UpdateReplayDto,
+  ShareReplayDto,
+  BattleConfigResponse,
+  CreateBattleConfigResponse,
+  UpdateBattleConfigResponse,
+  DeleteReplayResponse,
+  ShareReplayResponse,
+  DeleteBattleConfigResponse,
+  GetAllBattleConfigsResponse,
+  ValidateBattleConfigResponse,
+  BattleConfig
+} from './types/battle.types';
 
 @ApiTags('SmartRotom | Battle')
 @Controller('smartrotom/battle')
@@ -19,7 +33,7 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Replays retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve replays.' })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getUserReplays(@Param('uuid') uuid: string) {
+  async getUserReplays(@Param('uuid') uuid: string): Promise<BattleReplayResponse[]> {
     return await this.battleFacadeService.getUserReplays(uuid);
   }
 
@@ -30,21 +44,18 @@ export class BattleController {
   @ApiParam({ name: 'replayId', description: 'Replay ID' })
   @ApiQuery({ name: 'uuid', description: 'Player UUID for access validation', required: false })
   async getReplayById(
-    @Param('replayId') replayId: string,
+    @Param('replayId', ParseIntPipe) replayId: number,
     @Query('uuid') uuid?: string
-  ) {
-    const replayIdNum = parseInt(replayId, 10);
-    if (isNaN(replayIdNum)) {
-      throw new Error('Invalid replay ID');
-    }
-    return await this.battleFacadeService.getReplayById(replayIdNum, uuid);
+  ): Promise<BattleReplayResponse> {
+    return await this.battleFacadeService.getReplayById(replayId, uuid);
   }
 
   @Post('replay')
   @ApiOperation({ summary: 'Create a new replay' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Replay created successfully.' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid replay data.' })
-  async createReplay(@Body() createReplayDto: CreateReplayDto) {
+  @ApiBody({ type: Object })
+  async createReplay(@Body() createReplayDto: CreateReplayDto): Promise<BattleReplayResponse> {
     return await this.battleFacadeService.createReplay(createReplayDto);
   }
 
@@ -54,16 +65,13 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Replay not found.' })
   @ApiParam({ name: 'replayId', description: 'Replay ID' })
   @ApiQuery({ name: 'uuid', description: 'Player UUID for access validation', required: false })
+  @ApiBody({ type: Object })
   async updateReplay(
-    @Param('replayId') replayId: string,
+    @Param('replayId', ParseIntPipe) replayId: number,
     @Body() updateReplayDto: UpdateReplayDto,
     @Query('uuid') uuid?: string
-  ) {
-    const replayIdNum = parseInt(replayId, 10);
-    if (isNaN(replayIdNum)) {
-      throw new Error('Invalid replay ID');
-    }
-    return await this.battleFacadeService.updateReplay(replayIdNum, updateReplayDto, uuid);
+  ): Promise<BattleReplayResponse> {
+    return await this.battleFacadeService.updateReplay(replayId, updateReplayDto, uuid);
   }
 
   @Delete('replay/:replayId')
@@ -73,14 +81,10 @@ export class BattleController {
   @ApiParam({ name: 'replayId', description: 'Replay ID' })
   @ApiQuery({ name: 'uuid', description: 'Player UUID for access validation', required: false })
   async deleteReplay(
-    @Param('replayId') replayId: string,
+    @Param('replayId', ParseIntPipe) replayId: number,
     @Query('uuid') uuid?: string
-  ) {
-    const replayIdNum = parseInt(replayId, 10);
-    if (isNaN(replayIdNum)) {
-      throw new Error('Invalid replay ID');
-    }
-    return await this.battleFacadeService.deleteReplay(replayIdNum, uuid);
+  ): Promise<DeleteReplayResponse> {
+    return await this.battleFacadeService.deleteReplay(replayId, uuid);
   }
 
   @Post('replay/:replayId/share')
@@ -88,24 +92,16 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Replay shared successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Replay not found.' })
   @ApiParam({ name: 'replayId', description: 'Replay ID' })
-  @ApiBody({ 
-    schema: { 
-      type: 'object', 
-      properties: { 
-        targetUuid: { type: 'string' },
-        sourceUuid: { type: 'string'}
-      } 
-    } 
-  })
+  @ApiBody({ type: Object })
   async shareReplay(
-    @Param('replayId') replayId: string,
-    @Body() body: { targetUuid: string; sourceUuid?: string }
-  ) {
-    const replayIdNum = parseInt(replayId, 10);
-    if (isNaN(replayIdNum)) {
-      throw new Error('Invalid replay ID');
-    }
-    return await this.battleFacadeService.shareReplayWithUser(replayIdNum, body.targetUuid, body.sourceUuid);
+    @Param('replayId', ParseIntPipe) replayId: number,
+    @Body() shareReplayDto: ShareReplayDto
+  ): Promise<ShareReplayResponse> {
+    return await this.battleFacadeService.shareReplayWithUser(
+      replayId, 
+      shareReplayDto.targetUuid, 
+      shareReplayDto.sourceUuid
+    );
   }
 
   // ==================== CONFIG ENDPOINTS ====================
@@ -115,14 +111,14 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Battle configuration retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Configuration not found.' })
   @ApiParam({ name: 'npcConfigName', description: 'NPC configuration name' })
-  async getBattleConfig(@Param('npcConfigName') npcConfigName: string) {
+  async getBattleConfig(@Param('npcConfigName') npcConfigName: string): Promise<BattleConfigResponse> {
     return await this.battleFacadeService.getBattleConfig(npcConfigName);
   }
 
   @Get('configs')
   @ApiOperation({ summary: 'Get all available battle configurations' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Battle configurations retrieved successfully.' })
-  async getAllBattleConfigs() {
+  async getAllBattleConfigs(): Promise<GetAllBattleConfigsResponse> {
     return await this.battleFacadeService.getAllBattleConfigs();
   }
 
@@ -135,7 +131,7 @@ export class BattleController {
   async createBattleConfig(
     @Param('npcConfigName') npcConfigName: string,
     @Body() config: BattleConfig
-  ) {
+  ): Promise<CreateBattleConfigResponse> {
     return await this.battleFacadeService.createBattleConfig(npcConfigName, config);
   }
 
@@ -148,7 +144,7 @@ export class BattleController {
   async updateBattleConfig(
     @Param('npcConfigName') npcConfigName: string,
     @Body() config: Partial<BattleConfig>
-  ) {
+  ): Promise<UpdateBattleConfigResponse> {
     return await this.battleFacadeService.updateBattleConfig(npcConfigName, config);
   }
 
@@ -157,8 +153,16 @@ export class BattleController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Battle configuration deleted successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Configuration not found.' })
   @ApiParam({ name: 'npcConfigName', description: 'NPC configuration name' })
-  async deleteBattleConfig(@Param('npcConfigName') npcConfigName: string) {
+  async deleteBattleConfig(@Param('npcConfigName') npcConfigName: string): Promise<DeleteBattleConfigResponse> {
     return await this.battleFacadeService.deleteBattleConfig(npcConfigName);
+  }
+
+  @Get('config/:npcConfigName/validate')
+  @ApiOperation({ summary: 'Validate if a battle configuration exists' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Configuration validation completed.' })
+  @ApiParam({ name: 'npcConfigName', description: 'NPC configuration name' })
+  async validateBattleConfig(@Param('npcConfigName') npcConfigName: string): Promise<ValidateBattleConfigResponse> {
+    return await this.battleFacadeService.validateBattleConfig(npcConfigName);
   }
 
   // ==================== LEGACY ENDPOINTS ====================
@@ -167,7 +171,7 @@ export class BattleController {
   @ApiOperation({ summary: 'Get repetitions for a player (legacy endpoint)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Repetitions retrieved successfully.' })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getRepetitions(@Param('uuid') uuid: string) {
+  async getRepetitions(@Param('uuid') uuid: string): Promise<BattleReplayResponse[]> {
     // This is just an alias for getUserReplays to maintain backward compatibility
     return await this.battleFacadeService.getUserReplays(uuid);
   }

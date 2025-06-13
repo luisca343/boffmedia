@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../_dto/lottbox.dto';
+import { 
+  OpenLootBoxRequest, 
+  OpenLootBoxResponse,
+  GiveLootboxResponse,
+  LootBoxConfig 
+} from '../types/arcade.types';
 import { lootboxConfig, getRarityFromWeight } from '../_config/lootboxConfig';
 import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
 
@@ -9,7 +14,7 @@ export class LootboxService {
     private readonly arcadeRepository: ArcadeRepository,
   ) {}
 
-  async openLootBox(openLootBoxDto: OpenLootBoxDto): Promise<OpenLootBoxResponseDto> {
+  async openLootBox(openLootBoxDto: OpenLootBoxRequest): Promise<OpenLootBoxResponse> {
     const { uuid, boxId } = openLootBoxDto;
     
     // Check box configuration
@@ -46,7 +51,7 @@ export class LootboxService {
       rarity: rarity,
     });
     
-    const newItemId = Number(newItemResult[0]?.insertId);
+    const newItemId = Number(newItemResult.insertId);
     
     // Generate spinner animation data
     const spinnerItems = this.generateSpinnerItems(boxConfig.items, selectedItem);
@@ -67,7 +72,7 @@ export class LootboxService {
     };
   }
 
-  async giveLootbox(uuid: string, boxId: string, amount: number = 1) {
+  async giveLootbox(uuid: string, boxId: string, amount: number = 1): Promise<GiveLootboxResponse> {
     const lootbox = lootboxConfig.boxes.find(box => box.id === boxId);
     if (!lootbox) {
       throw new Error('Lootbox not found');
@@ -88,7 +93,7 @@ export class LootboxService {
     };
   }
 
-  getLootboxConfig() {
+  getLootboxConfig(): LootBoxConfig {
     return lootboxConfig;
   }
 

@@ -1,24 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatDetails, ChatMessage, ChatMember } from '@repositories/smartrotom/chatapp.repository';
-
-export interface Group {
-  id: number;
-  name: string;
-  type: number;
-  description: string;
-  image: string;
-  createdAt: Date;
-  updatedAt: Date;
-  messages: {
-    id: number;
-    content: string;
-    createdAt: Date;
-  }[];
-  unread: number;
-  members: {
-    uuid: string;
-  }[];
-}
+import { ChatappRepository } from '@api/_repositories/smartrotom/chatapp.repository';
+import {
+  GroupResponse,
+  ChatMessageSummary,
+  ChatMemberResponse
+} from '@api/smartrotom/chatapp/types/chatapp.types';
 
 @Injectable()
 export class GroupService {
@@ -26,132 +12,84 @@ export class GroupService {
     private readonly chatappRepository: ChatappRepository,
   ) {}
 
-  async getUserGroups(uuid: string): Promise<Group[]> {
-    const userChats = await this.chatappRepository.findUserChats(uuid);
-    
-    const groups = await Promise.all(
-      userChats.map(async (chat) => {
-        return this.buildGroupFromChat(chat, uuid);
-      })
-    );
+  async getUserGroups(uuid: string): Promise<GroupResponse[]> {
+    const chats = await this.chatappRepository.findUserChats(uuid);
+    const groups: GroupResponse[] = [];
 
-    // Sort by last message date
-    groups.sort((a, b) => {
-      const aDate = a.messages[0]?.createdAt || new Date(0);
-      const bDate = b.messages[0]?.createdAt || new Date(0);
-      return bDate.getTime() - aDate.getTime();
-    });
+    for (const chat of chats) {
+      // Get last few messages for preview
+      const messages = await this.chatappRepository.findChatMessages(chat.id, 5);
+      const messageSummaries: ChatMessageSummary[] = messages.map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        createdAt: msg.createdAt
+      }));
+
+      // Get chat members
+      const members = await this.chatappRepository.findChatMembers(chat.id);
+      const memberResponses: ChatMemberResponse[] = members.map(member => ({
+        uuid: member.uuid
+      }));
+
+      // Get unread count (placeholder for now)
+      const unread = await this.chatappRepository.getUnreadMessageCount(chat.id, uuid);
+
+      groups.push({
+        id: chat.id,
+        name: chat.name,
+        type: chat.type,
+        description: chat.description,
+        image: chat.image,
+        createdAt: chat.createdAt,
+        updatedAt: chat.updatedAt,
+        messages: messageSummaries,
+        unread,
+        members: memberResponses
+      });
+    }
 
     return groups;
   }
 
-  async getGroupById(groupId: number, requestingUserUuid: string): Promise<Group> {
+  async getGroupById(groupId: number, requestingUserUuid: string): Promise<GroupResponse> {
     const chat = await this.chatappRepository.findChatById(groupId);
     if (!chat) {
       throw new Error('Group not found');
     }
 
-    // Validate user has access to this group
-    const userInChat = await this.chatappRepository.findUserInChat(groupId, requestingUserUuid);
-    if (!userInChat && chat.type !== 0) { // Type 0 = public chats
-      throw new Error('User does not have access to this group');
-    }
-
-    return this.buildGroupFromChat(chat, requestingUserUuid);
-  }
-
-  async addMemberToGroup(groupId: number, uuid: string, requestingUserUuid: string): Promise<void> {
-    const chat = await this.chatappRepository.findChatById(groupId);
-    if (!chat) {
-      throw new Error('Group not found');
-    }
-
-    // Validate requesting user has access to add members (for group chats)
-    if (chat.type === 3) { // Group chat
-      const requestingUserInChat = await this.chatappRepository.findUserInChat(groupId, requestingUserUuid);
-      if (!requestingUserInChat) {
-        throw new Error('User does not have permission to add members to this group');
-      }
-    }
-
-    // Check if user is already a member
-    const existingMember = await this.chatappRepository.findUserInChat(groupId, uuid);
-    if (existingMember) {
-      throw new Error('User is already a member of this group');
-    }
-
-    await this.chatappRepository.addChatMember(groupId, uuid);
-  }
-
-  async removeMemberFromGroup(groupId: number, uuid: string, requestingUserUuid: string): Promise<void> {
-    const chat = await this.chatappRepository.findChatById(groupId);
-    if (!chat) {
-      throw new Error('Group not found');
-    }
-
-    // Users can remove themselves, or group members can remove others in group chats
-    if (uuid !== requestingUserUuid && chat.type === 3) {
-      const requestingUserInChat = await this.chatappRepository.findUserInChat(groupId, requestingUserUuid);
-      if (!requestingUserInChat) {
-        throw new Error('User does not have permission to remove members from this group');
-      }
-    }
-
-    const existingMember = await this.chatappRepository.findUserInChat(groupId, uuid);
-    if (!existingMember) {
+    const isUserInChat = await this.chatappRepository.isUserInChat(groupId, requestingUserUuid);
+    if (!isUserInChat) {
       throw new Error('User is not a member of this group');
     }
 
-    await this.chatappRepository.removeChatMember(groupId, uuid);
-  }
+    // Get last few messages for preview
+    const messages = await this.chatappRepository.findChatMessages(chat.id, 10);
+    const messageSummaries: ChatMessageSummary[] = messages.map(msg => ({
+      id: msg.id,
+      content: msg.content,
+      createdAt: msg.createdAt
+    }));
 
-  private async buildGroupFromChat(chat: ChatDetails, requestingUserUuid: string): Promise<Group> {
-    // Get recent messages
-    const messages = await this.chatappRepository.findChatMessages(chat.id, 50);
-    
-    // Get members
+    // Get chat members
     const members = await this.chatappRepository.findChatMembers(chat.id);
-    
-    // Determine chat name and image based on type
-    let chatName = chat.name;
-    let chatImage = chat.image || 'default.webp';
+    const memberResponses: ChatMemberResponse[] = members.map(member => ({
+      uuid: member.uuid
+    }));
 
-    if (chat.type === 0 || chat.type === 3) {
-      // Public or group chat - use configured name and image
-      chatName = chat.name;
-      chatImage = `/smartrotom/img/apps/chatapp/${chatImage}`;
-    } else if (chat.type === 1) {
-      // Single user chat (saved messages)
-      chatName = 'Mensajes guardados';
-      chatImage = `https://crafatar.com/avatars/${requestingUserUuid}`;
-    } else if (chat.type === 2) {
-      // Private chat - get other user's name
-      const otherPlayerUUID = chat.name.split('_').filter(name => name !== requestingUserUuid)[0];
-      if (otherPlayerUUID) {
-        const otherUser = await this.chatappRepository.findUserByUuid(otherPlayerUUID);
-        chatName = otherUser?.username || 'Unknown User';
-        chatImage = `https://crafatar.com/avatars/${otherPlayerUUID}`;
-      } else {
-        chatName = 'Private Chat';
-        chatImage = `https://crafatar.com/avatars/${requestingUserUuid}`;
-      }
-    }
+    // Get unread count
+    const unread = await this.chatappRepository.getUnreadMessageCount(chat.id, requestingUserUuid);
 
     return {
       id: chat.id,
-      name: chatName,
+      name: chat.name,
       type: chat.type,
       description: chat.description,
-      image: chatImage,
+      image: chat.image,
       createdAt: chat.createdAt,
       updatedAt: chat.updatedAt,
-      messages: messages.map(msg => ({
-        id: msg.id,
-        content: msg.content,
-        createdAt: msg.createdAt
-      })),
-      unread: 0, // TODO: Implement unread count logic
-      members: members
+      messages: messageSummaries,
+      unread,
+      members: memberResponses
     };
   }
 }

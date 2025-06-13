@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatMessage } from '@repositories/smartrotom/chatapp.repository';
-
-export interface RotomMessage {
-  id: number;
-  text: string;
-  date: Date;
-  uuid: string;
-}
+import { ChatappRepository } from '@api/_repositories/smartrotom/chatapp.repository';
+import {
+  ChatMessageResponse,
+  CreateMessageResult,
+  MessageCreationData
+} from '@api/smartrotom/chatapp/types/chatapp.types';
 
 @Injectable()
 export class MessageService {
@@ -14,8 +12,13 @@ export class MessageService {
     private readonly chatappRepository: ChatappRepository,
   ) {}
 
-  async getMessages(chatId: number): Promise<RotomMessage[]> {
-    const messages = await this.chatappRepository.findChatMessagesAscending(chatId);
+  async getMessages(chatId: number): Promise<ChatMessageResponse[]> {
+    const chatExists = await this.chatappRepository.chatExists(chatId);
+    if (!chatExists) {
+      throw new Error('Chat not found');
+    }
+
+    const messages = await this.chatappRepository.findChatMessages(chatId);
     
     return messages.map(message => ({
       id: message.id,
@@ -30,48 +33,63 @@ export class MessageService {
     message: string, 
     uuid: string, 
     type: string = 'text'
-  ): Promise<{ messageId: number; message: RotomMessage }> {
-    // Validate chat exists
-    const chat = await this.chatappRepository.findChatById(chatId);
-    if (!chat) {
+  ): Promise<CreateMessageResult> {
+    const chatExists = await this.chatappRepository.chatExists(chatId);
+    if (!chatExists) {
       throw new Error('Chat not found');
     }
 
-    // Create message
-    const result = await this.chatappRepository.createMessage({
+    const isUserInChat = await this.chatappRepository.isUserInChat(chatId, uuid);
+    if (!isUserInChat) {
+      throw new Error('User is not a member of this chat');
+    }
+
+    const messageData: MessageCreationData = {
       chatId,
       content: message,
       senderUUID: uuid,
       type
-    });
+    };
 
-    const rotomMessage: RotomMessage = {
-      id: result.insertId,
-      text: message,
-      date: new Date(),
-      uuid: uuid
+    const result = await this.chatappRepository.createMessage(messageData);
+    const messageId = result.insertId;
+
+    const createdMessage = await this.chatappRepository.findMessageById(messageId);
+    if (!createdMessage) {
+      throw new Error('Failed to retrieve created message');
+    }
+
+    const messageResponse: ChatMessageResponse = {
+      id: createdMessage.id,
+      text: createdMessage.content,
+      date: createdMessage.createdAt,
+      uuid: createdMessage.uuid
     };
 
     return {
-      messageId: result.insertId,
-      message: rotomMessage
+      messageId,
+      message: messageResponse
     };
   }
 
-  async updateMessage(messageId: number, content: string, senderUuid: string): Promise<RotomMessage> {
-    const existingMessage = await this.chatappRepository.findMessageById(messageId);
-    if (!existingMessage) {
+  async updateMessage(messageId: number, content: string, senderUuid: string): Promise<ChatMessageResponse> {
+    const messageExists = await this.chatappRepository.messageExists(messageId);
+    if (!messageExists) {
       throw new Error('Message not found');
     }
 
-    // Validate sender can edit this message
-    if (existingMessage.uuid !== senderUuid) {
-      throw new Error('User does not have permission to edit this message');
+    const isOwner = await this.chatappRepository.isMessageOwner(messageId, senderUuid);
+    if (!isOwner) {
+      throw new Error('User is not the owner of this message');
     }
 
     await this.chatappRepository.updateMessage(messageId, content);
-    
+
     const updatedMessage = await this.chatappRepository.findMessageById(messageId);
+    if (!updatedMessage) {
+      throw new Error('Failed to retrieve updated message');
+    }
+
     return {
       id: updatedMessage.id,
       text: updatedMessage.content,
@@ -81,25 +99,25 @@ export class MessageService {
   }
 
   async deleteMessage(messageId: number, senderUuid: string): Promise<void> {
-    const existingMessage = await this.chatappRepository.findMessageById(messageId);
-    if (!existingMessage) {
+    const messageExists = await this.chatappRepository.messageExists(messageId);
+    if (!messageExists) {
       throw new Error('Message not found');
     }
 
-    // Validate sender can delete this message
-    if (existingMessage.uuid !== senderUuid) {
-      throw new Error('User does not have permission to delete this message');
+    const isOwner = await this.chatappRepository.isMessageOwner(messageId, senderUuid);
+    if (!isOwner) {
+      throw new Error('User is not the owner of this message');
     }
 
     await this.chatappRepository.deleteMessage(messageId);
   }
 
-  async markMessageAsRead(messageId: number, uuid: string): Promise<void> {
+  async validateMessageAccess(messageId: number, uuid: string): Promise<boolean> {
     const message = await this.chatappRepository.findMessageById(messageId);
     if (!message) {
-      throw new Error('Message not found');
+      return false;
     }
 
-    await this.chatappRepository.markMessageAsRead(messageId, uuid);
+    return this.chatappRepository.isUserInChat(message.id, uuid);
   }
 }

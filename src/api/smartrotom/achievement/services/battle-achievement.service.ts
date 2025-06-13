@@ -2,17 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { AchievementService } from './achievement.service';
 import { ReplayService } from './replay.service';
 import { AchievementRepository } from '@repositories/smartrotom/achievement.repository';
-
-export interface BattleAchievementRequest {
-  uuid: string;
-  logro: string;
-  name1: string;
-  name2: string;
-  team1: any;
-  team2: any;
-  replay: string;
-  victoria: boolean;
-}
+import {
+  BattleAchievementRequest,
+  BattleAchievementResponse
+} from '../types/achievement.types';
 
 @Injectable()
 export class BattleAchievementService {
@@ -22,7 +15,7 @@ export class BattleAchievementService {
     private readonly achievementRepository: AchievementRepository,
   ) {}
 
-  async addBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; error?: string }> {
+  async addBattleAchievement(battleData: BattleAchievementRequest): Promise<BattleAchievementResponse> {
     const { uuid, logro, name1, name2, team1, team2, replay, victoria } = battleData;
 
     // Validate input

@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatDetails } from '@repositories/smartrotom/chatapp.repository';
-
-export interface CreateChatRequest {
-  player: string;
-  users: string[];
-  name: string;
-}
+import { ChatappRepository } from '@api/_repositories/smartrotom/chatapp.repository';
+import {
+  CreateChatRequest,
+  ChatDetails,
+  ChatCreationData
+} from '@api/smartrotom/chatapp/types/chatapp.types';
 
 @Injectable()
 export class ChatService {
@@ -14,50 +13,27 @@ export class ChatService {
   ) {}
 
   async createChat(createChatRequest: CreateChatRequest): Promise<number> {
-    const { player, users, name } = createChatRequest;
-    
-    const chatUsers = new Set(users);
-    chatUsers.add(player);
-    const uuids = Array.from(chatUsers);
-    
-    let chatName = name;
-    let chatType = 1;
+    const chatData: ChatCreationData = {
+      type: 1, // Default type for group chat
+      name: createChatRequest.name,
+      description: '',
+      image: null
+    };
 
-    if (uuids.length === 1) {
-      // Single user chat (saved messages)
-      const existingChat = await this.chatappRepository.findChatByName(chatName);
-      if (existingChat) {
-        return existingChat.id;
-      }
-      chatType = 1;
-    } else if (uuids.length === 2) {
-      // Private chat between two users
-      uuids.sort();
-      chatName = uuids.join('_');
-      chatType = 2;
+    const result = await this.chatappRepository.createChat(chatData);
+    const chatId = result.insertId;
 
-      const existingChat = await this.chatappRepository.findChatByName(chatName);
-      if (existingChat) {
-        return existingChat.id;
+    // Add creator to chat
+    await this.chatappRepository.addUserToChat(chatId, createChatRequest.player);
+
+    // Add other users to chat
+    for (const uuid of createChatRequest.users) {
+      if (uuid !== createChatRequest.player) {
+        await this.chatappRepository.addUserToChat(chatId, uuid);
       }
-    } else if (uuids.length > 2) {
-      // Group chat
-      chatType = 3;
     }
 
-    // Create new chat
-    const newChat = await this.chatappRepository.createChat({
-      type: chatType,
-      name: chatName,
-      description: 'Chat'
-    });
-
-    // Add all users to the chat
-    for (const uuid of uuids) {
-      await this.chatappRepository.addChatMember(newChat.insertId, uuid);
-    }
-
-    return newChat.insertId;
+    return chatId;
   }
 
   async getChatById(chatId: number): Promise<ChatDetails> {
@@ -88,12 +64,38 @@ export class ChatService {
   }
 
   async validateChatExists(chatId: number): Promise<boolean> {
-    const chat = await this.chatappRepository.findChatById(chatId);
-    return !!chat;
+    return this.chatappRepository.chatExists(chatId);
   }
 
-  async validateUserInChat(chatId: number, uuid: string): Promise<boolean> {
-    const membership = await this.chatappRepository.findUserInChat(chatId, uuid);
-    return !!membership;
+  async validateUserAccessToChat(chatId: number, uuid: string): Promise<boolean> {
+    return this.chatappRepository.isUserInChat(chatId, uuid);
+  }
+
+  async addMemberToChat(chatId: number, uuid: string): Promise<void> {
+    const chatExists = await this.validateChatExists(chatId);
+    if (!chatExists) {
+      throw new Error('Chat not found');
+    }
+
+    const isAlreadyMember = await this.chatappRepository.isUserInChat(chatId, uuid);
+    if (isAlreadyMember) {
+      throw new Error('User is already a member of this chat');
+    }
+
+    await this.chatappRepository.addUserToChat(chatId, uuid);
+  }
+
+  async removeMemberFromChat(chatId: number, uuid: string): Promise<void> {
+    const chatExists = await this.validateChatExists(chatId);
+    if (!chatExists) {
+      throw new Error('Chat not found');
+    }
+
+    const isMember = await this.chatappRepository.isUserInChat(chatId, uuid);
+    if (!isMember) {
+      throw new Error('User is not a member of this chat');
+    }
+
+    await this.chatappRepository.removeUserFromChat(chatId, uuid);
   }
 }

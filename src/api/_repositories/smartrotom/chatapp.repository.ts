@@ -1,45 +1,24 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, asc, desc, and } from 'drizzle-orm';
+import { eq, and, desc, count, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { 
   rotomChats, 
-  rotomChatUsers, 
-  rotomChatMessages, 
-  rotomChatMessageReads,
+  rotomChatUsers,
+  rotomChatMessages,
   RotomChat,
   RotomChatUser,
-  RotomChatMessage,
-  RotomChatMessageRead
+  RotomChatMessage
 } from '@/_db/schema/SmartRotomChat';
 import { smartrotomUsers } from '@/_db/schema/SmartRotom';
-
-export interface ChatDetails {
-  id: number;
-  name: string;
-  type: number;
-  description: string;
-  image: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ChatMessage {
-  id: number;
-  content: string;
-  createdAt: Date;
-  uuid: string;
-  type: string;
-}
-
-export interface ChatMember {
-  uuid: string;
-}
-
-export interface UserProfile {
-  uuid: string;
-  username: string;
-}
+import {
+  ChatDetails,
+  ChatMessage,
+  ChatMember,
+  BaseUserProfile,
+  ChatCreationData,
+  MessageCreationData
+} from '@api/smartrotom/chatapp/types/chatapp.types';
 
 @Injectable()
 export class ChatappRepository {
@@ -49,26 +28,18 @@ export class ChatappRepository {
 
   // ==================== CHAT OPERATIONS ====================
 
-  async findUserChats(uuid: string): Promise<ChatDetails[]> {
-    const params = {
-      id: rotomChats.id,
-      name: rotomChats.name,
-      type: rotomChats.type,
-      description: rotomChats.description,
-      image: rotomChats.image,
-      createdAt: rotomChats.createdAt,
-      updatedAt: rotomChats.updatedAt
-    };
-
-    return this.db.selectDistinct(params)
-      .from(rotomChats)
-      .leftJoin(rotomChatUsers, eq(rotomChatUsers.chatId, rotomChats.id))
-      .where(eq(rotomChatUsers.uuid, uuid))
-      .union(
-        this.db.select({ ...params })
-          .from(rotomChats)
-          .where(eq(rotomChats.type, 0))
-      );
+  async createChat(chatData: ChatCreationData): Promise<{ insertId: number }> {
+    const result = await this.db.insert(rotomChats)
+      .values({
+        type: chatData.type,
+        name: chatData.name,
+        description: chatData.description,
+        image: chatData.image || null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      } as RotomChat);
+    
+    return { insertId: result[0].insertId };
   }
 
   async findChatById(chatId: number): Promise<ChatDetails | null> {
@@ -79,7 +50,7 @@ export class ChatappRepository {
       description: rotomChats.description,
       image: rotomChats.image,
       createdAt: rotomChats.createdAt,
-      updatedAt: rotomChats.updatedAt
+      updatedAt: rotomChats.updatedAt,
     })
     .from(rotomChats)
     .where(eq(rotomChats.id, chatId))
@@ -88,45 +59,12 @@ export class ChatappRepository {
     return result[0] || null;
   }
 
-  async findChatByName(name: string): Promise<ChatDetails | null> {
-    const result = await this.db.select({
-      id: rotomChats.id,
-      name: rotomChats.name,
-      type: rotomChats.type,
-      description: rotomChats.description,
-      image: rotomChats.image,
-      createdAt: rotomChats.createdAt,
-      updatedAt: rotomChats.updatedAt
-    })
-    .from(rotomChats)
-    .where(eq(rotomChats.name, name))
-    .limit(1);
-
-    return result[0] || null;
-  }
-
-  async createChat(chatData: {
-    type: number;
-    name: string;
-    description: string;
-    image?: string;
-  }): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomChats)
-      .values({
-        ...chatData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as RotomChat);
-    
-    return { insertId: result[0].insertId };
-  }
-
-  async updateChat(chatId: number, chatData: Partial<RotomChat>): Promise<void> {
+  async updateChat(chatId: number, chatData: Partial<ChatCreationData>): Promise<void> {
     await this.db.update(rotomChats)
       .set({
         ...chatData,
         updatedAt: new Date()
-      } as RotomChat)
+      } as Partial<RotomChat>)
       .where(eq(rotomChats.id, chatId));
   }
 
@@ -135,27 +73,17 @@ export class ChatappRepository {
       .where(eq(rotomChats.id, chatId));
   }
 
-  // ==================== CHAT MEMBER OPERATIONS ====================
+  // ==================== CHAT USER OPERATIONS ====================
 
-  async findChatMembers(chatId: number): Promise<ChatMember[]> {
-    return this.db.select({ uuid: rotomChatUsers.uuid })
-      .from(rotomChatUsers)
-      .where(eq(rotomChatUsers.chatId, chatId));
-  }
-
-  async addChatMember(chatId: number, uuid: string): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomChatUsers)
+  async addUserToChat(chatId: number, uuid: string): Promise<void> {
+    await this.db.insert(rotomChatUsers)
       .values({
         chatId,
-        uuid,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        uuid
       } as RotomChatUser);
-    
-    return { insertId: result[0].insertId };
   }
 
-  async removeChatMember(chatId: number, uuid: string): Promise<void> {
+  async removeUserFromChat(chatId: number, uuid: string): Promise<void> {
     await this.db.delete(rotomChatUsers)
       .where(and(
         eq(rotomChatUsers.chatId, chatId),
@@ -163,8 +91,36 @@ export class ChatappRepository {
       ));
   }
 
-  async findUserInChat(chatId: number, uuid: string): Promise<ChatMember | null> {
-    const result = await this.db.select({ uuid: rotomChatUsers.uuid })
+  async findChatMembers(chatId: number): Promise<ChatMember[]> {
+    const result = await this.db.select({
+      uuid: rotomChatUsers.uuid
+    })
+    .from(rotomChatUsers)
+    .where(eq(rotomChatUsers.chatId, chatId));
+
+    return result;
+  }
+
+  async findUserChats(uuid: string): Promise<ChatDetails[]> {
+    const result = await this.db.select({
+      id: rotomChats.id,
+      name: rotomChats.name,
+      type: rotomChats.type,
+      description: rotomChats.description,
+      image: rotomChats.image,
+      createdAt: rotomChats.createdAt,
+      updatedAt: rotomChats.updatedAt,
+    })
+    .from(rotomChats)
+    .leftJoin(rotomChatUsers, eq(rotomChatUsers.chatId, rotomChats.id))
+    .where(eq(rotomChatUsers.uuid, uuid))
+    .orderBy(desc(rotomChats.updatedAt));
+
+    return result;
+  }
+
+  async isUserInChat(chatId: number, uuid: string): Promise<boolean> {
+    const result = await this.db.select()
       .from(rotomChatUsers)
       .where(and(
         eq(rotomChatUsers.chatId, chatId),
@@ -172,50 +128,20 @@ export class ChatappRepository {
       ))
       .limit(1);
 
-    return result[0] || null;
+    return result.length > 0;
   }
 
   // ==================== MESSAGE OPERATIONS ====================
 
-  async findChatMessages(chatId: number, limit: number = 50): Promise<ChatMessage[]> {
-    return this.db.select({
-      id: rotomChatMessages.id,
-      content: rotomChatMessages.content,
-      createdAt: rotomChatMessages.createdAt,
-      uuid: rotomChatMessages.senderUUID,
-      type: rotomChatMessages.type
-    })
-    .from(rotomChatMessages)
-    .where(eq(rotomChatMessages.chatId, chatId))
-    .orderBy(desc(rotomChatMessages.createdAt))
-    .limit(limit);
-  }
-
-  async findChatMessagesAscending(chatId: number): Promise<ChatMessage[]> {
-    return this.db.select({
-      id: rotomChatMessages.id,
-      content: rotomChatMessages.content,
-      createdAt: rotomChatMessages.createdAt,
-      uuid: rotomChatMessages.senderUUID,
-      type: rotomChatMessages.type
-    })
-    .from(rotomChatMessages)
-    .where(eq(rotomChatMessages.chatId, chatId))
-    .orderBy(asc(rotomChatMessages.createdAt));
-  }
-
-  async createMessage(messageData: {
-    chatId: number;
-    content: string;
-    senderUUID: string;
-    type: string;
-  }): Promise<{ insertId: number }> {
+  async createMessage(messageData: MessageCreationData): Promise<{ insertId: number }> {
     const result = await this.db.insert(rotomChatMessages)
       .values({
-        ...messageData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as any);
+        chatId: messageData.chatId,
+        senderUUID: messageData.senderUUID,
+        content: messageData.content,
+        type: messageData.type,
+        createdAt: new Date()
+      } as RotomChatMessage);
     
     return { insertId: result[0].insertId };
   }
@@ -226,7 +152,7 @@ export class ChatappRepository {
       content: rotomChatMessages.content,
       createdAt: rotomChatMessages.createdAt,
       uuid: rotomChatMessages.senderUUID,
-      type: rotomChatMessages.type
+      type: rotomChatMessages.type,
     })
     .from(rotomChatMessages)
     .where(eq(rotomChatMessages.id, messageId))
@@ -235,12 +161,44 @@ export class ChatappRepository {
     return result[0] || null;
   }
 
+  async findChatMessages(chatId: number, limit?: number): Promise<ChatMessage[]> {
+    const query = this.db.select({
+      id: rotomChatMessages.id,
+      content: rotomChatMessages.content,
+      createdAt: rotomChatMessages.createdAt,
+      uuid: rotomChatMessages.senderUUID,
+      type: rotomChatMessages.type,
+    })
+    .from(rotomChatMessages)
+    .where(eq(rotomChatMessages.chatId, chatId))
+    .orderBy(desc(rotomChatMessages.createdAt));
+
+    if (limit) {
+      query.limit(limit);
+    }
+
+    return await query;
+  }
+
+  async getLastChatMessage(chatId: number): Promise<ChatMessage | null> {
+    const result = await this.db.select({
+      id: rotomChatMessages.id,
+      content: rotomChatMessages.content,
+      createdAt: rotomChatMessages.createdAt,
+      uuid: rotomChatMessages.senderUUID,
+      type: rotomChatMessages.type,
+    })
+    .from(rotomChatMessages)
+    .where(eq(rotomChatMessages.chatId, chatId))
+    .orderBy(desc(rotomChatMessages.createdAt))
+    .limit(1);
+
+    return result[0] || null;
+  }
+
   async updateMessage(messageId: number, content: string): Promise<void> {
     await this.db.update(rotomChatMessages)
-      .set({
-        content,
-        updatedAt: new Date()
-      } as Partial<RotomChatMessage>)
+      .set({ content })
       .where(eq(rotomChatMessages.id, messageId));
   }
 
@@ -249,29 +207,15 @@ export class ChatappRepository {
       .where(eq(rotomChatMessages.id, messageId));
   }
 
-  // ==================== MESSAGE READ OPERATIONS ====================
-
-  async markMessageAsRead(messageId: number, uuid: string): Promise<{ insertId: number }> {
-    const result = await this.db.insert(rotomChatMessageReads)
-      .values({
-        messageId,
-        uuid,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as RotomChatMessageRead);
-    
-    return { insertId: result[0].insertId };
-  }
-
-  async findMessageReads(messageId: number): Promise<{ uuid: string }[]> {
-    return this.db.select({ uuid: rotomChatMessageReads.uuid })
-      .from(rotomChatMessageReads)
-      .where(eq(rotomChatMessageReads.messageId, messageId));
+  async getUnreadMessageCount(chatId: number, uuid: string): Promise<number> {
+    // This would require a message read tracking table
+    // For now, return 0 as placeholder
+    return 0;
   }
 
   // ==================== USER OPERATIONS ====================
 
-  async findUserByUuid(uuid: string): Promise<UserProfile | null> {
+  async findUserProfile(uuid: string): Promise<BaseUserProfile | null> {
     const result = await this.db.select({
       uuid: smartrotomUsers.uuid,
       username: smartrotomUsers.username
@@ -281,5 +225,50 @@ export class ChatappRepository {
     .limit(1);
 
     return result[0] || null;
+  }
+
+  async findUserProfiles(uuids: string[]): Promise<BaseUserProfile[]> {
+    if (uuids.length === 0) return [];
+
+    const result = await this.db.select({
+      uuid: smartrotomUsers.uuid,
+      username: smartrotomUsers.username
+    })
+    .from(smartrotomUsers)
+    .where(sql`${smartrotomUsers.uuid} IN (${uuids.map(uuid => `'${uuid}'`).join(',')})`);
+
+    return result;
+  }
+
+  // ==================== VALIDATION OPERATIONS ====================
+
+  async chatExists(chatId: number): Promise<boolean> {
+    const result = await this.db.select()
+      .from(rotomChats)
+      .where(eq(rotomChats.id, chatId))
+      .limit(1);
+
+    return result.length > 0;
+  }
+
+  async messageExists(messageId: number): Promise<boolean> {
+    const result = await this.db.select()
+      .from(rotomChatMessages)
+      .where(eq(rotomChatMessages.id, messageId))
+      .limit(1);
+
+    return result.length > 0;
+  }
+
+  async isMessageOwner(messageId: number, uuid: string): Promise<boolean> {
+    const result = await this.db.select()
+      .from(rotomChatMessages)
+      .where(and(
+        eq(rotomChatMessages.id, messageId),
+        eq(rotomChatMessages.senderUUID, uuid)
+      ))
+      .limit(1);
+
+    return result.length > 0;
   }
 }

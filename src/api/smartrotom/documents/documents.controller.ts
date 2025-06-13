@@ -1,12 +1,33 @@
-import { Body, Controller, Get, Param, Post, Put, Delete, HttpStatus, UseInterceptors, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Query, HttpStatus, UseInterceptors, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { DocumentsFacadeService } from './documents.facade.service';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { DocumentsFacadeService, CreateNoteWithUserRequest } from './documents.facade.service';
-import { CreateNewsRequest, UpdateNewsRequest } from './services/news.service';
-import { CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
-import { CreateNewsDto } from './dto/create-news-dto';
-import { NewsStatusDto } from './dto/news-status-dto';
-import { CreateDocumentDto, CreateDocumentDtoWithUuid } from './dto/create-document.dto';
+import {
+  CreateDocumentRequest,
+  CreateDocumentResponse,
+  UpdateDocumentRequest,
+  UpdateDocumentResponse,
+  DeleteDocumentResponse,
+  DocumentResponse,
+  SaveDocumentResponse,
+  CreateNoteWithUserRequest,
+  CreateNoteWithUserResponse,
+  GetUserNotesResponse,
+  AddNoteToUserResponse,
+  RemoveNoteFromUserResponse,
+  CreateNewsRequest,
+  CreateNewsResponse,
+  UpdateNewsRequest,
+  UpdateNewsResponse,
+  DeleteNewsResponse,
+  GetAllNewsResponse,
+  GetPublishedNewsResponse,
+  NewsResponse,
+  UpdateNewsStatusRequest,
+  UpdateNewsStatusResponse,
+  SaveNewsRequest,
+  SaveNewsResponse
+} from '@api/smartrotom/documents/types/documents.types';
 
 @ApiTags('SmartRotom | Documents')
 @Controller('smartrotom/documents')
@@ -18,51 +39,35 @@ export class DocumentsController {
 
   // ==================== DOCUMENT ENDPOINTS ====================
 
-  @Get(':id')
+  @Get('document/:id')
   @ApiOperation({ summary: 'Get a document by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Document retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Document not found.' })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async getDocument(@Param('id') id: string) {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.getDocumentById(documentId);
+  async getDocumentById(@Param('id', ParseIntPipe) id: number): Promise<DocumentResponse | null> {
+    return await this.documentsFacadeService.getDocumentById(id);
   }
 
   @Post('document')
   @ApiOperation({ summary: 'Create a new document' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Document created successfully.' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid document data.' })
-  @ApiBody({ type: CreateDocumentDto })
-  async createDocument(@Body() createDocumentDto: CreateDocumentDto) {
-    const createDocumentRequest: CreateDocumentRequest = {
-      title: createDocumentDto.title,
-      content: createDocumentDto.content,
-      type: createDocumentDto.type
-    };
+  @ApiBody({ type: Object })
+  async createDocument(@Body() createDocumentRequest: CreateDocumentRequest): Promise<CreateDocumentResponse> {
     return await this.documentsFacadeService.createDocument(createDocumentRequest);
   }
 
   @Put('document/:id')
-  @ApiOperation({ summary: 'Update an existing document' })
+  @ApiOperation({ summary: 'Update a document' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Document updated successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Document not found.' })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  @ApiBody({ type: CreateDocumentDto })
-  async updateDocument(@Param('id') id: string, @Body() updateDocumentDto: CreateDocumentDto) {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-
-    const updateDocumentRequest: UpdateDocumentRequest = {
-      title: updateDocumentDto.title,
-      content: updateDocumentDto.content,
-      type: updateDocumentDto.type
-    };
-    return await this.documentsFacadeService.updateDocument(documentId, updateDocumentRequest);
+  @ApiBody({ type: Object })
+  async updateDocument(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDocumentRequest: UpdateDocumentRequest
+  ): Promise<UpdateDocumentResponse> {
+    return await this.documentsFacadeService.updateDocument(id, updateDocumentRequest);
   }
 
   @Delete('document/:id')
@@ -70,100 +75,94 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Document deleted successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Document not found.' })
   @ApiParam({ name: 'id', description: 'Document ID' })
-  async deleteDocument(@Param('id') id: string) {
-    const documentId = parseInt(id, 10);
-    if (isNaN(documentId)) {
-      throw new Error('Invalid document ID');
-    }
-    return await this.documentsFacadeService.deleteDocument(documentId);
+  async deleteDocument(@Param('id', ParseIntPipe) id: number): Promise<DeleteDocumentResponse> {
+    return await this.documentsFacadeService.deleteDocument(id);
+  }
+
+  @Post('document/:id/save')
+  @ApiOperation({ summary: 'Save a document (create or update)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Document saved successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid document data.' })
+  @ApiParam({ name: 'id', description: 'Document ID' })
+  @ApiBody({ type: Object })
+  async saveDocument(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() saveData: { title: string; content: string; type: number }
+  ): Promise<SaveDocumentResponse> {
+    return await this.documentsFacadeService.saveDocument(id, saveData.title, saveData.content, saveData.type);
   }
 
   // ==================== NOTE ENDPOINTS ====================
 
-  @Get('all/:uuid')
-  @ApiOperation({ summary: 'Get notes for a player' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Notes retrieved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve notes.' })
-  @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getNotes(@Param('uuid') uuid: string) {
-    return await this.documentsFacadeService.getUserNotes(uuid);
+  @Get('notes/:uuid')
+  @ApiOperation({ summary: 'Get all notes for a user' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User notes retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
+  @ApiParam({ name: 'uuid', description: 'User UUID' })
+  async getUserNotes(@Param('uuid') uuid: string): Promise<GetUserNotesResponse> {
+    return await this.documentsFacadeService.getUserNotes({ uuid });
   }
 
-  @Post('create')
-  @ApiOperation({ summary: 'Create a new note and associate with user' })
+  @Post('note/create')
+  @ApiOperation({ summary: 'Create a note and associate it with a user' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Note created successfully.' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid note data.' })
-  @ApiBody({ type: CreateDocumentDtoWithUuid })
-  async createNote(@Body() body: CreateDocumentDtoWithUuid) {
-    const createNoteRequest: CreateNoteWithUserRequest = {
-      title: body.title,
-      content: body.content,
-      type: body.type,
-      uuid: body.uuid
-    };
+  @ApiBody({ type: Object })
+  async createNoteWithUser(@Body() createNoteRequest: CreateNoteWithUserRequest): Promise<CreateNoteWithUserResponse> {
     return await this.documentsFacadeService.createNoteWithUser(createNoteRequest);
   }
 
-  @Post('save/:id')
-  @ApiOperation({ summary: 'Save a note (create or update)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Note saved successfully.' })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to save note.' })
-  @ApiParam({ name: 'id', description: 'Note ID (0 for new note)' })
-  @ApiBody({ type: CreateDocumentDto })
-  async saveNote(@Param('id') id: string, @Body() body: CreateDocumentDto) {
-    const noteId = parseInt(id, 10);
-    if (isNaN(noteId)) {
-      throw new Error('Invalid note ID');
-    }
-    return await this.documentsFacadeService.saveDocument(noteId, body.title, body.content, body.type);
-  }
-
-  @Post('note/:noteId/user/:uuid')
-  @ApiOperation({ summary: 'Associate a note with a user' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Note associated with user successfully.' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Note or user not found.' })
-  @ApiParam({ name: 'noteId', description: 'Note ID' })
+  @Post('note/:documentId/user/:uuid')
+  @ApiOperation({ summary: 'Add a note to a user' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Note added to user successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid request data.' })
+  @ApiParam({ name: 'documentId', description: 'Document ID' })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async addNoteToUser(@Param('noteId') noteId: string, @Param('uuid') uuid: string) {
-    const noteIdNum = parseInt(noteId, 10);
-    if (isNaN(noteIdNum)) {
-      throw new Error('Invalid note ID');
-    }
-    return await this.documentsFacadeService.addNoteToUser(noteIdNum, uuid);
+  async addNoteToUser(
+    @Param('documentId', ParseIntPipe) documentId: number,
+    @Param('uuid') uuid: string
+  ): Promise<AddNoteToUserResponse> {
+    return await this.documentsFacadeService.addNoteToUser({ documentId, uuid });
   }
 
-  @Delete('note/:noteId/user/:uuid')
-  @ApiOperation({ summary: 'Remove association between note and user' })
+  @Delete('note/:documentId/user/:uuid')
+  @ApiOperation({ summary: 'Remove a note from a user' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Note removed from user successfully.' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Association not found.' })
-  @ApiParam({ name: 'noteId', description: 'Note ID' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Note or user not found.' })
+  @ApiParam({ name: 'documentId', description: 'Document ID' })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async removeNoteFromUser(@Param('noteId') noteId: string, @Param('uuid') uuid: string) {
-    const noteIdNum = parseInt(noteId, 10);
-    if (isNaN(noteIdNum)) {
-      throw new Error('Invalid note ID');
-    }
-    return await this.documentsFacadeService.removeNoteFromUser(noteIdNum, uuid);
+  async removeNoteFromUser(
+    @Param('documentId', ParseIntPipe) documentId: number,
+    @Param('uuid') uuid: string
+  ): Promise<RemoveNoteFromUserResponse> {
+    return await this.documentsFacadeService.removeNoteFromUser({ documentId, uuid });
   }
 
   // ==================== NEWS ENDPOINTS ====================
 
   @Get('news')
   @ApiOperation({ summary: 'Get all news' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'News retrieved successfully.' })
-  @ApiQuery({ name: 'published', description: 'Filter by published status', required: false })
-  async getNews(@Query('published') published?: string) {
+  @ApiResponse({ status: HttpStatus.OK, description: 'All news retrieved successfully.' })
+  @ApiQuery({ name: 'published', required: false, description: 'Filter by published status' })
+  async getAllNews(@Query('published') published?: string): Promise<GetAllNewsResponse | GetPublishedNewsResponse> {
     if (published === 'true') {
       return await this.documentsFacadeService.getPublishedNews();
     }
     return await this.documentsFacadeService.getAllNews();
   }
 
+  @Get('news/published')
+  @ApiOperation({ summary: 'Get published news' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Published news retrieved successfully.' })
+  async getPublishedNews(): Promise<GetPublishedNewsResponse> {
+    return await this.documentsFacadeService.getPublishedNews();
+  }
+
   @Get('news/featured')
   @ApiOperation({ summary: 'Get featured news' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Featured news retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No featured news found.' })
-  async getFeaturedNews() {
+  async getFeaturedNews(): Promise<NewsResponse | null> {
     return await this.documentsFacadeService.getFeaturedNews();
   }
 
@@ -172,58 +171,17 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
   @ApiParam({ name: 'newsId', description: 'News ID' })
-  async getNewsById(@Param('newsId') newsId: string) {
-    const newsIdNum = parseInt(newsId, 10);
-    if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
-    }
-    return await this.documentsFacadeService.getNewsById(newsIdNum);
+  async getNewsById(@Param('newsId', ParseIntPipe) newsId: number): Promise<NewsResponse | null> {
+    return await this.documentsFacadeService.getNewsById(newsId);
   }
 
   @Post('news')
   @ApiOperation({ summary: 'Create new news' })
   @ApiResponse({ status: HttpStatus.CREATED, description: 'News created successfully.' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid news data.' })
-  @ApiBody({ type: CreateNewsDto })
-  async createNews(@Body() createNewsDto: CreateNewsDto) {
-    const createNewsRequest: CreateNewsRequest = {
-      title: createNewsDto.title,
-      subtitle: createNewsDto.subtitle,
-      category: createNewsDto.category,
-      subcategory: createNewsDto.subcategory,
-      published: createNewsDto.published,
-      featured: createNewsDto.featured,
-      content: createNewsDto.content,
-      buttonText: createNewsDto.buttonText,
-      imageUrl: createNewsDto.imageUrl
-    };
+  @ApiBody({ type: Object })
+  async createNews(@Body() createNewsRequest: CreateNewsRequest): Promise<CreateNewsResponse> {
     return await this.documentsFacadeService.createNews(createNewsRequest);
-  }
-
-  @Post('news/:newsId')
-  @ApiOperation({ summary: 'Update existing news' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'News updated successfully.' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
-  @ApiParam({ name: 'newsId', description: 'News ID' })
-  @ApiBody({ type: CreateNewsDto })
-  async updateActiveNews(@Body() news: CreateNewsDto, @Param('newsId') newsId: string) {
-    const newsIdNum = parseInt(newsId, 10);
-    if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
-    }
-    
-    const updateNewsRequest: UpdateNewsRequest = {
-      title: news.title,
-      subtitle: news.subtitle,
-      category: news.category,
-      subcategory: news.subcategory,
-      published: news.published,
-      featured: news.featured,
-      content: news.content,
-      buttonText: news.buttonText,
-      imageUrl: news.imageUrl
-    };
-    return await this.documentsFacadeService.updateNews(newsIdNum, updateNewsRequest);
   }
 
   @Put('news/:newsId')
@@ -231,25 +189,12 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News updated successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
   @ApiParam({ name: 'newsId', description: 'News ID' })
-  @ApiBody({ type: CreateNewsDto })
-  async updateNews(@Body() news: CreateNewsDto, @Param('newsId') newsId: string) {
-    const newsIdNum = parseInt(newsId, 10);
-    if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
-    }
-    
-    const updateNewsRequest: UpdateNewsRequest = {
-      title: news.title,
-      subtitle: news.subtitle,
-      category: news.category,
-      subcategory: news.subcategory,
-      published: news.published,
-      featured: news.featured,
-      content: news.content,
-      buttonText: news.buttonText,
-      imageUrl: news.imageUrl
-    };
-    return await this.documentsFacadeService.updateNews(newsIdNum, updateNewsRequest);
+  @ApiBody({ type: Object })
+  async updateNews(
+    @Param('newsId', ParseIntPipe) newsId: number,
+    @Body() updateNewsRequest: UpdateNewsRequest
+  ): Promise<UpdateNewsResponse> {
+    return await this.documentsFacadeService.updateNews(newsId, updateNewsRequest);
   }
 
   @Delete('news/:newsId')
@@ -257,28 +202,45 @@ export class DocumentsController {
   @ApiResponse({ status: HttpStatus.OK, description: 'News deleted successfully.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'News not found.' })
   @ApiParam({ name: 'newsId', description: 'News ID' })
-  async deleteNews(@Param('newsId') newsId: string) {
-    const newsIdNum = parseInt(newsId, 10);
-    if (isNaN(newsIdNum)) {
-      throw new Error('Invalid news ID');
-    }
-    return await this.documentsFacadeService.deleteNews(newsIdNum);
+  async deleteNews(@Param('newsId', ParseIntPipe) newsId: number): Promise<DeleteNewsResponse> {
+    return await this.documentsFacadeService.deleteNews(newsId);
   }
 
-  @Post('newsstatus')
-  @ApiOperation({ summary: 'Update news status (published and featured)' })
+  @Put('news/status')
+  @ApiOperation({ summary: 'Update news status (published/featured)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'News status updated successfully.' })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid status data.' })
-  @ApiBody({ type: NewsStatusDto })
-  async updateNewsStatus(@Body() news: NewsStatusDto) {
-    return await this.documentsFacadeService.updateNewsStatus(news.published, news.featured);
+  @ApiBody({ type: Object })
+  async updateNewsStatus(@Body() updateStatusRequest: UpdateNewsStatusRequest): Promise<UpdateNewsStatusResponse> {
+    return await this.documentsFacadeService.updateNewsStatus(updateStatusRequest);
   }
 
-  // ==================== LEGACY ENDPOINTS (for backward compatibility) ====================
+  @Post('news/save')
+  @ApiOperation({ summary: 'Save news (create or update)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'News saved successfully.' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid news data.' })
+  @ApiBody({ type: Object })
+  async saveNews(@Body() saveNewsRequest: SaveNewsRequest): Promise<SaveNewsResponse> {
+    return await this.documentsFacadeService.saveNews(saveNewsRequest);
+  }
 
-  @Post('save/:id')
-  @ApiOperation({ summary: 'Save a note (legacy endpoint)' })
-  async saveNoteLegacy(@Param('id') id: number, @Body() body: CreateDocumentDto) {
-    return await this.documentsFacadeService.saveDocument(id, body.title, body.content, body.type);
+  // ==================== LEGACY ENDPOINTS ====================
+
+  @Get('documents/:uuid')
+  @ApiOperation({ summary: 'Get user documents (legacy endpoint)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User documents retrieved successfully.' })
+  @ApiParam({ name: 'uuid', description: 'User UUID' })
+  async getUserDocuments(@Param('uuid') uuid: string): Promise<GetUserNotesResponse> {
+    // This is just an alias for getUserNotes to maintain backward compatibility
+    return await this.documentsFacadeService.getUserNotes({ uuid });
+  }
+
+  @Post('documents')
+  @ApiOperation({ summary: 'Create document (legacy endpoint)' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Document created successfully.' })
+  @ApiBody({ type: Object })
+  async createDocumentLegacy(@Body() createDocumentRequest: CreateDocumentRequest): Promise<CreateDocumentResponse> {
+    // This is just an alias for createDocument to maintain backward compatibility
+    return await this.documentsFacadeService.createDocument(createDocumentRequest);
   }
 }
