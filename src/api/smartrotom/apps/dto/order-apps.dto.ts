@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ValidateNested, IsNumber, ValidateBy, ValidationArguments } from 'class-validator';
+import { IsString, IsArray, ValidateNested, IsNumber, ValidateBy, ValidationArguments, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 
 // Custom validator for number or string
@@ -36,9 +36,10 @@ class OrderItemDto {
 export class OrderAppDto {
   @ApiProperty({ 
     description: 'Player UUID',
-    example: 'player-uuid-123'
+    example: '007d1a64-661c-4396-8844-e27856f2ddfa'
   })
   @IsString()
+  @IsUUID()
   uuid: string;
 
   @ApiProperty({ 
