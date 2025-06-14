@@ -29,7 +29,7 @@ export function useSocketAuth() {
       !isConnecting &&
       !connectionAttempted.current
     ) {
-      console.log("Attempting to connect socket")
+      //console.log("Attempting to connect socket")
       connectionAttempted.current = true
       connect(session.user.smartRotomUser)
     }
@@ -38,16 +38,16 @@ export function useSocketAuth() {
   useEffect(() => {
     if (!socket) return
 
-    console.log("Setting up socket listeners")
+    //console.log("Setting up socket listeners")
     // Listen for user data updates
     const handleUserUpdated = async (data: any) => {
-      console.log("user:updated event received", data)
+      //console.log("user:updated event received", data)
       if (data.userId === (session as Session)?.user?.id) {
         try {
           await update(data.updates)
-          console.log("Session updated successfully")
+          //console.log("Session updated successfully")
         } catch (error) {
-          console.error("Failed to update session:", error)
+          //console.error("Failed to update session:", error)
         }
       }
     }
@@ -55,7 +55,7 @@ export function useSocketAuth() {
     socket.on("user:updated", handleUserUpdated)
 
     return () => {
-      console.log("Cleaning up socket listeners")
+      //console.log("Cleaning up socket listeners")
       socket.off("user:updated", handleUserUpdated)
     }
   }, [socket, session])

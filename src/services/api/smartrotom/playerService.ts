@@ -2,6 +2,7 @@ import { rotomPOST, ApiResponse } from "@/services/boffAPI"
 import { SuccessResponse } from "@/types"
 
 export type MinecraftStats = {
+  stats: {
     "minecraft:custom": {
       "minecraft:play_one_minute": number;
       "minecraft:deaths": number;
@@ -49,6 +50,7 @@ export type MinecraftStats = {
     "minecraft:crafted"?: {
       [key: string]: number;
     };
+  }
 };
 
 

@@ -155,19 +155,19 @@ export interface ParsedPokemonSpec {
             break;
             
           case 'move1':
-            result.moves[0] = value;
+            result.moves![0] = value;
             break;
             
           case 'move2':
-            result.moves[1] = value;
+            result.moves![1] = value;
             break;
             
           case 'move3':
-            result.moves[2] = value;
+            result.moves![2] = value;
             break;
             
           case 'move4':
-            result.moves[3] = value;
+            result.moves![3] = value;
             break;
             
           case 'nature':
@@ -220,82 +220,82 @@ export interface ParsedPokemonSpec {
             
           // Handle EVs
           case 'evhp':
-            result.evs.hp = parseInt(value, 10);
+            result.evs!.hp = parseInt(value, 10);
             break;
           case 'evatk':
-            result.evs.atk = parseInt(value, 10);
+            result.evs!.atk = parseInt(value, 10);
             break;
           case 'evdef':
-            result.evs.def = parseInt(value, 10);
+            result.evs!.def = parseInt(value, 10);
             break;
           case 'evspatk':
-            result.evs.spatk = parseInt(value, 10);
+            result.evs!.spatk = parseInt(value, 10);
             break;
           case 'evspdef':
-            result.evs.spdef = parseInt(value, 10);
+            result.evs!.spdef = parseInt(value, 10);
             break;
           case 'evspd':
-            result.evs.spd = parseInt(value, 10);
+            result.evs!.spd = parseInt(value, 10);
             break;
             
           // Handle IVs
           case 'ivhp':
-            result.ivs.hp = parseInt(value, 10);
+            result.ivs!.hp = parseInt(value, 10);
             break;
           case 'ivatk':
-            result.ivs.atk = parseInt(value, 10);
+            result.ivs!.atk = parseInt(value, 10);
             break;
           case 'ivdef':
-            result.ivs.def = parseInt(value, 10);
+            result.ivs!.def = parseInt(value, 10);
             break;
           case 'ivspatk':
-            result.ivs.spatk = parseInt(value, 10);
+            result.ivs!.spatk = parseInt(value, 10);
             break;
           case 'ivspdef':
-            result.ivs.spdef = parseInt(value, 10);
+            result.ivs!.spdef = parseInt(value, 10);
             break;
           case 'ivspd':
-            result.ivs.spd = parseInt(value, 10);
+            result.ivs!.spd = parseInt(value, 10);
             break;
             
           // Handle IV mods
           case 'modhpiv':
-            result.modIvs.hp = parseInt(value, 10);
+            result.modIvs!.hp = parseInt(value, 10);
             break;
           case 'modatkiv':
-            result.modIvs.atk = parseInt(value, 10);
+            result.modIvs!.atk = parseInt(value, 10);
             break;
           case 'moddefiv':
-            result.modIvs.def = parseInt(value, 10);
+            result.modIvs!.def = parseInt(value, 10);
             break;
           case 'modspatkiv':
-            result.modIvs.spatk = parseInt(value, 10);
+            result.modIvs!.spatk = parseInt(value, 10);
             break;
           case 'modspdefiv':
-            result.modIvs.spdef = parseInt(value, 10);
+            result.modIvs!.spdef = parseInt(value, 10);
             break;
           case 'modspdiv':
-            result.modIvs.spd = parseInt(value, 10);
+            result.modIvs!.spd = parseInt(value, 10);
             break;
             
           // Handle EV mods
           case 'modhpev':
-            result.modEvs.hp = parseInt(value, 10);
+            result.modEvs!.hp = parseInt(value, 10);
             break;
           case 'modatkev':
-            result.modEvs.atk = parseInt(value, 10);
+            result.modEvs!.atk = parseInt(value, 10);
             break;
           case 'moddefev':
-            result.modEvs.def = parseInt(value, 10);
+            result.modEvs!.def = parseInt(value, 10);
             break;
           case 'modspatkev':
-            result.modEvs.spatk = parseInt(value, 10);
+            result.modEvs!.spatk = parseInt(value, 10);
             break;
           case 'modspdefev':
-            result.modEvs.spdef = parseInt(value, 10);
+            result.modEvs!.spdef = parseInt(value, 10);
             break;
           case 'modspdiv':
-            result.modEvs.spd = parseInt(value, 10);
+            result.modEvs!.spd = parseInt(value, 10);
             break;
         }
       } 

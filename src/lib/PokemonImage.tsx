@@ -3,7 +3,7 @@ import { formatPokemonSpec, parsePokemonSpec } from "./pokemonSpecParser";
 import { PokemonSprite } from "@/app/smartrotom/pokedex/_components/PokemonSprite";
 import Image from "next/image";
 import { usePokemonStore } from "@/stores/pokemonStore";
-import type { Pokemon } from "@/app/smartrotom/pokedex/_types/pokemon";
+import { Pokemon } from "@/types/Pokemon";
 
 interface PokemonImageProps {
   type?: string;
