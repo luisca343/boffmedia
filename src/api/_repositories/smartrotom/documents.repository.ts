@@ -16,7 +16,7 @@ export interface DocumentDetails {
   title: string;
   content: string;
   type: number;
-  public: number;
+  //public: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,7 +52,7 @@ export class DocumentsRepository {
 
   // ==================== DOCUMENT OPERATIONS ====================
 
-  async findDocumentById(id: number): Promise<Partial<DocumentDetails> | null> {
+  async findDocumentById(id: number): Promise<DocumentDetails | null> {
     const result = await this.db.select({
       id: rotomDocuments.id,
       title: rotomDocuments.title,

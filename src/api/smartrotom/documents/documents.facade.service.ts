@@ -21,7 +21,7 @@ export class DocumentsFacadeService {
 
   // ==================== DOCUMENT MANAGEMENT ====================
 
-  async getDocumentById(id: number): Promise<Partial<DocumentDetails>> {
+  async getDocumentById(id: number): Promise<DocumentDetails> {
     try {
       return await this.documentService.getDocumentById(id);
     } catch (error) {
@@ -30,7 +30,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<Partial<DocumentDetails>> {
+  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<DocumentDetails> {
     try {
       return await this.documentService.createDocument(createDocumentRequest);
     } catch (error) {
@@ -39,7 +39,7 @@ export class DocumentsFacadeService {
     }
   }
 
-  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<Partial<DocumentDetails>> {
+  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<DocumentDetails> {
     try {
       return await this.documentService.updateDocument(id, updateDocumentRequest);
     } catch (error) {

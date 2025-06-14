@@ -21,7 +21,7 @@ export class DocumentService {
     private readonly documentsRepository: DocumentsRepository,
   ) {}
 
-  async getDocumentById(id: number): Promise<Partial<DocumentDetails>> {
+  async getDocumentById(id: number): Promise<DocumentDetails> {
     if (!id || id <= 0) {
       throw new Error('Valid document ID is required');
     }
@@ -42,7 +42,7 @@ export class DocumentService {
     return this.documentsRepository.findUserDocuments(uuid);
   }
 
-  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<Partial<DocumentDetails>> {
+  async createDocument(createDocumentRequest: CreateDocumentRequest): Promise<DocumentDetails> {
     const { title, content, type, public: isPublic } = createDocumentRequest;
 
     if (!title || !content) {
@@ -63,7 +63,7 @@ export class DocumentService {
     return this.getDocumentById(result.insertId);
   }
 
-  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<Partial<DocumentDetails>> {
+  async updateDocument(id: number, updateDocumentRequest: UpdateDocumentRequest): Promise<DocumentDetails> {
     const existingDocument = await this.documentsRepository.findDocumentById(id);
     if (!existingDocument) {
       throw new Error('Document not found');

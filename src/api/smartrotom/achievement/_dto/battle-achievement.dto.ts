@@ -97,14 +97,6 @@ export class BattleAchievementDto {
   @IsNotEmpty()
   @IsBoolean()
   victoria: boolean;
-
-  @ApiProperty({ 
-    description: 'Server identifier',
-    example: '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365'
-  })
-  @IsNotEmpty()
-  @IsString()
-  server: string;
 }
 
 
