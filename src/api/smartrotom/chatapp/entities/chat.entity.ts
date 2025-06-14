@@ -22,7 +22,7 @@ export class ChatMessage {
   content: string;
 
   @ApiProperty({ 
-    example: '2025-06-14T12:00:00.000Z',
+    example: '2025-06-13T23:06:15.000Z',
     description: 'Message creation date'
   })
   createdAt: Date;
@@ -36,56 +36,62 @@ export class Chat {
   id: number;
 
   @ApiProperty({ 
-    example: 'My Group Chat',
+    example: 'Mensajes guardados',
     description: 'Chat name'
   })
   name: string;
 
   @ApiProperty({ 
-    example: 3,
+    example: 1,
     description: 'Chat type (0=public, 1=private, 2=direct, 3=group)'
   })
   type: number;
 
   @ApiProperty({ 
-    example: 'A chat for discussing strategies',
+    example: 'Chat',
     description: 'Chat description'
   })
   description: string;
 
   @ApiProperty({ 
-    example: '/smartrotom/img/apps/chatapp/group_chat.png',
+    example: 'https://crafatar.com/avatars/67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
     description: 'Chat image URL'
   })
   image: string;
 
   @ApiProperty({ 
-    example: '2025-06-14T12:00:00.000Z',
+    example: '2025-06-13T23:06:15.000Z',
     description: 'Chat creation date'
   })
   createdAt: Date;
 
   @ApiProperty({ 
-    example: '2025-06-14T12:00:00.000Z',
+    example: '2025-06-13T23:06:15.000Z',
     description: 'Chat last update date'
   })
   updatedAt: Date;
 
   @ApiProperty({ 
     description: 'Recent messages in the chat',
-    type: [ChatMessage]
+    type: [ChatMessage],
+    example: []
   })
   messages: ChatMessage[];
 
   @ApiProperty({ 
-    example: 3,
+    example: 0,
     description: 'Number of unread messages'
   })
   unread: number;
 
   @ApiProperty({ 
     description: 'Chat members',
-    type: [ChatMember]
+    type: [ChatMember],
+    example: [
+      {
+        "uuid": "67d9b543-5ac9-41e1-a8a5-20d7689e24a4"
+      }
+    ]
   })
   members: ChatMember[];
 }
@@ -104,7 +110,7 @@ export class CreateChatResponse {
   message: string;
 
   @ApiProperty({ 
-    example: 123,
+    example: 1,
     description: 'Created chat ID'
   })
   chatId: number;

@@ -14,7 +14,7 @@ export class RotomMessage {
   text: string;
 
   @ApiProperty({ 
-    example: '2025-06-14T12:00:00.000Z',
+    example: '2025-06-13T23:06:15.000Z',
     description: 'Message creation date'
   })
   date: Date;
@@ -58,7 +58,7 @@ export class MessageDetails {
   type: string;
 
   @ApiProperty({ 
-    example: '2025-06-14T12:00:00.000Z',
+    example: '2025-06-13T23:06:15.000Z',
     description: 'Message creation date'
   })
   createdAt: Date;

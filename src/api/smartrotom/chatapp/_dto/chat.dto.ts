@@ -19,7 +19,7 @@ export class CreateChatDto {
 
   @ApiProperty({ 
     description: 'Array of user UUIDs to add to the chat',
-    example: ['67d9b543-5ac9-41e1-a8a5-20d7689e24a4', '12345678-1234-1234-1234-123456789012']
+    example: ['67d9b543-5ac9-41e1-a8a5-20d7689e24a4', '67d9b543-5ac9-41e1-a8a5-20d7689e24a4']
   })
   @IsArray()
   @IsString({ each: true })
