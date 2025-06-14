@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { GamesRepository } from '../../../_repositories/boffmedia/games.repository';
 import { Game } from '@/_db/schema/Events';
 import { CreateGameDto } from '../dto/create-game.dto';
+import { UpdateEventDto } from '../dto/update-event.dto';
 
 @Injectable()
 export class GamesService {
@@ -28,11 +29,11 @@ export class GamesService {
     return this.getGameById(result.insertId);
   }
 
-  async updateGame(id: number, createGameDto: CreateGameDto): Promise<Game> {
+  async updateGame(id: number, updateEventDto: UpdateEventDto): Promise<Game> {
     const gameData = {
-      title: createGameDto.title,
-      description: createGameDto.description,
-      icon: createGameDto.icon,
+      title: updateEventDto.title,
+      description: updateEventDto.description,
+      icon: updateEventDto.icon,
     };
 
     await this.gamesRepository.update(id, gameData);

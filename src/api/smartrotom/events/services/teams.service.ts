@@ -3,6 +3,8 @@ import { TeamsRepository } from '../../../_repositories/boffmedia/teams.reposito
 import { ParticipantsService } from './participants.service';
 import { EventTeam, EventTeamMember } from '@/_db/schema/Events';
 import { CreateTeamDto } from '../dto/create-team.dto';
+import { TeamMember } from '../entities/team-member.entity';
+import { UpdateTeamDto } from '../dto/update-team.dto';
 
 @Injectable()
 export class TeamsService {
@@ -56,11 +58,11 @@ export class TeamsService {
     return this.getTeamById(teamId);
   }
 
-  async updateTeam(teamId: number, createTeamDto: CreateTeamDto): Promise<EventTeam> {
+  async updateTeam(teamId: number, updateTeamDto: UpdateTeamDto): Promise<EventTeam> {
     const teamData = {
-      name: createTeamDto.name,
-      tag: createTeamDto.tag,
-      icon: createTeamDto.icon,
+      name: updateTeamDto.name,
+      tag: updateTeamDto.tag,
+      icon: updateTeamDto.icon,
     };
 
     await this.teamsRepository.update(teamId, teamData);
@@ -117,10 +119,9 @@ export class TeamsService {
     return { success: true };
   }
 
-  async getTeamMembers(teamId: number): Promise<EventTeamMember[]> {
-    return this.teamsRepository.findTeamMembers(teamId);
-  }
-
+async getTeamMembers(teamId: number): Promise<any[]> {
+  return this.teamsRepository.findTeamMembers(teamId);
+}
   async updateTeamScore(teamId: number): Promise<void> {
     const totalScore = await this.teamsRepository.calculateTeamScore(teamId);
     await this.teamsRepository.updateScore(teamId, totalScore);

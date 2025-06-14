@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AchievementsRepository } from '../../../_repositories/boffmedia/achievements.repository';
 import { Achievement } from '@/_db/schema/Events';
 import { CreateAchievementDto } from '../dto/create-achievement.dto';
+import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 
 @Injectable()
 export class AchievementsService {
@@ -45,16 +46,16 @@ export class AchievementsService {
     return this.getAchievementById(result.insertId);
   }
 
-  async updateAchievement(id: number, createAchievementDto: CreateAchievementDto): Promise<Achievement> {
+  async updateAchievement(id: number, updateAchievementDto: UpdateAchievementDto): Promise<Achievement> {
     const achievementData = {
-      name: createAchievementDto.name,
-      description: createAchievementDto.description,
-      icon: createAchievementDto.icon,
-      maxProgress: createAchievementDto.maxProgress || 1,
-      points: createAchievementDto.points,
-      category: createAchievementDto.category,
-      rarity: createAchievementDto.rarity,
-      order: createAchievementDto.order || 0,
+      name: updateAchievementDto.name,
+      description: updateAchievementDto.description,
+      icon: updateAchievementDto.icon,
+      maxProgress: updateAchievementDto.maxProgress || 1,
+      points: updateAchievementDto.points,
+      category: updateAchievementDto.category,
+      rarity: updateAchievementDto.rarity,
+      order: updateAchievementDto.order || 0,
     };
 
     await this.achievementsRepository.update(id, achievementData);

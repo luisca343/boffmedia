@@ -57,6 +57,7 @@ export class EventsRepository {
         isNull(boffMediaGames.deletedAt)
       ));
       
+      console.log('findById result:', result);
     if (!result.length) return null;
     return result[0];
   }

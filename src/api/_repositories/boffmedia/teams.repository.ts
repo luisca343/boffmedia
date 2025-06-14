@@ -154,13 +154,14 @@ export class TeamsRepository {
     return result[0];
   }
 
-  async findTeamMembers(teamId: number): Promise<EventTeamMember[]> {
-    return this.db.select({
+  async findTeamMembers(teamId: number): Promise<any[]> {
+    const result = await this.db.select({
       teamId: boffMediaEventTeamMembers.teamId,
       participantId: boffMediaEventTeamMembers.participantId,
-      participantName: boffMediaParticipants.nickname,
-      participantAvatar: boffMediaParticipants.avatar,
       userId: boffMediaParticipants.userId,
+      username: boffMediaParticipants.nickname,
+      displayName: boffMediaParticipants.nickname,
+      avatar: boffMediaParticipants.avatar,
       role: boffMediaEventTeamMembers.role,
       joinedAt: boffMediaEventTeamMembers.joinedAt,
       updatedAt: boffMediaEventTeamMembers.updatedAt
@@ -171,6 +172,19 @@ export class TeamsRepository {
       eq(boffMediaParticipants.id, boffMediaEventTeamMembers.participantId)
     )
     .where(eq(boffMediaEventTeamMembers.teamId, teamId));
+
+    // Ensure all required fields are present
+    return result.map(member => ({
+      teamId: member.teamId,
+      participantId: member.participantId,
+      userId: member.userId || 0,
+      username: member.username || '',
+      displayName: member.displayName || '',
+      avatar: member.avatar,
+      role: member.role,
+      joinedAt: member.joinedAt,
+      updatedAt: member.updatedAt
+    }));
   }
 
   async findParticipantTeamInEvent(participantId: number, eventId: number): Promise<EventTeamMember[]> {

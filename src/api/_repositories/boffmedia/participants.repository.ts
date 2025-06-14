@@ -59,10 +59,25 @@ export class ParticipantsRepository {
     return result[0];
   }
 
-  async findParticipantAchievements(participantId: number): Promise<(Achievement & { progress: number })[]> {
-    return this.db.select({
-      achievement: boffMediaAchievements,
-      progress: boffMediaParticipantProgress.currentProgress
+  async findParticipantAchievements(participantId: number): Promise<any[]> {
+    const result = await this.db.select({
+      achievement: {
+        id: boffMediaAchievements.id,
+        name: boffMediaAchievements.name,
+        description: boffMediaAchievements.description,
+        icon: boffMediaAchievements.icon,
+        maxProgress: boffMediaAchievements.maxProgress,
+        points: boffMediaAchievements.points,
+        itemType: boffMediaAchievements.itemType,
+        category: boffMediaAchievements.category,
+        rarity: boffMediaAchievements.rarity,
+        order: boffMediaAchievements.order,
+        eventId: boffMediaAchievements.eventId
+      },
+      progress: boffMediaParticipantProgress.currentProgress,
+      isCompleted: boffMediaParticipantProgress.isCompleted,
+      completedAt: boffMediaParticipantProgress.completedAt,
+      lastUpdated: boffMediaParticipantProgress.lastUpdated
     })
     .from(boffMediaAchievements)
     .leftJoin(
@@ -71,7 +86,9 @@ export class ParticipantsRepository {
         eq(boffMediaParticipantProgress.achievementId, boffMediaAchievements.id),
         eq(boffMediaParticipantProgress.participantId, participantId)
       )
-    ) as any;
+    );
+
+    return result;
   }
 
   async findEventParticipation(participantId: number, eventId: number): Promise<EventParticipant> {

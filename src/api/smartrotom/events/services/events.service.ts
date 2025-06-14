@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { EventsRepository } from '../../../_repositories/boffmedia/events.repository';
 import { Event } from '@/_db/schema/Events';
 import { CreateEventDto } from '../dto/create-event.dto';
+import { UpdateEventDto } from '../dto/update-event.dto';
 
 @Injectable()
 export class EventsService {
@@ -30,7 +31,7 @@ export class EventsService {
       parentId: createEventDto.parentId || null,
       title: createEventDto.title,
       description: createEventDto.description,
-      game: createEventDto.gameId,
+      gameId: createEventDto.gameId,
       startDate: new Date(createEventDto.startDate),
       endDate: createEventDto.endDate ? new Date(createEventDto.endDate) : null,
       visibility: createEventDto.visibility,
@@ -43,18 +44,18 @@ export class EventsService {
     return this.getEventById(result.insertId);
   }
 
-  async updateEvent(id: number, createEventDto: CreateEventDto): Promise<Event> {
+  async updateEvent(id: number, updateEventDto: UpdateEventDto): Promise<Event> {
     const eventData = {
-      parentId: createEventDto.parentId || null,
-      title: createEventDto.title,
-      description: createEventDto.description,
-      game: createEventDto.gameId,
-      startDate: new Date(createEventDto.startDate),
-      endDate: createEventDto.endDate ? new Date(createEventDto.endDate) : null,
-      visibility: createEventDto.visibility,
-      icon: createEventDto.icon,
-      banner: createEventDto.banner,
-      type: createEventDto.type,
+      parentId: updateEventDto.parentId || null,
+      title: updateEventDto.title,
+      description: updateEventDto.description,
+      gameId: updateEventDto.gameId,
+      startDate: new Date(updateEventDto.startDate),
+      endDate: updateEventDto.endDate ? new Date(updateEventDto.endDate) : null,
+      visibility: updateEventDto.visibility,
+      icon: updateEventDto.icon,
+      banner: updateEventDto.banner,
+      type: updateEventDto.type,
     };
 
     await this.eventsRepository.update(id, eventData);

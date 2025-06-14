@@ -42,8 +42,36 @@ export class ParticipantsService {
     } as Participant;
   }
 
-  async getParticipantAchievements(participantId: number): Promise<(Achievement & { progress: number })[]> {
-    return this.participantsRepository.findParticipantAchievements(participantId);
+  async getParticipantAchievements(participantId: number): Promise<any[]> {
+    // Get the progress data from repository
+    const progressData = await this.participantsRepository.findParticipantAchievements(participantId);
+    
+    // Transform to match AchievementWithProgress entity
+    return progressData.map(achievement => ({
+      // Achievement properties
+      id: achievement.id,
+      eventId: achievement.eventId || 0,
+      name: achievement.name,
+      description: achievement.description,
+      icon: achievement.icon,
+      points: achievement.points,
+      maxProgress: achievement.maxProgress,
+      itemType: achievement.itemType,
+      category: achievement.category,
+      rarity: achievement.rarity,
+      order: achievement.order || 0,
+      active: 1,
+      eventName: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+      
+      // Progress properties
+      currentProgress: achievement.progress || 0,
+      isCompleted: 0,
+      completedAt: null,
+      lastUpdated: new Date()
+    }));
   }
 
   async joinEvent(eventId: number, participantId: number, joinEventDto: JoinEventDto): Promise<EventParticipant> {
