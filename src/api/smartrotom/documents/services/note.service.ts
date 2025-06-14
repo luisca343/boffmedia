@@ -25,7 +25,7 @@ export class NoteService {
     // Check if association already exists
     const existingAssociation = await this.documentsRepository.findDocumentUserAssociation(documentId, uuid);
     if (existingAssociation) {
-      return { success: true }; // Already associated
+      return { success: true }; 
     }
 
     await this.documentsRepository.addDocumentToUser(documentId, uuid);
