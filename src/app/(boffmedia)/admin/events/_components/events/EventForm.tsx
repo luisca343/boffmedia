@@ -12,7 +12,7 @@ import type { Event } from "@/types/events"
 
 const eventSchema = z.object({
   id: z.number().optional(),
-  parentId: z.number().optional(),
+  parentId: z.number().default(0),
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
   icon: z.string().optional(),
@@ -46,12 +46,11 @@ export function EventForm({
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { games, isLoading: isLoadingGames } = useGetGames()
   
-  // Filter out events that can be parents (only server type events)
   const parentEvents =
     events?.filter(
       (event) =>
         event.type === "server" &&
-        event.id !== defaultValues?.id && // Can't be parent of itself
+        event.id !== defaultValues?.id && 
         !event.parentId, // Only top-level servers can be parents
     ) || []
 
@@ -59,7 +58,7 @@ export function EventForm({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       ...defaultValues,
-      parentId: parentEvent?.id || defaultValues?.parentId,
+      parentId: parentEvent?.id || (defaultValues?.parentId ?? 0),
       type: defaultValues?.type || (parentEvent ? "event" : "server"),
     },
   })
@@ -91,7 +90,7 @@ export function EventForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="bg-surface-800 border-surface-700">
-                    <SelectItem value="-1">Ninguno (Evento independiente)</SelectItem>
+                    <SelectItem value="0">Ninguno (Evento independiente)</SelectItem>
                     {parentEvents.map((event) => (
                       <SelectItem key={event.id} value={event.id.toString()}>
                         {event.title}

@@ -1,69 +1,275 @@
-import { type ApiResponse, apiGET, apiPOST, apiDELETE, apiPUT, apiPATCH } from "@/services/boffAPI"
-import { CreateEventDto } from "@/types/dto/create-event.dto"
-import { CreateGameDto } from "@/types/dto/create-game.dto"
-import { CreateAchievementDto } from "@/types/dto/create-achievement.dto"
-import { CreateTeamDto } from "@/types/dto/create-team.dto"
-import { UpdateProgressDto } from "@/types/dto/update-progress.dto"
-import { Event, Achievement, EventTeam, Game, LeaderboardEntry, TeamLeaderboardEntry, UserProgress } from "@/types/events"
-import { SuccessResponse } from "@/types"
+import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
+import type {
+  CreateEventDto,
+  UpdateEventDto,
+  CreateGameDto,
+  UpdateGameDto,
+  CreateAchievementDto,
+  UpdateAchievementDto,
+  CreateTeamDto,
+  UpdateTeamDto,
+  JoinEventDto,
+  UpdateProgressDto,
+  Event,
+  Game,
+  Achievement,
+  AchievementWithProgress,
+  Team,
+  TeamMember,
+  Participant,
+  LeaderboardEntry,
+  TeamLeaderboardEntry,
+} from '@/generated/api';
+import { SuccessResponse } from '@/types';
 
-interface JoinEventDto {
-  userId: number;
-  nickname?: string;
-  avatar?: string;
-  comment?: string;
-}
-
-// Add EventParticipant interface if not defined elsewhere
-interface EventParticipant {
-  id: number;
-  eventId: number;
-  userId: number;
-  nickname?: string;
-  avatar?: string;
-  comment?: string;
-  createdAt: string;
-  updatedAt: string;
+// Additional DTOs for specific operations
+interface JoinTeamDto {
+  participantId: number;
 }
 
 export const eventsService = {
-  // Event Management
-  getEvents: () => apiGET<Event[]>("/boffmedia/events"),
+  // ==================== EVENT OPERATIONS ====================
+  
+  /**
+   * Get all events
+   */
+  getEvents: () => apiGET<Event[]>('/boffmedia/events'),
+  
+  /**
+   * Get a specific event by ID
+   */
   getEvent: (id: number) => apiGET<Event>(`/boffmedia/events/event/${id}`),
-  createEvent: (createEventDto: CreateEventDto) => apiPOST<Event>("/boffmedia/events/event", createEventDto),
-  updateEvent: (id: number, createEventDto: CreateEventDto) => apiPATCH<ApiResponse>(`/boffmedia/events/event/${id}`, createEventDto),
+  
+  /**
+   * Create a new event
+   */
+  createEvent: (data: CreateEventDto) => apiPOST<Event>('/boffmedia/events/event', data),
+  
+  /**
+   * Update an existing event
+   */
+  updateEvent: (id: number, data: UpdateEventDto) => 
+    apiPATCH<Event>(`/boffmedia/events/event/${id}`, data),
+  
+  /**
+   * Delete an event
+   */
+  deleteEvent: (id: number) => apiDELETE<SuccessResponse>(`/boffmedia/events/event/${id}`),
 
-  // Event Participation
-  joinEvent: (eventId: number, joinEventDto: JoinEventDto) => apiPOST<ApiResponse>(`/boffmedia/events/${eventId}/join`, joinEventDto),
-  getEventParticipants: (eventId: number) => apiGET<EventParticipant[]>(`/boffmedia/events/${eventId}/participants`),
-
-  // Game Management
-  getGames: () => apiGET<Game[]>("/boffmedia/events/games"),
+  // ==================== GAME OPERATIONS ====================
+  
+  /**
+   * Get all games
+   */
+  getGames: () => apiGET<Game[]>('/boffmedia/events/games'),
+  
+  /**
+   * Get a specific game by ID
+   */
   getGame: (id: number) => apiGET<Game>(`/boffmedia/events/games/${id}`),
-  createGame: (game: CreateGameDto) => apiPOST<SuccessResponse>("/boffmedia/events/games", game),
-  updateGame: (id: number, game: Game) => apiPATCH<CreateGameDto>(`/boffmedia/events/games/${id}`, game),
+  
+  /**
+   * Create a new game
+   */
+  createGame: (data: CreateGameDto) => apiPOST<Game>('/boffmedia/events/games', data),
+  
+  /**
+   * Update an existing game
+   */
+  updateGame: (id: number, data: UpdateGameDto) => 
+    apiPATCH<Game>(`/boffmedia/events/games/${id}`, data),
+  
+  /**
+   * Delete a game
+   */
+  deleteGame: (id: number) => apiDELETE<SuccessResponse>(`/boffmedia/events/games/${id}`),
 
-  // Team Management
-  getTeams: () => apiGET<EventTeam[]>("/boffmedia/events/teams"),
-  createTeam: (eventId: number, createTeamDto: CreateTeamDto) => apiPOST<EventTeam>(`/boffmedia/events/${eventId}/teams`, createTeamDto),
-  updateTeam: (eventId: number, teamId: number, createTeamDto: CreateTeamDto) => apiPATCH<ApiResponse>(`/boffmedia/events/${eventId}/teams/${teamId}`, createTeamDto),
-  getEventTeams: (eventId: number) => apiGET<EventTeam[]>(`/boffmedia/events/${eventId}/teams`),
-  joinTeam: (eventId: number, teamId: number, participantId: number) => apiPOST<ApiResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/join`, { participantId }),
-  leaveTeam: (eventId: number, teamId: number, participantId: number) => apiDELETE<ApiResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/members/${participantId}`),
+  // ==================== ACHIEVEMENT OPERATIONS ====================
+  
+  /**
+   * Get all achievements
+   */
+  getAchievements: () => apiGET<Achievement[]>('/boffmedia/events/achievements'),
+  
+  /**
+   * Get all achievements for a specific event
+   */
+  getEventAchievements: (eventId: number) => 
+    apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`),
+  
+  /**
+   * Create a new achievement for an event
+   */
+  createAchievement: (eventId: number, data: CreateAchievementDto) => 
+    apiPOST<Achievement>(`/boffmedia/events/${eventId}/achievements`, data),
+  
+  /**
+   * Update an existing achievement
+   */
+  updateAchievement: (eventId: number, achievementId: number, data: UpdateAchievementDto) => 
+    apiPATCH<Achievement>(`/boffmedia/events/${eventId}/achievements/${achievementId}`, data),
 
-  // Achievement Management
-  getAchievements: () => apiGET<Achievement[]>("/boffmedia/events/achievements"),
-  createAchievement: (eventId: number, createAchievementDto: CreateAchievementDto) => apiPOST<Achievement>(`/boffmedia/events/${eventId}/achievements`, createAchievementDto),
-  updateAchievement: (eventId: number, achievementId: number, createAchievementDto: CreateAchievementDto) => apiPATCH<ApiResponse>(`/boffmedia/events/${eventId}/achievements/${achievementId}`, createAchievementDto),
-  getEventAchievements: (eventId: number) => apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`),
-  updateProgress: (eventId: number, updateProgressDto: UpdateProgressDto) => apiPATCH<ApiResponse>(`/boffmedia/events/${eventId}/progress`, updateProgressDto),
+  // ==================== TEAM OPERATIONS ====================
+  
+  /**
+   * Get all teams
+   */
+  getTeams: () => apiGET<Team[]>('/boffmedia/events/teams'),
+  
+  /**
+   * Get all teams for a specific event
+   */
+  getEventTeams: (eventId: number) => apiGET<Team[]>(`/boffmedia/events/${eventId}/teams`),
+  
+  /**
+   * Get a specific team by ID
+   */
+  getTeam: (teamId: number) => apiGET<Team>(`/boffmedia/events/teams/${teamId}`),
+  
+  /**
+   * Get team members
+   */
+  getTeamMembers: (teamId: number) => apiGET<TeamMember[]>(`/boffmedia/events/teams/${teamId}/members`),
+  
+  /**
+   * Create a new team for an event
+   */
+  createTeam: (eventId: number, data: CreateTeamDto) => 
+    apiPOST<Team>(`/boffmedia/events/${eventId}/teams`, data),
+  
+  /**
+   * Update an existing team
+   */
+  updateTeam: (eventId: number, teamId: number, data: UpdateTeamDto) => 
+    apiPATCH<Team>(`/boffmedia/events/${eventId}/teams/${teamId}`, data),
+  
+  /**
+   * Join a team
+   */
+  joinTeam: (eventId: number, teamId: number, data: JoinTeamDto) => 
+    apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/join`, data),
+  
+  /**
+   * Leave a team
+   */
+  leaveTeam: (eventId: number, teamId: number, userId: number) => 
+    apiDELETE<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/members/${userId}`),
 
-  // Progress Management
-  getParticipantProgress: (participantId: number) => apiGET<UserProgress[]>(`/boffmedia/events/participants/${participantId}/progress`),
-  getParticipantProgressByEvent: (eventId: number, participantId: number) => apiGET<UserProgress[]>(`/boffmedia/events/${eventId}/participants/${participantId}/progress`),
+  // ==================== PARTICIPANT OPERATIONS ====================
+  
+  /**
+   * Join an event
+   */
+  joinEvent: (eventId: number, data: JoinEventDto) => 
+    apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/join`, data),
+  
+  /**
+   * Get all participants for an event
+   */
+  getEventParticipants: (eventId: number) => 
+    apiGET<Participant[]>(`/boffmedia/events/${eventId}/participants`),
 
-  // Leaderboards
-  getLeaderboards: () => apiGET<LeaderboardEntry[]>("/boffmedia/events/leaderboards"),
-  getLeaderboard: (eventId: number) => apiGET<LeaderboardEntry[]>(`/boffmedia/events/${eventId}/leaderboard`),
-  getTeamLeaderboard: (eventId: number) => apiGET<TeamLeaderboardEntry[]>(`/boffmedia/events/${eventId}/teams/leaderboard`),
-}
+  // ==================== PROGRESS OPERATIONS ====================
+  
+  /**
+   * Get all achievement progress for a participant
+   */
+  getParticipantProgress: (participantId: number) => 
+    apiGET<AchievementWithProgress[]>(`/boffmedia/events/participants/${participantId}/progress`),
+  
+  /**
+   * Get achievement progress for a participant in a specific event
+   */
+  getParticipantProgressByEvent: (eventId: number, participantId: number) => 
+    apiGET<AchievementWithProgress[]>(`/boffmedia/events/${eventId}/participants/${participantId}/progress`),
+  
+  /**
+   * Update progress for an achievement
+   */
+  updateProgress: (eventId: number, data: UpdateProgressDto) => 
+    apiPUT<SuccessResponse>(`/boffmedia/events/${eventId}/progress`, data),
+
+  // ==================== LEADERBOARD OPERATIONS ====================
+  
+  /**
+   * Get all leaderboards
+   */
+  getLeaderboards: () => apiGET<LeaderboardEntry[]>('/boffmedia/events/leaderboards'),
+  
+  /**
+   * Get event leaderboard
+   */
+  getLeaderboard: (eventId: number) => 
+    apiGET<LeaderboardEntry[]>(`/boffmedia/events/${eventId}/leaderboard`),
+  
+  /**
+   * Get team leaderboard for an event
+   */
+  getTeamLeaderboard: (eventId: number) => 
+    apiGET<TeamLeaderboardEntry[]>(`/boffmedia/events/${eventId}/teams/leaderboard`),
+
+  // ==================== CONVENIENCE METHODS ====================
+  
+  /**
+   * Get event with achievements
+   */
+  getEventWithAchievements: async (eventId: number) => {
+    const [event, achievements] = await Promise.all([
+      eventsService.getEvent(eventId),
+      eventsService.getEventAchievements(eventId)
+    ]);
+    return { event, achievements };
+  },
+  
+  /**
+   * Get event with teams and participants
+   */
+  getEventDetails: async (eventId: number) => {
+    const [event, teams, participants] = await Promise.all([
+      eventsService.getEvent(eventId),
+      eventsService.getEventTeams(eventId),
+      eventsService.getEventParticipants(eventId)
+    ]);
+    return { event, teams, participants };
+  },
+  
+  /**
+   * Get full leaderboard data for an event
+   */
+  getEventLeaderboards: async (eventId: number) => {
+    const [participantLeaderboard, teamLeaderboard] = await Promise.all([
+      eventsService.getLeaderboard(eventId),
+      eventsService.getTeamLeaderboard(eventId)
+    ]);
+    return { participantLeaderboard, teamLeaderboard };
+  },
+  
+  /**
+   * Get participant's complete event data
+   */
+  getParticipantEventData: async (eventId: number, participantId: number) => {
+    const [progress, event, achievements] = await Promise.all([
+      eventsService.getParticipantProgressByEvent(eventId, participantId),
+      eventsService.getEvent(eventId),
+      eventsService.getEventAchievements(eventId)
+    ]);
+    return { progress, event, achievements };
+  },
+
+  // ==================== LEGACY METHODS ====================
+  
+  /**
+   * Legacy method: Create event (alias)
+   */
+  createNewEvent: (data: CreateEventDto) => eventsService.createEvent(data),
+  
+  /**
+   * Legacy method: Update event (alias)
+   */
+  updateEventData: (id: number, data: UpdateEventDto) => eventsService.updateEvent(id, data),
+  
+  /**
+   * Legacy method: Get user progress (alias)
+   */
+  getUserProgress: (participantId: number) => eventsService.getParticipantProgress(participantId),
+};

@@ -17,13 +17,13 @@ interface EventEditDialogProps {
 export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+
   const formatDateForInput = (dateString: string) => {
     return dateString?.split('.')[0] || dateString?.split('T')[0] || ""
   }
 
-  console.log("EventEditDialog", event)
-
   const formDefaultValues = {
+    id: event.id,
     title: event.title,
     parentId: event.parentId,
     description: event.description || undefined,

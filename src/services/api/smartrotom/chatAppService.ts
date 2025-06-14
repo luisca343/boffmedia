@@ -57,7 +57,7 @@ export const chatAppService = {
    * Delete a message
    */
   deleteMessage: (messageId: number, data: DeleteMessageDto) => 
-    rotomDELETE<MessageResponse>(`/chatapp/message/${messageId}`, data),
+    rotomPOST<MessageResponse>(`/chatapp/message/${messageId}`, data),
 
   /**
    * Mark a message as read
@@ -75,7 +75,7 @@ export const chatAppService = {
    * Remove a member from a group chat
    */
   removeMemberFromGroup: (groupId: number, uuid: string, data: RemoveMemberDto) => 
-    rotomDELETE<MessageResponse>(`/chatapp/group/${groupId}/member/${uuid}`, data),
+    rotomPOST<MessageResponse>(`/chatapp/group/${groupId}/member/${uuid}`, data),
 
   /**
    * Initiate a call in a chat
