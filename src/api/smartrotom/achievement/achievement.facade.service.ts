@@ -4,7 +4,7 @@ import { ReplayService } from './services/replay.service';
 import { BattleAchievementService, BattleAchievementRequest } from './services/battle-achievement.service';
 import { AchievementDetails, ReplayDetails } from '@repositories/smartrotom/achievement.repository';
 import { UserAchievement } from './entities/achievement.entity';
-import { AchievementStatusResponse } from './_dto/achievement.dto';
+import { AchievementStatusResponse } from './dto/achievement.dto';
 
 @Injectable()
 export class AchievementFacadeService {

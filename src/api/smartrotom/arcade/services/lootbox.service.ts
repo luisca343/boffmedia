@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../_dto/lottbox.dto';
+import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../dto/lottbox.dto';
 import { lootboxConfig, getRarityFromWeight } from '../_config/lootboxConfig';
 import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
 

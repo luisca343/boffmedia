@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Param, HttpStatus, UseInterceptors, ParseI
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from "@nestjs/swagger";
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { AchievementFacadeService } from "./achievement.facade.service";
-import { GetAchievementsDto, GetAchievementByIdDto, AchievementStatusResponse } from './_dto/achievement.dto';
-import { BattleAchievementDto, BattleAchievementResponse } from './_dto/battle-achievement.dto';
-import { GetReplayDto } from './_dto/replay.dto';
+import { GetAchievementsDto, GetAchievementByIdDto, AchievementStatusResponse } from './dto/achievement.dto';
+import { BattleAchievementDto, BattleAchievementResponse } from './dto/battle-achievement.dto';
+import { GetReplayDto } from './dto/replay.dto';
 import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
 

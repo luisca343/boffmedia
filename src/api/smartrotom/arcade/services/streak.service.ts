@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
-import { ArcadeStreak, DailyRewardItem } from '../_dto/arcade-streak.dto';
+import { ArcadeStreak, DailyRewardItem } from '../dto/arcade-streak.dto';
 import { DailyRewardsConfig } from '@api/smartrotom/_main/_config/daily-rewards.config';
 
 @Injectable()

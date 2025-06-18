@@ -2,10 +2,10 @@ import { Controller, Get, HttpStatus, Param, Post, Body, Query, UseInterceptors 
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ArcadeFacadeService } from './arcade.facade.service';
-import { OpenLootBoxDto, OpenLootBoxResponseDto } from './_dto/lottbox.dto';
-import { GetStreakDto, ClaimRewardDto, ArcadeStreak, ClaimRewardResponse } from './_dto/arcade-streak.dto';
-import { GetInventoryDto, AddInventoryItemDto, ConsumeInventoryItemDto, ClaimInventoryItemsDto } from './_dto/inventory.dto';
-import { GiveLootboxDto } from './_dto/lootbox-management.dto';
+import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
+import { GetStreakDto, ClaimRewardDto, ArcadeStreak, ClaimRewardResponse } from './dto/arcade-streak.dto';
+import { GetInventoryDto, AddInventoryItemDto, ConsumeInventoryItemDto, ClaimInventoryItemsDto } from './dto/inventory.dto';
+import { GiveLootboxDto } from './dto/lootbox-management.dto';
 import { InventoryResponse } from './entities/inventory-item.entity';
 import { LootboxConfigResponse } from './entities/lootbox.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
