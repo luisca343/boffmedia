@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { AppsService } from './apps.service';
-import { AppsRepository } from '@api/_repositories/smartrotom/apps.repository';
+import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
 import { CreateAppDto } from '../dto/create-app.dto';
 import { UpdateAppDto } from '../dto/update-app.dto';
 

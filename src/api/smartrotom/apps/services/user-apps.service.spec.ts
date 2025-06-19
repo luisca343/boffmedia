@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
 import { UserAppsService } from './user-apps.service';
-import { AppsRepository } from '@api/_repositories/smartrotom/apps.repository';
+import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
 
 describe('UserAppsService', () => {
   let service: UserAppsService;

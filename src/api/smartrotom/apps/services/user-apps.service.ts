@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
-import { AppsRepository } from '@api/_repositories/smartrotom/apps.repository';
+import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 
 @Injectable()
