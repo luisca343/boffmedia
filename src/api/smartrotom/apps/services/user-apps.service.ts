@@ -1,54 +1,53 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
-import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
+import { Injectable, NotFoundException, ConflictException, BadRequestException, Inject } from '@nestjs/common';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';
+import { IUserAppsRepository } from '../repositories/interfaces/user-apps-repository.interface';
+import { IAppsRepository } from '../repositories/interfaces/apps-repository.interface';
+import { APPS_REPOSITORY_TOKEN, USER_APPS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Injectable()
 export class UserAppsService {
   constructor(
-    private readonly appsRepository: AppsRepository,
+    @Inject(USER_APPS_REPOSITORY_TOKEN)
+    private readonly userAppsRepository: IUserAppsRepository,
+    @Inject(APPS_REPOSITORY_TOKEN)
+    private readonly appsRepository: IAppsRepository,
   ) {}
 
   async getAppsForPlayer(uuid: string): Promise<SmartRotomApp[]> {
-    if (!uuid) {
-      return [];
-    }
-    return this.appsRepository.getAppsForPlayer(uuid);
+    this.validateUuid(uuid);
+    return this.userAppsRepository.getAppsForPlayer(uuid);
   }
 
   async addAppToPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
-    if (!uuid || !appId) {
-      throw new BadRequestException('Invalid uuid or appId');
-    }
+    this.validateUuid(uuid);
+    this.validateAppId(appId);
 
     // Check if the app exists and is active
-    const app = await this.appsRepository.findActiveApp(appId);
+    const app = await this.appsRepository.findById(appId);
     if (!app) {
-      throw new NotFoundException('App not found or already active');
+      throw new NotFoundException('App not found');
+    }
+
+    if (app.active !== 1) {
+      throw new BadRequestException('App is not active');
     }
 
     // Check if the app is already in the player's list
-    const existingUserApp = await this.appsRepository.findUserApp(uuid, appId);
+    const existingUserApp = await this.userAppsRepository.findUserApp(uuid, appId);
     if (existingUserApp) {
       throw new ConflictException('App already added to player');
     }
 
-    // Add the app to the player
-    await this.appsRepository.addUserApp({
-      uuid,
-      appId,
-      order: 999,
-    });
-
+    await this.userAppsRepository.addUserApp(uuid, appId);
     return { success: true };
   }
 
   async removeAppFromPlayer(uuid: string, appId: number): Promise<{ success: boolean }> {
-    if (!uuid || !appId) {
-      throw new BadRequestException('Invalid uuid or appId');
-    }
+    this.validateUuid(uuid);
+    this.validateAppId(appId);
 
-    const result = await this.appsRepository.removeUserApp(uuid, appId);
-    if (result.affectedRows === 0) {
+    const removed = await this.userAppsRepository.removeUserApp(uuid, appId);
+    if (!removed) {
       throw new NotFoundException("App not found in player's list");
     }
 
@@ -59,12 +58,14 @@ export class UserAppsService {
     order: { id: number | string; order: number }[], 
     uuid: string
   ): Promise<{ success: boolean }> {
-    if (!uuid || !order?.length) {
-      throw new BadRequestException('Invalid uuid or order data');
+    this.validateUuid(uuid);
+    
+    if (!order?.length) {
+      throw new BadRequestException('Order data is required');
     }
 
     // Get existing apps for the player
-    const existingApps = await this.appsRepository.findUserApps(uuid);
+    const existingApps = await this.userAppsRepository.findByPlayerUuid(uuid);
     const existingAppIds = new Set(existingApps.map(app => app.appId));
 
     // Filter out any apps that are not in the existing set
@@ -72,17 +73,25 @@ export class UserAppsService {
 
     // Update the order of existing apps
     for (const app of validOrder) {
-      await this.appsRepository.updateUserAppOrder(
-        uuid, 
-        Number(app.id), 
-        app.order
-      );
+      await this.userAppsRepository.updateOrder(uuid, Number(app.id), app.order);
     }
 
     // Reset order for apps not in the valid order list
     const validAppIds = validOrder.map(app => Number(app.id));
-    await this.appsRepository.resetUserAppOrder(uuid, validAppIds);
+    await this.userAppsRepository.resetOrderExcept(uuid, validAppIds);
 
     return { success: true };
+  }
+
+  private validateUuid(uuid: string): void {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+  }
+
+  private validateAppId(appId: number): void {
+    if (!appId || appId <= 0) {
+      throw new BadRequestException('Valid App ID is required');
+    }
   }
 }

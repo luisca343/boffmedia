@@ -66,6 +66,7 @@ export class AppsController {
   })
   @ApiBody({ type: GetPlayerAppsDto })
   async getForPlayer(@Body() { uuid }: GetPlayerAppsDto): Promise<App[]> {
+    console.log('Fetching apps for player:', uuid);
     return this.appsFacadeService.getAppsForPlayer(uuid);
   }
 

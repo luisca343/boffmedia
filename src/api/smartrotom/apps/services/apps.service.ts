@@ -1,13 +1,15 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
-import { AppsRepository } from '@api/smartrotom/apps/repositories/apps.repository';
+import { Injectable, NotFoundException, ConflictException, Inject } from '@nestjs/common';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 import { CreateAppDto } from '../dto/create-app.dto';
 import { UpdateAppDto } from '../dto/update-app.dto';
+import { IAppsRepository } from '../repositories/interfaces/apps-repository.interface';
+import { APPS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Injectable()
 export class AppsService {
   constructor(
-    private readonly appsRepository: AppsRepository,
+    @Inject(APPS_REPOSITORY_TOKEN)
+    private readonly appsRepository: IAppsRepository,
   ) {}
 
   async getAllApps(): Promise<SmartRotomApp[]> {
@@ -23,35 +25,42 @@ export class AppsService {
   }
 
   async createApp(createAppDto: CreateAppDto): Promise<SmartRotomApp> {
-    const result = await this.appsRepository.create(createAppDto);
-    return this.getAppById(result.insertId);
+    // Check for duplicate URL if provided
+    if (createAppDto.url) {
+      const existingApp = await this.appsRepository.findByUrl(createAppDto.url);
+      if (existingApp) {
+        throw new ConflictException(`App with URL '${createAppDto.url}' already exists`);
+      }
+    }
+
+    return this.appsRepository.create(createAppDto);
   }
 
   async updateApp(id: number, updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
     const existingApp = await this.getAppById(id);
-    if (!existingApp) {
-      throw new NotFoundException(`App with ID ${id} not found`);
+
+    // Check for duplicate URL if updating URL
+    if (updateAppDto.url && updateAppDto.url !== existingApp.url) {
+      const duplicateApp = await this.appsRepository.findByUrl(updateAppDto.url);
+      if (duplicateApp && duplicateApp.id !== id) {
+        throw new ConflictException(`App with URL '${updateAppDto.url}' already exists`);
+      }
     }
 
-    await this.appsRepository.update(id, updateAppDto);
-    return this.getAppById(id);
+    return this.appsRepository.update(id, updateAppDto);
   }
 
   async deleteApp(id: number): Promise<{ success: boolean }> {
-    const result = await this.appsRepository.delete(id);
-    if (result.affectedRows === 0) {
+    const exists = await this.appsRepository.exists(id);
+    if (!exists) {
       throw new NotFoundException(`App with ID ${id} not found`);
     }
-    return { success: true };
+
+    const deleted = await this.appsRepository.delete(id);
+    return { success: deleted };
   }
 
-  async validateAppExists(appId: number): Promise<boolean> {
-    const app = await this.appsRepository.findById(appId);
-    return !!app;
-  }
-
-  async validateActiveApp(appId: number): Promise<boolean> {
-    const app = await this.appsRepository.findActiveApp(appId);
-    return !!app;
+  async getActiveApps(): Promise<SmartRotomApp[]> {
+    return this.appsRepository.findActiveApps();
   }
 }
