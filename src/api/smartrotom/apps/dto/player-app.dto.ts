@@ -1,7 +1,8 @@
+import { BaseDto } from '@api/_shared/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsUUID, IsString, Min } from 'class-validator';
 
-export class PlayerAppDto {
+export class PlayerAppDto extends BaseDto {
   @ApiProperty({ 
     description: 'The id of the app',
     example: 12

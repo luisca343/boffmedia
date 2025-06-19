@@ -50,6 +50,7 @@ export class AppsController {
   })
   @ApiBody({ type: OrderAppDto })
   async order(@Body() orderDto: OrderAppDto): Promise<SuccessResponse> {
+    console.log('Ordering apps with data:', orderDto);
     const result = await this.appsFacadeService.orderApps(orderDto.order, orderDto.uuid);
     return {
       success: result.success,
