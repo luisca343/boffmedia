@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsArray, ValidateNested, IsNumber, ValidateBy, ValidationArguments, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
+import { BaseDto } from '@api/_shared/dto/base.dto';
 
 // Custom validator for number or string
 const IsNumberOrString = () => {
@@ -17,7 +18,7 @@ const IsNumberOrString = () => {
   });
 };
 
-class OrderItemDto {
+class OrderItemDto extends BaseDto {
   @ApiProperty({ 
     description: 'App ID',
     example: 12
@@ -33,7 +34,7 @@ class OrderItemDto {
   order: number;
 }
 
-export class OrderAppDto {
+export class OrderAppDto extends BaseDto{
   @ApiProperty({ 
     description: 'Player UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'

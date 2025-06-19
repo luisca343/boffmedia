@@ -2,11 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { HttpStatus, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
 import { AppsController } from './apps.controller';
 import { AppsFacadeService } from './apps.facade.service';
-import { CreateAppDto } from './dto/create-app.dto';
-import { UpdateAppDto } from './dto/update-app.dto';
-import { OrderAppDto } from './dto/order-apps.dto';
-import { PlayerAppDto } from './dto/player-app.dto';
-import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
+import { CreateAppDto } from './dto/requests/create-app.dto';
+import { UpdateAppDto } from './dto/requests/update-app.dto';
+import { OrderAppDto } from './dto/requests/order-apps.dto';
+import { PlayerAppDto } from './dto/requests/player-app.dto';
+import { GetPlayerAppsDto } from './dto/requests/get-player-apps.dto';
 import { App } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 

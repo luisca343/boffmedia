@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsOptional, IsInt, Min, Max, Length } from 'class-validator';
+import { BaseDto } from '@api/_shared/dto/base.dto';
 
-export class CreateAppDto {
+export class CreateAppDto extends BaseDto {
   @ApiProperty({ 
     description: 'The name of the app',
     example: 'Pokedex'

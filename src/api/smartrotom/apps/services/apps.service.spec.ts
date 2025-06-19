@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { AppsService } from './apps.service';
 import { AppsRepository } from '@api/_repositories/smartrotom/apps.repository';
-import { CreateAppDto } from '../dto/create-app.dto';
-import { UpdateAppDto } from '../dto/update-app.dto';
+import { CreateAppDto } from '../dto/requests/create-app.dto';
+import { UpdateAppDto } from '../dto/requests/update-app.dto';
 
 describe('AppsService', () => {
   let service: AppsService;

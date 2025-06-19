@@ -1,22 +1,27 @@
 import { Module } from '@nestjs/common';
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { AppsController } from './apps.controller';
 import { AppsFacadeService } from './apps.facade.service';
 import { AppsService } from './services/apps.service';
 import { UserAppsService } from './services/user-apps.service';
-import { AppsRepository } from '@api/_repositories/smartrotom/apps.repository';
-import { ResponseService } from '@api/_utils/response/response.service';
-import { LoggerModule } from '@api/_utils/logger/logger.module';
-import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { AppsRepository } from './repositories/apps.repository';
 
 @Module({
-  imports: [LoggerModule, DrizzleModule],
+  imports: [DrizzleModule],
   controllers: [AppsController],
   providers: [
+    // Facade
     AppsFacadeService,
+    
+    // Domain Services
     AppsService,
     UserAppsService,
-    AppsRepository,
-    ResponseService,
+    
+    // Infrastructure
+    {
+      provide: 'IAppsRepository',
+      useClass: AppsRepository,
+    },
   ],
   exports: [AppsFacadeService, AppsService, UserAppsService],
 })

@@ -3,8 +3,8 @@ import { AppsFacadeService } from './apps.facade.service';
 import { AppsService } from './services/apps.service';
 import { UserAppsService } from './services/user-apps.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { CreateAppDto } from './dto/create-app.dto';
-import { UpdateAppDto } from './dto/update-app.dto';
+import { CreateAppDto } from './dto/requests/create-app.dto';
+import { UpdateAppDto } from './dto/requests/update-app.dto';
 
 describe('AppsFacadeService', () => {
   let service: AppsFacadeService;
