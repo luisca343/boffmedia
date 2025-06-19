@@ -1,27 +1,38 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsArray, ValidateNested, IsNumber, ValidateBy, ValidationArguments, IsUUID } from 'class-validator';
+import { IsString, IsArray, ValidateNested, IsNumber, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 import { BaseDto } from '@api/_shared/dto/base.dto';
 
-// Custom validator for number or string
-const IsNumberOrString = () => {
-  return ValidateBy({
-    name: 'isNumberOrString',
-    validator: {
-      validate: (value: any, args: ValidationArguments) => {
-        return typeof value === 'number' || typeof value === 'string';
-      },
-      defaultMessage: (args: ValidationArguments) => {
-        return `${args.property} must be a number or string`;
-      },
-    },
-  });
-};
+// Custom validator for number or string with proper typing
+import { registerDecorator, ValidationOptions } from 'class-validator';
+
+function IsNumberOrString(validationOptions?: ValidationOptions) {
+  return function (object: Object, propertyName: string) {
+    registerDecorator({
+      name: 'isNumberOrString',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: validationOptions,
+      validator: {
+        validate(value: any) {
+          return typeof value === 'number' || typeof value === 'string';
+        },
+        defaultMessage() {
+          return 'Value must be a number or string';
+        }
+      }
+    });
+  };
+}
 
 class OrderItemDto {
   @ApiProperty({ 
     description: 'App ID',
-    example: 12
+    example: 12,
+    oneOf: [
+      { type: 'string' },
+      { type: 'number' }
+    ]
   })
   @IsNumberOrString()
   id: number | string;

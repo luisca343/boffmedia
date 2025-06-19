@@ -7,14 +7,14 @@ import { UpdateAppDto } from './dto/update-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
 import { PlayerAppDto } from './dto/player-app.dto';
 import { GetPlayerAppsDto } from './dto/get-player-apps.dto';
-import { App } from './entities/app.entity';
+import { SmartRotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
 describe('AppsController', () => {
   let controller: AppsController;
   let facadeService: AppsFacadeService;
 
-  const mockAppsData: App[] = [
+  const mockAppsData: SmartRotomApp[] = [
     {
       id: 1,
       name: 'ChatApp',
@@ -29,14 +29,14 @@ describe('AppsController', () => {
     }
   ];
 
-  const mockAppData: App = {
+  const mockAppData: SmartRotomApp = {
     id: 1,
     name: 'ChatApp',
     url: 'chatapp',
     active: 1
   };
 
-  const mockPlayerAppsData: App[] = [
+  const mockPlayerAppsData: SmartRotomApp[] = [
     {
       id: 2,
       name: 'Admin',

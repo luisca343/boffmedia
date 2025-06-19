@@ -61,6 +61,7 @@ export class UserAppsRepository implements IUserAppsRepository {
   }
 
   async resetOrderExcept(uuid: string, excludeAppIds: number[]): Promise<void> {
+    console.log('Resetting order for user:', uuid, 'excluding apps:', excludeAppIds);
     if (excludeAppIds.length === 0) {
       await this.db.update(smartrotomUserApps)
         .set({ order: 999 } as SmartRotomUserApp)

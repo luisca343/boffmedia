@@ -78,7 +78,11 @@ export class UserAppsService {
 
     // Reset order for apps not in the valid order list
     const validAppIds = validOrder.map(app => Number(app.id));
-    await this.userAppsRepository.resetOrderExcept(uuid, validAppIds);
+    const appsToReset = Array.from(existingAppIds).filter(id => !validAppIds.includes(id));
+    
+    if (appsToReset.length > 0) {
+      await this.userAppsRepository.resetOrderExcept(uuid, appsToReset);
+    }
 
     return { success: true };
   }

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class App {
+export class SmartRotomApp {
   @ApiProperty({ 
     example: 1, 
     description: 'Unique identifier for the app' 
