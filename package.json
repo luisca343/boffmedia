@@ -21,7 +21,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "generate": "drizzle-kit generate",
     "push": "drizzle-kit push",
-    "generate-api": "openapi --input http://localhost:34301/api-json --output ./src/generated/api --client axios"
+    "generate-api": "openapi --input http://localhost:34301/api-json --output ./src/generated/api --client axios",
+    "generate:models": "openapi --input http://localhost:34301/api-json --output ./src/generated --exportModels true --exportServices false --exportCore false"
   },
   "dependencies": {
     "@discordjs/voice": "^0.17.0",
