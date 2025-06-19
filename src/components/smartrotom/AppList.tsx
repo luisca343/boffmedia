@@ -43,8 +43,8 @@ function SortableGrid({
           apps.indexOf(apps.find((app) => app.id === active.id) as OrderedApp),
           apps.indexOf(apps.find((app) => app.id === over.id) as OrderedApp),
         )
-        const newOrder = apps2.map((app) => ({ id: app.id, order: apps2.indexOf(app) }))
-        orderApps({ newOrder, uuid: session?.user?.smartRotomUser?.uuid! })
+        const order = apps2.map((app) => ({ id: app.id, order: apps2.indexOf(app) }))
+        orderApps({ order, uuid: session?.user?.smartRotomUser?.uuid! })
 
         setApps(apps2)
       }

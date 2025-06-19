@@ -1,7 +1,6 @@
+import { OrderAppDto } from "@/generated/api";
 import { useRotomRequest } from "../useRotomRequest";
 import { appsService } from "@/services/api/smartrotom/appsService";
-import { OrderAppDto } from "@/types/dto/order-apps.dto";
-
 export function useOrderApps() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.order)
 
