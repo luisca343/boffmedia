@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IAppsRepository } from '../repositories/apps.repository.interface';
+import { IUserAppsRepository } from '../repositories/user-apps.repository.interface';
+import { IUserAppsOrderingRepository } from '../repositories/user-apps-ordering.repository.interface';
+import { IUserAppsSyncRepository } from '../repositories/user-apps-sync.repository.interface';
 import { 
   EntityNotFoundException, 
   BusinessRuleViolationException,
@@ -17,6 +20,9 @@ import { SmartRotomUserApp } from '../entities';
 export class UserAppsService {
   constructor(
     @Inject('IAppsRepository') private readonly appsRepository: IAppsRepository,
+    @Inject('IUserAppsRepository') private readonly userAppsRepository: IUserAppsRepository,
+    @Inject('IUserAppsOrderingRepository') private readonly userAppsOrderingRepository: IUserAppsOrderingRepository,
+    @Inject('IUserAppsSyncRepository') private readonly userAppsSyncRepository: IUserAppsSyncRepository,
   ) {}
 
   // ==================== PUBLIC METHODS ====================
@@ -25,7 +31,7 @@ export class UserAppsService {
     
     await this.syncUserAppsWithActive(uuid);
     
-    const queryResults = await this.appsRepository.getAppsForPlayer(uuid);
+    const queryResults = await this.userAppsRepository.getAppsForPlayer(uuid);
     return SmartRotomUserApp.fromPlayerAppsQuery(queryResults);
   }
 
@@ -40,10 +46,10 @@ export class UserAppsService {
     await this.validateUserDoesNotHaveApp(uuid, appId);
 
     // Get max order for this user
-    const maxOrder = await this.appsRepository.getMaxUserAppOrder(uuid);
+    const maxOrder = await this.userAppsRepository.getMaxUserAppOrder(uuid);
 
     // Add the app to the player
-    await this.appsRepository.addUserApp(uuid, appId, maxOrder + 1);
+    await this.userAppsRepository.addUserApp(uuid, appId, maxOrder + 1);
 
     return { 
       added: true, 
@@ -60,7 +66,7 @@ export class UserAppsService {
     await this.validateUserHasApp(uuid, appId);
 
     // Remove the app
-    const result = await this.appsRepository.removeUserApp(uuid, appId);
+    const result = await this.userAppsRepository.removeUserApp(uuid, appId);
 
     return { 
       removed: result.affectedRows > 0, 
@@ -75,10 +81,9 @@ export class UserAppsService {
   ): Promise<{ updated: boolean; totalApps: number; uuid: string }> {
     this.validateUuid(uuid);
     this.validateOrderData(orderData);
-    
 
     // Get existing apps for the player
-    const existingApps = await this.appsRepository.getAppsForPlayer(uuid);
+    const existingApps = await this.userAppsRepository.getAppsForPlayer(uuid);
     const existingAppIds = new Set(existingApps.map(app => app.id));
 
     // Filter and validate order items
@@ -102,7 +107,7 @@ export class UserAppsService {
     const validAppIds = validOrderItems.map(item => Number(item.id));
     const appsToReset = Array.from(existingAppIds).filter(id => !validAppIds.includes(id));
     if (appsToReset.length > 0) {
-      await this.appsRepository.resetUserAppOrder(uuid, appsToReset);
+      await this.userAppsOrderingRepository.resetUserAppOrder(uuid, appsToReset);
     }
     
     return { 
@@ -115,7 +120,7 @@ export class UserAppsService {
   async resetPlayerAppOrder(uuid: string): Promise<{ reset: boolean; uuid: string }> {
     this.validateUuid(uuid);
 
-    await this.appsRepository.resetUserAppOrder(uuid, []);
+    await this.userAppsOrderingRepository.resetUserAppOrder(uuid, []);
 
     return { 
       reset: true, 
@@ -123,10 +128,29 @@ export class UserAppsService {
     };
   }
 
+  async reorderPlayerApps(uuid: string, startOrder: number = 1): Promise<{ reordered: boolean; uuid: string }> {
+    this.validateUuid(uuid);
+
+    if (!Number.isInteger(startOrder) || startOrder < 1) {
+      throw new ValidationException(
+        'Start order must be a positive integer',
+        ErrorCodes.VALIDATION_ERROR,
+        { startOrder }
+      );
+    }
+
+    await this.userAppsOrderingRepository.reorderUserApps(uuid, startOrder);
+
+    return {
+      reordered: true,
+      uuid
+    };
+  }
+
   async getPlayerAppCount(uuid: string): Promise<{ count: number; uuid: string }> {
     this.validateUuid(uuid);
 
-    const count = await this.appsRepository.getUserAppCount(uuid);
+    const count = await this.userAppsRepository.getUserAppCount(uuid);
 
     return { 
       count, 
@@ -137,11 +161,33 @@ export class UserAppsService {
   async getAvailableAppsForPlayer(uuid: string): Promise<SmartRotomUserApp[]> {
     this.validateUuid(uuid);
 
-    const apps = await this.appsRepository.getAvailableAppsForUser(uuid);
+    const apps = await this.userAppsRepository.getAvailableAppsForUser(uuid);
     return apps.map(app => new SmartRotomUserApp({
       ...app,
       orden: DefaultValues.APP_ORDER,
       is_user_app: 0
+    }));
+  }
+
+  async getActiveUserApps(uuid: string): Promise<SmartRotomUserApp[]> {
+    this.validateUuid(uuid);
+
+    const apps = await this.userAppsRepository.getActiveUserApps(uuid);
+    return apps.map(app => new SmartRotomUserApp({
+      ...app,
+      orden: DefaultValues.APP_ORDER,
+      is_user_app: 1
+    }));
+  }
+
+  async getInactiveUserApps(uuid: string): Promise<SmartRotomUserApp[]> {
+    this.validateUuid(uuid);
+
+    const apps = await this.userAppsRepository.getInactiveUserApps(uuid);
+    return apps.map(app => new SmartRotomUserApp({
+      ...app,
+      orden: DefaultValues.APP_ORDER,
+      is_user_app: 1
     }));
   }
 
@@ -163,7 +209,7 @@ export class UserAppsService {
       await this.validateUserDoesNotHaveApp(uuid, appId);
     }
 
-    const result = await this.appsRepository.bulkAddUserApps(uuid, appIds);
+    const result = await this.userAppsRepository.bulkAddUserApps(uuid, appIds);
 
     return {
       addedCount: result.insertedCount,
@@ -188,7 +234,7 @@ export class UserAppsService {
       await this.validateUserHasApp(uuid, appId);
     }
 
-    const result = await this.appsRepository.bulkRemoveUserApps(uuid, appIds);
+    const result = await this.userAppsRepository.bulkRemoveUserApps(uuid, appIds);
 
     return {
       removedCount: result.removedCount,
@@ -207,7 +253,7 @@ export class UserAppsService {
       );
     }
 
-    const apps = await this.appsRepository.searchUserApps(uuid, searchTerm.trim());
+    const apps = await this.userAppsRepository.searchUserApps(uuid, searchTerm.trim());
     return apps.map(app => new SmartRotomUserApp({
       ...app,
       orden: DefaultValues.APP_ORDER,
@@ -215,19 +261,19 @@ export class UserAppsService {
     }));
   }
 
-  // ==================== NEW SYNC METHODS ====================
+  // ==================== SYNC METHODS ====================
   async syncUserAppsWithActive(uuid: string): Promise<{ syncedCount: number }> {
     this.validateUuid(uuid);
-    return this.appsRepository.syncUserAppsWithActiveApps(uuid);
+    return this.userAppsSyncRepository.syncUserAppsWithActiveApps(uuid);
   }
 
   async removeInactiveAppsFromUser(uuid: string): Promise<{ removedCount: number }> {
     this.validateUuid(uuid);
-    return this.appsRepository.removeInactiveAppsFromUser(uuid);
+    return this.userAppsSyncRepository.removeInactiveAppsFromUser(uuid);
   }
 
   async syncAllUsersWithActiveApps(): Promise<{ totalSynced: number; usersAffected: number }> {
-    return this.appsRepository.syncAllUsersWithActiveApps();
+    return this.userAppsSyncRepository.syncAllUsersWithActiveApps();
   }
 
   // ==================== VALIDATION METHODS ====================
@@ -338,7 +384,7 @@ export class UserAppsService {
   }
 
   private async validateUserDoesNotHaveApp(uuid: string, appId: number): Promise<void> {
-    const existingUserApp = await this.appsRepository.findUserApp(uuid, appId);
+    const existingUserApp = await this.userAppsRepository.findUserApp(uuid, appId);
     if (existingUserApp) {
       throw new BusinessRuleViolationException(
         'User already has this app',
@@ -349,7 +395,7 @@ export class UserAppsService {
   }
 
   private async validateUserHasApp(uuid: string, appId: number): Promise<void> {
-    const userApp = await this.appsRepository.findUserApp(uuid, appId);
+    const userApp = await this.userAppsRepository.findUserApp(uuid, appId);
     if (!userApp) {
       throw new EntityNotFoundException('UserApp', `${uuid}:${appId}`);
     }
@@ -397,7 +443,7 @@ export class UserAppsService {
     orderItems: { id: number | string; order: number }[]
   ): Promise<void> {
     for (const item of orderItems) {
-      await this.appsRepository.updateUserAppOrder(
+      await this.userAppsOrderingRepository.updateUserAppOrder(
         uuid, 
         Number(item.id), 
         item.order

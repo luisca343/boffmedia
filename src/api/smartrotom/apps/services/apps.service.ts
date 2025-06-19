@@ -1,5 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IAppsRepository } from '../repositories/apps.repository.interface';
+import { IUserAppsRepository } from '../repositories/user-apps.repository.interface';
+import { IUserAppsSyncRepository } from '../repositories/user-apps-sync.repository.interface';
+import { IAppsAnalyticsRepository } from '../repositories/apps-analytics.repository.interface';
 import { CreateAppDto, UpdateAppDto } from '../dto';
 import { 
   EntityNotFoundException, 
@@ -8,13 +11,14 @@ import {
 } from '@/api/_shared/exceptions';
 import { ErrorCodes, AppStatus } from '@/api/_shared/constants/app.constants';
 import { SmartRotomApp } from '../entities';
-import { sql } from 'drizzle-orm';
-import { smartrotomUserApps } from '@/_db/schema/SmartRotom';
 
 @Injectable()
 export class AppsService {
   constructor(
     @Inject('IAppsRepository') private readonly appsRepository: IAppsRepository,
+    @Inject('IUserAppsRepository') private readonly userAppsRepository: IUserAppsRepository,
+    @Inject('IUserAppsSyncRepository') private readonly userAppsSyncRepository: IUserAppsSyncRepository,
+    @Inject('IAppsAnalyticsRepository') private readonly appsAnalyticsRepository: IAppsAnalyticsRepository,
   ) {}
 
   // ==================== PUBLIC METHODS ====================
@@ -63,7 +67,7 @@ export class AppsService {
     await this.appsRepository.findByIdOrThrow(id, 'App');
     
     // Check if app has users (business rule)
-    const users = await this.appsRepository.getUsersWithApp(id);
+    const users = await this.userAppsRepository.getUsersWithApp(id);
     
     if (users.length > 0) {
       throw new BusinessRuleViolationException(
@@ -129,14 +133,14 @@ export class AppsService {
   async activateApp(id: number): Promise<SmartRotomApp> {
     await this.validateAppExists(id);
     await this.appsRepository.update(id, { active: AppStatus.ACTIVE });
-    await this.syncAllUsersWithActiveApps();
+    await this.userAppsSyncRepository.syncAllUsersWithActiveApps();
     return this.getAppById(id);
   }
 
   async deactivateApp(id: number): Promise<SmartRotomApp> {
     await this.validateAppExists(id);
     await this.appsRepository.update(id, { active: AppStatus.INACTIVE });
-    await this.removeInactiveAppFromAllUsers(id);
+    await this.userAppsRepository.removeInactiveAppFromAllUsers(id);
     return this.getAppById(id);
   }
 
@@ -146,9 +150,21 @@ export class AppsService {
   }
 
   async getAppUsageStatistics(appId?: number): Promise<any[]> {
-    return this.appsRepository.getAppUsageStatistics(appId);
+    return this.appsAnalyticsRepository.getAppUsageStatistics(appId);
   }
 
+  async getMostPopularApps(limit: number = 10): Promise<any[]> {
+    return this.appsAnalyticsRepository.getMostPopularApps(limit);
+  }
+
+  async getAppsWithUserCounts(): Promise<any[]> {
+    return this.appsAnalyticsRepository.getAppsWithUserCounts();
+  }
+
+  async getAppsWithoutUsers(): Promise<SmartRotomApp[]> {
+    const apps = await this.appsAnalyticsRepository.getAppsWithoutUsers();
+    return SmartRotomApp.fromEntities(apps);
+  }
 
   async batchUpdateAppStatus(appIds: number[], status: AppStatus): Promise<{ updatedCount: number }> {
     if (appIds.length === 0) {
@@ -161,20 +177,22 @@ export class AppsService {
     }
 
     const result = await this.appsRepository.batchUpdateAppStatus(appIds, status);
+    
     if (status === AppStatus.ACTIVE) {
-      await this.syncAllUsersWithActiveApps();
+      await this.userAppsSyncRepository.syncAllUsersWithActiveApps();
     } else {
-      await this.removeAppsFromAllUsers(appIds);
+      await this.userAppsRepository.removeAppsFromAllUsers(appIds);
     }
 
     return result;
   }
+
   async batchDeleteApps(appIds: number[]): Promise<{ deletedCount: number }> {
     // Validate all apps exist and have no users
     for (const appId of appIds) {
       await this.validateAppExists(appId);
       
-      const users = await this.appsRepository.getUsersWithApp(appId);
+      const users = await this.userAppsRepository.getUsersWithApp(appId);
       if (users.length > 0) {
         throw new BusinessRuleViolationException(
           `Cannot delete app ${appId} that has users`,
@@ -186,16 +204,4 @@ export class AppsService {
 
     return this.appsRepository.batchDeleteApps(appIds);
   }
-  private async syncAllUsersWithActiveApps(): Promise<void> {
-    await this.appsRepository.syncAllUsersWithActiveApps();
-  }
-
-  private async removeInactiveAppFromAllUsers(appId: number): Promise<void> {
-    await this.appsRepository.removeInactiveAppFromAllUsers(appId);
-  }
-
-  private async removeAppsFromAllUsers(appIds: number[]): Promise<void> {
-    await this.appsRepository.removeAppsFromAllUsers(appIds);
-  }
-
 }
