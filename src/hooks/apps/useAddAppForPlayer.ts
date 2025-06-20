@@ -1,6 +1,5 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { appsService } from "@/services/api/smartrotom/appsService"
-import type { SuccessResponse } from "@/types"
 
 export function useAddAppToPlayer() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.addAppToPlayer)

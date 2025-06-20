@@ -3,11 +3,11 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
 import { InternalLink } from "../nav/Link"
-import type { OrderedApp } from "@/types/apps"
 import { useSortable } from "@dnd-kit/sortable"
+import { SmartRotomApp } from "@/generated/api"
 
 interface AppIconProps {
-  app: OrderedApp
+  app: SmartRotomApp
   size?: "small" | "normal"
   withLink?: boolean
 }
