@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { AchievementService } from './achievement.service';
-import { ReplayService } from './replay.service';
-import { AchievementRepository } from '@repositories/smartrotom/achievement.repository';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { AchievementsService } from './achievements.service';
+import { ReplaysService } from './replays.service';
 
 export interface BattleAchievementRequest {
   uuid: string;
@@ -17,53 +16,97 @@ export interface BattleAchievementRequest {
 @Injectable()
 export class BattleAchievementService {
   constructor(
-    private readonly achievementService: AchievementService,
-    private readonly replayService: ReplayService,
-    private readonly achievementRepository: AchievementRepository,
+    private readonly achievementsService: AchievementsService,
+    private readonly replaysService: ReplaysService,
   ) {}
 
-  async addBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; error?: string }> {
-    const { uuid, logro, name1, name2, team1, team2, replay, victoria } = battleData;
+  async processBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; message: string }> {
+    this.validateBattleData(battleData);
 
-    // Validate input
-    if (!uuid || !logro || !name1 || !name2 || !team1 || !team2 || !replay) {
-      throw new Error('All battle data fields are required');
+    // Check if achievement exists
+    const achievementExists = await this.achievementsService.validateAchievementExists(battleData.logro);
+    if (!achievementExists) {
+      throw new NotFoundException('Achievement not found');
     }
 
     // Check if user already has this achievement
-    const hasAchievement = await this.achievementService.checkUserHasAchievement(uuid, logro);
-    
-    if (hasAchievement.error) {
-      return { success: false, error: hasAchievement.error };
+    const userAchievementStatus = await this.achievementsService.checkUserHasAchievement(
+      battleData.uuid, 
+      battleData.logro
+    );
+
+    if (userAchievementStatus.completed === 1) {
+      return { 
+        success: false, 
+        message: 'Achievement already completed' 
+      };
     }
 
-    if (hasAchievement.completed) {
-      return { success: false, error: 'Achievement already completed' };
+    // Only process if user won the battle (for most achievements)
+    if (!battleData.victoria) {
+      return { 
+        success: false, 
+        message: 'Achievement requires victory' 
+      };
     }
 
-    // Create replay
-    const replayResult = await this.replayService.createReplay({
-      side1: name1,
-      side2: name2,
-      team1: JSON.stringify(team1),
-      team2: JSON.stringify(team2),
-      replay,
-      winner: victoria ? name1 : name2
+    // Create replay first
+    const replayResult = await this.replaysService.createReplay({
+      side1: battleData.name1,
+      side2: battleData.name2,
+      team1: JSON.stringify(battleData.team1),
+      team2: JSON.stringify(battleData.team2),
+      replay: battleData.replay,
+      winner: battleData.name1 // Assuming name1 is the winner based on victoria = true
     });
 
-    // Create user replay relation
-    await this.replayService.createUserReplay(replayResult.replayId, uuid, 1);
+    // Create user replay association
+    await this.replaysService.createUserReplay(battleData.uuid, replayResult.replayId);
 
     // Create user achievement
-    await this.achievementRepository.createUserAchievement({
-      dataId: replayResult.replayId,
-      uuid,
-      achievementId: logro,
+    const achievementData = {
+      uuid: battleData.uuid,
+      achievementId: battleData.logro,
       progress: 1,
       completed: 1,
-      completedAt: new Date()
-    });
+      dataId: replayResult.replayId,
+      completedAt: new Date().toISOString()
+    };
 
-    return { success: true };
+    await this.achievementsService.createUserAchievement(achievementData);
+
+    return { 
+      success: true, 
+      message: 'Achievement unlocked successfully' 
+    };
+  }
+
+  // ==================== VALIDATION METHODS ====================
+
+  private validateBattleData(battleData: BattleAchievementRequest): void {
+    if (!battleData.uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+    if (!battleData.logro) {
+      throw new BadRequestException('Achievement ID is required');
+    }
+    if (!battleData.name1) {
+      throw new BadRequestException('Player 1 name is required');
+    }
+    if (!battleData.name2) {
+      throw new BadRequestException('Player 2 name is required');
+    }
+    if (!battleData.team1) {
+      throw new BadRequestException('Player 1 team data is required');
+    }
+    if (!battleData.team2) {
+      throw new BadRequestException('Player 2 team data is required');
+    }
+    if (!battleData.replay) {
+      throw new BadRequestException('Replay data is required');
+    }
+    if (typeof battleData.victoria !== 'boolean') {
+      throw new BadRequestException('Victory status is required');
+    }
   }
 }

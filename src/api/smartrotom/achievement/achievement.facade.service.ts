@@ -1,85 +1,74 @@
 import { Injectable } from '@nestjs/common';
-import { AchievementService } from './services/achievement.service';
-import { ReplayService } from './services/replay.service';
+import { AchievementsService } from './services/achievements.service';
+import { ReplaysService } from './services/replays.service';
 import { BattleAchievementService, BattleAchievementRequest } from './services/battle-achievement.service';
-import { AchievementDetails, ReplayDetails } from '@repositories/smartrotom/achievement.repository';
-import { UserAchievement } from './entities/achievement.entity';
-import { AchievementStatusResponse } from './dto/achievement.dto';
 
 @Injectable()
 export class AchievementFacadeService {
   constructor(
-    private readonly achievementService: AchievementService,
-    private readonly replayService: ReplayService,
+    private readonly achievementsService: AchievementsService,
+    private readonly replaysService: ReplaysService,
     private readonly battleAchievementService: BattleAchievementService,
   ) {}
 
   // ==================== ACHIEVEMENT MANAGEMENT ====================
 
-  async getUserAchievements(uuid: string): Promise<AchievementDetails[]> {
-    try {
-      return await this.achievementService.getUserAchievements(uuid);
-    } catch (error) {
-      console.error(`Error getting achievements for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve achievements: ${error.message}`);
-    }
+  async getUserAchievements(uuid: string): Promise<any[]> {
+    return this.achievementsService.getUserAchievements(uuid);
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetails> {
-    try {
-      return await this.achievementService.getUserAchievementById(uuid, achievementId);
-    } catch (error) {
-      console.error(`Error getting achievement ${achievementId} for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve achievement: ${error.message}`);
-    }
+  async getUserAchievementById(uuid: string, achievementId: string): Promise<any> {
+    return this.achievementsService.getUserAchievementById(uuid, achievementId);
   }
 
-  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<AchievementStatusResponse> {
-    try {
-      const result = await this.achievementService.checkUserHasAchievement(uuid, achievementId);
-      return {
-        completed: result.completed,
-        error: result.error
-      };
-    } catch (error) {
-      console.error(`Error checking achievement ${achievementId} for user ${uuid}:`, error);
-      return {
-        completed: null,
-        error: `Failed to check achievement status: ${error.message}`
-      };
-    }
-  }
-
-  // ==================== BATTLE ACHIEVEMENT MANAGEMENT ====================
-
-  async addBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; error?: string }> {
-    try {
-      return await this.battleAchievementService.addBattleAchievement(battleData);
-    } catch (error) {
-      console.error('Error adding battle achievement:', error);
-      throw new Error(`Failed to add battle achievement: ${error.message}`);
-    }
+  async checkUserHasAchievement(uuid: string, achievementId: string): Promise<{ completed: number | null; error?: string }> {
+    return this.achievementsService.checkUserHasAchievement(uuid, achievementId);
   }
 
   // ==================== REPLAY MANAGEMENT ====================
 
-  async getUserReplay(uuid: string, replayId: number): Promise<ReplayDetails> {
-    try {
-      return await this.replayService.getUserReplay(uuid, replayId);
-    } catch (error) {
-      console.error(`Error getting replay ${replayId} for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve replay: ${error.message}`);
-    }
+  async createReplay(replayData: {
+    side1: string;
+    side2: string;
+    team1: string;
+    team2: string;
+    replay: string;
+    winner: string;
+  }): Promise<{ replayId: number }> {
+    return this.replaysService.createReplay(replayData);
   }
 
-  // ==================== VALIDATION METHODS ====================
+  async createUserReplay(uuid: string, replayId: number): Promise<{ insertId: number }> {
+    return this.replaysService.createUserReplay(uuid, replayId);
+  }
 
-  async validateAchievementExists(achievementId: string): Promise<boolean> {
+  async getUserReplay(uuid: string, replayId: number): Promise<any> {
+    return this.replaysService.getUserReplay(uuid, replayId);
+  }
+
+  // ==================== BATTLE ACHIEVEMENT PROCESSING ====================
+
+  async processBattleAchievement(battleData: BattleAchievementRequest): Promise<{ success: boolean; message: string }> {
+    return this.battleAchievementService.processBattleAchievement(battleData);
+  }
+
+  // ==================== LEGACY METHODS (for backwards compatibility) ====================
+
+  async unlockAchievement(uuid: string, logro: string): Promise<{ success: boolean; message: string }> {
+    // Simple achievement unlock without battle data
+    const achievementData = {
+      uuid,
+      achievementId: logro,
+      progress: 1,
+      completed: 1,
+      completedAt: new Date().toISOString()
+    };
+
     try {
-      return await this.achievementService.validateAchievementExists(achievementId);
+      await this.achievementsService.createUserAchievement(achievementData);
+      return { success: true, message: 'Achievement unlocked successfully' };
     } catch (error) {
-      console.error(`Error validating achievement ${achievementId}:`, error);
-      return false;
+      return { success: false, message: error.message || 'Failed to unlock achievement' };
     }
   }
 }

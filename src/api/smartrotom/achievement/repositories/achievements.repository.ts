@@ -2,95 +2,65 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, asc, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
+import { IAchievementsRepository } from './interfaces/achievements.repository.interface';
+import { CreateAchievementDto } from '../dto/create-achievement.dto';
+import { UpdateAchievementDto } from '../dto/update-achievement.dto';
+import { Achievement } from '../entities/achievement.entity';
 import {
-  SmartRotomReplay,
+  SmartRotomAchievement,
   SmartRotomUserAchievement,
-  SmartRotomUserReplay,
   smartRotomAchievements,
   smartRotomReplays,
   smartRotomUserAchievements,
   smartRotomUserReplays
 } from '@/_db/schema/SmartRotom';
 
-export interface AchievementDetails {
-  id: string;
-  battleId: number;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-  subcategory: string;
-  progress: number;
-  completed: number;
-  completedAt: Date;
-  uuid: string;
-  team: string;
-  replay: string;
-  target: number;
-  order: number;
-}
-
-export interface UserAchievementStatus {
-  id: string;
-  completed: number;
-}
-
-export interface ReplayDetails {
-  id: number;
-  team1: string;
-  team2: string;
-  replay: string;
-  winner: string;
-  side1: string;
-  side2: string;
-  date: Date;
-}
-
 @Injectable()
-export class AchievementRepository {
+export class AchievementsRepository 
+  extends BaseRepositoryImpl<Achievement, CreateAchievementDto, UpdateAchievementDto> 
+  implements IAchievementsRepository {
+
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-  ) {}
+    @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
+  ) {
+    super(db, smartRotomAchievements);
+  }
 
-  // ==================== COMMON SELECTS ====================
+  async create(data: CreateAchievementDto): Promise<Achievement> {
+    await this.db.insert(smartRotomAchievements).values(data as SmartRotomAchievement);
+    return this.findByStringId(data.id) as Promise<Achievement>;
+  }
 
-  private readonly achievementDetailsSelect = {
-    id: smartRotomAchievements.id,
-    battleId: smartRotomUserAchievements.dataId,
-    name: smartRotomAchievements.name,
-    description: smartRotomAchievements.description,
-    icon: smartRotomAchievements.icon,
-    category: smartRotomAchievements.category,
-    subcategory: smartRotomAchievements.subcategory,
-    progress: smartRotomUserAchievements.progress,
-    completed: smartRotomUserAchievements.completed,
-    completedAt: smartRotomUserAchievements.completedAt,
-    uuid: smartRotomUserAchievements.uuid,
-    team: smartRotomReplays.team1,
-    replay: smartRotomReplays.replay,
-    target: smartRotomAchievements.target,
-    order: smartRotomAchievements.order,
-  };
+  async update(id: number, data: UpdateAchievementDto): Promise<Achievement> {
+    // For achievements, we need to handle string ID differently
+    throw new Error('Use updateByStringId for achievements');
+  }
 
-  private readonly achievementStatusSelect = {
-    id: smartRotomAchievements.id,
-    completed: smartRotomUserAchievements.completed,
-  };
+  async delete(id: number): Promise<boolean> {
+    // For achievements, we need to handle string ID differently  
+    throw new Error('Use deleteByStringId for achievements');
+  }
 
-  private readonly replayDetailsSelect = {
-    id: smartRotomReplays.id,
-    team1: smartRotomReplays.team1,
-    team2: smartRotomReplays.team2,
-    replay: smartRotomReplays.replay,
-    winner: smartRotomReplays.winner,
-    side1: smartRotomReplays.side1,
-    side2: smartRotomReplays.side2,
-    date: smartRotomReplays.createdAt,
-  };
+  async updateByStringId(id: string, data: UpdateAchievementDto): Promise<Achievement> {
+    await this.db.update(smartRotomAchievements).set(data).where(eq(smartRotomAchievements.id, id));
+    return this.findByStringId(id) as Promise<Achievement>;
+  }
 
-  // ==================== ACHIEVEMENT OPERATIONS ====================
+  async deleteByStringId(id: string): Promise<boolean> {
+    const result = await this.db.delete(smartRotomAchievements).where(eq(smartRotomAchievements.id, id));
+    return result[0].affectedRows > 0;
+  }
 
-  async findUserAchievements(uuid: string): Promise<AchievementDetails[]> {
+  async findByStringId(id: string): Promise<Achievement | null> {
+    const result = await this.db.select()
+      .from(smartRotomAchievements)
+      .where(eq(smartRotomAchievements.id, id))
+      .limit(1);
+    return result[0] || null;
+  }
+
+  async findUserAchievements(uuid: string): Promise<any[]> {
     return this.db
       .select({
         id: smartRotomAchievements.id,
@@ -140,7 +110,7 @@ export class AchievementRepository {
       );
   }
 
-  async findUserAchievementById(uuid: string, achievementId: string): Promise<AchievementDetails | null> {
+  async findUserAchievementById(uuid: string, achievementId: string): Promise<any | null> {
     const result = await this.db
       .select({
         id: smartRotomAchievements.id,
@@ -184,7 +154,7 @@ export class AchievementRepository {
     return result[0] || null;
   }
 
-  async findUserAchievementStatus(uuid: string, achievementId: string): Promise<UserAchievementStatus | null> {
+  async findUserAchievementStatus(uuid: string, achievementId: string): Promise<any | null> {
     const result = await this.db
       .select({
         id: smartRotomAchievements.id,
@@ -204,14 +174,7 @@ export class AchievementRepository {
     return result[0] || null;
   }
 
-  async createUserAchievement(achievementData: {
-    dataId: number;
-    uuid: string;
-    achievementId: string;
-    progress: number;
-    completed: number;
-    completedAt: Date;
-  }): Promise<{ insertId: number }> {
+  async createUserAchievement(achievementData: any): Promise<{ insertId: number }> {
     const result = await this.db
       .insert(smartRotomUserAchievements)
       .values(achievementData as SmartRotomUserAchievement);
@@ -219,57 +182,13 @@ export class AchievementRepository {
     return { insertId: result[0].insertId };
   }
 
-  // ==================== REPLAY OPERATIONS ====================
-
-  async createReplay(replayData: {
-    side1: string;
-    side2: string;
-    team1: string;
-    team2: string;
-    replay: string;
-    winner: string;
-  }): Promise<{ insertId: number }> {
+  async achievementExists(achievementId: string): Promise<boolean> {
     const result = await this.db
-      .insert(smartRotomReplays)
-      .values(replayData as SmartRotomReplay);
-
-    return { insertId: result[0].insertId };
-  }
-
-  async createUserReplay(userReplayData: {
-    replayId: number;
-    uuid: string;
-    side: number;
-  }): Promise<{ insertId: number }> {
-    const result = await this.db
-      .insert(smartRotomUserReplays)
-      .values(userReplayData as SmartRotomUserReplay);
-
-    return { insertId: result[0].insertId };
-  }
-
-  async findUserReplay(uuid: string, replayId: number): Promise<ReplayDetails | null> {
-    const result = await this.db
-      .select({
-        id: smartRotomReplays.id,
-        team1: smartRotomReplays.team1,
-        team2: smartRotomReplays.team2,
-        replay: smartRotomReplays.replay,
-        winner: smartRotomReplays.winner,
-        side1: smartRotomReplays.side1,
-        side2: smartRotomReplays.side2,
-        date: smartRotomReplays.createdAt,
-      })
-      .from(smartRotomReplays)
-      .leftJoin(
-        smartRotomUserReplays,
-        and(
-          eq(smartRotomUserReplays.replayId, smartRotomReplays.id),
-          eq(smartRotomUserReplays.uuid, uuid),
-        ))
-      .where(eq(smartRotomReplays.id, replayId))
+      .select({ id: smartRotomAchievements.id })
+      .from(smartRotomAchievements)
+      .where(eq(smartRotomAchievements.id, achievementId))
       .limit(1);
 
-    return result[0] || null;
+    return result.length > 0;
   }
 }

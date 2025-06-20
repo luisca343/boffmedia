@@ -1,118 +1,169 @@
-import { Controller, Get, Post, Body, Param, HttpStatus, UseInterceptors, ParseIntPipe } from "@nestjs/common";
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from "@nestjs/swagger";
+import { Controller, Post, Body, UseInterceptors } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { AchievementFacadeService } from "./achievement.facade.service";
-import { GetAchievementsDto, GetAchievementByIdDto, AchievementStatusResponse } from './dto/achievement.dto';
-import { BattleAchievementDto, BattleAchievementResponse } from './dto/battle-achievement.dto';
-import { GetReplayDto } from './dto/replay.dto';
+import { AchievementFacadeService } from './achievement.facade.service';
+
+// DTOs
+import { GetAchievementsDto, GetAchievementByIdDto, CheckAchievementDto } from './dto/achievement.dto';
+import { BattleAchievementDto } from './dto/battle-achievement.dto';
+import { CreateReplayDto, CreateUserReplayDto, GetReplayDto } from './dto/replay.dto';
+
+// Entities
 import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
 
-@ApiTags("SmartRotom | Achievements")
-@Controller("/smartrotom/achievements")
+@ApiTags('SmartRotom | Achievements')
+@Controller('smartrotom/achievement')
 @UseInterceptors(ResponseInterceptor)
 export class AchievementController {
   constructor(
     private readonly achievementFacadeService: AchievementFacadeService,
   ) {}
 
-  @Get(":uuid/:achievementId")
-  @ApiOperation({ summary: "Get a specific achievement for a player" })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: "Achievement retrieved successfully.",
-    type: UserAchievement
-  })
-  @ApiResponse({ 
-    status: HttpStatus.NOT_FOUND, 
-    description: "Achievement not found." 
-  })
-  @ApiResponse({ 
-    status: HttpStatus.INTERNAL_SERVER_ERROR, 
-    description: "Failed to retrieve achievement." 
-  })
-  @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  @ApiParam({ name: 'achievementId', description: 'Achievement ID' })
-  async getAchievementForPlayer(
-    @Param('uuid') uuid: string, 
-    @Param('achievementId') achievementId: string
-  ): Promise<UserAchievement> {
-    return await this.achievementFacadeService.getUserAchievementById(uuid, achievementId);
-  }
+  // ==================== ACHIEVEMENT ENDPOINTS ====================
 
-  @Post()
-  @ApiOperation({ summary: 'Get all achievements for a player' })
+  @Post('get-achievements')
+  @ApiOperation({ 
+    summary: 'Get user achievements',
+    description: 'Retrieve all achievements for a specific player'
+  })
   @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'Achievements retrieved successfully.',
+    status: 200, 
+    description: 'User achievements retrieved successfully',
     type: [UserAchievement]
   })
   @ApiResponse({ 
-    status: HttpStatus.INTERNAL_SERVER_ERROR, 
-    description: 'Failed to retrieve achievements.' 
+    status: 400, 
+    description: 'Invalid UUID provided' 
   })
-  @ApiBody({ type: GetAchievementsDto })
-  async getAchievements(@Body() { uuid }: GetAchievementsDto): Promise<UserAchievement[]> {
-    return await this.achievementFacadeService.getUserAchievements(uuid);
+  async getUserAchievements(@Body() dto: GetAchievementsDto): Promise<any[]> {
+    return this.achievementFacadeService.getUserAchievements(dto.uuid);
   }
 
-  @Post('battle')
-  @ApiOperation({ summary: 'Save a battle and register its achievement' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'Battle achievement saved successfully.',
-    type: BattleAchievementResponse
+  @Post('get-achievement-by-id')
+  @ApiOperation({ 
+    summary: 'Get specific user achievement',
+    description: 'Retrieve a specific achievement for a player by achievement ID'
   })
   @ApiResponse({ 
-    status: HttpStatus.BAD_REQUEST, 
-    description: 'Invalid battle data or achievement already completed.' 
+    status: 200, 
+    description: 'User achievement retrieved successfully',
+    type: UserAchievement
   })
   @ApiResponse({ 
-    status: HttpStatus.INTERNAL_SERVER_ERROR, 
-    description: 'Failed to save battle achievement.' 
+    status: 404, 
+    description: 'Achievement not found' 
   })
-  @ApiBody({ type: BattleAchievementDto })
-  async addBattleAchievement(@Body() battleAchievement: BattleAchievementDto): Promise<BattleAchievementResponse> {
-    return await this.achievementFacadeService.addBattleAchievement(battleAchievement);
+  async getUserAchievementById(@Body() dto: GetAchievementByIdDto): Promise<any> {
+    return this.achievementFacadeService.getUserAchievementById(dto.uuid, dto.achievementId);
   }
 
-  @Get('replays/:uuid/:replayId')
-  @ApiOperation({ summary: 'Get replay for a player' })
+  @Post('check-achievement')
+  @ApiOperation({ 
+    summary: 'Check achievement status',
+    description: 'Check if a user has completed a specific achievement'
+  })
   @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'Replay retrieved successfully.',
+    status: 200, 
+    description: 'Achievement status checked successfully'
+  })
+  async checkUserHasAchievement(@Body() dto: CheckAchievementDto): Promise<{ completed: number | null; error?: string }> {
+    return this.achievementFacadeService.checkUserHasAchievement(dto.uuid, dto.achievementId);
+  }
+
+  // ==================== BATTLE ACHIEVEMENT ENDPOINTS ====================
+
+  @Post('battle-achievement')
+  @ApiOperation({ 
+    summary: 'Process battle achievement',
+    description: 'Process achievement unlock from battle results'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'Battle achievement processed successfully'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Invalid battle data provided' 
+  })
+  @ApiResponse({ 
+    status: 404, 
+    description: 'Achievement not found' 
+  })
+  async processBattleAchievement(@Body() dto: BattleAchievementDto): Promise<{ success: boolean; message: string }> {
+    // Map DTO to service interface
+    const battleData = {
+      uuid: dto.uuid,
+      logro: dto.logro,
+      name1: dto.uuid, // Assuming the requesting user is player 1
+      name2: 'opponent', // Default opponent name
+      team1: {}, // Empty team data for now
+      team2: {}, // Empty team data for now
+      replay: '', // Empty replay data for now
+      victoria: true // Assuming victory for achievement unlock
+    };
+
+    return this.achievementFacadeService.processBattleAchievement(battleData);
+  }
+
+  // ==================== REPLAY ENDPOINTS ====================
+
+  @Post('create-replay')
+  @ApiOperation({ 
+    summary: 'Create replay',
+    description: 'Create a new replay record'
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Replay created successfully'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Invalid replay data provided' 
+  })
+  async createReplay(@Body() dto: CreateReplayDto): Promise<{ replayId: number }> {
+    return this.achievementFacadeService.createReplay({
+      side1: dto.side1,
+      side2: dto.side2,
+      team1: dto.team1,
+      team2: dto.team2,
+      replay: dto.replay,
+      winner: dto.winner
+    });
+  }
+
+  @Post('create-user-replay')
+  @ApiOperation({ 
+    summary: 'Create user replay association',
+    description: 'Associate a replay with a user'
+  })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'User replay association created successfully'
+  })
+  @ApiResponse({ 
+    status: 400, 
+    description: 'Invalid user replay data provided' 
+  })
+  async createUserReplay(@Body() dto: CreateUserReplayDto): Promise<{ insertId: number }> {
+    return this.achievementFacadeService.createUserReplay(dto.uuid, dto.replayId);
+  }
+
+  @Post('get-replay')
+  @ApiOperation({ 
+    summary: 'Get user replay',
+    description: 'Retrieve replay data for a specific user and replay ID'
+  })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'User replay retrieved successfully',
     type: Replay
   })
   @ApiResponse({ 
-    status: HttpStatus.NOT_FOUND, 
-    description: 'Replay not found.' 
+    status: 404, 
+    description: 'Replay not found' 
   })
-  @ApiResponse({ 
-    status: HttpStatus.INTERNAL_SERVER_ERROR, 
-    description: 'Failed to retrieve replay.' 
-  })
-  @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  @ApiParam({ name: 'replayId', description: 'Replay ID' })
-  async getReplay(
-    @Param('uuid') uuid: string, 
-    @Param('replayId', ParseIntPipe) replayId: number
-  ): Promise<Replay> {
-    return await this.achievementFacadeService.getUserReplay(uuid, replayId);
-  }
-
-  @Post('check')
-  @ApiOperation({ summary: 'Check if player has completed a specific achievement' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'Achievement status checked successfully.',
-    type: AchievementStatusResponse
-  })
-  @ApiResponse({ 
-    status: HttpStatus.INTERNAL_SERVER_ERROR, 
-    description: 'Failed to check achievement status.' 
-  })
-  @ApiBody({ type: GetAchievementByIdDto })
-  async checkAchievementStatus(@Body() { uuid, achievementId }: GetAchievementByIdDto): Promise<AchievementStatusResponse> {
-    return await this.achievementFacadeService.checkUserHasAchievement(uuid, achievementId);
+  async getUserReplay(@Body() dto: GetReplayDto): Promise<any> {
+    return this.achievementFacadeService.getUserReplay(dto.uuid, dto.replayId);
   }
 }
