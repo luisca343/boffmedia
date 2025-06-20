@@ -1,4 +1,4 @@
-import { BaseDto } from '@api/_shared/dto/base.dto';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID } from 'class-validator';
 

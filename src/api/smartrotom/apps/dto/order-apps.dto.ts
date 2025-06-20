@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsArray, ValidateNested, IsNumber, IsUUID } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { BaseDto } from '@api/_shared/dto/base.dto';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
 class OrderItemDto {
   @ApiProperty({ 
