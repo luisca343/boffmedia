@@ -1,6 +1,7 @@
 import { BaseDto } from '@api/_shared/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsOptional, IsInt, Min, Max, Length } from 'class-validator';
+import { IsString, IsOptional, IsEnum, Length } from 'class-validator';
+import { AppStatus } from '../enums/app-status.enum';
 
 export class CreateAppDto extends BaseDto {
   @ApiProperty({ 
@@ -21,13 +22,12 @@ export class CreateAppDto extends BaseDto {
   url?: string;
 
   @ApiProperty({ 
-    description: 'The active status of the app (0 = inactive, 1 = active)', 
+    description: 'The active status of the app', 
     required: false,
-    example: 1
+    example: AppStatus.ACTIVE,
+    enum: AppStatus
   })
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  @Max(1)
-  active?: number;
+  @IsEnum(AppStatus)
+  active?: AppStatus;
 }

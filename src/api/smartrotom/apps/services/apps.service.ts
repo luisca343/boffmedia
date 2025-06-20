@@ -12,6 +12,8 @@ export class AppsService {
     private readonly appsRepository: IAppsRepository,
   ) {}
 
+  // ==================== APP MANAGEMENT ====================
+
   async getAllApps(): Promise<SmartRotomApp[]> {
     return this.appsRepository.findAll();
   }
@@ -22,6 +24,14 @@ export class AppsService {
       throw new NotFoundException(`App with ID ${id} not found`);
     }
     return app;
+  }
+
+  async getActiveApps(): Promise<SmartRotomApp[]> {
+    return this.appsRepository.findActiveApps();
+  }  
+  
+  async getInactiveApps(): Promise<SmartRotomApp[]> {
+    return this.appsRepository.findByActive(0);
   }
 
   async createApp(createAppDto: CreateAppDto): Promise<SmartRotomApp> {
@@ -60,7 +70,13 @@ export class AppsService {
     return { success: deleted };
   }
 
-  async getActiveApps(): Promise<SmartRotomApp[]> {
-    return this.appsRepository.findActiveApps();
+  // ==================== APP STATUS MANAGEMENT ====================
+
+  async activateApp(id: number): Promise<SmartRotomApp> {
+    return this.updateApp(id, { active: 1 });
+  }
+
+  async deactivateApp(id: number): Promise<SmartRotomApp> {
+    return this.updateApp(id, { active: 0 });
   }
 }

@@ -10,6 +10,7 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { SmartRotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 
+
 @ApiTags('SmartRotom | Apps')
 @Controller('/smartrotom/apps')
 @UseInterceptors(ResponseInterceptor)
@@ -17,6 +18,8 @@ export class AppsController {
   constructor(
     private readonly appsFacadeService: AppsFacadeService,
   ) {}
+
+  // ==================== APP MANAGEMENT ====================
 
   @Get()
   @ApiOperation({ summary: 'Get all apps' })
@@ -27,6 +30,43 @@ export class AppsController {
   })
   async findAll(): Promise<SmartRotomApp[]> {
     return this.appsFacadeService.getApps();
+  }
+
+  @Get('active')
+  @ApiOperation({ summary: 'Get all active apps' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Active apps found successfully.',
+    type: [SmartRotomApp]
+  })
+  async findActive(): Promise<SmartRotomApp[]> {
+    return this.appsFacadeService.getActiveApps();
+  }
+
+  @Get('inactive')
+  @ApiOperation({ summary: 'Get all inactive apps' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Inactive apps found successfully.',
+    type: [SmartRotomApp]
+  })
+  async findInactive(): Promise<SmartRotomApp[]> {
+    return this.appsFacadeService.getInactiveApps();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get an app by ID' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'App found successfully.',
+    type: SmartRotomApp
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'App not found.'
+  })
+  async findOne(@Param('id') id: number): Promise<SmartRotomApp> {
+    return this.appsFacadeService.getApp(id);
   }
 
   @Post()
@@ -41,22 +81,70 @@ export class AppsController {
     return this.appsFacadeService.createApp(createAppDto);
   }
 
-  @Post('order')
-  @ApiOperation({ summary: 'Order the apps' })
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update an app by ID' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Apps ordered successfully.',
+    description: 'App updated successfully.',
+    type: SmartRotomApp
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'App not found.'
+  })
+  @ApiBody({ type: UpdateAppDto })
+  async update(@Param('id') id: number, @Body() updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
+    return this.appsFacadeService.updateApp(id, updateAppDto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete an app by ID' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'App deleted successfully.',
     type: SuccessResponse
   })
-  @ApiBody({ type: OrderAppDto })
-  async order(@Body() orderDto: OrderAppDto): Promise<SuccessResponse> {
-    console.log('Ordering apps with data:', orderDto);
-    const result = await this.appsFacadeService.orderApps(orderDto.order, orderDto.uuid);
-    return {
-      success: result.success,
-      message: 'Apps ordered successfully'
-    };
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'App not found.'
+  })
+  async remove(@Param('id') id: number): Promise<SuccessResponse> {
+    return this.appsFacadeService.deleteApp(id);
   }
+
+  // ==================== APP STATUS MANAGEMENT ====================
+
+  @Patch(':id/activate')
+  @ApiOperation({ summary: 'Activate an app by ID' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'App activated successfully.',
+    type: SmartRotomApp
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'App not found.'
+  })
+  async activate(@Param('id') id: number): Promise<SmartRotomApp> {
+    return this.appsFacadeService.activateApp(id);
+  }
+
+  @Patch(':id/deactivate')
+  @ApiOperation({ summary: 'Deactivate an app by ID' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'App deactivated successfully.',
+    type: SmartRotomApp
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'App not found.'
+  })
+  async deactivate(@Param('id') id: number): Promise<SmartRotomApp> {
+    return this.appsFacadeService.deactivateApp(id);
+  }
+
+  // ==================== PLAYER APP MANAGEMENT ====================
 
   @Post('player')
   @ApiOperation({ summary: 'Get apps for a player' })
@@ -95,49 +183,22 @@ export class AppsController {
     return this.appsFacadeService.removeAppFromPlayer(uuid, id);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get an app by ID' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'App found successfully.',
-    type: SmartRotomApp
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'App not found.'
-  })
-  async findOne(@Param('id') id: number): Promise<SmartRotomApp> {
-    return this.appsFacadeService.getApp(id);
-  }
+  // ==================== APP ORDERING ====================
 
-  @Patch(':id')
-  @ApiOperation({ summary: 'Update an app by ID' })
+  @Post('order')
+  @ApiOperation({ summary: 'Order the apps for a player' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'App updated successfully.',
-    type: SmartRotomApp
-  })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'App not found.'
-  })
-  @ApiBody({ type: UpdateAppDto })
-  async update(@Param('id') id: number, @Body() updateAppDto: UpdateAppDto): Promise<SmartRotomApp> {
-    return this.appsFacadeService.updateApp(id, updateAppDto);
-  }
-
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete an app by ID' })
-  @ApiResponse({ 
-    status: HttpStatus.OK, 
-    description: 'App deleted successfully.',
+    description: 'Apps ordered successfully.',
     type: SuccessResponse
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'App not found.'
-  })
-  async remove(@Param('id') id: number): Promise<SuccessResponse> {
-    return this.appsFacadeService.deleteApp(id);
+  @ApiBody({ type: OrderAppDto })
+  async order(@Body() orderDto: OrderAppDto): Promise<SuccessResponse> {
+    console.log('Ordering apps with data:', orderDto);
+    const result = await this.appsFacadeService.orderApps(orderDto.order, orderDto.uuid);
+    return {
+      success: result.success,
+      message: 'Apps ordered successfully'
+    };
   }
 }

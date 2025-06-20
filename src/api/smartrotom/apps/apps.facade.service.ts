@@ -1,6 +1,4 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { AppsService } from './services/apps.service';
 import { UserAppsService } from './services/user-apps.service';
 import { SmartRotomApp } from '@/_db/schema/SmartRotom';
@@ -10,7 +8,6 @@ import { UpdateAppDto } from './dto/update-app.dto';
 @Injectable()
 export class AppsFacadeService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
     private readonly appsService: AppsService,
     private readonly userAppsService: UserAppsService,
   ) {}
@@ -18,6 +15,14 @@ export class AppsFacadeService {
   // ==================== APP MANAGEMENT ====================
   async getApps(): Promise<SmartRotomApp[]> {
     return this.appsService.getAllApps();
+  }
+
+  async getActiveApps(): Promise<SmartRotomApp[]> {
+    return this.appsService.getActiveApps();
+  }
+
+  async getInactiveApps(): Promise<SmartRotomApp[]> {
+    return this.appsService.getInactiveApps();
   }
 
   async getApp(id: number): Promise<SmartRotomApp> {
@@ -36,6 +41,16 @@ export class AppsFacadeService {
     return this.appsService.deleteApp(id);
   }
 
+  // ==================== APP STATUS MANAGEMENT ====================
+  
+  async activateApp(id: number): Promise<SmartRotomApp> {
+    return this.appsService.activateApp(id);
+  }
+
+  async deactivateApp(id: number): Promise<SmartRotomApp> {
+    return this.appsService.deactivateApp(id);
+  }
+
   // ==================== USER APP MANAGEMENT ====================
   async getAppsForPlayer(uuid: string): Promise<SmartRotomApp[]> {
     return this.userAppsService.getAppsForPlayer(uuid);
@@ -49,12 +64,10 @@ export class AppsFacadeService {
     return this.userAppsService.removeAppFromPlayer(uuid, appId);
   }
 
-async orderApps(
-  order: { id: number | string; order: number }[], 
-  uuid: string
-): Promise<{ success: boolean }> {
-  return this.db.transaction(async (tx) => {
+  async orderApps(
+    order: { id: number | string; order: number }[], 
+    uuid: string
+  ): Promise<{ success: boolean }> {
     return this.userAppsService.orderAppsForPlayer(order, uuid);
-  });
-}
+  }
 }

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, sql, or } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { 
   SmartRotomUserApp, 
@@ -39,7 +39,11 @@ export class UserAppsRepository implements IUserAppsRepository {
         order
       } as SmartRotomUserApp);
     
-    return this.findUserApp(uuid, appId);
+    const insertedApp = await this.findUserApp(uuid, appId);
+    if (!insertedApp) {
+      throw new Error('Failed to create user app');
+    }
+    return insertedApp;
   }
 
   async removeUserApp(uuid: string, appId: number): Promise<boolean> {
@@ -77,16 +81,24 @@ export class UserAppsRepository implements IUserAppsRepository {
   }
 
   async getAppsForPlayer(uuid: string): Promise<any[]> {
-    const result = await this.db.execute(sql`
-      SELECT DISTINCT sa.id, sa.url, sa.name, 
-        COALESCE(sao.order, 999) as orden,
-        CASE WHEN sao.uuid IS NOT NULL THEN 1 ELSE 0 END as is_user_app
-      FROM ${smartrotomApps} sa
-      LEFT JOIN ${smartrotomUserApps} sao ON sa.id = sao.app_id AND sao.uuid = ${uuid}
-      WHERE sa.active = 1 OR sao.uuid = ${uuid}
-      ORDER BY is_user_app DESC, orden ASC, sa.name ASC
-    `);
-
-    return result[0] as unknown as any[];
+    return this.db.select({
+      id: smartrotomApps.id,
+      url: smartrotomApps.url,
+      name: smartrotomApps.name,
+      orden: sql`COALESCE(${smartrotomUserApps.order}, 999)`.as('orden'),
+      is_user_app: sql`CASE WHEN ${smartrotomUserApps.uuid} IS NOT NULL THEN 1 ELSE 0 END`.as('is_user_app')
+    })
+    .from(smartrotomApps)
+    .leftJoin(smartrotomUserApps, and(
+      eq(smartrotomApps.id, smartrotomUserApps.appId),
+      eq(smartrotomUserApps.uuid, uuid)
+    ))
+    .where(or(
+      eq(smartrotomApps.active, 1),
+      eq(smartrotomUserApps.uuid, uuid)
+    ))
+    .orderBy(
+      sql`is_user_app DESC, orden ASC, ${smartrotomApps.name} ASC`
+    );
   }
 }

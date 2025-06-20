@@ -1,29 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsArray, ValidateNested, IsNumber, IsUUID } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { BaseDto } from '@api/_shared/dto/base.dto';
-
-// Custom validator for number or string with proper typing
-import { registerDecorator, ValidationOptions } from 'class-validator';
-
-function IsNumberOrString(validationOptions?: ValidationOptions) {
-  return function (object: Object, propertyName: string) {
-    registerDecorator({
-      name: 'isNumberOrString',
-      target: object.constructor,
-      propertyName: propertyName,
-      options: validationOptions,
-      validator: {
-        validate(value: any) {
-          return typeof value === 'number' || typeof value === 'string';
-        },
-        defaultMessage() {
-          return 'Value must be a number or string';
-        }
-      }
-    });
-  };
-}
 
 class OrderItemDto {
   @ApiProperty({ 
@@ -34,8 +12,9 @@ class OrderItemDto {
       { type: 'number' }
     ]
   })
-  @IsNumberOrString()
-  id: number | string;
+  @Transform(({ value }) => Number(value))
+  @IsNumber()
+  id: number;
 
   @ApiProperty({ 
     description: 'Display order position',

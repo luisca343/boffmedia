@@ -3,6 +3,7 @@ import { SmartRotomApp } from '@/_db/schema/SmartRotom';
 import { IUserAppsRepository } from '../repositories/interfaces/user-apps-repository.interface';
 import { IAppsRepository } from '../repositories/interfaces/apps-repository.interface';
 import { APPS_REPOSITORY_TOKEN, USER_APPS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { AppStatus } from '../enums/app-status.enum';
 
 @Injectable()
 export class UserAppsService {
@@ -13,6 +14,8 @@ export class UserAppsService {
     private readonly appsRepository: IAppsRepository,
   ) {}
 
+  // ==================== PLAYER APP MANAGEMENT ====================
+
   async getAppsForPlayer(uuid: string): Promise<SmartRotomApp[]> {
     this.validateUuid(uuid);
     return this.userAppsRepository.getAppsForPlayer(uuid);
@@ -22,23 +25,22 @@ export class UserAppsService {
     this.validateUuid(uuid);
     this.validateAppId(appId);
 
-    // Check if the app exists and is active
     const app = await this.appsRepository.findById(appId);
     if (!app) {
       throw new NotFoundException('App not found');
     }
 
-    if (app.active !== 1) {
+    if (app.active !== AppStatus.ACTIVE) {
       throw new BadRequestException('App is not active');
     }
 
-    // Check if the app is already in the player's list
     const existingUserApp = await this.userAppsRepository.findUserApp(uuid, appId);
     if (existingUserApp) {
       throw new ConflictException('App already added to player');
     }
 
     await this.userAppsRepository.addUserApp(uuid, appId);
+    
     return { success: true };
   }
 
@@ -53,6 +55,8 @@ export class UserAppsService {
 
     return { success: true };
   }
+
+  // ==================== APP ORDERING ====================
 
   async orderAppsForPlayer(
     order: { id: number | string; order: number }[], 
@@ -86,6 +90,8 @@ export class UserAppsService {
 
     return { success: true };
   }
+
+  // ==================== VALIDATION HELPERS ====================
 
   private validateUuid(uuid: string): void {
     if (!uuid) {
