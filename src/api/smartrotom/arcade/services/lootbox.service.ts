@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../dto/lottbox.dto';
 import { lootboxConfig, getRarityFromWeight } from '../_config/lootboxConfig';
-import { ArcadeRepository } from '@repositories/smartrotom/arcade.repository';
+import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
 
 @Injectable()
 export class LootboxService {
   constructor(
-    private readonly arcadeRepository: ArcadeRepository,
+    @Inject(ARCADE_INVENTORY_REPOSITORY_TOKEN)
+    private readonly arcadeInventoryRepository: IArcadeInventoryRepository,
   ) {}
 
   async openLootBox(openLootBoxDto: OpenLootBoxDto): Promise<OpenLootBoxResponseDto> {
@@ -18,25 +20,22 @@ export class LootboxService {
       throw new Error('Box not found');
     }
     
-    // Find available boxes
-    const inventoryBoxes = await this.arcadeRepository.findAvailableBoxes(uuid, boxId);
+    // Find available boxes using the new repository
+    const inventoryBoxes = await this.arcadeInventoryRepository.findUserItem(uuid, boxId);
     
-    if (!inventoryBoxes || inventoryBoxes.length === 0) {
+    if (!inventoryBoxes || inventoryBoxes.amount <= 0) {
       throw new Error('No boxes available');
     }
     
-    const boxToUse = inventoryBoxes[0];
-    const newUsedCount = (boxToUse.used || 0) + 1;
-    
-    // Update box usage
-    await this.arcadeRepository.updateInventoryItemUsage(boxToUse.id, newUsedCount);
+    // Consume one box
+    await this.arcadeInventoryRepository.consumeItem(uuid, boxId, 1);
     
     // Select random item
     const selectedItem = this.selectRandomItem(boxConfig.items);
     const rarity = getRarityFromWeight(selectedItem.weight);
     
-    // Add item to inventory
-    const newItemResult = await this.arcadeRepository.addInventoryItem({
+    // Add item to inventory using new repository
+    const newItemResult = await this.arcadeInventoryRepository.addItem({
       uuid,
       itemId: selectedItem.id,
       itemType: rarity.toUpperCase(),
@@ -46,8 +45,6 @@ export class LootboxService {
       rarity: rarity,
     });
     
-    const newItemId = Number(newItemResult[0]?.insertId);
-    
     // Generate spinner animation data
     const spinnerItems = this.generateSpinnerItems(boxConfig.items, selectedItem);
     const winningPosition = spinnerItems.findIndex(
@@ -55,12 +52,10 @@ export class LootboxService {
     );
     
     return {
-      success: true,
-      message: 'Successfully opened loot box',
       item: {
         id: selectedItem.id,
         rarity: rarity,
-        serverId: newItemId
+        serverId: newItemResult.insertId
       },
       spinnerItems: spinnerItems,
       winningPosition: winningPosition,
@@ -73,7 +68,7 @@ export class LootboxService {
       throw new Error('Lootbox not found');
     }
     
-    await this.arcadeRepository.addInventoryItem({
+    await this.arcadeInventoryRepository.addItem({
       uuid,
       itemId: boxId,
       itemType: 'lootbox',
@@ -92,6 +87,7 @@ export class LootboxService {
     return lootboxConfig;
   }
 
+  // ... rest of private methods stay the same
   private selectRandomItem(items: any[]) {
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
     const randomValue = Math.random() * totalWeight;

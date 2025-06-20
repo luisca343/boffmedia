@@ -79,6 +79,11 @@ export class ConsumeInventoryItemDto {
   @IsNotEmpty()
   @IsString()
   itemId: string;
+
+  @ApiProperty({ description: 'Amount to consume', required: false, example: 1 })
+  @IsOptional()
+  @IsInt()
+  amount?: number = 1;
 }
 
 export class ClaimItemDto {

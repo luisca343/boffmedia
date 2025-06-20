@@ -11,11 +11,6 @@ export class OpenLootBoxDto {
   @IsNotEmpty()
   @IsString()
   boxId: string;
-
-  @ApiProperty({ description: 'Inventory item ID to consume', example: 123 })
-  @IsNotEmpty()
-  @IsNumber()
-  itemId: number;
 }
 
 class SpinnerItemDto {
@@ -41,12 +36,6 @@ class LootItemDto {
 }
 
 export class OpenLootBoxResponseDto {
-  @ApiProperty({ description: 'Whether the operation was successful', example: true })
-  success: boolean;
-
-  @ApiProperty({ description: 'Message describing the result', required: false, example: 'Successfully opened loot box' })
-  message?: string;
-
   @ApiProperty({ description: 'The item obtained from the loot box', required: false, type: LootItemDto })
   item?: LootItemDto;
 

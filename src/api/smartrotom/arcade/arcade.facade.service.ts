@@ -1,329 +1,334 @@
-import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { Injectable, OnModuleInit, BadRequestException, NotFoundException } from '@nestjs/common';
 import { StreakService } from './services/streak.service';
 import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
+import { ArcadeStreak } from './entities/arcade-streak.entity';
+import { ArcadeInventory } from './entities/arcade-inventory.entity';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
-import { rarityRanges } from './_config/lootboxConfig';
-import { DailyRewardsConfig, loadRewardsConfig } from '../_main/_config/daily-rewards.config';
-import { WingullFacadeService } from '../wingull/wingull.facade.service';
-import { StarbankFacadeService } from '../starbank/starbank.facade.service';
-import { ArcadeStreak, ClaimRewardResponse } from './dto/arcade-streak.dto';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
-  private rewardsConfig: DailyRewardsConfig;
-  
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
     private readonly streakService: StreakService,
     private readonly inventoryService: InventoryService,
     private readonly lootboxService: LootboxService,
-    private readonly starbankService: StarbankFacadeService,
-    private readonly wingullService: WingullFacadeService,
   ) {}
-  
-  onModuleInit() {
-    this.rewardsConfig = loadRewardsConfig();
-    console.log(`Loaded daily rewards configuration: ${this.rewardsConfig.totalDays} total days`);
+
+  async onModuleInit() {
+    // Initialize any required data or configurations
+    console.log('ArcadeFacadeService initialized');
   }
 
   // ==================== STREAK MANAGEMENT ====================
-  
-  async getArcadeStreak(uuid: string): Promise<ArcadeStreak> {
-    return this.streakService.getArcadeStreak(uuid, this.rewardsConfig);
+
+  async getUserStreak(uuid: string): Promise<ArcadeStreak> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+
+    return this.streakService.getUserStreak(uuid);
   }
 
-  async claimDailyReward(uuid: string): Promise<ClaimRewardResponse> {
-    try {
-      const currentStreak = await this.getArcadeStreak(uuid);
+  async canClaimDailyReward(uuid: string): Promise<{ canClaim: boolean; streak: ArcadeStreak }> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
 
-      if (currentStreak.claimedToday) {
-        return {
-          success: false,
-          rewardGiven: null,
-          newStreak: currentStreak.streak,
-          message: "You've already claimed your daily reward today."
+    return this.streakService.canClaimReward(uuid);
+  }
+
+  async claimDailyReward(uuid: string): Promise<{
+    streak: ArcadeStreak;
+    reward: any;
+    inventoryItems?: ArcadeInventory[];
+  }> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+
+    const result = await this.streakService.claimDailyReward(uuid);
+
+    // Add reward items to inventory if any
+    if (result.reward.items && result.reward.items.length > 0) {
+      const inventoryItems: ArcadeInventory[] = [];
+      
+      for (const rewardItem of result.reward.items) {
+        const claimData: ClaimItemData = {
+          uuid,
+          itemId: rewardItem.itemId,
+          itemType: rewardItem.itemType,
+          amount: rewardItem.amount,
+          rarity: rewardItem.rarity,
+          sourceType: 'daily_reward'
         };
+
+        const inventoryResult = await this.inventoryService.addItemToInventory(claimData);
+        inventoryItems.push(inventoryResult.item);
       }
 
-      // Calculate new streak
-      const bannerChanged = currentStreak.lastBanner && 
-                           currentStreak.lastBanner !== this.rewardsConfig.name;
-      
-      let newStreak = bannerChanged ? 1 : currentStreak.streak + 1;
-      const dayInCycle = ((newStreak - 1) % this.rewardsConfig.totalDays) + 1;
-      
-      // Get reward from configuration
-      const reward = this.getRewardForDay(dayInCycle);
-
-      // Update streak
-      await this.streakService.updateStreak(uuid, {
-        lastClaimed: new Date(),
-        streak: newStreak,
-        totalClaims: (currentStreak.totalClaims || 0) + 1,
-        lastBanner: this.rewardsConfig.name
-      });
-      
-      // Award the reward
-      await this.awardReward(uuid, reward);
-      
-      // Calculate next reward
-      const nextDayInCycle = (dayInCycle % this.rewardsConfig.totalDays) + 1;
-      const nextReward = this.getRewardForDay(nextDayInCycle);
-      
       return {
-        success: true,
-        rewardGiven: reward,
-        newStreak: newStreak,
-        currentDay: dayInCycle,
-        totalDays: this.rewardsConfig.totalDays,
-        nextReward: nextReward,
-        message: reward.description || this.getDefaultRewardMessage(dayInCycle),
-        bannerName: this.rewardsConfig.name
+        streak: result.streak,
+        reward: result.reward,
+        inventoryItems
       };
-    } catch (error) {
-      console.error('Error claiming daily reward:', error);
-      throw error;
+    }
+
+    return {
+      streak: result.streak,
+      reward: result.reward
+    };
+  }
+
+  async resetUserStreak(uuid: string): Promise<void> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+
+    const result = await this.streakService.resetUserStreak(uuid);
+    
+    if (!result.success) {
+      throw new NotFoundException('Streak not found or could not be reset');
     }
   }
 
-  async getRewardsBanner(): Promise<DailyRewardsConfig> {
-    return this.rewardsConfig;
+  async getStreakStats(uuid: string): Promise<ArcadeStreak> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+
+    return this.streakService.getStreakStats(uuid);
+  }
+
+  async updateLastBanner(uuid: string, banner: string): Promise<ArcadeStreak> {
+    if (!uuid || !banner) {
+      throw new BadRequestException('UUID and banner are required');
+    }
+
+    return this.streakService.updateLastBanner(uuid, banner);
   }
 
   // ==================== INVENTORY MANAGEMENT ====================
-  
-  async getInventory(uuid: string, sourceType?: string) {
-    return this.inventoryService.getInventory(uuid, sourceType);
+
+  async getUserInventory(uuid: string): Promise<ArcadeInventory[]> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+
+    return this.inventoryService.getUserInventory(uuid);
   }
 
-  async addInventoryItem(data: {
+  async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventory | null> {
+    if (!uuid || !itemId) {
+      throw new BadRequestException('UUID and item ID are required');
+    }
+
+    return this.inventoryService.getUserItem(uuid, itemId);
+  }
+
+  async addItemToInventory(itemData: {
     uuid: string;
     itemId: string;
     itemType: string;
-    name: string;
-    amount?: number;
-    sourceType?: string;
-    sourceId?: number;
+    amount: number;
     rarity?: string;
-  }) {
-    try {
-      const result = await this.inventoryService.addInventoryItem(data);
-      return {
-        success: true,
-        message: 'Item added to inventory successfully',
-        itemId: result.insertId
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message
-      };
+    sourceType?: string;
+  }): Promise<ArcadeInventory> {
+    if (!itemData.uuid || !itemData.itemId || !itemData.itemType) {
+      throw new BadRequestException('UUID, item ID, and item type are required');
     }
+
+    const claimData: ClaimItemData = {
+      uuid: itemData.uuid,
+      itemId: itemData.itemId,
+      itemType: itemData.itemType,
+      amount: itemData.amount || 1,
+      rarity: itemData.rarity || 'common',
+      sourceType: itemData.sourceType || 'manual'
+    };
+
+    const result = await this.inventoryService.addItemToInventory(claimData);
+    return result.item;
   }
 
-  async consumeInventoryItem(uuid: string, itemId: string) {
-    try {
-      const result = await this.inventoryService.consumeInventoryItem(uuid, itemId);
-      return {
-        success: true,
-        message: `Successfully consumed ${itemId}`,
-        consumed: true,
-        itemDetails: result
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.message,
-        consumed: false
-      };
+  async consumeInventoryItem(uuid: string, itemId: string, amount: number = 1): Promise<{
+    item: ArcadeInventory | null;
+    consumed: number;
+  }> {
+    if (!uuid || !itemId) {
+      throw new BadRequestException('UUID and item ID are required');
     }
-  }
 
-  async claimInventoryItems(uuid: string, items: ClaimItemData[]) {
-    try {
-      if (!Array.isArray(items) || items.length === 0) {
-        return {
-          success: false,
-          message: 'No items to claim'
-        };
-      }
-
-      const inventory = await this.getInventory(uuid);
-      const itemIds = items.map(item => item.id);
-      
-      const inventoryItems = inventory.rawItems.filter(item => 
-        itemIds.includes(item.itemId)
-      );
-
-      if (inventoryItems.length === 0) {
-        return {
-          success: false,
-          message: 'No items found for the provided IDs'
-        };
-      }
-
-      // Separate Pokémon and regular items
-      const pokemonItems = inventoryItems.filter(item => 
-        item.itemType.toLowerCase() === 'pokemon'
-      );
-      const regularItems = inventoryItems.filter(item => 
-        item.itemType.toLowerCase() !== 'pokemon'
-      );
-
-      // Process regular items
-      const regularItemsToGive = this.processRegularItems(regularItems);
-      
-      // Process Pokémon items
-      const pokemonResults = await this.processPokemonItems(uuid, pokemonItems);
-      
-      // Give regular items
-      let regularItemsResult = null;
-      if (regularItemsToGive.length > 0) {
-        regularItemsResult = await this.wingullService.giveItems(uuid, regularItemsToGive);
-      }
-
-      return {
-        success: true,
-        message: 'Items claimed and sent to player successfully',
-        claimedItems: inventoryItems.map(item => ({ 
-          id: item.id, 
-          itemId: item.itemId,
-          itemType: item.itemType
-        })),
-        regularItems: {
-          count: regularItems.length,
-          optimizedStackCount: regularItemsToGive.length,
-          giveResult: regularItemsResult
-        },
-        pokemonItems: {
-          count: pokemonItems.length,
-          processedItems: pokemonResults
-        }
-      };
-    } catch (error) {
-      console.error('Error claiming inventory items:', error);
-      throw error;
+    if (amount < 1) {
+      throw new BadRequestException('Amount must be greater than 0');
     }
-  }
 
-  // ==================== LOOTBOX MANAGEMENT ====================
-  
-  async openLootBox(openLootBoxDto: OpenLootBoxDto): Promise<OpenLootBoxResponseDto> {
-    return this.lootboxService.openLootBox(openLootBoxDto);
-  }
+    const result = await this.inventoryService.consumeItem(uuid, itemId, amount);
+    
+    if (!result.success) {
+      throw new BadRequestException('Failed to consume item');
+    }
 
-  async giveLootbox(uuid: string, lootboxType: string, amount?: number) {
-    return this.lootboxService.giveLootbox(uuid, lootboxType, amount || 1);
-  }
-
-  async getLootboxConfig() {
-    return { 
-      rarityRanges, 
-      lootboxConfig: this.lootboxService.getLootboxConfig() 
+    return {
+      item: result.item,
+      consumed: result.consumed
     };
   }
 
-  // ==================== GAME FEATURES ====================
-  
-  getWordle() {
-    return 'wordle';
+  async removeInventoryItem(uuid: string, itemId: string): Promise<void> {
+    if (!uuid || !itemId) {
+      throw new BadRequestException('UUID and item ID are required');
+    }
+
+    const result = await this.inventoryService.removeItem(uuid, itemId);
+    
+    if (!result.success) {
+      throw new BadRequestException('Failed to remove item');
+    }
   }
 
-  // ==================== PRIVATE HELPER METHODS ====================
-  
-  private getRewardForDay(day: number) {
-    const dayInCycle = ((day - 1) % this.rewardsConfig.totalDays) + 1;
-    const rewardConfig = this.rewardsConfig.rewards.find(r => r.day === dayInCycle);
-    
-    return rewardConfig || { 
-      day: dayInCycle, 
-      type: "CURRENCY", 
-      amount: 100,
-      description: `Day ${dayInCycle} reward`
+  async getInventoryStats(uuid: string): Promise<{
+    totalItems: number;
+    itemsByType: Record<string, number>;
+    itemsByRarity: Record<string, number>;
+  }> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
+    }
+
+    return this.inventoryService.getInventoryStats(uuid);
+  }
+
+  async getInventoryItemsByType(uuid: string, itemType: string): Promise<ArcadeInventory[]> {
+    if (!uuid || !itemType) {
+      throw new BadRequestException('UUID and item type are required');
+    }
+
+    return this.inventoryService.getItemsByType(uuid, itemType);
+  }
+
+  async getInventoryItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventory[]> {
+    if (!uuid || !rarity) {
+      throw new BadRequestException('UUID and rarity are required');
+    }
+
+    return this.inventoryService.getItemsByRarity(uuid, rarity);
+  }
+
+  async markItemAsUsed(uuid: string, itemId: string): Promise<ArcadeInventory> {
+    if (!uuid || !itemId) {
+      throw new BadRequestException('UUID and item ID are required');
+    }
+
+    return this.inventoryService.markItemAsUsed(uuid, itemId);
+  }
+
+// ==================== LOOTBOX MANAGEMENT ====================
+
+  async getLootboxConfig(): Promise<any> {
+    return this.lootboxService.getLootboxConfig();
+  }
+
+  async openLootbox(uuid: string, lootboxType: string): Promise<OpenLootBoxResponseDto> {
+    if (!uuid || !lootboxType) {
+      throw new BadRequestException('UUID and lootbox type are required');
+    }
+
+    const openLootBoxDto: OpenLootBoxDto = {
+      uuid,
+      boxId: lootboxType,
+    };
+
+    // Use existing lootbox service logic
+    const lootboxResult = await this.lootboxService.openLootBox(openLootBoxDto);
+
+    // Add the won item to inventory
+    if (lootboxResult.item) {
+      const claimData: ClaimItemData = {
+        uuid,
+        itemId: lootboxResult.item.id,
+        itemType: lootboxResult.item.rarity.toUpperCase(),
+        amount: 1,
+        rarity: lootboxResult.item.rarity,
+        sourceType: 'lootbox'
+      };
+
+      const inventoryResult = await this.inventoryService.addItemToInventory(claimData);
+
+      return {
+        item: lootboxResult.item,
+        spinnerItems: lootboxResult.spinnerItems || [],
+        winningPosition: lootboxResult.winningPosition || 0
+      };
+    }
+
+    return {
+      item: lootboxResult.item,
+      spinnerItems: lootboxResult.spinnerItems || [],
+      winningPosition: lootboxResult.winningPosition || 0
     };
   }
 
-  private async awardReward(uuid: string, reward: any) {
-    if (reward.type === "CURRENCY" && reward.amount > 0) {
-      await this.awardCurrency(uuid, reward.amount);
-    } else if (reward.type === "box") {
-      await this.giveLootbox(uuid, reward.description, reward.amount);
+  async giveLootbox(uuid: string, lootboxType: string, amount: number = 1): Promise<void> {
+    if (!uuid || !lootboxType) {
+      throw new BadRequestException('UUID and lootbox type are required');
+    }
+
+    if (amount < 1) {
+      throw new BadRequestException('Amount must be greater than 0');
+    }
+
+    const result = await this.lootboxService.giveLootbox(uuid, lootboxType, amount);
+    
+    if (!result.success) {
+      throw new BadRequestException(result.message || 'Failed to give lootbox');
     }
   }
 
-  private async awardCurrency(uuid: string, amount: number) {
-    const account = await this.starbankService.getMainAccount(uuid);
-    if (!account) {
-      throw new Error("No account found for user");
+  // ==================== COMBINED OPERATIONS ====================
+
+  async claimMultipleItems(uuid: string, items: ClaimItemData[]): Promise<ArcadeInventory[]> {
+    if (!uuid || !items || items.length === 0) {
+      throw new BadRequestException('UUID and items array are required');
     }
-    
-    await this.starbankService.transfer(
-      0,
-      account.id,
-      amount,
-      "Daily bonus reward",
-    );
+
+    const claimedItems: ArcadeInventory[] = [];
+
+    for (const itemData of items) {
+      const claimData: ClaimItemData = {
+        ...itemData,
+        uuid // Ensure UUID is set
+      };
+
+      const result = await this.inventoryService.addItemToInventory(claimData);
+      claimedItems.push(result.item);
+    }
+
+    return claimedItems;
   }
 
-  private getDefaultRewardMessage(day: number): string {
-    const dayInCycle = ((day - 1) % this.rewardsConfig.totalDays) + 1;
-    
-    if (dayInCycle === this.rewardsConfig.totalDays) {
-      return `Congratulations! You've completed the ${this.rewardsConfig.totalDays}-day reward cycle!`;
-    } else if (dayInCycle === 1) {
-      return `You've started a new reward cycle! Come back tomorrow for more rewards!`;
-    } else {
-      return `Day ${dayInCycle} of ${this.rewardsConfig.totalDays} complete! Keep coming back for larger rewards!`;
+  async getCompleteUserData(uuid: string): Promise<{
+    streak: ArcadeStreak;
+    inventory: ArcadeInventory[];
+    inventoryStats: {
+      totalItems: number;
+      itemsByType: Record<string, number>;
+      itemsByRarity: Record<string, number>;
+    };
+  }> {
+    if (!uuid) {
+      throw new BadRequestException('UUID is required');
     }
-  }
 
-  private processRegularItems(items: any[]): Array<{id: string, amount: number}> {
-    const itemsToGive: Array<{id: string, amount: number}> = [];
-    const itemsMap = new Map<string, number>();
-    
-    for (const item of items) {
-      const currentAmount = itemsMap.get(item.itemId) || 0;
-      itemsMap.set(item.itemId, currentAmount + item.amount);
-    }
-    
-    itemsMap.forEach((totalAmount, itemId) => {
-      const fullStacks = Math.floor(totalAmount / 64);
-      for (let i = 0; i < fullStacks; i++) {
-        itemsToGive.push({ id: itemId, amount: 64 });
-      }
-      
-      const remainder = totalAmount % 64;
-      if (remainder > 0) {
-        itemsToGive.push({ id: itemId, amount: remainder });
-      }
-    });
-    
-    return itemsToGive;
-  }
+    const [streak, inventory, inventoryStats] = await Promise.all([
+      this.streakService.getUserStreak(uuid),
+      this.inventoryService.getUserInventory(uuid),
+      this.inventoryService.getInventoryStats(uuid)
+    ]);
 
-  private async processPokemonItems(uuid: string, pokemonItems: any[]) {
-    const results = [];
-    
-    for (const pokemonItem of pokemonItems) {
-      try {
-        const giveResult = await this.wingullService.givePokemon(uuid, pokemonItem.itemId, true);
-        results.push({
-          id: pokemonItem.id,
-          itemId: pokemonItem.itemId,
-          result: giveResult
-        });
-      } catch (error) {
-        results.push({
-          id: pokemonItem.id,
-          itemId: pokemonItem.itemId,
-          error: error.message || 'Unknown error'
-        });
-      }
-    }
-    
-    return results;
+    return {
+      streak,
+      inventory,
+      inventoryStats
+    };
   }
 }
