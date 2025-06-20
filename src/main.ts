@@ -48,8 +48,8 @@ async function bootstrap() {
       .setDescription('Comprehensive API for Ficus Labs services including SmartRotom and BoffMedia tools')
       .setVersion('1.0.0')
       .setContact('Ficus Labs', 'https://ficuslab.es', 'contact@ficuslab.es')
-      .addServer('http://localhost:34301', 'Development server')
-      .addServer('https://api.ficuslab.es', 'Production server')
+      .addServer('https://api.ficuslab.es', 'Development server')
+      .addServer('https://api.boffmedia.es', 'Production server')
       .addBearerAuth({
         type: 'http',
         scheme: 'bearer',
