@@ -1,15 +1,10 @@
 import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { IReplaysRepository } from '../repositories/interfaces/achievements.replays.repository.interface';
 import { REPLAYS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
-
-export interface CreateReplayRequest {
-  side1: string;
-  side2: string;
-  team1: string;
-  team2: string;
-  replay: string;
-  winner: string;
-}
+import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
+import { Replay } from '../entities/replay.entity';
+import { UserReplayEntity } from '../entities/user-replay.entity';
+import { CreateReplayFullDto } from '../dto/create-replay-full.dto';
 
 @Injectable()
 export class ReplaysService {
@@ -18,26 +13,27 @@ export class ReplaysService {
     private readonly replaysRepository: IReplaysRepository,
   ) {}
 
-  async createReplay(replayData: CreateReplayRequest): Promise<{ replayId: number }> {
+  async createReplay(replayData: CreateReplayFullDto): Promise<BaseInsertResponse> {
     this.validateReplayData(replayData);
 
     const replay = await this.replaysRepository.create(replayData);
-    return { replayId: replay.id };
+    return { insertId: replay.id };
   }
 
-  async createUserReplay(uuid: string, replayId: number): Promise<{ insertId: number }> {
+  async createUserReplay(uuid: string, replayId: number): Promise<BaseInsertResponse> {
     this.validateUuid(uuid);
     this.validateReplayId(replayId);
 
-    const userReplayData = {
+    const userReplayData: UserReplayEntity = {
       uuid,
-      replayId
+      replayId,
+      side: 1 // Default to side 1, could be parameterized later
     };
 
     return this.replaysRepository.createUserReplay(userReplayData);
   }
 
-  async getUserReplay(uuid: string, replayId: number): Promise<any> {
+  async getUserReplay(uuid: string, replayId: number): Promise<Replay | null> {
     this.validateUuid(uuid);
     this.validateReplayId(replayId);
 
@@ -58,7 +54,7 @@ export class ReplaysService {
     }
   }
 
-  private validateReplayData(replayData: CreateReplayRequest): void {
+  private validateReplayData(replayData: CreateReplayFullDto): void {
     if (!replayData.side1) {
       throw new BadRequestException('Player 1 name is required');
     }

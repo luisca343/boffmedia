@@ -1,6 +1,10 @@
 import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { IAchievementsRepository } from '../repositories/interfaces/achievements.repository.interface';
 import { ACHIEVEMENTS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
+import { UserAchievement } from '../entities/achievement.entity';
+import { UserAchievementEntity } from '../entities/user-achievement.entity';
+import { AchievementStatusEntity } from '../entities/achievement-status.entity';
 
 @Injectable()
 export class AchievementsService {
@@ -9,12 +13,12 @@ export class AchievementsService {
     private readonly achievementsRepository: IAchievementsRepository,
   ) {}
 
-  async getUserAchievements(uuid: string): Promise<any[]> {
+  async getUserAchievements(uuid: string): Promise<UserAchievement[]> {
     this.validateUuid(uuid);
     return this.achievementsRepository.findUserAchievements(uuid);
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<any> {
+  async getUserAchievementById(uuid: string, achievementId: string): Promise<UserAchievement> {
     this.validateUuid(uuid);
     this.validateAchievementId(achievementId);
 
@@ -46,7 +50,7 @@ export class AchievementsService {
     }
   }
 
-  async createUserAchievement(achievementData: any): Promise<{ insertId: number }> {
+  async createUserAchievement(achievementData: UserAchievementEntity): Promise<BaseInsertResponse> {
     this.validateUuid(achievementData.uuid);
     this.validateAchievementId(achievementData.achievementId);
 

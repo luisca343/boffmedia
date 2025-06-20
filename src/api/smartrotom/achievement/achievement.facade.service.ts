@@ -2,6 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { AchievementsService } from './services/achievements.service';
 import { ReplaysService } from './services/replays.service';
 import { BattleAchievementService, BattleAchievementRequest } from './services/battle-achievement.service';
+import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
+import { UserAchievement } from './entities/achievement.entity';
+import { Replay } from './entities/replay.entity';
+import { UserAchievementEntity } from './entities/user-achievement.entity';
+import { CreateReplayFullDto } from './dto/create-replay-full.dto';
 
 @Injectable()
 export class AchievementFacadeService {
@@ -13,11 +18,11 @@ export class AchievementFacadeService {
 
   // ==================== ACHIEVEMENT MANAGEMENT ====================
 
-  async getUserAchievements(uuid: string): Promise<any[]> {
+  async getUserAchievements(uuid: string): Promise<UserAchievement[]> {
     return this.achievementsService.getUserAchievements(uuid);
   }
 
-  async getUserAchievementById(uuid: string, achievementId: string): Promise<any> {
+  async getUserAchievementById(uuid: string, achievementId: string): Promise<UserAchievement> {
     return this.achievementsService.getUserAchievementById(uuid, achievementId);
   }
 
@@ -27,22 +32,15 @@ export class AchievementFacadeService {
 
   // ==================== REPLAY MANAGEMENT ====================
 
-  async createReplay(replayData: {
-    side1: string;
-    side2: string;
-    team1: string;
-    team2: string;
-    replay: string;
-    winner: string;
-  }): Promise<{ replayId: number }> {
+  async createReplay(replayData: CreateReplayFullDto): Promise<BaseInsertResponse> {
     return this.replaysService.createReplay(replayData);
   }
 
-  async createUserReplay(uuid: string, replayId: number): Promise<{ insertId: number }> {
+  async createUserReplay(uuid: string, replayId: number): Promise<BaseInsertResponse> {
     return this.replaysService.createUserReplay(uuid, replayId);
   }
 
-  async getUserReplay(uuid: string, replayId: number): Promise<any> {
+  async getUserReplay(uuid: string, replayId: number): Promise<Replay | null> {
     return this.replaysService.getUserReplay(uuid, replayId);
   }
 
@@ -56,12 +54,13 @@ export class AchievementFacadeService {
 
   async unlockAchievement(uuid: string, logro: string): Promise<{ success: boolean; message: string }> {
     // Simple achievement unlock without battle data
-    const achievementData = {
+    const achievementData: UserAchievementEntity = {
       uuid,
       achievementId: logro,
       progress: 1,
       completed: 1,
-      completedAt: new Date().toISOString()
+      completedAt: new Date(),
+      dataId: null
     };
 
     try {

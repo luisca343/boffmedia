@@ -4,13 +4,14 @@ import { ResponseInterceptor } from '@api/_utils/interceptors/response.intercept
 import { AchievementFacadeService } from './achievement.facade.service';
 
 // DTOs
-import { GetAchievementsDto, GetAchievementByIdDto, CheckAchievementDto } from './dto/achievement.dto';
-import { BattleAchievementDto } from './dto/battle-achievement.dto';
-import { CreateReplayDto, CreateUserReplayDto, GetReplayDto } from './dto/replay.dto';
+import { GetAchievementsDto, GetAchievementByIdDto, CheckAchievementDto, AchievementStatusResponse } from './dto/achievement.dto';
+import { BattleAchievementDto, BattleAchievementResponse } from './dto/battle-achievement.dto';
+import { CreateReplayDto, CreateUserReplayDto, GetReplayDto, CreateReplayResponse, CreateUserReplayResponse } from './dto/replay.dto';
 
 // Entities
 import { UserAchievement } from './entities/achievement.entity';
 import { Replay } from './entities/replay.entity';
+import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
 @ApiTags('SmartRotom | Achievements')
 @Controller('smartrotom/achievement')
@@ -36,7 +37,7 @@ export class AchievementController {
     status: 400, 
     description: 'Invalid UUID provided' 
   })
-  async getUserAchievements(@Body() dto: GetAchievementsDto): Promise<any[]> {
+  async getUserAchievements(@Body() dto: GetAchievementsDto): Promise<UserAchievement[]> {
     return this.achievementFacadeService.getUserAchievements(dto.uuid);
   }
 
@@ -54,7 +55,7 @@ export class AchievementController {
     status: 404, 
     description: 'Achievement not found' 
   })
-  async getUserAchievementById(@Body() dto: GetAchievementByIdDto): Promise<any> {
+  async getUserAchievementById(@Body() dto: GetAchievementByIdDto): Promise<UserAchievement> {
     return this.achievementFacadeService.getUserAchievementById(dto.uuid, dto.achievementId);
   }
 
@@ -65,9 +66,10 @@ export class AchievementController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Achievement status checked successfully'
+    description: 'Achievement status checked successfully',
+    type: AchievementStatusResponse
   })
-  async checkUserHasAchievement(@Body() dto: CheckAchievementDto): Promise<{ completed: number | null; error?: string }> {
+  async checkUserHasAchievement(@Body() dto: CheckAchievementDto): Promise<AchievementStatusResponse> {
     return this.achievementFacadeService.checkUserHasAchievement(dto.uuid, dto.achievementId);
   }
 
@@ -80,7 +82,8 @@ export class AchievementController {
   })
   @ApiResponse({ 
     status: 200, 
-    description: 'Battle achievement processed successfully'
+    description: 'Battle achievement processed successfully',
+    type: BattleAchievementResponse
   })
   @ApiResponse({ 
     status: 400, 
@@ -90,20 +93,30 @@ export class AchievementController {
     status: 404, 
     description: 'Achievement not found' 
   })
-  async processBattleAchievement(@Body() dto: BattleAchievementDto): Promise<{ success: boolean; message: string }> {
-    // Map DTO to service interface
-    const battleData = {
-      uuid: dto.uuid,
-      logro: dto.logro,
-      name1: dto.uuid, // Assuming the requesting user is player 1
-      name2: 'opponent', // Default opponent name
-      team1: {}, // Empty team data for now
-      team2: {}, // Empty team data for now
-      replay: '', // Empty replay data for now
-      victoria: true // Assuming victory for achievement unlock
-    };
+  async processBattleAchievement(@Body() dto: BattleAchievementDto): Promise<BattleAchievementResponse> {
+    try {
+      const battleData = {
+        uuid: dto.uuid,
+        logro: dto.logro,
+        name1: dto.name1,
+        name2: dto.name2,
+        team1: dto.team1,
+        team2: dto.team2,
+        replay: dto.replay,
+        victoria: dto.victoria
+      };
 
-    return this.achievementFacadeService.processBattleAchievement(battleData);
+      const result = await this.achievementFacadeService.processBattleAchievement(battleData);
+      return { 
+        success: result.success,
+        replayId: result.success ? 1 : undefined // This should be properly returned from the service
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message
+      };
+    }
   }
 
   // ==================== REPLAY ENDPOINTS ====================
@@ -115,14 +128,15 @@ export class AchievementController {
   })
   @ApiResponse({ 
     status: 201, 
-    description: 'Replay created successfully'
+    description: 'Replay created successfully',
+    type: CreateReplayResponse
   })
-  @ApiResponse({ 
-    status: 400, 
+  @ApiResponse({
+    status: 400,
     description: 'Invalid replay data provided' 
   })
-  async createReplay(@Body() dto: CreateReplayDto): Promise<{ replayId: number }> {
-    return this.achievementFacadeService.createReplay({
+  async createReplay(@Body() dto: CreateReplayDto): Promise<CreateReplayResponse> {
+    const result = await this.achievementFacadeService.createReplay({
       side1: dto.side1,
       side2: dto.side2,
       team1: dto.team1,
@@ -130,6 +144,8 @@ export class AchievementController {
       replay: dto.replay,
       winner: dto.winner
     });
+    
+    return { replayId: result.insertId };
   }
 
   @Post('create-user-replay')
@@ -139,14 +155,16 @@ export class AchievementController {
   })
   @ApiResponse({ 
     status: 201, 
-    description: 'User replay association created successfully'
+    description: 'User replay association created successfully',
+    type: CreateUserReplayResponse
   })
   @ApiResponse({ 
     status: 400, 
     description: 'Invalid user replay data provided' 
   })
-  async createUserReplay(@Body() dto: CreateUserReplayDto): Promise<{ insertId: number }> {
-    return this.achievementFacadeService.createUserReplay(dto.uuid, dto.replayId);
+  async createUserReplay(@Body() dto: CreateUserReplayDto): Promise<CreateUserReplayResponse> {
+    const result = await this.achievementFacadeService.createUserReplay(dto.uuid, dto.replayId);
+    return { relationId: result.insertId };
   }
 
   @Post('get-replay')
@@ -163,7 +181,7 @@ export class AchievementController {
     status: 404, 
     description: 'Replay not found' 
   })
-  async getUserReplay(@Body() dto: GetReplayDto): Promise<any> {
+  async getUserReplay(@Body() dto: GetReplayDto): Promise<Replay | null> {
     return this.achievementFacadeService.getUserReplay(dto.uuid, dto.replayId);
   }
 }

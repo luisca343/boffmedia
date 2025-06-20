@@ -15,6 +15,7 @@ import {
   smartRotomUserAchievements,
   smartRotomUserReplays
 } from '@/_db/schema/SmartRotom';
+import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
 @Injectable()
 export class AchievementsRepository 
@@ -174,7 +175,7 @@ export class AchievementsRepository
     return result[0] || null;
   }
 
-  async createUserAchievement(achievementData: any): Promise<{ insertId: number }> {
+  async createUserAchievement(achievementData: any): Promise<BaseInsertResponse> {
     const result = await this.db
       .insert(smartRotomUserAchievements)
       .values(achievementData as SmartRotomUserAchievement);

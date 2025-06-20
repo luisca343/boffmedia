@@ -13,6 +13,7 @@ import {
   smartRotomReplays,
   smartRotomUserReplays
 } from '@/_db/schema/SmartRotom';
+import { BaseInsertResponse } from '@api/_utils/dto/base-responses.dto';
 
 @Injectable()
 export class ReplaysRepository 
@@ -40,7 +41,7 @@ export class ReplaysRepository
     return result[0].affectedRows > 0;
   }
 
-  async createUserReplay(userReplayData: any): Promise<{ insertId: number }> {
+  async createUserReplay(userReplayData: any): Promise<BaseInsertResponse> {
     const result = await this.db
       .insert(smartRotomUserReplays)
       .values(userReplayData as SmartRotomUserReplay);
