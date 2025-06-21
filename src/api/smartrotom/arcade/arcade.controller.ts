@@ -34,6 +34,12 @@ export class ArcadeController {
   }
   
   // ==================== STREAK ENDPOINTS ====================
+  @Get('banner')
+  @ApiOperation({ summary: 'Get daily rewards banner configuration' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Banner configuration retrieved successfully.' })
+  async getRewardsBanner() {
+    return await this.arcadeFacadeService.getRewardsBanner();
+  }
   
   @Get('streak/:uuid')
   @ApiOperation({ summary: 'Get user\'s arcade streak status' })

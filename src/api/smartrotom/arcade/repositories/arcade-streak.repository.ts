@@ -51,7 +51,7 @@ export class ArcadeStreakRepository
     return result[0].affectedRows > 0;
   }
 
-  async findByUuid(uuid: string): Promise<ArcadeStreak | null> {
+  async findByUuid(uuid: string): Promise<SmartRotomArcadeStreak> {
     const result = await this.db.select()
       .from(smartRotomArcadeStreaks)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid))
@@ -72,7 +72,7 @@ export class ArcadeStreakRepository
     return { insertId: result[0].insertId };
   }
 
-  async updateUserStreak(uuid: string, streakData: any): Promise<ArcadeStreak> {
+  async updateUserStreak(uuid: string, streakData: any): Promise<SmartRotomArcadeStreak> {
     const updateData: Partial<SmartRotomArcadeStreak> = {};
     if (typeof streakData.streak !== 'undefined') updateData.streak = streakData.streak;
     if (streakData.lastClaimed) updateData.lastClaimed = new Date(streakData.lastClaimed);
@@ -82,7 +82,7 @@ export class ArcadeStreakRepository
     await this.db.update(smartRotomArcadeStreaks)
       .set(updateData)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid));
-    return this.findByUuid(uuid) as Promise<ArcadeStreak>;
+    return this.findByUuid(uuid) as Promise<SmartRotomArcadeStreak>;
   }
 
   async resetStreak(uuid: string): Promise<boolean> {
@@ -95,7 +95,7 @@ export class ArcadeStreakRepository
     return result[0].affectedRows > 0;
   }
 
-  async incrementStreak(uuid: string): Promise<ArcadeStreak> {
+  async incrementStreak(uuid: string): Promise<SmartRotomArcadeStreak> {
     await this.db.update(smartRotomArcadeStreaks)
       .set({ 
         streak: sql`${smartRotomArcadeStreaks.streak} + 1`,
@@ -103,7 +103,7 @@ export class ArcadeStreakRepository
         totalClaims: sql`${smartRotomArcadeStreaks.totalClaims} + 1`
       } as any)
       .where(eq(smartRotomArcadeStreaks.uuid, uuid));
-    return this.findByUuid(uuid) as Promise<ArcadeStreak>;
+    return this.findByUuid(uuid) as Promise<SmartRotomArcadeStreak>;
   }
 
   async canClaimToday(uuid: string): Promise<boolean> {
@@ -119,7 +119,7 @@ export class ArcadeStreakRepository
     return today.getTime() !== lastClaim.getTime();
   }
 
-  async getStreakStats(uuid: string): Promise<ArcadeStreak | null> {
+  async getStreakStats(uuid: string): Promise<SmartRotomArcadeStreak | null> {
     return this.findByUuid(uuid);
   }
 }

@@ -5,6 +5,7 @@ import { LootboxService } from './services/lootbox.service';
 import { ArcadeStreak } from './entities/arcade-streak.entity';
 import { ArcadeInventory } from './entities/arcade-inventory.entity';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
+import { loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
@@ -20,6 +21,9 @@ export class ArcadeFacadeService implements OnModuleInit {
   }
 
   // ==================== STREAK MANAGEMENT ====================
+  async getRewardsBanner(): Promise<any> {
+    return loadRewardsConfig();
+  }
 
   async getUserStreak(uuid: string): Promise<ArcadeStreak> {
     if (!uuid) {

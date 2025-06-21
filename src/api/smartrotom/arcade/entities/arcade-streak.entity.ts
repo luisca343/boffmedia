@@ -2,38 +2,81 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class ArcadeStreak {
   @ApiProperty({ 
-    example: 1, 
-    description: 'Unique identifier for the streak record' 
+    example: '2023-11-01T10:00:00Z', 
+    description: 'Last time the user claimed a reward',
+    nullable: true
   })
-  id: number;
+  lastClaimed: Date | null;
 
   @ApiProperty({ 
-    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4', 
-    description: 'Player UUID' 
-  })
-  uuid: string;
-
-  @ApiProperty({ 
-    example: 5, 
+    example: 3, 
     description: 'Current streak count' 
   })
   streak: number;
 
   @ApiProperty({ 
-    example: '2023-12-01T10:00:00Z', 
-    description: 'Last claimed date' 
-  })
-  lastClaimed: Date;
-
-  @ApiProperty({ 
-    example: 'christmas_2023', 
-    description: 'Last banner shown' 
-  })
-  lastBanner: string;
-
-  @ApiProperty({ 
-    example: 25, 
-    description: 'Total claims made' 
+    example: 10, 
+    description: 'Total number of claims made' 
   })
   totalClaims: number;
+
+  @ApiProperty({ 
+    example: 'winter_2023', 
+    description: 'Last banner the user interacted with',
+    nullable: true 
+  })
+  lastBanner: string | null;
+
+  @ApiProperty({ 
+    example: 3, 
+    description: 'Current day in the reward cycle' 
+  })
+  currentDay: number;
+
+  @ApiProperty({ 
+    example: 7, 
+    description: 'Total days in the reward cycle' 
+  })
+  totalDays: number;
+
+  @ApiProperty({ 
+    description: 'Next reward information',
+    type: 'object',
+    example: {
+      day: 3,
+      type: 'CURRENCY',
+      amount: 150,
+      description: 'Day 3 reward'
+    }
+  })
+  nextReward: {
+    day: number;
+    type: string;
+    amount: number;
+    description: string;
+  };
+
+  @ApiProperty({ 
+    example: 'winter_2023', 
+    description: 'Current active banner' 
+  })
+  currentBanner: string;
+
+  @ApiProperty({ 
+    example: false, 
+    description: 'Whether user has claimed reward today' 
+  })
+  claimedToday: boolean;
+
+  @ApiProperty({ 
+    example: '2023-11-02T06:00:00Z', 
+    description: 'Next daily reset time' 
+  })
+  nextResetTime: string;
+
+  @ApiProperty({ 
+    example: false, 
+    description: 'Whether banner has changed since last claim' 
+  })
+  bannerChanged: boolean;
 }
