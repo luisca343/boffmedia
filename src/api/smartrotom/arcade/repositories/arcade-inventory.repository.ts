@@ -87,7 +87,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     return { insertId: result[0].insertId };
     }
 
-    async updateItemQuantity(uuid: string, itemId: string, amount: number): Promise<ArcadeInventory> {  // ✅ Fixed parameter name
+    async updateItemQuantity(uuid: string, itemId: string, amount: number): Promise<ArcadeInventory> {
     await this.db.update(smartRotomInventory)
         .set({ amount } as SmartRotomInventoryItem)
         .where(and(

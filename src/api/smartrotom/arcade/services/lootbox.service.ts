@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../dto/lottbox.dto';
-import { lootboxConfig, getRarityFromWeight } from '../_config/lootboxConfig';
+import { lootboxConfig, getRarityFromWeight, rarityRanges } from '../_config/lootboxConfig';
 import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
 
@@ -84,7 +84,10 @@ export class LootboxService {
   }
 
   getLootboxConfig() {
-    return lootboxConfig;
+      return { 
+        rarityRanges, 
+        lootboxConfig 
+      };
   }
 
   // ... rest of private methods stay the same

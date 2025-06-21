@@ -117,21 +117,6 @@ export class InventoryService {
     this.validateItemId(itemData.itemId);
     this.validateAmount(itemData.amount);
 
-    // Check if user already has this item
-    const existingItem = await this.arcadeInventoryRepository.findUserItem(itemData.uuid, itemData.itemId);
-
-    if (existingItem) {
-      // Update existing item quantity
-      const newAmount = existingItem.amount + itemData.amount;
-      const updatedItem = await this.arcadeInventoryRepository.updateItemQuantity(
-        itemData.uuid, 
-        itemData.itemId, 
-        newAmount
-      );
-      
-      return { success: true, item: updatedItem };
-    } else {
-      // Create new item
       const createData: CreateInventoryItemDto = {
         uuid: itemData.uuid,
         itemId: itemData.itemId,
@@ -149,7 +134,6 @@ export class InventoryService {
       }
 
       return { success: true, item: newItem };
-    }
   }
 
   async consumeItem(uuid: string, itemId: string, amount: number = 1): Promise<{ 

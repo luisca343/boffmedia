@@ -243,29 +243,8 @@ export class ArcadeFacadeService implements OnModuleInit {
       boxId: lootboxType,
     };
 
-    // Use existing lootbox service logic
     const lootboxResult = await this.lootboxService.openLootBox(openLootBoxDto);
-
-    // Add the won item to inventory
-    if (lootboxResult.item) {
-      const claimData: ClaimItemData = {
-        uuid,
-        itemId: lootboxResult.item.id,
-        itemType: lootboxResult.item.rarity.toUpperCase(),
-        amount: 1,
-        rarity: lootboxResult.item.rarity,
-        sourceType: 'lootbox'
-      };
-
-      const inventoryResult = await this.inventoryService.addItemToInventory(claimData);
-
-      return {
-        item: lootboxResult.item,
-        spinnerItems: lootboxResult.spinnerItems || [],
-        winningPosition: lootboxResult.winningPosition || 0
-      };
-    }
-
+    
     return {
       item: lootboxResult.item,
       spinnerItems: lootboxResult.spinnerItems || [],
