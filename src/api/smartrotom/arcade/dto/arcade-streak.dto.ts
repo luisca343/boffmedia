@@ -1,3 +1,4 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
@@ -11,7 +12,7 @@ export class GetStreakDto {
   uuid: string;
 }
 
-export class ClaimRewardDto {
+export class ClaimRewardDto extends BaseDto {
   @ApiProperty({ 
     description: 'Player UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'

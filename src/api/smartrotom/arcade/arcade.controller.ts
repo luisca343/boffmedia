@@ -12,6 +12,7 @@ import { GiveLootboxDto } from './dto/lootbox-management.dto';
 // Import entities
 import { ArcadeStreak } from './entities/arcade-streak.entity';
 import { ArcadeInventory } from './entities/arcade-inventory.entity';
+import { ArcadeStreakClaim } from './entities/arcade-streak-claim.entity';
 
 @ApiTags('SmartRotom | Arcade')
 @Controller('smartrotom/arcade')
@@ -50,14 +51,11 @@ export class ArcadeController {
   @ApiOperation({ summary: 'Claim daily arcade reward' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Daily reward claimed successfully.'
+    description: 'Daily reward claimed successfully.',
+    type: ArcadeStreakClaim
   })
   @ApiBody({ type: ClaimRewardDto })
-  async claimDailyReward(@Body() { uuid }: ClaimRewardDto): Promise<{
-    streak: ArcadeStreak;
-    reward: any;
-    inventoryItems?: ArcadeInventory[];
-  }> {
+  async claimDailyReward(@Body() { uuid }: ClaimRewardDto): Promise<ArcadeStreakClaim> {
     return this.arcadeFacadeService.claimDailyReward(uuid);
   }
 
