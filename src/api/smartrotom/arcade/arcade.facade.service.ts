@@ -6,6 +6,7 @@ import { ArcadeStreak } from './entities/arcade-streak.entity';
 import { ArcadeInventory } from './entities/arcade-inventory.entity';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
 import { loadRewardsConfig } from '../_main/_config/daily-rewards.config';
+import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
@@ -113,7 +114,7 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   // ==================== INVENTORY MANAGEMENT ====================
 
-  async getUserInventory(uuid: string): Promise<ArcadeInventory[]> {
+  async getUserInventory(uuid: string): Promise<ArcadeInventoryResponse> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
     }
@@ -312,7 +313,7 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   async getCompleteUserData(uuid: string): Promise<{
     streak: ArcadeStreak;
-    inventory: ArcadeInventory[];
+    inventory: ArcadeInventoryResponse;
     inventoryStats: {
       totalItems: number;
       itemsByType: Record<string, number>;

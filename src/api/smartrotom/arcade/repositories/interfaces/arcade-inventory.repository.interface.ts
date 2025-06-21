@@ -1,7 +1,10 @@
 import { BaseRepository } from '@api/_utils/repositories/base-repository.interface';
+import { ArcadeInventory } from '../../entities/arcade-inventory.entity';
+import { CreateInventoryItemDto } from '../../dto/create-inventory-item.dto';
+import { UpdateInventoryItemDto } from '../../dto/update-inventory-item.dto';
 
-export interface IArcadeInventoryRepository extends BaseRepository<any, any, any> {
-  findUserInventory(uuid: string): Promise<any[]>;
+export interface IArcadeInventoryRepository extends BaseRepository<ArcadeInventory, CreateInventoryItemDto, UpdateInventoryItemDto>  {
+  findUserInventory(uuid: string): Promise<ArcadeInventory[]>;
   findUserItem(uuid: string, itemId: string): Promise<any | null>;
   addItem(inventoryData: any): Promise<{ insertId: number }>;
   updateItemQuantity(uuid: string, itemId: string, quantity: number): Promise<any>;

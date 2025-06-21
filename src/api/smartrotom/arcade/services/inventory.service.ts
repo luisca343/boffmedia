@@ -4,6 +4,7 @@ import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-in
 import { CreateInventoryItemDto } from '../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
 import { ArcadeInventory } from '../entities/arcade-inventory.entity';
+import { ArcadeInventoryResponse } from '../entities/inventory-response.entity';
 
 export interface ClaimItemData {
   uuid: string;
@@ -43,9 +44,66 @@ export class InventoryService {
 
   // ==================== INVENTORY MANAGEMENT ====================
 
-  async getUserInventory(uuid: string): Promise<ArcadeInventory[]> {
+  async getUserInventory(uuid: string, sourceType?: string): Promise<ArcadeInventoryResponse> {
     this.validateUuid(uuid);
-    return this.arcadeInventoryRepository.findUserInventory(uuid);
+    const rawItems = await this.arcadeInventoryRepository.findUserInventory(uuid);
+    
+    // Aggregate items with the same itemId
+    const aggregatedItems = rawItems.reduce((acc, item) => {
+      const consumableTypes = ['crate', 'lootbox'];
+      const isConsumable = consumableTypes.includes(item.itemType);
+      
+      const key = isConsumable
+        ? `${item.itemId}_${item.sourceType || 'unknown'}`
+        : `${item.itemId}_${item.used}_${item.sourceType || 'unknown'}`;
+      
+      if (!acc[key]) {
+        acc[key] = {
+          ...item,
+          totalAmount: isConsumable ? item.amount : item.amount,
+          usedAmount: isConsumable ? (item.used || 0) : 0,
+          originalIds: [item.id]
+        };
+      } else {
+        if (isConsumable) {
+          acc[key].totalAmount += item.amount;
+          acc[key].usedAmount += (item.used || 0);
+        } else {
+          acc[key].amount += item.amount;
+        }
+        acc[key].originalIds.push(item.id);
+      }
+      return acc;
+    }, {} as Record<string, any>);
+    
+    // Process consumables
+    for (const key in aggregatedItems) {
+      const item = aggregatedItems[key];
+      const consumableTypes = ['crate', 'lootbox'];
+      
+      if (consumableTypes.includes(item.itemType)) {
+        item.remainingAmount = item.totalAmount - item.usedAmount;
+        item.amount = item.remainingAmount;
+        item.used = item.remainingAmount > 0 ? 0 : 1;
+      }
+    }
+    
+    const items = Object.values(aggregatedItems);
+    
+    const groupedItems = items.reduce((acc, item) => {
+      const key = `${item.itemType}`;
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(item);
+      return acc;
+    }, {} as Record<string, any[]>);
+    
+    return {
+      items,
+      groupedItems,
+      rawItems
+    };
   }
 
   async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventory | null> {

@@ -13,6 +13,7 @@ import { GiveLootboxDto } from './dto/lootbox-management.dto';
 import { ArcadeStreak } from './entities/arcade-streak.entity';
 import { ArcadeInventory } from './entities/arcade-inventory.entity';
 import { ArcadeStreakClaim } from './entities/arcade-streak-claim.entity';
+import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
 
 @ApiTags('SmartRotom | Arcade')
 @Controller('smartrotom/arcade')
@@ -95,7 +96,7 @@ export class ArcadeController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Inventory retrieved successfully.',
-    type: [ArcadeInventory]
+    type: [ArcadeInventoryResponse]
   })
   @ApiParam({ name: 'uuid', description: 'Player UUID', example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
   @ApiQuery({ name: 'itemType', description: 'Filter by item type', required: false, example: 'consumable' })
@@ -104,13 +105,14 @@ export class ArcadeController {
     @Param('uuid') uuid: string,
     @Query('itemType') itemType?: string,
     @Query('rarity') rarity?: string
-  ): Promise<ArcadeInventory[]> {
+  ): Promise<ArcadeInventoryResponse> {
+    /*
     if (itemType) {
       return this.arcadeFacadeService.getInventoryItemsByType(uuid, itemType);
     }
     if (rarity) {
       return this.arcadeFacadeService.getInventoryItemsByRarity(uuid, rarity);
-    }
+    }*/
     return this.arcadeFacadeService.getUserInventory(uuid);
   }
 
@@ -253,11 +255,11 @@ export class ArcadeController {
   @ApiParam({ name: 'uuid', description: 'Player UUID', example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Complete user data retrieved successfully.'
+    description: 'Complete user data retrieved successfully.',
   })
   async getCompleteUserData(@Param('uuid') uuid: string): Promise<{
     streak: ArcadeStreak;
-    inventory: ArcadeInventory[];
+    inventory: ArcadeInventoryResponse;
     inventoryStats: {
       totalItems: number;
       itemsByType: Record<string, number>;
