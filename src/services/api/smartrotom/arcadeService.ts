@@ -1,6 +1,5 @@
 import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, ApiResponse } from '@/services/boffAPI';
 import type { 
-  ArcadeStreak, 
   ArcadeInventory, 
   OpenLootBoxDto, 
   OpenLootBoxResponseDto,
@@ -8,12 +7,125 @@ import type {
   AddInventoryItemDto,
   ConsumeInventoryItemDto,
   GiveLootboxDto,
-  SuccessResponse
+  ArcadeStreakClaim,
+  SuccessResponse,
+  ArcadeStreak
 } from '@/generated/api';
+
+
+  export interface DailyReward {
+    day: number
+    type: string
+    amount: number
+    description: string
+  }
+
+  export interface DailyRewardsConfig {
+    totalDays: number;
+    bannerName: string;
+    rewards: DailyReward[];
+  }
+
+  export interface InventoryItem {
+    id: number;
+    itemId: string;
+    itemType: string;
+    amount: number;
+    sourceType: string;
+    used: number;
+    rarity: string;
+    createdAt: string;
+  }
+
+  export interface GetInventoryResponse {
+    items: InventoryItem[];
+    groupedItems: Record<string, InventoryItem[]>;
+  }
+
+  export interface ClaimItemsResponse {
+    success: boolean;
+    message: string;
+    claimedIds: number[];
+  }
+
+  export interface AddInventoryItemRequest {
+    uuid: string;
+    itemId: string;
+    itemType: string;
+    amount?: number;
+    sourceType?: string;
+    sourceId?: number;
+  }
+
+  export interface AddInventoryItemResponse {
+    success: boolean;
+    message: string;
+    itemId?: number;
+  }
+
+  export interface OpenLootBoxRequest {
+    uuid: string;
+    boxId: string;
+  }
+
+  export interface OpenLootBoxResponse {
+    success: boolean;
+    message?: string;
+    item?: {
+      id: string;
+      name: string;
+      weight: number;
+      rarity: string;
+      description: string;
+      serverId?: number;
+    };
+  }
+
+  export interface RarityRanges {
+    [key: string]: {
+      min: number;
+      max: number;
+    };
+  }
+
+  export interface LootBoxConfigResponse {
+    rarityRanges: {
+      [key: string]: {
+        min: number;
+        max: number;
+      };
+    }
+    lootboxConfig: {
+      boxes: Array<{
+        id: string;
+        name: string;
+        image: string;
+        description: string;
+        items: Array<{
+          id: string;
+          rarity: string;
+          weight: number;
+        }>;
+        theme: string;
+      }>;
+    }
+  }
+  export interface ClaimItemData {
+    id: string;
+    type: string;
+  }
+
+  export interface ClaimItemsWithTypesRequest {
+    uuid: string;
+    items: ClaimItemData[];
+  }
+
 
 export const arcadeService = {
   // ==================== STREAK ENDPOINTS ====================
-  
+  getRewardsBanner: (): Promise<ApiResponse<any>> => 
+    rotomGET<any>('/arcade/banner'),
+
   /**
    * Get user's arcade streak status
    */
@@ -176,7 +288,7 @@ export const arcadeService = {
     }
 
     // Simple client-side check (server does the real validation)
-    const streak = streakResponse.data;
+    const streak = streakResponse.data!;
     const canClaimBasic = !streak.lastClaimed || 
       new Date(streak.lastClaimed).toDateString() !== new Date().toDateString();
 
@@ -207,11 +319,7 @@ export const arcadeService = {
   /**
    * Quick claim daily reward (convenience method)
    */
-  quickClaimDaily: (uuid: string): Promise<ApiResponse<{
-    streak: ArcadeStreak;
-    reward: any;
-    inventoryItems?: ArcadeInventory[];
-  }>> => 
+  quickClaimDaily: (uuid: string): Promise<ApiResponse<ArcadeStreakClaim>> => 
     arcadeService.claimDailyReward({ uuid }),
 
   /**
