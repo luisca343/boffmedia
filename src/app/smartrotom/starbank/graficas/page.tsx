@@ -86,7 +86,7 @@ export default function Graficas() {
       if (selectedAccount) {
         // Use changeActiveAccount utility to save to localStorage
         changeActiveAccount(accountId);
-        setActiveAccount(selectedAccount);
+        setActiveAccount(selectedAccount.id);
       }
     }
   }, [accounts, setActiveAccount, currentAccountId]);
@@ -189,7 +189,7 @@ export default function Graficas() {
                 <AccountSelect 
                   accounts={accounts}
                   activeAccount={activeAccount}
-                  setActiveAccount={(account) => {
+                  setActiveAccount={(account: any) => {
                     if (account) {
                       changeActiveAccount(account);
                     }
@@ -266,7 +266,7 @@ export default function Graficas() {
           {filteredTransactions && filteredTransactions.length > 0 ? (
             <TransactionTypeDistribution 
               transactions={filteredTransactions} 
-              activeAccount={activeAccount}
+              activeAccount={activeAccount!}
             />
           ) : (
             <div className="p-8 text-center">

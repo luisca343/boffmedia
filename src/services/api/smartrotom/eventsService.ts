@@ -19,13 +19,9 @@ import type {
   Participant,
   LeaderboardEntry,
   TeamLeaderboardEntry,
+  JoinTeamDto,
 } from '@/generated/api';
 import { SuccessResponse } from '@/types';
-
-// Additional DTOs for specific operations
-interface JoinTeamDto {
-  participantId: number;
-}
 
 export const eventsService = {
   // ==================== EVENT OPERATIONS ====================
@@ -43,7 +39,7 @@ export const eventsService = {
   /**
    * Create a new event
    */
-  createEvent: (data: CreateEventDto) => apiPOST<Event>('/boffmedia/events/event', data),
+  createEvent: (data: any) => apiPOST<any>('/boffmedia/events/event', data),
   
   /**
    * Update an existing event
@@ -160,7 +156,7 @@ export const eventsService = {
   /**
    * Join an event
    */
-  joinEvent: (eventId: number, data: JoinEventDto) => 
+  joinEvent: (eventId: number, data: any) => 
     apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/join`, data),
   
   /**

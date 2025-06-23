@@ -15,10 +15,10 @@ interface TeamCreateDialogProps {
 export function TeamCreateDialog({ open, onOpenChange, onSuccess }: TeamCreateDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (data: TeamFormValues) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await (await eventsService.createTeam(data.eventId, data)).data
+      await (await eventsService.createTeam(data.eventId, data!)).data
       toast.success(`El equipo "${data.name}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {

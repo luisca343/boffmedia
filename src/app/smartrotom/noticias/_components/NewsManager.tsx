@@ -9,6 +9,7 @@ import { CreateNewsDto } from "@/types/dto/create-news-dto";
 
 interface NewsManagerProps {
   initialNews?: CreateNewsDto;
+  onClose?: () => void;
 }
 
 const NewsManager: React.FC<NewsManagerProps> = ({ initialNews }) => {

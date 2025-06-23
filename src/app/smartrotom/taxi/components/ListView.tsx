@@ -13,7 +13,7 @@ interface ListViewProps {
   playerPosition: Position;
   playerMoney: number;
   selectedStop: TaxiStop | null;
-  setSelectedStop: (stop: TaxiStop) => void;
+  setSelectedStop: (stop: TaxiStop | null) => void;
   calculateDistance: (x1: number, z1: number, x2: number, z2: number) => number;
   calculatePrice: (distance: number) => number;
   formatDistance: (distance: number) => string;

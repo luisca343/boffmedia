@@ -6,7 +6,7 @@ import { Badge as UIBadge } from "@/components/ui/badge"
 import { Medal, Lock } from "lucide-react"
 
 export default function Badges({ achievementData, book, pageType = 0 }: { 
-  achievementData: SmartRotomAchievement[]; 
+  achievementData: any[]; 
   book: any;
   pageType?: number; // 0: Summary, 1: Regional, 2: League
 }) {

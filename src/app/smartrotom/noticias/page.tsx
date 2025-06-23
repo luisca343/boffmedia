@@ -69,7 +69,7 @@ export default function FurretToday() {
             </div>
 
             <main className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22%3E%3Ccircle cx=%222%22 cy=%222%22 r=%222%22 fill=%22%23000%22 fill-opacity=%220.1%22%2F%3E%3C%2Fsvg%3E')] bg-repeat">
-              <MainCard news={featured} />
+              <MainCard news={featured!} />
 
               <div className="space-y-6">
                 {published && published[0] && <CardComponent variant="pink" news={published[0]} />}

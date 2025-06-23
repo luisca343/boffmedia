@@ -2,10 +2,10 @@ import { useRotomRequest } from "../useRotomRequest";
 import { chatAppService } from "@/services/api/smartrotom/chatAppService";
 
 export function useCall() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.call)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.initiateCall)
 
   const call = (chatId: number, uuid: string) => {
-    return chatAppService.call(chatId, uuid);
+    return chatAppService.initiateCall(chatId, {chatId, uuid});
   }
 
   return {

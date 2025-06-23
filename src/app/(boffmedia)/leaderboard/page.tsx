@@ -22,6 +22,8 @@ export default function FullLeaderboardComponent() {
   }, [])
 
   useEffect(() => {
+    /*
+    TODO: Implement LEADERBOARD SORTING AND FILTERING
     if (leaderboards && Array.isArray(leaderboards)) {
       let sorted = [...leaderboards]
 
@@ -44,7 +46,7 @@ export default function FullLeaderboardComponent() {
 
       setFilteredPlayers(sorted)
       setCurrentPage(1)
-    }
+    }*/
   }, [leaderboards, searchTerm, sortBy, sortDirection, calculateTotalScore])
 
   const totalPages = Math.ceil(filteredPlayers.length / playersPerPage)

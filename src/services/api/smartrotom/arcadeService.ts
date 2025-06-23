@@ -9,7 +9,8 @@ import type {
   GiveLootboxDto,
   ArcadeStreakClaim,
   SuccessResponse,
-  ArcadeStreak
+  ArcadeStreak,
+  ArcadeInventoryResponse
 } from '@/generated/api';
 
 
@@ -166,7 +167,7 @@ export const arcadeService = {
   getInventory: (uuid: string, filters?: { 
     itemType?: string; 
     rarity?: string; 
-  }): Promise<ApiResponse<ArcadeInventory[]>> => {
+  }): Promise<ApiResponse<ArcadeInventoryResponse>> => {
     const params = new URLSearchParams();
     if (filters?.itemType) params.append('itemType', filters.itemType);
     if (filters?.rarity) params.append('rarity', filters.rarity);
@@ -174,7 +175,7 @@ export const arcadeService = {
     const queryString = params.toString();
     const url = `/arcade/inventory/${uuid}${queryString ? `?${queryString}` : ''}`;
     
-    return rotomGET<ArcadeInventory[]>(url);
+    return rotomGET<ArcadeInventoryResponse>(url);
   },
 
   /**
@@ -307,13 +308,13 @@ export const arcadeService = {
   /**
    * Get inventory items by type
    */
-  getInventoryByType: (uuid: string, itemType: string): Promise<ApiResponse<ArcadeInventory[]>> => 
+  getInventoryByType: (uuid: string, itemType: string): Promise<ApiResponse<ArcadeInventoryResponse>> => 
     arcadeService.getInventory(uuid, { itemType }),
 
   /**
    * Get inventory items by rarity
    */
-  getInventoryByRarity: (uuid: string, rarity: string): Promise<ApiResponse<ArcadeInventory[]>> => 
+  getInventoryByRarity: (uuid: string, rarity: string): Promise<ApiResponse<ArcadeInventoryResponse>> => 
     arcadeService.getInventory(uuid, { rarity }),
 
   /**

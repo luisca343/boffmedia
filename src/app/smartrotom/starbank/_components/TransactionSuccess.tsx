@@ -2,8 +2,6 @@ import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import { formatMoney } from "../bankUtils";
 import { BankSectionButton } from "./BankSection";
 import { useRouter } from "next/navigation";
-import confetti from "canvas-confetti";
-import { useEffect } from "react";
 
 interface TransactionSuccessProps {
   amount: number;
@@ -19,36 +17,6 @@ export function TransactionSuccess({
   onClose 
 }: TransactionSuccessProps) {
   const router = useRouter();
-  
-  useEffect(() => {
-    // Trigger confetti effect on successful transaction
-    const duration = 3 * 1000;
-    const end = Date.now() + duration;
-    
-    const frame = () => {
-      confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ['#60a5fa', '#3b82f6', '#2563eb']
-      });
-      
-      confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ['#60a5fa', '#3b82f6', '#2563eb']
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    
-    frame();
-  }, []);
   
   return (
     <div className="flex flex-col items-center text-center p-6">

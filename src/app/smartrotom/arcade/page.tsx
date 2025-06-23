@@ -39,9 +39,9 @@ export default function CentroArcade() {
   const handleClaimDailyBonus = async () => {
     const result = await claimReward();
     
-    if (result && result.success) {
+    if (result) {
       // Store the claimed reward details
-      setClaimedReward(result.rewardGiven);
+      setClaimedReward(result.reward);
       
       // Show animation
       setShowBonusAnimation(true);

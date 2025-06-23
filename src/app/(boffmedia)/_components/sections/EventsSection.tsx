@@ -48,7 +48,7 @@ export function EventsSection() {
 
   // Get top players from the global leaderboards
   const topPlayers = leaderboards && Array.isArray(leaderboards)
-    ? [...leaderboards].sort((a, b) => b.totalPoints - a.totalPoints).slice(0, 3) as LeaderboardEntry[]
+    ? [...leaderboards].sort((a: any, b: any) => b.totalPoints - a.totalPoints).slice(0, 3) as any[]
     : []
 
   return (
@@ -89,7 +89,7 @@ export function EventsSection() {
                 <div className="space-y-4">
                   {upcomingEvents.map((event, index) => {
                     const startDate = new Date(event.startDate);
-                    const endDate = new Date(event.endDate);
+                    const endDate = new Date(event.endDate!);
                     const formattedStartDate = startDate.toLocaleDateString(t("locale"), {day: '2-digit', month: 'short'});
                     const formattedEndDate = endDate.toLocaleDateString(t("locale"), {day: '2-digit', month: 'short'});
                     

@@ -27,7 +27,7 @@ export function EventsTab() {
             event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             event.description?.toLowerCase().includes(searchTerm.toLowerCase())
         )
-      : events
+      : events as any
     : []
 
   const handleCreateSuccess = () => {

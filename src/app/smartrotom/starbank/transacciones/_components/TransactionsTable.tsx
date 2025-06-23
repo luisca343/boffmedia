@@ -39,8 +39,8 @@ export const columns: ColumnDef<Transaction>[] = [
           <AccountImage
             height={40}
             width={40}
-            type={row.original.type}
-            name={row.original.name}
+            type={row.original.type!}
+            name={row.original.name!}
           />
           <div className="hidden md:block">
             <p className="text-sm font-medium text-blue-900">{row.original.name}</p>

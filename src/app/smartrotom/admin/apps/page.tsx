@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Plus, Minus, RefreshCw, UserSearch, User as UserIcon, AlertTriangle } from 'lucide-react'
-import { App as AppType, OrderedApp } from '@/types/apps'
 import { useGetAppsForPlayer } from '@/hooks/apps/useGetAppsForPlayer'
 import { useAddAppToPlayer } from '@/hooks/apps/useAddAppForPlayer'
 import { useRemoveAppFromPlayer } from '@/hooks/apps/useRemoveAppForPlayer'
@@ -17,6 +16,7 @@ import AdminPageLayout from '../_components/AdminPageLayout'
 import TerminalCard from '../_components/TerminalCard'
 import TerminalHeader from '../_components/TerminalHeader'
 import EmptyState from '../_components/EmptyState'
+import { SmartRotomApp } from '@/generated/api'
 
 export default function PlayerAppManagement() {
   const { session } = useBoffSession()
@@ -28,8 +28,8 @@ export default function PlayerAppManagement() {
   const { apps: allApps, error: allAppsError, isLoading: allAppsLoading, refetch: refetchAllApps } = useFindAllApps()
   const { addAppToPlayer, isLoading: isAdding } = useAddAppToPlayer()
   const { removeAppFromPlayer, isLoading: isRemoving } = useRemoveAppFromPlayer()
-  const [extraApps, setExtraApps] = useState<AppType[]>([])
-  const [availableApps, setAvailableApps] = useState<AppType[]>([])
+  const [extraApps, setExtraApps] = useState<SmartRotomApp[]>([])
+  const [availableApps, setAvailableApps] = useState<SmartRotomApp[]>([])
 
   // Fetch all users on component mount
   useEffect(() => {
@@ -37,7 +37,7 @@ export default function PlayerAppManagement() {
       try {
         const response = await usersService.findAll();
         if (response.statusCode === 200) {
-          setAllUsers(response.data);
+          setAllUsers(response.data!);
         }
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -198,7 +198,7 @@ export default function PlayerAppManagement() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {extraApps.map(app => (
                   <div key={app.id} className="flex flex-col items-center bg-black/40 p-3 border border-green-900/30 rounded hover:border-green-700 transition-all">
-                    <App app={app as OrderedApp} withLink={false} size='small'/>
+                    <App app={app as SmartRotomApp} withLink={false} size='small'/>
                     <Button
                       onClick={() => handleRemoveApp(app.id)}
                       className="mt-2 bg-red-900/60 hover:bg-red-800 text-red-100 border border-red-700 hover:shadow-[0_0_5px_rgba(220,38,38,0.5)] transition-all"
@@ -226,7 +226,7 @@ export default function PlayerAppManagement() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {availableApps.map(app => (
                   <div key={app.id} className="flex flex-col items-center bg-black/40 p-3 border border-green-900/30 rounded hover:border-green-700 transition-all">
-                    <App app={app as OrderedApp} withLink={false} size='small'/>
+                    <App app={app as SmartRotomApp} withLink={false} size='small'/>
                     <Button
                       onClick={() => handleAddApp(app.id)}
                       className="mt-2 bg-green-900/60 hover:bg-green-800 text-green-100 border border-green-700 hover:shadow-neon transition-all"

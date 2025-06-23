@@ -24,7 +24,7 @@ export function EventFilters({ filter, onFilterChange, eventsCount }: EventFilte
           </SelectTrigger>
           <SelectContent className="bg-surface-800 border-surface-700">
             <SelectItem value="all">Todos los juegos</SelectItem>
-            {!isLoading && games?.map((game: Game) => (
+            {!isLoading && games?.map((game: any) => (
               <SelectItem key={game.id} value={game.id.toString()}>
                 {game.title}
               </SelectItem>

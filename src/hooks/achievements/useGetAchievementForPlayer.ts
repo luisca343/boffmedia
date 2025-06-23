@@ -1,9 +1,9 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { Achievement, achievementService } from "@/services/api/smartrotom/achievementsService"
+import { achievementService } from "@/services/api/smartrotom/achievementsService"
 
 export function useGetAchievementForPlayer(uuid: string, achievementId: string) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    () => achievementService.getAchievementForPlayer(uuid, achievementId),
+    () => achievementService.getAchievementById(uuid, achievementId),
     [uuid, achievementId],
   )
 

@@ -9,6 +9,8 @@ interface InternalLinkProps {
   href: string
   children: React.ReactNode
   className?: string
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
   onClick?: () => void
   app?: string | null
 }

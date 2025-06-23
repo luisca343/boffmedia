@@ -128,10 +128,13 @@ export function useBattleFlow(
     if (scene) {
       // Clear any active Pokemon on the field
       Object.keys(freshBattle.sides).forEach(side => {
-        const activePokemon = freshBattle.sides[side]?.active[0];
-        if (activePokemon) {
-          const pokemonIdent = `${side}a:` as PokemonIdent;
-          scene.clearPokemonElement(pokemonIdent);
+        const sideObj = freshBattle.sides[side as keyof typeof freshBattle.sides];
+        if (sideObj && typeof sideObj === 'object' && 'active' in sideObj) {
+          const activePokemon = sideObj.active[0];
+          if (activePokemon) {
+            const pokemonIdent = `${side}a:` as PokemonIdent;
+            scene.clearPokemonElement(pokemonIdent);
+          }
         }
       });
     }

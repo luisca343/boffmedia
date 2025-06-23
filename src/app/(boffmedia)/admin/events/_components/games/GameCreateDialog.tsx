@@ -12,13 +12,13 @@ interface GameCreateDialogProps {
   onSuccess: () => void
 }
 
-export function GameCreateDialog({ open, onOpenChange, onSuccess }: GameCreateDialogProps) {
+export function GameCreateDialog({ open, onOpenChange, onSuccess }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (data: GameFormValues) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await (await eventsService.createGame(data)).data
+      await (await eventsService.createGame(data!)).data
       toast.success(`El juego "${data.title}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {

@@ -21,7 +21,7 @@ export function AchievementCreateDialog({
 }: AchievementCreateDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = async (data: AchievementFormValues) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
       await (await eventsService.createAchievement(data.eventId, data)).data

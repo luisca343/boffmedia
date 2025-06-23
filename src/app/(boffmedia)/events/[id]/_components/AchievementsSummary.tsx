@@ -20,10 +20,10 @@ interface AchievementsSummaryProps {
   eventId: number
 }
 
-export function AchievementsSummary({ eventId }: AchievementsSummaryProps) {
+export function AchievementsSummary({ eventId }: any) {
   const { session } = useBoffSession()
-  const [achievements, setAchievements] = useState<Achievement[]>([])
-  const [progressData, setProgressData] = useState<UserProgress[]>([])
+  const [achievements, setAchievements] = useState<any[]>([])
+  const [progressData, setProgressData] = useState<any[]>([])
   const [participantId, setParticipantId] = useState<number | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -34,14 +34,14 @@ export function AchievementsSummary({ eventId }: AchievementsSummaryProps) {
         
         // Fetch achievements
         const achievementsResponse = await eventsService.getEventAchievements(eventId)
-        setAchievements(achievementsResponse.data)
+        setAchievements(achievementsResponse.data!)
 
         // Get current user's participant ID
         if (session?.user?.id) {
           try {
             const participantsResponse = await eventsService.getEventParticipants(eventId)
-            const participant = participantsResponse.data.find(
-              (p: EventParticipant) => p.userId === parseInt(session.user.id)
+            const participant = participantsResponse.data!.find(
+              (p: any) => p.userId === parseInt(session.user.id!)
             )
             
             if (participant) {
@@ -52,7 +52,7 @@ export function AchievementsSummary({ eventId }: AchievementsSummaryProps) {
                 eventId, 
                 participant.id
               )
-              setProgressData(progressResponse.data)
+              setProgressData(progressResponse.data!)
             }
           } catch (progressError) {
             console.error("Error fetching progress:", progressError)

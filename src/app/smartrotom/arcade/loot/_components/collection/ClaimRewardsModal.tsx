@@ -76,9 +76,12 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
       }));
       
       // Send both item IDs and types to the server
-      const response = await (await arcadeService.claimInventoryItems(uuid, claimItems)).data;
+      //TODO: Uncomment the following line when arcadeService is properly set up
+      //const response = await (await arcadeService.claimInventoryItems(uuid, claimItems)).data;
+
+      const response = false;
       
-      if (response?.success) {
+      if (response) {
         // Different messages based on what was claimed
         if (selectedItems.some(item => item.source === 'pokemon') && 
             selectedItems.some(item => item.source !== 'pokemon')) {
@@ -92,7 +95,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
         // Pass the claimed item IDs to update the local state
         onClaimSuccess(selectedItems.map(item => item.id));
       } else {
-        toast.error(response!.message || 'Error al reclamar los objetos');
+        toast.error(response || 'Error al reclamar los objetos');
       }
     } catch (error) {
       console.error('Error claiming rewards:', error);

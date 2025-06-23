@@ -56,7 +56,7 @@ export default function EventPage() {
 
   const status = event ? getEventStatus(event.startDate, event.endDate) : { label: "Desconocido", class: "" };
   
-  const game = event ? games?.find((g: Game) => g.id === event.gameId) : null;
+  const game = event ? games?.find((g: any) => g.id === event.gameId) : null;
 
   const formatDate = (dateString?: string | null) => {
     if (!dateString) return "No definida";

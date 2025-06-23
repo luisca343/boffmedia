@@ -106,8 +106,8 @@ export default function Transacciones() {
           amount: transaction.amount,
           balance: isActiveAccount ? transaction.fromBalance : transaction.toBalance,
           date: transaction.date,
-          type: isActiveAccount ? transaction.toType : transaction.fromType,
-          name: isActiveAccount ? transaction.toName : transaction.fromName,
+          //type: isActiveAccount ? transaction.toType : transaction.fromType,
+          //name: isActiveAccount ? transaction.toName : transaction.fromName,
         };
       });
 

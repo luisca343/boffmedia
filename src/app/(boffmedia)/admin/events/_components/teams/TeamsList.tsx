@@ -5,7 +5,7 @@ import { TeamCard } from "./TeamCard"
 import { TeamEmptyState } from "./TeamEmptyState"
 
 interface TeamsListProps {
-  teams: EventTeam[]
+  teams: any[]
   onEdit: (team: EventTeam) => void
   onDelete: (team: EventTeam) => void
 }

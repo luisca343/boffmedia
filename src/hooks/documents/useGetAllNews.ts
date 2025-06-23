@@ -16,13 +16,8 @@ export type News = {
   updatedAt: Date;
 }
 
-type NewsResponse = {
-  featured: News;
-  news: News[];
-}
-
 export function useGetAllNews() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest<NewsResponse>(documentsService.getAllNews);
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.getAllNews);
 
   const featured = useMemo(() => data?.featured, [data]);
   const news = useMemo(() => data?.news || [], [data]);

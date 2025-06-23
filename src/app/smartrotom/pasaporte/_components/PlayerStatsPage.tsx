@@ -17,7 +17,7 @@ export function formatNumber(num: number): string {
   return num.toLocaleString()
 }
 
-export function PlayerStatsPage({ stats, username, uuid }: PlayerStatsProps) {
+export function PlayerStatsPage({ stats, username, uuid }: any) {
   const customStats = stats?.["minecraft:custom"] || {}
   const killedStats = stats?.["minecraft:killed"] || {}
 

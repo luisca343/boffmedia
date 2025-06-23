@@ -1,7 +1,5 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { achievementService } from "@/services/api/smartrotom/achievementsService"
-import { SuccessResponse } from "@/types"
-import { BattleAchievementDto } from "@/types/dto/battle-achievement-dto"
+import { achievementService, BattleAchievementDto } from "@/services/api/smartrotom/achievementsService"
 
 export function useAddBattleAchievement() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(achievementService.addBattleAchievement)

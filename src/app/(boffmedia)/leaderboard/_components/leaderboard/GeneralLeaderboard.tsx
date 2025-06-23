@@ -77,7 +77,7 @@ export function GeneralLeaderboard({
                         <ProfileImage userId={player.userId} />
                         <div>
                           <p className="font-medium text-surface-50">
-                            {player.username || `Jugador ${player.userId}`}
+                            {player.nickname || `Jugador ${player.userId}`}
                           </p>
                         </div>
                       </div>

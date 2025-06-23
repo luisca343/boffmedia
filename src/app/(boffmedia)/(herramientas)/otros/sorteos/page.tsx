@@ -27,7 +27,7 @@ export default function Sorteo() {
   }
 
   const handleUploadList = (list: string[]) => {
-    const uniqueList = [...new Set(list.map(name => name.trim()).filter(Boolean))]
+    const uniqueList = Array.from(new Set(list.map(name => name.trim()).filter(Boolean)))
     setParticipants(uniqueList)
   }
 

@@ -12,10 +12,10 @@ import { useBoffSession } from "@/services/useBoffSession";
 import { useGetPlayerStats } from "@/hooks/player/useGetPlayerStats";
 import { useGetPlayerTeam } from "@/hooks/player/useGetPlayerTeam";
 import { useGetAchievements } from "@/hooks/achievements/useGetAchievements";
-import { Achievement } from "@/services/api/smartrotom/achievementsService";
 import { PlayerStatsPage } from "./_components/PlayerStatsPage";
 import { IndexPage } from "./_components/IndexPage";
 import { BadgePage } from "./_components/BadgePage";
+import { UserAchievement } from "@/generated/api";
 
 export default function Pasaporte(){
   const [book, setBook] = useState<PageFlip>({ getPageCount: () => 0 })  
@@ -30,7 +30,7 @@ export default function Pasaporte(){
   console.log('GET ACHIEVEMENTS')
   console.log(achievements)
 
-  const obtainedBadges = (achievements ?? []).filter((achievement: Achievement)=>achievement.completed && achievement.category === 'Gimnasios').length
+  const obtainedBadges = (achievements ?? []).filter((achievement: UserAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 
   let page  = 0;
   let badgePage = 4
@@ -70,7 +70,7 @@ export default function Pasaporte(){
             </Page>
             {
               achievements &&
-                achievements.map((achievement: SmartRotomAchievement) => {
+                achievements.map((achievement: any) => {
                   if (achievement.completed && achievement.category === "Gimnasios") {
                     const team = achievement.team ? JSON.parse(achievement.team) : null
                     return (

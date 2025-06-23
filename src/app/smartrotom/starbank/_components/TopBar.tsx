@@ -84,7 +84,7 @@ export default function TopBar({
                       <div
                         key={account.id}
                         className={`flex items-center px-4 py-2 hover:bg-blue-50 cursor-pointer ${
-                          activeAccount.id === account.id ? 'bg-blue-50' : ''
+                          activeAccount!.id === account.id ? 'bg-blue-50' : ''
                         }`}
                         onClick={() => handleAccountChange(account)}
                       >
@@ -100,7 +100,7 @@ export default function TopBar({
                           <p className="text-sm font-medium text-blue-900">{account.name}</p>
                           <p className="text-xs text-blue-600">{formatMoney(account.balance)}</p>
                         </div>
-                        {activeAccount.id === account.id && (
+                        {activeAccount!.id === account.id && (
                           <div className="flex-shrink-0 ml-2">
                             <span className="w-2 h-2 bg-green-500 rounded-full inline-block"></span>
                           </div>

@@ -8,7 +8,7 @@ export function useJoinTeam(eventId: number, teamId: number) {
   )
 
   const joinTeam = (userId: number) => {
-    return eventsService.joinTeam(eventId, teamId, userId)
+    return eventsService.joinTeam(eventId, teamId, {participantId: userId})
   }
 
   return {

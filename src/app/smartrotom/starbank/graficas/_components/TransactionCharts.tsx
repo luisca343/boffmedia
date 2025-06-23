@@ -24,7 +24,7 @@ const BALANCE_COLOR = '#3b82f6';
 
 interface TransactionChartsProps {
   transactions: FullTransaction[];
-  activeAccount: StarBankAccount;
+  activeAccount: any;
   chartType: 'balance' | 'inout';
 }
 

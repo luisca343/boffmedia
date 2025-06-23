@@ -63,7 +63,7 @@ export default function ExploreGames() {
     }
   }
 
-  const openEditDialog = (game: Game) => {
+  const openEditDialog = (game: any) => {
     setEditingGame(game)
     setIsEditDialogOpen(true)
   }

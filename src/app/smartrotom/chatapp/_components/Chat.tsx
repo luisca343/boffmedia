@@ -80,7 +80,7 @@ export function Chat({
   }
 
   function call() {
-    chatAppService.call(chat.id, getSmartRotomUser(session).uuid).then((res) => {
+    chatAppService.initiateCall(chat.id, { chatId: chat.id, uuid: getSmartRotomUser(session).uuid }).then((res) => {
       if (res.error) return toast.error(res.error)
     })
   }

@@ -195,7 +195,7 @@ export default function PokemonDetail({
                                         stat === 'hp' ? 0 : 0, // Default EVs
                                         1.0 // Neutral nature
                                     );
-                                    const boost = pokemon.boosts?.[stat];
+                                    const boost = stat !== 'hp' ? pokemon.boosts?.[stat as Exclude<StatID, 'hp'>] : undefined;
                                     const baseStatValue = pokemon.species.baseStats[stat];
                                     
                                     return (

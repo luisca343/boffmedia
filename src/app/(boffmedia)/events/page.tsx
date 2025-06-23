@@ -18,7 +18,7 @@ export default function EventsPage() {
 
   // Filter events based on search and filter
   const filteredEvents = events
-    ? events.filter((event: Event) => {
+    ? events.filter((event: any) => {
         // Search filter
         const matchesSearch = searchTerm 
           ? event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -1,9 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { Protocol } from "@pkmn/protocol";
 
-const BattleStateDebugger = ({ battleLog, currentAction, isPlaying }) => {
-  const [parsedActions, setParsedActions] = useState([]);
-  const [stateStack, setStateStack] = useState([]);
+interface ActionType {
+  index: number;
+  type: string;
+  args: string[];
+  kwArgs: Record<string, any>;
+  raw: string;
+}
+
+interface StateItem {
+  action: number;
+  state: ActionType;
+}
+
+interface BattleStateDebuggerProps {
+  battleLog: string;
+  currentAction: number;
+  isPlaying: boolean;
+}
+
+const BattleStateDebugger = ({ battleLog, currentAction, isPlaying }: BattleStateDebuggerProps) => {
+  const [parsedActions, setParsedActions] = useState<ActionType[]>([]);
+  const [stateStack, setStateStack] = useState<StateItem[]>([]);
   
   useEffect(() => {
     if (!battleLog) return;
@@ -14,7 +33,7 @@ const BattleStateDebugger = ({ battleLog, currentAction, isPlaying }) => {
       return {
         index,
         type: args[0],
-        args: args.slice(1),
+        args: args.slice(1).map(arg => String(arg)), // Convert all args to strings
         kwArgs,
         raw: line
       };

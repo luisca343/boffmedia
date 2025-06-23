@@ -5,7 +5,7 @@ import { GameCard } from "./GameCard"
 import { GameEmptyState } from "./GameEmptyState"
 
 interface GamesListProps {
-  games: Game[]
+  games: any[]
   onEdit: (game: Game) => void
   onDelete: (game: Game) => void
 }

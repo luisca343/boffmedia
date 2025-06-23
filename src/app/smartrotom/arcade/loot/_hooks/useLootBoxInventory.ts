@@ -26,7 +26,7 @@ export function useLootBoxInventory(uuid?: string) {
   const fetchInventory = async (userId: string) => {
     try {
       setLoadingInventory(true);
-      const response = await arcadeService.getInventory(userId, '');
+      const response = await arcadeService.getInventory(userId);
       if (response.data && response.data.items) {
         const serverItems = response.data.items
           .filter(item => item.used === 0) // Only include unused items
@@ -74,12 +74,12 @@ export function useLootBoxInventory(uuid?: string) {
       const {rarityRanges, lootboxConfig} = (await arcadeService.getLootboxConfig()).data!
       
       if (lootboxConfig && lootboxConfig.boxes) {
-        const lootBoxes: LootBox[] = lootboxConfig.boxes.map(box => ({
+        const lootBoxes: LootBox[] = lootboxConfig.boxes.map((box: any) => ({
           id: box.id,
           name: box.name,
           description: box.description,
           image: box.image,
-          items: box.items.map(item => ({
+          items: box.items.map((item: any) => ({
             id: item.id,
             weight: item.weight,
             rarity: getRarityFromWeight(rarityRanges, item.weight) as Rarity,
@@ -109,13 +109,13 @@ export function useLootBoxInventory(uuid?: string) {
   // Open a loot box and get a reward
   const openLootBox = async (uuid: string, boxId: string) => {
     try {
-      const response = await arcadeService.openLootBox({
+      const response = await arcadeService.openLootbox({
         uuid,
         boxId,
       });
       
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || "Error al abrir la caja");
+      if (!response.data || !response.success) {
+        throw new Error(response?.message || "Error al abrir la caja");
       }
 
       // Update local state to reflect the consumed box
@@ -130,7 +130,8 @@ export function useLootBoxInventory(uuid?: string) {
       // Return the won item
       const item: Item = {
         id: response.data.item!.id,
-        weight: response.data.item!.weight,
+        weight: 0, //TODO: FIX THIS
+        //weight: response.data.item!.weight,
         rarity: response.data.item!.rarity as Rarity,
       };
       

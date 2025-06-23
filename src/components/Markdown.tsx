@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import emoji from 'remark-emoji';
 
@@ -25,10 +25,10 @@ export function Markdown({ children, className = '' }: MarkdownProps) {
           li: ({node, ...props}) => <li className="text-surface-300" {...props} />,
           p: ({node, ...props}) => <p className="mb-4 text-surface-300" {...props} />,
           blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary-500 pl-4 italic text-surface-400" {...props} />,
-          code: ({node, inline, ...props}) => 
+          code: ({node, inline, className, children, ...props}: any) => 
             inline ? 
-              <code className="bg-surface-700 px-1.5 py-0.5 rounded text-primary-300 text-sm" {...props} /> :
-              <pre className="bg-surface-700 p-4 rounded-md overflow-x-auto" {...props} />
+              <code className="bg-surface-700 px-1.5 py-0.5 rounded text-primary-300 text-sm" {...props}>{children}</code> :
+              <pre className="bg-surface-700 p-4 rounded-md overflow-x-auto"><code className={className} {...props}>{children}</code></pre>
         }}
       >
         {children}

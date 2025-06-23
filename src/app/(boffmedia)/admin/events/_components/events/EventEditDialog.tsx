@@ -35,10 +35,10 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
     visibility: event.visibility,
   }
   
-  const handleSubmit = async (data: EventFormValues) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await eventsService.updateEvent(event.id!, data)
+      await eventsService.updateEvent(event.id!, data!)
       toast.success(`El evento "${data.title}" ha sido actualizado con éxito.`)
       onSuccess()
     } catch (error) {

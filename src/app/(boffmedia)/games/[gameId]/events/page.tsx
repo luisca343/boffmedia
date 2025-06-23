@@ -16,17 +16,17 @@ import {
 } from "@/components/ui/dialog"
 import { Calendar, Plus, Loader2, ArrowLeft } from "lucide-react"
 import { eventsService } from "@/services/api/smartrotom/eventsService"
-import type { CreateEventDto } from "@/types/dto/create-event.dto"
 import type { Event, Game } from "@/types/events"
 import Link from "next/link"
 import { format } from "date-fns"
 import { useBoffSession } from "@/services/useBoffSession"
+import { CreateEventDto } from "@/generated/api"
 
 export default function GameEvents({ params }: { params: { gameId: string } }) {
   const { gameId } = params
   const gameIdNumber = Number(gameId)
-  const [events, setEvents] = useState<Event[]>([])
-  const [game, setGame] = useState<Game | null>(null)
+  const [events, setEvents] = useState<any[]>([])
+  const [game, setGame] = useState<any | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [newEvent, setNewEvent] = useState<CreateEventDto>({
@@ -35,8 +35,8 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
     gameId: gameIdNumber,
     icon: "",
     startDate: "",
-    endDate: "",
-    type: "event",
+    visibility: CreateEventDto.visibility.PUBLIC,
+    type: CreateEventDto.type.EVENT,
   })
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
@@ -47,17 +47,17 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
     setIsLoading(true)
     try {
       // First fetch just the game data
-      const gameData = await eventsService.getGame(gameIdNumber)
+      const gameData = await eventsService.getGame(gameIdNumber) as any
       if (!gameData.data) {
         throw new Error("Game not found")
       }
       setGame(gameData.data)
       
       // Then fetch events for this specific game
-      const eventsData = await eventsService.getEvents()
+      const eventsData = await eventsService.getEvents() as any
       if (eventsData.data) {
         // Filter events on the client side
-        const filteredEvents = eventsData.data.filter((event) => event.game === gameIdNumber)
+        const filteredEvents = eventsData.data.filter((event: any) => event.game === gameIdNumber)
         setEvents(filteredEvents)
       }
     } catch (err) {
@@ -89,8 +89,8 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
         icon: "",
         gameId: gameIdNumber,
         startDate: "",
-        endDate: "",
-        type: "event",
+        visibility: CreateEventDto.visibility.PUBLIC,
+        type: CreateEventDto.type.EVENT,
       })
       setIsDialogOpen(false)
     } catch (error) {
@@ -143,18 +143,19 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleCreateEvent} className="space-y-4">
-                {/* Form fields remain the same */}
                 <Input
                   placeholder="Título del evento"
                   value={newEvent.title}
                   onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                   className="bg-surface-700 text-surface-50 border-surface-600"
+                  required
                 />
                 <Textarea
                   placeholder="Descripción del evento"
                   value={newEvent.description}
                   onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                   className="bg-surface-700 text-surface-50 border-surface-600"
+                  required
                 />
                 <Input
                   type="datetime-local"
@@ -162,22 +163,50 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
                   value={newEvent.startDate}
                   onChange={(e) => setNewEvent({ ...newEvent, startDate: e.target.value })}
                   className="bg-surface-700 text-surface-50 border-surface-600"
+                  required
                 />
                 <Input
                   type="datetime-local"
-                  placeholder="Fecha de fin"
-                  value={newEvent.endDate}
+                  placeholder="Fecha de fin (opcional)"
+                  value={newEvent.endDate || ""}
                   onChange={(e) => setNewEvent({ ...newEvent, endDate: e.target.value })}
                   className="bg-surface-700 text-surface-50 border-surface-600"
                 />
-                <select
-                  value={newEvent.type}
-                  onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value as "event" | "server" })}
-                  className="w-full bg-surface-700 text-surface-50 border-surface-600 rounded-md"
-                >
-                  <option value="event">Evento</option>
-                  <option value="server">Servidor</option>
-                </select>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm text-surface-400 mb-1 block">Tipo de evento</label>
+                    <select
+                      value={newEvent.type}
+                      onChange={(e) => setNewEvent({ 
+                        ...newEvent, 
+                        type: e.target.value as CreateEventDto.type
+                      })}
+                      className="w-full bg-surface-700 text-surface-50 border-surface-600 rounded-md p-2"
+                      required
+                    >
+                      <option value={CreateEventDto.type.EVENT}>Evento</option>
+                      <option value={CreateEventDto.type.SERVER}>Servidor</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm text-surface-400 mb-1 block">Visibilidad</label>
+                    <select
+                      value={newEvent.visibility}
+                      onChange={(e) => setNewEvent({ 
+                        ...newEvent, 
+                        visibility: e.target.value as CreateEventDto.visibility
+                      })}
+                      className="w-full bg-surface-700 text-surface-50 border-surface-600 rounded-md p-2"
+                      required
+                    >
+                      <option value={CreateEventDto.visibility.PUBLIC}>Público</option>
+                      <option value={CreateEventDto.visibility.PRIVATE}>Privado</option>
+                    </select>
+                  </div>
+                </div>
+                
                 <Input
                   placeholder="URL del icono (obligatorio)"
                   value={newEvent.icon}
@@ -187,7 +216,7 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
                 />
                 <Input
                   placeholder="URL del banner (opcional)"
-                  value={newEvent.banner}
+                  value={newEvent.banner || ""}
                   onChange={(e) => setNewEvent({ ...newEvent, banner: e.target.value })}
                   className="bg-surface-700 text-surface-50 border-surface-600"
                 />
@@ -228,11 +257,18 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
                     <Calendar className="inline-block mr-2 h-4 w-4" />
                     Inicio: {format(new Date(event.startDate), "dd/MM/yyyy HH:mm")}
                   </p>
+                  {event.endDate && (
+                    <p className="text-surface-300">
+                      <Calendar className="inline-block mr-2 h-4 w-4" />
+                      Fin: {format(new Date(event.endDate), "dd/MM/yyyy HH:mm")}
+                    </p>
+                  )}
                   <p className="text-surface-300">
-                    <Calendar className="inline-block mr-2 h-4 w-4" />
-                    Fin: {format(new Date(event.endDate), "dd/MM/yyyy HH:mm")}
+                    Tipo: {event.type === CreateEventDto.type.EVENT ? "Evento" : "Servidor"}
                   </p>
-                  <p className="text-surface-300">Tipo: {event.type === "event" ? "Evento" : "Servidor"}</p>
+                  <p className="text-surface-300">
+                    Visibilidad: {event.visibility === CreateEventDto.visibility.PUBLIC ? "Público" : "Privado"}
+                  </p>
                 </div>
               </CardContent>
             </Card>

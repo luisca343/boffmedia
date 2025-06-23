@@ -10,7 +10,7 @@ interface AchievementCardProps {
   onDelete: () => void
 }
 
-export function AchievementCard({ achievement, onEdit, onDelete }: AchievementCardProps) {
+export function AchievementCard({ achievement, onEdit, onDelete }: any) {
   return (
     <TableRow className="border-surface-700 hover:bg-surface-700/50">
       <TableCell className="font-medium text-surface-400">#{achievement.id}</TableCell>

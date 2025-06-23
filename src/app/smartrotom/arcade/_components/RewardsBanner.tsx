@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Calendar, Award, Gift, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { DailyReward, DailyRewardsConfig } from "@/services/api/smartrotom/smartrotomService";
+import { arcadeService, DailyRewardsConfig } from "@/services/api/smartrotom/arcadeService";
+import { DailyRewardItem } from "@/generated/api";
 
 interface RewardsBannerProps {
   currentDay: number;
@@ -22,7 +23,7 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
         setLoadingRewards(true);
         // Import here to avoid circular dependency
         const { smartrotomService } = await import("@/services/api/smartrotom/smartrotomService");
-        const response = await smartrotomService.getRewardsBanner();
+        const response = await arcadeService.getRewardsBanner();
         setRewardsConfig(response.data);
       } catch (err) {
         console.error("Failed to fetch rewards banner:", err);
@@ -38,7 +39,8 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
   // Set active index to current day when data loads
   useEffect(() => {
     if (rewardsConfig && currentDay > 0) {
-      const index = rewardsConfig.rewards.findIndex(r => r.day === currentDay);
+      // Find the reward that matches the current day
+      const index: number = rewardsConfig.rewards.findIndex((r: DailyRewardItem) => r.day === currentDay);
       if (index >= 0) setActiveIndex(index);
     }
   }, [rewardsConfig, currentDay]);
@@ -70,7 +72,7 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
   const activeReward = rewardsConfig.rewards[activeIndex];
   
   // Function to get appropriate icon and color based on reward type
-  const getRewardVisuals = (reward: DailyReward) => {
+  const getRewardVisuals = (reward: DailyRewardItem) => {
     switch (reward.type.toLowerCase()) {
       case 'stars':
         return { 
@@ -190,24 +192,24 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
               
               {/* Day indicators */}
               <div className="relative w-full h-6 mt-1">
-                {rewardsConfig.rewards.map((reward, index) => {
+                {rewardsConfig.rewards.map((reward: DailyRewardItem, index: number) => {
                   // Calculate position based on day number
-                  const position = (reward.day / rewardsConfig.totalDays) * 100;
-                  const isSpecial = reward.type.toLowerCase() !== 'stars';
+                  const position: number = (reward.day / rewardsConfig.totalDays) * 100;
+                  const isSpecial: boolean = reward.type.toLowerCase() !== 'stars';
                   
                   return (
-                    <div 
-                      key={reward.day}
-                      className={`absolute w-2 h-2 rounded-full -mt-3 transform -translate-x-1/2 ${
-                        reward.day <= currentDay 
-                          ? 'bg-cyan-400' 
-                          : isSpecial 
-                            ? 'bg-purple-500' 
-                            : 'bg-gray-500'
-                      } ${reward.day === currentDay + 1 ? 'ring-2 ring-yellow-500 ring-offset-1 ring-offset-gray-900' : ''}`}
-                      style={{ left: `${position}%` }}
-                      onClick={() => setActiveIndex(index)}
-                    ></div>
+                  <div 
+                    key={reward.day}
+                    className={`absolute w-2 h-2 rounded-full -mt-3 transform -translate-x-1/2 ${
+                    reward.day <= currentDay 
+                      ? 'bg-cyan-400' 
+                      : isSpecial 
+                      ? 'bg-purple-500' 
+                      : 'bg-gray-500'
+                    } ${reward.day === currentDay + 1 ? 'ring-2 ring-yellow-500 ring-offset-1 ring-offset-gray-900' : ''}`}
+                    style={{ left: `${position}%` }}
+                    onClick={() => setActiveIndex(index)}
+                  ></div>
                   );
                 })}
               </div>

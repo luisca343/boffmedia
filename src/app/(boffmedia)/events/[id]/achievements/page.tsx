@@ -30,11 +30,11 @@ export default function EventAchievementsPage() {
   // Extract userId to a stable reference
   const userId = session?.user?.id
   
-  const [event, setEvent] = useState<Event | null>(null)
-  const [achievements, setAchievements] = useState<Achievement[]>([])
-  const [progressData, setProgressData] = useState<UserProgress[]>([])
+  const [event, setEvent] = useState<any>(null)
+  const [achievements, setAchievements] = useState<any>()
+  const [progressData, setProgressData] = useState<any[]>([])
   const [participantId, setParticipantId] = useState<number | null>(null)
-  const [filteredAchievements, setFilteredAchievements] = useState<AchievementWithProgress[]>([])
+  const [filteredAchievements, setFilteredAchievements] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeFilter, setActiveFilter] = useState("all")
@@ -56,9 +56,9 @@ export default function EventAchievementsPage() {
         // Get current user's participant ID and progress
         if (userId) {
           try {
-            const participantsResponse = await eventsService.getEventParticipants(eventId)
+            const participantsResponse = await eventsService.getEventParticipants(eventId) as any
             const participant = participantsResponse.data.find(
-              (p: EventParticipant) => p.userId === parseInt(userId)
+              (p: any) => p.userId === parseInt(userId)
             )
             
             if (participant) {
@@ -69,7 +69,7 @@ export default function EventAchievementsPage() {
                 eventId, 
                 participant.id
               )
-              setProgressData(progressResponse.data)
+              setProgressData(progressResponse.data!)
             } else {
               // Reset progress data if user is not a participant
               setParticipantId(null)
@@ -100,7 +100,7 @@ export default function EventAchievementsPage() {
 
   // Merge achievements with progress data
   const achievementsWithProgress: AchievementWithProgress[] = useMemo(() => {
-    return achievements.map(achievement => {
+    return achievements.map((achievement: any) => {
       const progress = progressData.find(p => p.achievementId === achievement.id)
       return {
         ...achievement,
