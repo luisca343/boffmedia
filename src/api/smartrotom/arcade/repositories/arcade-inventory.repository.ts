@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { IArcadeInventoryRepository } from './interfaces/arcade-inventory.repository.interface';
@@ -106,18 +106,61 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     return result[0].affectedRows > 0;
   }
 
-    async consumeItem(uuid: string, itemId: string, amount: number): Promise<ArcadeInventory> {
-    const item = await this.findUserItem(uuid, itemId);
-    if (!item) throw new Error('Item not found');
+  async consumeItem(uuid: string, itemId: string, amount: number): Promise<ArcadeInventory> {
+    // Get all items matching this itemId for the user
+    const items = await this.db.select()
+      .from(smartRotomInventory)
+      .where(and(
+        eq(smartRotomInventory.uuid, uuid),
+        eq(smartRotomInventory.itemId, itemId)
+      ))
+      .orderBy(asc(smartRotomInventory.used));
     
-    const newAmount = Math.max(0, (item as any).amount - amount);
-    if (newAmount === 0) {
-        await this.removeItem(uuid, itemId);
-        return { ...item, amount: 0 } as ArcadeInventory;
+    if (!items.length) {
+      throw new Error('Item not found');
     }
     
-    return this.updateItemQuantity(uuid, itemId, newAmount);
+    const currentItem = items[0];
+    const consumableTypes = ['crate', 'lootbox'];
+    const isConsumable = consumableTypes.includes(currentItem.itemType);
+    
+    if (isConsumable) {
+      // For consumables, we update the "used" count
+      const newUsedCount = (currentItem.used || 0) + amount;
+      
+      if (newUsedCount > currentItem.amount) {
+        throw new Error('Insufficient quantity');
+      }
+      
+      // Update the used count
+      await this.db.update(smartRotomInventory)
+        .set({ used: newUsedCount } as SmartRotomInventoryItem)
+        .where(eq(smartRotomInventory.id, currentItem.id));
+      
+      // Fetch the updated item
+      const updatedItem = await this.findById(currentItem.id) as ArcadeInventory;
+      
+      // Add remaining amount information
+      return {
+        ...updatedItem,
+        remainingAmount: updatedItem.amount - newUsedCount
+      } as ArcadeInventory;
+    } else {
+      // For non-consumables, we reduce the amount directly
+      const newAmount = Math.max(0, currentItem.amount - amount);
+      
+      if (newAmount === 0) {
+        await this.delete(currentItem.id);
+        return { ...currentItem, amount: 0 } as ArcadeInventory;
+      } else {
+        await this.db.update(smartRotomInventory)
+          .set({ amount: newAmount } as SmartRotomInventoryItem)
+          .where(eq(smartRotomInventory.id, currentItem.id));
+        
+        return this.findById(currentItem.id) as Promise<ArcadeInventory>;
+      }
     }
+  }
 
   async getTotalItems(uuid: string): Promise<number> {
     const items = await this.findUserInventory(uuid);

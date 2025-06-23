@@ -140,28 +140,43 @@ export class InventoryService {
     success: boolean; 
     item: ArcadeInventory | null;
     consumed: number;
+    remainingAmount?: number;
+    totalRemaining?: number;
   }> {
     this.validateUuid(uuid);
     this.validateItemId(itemId);
     this.validateAmount(amount);
 
-    const existingItem = await this.arcadeInventoryRepository.findUserItem(uuid, itemId);
-    
-    if (!existingItem) {
-      throw new NotFoundException('Item not found in inventory');
+    try {
+      // Get all matching items to calculate total
+      const allItems = await this.arcadeInventoryRepository.getItemsByType(uuid, 'lootbox');
+      const targetItems = allItems.filter(item => item.itemId === itemId);
+      
+      if (!targetItems.length) {
+        throw new NotFoundException('Item not found in inventory');
+      }
+      
+      const updatedItem = await this.arcadeInventoryRepository.consumeItem(uuid, itemId, amount);
+      
+      // Calculate total remaining across all instances of this item
+      const totalRemaining = targetItems.reduce((total, item) => {
+        return total + (item.amount - (item.id === updatedItem.id ? 
+          (updatedItem.used || 0) : (item.used || 0)));
+      }, 0);
+      
+      return {
+        success: true,
+        item: updatedItem,
+        consumed: amount,
+        remainingAmount: updatedItem.remainingAmount || updatedItem.amount,
+        totalRemaining
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new BadRequestException(error.message);
     }
-
-    if (existingItem.amount < amount) {
-      throw new BadRequestException(`Insufficient quantity. Available: ${existingItem.amount}, Requested: ${amount}`);
-    }
-
-    const updatedItem = await this.arcadeInventoryRepository.consumeItem(uuid, itemId, amount);
-
-    return {
-      success: true,
-      item: updatedItem.amount > 0 ? updatedItem : null,
-      consumed: amount
-    };
   }
 
   async removeItem(uuid: string, itemId: string): Promise<{ success: boolean; message: string }> {
