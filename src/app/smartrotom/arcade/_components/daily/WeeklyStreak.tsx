@@ -39,7 +39,7 @@ export default function WeeklyStreak({
   nextResetTime,
   bannerChanged = false
 }: WeeklyStreakProps) {
-  const [rewardsConfig, setRewardsConfig] = useState<DailyRewardsConfig | null>(null);
+  const [rewardsConfig, setRewardsConfig] = useState<any | null>(null);
   const [loadingRewards, setLoadingRewards] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
   

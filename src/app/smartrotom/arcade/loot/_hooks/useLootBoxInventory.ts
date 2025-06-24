@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArcadeInventory, ArcadeService } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeInventoryItem, ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import { useTranslations } from 'next-intl';
 import { LootboxBoxConfig } from "@/generated/api";
 
@@ -12,7 +12,7 @@ const BOX_TYPE_MAP: Record<string, string> = {
 
 export function useLootBoxInventory(uuid?: string) {
   const t = useTranslations("");
-  const [collection, setCollection] = useState<ArcadeInventory[]>([]);
+  const [collection, setCollection] = useState<ArcadeInventoryItem[]>([]);
   const [ownedBoxes, setOwnedBoxes] = useState<Record<string, any>>({});
   const [loadingInventory, setLoadingInventory] = useState(false);
   const [availableLootBoxes, setAvailableLootBoxes] = useState<LootboxBoxConfig[]>([]);
@@ -153,6 +153,6 @@ export function useLootBoxInventory(uuid?: string) {
     error,
     fetchInventory,
     openLootBox,
-    addItemToCollection: (item: ArcadeInventory) => setCollection(prev => [...prev, item])
+    addItemToCollection: (item: ArcadeInventoryItem) => setCollection(prev => [...prev, item])
   };
 }

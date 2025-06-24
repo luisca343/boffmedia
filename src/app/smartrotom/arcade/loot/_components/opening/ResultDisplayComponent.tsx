@@ -6,9 +6,10 @@ import { getItemDescription, getItemName } from "@/lib/intlUtils";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 interface ResultDisplayProps {
-  wonItem: Item;
+  wonItem: ArcadeInventoryItem;
   onComplete: () => void;
 }
 
@@ -36,13 +37,13 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
       
       <div className={`flex flex-col items-center p-4 rounded-lg ${config.bgColor} border-2 ${config.borderColor} ${config.glow}`}>
         <h3 className={`text-xl font-bold ${config.textColor} mb-2 text-center`}>
-          {getItemName(t, wonItem.id)}
+          {getItemName(t, wonItem.itemId)}
         </h3>
         
         <div className="relative w-32 h-32 mb-4">
           <ItemImage
-            type={wonItem.source}
-            itemId={wonItem.id}
+            type={wonItem.sourceType}
+            itemId={wonItem.itemId}
             size={128}
           />
           
@@ -74,7 +75,7 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         </div>
         
         <p className="text-gray-200 text-center mb-4 bg-black/40 p-3 rounded-lg border border-gray-800">
-          {getItemDescription(t, wonItem.id)}
+          {getItemDescription(t, wonItem.itemId)}
         </p>
       </div>
       

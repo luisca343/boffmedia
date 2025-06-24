@@ -4,9 +4,10 @@ import { useTranslations } from "next-intl";
 import { getItemName } from "@/lib/intlUtils";
 import { ItemImage } from "@/lib/ItemImage";
 import { calculateLootBoxOdds } from "../../_utils/calculateLootBoxOdds";
+import { LootboxBoxConfig } from "@/generated/api";
 
 interface LootBoxOddsProps {
-  lootBox: LootBox;
+  lootBox: LootboxBoxConfig;
   currentBoxTheme: {
     bgGradient: string;
     border: string;
@@ -31,7 +32,7 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
     const rarityGroups: Record<string, typeof itemsWithOdds> = {};
     
     itemsWithOdds.forEach(item => {
-      const rarity = item.rarity || 'common';
+      const rarity = item.weight || 'common';
       if (!rarityGroups[rarity]) {
         rarityGroups[rarity] = [];
       }

@@ -1,4 +1,5 @@
-import { DailyReward, DailyRewardsConfig } from "@/services/api/smartrotom/arcadeService";
+
+import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
 import DayReward from "./DayReward";
 
 interface DaysGridProps {
@@ -21,8 +22,8 @@ export default function DaysGrid({
       {[...Array(totalDays)].map((_, i) => {
         const dayNumber = i + 1;
         // Check if there's a reward for this day from server
-        const dayReward: DailyReward | undefined = 
-          rewardsConfig?.rewards.find((r: DailyReward) => r.day === dayNumber);
+        const dayReward: DailyRewardItem | undefined = 
+          rewardsConfig?.rewards.find((r: DailyRewardItem) => r.day === dayNumber);
         
         return (
           <DayReward 

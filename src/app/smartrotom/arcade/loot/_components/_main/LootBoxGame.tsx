@@ -15,7 +15,7 @@ import { LootBoxHeader } from "./LootBoxHeader";
 import { InfoModal } from "./InfoModal";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { Loader2 } from "lucide-react";
-import { ArcadeInventory, LootboxBoxConfig } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
 
 export default function LootBoxGame() {
   const t = useTranslations("");
@@ -42,7 +42,7 @@ export default function LootBoxGame() {
   
   const [selectedBox, setSelectedBox] = useState<LootboxBoxConfig | null>(null);
   const [isOpening, setIsOpening] = useState(false);
-  const [wonItem, setWonItem] = useState<ArcadeInventory | null>(null);
+  const [wonItem, setWonItem] = useState<ArcadeInventoryItem | null>(null);
   const [showCollection, setShowCollection] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);

@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react';
 import { rarityOrder } from '../_utils/rarityConfig';
-import { ArcadeInventory } from '@/generated/api';
+import { ArcadeInventoryItem } from '@/generated/api';
 
 const ITEMS_PER_PAGE = 16;
 
-export function useCollectionFilters(items: ArcadeInventory[]) {
+export function useCollectionFilters(items: ArcadeInventoryItem[]) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRarity, setSelectedRarity] = useState<any | "all">("all");
   const [currentPage, setCurrentPage] = useState(0);

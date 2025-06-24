@@ -5,9 +5,10 @@ import { ItemDisplay } from '../ItemDisplay';
 import { useTranslations } from 'next-intl';
 import { getItemName } from '@/lib/intlUtils';
 import { toast } from 'react-toastify';
+import { ArcadeInventoryItem } from '@/generated/api';
 
 interface ClaimRewardsModalProps {
-  items: Item[];
+  items: ArcadeInventoryItem[];
   onClose: () => void;
   onClaimSuccess: (claimedItemIds: string[]) => void;
   uuid: string;
@@ -21,30 +22,30 @@ interface ClaimItemData {
 
 export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: ClaimRewardsModalProps) {
   const t = useTranslations("");
-  const [selectedItems, setSelectedItems] = useState<Item[]>([]);
+  const [selectedItems, setSelectedItems] = useState<ArcadeInventoryItem[]>([]);
   const [isClaiming, setIsClaiming] = useState(false);
   
   // Filter out chests and boxes
   const claimableItems = items.filter(item => 
-    !item.id.toLowerCase().includes('chest') && 
-    !item.id.toLowerCase().includes('box')
+    !item.itemId.toLowerCase().includes('chest') && 
+    !item.itemId.toLowerCase().includes('box')
   );
   
   // Separate Pokémon from non-Pokémon items
-  const pokemonItems = claimableItems.filter(item => item.source === 'pokemon');
-  const nonPokemonItems = claimableItems.filter(item => item.source !== 'pokemon');
+  const pokemonItems = claimableItems.filter(item => item.sourceType === 'pokemon');
+  const nonPokemonItems = claimableItems.filter(item => item.sourceType !== 'pokemon');
   
   // Calculate required chests for Minecraft items
   const chestCalculation = useMemo(() => {
     if (selectedItems.length === 0) return { slots: 0, chests: 0 };
     
-    const selectedNonPokemon = selectedItems.filter(item => item.source !== 'pokemon');
+    const selectedNonPokemon = selectedItems.filter(item => item.sourceType !== 'pokemon');
     
     // Calculate slots needed
     const requiredSlots = selectedNonPokemon.reduce((total, item) => {
       // Each item type uses at least one slot
       // If count is more than 64, calculate additional slots needed
-      const itemSlots = Math.ceil((item.count || 1) / 64);
+      const itemSlots = Math.ceil((item.amount || 1) / 64);
       return total + itemSlots;
     }, 0);
     
@@ -54,9 +55,9 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
     return { slots: requiredSlots, chests: chestsNeeded };
   }, [selectedItems]);
   
-  const toggleItemSelection = (item: Item) => {
-    if (selectedItems.some(i => i.id === item.id)) {
-      setSelectedItems(selectedItems.filter(i => i.id !== item.id));
+  const toggleItemSelection = (item: ArcadeInventoryItem) => {
+    if (selectedItems.some(i => i.itemId === item.itemId)) {
+      setSelectedItems(selectedItems.filter(i => i.itemId !== item.itemId));
     } else {
       setSelectedItems([...selectedItems, item]);
     }
@@ -70,8 +71,8 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
       
       // Create an array of item IDs and types for claiming
       const claimItems: ClaimItemData[] = selectedItems.map(item => ({
-        id: item.id,
-        type: item.source || 'minecraft' // Default to 'minecraft' if source is not specified
+        id: item.itemId,
+        type: item.sourceType || 'minecraft' // Default to 'minecraft' if source is not specified
       }));
       
       // Send both item IDs and types to the server
@@ -82,17 +83,17 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
       
       if (response) {
         // Different messages based on what was claimed
-        if (selectedItems.some(item => item.source === 'pokemon') && 
-            selectedItems.some(item => item.source !== 'pokemon')) {
+        if (selectedItems.some(item => item.sourceType === 'pokemon') && 
+            selectedItems.some(item => item.sourceType !== 'pokemon')) {
           toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente! Se te entregarán ${chestCalculation.chests} cofre(s) en Minecraft.`);
-        } else if (selectedItems.every(item => item.source === 'pokemon')) {
+        } else if (selectedItems.every(item => item.sourceType === 'pokemon')) {
           toast.success(`¡Has reclamado ${selectedItems.length} Pokémon correctamente!`);
         } else {
           toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente! Se te entregarán ${chestCalculation.chests} cofre(s) en Minecraft.`);
         }
         
         // Pass the claimed item IDs to update the local state
-        onClaimSuccess(selectedItems.map(item => item.id));
+        onClaimSuccess(selectedItems.map(item => item.itemId));
       } else {
         toast.error(response || 'Error al reclamar los objetos');
       }
@@ -136,8 +137,8 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
     );
   }
   
-  const selectedNonPokemon = selectedItems.filter(item => item.source !== 'pokemon');
-  const selectedPokemon = selectedItems.filter(item => item.source === 'pokemon');
+  const selectedNonPokemon = selectedItems.filter(item => item.sourceType !== 'pokemon');
+  const selectedPokemon = selectedItems.filter(item => item.sourceType === 'pokemon');
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
@@ -188,16 +189,16 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
               <h4 className="text-cyan-300 font-medium mb-2 border-b border-gray-700 pb-1">Pokémon</h4>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {pokemonItems.map(item => {
-                  const isSelected = selectedItems.some(i => i.id === item.id);
+                  const isSelected = selectedItems.some(i => i.itemId === item.itemId);
                   return (
                     <div key={item.id} className="flex flex-col items-center text-surface-100">
                       <ItemDisplay
-                        type={item.source!}
-                        itemId={item.id}
-                        count={item.count}
+                        type={item.sourceType!}
+                        itemId={item.itemId}
+                        count={item.amount}
                         size={64}
                         rarity={item.rarity}
-                        name={getItemName(t, item.id, item.source)}
+                        name={getItemName(t, item.itemId, item.sourceType)}
                         selectable={true}
                         selected={isSelected}
                         isChest={false}
@@ -219,12 +220,12 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
                   return (
                     <div key={item.id} className="flex flex-col items-center text-surface-100">
                       <ItemDisplay
-                        type={item.source!}
-                        itemId={item.id}
-                        count={item.count}
+                        type={item.sourceType!}
+                        itemId={item.itemId}
+                        count={item.amount}
                         size={64}
                         rarity={item.rarity}
-                        name={getItemName(t, item.id, item.source)}
+                        name={getItemName(t, item.itemId, item.sourceType)}
                         selectable={true}
                         selected={isSelected}
                         isChest={false}

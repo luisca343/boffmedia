@@ -6,9 +6,10 @@ import { Sparkles } from "lucide-react";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
+import { ArcadeInventoryItem, LootboxItemConfig } from "@/generated/api";
 
 interface SpinnerItemProps {
-  item: Item;
+  item: LootboxItemConfig;
   index: number;
   isWinningItem: boolean;
   winningIndex: number | null;
