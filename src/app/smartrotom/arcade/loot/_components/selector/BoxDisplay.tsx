@@ -1,10 +1,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { LootboxBoxConfig } from "@/generated/api";
+import { LootBox } from "../../types";
 
 interface BoxDisplayProps {
-  lootBox: LootboxBoxConfig;
+  lootBox: LootBox;
 }
 
 export function BoxDisplay({ lootBox }: BoxDisplayProps) {

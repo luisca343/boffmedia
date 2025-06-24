@@ -1,8 +1,8 @@
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventory } from "@/generated/api";
 import { Box, Info, Loader2, Sparkles } from "lucide-react";
 
 interface LootBoxHeaderProps {
-  ownedBoxes: Record<string, ArcadeInventoryItem>;
+  ownedBoxes: Record<string, ArcadeInventory>;
   collectionCount: number;
   loadingInventory: boolean;
   onShowInfo: () => void;

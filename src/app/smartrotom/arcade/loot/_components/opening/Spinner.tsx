@@ -1,16 +1,15 @@
 import { useRef } from "react";
 import { LootBox, Item } from "../../types";
 import { SpinnerItem } from "./SpinnerItem";
-import { ArcadeInventoryItem, LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
 
 interface SpinnerProps {
-  lootBox: LootboxBoxConfig;
-  spinItems: LootboxItemConfig[];
+  lootBox: LootBox;
+  spinItems: Item[];
   scrollPosition: number;
   spinComplete: boolean;
   isSpinning: boolean;
   winningIndex: number | null;
-  wonItem: ArcadeInventoryItem;
+  wonItem: Item;
   spinnerRef: React.RefObject<HTMLDivElement>;
   itemsContainerRef: React.RefObject<HTMLDivElement>;
   ITEM_WIDTH: number;
@@ -68,7 +67,7 @@ export function Spinner({
           >
             {spinItems.map((item, index) => {
               // Only highlight the specific instance that matches both the ID AND the winning index
-              const isWinningItem = spinComplete && item.id === wonItem.itemId && index === winningIndex;
+              const isWinningItem = spinComplete && item.id === wonItem.id && index === winningIndex;
               
               return (
                 <SpinnerItem

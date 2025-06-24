@@ -1,7 +1,7 @@
 import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
 import type {
   ArcadeStreak,
-  ArcadeInventoryItem,
+  ArcadeInventory,
   ArcadeStreakClaim,
   ArcadeInventoryResponse,
   ClaimRewardDto,
@@ -92,22 +92,22 @@ export class ArcadeService {
   /**
    * Get specific inventory item
    */
-  static getUserItem(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem | null>> {
-    return rotomGET<ArcadeInventoryItem | null>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}`);
+  static getUserItem(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory | null>> {
+    return rotomGET<ArcadeInventory | null>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}`);
   }
 
   /**
    * Add item to player inventory
    */
-  static addInventoryItem(addInventoryItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventoryItem>> {
-    return rotomPOST<ArcadeInventoryItem>('/smartrotom/arcade/inventory/add', addInventoryItemDto);
+  static addInventoryItem(addInventoryItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventory>> {
+    return rotomPOST<ArcadeInventory>('/smartrotom/arcade/inventory/add', addInventoryItemDto);
   }
 
   /**
    * Consume an inventory item
    */
   static consumeInventoryItem(consumeInventoryItemDto: ConsumeInventoryItemDto): Promise<ApiResponse<{
-    item: ArcadeInventoryItem | null;
+    item: ArcadeInventory | null;
     consumed: number;
   }>> {
     return rotomPOST('/smartrotom/arcade/inventory/consume', consumeInventoryItemDto);
@@ -116,8 +116,8 @@ export class ArcadeService {
   /**
    * Mark inventory item as used
    */
-  static markItemAsUsed(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem>> {
-    return rotomPOST<ArcadeInventoryItem>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}/use`, {});
+  static markItemAsUsed(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory>> {
+    return rotomPOST<ArcadeInventory>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}/use`, {});
   }
 
   // ==================== LOOTBOX ENDPOINTS ====================
@@ -184,7 +184,7 @@ export class ArcadeService {
    * Quick method to consume an inventory item
    */
   static consumeItem(uuid: string, itemId: string, amount: number = 1): Promise<ApiResponse<{
-    item: ArcadeInventoryItem | null;
+    item: ArcadeInventory | null;
     consumed: number;
   }>> {
     return ArcadeService.consumeInventoryItem({ uuid, itemId, amount });
@@ -227,7 +227,7 @@ export class ArcadeService {
 // Export types for convenience
 export type {
   ArcadeStreak,
-  ArcadeInventoryItem,
+  ArcadeInventory,
   ArcadeStreakClaim,
   ArcadeInventoryResponse,
   ClaimRewardDto,

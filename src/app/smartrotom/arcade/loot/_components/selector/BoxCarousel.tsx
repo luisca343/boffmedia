@@ -3,14 +3,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LootBox } from "../../types";
 import { BoxDisplay } from "./BoxDisplay";
 import { BoxInfo } from "./BoxInfo";
-import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
+import { ArcadeInventory } from "@/generated/api";
 
 interface BoxCarouselProps {
-  lootBoxes: LootboxBoxConfig[];
+  lootBoxes: LootBox[];
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
-  onSelect: (box: LootboxBoxConfig) => void;
-  selectedBox: LootboxBoxConfig;
+  onSelect: (box: LootBox) => void;
+  selectedBox: LootBox;
   currentBoxTheme: {
     bgGradient: string;
     border: string;
@@ -20,7 +20,7 @@ interface BoxCarouselProps {
     buttonHover: string;
   };
   onShowOdds: () => void;
-  ownedBoxes: Record<string, ArcadeInventoryItem>;
+  ownedBoxes: Record<string, ArcadeInventory>;
 }
 
 export function BoxCarousel({ 

@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { LootBox } from "../../types";
-import { LootboxBoxConfig } from "@/generated/api";
 
 interface BoxAnimationProps {
-  lootBox: LootboxBoxConfig;
+  lootBox: LootBox;
 }
 
 export function BoxAnimation({ lootBox }: BoxAnimationProps) {

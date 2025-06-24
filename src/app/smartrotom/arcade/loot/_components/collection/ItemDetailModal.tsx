@@ -4,10 +4,9 @@ import { getRarityConfig } from "../../_utils/rarityConfig";
 import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemDescription, getItemName, getItemRarity } from "@/lib/intlUtils";
-import { ArcadeInventoryItem } from "@/generated/api";
 
 interface ItemDetailModalProps {
-  item: ArcadeInventoryItem | null;
+  item: Item | null;
   onClose: () => void;
 }
 
@@ -17,8 +16,8 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
   if (!item) return null;
   
   // Get the type based on item source
-  const getItemType = (item: ArcadeInventoryItem) => {
-    return item.sourceType === "arcade" ? "arcade" : "mina";
+  const getItemType = (item: Item) => {
+    return item.source === "arcade" ? "arcade" : "mina";
   };
 
   const config = getRarityConfig(item.rarity);
@@ -28,7 +27,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
       <div className={`${config.bgColor} border-4 ${config.borderColor} rounded-lg p-6 max-w-md w-full ${config.glow}`}>
         <div className="flex justify-between items-start mb-4">
           <h3 className={`${config.textColor} text-2xl font-bold`}>
-            {getItemName(t, item.id.toString())}
+            {getItemName(t, item.id)}
           </h3>
           <button 
             onClick={onClose}
@@ -42,17 +41,17 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
           <div className="w-48 h-48 mb-4 flex items-center justify-center bg-black/30 rounded-lg border border-gray-700">
             <ItemDisplay
               type={getItemType(item)}
-              itemId={item.id.toString()}
-              count={item.amount}
+              itemId={item.id}
+              count={item.count}
               size={160}
               rarity={item.rarity}
             />
           </div>
           
-          {item.amount && item.amount > 1 && (
+          {item.count && item.count > 1 && (
             <div className="mb-2 px-3 py-1 bg-black/50 rounded-md border border-gray-700">
               <span className={`${config.textColor}`}>
-                Cantidad: <strong>{item.amount}</strong>
+                Cantidad: <strong>{item.count}</strong>
               </span>
             </div>
           )}
@@ -62,7 +61,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
           </span>
           
           <p className="text-gray-200 text-center bg-black/30 p-4 rounded-lg border border-gray-800">
-            {getItemDescription(t, item.id.toString()) || `Un objeto ${item.rarity} de la colección.`}
+            {getItemDescription(t, item.id) || `Un objeto ${item.rarity} de la colección.`}
           </p>
         </div>
         

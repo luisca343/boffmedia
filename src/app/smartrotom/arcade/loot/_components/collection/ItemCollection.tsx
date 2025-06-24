@@ -7,19 +7,19 @@ import { CollectionPagination } from "./CollectionPagination";
 import { ItemDetailModal } from "./ItemDetailModal";
 import { ClaimRewardsModal } from "./ClaimRewardsModal";
 import { useCollectionFilters } from "../../_hooks/useCollectionFilter";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventory } from "@/generated/api";
 
 interface ItemCollectionProps {
-  items: ArcadeInventoryItem[];
+  items: ArcadeInventory[];
   onClose: () => void;
   uuid: string;
   onInventoryUpdate?: () => void;
 }
 
 export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate }: ItemCollectionProps) {
-  const [selectedItem, setSelectedItem] = useState<ArcadeInventoryItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ArcadeInventory | null>(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
-  const [localItems, setLocalItems] = useState<ArcadeInventoryItem[]>(items);
+  const [localItems, setLocalItems] = useState<ArcadeInventory[]>(items);
   
   const {
     searchTerm,
@@ -36,18 +36,18 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
 
   // Filter claimable items (not chests or boxes)
   const claimableItems = localItems.filter(item => 
-    !item.itemId.toLowerCase().includes('chest') && 
-    !item.itemId.toLowerCase().includes('box')
+    !item.id.toLowerCase().includes('chest') && 
+    !item.id.toLowerCase().includes('box')
   );
 
-  const handleItemClick = (item: ArcadeInventoryItem) => {
+  const handleItemClick = (item: Item) => {
     setSelectedItem(item);
   };
 
   const handleClaimSuccess = (claimedItemIds: string[]) => {
     // Update local state by removing claimed items
     setLocalItems(prevItems => 
-      prevItems.filter(item => !claimedItemIds.includes(item.itemId))
+      prevItems.filter(item => !claimedItemIds.includes(item.id))
     );
     
     // Also call parent update function if provided

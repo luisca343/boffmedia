@@ -4,16 +4,16 @@ import { useAudio } from "@/hooks/useAudio";
 
 interface UseSpinnerAnimationProps {
   lootBox: {
-    items: any[];
+    items: Item[];
   };
-  wonItem: any;
+  wonItem: Item;
 }
 
 interface SpinnerAnimationResult {
   showBox: boolean;
   showSpinner: boolean;
   animationCompleted: boolean;
-  spinItems: any[];
+  spinItems: Item[];
   scrollPosition: number;
   isSpinning: boolean;
   spinComplete: boolean;

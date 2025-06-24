@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
 import { toast } from 'react-toastify';
-import { ArcadeInventoryItem, ArcadeService } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeInventory, ArcadeService } from '@/services/api/smartrotom/arcadeService';
 import { ArcadeStreak, ArcadeStreakClaim } from '@/generated/api';
 
 interface UseArcadeStreakReturn {
@@ -14,7 +14,7 @@ interface UseArcadeStreakReturn {
   claimReward: () => Promise<{
     streak: ArcadeStreak;
     reward: any;
-    inventoryItems?: ArcadeInventoryItem[];
+    inventoryItems?: ArcadeInventory[];
   } | null>;
   error: string | null;
   nextReward: any | null;

@@ -4,12 +4,11 @@ import { getRarityConfig } from "../../_utils/rarityConfig";
 import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemName, getItemRarity } from "@/lib/intlUtils";
-import { ArcadeInventoryItem } from "@/generated/api";
 
 interface CollectionGridProps {
-  items: ArcadeInventoryItem[];
+  items: Item[];
   totalItems: number;
-  onItemClick: (item: ArcadeInventoryItem) => void;
+  onItemClick: (item: Item) => void;
 }
 
 export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGridProps) {
@@ -42,7 +41,7 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
   return (
     <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
       {items.map(item => {
-        const config = getRarityConfig(item.rarity as ArcadeInventoryItem.rarity);
+        const config = getRarityConfig(item.rarity);
         
         return (
           <div
@@ -52,16 +51,16 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
           >
             <div className="w-full aspect-square mb-2 flex items-center justify-center">
               <ItemDisplay
-                type={item.sourceType!}
-                itemId={item.itemType}
-                count={item.amount}
+                type={item.source!}
+                itemId={item.id}
+                count={item.count}
                 size={96}
                 rarity={item.rarity}
               />
             </div>
             
             <h3 className={`${config.textColor} font-medium text-center text-sm truncate w-full`}>
-              {getItemName(t, item.itemType, item.sourceType)}
+              {getItemName(t, item.id, item.source)}
             </h3>
             <p className={`${config.textColor} text-xs mt-1`}>
               {getItemRarity(t, item.rarity)}

@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Sparkles, Gift } from "lucide-react";
+import { DailyReward } from "@/services/api/smartrotom/arcadeService";
 import { getItemName } from "@/lib/intlUtils";
 import { useTranslations } from "next-intl";
 import { getRewardIcon, getRewardVisuals, isNamedReward } from "../../_util/rewardIcons";
-import { DailyRewardItem } from "@/generated/api";
 
 interface DayRewardProps {
   day: number;
   currentDay: number;
   claimed: boolean;
-  dayReward?: DailyRewardItem;
+  dayReward?: DailyReward;
   isLoading: boolean;
 }
 
@@ -76,7 +76,7 @@ export default function DayReward({
       <div className="text-[10px] text-gray-300 truncate px-1 text-center max-w-full">
         {isNamedReward(dayReward?.type || '') && dayReward?.description
           ? getItemName(t, dayReward.description)
-          : dayReward?.type === DailyRewardItem.type.COINS
+          : dayReward?.type === 'currency' 
             ? 'Estrellas' 
             : dayReward?.type || 'Estrellas'}
       </div>

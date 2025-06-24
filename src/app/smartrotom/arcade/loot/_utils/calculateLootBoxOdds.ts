@@ -1,4 +1,3 @@
-import { LootboxItemConfig } from "@/generated/api";
 import { Item } from "../types";
 
 /**
@@ -7,7 +6,7 @@ import { Item } from "../types";
  * @param items Array of loot box items with weights
  * @returns Array of items with added percentage field
  */
-export function calculateLootBoxOdds(items: LootboxItemConfig[]): (LootboxItemConfig & { percentage: number })[] {
+export function calculateLootBoxOdds(items: Item[]): (Item & { percentage: number })[] {
   // Calculate the total weight of all items
   const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
   
