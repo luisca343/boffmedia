@@ -1,11 +1,11 @@
 import { OrderAppDto } from "@/generated/api";
 import { useRotomRequest } from "../useRotomRequest";
-import { appsService } from "@/services/api/smartrotom/appsService";
+import { AppsService } from "@/services/api/smartrotom/appsService";
 export function useOrderApps() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.order)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(AppsService.order)
 
   const orderApps = (orderAppDto: OrderAppDto) => {
-    return appsService.order(orderAppDto);
+    return AppsService.order(orderAppDto);
   }
 
   return {

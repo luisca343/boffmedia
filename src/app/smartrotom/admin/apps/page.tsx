@@ -21,6 +21,7 @@ import { SmartRotomApp } from '@/generated/api'
 export default function PlayerAppManagement() {
   const { session } = useBoffSession()
   const [selectedPlayerUuid, setSelectedPlayerUuid] = useState<string>("")
+  // TODO: any
   const [allUsers, setAllUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   
@@ -150,7 +151,7 @@ export default function PlayerAppManagement() {
               <SelectContent className="bg-black text-green-400 border-green-700">
                 {allUsers && allUsers.length > 0 ? (
                   allUsers
-                    .filter(user => user.id > 0) // Filter out system users and any with ID <= 0
+                    .filter(user => user.id > 0)
                     .map(user => (
                       <SelectItem 
                         key={user.uuid} 

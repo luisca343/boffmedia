@@ -1,12 +1,11 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { appsService } from "@/services/api/smartrotom/appsService"
-import type { SuccessResponse } from "@/types"
+import { AppsService } from "@/services/api/smartrotom/appsService"
 
 export function useRemoveAppFromPlayer() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.removeAppFromPlayer)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(AppsService.removeAppFromPlayer)
 
   const removeAppFromPlayer = (uuid: string, appId: number) => {
-    return appsService.removeAppFromPlayer(uuid, appId)
+    return AppsService.removeAppFromPlayer(uuid, appId)
   }
 
   return {
