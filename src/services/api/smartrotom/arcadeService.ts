@@ -1,6 +1,6 @@
 import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, ApiResponse } from '@/services/boffAPI';
 import type { 
-  ArcadeInventory, 
+  ArcadeInventoryItem, 
   OpenLootBoxDto, 
   OpenLootBoxResponseDto,
   ClaimRewardDto,
@@ -139,12 +139,12 @@ export const arcadeService = {
   claimDailyReward: (claimRewardDto: ClaimRewardDto): Promise<ApiResponse<{
     streak: ArcadeStreak;
     reward: any;
-    inventoryItems?: ArcadeInventory[];
+    inventoryItems?: ArcadeInventoryItem[];
   }>> => 
     rotomPOST<{
       streak: ArcadeStreak;
       reward: any;
-      inventoryItems?: ArcadeInventory[];
+      inventoryItems?: ArcadeInventoryItem[];
     }>('/arcade/streak/claim', claimRewardDto),
 
   /**
@@ -195,32 +195,32 @@ export const arcadeService = {
   /**
    * Get specific inventory item
    */
-  getInventoryItem: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory | null>> => 
-    rotomGET<ArcadeInventory | null>(`/arcade/inventory/${uuid}/item/${itemId}`),
+  getInventoryItem: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem | null>> => 
+    rotomGET<ArcadeInventoryItem | null>(`/arcade/inventory/${uuid}/item/${itemId}`),
 
   /**
    * Add item to player inventory
    */
-  addInventoryItem: (addItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventory>> => 
-    rotomPOST<ArcadeInventory>('/arcade/inventory/add', addItemDto),
+  addInventoryItem: (addItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventoryItem>> => 
+    rotomPOST<ArcadeInventoryItem>('/arcade/inventory/add', addItemDto),
 
   /**
    * Consume an inventory item
    */
   consumeInventoryItem: (consumeItemDto: ConsumeInventoryItemDto): Promise<ApiResponse<{
-    item: ArcadeInventory | null;
+    item: ArcadeInventoryItem | null;
     consumed: number;
   }>> => 
     rotomPOST<{
-      item: ArcadeInventory | null;
+      item: ArcadeInventoryItem | null;
       consumed: number;
     }>('/arcade/inventory/consume', consumeItemDto),
 
   /**
    * Mark inventory item as used
    */
-  markItemAsUsed: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory>> => 
-    rotomPOST<ArcadeInventory>(`/arcade/inventory/${uuid}/item/${itemId}/use`, {}),
+  markItemAsUsed: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem>> => 
+    rotomPOST<ArcadeInventoryItem>(`/arcade/inventory/${uuid}/item/${itemId}/use`, {}),
 
   // ==================== LOOTBOX ENDPOINTS ====================
   
@@ -248,15 +248,15 @@ export const arcadeService = {
    * Claim multiple items at once
    */
   /*
-  claimMultipleItems: (claimItemsDto: ClaimInventoryItemsDto): Promise<ApiResponse<ArcadeInventory[]>> => 
-    rotomPOST<ArcadeInventory[]>('/arcade/inventory/claim-multiple', claimItemsDto),
+  claimMultipleItems: (claimItemsDto: ClaimInventoryItemsDto): Promise<ApiResponse<ArcadeInventoryItem[]>> => 
+    rotomPOST<ArcadeInventoryItem[]>('/arcade/inventory/claim-multiple', claimItemsDto),
   */
   /**
    * Get complete user arcade data
    */
   getCompleteUserData: (uuid: string): Promise<ApiResponse<{
     streak: ArcadeStreak;
-    inventory: ArcadeInventory[];
+    inventory: ArcadeInventoryItem[];
     inventoryStats: {
       totalItems: number;
       itemsByType: Record<string, number>;
@@ -265,7 +265,7 @@ export const arcadeService = {
   }>> => 
     rotomGET<{
       streak: ArcadeStreak;
-      inventory: ArcadeInventory[];
+      inventory: ArcadeInventoryItem[];
       inventoryStats: {
         totalItems: number;
         itemsByType: Record<string, number>;
@@ -333,7 +333,7 @@ export const arcadeService = {
 // Export types for convenience
 export type { 
   ArcadeStreak, 
-  ArcadeInventory, 
+  ArcadeInventoryItem, 
   OpenLootBoxDto, 
   OpenLootBoxResponseDto,
   ClaimRewardDto,

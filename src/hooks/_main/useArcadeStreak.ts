@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
 import { toast } from 'react-toastify';
-import { ArcadeInventory, arcadeService } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeInventoryItem, arcadeService } from '@/services/api/smartrotom/arcadeService';
 import { ArcadeStreak, ArcadeStreakClaim } from '@/generated/api';
 
 interface UseArcadeStreakReturn {

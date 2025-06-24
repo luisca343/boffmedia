@@ -138,7 +138,7 @@ export default function CentroArcade() {
               <div className="text-3xl text-white font-bold text-shadow-lg">
                 {isNamedReward(claimedReward.type) && claimedReward.description
                   ? getItemName(t, claimedReward.description)
-                  : claimedReward.type.toLowerCase() === 'currency' 
+                  : claimedReward.type?.toLowerCase() === 'currency' 
                     ? '¡Estrellas!' 
                     : `¡${claimedReward.type}!`}
               </div>
