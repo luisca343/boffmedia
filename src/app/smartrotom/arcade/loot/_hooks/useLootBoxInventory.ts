@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { ArcadeInventoryItem, arcadeService } from "@/services/api/smartrotom/arcadeService";
-import { LootBox } from "../types";
 import { useTranslations } from 'next-intl';
 import { getItemDescription, getItemName } from "@/lib/intlUtils";
-import { LootboxItemConfig, LootItemDto, RarityRange, RarityRanges } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig, LootItemDto, RarityRange, RarityRanges } from "@/generated/api";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {
@@ -17,7 +16,7 @@ export function useLootBoxInventory(uuid?: string) {
   const [collection, setCollection] = useState<ArcadeInventoryItem[]>([]);
   const [ownedBoxes, setOwnedBoxes] = useState<Record<string, ArcadeInventoryItem>>({});
   const [loadingInventory, setLoadingInventory] = useState(false);
-  const [availableLootBoxes, setAvailableLootBoxes] = useState<LootBox[]>([]);
+  const [availableLootBoxes, setAvailableLootBoxes] = useState<LootboxBoxConfig[]>([]);
   const [loadingLootBoxes, setLoadingLootBoxes] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,7 +62,7 @@ export function useLootBoxInventory(uuid?: string) {
       const {rarityRanges, lootboxConfig} = (await arcadeService.getLootboxConfig()).data!
       
       if (lootboxConfig && lootboxConfig.boxes) {
-        const lootBoxes: LootBox[] = lootboxConfig.boxes.map((box: any) => ({
+        const lootBoxes: LootboxBoxConfig[] = lootboxConfig.boxes.map((box: any) => ({
           id: box.id,
           name: box.name,
           description: box.description,

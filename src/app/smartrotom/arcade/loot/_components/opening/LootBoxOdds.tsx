@@ -1,12 +1,12 @@
 import { useMemo, useRef, useEffect } from "react";
-import { LootBox } from "../../types";
 import { useTranslations } from "next-intl";
 import { getItemName } from "@/lib/intlUtils";
 import { ItemImage } from "@/lib/ItemImage";
 import { calculateLootBoxOdds } from "../../_utils/calculateLootBoxOdds";
+import { LootboxBoxConfig } from "@/generated/api";
 
 interface LootBoxOddsProps {
-  lootBox: LootBox;
+  lootBox: LootboxBoxConfig;
   currentBoxTheme: {
     bgGradient: string;
     border: string;

@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
-import { LootBox } from "../../types";
 import { getThemeColors } from "../../_utils/getThemeColors";
 import { BoxCarousel } from "./BoxCarousel";
 import { BoxInfo } from "./BoxInfo";
 import { OpenBoxButton } from "./OpenBoxButton";
 import { LootBoxOdds } from "../opening/LootBoxOdds";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
 
 interface LootBoxSelectorProps {
-  lootBoxes: LootBox[];
-  selectedBox: LootBox | null;
-  onSelect: (box: LootBox) => void;
+  lootBoxes: LootboxBoxConfig[];
+  selectedBox: LootboxBoxConfig | null;
+  onSelect: (box: LootboxBoxConfig) => void;
   onOpenBox: () => void;
   ownedBoxes: Record<string, ArcadeInventoryItem>;
 }

@@ -2,11 +2,10 @@ import { useSpinnerAnimation } from "../../_hooks/useSpinnerAnimation";
 import { BoxAnimation } from "./BoxAnimation";
 import { ResultDisplay } from "./ResultDisplayComponent";
 import { Spinner } from "./Spinner";
-import { LootBox } from "../../types";
-import { LootboxItemConfig } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
 
 interface LootBoxOpeningProps {
-  lootBox: LootBox;
+  lootBox: LootboxBoxConfig;
   wonItem: LootboxItemConfig;
   onComplete: () => void;
 }

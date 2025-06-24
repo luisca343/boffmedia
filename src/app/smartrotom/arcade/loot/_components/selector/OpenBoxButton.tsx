@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
 import { Box } from "lucide-react";
-import { LootBox } from "../../types";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
 
 interface OpenBoxButtonProps {
-  selectedBox: LootBox | null;
+  selectedBox: LootboxBoxConfig | null;
   ownedBoxes: Record<string, ArcadeInventoryItem>;
   currentBoxTheme: {
     buttonGradient: string;

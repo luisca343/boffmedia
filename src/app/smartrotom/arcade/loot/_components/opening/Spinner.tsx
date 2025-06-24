@@ -1,10 +1,8 @@
-import { useRef } from "react";
-import { LootBox } from "../../types";
 import { SpinnerItem } from "./SpinnerItem";
-import { LootboxItemConfig } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
 
 interface SpinnerProps {
-  lootBox: LootBox;
+  lootBox: LootboxBoxConfig;
   spinItems: LootboxItemConfig[];
   scrollPosition: number;
   spinComplete: boolean;

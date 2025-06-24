@@ -1,16 +1,15 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { LootBox } from "../../types";
 import { BoxDisplay } from "./BoxDisplay";
 import { BoxInfo } from "./BoxInfo";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
 
 interface BoxCarouselProps {
-  lootBoxes: LootBox[];
+  lootBoxes: LootboxBoxConfig[];
   currentIndex: number;
   setCurrentIndex: (index: number) => void;
-  onSelect: (box: LootBox) => void;
-  selectedBox: LootBox;
+  onSelect: (box: LootboxBoxConfig) => void;
+  selectedBox: LootboxBoxConfig;
   currentBoxTheme: {
     bgGradient: string;
     border: string;
