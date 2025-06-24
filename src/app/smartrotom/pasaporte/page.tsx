@@ -27,9 +27,6 @@ export default function Pasaporte(){
   const {playerTeam } = useGetPlayerTeam(uuid)
   const {achievements} = useGetAchievements(uuid)
 
-  console.log('GET ACHIEVEMENTS')
-  console.log(achievements)
-
   const obtainedBadges = (achievements ?? []).filter((achievement: UserAchievement)=>achievement.completed && achievement.category === 'Gimnasios').length
 
   let page  = 0;
@@ -70,7 +67,7 @@ export default function Pasaporte(){
             </Page>
             {
               achievements &&
-                achievements.map((achievement: any) => {
+                achievements.map((achievement: UserAchievement) => {
                   if (achievement.completed && achievement.category === "Gimnasios") {
                     const team = achievement.team ? JSON.parse(achievement.team) : null
                     return (

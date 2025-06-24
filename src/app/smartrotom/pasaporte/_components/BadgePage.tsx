@@ -3,21 +3,23 @@ import { parseDate } from "@/lib/utils"
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
 import { Game } from "@/app/battlesim/replay/_components/Game"
 import ActiveTeam from "./ActiveTeam"
-import { achievementService } from "@/services/api/smartrotom/achievementsService"
+import { AchievementService, UserAchievement, Replay } from "@/services/api/smartrotom/achievementsService"
 import { useEffect, useState } from "react"
+import { Pokemon } from "@/services/api/smartrotom/playerService";
 
 interface BadgePageProps {
-  achievement: SmartRotomAchievement
-  team: any
+  achievement: UserAchievement
+  team: Pokemon[]
 }
 
 export function BadgePage({ achievement, team }: BadgePageProps) {
+  // TODO: any
   const [replayData, setReplayData] = useState<any>(null)
 
   useEffect(() => {
     const fetchReplayData = async () => {
       try {
-        const response = await achievementService.getReplay(achievement.uuid, achievement.battleId)
+        const response = await AchievementService.getReplay(achievement.uuid, achievement.battleId)
         setReplayData(response.data)
       } catch (error) {
         console.error("Error fetching replay data:", error)
