@@ -1,6 +1,7 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { LootboxItemConfig } from '../entities/lootbox-config.entity';
 
 export class OpenLootBoxDto extends BaseDto {
   @ApiProperty({ description: 'Player UUID', example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
@@ -38,7 +39,7 @@ class LootItemDto {
 
 export class OpenLootBoxResponseDto {
   @ApiProperty({ description: 'The item obtained from the loot box', required: false, type: LootItemDto })
-  item?: LootItemDto;
+  item?: LootboxItemConfig;
 
   @ApiProperty({ 
     description: 'Array of items to display in the spinner animation', 

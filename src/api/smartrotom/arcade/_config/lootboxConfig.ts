@@ -1,3 +1,5 @@
+import { ItemRarity } from "../entities/arcade-inventory.entity";
+
 interface LootBoxItem {
   id: string;
   weight: number;
@@ -12,10 +14,10 @@ export const rarityRanges = {
 };
 
 // Helper function to determine rarity from weight
-export function getRarityFromWeight(weight: number): string {
+export function getRarityFromWeight(weight: number): ItemRarity {
   for (const [rarity, range] of Object.entries(rarityRanges)) {
     if (weight >= range.min && weight <= range.max) {
-      return rarity;
+      return rarity as ItemRarity;
     }
   }
   return 'common';

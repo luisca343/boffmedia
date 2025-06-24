@@ -1,5 +1,5 @@
 import { Controller, Get, HttpStatus, Param, Post, Body, Query, UseInterceptors } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiQuery, ApiExtraModels } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ArcadeFacadeService } from './arcade.facade.service';
 
@@ -14,7 +14,7 @@ import { ArcadeStreak } from './entities/arcade-streak.entity';
 import { ArcadeInventoryItem } from './entities/arcade-inventory.entity';
 import { ArcadeStreakClaim } from './entities/arcade-streak-claim.entity';
 import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
-import { LootboxConfigEntity } from './entities/lootbox-config.entity';
+import { LootboxConfigEntity, RarityRange } from './entities/lootbox-config.entity';
 import { DailyRewardsConfig } from './entities/daily-rewards.entity';
 
 @ApiTags('SmartRotom | Arcade')
@@ -136,7 +136,7 @@ export class ArcadeController {
   }> {
     return this.arcadeFacadeService.getInventoryStats(uuid);
   }
-
+  @ApiExtraModels(RarityRange)
   @Get('inventory/:uuid/item/:itemId')
   @ApiOperation({ summary: 'Get specific inventory item' })
   @ApiParam({ name: 'uuid', description: 'Player UUID', example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
@@ -231,6 +231,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.giveLootbox(uuid, lootboxType, amount || 1);
   }
 
+  @ApiExtraModels(RarityRange)
   @Get('lootbox/config')
   @ApiOperation({ summary: 'Get lootbox configuration' })
   @ApiResponse({ 

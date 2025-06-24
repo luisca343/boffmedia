@@ -56,7 +56,7 @@ export class LootboxService {
       item: {
         id: selectedItem.id,
         rarity: rarity,
-        serverId: newItemResult.insertId
+        weight: selectedItem.weight,
       },
       spinnerItems: spinnerItems,
       winningPosition: winningPosition,

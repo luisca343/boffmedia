@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+export type ItemRarityEnum = ['common', 'uncommon', 'rare', 'epic', 'legendary']
 
 export class ArcadeInventoryItem {
   @ApiProperty({ 

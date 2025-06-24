@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ItemRarity } from './arcade-inventory.entity';
 
 export class LootboxItemConfig {
   @ApiProperty({
@@ -12,6 +13,13 @@ export class LootboxItemConfig {
     description: 'Weight value determining item rarity probability'
   })
   weight: number;
+
+  @ApiProperty({
+    example: 'rare',
+    description: 'Rarity category of the item',
+    enum: ['common', 'uncommon', 'rare', 'epic', 'legendary']
+  })
+  rarity?: ItemRarity;
 }
 
 export class LootboxBoxConfig {
