@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export type ItemRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+
 export class ArcadeInventoryItem {
   @ApiProperty({ 
     example: 1, 
@@ -33,9 +35,10 @@ export class ArcadeInventoryItem {
 
   @ApiProperty({ 
     example: 'rare', 
-    description: 'Item rarity' 
+    description: 'Item rarity',
+    enum: ['common', 'uncommon', 'rare', 'epic', 'legendary']
   })
-  rarity: string;
+  rarity: ItemRarity;
 
   @ApiProperty({ 
     example: 'lootbox', 

@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsOptional, IsInt, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { ItemRarity } from '../entities/arcade-inventory.entity';
 
 export class GetInventoryDto {
   @ApiProperty({ 
@@ -63,7 +64,7 @@ export class AddInventoryItemDto {
   @ApiProperty({ description: 'Item rarity', required: false, example: 'legendary' })
   @IsOptional()
   @IsString()
-  rarity?: string;
+  rarity?: ItemRarity;
 }
 
 export class ConsumeInventoryItemDto {

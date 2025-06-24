@@ -3,7 +3,7 @@ import { StreakService } from './services/streak.service';
 import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
 import { ArcadeStreak } from './entities/arcade-streak.entity';
-import { ArcadeInventoryItem } from './entities/arcade-inventory.entity';
+import { ArcadeInventoryItem, ItemRarity } from './entities/arcade-inventory.entity';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
 import { loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
@@ -137,7 +137,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     itemId: string;
     itemType: string;
     amount: number;
-    rarity?: string;
+    rarity?: ItemRarity;
     sourceType?: string;
   }): Promise<ArcadeInventoryItem> {
     if (!itemData.uuid || !itemData.itemId || !itemData.itemType) {

@@ -111,7 +111,7 @@ export const smartRotomInventory = mysqlTable("rotom_inventory", {
     amount: int("amount").default(1),
     sourceType: varchar("source_type", { length: 32 }),
     used: int("used").default(0),
-    rarity: varchar("rarity", { length: 20 }).default("common"),
+    rarity: varchar("rarity", { length: 20 }).$type<"common" | "uncommon" | "rare" | "epic" | "legendary">().default("common"),
     createdAt: datetime("created_at").default(sql`CURRENT_TIMESTAMP()`),
 });
 

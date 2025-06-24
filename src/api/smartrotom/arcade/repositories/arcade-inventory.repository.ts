@@ -6,7 +6,7 @@ import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { IArcadeInventoryRepository } from './interfaces/arcade-inventory.repository.interface';
 import { CreateInventoryItemDto } from '../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
-import { ArcadeInventoryItem } from '../entities/arcade-inventory.entity';
+import { ArcadeInventoryItem, ItemRarity } from '../entities/arcade-inventory.entity';
 import {
   SmartRotomInventoryItem,
   smartRotomInventory
@@ -176,7 +176,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
       ));
   }
 
-  async getItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventoryItem[]> {
+  async getItemsByRarity(uuid: string, rarity: ItemRarity): Promise<ArcadeInventoryItem[]> {
     return this.db.select()
       .from(smartRotomInventory)
       .where(and(

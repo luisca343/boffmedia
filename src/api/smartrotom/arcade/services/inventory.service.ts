@@ -3,7 +3,7 @@ import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/inte
 import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
 import { CreateInventoryItemDto } from '../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
-import { ArcadeInventoryItem } from '../entities/arcade-inventory.entity';
+import { ArcadeInventoryItem, ItemRarity } from '../entities/arcade-inventory.entity';
 import { ArcadeInventoryResponse } from '../entities/inventory-response.entity';
 
 export interface ClaimItemData {
@@ -11,7 +11,7 @@ export interface ClaimItemData {
   itemId: string;
   itemType: string;
   amount: number;
-  rarity?: string;
+  rarity?: ItemRarity;
   sourceType?: string;
 }
 

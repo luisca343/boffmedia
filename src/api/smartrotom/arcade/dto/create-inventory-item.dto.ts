@@ -1,6 +1,7 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID, IsInt, IsOptional, Min, MaxLength } from 'class-validator';
+import { ItemRarity } from '../entities/arcade-inventory.entity';
 
 export class CreateInventoryItemDto extends BaseDto {
   @ApiProperty({ 
@@ -45,7 +46,7 @@ export class CreateInventoryItemDto extends BaseDto {
   @IsOptional()
   @IsString()
   @MaxLength(20)
-  rarity?: string = 'common';
+  rarity?: ItemRarity = 'common';
 
   @ApiProperty({ 
     description: 'Source type (how item was obtained)',
