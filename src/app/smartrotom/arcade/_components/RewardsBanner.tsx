@@ -36,10 +36,8 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
     fetchRewards();
   }, []);
 
-  // Set active index to current day when data loads
   useEffect(() => {
     if (rewardsConfig && currentDay > 0) {
-      // Find the reward that matches the current day
       const index: number = rewardsConfig.rewards.findIndex((r: DailyRewardItem) => r.day === currentDay);
       if (index >= 0) setActiveIndex(index);
     }

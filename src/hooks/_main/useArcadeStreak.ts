@@ -14,7 +14,7 @@ interface UseArcadeStreakReturn {
   claimReward: () => Promise<{
     streak: ArcadeStreak;
     reward: any;
-    inventoryItems?: ArcadeInventory[];
+    inventoryItems?: ArcadeInventoryItem[];
   } | null>;
   error: string | null;
   nextReward: any | null;

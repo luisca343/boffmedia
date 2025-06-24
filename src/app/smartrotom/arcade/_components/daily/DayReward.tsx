@@ -76,7 +76,7 @@ export default function DayReward({
       <div className="text-[10px] text-gray-300 truncate px-1 text-center max-w-full">
         {isNamedReward(dayReward?.type || '') && dayReward?.description
           ? getItemName(t, dayReward.description)
-          : dayReward?.type === 'currency' 
+          : dayReward?.type === 'coins' 
             ? 'Estrellas' 
             : dayReward?.type || 'Estrellas'}
       </div>

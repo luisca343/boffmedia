@@ -10,13 +10,14 @@ import type {
   ArcadeStreakClaim,
   SuccessResponse,
   ArcadeStreak,
-  ArcadeInventoryResponse
+  ArcadeInventoryResponse,
+  DailyRewardItem
 } from '@/generated/api';
 
 
   export interface DailyReward {
     day: number
-    type: string
+    type: DailyRewardItem.type
     amount: number
     description: string
   }
