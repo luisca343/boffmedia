@@ -1,19 +1,19 @@
 "use client"
 import type { Session } from "next-auth"
 import RotomNav from "../nav/RotomNav"
-import { motion } from "framer-motion"
 import { signIn, signOut } from "next-auth/react"
 import { LoadingScreen } from "./Loading"
 import { CallStatus } from "./calls/CallStatus"
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { AlertTriangle } from "lucide-react"
 import { AuthForm } from "@/app/auth/AuthForm"
 import "react-toastify/dist/ReactToastify.css"
 import { ToastContainer } from "react-toastify"
 import { getMcUserData } from "@/services/mcef/mcefApi"
 import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { MinecraftAuthForm } from "./MinecraftAuthForm"
+import { RotomError, RotomErrorPage } from "./RotomError"
+import { RotomErrorCodeKey } from "./RotomErrorSystem"
 
 export default function AppWrapper({
   children,
@@ -98,7 +98,18 @@ export default function AppWrapper({
 
   if (status === "authenticated" && !smartRotomLinked()) {
     if (!isMC)
-      return <RotomErrorPage error="Usuario de SmartRotom no vinculado. Accede a Minecraft antes de usar la web." />
+      return (
+        <RotomErrorPage 
+          errorCode={"SMARTROTOM_NOT_LINKED" as RotomErrorCodeKey}
+          context={{ 
+            userId: session?.user?.id,
+            hasMinecraft: isMC
+          }}
+          onAction={() => signOut({ callbackUrl: "/" })} 
+          actionText="Cerrar sesión"
+          showHelp={true}
+        />
+      )
     return <div>
       <button
         className="bg-red-500 text-white px-4 py-2 rounded"
@@ -110,7 +121,13 @@ export default function AppWrapper({
   }
 
   if (status === "authenticated" && !boffMediaLinked()) {
-    <RotomError error="Usuario de BoffMedia no vinculado"/>
+    return (
+      <RotomError 
+        errorCode={"BOFFMEDIA_NOT_LINKED" as RotomErrorCodeKey}
+        context={{ userId: session?.user?.id }}
+        showHelp={true}
+      />
+    )
   }
 
   return (
@@ -127,36 +144,3 @@ export default function AppWrapper({
     </section>
   )
 }
-
-function RotomErrorPage({ error }: { error: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center h-full bg-primary-400 text-primary-950 font-mono">
-      <RotomError error={error} />
-    </div>
-  )
-}
-
-function RotomError({ error }: { error: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300"
-    >
-      <div className="flex items-center mb-4">
-        <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />
-        <h1 className="text-2xl font-bold">Error Detectado</h1>
-      </div>
-      <div className="bg-primary-300 p-4 rounded">
-        <p className="text-sm">{error}</p>
-      </div>
-      <div className="mt-6 text-center">
-        <p className="text-xs text-primary-700">
-          SmartRotom Error Code: <span className="font-bold">SR-001</span>
-        </p>
-      </div>
-    </motion.div>
-  )
-}
-
