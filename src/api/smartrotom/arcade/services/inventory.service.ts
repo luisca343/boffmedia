@@ -3,7 +3,7 @@ import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/inte
 import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
 import { CreateInventoryItemDto } from '../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
-import { ArcadeInventory } from '../entities/arcade-inventory.entity';
+import { ArcadeInventoryItem } from '../entities/arcade-inventory.entity';
 import { ArcadeInventoryResponse } from '../entities/inventory-response.entity';
 
 export interface ClaimItemData {
@@ -106,13 +106,13 @@ export class InventoryService {
     };
   }
 
-  async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventory | null> {
+  async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventoryItem | null> {
     this.validateUuid(uuid);
     this.validateItemId(itemId);
     return this.arcadeInventoryRepository.findUserItem(uuid, itemId);
   }
 
-  async addItemToInventory(itemData: ClaimItemData): Promise<{ success: boolean; item: ArcadeInventory }> {
+  async addItemToInventory(itemData: ClaimItemData): Promise<{ success: boolean; item: ArcadeInventoryItem }> {
     this.validateUuid(itemData.uuid);
     this.validateItemId(itemData.itemId);
     this.validateAmount(itemData.amount);
@@ -138,7 +138,7 @@ export class InventoryService {
 
   async consumeItem(uuid: string, itemId: string, amount: number = 1): Promise<{ 
     success: boolean; 
-    item: ArcadeInventory | null;
+    item: ArcadeInventoryItem | null;
     consumed: number;
     remainingAmount?: number;
     totalRemaining?: number;
@@ -229,7 +229,7 @@ export class InventoryService {
     };
   }
 
-  async getItemsByType(uuid: string, itemType: string): Promise<ArcadeInventory[]> {
+  async getItemsByType(uuid: string, itemType: string): Promise<ArcadeInventoryItem[]> {
     this.validateUuid(uuid);
     
     if (!itemType) {
@@ -239,7 +239,7 @@ export class InventoryService {
     return this.arcadeInventoryRepository.getItemsByType(uuid, itemType);
   }
 
-  async getItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventory[]> {
+  async getItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventoryItem[]> {
     this.validateUuid(uuid);
     
     if (!rarity) {
@@ -249,7 +249,7 @@ export class InventoryService {
     return this.arcadeInventoryRepository.getItemsByRarity(uuid, rarity);
   }
 
-  async markItemAsUsed(uuid: string, itemId: string): Promise<ArcadeInventory> {
+  async markItemAsUsed(uuid: string, itemId: string): Promise<ArcadeInventoryItem> {
     this.validateUuid(uuid);
     this.validateItemId(itemId);
 

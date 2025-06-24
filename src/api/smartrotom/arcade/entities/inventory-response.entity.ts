@@ -1,36 +1,36 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArcadeInventory } from './arcade-inventory.entity';
+import { ArcadeInventoryItem } from './arcade-inventory.entity';
 
 export class InventoryItemGroup {
-  [key: string]: ArcadeInventory[];
+  [key: string]: ArcadeInventoryItem[];
 }
 
 // Use this class for Swagger documentation
 export class InventoryItemGroupDto {
   @ApiProperty({
     description: 'Items of a specific type',
-    type: [ArcadeInventory],
+    type: [ArcadeInventoryItem],
     additionalProperties: { type: 'array', items: { $ref: 'ArcadeInventory' } }
   })
-  items: Record<string, ArcadeInventory[]>;
+  items: Record<string, ArcadeInventoryItem[]>;
 }
 
 export class ArcadeInventoryResponse {
   @ApiProperty({
     description: 'Aggregated inventory items list',
-    type: [ArcadeInventory]
+    type: [ArcadeInventoryItem]
   })
-  items: ArcadeInventory[];
+  items: ArcadeInventoryItem[];
 
   @ApiProperty({
     description: 'Items grouped by their type',
     type: InventoryItemGroup
   })
-  groupedItems: Record<string, ArcadeInventory[]>;
+  groupedItems: Record<string, ArcadeInventoryItem[]>;
 
   @ApiProperty({
     description: 'Raw inventory items from database without aggregation',
-    type: [ArcadeInventory]
+    type: [ArcadeInventoryItem]
   })
-  rawItems: ArcadeInventory[];
+  rawItems: ArcadeInventoryItem[];
 }

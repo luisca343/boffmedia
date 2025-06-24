@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArcadeStreak } from './arcade-streak.entity';
-import { ArcadeInventory } from './arcade-inventory.entity';
-import { DailyRewardItem } from '../dto/arcade-streak.dto';
+import { ArcadeInventoryItem } from './arcade-inventory.entity';
+import { DailyRewardItem } from './daily-rewards.entity';
 
 export class ArcadeStreakClaim {
   @ApiProperty({ 
@@ -18,8 +18,8 @@ export class ArcadeStreakClaim {
 
   @ApiProperty({ 
     description: 'Items added to inventory as part of the claim',
-    type: [ArcadeInventory],
+    type: [ArcadeInventoryItem],
     required: false
   })
-  inventoryItems?: ArcadeInventory[];
+  inventoryItems?: ArcadeInventoryItem[];
 }

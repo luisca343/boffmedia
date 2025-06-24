@@ -3,6 +3,7 @@ import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../dto/lottbox.dto';
 import { lootboxConfig, getRarityFromWeight, rarityRanges } from '../_config/lootboxConfig';
 import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
+import { LootboxBoxesCollection, LootboxConfigEntity } from '../entities/lootbox-config.entity';
 
 @Injectable()
 export class LootboxService {
@@ -83,14 +84,30 @@ export class LootboxService {
     };
   }
 
-  getLootboxConfig() {
-      return { 
-        rarityRanges, 
-        lootboxConfig 
-      };
+  getLootboxConfig(): LootboxConfigEntity {
+    // Transform the raw config into our entity structure
+    const formattedBoxes = lootboxConfig.boxes.map(box => ({
+      id: box.id,
+      name: box.name,
+      image: box.image,
+      description: box.description,
+      items: box.items.map(item => ({
+        id: item.id,
+        weight: item.weight
+      })),
+      theme: box.theme
+    }));
+    
+    const boxesCollection = new LootboxBoxesCollection();
+    boxesCollection.boxes = formattedBoxes;
+    
+    const configEntity = new LootboxConfigEntity();
+    configEntity.rarityRanges = rarityRanges;
+    configEntity.lootboxConfig = boxesCollection;
+    
+    return configEntity;
   }
 
-  // ... rest of private methods stay the same
   private selectRandomItem(items: any[]) {
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
     const randomValue = Math.random() * totalWeight;

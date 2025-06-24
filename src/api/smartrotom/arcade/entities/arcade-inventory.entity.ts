@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ArcadeInventory {
+export class ArcadeInventoryItem {
   @ApiProperty({ 
     example: 1, 
     description: 'Unique identifier for the inventory record' 

@@ -5,15 +5,17 @@ import { ArcadeFacadeService } from './arcade.facade.service';
 
 // Import the correct DTOs
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
-import { GetStreakDto, ClaimRewardDto } from './dto/arcade-streak.dto';
-import { GetInventoryDto, AddInventoryItemDto, ConsumeInventoryItemDto, ClaimInventoryItemsDto } from './dto/inventory.dto';
+import { ClaimRewardDto } from './dto/arcade-streak.dto';
+import { AddInventoryItemDto, ConsumeInventoryItemDto } from './dto/inventory.dto';
 import { GiveLootboxDto } from './dto/lootbox-management.dto';
 
 // Import entities
 import { ArcadeStreak } from './entities/arcade-streak.entity';
-import { ArcadeInventory } from './entities/arcade-inventory.entity';
+import { ArcadeInventoryItem } from './entities/arcade-inventory.entity';
 import { ArcadeStreakClaim } from './entities/arcade-streak-claim.entity';
 import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
+import { LootboxConfigEntity } from './entities/lootbox-config.entity';
+import { DailyRewardsConfig } from './entities/daily-rewards.entity';
 
 @ApiTags('SmartRotom | Arcade')
 @Controller('smartrotom/arcade')
@@ -37,11 +39,15 @@ export class ArcadeController {
   // ==================== STREAK ENDPOINTS ====================
   @Get('banner')
   @ApiOperation({ summary: 'Get daily rewards banner configuration' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Banner configuration retrieved successfully.' })
-  async getRewardsBanner() {
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Banner configuration retrieved successfully.',
+    type: DailyRewardsConfig
+  })
+  async getRewardsBanner(): Promise<DailyRewardsConfig> {
     return await this.arcadeFacadeService.getRewardsBanner();
   }
-  
+
   @Get('streak/:uuid')
   @ApiOperation({ summary: 'Get user\'s arcade streak status' })
   @ApiParam({ name: 'uuid', description: 'Player UUID', example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4' })
@@ -138,12 +144,12 @@ export class ArcadeController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Inventory item retrieved successfully.',
-    type: ArcadeInventory
+    type: ArcadeInventoryItem
   })
   async getUserItem(
     @Param('uuid') uuid: string,
     @Param('itemId') itemId: string
-  ): Promise<ArcadeInventory | null> {
+  ): Promise<ArcadeInventoryItem | null> {
     return this.arcadeFacadeService.getUserItem(uuid, itemId);
   }
   
@@ -152,10 +158,10 @@ export class ArcadeController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Item added successfully.',
-    type: ArcadeInventory
+    type: ArcadeInventoryItem
   })
   @ApiBody({ type: AddInventoryItemDto })
-  async addInventoryItem(@Body() data: AddInventoryItemDto): Promise<ArcadeInventory> {
+  async addInventoryItem(@Body() data: AddInventoryItemDto): Promise<ArcadeInventoryItem> {
     return this.arcadeFacadeService.addItemToInventory({
       uuid: data.uuid,
       itemId: data.itemId,
@@ -174,7 +180,7 @@ export class ArcadeController {
   })
   @ApiBody({ type: ConsumeInventoryItemDto })
   async consumeInventoryItem(@Body() { uuid, itemId, amount }: ConsumeInventoryItemDto): Promise<{
-    item: ArcadeInventory | null;
+    item: ArcadeInventoryItem | null;
     consumed: number;
   }> {
     return this.arcadeFacadeService.consumeInventoryItem(uuid, itemId, amount || 1);
@@ -187,12 +193,12 @@ export class ArcadeController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Item marked as used successfully.',
-    type: ArcadeInventory
+    type: ArcadeInventoryItem
   })
   async markItemAsUsed(
     @Param('uuid') uuid: string,
     @Param('itemId') itemId: string
-  ): Promise<ArcadeInventory> {
+  ): Promise<ArcadeInventoryItem> {
     return this.arcadeFacadeService.markItemAsUsed(uuid, itemId);
   }
   
@@ -229,12 +235,13 @@ export class ArcadeController {
   @ApiOperation({ summary: 'Get lootbox configuration' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Lootbox configuration retrieved successfully.'
+    description: 'Lootbox configuration retrieved successfully.',
+    type: LootboxConfigEntity
   })
-  async getLootboxConfig(): Promise<any> {
+  async getLootboxConfig(): Promise<LootboxConfigEntity> {
     return this.arcadeFacadeService.getLootboxConfig();
   }
-  
+
   // ==================== COMBINED ENDPOINTS ====================
 
   /*

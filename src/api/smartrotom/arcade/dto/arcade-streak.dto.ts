@@ -1,6 +1,7 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
+import { DailyRewardItem } from '../entities/daily-rewards.entity';
 
 export class GetStreakDto {
   @ApiProperty({ 
@@ -20,78 +21,6 @@ export class ClaimRewardDto extends BaseDto {
   @IsNotEmpty()
   @IsString()
   uuid: string;
-}
-
-export class DailyRewardItem {
-  @ApiProperty({ description: 'Day number in the cycle', example: 1 })
-  day: number;
-
-  @ApiProperty({ description: 'Type of reward', example: 'box' })
-  type: string;
-
-  @ApiProperty({ description: 'Amount of the reward', example: 1 })
-  amount: number;
-
-  @ApiProperty({ description: 'Description of the reward', example: 'trainer_box' })
-  description: string;
-}
-
-export class DailyRewardsConfig {
-  @ApiProperty({ description: 'Total days in the reward cycle', example: 7 })
-  totalDays: number;
-
-  @ApiProperty({ description: 'Banner name', example: 'Recompensas de Bienvenida' })
-  name: string;
-
-  @ApiProperty({ 
-    description: 'Rewards for each day',
-    type: [DailyRewardItem],
-    example: [
-      {
-        "day": 1,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      },
-      {
-        "day": 2,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      },
-      {
-        "day": 3,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      },
-      {
-        "day": 4,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      },
-      {
-        "day": 5,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      },
-      {
-        "day": 6,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      },
-      {
-        "day": 7,
-        "type": "box",
-        "amount": 1,
-        "description": "trainer_box"
-      }
-    ]
-  })
-  rewards: DailyRewardItem[];
 }
 
 export class ArcadeStreak {

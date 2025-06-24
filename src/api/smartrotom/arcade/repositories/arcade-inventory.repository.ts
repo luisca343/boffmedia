@@ -6,7 +6,7 @@ import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { IArcadeInventoryRepository } from './interfaces/arcade-inventory.repository.interface';
 import { CreateInventoryItemDto } from '../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
-import { ArcadeInventory } from '../entities/arcade-inventory.entity';
+import { ArcadeInventoryItem } from '../entities/arcade-inventory.entity';
 import {
   SmartRotomInventoryItem,
   smartRotomInventory
@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class ArcadeInventoryRepository 
-  extends BaseRepositoryImpl<ArcadeInventory, CreateInventoryItemDto, UpdateInventoryItemDto> 
+  extends BaseRepositoryImpl<ArcadeInventoryItem, CreateInventoryItemDto, UpdateInventoryItemDto> 
   implements IArcadeInventoryRepository {
 
   constructor(
@@ -23,7 +23,7 @@ export class ArcadeInventoryRepository
     super(db, smartRotomInventory);
   }
 
-    async create(data: CreateInventoryItemDto): Promise<ArcadeInventory> {
+    async create(data: CreateInventoryItemDto): Promise<ArcadeInventoryItem> {
     const result = await this.db.insert(smartRotomInventory).values({
         uuid: data.uuid,
         itemId: data.itemId,
@@ -33,11 +33,11 @@ export class ArcadeInventoryRepository
         sourceType: data.sourceType,
         used: data.used || 0
     } as SmartRotomInventoryItem);
-    return this.findById(result[0].insertId) as Promise<ArcadeInventory>;
+    return this.findById(result[0].insertId) as Promise<ArcadeInventoryItem>;
     }
 
 
-async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory> {
+async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryItem> {
     const updateData: Partial<SmartRotomInventoryItem> = {};
     if (data.itemId) updateData.itemId = data.itemId;
     if (data.itemType) updateData.itemType = data.itemType;
@@ -47,7 +47,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     if (typeof data.used !== 'undefined') updateData.used = data.used;
 
     await this.db.update(smartRotomInventory).set(updateData).where(eq(smartRotomInventory.id, id));
-    return this.findById(id) as Promise<ArcadeInventory>;
+    return this.findById(id) as Promise<ArcadeInventoryItem>;
     }
 
   async delete(id: number): Promise<boolean> {
@@ -55,13 +55,13 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     return result[0].affectedRows > 0;
   }
 
-  async findUserInventory(uuid: string): Promise<ArcadeInventory[]> {
+  async findUserInventory(uuid: string): Promise<ArcadeInventoryItem[]> {
     return this.db.select()
       .from(smartRotomInventory)
       .where(eq(smartRotomInventory.uuid, uuid));
   }
 
-  async findUserItem(uuid: string, itemId: string): Promise<ArcadeInventory | null> {
+  async findUserItem(uuid: string, itemId: string): Promise<ArcadeInventoryItem | null> {
     const result = await this.db.select()
       .from(smartRotomInventory)
       .where(and(
@@ -87,14 +87,14 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     return { insertId: result[0].insertId };
     }
 
-    async updateItemQuantity(uuid: string, itemId: string, amount: number): Promise<ArcadeInventory> {
+    async updateItemQuantity(uuid: string, itemId: string, amount: number): Promise<ArcadeInventoryItem> {
     await this.db.update(smartRotomInventory)
         .set({ amount } as SmartRotomInventoryItem)
         .where(and(
         eq(smartRotomInventory.uuid, uuid),
         eq(smartRotomInventory.itemId, itemId)
         ));
-    return this.findUserItem(uuid, itemId) as Promise<ArcadeInventory>;
+    return this.findUserItem(uuid, itemId) as Promise<ArcadeInventoryItem>;
     }
 
   async removeItem(uuid: string, itemId: string): Promise<boolean> {
@@ -106,7 +106,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     return result[0].affectedRows > 0;
   }
 
-  async consumeItem(uuid: string, itemId: string, amount: number): Promise<ArcadeInventory> {
+  async consumeItem(uuid: string, itemId: string, amount: number): Promise<ArcadeInventoryItem> {
     // Get all items matching this itemId for the user
     const items = await this.db.select()
       .from(smartRotomInventory)
@@ -138,26 +138,26 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
         .where(eq(smartRotomInventory.id, currentItem.id));
       
       // Fetch the updated item
-      const updatedItem = await this.findById(currentItem.id) as ArcadeInventory;
+      const updatedItem = await this.findById(currentItem.id) as ArcadeInventoryItem;
       
       // Add remaining amount information
       return {
         ...updatedItem,
         remainingAmount: updatedItem.amount - newUsedCount
-      } as ArcadeInventory;
+      } as ArcadeInventoryItem;
     } else {
       // For non-consumables, we reduce the amount directly
       const newAmount = Math.max(0, currentItem.amount - amount);
       
       if (newAmount === 0) {
         await this.delete(currentItem.id);
-        return { ...currentItem, amount: 0 } as ArcadeInventory;
+        return { ...currentItem, amount: 0 } as ArcadeInventoryItem;
       } else {
         await this.db.update(smartRotomInventory)
           .set({ amount: newAmount } as SmartRotomInventoryItem)
           .where(eq(smartRotomInventory.id, currentItem.id));
         
-        return this.findById(currentItem.id) as Promise<ArcadeInventory>;
+        return this.findById(currentItem.id) as Promise<ArcadeInventoryItem>;
       }
     }
   }
@@ -167,7 +167,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
     return items.reduce((total, item) => total + ((item as any).amount || 0), 0);
   }
 
-  async getItemsByType(uuid: string, type: string): Promise<ArcadeInventory[]> {
+  async getItemsByType(uuid: string, type: string): Promise<ArcadeInventoryItem[]> {
     return this.db.select()
       .from(smartRotomInventory)
       .where(and(
@@ -176,7 +176,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventory>
       ));
   }
 
-  async getItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventory[]> {
+  async getItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventoryItem[]> {
     return this.db.select()
       .from(smartRotomInventory)
       .where(and(

@@ -3,10 +3,12 @@ import { StreakService } from './services/streak.service';
 import { InventoryService, ClaimItemData } from './services/inventory.service';
 import { LootboxService } from './services/lootbox.service';
 import { ArcadeStreak } from './entities/arcade-streak.entity';
-import { ArcadeInventory } from './entities/arcade-inventory.entity';
+import { ArcadeInventoryItem } from './entities/arcade-inventory.entity';
 import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
 import { loadRewardsConfig } from '../_main/_config/daily-rewards.config';
 import { ArcadeInventoryResponse } from './entities/inventory-response.entity';
+import { LootboxConfigEntity } from './entities/lootbox-config.entity';
+import { DailyRewardsConfig } from './entities/daily-rewards.entity';
 
 @Injectable()
 export class ArcadeFacadeService implements OnModuleInit {
@@ -22,10 +24,10 @@ export class ArcadeFacadeService implements OnModuleInit {
   }
 
   // ==================== STREAK MANAGEMENT ====================
-  async getRewardsBanner(): Promise<any> {
+  async getRewardsBanner(): Promise<DailyRewardsConfig> {
     return loadRewardsConfig();
   }
-
+  
   async getUserStreak(uuid: string): Promise<ArcadeStreak> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
@@ -45,7 +47,7 @@ export class ArcadeFacadeService implements OnModuleInit {
   async claimDailyReward(uuid: string): Promise<{
     streak: ArcadeStreak;
     reward: any;
-    inventoryItems?: ArcadeInventory[];
+    inventoryItems?: ArcadeInventoryItem[];
   }> {
     if (!uuid) {
       throw new BadRequestException('UUID is required');
@@ -55,7 +57,7 @@ export class ArcadeFacadeService implements OnModuleInit {
 
     // Add reward items to inventory if any
     if (result.reward.items && result.reward.items.length > 0) {
-      const inventoryItems: ArcadeInventory[] = [];
+      const inventoryItems: ArcadeInventoryItem[] = [];
       
       for (const rewardItem of result.reward.items) {
         const claimData: ClaimItemData = {
@@ -122,7 +124,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getUserInventory(uuid);
   }
 
-  async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventory | null> {
+  async getUserItem(uuid: string, itemId: string): Promise<ArcadeInventoryItem | null> {
     if (!uuid || !itemId) {
       throw new BadRequestException('UUID and item ID are required');
     }
@@ -137,7 +139,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     amount: number;
     rarity?: string;
     sourceType?: string;
-  }): Promise<ArcadeInventory> {
+  }): Promise<ArcadeInventoryItem> {
     if (!itemData.uuid || !itemData.itemId || !itemData.itemType) {
       throw new BadRequestException('UUID, item ID, and item type are required');
     }
@@ -156,7 +158,7 @@ export class ArcadeFacadeService implements OnModuleInit {
   }
 
   async consumeInventoryItem(uuid: string, itemId: string, amount: number = 1): Promise<{
-    item: ArcadeInventory | null;
+    item: ArcadeInventoryItem | null;
     consumed: number;
   }> {
     if (!uuid || !itemId) {
@@ -203,7 +205,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getInventoryStats(uuid);
   }
 
-  async getInventoryItemsByType(uuid: string, itemType: string): Promise<ArcadeInventory[]> {
+  async getInventoryItemsByType(uuid: string, itemType: string): Promise<ArcadeInventoryItem[]> {
     if (!uuid || !itemType) {
       throw new BadRequestException('UUID and item type are required');
     }
@@ -211,7 +213,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getItemsByType(uuid, itemType);
   }
 
-  async getInventoryItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventory[]> {
+  async getInventoryItemsByRarity(uuid: string, rarity: string): Promise<ArcadeInventoryItem[]> {
     if (!uuid || !rarity) {
       throw new BadRequestException('UUID and rarity are required');
     }
@@ -219,7 +221,7 @@ export class ArcadeFacadeService implements OnModuleInit {
     return this.inventoryService.getItemsByRarity(uuid, rarity);
   }
 
-  async markItemAsUsed(uuid: string, itemId: string): Promise<ArcadeInventory> {
+  async markItemAsUsed(uuid: string, itemId: string): Promise<ArcadeInventoryItem> {
     if (!uuid || !itemId) {
       throw new BadRequestException('UUID and item ID are required');
     }
@@ -229,9 +231,10 @@ export class ArcadeFacadeService implements OnModuleInit {
 
 // ==================== LOOTBOX MANAGEMENT ====================
 
-  async getLootboxConfig(): Promise<any> {
+  async getLootboxConfig(): Promise<LootboxConfigEntity> {
     return this.lootboxService.getLootboxConfig();
   }
+
 
   async openLootbox(uuid: string, lootboxType: string): Promise<OpenLootBoxResponseDto> {
     if (!uuid || !lootboxType) {
@@ -270,12 +273,12 @@ export class ArcadeFacadeService implements OnModuleInit {
 
   // ==================== COMBINED OPERATIONS ====================
 
-  async claimMultipleItems(uuid: string, items: ClaimItemData[]): Promise<ArcadeInventory[]> {
+  async claimMultipleItems(uuid: string, items: ClaimItemData[]): Promise<ArcadeInventoryItem[]> {
     if (!uuid || !items || items.length === 0) {
       throw new BadRequestException('UUID and items array are required');
     }
 
-    const claimedItems: ArcadeInventory[] = [];
+    const claimedItems: ArcadeInventoryItem[] = [];
 
     for (const itemData of items) {
       const claimData: ClaimItemData = {
