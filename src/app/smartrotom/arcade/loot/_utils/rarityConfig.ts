@@ -1,4 +1,4 @@
-import { Rarity } from "../types";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 export interface RarityStyleConfig {
   color: string;
@@ -8,7 +8,7 @@ export interface RarityStyleConfig {
   glow: string;
 }
 
-export function getRarityConfig(rarity: Rarity): RarityStyleConfig {
+export function getRarityConfig(rarity: ArcadeInventoryItem.rarity): RarityStyleConfig {
   switch (rarity) {
     case "common":
       return {
@@ -50,10 +50,12 @@ export function getRarityConfig(rarity: Rarity): RarityStyleConfig {
         textColor: "text-yellow-400",
         glow: "shadow-2xl shadow-yellow-500/60"
       };
+    default:
+      throw new Error(`Unknown rarity: ${rarity}`);
   }
 }
 
-export const rarityOrder: Record<Rarity, number> = {
+export const rarityOrder: Record<ArcadeInventoryItem.rarity, number> = {
   legendary: 0,
   epic: 1,
   rare: 2,

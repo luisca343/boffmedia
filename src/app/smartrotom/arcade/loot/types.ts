@@ -1,9 +1,10 @@
-export type Rarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
+import { ArcadeInventoryItem } from "@/generated/api";
+
 
 export type Item = {
   id: string;
   weight: number;
-  rarity: Rarity;
+  rarity: ArcadeInventoryItem.rarity;
   source?: string;
   count?: number;
 };

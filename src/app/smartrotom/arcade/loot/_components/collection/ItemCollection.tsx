@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Item, Rarity } from "../../types";
+import { Item } from "../../types";
 import { Gift, X } from "lucide-react";
 import { CollectionFilters } from "./CollectionFilters";
 import { CollectionStats } from "./CollectionStats";

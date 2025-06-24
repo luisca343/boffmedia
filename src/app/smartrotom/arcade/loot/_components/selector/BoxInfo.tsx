@@ -1,10 +1,10 @@
 import { Box } from "lucide-react";
 import { LootBox } from "../../types";
-import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 interface BoxInfoProps {
   selectedBox: LootBox | null;
-  ownedBoxes: Record<string, InventoryItem>;
+  ownedBoxes: Record<string, ArcadeInventoryItem>;
   currentBoxTheme: {
     text: string;
     border: string;

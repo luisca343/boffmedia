@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { arcadeService, InventoryItem, RarityRanges } from "@/services/api/smartrotom/arcadeService";
-import { Item, LootBox, Rarity } from "../types";
+import { ArcadeInventoryItem, arcadeService } from "@/services/api/smartrotom/arcadeService";
+import { Item, LootBox } from "../types";
 import { useTranslations } from 'next-intl';
 import { getItemDescription, getItemName } from "@/lib/intlUtils";
-import { Weight } from "lucide-react";
+import { RarityRange, RarityRanges } from "@/generated/api";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {
@@ -16,7 +15,7 @@ const BOX_TYPE_MAP: Record<string, string> = {
 export function useLootBoxInventory(uuid?: string) {
   const t = useTranslations("");
   const [collection, setCollection] = useState<Item[]>([]);
-  const [ownedBoxes, setOwnedBoxes] = useState<Record<string, InventoryItem>>({});
+  const [ownedBoxes, setOwnedBoxes] = useState<Record<string, ArcadeInventoryItem>>({});
   const [loadingInventory, setLoadingInventory] = useState(false);
   const [availableLootBoxes, setAvailableLootBoxes] = useState<LootBox[]>([]);
   const [loadingLootBoxes, setLoadingLootBoxes] = useState(true);
@@ -36,7 +35,7 @@ export function useLootBoxInventory(uuid?: string) {
             source: item.sourceType,
             image: getItemName(t, item.itemId),
             weight: 0,
-            rarity: item.rarity as Rarity,
+            rarity: item.rarity as ArcadeInventoryItem.rarity,
             count: item.amount,
             description: getItemDescription(t, item.itemId),
             serverId: item.id,
@@ -44,7 +43,7 @@ export function useLootBoxInventory(uuid?: string) {
         
         setCollection(serverItems);
         
-        const boxes: Record<string, InventoryItem> = {};
+        const boxes: Record<string, ArcadeInventoryItem> = {};
         response.data.items
           .filter(item => item.used === 0) // Only include unused boxes
           .forEach(item => {
@@ -62,7 +61,8 @@ export function useLootBoxInventory(uuid?: string) {
   
   function getRarityFromWeight(rarityRanges: RarityRanges, weight: number): string {
     for (const [rarity, range] of Object.entries(rarityRanges)) {
-      if (weight >= range.min && weight <= range.max) {
+      const typedRange = range as RarityRange;
+      if (weight >= typedRange.min && weight <= typedRange.max) {
         return rarity;
       }
     }
@@ -82,7 +82,7 @@ export function useLootBoxInventory(uuid?: string) {
           items: box.items.map((item: any) => ({
             id: item.id,
             weight: item.weight,
-            rarity: getRarityFromWeight(rarityRanges, item.weight) as Rarity,
+            rarity: getRarityFromWeight(rarityRanges, item.weight) as ArcadeInventoryItem.rarity,
           })),
           theme: box.theme || "default"
         }));
@@ -132,7 +132,7 @@ export function useLootBoxInventory(uuid?: string) {
         id: response.data.item!.id,
         weight: 0, //TODO: FIX THIS
         //weight: response.data.item!.weight,
-        rarity: response.data.item!.rarity as Rarity,
+        rarity: response.data.item!.rarity as ArcadeInventoryItem.rarity,
       };
       
       return item;

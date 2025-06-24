@@ -1,5 +1,5 @@
 import { Archive, Search } from "lucide-react";
-import { Item, Rarity } from "../../types";
+import { Item } from "../../types";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";

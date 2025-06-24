@@ -1,12 +1,12 @@
 import { Filter, Search } from "lucide-react";
-import { Rarity } from "../../types";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
 import { getItemRarity } from "@/lib/intlUtils";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 interface CollectionFiltersProps {
-  selectedRarity: Rarity | "all";
-  onRarityChange: (rarity: Rarity | "all") => void;
+  selectedRarity: ArcadeInventoryItem.rarity | "all";
+  onRarityChange: (rarity: ArcadeInventoryItem.rarity | "all") => void;
   searchTerm: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
@@ -43,7 +43,7 @@ export function CollectionFilters({
               ? "bg-white text-black" 
               : "bg-gray-800 text-gray-300 hover:bg-gray-700";
           } else {
-            const config = getRarityConfig(rarity as Rarity);
+            const config = getRarityConfig(rarity as ArcadeInventoryItem.rarity);
             styles = isActive 
               ? `${config.bgColor} ${config.textColor}` 
               : "bg-gray-800 text-gray-300 hover:bg-gray-700";
@@ -52,10 +52,10 @@ export function CollectionFilters({
           return (
             <button
               key={rarity}
-              onClick={() => onRarityChange(rarity as Rarity | "all")}
+              onClick={() => onRarityChange(rarity as ArcadeInventoryItem.rarity | "all")}
               className={`px-3 py-1 rounded-full text-sm whitespace-nowrap border ${isActive ? 'border-cyan-500/50' : 'border-gray-700'} ${styles}`}
             >
-              {getItemRarity(t, rarity as Rarity)}
+              {getItemRarity(t, rarity as ArcadeInventoryItem.rarity)}
             </button>
           );
         })}

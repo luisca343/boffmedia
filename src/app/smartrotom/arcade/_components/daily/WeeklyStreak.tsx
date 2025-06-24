@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { arcadeService, DailyRewardsConfig } from "@/services/api/smartrotom/arcadeService";
+import { arcadeService } from "@/services/api/smartrotom/arcadeService";
 import StreakHeader from "./StreakHeader";
 import StreakNotifications from "./StreakNotifications";
 import DaysGrid from "./DaysGrid";
 import ClaimSection from "./ClaimSection";
+import { DailyRewardsConfig } from "@/generated/api";
 
 interface WeeklyStreakProps {
   streak: number;

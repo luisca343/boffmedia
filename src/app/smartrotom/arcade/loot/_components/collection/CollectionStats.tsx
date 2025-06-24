@@ -1,10 +1,11 @@
-import { Rarity } from "../../types";
+import { ArcadeInventoryItem } from "@/generated/api";
+
 
 interface CollectionStatsProps {
   totalCount: number;
   filteredCount: number;
   displayedCount: number;
-  selectedRarity: Rarity | "all";
+  selectedRarity: ArcadeInventoryItem.rarity | "all";
 }
 
 export function CollectionStats({ 

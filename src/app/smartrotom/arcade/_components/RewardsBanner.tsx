@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Calendar, Award, Gift, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { arcadeService, DailyRewardsConfig } from "@/services/api/smartrotom/arcadeService";
-import { DailyRewardItem } from "@/generated/api";
+import { arcadeService } from "@/services/api/smartrotom/arcadeService";
+import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
 
 interface RewardsBannerProps {
   currentDay: number;
