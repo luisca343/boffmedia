@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { LootBox } from "../../types";
 import { BoxDisplay } from "./BoxDisplay";
 import { BoxInfo } from "./BoxInfo";
-import { ArcadeInventory } from "@/generated/api";
+import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
 
 interface BoxCarouselProps {
   lootBoxes: LootBox[];
@@ -20,7 +20,7 @@ interface BoxCarouselProps {
     buttonHover: string;
   };
   onShowOdds: () => void;
-  ownedBoxes: Record<string, ArcadeInventory>;
+  ownedBoxes: Record<string, InventoryItem>;
 }
 
 export function BoxCarousel({ 

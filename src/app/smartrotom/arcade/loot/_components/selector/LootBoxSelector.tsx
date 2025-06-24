@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { LootBox } from "../../types";
+import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
 import { getThemeColors } from "../../_utils/getThemeColors";
 import { BoxCarousel } from "./BoxCarousel";
 import { BoxInfo } from "./BoxInfo";
 import { OpenBoxButton } from "./OpenBoxButton";
 import { LootBoxOdds } from "../opening/LootBoxOdds";
-import { ArcadeInventory } from "@/generated/api";
 
 interface LootBoxSelectorProps {
   lootBoxes: LootBox[];
   selectedBox: LootBox | null;
   onSelect: (box: LootBox) => void;
   onOpenBox: () => void;
-  ownedBoxes: Record<string, ArcadeInventory>;
+  ownedBoxes: Record<string, InventoryItem>;
 }
 
 export default function LootBoxSelector({ 

@@ -1,21 +1,21 @@
 import { useState, useMemo } from 'react';
+import { Item, Rarity } from '../types';
 import { rarityOrder } from '../_utils/rarityConfig';
-import { ArcadeInventory } from '@/generated/api';
 
 const ITEMS_PER_PAGE = 16;
 
-export function useCollectionFilters(items: ArcadeInventory[]) {
+export function useCollectionFilters(items: Item[]) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedRarity, setSelectedRarity] = useState<any | "all">("all");
+  const [selectedRarity, setSelectedRarity] = useState<Rarity | "all">("all");
   const [currentPage, setCurrentPage] = useState(0);
   
   // Filter and sort items
   const filteredItems = useMemo(() => {
     return items.filter(item => 
       (selectedRarity === "all" || item.rarity === selectedRarity) &&
-      item.itemId.toLowerCase().includes(searchTerm.toLowerCase())
+      item.id.toLowerCase().includes(searchTerm.toLowerCase())
     ).sort((a, b) => {
-      return rarityOrder[a.rarity as keyof typeof rarityOrder] - rarityOrder[b.rarity as keyof typeof rarityOrder];
+      return rarityOrder[a.rarity] - rarityOrder[b.rarity];
     });
   }, [items, selectedRarity, searchTerm]);
   
@@ -37,7 +37,7 @@ export function useCollectionFilters(items: ArcadeInventory[]) {
     setCurrentPage(prev => Math.min(pageCount - 1, prev + 1));
   };
 
-  const handleRarityFilter = (rarity: keyof typeof rarityOrder | "all") => {
+  const handleRarityFilter = (rarity: Rarity | "all") => {
     setSelectedRarity(rarity);
     setCurrentPage(0);
   };

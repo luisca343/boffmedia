@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
 import { Box } from "lucide-react";
 import { LootBox } from "../../types";
-import { ArcadeInventory } from "@/generated/api";
+import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
 
 interface OpenBoxButtonProps {
   selectedBox: LootBox | null;
-  ownedBoxes: Record<string, ArcadeInventory>;
+  ownedBoxes: Record<string, InventoryItem>;
   currentBoxTheme: {
     buttonGradient: string;
     buttonHover: string;

@@ -1,8 +1,8 @@
-import { ArcadeInventory } from "@/generated/api";
 import { Box, Info, Loader2, Sparkles } from "lucide-react";
+import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
 
 interface LootBoxHeaderProps {
-  ownedBoxes: Record<string, ArcadeInventory>;
+  ownedBoxes: Record<string, InventoryItem>;
   collectionCount: number;
   loadingInventory: boolean;
   onShowInfo: () => void;

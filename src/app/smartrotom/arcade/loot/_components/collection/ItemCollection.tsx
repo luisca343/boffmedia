@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Item, Rarity } from "../../types";
 import { Gift, X } from "lucide-react";
 import { CollectionFilters } from "./CollectionFilters";
 import { CollectionStats } from "./CollectionStats";
@@ -7,19 +8,18 @@ import { CollectionPagination } from "./CollectionPagination";
 import { ItemDetailModal } from "./ItemDetailModal";
 import { ClaimRewardsModal } from "./ClaimRewardsModal";
 import { useCollectionFilters } from "../../_hooks/useCollectionFilter";
-import { ArcadeInventory } from "@/generated/api";
 
 interface ItemCollectionProps {
-  items: ArcadeInventory[];
+  items: Item[];
   onClose: () => void;
   uuid: string;
   onInventoryUpdate?: () => void;
 }
 
 export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate }: ItemCollectionProps) {
-  const [selectedItem, setSelectedItem] = useState<ArcadeInventory | null>(null);
+  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
-  const [localItems, setLocalItems] = useState<ArcadeInventory[]>(items);
+  const [localItems, setLocalItems] = useState<Item[]>(items);
   
   const {
     searchTerm,
