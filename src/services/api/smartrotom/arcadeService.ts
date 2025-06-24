@@ -18,7 +18,7 @@ export class ArcadeService {
    * Get arcade information
    */
   static getArcade(): Promise<ApiResponse<string>> {
-    return rotomGET<string>('/arcade');
+    return rotomGET<string>('/smartrotom/arcade');
   }
 
   // ==================== STREAK ENDPOINTS ====================
@@ -26,35 +26,35 @@ export class ArcadeService {
    * Get daily rewards banner configuration
    */
   static getRewardsBanner(): Promise<ApiResponse<any>> {
-    return rotomGET<any>('/arcade/banner');
+    return rotomGET<any>('/smartrotom/arcade/banner');
   }
 
   /**
    * Get user's arcade streak status
    */
   static getUserStreak(uuid: string): Promise<ApiResponse<ArcadeStreak>> {
-    return rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`);
+    return rotomGET<ArcadeStreak>(`/smartrotom/arcade/streak/${uuid}`);
   }
 
   /**
    * Claim daily arcade reward
    */
   static claimDailyReward(claimRewardDto: ClaimRewardDto): Promise<ApiResponse<ArcadeStreakClaim>> {
-    return rotomPOST<ArcadeStreakClaim>('/arcade/streak/claim', claimRewardDto);
+    return rotomPOST<ArcadeStreakClaim>('/smartrotom/arcade/streak/claim', claimRewardDto);
   }
 
   /**
    * Get detailed streak statistics
    */
   static getStreakStats(uuid: string): Promise<ApiResponse<ArcadeStreak>> {
-    return rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}/stats`);
+    return rotomGET<ArcadeStreak>(`/smartrotom/arcade/streak/${uuid}/stats`);
   }
 
   /**
    * Reset user streak (admin only)
    */
   static resetUserStreak(uuid: string): Promise<ApiResponse<void>> {
-    return rotomPOST<void>(`/arcade/streak/${uuid}/reset`, {});
+    return rotomPOST<void>(`/smartrotom/arcade/streak/${uuid}/reset`, {});
   }
 
   // ==================== INVENTORY ENDPOINTS ====================
@@ -66,7 +66,7 @@ export class ArcadeService {
     itemType?: string,
     rarity?: string
   ): Promise<ApiResponse<ArcadeInventoryResponse>> {
-    let url = `/arcade/inventory/${uuid}`;
+    let url = `/smartrotom/arcade/inventory/${uuid}`;
     const params = new URLSearchParams();
     
     if (itemType) params.append('itemType', itemType);
@@ -86,21 +86,21 @@ export class ArcadeService {
     itemsByType: Record<string, number>;
     itemsByRarity: Record<string, number>;
   }>> {
-    return rotomGET(`/arcade/inventory/${uuid}/stats`);
+    return rotomGET(`/smartrotom/arcade/inventory/${uuid}/stats`);
   }
 
   /**
    * Get specific inventory item
    */
   static getUserItem(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem | null>> {
-    return rotomGET<ArcadeInventoryItem | null>(`/arcade/inventory/${uuid}/item/${itemId}`);
+    return rotomGET<ArcadeInventoryItem | null>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}`);
   }
 
   /**
    * Add item to player inventory
    */
   static addInventoryItem(addInventoryItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventoryItem>> {
-    return rotomPOST<ArcadeInventoryItem>('/arcade/inventory/add', addInventoryItemDto);
+    return rotomPOST<ArcadeInventoryItem>('/smartrotom/arcade/inventory/add', addInventoryItemDto);
   }
 
   /**
@@ -110,14 +110,14 @@ export class ArcadeService {
     item: ArcadeInventoryItem | null;
     consumed: number;
   }>> {
-    return rotomPOST('/arcade/inventory/consume', consumeInventoryItemDto);
+    return rotomPOST('/smartrotom/arcade/inventory/consume', consumeInventoryItemDto);
   }
 
   /**
    * Mark inventory item as used
    */
   static markItemAsUsed(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem>> {
-    return rotomPOST<ArcadeInventoryItem>(`/arcade/inventory/${uuid}/item/${itemId}/use`, {});
+    return rotomPOST<ArcadeInventoryItem>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}/use`, {});
   }
 
   // ==================== LOOTBOX ENDPOINTS ====================
@@ -125,21 +125,21 @@ export class ArcadeService {
    * Open a loot box and get a random item
    */
   static openLootbox(openLootBoxDto: OpenLootBoxDto): Promise<ApiResponse<OpenLootBoxResponseDto>> {
-    return rotomPOST<OpenLootBoxResponseDto>('/arcade/lootbox/open', openLootBoxDto);
+    return rotomPOST<OpenLootBoxResponseDto>('/smartrotom/arcade/lootbox/open', openLootBoxDto);
   }
 
   /**
    * Give lootbox to player
    */
   static giveLootbox(giveLootboxDto: GiveLootboxDto): Promise<ApiResponse<void>> {
-    return rotomPOST<void>('/arcade/lootbox/give', giveLootboxDto);
+    return rotomPOST<void>('/smartrotom/arcade/lootbox/give', giveLootboxDto);
   }
 
   /**
    * Get lootbox configuration
    */
   static getLootboxConfig(): Promise<ApiResponse<LootboxConfigEntity>> {
-    return rotomGET<any>('/arcade/lootbox/config');
+    return rotomGET<any>('/smartrotom/arcade/lootbox/config');
   }
 
   // ==================== COMBINED ENDPOINTS ====================
@@ -155,7 +155,7 @@ export class ArcadeService {
       itemsByRarity: Record<string, number>;
     };
   }>> {
-    return rotomGET(`/arcade/user/${uuid}/complete-data`);
+    return rotomGET(`/smartrotom/arcade/user/${uuid}/complete-data`);
   }
 
   // ==================== CONVENIENCE METHODS ====================
