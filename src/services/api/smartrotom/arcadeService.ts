@@ -1,345 +1,240 @@
-import { rotomGET, rotomPOST, rotomPATCH, rotomDELETE, ApiResponse } from '@/services/boffAPI';
-import type { 
-  ArcadeInventory, 
-  OpenLootBoxDto, 
-  OpenLootBoxResponseDto,
+import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
+import type {
+  ArcadeStreak,
+  ArcadeInventory,
+  ArcadeStreakClaim,
+  ArcadeInventoryResponse,
   ClaimRewardDto,
+  OpenLootBoxDto,
+  OpenLootBoxResponseDto,
   AddInventoryItemDto,
   ConsumeInventoryItemDto,
   GiveLootboxDto,
-  ArcadeStreakClaim,
-  SuccessResponse,
-  ArcadeStreak,
-  ArcadeInventoryResponse
+  LootboxConfigEntity
 } from '@/generated/api';
 
-
-  export interface DailyReward {
-    day: number
-    type: string
-    amount: number
-    description: string
+export class ArcadeService {
+  /**
+   * Get arcade information
+   */
+  static getArcade(): Promise<ApiResponse<string>> {
+    return rotomGET<string>('/smartrotom/arcade');
   }
 
-  export interface DailyRewardsConfig {
-    totalDays: number;
-    bannerName: string;
-    rewards: DailyReward[];
-  }
-
-  export interface InventoryItem {
-    id: number;
-    itemId: string;
-    itemType: string;
-    amount: number;
-    sourceType: string;
-    used: number;
-    rarity: string;
-    createdAt: string;
-  }
-
-  export interface GetInventoryResponse {
-    items: InventoryItem[];
-    groupedItems: Record<string, InventoryItem[]>;
-  }
-
-  export interface ClaimItemsResponse {
-    success: boolean;
-    message: string;
-    claimedIds: number[];
-  }
-
-  export interface AddInventoryItemRequest {
-    uuid: string;
-    itemId: string;
-    itemType: string;
-    amount?: number;
-    sourceType?: string;
-    sourceId?: number;
-  }
-
-  export interface AddInventoryItemResponse {
-    success: boolean;
-    message: string;
-    itemId?: number;
-  }
-
-  export interface OpenLootBoxRequest {
-    uuid: string;
-    boxId: string;
-  }
-
-  export interface OpenLootBoxResponse {
-    success: boolean;
-    message?: string;
-    item?: {
-      id: string;
-      name: string;
-      weight: number;
-      rarity: string;
-      description: string;
-      serverId?: number;
-    };
-  }
-
-  export interface RarityRanges {
-    [key: string]: {
-      min: number;
-      max: number;
-    };
-  }
-
-  export interface LootBoxConfigResponse {
-    rarityRanges: {
-      [key: string]: {
-        min: number;
-        max: number;
-      };
-    }
-    lootboxConfig: {
-      boxes: Array<{
-        id: string;
-        name: string;
-        image: string;
-        description: string;
-        items: Array<{
-          id: string;
-          rarity: string;
-          weight: number;
-        }>;
-        theme: string;
-      }>;
-    }
-  }
-  export interface ClaimItemData {
-    id: string;
-    type: string;
-  }
-
-  export interface ClaimItemsWithTypesRequest {
-    uuid: string;
-    items: ClaimItemData[];
-  }
-
-
-export const arcadeService = {
   // ==================== STREAK ENDPOINTS ====================
-  getRewardsBanner: (): Promise<ApiResponse<any>> => 
-    rotomGET<any>('/arcade/banner'),
+  /**
+   * Get daily rewards banner configuration
+   */
+  static getRewardsBanner(): Promise<ApiResponse<any>> {
+    return rotomGET<any>('/smartrotom/arcade/banner');
+  }
 
   /**
    * Get user's arcade streak status
    */
-  getStreak: (uuid: string): Promise<ApiResponse<ArcadeStreak>> => 
-    rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`),
+  static getUserStreak(uuid: string): Promise<ApiResponse<ArcadeStreak>> {
+    return rotomGET<ArcadeStreak>(`/smartrotom/arcade/streak/${uuid}`);
+  }
 
   /**
    * Claim daily arcade reward
    */
-  claimDailyReward: (claimRewardDto: ClaimRewardDto): Promise<ApiResponse<{
-    streak: ArcadeStreak;
-    reward: any;
-    inventoryItems?: ArcadeInventory[];
-  }>> => 
-    rotomPOST<{
-      streak: ArcadeStreak;
-      reward: any;
-      inventoryItems?: ArcadeInventory[];
-    }>('/arcade/streak/claim', claimRewardDto),
+  static claimDailyReward(claimRewardDto: ClaimRewardDto): Promise<ApiResponse<ArcadeStreakClaim>> {
+    return rotomPOST<ArcadeStreakClaim>('/smartrotom/arcade/streak/claim', claimRewardDto);
+  }
 
   /**
    * Get detailed streak statistics
    */
-  getStreakStats: (uuid: string): Promise<ApiResponse<ArcadeStreak>> => 
-    rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}/stats`),
+  static getStreakStats(uuid: string): Promise<ApiResponse<ArcadeStreak>> {
+    return rotomGET<ArcadeStreak>(`/smartrotom/arcade/streak/${uuid}/stats`);
+  }
 
   /**
    * Reset user streak (admin only)
    */
-  resetStreak: (uuid: string): Promise<ApiResponse<SuccessResponse>> => 
-    rotomPOST<SuccessResponse>(`/arcade/streak/${uuid}/reset`, {}),
+  static resetUserStreak(uuid: string): Promise<ApiResponse<void>> {
+    return rotomPOST<void>(`/smartrotom/arcade/streak/${uuid}/reset`, {});
+  }
 
   // ==================== INVENTORY ENDPOINTS ====================
-  
   /**
    * Get player inventory items
    */
-  getInventory: (uuid: string, filters?: { 
-    itemType?: string; 
-    rarity?: string; 
-  }): Promise<ApiResponse<ArcadeInventoryResponse>> => {
+  static getUserInventory(
+    uuid: string,
+    itemType?: string,
+    rarity?: string
+  ): Promise<ApiResponse<ArcadeInventoryResponse>> {
+    let url = `/smartrotom/arcade/inventory/${uuid}`;
     const params = new URLSearchParams();
-    if (filters?.itemType) params.append('itemType', filters.itemType);
-    if (filters?.rarity) params.append('rarity', filters.rarity);
+    
+    if (itemType) params.append('itemType', itemType);
+    if (rarity) params.append('rarity', rarity);
     
     const queryString = params.toString();
-    const url = `/arcade/inventory/${uuid}${queryString ? `?${queryString}` : ''}`;
+    if (queryString) url += `?${queryString}`;
     
     return rotomGET<ArcadeInventoryResponse>(url);
-  },
+  }
 
   /**
    * Get inventory statistics
    */
-  getInventoryStats: (uuid: string): Promise<ApiResponse<{
+  static getInventoryStats(uuid: string): Promise<ApiResponse<{
     totalItems: number;
     itemsByType: Record<string, number>;
     itemsByRarity: Record<string, number>;
-  }>> => 
-    rotomGET<{
-      totalItems: number;
-      itemsByType: Record<string, number>;
-      itemsByRarity: Record<string, number>;
-    }>(`/arcade/inventory/${uuid}/stats`),
+  }>> {
+    return rotomGET(`/smartrotom/arcade/inventory/${uuid}/stats`);
+  }
 
   /**
    * Get specific inventory item
    */
-  getInventoryItem: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory | null>> => 
-    rotomGET<ArcadeInventory | null>(`/arcade/inventory/${uuid}/item/${itemId}`),
+  static getUserItem(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory | null>> {
+    return rotomGET<ArcadeInventory | null>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}`);
+  }
 
   /**
    * Add item to player inventory
    */
-  addInventoryItem: (addItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventory>> => 
-    rotomPOST<ArcadeInventory>('/arcade/inventory/add', addItemDto),
+  static addInventoryItem(addInventoryItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventory>> {
+    return rotomPOST<ArcadeInventory>('/smartrotom/arcade/inventory/add', addInventoryItemDto);
+  }
 
   /**
    * Consume an inventory item
    */
-  consumeInventoryItem: (consumeItemDto: ConsumeInventoryItemDto): Promise<ApiResponse<{
+  static consumeInventoryItem(consumeInventoryItemDto: ConsumeInventoryItemDto): Promise<ApiResponse<{
     item: ArcadeInventory | null;
     consumed: number;
-  }>> => 
-    rotomPOST<{
-      item: ArcadeInventory | null;
-      consumed: number;
-    }>('/arcade/inventory/consume', consumeItemDto),
+  }>> {
+    return rotomPOST('/smartrotom/arcade/inventory/consume', consumeInventoryItemDto);
+  }
 
   /**
    * Mark inventory item as used
    */
-  markItemAsUsed: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory>> => 
-    rotomPOST<ArcadeInventory>(`/arcade/inventory/${uuid}/item/${itemId}/use`, {}),
+  static markItemAsUsed(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventory>> {
+    return rotomPOST<ArcadeInventory>(`/smartrotom/arcade/inventory/${uuid}/item/${itemId}/use`, {});
+  }
 
   // ==================== LOOTBOX ENDPOINTS ====================
-  
   /**
    * Open a loot box and get a random item
    */
-  openLootbox: (openLootBoxDto: OpenLootBoxDto): Promise<ApiResponse<OpenLootBoxResponseDto>> => 
-    rotomPOST<OpenLootBoxResponseDto>('/arcade/lootbox/open', openLootBoxDto),
+  static openLootbox(openLootBoxDto: OpenLootBoxDto): Promise<ApiResponse<OpenLootBoxResponseDto>> {
+    return rotomPOST<OpenLootBoxResponseDto>('/smartrotom/arcade/lootbox/open', openLootBoxDto);
+  }
 
   /**
    * Give lootbox to player
    */
-  giveLootbox: (giveLootboxDto: GiveLootboxDto): Promise<ApiResponse<SuccessResponse>> => 
-    rotomPOST<SuccessResponse>('/arcade/lootbox/give', giveLootboxDto),
+  static giveLootbox(giveLootboxDto: GiveLootboxDto): Promise<ApiResponse<void>> {
+    return rotomPOST<void>('/smartrotom/arcade/lootbox/give', giveLootboxDto);
+  }
 
   /**
    * Get lootbox configuration
    */
-  getLootboxConfig: (): Promise<ApiResponse<any>> => 
-    rotomGET<any>('/arcade/lootbox/config'),
+  static getLootboxConfig(): Promise<ApiResponse<LootboxConfigEntity>> {
+    return rotomGET<any>('/smartrotom/arcade/lootbox/config');
+  }
 
   // ==================== COMBINED ENDPOINTS ====================
-
-  /**
-   * Claim multiple items at once
-   */
-  /*
-  claimMultipleItems: (claimItemsDto: ClaimInventoryItemsDto): Promise<ApiResponse<ArcadeInventory[]>> => 
-    rotomPOST<ArcadeInventory[]>('/arcade/inventory/claim-multiple', claimItemsDto),
-  */
   /**
    * Get complete user arcade data
    */
-  getCompleteUserData: (uuid: string): Promise<ApiResponse<{
+  static getCompleteUserData(uuid: string): Promise<ApiResponse<{
     streak: ArcadeStreak;
-    inventory: ArcadeInventory[];
+    inventory: ArcadeInventoryResponse;
     inventoryStats: {
       totalItems: number;
       itemsByType: Record<string, number>;
       itemsByRarity: Record<string, number>;
     };
-  }>> => 
-    rotomGET<{
-      streak: ArcadeStreak;
-      inventory: ArcadeInventory[];
-      inventoryStats: {
-        totalItems: number;
-        itemsByType: Record<string, number>;
-        itemsByRarity: Record<string, number>;
-      };
-    }>(`/arcade/user/${uuid}/complete-data`),
+  }>> {
+    return rotomGET(`/smartrotom/arcade/user/${uuid}/complete-data`);
+  }
 
   // ==================== CONVENIENCE METHODS ====================
+  /**
+   * Quick method to open a lootbox
+   */
+  static quickOpenLootbox(uuid: string, boxId: string): Promise<ApiResponse<OpenLootBoxResponseDto>> {
+    return ArcadeService.openLootbox({ uuid, boxId });
+  }
+
+  /**
+   * Quick method to get user inventory
+   */
+  static getInventory(uuid: string): Promise<ApiResponse<ArcadeInventoryResponse>> {
+    return ArcadeService.getUserInventory(uuid);
+  }
+
+  /**
+   * Quick method to claim daily reward
+   */
+  static claimDaily(uuid: string): Promise<ApiResponse<ArcadeStreakClaim>> {
+    return ArcadeService.claimDailyReward({ uuid });
+  }
+
+  /**
+   * Quick method to consume an inventory item
+   */
+  static consumeItem(uuid: string, itemId: string, amount: number = 1): Promise<ApiResponse<{
+    item: ArcadeInventory | null;
+    consumed: number;
+  }>> {
+    return ArcadeService.consumeInventoryItem({ uuid, itemId, amount });
+  }
+
 
   /**
    * Get user streak and check if can claim reward
    */
-  getStreakStatus: async (uuid: string): Promise<ApiResponse<{
+  static getStreakStatus(uuid: string): Promise<ApiResponse<{
     streak: ArcadeStreak;
     canClaim: boolean;
-  }>> => {
-    const streakResponse = await rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`);
-    
-    if (!streakResponse.success) {
-      return streakResponse as any;
-    }
-
-    // Simple client-side check (server does the real validation)
-    const streak = streakResponse.data!;
-    const canClaimBasic = !streak.lastClaimed || 
-      new Date(streak.lastClaimed).toDateString() !== new Date().toDateString();
-
-    return {
-      success: true,
-      data: {
-        streak: streak,
-        canClaim: canClaimBasic
+  }>> {
+    return new Promise(async (resolve) => {
+      const streakResponse = await ArcadeService.getUserStreak(uuid);
+      
+      if (!streakResponse.success) {
+        resolve(streakResponse as any);
+        return;
       }
-    } as ApiResponse<{
-      streak: ArcadeStreak;
-      canClaim: boolean;
-    }>;
-  },
 
-  /**
-   * Get inventory items by type
-   */
-  getInventoryByType: (uuid: string, itemType: string): Promise<ApiResponse<ArcadeInventoryResponse>> => 
-    arcadeService.getInventory(uuid, { itemType }),
+      const streak = streakResponse.data!;
+      const canClaimBasic = !streak.lastClaimed || 
+        new Date(streak.lastClaimed).toDateString() !== new Date().toDateString();
 
-  /**
-   * Get inventory items by rarity
-   */
-  getInventoryByRarity: (uuid: string, rarity: string): Promise<ApiResponse<ArcadeInventoryResponse>> => 
-    arcadeService.getInventory(uuid, { rarity }),
+      resolve({
+        success: true,
+        statusCode: 200,
+        message: 'Success',
+        data: {
+          streak: streak,
+          canClaim: canClaimBasic
+        }
+      });
+    });
+  }
 
-  /**
-   * Quick claim daily reward (convenience method)
-   */
-  quickClaimDaily: (uuid: string): Promise<ApiResponse<ArcadeStreakClaim>> => 
-    arcadeService.claimDailyReward({ uuid }),
-
-  /**
-   * Quick open lootbox (convenience method)
-   */
-  quickOpenLootbox: (uuid: string, boxId: string): Promise<ApiResponse<OpenLootBoxResponseDto>> => 
-    arcadeService.openLootbox({ uuid, boxId }),
-};
+}
 
 // Export types for convenience
-export type { 
-  ArcadeStreak, 
-  ArcadeInventory, 
-  OpenLootBoxDto, 
-  OpenLootBoxResponseDto,
+export type {
+  ArcadeStreak,
+  ArcadeInventory,
+  ArcadeStreakClaim,
+  ArcadeInventoryResponse,
   ClaimRewardDto,
+  OpenLootBoxDto,
+  OpenLootBoxResponseDto,
   AddInventoryItemDto,
   ConsumeInventoryItemDto,
   GiveLootboxDto,
-  SuccessResponse,
-  ApiResponse 
+  ApiResponse
 };

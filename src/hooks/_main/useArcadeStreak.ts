@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
 import { toast } from 'react-toastify';
-import { ArcadeInventory, arcadeService } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeInventory, ArcadeService } from '@/services/api/smartrotom/arcadeService';
 import { ArcadeStreak, ArcadeStreakClaim } from '@/generated/api';
 
 interface UseArcadeStreakReturn {
@@ -68,7 +68,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
 
       try {
         setLoading(true);
-        const response = (await arcadeService.getStreak(session.user.smartRotomUser?.uuid!)).data as ArcadeStreak;
+        const response = (await ArcadeService.getUserStreak(session.user.smartRotomUser?.uuid!)).data as ArcadeStreak;
 
         // Use the claimedToday property directly from the server response
         setStreakData({
@@ -132,8 +132,8 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
     }
 
     try {
-      const result = await arcadeService.claimDailyReward({uuid: session.user.smartRotomUser?.uuid!});
-      const daily = await (await arcadeService.getStreakStatus(session.user.smartRotomUser?.uuid!)).data!;
+      const result = await ArcadeService.claimDailyReward({uuid: session.user.smartRotomUser?.uuid!});
+      const daily = await (await ArcadeService.getStreakStatus(session.user.smartRotomUser?.uuid!)).data!;
       const { streak } = daily;
 
       console.log("daily", daily);

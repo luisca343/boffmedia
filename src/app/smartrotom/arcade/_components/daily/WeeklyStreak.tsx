@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { arcadeService, DailyRewardsConfig } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import StreakHeader from "./StreakHeader";
 import StreakNotifications from "./StreakNotifications";
 import DaysGrid from "./DaysGrid";
@@ -71,7 +71,7 @@ export default function WeeklyStreak({
     const fetchRewards = async () => {
       try {
         setLoadingRewards(true);
-        const response = await arcadeService.getRewardsBanner();
+        const response = await ArcadeService.getRewardsBanner();
         setRewardsConfig(response.data!);
       } catch (err) {
         console.error("Failed to fetch rewards banner:", err);
