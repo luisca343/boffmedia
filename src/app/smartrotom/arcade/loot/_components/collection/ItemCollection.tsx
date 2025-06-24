@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Item } from "../../types";
 import { Gift, X } from "lucide-react";
 import { CollectionFilters } from "./CollectionFilters";
 import { CollectionStats } from "./CollectionStats";
@@ -8,18 +7,19 @@ import { CollectionPagination } from "./CollectionPagination";
 import { ItemDetailModal } from "./ItemDetailModal";
 import { ClaimRewardsModal } from "./ClaimRewardsModal";
 import { useCollectionFilters } from "../../_hooks/useCollectionFilter";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 interface ItemCollectionProps {
-  items: Item[];
+  items: ArcadeInventoryItem[];
   onClose: () => void;
   uuid: string;
   onInventoryUpdate?: () => void;
 }
 
 export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate }: ItemCollectionProps) {
-  const [selectedItem, setSelectedItem] = useState<Item | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ArcadeInventoryItem | null>(null);
   const [showClaimModal, setShowClaimModal] = useState(false);
-  const [localItems, setLocalItems] = useState<Item[]>(items);
+  const [localItems, setLocalItems] = useState<ArcadeInventoryItem[]>(items);
   
   const {
     searchTerm,
@@ -36,18 +36,18 @@ export default function ItemCollection({ items, onClose, uuid, onInventoryUpdate
 
   // Filter claimable items (not chests or boxes)
   const claimableItems = localItems.filter(item => 
-    !item.id.toLowerCase().includes('chest') && 
-    !item.id.toLowerCase().includes('box')
+    !item.itemId.toLowerCase().includes('chest') && 
+    !item.itemId.toLowerCase().includes('box')
   );
 
-  const handleItemClick = (item: Item) => {
+  const handleItemClick = (item: ArcadeInventoryItem) => {
     setSelectedItem(item);
   };
 
   const handleClaimSuccess = (claimedItemIds: string[]) => {
     // Update local state by removing claimed items
     setLocalItems(prevItems => 
-      prevItems.filter(item => !claimedItemIds.includes(item.id))
+      prevItems.filter(item => !claimedItemIds.includes(item.itemId))
     );
     
     // Also call parent update function if provided

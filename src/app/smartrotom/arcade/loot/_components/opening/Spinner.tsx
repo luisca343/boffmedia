@@ -1,15 +1,16 @@
 import { useRef } from "react";
-import { LootBox, Item } from "../../types";
+import { LootBox } from "../../types";
 import { SpinnerItem } from "./SpinnerItem";
+import { LootboxItemConfig } from "@/generated/api";
 
 interface SpinnerProps {
   lootBox: LootBox;
-  spinItems: Item[];
+  spinItems: LootboxItemConfig[];
   scrollPosition: number;
   spinComplete: boolean;
   isSpinning: boolean;
   winningIndex: number | null;
-  wonItem: Item;
+  wonItem: LootboxItemConfig;
   spinnerRef: React.RefObject<HTMLDivElement>;
   itemsContainerRef: React.RefObject<HTMLDivElement>;
   ITEM_WIDTH: number;
@@ -27,6 +28,8 @@ export function Spinner({
   itemsContainerRef,
   ITEM_WIDTH
 }: SpinnerProps) {
+  console.log("spinItems:", spinItems);
+  console.log("wonItem:", wonItem);
   return (
     <div className="relative w-full">
       {/* Arcade cabinet frame for spinner */}

@@ -33,6 +33,7 @@ export const ItemDisplay = ({
   selected = false,
   isChest = false
 }: ItemDisplayProps) => {
+  
   return (
     <div 
       className={`relative flex flex-col items-center ${selectable && !isChest ? 'cursor-pointer' : ''} ${isChest ? 'cursor-not-allowed opacity-80' : ''} ${className}`}

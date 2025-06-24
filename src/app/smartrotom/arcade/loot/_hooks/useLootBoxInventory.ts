@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { ArcadeInventoryItem, arcadeService } from "@/services/api/smartrotom/arcadeService";
-import { Item, LootBox } from "../types";
+import { LootBox } from "../types";
 import { useTranslations } from 'next-intl';
 import { getItemDescription, getItemName } from "@/lib/intlUtils";
-import { RarityRange, RarityRanges } from "@/generated/api";
+import { LootboxItemConfig, LootItemDto, RarityRange, RarityRanges } from "@/generated/api";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {
@@ -14,7 +14,7 @@ const BOX_TYPE_MAP: Record<string, string> = {
 
 export function useLootBoxInventory(uuid?: string) {
   const t = useTranslations("");
-  const [collection, setCollection] = useState<Item[]>([]);
+  const [collection, setCollection] = useState<ArcadeInventoryItem[]>([]);
   const [ownedBoxes, setOwnedBoxes] = useState<Record<string, ArcadeInventoryItem>>({});
   const [loadingInventory, setLoadingInventory] = useState(false);
   const [availableLootBoxes, setAvailableLootBoxes] = useState<LootBox[]>([]);
@@ -28,18 +28,7 @@ export function useLootBoxInventory(uuid?: string) {
       const response = await arcadeService.getInventory(userId);
       if (response.data && response.data.items) {
         const serverItems = response.data.items
-          .filter(item => item.used === 0) // Only include unused items
-          .map(item => ({
-            id: item.itemId,
-            name: t(`items.${item.itemId.replace(":", ".")}_name`),
-            source: item.sourceType,
-            image: getItemName(t, item.itemId),
-            weight: 0,
-            rarity: item.rarity as ArcadeInventoryItem.rarity,
-            count: item.amount,
-            description: getItemDescription(t, item.itemId),
-            serverId: item.id,
-          }));
+          .filter(item => item.used === 0);
         
         setCollection(serverItems);
         
@@ -128,7 +117,7 @@ export function useLootBoxInventory(uuid?: string) {
       }));
       
       // Return the won item
-      const item: Item = {
+      const item: LootboxItemConfig = {
         id: response.data.item!.id,
         weight: 0, //TODO: FIX THIS
         //weight: response.data.item!.weight,
@@ -169,6 +158,6 @@ export function useLootBoxInventory(uuid?: string) {
     error,
     fetchInventory,
     openLootBox,
-    addItemToCollection: (item: Item) => setCollection(prev => [...prev, item])
+    addItemToCollection: (item: any) => setCollection(prev => [...prev, item])
   };
 }

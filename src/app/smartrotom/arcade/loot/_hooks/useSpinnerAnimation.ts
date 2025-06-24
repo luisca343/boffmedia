@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from "react";
-import { Item } from "../types";
 import { useAudio } from "@/hooks/useAudio";
+import { LootboxItemConfig } from "@/generated/api";
 
 interface UseSpinnerAnimationProps {
   lootBox: {
-    items: Item[];
+    items: LootboxItemConfig[];
   };
-  wonItem: Item;
+  wonItem: LootboxItemConfig;
 }
 
 interface SpinnerAnimationResult {
   showBox: boolean;
   showSpinner: boolean;
   animationCompleted: boolean;
-  spinItems: Item[];
+  spinItems: LootboxItemConfig[];
   scrollPosition: number;
   isSpinning: boolean;
   spinComplete: boolean;
@@ -27,7 +27,7 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
   const [showBox, setShowBox] = useState(true);
   const [showSpinner, setShowSpinner] = useState(false);
   const [animationCompleted, setAnimationCompleted] = useState(false);
-  const [spinItems, setSpinItems] = useState<Item[]>([]);
+  const [spinItems, setSpinItems] = useState<LootboxItemConfig[]>([]);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [spinComplete, setSpinComplete] = useState(false);
@@ -51,7 +51,7 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
   // Generate items immediately on mount
   useEffect(() => {
     // Generate a large array of items for a smooth animation
-    const items: Item[] = [];
+    const items: LootboxItemConfig[] = [];
     const totalItems = 300;
     
     // Insert winning item at a strategic position
@@ -127,7 +127,7 @@ export function useSpinnerAnimation({ lootBox, wonItem }: UseSpinnerAnimationPro
     }
   };
 
-  const startScrollingAnimation = (items: Item[], winningPosition: number) => {
+  const startScrollingAnimation = (items: LootboxItemConfig[], winningPosition: number) => {
     if (!spinnerRef.current) return;
     
     const containerWidth = spinnerRef.current.offsetWidth;

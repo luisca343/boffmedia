@@ -1,20 +1,20 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Item } from "../../types";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { getItemDescription, getItemName } from "@/lib/intlUtils";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
+import { ArcadeInventoryItem, LootItemDto } from "@/generated/api";
 
 interface ResultDisplayProps {
-  wonItem: Item;
+  wonItem: LootItemDto;
   onComplete: () => void;
 }
 
 export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
   const t = useTranslations("");
-  const config = getRarityConfig(wonItem.rarity);
+  const config = getRarityConfig(wonItem.rarity as ArcadeInventoryItem.rarity);
   
   return (
     <motion.div
@@ -41,7 +41,6 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         
         <div className="relative w-32 h-32 mb-4">
           <ItemImage
-            type={wonItem.source}
             itemId={wonItem.id}
             size={128}
           />

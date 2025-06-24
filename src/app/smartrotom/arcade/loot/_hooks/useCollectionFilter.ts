@@ -1,11 +1,10 @@
 import { useState, useMemo } from 'react';
-import { Item } from '../types';
 import { rarityOrder } from '../_utils/rarityConfig';
 import { ArcadeInventoryItem } from '@/generated/api';
 
 const ITEMS_PER_PAGE = 16;
 
-export function useCollectionFilters(items: Item[]) {
+export function useCollectionFilters(items: ArcadeInventoryItem[]) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRarity, setSelectedRarity] = useState<ArcadeInventoryItem.rarity | "all">("all");
   const [currentPage, setCurrentPage] = useState(0);
@@ -14,7 +13,7 @@ export function useCollectionFilters(items: Item[]) {
   const filteredItems = useMemo(() => {
     return items.filter(item => 
       (selectedRarity === "all" || item.rarity === selectedRarity) &&
-      item.id.toLowerCase().includes(searchTerm.toLowerCase())
+      item.itemId.toLowerCase().includes(searchTerm.toLowerCase())
     ).sort((a, b) => {
       return rarityOrder[a.rarity] - rarityOrder[b.rarity];
     });

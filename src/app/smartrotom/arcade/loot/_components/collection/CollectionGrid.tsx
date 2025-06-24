@@ -1,14 +1,14 @@
 import { Archive, Search } from "lucide-react";
-import { Item } from "../../types";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemName, getItemRarity } from "@/lib/intlUtils";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 interface CollectionGridProps {
-  items: Item[];
+  items: ArcadeInventoryItem[];
   totalItems: number;
-  onItemClick: (item: Item) => void;
+  onItemClick: (item: ArcadeInventoryItem) => void;
 }
 
 export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGridProps) {
@@ -51,16 +51,16 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
           >
             <div className="w-full aspect-square mb-2 flex items-center justify-center">
               <ItemDisplay
-                type={item.source!}
-                itemId={item.id}
-                count={item.count}
+                type={item.sourceType!}
+                itemId={item.itemId}
+                count={item.amount}
                 size={96}
                 rarity={item.rarity}
               />
             </div>
             
             <h3 className={`${config.textColor} font-medium text-center text-sm truncate w-full`}>
-              {getItemName(t, item.id, item.source)}
+              {getItemName(t, item.itemId, item.sourceType)}
             </h3>
             <p className={`${config.textColor} text-xs mt-1`}>
               {getItemRarity(t, item.rarity)}

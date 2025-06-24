@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LootBox, Item } from "../../types";
+import { LootBox } from "../../types";
 import LootBoxSelector from "../selector/LootBoxSelector";
 import LootBoxOpening from "../opening/LootBoxOpening";
 import ItemCollection from "../collection/ItemCollection";
@@ -16,6 +16,7 @@ import { LootBoxHeader } from "./LootBoxHeader";
 import { InfoModal } from "./InfoModal";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { Loader2 } from "lucide-react";
+import { LootboxItemConfig } from "@/generated/api";
 
 export default function LootBoxGame() {
   const t = useTranslations("");
@@ -42,7 +43,7 @@ export default function LootBoxGame() {
   
   const [selectedBox, setSelectedBox] = useState<LootBox | null>(null);
   const [isOpening, setIsOpening] = useState(false);
-  const [wonItem, setWonItem] = useState<Item | null>(null);
+  const [wonItem, setWonItem] = useState<LootboxItemConfig | null>(null);
   const [showCollection, setShowCollection] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);
