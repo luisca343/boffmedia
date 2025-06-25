@@ -116,7 +116,6 @@ export class StreakService {
     reward: any;
     message: string;
   }> {
-    console.log(`Claiming daily reward for user: ${uuid}`);
     this.validateUuid(uuid);
 
     const { canClaim, streak } = await this.canClaimReward(uuid);
@@ -142,7 +141,6 @@ export class StreakService {
     // Calculate reward based on streak
     const reward = this.calculateReward(updatedStreak.streak);
 
-    console.log(`Reward for streak ${updatedStreak.streak}:`, reward);
 
     return {
       success: true,

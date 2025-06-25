@@ -52,8 +52,6 @@ export class InventoryService {
     const aggregatedItems = rawItems.reduce((acc, item) => {
       const consumableTypes = ['box'];
       const isConsumable = consumableTypes.includes(item.itemType);
-
-      console.log(`Processing item: ${item.itemId}, Type: ${item.itemType}, Consumable: ${isConsumable}`);
       
       const key = isConsumable
         ? `${item.itemId}_${item.sourceType || 'unknown'}`
@@ -117,12 +115,9 @@ export class InventoryService {
   }
 
   async addItemToInventory(itemData: ClaimItemData): Promise<{ success: boolean; item: ArcadeInventoryItem }> {
-    console.log('Adding item to inventory:', itemData);
     this.validateUuid(itemData.uuid);
     this.validateItemId(itemData.itemId);
     this.validateAmount(itemData.amount);
-
-    console.log('Validated item data:', itemData);
 
       const createData: CreateInventoryItemDto = {
         uuid: itemData.uuid,
@@ -135,11 +130,7 @@ export class InventoryService {
 
       const result = await this.arcadeInventoryRepository.addItem(createData);
 
-      console.log('Item added to inventory, result:', result);
-
       const newItem = await this.arcadeInventoryRepository.findById(result.insertId);
-
-      console.log('Retrieved new item from database:', newItem);
       
       if (!newItem) {
         throw new NotFoundException('Failed to retrieve created item');

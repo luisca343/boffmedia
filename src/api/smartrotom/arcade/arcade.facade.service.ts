@@ -55,8 +55,6 @@ export class ArcadeFacadeService implements OnModuleInit {
 
     const result = await this.streakService.claimDailyReward(uuid);
 
-    console.log('Claim Daily Reward Result:', result);
-
     const { streak, reward } = result;
 
     if (!reward) {
