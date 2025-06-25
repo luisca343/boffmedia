@@ -3,12 +3,13 @@ import { Loader2 } from "lucide-react";
 import { getItemName } from "@/lib/intlUtils";
 import { useTranslations } from "next-intl";
 import { getRewardIcon, isNamedReward } from "../../_util/rewardIcons";
+import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
 
 interface ClaimSectionProps {
-  nextReward: any;
+  nextReward: DailyRewardItem | undefined;
   currentDay: number;
   rewardAmount: number;
-  rewardsConfig: any;
+  rewardsConfig: DailyRewardsConfig | null;
   claimed: boolean;
   isLoggedIn: boolean;
   isLoading: boolean;
@@ -29,11 +30,12 @@ export default function ClaimSection({
 }: ClaimSectionProps) {
   const t = useTranslations();
   
+  
   const getCurrentReward = () => {
     if (nextReward) {
       return nextReward;
     }
-    return rewardsConfig?.rewards.find((r: any) => r.day === currentDay);
+    return rewardsConfig?.rewards.find((r: DailyRewardItem) => r.day === currentDay);
   };
   
   const currentReward = getCurrentReward();

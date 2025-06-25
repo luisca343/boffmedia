@@ -17,8 +17,6 @@ interface SpinnerItemProps {
 export function SpinnerItem({ item, index, isWinningItem, winningIndex }: SpinnerItemProps) {
   const t = useTranslations("");
   const config = getRarityConfig(item.rarity as ArcadeInventoryItem.rarity);
-
-  console.log('item', item);
   
   return (
     <div

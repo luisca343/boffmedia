@@ -6,7 +6,7 @@ import StreakHeader from "./StreakHeader";
 import StreakNotifications from "./StreakNotifications";
 import DaysGrid from "./DaysGrid";
 import ClaimSection from "./ClaimSection";
-import { DailyRewardsConfig } from "@/generated/api";
+import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
 
 interface WeeklyStreakProps {
   streak: number;
@@ -18,7 +18,7 @@ interface WeeklyStreakProps {
   error?: string | null;
   currentBanner?: string | null;
   lastBanner?: string | null;
-  nextReward?: any;
+  nextReward?: DailyRewardItem ;
   currentDay?: number;
   totalDays?: number;
   uuid?: string;

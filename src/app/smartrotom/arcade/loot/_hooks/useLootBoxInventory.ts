@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArcadeInventoryItem, arcadeService } from "@/services/api/smartrotom/arcadeService";
 import { useTranslations } from 'next-intl';
-import { getItemDescription, getItemName } from "@/lib/intlUtils";
-import { LootboxBoxConfig, LootboxItemConfig, LootItemDto, RarityRange, RarityRanges } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig, RarityRange } from "@/generated/api";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {
@@ -33,8 +32,8 @@ export function useLootBoxInventory(uuid?: string) {
         
         const boxes: Record<string, ArcadeInventoryItem> = {};
         response.data.items
-          .filter(item => item.used === 0) // Only include unused boxes
           .forEach(item => {
+            item.amount = item.amount - (item.used || 0);
             if (Object.keys(BOX_TYPE_MAP).includes(item.itemId)) {
               boxes[item.itemId] = item;
             }
@@ -47,27 +46,27 @@ export function useLootBoxInventory(uuid?: string) {
     }
   };
   
-  function getRarityFromWeight(rarityRanges: RarityRanges, weight: number): string {
+  function getRarityFromWeight(rarityRanges: Record<string, RarityRange>, weight: number): string {
     for (const [rarity, range] of Object.entries(rarityRanges)) {
-      const typedRange = range as RarityRange;
-      if (weight >= typedRange.min && weight <= typedRange.max) {
+      if (weight >= range.min && weight <= range.max) {
         return rarity;
       }
     }
     return 'common';
   }
+  
   const fetchLootBoxConfig = async () => {
     try {
       setLoadingLootBoxes(true);
       const {rarityRanges, lootboxConfig} = (await arcadeService.getLootboxConfig()).data!
       
       if (lootboxConfig && lootboxConfig.boxes) {
-        const lootBoxes: LootboxBoxConfig[] = lootboxConfig.boxes.map((box: any) => ({
+        const lootBoxes: LootboxBoxConfig[] = lootboxConfig.boxes.map((box: LootboxBoxConfig) => ({
           id: box.id,
           name: box.name,
           description: box.description,
           image: box.image,
-          items: box.items.map((item: any) => ({
+          items: box.items.map((item: LootboxItemConfig) => ({
             id: item.id,
             weight: item.weight,
             rarity: getRarityFromWeight(rarityRanges, item.weight) as ArcadeInventoryItem.rarity,
@@ -157,6 +156,10 @@ export function useLootBoxInventory(uuid?: string) {
     error,
     fetchInventory,
     openLootBox,
-    addItemToCollection: (item: any) => setCollection(prev => [...prev, item])
+    addItemToCollection: (item: any) => setCollection(prev => {
+      console.log('Previous collection:', prev);
+      console.log('Adding item:', item);
+      return [...prev, item];
+    })
   };
 }

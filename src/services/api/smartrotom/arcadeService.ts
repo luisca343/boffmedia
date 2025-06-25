@@ -10,7 +10,8 @@ import type {
   ArcadeStreakClaim,
   SuccessResponse,
   ArcadeStreak,
-  ArcadeInventoryResponse
+  ArcadeInventoryResponse,
+  LootboxConfigEntity
 } from '@/generated/api';
 
 export const arcadeService = {
@@ -130,7 +131,7 @@ export const arcadeService = {
   /**
    * Get lootbox configuration
    */
-  getLootboxConfig: (): Promise<ApiResponse<any>> => 
+  getLootboxConfig: (): Promise<ApiResponse<LootboxConfigEntity>> => 
     rotomGET<any>('/arcade/lootbox/config'),
 
   // ==================== COMBINED ENDPOINTS ====================

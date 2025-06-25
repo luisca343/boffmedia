@@ -26,8 +26,6 @@ export function Spinner({
   itemsContainerRef,
   ITEM_WIDTH
 }: SpinnerProps) {
-  console.log("spinItems:", spinItems);
-  console.log("wonItem:", wonItem);
   return (
     <div className="relative w-full">
       {/* Arcade cabinet frame for spinner */}
