@@ -118,7 +118,6 @@ export default function RetroPokemonGuesser() {
     const value = e.target.value;
     setCurrentGuess(value);
     if (value.length > 1) {
-      console.log(value);
       const results = fuse.search(value);
       const filteredSuggestions = results.map((result) => result.item);
       setSuggestions(filteredSuggestions);

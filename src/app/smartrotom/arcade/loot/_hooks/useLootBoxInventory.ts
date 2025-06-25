@@ -86,7 +86,6 @@ export function useLootBoxInventory(uuid?: string) {
         setError("No se pudieron cargar las cajas de botín. Intente de nuevo más tarde.");
       }
     } catch (err) {
-      console.error("Failed to fetch loot box config:", err);
       setError("Error al cargar las configuraciones de cajas. Por favor, intente de nuevo más tarde.");
     } finally {
       setLoadingLootBoxes(false);
@@ -157,8 +156,6 @@ export function useLootBoxInventory(uuid?: string) {
     fetchInventory,
     openLootBox,
     addItemToCollection: (item: any) => setCollection(prev => {
-      console.log('Previous collection:', prev);
-      console.log('Adding item:', item);
       return [...prev, item];
     })
   };

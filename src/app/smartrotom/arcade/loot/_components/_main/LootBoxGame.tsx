@@ -107,7 +107,6 @@ export default function LootBoxGame() {
     if (wonItem && selectedBox) {
       // Add the item to the collection
       addItemToCollection(wonItem);
-      console.log("Item added to collection:", wonItem);
       
       // For non-authenticated users, just show a message
       if (!uuid) {

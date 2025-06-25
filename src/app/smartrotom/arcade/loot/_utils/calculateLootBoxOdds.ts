@@ -8,7 +8,6 @@ import { LootboxItemConfig } from "@/generated/api";
  * @returns Array of items with added percentage field
  */
 export function calculateLootBoxOdds(items: LootboxItemConfig[]): (LootboxItemConfig & { percentage: number })[] {
-  console.log("Calculating loot box odds for items:", items);
   // Calculate the total weight of all items
   const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
   
