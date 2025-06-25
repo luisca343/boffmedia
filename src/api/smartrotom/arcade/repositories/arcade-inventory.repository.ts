@@ -72,7 +72,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
     return result[0] || null;
   }
 
-    async addItem(inventoryData: any): Promise<{ insertId: number }> {
+    async addItem(inventoryData: CreateInventoryItemDto): Promise<{ insertId: number }> {
     const result = await this.db
         .insert(smartRotomInventory)
         .values({
@@ -121,7 +121,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
     }
     
     const currentItem = items[0];
-    const consumableTypes = ['crate', 'lootbox'];
+    const consumableTypes = ['box'];
     const isConsumable = consumableTypes.includes(currentItem.itemType);
     
     if (isConsumable) {
@@ -145,26 +145,12 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
         ...updatedItem,
         remainingAmount: updatedItem.amount - newUsedCount
       } as ArcadeInventoryItem;
-    } else {
-      // For non-consumables, we reduce the amount directly
-      const newAmount = Math.max(0, currentItem.amount - amount);
-      
-      if (newAmount === 0) {
-        await this.delete(currentItem.id);
-        return { ...currentItem, amount: 0 } as ArcadeInventoryItem;
-      } else {
-        await this.db.update(smartRotomInventory)
-          .set({ amount: newAmount } as SmartRotomInventoryItem)
-          .where(eq(smartRotomInventory.id, currentItem.id));
-        
-        return this.findById(currentItem.id) as Promise<ArcadeInventoryItem>;
-      }
     }
   }
 
   async getTotalItems(uuid: string): Promise<number> {
     const items = await this.findUserInventory(uuid);
-    return items.reduce((total, item) => total + ((item as any).amount || 0), 0);
+    return items.reduce((total, item) => total + ((item as ArcadeInventoryItem).amount || 0), 0);
   }
 
   async getItemsByType(uuid: string, type: string): Promise<ArcadeInventoryItem[]> {

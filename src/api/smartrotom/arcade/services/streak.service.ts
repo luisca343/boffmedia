@@ -116,6 +116,7 @@ export class StreakService {
     reward: any;
     message: string;
   }> {
+    console.log(`Claiming daily reward for user: ${uuid}`);
     this.validateUuid(uuid);
 
     const { canClaim, streak } = await this.canClaimReward(uuid);
@@ -140,6 +141,8 @@ export class StreakService {
 
     // Calculate reward based on streak
     const reward = this.calculateReward(updatedStreak.streak);
+
+    console.log(`Reward for streak ${updatedStreak.streak}:`, reward);
 
     return {
       success: true,
@@ -210,33 +213,9 @@ export class StreakService {
   }
 
   private calculateReward(streakDay: number): any {
-    // Basic reward calculation - can be enhanced with your lootbox config
-    const baseReward = {
-      coins: 100 * streakDay,
-      experience: 50 * streakDay,
-      items: []
-    };
-
-    // Special rewards for milestone days
-    if (streakDay % 7 === 0) {
-      baseReward.items.push({
-        itemId: 'weekly_bonus',
-        itemType: 'bonus',
-        amount: 1,
-        rarity: 'rare'
-      });
-    }
-
-    if (streakDay % 30 === 0) {
-      baseReward.items.push({
-        itemId: 'monthly_bonus',
-        itemType: 'bonus',
-        amount: 1,
-        rarity: 'legendary'
-      });
-    }
-
-    return baseReward;
+    const rewardsConfig = loadRewardsConfig();
+    const reward = this.getRewardForDay(streakDay, rewardsConfig);
+    return reward;
   }
 
     private getDailyResetTime(date: Date): Date {

@@ -55,34 +55,36 @@ export class ArcadeFacadeService implements OnModuleInit {
 
     const result = await this.streakService.claimDailyReward(uuid);
 
-    // Add reward items to inventory if any
-    if (result.reward.items && result.reward.items.length > 0) {
-      const inventoryItems: ArcadeInventoryItem[] = [];
-      
-      for (const rewardItem of result.reward.items) {
-        const claimData: ClaimItemData = {
-          uuid,
-          itemId: rewardItem.itemId,
-          itemType: rewardItem.itemType,
-          amount: rewardItem.amount,
-          rarity: rewardItem.rarity,
-          sourceType: 'daily_reward'
-        };
+    console.log('Claim Daily Reward Result:', result);
 
-        const inventoryResult = await this.inventoryService.addItemToInventory(claimData);
-        inventoryItems.push(inventoryResult.item);
-      }
+    const { streak, reward } = result;
 
+    if (!reward) {
       return {
-        streak: result.streak,
-        reward: result.reward,
-        inventoryItems
+        streak,
+        reward: null,
       };
     }
 
+    // If the reward is a box or item, add it to the inventory
+    let inventoryItems: ArcadeInventoryItem[] = [];
+    if (reward.type === 'box' || reward.type === 'item') {
+      const claimData: ClaimItemData = {
+        uuid,
+        itemId: reward.description,
+        itemType: reward.type,
+        amount: reward.amount,
+        sourceType: 'daily_reward'
+      };
+      
+      const inventoryResult = await this.inventoryService.addItemToInventory(claimData);
+      inventoryItems.push(inventoryResult.item);
+    }
+
     return {
-      streak: result.streak,
-      reward: result.reward
+      streak,
+      reward,
+      inventoryItems: inventoryItems.length > 0 ? inventoryItems : undefined,
     };
   }
 

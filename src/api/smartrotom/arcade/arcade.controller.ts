@@ -69,6 +69,7 @@ export class ArcadeController {
   })
   @ApiBody({ type: ClaimRewardDto })
   async claimDailyReward(@Body() { uuid }: ClaimRewardDto): Promise<ArcadeStreakClaim> {
+    console.log('Claiming daily reward for UUID:', uuid);
     return this.arcadeFacadeService.claimDailyReward(uuid);
   }
 

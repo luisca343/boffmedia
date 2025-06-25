@@ -6,7 +6,7 @@ import { UpdateInventoryItemDto } from '../../dto/update-inventory-item.dto';
 export interface IArcadeInventoryRepository extends BaseRepository<ArcadeInventoryItem, CreateInventoryItemDto, UpdateInventoryItemDto>  {
   findUserInventory(uuid: string): Promise<ArcadeInventoryItem[]>;
   findUserItem(uuid: string, itemId: string): Promise<any | null>;
-  addItem(inventoryData: any): Promise<{ insertId: number }>;
+  addItem(inventoryData: CreateInventoryItemDto): Promise<{ insertId: number }>;
   updateItemQuantity(uuid: string, itemId: string, quantity: number): Promise<any>;
   removeItem(uuid: string, itemId: string): Promise<boolean>;
   consumeItem(uuid: string, itemId: string, quantity: number): Promise<any>;
