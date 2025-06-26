@@ -47,7 +47,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to update balance in WINGULL API:', error);
       throw new Error(`Balance update failed: ${error.message}`);
@@ -75,7 +75,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to get current balance for UUID ${uuid}:`, error);
       throw new Error(`Current balance retrieval failed: ${error.message}`);
@@ -103,7 +103,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to get money for UUID ${uuid}:`, error);
       throw new Error(`Money retrieval failed: ${error.message}`);
@@ -133,7 +133,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to get stats for UUID ${uuid}:`, error);
       throw new Error(`Stats retrieval failed: ${error.message}`);
@@ -161,7 +161,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to get team for UUID ${uuid}:`, error);
       throw new Error(`Team retrieval failed: ${error.message}`);
@@ -189,7 +189,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to update dex for UUID ${uuid}:`, error);
       throw new Error(`Dex update failed: ${error.message}`);
@@ -217,7 +217,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to get quests for UUID ${uuid}:`, error);
       throw new Error(`Quests retrieval failed: ${error.message}`);
@@ -249,7 +249,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to send message to UUID ${request.uuid}:`, error);
       throw new Error(`Message sending failed: ${error.message}`);
@@ -281,7 +281,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to give Pokémon to UUID ${request.uuid}:`, error);
       throw new Error(`Pokémon giving failed: ${error.message}`);
@@ -318,7 +318,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to give items to UUID ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
@@ -343,7 +343,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to get performance data:', error);
       throw new Error(`Performance data retrieval failed: ${error.message}`);
@@ -372,14 +372,14 @@ export class WingullRepository {
         return this.mergeRegionsWithColors(response.data, townColors);
       }
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to get regions data:', error);
       throw new Error(`Regions data retrieval failed: ${error.message}`);
     }
   }
   
-  async getWeatherFromAPI(): Promise<any> {
+  async getWeatherFromAPI(): Promise<{weather: string, changeTime: number, minecraftTime: number}> {
     if (!this.WINGULL_API_BASE_URL) {
       throw new Error('WINGULL_API environment variable is not configured');
     }
@@ -395,7 +395,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to get weather data:', error);
       throw new Error(`Weather data retrieval failed: ${error.message}`);
@@ -419,7 +419,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to update NPCs:', error);
       throw new Error(`NPCs update failed: ${error.message}`);
@@ -444,7 +444,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error('Failed to get taxi stops:', error);
       throw new Error(`Taxi stops retrieval failed: ${error.message}`);
@@ -476,7 +476,7 @@ export class WingullRepository {
         }
       );
       
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to teleport player ${request.uuid} to stop ${request.id}:`, error);
       throw new Error(`Player teleportation failed: ${error.message}`);
