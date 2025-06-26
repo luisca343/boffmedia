@@ -1,4 +1,4 @@
-import { rotomGET, rotomPOST, rotomPUT, rotomDELETE } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, rotomPUT } from '@/services/boffAPI';
 import type {
   CreateChatDto,
   CreateMessageDto,
@@ -11,7 +11,6 @@ import type {
   EndCallDto,
   Chat,
   RotomMessage,
-  CallSession,
   CreateChatResponse,
   CreateMessageResponse,
   MessageResponse,

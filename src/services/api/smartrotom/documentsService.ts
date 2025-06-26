@@ -12,8 +12,8 @@ import type {
   SaveDocumentResponse,
   News,
   NewsResponse,
+  SuccessResponse,
 } from '@/generated/api';
-import { SuccessResponse } from '@/types';
 
 export const documentsService = {
   // ==================== DOCUMENT OPERATIONS ====================

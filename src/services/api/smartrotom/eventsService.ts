@@ -20,9 +20,8 @@ import type {
   LeaderboardEntry,
   TeamLeaderboardEntry,
   JoinTeamDto,
+  SuccessResponse,
 } from '@/generated/api';
-import { SuccessResponse } from '@/types';
-
 export const eventsService = {
   // ==================== EVENT OPERATIONS ====================
   
