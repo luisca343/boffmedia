@@ -12,29 +12,24 @@ import {
   UpdateDocumentDto, 
   GetUserDocumentsDto, 
   AddNoteToUserDto 
-} from './_dto/document.dto';
+} from './dto/document.dto';
 import { 
   CreateNewsDto, 
   UpdateNewsDto, 
   NewsStatusDto, 
   GetNewsDto 
-} from './_dto/news.dto';
+} from './dto/news.dto';
 
 // Import Entities
 import { 
   Document, 
   NotePreview, 
-  CreateDocumentResponse, 
-  DocumentResponse, 
   CreateNoteResponse, 
   SaveDocumentResponse 
 } from './entities/document.entity';
 import { 
   News, 
   NewsResponse, 
-  CreateNewsResponse, 
-  NewsOperationResponse, 
-  SaveNewsResponse 
 } from './entities/news.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 

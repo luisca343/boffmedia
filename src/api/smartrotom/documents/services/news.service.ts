@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentsRepository, NewsDetails } from '@repositories/smartrotom/documents.repository';
+import { DocumentsRepository, NewsDetails } from '@api/smartrotom/documents/repositories/documents.repository';
 
 export interface CreateNewsRequest {
   title: string;

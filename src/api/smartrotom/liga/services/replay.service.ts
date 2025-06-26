@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LigaRepository, LeagueReplay } from '@repositories/smartrotom/liga.repository';
+import { LigaRepository, LeagueReplay } from '@api/smartrotom/liga/repositories/liga.repository';
 
 @Injectable()
 export class ReplayService {

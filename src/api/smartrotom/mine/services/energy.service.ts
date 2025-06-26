@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MineRepository, PlayerEnergy } from '@repositories/smartrotom/mine.repository';
+import { MineRepository, PlayerEnergy } from '@api/smartrotom/mine/repositories/mine.repository';
 
 export interface EnergyStatus {
   energy: number;

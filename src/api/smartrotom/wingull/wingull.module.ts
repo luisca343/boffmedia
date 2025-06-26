@@ -4,7 +4,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import repository
-import { WingullRepository } from '@repositories/smartrotom/wingull.repository';
+import { WingullRepository } from '@api/smartrotom/wingull/repositories/wingull.repository';
 
 // Import domain services
 import { WingullEconomyService } from './services/wingull-economy.service';

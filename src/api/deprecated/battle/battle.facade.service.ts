@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ReplayService } from './services/replay.service';
-import { BattleReplay } from '@repositories/smartrotom/battle.repository';
+import { BattleReplay } from '@api/deprecated/battle/repositories/battle.repository';
 import { BattleConfig, ConfigService } from './services/config.service';
 
 export interface CreateReplayDto {

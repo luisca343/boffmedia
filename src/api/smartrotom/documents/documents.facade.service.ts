@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DocumentService, CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
 import { NoteService } from './services/note.service';
 import { NewsService, CreateNewsRequest, UpdateNewsRequest, NewsResponse } from './services/news.service';
-import { DocumentDetails, NotePreview, NewsDetails } from '@repositories/smartrotom/documents.repository';
+import { DocumentDetails, NotePreview, NewsDetails } from '@api/smartrotom/documents/repositories/documents.repository';
 
 export interface CreateNoteWithUserRequest {
   title: string;

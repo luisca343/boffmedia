@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WingullRepository, MessageRequest, PokemonGiveRequest } from '@repositories/smartrotom/wingull.repository';
+import { WingullRepository, MessageRequest, PokemonGiveRequest } from '@api/smartrotom/wingull/repositories/wingull.repository';
 
 @Injectable()
 export class WingullPlayerService {

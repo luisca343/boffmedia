@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EventsRepository } from '../../../_repositories/boffmedia/events.repository';
+import { EventsRepository } from '../repositories/events.repository';
 import { Event } from '@/_db/schema/Events';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';

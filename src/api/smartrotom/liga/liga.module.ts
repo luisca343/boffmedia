@@ -4,7 +4,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import repository
-import { LigaRepository } from '@repositories/smartrotom/liga.repository';
+import { LigaRepository } from '@api/smartrotom/liga/repositories/liga.repository';
 
 // Import domain services
 import { ReplayService } from './services/replay.service';

@@ -4,7 +4,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import repository
-import { DocumentsRepository } from '@repositories/smartrotom/documents.repository';
+import { DocumentsRepository } from '@api/smartrotom/documents/repositories/documents.repository';
 
 // Import domain services
 import { DocumentService } from './services/document.service';

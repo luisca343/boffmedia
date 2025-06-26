@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DocumentsRepository } from '@repositories/smartrotom/documents.repository';
+import { DocumentsRepository } from '@api/smartrotom/documents/repositories/documents.repository';
 
 @Injectable()
 export class NoteService {

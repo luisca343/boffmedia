@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MineRepository, MineRewardItem, GameSession } from '@repositories/smartrotom/mine.repository';
+import { MineRepository, MineRewardItem, GameSession } from '@api/smartrotom/mine/repositories/mine.repository';
 
 export interface GameStartResponse {
   idPartida: number; // Keep legacy naming for backward compatibility

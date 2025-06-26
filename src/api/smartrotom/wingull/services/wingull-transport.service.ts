@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WingullRepository, TeleportRequest } from '@repositories/smartrotom/wingull.repository';
+import { WingullRepository, TeleportRequest } from '@api/smartrotom/wingull/repositories/wingull.repository';
 
 @Injectable()
 export class WingullTransportService {

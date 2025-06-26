@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PlayerRepository } from '@repositories/smartrotom/player.repository';
+import { PlayerRepository } from '@api/smartrotom/player/repositories/player.repository';
 
 @Injectable()
 export class PlayerStatsService {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatDetails, ChatMessage, ChatMember } from '@repositories/smartrotom/chatapp.repository';
+import { ChatappRepository, ChatDetails, ChatMessage, ChatMember } from '@api/smartrotom/chatapp/repositories/chatapp.repository';
 
 export interface Group {
   id: number;

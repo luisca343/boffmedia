@@ -3,7 +3,7 @@ import { EnergyService, EnergyStatus } from './services/energy.service';
 import { GameService, GameStartResponse, GameEndResponse } from './services/game.service';
 import { RewardService, RewardsByType } from './services/reward.service';
 import { PlayerService, PlayerHistory, ClaimResponse, PlayerStatistics } from './services/player.service';
-import { MineRewardItem, RankingEntry, UnclaimedItem } from '@repositories/smartrotom/mine.repository';
+import { MineRewardItem, RankingEntry, UnclaimedItem } from '@api/smartrotom/mine/repositories/mine.repository';
 
 export interface PlayGameRequest {
   uuid: string;

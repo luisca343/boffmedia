@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatMessage } from '@repositories/smartrotom/chatapp.repository';
+import { ChatappRepository, ChatMessage } from '@api/smartrotom/chatapp/repositories/chatapp.repository';
 
 export interface RotomMessage {
   id: number;

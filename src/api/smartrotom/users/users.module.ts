@@ -4,7 +4,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { WingullModule } from '../wingull/wingull.module';
 import { StarbankModule } from '../starbank/starbank.module'; // Add this import
-import { UsersRepository } from '@repositories/smartrotom/users.repository';
+import { UsersRepository } from '@api/smartrotom/users/repositories/users.repository';
 import { UsersManagementService } from './services/users-management.service';
 import { UsersFacadeService } from './users.facade.service';
 import { UsersController } from './users.controller';

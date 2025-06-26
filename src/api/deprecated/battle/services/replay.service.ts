@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BattleRepository, BattleReplay } from '@repositories/smartrotom/battle.repository';
+import { BattleRepository, BattleReplay } from '@api/deprecated/battle/repositories/battle.repository';
 
 @Injectable()
 export class ReplayService {

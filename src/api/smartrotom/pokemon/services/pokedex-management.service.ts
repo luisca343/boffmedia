@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PokemonRepository, PokedexRegistryData, PokedexStatistics, DetailedPokedexStatistics, BulkUpdateData, BulkUpdateResult } from '@repositories/smartrotom/pokemon.repository';
+import { PokemonRepository, PokedexRegistryData, PokedexStatistics, DetailedPokedexStatistics, BulkUpdateData, BulkUpdateResult } from '@api/smartrotom/pokemon/repositories/pokemon.repository';
 import { PokemonDataManagementService } from './pokemon-data-management.service';
 
 export interface RegistrationResult {

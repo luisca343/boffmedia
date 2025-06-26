@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatDetails } from '@repositories/smartrotom/chatapp.repository';
+import { ChatappRepository, ChatDetails } from '@api/smartrotom/chatapp/repositories/chatapp.repository';
 
 export interface CreateChatRequest {
   player: string;

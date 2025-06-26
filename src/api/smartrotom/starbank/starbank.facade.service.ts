@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { StarbankAccountService, ShopTransactionData } from './services/starbank-account.service';
 import { StarbankTransactionService } from './services/starbank-transaction.service';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
-import { AccountInfo } from '@repositories/smartrotom/starbank.repository';
+import { AccountInfo } from '@api/smartrotom/starbank/repositories/starbank.repository';
 
 export interface BalanceUpdateResult {
   success: boolean;

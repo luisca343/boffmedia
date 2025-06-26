@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { QuestRepository } from '@repositories/smartrotom/quest.repository';
+import { QuestRepository } from '@api/smartrotom/misiones/repositories/quest.repository';
 import { QuestCacheService } from './quest.cache.service';
 import { QuestSystemData, QuestData, IDialogue, NPC } from '../types';
 

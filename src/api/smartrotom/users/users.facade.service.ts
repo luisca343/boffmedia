@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersManagementService, UserCreationResult } from './services/users-management.service';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
-import { CreateUserData, UpdateUserData } from '@repositories/smartrotom/users.repository';
+import { CreateUserData, UpdateUserData } from '@api/smartrotom/users/repositories/users.repository';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 
 export interface UserInitializationData {

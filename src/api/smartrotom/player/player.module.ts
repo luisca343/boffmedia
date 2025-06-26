@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseModule } from '@api/_utils/response/response.module';
-import { PlayerRepository } from '@repositories/smartrotom/player.repository';
+import { PlayerRepository } from '@api/smartrotom/player/repositories/player.repository';
 import { PlayerStatsService } from './services/player.stats.service';
 import { PlayerTeamService } from './services/player.team.service';
 import { PlayerFacadeService } from './player.facade.service';

@@ -5,8 +5,8 @@ import { ChatappFacadeService, CreateChatMessageRequest } from './chatapp.facade
 import { CreateChatRequest } from './services/chat.service';
 
 // Import DTOs
-import { CreateChatDto, GetChatsDto, GetChatByIdDto } from './dto/chat.dto';
-import { CreateMessageDto, GetMessagesDto, UpdateMessageDto, DeleteMessageDto, MarkMessageReadDto } from './dto/message.dto';
+import { CreateChatDto } from './dto/chat.dto';
+import { CreateMessageDto, UpdateMessageDto, DeleteMessageDto, MarkMessageReadDto } from './dto/message.dto';
 import { AddMemberDto, RemoveMemberDto } from './dto/group.dto';
 import { InitiateCallDto, EndCallDto } from './dto/call.dto';
 

@@ -5,7 +5,7 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import all repositories
-import { EventsRepository } from '../../_repositories/boffmedia/events.repository';
+import { EventsRepository } from './repositories/events.repository';
 import { GamesRepository } from '../../_repositories/boffmedia/games.repository';
 import { AchievementsRepository } from '../../_repositories/boffmedia/achievements.repository';
 import { ParticipantsRepository } from '../../_repositories/boffmedia/participants.repository';

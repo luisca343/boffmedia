@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { StarbankRepository, CreateTransactionData } from '@repositories/smartrotom/starbank.repository';
+import { StarbankRepository, CreateTransactionData } from '@api/smartrotom/starbank/repositories/starbank.repository';
 import { StarbankAccountService, ShopTransactionData, TransferData } from './starbank-account.service';
 
 @Injectable()

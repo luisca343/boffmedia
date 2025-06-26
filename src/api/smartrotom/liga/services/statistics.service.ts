@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LigaRepository, LeagueStanding } from '@repositories/smartrotom/liga.repository';
+import { LigaRepository, LeagueStanding } from '@api/smartrotom/liga/repositories/liga.repository';
 
 export interface PlayerStatistics {
   uuid: string;

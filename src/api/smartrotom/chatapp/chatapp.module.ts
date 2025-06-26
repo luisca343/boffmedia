@@ -4,7 +4,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 
 // Import repository
-import { ChatappRepository } from '@repositories/smartrotom/chatapp.repository';
+import { ChatappRepository } from '@api/smartrotom/chatapp/repositories/chatapp.repository';
 
 // Import domain services
 import { ChatService } from './services/chat.service';

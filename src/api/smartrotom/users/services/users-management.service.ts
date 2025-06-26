@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository, CreateUserData, UpdateUserData } from '@repositories/smartrotom/users.repository';
+import { UsersRepository, CreateUserData, UpdateUserData } from '@api/smartrotom/users/repositories/users.repository';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 
 export interface UserCreationResult {

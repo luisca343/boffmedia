@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { LigaRepository, Tournament, LeagueMatch } from '@repositories/smartrotom/liga.repository';
+import { LigaRepository, Tournament, LeagueMatch } from '@api/smartrotom/liga/repositories/liga.repository';
 
 export interface TournamentCreationRequest {
   name: string;

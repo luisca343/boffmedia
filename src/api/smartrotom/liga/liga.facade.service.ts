@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ReplayService } from './services/replay.service';
 import { StatisticsService, PlayerStatistics, LeaderboardResponse } from './services/statistics.service';
 import { TournamentService, TournamentCreationRequest, TournamentRegistration } from './services/tournament.service';
-import { LeagueReplay, LeagueStanding, Tournament, LeagueMatch } from '@repositories/smartrotom/liga.repository';
+import { LeagueReplay, LeagueStanding, Tournament, LeagueMatch } from '@api/smartrotom/liga/repositories/liga.repository';
 
 @Injectable()
 export class LigaFacadeService {

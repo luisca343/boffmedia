@@ -3,7 +3,7 @@ import { WingullEconomyService } from './services/wingull-economy.service';
 import { WingullPlayerService } from './services/wingull-player.service';
 import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
-import { WingullBalance } from '@repositories/smartrotom/wingull.repository';
+import { WingullBalance } from '@api/smartrotom/wingull/repositories/wingull.repository';
 
 @Injectable()
 export class WingullFacadeService {

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChatappRepository } from '@repositories/smartrotom/chatapp.repository';
+import { ChatappRepository } from '@api/smartrotom/chatapp/repositories/chatapp.repository';
 
 export interface CallUser {
   uuid: string;

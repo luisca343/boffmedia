@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WingullRepository, WingullBalance } from '@repositories/smartrotom/wingull.repository';
+import { WingullRepository, WingullBalance } from '@api/smartrotom/wingull/repositories/wingull.repository';
 
 @Injectable()
 export class WingullEconomyService {

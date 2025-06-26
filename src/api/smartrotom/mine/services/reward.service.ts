@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MineRepository, MineRewardItem } from '@repositories/smartrotom/mine.repository';
+import { MineRepository, MineRewardItem } from '@api/smartrotom/mine/repositories/mine.repository';
 
 export interface RewardsByType {
   drops: { [key: string]: { items: MineRewardItem[]; totalValue: number } };

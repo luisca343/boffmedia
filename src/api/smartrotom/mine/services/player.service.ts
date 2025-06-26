@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MineRepository, HistoryEntry, RankingEntry, UnclaimedItem } from '@repositories/smartrotom/mine.repository';
+import { MineRepository, HistoryEntry, RankingEntry, UnclaimedItem } from '@api/smartrotom/mine/repositories/mine.repository';
 
 export interface PlayerHistory {
   [gameId: number]: HistoryEntry[];

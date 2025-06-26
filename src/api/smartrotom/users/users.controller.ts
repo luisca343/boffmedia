@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseInter
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { UsersFacadeService, UserInitializationData } from './users.facade.service';
-import { CreateUserData, UpdateUserData } from '@repositories/smartrotom/users.repository';
+import { CreateUserData, UpdateUserData } from '@api/smartrotom/users/repositories/users.repository';
 
 @ApiTags('SmartRotom | Users')
 @Controller('smartrotom/users')

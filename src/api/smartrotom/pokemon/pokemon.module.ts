@@ -5,7 +5,7 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { WingullModule } from '../wingull/wingull.module';
 
 // Import repository
-import { PokemonRepository } from '@repositories/smartrotom/pokemon.repository';
+import { PokemonRepository } from '@api/smartrotom/pokemon/repositories/pokemon.repository';
 
 // Import existing services (keep the original file-based services)
 import { BaseDataService } from './services/data/base-data.service';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { StarbankRepository, CreateAccountData, CreateTransactionData, AccountInfo } from '@repositories/smartrotom/starbank.repository';
+import { StarbankRepository, CreateAccountData, CreateTransactionData, AccountInfo } from '@api/smartrotom/starbank/repositories/starbank.repository';
 
 export interface ShopTransactionData {
   uuid: string;
