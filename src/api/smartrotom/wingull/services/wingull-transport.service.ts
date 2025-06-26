@@ -1,15 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { WingullRepository, TeleportRequest } from '@api/smartrotom/wingull/repositories/wingull.repository';
+import { Inject, Injectable } from '@nestjs/common';
+import { TeleportRequestDto } from '../dto/teleport-request.dto';
+import { WingullTransportRepository } from '../repositories/wingull-transport.repository';
+import { WINGULL_TRANSPORT_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IWingullTransportRepository } from '../repositories/interfaces/wingull-transport.repository.interface';
+import { TaxiStop } from '../entities/taxi-stop.entity';
 
 @Injectable()
 export class WingullTransportService {
   constructor(
-    private readonly wingullRepository: WingullRepository,
+    @Inject(WINGULL_TRANSPORT_REPOSITORY_TOKEN)
+    private readonly wingullTransportRepository: IWingullTransportRepository,
   ) {}
 
-  async getTaxiStops(): Promise<any> {
+  async getTaxiStops(): Promise<TaxiStop[]> {
     try {
-      return await this.wingullRepository.getTaxiStopsFromAPI();
+      return await this.wingullTransportRepository.getTaxiStopsFromAPI();
     } catch (error) {
       console.error('Failed to get taxi stops:', error);
       throw new Error(`Taxi stops retrieval failed: ${error.message}`);
@@ -18,8 +23,8 @@ export class WingullTransportService {
 
   async teleportPlayer(id: string, uuid: string): Promise<boolean> {
     try {
-      const request: TeleportRequest = { id, uuid };
-      const result = await this.wingullRepository.teleportPlayerInAPI(request);
+      const request: TeleportRequestDto = { id, uuid };
+      const result = await this.wingullTransportRepository.teleportPlayerInAPI(request);
       return !!result; // Convert to boolean
     } catch (error) {
       console.error(`Failed to teleport player ${uuid} to ${id}:`, error);

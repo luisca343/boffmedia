@@ -3,7 +3,10 @@ import { WingullEconomyService } from './services/wingull-economy.service';
 import { WingullPlayerService } from './services/wingull-player.service';
 import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
-import { WingullBalance } from '@api/smartrotom/wingull/repositories/wingull.repository';
+import { WingullBalanceDto } from './dto/wingull-balance.dto';
+import { TaxiStop } from './entities/taxi-stop.entity';
+import { Pokemon } from './entities/pokemon.entity';
+import { PlayerStats } from './entities/player-stats.entity';
 
 @Injectable()
 export class WingullFacadeService {
@@ -16,7 +19,7 @@ export class WingullFacadeService {
   
   // ==================== ECONOMY OPERATIONS ====================
   
-  async updateBalance(balanceData: WingullBalance): Promise<any> {
+  async updateBalance(balanceData: WingullBalanceDto): Promise<any> {
     try {
       return await this.wingullEconomyService.updateBalance(balanceData);
     } catch (error) {
@@ -45,7 +48,7 @@ export class WingullFacadeService {
   
   // ==================== PLAYER OPERATIONS ====================
   
-  async getStats(uuid: string): Promise<any> {
+  async getStats(uuid: string): Promise<PlayerStats> {
     try {
       return await this.wingullPlayerService.getStats(uuid);
     } catch (error) {
@@ -54,7 +57,7 @@ export class WingullFacadeService {
     }
   }
   
-  async getTeam(uuid: string): Promise<any> {
+  async getTeam(uuid: string): Promise<Pokemon[]> {
     try {
       return await this.wingullPlayerService.getTeam(uuid);
     } catch (error) {
@@ -124,9 +127,9 @@ export class WingullFacadeService {
     }
   }
   
-  async getRegions(townColors?: any): Promise<any> {
+  async getRegions(): Promise<any> {
     try {
-      return await this.wingullWorldService.getRegions(townColors);
+      return await this.wingullWorldService.getRegions();
     } catch (error) {
       console.error('Error getting regions data:', error);
       throw new Error(`Failed to get regions data: ${error.message}`);
@@ -153,7 +156,7 @@ export class WingullFacadeService {
   
   // ==================== TRANSPORTATION OPERATIONS ====================
   
-  async getTaxiStops(): Promise<any> {
+  async getTaxiStops(): Promise<TaxiStop[]> {
     try {
       return await this.wingullTransportService.getTaxiStops();
     } catch (error) {

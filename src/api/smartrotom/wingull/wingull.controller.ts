@@ -4,6 +4,13 @@ import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { Weather } from './entities/weather.entity';
+import { Performance } from './entities/performance.entity';
+import { Region } from './entities/region.entity';
+import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
+import { TaxiStop } from './entities/taxi-stop.entity';
+import { PlayerStats } from './entities/player-stats.entity';
+import { Pokemon } from './entities/pokemon.entity';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('smartrotom/wingull')
@@ -48,17 +55,19 @@ export class WingullController {
   @ApiOperation({ summary: 'Update player balance in game' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Balance updated successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update balance.' })
+  @ApiBody({ type: UuidDto })
   async updateBalance(@Body() account: {balance: number, type: string, uuid: string}) {
     return await this.wingullFacadeService.updateBalance(account);
   }
 
   @Post('getCurrentBalance')
   @ApiOperation({ summary: 'Get current balance for player from game' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Current balance retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Current balance retrieved successfully.', type: Number })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve current balance.' })
+  @ApiBody({ type: UuidDto })
   async getCurrentBalance(@Body() { uuid, amount }: { uuid: string, amount?: number }) {
     const balance = await this.wingullFacadeService.getCurrentBalance(uuid, amount);
-    return { balance };
+    return balance ;
   }
 
   @Post('money')
@@ -77,7 +86,7 @@ export class WingullController {
 
   @Post('stats')
   @ApiOperation({ summary: 'Get player stats' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Player stats retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player stats retrieved successfully.', type: PlayerStats })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player stats.' })
   @ApiBody({ type: UuidDto })
   async getStats(@Body() { uuid }: UuidDto) {
@@ -86,7 +95,7 @@ export class WingullController {
 
   @Post('team')
   @ApiOperation({ summary: 'Get player team' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Player team retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player team retrieved successfully.', type: [Pokemon] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player team.' })
   @ApiBody({ type: UuidDto })
   async getTeam(@Body() { uuid }: UuidDto) {
@@ -136,7 +145,7 @@ export class WingullController {
 
   @Get('performance')
   @ApiOperation({ summary: 'Get server performance data' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Performance data retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Performance data retrieved successfully.', type: Performance })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve performance data.' })
   async getPerformance() {
     return await this.wingullFacadeService.getPerformance();
@@ -144,24 +153,25 @@ export class WingullController {
 
   @Get('regions')
   @ApiOperation({ summary: 'Get regions data' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Regions data retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Regions data retrieved successfully.', type: [Region] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve regions data.' })
   async getRegions() {
-    return await this.wingullFacadeService.getRegions(this.townColors);
+    return await this.wingullFacadeService.getRegions();
   }
 
   @Get('weather')
   @ApiOperation({ summary: 'Get current weather information' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Weather information retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Weather information retrieved successfully.', type: Weather })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve weather information.' })
-  async getWeather() {
+  async getWeather(): Promise<Weather> {
     return await this.wingullFacadeService.getWeather();
   }
 
   @Post('updateNPCs')
   @ApiOperation({ summary: 'Update NPCs in game world' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'NPCs updated successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'NPCs updated successfully.', type: SuccessResponse })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update NPCs.' })
+  @ApiBody({ description: 'Data to update NPCs', type: Object })
   async updateNPCs(@Body() data: any) {
     return await this.wingullFacadeService.updateNPCs(data);
   }
@@ -172,7 +182,7 @@ export class WingullController {
 
   @Get('taxi/stops')
   @ApiOperation({ summary: 'Get all taxi stops' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.', type: [TaxiStop] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve taxi stops.' })
   async getTaxiStops() {
     return await this.wingullFacadeService.getTaxiStops();
@@ -180,7 +190,7 @@ export class WingullController {
 
   @Post('taxi/teleport')
   @ApiOperation({ summary: 'Teleport player to taxi stop' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Player teleported successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player teleported successfully.', type: SuccessResponse })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to teleport player.' })
   async teleportPlayer(@Body() { id, uuid }: TeleportPlayerDto) {
     const result = await this.wingullFacadeService.teleportPlayer(id, uuid);
