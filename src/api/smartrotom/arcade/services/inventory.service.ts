@@ -52,41 +52,34 @@ export class InventoryService {
     const aggregatedItems = rawItems.reduce((acc, item) => {
       const consumableTypes = ['box'];
       const isConsumable = consumableTypes.includes(item.itemType);
-      
+
       const key = isConsumable
         ? `${item.itemId}_${item.sourceType || 'unknown'}`
         : `${item.itemId}_${item.used}_${item.sourceType || 'unknown'}`;
-      
-        
 
       if (!acc[key]) {
         acc[key] = {
           ...item,
-          totalAmount: isConsumable ? item.amount : item.amount,
-          usedAmount: isConsumable ? (item.used || 0) : 0,
+          amount: item.amount,
+          used: item.used || 0,
           originalIds: [item.id]
         };
       } else {
-        if (isConsumable) {
-          acc[key].totalAmount += item.amount;
-          acc[key].usedAmount += (item.used || 0);
-        } else {
-          acc[key].amount += item.amount;
-        }
+        acc[key].amount += item.amount;
+        acc[key].used += item.used || 0;
         acc[key].originalIds.push(item.id);
       }
       return acc;
     }, {} as Record<string, any>);
-    
+
     // Process consumables
     for (const key in aggregatedItems) {
       const item = aggregatedItems[key];
       const consumableTypes = ['crate', 'lootbox'];
-      
+
       if (consumableTypes.includes(item.itemType)) {
-        item.remainingAmount = item.totalAmount - item.usedAmount;
-        item.amount = item.remainingAmount;
-        item.used = item.remainingAmount > 0 ? 0 : 1;
+        item.amount = item.amount - item.used;
+        item.used = item.amount > 0 ? 0 : 1;
       }
     }
     
