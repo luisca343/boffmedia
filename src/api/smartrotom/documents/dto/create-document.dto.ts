@@ -16,6 +16,11 @@ export class CreateDocumentDto {
   @IsInt()
   @IsNotEmpty()
   type: number;
+
+  @ApiProperty({ description: 'Public status of the document (0=private, 1=public)' })
+  @IsInt()
+  @IsNotEmpty()
+  public: number;
 }
 
 export class CreateDocumentDtoWithUuid extends CreateDocumentDto {

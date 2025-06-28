@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { DocumentsRepository, DocumentDetails, NotePreview } from '@api/smartrotom/documents/repositories/documents.repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { DOCUMENTS_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
+import { IDocumentsRepository } from '../repositories/interfaces/documents.repository.interface';
+import { DocumentDetails, NotePreview } from '../repositories/documents.repository';
 
 export interface CreateDocumentRequest {
   title: string;
@@ -18,7 +20,8 @@ export interface UpdateDocumentRequest {
 @Injectable()
 export class DocumentService {
   constructor(
-    private readonly documentsRepository: DocumentsRepository,
+    @Inject(DOCUMENTS_REPOSITORY_TOKEN)
+    private readonly documentsRepository: IDocumentsRepository,
   ) {}
 
   async getDocumentById(id: number): Promise<DocumentDetails> {

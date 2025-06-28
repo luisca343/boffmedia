@@ -5,7 +5,6 @@ import { DocumentsFacadeService, CreateNoteWithUserRequest } from './documents.f
 import { CreateNewsRequest, UpdateNewsRequest } from './services/news.service';
 import { CreateDocumentRequest, UpdateDocumentRequest } from './services/document.service';
 
-// Import DTOs
 import { 
   CreateDocumentDto, 
   CreateDocumentDtoWithUuid, 
@@ -20,7 +19,6 @@ import {
   GetNewsDto 
 } from './dto/news.dto';
 
-// Import Entities
 import { 
   Document, 
   NotePreview, 

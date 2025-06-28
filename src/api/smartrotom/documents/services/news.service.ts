@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { DocumentsRepository, NewsDetails } from '@api/smartrotom/documents/repositories/documents.repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { NEWS_REPOSITORY_TOKEN } from '../repositories/interfaces/documents.repository.token';
+import { INewsRepository } from '../repositories/interfaces/news.repository.interface';
+import { NewsDetails } from '../repositories/documents.repository';
 
 export interface CreateNewsRequest {
   title: string;
@@ -33,18 +35,19 @@ export interface NewsResponse {
 @Injectable()
 export class NewsService {
   constructor(
-    private readonly documentsRepository: DocumentsRepository,
+    @Inject(NEWS_REPOSITORY_TOKEN)
+    private readonly newsRepository: INewsRepository,
   ) {}
 
   async getAllNews(): Promise<NewsResponse> {
-    const allNews = await this.documentsRepository.findAllNews();
+    const allNews = await this.newsRepository.findAllNews();
     const featured = allNews.find(item => item.featured === 1) || null;
 
     return { featured, news: allNews };
   }
 
   async getPublishedNews(): Promise<NewsResponse> {
-    const publishedNews = await this.documentsRepository.findPublishedNews();
+    const publishedNews = await this.newsRepository.findPublishedNews();
     const featured = publishedNews.find(item => item.featured === 1) || null;
 
     return { featured, news: publishedNews };
@@ -55,7 +58,7 @@ export class NewsService {
       throw new Error('Valid news ID is required');
     }
 
-    const news = await this.documentsRepository.findNewsById(newsId);
+    const news = await this.newsRepository.findNewsById(newsId);
     if (!news) {
       throw new Error('News not found');
     }
@@ -64,7 +67,7 @@ export class NewsService {
   }
 
   async getFeaturedNews(): Promise<NewsDetails | null> {
-    return this.documentsRepository.findFeaturedNews();
+    return this.newsRepository.findFeaturedNews();
   }
 
   async createNews(createNewsRequest: CreateNewsRequest): Promise<NewsDetails> {
@@ -79,7 +82,7 @@ export class NewsService {
       throw new Error('Invalid image URL format');
     }
 
-    const result = await this.documentsRepository.createNews({
+    const result = await this.newsRepository.createNews({
       ...createNewsRequest,
       title: title.trim(),
       content: content.trim()
@@ -89,7 +92,7 @@ export class NewsService {
   }
 
   async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
-    const existingNews = await this.documentsRepository.findNewsById(newsId);
+    const existingNews = await this.newsRepository.findNewsById(newsId);
     if (!existingNews) {
       throw new Error('News not found');
     }
@@ -112,17 +115,17 @@ export class NewsService {
       }
     });
 
-    await this.documentsRepository.updateNews(newsId, updateData);
+    await this.newsRepository.updateNews(newsId, updateData);
     return this.getNewsById(newsId);
   }
 
   async deleteNews(newsId: number): Promise<void> {
-    const existingNews = await this.documentsRepository.findNewsById(newsId);
+    const existingNews = await this.newsRepository.findNewsById(newsId);
     if (!existingNews) {
       throw new Error('News not found');
     }
 
-    await this.documentsRepository.deleteNews(newsId);
+    await this.newsRepository.deleteNews(newsId);
   }
 
   async updateNewsStatus(publishedIds: number[], featuredId: number): Promise<{ success: boolean }> {
@@ -136,30 +139,30 @@ export class NewsService {
     }
 
     // Check if featured news exists
-    const featuredNews = await this.documentsRepository.findNewsById(featuredId);
+    const featuredNews = await this.newsRepository.findNewsById(featuredId);
     if (!featuredNews) {
       throw new Error('Featured news not found');
     }
 
     // Validate all published news exist
     for (const id of publishedIds) {
-      const news = await this.documentsRepository.findNewsById(id);
+      const news = await this.newsRepository.findNewsById(id);
       if (!news) {
         throw new Error(`News with ID ${id} not found`);
       }
     }
 
     // Reset all news to unpublished and unfeatured
-    await this.documentsRepository.updateAllNewsPublishedStatus(0);
-    await this.documentsRepository.updateAllNewsFeaturedStatus(0);
+    await this.newsRepository.updateAllNewsPublishedStatus(0);
+    await this.newsRepository.updateAllNewsFeaturedStatus(0);
 
     // Set published status for specified news
     if (publishedIds.length > 0) {
-      await this.documentsRepository.updateNewsPublishedStatus(publishedIds, 1);
+      await this.newsRepository.updateNewsPublishedStatus(publishedIds, 1);
     }
 
     // Set featured status
-    await this.documentsRepository.updateNewsFeaturedStatus(featuredId, 1);
+    await this.newsRepository.updateNewsFeaturedStatus(featuredId, 1);
 
     return { success: true };
   }

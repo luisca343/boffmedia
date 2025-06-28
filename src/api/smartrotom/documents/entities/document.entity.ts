@@ -3,6 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class Document {
   @ApiProperty({ 
+    example: 123,
+    description: 'Document ID'
+  })
+  id: number;
+  @ApiProperty({ 
     example: 'My Important Notes',
     description: 'Document title'
   })
