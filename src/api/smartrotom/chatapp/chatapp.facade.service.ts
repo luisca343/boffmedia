@@ -1,9 +1,11 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ChatService, CreateChatRequest } from './services/chat.service';
-import { MessageService, RotomMessage } from './services/message.service';
-import { GroupService, Group } from './services/group.service';
+import { MessageService } from './services/message.service';
+import { GroupService } from './services/group.service';
 import { CallService, CallSession } from './services/call.service';
 import { SocketsGateway } from '../../_utils/sockets/sockets.gateway';
+import { RotomMessage } from './entities/message.entity';
+import { Group } from './entities/group.entity';
 
 export interface CreateChatMessageRequest {
   uuid: string;

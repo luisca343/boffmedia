@@ -1,21 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { ChatappRepository, ChatMessage } from '@api/smartrotom/chatapp/repositories/chatapp.repository';
+import { Inject, Injectable } from '@nestjs/common';
+import { CHAT_REPOSITORY_TOKEN, CHAT_MESSAGE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/chatapp.repository.token';
+import { IChatRepository } from '../repositories/interfaces/chat.repository.interface';
+import { IMessageRepository } from '../repositories/interfaces/chat-message.repository.interface';
+import { RotomMessage } from '../entities/message.entity';
 
-export interface RotomMessage {
-  id: number;
-  text: string;
-  date: Date;
-  uuid: string;
-}
 
 @Injectable()
 export class MessageService {
   constructor(
-    private readonly chatappRepository: ChatappRepository,
+    @Inject(CHAT_REPOSITORY_TOKEN)
+    private readonly chatRepository: IChatRepository,
+    @Inject(CHAT_MESSAGE_REPOSITORY_TOKEN)
+    private readonly chatMessageRepository: IMessageRepository,
   ) {}
 
   async getMessages(chatId: number): Promise<RotomMessage[]> {
-    const messages = await this.chatappRepository.findChatMessagesAscending(chatId);
+    const messages = await this.chatMessageRepository.findChatMessagesAscending(chatId);
     
     return messages.map(message => ({
       id: message.id,
@@ -32,13 +32,13 @@ export class MessageService {
     type: string = 'text'
   ): Promise<{ messageId: number; message: RotomMessage }> {
     // Validate chat exists
-    const chat = await this.chatappRepository.findChatById(chatId);
+    const chat = await this.chatRepository.findChatById(chatId);
     if (!chat) {
       throw new Error('Chat not found');
     }
 
     // Create message
-    const result = await this.chatappRepository.createMessage({
+    const result = await this.chatMessageRepository.createMessage({
       chatId,
       content: message,
       senderUUID: uuid,
@@ -59,7 +59,7 @@ export class MessageService {
   }
 
   async updateMessage(messageId: number, content: string, senderUuid: string): Promise<RotomMessage> {
-    const existingMessage = await this.chatappRepository.findMessageById(messageId);
+    const existingMessage = await this.chatMessageRepository.findMessageById(messageId);
     if (!existingMessage) {
       throw new Error('Message not found');
     }
@@ -69,9 +69,9 @@ export class MessageService {
       throw new Error('User does not have permission to edit this message');
     }
 
-    await this.chatappRepository.updateMessage(messageId, content);
+    await this.chatMessageRepository.updateMessage(messageId, content);
     
-    const updatedMessage = await this.chatappRepository.findMessageById(messageId);
+    const updatedMessage = await this.chatMessageRepository.findMessageById(messageId);
     return {
       id: updatedMessage.id,
       text: updatedMessage.content,
@@ -81,7 +81,7 @@ export class MessageService {
   }
 
   async deleteMessage(messageId: number, senderUuid: string): Promise<void> {
-    const existingMessage = await this.chatappRepository.findMessageById(messageId);
+    const existingMessage = await this.chatMessageRepository.findMessageById(messageId);
     if (!existingMessage) {
       throw new Error('Message not found');
     }
@@ -91,15 +91,15 @@ export class MessageService {
       throw new Error('User does not have permission to delete this message');
     }
 
-    await this.chatappRepository.deleteMessage(messageId);
+    await this.chatMessageRepository.deleteMessage(messageId);
   }
 
   async markMessageAsRead(messageId: number, uuid: string): Promise<void> {
-    const message = await this.chatappRepository.findMessageById(messageId);
+    const message = await this.chatMessageRepository.findMessageById(messageId);
     if (!message) {
       throw new Error('Message not found');
     }
 
-    await this.chatappRepository.markMessageAsRead(messageId, uuid);
+    await this.chatMessageRepository.markMessageAsRead(messageId, uuid);
   }
 }

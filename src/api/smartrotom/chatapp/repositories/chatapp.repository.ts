@@ -215,7 +215,7 @@ export class ChatappRepository {
         ...messageData,
         createdAt: new Date(),
         updatedAt: new Date()
-      } as any);
+      } as unknown as RotomChatMessage);
     
     return { insertId: result[0].insertId };
   }
