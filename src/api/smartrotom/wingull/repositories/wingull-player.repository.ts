@@ -4,7 +4,7 @@ import { IWingullPlayerRepository } from './interfaces/wingull-player.repository
 import { PokemonGiveRequestDto } from '../dto/pokemon-give-request.dto';
 import { MessageRequestDto } from '../dto/message-request.dto';
 import { PlayerStats } from '../entities/player-stats.entity';
-import { Pokemon } from '../entities/pokemon.entity';
+import { PokemonW } from '../entities/pokemon-w-.entity';
 
 @Injectable()
 export class WingullPlayerRepository implements IWingullPlayerRepository {
@@ -36,7 +36,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
-  async getTeamFromAPI(uuid: string): Promise<Pokemon[]> {
+  async getTeamFromAPI(uuid: string): Promise<PokemonW[]> {
     if (!uuid || uuid.trim() === '') {
       throw new Error('UUID is required for getting team');
     }

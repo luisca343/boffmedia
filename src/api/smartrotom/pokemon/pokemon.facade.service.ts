@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { PokemonDataManagementService } from './services/pokemon-data-management.service';
 import { PokedexManagementService, RegistrationResult } from './services/pokedex-management.service';
 import { PokemonIntegrationService } from './services/pokemon-integration.service';
-import { Pokemon, SpawnInfo, Attack } from './interfaces/pokemon.interface';
+import { Pokemon, Attack } from './interfaces/pokemon.interface';
 import { EvoTreeNode } from './services/data/pokemon-data.service';
 import Fuse, { FuseResult } from 'fuse.js';
+import { FullMove } from './entities/pokemon-move.entity';
+import { SpawnInfo } from './entities/pokemon-spawn.entity';
 
 @Injectable()
 export class PokemonFacadeService {
@@ -112,7 +114,7 @@ export class PokemonFacadeService {
     }
   }
 
-  getMove(name: string): Attack | undefined {
+  getMove(name: string): FullMove | undefined {
     try {
       return this.pokemonDataService.getMove(name);
     } catch (error) {

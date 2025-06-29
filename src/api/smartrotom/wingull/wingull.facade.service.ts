@@ -5,7 +5,7 @@ import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
 import { WingullBalanceDto } from './dto/wingull-balance.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
-import { Pokemon } from './entities/pokemon.entity';
+import { PokemonW } from './entities/pokemon-w-.entity';
 import { PlayerStats } from './entities/player-stats.entity';
 
 @Injectable()
@@ -57,7 +57,7 @@ export class WingullFacadeService {
     }
   }
   
-  async getTeam(uuid: string): Promise<Pokemon[]> {
+  async getTeam(uuid: string): Promise<PokemonW[]> {
     try {
       return await this.wingullPlayerService.getTeam(uuid);
     } catch (error) {

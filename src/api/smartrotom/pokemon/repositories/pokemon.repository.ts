@@ -3,6 +3,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { PokedexRegistry, pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
 import { eq, and, desc } from 'drizzle-orm';
+import { IPokemonRepository } from './interfaces/pokemon.repository.interface';
 
 export interface PokedexRegistryData {
   uuid: string;
@@ -57,7 +58,7 @@ export interface BulkUpdateResult {
 }
 
 @Injectable()
-export class PokemonRepository {
+export class PokemonRepository implements IPokemonRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}

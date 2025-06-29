@@ -45,10 +45,13 @@ export interface Pokemon {
     sprite?: string;
   }
   
-  export interface Evolution {
-    to: string;
-    // Add other evolution properties as needed
-  }
+export interface Evolution {
+  to: string;
+  evoType: string;  // Add this required field
+  conditions?: any[];
+  item?: { itemID: string };
+  moves?: string[];
+}
   
   export interface BattleStats {
     hp: number;

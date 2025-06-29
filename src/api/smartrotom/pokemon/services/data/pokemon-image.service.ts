@@ -2,18 +2,17 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { PokemonDataService } from './pokemon-data.service';
-
-import { and, eq } from 'drizzle-orm';
-import { pokedexRegistry } from '@/_db/schema/SmartRotomPokedex';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { MySql2Database } from 'drizzle-orm/mysql2';
+import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IPokemonRepository } from '../../repositories/interfaces/pokemon.repository.interface';
 
 @Injectable()
 export class PokemonImageService {
   constructor(
     private readonly pokemonDataService: PokemonDataService,
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
-) {}
+    @Inject(POKEMON_REPOSITORY_TOKEN) 
+    private readonly pokemonRepository: IPokemonRepository
+  ) {}
+  
   private dexCache: { [key: string]: { date: Date; data: any[] } } = {};
 
   getItemSprite(name: string) {
@@ -51,13 +50,7 @@ export class PokemonImageService {
     
     if (pokemonId > 0) {
       if (!this.dexCache[uuid] || new Date().getTime() - this.dexCache[uuid].date.getTime() > 1000) {
-        const pokemonStatus = await this.db
-        .select()
-        .from(pokedexRegistry)
-        .where(and(
-          eq(pokedexRegistry.uuid, uuid),
-        ))
-        .execute();
+        const pokemonStatus = await this.pokemonRepository.getUserRegistriesForCache(uuid);
         this.dexCache[uuid] = { date: new Date(), data: pokemonStatus };
       }
       const pokemonStatus = this.dexCache[uuid].data;
@@ -168,4 +161,3 @@ export class PokemonImageService {
     }
   }
 }
-

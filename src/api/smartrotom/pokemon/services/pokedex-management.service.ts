@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { PokemonRepository, PokedexRegistryData, PokedexStatistics, DetailedPokedexStatistics, BulkUpdateData, BulkUpdateResult } from '@api/smartrotom/pokemon/repositories/pokemon.repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { PokedexRegistryData, PokedexStatistics, DetailedPokedexStatistics, BulkUpdateData, BulkUpdateResult } from '../repositories/pokemon.repository';
 import { PokemonDataManagementService } from './pokemon-data-management.service';
+import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IPokemonRepository } from '../repositories/interfaces/pokemon.repository.interface';
 
 export interface RegistrationResult {
   success: boolean;
@@ -14,7 +16,8 @@ export class PokedexManagementService {
   private dexCache: { [key: string]: { date: Date; data: any[] } } = {};
 
   constructor(
-    private readonly pokemonRepository: PokemonRepository,
+    @Inject(POKEMON_REPOSITORY_TOKEN)
+    private readonly pokemonRepository: IPokemonRepository,
     private readonly pokemonDataService: PokemonDataManagementService,
   ) {}
 

@@ -4,8 +4,9 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { WingullModule } from '../wingull/wingull.module';
 
-// Import repository
+// Import repository and token
 import { PokemonRepository } from '@api/smartrotom/pokemon/repositories/pokemon.repository';
+import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 // Import existing services (keep the original file-based services)
 import { BaseDataService } from './services/data/base-data.service';
@@ -28,10 +29,23 @@ import { PokemonFacadeService } from './pokemon.facade.service';
 import { PokemonController } from './pokemon.controller';
 
 @Module({
-  imports: [LoggerModule, ResponseModule, DrizzleModule, WingullModule],
-  controllers: [PokemonController],
+  imports: [
+    LoggerModule, 
+    ResponseModule, 
+    DrizzleModule, 
+    WingullModule  // Keep this - PokemonIntegrationService needs WingullFacadeService
+  ],
+  controllers: [
+    PokemonController
+  ],
   providers: [
-    // Repository
+    // Repository with token binding (add this for clean architecture)
+    {
+      provide: POKEMON_REPOSITORY_TOKEN,
+      useClass: PokemonRepository,
+    },
+    
+    // Keep the original repository for existing code compatibility
     PokemonRepository,
     
     // Existing file-based services
@@ -46,14 +60,20 @@ import { PokemonController } from './pokemon.controller';
     // Domain services
     PokemonDataManagementService,
     PokedexManagementService,
-    PokemonIntegrationService,
+    PokemonIntegrationService,  // This needs WingullFacadeService
     
     // Facade service
     PokemonFacadeService,
   ],
   exports: [
+    // Export facade for other modules
     PokemonFacadeService,
+    
+    // Export core services for potential reuse
     PokemonDataManagementService,
+    
+    // Export repository token for testing/clean architecture
+    POKEMON_REPOSITORY_TOKEN,
   ],
 })
 export class PokemonModule implements OnModuleInit {

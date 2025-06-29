@@ -10,7 +10,7 @@ import { Region } from './entities/region.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PlayerStats } from './entities/player-stats.entity';
-import { Pokemon } from './entities/pokemon.entity';
+import { PokemonW } from './entities/pokemon-w-.entity';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('smartrotom/wingull')
@@ -95,7 +95,7 @@ export class WingullController {
 
   @Post('team')
   @ApiOperation({ summary: 'Get player team' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Player team retrieved successfully.', type: [Pokemon] })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player team retrieved successfully.', type: [PokemonW] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player team.' })
   @ApiBody({ type: UuidDto })
   async getTeam(@Body() { uuid }: UuidDto) {

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class Pokemon {
+export class PokemonW {
   @ApiProperty({ example: 777, description: 'Pokédex number' })
   dex: number;
 

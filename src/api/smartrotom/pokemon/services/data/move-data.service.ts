@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { Attack } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
+import { FullMove } from '../../entities/pokemon-move.entity';
 
 @Injectable()
 export class MoveDataService extends BaseDataService {
-  private moveList: Attack[] = [];
-  private movesByName: { [key: string]: Attack } = {};
-  private movesByType: { [key: string]: Attack[] } = {};
-  private movesByCategory: { [key: string]: Attack[] } = {};
+  private moveList: FullMove[] = [];
+  private movesByName: { [key: string]: FullMove } = {};
+  private movesByType: { [key: string]: FullMove[] } = {};
+  private movesByCategory: { [key: string]: FullMove[] } = {};
 
   async loadMoveData() {
     const startingTime = Date.now();
@@ -17,7 +18,7 @@ export class MoveDataService extends BaseDataService {
 
     const moves = await this.readJsonFiles(defaultDir, publicDir);
 
-    moves.forEach((move: Attack) => {
+    moves.forEach((move: FullMove) => {
       this.moveList.push(move);
       this.movesByName[move.attackName] = move;
       if (!this.movesByType[move.attackType]) this.movesByType[move.attackType] = [];
@@ -45,15 +46,15 @@ export class MoveDataService extends BaseDataService {
     return this.moveList;
   }
 
-  getMove(name: string): Attack | undefined {
+  getMove(name: string): FullMove | undefined {
     return this.movesByName[name];
   }
 
-  getMovesOfType(type: string): Attack[] {
+  getMovesOfType(type: string): FullMove[] {
     return this.movesByType[type] || [];
   }
 
-  getMovesOfCategory(category: string): Attack[] {
+  getMovesOfCategory(category: string): FullMove[] {
     return this.movesByCategory[category] || [];
   }
 }

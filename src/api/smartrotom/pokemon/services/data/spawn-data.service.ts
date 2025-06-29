@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { BaseDataService } from './base-data.service';
 import { PokemonDataService } from './pokemon-data.service';
-import { SpawnInfo, SpawnInfos } from '../../interfaces/pokemon.interface';
+import {  SpawnInfos } from '../../interfaces/pokemon.interface';
 import * as path from 'path';
 import * as fs from 'fs';
+import { Console } from 'console';
+import { SpawnInfo } from '../../entities/pokemon-spawn.entity';
 
 @Injectable()
 export class SpawnDataService extends BaseDataService {

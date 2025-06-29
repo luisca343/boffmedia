@@ -13,3 +13,4 @@ export const WINGULL_TRANSPORT_REPOSITORY_TOKEN = Symbol('WINGULL_TRANSPORT_REPO
 export const WINGULL_USER_REPOSITORY_TOKEN = Symbol('WINGULL_USER_REPOSITORY');
 export const MINE_REPOSITORY_TOKEN = Symbol('IMineRepository');
 export const QUEST_REPOSITORY_TOKEN = 'QuestRepository';
+export const POKEMON_REPOSITORY_TOKEN = 'PokemonRepository';

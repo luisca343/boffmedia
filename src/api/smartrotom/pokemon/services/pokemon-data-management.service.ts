@@ -4,9 +4,11 @@ import { MoveDataService } from './data/move-data.service';
 import { SpawnDataService } from './data/spawn-data.service';
 import { PokemonImageService } from './data/pokemon-image.service';
 import { SpriteManifestService } from './sprite-manifest.service';
-import { Pokemon, PokemonForm, SpawnInfo, Attack } from '../interfaces/pokemon.interface';
+import { Pokemon, PokemonForm, Attack } from '../interfaces/pokemon.interface';
 import { EvoTreeNode } from './data/pokemon-data.service';
 import Fuse, { IFuseOptions, FuseResult } from 'fuse.js';
+import { FullMove } from '../entities/pokemon-move.entity';
+import { SpawnInfo } from '../entities/pokemon-spawn.entity';
 
 @Injectable()
 export class PokemonDataManagementService {
@@ -100,7 +102,7 @@ export class PokemonDataManagementService {
     return this.pokemonDataService.getAllMovesSortedByCount();
   }
 
-  getMove(name: string): Attack | undefined {
+  getMove(name: string): FullMove | undefined {
     return this.moveDataService.getMove(name);
   }
 
