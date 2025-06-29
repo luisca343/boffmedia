@@ -1,9 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { QuestCacheService } from './services/quest.cache.service';
-import { UserQuestService, UserQuestData } from './services/user.quest.service';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { NPCService, NPCUpdateRequest, NPCUpdateResponse } from './services/npc.service';
 import { ImageService, ImageUploadRequest, ImageUploadResponse, ImageExistsResponse } from './services/image.service';
 import { QuestSystemData, NPC } from './types';
+import { QuestCacheService } from './services/quest.cache.service';
+import { UserQuestData, UserQuestService } from './services/user.quest.service';
+import { UpdateNPCsDto } from './dto/update-npcs.dto';
+
+export interface GetQuestsRequest {
+  force?: number;
+}
+
+export interface GetUserQuestsRequest {
+  uuid: string;
+}
+
+export interface CheckImageRequest {
+  npcName: string;
+}
+
+export interface CacheRefreshResponse {
+  success: boolean;
+  timestamp: Date;
+}
+
+export interface CacheStatusResponse {
+  cached: boolean;
+  age?: number;
+  nextRefresh?: number;
+  healthy: boolean;
+}
+
+export interface SystemHealthResponse {
+  overall: 'healthy' | 'degraded' | 'unhealthy';
+  cache: boolean;
+  externalAPI: boolean;
+  fileSystem: boolean;
+}
 
 @Injectable()
 export class MisionesFacadeService {
@@ -17,29 +49,19 @@ export class MisionesFacadeService {
   // ==================== QUEST MANAGEMENT ====================
 
   async getAllQuests(force: number = 0): Promise<QuestSystemData> {
-    try {
-      const forceRefresh = force === 1;
-      return await this.questCacheService.getQuestSystemData(forceRefresh);
-    } catch (error) {
-      console.error('Error getting all quests:', error);
-      throw new Error(`Failed to retrieve quests: ${error.message}`);
-    }
+    const forceRefresh = force === 1;
+    return this.questCacheService.getQuestSystemData(forceRefresh);
   }
 
   async getQuestsForUser(uuid: string): Promise<UserQuestData> {
-    try {
-      if (!uuid) {
-        throw new Error('User UUID is required');
-      }
-
-      return await this.userQuestService.getUserQuests(uuid);
-    } catch (error) {
-      console.error(`Error getting quests for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve quests for user: ${error.message}`);
+    if (!uuid || uuid.trim() === '') {
+      throw new BadRequestException('UUID is required');
     }
+
+    return this.userQuestService.getUserQuests(uuid);
   }
 
-  async refreshQuestCache(): Promise<{ success: boolean; timestamp: Date }> {
+  async refreshQuestCache(): Promise<CacheRefreshResponse> {
     try {
       await this.questCacheService.refreshCache();
       return {
@@ -47,154 +69,115 @@ export class MisionesFacadeService {
         timestamp: new Date()
       };
     } catch (error) {
-      console.error('Error refreshing quest cache:', error);
-      throw new Error(`Failed to refresh quest cache: ${error.message}`);
+      throw new BadRequestException(`Failed to refresh cache: ${error.message}`);
     }
   }
 
-  async getQuestCacheStatus(): Promise<{
-    cached: boolean;
-    age?: number;
-    nextRefresh?: number;
-    healthy: boolean;
-  }> {
-    try {
-      const cacheStatus = this.questCacheService.getCacheStatus();
-      return {
-        ...cacheStatus,
-        healthy: true
-      };
-    } catch (error) {
-      console.error('Error getting cache status:', error);
-      return {
-        cached: false,
-        healthy: false
-      };
-    }
+  async getCacheStatus(): Promise<CacheStatusResponse> {
+    const status = this.questCacheService.getCacheStatus();
+    const healthy = status.cached && (!status.age || status.age < 6 * 60 * 60 * 1000); // 6 hours
+
+    return {
+      ...status,
+      healthy
+    };
   }
 
   // ==================== NPC MANAGEMENT ====================
 
-  async updateNPCs(updateRequest: NPCUpdateRequest): Promise<NPCUpdateResponse> {
-    try {
-      return await this.npcService.updateNPCs(updateRequest);
-    } catch (error) {
-      console.error('Error updating NPCs:', error);
-      throw new Error(`Failed to update NPCs: ${error.message}`);
-    }
+  async updateNPCs(request: UpdateNPCsDto): Promise<NPCUpdateResponse> {
+    return this.npcService.updateNPCs(request);
   }
 
   async getAllNPCs(): Promise<NPC[]> {
-    try {
-      return await this.npcService.getAllNPCs();
-    } catch (error) {
-      console.error('Error getting all NPCs:', error);
-      throw new Error(`Failed to retrieve NPCs: ${error.message}`);
-    }
+    return this.npcService.getAllNPCs();
   }
 
   async getNPCById(npcId: number): Promise<NPC | null> {
-    try {
-      return await this.npcService.getNPCById(npcId);
-    } catch (error) {
-      console.error(`Error getting NPC ${npcId}:`, error);
-      return null;
+    if (!npcId || npcId <= 0) {
+      throw new BadRequestException('Valid NPC ID is required');
     }
+
+    return this.npcService.getNPCById(npcId);
   }
 
   async getNPCsByQuestId(questId: number): Promise<NPC[]> {
-    try {
-      return await this.npcService.getNPCsByQuestId(questId);
-    } catch (error) {
-      console.error(`Error getting NPCs for quest ${questId}:`, error);
-      return [];
+    if (!questId || questId <= 0) {
+      throw new BadRequestException('Valid Quest ID is required');
     }
+
+    return this.npcService.getNPCsByQuestId(questId);
   }
 
   // ==================== IMAGE MANAGEMENT ====================
 
-  async uploadCustomNPCImage(request: ImageUploadRequest): Promise<ImageUploadResponse> {
-    try {
-      return await this.imageService.uploadCustomNPCImage(request);
-    } catch (error) {
-      console.error(`Error uploading image for NPC ${request.npcName}:`, error);
-      throw new Error(`Failed to upload NPC image: ${error.message}`);
+  async uploadNPCImage(request: ImageUploadRequest): Promise<ImageUploadResponse> {
+    if (!request.npcName || !request.image) {
+      throw new BadRequestException('NPC name and image are required');
     }
+
+    return this.imageService.uploadCustomNPCImage(request);
   }
 
-  async checkCustomNPCRenderExists(npcName: string): Promise<ImageExistsResponse> {
-    try {
-      return await this.imageService.checkCustomNPCRenderExists(npcName);
-    } catch (error) {
-      console.error(`Error checking render for NPC ${npcName}:`, error);
-      return { exists: false };
+  async checkNPCRenderExists(npcName: string): Promise<ImageExistsResponse> {
+    if (!npcName || npcName.trim() === '') {
+      throw new BadRequestException('NPC name is required');
     }
+
+    return this.imageService.checkCustomNPCRenderExists(npcName);
   }
 
-  async checkCustomNPCImageExists(npcName: string): Promise<ImageExistsResponse> {
-    try {
-      return await this.imageService.checkCustomNPCImageExists(npcName);
-    } catch (error) {
-      console.error(`Error checking image for NPC ${npcName}:`, error);
-      return { exists: false };
+  async checkNPCImageExists(npcName: string): Promise<ImageExistsResponse> {
+    if (!npcName || npcName.trim() === '') {
+      throw new BadRequestException('NPC name is required');
     }
+
+    return this.imageService.checkCustomNPCImageExists(npcName);
   }
 
-  async deleteCustomNPCImage(npcName: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      return await this.imageService.deleteCustomNPCImage(npcName);
-    } catch (error) {
-      console.error(`Error deleting image for NPC ${npcName}:`, error);
-      return { success: false, error: error.message };
-    }
-  }
+  // ==================== SYSTEM HEALTH ====================
 
-  // ==================== VALIDATION METHODS ====================
-
-  async validateUserExists(uuid: string): Promise<boolean> {
+  async getSystemHealth(): Promise<SystemHealthResponse> {
     try {
-      return await this.userQuestService.validateUserExists(uuid);
-    } catch (error) {
-      console.error(`Error validating user ${uuid}:`, error);
-      return false;
-    }
-  }
+      // Check cache health
+      const cacheStatus = await this.getCacheStatus();
+      const cacheHealthy = cacheStatus.healthy;
 
-  async validateNPCName(npcName: string): Promise<boolean> {
-    try {
-      if (!npcName || typeof npcName !== 'string') return false;
+      // Check external API health (try to fetch a small amount of data)
+      let externalAPIHealthy = true;
+      try {
+        await this.questCacheService.getQuestSystemData();
+      } catch {
+        externalAPIHealthy = false;
+      }
+
+      // Check file system health (try to check if directories exist)
+      let fileSystemHealthy = true;
+      try {
+        await this.imageService.checkCustomNPCRenderExists('health_check');
+      } catch {
+        fileSystemHealthy = false;
+      }
+
+      // Determine overall health
+      let overall: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
       
-      // Allow alphanumeric characters, underscores, and hyphens
-      const validNameRegex = /^[a-zA-Z0-9_-]+$/;
-      return validNameRegex.test(npcName) && npcName.length <= 50;
-    } catch (error) {
-      console.error(`Error validating NPC name ${npcName}:`, error);
-      return false;
-    }
-  }
-
-  // ==================== HEALTH CHECK ====================
-
-  async getSystemHealth(): Promise<{
-    overall: 'healthy' | 'degraded' | 'unhealthy';
-    cache: boolean;
-    externalAPI: boolean;
-    fileSystem: boolean;
-  }> {
-    try {
-      const cacheStatus = this.questCacheService.getCacheStatus();
+      if (!cacheHealthy || !externalAPIHealthy) {
+        overall = 'degraded';
+      }
       
-      // We would need to add health check to repository
-      // For now, assume healthy if cache is working
-      
+      if (!cacheHealthy && !externalAPIHealthy) {
+        overall = 'unhealthy';
+      }
+
       return {
-        overall: cacheStatus.cached ? 'healthy' : 'degraded',
-        cache: cacheStatus.cached,
-        externalAPI: true, // Would need actual health check
-        fileSystem: true   // Would need actual health check
+        overall,
+        cache: cacheHealthy,
+        externalAPI: externalAPIHealthy,
+        fileSystem: fileSystemHealthy
       };
+
     } catch (error) {
-      console.error('Error getting system health:', error);
       return {
         overall: 'unhealthy',
         cache: false,
@@ -202,5 +185,15 @@ export class MisionesFacadeService {
         fileSystem: false
       };
     }
+  }
+
+  // ==================== VALIDATION ====================
+
+  async validateUserExists(uuid: string): Promise<boolean> {
+    if (!uuid || uuid.trim() === '') {
+      return false;
+    }
+
+    return this.userQuestService.validateUserExists(uuid);
   }
 }

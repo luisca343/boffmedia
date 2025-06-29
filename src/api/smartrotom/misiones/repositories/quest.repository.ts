@@ -1,151 +1,118 @@
-import { QuestSystemData, QuestData, IDialogue, IQuestCategory, NPC } from '@api/smartrotom/misiones/types';
-import { Injectable } from '@nestjs/common';
-import axios, { AxiosResponse } from 'axios';
-
-export interface ExternalQuestResponse {
-  quests: { [key: string]: QuestData };
-  dialogs: { [key: string]: IDialogue };
-  categories: { [key: string]: IQuestCategory };
-  npcs?: NPC[];
-}
-
-export interface UserQuestResponse {
-  quests: { [key: string]: QuestData };
-}
+import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import axios from 'axios';
+import { QuestData, IDialogue, IQuestCategory, NPC } from '../types';
+import { ExternalQuestResponse, IQuestRepository, UserQuestResponse } from './interfaces/quest.repository.interface';
 
 @Injectable()
-export class QuestRepository {
-  private readonly QUEST_API_BASE_URL = 'http://148.251.3.244:34370';
+export class QuestRepository implements IQuestRepository {
+  private readonly logger = new Logger(QuestRepository.name);
+  private readonly baseUrl: string;
+
+  constructor(private readonly configService: ConfigService) {
+    this.baseUrl = this.configService.get<string>('EXTERNAL_API_URL') || 'http://localhost:3001';
+  }
 
   // ==================== EXTERNAL API OPERATIONS ====================
 
   async fetchAllQuestsFromAPI(): Promise<ExternalQuestResponse> {
     try {
-      const response: AxiosResponse<any> = await axios.get(
-        `${this.QUEST_API_BASE_URL}/quests`,
-        {
-          timeout: 10000, // 10 second timeout
-          headers: {
-            'Content-Type': 'application/json',
-          }
+      this.logger.log('Fetching all quests from external API');
+      
+      const response = await axios.get(`${this.baseUrl}/api/quests/all`, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'FicusLabs-QuestService/1.0'
         }
-      );
+      });
 
-      // Check if response is wrapped in a success object
-      if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
+      if (!response.data) {
+        throw new Error('No data received from external API');
       }
 
-      // Return raw data if not wrapped
-      return response.data;
+      const questResponse: ExternalQuestResponse = {
+        quests: response.data.quests || {},
+        dialogs: response.data.dialogs || {},
+        categories: response.data.categories || {},
+        npcs: response.data.npcs || []
+      };
+
+      this.logger.log(`Successfully fetched ${Object.keys(questResponse.quests).length} quests`);
+      return questResponse;
+
     } catch (error) {
-      console.error('Failed to fetch quests from external API:', error);
-      throw new Error(`External quest API request failed: ${error.message}`);
+      this.logger.error('Failed to fetch quests from external API', error.stack);
+      throw new BadRequestException(`Failed to fetch quest data: ${error.message}`);
     }
   }
 
-  // TODO: Fix this method to handle user quests properly
   async fetchUserQuestsFromAPI(uuid: string): Promise<UserQuestResponse> {
     if (!uuid || uuid.trim() === '') {
-      throw new Error('UUID is required for fetching user quests');
+      throw new BadRequestException('UUID is required');
     }
 
     try {
-      const response: AxiosResponse<any> = await axios.post(
-        `${this.QUEST_API_BASE_URL}/quests`,
-        { uuid },
-        {
-          timeout: 10000, // 10 second timeout
-          headers: {
-            'Content-Type': 'application/json',
-          }
+      this.logger.log(`Fetching user quests for UUID: ${uuid}`);
+      
+      const response = await axios.get(`${this.baseUrl}/api/quests/user/${uuid}`, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'FicusLabs-QuestService/1.0'
         }
-      );
+      });
 
-      // Check if response is wrapped in a success object
-      if (response.data && response.data.success && response.data.data) {
-        return response.data.data;
+      if (!response.data) {
+        throw new Error('No user quest data received from external API');
       }
 
-      // Return raw data if not wrapped
-      return response.data;
+      const userQuestResponse: UserQuestResponse = {
+        quests: response.data.quests || {}
+      };
+
+      this.logger.log(`Successfully fetched user quests for ${uuid}`);
+      return userQuestResponse;
+
     } catch (error) {
-      console.error(`Failed to fetch user quests for UUID ${uuid}:`, error);
-      throw new Error(`User quest API request failed: ${error.message}`);
+      this.logger.error(`Failed to fetch user quests for ${uuid}`, error.stack);
+      throw new BadRequestException(`Failed to fetch user quest data: ${error.message}`);
     }
   }
 
-  // ==================== DATA VALIDATION ====================
+  // ==================== VALIDATION ====================
 
-  validateQuestSystemData(data: ExternalQuestResponse): boolean {
-    if (!data || typeof data !== 'object') {
-      return false;
-    }
-
-    if (!data.quests || typeof data.quests !== 'object') {
-      return false;
-    }
-
-    if (!data.dialogs || typeof data.dialogs !== 'object') {
-      return false;
-    }
-
-    if (!data.categories || typeof data.categories !== 'object') {
-      return false;
-    }
-
-    return true;
-  }
-
-  validateUserQuestData(data: UserQuestResponse): boolean {
-    if (!data || typeof data !== 'object') {
-      return false;
-    }
-
-    if (!data.quests || typeof data.quests !== 'object') {
-      return false;
-    }
-
-    return true;
-  }
-
-  // ==================== DATA TRANSFORMATION ====================
-
-  transformExternalDataToSystemData(externalData: ExternalQuestResponse, npcs: NPC[] = []): QuestSystemData {
-    const quests = Object.values(externalData.quests);
-    const dialogs = Object.values(externalData.dialogs);
-    const categories = Object.values(externalData.categories);
-
-    return {
-      quests,
-      dialogs,
-      categories,
-      npcs: npcs || externalData.npcs || []
-    };
-  }
-
-  // ==================== HEALTH CHECK ====================
-
-  async checkAPIHealth(): Promise<{ healthy: boolean; latency?: number; error?: string }> {
-    const startTime = Date.now();
+  validateQuestData(questData: any): boolean {
+    if (!questData || typeof questData !== 'object') return false;
     
-    try {
-      const response = await axios.get(`${this.QUEST_API_BASE_URL}/health`, {
-        timeout: 5000,
-        validateStatus: (status) => status < 500 // Accept 4xx as "healthy" but not 5xx
-      });
-      
-      const latency = Date.now() - startTime;
-      return {
-        healthy: response.status < 400,
-        latency
-      };
-    } catch (error) {
-      return {
-        healthy: false,
-        latency: Date.now() - startTime,
-        error: error.message
-      };
-    }
+    return !!(
+      questData.id &&
+      questData.name &&
+      questData.logText &&
+      Array.isArray(questData.objectives) &&
+      questData.requirements
+    );
+  }
+
+  validateDialogueData(dialogueData: any): boolean {
+    if (!dialogueData || typeof dialogueData !== 'object') return false;
+    
+    return !!(
+      dialogueData.id &&
+      dialogueData.name &&
+      dialogueData.text &&
+      dialogueData.questId !== undefined
+    );
+  }
+
+  validateNPCData(npcData: any): boolean {
+    if (!npcData || typeof npcData !== 'object') return false;
+    
+    return !!(
+      npcData.id &&
+      npcData.name &&
+      npcData.text &&
+      npcData.questId !== undefined
+    );
   }
 }

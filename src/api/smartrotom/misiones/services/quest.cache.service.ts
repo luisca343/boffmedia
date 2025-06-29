@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { QuestRepository, ExternalQuestResponse } from '@api/smartrotom/misiones/repositories/quest.repository';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { QuestSystemData, QuestData, IDialogue, IQuestCategory, NPC } from '../types';
+import { QUEST_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IQuestRepository } from '../repositories/interfaces/quest.repository.interface';
 
 export interface QuestCacheEntry {
   data: QuestSystemData;
@@ -9,21 +10,22 @@ export interface QuestCacheEntry {
 
 @Injectable()
 export class QuestCacheService {
+  private readonly logger = new Logger(QuestCacheService.name);
   private readonly CACHE_DURATION = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
   private questCache: QuestCacheEntry | null = null;
 
   constructor(
-    private readonly questRepository: QuestRepository,
+    @Inject(QUEST_REPOSITORY_TOKEN)
+    private readonly questRepository: IQuestRepository,
   ) {}
 
   async getQuestSystemData(force: boolean = false): Promise<QuestSystemData> {
-    // Check if we need to fetch fresh data
     if (this.shouldRefreshCache(force)) {
       await this.refreshCache();
     }
 
     if (!this.questCache) {
-      throw new Error('Failed to load quest data from cache');
+      throw new Error('Failed to load quest data');
     }
 
     return this.questCache.data;
@@ -31,48 +33,46 @@ export class QuestCacheService {
 
   async refreshCache(): Promise<void> {
     try {
+      this.logger.log('Refreshing quest cache from external API');
+      
       const externalData = await this.questRepository.fetchAllQuestsFromAPI();
       
-      if (!this.questRepository.validateQuestSystemData(externalData)) {
-        throw new Error('Invalid quest data structure received from API');
-      }
-
-      const systemData = this.questRepository.transformExternalDataToSystemData(
-        externalData,
-        this.questCache?.data.npcs || []
-      );
+      // Transform the data structure
+      const questSystemData: QuestSystemData = {
+        quests: Object.values(externalData.quests),
+        dialogs: Object.values(externalData.dialogs),
+        categories: Object.values(externalData.categories),
+        npcs: externalData.npcs || []
+      };
 
       this.questCache = {
-        data: systemData,
+        data: questSystemData,
         timestamp: Date.now()
       };
+
+      this.logger.log('Quest cache refreshed successfully');
     } catch (error) {
-      console.error('Failed to refresh quest cache:', error);
-      
-      // If we have cached data, use it but log the error
-      if (this.questCache) {
-        console.warn('Using stale quest data due to API failure');
-        return;
-      }
-      
-      throw new Error(`Quest cache refresh failed: ${error.message}`);
+      this.logger.error('Failed to refresh quest cache', error.stack);
+      throw error;
     }
   }
 
   updateNPCs(npcs: NPC[]): void {
-    if (this.questCache) {
-      this.questCache.data.npcs = npcs;
+    if (!this.questCache) {
+      this.logger.warn('Cannot update NPCs: cache not initialized');
+      return;
     }
+
+    this.questCache.data.npcs = npcs;
+    this.logger.log(`Updated ${npcs.length} NPCs in cache`);
   }
 
   private shouldRefreshCache(force: boolean): boolean {
     if (force) return true;
     if (!this.questCache) return true;
     
-    const now = Date.now();
-    const cacheAge = now - this.questCache.timestamp;
-    
-    return cacheAge >= this.CACHE_DURATION;
+    const age = Date.now() - this.questCache.timestamp;
+    return age > this.CACHE_DURATION;
   }
 
   getCacheStatus(): { cached: boolean; age?: number; nextRefresh?: number } {
@@ -80,14 +80,13 @@ export class QuestCacheService {
       return { cached: false };
     }
 
-    const now = Date.now();
-    const age = now - this.questCache.timestamp;
-    const nextRefresh = this.CACHE_DURATION - age;
+    const age = Date.now() - this.questCache.timestamp;
+    const nextRefresh = Math.max(0, this.CACHE_DURATION - age);
 
     return {
       cached: true,
       age,
-      nextRefresh: Math.max(0, nextRefresh)
+      nextRefresh
     };
   }
 }

@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { QuestCacheService } from './quest.cache.service';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { NPC } from '../types';
+import { QuestCacheService } from './quest.cache.service';
+import { UpdateNPCsDto } from '../dto/update-npcs.dto';
 
 export interface NPCUpdateRequest {
   npcs: NPC[];
@@ -18,57 +19,41 @@ export class NPCService {
     private readonly questCacheService: QuestCacheService,
   ) {}
 
-  async updateNPCs(updateRequest: NPCUpdateRequest): Promise<NPCUpdateResponse> {
-    if (!updateRequest || !Array.isArray(updateRequest.npcs)) {
-      throw new Error('Invalid NPC update request: npcs array is required');
+  async updateNPCs(updateRequest: UpdateNPCsDto): Promise<NPCUpdateResponse> {
+    if (!updateRequest.npcs || !Array.isArray(updateRequest.npcs)) {
+      throw new BadRequestException('NPCs array is required');
     }
 
-    try {
-      // Validate NPC data structure
-      const validatedNPCs = this.validateAndCleanNPCs(updateRequest.npcs);
-      
-      // Update NPCs in cache
-      this.questCacheService.updateNPCs(validatedNPCs);
-
-      return {
-        status: 'ok',
-        updated: validatedNPCs.length,
-        timestamp: new Date()
-      };
-    } catch (error) {
-      console.error('Failed to update NPCs:', error);
-      throw new Error(`NPC update failed: ${error.message}`);
+    // Validate and clean NPC data
+    const validNPCs = this.validateAndCleanNPCs(updateRequest.npcs);
+    
+    if (validNPCs.length === 0) {
+      throw new BadRequestException('No valid NPCs provided');
     }
+
+    // Update the cache
+    this.questCacheService.updateNPCs(validNPCs);
+
+    return {
+      status: 'ok',
+      updated: validNPCs.length,
+      timestamp: new Date()
+    };
   }
 
   async getAllNPCs(): Promise<NPC[]> {
-    try {
-      const systemData = await this.questCacheService.getQuestSystemData();
-      return systemData.npcs || [];
-    } catch (error) {
-      console.error('Failed to get NPCs:', error);
-      throw new Error(`Failed to retrieve NPCs: ${error.message}`);
-    }
+    const questData = await this.questCacheService.getQuestSystemData();
+    return questData.npcs;
   }
 
   async getNPCById(npcId: number): Promise<NPC | null> {
-    try {
-      const npcs = await this.getAllNPCs();
-      return npcs.find(npc => npc.id === npcId) || null;
-    } catch (error) {
-      console.error(`Failed to get NPC ${npcId}:`, error);
-      return null;
-    }
+    const npcs = await this.getAllNPCs();
+    return npcs.find(npc => npc.id === npcId) || null;
   }
 
   async getNPCsByQuestId(questId: number): Promise<NPC[]> {
-    try {
-      const npcs = await this.getAllNPCs();
-      return npcs.filter(npc => npc.questId === questId);
-    } catch (error) {
-      console.error(`Failed to get NPCs for quest ${questId}:`, error);
-      return [];
-    }
+    const npcs = await this.getAllNPCs();
+    return npcs.filter(npc => npc.questId === questId);
   }
 
   private validateAndCleanNPCs(npcs: any[]): NPC[] {
@@ -78,19 +63,22 @@ export class NPCService {
   }
 
   private isValidNPC(npc: any): boolean {
-    if (!npc || typeof npc !== 'object') return false;
-    if (typeof npc.id !== 'number') return false;
-    if (!npc.name || typeof npc.name !== 'string') return false;
-    
-    return true;
+    return !!(
+      npc &&
+      typeof npc.id === 'number' &&
+      typeof npc.name === 'string' &&
+      npc.name.trim() !== '' &&
+      typeof npc.text === 'string' &&
+      typeof npc.questId === 'number'
+    );
   }
 
   private cleanNPCData(npc: any): NPC {
     return {
       id: Number(npc.id),
       name: String(npc.name).trim(),
-      text: npc.text ? String(npc.text).trim() : '',
-      questId: npc.questId ? Number(npc.questId) : 0,
+      text: String(npc.text),
+      questId: Number(npc.questId),
       requirements: npc.requirements || {
         available: true,
         requiredQuests: [],

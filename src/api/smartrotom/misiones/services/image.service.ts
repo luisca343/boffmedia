@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { promises as fs } from 'fs';
-import { join } from 'path';
+import * as path from 'path';
 
 export interface ImageUploadRequest {
   npcName: string;
@@ -20,8 +20,10 @@ export interface ImageExistsResponse {
 
 @Injectable()
 export class ImageService {
-  private readonly BASE_PATH = './public/smartrotom/img/customNPC';
-  private readonly RENDER_PATH = join(this.BASE_PATH, 'renders');
+  private readonly logger = new Logger(ImageService.name);
+  private readonly baseImagePath = './public/smartrotom/img/customNPC';
+  private readonly renderPath = path.join(this.baseImagePath, 'renders');
+  private readonly imagePath = path.join(this.baseImagePath, 'images');
 
   constructor() {
     this.ensureDirectoriesExist();
@@ -29,130 +31,93 @@ export class ImageService {
 
   async uploadCustomNPCImage(request: ImageUploadRequest): Promise<ImageUploadResponse> {
     try {
-      const { npcName, image } = request;
-      
-      if (!npcName || !image) {
-        throw new Error('NPC name and image are required');
+      if (!request.npcName || !request.image) {
+        throw new BadRequestException('NPC name and image are required');
       }
 
-      if (!this.isValidNPCName(npcName)) {
-        throw new Error('Invalid NPC name format');
+      // Validate image format
+      if (!request.image.startsWith('data:image/png;base64,')) {
+        throw new BadRequestException('Image must be a base64 encoded PNG');
       }
 
-      if (!this.isValidBase64Image(image)) {
-        throw new Error('Invalid image format. Expected base64 PNG.');
-      }
+      // Extract base64 data
+      const base64Data = request.image.replace(/^data:image\/png;base64,/, '');
+      const imageBuffer = Buffer.from(base64Data, 'base64');
 
-      const cleanedImage = image.replace(/^data:image\/png;base64,/, '');
-      const filePath = join(this.RENDER_PATH, `${npcName}.png`);
+      // Sanitize filename
+      const sanitizedName = this.sanitizeFilename(request.npcName);
+      const filename = `${sanitizedName}.png`;
+      const filepath = path.join(this.renderPath, filename);
 
-      await fs.writeFile(filePath, cleanedImage, 'base64');
+      // Write file
+      await fs.writeFile(filepath, imageBuffer);
+
+      this.logger.log(`Successfully uploaded image for NPC: ${request.npcName}`);
 
       return {
         status: 'OK',
-        path: filePath
+        path: filepath
       };
+
     } catch (error) {
-      console.error(`Failed to upload image for NPC ${request.npcName}:`, error);
+      this.logger.error(`Failed to upload image for NPC ${request.npcName}`, error.stack);
+      
       return {
         status: 'ERROR',
-        error: error.message
+        error: error.message || 'Upload failed'
       };
     }
   }
 
   async checkCustomNPCRenderExists(npcName: string): Promise<ImageExistsResponse> {
+    const sanitizedName = this.sanitizeFilename(npcName);
+    const filepath = path.join(this.renderPath, `${sanitizedName}.png`);
+    
     try {
-      if (!this.isValidNPCName(npcName)) {
-        return { exists: false };
-      }
-
-      const filePath = join(this.RENDER_PATH, `${npcName}.png`);
-      
-      try {
-        await fs.access(filePath);
-        return { exists: true, path: filePath };
-      } catch {
-        return { exists: false };
-      }
-    } catch (error) {
-      console.error(`Failed to check render existence for NPC ${npcName}:`, error);
-      return { exists: false };
+      await fs.access(filepath);
+      return {
+        exists: true,
+        path: filepath
+      };
+    } catch {
+      return {
+        exists: false
+      };
     }
   }
 
   async checkCustomNPCImageExists(npcName: string): Promise<ImageExistsResponse> {
+    const sanitizedName = this.sanitizeFilename(npcName);
+    const filepath = path.join(this.imagePath, `${sanitizedName}.png`);
+    
     try {
-      if (!this.isValidNPCName(npcName)) {
-        return { exists: false };
-      }
-
-      const filePath = join(this.BASE_PATH, `${npcName}.png`);
-      
-      try {
-        await fs.access(filePath);
-        return { exists: true, path: filePath };
-      } catch {
-        return { exists: false };
-      }
-    } catch (error) {
-      console.error(`Failed to check image existence for NPC ${npcName}:`, error);
-      return { exists: false };
-    }
-  }
-
-  async deleteCustomNPCImage(npcName: string): Promise<{ success: boolean; error?: string }> {
-    try {
-      if (!this.isValidNPCName(npcName)) {
-        throw new Error('Invalid NPC name format');
-      }
-
-      const imagePath = join(this.BASE_PATH, `${npcName}.png`);
-      const renderPath = join(this.RENDER_PATH, `${npcName}.png`);
-
-      // Delete both files if they exist
-      const deletePromises = [imagePath, renderPath].map(async (path) => {
-        try {
-          await fs.unlink(path);
-        } catch (error) {
-          // File might not exist, which is fine
-          if (error.code !== 'ENOENT') {
-            throw error;
-          }
-        }
-      });
-
-      await Promise.all(deletePromises);
-
-      return { success: true };
-    } catch (error) {
-      console.error(`Failed to delete images for NPC ${npcName}:`, error);
-      return { success: false, error: error.message };
+      await fs.access(filepath);
+      return {
+        exists: true,
+        path: filepath
+      };
+    } catch {
+      return {
+        exists: false
+      };
     }
   }
 
   private async ensureDirectoriesExist(): Promise<void> {
     try {
-      await fs.mkdir(this.BASE_PATH, { recursive: true });
-      await fs.mkdir(this.RENDER_PATH, { recursive: true });
+      await fs.mkdir(this.renderPath, { recursive: true });
+      await fs.mkdir(this.imagePath, { recursive: true });
+      this.logger.log('Image directories ensured');
     } catch (error) {
-      console.error('Failed to create image directories:', error);
+      this.logger.error('Failed to create image directories', error.stack);
     }
   }
 
-  private isValidNPCName(name: string): boolean {
-    if (!name || typeof name !== 'string') return false;
-    
-    // Allow alphanumeric characters, underscores, and hyphens
-    const validNameRegex = /^[a-zA-Z0-9_-]+$/;
-    return validNameRegex.test(name) && name.length <= 50;
-  }
-
-  private isValidBase64Image(image: string): boolean {
-    if (!image || typeof image !== 'string') return false;
-    
-    // Check if it's a PNG base64 image
-    const base64PngRegex = /^data:image\/png;base64,/;
-    return base64PngRegex.test(image);
+  private sanitizeFilename(filename: string): string {
+    return filename
+      .toLowerCase()
+      .replace(/[^a-z0-9_-]/g, '_')
+      .replace(/_{2,}/g, '_')
+      .replace(/^_|_$/g, '');
   }
 }
