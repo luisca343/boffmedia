@@ -17,3 +17,4 @@ export const POKEMON_REPOSITORY_TOKEN = 'PokemonRepository';
 
 export const STARBANK_ACCOUNT_REPOSITORY_TOKEN = Symbol('IStarbankAccountRepository');
 export const STARBANK_TRANSACTION_REPOSITORY_TOKEN = Symbol('IStarbankTransactionRepository');
+export const USERS_REPOSITORY_TOKEN = Symbol('IUsersRepository');
