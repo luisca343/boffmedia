@@ -1,8 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsEnum } from 'class-validator';
 import { AccountType } from '../enums/account-type.enum';
+import { BaseDto } from '@api/_utils/dto/base.dto';
 
-export class CreateAccountDto {
+export class CreateAccountDto extends BaseDto {
   @ApiProperty({ description: 'UUID of the user' })
   @IsString()
   uuid: string;
@@ -14,14 +15,19 @@ export class CreateAccountDto {
   @ApiProperty({ 
     description: 'Type of the account', 
     enum: AccountType,
-    default: 'MAIN' 
+    default: AccountType.SECONDARY,
+    required: false
   })
-  @IsString()
-  type: AccountType
+  @IsOptional()
+  @IsEnum(AccountType)
+  type?: AccountType = AccountType.SECONDARY;
 
   @ApiProperty({ 
     description: 'Initial balance of the account in PokéDollars', 
-    default: 0 
+    default: 0,
+    required: false
   })
+  @IsOptional()
+  @IsNumber()
   initialBalance?: number = 0;
 }

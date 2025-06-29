@@ -1,7 +1,8 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber } from 'class-validator';
 
-export class CreateShopTransactionDto {
+export class CreateShopTransactionDto extends BaseDto {
   @ApiProperty({ description: 'UUID of the user' })
   @IsString()
   uuid: string;

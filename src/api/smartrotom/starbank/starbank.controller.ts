@@ -10,15 +10,9 @@ import { CreateShopTransactionDto } from './dto/create-shop-transaction.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
 import { TransferFromMainDto } from './dto/transfer-from-main.dto';
 
-// Import Response DTOs
-import { TransactionResponseDto } from './dto/transaction-response.dto';
-import { AccountsListResponseDto } from './dto/accounts-list-response.dto';
-import { TransactionsListResponseDto } from './dto/transactions-list-response.dto';
-
 // Import Entities
 import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
-import { AccountResponseDto } from './dto/account-response-dto';
 
 @ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')
@@ -36,13 +30,13 @@ export class StarbankController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Accounts retrieved successfully.',
-    type: AccountsListResponseDto
+    type: [StarBankAccount]
   })
   @ApiResponse({ 
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to retrieve accounts.' 
   })
-  async getAllAccounts(): Promise<AccountsListResponseDto> {
+  async getAllAccounts(): Promise<StarBankAccount[]> {
     return await this.starbankFacadeService.getAllAccounts();
   }
 
@@ -55,7 +49,7 @@ export class StarbankController {
   @ApiResponse({ 
     status: HttpStatus.CREATED, 
     description: 'Account created successfully.',
-    type: AccountResponseDto
+    type: StarBankAccount
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
@@ -65,7 +59,8 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to create account.' 
   })
-  async createAccount(@Body(ValidationPipe) createAccountDto: CreateAccountDto): Promise<AccountResponseDto> {
+  async createAccount(@Body(ValidationPipe) createAccountDto: CreateAccountDto): Promise<StarBankAccount> {
+    console.log('Creating account with data:', createAccountDto);
     return await this.starbankFacadeService.createAccount(createAccountDto.uuid, createAccountDto.name);
   }
 
@@ -87,7 +82,7 @@ export class StarbankController {
   @ApiResponse({ 
     status: HttpStatus.CREATED, 
     description: 'Main account created successfully.',
-    type: AccountResponseDto
+    type: StarBankAccount
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
@@ -97,7 +92,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to create main account.' 
   })
-  async createMainAccount(@Body() body: { uuid: string; username: string }): Promise<AccountResponseDto> {
+  async createMainAccount(@Body() body: { uuid: string; username: string }): Promise<StarBankAccount> {
     return await this.starbankFacadeService.createMainAccount(body.uuid, body.username);
   }
 
@@ -174,8 +169,7 @@ export class StarbankController {
   @ApiBody({ type: CreateTransferDto })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Transfer completed successfully.',
-    type: TransactionResponseDto
+    description: 'Transfer completed successfully.'
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
@@ -185,7 +179,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to process transfer.' 
   })
-  async transfer(@Body(ValidationPipe) transferDto: CreateTransferDto): Promise<TransactionResponseDto> {
+  async transfer(@Body(ValidationPipe) transferDto: CreateTransferDto): Promise<void> {
     return await this.starbankFacadeService.transfer(
       transferDto.from,
       transferDto.to,
@@ -202,8 +196,7 @@ export class StarbankController {
   @ApiBody({ type: TransferFromMainDto })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Transfer from main completed successfully.',
-    type: TransactionResponseDto
+    description: 'Transfer from main completed successfully.'
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
@@ -217,7 +210,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to process transfer.' 
   })
-  async transferFromMain(@Body(ValidationPipe) transferDto: TransferFromMainDto): Promise<TransactionResponseDto> {
+  async transferFromMain(@Body(ValidationPipe) transferDto: TransferFromMainDto): Promise<void> {
     return await this.starbankFacadeService.transferFromMain(
       transferDto.uuid,
       transferDto.to,
@@ -234,8 +227,7 @@ export class StarbankController {
   @ApiBody({ type: CreateShopTransactionDto })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Shop transaction processed successfully.',
-    type: TransactionResponseDto
+    description: 'Shop transaction processed successfully.'
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
@@ -245,7 +237,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to process shop transaction.' 
   })
-  async shopTransaction(@Body(ValidationPipe) shopDto: CreateShopTransactionDto): Promise<TransactionResponseDto> {
+  async shopTransaction(@Body(ValidationPipe) shopDto: CreateShopTransactionDto): Promise<void> {
     return await this.starbankFacadeService.shop(shopDto);
   }
 
@@ -257,8 +249,7 @@ export class StarbankController {
   @ApiBody({ type: TrainerDefeatMoneyDto })
   @ApiResponse({ 
     status: HttpStatus.OK, 
-    description: 'Trainer defeat reward processed successfully.',
-    type: TransactionResponseDto
+    description: 'Trainer defeat reward processed successfully.'
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
@@ -268,7 +259,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to process trainer defeat reward.' 
   })
-  async trainerDefeat(@Body(ValidationPipe) trainerDto: TrainerDefeatMoneyDto): Promise<TransactionResponseDto> {
+  async trainerDefeat(@Body(ValidationPipe) trainerDto: TrainerDefeatMoneyDto): Promise<void> {
     return await this.starbankFacadeService.trainerDefeat(trainerDto.money, trainerDto.uuid);
   }
 
@@ -334,7 +325,7 @@ export class StarbankController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User transaction history retrieved successfully.',
-    type: TransactionsListResponseDto
+    type: [StarBankTransaction]
   })
   @ApiResponse({ 
     status: HttpStatus.NOT_FOUND, 
@@ -365,7 +356,7 @@ export class StarbankController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Transfer history retrieved successfully.',
-    type: TransactionsListResponseDto
+    type: [StarBankTransaction]
   })
   @ApiResponse({ 
     status: HttpStatus.NOT_FOUND, 
@@ -375,7 +366,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to retrieve transfer history.' 
   })
-  async getAccountTransfers(@Param('account') account: number): Promise<TransactionsListResponseDto> {
+  async getAccountTransfers(@Param('account') account: number): Promise<StarBankTransaction[]> {
     return await this.starbankFacadeService.getTransfers(account);
   }
 
@@ -394,7 +385,7 @@ export class StarbankController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User transfer history retrieved successfully.',
-    type: TransactionsListResponseDto
+    type: [StarBankTransaction]
   })
   @ApiResponse({ 
     status: HttpStatus.NOT_FOUND, 
@@ -404,7 +395,7 @@ export class StarbankController {
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to retrieve transfer history.' 
   })
-  async getUserTransfers(@Param('uuid') uuid: string): Promise<TransactionsListResponseDto> {
+  async getUserTransfers(@Param('uuid') uuid: string): Promise<StarBankTransaction[]> {
     return await this.starbankFacadeService.getTransfersByUUID(uuid);
   }
 }

@@ -5,20 +5,11 @@ import { WingullFacadeService } from '../wingull/wingull.facade.service';
 import { CreateAccountDto } from './dto/create-account.dto';
 import { CreateTransferDto } from './dto/create-transfer.dto';
 import { CreateShopTransactionDto } from './dto/create-shop-transaction.dto';
-import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
-import { AccountsListResponseDto } from './dto/accounts-list-response.dto';
-import { TransactionResponseDto } from './dto/transaction-response.dto';
-import { TransactionsListResponseDto } from './dto/transactions-list-response.dto';
-import { StarBankAccount } from './entities/starbank-account.entity';
-import { AccountType } from './enums/account-type.enum';
 import { TransferFromMainDto } from './dto/transfer-from-main.dto';
+import { TrainerDefeatMoneyDto } from './dto/trainer-defeat-money.dto';
+import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
-import { AccountResponseDto } from './dto/account-response-dto';
-
-export interface BalanceUpdateResult {
-  success: boolean;
-  message?: string;
-}
+import { AccountType } from './enums/account-type.enum';
 
 @Injectable()
 export class StarbankFacadeService {
@@ -30,233 +21,145 @@ export class StarbankFacadeService {
 
   // ==================== ACCOUNT OPERATIONS ====================
 
-  async createAccount(uuid: string, name: string): Promise<AccountResponseDto> {
-    try {
-      if (!name || name.length === 0) {
-        return await this.createMainAccount(uuid, name);
-      }
-      
-      const createAccountDto: CreateAccountDto = {
-        uuid,
-        name,
-        type: AccountType.SECONDARY
-      };
-      
-      return await this.accountService.createAccount(createAccountDto);
-    } catch (error) {
-      console.error('Error creating account:', error);
-      return { success: false, message: `Failed to create account: ${error.message}` };
+  async createAccount(uuid: string, name: string): Promise<StarBankAccount> {
+    if (!name || name.length === 0) {
+      return await this.createMainAccount(uuid, name);
     }
+    
+    const createAccountDto: CreateAccountDto = {
+      uuid,
+      name,
+      type: AccountType.SECONDARY
+    };
+    
+    return await this.accountService.createAccount(createAccountDto);
   }
 
-  async createMainAccount(uuid: string, username: string): Promise<AccountResponseDto> {
-    try {
-      return await this.accountService.createMainAccount(uuid, username);
-    } catch (error) {
-      console.error('Error creating main account:', error);
-      return { success: false, message: `Failed to create main account: ${error.message}` };
-    }
+  async createMainAccount(uuid: string, username: string): Promise<StarBankAccount> {
+    return await this.accountService.createMainAccount(uuid, username);
   }
 
-  async getAllAccounts(): Promise<AccountsListResponseDto> {
-    try {
-      return await this.accountService.getAllAccounts();
-    } catch (error) {
-      console.error('Error getting all accounts:', error);
-      throw new Error(`Failed to retrieve all accounts: ${error.message}`);
-    }
+  async getAllAccounts(): Promise<StarBankAccount[]> {
+    return await this.accountService.getAllAccounts();
   }
 
   async getAccounts(uuid: string): Promise<StarBankAccount[]> {
-    try {
-      return await this.accountService.getUserAccounts(uuid);
-    } catch (error) {
-      console.error(`Error getting accounts for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve user accounts: ${error.message}`);
-    }
+    return await this.accountService.getUserAccounts(uuid);
   }
 
   async getMainAccount(uuid: string): Promise<{ id: number; balance: number } | null> {
-    try {
-      return await this.accountService.getUserMainAccount(uuid);
-    } catch (error) {
-      console.error(`Error getting main account for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve main account: ${error.message}`);
-    }
+    return await this.accountService.getUserMainAccount(uuid);
   }
 
   async getBalance(uuid: string): Promise<{ balance: number }> {
-    try {
-      return await this.accountService.getUserBalance(uuid);
-    } catch (error) {
-      console.error(`Error getting balance for user ${uuid}:`, error);
-      return { balance: 0 };
-    }
+    return await this.accountService.getUserBalance(uuid);
   }
 
   async getAccountInfo(accountId: number): Promise<StarBankAccount | null> {
-    try {
-      return await this.accountService.getAccountInfo(accountId);
-    } catch (error) {
-      console.error(`Error getting account info for ${accountId}:`, error);
-      throw new Error(`Failed to retrieve account info: ${error.message}`);
-    }
+    return await this.accountService.getAccountInfo(accountId);
   }
 
   // ==================== TRANSACTION OPERATIONS ====================
 
-  async transfer(from: number, to: number, amount: number, concept: string): Promise<TransactionResponseDto> {
-    try {
-      const transferDto: CreateTransferDto = {
-        from,
-        to,
-        amount,
-        concept
-      };
+  async transfer(from: number, to: number, amount: number, concept: string): Promise<void> {
+    const transferDto: CreateTransferDto = {
+      from,
+      to,
+      amount,
+      concept
+    };
 
-      const result = await this.transactionService.transfer(transferDto);
+    await this.transactionService.transfer(transferDto);
 
-      // Update balance in game if successful
-      if (result.success) {
-        const fromAccount = await this.getAccountInfo(from);
-        const toAccount = await this.getAccountInfo(to);
+    // Update balance in game after successful transfer
+    const fromAccount = await this.getAccountInfo(from);
+    const toAccount = await this.getAccountInfo(to);
 
-        const accounts = [fromAccount, toAccount].filter(acc => acc && acc.type === 'MAIN');
+    const accounts = [fromAccount, toAccount].filter(acc => acc && acc.type === AccountType.MAIN);
 
-        for (const account of accounts) {
-          if (account && account.uuid) {
-            await this.updateBalance({
-              balance: account.balance,
-              type: account.type,
-              uuid: account.uuid
-            });
-          }
-        }
+    for (const account of accounts) {
+      if (account && account.uuid) {
+        await this.updateBalance({
+          balance: account.balance,
+          type: account.type,
+          uuid: account.uuid
+        });
       }
-
-      return result;
-    } catch (error) {
-      console.error('Error processing transfer:', error);
-      return { success: false, message: `Transfer failed: ${error.message}` };
     }
   }
 
-  async transferFromMain(uuid: string, to: number, amount: number, concept: string): Promise<TransactionResponseDto> {
-    try {
-      const transferDto: TransferFromMainDto = {
-        uuid,
-        to,
-        amount,
-        concept
-      };
+  async transferFromMain(uuid: string, to: number, amount: number, concept: string): Promise<void> {
+    const transferDto: TransferFromMainDto = {
+      uuid,
+      to,
+      amount,
+      concept
+    };
 
-      const result = await this.transactionService.transferFromMain(transferDto);
+    await this.transactionService.transferFromMain(transferDto);
 
-      // Update balance in game if successful
-      if (result.success) {
-        const mainAccount = await this.getMainAccount(uuid);
-        if (mainAccount) {
-          await this.updateBalance({
-            balance: mainAccount.balance,
-            type: 'MAIN',
-            uuid
-          });
-        }
-      }
-
-      return result;
-    } catch (error) {
-      console.error('Error processing transfer from main:', error);
-      return { success: false, message: `Transfer from main failed: ${error.message}` };
+    // Update balance in game after successful transfer
+    const mainAccount = await this.getMainAccount(uuid);
+    if (mainAccount) {
+      await this.updateBalance({
+        balance: mainAccount.balance,
+        type: AccountType.MAIN,
+        uuid
+      });
     }
   }
 
-  async shop(shopData: CreateShopTransactionDto): Promise<TransactionResponseDto> {
-    try {
-      const result = await this.transactionService.processShopTransaction(shopData);
+  async shop(shopData: CreateShopTransactionDto): Promise<void> {
+    await this.transactionService.processShopTransaction(shopData);
 
-      // Update balance in game if successful
-      if (result.success) {
-        const mainAccount = await this.getMainAccount(shopData.uuid);
-        if (mainAccount) {
-          await this.updateBalance({
-            balance: mainAccount.balance,
-            type: 'MAIN',
-            uuid: shopData.uuid
-          });
-        }
-      }
-
-      return result;
-    } catch (error) {
-      console.error('Error processing shop transaction:', error);
-      return { success: false, message: `Shop transaction failed: ${error.message}` };
+    // Update balance in game after successful transaction
+    const mainAccount = await this.getMainAccount(shopData.uuid);
+    if (mainAccount) {
+      await this.updateBalance({
+        balance: mainAccount.balance,
+        type: AccountType.MAIN,
+        uuid: shopData.uuid
+      });
     }
   }
 
-  async trainerDefeat(amount: number, uuid: string): Promise<TransactionResponseDto> {
-    try {
-      const trainerDto: TrainerDefeatMoneyDto = {
-        uuid,
-        money: amount
-      };
+  async trainerDefeat(amount: number, uuid: string): Promise<void> {
+    const trainerDto: TrainerDefeatMoneyDto = {
+      uuid,
+      money: amount
+    };
 
-      const currentGameBalance = await this.wingullFacadeService.getCurrentBalance(uuid, amount);
-      
-      return await this.transactionService.processTrainerDefeat(trainerDto, currentGameBalance);
-    } catch (error) {
-      console.error('Error processing trainer defeat:', error);
-      return { success: false, message: `Trainer defeat processing failed: ${error.message}` };
-    }
+    const currentGameBalance = await this.wingullFacadeService.getCurrentBalance(uuid, amount);
+    
+    await this.transactionService.processTrainerDefeat(trainerDto, currentGameBalance);
   }
 
   // ==================== TRANSACTION HISTORY ====================
 
   async getTransactions(account: number, limit: number = 50): Promise<StarBankTransaction[]> {
-    try {
-      return await this.transactionService.getAccountTransactions(account, limit);
-    } catch (error) {
-      console.error(`Error getting transactions for account ${account}:`, error);
-      throw new Error(`Failed to retrieve transactions: ${error.message}`);
-    }
+    return await this.transactionService.getAccountTransactions(account, limit);
   }
 
   async getTransactionsByUUID(uuid: string, limit: number = 50): Promise<StarBankTransaction[]> {
-    try {
-      return await this.transactionService.getUserTransactions(uuid, limit);
-    } catch (error) {
-      console.error(`Error getting transactions for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve user transactions: ${error.message}`);
-    }
+    return await this.transactionService.getUserTransactions(uuid, limit);
   }
 
-  async getTransfers(account: number): Promise<TransactionsListResponseDto> {
-    try {
-      return await this.transactionService.getAccountTransfers(account, 10);
-    } catch (error) {
-      console.error(`Error getting transfers for account ${account}:`, error);
-      throw new Error(`Failed to retrieve transfers: ${error.message}`);
-    }
+  async getTransfers(account: number): Promise<StarBankTransaction[]> {
+    return await this.transactionService.getAccountTransfers(account, 10);
   }
 
-  async getTransfersByUUID(uuid: string): Promise<TransactionsListResponseDto> {
-    try {
-      return await this.transactionService.getUserTransfers(uuid, 10);
-    } catch (error) {
-      console.error(`Error getting transfers for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve user transfers: ${error.message}`);
-    }
+  async getTransfersByUUID(uuid: string): Promise<StarBankTransaction[]> {
+    return await this.transactionService.getUserTransfers(uuid, 10);
   }
 
   // ==================== BALANCE MANAGEMENT ====================
 
-  private async updateBalance(account: { balance: number; type: string; uuid: string }): Promise<BalanceUpdateResult> {
+  private async updateBalance(account: { balance: number; type: AccountType | string; uuid: string }): Promise<void> {
     try {
-      const result = await this.wingullFacadeService.updateBalance(account);
-      return { success: !!result };
+      await this.wingullFacadeService.updateBalance(account);
     } catch (error) {
       console.error('Error updating balance in game:', error);
-      return { success: false, message: `Balance update failed: ${error.message}` };
+      throw new Error(`Balance update failed: ${error.message}`);
     }
   }
 }

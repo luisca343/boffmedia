@@ -4,8 +4,6 @@ import { StarBankAccount } from '../entities/starbank-account.entity';
 import { AccountType } from '../enums/account-type.enum';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { IStarbankAccountRepository } from '../repositories/interfaces/starbank-account.repository';
-import { AccountsListResponseDto } from '../dto/accounts-list-response.dto';
-import { AccountResponseDto } from '../dto/account-response-dto';
 
 @Injectable()
 export class StarbankAccountService {
@@ -14,115 +12,62 @@ export class StarbankAccountService {
     private readonly accountRepository: IStarbankAccountRepository,
   ) {}
 
-  async createAccount(createAccountDto: CreateAccountDto): Promise<AccountResponseDto> {
-    try {
-      // Validate inputs
-      if (!createAccountDto.uuid || createAccountDto.uuid.trim() === '') {
-        return { 
-          success: false, 
-          message: 'UUID is required' 
-        };
-      }
-      if (!createAccountDto.name || createAccountDto.name.trim() === '') {
-        return { 
-          success: false, 
-          message: 'Account name is required' 
-        };
-      }
-
-      // For main accounts, check if user already has one
-      if (createAccountDto.type === AccountType.MAIN) {
-        const existingMain = await this.accountRepository.findUserMainAccount(createAccountDto.uuid);
-        if (existingMain) {
-          return { 
-            success: false, 
-            message: 'User already has a main account' 
-          };
-        }
-      }
-
-      const accountData = {
-        uuid: createAccountDto.uuid,
-        name: createAccountDto.name,
-        type: createAccountDto.type || AccountType.SECONDARY,
-        initialBalance: createAccountDto.initialBalance || 0
-      };
-
-      const account = await this.accountRepository.create(accountData);
-      
-      return {
-        success: true,
-        account,
-        accountId: account.id,
-        message: 'Account created successfully'
-      };
-    } catch (error) {
-      console.error('Failed to create account:', error);
-      return { 
-        success: false, 
-        message: `Account creation failed: ${error.message}` 
-      };
+  async createAccount(createAccountDto: CreateAccountDto): Promise<StarBankAccount> {
+    // Validate inputs
+    if (!createAccountDto.uuid || createAccountDto.uuid.trim() === '') {
+      throw new Error('UUID is required');
     }
-  }
+    if (!createAccountDto.name || createAccountDto.name.trim() === '') {
+      throw new Error('Account name is required');
+    }
 
-  async createMainAccount(uuid: string, username: string): Promise<AccountResponseDto> {
-    try {
-      // Check if main account already exists
-      const existingMain = await this.accountRepository.findUserMainAccount(uuid);
+    // For main accounts, check if user already has one
+    if (createAccountDto.type === AccountType.MAIN) {
+      const existingMain = await this.accountRepository.findUserMainAccount(createAccountDto.uuid);
       if (existingMain) {
-        return { 
-          success: false, 
-          message: 'Main account already exists' 
-        };
+        throw new Error('User already has a main account');
       }
-
-      const createAccountDto: CreateAccountDto = {
-        uuid,
-        name: username,
-        type: AccountType.MAIN,
-        initialBalance: 0
-      };
-
-      return await this.createAccount(createAccountDto);
-    } catch (error) {
-      console.error('Failed to create main account:', error);
-      return { 
-        success: false, 
-        message: `Main account creation failed: ${error.message}` 
-      };
     }
+
+    const accountData = {
+      uuid: createAccountDto.uuid,
+      name: createAccountDto.name,
+      type: createAccountDto.type || AccountType.SECONDARY,
+      initialBalance: createAccountDto.initialBalance || 0
+    };
+
+    console.log('Creating account with data:', accountData);
+
+    return await this.accountRepository.create(accountData);
   }
 
-  async getAllAccounts(): Promise<AccountsListResponseDto> {
-    try {
-      const accounts = await this.accountRepository.findAll();
-      return {
-        accounts,
-        total: accounts.length
-      };
-    } catch (error) {
-      console.error('Failed to get all accounts:', error);
-      throw new Error(`Failed to retrieve all accounts: ${error.message}`);
+  async createMainAccount(uuid: string, username: string): Promise<StarBankAccount> {
+    // Check if main account already exists
+    const existingMain = await this.accountRepository.findUserMainAccount(uuid);
+    if (existingMain) {
+      throw new Error('Main account already exists');
     }
+
+    const createAccountDto: CreateAccountDto = {
+      uuid,
+      name: username,
+      type: AccountType.MAIN,
+      initialBalance: 0
+    };
+
+    return await this.createAccount(createAccountDto);
+  }
+
+  async getAllAccounts(): Promise<StarBankAccount[]> {
+    return await this.accountRepository.findAll();
   }
 
   async getUserAccounts(uuid: string): Promise<StarBankAccount[]> {
-    try {
-      const accounts = await this.accountRepository.findByUuid(uuid);
-      return accounts;
-    } catch (error) {
-      console.error(`Failed to get accounts for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve user accounts: ${error.message}`);
-    }
+    return await this.accountRepository.findByUuid(uuid);
   }
 
   async getUserMainAccount(uuid: string): Promise<{ id: number; balance: number } | null> {
-    try {
-      return await this.accountRepository.findUserMainAccount(uuid);
-    } catch (error) {
-      console.error(`Failed to get main account for user ${uuid}:`, error);
-      throw new Error(`Failed to retrieve main account: ${error.message}`);
-    }
+    return await this.accountRepository.findUserMainAccount(uuid);
   }
 
   async getUserBalance(uuid: string): Promise<{ balance: number }> {
@@ -136,25 +81,11 @@ export class StarbankAccountService {
   }
 
   async getAccountInfo(accountId: number): Promise<StarBankAccount | null> {
-    try {
-      return await this.accountRepository.findById(accountId);
-    } catch (error) {
-      console.error(`Failed to get account info for ${accountId}:`, error);
-      throw new Error(`Failed to retrieve account info: ${error.message}`);
-    }
+    return await this.accountRepository.findById(accountId);
   }
 
-  async getAccountsByType(type: AccountType): Promise<AccountsListResponseDto> {
-    try {
-      const accounts = await this.accountRepository.findByType(type);
-      return {
-        accounts,
-        total: accounts.length
-      };
-    } catch (error) {
-      console.error(`Failed to get accounts by type ${type}:`, error);
-      throw new Error(`Failed to retrieve accounts by type: ${error.message}`);
-    }
+  async getAccountsByType(type: AccountType): Promise<StarBankAccount[]> {
+    return await this.accountRepository.findByType(type);
   }
 
   async checkAccountExists(accountId: number): Promise<boolean> {
@@ -167,11 +98,6 @@ export class StarbankAccountService {
   }
 
   async updateAccountBalance(accountId: number, newBalance: number): Promise<boolean> {
-    try {
-      return await this.accountRepository.updateBalance(accountId, newBalance);
-    } catch (error) {
-      console.error(`Failed to update balance for account ${accountId}:`, error);
-      throw new Error(`Failed to update account balance: ${error.message}`);
-    }
+    return await this.accountRepository.updateBalance(accountId, newBalance);
   }
 }
