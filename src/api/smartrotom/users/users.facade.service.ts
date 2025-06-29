@@ -124,7 +124,7 @@ export class UsersFacadeService {
 
       return {
         user: userResult.user,
-        accounts,
+        accounts: accounts || [],
         isNewUser: userResult.isNew,
         isNewAccount
       };
@@ -145,7 +145,7 @@ export class UsersFacadeService {
 
       return {
         user,
-        accounts
+        accounts: accounts || []
       };
     } catch (error) {
       console.error(`Error getting user with accounts for ${uuid}:`, error);

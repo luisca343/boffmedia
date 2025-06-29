@@ -12,7 +12,7 @@ export class TeleportPlayerDto {
 
   @ApiProperty({
     description: 'UUID of the player to teleport',
-    example: 'a1b2c3d4-e5f6-g7h8-i9j0-k1l2m3n4o5p6'
+    example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
   })
   @IsNotEmpty()
   @IsString()

@@ -14,3 +14,6 @@ export const WINGULL_USER_REPOSITORY_TOKEN = Symbol('WINGULL_USER_REPOSITORY');
 export const MINE_REPOSITORY_TOKEN = Symbol('IMineRepository');
 export const QUEST_REPOSITORY_TOKEN = 'QuestRepository';
 export const POKEMON_REPOSITORY_TOKEN = 'PokemonRepository';
+
+export const STARBANK_ACCOUNT_REPOSITORY_TOKEN = Symbol('IStarbankAccountRepository');
+export const STARBANK_TRANSACTION_REPOSITORY_TOKEN = Symbol('IStarbankTransactionRepository');
