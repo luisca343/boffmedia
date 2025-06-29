@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
-import { ResponseModule } from '@api/_utils/response/response.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { ResponseService } from '@api/_utils/response/response.service';
 
-// Import repository
-import { MineRepository } from '@api/smartrotom/mine/repositories/mine.repository';
+// Import repository and interfaces
+import { MineRepository } from './repositories/mine.repository';
 
 // Import domain services
 import { EnergyService } from './services/energy.service';
@@ -15,29 +15,30 @@ import { PlayerService } from './services/player.service';
 // Import facade service
 import { MineFacadeService } from './mine.facade.service';
 
-// Import controller
-import { MinaController } from './mine.controller';
+import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { MineController } from './mine.controller';
 
 @Module({
-  imports: [LoggerModule, ResponseModule, DrizzleModule],
-  controllers: [MinaController],
+  imports: [LoggerModule, DrizzleModule],
+  controllers: [MineController],
   providers: [
-    MineRepository,
-    
+    MineFacadeService,
     EnergyService,
     GameService,
     RewardService,
     PlayerService,
-    
-    MineFacadeService,
+    ResponseService,
+    {
+      provide: MINE_REPOSITORY_TOKEN,
+      useClass: MineRepository,
+    },
   ],
   exports: [
     MineFacadeService,
-    
     EnergyService,
     GameService,
     RewardService,
     PlayerService,
   ],
 })
-export class MineModule {}
+export class SmartRotomMineModule {}

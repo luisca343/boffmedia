@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { MineRepository, MineRewardItem, GameSession } from '@api/smartrotom/mine/repositories/mine.repository';
+import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { Injectable, Inject, BadRequestException, NotFoundException } from '@nestjs/common';
+import { IMineRepository } from '../repositories/interfaces/mine.repository.interface';
 
 export interface GameStartResponse {
   idPartida: number; // Keep legacy naming for backward compatibility
@@ -28,12 +29,13 @@ export enum ItemRarity {
 @Injectable()
 export class GameService {
   constructor(
-    private readonly mineRepository: MineRepository,
+    @Inject(MINE_REPOSITORY_TOKEN)
+    private readonly mineRepository: IMineRepository,
   ) {}
 
   async startGame(uuid: string): Promise<GameStartResponse> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     // Create new game session
@@ -46,75 +48,71 @@ export class GameService {
 
   async endGame(uuid: string, rewards: { value: number; id: number }[]): Promise<GameEndResponse> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     if (!Array.isArray(rewards)) {
-      throw new Error('Rewards must be an array');
+      throw new BadRequestException('Rewards must be an array');
     }
 
     // Get the latest game session for this player
     const gameSession = await this.mineRepository.findLatestGameSession(uuid);
     if (!gameSession) {
-      throw new Error('No active game session found');
+      throw new NotFoundException('No active game session found');
     }
 
     // Validate rewards exist
-    if (rewards.length > 0) {
-      const rewardIds = rewards.map(r => r.id);
-      const rewardDetails = await this.mineRepository.findRewardsByIds(rewardIds);
-      
-      if (rewardDetails.length !== rewardIds.length) {
-        throw new Error('Some rewards not found');
-      }
+    const rewardIds = rewards.map(r => r.id);
+    const validRewards = await this.mineRepository.findRewardsByIds(rewardIds);
+    
+    if (validRewards.length !== rewardIds.length) {
+      throw new BadRequestException('Some rewards do not exist');
     }
 
-    // Get max reward value for weight calculation
-    const maxRewardValue = await this.mineRepository.findMaxRewardValue();
+    // Create game rewards
+    await this.mineRepository.createGameRewards(
+      gameSession.id,
+      rewards.map(reward => ({
+        rewardId: reward.id,
+        value: reward.value
+      }))
+    );
 
-    // Process rewards and create game details
-    const gameRewards = rewards.map(reward => ({
-      rewardId: reward.id,
-      value: maxRewardValue / reward.value
-    }));
-
-    await this.mineRepository.createGameRewards(gameSession.id, gameRewards);
-
-    // Add rewards to inventory
-    if (rewards.length > 0) {
-      const rewardDetails = await this.mineRepository.findRewardsByIds(rewards.map(r => r.id));
-      
-      const inventoryEntries = rewardDetails.map(reward => ({
+    // Create inventory entries
+    const inventoryEntries = rewards.map(reward => {
+      const rewardData = validRewards.find(r => r.id === reward.id);
+      return {
         uuid,
-        itemId: reward.itemId,
-        itemType: reward.type,
-        name: reward.name,
+        itemId: rewardData!.itemId,
+        itemType: rewardData!.type,
+        name: rewardData!.name,
         amount: 1,
         sourceType: 'mine',
         sourceId: gameSession.id,
         used: 0,
         rarity: this.calculateRarityFromWeight(reward.value)
-      }));
+      };
+    });
 
-      await this.mineRepository.createInventoryEntries(inventoryEntries);
-    }
+    await this.mineRepository.createInventoryEntries(inventoryEntries);
 
     return {
-      idPartida: gameSession.id
+      idPartida: gameSession.id,
+      success: true,
+      rewardsProcessed: rewards.length
     };
   }
 
   async validateGameSession(gameId: number, uuid: string): Promise<boolean> {
     const gameSession = await this.mineRepository.findGameSession(gameId);
-    return gameSession !== null && gameSession.uuid === uuid;
+    return gameSession?.uuid === uuid;
   }
 
   private calculateRarityFromWeight(weight: number): string {
-    if (weight <= 10) return ItemRarity.LEGENDARY;
-    if (weight <= 200) return ItemRarity.EPIC;
-    if (weight <= 1500) return ItemRarity.RARE;
-    if (weight <= 5000) return ItemRarity.UNCOMMON;
-    
+    if (weight >= 1000) return ItemRarity.LEGENDARY;
+    if (weight >= 500) return ItemRarity.EPIC;
+    if (weight >= 200) return ItemRarity.RARE;
+    if (weight >= 50) return ItemRarity.UNCOMMON;
     return ItemRarity.COMMON;
   }
 }

@@ -1,18 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { MineRepository, MineRewardItem } from '@api/smartrotom/mine/repositories/mine.repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { MineReward } from '../entities/mine-reward.entity';
+import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IMineRepository } from '../repositories/interfaces/mine.repository.interface';
 
 export interface RewardsByType {
-  drops: { [key: string]: { items: MineRewardItem[]; totalValue: number } };
+  drops: { [key: string]: { items: MineReward[]; totalValue: number } };
   totalValue: number;
 }
 
 @Injectable()
 export class RewardService {
   constructor(
-    private readonly mineRepository: MineRepository,
+    @Inject(MINE_REPOSITORY_TOKEN)
+    private readonly mineRepository: IMineRepository,
   ) {}
 
-  async getAllRewards(): Promise<MineRewardItem[]> {
+  async getAllRewards(): Promise<MineReward[]> {
     return this.mineRepository.findAllRewards();
   }
 
@@ -26,7 +29,7 @@ export class RewardService {
       acc[reward.type].items.push(reward);
       acc[reward.type].totalValue += reward.value;
       return acc;
-    }, {} as { [key: string]: { items: MineRewardItem[]; totalValue: number } });
+    }, {} as { [key: string]: { items: MineReward[]; totalValue: number } });
 
     // Sort by total value (descending)
     const sortedEntries = Object.entries(groupedByType)
@@ -43,7 +46,7 @@ export class RewardService {
     };
   }
 
-  async getRewardById(id: number): Promise<MineRewardItem | null> {
+  async getRewardById(id: number): Promise<MineReward | null> {
     const rewards = await this.mineRepository.findRewardsByIds([id]);
     return rewards[0] || null;
   }

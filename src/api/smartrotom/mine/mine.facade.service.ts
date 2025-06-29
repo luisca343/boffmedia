@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { EnergyService, EnergyStatus } from './services/energy.service';
 import { GameService, GameStartResponse, GameEndResponse } from './services/game.service';
 import { RewardService, RewardsByType } from './services/reward.service';
-import { PlayerService, PlayerHistory, ClaimResponse, PlayerStatistics } from './services/player.service';
-import { MineRewardItem, RankingEntry, UnclaimedItem } from '@api/smartrotom/mine/repositories/mine.repository';
+import { PlayerService, PlayerHistory, ClaimResponse } from './services/player.service';
+import { MineRewardItem, RankingEntry } from '@api/smartrotom/mine/repositories/mine.repository';
+import { PlayerStatistics, UnclaimedItem } from './repositories/interfaces/mine.repository.interface';
 
 export interface PlayGameRequest {
   uuid: string;

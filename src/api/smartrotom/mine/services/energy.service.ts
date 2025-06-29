@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { MineRepository, PlayerEnergy } from '@api/smartrotom/mine/repositories/mine.repository';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { PlayerEnergy } from '../entities/player-energy.entity';
+import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IMineRepository } from '../repositories/interfaces/mine.repository.interface';
 
 export interface EnergyStatus {
   energy: number;
@@ -14,22 +16,23 @@ export class EnergyService {
   private readonly MAX_ENERGY = 10;
 
   constructor(
-    private readonly mineRepository: MineRepository,
+    @Inject(MINE_REPOSITORY_TOKEN)
+    private readonly mineRepository: IMineRepository,
   ) {}
 
   async getPlayerEnergy(uuid: string): Promise<EnergyStatus> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     const playerEnergy = await this.mineRepository.findPlayerEnergy(uuid);
     if (!playerEnergy) {
-      throw new Error('Player not found');
+      throw new BadRequestException('Player not found');
     }
 
     const lastCharge = await this.mineRepository.findPlayerLastCharge(uuid);
     if (!lastCharge) {
-      throw new Error('Player charge data not found');
+      throw new BadRequestException('Player energy data not found');
     }
 
     let currentEnergy = playerEnergy.energy;
@@ -37,7 +40,7 @@ export class EnergyService {
     // If already at max energy, return current state
     if (currentEnergy >= this.MAX_ENERGY) {
       return {
-        energy: currentEnergy,
+        energy: this.MAX_ENERGY,
         maxEnergy: this.MAX_ENERGY,
         lastCharge,
         timeToNextCharge: 0
@@ -57,8 +60,8 @@ export class EnergyService {
 
     // Update energy if it has increased
     if (newEnergy > currentEnergy) {
-      const newChargeTime = new Date(lastCharge.getTime() + (extraEnergy * this.HOURS_TO_CHARGE * 60 * 60 * 1000));
-      await this.mineRepository.updatePlayerEnergy(uuid, newEnergy, newChargeTime);
+      const newLastCharge = new Date(lastCharge.getTime() + (extraEnergy * this.HOURS_TO_CHARGE * 60 * 60 * 1000));
+      await this.mineRepository.updatePlayerEnergy(uuid, newEnergy, newLastCharge);
     }
 
     // Calculate time to next charge
@@ -70,7 +73,7 @@ export class EnergyService {
       energy: newEnergy,
       maxEnergy: this.MAX_ENERGY,
       lastCharge,
-      timeToNextCharge
+      timeToNextCharge: Math.max(0, timeToNextCharge)
     };
   }
 
@@ -78,23 +81,15 @@ export class EnergyService {
     const currentStatus = await this.getPlayerEnergy(uuid);
     
     if (currentStatus.energy < amount) {
-      throw new Error('Insufficient energy');
+      throw new BadRequestException('Not enough energy');
     }
 
-    let newEnergy = currentStatus.energy - amount;
-    let newLastCharge = currentStatus.lastCharge;
-
-    // If we were at max energy, start the charge timer
-    if (currentStatus.energy >= this.MAX_ENERGY) {
-      newLastCharge = new Date();
-    }
-
-    await this.mineRepository.updatePlayerEnergy(uuid, newEnergy, newLastCharge);
+    const newEnergy = currentStatus.energy - amount;
+    await this.mineRepository.updatePlayerEnergy(uuid, newEnergy);
 
     return {
-      energy: newEnergy,
-      maxEnergy: this.MAX_ENERGY,
-      lastCharge: newLastCharge
+      ...currentStatus,
+      energy: newEnergy
     };
   }
 

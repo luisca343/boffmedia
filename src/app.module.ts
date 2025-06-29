@@ -62,10 +62,10 @@ import { MhwildsModule } from './api/boffmedia/herramientas/mhwilds/mhwilds.modu
 import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/services/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-manifest.service';
-import { MineModule } from '@api/smartrotom/mine/mine.module';
 import { ChatModule } from '@api/deprecated/chat/chat.module';
 import { ChatController } from '@api/deprecated/chat/chat.controller';
 import { ChatService } from '@api/deprecated/chat/chat.service';
+import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
 
 @Module({
   imports: [
@@ -108,7 +108,7 @@ import { ChatService } from '@api/deprecated/chat/chat.service';
     UploadModule,
     MhwildsModule,
     WingullModule,
-    MineModule,
+    SmartRotomMineModule,
     PokemonModule
   ],
   controllers: [AppController, ChatController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],

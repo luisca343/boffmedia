@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { MineRepository, HistoryEntry, RankingEntry, UnclaimedItem } from '@api/smartrotom/mine/repositories/mine.repository';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { IMineRepository, PlayerStatistics, RankingEntry, UnclaimedItem } from '../repositories/interfaces/mine.repository.interface';
+import { MINE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 export interface PlayerHistory {
   [gameId: number]: HistoryEntry[];
@@ -11,23 +12,20 @@ export interface ClaimResponse {
   success: boolean;
 }
 
-export interface PlayerStatistics {
-  totalGames: number;
-  totalValue: number;
-  averageValue: number;
-  lastPlayed: Date | null;
+export interface PlayerStatisticsResponse extends PlayerStatistics {
   ranking: { rank: number; totalValue: number } | null;
 }
 
 @Injectable()
 export class PlayerService {
   constructor(
-    private readonly mineRepository: MineRepository,
+    @Inject(MINE_REPOSITORY_TOKEN)
+    private readonly mineRepository: IMineRepository,
   ) {}
 
   async getPlayerHistory(uuid: string): Promise<PlayerHistory> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     const historyEntries = await this.mineRepository.findPlayerHistory(uuid);
@@ -37,21 +35,7 @@ export class PlayerService {
       if (!acc[entry.id]) {
         acc[entry.id] = [];
       }
-      
-      if (entry.itemId) {
-        acc[entry.id].push(entry);
-      } else {
-        // No rewards for this game
-        acc[entry.id].push({
-          id: entry.id,
-          itemId: "nada:nada",
-          itemName: "Nada",
-          claimed: 0,
-          value: 0,
-          date: entry.date
-        });
-      }
-      
+      acc[entry.id].push(entry);
       return acc;
     }, {} as PlayerHistory);
 
@@ -64,7 +48,7 @@ export class PlayerService {
 
   async getPlayerRank(uuid: string): Promise<{ rank: number; totalValue: number } | null> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     return this.mineRepository.findPlayerRanking(uuid);
@@ -72,49 +56,40 @@ export class PlayerService {
 
   async getUnclaimedRewards(uuid: string): Promise<UnclaimedItem[]> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
-    const unclaimedItems = await this.mineRepository.findUnclaimedItems(uuid);
-    
-    // Group by item ID and count amounts
-    const groupedItems = unclaimedItems.reduce((acc, item) => {
-      if (!acc[item.itemId]) {
-        acc[item.itemId] = {
-          itemId: item.itemId,
-          type: item.type,
-          amount: 0
-        };
-      }
-      acc[item.itemId].amount += 1;
-      return acc;
-    }, {} as { [key: string]: UnclaimedItem });
-
-    return Object.values(groupedItems);
+    return this.mineRepository.findUnclaimedItems(uuid);
   }
 
   async claimRewards(uuid: string): Promise<ClaimResponse> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     const unclaimedItems = await this.mineRepository.findUnclaimedItems(uuid);
-    const claimedIds = unclaimedItems.map(item => item.id);
-
-    if (claimedIds.length > 0) {
-      await this.mineRepository.claimInventoryItems(claimedIds);
+    
+    if (unclaimedItems.length === 0) {
+      return {
+        claimedIds: [],
+        totalClaimed: 0,
+        success: true
+      };
     }
 
+    const itemIds = unclaimedItems.map(item => item.id);
+    await this.mineRepository.claimInventoryItems(itemIds);
+
     return {
-      claimedIds,
-      totalClaimed: claimedIds.length,
+      claimedIds: itemIds,
+      totalClaimed: unclaimedItems.length,
       success: true
     };
   }
 
-  async getPlayerStatistics(uuid: string): Promise<PlayerStatistics> {
+  async getPlayerStatistics(uuid: string): Promise<PlayerStatisticsResponse> {
     if (!uuid) {
-      throw new Error('Player UUID is required');
+      throw new BadRequestException('UUID is required');
     }
 
     const [stats, ranking] = await Promise.all([
@@ -129,11 +104,7 @@ export class PlayerService {
   }
 
   async validatePlayerExists(uuid: string): Promise<boolean> {
-    try {
-      const energy = await this.mineRepository.findPlayerEnergy(uuid);
-      return energy !== null;
-    } catch {
-      return false;
-    }
+    const energy = await this.mineRepository.findPlayerEnergy(uuid);
+    return energy !== null;
   }
 }
