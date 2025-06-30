@@ -4,7 +4,6 @@ import type {
   CreateSmartrotomUserDto,
   UpdateSmartrotomUserDto,
   UserInitializationDataDto,
-  BatchUsersRequestDto,
   InitializationResult,
   UserWithAccounts,
   FindOrCreateResult,
