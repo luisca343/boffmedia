@@ -10,7 +10,7 @@ import { useFindAllApps } from '@/hooks/apps/useFindAllApps'
 import { App } from '@/components/smartrotom/App'
 import { useBoffSession } from '@/services/useBoffSession'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { usersService } from '@/services/api/smartrotom/usersService'
+import { UsersService } from '@/services/api/smartrotom/usersService'
 
 import AdminPageLayout from '../_components/AdminPageLayout'
 import TerminalCard from '../_components/TerminalCard'
@@ -36,7 +36,7 @@ export default function PlayerAppManagement() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await usersService.findAll();
+        const response = await UsersService.findAll();
         if (response.statusCode === 200) {
           setAllUsers(response.data!);
         }

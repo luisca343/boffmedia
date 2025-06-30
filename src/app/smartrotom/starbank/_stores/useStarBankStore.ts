@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import { getValidAccountId } from "../bankUtils";
 import { Session } from "next-auth";
-import { Account } from "@/services/api/smartrotom/usersService";
 import { starbankService } from "@/services/api/smartrotom/starbankService";
+import { StarBankAccount } from "@/generated/api";
 
 
 interface StarBankState {
-  accounts: Account[];
-  activeAccount: Account | null;
-  setAccounts: (accounts: Account[]) => void;
+  accounts: StarBankAccount[];
+  activeAccount: StarBankAccount | null;
+  setAccounts: (accounts: StarBankAccount[]) => void;
   setActiveAccount: (id: number | null) => void;
   fetchAccounts: (session: Session) => void;
 }

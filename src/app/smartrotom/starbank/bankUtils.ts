@@ -1,6 +1,7 @@
-import { Account } from "@/services/api/smartrotom/usersService";
+import { StarBankAccount } from "@/generated/api";
 
-export function getValidAccountId(accounts: Account[]): number {
+
+export function getValidAccountId(accounts: StarBankAccount[]): number {
     const storedAccount = localStorage.getItem("activeAccount");
     if (storedAccount) {
         const accountId = parseInt(storedAccount);

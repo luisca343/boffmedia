@@ -4,8 +4,9 @@ import { TrainerDefeatMoneyDto } from '@/types/dto/trainer-defeat-money-dto';
 import { CreateShopTransactionDto } from '@/types/dto/create-shop-transaction-dto';
 import { CreateTransferDto } from '@/types/dto/create-transfer-dto';
 import { TransferFromMainDto } from '@/types/dto/transfer-from-main-dto';
-import { Balance, FullTransaction, StarBankAccount } from '@/types/starbank';
+import { Balance, FullTransaction } from '@/types/starbank';
 import { SuccessResponse } from '@/types';
+import { StarBankAccount } from '@/generated/api';
 
 export type Transfer = any; // Replace 'any' with the actual Transfer type
 

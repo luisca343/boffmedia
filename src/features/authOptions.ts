@@ -5,7 +5,6 @@ import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
-import { User } from "@/services/api/smartrotom/usersService";
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -27,7 +26,7 @@ export const authOptions: NextAuthOptions = {
           }
           const response = (await boffPOST(`/auth/login`, credentials)).data as any;
           if (response && !response.error) {
-            return response.user as User;
+            return response.user as any // TODO - CREATE FULL USER TYPE
           }
           throw new AuthError("Invalid credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
         } catch (error) {
@@ -51,7 +50,7 @@ export const authOptions: NextAuthOptions = {
           const response = (await boffPOST(`/auth/loginmc`, credentials)).data as any;
           if (response && !response.error) {
             const responseData = response.user as any;
-            const user: User = {
+            const user: any = {  // TODO - CREATE FULL USER TYPE
               id: responseData.id,
               name: responseData.name,
               email: responseData.email,
