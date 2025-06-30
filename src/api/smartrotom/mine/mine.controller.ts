@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiOkResponse, getSchemaPath, ApiExtraModels } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { MineFacadeService } from './mine.facade.service';
 import { PlayGameDto } from './dto/play-game.dto';
@@ -10,7 +10,7 @@ import { EnergyStatus } from './entities/energy-status.entity';
 import { GameStartResponse } from './entities/game-start-response.entity';
 import { GameEndResponse } from './entities/game-end-response.entity';
 import { RewardsByType } from './entities/rewards-by-type.entity';
-import { DropRates } from './entities/drop-rates.entity';
+import { DropRateEntry, DropRates } from './entities/drop-rates.entity';
 import { PlayerHistory } from './entities/history-entry.entity';
 import { RankingEntry } from './entities/ranking-entry.entity';
 import { UnclaimedItem } from './entities/unclaimed-item.entity';
@@ -95,6 +95,7 @@ export class MineController {
 
   @Get('rewards/droprates')
   @ApiOperation({ summary: 'Get reward drop rates' })
+  @ApiExtraModels(DropRateEntry)
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Drop rates retrieved successfully.',
@@ -108,6 +109,7 @@ export class MineController {
 
   @Get('history/:uuid')
   @ApiOperation({ summary: 'Get game history for a player' })
+  @ApiExtraModels(PlayerHistory)
   @ApiOkResponse({
     status: HttpStatus.OK,
     description: 'Player history retrieved successfully.',

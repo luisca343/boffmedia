@@ -19,7 +19,8 @@ import {
   ApiBody,
   ApiBadRequestResponse,
   ApiNotFoundResponse,
-  ApiInternalServerErrorResponse
+  ApiInternalServerErrorResponse,
+  ApiExtraModels
 } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { PokemonFacadeService } from './pokemon.facade.service';
@@ -38,7 +39,7 @@ import { AbilityCount, AbilityInfo, PokemonAbilityEntry } from './entities/pokem
 import { SpawnInfo, BiomeSpawnData } from './entities/pokemon-spawn.entity';
 import { PokemonImage, ItemSprite } from './entities/pokemon-image.entity';
 import { PokedexStatistics, DetailedPokedexStatistics, PokedexRegistry } from './entities/pokedex.entity';
-import { EvolutionTree } from './entities/pokemon-evolution-tree';
+import { EvolutionNode, EvolutionTree } from './entities/pokemon-evolution-tree';
 import { BiomeSpawnCollection } from './entities/biome-spawn-collection.entity';
 import { PokemonBiomes } from './entities/pokemon-biomes';
 
@@ -169,6 +170,7 @@ export class PokemonController {
 
     @Get('evotree/:id')
     @ApiOperation({ summary: 'Get Pokémon evolution tree by ID' })
+    @ApiExtraModels(EvolutionNode)
     @ApiResponse({ 
       status: HttpStatus.OK, 
       description: 'Pokémon evolution tree retrieved successfully.',

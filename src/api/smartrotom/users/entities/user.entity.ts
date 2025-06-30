@@ -14,15 +14,27 @@ export class SmartRotomUser {
   uuid: string;
 
   @ApiProperty({ 
-    example: 'PlayerName123', 
+    example: 'Luisca343', 
     description: 'Username of the user' 
   })
   username: string;
 
   @ApiProperty({ 
-    example: 'survival', 
+    example: '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365', 
     description: 'World of the user',
     required: false
   })
   world?: string;
+
+  @ApiProperty({
+    example: 10,
+    description: 'Current energy of the user'
+  })
+  energy: number;
+
+  @ApiProperty({
+    example: '2025-06-29T11:03:01.000Z',
+    description: 'Last time the user charged energy'
+  })
+  lastCharge: Date;
 }

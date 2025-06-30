@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 export class DropRateEntry {
   @ApiProperty({ 
@@ -26,7 +26,7 @@ export class DropRates {
       6: { name: 'Piedra Teras', dropRate: 10 },
     },
     additionalProperties: {
-      $ref: '#/components/schemas/DropRateEntry'
+      $ref: getSchemaPath(DropRateEntry)
     }
   })
   entries: Record<number, DropRateEntry>;

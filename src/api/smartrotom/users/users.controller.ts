@@ -1,10 +1,17 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseInterceptors, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
-import { UsersFacadeService, UserInitializationData } from './users.facade.service';
+import { UsersFacadeService } from './users.facade.service';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
+import { UserInitializationDataDto } from './dto/user-initialization-data.dto';
+import { BatchUsersRequestDto } from './dto/batch-users-request.dto';
 import { SmartRotomUser } from './entities/user.entity';
+import { InitializationResult } from './entities/initialization-result.entity';
+import { UserWithAccounts } from './entities/user-with-accounts.entity';
+import { FindOrCreateResult } from './entities/find-or-create-result.entity';
+import { UserStatistics } from './entities/user-statistics.entity';
+import { UserValidationResult } from './entities/user-validation-result.entity';
 
 @ApiTags('SmartRotom | Users')
 @Controller('smartrotom/users')
@@ -119,18 +126,11 @@ export class UsersController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User found or created successfully.',
-    schema: {
-      type: 'object',
-      properties: {
-        user: { $ref: '#/components/schemas/SmartRotomUser' },
-        isNew: { type: 'boolean' },
-        status: { type: 'string', enum: ['found', 'created'] }
-      }
-    }
+    type: FindOrCreateResult
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data.' })
   @ApiResponse({ status: HttpStatus.CONFLICT, description: 'Username already taken.' })
-  async findOrCreateUser(@Body() createUserDto: CreateSmartrotomUserDto) {
+  async findOrCreateUser(@Body() createUserDto: CreateSmartrotomUserDto): Promise<FindOrCreateResult> {
     const result = await this.usersFacadeService.findOrCreateUser(createUserDto);
     return {
       user: result.user,
@@ -144,29 +144,10 @@ export class UsersController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User and accounts initialized successfully.',
-    schema: {
-      type: 'object',
-      properties: {
-        user: { $ref: '#/components/schemas/SmartRotomUser' },
-        accounts: { type: 'array', items: { type: 'object' } },
-        isNewUser: { type: 'boolean' },
-        isNewAccount: { type: 'boolean' }
-      }
-    }
+    type: InitializationResult
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data.' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['uuid', 'username'],
-      properties: {
-        uuid: { type: 'string', format: 'uuid' },
-        username: { type: 'string', minLength: 3, maxLength: 16 },
-        world: { type: 'string', maxLength: 32 }
-      }
-    }
-  })
-  async initialize(@Body() data: UserInitializationData) {
+  async initialize(@Body() data: UserInitializationDataDto): Promise<InitializationResult> {
     return this.usersFacadeService.initializeUserAndAccounts(data);
   }
 
@@ -177,17 +158,11 @@ export class UsersController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User and accounts retrieved successfully.',
-    schema: {
-      type: 'object',
-      properties: {
-        user: { $ref: '#/components/schemas/SmartRotomUser' },
-        accounts: { type: 'array', items: { type: 'object' } }
-      }
-    }
+    type: UserWithAccounts
   })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async getUserWithAccounts(@Param('uuid') uuid: string) {
+  async getUserWithAccounts(@Param('uuid') uuid: string): Promise<UserWithAccounts> {
     const result = await this.usersFacadeService.getUserWithAccounts(uuid);
     if (!result) {
       throw new Error('User not found');
@@ -213,24 +188,8 @@ export class UsersController {
     }
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid request data.' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['uuids'],
-      properties: {
-        uuids: { 
-          type: 'array', 
-          items: { type: 'string', format: 'uuid' },
-          minItems: 1
-        }
-      }
-    }
-  })
-  async getMultipleUsers(@Body() { uuids }: { uuids: string[] }) {
-    if (!Array.isArray(uuids) || uuids.length === 0) {
-      throw new Error('UUIDs array is required and cannot be empty');
-    }
-    return this.usersFacadeService.getMultipleUsers(uuids);
+  async getMultipleUsers(@Body() request: BatchUsersRequestDto): Promise<{ [uuid: string]: SmartRotomUser | null }> {
+    return this.usersFacadeService.getMultipleUsers(request.uuids);
   }
 
   @Post('batch/accounts')
@@ -242,37 +201,15 @@ export class UsersController {
       type: 'object',
       additionalProperties: {
         oneOf: [
-          {
-            type: 'object',
-            properties: {
-              user: { $ref: '#/components/schemas/SmartRotomUser' },
-              accounts: { type: 'array', items: { type: 'object' } }
-            }
-          },
+          { $ref: '#/components/schemas/UserWithAccounts' },
           { type: 'null' }
         ]
       }
     }
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid request data.' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['uuids'],
-      properties: {
-        uuids: { 
-          type: 'array', 
-          items: { type: 'string', format: 'uuid' },
-          minItems: 1
-        }
-      }
-    }
-  })
-  async getMultipleUsersWithAccounts(@Body() { uuids }: { uuids: string[] }) {
-    if (!Array.isArray(uuids) || uuids.length === 0) {
-      throw new Error('UUIDs array is required and cannot be empty');
-    }
-    return this.usersFacadeService.getMultipleUsersWithAccounts(uuids);
+  async getMultipleUsersWithAccounts(@Body() request: BatchUsersRequestDto): Promise<{ [uuid: string]: UserWithAccounts | null }> {
+    return this.usersFacadeService.getMultipleUsersWithAccounts(request.uuids);
   }
 
   // ==================== STATISTICS ====================
@@ -282,16 +219,9 @@ export class UsersController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Statistics retrieved successfully.',
-    schema: {
-      type: 'object',
-      properties: {
-        totalUsers: { type: 'number' },
-        usersWithAccounts: { type: 'number' },
-        usersWithoutAccounts: { type: 'number' }
-      }
-    }
+    type: UserStatistics
   })
-  async getStatistics() {
+  async getStatistics(): Promise<UserStatistics> {
     return this.usersFacadeService.getUserStatistics();
   }
 
@@ -302,15 +232,10 @@ export class UsersController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User validation result.',
-    schema: {
-      type: 'object',
-      properties: {
-        exists: { type: 'boolean' }
-      }
-    }
+    type: UserValidationResult
   })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
-  async validateUser(@Param('uuid') uuid: string) {
+  async validateUser(@Param('uuid') uuid: string): Promise<UserValidationResult> {
     return { 
       exists: await this.usersFacadeService.validateUserExists(uuid) 
     };

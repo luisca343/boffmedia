@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 
 export class EvolutionMethod {
   @ApiProperty({ 
@@ -84,7 +84,7 @@ export class EvolutionTree {
   @ApiProperty({ 
     description: 'Evolution tree structure',
     type: 'object',
-    additionalProperties: { $ref: '#/components/schemas/EvolutionNode' },
+    additionalProperties: { $ref:  getSchemaPath(EvolutionNode) },
     example: {
       "Vulpix_base": {
         "pkm": "Vulpix",
