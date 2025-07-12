@@ -59,7 +59,28 @@ export class PlayerService {
       throw new BadRequestException('UUID is required');
     }
 
-    return this.mineRepository.findUnclaimedItems(uuid);
+    const unclaimedItems = await this.mineRepository.findUnclaimedItems(uuid);
+    
+    // Aggregate items by itemId
+    const aggregatedItems = new Map<string, UnclaimedItem>();
+    
+    for (const item of unclaimedItems) {
+      const existingItem = aggregatedItems.get(item.itemId);
+      
+      if (existingItem) {
+        existingItem.amount = (existingItem.amount || 1) + (item.amount || 1);
+      } else {
+        // Create new aggregated item
+        aggregatedItems.set(item.itemId, {
+          id: item.id, 
+          itemId: item.itemId,
+          type: item.type,
+          amount: item.amount || 1
+        });
+      }
+    }
+    
+    return Array.from(aggregatedItems.values());
   }
 
   async claimRewards(uuid: string): Promise<ClaimResponse> {
