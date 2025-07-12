@@ -10,48 +10,16 @@ import {
 } from '@/_db/schema/BoffMedia';
 import { smartrotomUsers, SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { boffMediaParticipants } from '@/_db/schema/Events';
-
-export type BoffMediaUserSafe = Omit<BoffMediaUser, 'password'>;
-
-export interface CreateUserData {
-  email: string;
-  username: string;
-  password: string;
-  uuid?: string;
-  profilePicture?: string;
-  googleId?: string;
-  discordId?: string;
-}
-
-export interface UpdateUserData {
-  email?: string;
-  username?: string;
-  password?: string;
-  uuid?: string;
-  profilePicture?: string;
-  googleId?: string;
-  discordId?: string;
-}
-
-export interface UserWithRoles extends BoffMediaUserSafe {
-  roles: string[];
-}
-
-export interface FullUserData {
-  boffmedia_users: BoffMediaUser;
-  rotom_users: SmartRotomUser | null;
-}
-
-export interface FullUserDataSafe {
-  boffmedia_users: BoffMediaUserSafe;
-  rotom_users: SmartRotomUser | null;
-}
+import { BoffMediaUserSafe, FullUserData, FullUserDataSafe, IBoffMediaUsersRepository } from './interfaces/users.repository.interface';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 @Injectable()
-export class BoffMediaUsersRepository {
+export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
+
 
   // ==================== SELECT CLAUSES ====================
 
@@ -85,7 +53,7 @@ export class BoffMediaUsersRepository {
 
   // ==================== CREATE OPERATIONS ====================
 
-  async createUser(userData: CreateUserData): Promise<BoffMediaUserSafe> {
+  async createUser(userData: CreateUserDto): Promise<BoffMediaUserSafe> {
     try {
       const result = await this.db.insert(boffMediaUsers)
         .values(userData as BoffMediaUser)
@@ -363,7 +331,7 @@ export class BoffMediaUsersRepository {
 
   // ==================== UPDATE OPERATIONS ====================
 
-  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUserSafe> {
+  async updateUser(id: number, updateData: UpdateUserDto): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new Error('Valid ID is required');
     }

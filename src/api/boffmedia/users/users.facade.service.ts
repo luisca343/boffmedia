@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { BoffMediaUsersManagementService, UserCreationResult, SessionUser, GoogleUserData, MinecraftRegistrationData, MinecraftLinkData } from './services/users-management.service';
 import { UsersFacadeService as SmartRotomUsersFacadeService } from '@api/smartrotom/users/users.facade.service';
 import { StarbankFacadeService } from '@api/smartrotom/starbank/starbank.facade.service';
-import { CreateUserData, UpdateUserData, FullUserData, BoffMediaUserSafe, FullUserDataSafe } from '@repositories/boffmedia/users.repository';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { SmartRotomUser } from '@/_db/schema/SmartRotom';
+import { BoffMediaUserSafe, FullUserData, FullUserDataSafe } from './repositories/interfaces/users.repository.interface';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 export interface BoffMediaUserInitializationData {
   email: string;
@@ -55,7 +57,7 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== USER CREATION & INITIALIZATION ====================
 
-  async createUser(userData: CreateUserData): Promise<BoffMediaUserSafe> {
+  async createUser(userData: CreateUserDto): Promise<BoffMediaUserSafe> {
     try {
       return await this.usersManagementService.createUser(userData);
     } catch (error) {
@@ -64,7 +66,7 @@ export class BoffMediaUsersFacadeService {
     }
   }
 
-  async findOrCreateUser(userData: CreateUserData): Promise<UserCreationResult> {
+  async findOrCreateUser(userData: CreateUserDto): Promise<UserCreationResult> {
     try {
       return await this.usersManagementService.findOrCreateUser(userData);
     } catch (error) {
@@ -78,7 +80,7 @@ export class BoffMediaUsersFacadeService {
       console.log('Initializing full user with integrations:', { username: data.username, email: data.email });
 
       // Create BoffMedia user
-      const boffMediaUserData: CreateUserData = {
+      const boffMediaUserData: CreateUserDto = {
         email: data.email,
         username: data.username,
         password: data.password,
@@ -241,7 +243,7 @@ export class BoffMediaUsersFacadeService {
 
   // ==================== USER UPDATE ====================
 
-  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUserSafe> {
+  async updateUser(id: number, updateData: UpdateUserDto): Promise<BoffMediaUserSafe> {
     try {
       return await this.usersManagementService.updateUser(id, updateData);
     } catch (error) {
@@ -531,7 +533,7 @@ export class BoffMediaUsersFacadeService {
       throw new Error('Email, username, and password are required');
     }
 
-    const userData: CreateUserData = {
+    const userData: CreateUserDto = {
       email: boffMediaUser.email,
       username: boffMediaUser.username,
       password: boffMediaUser.password,

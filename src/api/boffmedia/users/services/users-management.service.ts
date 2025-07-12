@@ -1,8 +1,11 @@
 import { Injectable, BadRequestException, ConflictException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { BoffMediaUsersRepository, CreateUserData, UpdateUserData, FullUserData, BoffMediaUserSafe, FullUserDataSafe } from '@repositories/boffmedia/users.repository';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { BoffMediaUser } from '@/_db/schema/BoffMedia';
 import { PasswordService } from '@api/auth/password.service';
+import { BoffMediaUserSafe, FullUserData, FullUserDataSafe } from '../repositories/interfaces/users.repository.interface';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
 
 export interface UserCreationResult {
   user: BoffMediaUserSafe;
@@ -65,7 +68,7 @@ export class BoffMediaUsersManagementService {
 
   // ==================== USER CREATION ====================
 
-  async createUser(userData: CreateUserData): Promise<BoffMediaUserSafe> {
+  async createUser(userData: CreateUserDto): Promise<BoffMediaUserSafe> {
     // Validate input
     const validation = this.validateUserData(userData);
     if (!validation.isValid) {
@@ -120,7 +123,7 @@ export class BoffMediaUsersManagementService {
     }
   }
 
-  async findOrCreateUser(userData: CreateUserData): Promise<UserCreationResult> {
+  async findOrCreateUser(userData: CreateUserDto): Promise<UserCreationResult> {
     try {
       // Try to find existing user by username or email
       let user = await this.usersRepository.findUserByUsername(userData.username);
@@ -273,7 +276,7 @@ export class BoffMediaUsersManagementService {
 
   // ==================== USER UPDATE ====================
 
-  async updateUser(id: number, updateData: UpdateUserData): Promise<BoffMediaUserSafe> {
+  async updateUser(id: number, updateData: UpdateUserDto): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
       throw new BadRequestException('Valid ID is required');
     }
@@ -372,7 +375,7 @@ export class BoffMediaUsersManagementService {
           });
         } else {
           // Create new user with secure random password
-          const userData: CreateUserData = {
+          const userData: CreateUserDto = {
             email: googleUser.email,
             username: this.generateUsernameFromEmail(googleUser.email),
             password: this.passwordService.generateOAuthPassword(), // Use PasswordService
@@ -400,7 +403,7 @@ export class BoffMediaUsersManagementService {
 
   async createMinecraftUser(registerData: MinecraftRegistrationData): Promise<BoffMediaUserSafe> {
     try {
-      const userData: CreateUserData = {
+      const userData: CreateUserDto = {
         email: registerData.email,
         username: registerData.username,
         password: registerData.password,
@@ -486,7 +489,7 @@ export class BoffMediaUsersManagementService {
 
   // ==================== VALIDATION METHODS ====================
 
-  private validateUserData(userData: CreateUserData): UserValidationResult {
+  private validateUserData(userData: CreateUserDto): UserValidationResult {
     const errors: string[] = [];
 
     console.log('Validating user data:', userData);
