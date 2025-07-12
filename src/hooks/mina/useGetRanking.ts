@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export function useGetHistory(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.getHistory, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(MinaService.getPlayerHistory, uuid)
 
   return {
     history: data,

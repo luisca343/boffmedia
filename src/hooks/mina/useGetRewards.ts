@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export function useGetRewards() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.getRewards)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(MinaService.getAllRewards)
 
   return {
     rewards: data,

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { useRotomRequest } from "../useRotomRequest";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export function useGetUnclaimed(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.getUnclaimed, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(MinaService.getUnclaimedRewards, uuid)
   
   const getBoxes = useMemo(() => {
     return Math.ceil((data?.length || 0) / 27);

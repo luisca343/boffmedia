@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useRotomRequest } from "../useRotomRequest";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export function useGetEnergy(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(minaService.getEnergy, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(MinaService.getPlayerEnergy, uuid)
   const [maxEnergy, setMaxEnergy] = useState<number>(0)
   const [energy, setEnergy] = useState<number>(0)
   const [ultimaRecarga, setUltimaRecarga] = useState<Date>(new Date())

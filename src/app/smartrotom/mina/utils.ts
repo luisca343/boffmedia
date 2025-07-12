@@ -4,12 +4,12 @@
 import NoiseMap from 'noise-map'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { toast } from 'react-toastify';
-import { minaService } from '@/services/api/smartrotom/minaService';
-import { RewardEntry } from '@/types/mina';
+import { MinaService } from '@/services/api/smartrotom/minaService';
+import { MineReward } from '@/generated/api';
 
 
 export async function generateGame(numFilas: number, numColumnas: number){
-    const rewards = await getRewards() as RewardEntry[];
+    const rewards = await getRewards() as MineReward[];
     const positions = await generatePositions(numFilas, numColumnas, rewards);
     const map = await getMineMap(numFilas, numColumnas);
 
@@ -35,14 +35,18 @@ export async function getMineMap(numFilas: number, numColumnas: number) {
 }
 
 async function getRewards(cantidad: number = 5) {
-    const {data: rewards} = await minaService.getRewards() as {data: RewardEntry[]};
+    const {data: rewards} = await MinaService.getAllRewards();
     const rewardsTmp = []
     console.log(rewards);
     
-    let valorTotal = rewards.reduce((acc:number, reward: RewardEntry) => acc + reward.value, 0);
+    if (!rewards) {
+        console.error('No rewards found');
+        return [];
+    }
+    let valorTotal = (rewards as MineReward[]).reduce((acc: number, reward: MineReward) => acc + reward.value, 0);
     for (let i = 0; i < cantidad; i++) {
         let valor = Math.random() * valorTotal;
-        let reward = rewards.find((reward: RewardEntry) => {
+        let reward = rewards.find((reward: MineReward) => {
             valor -= reward.value;
             return valor <= 0;
         });
@@ -54,13 +58,13 @@ async function getRewards(cantidad: number = 5) {
 }
 
 async function getRewardsNoRepeat(cantidad: number = 5) {
-    const {data: rewards} = await minaService.getRewards() as {data: RewardEntry[]};
+    const {data: rewards} = await MinaService.getAllRewards() as {data: MineReward[]};
     const rewardsTmp = [];
     
-    let valorTotal = rewards.reduce((acc:number, reward: RewardEntry) => acc + reward.value, 0);
+    let valorTotal = rewards.reduce((acc:number, reward: MineReward) => acc + reward.value, 0);
     for (let i = 0; i < cantidad; i++) {
         let valor = Math.random() * valorTotal;
-        let index = rewards.findIndex((reward: RewardEntry) => {
+        let index = rewards.findIndex((reward: MineReward) => {
             valor -= reward.value;
             return valor <= 0;
         });
@@ -75,8 +79,8 @@ async function getRewardsNoRepeat(cantidad: number = 5) {
     return rewardsTmp;
 }
 
-async function generatePositions(rowNum: number, colNum: number, rewards: RewardEntry[]) {
-    const positions = [] as {reward: RewardEntry ,x: number, y: number}[];
+async function generatePositions(rowNum: number, colNum: number, rewards: MineReward[]) {
+    const positions = [] as {reward: MineReward ,x: number, y: number}[];
     let errors = 0;
 
     for(let i = 0; i < rewards.length; i++) {
@@ -117,7 +121,7 @@ async function generatePositions(rowNum: number, colNum: number, rewards: Reward
 }
 
 
-function  validPosition(rew: {reward: RewardEntry, x: number, y: number}, comparing: {reward: RewardEntry, x: number, y: number}) {
+function  validPosition(rew: {reward: MineReward, x: number, y: number}, comparing: {reward: MineReward, x: number, y: number}) {
     return rew.x < comparing.x + comparing.reward.width &&
         rew.x + rew.reward.width > comparing.x &&
         rew.y < comparing.y + comparing.reward.height &&
@@ -126,7 +130,7 @@ function  validPosition(rew: {reward: RewardEntry, x: number, y: number}, compar
 
 
 export function jugar(session: any, router: AppRouterInstance, redirect: string = "" ){
-    minaService.play({uuid: session?.user.smartRotomUser.uuid}).then(res => {
+    MinaService.playGame({uuid: session?.user.smartRotomUser.uuid}).then(res => {
         if(!res.error) return router.push('/smartrotom/mina/jugar')
         toast.error(res.error)
         redirect != "" && router.push(redirect)
