@@ -51,7 +51,18 @@ export class AuthService {
       return { error: 'User not found in BoffMedia system' };
     }
 
-    return this.login(user);
+    const loginUser = {
+      sessionUser: {
+        id: user.boffMediaUser.id,
+        name: user.boffMediaUser.username,
+        email: user.boffMediaUser.email,
+        roles: user.roles,
+        mcUUid: user.boffMediaUser.uuid,
+        smartRotomUser: user.smartRotomUser
+      }
+    };
+
+    return this.login(loginUser);
   }
 
   async registerMinecraft(registerData: {
