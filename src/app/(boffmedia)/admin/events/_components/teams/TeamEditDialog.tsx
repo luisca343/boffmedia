@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { TeamForm, type TeamFormValues } from "./TeamForm"
 import type { EventTeam } from "@/types/events"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 
 interface TeamEditDialogProps {
   open: boolean

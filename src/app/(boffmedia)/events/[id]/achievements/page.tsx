@@ -11,7 +11,7 @@ import {
   ArrowLeft, Trophy, Award, Search, Filter, Lock, 
   Calendar, Target, Users, Star 
 } from "lucide-react"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, Event, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"

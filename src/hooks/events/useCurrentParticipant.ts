@@ -1,5 +1,5 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useMemo } from "react"
 

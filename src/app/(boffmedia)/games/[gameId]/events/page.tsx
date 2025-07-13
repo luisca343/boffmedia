@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Calendar, Plus, Loader2, ArrowLeft } from "lucide-react"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 import type { Event, Game } from "@/types/events"
 import Link from "next/link"
 import { format } from "date-fns"

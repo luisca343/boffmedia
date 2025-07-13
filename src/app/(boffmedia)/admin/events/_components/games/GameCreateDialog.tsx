@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "react-toastify"
 import { GameForm, type GameFormValues } from "./GameForm"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 
 interface GameCreateDialogProps {
   open: boolean

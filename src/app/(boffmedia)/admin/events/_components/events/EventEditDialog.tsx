@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
 import type { Event } from "@/types/events"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 
 interface EventEditDialogProps {
   open: boolean

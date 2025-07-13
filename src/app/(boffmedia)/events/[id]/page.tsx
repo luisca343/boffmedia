@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import Link from "next/link";
 import { Event, Game } from "@/types/events";
-import { eventsService } from "@/services/api/smartrotom/eventsService";
+import { eventsService } from "@/services/api/boffmedia/eventsService";
 import { EventRegistrationButton } from "../_components/EventRegistrationButton";
 import { Markdown } from "@/components/Markdown";
 import { getEventStatus } from "@/lib/events";

@@ -7,7 +7,7 @@ import { User, UserPlus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import type { Event } from "@/types/events";
-import { eventsService } from "@/services/api/smartrotom/eventsService";
+import { eventsService } from "@/services/api/boffmedia/eventsService";
 import { getEventStatus } from "@/lib/events";
 
 interface EventRegistrationButtonProps {

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Gamepad, Plus, Loader2, Edit, Calendar } from "lucide-react"
 import { useGetGames } from "@/hooks/events/useGetGames"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 import type { CreateGameDto } from "@/types/dto/create-game.dto"
 import type { Game } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"

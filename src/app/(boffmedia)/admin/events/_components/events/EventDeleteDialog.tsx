@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "react-toastify"
 import { Calendar, RefreshCw } from "lucide-react"
 import type { Event } from "@/types/events"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { eventsService } from "@/services/api/boffmedia/eventsService"
 
 interface EventDeleteDialogProps {
   open: boolean

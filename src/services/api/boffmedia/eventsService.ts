@@ -8,7 +8,6 @@ import type {
   UpdateAchievementDto,
   CreateTeamDto,
   UpdateTeamDto,
-  JoinEventDto,
   UpdateProgressDto,
   Event,
   Game,
