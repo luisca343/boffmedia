@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { pokemonService } from '@/services/api/smartrotom/pokemonService';
+import { PokemonService } from '@/services/api/smartrotom/pokemonService';
 import { SpriteInfo, SpriteManifest } from '@/types/Pokemon';
 
 interface SpriteManifestState {
@@ -22,7 +22,7 @@ export const useSpriteManifestStore = create<SpriteManifestState>((set, get) => 
     set({ isLoading: true, error: null });
     try {
       console.log('Fetching sprite manifest...');
-      const manifest = (await pokemonService.getSpriteManifest()).data as SpriteManifest;
+      const manifest = (await PokemonService.getSpriteManifest()).data as SpriteManifest;
       set({ manifest, isLoading: false });
     } catch (error) {
       console.error('Error fetching sprite manifest:', error);
@@ -36,7 +36,7 @@ export const useSpriteManifestStore = create<SpriteManifestState>((set, get) => 
   refreshManifest: async () => {
     set({ isLoading: true, error: null });
     try {
-      const result = (await pokemonService.refreshSpriteManifest()).data as { count: number };
+      const result = (await PokemonService.refreshSpriteManifest()).data as { count: number };
       await get().fetchManifest();
       return result.count;
     } catch (error) {

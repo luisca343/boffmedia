@@ -10,15 +10,74 @@ import { StarBankAccount } from '@/generated/api';
 
 export type Transfer = any; // Replace 'any' with the actual Transfer type
 
-export const starbankService = {
-  getAllAccounts: () => rotomGET<StarBankAccount[]>('/starbank/accounts'),
-  createAccount: (data: CreateAccountDto) => rotomPOST<SuccessResponse>('/starbank/accounts', data),
-  getAccounts: (uuid: string) => rotomGET<StarBankAccount[]>(`/starbank/accounts/${uuid}`),
-  getBalance: (uuid: string) => rotomGET<Balance>(`/starbank/balance/${uuid}`),
-  shop: (data: CreateShopTransactionDto) => rotomPOST<SuccessResponse>('/starbank/shop', data),
-  trainerDefeat: (data: TrainerDefeatMoneyDto) => rotomPOST<SuccessResponse>('/starbank/trainerdefeat', data),
-  getTransactions: (account: number, limit?: number) => rotomGET<FullTransaction[]>(`/starbank/transactions/${account}${limit ? `?limit=${limit}` : ''}`),
-  transfer: (data: CreateTransferDto) => rotomPOST<SuccessResponse>('/starbank/transfer', data),
-  transferFromMain: (data: TransferFromMainDto) => rotomPOST<SuccessResponse>('/starbank/transfer/from-main', data),
-  getTransfers: (account: number) => rotomGET<Transfer[]>(`/starbank/transfers/${account}`),
-};
+export class StarbankService {
+  /**
+   * Get all StarBank accounts
+   */
+  static getAllAccounts() {
+    return rotomGET<StarBankAccount[]>('/starbank/accounts');
+  }
+
+  /**
+   * Create a new StarBank account
+   */
+  static createAccount(data: CreateAccountDto) {
+    return rotomPOST<SuccessResponse>('/starbank/accounts', data);
+  }
+
+  /**
+   * Get accounts for a specific user
+   */
+  static getAccounts(uuid: string) {
+    return rotomGET<StarBankAccount[]>(`/starbank/accounts/${uuid}`);
+  }
+
+  /**
+   * Get balance for a user
+   */
+  static getBalance(uuid: string) {
+    return rotomGET<Balance>(`/starbank/balance/${uuid}`);
+  }
+
+  /**
+   * Process a shop transaction
+   */
+  static shop(data: CreateShopTransactionDto) {
+    return rotomPOST<SuccessResponse>('/starbank/shop', data);
+  }
+
+  /**
+   * Process trainer defeat money transaction
+   */
+  static trainerDefeat(data: TrainerDefeatMoneyDto) {
+    return rotomPOST<SuccessResponse>('/starbank/trainerdefeat', data);
+  }
+
+  /**
+   * Get transactions for an account
+   */
+  static getTransactions(account: number, limit?: number) {
+    return rotomGET<FullTransaction[]>(`/starbank/transactions/${account}${limit ? `?limit=${limit}` : ''}`);
+  }
+
+  /**
+   * Transfer money between accounts
+   */
+  static transfer(data: CreateTransferDto) {
+    return rotomPOST<SuccessResponse>('/starbank/transfer', data);
+  }
+
+  /**
+   * Transfer money from main account
+   */
+  static transferFromMain(data: TransferFromMainDto) {
+    return rotomPOST<SuccessResponse>('/starbank/transfer/from-main', data);
+  }
+
+  /**
+   * Get transfers for an account
+   */
+  static getTransfers(account: number) {
+    return rotomGET<Transfer[]>(`/starbank/transfers/${account}`);
+  }
+}

@@ -3,7 +3,7 @@ import { X, Check, AlertCircle, Box } from 'lucide-react';
 import { ItemDisplay } from '../ItemDisplay';
 import { useTranslations } from 'next-intl';
 import { getItemName } from '@/lib/intlUtils';
-import { ArcadeInventoryItem, arcadeService } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeInventoryItem } from '@/services/api/smartrotom/arcadeService';
 import { toast } from 'react-toastify';
 
 interface ClaimRewardsModalProps {

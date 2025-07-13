@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import { pokemonService } from "@/services/api/smartrotom/pokemonService";
+import { PokemonService } from "@/services/api/smartrotom/pokemonService";
 import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -16,7 +16,7 @@ export default function PokemonList() {
   useEffect(() => {
     async function fetchPokemonList() {
       try {
-        const response = await pokemonService.getAllPokemon();
+        const response = await PokemonService.getAllPokemon();
         setPokemonList(Array.isArray(response.data) ? response.data : []);
       } catch (error) {
         console.error("Failed to fetch Pokemon list:", error);

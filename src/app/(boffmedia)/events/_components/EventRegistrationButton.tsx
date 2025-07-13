@@ -7,7 +7,7 @@ import { User, UserPlus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import type { Event } from "@/types/events";
-import { eventsService } from "@/services/api/boffmedia/eventsService";
+import { EventsService } from "@/services/api/boffmedia/eventsService";
 import { getEventStatus } from "@/lib/events";
 
 interface EventRegistrationButtonProps {
@@ -29,7 +29,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
       
       try {
         setIsLoading(true);
-        const result = await eventsService.getEventParticipants(event.id);
+        const result = await EventsService.getEventParticipants(event.id);
         setParticipants(result.data || []);
         
         // Check if user is already registered
@@ -73,14 +73,14 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
         // Optional comment can be added if needed
       };
       
-      const response = await eventsService.joinEvent(event.id, joinEventData);
+      const response = await EventsService.joinEvent(event.id, joinEventData);
       
       if (response.statusCode === 200) {
         setIsRegistered(true);
         toast.success("¡Te has registrado exitosamente para este evento!");
         
         // Refresh participant list
-        const updatedParticipants = await eventsService.getEventParticipants(event.id);
+        const updatedParticipants = await EventsService.getEventParticipants(event.id);
         setParticipants(updatedParticipants.data || []);
       } else {
         toast.error(response.message || "No se pudo completar el registro");

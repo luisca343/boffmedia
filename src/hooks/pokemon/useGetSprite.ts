@@ -1,5 +1,5 @@
 import { useRotomRequest } from "../useRotomRequest"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 
 export function useGetSprite(params: {
   pokemonId: number
@@ -8,7 +8,7 @@ export function useGetSprite(params: {
   uuid: string
   hide: number
 }) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(pokemonService.getSprite, params)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(PokemonService.getSprite, params)
 
   return {
     sprite: data,

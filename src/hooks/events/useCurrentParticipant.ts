@@ -1,5 +1,5 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useMemo } from "react"
 
@@ -10,7 +10,7 @@ export function useCurrentParticipant(eventId: number) {
   const shouldFetch = eventId && userId
   
   const { data, error, isLoading, refetch } = useRotomRequest(
-    () => eventsService.getEventParticipants(eventId),
+    () => EventsService.getEventParticipants(eventId),
     [eventId],
     !shouldFetch
   )

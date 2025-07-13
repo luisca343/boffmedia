@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { chatAppService } from "@/services/api/smartrotom/chatAppService";
+import { ChatAppService } from "@/services/api/smartrotom/chatAppService";
 
 export function useGetChats(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.getChats, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(ChatAppService.getChats, uuid)
 
   return {
     chats: data,

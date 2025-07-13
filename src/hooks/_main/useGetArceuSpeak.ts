@@ -1,8 +1,8 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { smartrotomService } from "@/services/api/smartrotom/smartrotomService"
+import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
 
 export function useGetArceuSpeak() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(smartrotomService.getArceuSpeak)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(SmartrotomService.getArceuSpeak)
 
   return {
     speakers: data,

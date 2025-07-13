@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Gamepad, Plus, Loader2, Edit, Calendar } from "lucide-react"
 import { useGetGames } from "@/hooks/events/useGetGames"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import type { CreateGameDto } from "@/types/dto/create-game.dto"
 import type { Game } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
@@ -36,7 +36,7 @@ export default function ExploreGames() {
     e.preventDefault()
     setIsCreating(true)
     try {
-      await eventsService.createGame(newGame)
+      await EventsService.createGame(newGame)
       setNewGame({ title: "", description: "", icon: "" })
       setIsDialogOpen(false)
       refetch()
@@ -53,7 +53,7 @@ export default function ExploreGames() {
 
     setIsUpdating(true)
     try {
-      await eventsService.updateGame(editingGame.id!, editingGame)
+      await EventsService.updateGame(editingGame.id!, editingGame)
       setIsEditDialogOpen(false)
       refetch()
     } catch (error) {

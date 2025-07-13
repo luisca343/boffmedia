@@ -1,9 +1,9 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useGetLeaderboard(eventId: number) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    () => eventsService.getLeaderboard(eventId),
+    () => EventsService.getLeaderboard(eventId),
     [eventId],
   )
 

@@ -21,249 +21,300 @@ import type {
   JoinTeamDto,
   SuccessResponse,
 } from '@/generated/api';
-export const eventsService = {
+
+export class EventsService {
   // ==================== EVENT OPERATIONS ====================
   
   /**
    * Get all events
    */
-  getEvents: () => apiGET<Event[]>('/boffmedia/events'),
+  static getEvents() {
+    return apiGET<Event[]>('/boffmedia/events');
+  }
   
   /**
    * Get a specific event by ID
    */
-  getEvent: (id: number) => apiGET<Event>(`/boffmedia/events/event/${id}`),
+  static getEvent(id: number) {
+    return apiGET<Event>(`/boffmedia/events/event/${id}`);
+  }
   
   /**
    * Create a new event
    */
-  createEvent: (data: any) => apiPOST<any>('/boffmedia/events/event', data),
+  static createEvent(data: any) {
+    return apiPOST<any>('/boffmedia/events/event', data);
+  }
   
   /**
    * Update an existing event
    */
-  updateEvent: (id: number, data: UpdateEventDto) => 
-    apiPATCH<Event>(`/boffmedia/events/event/${id}`, data),
+  static updateEvent(id: number, data: UpdateEventDto) {
+    return apiPATCH<Event>(`/boffmedia/events/event/${id}`, data);
+  }
   
   /**
    * Delete an event
    */
-  deleteEvent: (id: number) => apiDELETE<SuccessResponse>(`/boffmedia/events/event/${id}`),
+  static deleteEvent(id: number) {
+    return apiDELETE<SuccessResponse>(`/boffmedia/events/event/${id}`);
+  }
 
   // ==================== GAME OPERATIONS ====================
   
   /**
    * Get all games
    */
-  getGames: () => apiGET<Game[]>('/boffmedia/events/games'),
+  static getGames() {
+    return apiGET<Game[]>('/boffmedia/events/games');
+  }
   
   /**
    * Get a specific game by ID
    */
-  getGame: (id: number) => apiGET<Game>(`/boffmedia/events/games/${id}`),
+  static getGame(id: number) {
+    return apiGET<Game>(`/boffmedia/events/games/${id}`);
+  }
   
   /**
    * Create a new game
    */
-  createGame: (data: CreateGameDto) => apiPOST<Game>('/boffmedia/events/games', data),
+  static createGame(data: CreateGameDto) {
+    return apiPOST<Game>('/boffmedia/events/games', data);
+  }
   
   /**
    * Update an existing game
    */
-  updateGame: (id: number, data: UpdateGameDto) => 
-    apiPATCH<Game>(`/boffmedia/events/games/${id}`, data),
+  static updateGame(id: number, data: UpdateGameDto) {
+    return apiPATCH<Game>(`/boffmedia/events/games/${id}`, data);
+  }
   
   /**
    * Delete a game
    */
-  deleteGame: (id: number) => apiDELETE<SuccessResponse>(`/boffmedia/events/games/${id}`),
+  static deleteGame(id: number) {
+    return apiDELETE<SuccessResponse>(`/boffmedia/events/games/${id}`);
+  }
 
   // ==================== ACHIEVEMENT OPERATIONS ====================
   
   /**
    * Get all achievements
    */
-  getAchievements: () => apiGET<Achievement[]>('/boffmedia/events/achievements'),
+  static getAchievements() {
+    return apiGET<Achievement[]>('/boffmedia/events/achievements');
+  }
   
   /**
    * Get all achievements for a specific event
    */
-  getEventAchievements: (eventId: number) => 
-    apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`),
+  static getEventAchievements(eventId: number) {
+    return apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`);
+  }
   
   /**
    * Create a new achievement for an event
    */
-  createAchievement: (eventId: number, data: CreateAchievementDto) => 
-    apiPOST<Achievement>(`/boffmedia/events/${eventId}/achievements`, data),
+  static createAchievement(eventId: number, data: CreateAchievementDto) {
+    return apiPOST<Achievement>(`/boffmedia/events/${eventId}/achievements`, data);
+  }
   
   /**
    * Update an existing achievement
    */
-  updateAchievement: (eventId: number, achievementId: number, data: UpdateAchievementDto) => 
-    apiPATCH<Achievement>(`/boffmedia/events/${eventId}/achievements/${achievementId}`, data),
+  static updateAchievement(eventId: number, achievementId: number, data: UpdateAchievementDto) {
+    return apiPATCH<Achievement>(`/boffmedia/events/${eventId}/achievements/${achievementId}`, data);
+  }
 
   // ==================== TEAM OPERATIONS ====================
   
   /**
    * Get all teams
    */
-  getTeams: () => apiGET<Team[]>('/boffmedia/events/teams'),
+  static getTeams() {
+    return apiGET<Team[]>('/boffmedia/events/teams');
+  }
   
   /**
    * Get all teams for a specific event
    */
-  getEventTeams: (eventId: number) => apiGET<Team[]>(`/boffmedia/events/${eventId}/teams`),
+  static getEventTeams(eventId: number) {
+    return apiGET<Team[]>(`/boffmedia/events/${eventId}/teams`);
+  }
   
   /**
    * Get a specific team by ID
    */
-  getTeam: (teamId: number) => apiGET<Team>(`/boffmedia/events/teams/${teamId}`),
+  static getTeam(teamId: number) {
+    return apiGET<Team>(`/boffmedia/events/teams/${teamId}`);
+  }
   
   /**
    * Get team members
    */
-  getTeamMembers: (teamId: number) => apiGET<TeamMember[]>(`/boffmedia/events/teams/${teamId}/members`),
+  static getTeamMembers(teamId: number) {
+    return apiGET<TeamMember[]>(`/boffmedia/events/teams/${teamId}/members`);
+  }
   
   /**
    * Create a new team for an event
    */
-  createTeam: (eventId: number, data: CreateTeamDto) => 
-    apiPOST<Team>(`/boffmedia/events/${eventId}/teams`, data),
+  static createTeam(eventId: number, data: CreateTeamDto) {
+    return apiPOST<Team>(`/boffmedia/events/${eventId}/teams`, data);
+  }
   
   /**
    * Update an existing team
    */
-  updateTeam: (eventId: number, teamId: number, data: UpdateTeamDto) => 
-    apiPATCH<Team>(`/boffmedia/events/${eventId}/teams/${teamId}`, data),
+  static updateTeam(eventId: number, teamId: number, data: UpdateTeamDto) {
+    return apiPATCH<Team>(`/boffmedia/events/${eventId}/teams/${teamId}`, data);
+  }
   
   /**
    * Join a team
    */
-  joinTeam: (eventId: number, teamId: number, data: JoinTeamDto) => 
-    apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/join`, data),
+  static joinTeam(eventId: number, teamId: number, data: JoinTeamDto) {
+    return apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/join`, data);
+  }
   
   /**
    * Leave a team
    */
-  leaveTeam: (eventId: number, teamId: number, userId: number) => 
-    apiDELETE<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/members/${userId}`),
+  static leaveTeam(eventId: number, teamId: number, userId: number) {
+    return apiDELETE<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/members/${userId}`);
+  }
 
   // ==================== PARTICIPANT OPERATIONS ====================
   
   /**
    * Join an event
    */
-  joinEvent: (eventId: number, data: any) => 
-    apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/join`, data),
+  static joinEvent(eventId: number, data: any) {
+    return apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/join`, data);
+  }
   
   /**
    * Get all participants for an event
    */
-  getEventParticipants: (eventId: number) => 
-    apiGET<Participant[]>(`/boffmedia/events/${eventId}/participants`),
+  static getEventParticipants(eventId: number) {
+    return apiGET<Participant[]>(`/boffmedia/events/${eventId}/participants`);
+  }
 
   // ==================== PROGRESS OPERATIONS ====================
   
   /**
    * Get all achievement progress for a participant
    */
-  getParticipantProgress: (participantId: number) => 
-    apiGET<AchievementWithProgress[]>(`/boffmedia/events/participants/${participantId}/progress`),
+  static getParticipantProgress(participantId: number) {
+    return apiGET<AchievementWithProgress[]>(`/boffmedia/events/participants/${participantId}/progress`);
+  }
   
   /**
    * Get achievement progress for a participant in a specific event
    */
-  getParticipantProgressByEvent: (eventId: number, participantId: number) => 
-    apiGET<AchievementWithProgress[]>(`/boffmedia/events/${eventId}/participants/${participantId}/progress`),
+  static getParticipantProgressByEvent(eventId: number, participantId: number) {
+    return apiGET<AchievementWithProgress[]>(`/boffmedia/events/${eventId}/participants/${participantId}/progress`);
+  }
   
   /**
    * Update progress for an achievement
    */
-  updateProgress: (eventId: number, data: UpdateProgressDto) => 
-    apiPUT<SuccessResponse>(`/boffmedia/events/${eventId}/progress`, data),
+  static updateProgress(eventId: number, data: UpdateProgressDto) {
+    return apiPUT<SuccessResponse>(`/boffmedia/events/${eventId}/progress`, data);
+  }
 
   // ==================== LEADERBOARD OPERATIONS ====================
   
   /**
    * Get all leaderboards
    */
-  getLeaderboards: () => apiGET<LeaderboardEntry[]>('/boffmedia/events/leaderboards'),
+  static getLeaderboards() {
+    return apiGET<LeaderboardEntry[]>('/boffmedia/events/leaderboards');
+  }
   
   /**
    * Get event leaderboard
    */
-  getLeaderboard: (eventId: number) => 
-    apiGET<LeaderboardEntry[]>(`/boffmedia/events/${eventId}/leaderboard`),
+  static getLeaderboard(eventId: number) {
+    return apiGET<LeaderboardEntry[]>(`/boffmedia/events/${eventId}/leaderboard`);
+  }
   
   /**
    * Get team leaderboard for an event
    */
-  getTeamLeaderboard: (eventId: number) => 
-    apiGET<TeamLeaderboardEntry[]>(`/boffmedia/events/${eventId}/teams/leaderboard`),
+  static getTeamLeaderboard(eventId: number) {
+    return apiGET<TeamLeaderboardEntry[]>(`/boffmedia/events/${eventId}/teams/leaderboard`);
+  }
 
   // ==================== CONVENIENCE METHODS ====================
   
   /**
    * Get event with achievements
    */
-  getEventWithAchievements: async (eventId: number) => {
+  static async getEventWithAchievements(eventId: number) {
     const [event, achievements] = await Promise.all([
-      eventsService.getEvent(eventId),
-      eventsService.getEventAchievements(eventId)
+      EventsService.getEvent(eventId),
+      EventsService.getEventAchievements(eventId)
     ]);
     return { event, achievements };
-  },
+  }
   
   /**
    * Get event with teams and participants
    */
-  getEventDetails: async (eventId: number) => {
+  static async getEventDetails(eventId: number) {
     const [event, teams, participants] = await Promise.all([
-      eventsService.getEvent(eventId),
-      eventsService.getEventTeams(eventId),
-      eventsService.getEventParticipants(eventId)
+      EventsService.getEvent(eventId),
+      EventsService.getEventTeams(eventId),
+      EventsService.getEventParticipants(eventId)
     ]);
     return { event, teams, participants };
-  },
+  }
   
   /**
    * Get full leaderboard data for an event
    */
-  getEventLeaderboards: async (eventId: number) => {
+  static async getEventLeaderboards(eventId: number) {
     const [participantLeaderboard, teamLeaderboard] = await Promise.all([
-      eventsService.getLeaderboard(eventId),
-      eventsService.getTeamLeaderboard(eventId)
+      EventsService.getLeaderboard(eventId),
+      EventsService.getTeamLeaderboard(eventId)
     ]);
     return { participantLeaderboard, teamLeaderboard };
-  },
+  }
   
   /**
    * Get participant's complete event data
    */
-  getParticipantEventData: async (eventId: number, participantId: number) => {
+  static async getParticipantEventData(eventId: number, participantId: number) {
     const [progress, event, achievements] = await Promise.all([
-      eventsService.getParticipantProgressByEvent(eventId, participantId),
-      eventsService.getEvent(eventId),
-      eventsService.getEventAchievements(eventId)
+      EventsService.getParticipantProgressByEvent(eventId, participantId),
+      EventsService.getEvent(eventId),
+      EventsService.getEventAchievements(eventId)
     ]);
     return { progress, event, achievements };
-  },
+  }
 
   // ==================== LEGACY METHODS ====================
   
   /**
    * Legacy method: Create event (alias)
    */
-  createNewEvent: (data: CreateEventDto) => eventsService.createEvent(data),
+  static createNewEvent(data: CreateEventDto) {
+    return EventsService.createEvent(data);
+  }
   
   /**
    * Legacy method: Update event (alias)
    */
-  updateEventData: (id: number, data: UpdateEventDto) => eventsService.updateEvent(id, data),
+  static updateEventData(id: number, data: UpdateEventDto) {
+    return EventsService.updateEvent(id, data);
+  }
   
   /**
    * Legacy method: Get user progress (alias)
    */
-  getUserProgress: (participantId: number) => eventsService.getParticipantProgress(participantId),
-};
+  static getUserProgress(participantId: number) {
+    return EventsService.getParticipantProgress(participantId);
+  }
+}

@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useBoffSession } from "@/services/useBoffSession"
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { smartrotomService } from "@/services/api/smartrotom/smartrotomService"
-import { starbankService } from "@/services/api/smartrotom/starbankService"
+import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
+import { StarbankService } from "@/services/api/smartrotom/starbankService"
 import { TaxiStop } from "@/types/dto/taxi-stop.dto"
 import { getMcUserData } from '@/services/mcef/mcefApi'
 import TaxiHeader from './components/TaxiHeader'
@@ -71,7 +71,7 @@ export default function TaxiApp() {
       
       setIsLoading(true)
       try {
-        const stopsResponse = await smartrotomService.getTaxiStops()
+        const stopsResponse = await SmartrotomService.getTaxiStops()
         
         if (stopsResponse.data) {
           const stopsArray = Object.values(stopsResponse.data)
@@ -83,7 +83,7 @@ export default function TaxiApp() {
         await updatePlayerPosition()
 
         if (session?.user?.smartRotomUser?.uuid) {
-          const balanceResponse = await starbankService.getBalance(session.user.smartRotomUser.uuid)
+          const balanceResponse = await StarbankService.getBalance(session.user.smartRotomUser.uuid)
           if (balanceResponse.data) {
             setPlayerMoney(balanceResponse.data.balance)
           }
@@ -131,14 +131,14 @@ export default function TaxiApp() {
     setIsLoading(true)
     try {
       if (session?.user?.smartRotomUser?.uuid) {
-        await starbankService.transferFromMain({
+        await StarbankService.transferFromMain({
           uuid: session.user.smartRotomUser.uuid,
           to: TAXI_SERVICE_ACCOUNT,
           amount: price,
           concept: `Taxi a ${stop.id}`,
         })
 
-        await smartrotomService.teleportPlayer({
+        await SmartrotomService.teleportPlayer({
           id: stop.id,
           uuid: session.user.smartRotomUser.uuid
         })

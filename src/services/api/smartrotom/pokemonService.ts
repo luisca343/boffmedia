@@ -78,36 +78,170 @@ export type Ability = {
   isHidden?: boolean;
 };
 
-export const pokemonService = {
-  getAllPokemon: () => rotomGET("/pokemon"),
-  getPokemonByDex: (dex: number) => rotomGET<Pokemon>(`/pokemon/dex/${dex}`),
-  getAllMoves: () => rotomGET<MoveCount[]>("/pokemon/moves"),
-  getMoves: (id: number, form: number) => rotomGET<PokemonMove[]>(`/pokemon/moves/${id}/${form}`),
-  getPokemonNames: () => rotomGET("/pokemon/names"),
-  getSpawnByPokemon: (name: string) => rotomGET(`/pokemon/spawns/${name}`),
-  getMove: (name: string) => rotomGET<Move>(`/pokemon/move/${name}`),
-  getPokemonByMove: (name: string) => rotomGET<SpeciesMoveEntry[]>(`/pokemon/move/${name}/pokemon`),
-  getBiomes: () => rotomGET("/pokemon/biomes"),
-  getPokemonByBiome: (name: string) => rotomGET(`/pokemon/biome/${name}`),
-  getImage: (params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) =>
-    rotomGET<ImageResult>(
+export class PokemonService {
+  /**
+   * Get all Pokemon
+   */
+  static getAllPokemon() {
+    return rotomGET("/pokemon");
+  }
+
+  /**
+   * Get Pokemon by Pokedex number
+   */
+  static getPokemonByDex(dex: number) {
+    return rotomGET<Pokemon>(`/pokemon/dex/${dex}`);
+  }
+
+  /**
+   * Get all moves
+   */
+  static getAllMoves() {
+    return rotomGET<MoveCount[]>("/pokemon/moves");
+  }
+
+  /**
+   * Get moves for a specific Pokemon form
+   */
+  static getMoves(id: number, form: number) {
+    return rotomGET<PokemonMove[]>(`/pokemon/moves/${id}/${form}`);
+  }
+
+  /**
+   * Get all Pokemon names
+   */
+  static getPokemonNames() {
+    return rotomGET("/pokemon/names");
+  }
+
+  /**
+   * Get spawn data for a Pokemon
+   */
+  static getSpawnByPokemon(name: string) {
+    return rotomGET(`/pokemon/spawns/${name}`);
+  }
+
+  /**
+   * Get move details by name
+   */
+  static getMove(name: string) {
+    return rotomGET<Move>(`/pokemon/move/${name}`);
+  }
+
+  /**
+   * Get Pokemon that can learn a specific move
+   */
+  static getPokemonByMove(name: string) {
+    return rotomGET<SpeciesMoveEntry[]>(`/pokemon/move/${name}/pokemon`);
+  }
+
+  /**
+   * Get all biomes
+   */
+  static getBiomes() {
+    return rotomGET("/pokemon/biomes");
+  }
+
+  /**
+   * Get Pokemon found in a specific biome
+   */
+  static getPokemonByBiome(name: string) {
+    return rotomGET(`/pokemon/biome/${name}`);
+  }
+
+  /**
+   * Get Pokemon image
+   */
+  static getImage(params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) {
+    return rotomGET<ImageResult>(
       `/pokemon/image/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
-    ),
-  getSprite: (params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) =>
-    rotomGET<ImageResult>(
+    );
+  }
+
+  /**
+   * Get Pokemon sprite
+   */
+  static getSprite(params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) {
+    return rotomGET<ImageResult>(
       `/pokemon/sprite/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
-    ),
-  getItemSprite: (name: string) => rotomGET<ItemSpriteResult>(`/pokemon/item/sprite/${name}`),
-  getNextPrev: (id: number) => rotomGET<{next: NextPrev, prev: NextPrev}>(`/pokemon/nextprev/${id}`),
-  getEvoTree: (id: number) => rotomGET<EvolutionTree>(`/pokemon/evotree/${id}`),
-  searchPokemonByName: (name: string) => rotomGET(`/pokemon/search/species/${name}`),
-  getRegistries: (uuid: string) => rotomGET<Registry[]>(`/pokemon/registries/${uuid}`),
-  getPokedexStatus:  (uuid: string) => rotomGET<PokedexData>(`/pokemon/pokedex-status/${uuid}`),
-  getAllAbilities: () => rotomGET<AbilityCount[]>("/pokemon/abilities"),
-  getAbility: (name: string) => rotomGET<Ability>(`/pokemon/ability/${name}`),
-  getPokemonByAbility: (name: string) => rotomGET<SpeciesMoveEntry[]>(`/pokemon/ability/${name}/pokemon`),
-  getSpriteManifest: () => rotomGET<SpriteManifest>("/pokemon/sprites/manifest"),
-  refreshSpriteManifest: () => rotomGET<{ count: number }>("/pokemon/sprites/refresh"),
-  
+    );
+  }
+
+  /**
+   * Get item sprite
+   */
+  static getItemSprite(name: string) {
+    return rotomGET<ItemSpriteResult>(`/pokemon/item/sprite/${name}`);
+  }
+
+  /**
+   * Get next/previous Pokemon in Pokedex
+   */
+  static getNextPrev(id: number) {
+    return rotomGET<{next: NextPrev, prev: NextPrev}>(`/pokemon/nextprev/${id}`);
+  }
+
+  /**
+   * Get evolution tree for a Pokemon
+   */
+  static getEvoTree(id: number) {
+    return rotomGET<EvolutionTree>(`/pokemon/evotree/${id}`);
+  }
+
+  /**
+   * Search Pokemon by name
+   */
+  static searchPokemonByName(name: string) {
+    return rotomGET(`/pokemon/search/species/${name}`);
+  }
+
+  /**
+   * Get registries for a user
+   */
+  static getRegistries(uuid: string) {
+    return rotomGET<Registry[]>(`/pokemon/registries/${uuid}`);
+  }
+
+  /**
+   * Get Pokedex status for a user
+   */
+  static getPokedexStatus(uuid: string) {
+    return rotomGET<PokedexData>(`/pokemon/pokedex-status/${uuid}`);
+  }
+
+  /**
+   * Get all abilities
+   */
+  static getAllAbilities() {
+    return rotomGET<AbilityCount[]>("/pokemon/abilities");
+  }
+
+  /**
+   * Get ability details by name
+   */
+  static getAbility(name: string) {
+    return rotomGET<Ability>(`/pokemon/ability/${name}`);
+  }
+
+  /**
+   * Get Pokemon that have a specific ability
+   */
+  static getPokemonByAbility(name: string) {
+    return rotomGET<SpeciesMoveEntry[]>(`/pokemon/ability/${name}/pokemon`);
+  }
+
+  /**
+   * Get sprite manifest
+   */
+  static getSpriteManifest() {
+    return rotomGET<SpriteManifest>("/pokemon/sprites/manifest");
+  }
+
+  /**
+   * Refresh sprite manifest
+   */
+  static refreshSpriteManifest() {
+    return rotomGET<{ count: number }>("/pokemon/sprites/refresh");
+  }
 }
 

@@ -70,8 +70,19 @@ export type MinecraftStats = {
     stats: number[];
   };
 
-export const playerService = {
-  getStats: (uuid: string) => rotomPOST<MinecraftStats>("/player/stats", { uuid }),
-  getTeam: (uuid: string) => rotomPOST<Pokemon[]>("/player/team", { uuid }),
+export class PlayerService {
+  /**
+   * Get player statistics
+   */
+  static getStats(uuid: string) {
+    return rotomPOST<MinecraftStats>("/player/stats", { uuid });
+  }
+
+  /**
+   * Get player's Pokemon team
+   */
+  static getTeam(uuid: string) {
+    return rotomPOST<Pokemon[]>("/player/team", { uuid });
+  }
 }
 

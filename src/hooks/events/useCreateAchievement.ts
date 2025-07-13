@@ -1,15 +1,15 @@
 import { CreateAchievementDto } from "@/generated/api"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useCreateAchievement(eventId: number) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    (createAchievementDto) => eventsService.createAchievement(eventId, createAchievementDto),
+    (createAchievementDto) => EventsService.createAchievement(eventId, createAchievementDto),
     [eventId],
   )
 
   const createAchievement = (createAchievementDto: CreateAchievementDto) => {
-    return eventsService.createAchievement(eventId, createAchievementDto)
+    return EventsService.createAchievement(eventId, createAchievementDto)
   }
 
   return {

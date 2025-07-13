@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArcadeInventoryItem, arcadeService } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeInventoryItem, ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import { useTranslations } from 'next-intl';
 import { LootboxBoxConfig, LootboxItemConfig, RarityRange } from "@/generated/api";
 
@@ -23,7 +23,7 @@ export function useLootBoxInventory(uuid?: string) {
   const fetchInventory = async (userId: string) => {
     try {
       setLoadingInventory(true);
-      const response = await arcadeService.getInventory(userId);
+      const response = await ArcadeService.getInventory(userId);
       if (response.data && response.data.items) {
         const serverItems = response.data.items
           .filter(item => item.used === 0);
@@ -58,7 +58,7 @@ export function useLootBoxInventory(uuid?: string) {
   const fetchLootBoxConfig = async () => {
     try {
       setLoadingLootBoxes(true);
-      const {rarityRanges, lootboxConfig} = (await arcadeService.getLootboxConfig()).data!
+      const {rarityRanges, lootboxConfig} = (await ArcadeService.getLootboxConfig()).data!
       
       if (lootboxConfig && lootboxConfig.boxes) {
         const lootBoxes: LootboxBoxConfig[] = lootboxConfig.boxes.map((box: LootboxBoxConfig) => ({
@@ -95,7 +95,7 @@ export function useLootBoxInventory(uuid?: string) {
   // Open a loot box and get a reward
   const openLootBox = async (uuid: string, boxId: string) => {
     try {
-      const response = await arcadeService.openLootbox({
+      const response = await ArcadeService.openLootbox({
         uuid,
         boxId,
       });

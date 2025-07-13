@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { GameForm, type GameFormValues } from "./GameForm"
 import type { Game } from "@/types/events"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface GameEditDialogProps {
   open: boolean
@@ -20,7 +20,7 @@ export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEdit
   const handleSubmit = async (data: GameFormValues) => {
     setIsSubmitting(true)
     try {
-      await eventsService.updateGame(game.id!, {
+      await EventsService.updateGame(game.id!, {
         ...game,
         ...data,
       })

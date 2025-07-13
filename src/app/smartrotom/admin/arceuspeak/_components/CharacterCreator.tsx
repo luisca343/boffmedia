@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { smartrotomService } from '@/services/api/smartrotom/smartrotomService'
+import { SmartrotomService } from '@/services/api/smartrotom/smartrotomService'
 import { toast } from 'react-toastify'
 import { Plus, Eye, AlertTriangle, Check } from 'lucide-react'
 
@@ -93,7 +93,7 @@ export default function CharacterCreator() {
     console.log(newCharacter)
     
     try {
-      const res = await smartrotomService.postArceuSpeak(newCharacter)
+      const res = await SmartrotomService.postArceuSpeak(newCharacter)
       if(res.statusCode === 200) {
         toast.success('Personaje creado')
         setName('')

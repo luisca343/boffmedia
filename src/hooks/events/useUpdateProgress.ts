@@ -1,15 +1,15 @@
 import { UpdateProgressDto } from "@/generated/api"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useUpdateProgress(eventId: number) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    (updateProgressDto) => eventsService.updateProgress(eventId, updateProgressDto),
+    (updateProgressDto) => EventsService.updateProgress(eventId, updateProgressDto),
     [eventId],
   )
 
   const updateProgress = (updateProgressDto: UpdateProgressDto) => {
-    return eventsService.updateProgress(eventId, updateProgressDto)
+    return EventsService.updateProgress(eventId, updateProgressDto)
   }
 
   return {

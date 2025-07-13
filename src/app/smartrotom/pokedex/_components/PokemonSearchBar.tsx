@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"
 import { Loading } from "@/components/smartrotom/Loading"
 
@@ -17,7 +17,7 @@ export default function PokemonSearchBar() {
         if (value.trim().length > 2) {
             setIsSearching(true)
             try {
-                const res = (await pokemonService.searchPokemonByName(value)).data as any
+                const res = (await PokemonService.searchPokemonByName(value)).data as any
                 setPokemon(res)
             } catch (error) {
                 console.error("Error searching for Pokemon:", error)

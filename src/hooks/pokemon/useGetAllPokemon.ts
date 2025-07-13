@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 
 export function useGetAllPokemon() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(pokemonService.getAllPokemon)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(PokemonService.getAllPokemon)
 
   return {
     pokemon: data,

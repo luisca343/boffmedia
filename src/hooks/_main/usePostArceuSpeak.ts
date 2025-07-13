@@ -1,12 +1,12 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { smartrotomService } from "@/services/api/smartrotom/smartrotomService"
+import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
 import type { ApiResponse } from "@/services/boffAPI"
 
 export function usePostArceuSpeak() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(smartrotomService.postArceuSpeak)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(SmartrotomService.postArceuSpeak)
 
   const postArceuSpeak = (name: string, value: string, format: string) => {
-    return smartrotomService.postArceuSpeak({name, value, format})
+    return SmartrotomService.postArceuSpeak({name, value, format})
   }
 
   return {

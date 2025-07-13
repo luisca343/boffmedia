@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface EventCreateDialogProps {
   open: boolean
@@ -28,7 +28,7 @@ export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreate
         };
         
       
-      await (await eventsService.createEvent(eventData)).data
+      await (await EventsService.createEvent(eventData)).data
       toast.success(`El evento "${data.title}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {

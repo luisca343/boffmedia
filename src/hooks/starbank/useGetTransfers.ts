@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { starbankService } from "@/services/api/smartrotom/starbankService";
+import { StarbankService } from "@/services/api/smartrotom/starbankService";
 
 export function useGetTransfers(account: number) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(starbankService.getTransfers, account)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(StarbankService.getTransfers, account)
 
   return {
     transfers: data,

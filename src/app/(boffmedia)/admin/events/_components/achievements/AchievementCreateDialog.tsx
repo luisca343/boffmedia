@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "react-toastify"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
 
 interface AchievementCreateDialogProps {
@@ -24,7 +24,7 @@ export function AchievementCreateDialog({
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await (await eventsService.createAchievement(data.eventId, data)).data
+      await (await EventsService.createAchievement(data.eventId, data)).data
       toast.success(`El logro "${data.name}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {

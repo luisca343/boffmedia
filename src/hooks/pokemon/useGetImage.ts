@@ -1,5 +1,5 @@
 import { useRotomRequest } from "../useRotomRequest"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 
 export function useGetImage(params: {
   pokemonId: number
@@ -8,7 +8,7 @@ export function useGetImage(params: {
   uuid: string
   hide: number
 }) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(pokemonService.getImage, params)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(PokemonService.getImage, params)
 
   return {
     image: data,

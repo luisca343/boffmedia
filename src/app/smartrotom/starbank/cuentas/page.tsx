@@ -22,7 +22,6 @@ import { Input } from "@/components/ui/input";
 import { AccountImage } from "../_components/AccountImage";
 import useStarBank from "../_hooks/useStarBank";
 import { useBoffSession } from "@/services/useBoffSession";
-import { starbankService } from "@/services/api/smartrotom/starbankService";
 import { useCreateAccount } from "@/hooks/starbank/useCreateAccount";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 

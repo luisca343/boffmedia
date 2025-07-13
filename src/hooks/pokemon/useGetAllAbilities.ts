@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 
 export function useGetAllAbilities() {
-  const { data, error, isLoading, refetch } = useRotomRequest(pokemonService.getAllAbilities)
+  const { data, error, isLoading, refetch } = useRotomRequest(PokemonService.getAllAbilities)
 
   return {
     abilities: data,

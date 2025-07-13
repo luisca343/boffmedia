@@ -5,7 +5,7 @@ import Editor from "./ckeditor.js"
 import './styles.css'
 import { sendToast } from '@/lib/toast';
 import { rotomPOST } from '@/services/boffAPI';
-import { documentsService } from '@/services/api/smartrotom/documentsService';
+import { DocumentsService } from '@/services/api/smartrotom/documentsService';
 import { CreateNewsDto } from '@/types/dto/create-news-dto';
 
 const editorConfiguration = {
@@ -89,7 +89,7 @@ function createSaveButton (data: any, props: {
         let title = !h1 || h1[1] === '&nbsp;' ? 'Sin título' : h1[1];
         
         if(props.documentType === 1) {
-            documentsService.updateActiveNews(documentId, {
+            DocumentsService.updateActiveNews(documentId, {
                 content: data,
                 id: documentId,
                 title: title || "Sin título",

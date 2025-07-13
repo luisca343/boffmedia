@@ -4,11 +4,46 @@ import { SuccessResponse } from '@/types';
 import { NpcImageDto } from '@/types/dto/npc-image-dto';
 import { QuestSystemData } from '@/types/misiones';
 
-export const misionesService = {
-  getAllQuests: (force: number) => rotomGET<QuestSystemData>(`/misiones?force=${force}`),
-  getQuestsForUser: (uuid: string) => rotomPOST<QuestSystemData>('/misiones', { uuid }),
-  updateNPCs: (npcs: INPC[]) => rotomPOST<SuccessResponse>('/misiones/npcs', { npcs }),
-  uploadCustomNpcImage: (data: NpcImageDto) => rotomPOST<SuccessResponse>('/misiones/img/customNPC', data),
-  getCustomNpcRender: (npcName: string) => rotomGET<SuccessResponse>(`/misiones/img/customNPC/render/${npcName}`),
-  getCustomNpcImage: (npcName: string) => rotomGET<SuccessResponse>(`/misiones/img/customNPC/${npcName}`),
-};
+export class MisionesService {
+  /**
+   * Get all quests
+   */
+  static getAllQuests(force: number) {
+    return rotomGET<QuestSystemData>(`/misiones?force=${force}`);
+  }
+
+  /**
+   * Get quests for a specific user
+   */
+  static getQuestsForUser(uuid: string) {
+    return rotomPOST<QuestSystemData>('/misiones', { uuid });
+  }
+
+  /**
+   * Update NPCs
+   */
+  static updateNPCs(npcs: INPC[]) {
+    return rotomPOST<SuccessResponse>('/misiones/npcs', { npcs });
+  }
+
+  /**
+   * Upload custom NPC image
+   */
+  static uploadCustomNpcImage(data: NpcImageDto) {
+    return rotomPOST<SuccessResponse>('/misiones/img/customNPC', data);
+  }
+
+  /**
+   * Get custom NPC render
+   */
+  static getCustomNpcRender(npcName: string) {
+    return rotomGET<SuccessResponse>(`/misiones/img/customNPC/render/${npcName}`);
+  }
+
+  /**
+   * Get custom NPC image
+   */
+  static getCustomNpcImage(npcName: string) {
+    return rotomGET<SuccessResponse>(`/misiones/img/customNPC/${npcName}`);
+  }
+}

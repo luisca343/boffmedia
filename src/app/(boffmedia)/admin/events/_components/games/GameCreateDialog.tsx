@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "react-toastify"
 import { GameForm, type GameFormValues } from "./GameForm"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface GameCreateDialogProps {
   open: boolean
@@ -18,7 +18,7 @@ export function GameCreateDialog({ open, onOpenChange, onSuccess }: any) {
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await (await eventsService.createGame(data!)).data
+      await (await EventsService.createGame(data!)).data
       toast.success(`El juego "${data.title}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {

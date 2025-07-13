@@ -7,19 +7,31 @@ interface UploadResponse {
   url: string;
 }
 
-export const uploadService = {
-  uploadImage: (
+export class UploadService {
+  /**
+   * Upload an image file
+   */
+  static uploadImage(
     file: File, 
     options?: { path?: string; filename?: string }
-  ) => apiUpload(file, options),
+  ) {
+    return apiUpload(file, options);
+  }
 
-  uploadBlogImage: (file: File, filename?: string) => 
-    apiUpload(file, { path: 'blog/images', filename }),
+  /**
+   * Upload a blog image
+   */
+  static uploadBlogImage(file: File, filename?: string) {
+    return apiUpload(file, { path: 'blog/images', filename });
+  }
 
-  uploadProfileImage: (file: File, userId: string) =>
-    apiUpload(file, { 
+  /**
+   * Upload a profile image for a user
+   */
+  static uploadProfileImage(file: File, userId: string) {
+    return apiUpload(file, { 
       path: `profiles`,
       filename: `${userId}.jpg`
-    }),
-
+    });
+  }
 }

@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { PokedexData } from "@/types/pokedex"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { Pokemon } from "@/types/Pokemon"
 
 interface PokemonState {
@@ -27,7 +27,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   fetchPokedex: async (uuid: string) => {
     set({ isLoading: true, error: null })
     try {
-      const response = await pokemonService.getPokedexStatus(uuid)
+      const response = await PokemonService.getPokedexStatus(uuid)
       set({ pokedexData: response.data, isLoading: false })
     } catch (error) {
       set({ error: "Failed to fetch Pokedex data", isLoading: false })
@@ -41,7 +41,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   fetchAllPokemon: async () => {
     set({ isLoading: true, error: null })
     try {
-      const response = await pokemonService.getAllPokemon()
+      const response = await PokemonService.getAllPokemon()
       const pokemonList = response.data as Pokemon[]
       const pokemonMap = pokemonList.reduce(
         (acc, pokemon) => {
@@ -67,7 +67,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
     }
     set({ isLoading: true, error: null })
     try {
-      const response = await pokemonService.getPokemonByDex(dex)
+      const response = await PokemonService.getPokemonByDex(dex)
       const pokemon = response.data
       set((state) => ({
         pokemonByDex: { ...state.pokemonByDex, [dex]: pokemon as Pokemon },

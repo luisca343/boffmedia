@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
 import type { Achievement } from "@/types/events"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface AchievementEditDialogProps {
   open: boolean
@@ -29,7 +29,7 @@ export function AchievementEditDialog({ open, onOpenChange, achievement, onSucce
   const handleSubmit = async (data: AchievementFormValues) => {
     setIsSubmitting(true)
     try {
-      await eventsService.updateAchievement(achievement.eventId, achievement.id!, data)
+      await EventsService.updateAchievement(achievement.eventId, achievement.id!, data)
       toast.success(`El logro "${data.name}" ha sido actualizado con éxito.`)
       onSuccess()
     } catch (error) {

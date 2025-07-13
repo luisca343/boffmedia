@@ -5,7 +5,7 @@ import { Award, Users, Trophy, Target, ChevronRight } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
@@ -33,13 +33,13 @@ export function AchievementsSummary({ eventId }: any) {
         setIsLoading(true)
         
         // Fetch achievements
-        const achievementsResponse = await eventsService.getEventAchievements(eventId)
+        const achievementsResponse = await EventsService.getEventAchievements(eventId)
         setAchievements(achievementsResponse.data!)
 
         // Get current user's participant ID
         if (session?.user?.id) {
           try {
-            const participantsResponse = await eventsService.getEventParticipants(eventId)
+            const participantsResponse = await EventsService.getEventParticipants(eventId)
             const participant = participantsResponse.data!.find(
               (p: any) => p.userId === parseInt(session.user.id!)
             )
@@ -48,7 +48,7 @@ export function AchievementsSummary({ eventId }: any) {
               setParticipantId(participant.id)
               
               // Fetch user progress if participant exists
-              const progressResponse = await eventsService.getParticipantProgressByEvent(
+              const progressResponse = await EventsService.getParticipantProgressByEvent(
                 eventId, 
                 participant.id
               )

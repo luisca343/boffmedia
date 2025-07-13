@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { misionesService } from "@/services/api/smartrotom/misionesService";
+import { MisionesService } from "@/services/api/smartrotom/misionesService";
 
 export function useGetQuestsForUser(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(misionesService.getQuestsForUser, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(MisionesService.getQuestsForUser, uuid)
 
   return {
     userQuests: data,

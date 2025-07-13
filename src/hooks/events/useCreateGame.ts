@@ -1,12 +1,12 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { CreateGameDto } from "@/types/dto/create-game.dto"
 
 export function useCreateGame() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(eventsService.createGame)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(EventsService.createGame)
 
   const createGame = (game: CreateGameDto) => {
-    return eventsService.createGame(game)
+    return EventsService.createGame(game)
   }
 
   return {

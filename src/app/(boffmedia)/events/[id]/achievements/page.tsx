@@ -11,7 +11,7 @@ import {
   ArrowLeft, Trophy, Award, Search, Filter, Lock, 
   Calendar, Target, Users, Star 
 } from "lucide-react"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, Event, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
@@ -46,8 +46,8 @@ export default function EventAchievementsPage() {
         
         // Fetch event and achievements in parallel
         const [eventResponse, achievementsResponse] = await Promise.all([
-          eventsService.getEvent(eventId),
-          eventsService.getEventAchievements(eventId)
+          EventsService.getEvent(eventId),
+          EventsService.getEventAchievements(eventId)
         ])
         
         setEvent(eventResponse.data)
@@ -56,7 +56,7 @@ export default function EventAchievementsPage() {
         // Get current user's participant ID and progress
         if (userId) {
           try {
-            const participantsResponse = await eventsService.getEventParticipants(eventId) as any
+            const participantsResponse = await EventsService.getEventParticipants(eventId) as any
             const participant = participantsResponse.data.find(
               (p: any) => p.userId === parseInt(userId)
             )
@@ -65,7 +65,7 @@ export default function EventAchievementsPage() {
               setParticipantId(participant.id)
               
               // Fetch user progress if participant exists
-              const progressResponse = await eventsService.getParticipantProgressByEvent(
+              const progressResponse = await EventsService.getParticipantProgressByEvent(
                 eventId, 
                 participant.id
               )

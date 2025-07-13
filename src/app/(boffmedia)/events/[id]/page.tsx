@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import Link from "next/link";
 import { Event, Game } from "@/types/events";
-import { eventsService } from "@/services/api/boffmedia/eventsService";
+import { EventsService } from "@/services/api/boffmedia/eventsService";
 import { EventRegistrationButton } from "../_components/EventRegistrationButton";
 import { Markdown } from "@/components/Markdown";
 import { getEventStatus } from "@/lib/events";
@@ -37,7 +37,7 @@ export default function EventPage() {
     async function fetchEvent() {
       try {
         setIsLoading(true);
-        const response = await eventsService.getEvent(parseInt(eventId));
+        const response = await EventsService.getEvent(parseInt(eventId));
         console.log("Fetched event:", response.data);
         setEvent(response.data as EventWithChildren);
         setError(null);

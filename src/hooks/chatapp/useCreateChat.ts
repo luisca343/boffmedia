@@ -1,12 +1,12 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { chatAppService } from "@/services/api/smartrotom/chatAppService";
+import { ChatAppService } from "@/services/api/smartrotom/chatAppService";
 import { CreateChatDto } from "@/types/dto/create-chat-dto";
 
 export function useCreateChat() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(chatAppService.createChat)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(ChatAppService.createChat)
 
   const createChat = (chatData: CreateChatDto) => {
-    return chatAppService.createChat(chatData);
+    return ChatAppService.createChat(chatData);
   }
 
   return {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Calendar, Award, Gift, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
-import { arcadeService } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
 
 interface RewardsBannerProps {
@@ -22,8 +22,8 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
       try {
         setLoadingRewards(true);
         // Import here to avoid circular dependency
-        const { smartrotomService } = await import("@/services/api/smartrotom/smartrotomService");
-        const response = await arcadeService.getRewardsBanner();
+        const { SmartrotomService } = await import("@/services/api/smartrotom/smartrotomService");
+        const response = await ArcadeService.getRewardsBanner();
         setRewardsConfig(response.data);
       } catch (err) {
         console.error("Failed to fetch rewards banner:", err);

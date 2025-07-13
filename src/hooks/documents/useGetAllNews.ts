@@ -1,5 +1,5 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 import { useMemo } from "react";
 
 export type News = {
@@ -17,7 +17,7 @@ export type News = {
 }
 
 export function useGetAllNews() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.getAllNews);
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.getAllNews);
 
   const featured = useMemo(() => data?.featured, [data]);
   const news = useMemo(() => data?.news || [], [data]);

@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { TeamForm, type TeamFormValues } from "./TeamForm"
 import type { EventTeam } from "@/types/events"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface TeamEditDialogProps {
   open: boolean
@@ -20,7 +20,7 @@ export function TeamEditDialog({ open, onOpenChange, team, onSuccess }: TeamEdit
   const handleSubmit = async (data: TeamFormValues) => {
     setIsSubmitting(true)
     try {
-      await eventsService.updateTeam(team.eventId, team.id!, data)
+      await EventsService.updateTeam(team.eventId, team.id!, data)
       toast.success(`El equipo "${data.name}" ha sido actualizado con éxito.`)
       onSuccess()
     } catch (error) {

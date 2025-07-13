@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SkinViewer } from "skinview3d";
-import { misionesService } from "@/services/api/smartrotom/misionesService";
+import { MisionesService } from "@/services/api/smartrotom/misionesService";
 
 const skinCache = new Map<string, string>();
 
@@ -9,7 +9,7 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
 
   useEffect(() => {
     const fetchSkin = async () => {
-      let skin = (await misionesService.getCustomNpcRender(npcName)).data as any;
+      let skin = (await MisionesService.getCustomNpcRender(npcName)).data as any;
       if (!skin) {
         const skinViewer = new SkinViewer({
           width: 200,
@@ -24,7 +24,7 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
         skinViewer.camera.position.y = 22.0;
         skinViewer.camera.position.z = 42.0;
 
-        let skin = (await misionesService.getCustomNpcImage(npcName)).data as any;
+        let skin = (await MisionesService.getCustomNpcImage(npcName)).data as any;
         if (!skin) {
           await skinViewer.loadSkin(`/smartrotom/img/customNPC/steve.png`);
         } else {
@@ -37,7 +37,7 @@ export default function NpcSkin({ npcName, width = 150, height = 150, style }: {
         skinCache.set(npcName, image);
         skin = { img: image };
 
-        misionesService.uploadCustomNpcImage({ npcName, image });
+        MisionesService.uploadCustomNpcImage({ npcName, image });
 
         skinViewer.dispose();
       }

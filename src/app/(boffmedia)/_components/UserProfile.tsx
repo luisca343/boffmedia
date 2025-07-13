@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Camera, Gamepad2, LinkIcon, Loader2, User, Mail, Shield, Wifi } from 'lucide-react';
 import useSocketStore from "@/stores/useSocketStore";
 import { useBoffSession } from "@/services/useBoffSession";
-import { uploadService } from "@/services/api/smartrotom/uploadService";
+import { UploadService } from "@/services/api/smartrotom/uploadService";
 import { FloatingBackground } from "./layout/FloatingBackground";
 
 export default function UserProfile() {
@@ -56,7 +56,7 @@ export default function UserProfile() {
     setIsUploading(true);
 
     try {
-      const response = await uploadService.uploadProfileImage(file, user?.id || 'default');
+      const response = await UploadService.uploadProfileImage(file, user?.id || 'default');
 
       console.log("Upload response:", response);
       

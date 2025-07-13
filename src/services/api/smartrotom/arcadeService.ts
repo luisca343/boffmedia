@@ -14,52 +14,61 @@ import type {
   LootboxConfigEntity
 } from '@/generated/api';
 
-export const arcadeService = {
+export class ArcadeService {
   // ==================== STREAK ENDPOINTS ====================
-  getRewardsBanner: (): Promise<ApiResponse<any>> => 
-    rotomGET<any>('/arcade/banner'),
+  
+  /**
+   * Get rewards banner
+   */
+  static getRewardsBanner(): Promise<ApiResponse<any>> {
+    return rotomGET<any>('/arcade/banner');
+  }
 
   /**
    * Get user's arcade streak status
    */
-  getStreak: (uuid: string): Promise<ApiResponse<ArcadeStreak>> => 
-    rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`),
+  static getStreak(uuid: string): Promise<ApiResponse<ArcadeStreak>> {
+    return rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`);
+  }
 
   /**
    * Claim daily arcade reward
    */
-  claimDailyReward: (claimRewardDto: ClaimRewardDto): Promise<ApiResponse<{
+  static claimDailyReward(claimRewardDto: ClaimRewardDto): Promise<ApiResponse<{
     streak: ArcadeStreak;
     reward: any;
     inventoryItems?: ArcadeInventoryItem[];
-  }>> => 
-    rotomPOST<{
+  }>> {
+    return rotomPOST<{
       streak: ArcadeStreak;
       reward: any;
       inventoryItems?: ArcadeInventoryItem[];
-    }>('/arcade/streak/claim', claimRewardDto),
+    }>('/arcade/streak/claim', claimRewardDto);
+  }
 
   /**
    * Get detailed streak statistics
    */
-  getStreakStats: (uuid: string): Promise<ApiResponse<ArcadeStreak>> => 
-    rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}/stats`),
+  static getStreakStats(uuid: string): Promise<ApiResponse<ArcadeStreak>> {
+    return rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}/stats`);
+  }
 
   /**
    * Reset user streak (admin only)
    */
-  resetStreak: (uuid: string): Promise<ApiResponse<SuccessResponse>> => 
-    rotomPOST<SuccessResponse>(`/arcade/streak/${uuid}/reset`, {}),
+  static resetStreak(uuid: string): Promise<ApiResponse<SuccessResponse>> {
+    return rotomPOST<SuccessResponse>(`/arcade/streak/${uuid}/reset`, {});
+  }
 
   // ==================== INVENTORY ENDPOINTS ====================
   
   /**
    * Get player inventory items
    */
-  getInventory: (uuid: string, filters?: { 
+  static getInventory(uuid: string, filters?: { 
     itemType?: string; 
     rarity?: string; 
-  }): Promise<ApiResponse<ArcadeInventoryResponse>> => {
+  }): Promise<ApiResponse<ArcadeInventoryResponse>> {
     const params = new URLSearchParams();
     if (filters?.itemType) params.append('itemType', filters.itemType);
     if (filters?.rarity) params.append('rarity', filters.rarity);
@@ -68,85 +77,86 @@ export const arcadeService = {
     const url = `/arcade/inventory/${uuid}${queryString ? `?${queryString}` : ''}`;
     
     return rotomGET<ArcadeInventoryResponse>(url);
-  },
+  }
 
   /**
    * Get inventory statistics
    */
-  getInventoryStats: (uuid: string): Promise<ApiResponse<{
+  static getInventoryStats(uuid: string): Promise<ApiResponse<{
     totalItems: number;
     itemsByType: Record<string, number>;
     itemsByRarity: Record<string, number>;
-  }>> => 
-    rotomGET<{
+  }>> {
+    return rotomGET<{
       totalItems: number;
       itemsByType: Record<string, number>;
       itemsByRarity: Record<string, number>;
-    }>(`/arcade/inventory/${uuid}/stats`),
+    }>(`/arcade/inventory/${uuid}/stats`);
+  }
 
   /**
    * Get specific inventory item
    */
-  getInventoryItem: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem | null>> => 
-    rotomGET<ArcadeInventoryItem | null>(`/arcade/inventory/${uuid}/item/${itemId}`),
+  static getInventoryItem(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem | null>> {
+    return rotomGET<ArcadeInventoryItem | null>(`/arcade/inventory/${uuid}/item/${itemId}`);
+  }
 
   /**
    * Add item to player inventory
    */
-  addInventoryItem: (addItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventoryItem>> => 
-    rotomPOST<ArcadeInventoryItem>('/arcade/inventory/add', addItemDto),
+  static addInventoryItem(addItemDto: AddInventoryItemDto): Promise<ApiResponse<ArcadeInventoryItem>> {
+    return rotomPOST<ArcadeInventoryItem>('/arcade/inventory/add', addItemDto);
+  }
 
   /**
    * Consume an inventory item
    */
-  consumeInventoryItem: (consumeItemDto: ConsumeInventoryItemDto): Promise<ApiResponse<{
+  static consumeInventoryItem(consumeItemDto: ConsumeInventoryItemDto): Promise<ApiResponse<{
     item: ArcadeInventoryItem | null;
     consumed: number;
-  }>> => 
-    rotomPOST<{
+  }>> {
+    return rotomPOST<{
       item: ArcadeInventoryItem | null;
       consumed: number;
-    }>('/arcade/inventory/consume', consumeItemDto),
+    }>('/arcade/inventory/consume', consumeItemDto);
+  }
 
   /**
    * Mark inventory item as used
    */
-  markItemAsUsed: (uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem>> => 
-    rotomPOST<ArcadeInventoryItem>(`/arcade/inventory/${uuid}/item/${itemId}/use`, {}),
+  static markItemAsUsed(uuid: string, itemId: string): Promise<ApiResponse<ArcadeInventoryItem>> {
+    return rotomPOST<ArcadeInventoryItem>(`/arcade/inventory/${uuid}/item/${itemId}/use`, {});
+  }
 
   // ==================== LOOTBOX ENDPOINTS ====================
   
   /**
    * Open a loot box and get a random item
    */
-  openLootbox: (openLootBoxDto: OpenLootBoxDto): Promise<ApiResponse<OpenLootBoxResponseDto>> => 
-    rotomPOST<OpenLootBoxResponseDto>('/arcade/lootbox/open', openLootBoxDto),
+  static openLootbox(openLootBoxDto: OpenLootBoxDto): Promise<ApiResponse<OpenLootBoxResponseDto>> {
+    return rotomPOST<OpenLootBoxResponseDto>('/arcade/lootbox/open', openLootBoxDto);
+  }
 
   /**
    * Give lootbox to player
    */
-  giveLootbox: (giveLootboxDto: GiveLootboxDto): Promise<ApiResponse<SuccessResponse>> => 
-    rotomPOST<SuccessResponse>('/arcade/lootbox/give', giveLootboxDto),
+  static giveLootbox(giveLootboxDto: GiveLootboxDto): Promise<ApiResponse<SuccessResponse>> {
+    return rotomPOST<SuccessResponse>('/arcade/lootbox/give', giveLootboxDto);
+  }
 
   /**
    * Get lootbox configuration
    */
-  getLootboxConfig: (): Promise<ApiResponse<LootboxConfigEntity>> => 
-    rotomGET<any>('/arcade/lootbox/config'),
+  static getLootboxConfig(): Promise<ApiResponse<LootboxConfigEntity>> {
+    return rotomGET<LootboxConfigEntity>('/arcade/lootbox/config');
+  }
 
   // ==================== COMBINED ENDPOINTS ====================
 
   /**
-   * Claim multiple items at once
-   */
-  /*
-  claimMultipleItems: (claimItemsDto: ClaimInventoryItemsDto): Promise<ApiResponse<ArcadeInventoryItem[]>> => 
-    rotomPOST<ArcadeInventoryItem[]>('/arcade/inventory/claim-multiple', claimItemsDto),
-  */
-  /**
    * Get complete user arcade data
    */
-  getCompleteUserData: (uuid: string): Promise<ApiResponse<{
+  static getCompleteUserData(uuid: string): Promise<ApiResponse<{
     streak: ArcadeStreak;
     inventory: ArcadeInventoryItem[];
     inventoryStats: {
@@ -154,8 +164,8 @@ export const arcadeService = {
       itemsByType: Record<string, number>;
       itemsByRarity: Record<string, number>;
     };
-  }>> => 
-    rotomGET<{
+  }>> {
+    return rotomGET<{
       streak: ArcadeStreak;
       inventory: ArcadeInventoryItem[];
       inventoryStats: {
@@ -163,17 +173,18 @@ export const arcadeService = {
         itemsByType: Record<string, number>;
         itemsByRarity: Record<string, number>;
       };
-    }>(`/arcade/user/${uuid}/complete-data`),
+    }>(`/arcade/user/${uuid}/complete-data`);
+  }
 
   // ==================== CONVENIENCE METHODS ====================
 
   /**
    * Get user streak and check if can claim reward
    */
-  getStreakStatus: async (uuid: string): Promise<ApiResponse<{
+  static async getStreakStatus(uuid: string): Promise<ApiResponse<{
     streak: ArcadeStreak;
     canClaim: boolean;
-  }>> => {
+  }>> {
     const streakResponse = await rotomGET<ArcadeStreak>(`/arcade/streak/${uuid}`);
     
     if (!streakResponse.success) {
@@ -195,32 +206,36 @@ export const arcadeService = {
       streak: ArcadeStreak;
       canClaim: boolean;
     }>;
-  },
+  }
 
   /**
    * Get inventory items by type
    */
-  getInventoryByType: (uuid: string, itemType: string): Promise<ApiResponse<ArcadeInventoryResponse>> => 
-    arcadeService.getInventory(uuid, { itemType }),
+  static getInventoryByType(uuid: string, itemType: string): Promise<ApiResponse<ArcadeInventoryResponse>> {
+    return ArcadeService.getInventory(uuid, { itemType });
+  }
 
   /**
    * Get inventory items by rarity
    */
-  getInventoryByRarity: (uuid: string, rarity: string): Promise<ApiResponse<ArcadeInventoryResponse>> => 
-    arcadeService.getInventory(uuid, { rarity }),
+  static getInventoryByRarity(uuid: string, rarity: string): Promise<ApiResponse<ArcadeInventoryResponse>> {
+    return ArcadeService.getInventory(uuid, { rarity });
+  }
 
   /**
    * Quick claim daily reward (convenience method)
    */
-  quickClaimDaily: (uuid: string): Promise<ApiResponse<ArcadeStreakClaim>> => 
-    arcadeService.claimDailyReward({ uuid }),
+  static quickClaimDaily(uuid: string): Promise<ApiResponse<ArcadeStreakClaim>> {
+    return ArcadeService.claimDailyReward({ uuid });
+  }
 
   /**
    * Quick open lootbox (convenience method)
    */
-  quickOpenLootbox: (uuid: string, boxId: string): Promise<ApiResponse<OpenLootBoxResponseDto>> => 
-    arcadeService.openLootbox({ uuid, boxId }),
-};
+  static quickOpenLootbox(uuid: string, boxId: string): Promise<ApiResponse<OpenLootBoxResponseDto>> {
+    return ArcadeService.openLootbox({ uuid, boxId });
+  }
+}
 
 // Export types for convenience
 export type { 

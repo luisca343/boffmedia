@@ -1,11 +1,11 @@
 import { InternalLink } from "@/components/nav/Link"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService";
+import { PokemonService } from "@/services/api/smartrotom/pokemonService";
 import { getTranslations } from "next-intl/server";
 import { MapPinIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
 
 export default async function Biomas(){
     const t = await getTranslations("pokedex");
-    const biomes = await (await pokemonService.getBiomes()).data as Record<string, number>;
+    const biomes = await (await PokemonService.getBiomes()).data as Record<string, number>;
     
     // Format the biome name for display
     const formatBiomeTitle = (rawBiome: string) => {

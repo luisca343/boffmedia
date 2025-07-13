@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Calendar, Plus, Loader2, ArrowLeft } from "lucide-react"
-import { eventsService } from "@/services/api/boffmedia/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 import type { Event, Game } from "@/types/events"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -47,14 +47,14 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
     setIsLoading(true)
     try {
       // First fetch just the game data
-      const gameData = await eventsService.getGame(gameIdNumber) as any
+      const gameData = await EventsService.getGame(gameIdNumber) as any
       if (!gameData.data) {
         throw new Error("Game not found")
       }
       setGame(gameData.data)
       
       // Then fetch events for this specific game
-      const eventsData = await eventsService.getEvents() as any
+      const eventsData = await EventsService.getEvents() as any
       if (eventsData.data) {
         // Filter events on the client side
         const filteredEvents = eventsData.data.filter((event: any) => event.game === gameIdNumber)
@@ -76,7 +76,7 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
     e.preventDefault()
     setIsCreating(true)
     try {
-      const result = await eventsService.createEvent(newEvent)
+      const result = await EventsService.createEvent(newEvent)
       if (result.data) {
         // Just add the new event to the existing events array
         setEvents(prevEvents => [...prevEvents, result.data!])
