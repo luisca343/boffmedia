@@ -107,41 +107,27 @@ export class PokemonDataManagementService {
   }
 
   getPokemonMoves(id: number, formIndex: number): any {
-    const pokemon = this.pokemonDataService.getSpeciesByDex(id);
-    if (!pokemon) return null;
+      const pokemon = this.pokemonDataService.getSpeciesByDex(id);
+      if (!pokemon) return null;
 
-    const form = pokemon.forms[formIndex] || pokemon.forms[0];
-    const moves = form.moves || {};
+      const form = pokemon.forms[formIndex] || pokemon.forms[0];
+      const moves = form.moves || {};
 
-    const moveDataSet = {};
+      const moveDataSet = {};
 
-    Object.entries(moves).forEach(([key, moveList]) => {
-      if (key === 'levelUpMoves') {
-        moveDataSet[key] = {};
-        moveList.forEach((move: any) => {
-          if (typeof move === 'object' && move.attacks) {
-            move.attacks.forEach((attack: string) => {
-              this.addMoveToDataSet(attack, moveDataSet[key]);
-            });
-          } else if (typeof move === 'string') {
-            this.addMoveToDataSet(move, moveDataSet[key]);
-          }
-        });
-      } else {
-        moveDataSet[key] = {};
-        moveList.forEach((move: any) => {
-          if (typeof move === 'object' && move.attacks) {
-            move.attacks.forEach((attack: string) => {
-              this.addMoveToDataSet(attack, moveDataSet[key]);
-            });
-          } else if (typeof move === 'string') {
-            this.addMoveToDataSet(move, moveDataSet[key]);
-          }
-        });
-      }
-    });
+      Object.entries(moves).forEach(([key, moveList]) => {
+          moveList.forEach((move: any) => {
+              if (typeof move === 'object' && move.attacks) {
+                  move.attacks.forEach((attack: string) => {
+                      this.addMoveToDataSet(attack, moveDataSet);
+                  });
+              } else if (typeof move === 'string') {
+                  this.addMoveToDataSet(move, moveDataSet);
+              }
+          });
+      });
 
-    return moveDataSet;
+      return moveDataSet;
   }
 
   private addMoveToDataSet(moveName: string, moveDataSet: any): void {

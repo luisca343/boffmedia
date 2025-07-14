@@ -181,13 +181,17 @@ export class PokemonFacadeService {
     }
   }
 
-  getBiomes(): { [key: string]: number } {
-    try {
-      return this.pokemonDataService.getBiomes();
-    } catch (error) {
-      console.error('Error getting biomes:', error);
-      throw new Error(`Failed to retrieve biomes: ${error.message}`);
-    }
+  getBiomes(): { name: string; count: number }[] {
+      try {
+          const biomesObject = this.pokemonDataService.getBiomes();
+          return Object.entries(biomesObject).map(([name, count]) => ({
+              name,
+              count
+          }));
+      } catch (error) {
+          console.error('Error getting biomes:', error);
+          throw new Error(`Failed to retrieve biomes: ${error.message}`);
+      }
   }
 
   getPokemonByBiome(name: string): { [key: string]: Array<{ dex: number; species: string; form: string; palette: string; rarity: number; percentage: number }> } {

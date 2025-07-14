@@ -304,17 +304,23 @@ export class PokemonController {
       description: 'Biomes retrieved successfully.',
       schema: {
         type: 'array',
-        items: { type: 'string' },
-        example: ['Plains', 'Forest', 'Ocean']
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            count: { type: 'number' }
+          }
+        },
+        example: [
+          { name: 'Plains', count: 45 },
+          { name: 'Forest', count: 32 },
+          { name: 'Ocean', count: 28 }
+        ]
       }
     })
     @ApiInternalServerErrorResponse({ description: 'Failed to retrieve biomes.' })
-    async getBiomes(): Promise<string[]> {
-        const biomesObject = this.pokemonFacadeService.getBiomes();
-        // Convert object keys to array if the facade returns an object
-        return typeof biomesObject === 'object' && !Array.isArray(biomesObject) 
-            ? Object.keys(biomesObject) 
-            : biomesObject as string[];
+    async getBiomes(): Promise<{ name: string; count: number }[]> {
+        return this.pokemonFacadeService.getBiomes();
     }
     
     @Get('biome/:name')
@@ -331,23 +337,35 @@ export class PokemonController {
         return result;
     }
 
-    @Get('biomes/:name')
-    @ApiOperation({ summary: 'Get biomes by Pokémon name and form' })
-    @ApiResponse({ 
-      status: HttpStatus.OK, 
-      description: 'Biomes retrieved successfully.',
-      type: PokemonBiomes
-    })
-    @ApiInternalServerErrorResponse({ description: 'Failed to retrieve biomes.' })
-    @ApiParam({ 
-      name: 'name', 
-      description: 'Pokémon name and form (format: pokemon_form)', 
-      example: 'vulpix_base' 
-    })
-    async getBiomesByPokemon(@Param('name') name: string): Promise<PokemonBiomes> {
-        const biomes = this.pokemonFacadeService.getBiomesByPokemon(name);
-        return { biomes };
+  @Get('biomes/:name')
+  @ApiOperation({ summary: 'Get biomes by Pokémon name and form' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Biomes retrieved successfully.',
+    schema: {
+      type: 'array',
+      items: { type: 'string' },
+      example: [
+        'redwoods',
+        'biomesoplenty:seasonal_forest',
+        'byg:seasonal_forest',
+        'byg:seasonal_forest_hills',
+        'biomesoplenty:burnt_forest',
+        'teras:pueblo_sakura',
+        'pixelmon:ultra_forest',
+        'pixelmon:ultra_plant'
+      ]
     }
+  })
+  @ApiInternalServerErrorResponse({ description: 'Failed to retrieve biomes.' })
+  @ApiParam({ 
+    name: 'name', 
+    description: 'Pokémon name and form (format: pokemon_form)', 
+    example: 'vulpix_base' 
+  })
+  async getBiomesByPokemon(@Param('name') name: string): Promise<string[]> {
+      return await this.pokemonFacadeService.getBiomesByPokemon(name);
+  }
 
     // ==================== IMAGE OPERATIONS ====================
 
