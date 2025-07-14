@@ -212,7 +212,7 @@ export default function StarBank() {
   );
 }
 
-export function TransfersShort({
+function TransfersShort({
   transfers,
   activeAccount,
 }: {
@@ -262,7 +262,7 @@ export function TransfersShort({
   );
 }
 
-export function TablaTransacciones({
+function TablaTransacciones({
   transactions,
   activeAccount,
 }: {
@@ -345,7 +345,7 @@ export function TablaTransacciones({
           </div>
         );*/
 
-export function Transactions({
+function Transactions({
   trans,
   activeAccount,
   className,

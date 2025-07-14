@@ -23,7 +23,7 @@ export const useStarBankStore = create<StarBankState>((set, get) => ({
   },
   fetchAccounts: async (session) => {
     if (session?.user) {
-      const accounts = (await StarbankService.getAccounts(session.user.smartRotomUser?.uuid!)).data!;
+      const accounts = (await StarbankService.getUserAccounts(session.user.smartRotomUser?.uuid!)).data!;
       const validAccountId = getValidAccountId(accounts);
       const activeAccount = accounts.find((account: { id: number; }) => account.id === validAccountId) || null;
       set({ accounts: accounts, activeAccount });

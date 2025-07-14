@@ -83,7 +83,7 @@ export default function TaxiApp() {
         await updatePlayerPosition()
 
         if (session?.user?.smartRotomUser?.uuid) {
-          const balanceResponse = await StarbankService.getBalance(session.user.smartRotomUser.uuid)
+          const balanceResponse = await StarbankService.getUserBalance(session.user.smartRotomUser.uuid)
           if (balanceResponse.data) {
             setPlayerMoney(balanceResponse.data.balance)
           }
