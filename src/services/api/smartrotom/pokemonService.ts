@@ -1,5 +1,5 @@
 
-import { rotomGET } from "@/services/boffAPI"
+import { rotomGET, rotomPOST } from "@/services/boffAPI"
 import { EvolutionTree, PokedexData, PokemonMove, Registry } from "@/types/pokedex";
 import { NextPrev, Pokemon, SpeciesMoveEntry, SpriteManifest } from "@/types/Pokemon";
 
@@ -79,11 +79,13 @@ export type Ability = {
 };
 
 export class PokemonService {
+  // ==================== BASIC POKEMON OPERATIONS ====================
+
   /**
    * Get all Pokemon
    */
-  static getAllPokemon() {
-    return rotomGET("/pokemon");
+  static getPokemon() {
+    return rotomGET<Pokemon[]>("/pokemon");
   }
 
   /**
@@ -94,84 +96,25 @@ export class PokemonService {
   }
 
   /**
-   * Get all moves
-   */
-  static getAllMoves() {
-    return rotomGET<MoveCount[]>("/pokemon/moves");
-  }
-
-  /**
-   * Get moves for a specific Pokemon form
-   */
-  static getMoves(id: number, form: number) {
-    return rotomGET<PokemonMove[]>(`/pokemon/moves/${id}/${form}`);
-  }
-
-  /**
    * Get all Pokemon names
    */
   static getPokemonNames() {
-    return rotomGET("/pokemon/names");
+    return rotomGET<string[]>("/pokemon/names");
   }
 
   /**
-   * Get spawn data for a Pokemon
+   * Get Pokemon by name
    */
-  static getSpawnByPokemon(name: string) {
-    return rotomGET(`/pokemon/spawns/${name}`);
+  static getPokemonByName(name: string) {
+    return rotomGET<Pokemon>(`/pokemon/search/species/${name}`);
   }
 
   /**
-   * Get move details by name
+   * Search Pokemon by name
    */
-  static getMove(name: string) {
-    return rotomGET<Move>(`/pokemon/move/${name}`);
-  }
-
-  /**
-   * Get Pokemon that can learn a specific move
-   */
-  static getPokemonByMove(name: string) {
-    return rotomGET<SpeciesMoveEntry[]>(`/pokemon/move/${name}/pokemon`);
-  }
-
-  /**
-   * Get all biomes
-   */
-  static getBiomes() {
-    return rotomGET("/pokemon/biomes");
-  }
-
-  /**
-   * Get Pokemon found in a specific biome
-   */
-  static getPokemonByBiome(name: string) {
-    return rotomGET(`/pokemon/biome/${name}`);
-  }
-
-  /**
-   * Get Pokemon image
-   */
-  static getImage(params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) {
-    return rotomGET<ImageResult>(
-      `/pokemon/image/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
-    );
-  }
-
-  /**
-   * Get Pokemon sprite
-   */
-  static getSprite(params: { pokemonId: number; formName: string; paletteName: string; uuid: string; hide: number }) {
-    return rotomGET<ImageResult>(
-      `/pokemon/sprite/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}/${params.hide}`,
-    );
-  }
-
-  /**
-   * Get item sprite
-   */
-  static getItemSprite(name: string) {
-    return rotomGET<ItemSpriteResult>(`/pokemon/item/sprite/${name}`);
+  static searchPokemon(name: string, amount?: number) {
+    const params = amount ? `?amount=${amount}` : '';
+    return rotomGET(`/pokemon/search/${name}${params}`);
   }
 
   /**
@@ -188,26 +131,37 @@ export class PokemonService {
     return rotomGET<EvolutionTree>(`/pokemon/evotree/${id}`);
   }
 
+  // ==================== MOVE OPERATIONS ====================
+
   /**
-   * Search Pokemon by name
+   * Get all moves
    */
-  static searchPokemonByName(name: string) {
-    return rotomGET(`/pokemon/search/species/${name}`);
+  static getAllMoves() {
+    return rotomGET<MoveCount[]>("/pokemon/moves");
   }
 
   /**
-   * Get registries for a user
+   * Get moves for a specific Pokemon form
    */
-  static getRegistries(uuid: string) {
-    return rotomGET<Registry[]>(`/pokemon/registries/${uuid}`);
+  static getMoves(id: number, form: number) {
+    return rotomGET<PokemonMove[]>(`/pokemon/moves/${id}/${form}`);
   }
 
   /**
-   * Get Pokedex status for a user
+   * Get move details by name
    */
-  static getPokedexStatus(uuid: string) {
-    return rotomGET<PokedexData>(`/pokemon/pokedex-status/${uuid}`);
+  static getMove(name: string) {
+    return rotomGET<Move>(`/pokemon/move/${name}`);
   }
+
+  /**
+   * Get Pokemon that can learn a specific move
+   */
+  static getPokemonByMove(name: string) {
+    return rotomGET<SpeciesMoveEntry[]>(`/pokemon/move/${name}/pokemon`);
+  }
+
+  // ==================== ABILITY OPERATIONS ====================
 
   /**
    * Get all abilities
@@ -230,6 +184,121 @@ export class PokemonService {
     return rotomGET<SpeciesMoveEntry[]>(`/pokemon/ability/${name}/pokemon`);
   }
 
+  // ==================== SPAWN OPERATIONS ====================
+
+  /**
+   * Get spawn data for a Pokemon
+   */
+  static getSpawns(name: string) {
+    return rotomGET(`/pokemon/spawns/${name}`);
+  }
+
+  /**
+   * Get all biomes
+   */
+  static getBiomes() {
+    return rotomGET<{ name: string; count: number }[]>("/pokemon/biomes");
+  }
+
+  /**
+   * Get Pokemon found in a specific biome
+   */
+  static getPokemonByBiome(name: string) {
+    return rotomGET(`/pokemon/biome/${name}`);
+  }
+
+  /**
+   * Get biomes by Pokemon name
+   */
+  static getBiomesByPokemon(name: string) {
+    return rotomGET(`/pokemon/biomes/${name}`);
+  }
+
+  // ==================== IMAGE OPERATIONS ====================
+
+  /**
+   * Get Pokemon image
+   */
+  static getImage(params: { 
+    pokemonId: number; 
+    formName: string; 
+    paletteName: string; 
+    uuid: string; 
+    type?: string;
+    hide?: number;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params.type) queryParams.append('type', params.type);
+    if (params.hide !== undefined) queryParams.append('hide', params.hide.toString());
+    
+    const query = queryParams.toString() ? `?${queryParams.toString()}` : '';
+    return rotomGET<ImageResult>(
+      `/pokemon/image/${params.pokemonId}/${params.formName}/${params.paletteName}/${params.uuid}${query}`
+    );
+  }
+
+  /**
+   * Get item sprite
+   */
+  static getItemSprite(name: string) {
+    return rotomGET<ItemSpriteResult>(`/pokemon/sprite/item/${name}`);
+  }
+
+  // ==================== POKEDEX OPERATIONS ====================
+
+  /**
+   * Register a Pokemon encounter
+   */
+  static registerPokemon(uuid: string, pokemonId: number, form: string, palette: string, status: string) {
+    return rotomPOST(`/pokemon/register`, { uuid, pokemonId, form, palette, status });
+  }
+
+  /**
+   * Bulk update Pokedex
+   */
+  static updateDex(uuid: string, SEEN: number[], CAUGHT: number[]) {
+    return rotomPOST(`/pokemon/dex/update`, { uuid, SEEN, CAUGHT });
+  }
+
+  /**
+   * Get Pokedex statistics for user
+   */
+  static getDexStats(uuid: string) {
+    return rotomGET(`/pokemon/dex/stats/${uuid}`);
+  }
+
+  /**
+   * Get detailed Pokedex status for user
+   */
+  static getDetailedPokedexStatus(uuid: string) {
+    return rotomGET<PokedexData>(`/pokemon/dex/detailed/${uuid}`);
+  }
+
+  /**
+   * Get Pokedex registries for user
+   */
+  static getPokedexRegistries(uuid: string) {
+    return rotomGET<Registry[]>(`/pokemon/dex/registries/${uuid}`);
+  }
+
+  // ==================== INTEGRATION OPERATIONS ====================
+
+  /**
+   * Get Teras Pokemon Showdown data
+   */
+  static getTerasShowdownData() {
+    return rotomGET("/pokemon/showdown/teras");
+  }
+
+  // ==================== UTILITY OPERATIONS ====================
+
+  /**
+   * Get Pokemon Wordle data
+   */
+  static getWordleData() {
+    return rotomGET("/pokemon/wordle");
+  }
+
   /**
    * Get sprite manifest
    */
@@ -241,7 +310,21 @@ export class PokemonService {
    * Refresh sprite manifest
    */
   static refreshSpriteManifest() {
-    return rotomGET<{ count: number }>("/pokemon/sprites/refresh");
+    return rotomPOST("/pokemon/sprites/refresh", {});
+  }
+
+  /**
+   * Get PMD portrait by Pokemon name
+   */
+  static getPmdPortrait(name: string) {
+    return rotomGET(`/pokemon/pmd/portrait/${name}`);
+  }
+
+  /**
+   * Get total Pokemon count
+   */
+  static getPokemonCount() {
+    return rotomGET<{ count: number }>("/pokemon/count");
   }
 }
 

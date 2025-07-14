@@ -46,7 +46,7 @@ export default async function EntradaPokedex({params}: any){
     
     const formName = getFormName(pokemon, formIndex)
     
-    const spawns = (await PokemonService.getSpawnByPokemon(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
+    const spawns = (await PokemonService.getSpawns(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
 
 
     

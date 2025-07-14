@@ -11,6 +11,7 @@ import { BoltIcon } from "@heroicons/react/24/outline";
 import { InternalLink } from "@/components/nav/Link";
 
 export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves, sort?: boolean, moveData?: any, title?: string}){
+  console.log("=============================================== MovesTable Rendered ================================================");
     const t = useTranslations("pokedex");
     let sortedMoves = {} as {[key: string]: any[]}
     Object.entries(moves).forEach(([key, value]: [string, any]) => {
@@ -47,7 +48,13 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
         sortedMoves = sortedMovesCopy
     }
     
+    console.log("Sorted Moves:", sortedMoves);
+    console.log("Move Data:", moveData);
+
     const moveEntries = Object.entries(sortedMoves).filter(([key, _]) => moveData?.[key])
+
+    console.log("Move Entries:", moveEntries);
+
     const hasData = moveEntries.length > 0
     
     return (

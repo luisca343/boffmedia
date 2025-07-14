@@ -16,8 +16,8 @@ export default function PokemonList() {
   useEffect(() => {
     async function fetchPokemonList() {
       try {
-        const response = await PokemonService.getAllPokemon();
-        setPokemonList(Array.isArray(response.data) ? response.data : []);
+        const pokemonList = (await PokemonService.getPokemon()).data! as Array<{dex: number, name: string, spriteUrl: string}>;
+        setPokemonList(Array.isArray(pokemonList) ? pokemonList : []);
       } catch (error) {
         console.error("Failed to fetch Pokemon list:", error);
       } finally {

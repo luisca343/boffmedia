@@ -17,7 +17,7 @@ export default function PokemonSearchBar() {
         if (value.trim().length > 2) {
             setIsSearching(true)
             try {
-                const res = (await PokemonService.searchPokemonByName(value)).data as any
+                const res = (await PokemonService.searchPokemon(value)).data as any
                 setPokemon(res)
             } catch (error) {
                 console.error("Error searching for Pokemon:", error)

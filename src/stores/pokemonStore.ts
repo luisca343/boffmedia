@@ -27,7 +27,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   fetchPokedex: async (uuid: string) => {
     set({ isLoading: true, error: null })
     try {
-      const response = await PokemonService.getPokedexStatus(uuid)
+      const response = await PokemonService.getDetailedPokedexStatus(uuid)
       set({ pokedexData: response.data, isLoading: false })
     } catch (error) {
       set({ error: "Failed to fetch Pokedex data", isLoading: false })
@@ -41,7 +41,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   fetchAllPokemon: async () => {
     set({ isLoading: true, error: null })
     try {
-      const response = await PokemonService.getAllPokemon()
+      const response = await PokemonService.getPokemon()
       const pokemonList = response.data as Pokemon[]
       const pokemonMap = pokemonList.reduce(
         (acc, pokemon) => {
