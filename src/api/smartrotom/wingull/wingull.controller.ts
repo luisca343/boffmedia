@@ -13,7 +13,7 @@ import { PlayerStats } from './entities/player-stats.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 
 @ApiTags('SmartRotom | Wingull')
-@Controller('smartrotom/wingull')
+@Controller('wingull')
 @UseInterceptors(ResponseInterceptor)
 export class WingullController {
   constructor(
@@ -164,6 +164,8 @@ export class WingullController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Weather information retrieved successfully.', type: Weather })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve weather information.' })
   async getWeather(): Promise<Weather> {
+    console.log('Fetching current weather information');
+    console.log(await this.wingullFacadeService.getWeather());
     return await this.wingullFacadeService.getWeather();
   }
 
