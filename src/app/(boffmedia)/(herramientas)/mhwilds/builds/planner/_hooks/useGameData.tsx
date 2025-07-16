@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Decoration, ArmorPiece, Weapon, Charm } from '../../../../../../../types/tools/mhwilds';
-import { mhWildsService } from '@/services/api/tools/mhWildsService';
 import { useLocale } from "next-intl"
+import { MhWildsService } from '@/services/api/tools/mhWildsService';
 
 // Define a type for the server-side skill data
 export interface ServerSkill {
@@ -89,7 +89,7 @@ export function useGameData() {
   const fetchDecorations = async () => {
     setLoadingDecorations(true);
     try {
-      const response = await mhWildsService.getDecorations(locale);
+      const response = await MhWildsService.getDecorations(locale);
       setDecorations(response.data!);
       setDecorationsError(null);
     } catch (err) {
@@ -104,7 +104,7 @@ export function useGameData() {
   const fetchWeapons = async () => {
     setLoadingWeapons(true);
     try {
-      const response = await mhWildsService.getWeapons(locale);
+      const response = await MhWildsService.getWeapons(locale);
       setWeapons(response.data!);
       setWeaponsError(null);
     } catch (err) {
@@ -119,7 +119,7 @@ export function useGameData() {
   const fetchArmor = async () => {
     setLoadingArmor(true);
     try {
-      const response = await mhWildsService.getArmor(locale);
+      const response = await MhWildsService.getArmor(locale);
       setArmor(response.data!);
       setArmorError(null);
     } catch (err) {
@@ -134,7 +134,7 @@ export function useGameData() {
   const fetchSkills = async () => {
     setLoadingSkills(true);
     try {
-      const response = await mhWildsService.getSkills(locale);
+      const response = await MhWildsService.getSkills(locale);
       
       // Create a lookup map by both ID and name for faster access
       const skillsMap: Record<string, EnhancedSkill> = {};
@@ -170,7 +170,7 @@ export function useGameData() {
   const fetchCharms = async () => {
     setLoadingCharms(true);
     try {
-      const response = await mhWildsService.getCharms(locale);
+      const response = await MhWildsService.getCharms(locale);
       setCharms(response.data!);
       setCharmsError(null);
     } catch (err) {

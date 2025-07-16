@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocale } from 'next-intl';
-import { mhWildsService } from '@/services/api/tools/mhWildsService';
+import { MhWildsService } from '@/services/api/tools/mhWildsService';
 
 export interface WeaponTree {
   tree: any[];
@@ -35,7 +35,7 @@ export function useWeaponTreeData() {
   const fetchWeaponTree = async () => {
     try {
       setLoading(true);
-      const response = await mhWildsService.getWeaponTree(locale);
+      const response = await MhWildsService.getWeaponTree(locale);
       
       if (!response.data) {
         throw new Error('No data received from weapon tree API');
