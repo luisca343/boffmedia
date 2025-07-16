@@ -16,13 +16,7 @@ export interface ArceuSpeak {
 }
 
 export class SmartrotomService {
-  /**
-   * Get server performance metrics
-   */
-  static getPerformance() {
-    return rotomGET<Performance>("/performance");
-  }
-
+  
   /**
    * Get ArceuSpeak messages
    */
@@ -35,19 +29,5 @@ export class SmartrotomService {
    */
   static postArceuSpeak({name, value, format}: ArceuSpeak) {
     return rotomPOST<ApiResponse>('/arceuspeak', {name, value, format});
-  }
-
-  /**
-   * Get taxi stops
-   */
-  static getTaxiStops() {
-    return rotomGET<Record<string, TaxiStop>>("/taxi/stops");
-  }
-
-  /**
-   * Teleport a player
-   */
-  static teleportPlayer(data: TeleportPlayerDto) {
-    return rotomPOST<ApiResponse>("/taxi/teleport", data);
   }
 }

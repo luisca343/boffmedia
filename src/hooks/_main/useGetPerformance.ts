@@ -1,8 +1,8 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
+import { WingullService } from "@/services/api/smartrotom/wingullService"
 
 export function useGetPerformance() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(SmartrotomService.getPerformance)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(WingullService.getPerformance)
 
   
   return {

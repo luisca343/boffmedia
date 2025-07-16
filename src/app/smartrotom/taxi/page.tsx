@@ -14,9 +14,7 @@ import MapView from './components/MapView'
 import ListView from './components/ListView'
 import LoadingOverlay from './components/LoadingOverlay'
 import SelectedStopDetails from './components/SelectedStopDetails'
-import RecentDestinations from './components/RecentDestinations'
-import TravelHistory from './components/TravelHistory'
-import { FaTimes, FaCarSide } from 'react-icons/fa'
+import { WingullService } from '@/services/api/smartrotom/wingullService'
 
 const MINIMUM_FARE = 100
 const PRICE_PER_BLOCK = 0.5
@@ -71,7 +69,7 @@ export default function TaxiApp() {
       
       setIsLoading(true)
       try {
-        const stopsResponse = await SmartrotomService.getTaxiStops()
+        const stopsResponse = await WingullService.getTaxiStops()
         
         if (stopsResponse.data) {
           const stopsArray = Object.values(stopsResponse.data)
@@ -138,7 +136,7 @@ export default function TaxiApp() {
           concept: `Taxi a ${stop.id}`,
         })
 
-        await SmartrotomService.teleportPlayer({
+        await WingullService.teleportPlayer({
           id: stop.id,
           uuid: session.user.smartRotomUser.uuid
         })

@@ -70,7 +70,7 @@ export default function Component() {
               {weatherData.weather}
             </p>
             <p className="text-sm text-surface-600">
-              Cambia en: {formatTime(weatherData.timeUntilChange)}
+              Cambia en: {formatTime(weatherData.changeTime)}
             </p>
           </div>
         </div>

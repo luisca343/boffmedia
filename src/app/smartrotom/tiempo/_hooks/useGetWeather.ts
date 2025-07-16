@@ -1,16 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { rotomGET } from "@/services/boffAPI";
-
-interface WeatherData {
-  weather: string;
-  timeUntilChange: number;
-  minecraftTime: number;
-}
+import { WingullService } from "@/services/api/smartrotom/wingullService";
+import { Weather } from "@/generated/api";
 
 export default function useGetWeather() {
-  const [weatherData, setWeatherData] = useState<WeatherData>({
+  const [weatherData, setWeatherData] = useState<Weather>({
     weather: "",
-    timeUntilChange: 0,
+    changeTime: 0,
     minecraftTime: 0,
   });
   const [changeTime, setChangeTime] = useState(0);
@@ -18,7 +13,8 @@ export default function useGetWeather() {
 
   const fetchWeatherData = useCallback(async () => {
     try {
-      const data = (await rotomGET("/wingull/weather")).data as any;
+      const data = await (await WingullService.getWeather()).data!
+      
       setWeatherData(data);
       setChangeTime(data.changeTime);
       setMinecraftTime(data.minecraftTime);

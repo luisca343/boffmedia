@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from "next-auth/react"
 import { Lock, Mail, User } from 'lucide-react'
 import { useState } from "react"
-import { boffPOST, rotomPOST } from "@/services/boffAPI"
+import { UsersService } from "@/services/api/boffmedia/usersService"
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -46,7 +46,12 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
     setIsLoading(true)
     if (isRegister) {
       try {
-        const response = await boffPOST('/users', values)
+        const response = await UsersService.createUser({
+            email: values.email,
+            username: values.username,
+            password: values.password,
+          }
+        )
         if (response.statusCode === 200) {
           router.push('/auth?mode=login&message=Registration successful. Please log in.')
         } else {

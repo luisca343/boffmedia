@@ -1,7 +1,6 @@
 "use client";
 
 import MenuWrapper from "../_components/MenuWrapper";
-import { rotomPOST } from "@/services/boffAPI";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
