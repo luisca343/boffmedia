@@ -6,7 +6,8 @@ import { MhwildsDataService } from './services/mhwilds-data.service';
 import { MhwildsCacheService } from './services/mhwilds-cache.service';
 import { MhwildsFacadeService } from './mhwilds.facade.service';
 import { MhwildsController } from './mhwilds.controller';
-import { MhwildsRepository } from '@repositories/boffmedia/mhwilds.repository';
+import { MhwildsRepository } from './repositories/mhwilds.repository';
+import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
   imports: [
@@ -16,13 +17,18 @@ import { MhwildsRepository } from '@repositories/boffmedia/mhwilds.repository';
   ],
   controllers: [MhwildsController],
   providers: [
-    MhwildsRepository,
     MhwildsDataService,
     MhwildsCacheService,
     MhwildsFacadeService,
+    {
+      provide: MHWILDS_REPOSITORY_TOKEN,
+      useClass: MhwildsRepository,
+    },
   ],
   exports: [
     MhwildsFacadeService,
+    MhwildsDataService,
+    MhwildsCacheService,
   ],
 })
 export class MhwildsModule {}

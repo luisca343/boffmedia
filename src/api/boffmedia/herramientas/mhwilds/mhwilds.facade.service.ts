@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { MhwildsDataService, WeaponTreeResult, CharmRankResult, CacheInfo } from './services/mhwilds-data.service';
+import { MhwildsDataService, WeaponTreeResult, CharmRankResult } from './services/mhwilds-data.service';
 import { MhwildsCacheService, CacheOperationResult } from './services/mhwilds-cache.service';
 
 @Injectable()
@@ -11,41 +11,46 @@ export class MhwildsFacadeService {
 
   // ==================== BASIC DATA OPERATIONS ====================
 
-  async getWeapons(locale: string = 'es'): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getWeapons(locale: string = 'es'): Promise<any[]> {
     try {
-      return await this.mhwildsDataService.getWeapons(locale);
+      const result = await this.mhwildsDataService.getWeapons(locale);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get weapons: ${error.message}`);
     }
   }
 
-  async getArmor(locale: string = 'es'): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getArmor(locale: string = 'es'): Promise<any[]> {
     try {
-      return await this.mhwildsDataService.getArmor(locale);
+      const result = await this.mhwildsDataService.getArmor(locale);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get armor: ${error.message}`);
     }
   }
 
-  async getCharms(locale: string = 'es'): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getCharms(locale: string = 'es'): Promise<any[]> {
     try {
-      return await this.mhwildsDataService.getCharms(locale);
+      const result = await this.mhwildsDataService.getCharms(locale);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get charms: ${error.message}`);
     }
   }
 
-  async getDecorations(locale: string = 'es'): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getDecorations(locale: string = 'es'): Promise<any[]> {
     try {
-      return await this.mhwildsDataService.getDecorations(locale);
+      const result = await this.mhwildsDataService.getDecorations(locale);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get decorations: ${error.message}`);
     }
   }
 
-  async getSkills(locale: string = 'es'): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getSkills(locale: string = 'es'): Promise<any[]> {
     try {
-      return await this.mhwildsDataService.getSkills(locale);
+      const result = await this.mhwildsDataService.getSkills(locale);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get skills: ${error.message}`);
     }
@@ -53,9 +58,10 @@ export class MhwildsFacadeService {
 
   // ==================== PROCESSED DATA OPERATIONS ====================
 
-  async getAllCharmRanks(locale: string = 'es'): Promise<{ data: CharmRankResult[]; cacheInfo: CacheInfo }> {
+  async getAllCharmRanks(locale: string = 'es'): Promise<CharmRankResult[]> {
     try {
-      return await this.mhwildsDataService.getAllCharmRanks(locale);
+      const result = await this.mhwildsDataService.getAllCharmRanks(locale);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get charm ranks: ${error.message}`);
     }
@@ -71,37 +77,40 @@ export class MhwildsFacadeService {
 
   // ==================== SEARCH AND FILTER OPERATIONS ====================
 
-  async searchWeaponsByName(locale: string, searchTerm: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async searchWeaponsByName(locale: string, searchTerm: string): Promise<any[]> {
     try {
       if (!searchTerm || searchTerm.trim().length < 2) {
         throw new Error('Search term must be at least 2 characters long');
       }
       
-      return await this.mhwildsDataService.searchWeaponsByName(locale, searchTerm.trim());
+      const result = await this.mhwildsDataService.searchWeaponsByName(locale, searchTerm.trim());
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to search weapons: ${error.message}`);
     }
   }
 
-  async getWeaponsByKind(locale: string, kind: string): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getWeaponsByKind(locale: string, kind: string): Promise<any[]> {
     try {
       if (!kind || kind.trim().length === 0) {
         throw new Error('Weapon kind is required');
       }
       
-      return await this.mhwildsDataService.getWeaponsByKind(locale, kind.trim());
+      const result = await this.mhwildsDataService.getWeaponsByKind(locale, kind.trim());
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get weapons by kind: ${error.message}`);
     }
   }
 
-  async getArmorByRarity(locale: string, rarity: number): Promise<{ data: any[]; cacheInfo: CacheInfo }> {
+  async getArmorByRarity(locale: string, rarity: number): Promise<any[]> {
     try {
       if (!Number.isInteger(rarity) || rarity < 1 || rarity > 10) {
         throw new Error('Rarity must be an integer between 1 and 10');
       }
       
-      return await this.mhwildsDataService.getArmorByRarity(locale, rarity);
+      const result = await this.mhwildsDataService.getArmorByRarity(locale, rarity);
+      return result.data;
     } catch (error) {
       throw new Error(`Failed to get armor by rarity: ${error.message}`);
     }

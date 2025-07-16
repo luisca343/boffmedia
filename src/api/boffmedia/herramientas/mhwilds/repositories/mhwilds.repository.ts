@@ -4,6 +4,7 @@ import { MySql2Database } from 'drizzle-orm/mysql2';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 import axios from 'axios';
+import { IMhwildsRepository } from './interface/mhwilds.repository.interface';
 
 export interface CacheMetadata {
   filePath: string;
@@ -32,14 +33,14 @@ export interface WeaponTreeNode {
 }
 
 @Injectable()
-export class MhwildsRepository {
+export class MhwildsRepository implements IMhwildsRepository {
+  
   private readonly API_BASE_URL = 'https://wilds.mhdb.io';
   private readonly CACHE_DURATION_MS = 86400000; // 1 day in milliseconds
   
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
+    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>
   ) {}
-
   // ==================== CACHE MANAGEMENT ====================
 
   async getCacheMetadata(resourceType: string, locale: string): Promise<CacheMetadata> {

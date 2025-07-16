@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { MhwildsRepository, ResourceFetchResult, WeaponTreeNode } from '@repositories/boffmedia/mhwilds.repository';
+import { Inject, Injectable } from '@nestjs/common';
+import { MhwildsRepository, ResourceFetchResult, WeaponTreeNode } from '@api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository';
+import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IMhwildsRepository } from '../repositories/interface/mhwilds.repository.interface';
 
 export interface WeaponTreeResult {
   tree: WeaponTreeNode[];
@@ -31,7 +33,8 @@ export interface CacheInfo {
 @Injectable()
 export class MhwildsDataService {
   constructor(
-    private readonly mhwildsRepository: MhwildsRepository,
+    @Inject(MHWILDS_REPOSITORY_TOKEN)
+    private readonly mhwildsRepository: IMhwildsRepository,
   ) {}
 
   // ==================== BASIC DATA RETRIEVAL ====================

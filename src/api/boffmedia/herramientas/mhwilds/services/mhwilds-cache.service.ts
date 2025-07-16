@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { MhwildsRepository } from '@repositories/boffmedia/mhwilds.repository';
+import { Inject, Injectable } from '@nestjs/common';
+import { MhwildsRepository } from '@api/boffmedia/herramientas/mhwilds/repositories/mhwilds.repository';
+import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IMhwildsRepository } from '../repositories/interface/mhwilds.repository.interface';
 
 export interface CacheOperationResult {
   success: boolean;
@@ -10,7 +12,8 @@ export interface CacheOperationResult {
 @Injectable()
 export class MhwildsCacheService {
   constructor(
-    private readonly mhwildsRepository: MhwildsRepository,
+    @Inject(MHWILDS_REPOSITORY_TOKEN)
+    private readonly mhwildsRepository: IMhwildsRepository,
   ) {}
 
   // ==================== CACHE MANAGEMENT ====================
