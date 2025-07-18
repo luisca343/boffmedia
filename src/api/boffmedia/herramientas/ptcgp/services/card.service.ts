@@ -1,15 +1,20 @@
-import { Injectable } from '@nestjs/common';
-import { PtcgpRepository } from '@repositories/boffmedia/ptcgp.repository';
+import { Injectable, Inject } from '@nestjs/common';
+import { PTCGP_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IPtcgpRepository } from '../repositories/interfaces/ptcgp.repository.interface';
 import { TcgpCard } from '@/_db/schema/TCGP';
 
 @Injectable()
 export class CardService {
   constructor(
-    private readonly ptcgpRepository: PtcgpRepository,
+    @Inject(PTCGP_REPOSITORY_TOKEN) private readonly ptcgpRepository: IPtcgpRepository,
   ) {}
 
   async getCards(expansion?: string): Promise<TcgpCard[]> {
-    return this.ptcgpRepository.findCards(expansion);
+    try {
+      return await this.ptcgpRepository.findCards(expansion);
+    } catch (error) {
+      throw new Error(`Failed to get cards: ${error.message}`);
+    }
   }
 
   async getCard(expansion: string, number: number): Promise<TcgpCard | null> {
@@ -17,7 +22,11 @@ export class CardService {
       throw new Error('Expansion and card number are required');
     }
     
-    return this.ptcgpRepository.findCard(expansion, number);
+    try {
+      return await this.ptcgpRepository.findCard(expansion, number);
+    } catch (error) {
+      throw new Error(`Failed to get card: ${error.message}`);
+    }
   }
 
   async createCard(cardData: Partial<TcgpCard>) {
@@ -25,13 +34,17 @@ export class CardService {
       throw new Error('Expansion, number, and name are required');
     }
 
-    // Check if card already exists
-    const existingCard = await this.ptcgpRepository.findCard(cardData.expansion, cardData.number);
-    if (existingCard) {
-      throw new Error(`Card ${cardData.number} already exists in expansion ${cardData.expansion}`);
-    }
+    try {
+      // Check if card already exists
+      const existingCard = await this.ptcgpRepository.findCard(cardData.expansion, cardData.number);
+      if (existingCard) {
+        throw new Error(`Card ${cardData.number} already exists in expansion ${cardData.expansion}`);
+      }
 
-    return this.ptcgpRepository.createCard(cardData);
+      return await this.ptcgpRepository.createCard(cardData);
+    } catch (error) {
+      throw new Error(`Failed to create card: ${error.message}`);
+    }
   }
 
   async getCardsByPack(expansion: string, packId: string) {
@@ -39,6 +52,10 @@ export class CardService {
       throw new Error('Expansion and pack ID are required');
     }
 
-    return this.ptcgpRepository.findCardsByPack(expansion, packId);
+    try {
+      return await this.ptcgpRepository.findCardsByPack(expansion, packId);
+    } catch (error) {
+      throw new Error(`Failed to get cards by pack: ${error.message}`);
+    }
   }
 }

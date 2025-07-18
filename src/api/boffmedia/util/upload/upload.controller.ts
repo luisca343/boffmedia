@@ -20,7 +20,7 @@ import { mkdir } from 'fs/promises';
 import { UploadFacadeService } from './upload.facade.service';
 import { UploadImageDto, UploadFileDto, DeleteFileDto } from './dto/upload.dto';
 
-@ApiTags("upload")
+@ApiTags("BoffMedia 🛠 | Upload")
 @Controller("upload")
 export class UploadController {
   constructor(

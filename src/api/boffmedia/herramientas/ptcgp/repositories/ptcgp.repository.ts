@@ -15,16 +15,17 @@ import {
   TcgpUserCard
 } from '@/_db/schema/TCGP';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
+import { IPtcgpRepository, UserCardData, MissingCardData, RecentCardUpdate, CardHistoryData, CardPackData } from './interfaces/ptcgp.repository.interface';
 
 @Injectable()
-export class PtcgpRepository {
+export class PtcgpRepository implements IPtcgpRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
   // ==================== USER OPERATIONS ====================
   
-  async findUserByUsername(username: string) {
+  async findUserByUsername(username: string): Promise<{ id: number } | null> {
     const result = await this.db.select({ id: boffMediaUsers.id })
       .from(boffMediaUsers)
       .where(eq(boffMediaUsers.username, username))
@@ -35,7 +36,7 @@ export class PtcgpRepository {
 
   // ==================== EXPANSION OPERATIONS ====================
   
-  async findExpansionById(id: string) {
+  async findExpansionById(id: string): Promise<TcgpExpansion | null> {
     const result = await this.db.select()
       .from(tcgpExpansions)
       .where(eq(tcgpExpansions.id, id))
@@ -44,11 +45,11 @@ export class PtcgpRepository {
     return result[0] || null;
   }
 
-  async createExpansion(data: Partial<TcgpExpansion>) {
+  async createExpansion(data: Partial<TcgpExpansion>): Promise<any> {
     return this.db.insert(tcgpExpansions).values(data as TcgpExpansion);
   }
 
-  async updateExpansion(id: string, data: Partial<TcgpExpansion>) {
+  async updateExpansion(id: string, data: Partial<TcgpExpansion>): Promise<any> {
     return this.db.update(tcgpExpansions)
       .set(data as TcgpExpansion)
       .where(eq(tcgpExpansions.id, id));
@@ -56,7 +57,7 @@ export class PtcgpRepository {
 
   // ==================== BOOSTER PACK OPERATIONS ====================
   
-  async findBoosterPacksByExpansion(expansion?: string) {
+  async findBoosterPacksByExpansion(expansion?: string): Promise<TcgpBoosterPack[]> {
     if (!expansion) {
       return this.db.select().from(tcgpBoosterPacks);
     }
@@ -66,7 +67,7 @@ export class PtcgpRepository {
       .where(eq(tcgpBoosterPacks.expansion, expansion));
   }
 
-  async findBoosterPackByName(name: string, expansion: string) {
+  async findBoosterPackByName(name: string, expansion: string): Promise<TcgpBoosterPack | null> {
     const result = await this.db.select()
       .from(tcgpBoosterPacks)
       .where(and(
@@ -78,13 +79,13 @@ export class PtcgpRepository {
     return result[0] || null;
   }
 
-  async createBoosterPack(data: Partial<TcgpBoosterPack>) {
+  async createBoosterPack(data: Partial<TcgpBoosterPack>): Promise<any> {
     return this.db.insert(tcgpBoosterPacks).values(data as TcgpBoosterPack);
   }
 
   // ==================== CARD OPERATIONS ====================
   
-  async findCards(expansion?: string) {
+  async findCards(expansion?: string): Promise<TcgpCard[]> {
     if (!expansion) {
       return this.db.select()
         .from(tcgpCards)
@@ -97,7 +98,7 @@ export class PtcgpRepository {
       .orderBy(asc(tcgpCards.expansion), asc(tcgpCards.number));
   }
 
-  async findCard(expansion: string, number: number) {
+  async findCard(expansion: string, number: number): Promise<TcgpCard | null> {
     const result = await this.db.select()
       .from(tcgpCards)
       .where(and(
@@ -109,11 +110,11 @@ export class PtcgpRepository {
     return result[0] || null;
   }
 
-  async createCard(data: Partial<TcgpCard>) {
+  async createCard(data: Partial<TcgpCard>): Promise<any> {
     return this.db.insert(tcgpCards).values(data as TcgpCard);
   }
 
-  async findCardsByPack(expansion: string, packId: string) {
+  async findCardsByPack(expansion: string, packId: string): Promise<{ rarity: string | null }[]> {
     return this.db.select({
       rarity: tcgpCards.rarity,
     })
@@ -135,7 +136,7 @@ export class PtcgpRepository {
 
   // ==================== USER CARD OPERATIONS ====================
   
-  async findUserCards(username: string) {
+  async findUserCards(username: string): Promise<UserCardData[]> {
     return this.db.select({
       expansion: tcgpUsersCards.expansion,
       cardNumber: tcgpUsersCards.card_number,
@@ -151,7 +152,7 @@ export class PtcgpRepository {
     .where(eq(boffMediaUsers.username, username));
   }
 
-  async findUserCard(userId: number, expansion: string, cardNumber: number) {
+  async findUserCard(userId: number, expansion: string, cardNumber: number): Promise<TcgpUserCard | null> {
     const result = await this.db.select()
       .from(tcgpUsersCards)
       .where(and(
@@ -164,11 +165,11 @@ export class PtcgpRepository {
     return result[0] || null;
   }
 
-  async createUserCard(data: Partial<TcgpUserCard>) {
+  async createUserCard(data: Partial<TcgpUserCard>): Promise<any> {
     return this.db.insert(tcgpUsersCards).values(data as TcgpUserCard);
   }
 
-  async updateUserCard(userId: number, expansion: string, cardNumber: number, data: Partial<TcgpUserCard>) {
+  async updateUserCard(userId: number, expansion: string, cardNumber: number, data: Partial<TcgpUserCard>): Promise<any> {
     return this.db.update(tcgpUsersCards)
       .set(data as TcgpUserCard)
       .where(and(
@@ -178,7 +179,7 @@ export class PtcgpRepository {
       ));
   }
 
-  async deleteUserCard(userId: number, expansion: string, cardNumber: number) {
+  async deleteUserCard(userId: number, expansion: string, cardNumber: number): Promise<any> {
     return this.db.delete(tcgpUsersCards)
       .where(and(
         eq(tcgpUsersCards.user_id, userId),
@@ -189,7 +190,7 @@ export class PtcgpRepository {
 
   // ==================== MISSING CARDS OPERATIONS ====================
   
-  async findMissingCards(userId: number, expansion?: string) {
+  async findMissingCards(userId: number, expansion?: string): Promise<MissingCardData[]> {
     const whereConditions = [isNull(tcgpUsersCards.user_id)];
     
     if (expansion) {
@@ -232,16 +233,11 @@ export class PtcgpRepository {
 
   // ==================== CARD HISTORY OPERATIONS ====================
   
-  async createCardHistory(data: {
-    user_id: number;
-    expansion: string;
-    card_number: number;
-    count: number;
-  }) {
+  async createCardHistory(data: CardHistoryData): Promise<any> {
     return this.db.insert(tcgpUserCardHistory).values(data);
   }
 
-  async findRecentCardUpdates(userId: number, limit: number = 10, offset: number = 0) {
+  async findRecentCardUpdates(userId: number, limit: number = 10, offset: number = 0): Promise<RecentCardUpdate[]> {
     return this.db.select({
       id: tcgpUserCardHistory.id,
       expansion: tcgpUserCardHistory.expansion,
@@ -263,11 +259,7 @@ export class PtcgpRepository {
 
   // ==================== CARD PACK OPERATIONS ====================
   
-  async createCardPack(data: {
-    expansion: string;
-    card_number: number;
-    pack_id: string;
-  }) {
+  async createCardPack(data: CardPackData): Promise<any> {
     return this.db.insert(tcgpCardsPacks).values(data);
   }
 

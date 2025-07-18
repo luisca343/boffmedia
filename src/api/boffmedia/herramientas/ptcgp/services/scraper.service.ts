@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Inject, Logger } from '@nestjs/common';
 import { Subject, Observable } from 'rxjs';
-import { PtcgpRepository } from '@repositories/boffmedia/ptcgp.repository';
+import { PTCGP_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { IPtcgpRepository } from '../repositories/interfaces/ptcgp.repository.interface';
 import { ConfigService } from '@api/config.service';
 import * as cheerio from 'cheerio';
 import axios from 'axios';
@@ -49,7 +50,7 @@ export class ScraperService {
   private fetchStatus = new Subject<FetchStatusData>();
 
   constructor(
-    private readonly ptcgpRepository: PtcgpRepository,
+    @Inject(PTCGP_REPOSITORY_TOKEN) private readonly ptcgpRepository: IPtcgpRepository,
     private readonly configService: ConfigService
   ) {}
 
@@ -61,10 +62,10 @@ export class ScraperService {
       }
       
       this.logger.log('Datos de Serebii no encontrados en caché, iniciando búsqueda...');
-      return this.startFetch();
+      return await this.startFetch();
     } catch (error) {
       this.logger.error('Error getting sets:', error);
-      throw new Error('Failed to get sets data');
+      throw new Error(`Failed to get sets data: ${error.message}`);
     }
   }
 
@@ -80,7 +81,7 @@ export class ScraperService {
     } catch (error) {
       this.logger.error('Error scraping solo battles:', error);
       this.updateFetchStatus('error', 'Failed to scrape solo battles');
-      throw error;
+      throw new Error(`Failed to scrape solo battles: ${error.message}`);
     }
   }
 
@@ -105,7 +106,7 @@ export class ScraperService {
     } catch (error) {
       this.logger.error('Error during fetch:', error);
       this.updateFetchStatus('error', `Error: ${error.message}`);
-      throw error;
+      throw new Error(`Failed to fetch data: ${error.message}`);
     }
   }
 
@@ -138,7 +139,7 @@ export class ScraperService {
       return sets;
     } catch (error) {
       this.logger.error('Error fetching sets:', error);
-      throw new Error('Failed to fetch sets from Serebii');
+      throw new Error(`Failed to fetch sets from Serebii: ${error.message}`);
     }
   }
 
@@ -235,7 +236,7 @@ export class ScraperService {
       this.logger.log('Data saved to database successfully');
     } catch (error) {
       this.logger.error('Error saving to database:', error);
-      throw new Error('Failed to save data to database');
+      throw new Error(`Failed to save data to database: ${error.message}`);
     }
   }
 
@@ -285,5 +286,4 @@ export class ScraperService {
       throw new Error(`Failed to scrape battle data: ${error.message}`);
     }
   }
-
 }

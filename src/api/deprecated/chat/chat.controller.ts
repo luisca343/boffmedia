@@ -5,7 +5,7 @@ import { SendMessageDto } from './dto/send-message.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { UuidDto } from '@api/smartrotom/_dto/smartrotom-request-dto';
 
-@ApiTags('SmartRotom | AI Test')
+@ApiTags('🗑 | SmartRotom | AI Test')
 @Controller('smartrotom/chat')
 @UseInterceptors(ResponseInterceptor)
 export class ChatController {

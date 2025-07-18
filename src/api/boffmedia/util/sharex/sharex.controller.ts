@@ -6,7 +6,7 @@ import *  as  path from 'path';
 import { SharexService } from './sharex.service';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('ShareX')
+@ApiTags('BoffMedia 🛠 | ShareX')
 @Controller('sharex')
 export class SharexController {
     constructor(private readonly sharexService: SharexService) {}

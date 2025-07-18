@@ -1,29 +1,26 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { CardService } from './services/card.service';
-import { PackService, RarityProbabilities } from './services/pack.service';
+import { PackService } from './services/pack.service';
 import { UserCardService, CardUpdate } from './services/user-card.service';
 import { ScraperService } from './services/scraper.service';
-import { TcgpCard, TcgpBoosterPack } from '@/_db/schema/TCGP';
 
-interface FetchStatusData {
-  status: 'fetching' | 'success' | 'error';
-  message: string;
-  timestamp: string;
-}
-
-interface BestPackResult {
-  bestPack: string;
-  score: number;
-  allScores: { [key: string]: number };
-}
-
-interface CollectionStats {
-  totalCards: number;
-  ownedCards: number;
-  missingCards: number;
-  completionPercentage: number;
-}
+// Import entities instead of database types
+import { CardEntity } from './entities/card.entity';
+import { BoosterPackEntity, PackProbabilitiesEntity, BestPackEntity } from './entities/pack.entity';
+import { 
+  UserCardEntity, 
+  CardUpdateResultEntity, 
+  RecentCardUpdateEntity, 
+  MissingCardEntity, 
+  CollectionStatsEntity 
+} from './entities/user-card.entity';
+import { ExpansionEntity } from './entities/expansion.entity';
+import { 
+  FetchStatusEntity, 
+  BattleDataEntity, 
+  SetsDataEntity 
+} from './entities/scraper.entity';
 
 @Injectable()
 export class PtcgpFacadeService {
@@ -38,7 +35,7 @@ export class PtcgpFacadeService {
 
   // ==================== CARD MANAGEMENT ====================
 
-  async getCards(expansion?: string): Promise<TcgpCard[]> {
+  async getCards(expansion?: string): Promise<CardEntity[]> {
     try {
       return await this.cardService.getCards(expansion);
     } catch (error) {
@@ -47,7 +44,7 @@ export class PtcgpFacadeService {
     }
   }
 
-  async getCard(expansion: string, number: number): Promise<TcgpCard | null> {
+  async getCard(expansion: string, number: number): Promise<CardEntity | null> {
     try {
       return await this.cardService.getCard(expansion, number);
     } catch (error) {
@@ -56,9 +53,10 @@ export class PtcgpFacadeService {
     }
   }
 
-  async createCard(cardData: Partial<TcgpCard>) {
+  async createCard(cardData: Partial<CardEntity>): Promise<{ insertId: number }> {
     try {
-      return await this.cardService.createCard(cardData);
+      const result = await this.cardService.createCard(cardData);
+      return { insertId: result.insertId || result.lastInsertRowid || 0 };
     } catch (error) {
       this.logger.error('Error creating card:', error);
       throw new Error(`Failed to create card: ${error.message}`);
@@ -67,7 +65,7 @@ export class PtcgpFacadeService {
 
   // ==================== PACK MANAGEMENT ====================
 
-  async getBoosterPacks(expansion?: string): Promise<TcgpBoosterPack[]> {
+  async getBoosterPacks(expansion?: string): Promise<BoosterPackEntity[]> {
     try {
       return await this.packService.getBoosterPacks(expansion);
     } catch (error) {
@@ -76,25 +74,32 @@ export class PtcgpFacadeService {
     }
   }
 
-  async createBoosterPack(packData: Partial<TcgpBoosterPack>) {
+  async createBoosterPack(packData: Partial<BoosterPackEntity>): Promise<{ insertId: number }> {
     try {
-      return await this.packService.createBoosterPack(packData);
+      const result = await this.packService.createBoosterPack(packData);
+      return { insertId: result.insertId || result.lastInsertRowid || 0 };
     } catch (error) {
       this.logger.error('Error creating booster pack:', error);
       throw new Error(`Failed to create booster pack: ${error.message}`);
     }
   }
 
-  async calculatePackProbabilities(expansionID: string, packId: string): Promise<RarityProbabilities> {
+  async calculatePackProbabilities(expansionID: string, packId: string): Promise<PackProbabilitiesEntity> {
     try {
-      return await this.packService.calculateIndividualProbabilities(expansionID, packId);
+      const probabilities = await this.packService.calculateIndividualProbabilities(expansionID, packId);
+      
+      return {
+        expansion: expansionID,
+        packId,
+        probabilities
+      };
     } catch (error) {
       this.logger.error('Error calculating pack probabilities:', error);
       throw new Error(`Failed to calculate pack probabilities: ${error.message}`);
     }
   }
 
-  async getBestPackToPull(username: string): Promise<BestPackResult> {
+  async getBestPackToPull(username: string): Promise<BestPackEntity> {
     try {
       return await this.packService.getBestPackToPull(username);
     } catch (error) {
@@ -103,7 +108,7 @@ export class PtcgpFacadeService {
     }
   }
 
-  async getBestPackForExpansion(username: string, expansion: string): Promise<BestPackResult & { expansion: string }> {
+  async getBestPackForExpansion(username: string, expansion: string): Promise<BestPackEntity> {
     try {
       return await this.packService.getBestPackForExpansion(username, expansion);
     } catch (error) {
@@ -112,7 +117,7 @@ export class PtcgpFacadeService {
     }
   }
 
-  async getBestPackForEvent(username: string, eventCards: string[], expansion: string) {
+  async getBestPackForEvent(username: string, eventCards: string[], expansion: string): Promise<BestPackEntity> {
     try {
       return await this.packService.getBestPackForEvent(username, eventCards, expansion);
     } catch (error) {
@@ -123,7 +128,7 @@ export class PtcgpFacadeService {
 
   // ==================== USER CARD MANAGEMENT ====================
 
-  async getUserCards(username: string) {
+  async getUserCards(username: string): Promise<UserCardEntity[]> {
     try {
       return await this.userCardService.getUserCards(username);
     } catch (error) {
@@ -132,24 +137,20 @@ export class PtcgpFacadeService {
     }
   }
 
-  async batchUpdateUserCards(username: string, cardUpdates: CardUpdate[]) {
+  async batchUpdateUserCards(username: string, cardUpdates: CardUpdate[]): Promise<CardUpdateResultEntity[]> {
     try {
       const results = await this.userCardService.batchUpdateUserCards(username, cardUpdates);
       
       this.logger.log(`Successfully updated ${cardUpdates.length} cards for user ${username}`);
       
-      return {
-        success: true,
-        message: 'Cards updated successfully',
-        results
-      };
+      return results;
     } catch (error) {
       this.logger.error('Error updating user cards:', error);
       throw new Error(`Failed to update cards: ${error.message}`);
     }
   }
 
-  async getRecentCardUpdates(username: string, limit: number = 10, offset: number = 0) {
+  async getRecentCardUpdates(username: string, limit: number = 10, offset: number = 0): Promise<RecentCardUpdateEntity[]> {
     try {
       return await this.userCardService.getRecentCardUpdates(username, limit, offset);
     } catch (error) {
@@ -158,7 +159,7 @@ export class PtcgpFacadeService {
     }
   }
 
-  async getMissingCards(username: string, expansion?: string) {
+  async getMissingCards(username: string, expansion?: string): Promise<MissingCardEntity[]> {
     try {
       return await this.userCardService.getMissingCards(username, expansion);
     } catch (error) {
@@ -167,7 +168,7 @@ export class PtcgpFacadeService {
     }
   }
 
-  async getCollectionStats(username: string, expansion?: string): Promise<CollectionStats> {
+  async getCollectionStats(username: string, expansion?: string): Promise<CollectionStatsEntity> {
     try {
       return await this.userCardService.getCollectionStats(username, expansion);
     } catch (error) {
@@ -178,16 +179,22 @@ export class PtcgpFacadeService {
 
   // ==================== DATA SCRAPING ====================
 
-  async getSets(): Promise<any> {
+  async getSets(): Promise<SetsDataEntity> {
     try {
-      return await this.scraperService.getSets();
+      const rawData = await this.scraperService.getSets();
+      
+      // Transform raw data to match entity structure
+      return {
+        mainSets: rawData['Main Sets'] || rawData.mainSets || [],
+        promoSets: rawData['Promo Sets'] || rawData.promoSets || []
+      };
     } catch (error) {
       this.logger.error('Error getting sets:', error);
       throw new Error(`Failed to get sets: ${error.message}`);
     }
   }
 
-  async scrapeSoloBattles() {
+  async scrapeSoloBattles(): Promise<BattleDataEntity> {
     try {
       return await this.scraperService.scrapeSoloBattles();
     } catch (error) {
@@ -196,18 +203,33 @@ export class PtcgpFacadeService {
     }
   }
 
-  async refreshDataFromSerebii(): Promise<any> {
+  async refreshDataFromSerebii(): Promise<SetsDataEntity> {
     try {
       this.logger.log('Starting data refresh from Serebii...');
-      return await this.scraperService.startFetch();
+      const rawData = await this.scraperService.startFetch();
+      
+      // Transform and return structured data
+      return {
+        mainSets: rawData['Main Sets'] || rawData.mainSets || [],
+        promoSets: rawData['Promo Sets'] || rawData.promoSets || []
+      };
     } catch (error) {
       this.logger.error('Error refreshing data from Serebii:', error);
       throw new Error(`Failed to refresh data: ${error.message}`);
     }
   }
 
-  getFetchStatus(): Observable<FetchStatusData> {
+  getFetchStatus(): Observable<FetchStatusEntity> {
     return this.scraperService.getFetchStatus();
+  }
+
+  async getBattleData(battleUrl: string): Promise<BattleDataEntity> {
+    try {
+      return await this.scraperService.getBattleData(battleUrl);
+    } catch (error) {
+      this.logger.error('Error getting battle data:', error);
+      throw new Error(`Failed to get battle data: ${error.message}`);
+    }
   }
 
   // ==================== ANALYTICS & INSIGHTS ====================
@@ -229,7 +251,7 @@ export class PtcgpFacadeService {
       ]);
 
       // Group missing cards by pack
-      const missingByPack: { [key: string]: any[] } = {};
+      const missingByPack: { [key: string]: MissingCardEntity[] } = {};
       const rarityByPack: { [key: string]: { [key: string]: number } } = {};
 
       for (const card of missingCards) {
@@ -309,22 +331,11 @@ export class PtcgpFacadeService {
     }
   }
 
-  // ==================== BATTLE UTILITIES ====================
-
-  async getBattleData(battleUrl: string) {
-    try {
-      return await this.scraperService.getBattleData(battleUrl);
-    } catch (error) {
-      this.logger.error('Error getting battle data:', error);
-      throw new Error(`Failed to get battle data: ${error.message}`);
-    }
-  }
-
   // ==================== UTILITY METHODS ====================
 
   async validateUserExists(username: string): Promise<boolean> {
     try {
-      const userCards = await this.getUserCards(username);
+      await this.getUserCards(username);
       return true; // If no error thrown, user exists
     } catch (error) {
       if (error.message.includes('User not found')) {

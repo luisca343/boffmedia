@@ -28,7 +28,7 @@ import { WeaponKind } from './enums/weapon-kind.enum';
 import { Rarity } from './enums/rarity.enum';
 import { WeaponTreeEntity } from './entities/weapon-tree.entity';
 
-@ApiTags('Tools | MHWilds')
+@ApiTags('BoffMedia 🛠 | MHWilds')
 @Controller('tools/mhwilds')
 @UseInterceptors(ResponseInterceptor)
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))

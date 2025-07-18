@@ -7,7 +7,7 @@ import { CreateBattleConfigDto, UpdateBattleConfigDto } from './_dto/battle-conf
 import { BattleReplay, BattleConfig } from './entities/battle.entity';
 import { BattleOperationResponse, GetAllConfigsResponse } from './entities/battle-response.entity';
 
-@ApiTags('SmartRotom | Battle')
+@ApiTags('🗑 | SmartRotom | Battle')
 @Controller('smartrotom/battle')
 @UseInterceptors(ResponseInterceptor)
 export class BattleController {
