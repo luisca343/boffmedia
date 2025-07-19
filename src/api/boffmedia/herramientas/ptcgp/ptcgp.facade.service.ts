@@ -196,7 +196,7 @@ export class PtcgpFacadeService {
 
   async scrapeSoloBattles(): Promise<BattleDataEntity> {
     try {
-      return await this.scraperService.scrapeSoloBattles();
+      return await this.scraperService.scrapeSoloBattles() as any;
     } catch (error) {
       this.logger.error('Error scraping solo battles:', error);
       throw new Error(`Failed to scrape solo battles: ${error.message}`);

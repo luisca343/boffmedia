@@ -8,7 +8,8 @@ export class CreateUserDto extends BaseDto {
     example: 'user@example.com'
   })
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
 
   @ApiProperty({ 
     description: 'Username for the user',

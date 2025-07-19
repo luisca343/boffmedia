@@ -263,6 +263,21 @@ export class PtcgpRepository implements IPtcgpRepository {
     return this.db.insert(tcgpCardsPacks).values(data);
   }
 
+  async findCardPack(expansion: string, cardNumber: number, packId: string): Promise<CardPackData | null> {
+    const result = await this.db.select()
+      .from(tcgpCardsPacks)
+      .where(
+        and(
+          eq(tcgpCardsPacks.expansion, expansion),
+          eq(tcgpCardsPacks.card_number, cardNumber),
+          eq(tcgpCardsPacks.pack_id, packId)
+        )
+      )
+      .limit(1);
+    
+    return result[0] || null;
+  }
+
   // ==================== TRANSACTION OPERATIONS ====================
   
   async executeTransaction<T>(callback: (tx: MySql2Database<Record<string, never>>) => Promise<T>): Promise<T> {

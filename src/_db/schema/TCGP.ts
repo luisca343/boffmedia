@@ -2,6 +2,7 @@ import { datetime, int, mysqlTable, primaryKey, unique, varchar } from "drizzle-
 import { boffMediaUsers } from "./BoffMedia";
 import { count } from "console";
 import { sql } from "drizzle-orm";
+import { iam } from "googleapis/build/src/apis/iam";
 
 export const tcgpExpansions = mysqlTable("tcgp_expansions", {
     id: varchar("id", { length: 32 }).notNull().primaryKey().unique(),
@@ -17,6 +18,7 @@ export type TcgpExpansion = typeof tcgpExpansions.$inferSelect;
 export const tcgpBoosterPacks = mysqlTable("tcgp_booster_packs", {
     name: varchar("name", { length: 32 }).notNull().primaryKey().unique(),
     expansion: varchar("expansion", { length: 32 }).notNull().references(() => tcgpExpansions.id, {onDelete: "cascade", onUpdate: "cascade"}),
+    image_url: varchar("image_url", { length: 255 }).notNull(),
 });
 
 export type TcgpBoosterPack = typeof tcgpBoosterPacks.$inferSelect;
@@ -30,7 +32,8 @@ export const tcgpCards = mysqlTable("tcgp_cards", {
     hp: int("hp"),
     weakness: varchar("weakness", { length: 32 }),
     weakness_value: int("weakness_value"),
-    retreat_cost: int("retreat_cost")
+    retreat_cost: int("retreat_cost"),
+    image_url: varchar("image_url", { length: 255 }).notNull(),
 }, (table) => (
     {
         primaryKey: primaryKey({ columns: [table.expansion, table.number] })

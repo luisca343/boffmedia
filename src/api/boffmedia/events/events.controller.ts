@@ -35,7 +35,7 @@ import { UpdateTeamDto } from './dto/update-team.dto';
 
 
 @ApiTags('BoffMedia | Events')
-@Controller('boffmedia/events')
+@Controller('events')
 @UseInterceptors(ResponseInterceptor)
 export class EventsController {
   constructor(

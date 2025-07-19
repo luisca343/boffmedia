@@ -75,6 +75,7 @@ export interface IPtcgpRepository {
 
   // Card Pack Operations
   createCardPack(data: CardPackData): Promise<any>;
+  findCardPack(expansion: string, cardNumber: number, packId: string): Promise<CardPackData | null>;
 
   // Transaction Operations
   executeTransaction<T>(callback: (tx: MySql2Database<Record<string, never>>) => Promise<T>): Promise<T>;
