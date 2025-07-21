@@ -37,8 +37,6 @@ import { LigaModule } from '@api/smartrotom/liga/liga.module';
 import { ResponseService } from './api/_utils/response/response.service';
 import { ResponseModule } from './api/_utils/response/response.module';
 import { LoggerModule } from './api/_utils/logger/logger.module';
-import { PtcgpController } from '@api/boffmedia/herramientas/ptcgp/ptcgp.controller';
-import { PtcgpModule } from '@api/boffmedia/herramientas/ptcgp/ptcgp.module';
 import { ConfigService } from './api/config.service';
 import { AuthModule } from './api/auth/auth.module';
 import { ShowdownGateway } from './api/battlesimulator/showdown.gateway';
@@ -63,6 +61,7 @@ import { WingullModule } from '@api/smartrotom/wingull/wingull.module';
 import { PokemonShowdownService } from '@api/smartrotom/pokemon/services/pokemon-showdown.service';
 import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-manifest.service';
 import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
+import { TcgModule } from '@api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module';
 
 @Module({
   imports: [
@@ -92,7 +91,7 @@ import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
     LigaModule,
     ResponseModule,
     LoggerModule,
-    PtcgpModule,
+    TcgModule,
     //EventsModule,
     AuthModule,
     DrizzleModule,
@@ -105,9 +104,9 @@ import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
     MhwildsModule,
     WingullModule,
     SmartRotomMineModule,
-    PokemonModule
+    PokemonModule,
   ],
-  controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, PtcgpController, EventsController, UploadController, MhwildsController],
+  controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
      ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {

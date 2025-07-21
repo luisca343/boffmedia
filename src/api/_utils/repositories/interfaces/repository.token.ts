@@ -21,3 +21,4 @@ export const USERS_REPOSITORY_TOKEN = Symbol('IUsersRepository');
 export const BOFFMEDIA_USERS_REPOSITORY_TOKEN = Symbol('IBoffMediaUsersRepository');
 export const MHWILDS_REPOSITORY_TOKEN = Symbol('MHWILDS_REPOSITORY_TOKEN');
 export const PTCGP_REPOSITORY_TOKEN = Symbol('PTCGP_REPOSITORY_TOKEN');
+export const TCGPOCKET_REPOSITORY_TOKEN = Symbol('TCGPOCKET_REPOSITORY_TOKEN');
