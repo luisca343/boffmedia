@@ -34,6 +34,7 @@ export const tcgCards = mysqlTable("tcg_cards", {
   illustrator: varchar("illustrator", { length: 128 }),
   rarity: varchar("rarity", { length: 64 }),
   hp: int("hp"),
+  stage: varchar("stage", { length: 32 }),
   description_en: varchar("description_en", { length: 1024 }),
   description_es: varchar("description_es", { length: 1024 }),
   updated: varchar("updated", { length: 32 }),
