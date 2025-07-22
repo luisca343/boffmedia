@@ -1,18 +1,25 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
-import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module'; // <-- import this
+import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { LoggerModule } from '@api/_utils/logger/logger.module';
+import { ResponseService } from '@api/_utils/response/response.service';
 import { TcgController } from './tcg.controller';
 import { TcgService } from './services/tcg.service';
-import { TcgFacadeService } from './tcg.facade.service';;
+import { TcgErrorService } from './services/tcg-error.service';
+import { TcgConfigService } from './services/tcg-config.service';
+import { TcgFacadeService } from './tcg.facade.service';
 import { TcgRepository } from './repositories/tcg.repository';
 import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
-  imports: [HttpModule, DrizzleModule],
+  imports: [HttpModule, DrizzleModule, LoggerModule],
   controllers: [TcgController],
   providers: [
     TcgService,
     TcgFacadeService,
+    TcgErrorService,
+    TcgConfigService,
+    ResponseService,
     {
       provide: TCGPOCKET_REPOSITORY_TOKEN,
       useClass: TcgRepository,

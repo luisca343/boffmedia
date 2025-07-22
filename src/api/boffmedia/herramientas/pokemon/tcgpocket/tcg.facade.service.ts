@@ -11,6 +11,11 @@ export class TcgFacadeService {
   async getCardsForSetFromDb(setId: string) {
     return this.tcgService.getCardsForSetFromDb(setId);
   }
+
+  async getCardById(cardId: string) {
+    return this.tcgService.getCardById(cardId);
+  }
+
   async fetchAndStoreCardsForSet(setId: string, locale: string = 'en') {
     return this.tcgService.fetchAndStoreCardsForSet(setId, locale);
   }
