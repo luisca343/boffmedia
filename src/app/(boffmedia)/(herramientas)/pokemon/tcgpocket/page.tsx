@@ -38,7 +38,9 @@ export default function TCGPocket() {
       description: t("viewGallery.description"),
       icon: Users,
       href: "/pokemon/tcgpocket/galeria",
-      color: "from-amber-400 to-yellow-500",
+      iconBg: "bg-gradient-to-br from-amber-400 to-yellow-500",
+      textColor: "text-amber-400",
+      hoverColor: "hover:text-amber-300",
       bg: "bg-gradient-to-br from-amber-900/20 to-yellow-900/30"
     },
     {
@@ -46,7 +48,9 @@ export default function TCGPocket() {
       description: t("cardsList.description"),
       icon: CreditCard,
       href: "/pokemon/tcgpocket/cartas",
-      color: "from-blue-400 to-cyan-500",
+      iconBg: "bg-gradient-to-br from-blue-400 to-cyan-500",
+      textColor: "text-blue-400",
+      hoverColor: "hover:text-blue-300",
       bg: "bg-gradient-to-br from-blue-900/20 to-cyan-900/30"
     },
     {
@@ -54,7 +58,9 @@ export default function TCGPocket() {
       description: t("battles.description"),
       icon: SwordIcon,
       href: "/pokemon/tcgpocket/combates",
-      color: "from-red-400 to-rose-500",
+      iconBg: "bg-gradient-to-br from-red-400 to-rose-500",
+      textColor: "text-red-400",
+      hoverColor: "hover:text-red-300",
       bg: "bg-gradient-to-br from-red-900/20 to-rose-900/30"
     },
   ];
@@ -142,25 +148,23 @@ export default function TCGPocket() {
                 className="h-full"
               >
                 <Card
-                  className={`border-surface-700 hover:border-surface-600 transition-all cursor-pointer h-full flex flex-col overflow-hidden ${item.bg}`}
+                  className={`border-surface-700 hover:border-surface-600 transition-all duration-300 cursor-pointer h-full flex flex-col overflow-hidden hover:scale-105 hover:shadow-xl ${item.bg}`}
                   onClick={() => router.push(item.href)}
                 >
                   <CardHeader className="pb-2">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center mb-3 shadow-lg"
-                         style={{ backgroundImage: `linear-gradient(to bottom right, var(--${item.color.split('-')[1]}-400), var(--${item.color.split('-')[3]}-500))` }}
-                    >
+                    <div className={`w-12 h-12 rounded-full ${item.iconBg} flex items-center justify-center mb-3 shadow-lg`}>
                       <item.icon className="h-6 w-6 text-white" />
                     </div>
                     <CardTitle>{item.title}</CardTitle>
                     <CardDescription>{item.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex-grow">
-                    {/* Additional content could go here */}
+                    
                   </CardContent>
                   <CardFooter className="pt-2 border-t border-surface-700/30">
                     <Button 
                       variant="ghost" 
-                      className={`ml-auto p-0 text-${item.color.split('-')[3]}-400 hover:text-${item.color.split('-')[3]}-300`}>
+                      className={`ml-auto p-0 ${item.textColor} ${item.hoverColor} transition-colors`}>
                       {t("common.access")} <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   </CardFooter>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { PtcgpService } from '@/services/api/boffmedia/ptcgpService'
 import { toast } from 'react-toastify'
 import { TcgCard, UserCardEntity } from '@/generated/api'
+import { useLocale } from 'next-intl'
 
 interface Card {
   expansion: string
@@ -15,6 +16,7 @@ export function useGalleryData(username: string) {
   const [userCards, setUserCards] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const locale = useLocale()
 
   useEffect(() => {
     if(!username) return
@@ -25,7 +27,7 @@ export function useGalleryData(username: string) {
     try {
       setLoading(true)
       const [allCardsResponse, userCardsResponse] = await Promise.all([
-        PtcgpService.getAllCardsForSeries('tcgp'),
+        PtcgpService.getAllCardsForSeries('tcgp', locale),
         PtcgpService.getUserCards(username),
       ])
 
@@ -35,10 +37,14 @@ export function useGalleryData(username: string) {
       if(!allCardsData || !userCardsData) return  
       
       setAllCards(allCardsData)
+      
       const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: any) => {
-        acc[card.cardId] = card.quantity
+        acc[card.card_id] = card.quantity
         return acc
       }, {})
+
+
+      
       setUserCards(userCardsMap)
       setError(null)
     } catch (error) {

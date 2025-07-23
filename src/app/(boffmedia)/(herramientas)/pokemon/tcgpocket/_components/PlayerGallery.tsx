@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Loader2, Save } from 'lucide-react'
-import { useTranslations } from "next-intl"
+import { useLocale, useTranslations } from "next-intl"
 import { toast } from 'react-toastify'
 import { boffPOST, boffGET } from "@/services/boffAPI"
 import { usePathname } from "next/navigation"
@@ -42,6 +42,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const t = useTranslations('tcgpocket')
   const [nameFilter, setNameFilter] = useState("")
   const [expansionFilter, setExpansionFilter] = useState("")
+  const locale = useLocale()
 
   const pathname = usePathname();
   const editable = pathname === '/pokemon/tcgpocket/galeria';
@@ -166,7 +167,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
           />
           <div className="mt-8">
             <FilterComponent
-              expansions={Array.from(new Set(allCards.map(card => card.setId)))}
+              expansions={Array.from(new Set(allCards.map(card => card.setName)))}
               onFilterChange={(name, expansion) => {
                 setNameFilter(name)
                 setExpansionFilter(expansion)
@@ -188,19 +189,19 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                     .filter(card =>
                       (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
                         card.id.toString().includes(nameFilter)) &&
-                      (expansionFilter === "" || card.setId === expansionFilter)
+                      (expansionFilter === "" || card.setName === expansionFilter)
                     )
                     .reduce<Record<string, TcgCard[]>>((acc, curr) => {
-                      if (!acc[curr.setId]) {
-                        acc[curr.setId] = []
+                      if (!acc[curr.setName]) {
+                        acc[curr.setName] = []
                       }
-                      acc[curr.setId].push(curr)
+                      acc[curr.setName].push(curr)
                       return acc
                     }, {})
-                ).map(([setId, cards]) => (
+                ).map(([setName, cards]) => (
                   <CollectionGroup
-                    key={setId}
-                    expansion={setId}
+                    key={setName}
+                    expansion={setName}
                     cards={cards}
                     userCards={userCards}
                     changes={changes}

@@ -16,9 +16,10 @@
   user-drag: none;
 }
 
+/*
 ::-webkit-scrollbar {
   display: none;
-}
+}*/
 
 .bg-wingull {
   background-image: url("http://i.lizardon.es/pixelmon/img/w2.webp");
