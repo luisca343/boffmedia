@@ -400,12 +400,73 @@ CREATE TABLE `rotom_bank_users_accounts` (
 	`account_id` int NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE `tcg_cards` (
+	`id` varchar(32) NOT NULL,
+	`set_id` varchar(32) NOT NULL,
+	`local_id` varchar(16),
+	`name_en` varchar(128) NOT NULL,
+	`name_es` varchar(128) NOT NULL,
+	`image_local_en` varchar(255),
+	`image_local_es` varchar(255),
+	`category` varchar(64),
+	`illustrator` varchar(128),
+	`rarity` varchar(64),
+	`hp` int,
+	`stage` varchar(32),
+	`description_en` varchar(1024),
+	`description_es` varchar(1024),
+	`updated` timestamp,
+	`types` varchar(255),
+	`weaknesses` varchar(512),
+	`attacks` text,
+	`boosters` varchar(512),
+	`variants` varchar(255),
+	`legal` varchar(100),
+	`retreat` int,
+	CONSTRAINT `tcg_cards_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `tcg_series` (
 	`id` varchar(32) NOT NULL,
 	`name_en` varchar(64) NOT NULL,
 	`name_es` varchar(64) NOT NULL,
 	`logo` varchar(255),
+	`logo_local` varchar(255),
 	CONSTRAINT `tcg_series_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `tcg_sets` (
+	`id` varchar(32) NOT NULL,
+	`series_id` varchar(32) NOT NULL,
+	`name_en` varchar(128) NOT NULL,
+	`name_es` varchar(128) NOT NULL,
+	`logo` varchar(255),
+	`symbol` varchar(255),
+	`logo_local` varchar(255),
+	`symbol_local` varchar(255),
+	`card_count_official` int,
+	`card_count_total` int,
+	CONSTRAINT `tcg_sets_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `user_card_history` (
+	`id` varchar(32) NOT NULL,
+	`user_id` varchar(32) NOT NULL,
+	`card_id` varchar(32) NOT NULL,
+	`quantity_change` int NOT NULL,
+	`timestamp` timestamp NOT NULL,
+	CONSTRAINT `user_card_history_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `user_cards` (
+	`id` varchar(32) NOT NULL,
+	`user_id` varchar(32) NOT NULL,
+	`card_id` varchar(32) NOT NULL,
+	`quantity` int NOT NULL DEFAULT 1,
+	`acquired_date` timestamp NOT NULL,
+	`created_at` timestamp NOT NULL,
+	`updated_at` timestamp NOT NULL,
+	CONSTRAINT `user_cards_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `wingull_invites` (

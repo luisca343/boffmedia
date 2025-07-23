@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TcgService } from './services/tcg.service';
+import { AddUserCardDto, UpdateUserCardQuantityDto } from './dto/user-card.dto';
 
 @Injectable()
 export class TcgFacadeService {
@@ -38,5 +39,24 @@ export class TcgFacadeService {
 
   async fetchAndStoreCardsForSetBothLanguages(setId: string) {
     return this.tcgService.fetchAndStoreCardsForSetBothLanguages(setId);
+  }
+  async getUserCards(userId: string) {
+    return this.tcgService.getUserCards(userId);
+  }
+
+  async addUserCard(addUserCardDto: AddUserCardDto) {
+    return this.tcgService.addUserCard(addUserCardDto);
+  }
+
+  async updateUserCardQuantity(userId: string, cardId: string, updateDto: UpdateUserCardQuantityDto) {
+    return this.tcgService.updateUserCardQuantity(userId, cardId, updateDto);
+  }
+
+  async removeUserCard(userId: string, cardId: string) {
+    return this.tcgService.removeUserCard(userId, cardId);
+  }
+
+  async getUserCardHistory(userId: string) {
+    return this.tcgService.getUserCardHistory(userId);
   }
 }

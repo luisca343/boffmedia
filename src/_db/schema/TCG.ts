@@ -1,5 +1,5 @@
+import { mysqlTable, varchar, int, text, primaryKey, timestamp } from "drizzle-orm/mysql-core";
 
-import { mysqlTable, varchar, int } from "drizzle-orm/mysql-core";
 export const tcgSets = mysqlTable("tcg_sets", {
   id: varchar("id", { length: 32 }).primaryKey(),
   series_id: varchar("series_id", { length: 32 }).notNull(),
@@ -7,6 +7,8 @@ export const tcgSets = mysqlTable("tcg_sets", {
   name_es: varchar("name_es", { length: 128 }).notNull(),
   logo: varchar("logo", { length: 255 }),
   symbol: varchar("symbol", { length: 255 }),
+  logo_local: varchar("logo_local", { length: 255 }),
+  symbol_local: varchar("symbol_local", { length: 255 }),
   card_count_official: int("card_count_official"),
   card_count_total: int("card_count_total"),
 });
@@ -18,6 +20,7 @@ export const tcgSeries = mysqlTable("tcg_series", {
   name_en: varchar("name_en", { length: 64 }).notNull(),
   name_es: varchar("name_es", { length: 64 }).notNull(),
   logo: varchar("logo", { length: 255 }),
+  logo_local: varchar("logo_local", { length: 255 }),
 });
 
 export type TcgSeries = typeof tcgSeries.$inferSelect;
@@ -37,7 +40,43 @@ export const tcgCards = mysqlTable("tcg_cards", {
   stage: varchar("stage", { length: 32 }),
   description_en: varchar("description_en", { length: 1024 }),
   description_es: varchar("description_es", { length: 1024 }),
-  updated: varchar("updated", { length: 32 }),
+  updated: timestamp("updated"),
+  
+  // TODO: Pensar en cómo manejar estos campos complejos de forma más eficiente
+  types: varchar("types", { length: 255 }), // JSON: ["Grass", "Water"]
+  weaknesses: varchar("weaknesses", { length: 512 }), // JSON: [{"type": "Fire", "value": "+20"}]
+  attacks: text("attacks"), // JSON: [{"cost": [...], "name": "...", "damage": "..."}]
+  boosters: varchar("boosters", { length: 512 }), // JSON: [{"id": "...", "name": "..."}]
+  variants: varchar("variants", { length: 255 }), // JSON: {"holo": true, "normal": false, ...}
+  legal: varchar("legal", { length: 100 }), // JSON: {"standard": false, "expanded": false}
+  retreat: int("retreat"), // Simple integer
 });
 
 export type TcgCard = typeof tcgCards.$inferSelect;
+
+export const userCards = mysqlTable("user_cards", {
+  id: varchar("id", { length: 32 }).primaryKey(),
+  user_id: varchar("user_id", { length: 32 }).notNull(),
+  card_id: varchar("card_id", { length: 32 }).notNull(),
+  quantity: int("quantity").default(1).notNull(),
+  acquired_date: timestamp("acquired_date").notNull(),
+  created_at: timestamp("created_at").notNull(),
+  updated_at: timestamp("updated_at").notNull(),
+}, (table) => ({
+  userCardUnique: primaryKey({
+    name: "user_card_unique",
+    columns: [table.user_id, table.card_id]
+  })
+}));
+
+export type UserCard = typeof userCards.$inferSelect;
+
+export const userCardHistory = mysqlTable("user_card_history", {
+  id: varchar("id", { length: 32 }).primaryKey(),
+  user_id: varchar("user_id", { length: 32 }).notNull(),
+  card_id: varchar("card_id", { length: 32 }).notNull(),
+  quantity_change: int("quantity_change").notNull(), // +/- amount
+  timestamp: timestamp("timestamp").notNull(),
+});
+
+export type UserCardHistory = typeof userCardHistory.$inferSelect;

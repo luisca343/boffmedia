@@ -52,9 +52,15 @@ export class TcgCardBooster {
   name: string;
 }
 
-export class TcgCardEntity {
+export class TcgCard {
   @ApiProperty({ example: 'tcgp-A1-001', description: 'Card ID' })
   id: string;
+
+  @ApiProperty({ example: 'A1', description: 'Set ID' })
+  setId: string;
+  
+  @ApiProperty({ example: 'Genetic Apex', description: 'Set name (localized)' })
+  setName: string;
 
   @ApiProperty({ example: '001', description: 'Local ID within set' })
   localId: string;

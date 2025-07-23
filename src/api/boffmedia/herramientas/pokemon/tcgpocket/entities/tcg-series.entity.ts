@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class TcgSeriesEntity {
+export class TcgSeries {
   @ApiProperty({ example: 'base', description: 'Series ID' })
   id: string;
 

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TcgSeriesEntity } from '../../entities/tcg-series.entity';
+import { TcgSeries } from '../../entities/tcg-series.entity';
 
 export class GetAllSeriesResponseDto {
   @ApiProperty({ 
@@ -10,9 +10,9 @@ export class GetAllSeriesResponseDto {
 
   @ApiProperty({ 
     description: 'List of TCG series',
-    type: [TcgSeriesEntity]
+    type: [TcgSeries]
   })
-  data: TcgSeriesEntity[];
+  data: TcgSeries[];
 
   @ApiProperty({ 
     description: 'Total number of series',

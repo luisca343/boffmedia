@@ -5,6 +5,8 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseService } from '@api/_utils/response/response.service';
 import { TcgController } from './tcg.controller';
 import { TcgService } from './services/tcg.service';
+import { TcgFetchService } from './services/tcg-fetch.service';
+import { TcgImageService } from './services/tcg-image.service';
 import { TcgErrorService } from './services/tcg-error.service';
 import { TcgConfigService } from './services/tcg-config.service';
 import { TcgFacadeService } from './tcg.facade.service';
@@ -16,6 +18,8 @@ import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/
   controllers: [TcgController],
   providers: [
     TcgService,
+    TcgFetchService,
+    TcgImageService,
     TcgFacadeService,
     TcgErrorService,
     TcgConfigService,

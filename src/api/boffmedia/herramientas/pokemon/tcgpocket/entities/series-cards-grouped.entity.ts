@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TcgCardEntity } from './tcg-card.entity';
+import { TcgCard } from './tcg-card.entity';
 
-export class SeriesCardsGroupEntity {
+export class SeriesCardsGroup {
   @ApiProperty({ 
     description: 'Set ID',
     example: 'A1'
@@ -22,9 +22,9 @@ export class SeriesCardsGroupEntity {
 
   @ApiProperty({ 
     description: 'Cards in this set',
-    type: [TcgCardEntity]
+    type: [TcgCard]
   })
-  cards: TcgCardEntity[];
+  cards: TcgCard[];
 }
 
 export class SeriesCardsGroupedEntity {
@@ -36,9 +36,9 @@ export class SeriesCardsGroupedEntity {
 
   @ApiProperty({ 
     description: 'Series cards grouped by set',
-    type: [SeriesCardsGroupEntity]
+    type: [SeriesCardsGroup]
   })
-  data: SeriesCardsGroupEntity[];
+  data: SeriesCardsGroup[];
 
   @ApiProperty({ 
     description: 'Total number of sets',

@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, sql } from 'drizzle-orm';
-import { tcgSeries, TcgSeries, tcgCards, tcgSets } from '@/_db/schema/TCG';
+import { eq, sql, and } from 'drizzle-orm';
+import { tcgSeries, TcgSeries, tcgCards, tcgSets, userCards, userCardHistory, UserCard, UserCardHistory } from '@/_db/schema/TCG';
 import { ITcgRepository } from './interfaces/tcg.repository.interface';
 import { TcgSeriesDto } from '../dto/tcg-series.dto';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -147,11 +147,40 @@ export class TcgRepository implements ITcgRepository {
 
   // ==================== CARDS OPERATIONS ====================
 
+  private readonly cardSelect = {
+          id: tcgCards.id,
+          setId: tcgCards.set_id,
+          localId: tcgCards.local_id,
+          set_name_en: tcgSets.name_en,
+          set_name_es: tcgSets.name_es,
+          name_en: tcgCards.name_en,
+          name_es: tcgCards.name_es,
+          image_en: tcgCards.image_local_en,
+          image_es: tcgCards.image_local_es,
+          category: tcgCards.category,
+          illustrator: tcgCards.illustrator,
+          rarity: tcgCards.rarity,
+          hp: tcgCards.hp,
+          stage: tcgCards.stage,
+          description_en: tcgCards.description_en,
+          description_es: tcgCards.description_es,
+          updated: tcgCards.updated,
+          retreat: tcgCards.retreat,
+          
+          types: tcgCards.types,
+          weaknesses: tcgCards.weaknesses,
+          attacks: tcgCards.attacks,
+          boosters: tcgCards.boosters,
+          variants: tcgCards.variants,
+          legal: tcgCards.legal,
+        }
+
   async getCardsBySetId(setId: string): Promise<any[]> {
     try {
       return await this.db
-        .select()
+        .select(this.cardSelect)
         .from(tcgCards)
+        .leftJoin(tcgSets, eq(tcgCards.set_id, tcgSets.id))
         .where(eq(tcgCards.set_id, setId));
     } catch (error) {
       console.error(`[TcgRepository] Error getting cards for set ${setId}:`, error);
@@ -179,8 +208,9 @@ export class TcgRepository implements ITcgRepository {
   async findCardById(id: string): Promise<any | null> {
     try {
       const result = await this.db
-        .select()
+        .select(this.cardSelect)
         .from(tcgCards)
+        .leftJoin(tcgSets, eq(tcgCards.set_id, tcgSets.id))
         .where(eq(tcgCards.id, id))
         .limit(1);
 
@@ -213,6 +243,105 @@ export class TcgRepository implements ITcgRepository {
         .where(eq(tcgCards.set_id, setId));
     } catch (error) {
       console.error(`[TcgRepository] Error checking existing cards for set ${setId}:`, error);
+      throw error;
+    }
+  }
+  // ==================== USER CARDS OPERATIONS ====================
+
+  async getUserCards(userId: string): Promise<UserCard[]> {
+    try {
+      return await this.db
+        .select()
+        .from(userCards)
+        .where(eq(userCards.user_id, userId));
+    } catch (error) {
+      console.error(`[TcgRepository] Error getting user cards for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async getUserCard(userId: string, cardId: string): Promise<UserCard | null> {
+    try {
+      const result = await this.db
+        .select()
+        .from(userCards)
+        .where(and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)))
+        .limit(1);
+
+      return result[0] || null;
+    } catch (error) {
+      console.error(`[TcgRepository] Error getting user card ${cardId} for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async addUserCard(userId: string, cardId: string, quantity: number): Promise<void> {
+    try {
+      const now = new Date();
+      await this.db.insert(userCards).values({
+        id: `${userId}_${cardId}`,
+        user_id: userId,
+        card_id: cardId,
+        quantity: quantity,
+        acquired_date: now,
+        created_at: now,
+        updated_at: now,
+      } as UserCard);
+    } catch (error) {
+      console.error(`[TcgRepository] Error adding user card ${cardId} for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async updateUserCardQuantity(userId: string, cardId: string, quantity: number): Promise<void> {
+    try {
+      await this.db
+        .update(userCards)
+        .set({ 
+          quantity: quantity,
+          updated_at: new Date(),
+        } as Partial<UserCard>)
+        .where(and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)));
+    } catch (error) {
+      console.error(`[TcgRepository] Error updating user card ${cardId} for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async removeUserCard(userId: string, cardId: string): Promise<void> {
+    try {
+      await this.db
+        .delete(userCards)
+        .where(and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)));
+    } catch (error) {
+      console.error(`[TcgRepository] Error removing user card ${cardId} for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async getUserCardHistory(userId: string): Promise<UserCardHistory[]> {
+    try {
+      return await this.db
+        .select()
+        .from(userCardHistory)
+        .where(eq(userCardHistory.user_id, userId));
+    } catch (error) {
+      console.error(`[TcgRepository] Error getting user card history for user ${userId}:`, error);
+      throw error;
+    }
+  }
+
+  async addUserCardHistory(userId: string, cardId: string, quantityChange: number): Promise<void> {
+    try {
+      await this.db.insert(userCardHistory).values({
+        id: `${userId}_${cardId}_${Date.now()}`,
+        user_id: userId,
+        card_id: cardId,
+        quantity_change: quantityChange,
+        timestamp: new Date(),
+      });
+    } catch (error) {
+      console.error(`[TcgRepository] Error adding user card history for user ${userId}:`, error);
       throw error;
     }
   }

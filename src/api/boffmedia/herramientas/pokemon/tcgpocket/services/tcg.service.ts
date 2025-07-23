@@ -1,23 +1,21 @@
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import axios from 'axios';
-import { Injectable, Inject, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { ITcgRepository } from '../repositories/interfaces/tcg.repository.interface';
 import { TcgSeriesDto } from '../dto/tcg-series.dto';
 import { TcgErrorService } from './tcg-error.service';
-import { TcgConfigService } from './tcg-config.service';
+import { TcgFetchService } from './tcg-fetch.service';
+import { TcgImageService } from './tcg-image.service';
+import { AddUserCardDto, UpdateUserCardQuantityDto } from '../dto/user-card.dto';
+import { UserCard, UserCardHistory } from '@/_db/schema/TCG';
 
 @Injectable()
 export class TcgService {
   constructor(
     @Inject(TCGPOCKET_REPOSITORY_TOKEN)
     private readonly tcgRepository: ITcgRepository,
-    private readonly httpService: HttpService,
     private readonly errorService: TcgErrorService,
-    private readonly configService: TcgConfigService,
+    private readonly fetchService: TcgFetchService,
+    private readonly imageService: TcgImageService,
   ) {}
 
   // ==================== SERIES OPERATIONS ====================
@@ -72,41 +70,7 @@ export class TcgService {
 
   async fetchAndStoreSeries(): Promise<{ success: boolean; count: number }> {
     try {
-      // Fetch EN and ES series in parallel
-      const [enRes, esRes] = await Promise.all([
-        firstValueFrom(this.httpService.get(this.configService.getSeriesUrl('en'))),
-        firstValueFrom(this.httpService.get(this.configService.getSeriesUrl('es'))),
-      ]);
-
-      const enSeries = enRes.data;
-      const esSeries = esRes.data;
-
-      // Merge by id
-      const seriesMap = new Map<string, TcgSeriesDto>();
-      
-      enSeries.forEach((s: any) => {
-        seriesMap.set(s.id, {
-          id: s.id,
-          name_en: s.name,
-          name_es: '',
-          logo: s.logo || null,
-        });
-      });
-
-      esSeries.forEach((s: any) => {
-        if (seriesMap.has(s.id)) {
-          seriesMap.get(s.id)!.name_es = s.name;
-        } else {
-          seriesMap.set(s.id, {
-            id: s.id,
-            name_en: '',
-            name_es: s.name,
-            logo: s.logo || null,
-          });
-        }
-      });
-
-      const mergedSeries = Array.from(seriesMap.values());
+      const mergedSeries = await this.fetchService.fetchAndMergeSeries();
       await this.saveSeries(mergedSeries);
 
       return { success: true, count: mergedSeries.length };
@@ -131,96 +95,25 @@ export class TcgService {
 
   async fetchSetsForSeries(seriesId: string, locale: string = 'en'): Promise<any[]> {
     try {
-      this.errorService.validateSeriesId(seriesId);
-      this.errorService.validateLocale(locale);
-
-      const url = this.configService.getSeriesDetailUrl(locale, seriesId);
-      const response = await firstValueFrom(this.httpService.get(url));
-      const sets = response.data.sets || [];
-
-      return sets.map((set: any) => ({
-        id: set.id,
-        name: set.name,
-        logo: set.logo,
-        symbol: set.symbol,
-        cardCountOfficial: set.cardCount?.official ?? 0,
-        cardCountTotal: set.cardCount?.total ?? 0,
-      }));
+      return await this.fetchService.fetchSetsForSeries(seriesId, locale);
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      this.errorService.handleApiError(error, 'Fetch sets for series');
+      throw error; // Re-throw as fetchService already handles the error
     }
   }
 
   async fetchSetsForSeriesBothLanguages(seriesId: string): Promise<any[]> {
-    console.log(`[TCG] Fetching sets for series ${seriesId} in both languages`);
     try {
-      this.errorService.validateSeriesId(seriesId);
-
-      // Fetch EN and ES sets in parallel
-      const [enRes, esRes] = await Promise.all([
-        firstValueFrom(this.httpService.get(this.configService.getSeriesDetailUrl('en', seriesId))),
-        firstValueFrom(this.httpService.get(this.configService.getSeriesDetailUrl('es', seriesId))),
-      ]);
-
-      console.log(`[TCG] EN sets: ${enRes.data.sets.length}, ES sets: ${esRes.data.sets.length}`);
-      if (!enRes.data.sets || !esRes.data.sets) {
-        throw new NotFoundException(`No sets found for series ID ${seriesId}`);
-      }
-      
-
-      const enSets = enRes.data.sets || [];
-      const esSets = esRes.data.sets || [];
-
-      // Merge by set id
-      const setMap = new Map<string, any>();
-      
-      enSets.forEach((set: any) => {
-        setMap.set(set.id, {
-          id: set.id,
-          series_id: seriesId,
-          name_en: set.name,
-          name_es: '',
-          logo: set.logo,
-          symbol: set.symbol,
-          card_count_official: set.cardCount?.official ?? 0,
-          card_count_total: set.cardCount?.total ?? 0,
-        });
-      });
-
-      esSets.forEach((set: any) => {
-        if (setMap.has(set.id)) {
-          setMap.get(set.id).name_es = set.name;
-        } else {
-          setMap.set(set.id, {
-            id: set.id,
-            series_id: seriesId,
-            name_en: '',
-            name_es: set.name,
-            logo: set.logo,
-            symbol: set.symbol,
-            card_count_official: set.cardCount?.official ?? 0,
-            card_count_total: set.cardCount?.total ?? 0,
-          });
-        }
-      });
-
-      const mergedSets = Array.from(setMap.values());
+      const mergedSets = await this.fetchService.fetchAndMergeSetsForSeries(seriesId);
 
       // Download images locally
-      await this.downloadSetImages(mergedSets);
+      await this.imageService.downloadSetImages(mergedSets);
 
       // Store in database
       await this.tcgRepository.insertSets(mergedSets);
 
       return mergedSets;
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      this.errorService.handleApiError(error, 'Fetch sets for series (both languages)');
+      throw error; // Re-throw as fetchService already handles the error
     }
   }
 
@@ -261,283 +154,218 @@ export class TcgService {
 
   async fetchAndStoreCardsForSet(setId: string, locale: string = 'en'): Promise<any[]> {
     try {
-      this.errorService.validateSetId(setId);
-      this.errorService.validateLocale(locale);
+      const mergedCards = await this.fetchService.fetchCardsForSet(setId, locale);
 
-      // Fetch CardBriefs for the given locale
-      const setRes = await firstValueFrom(this.httpService.get(this.configService.getSetUrl(locale, setId)));
-      const cards = setRes.data.cards || [];
-      const mergedCards: any[] = [];
-
-      for (const card of cards) {
-        // Fetch full card data
-        const cardRes = await firstValueFrom(this.httpService.get(this.configService.getCardUrl(locale, card.id)));
-        const cardData = cardRes.data;
-
-        // Build card object (only for the requested language)
-        const merged = {
-          id: card.id,
-          set_id: setId,
-          local_id: card.localId,
-          name_en: locale === 'en' ? cardData.name : '',
-          name_es: locale === 'es' ? cardData.name : '',
-          image_local_en: null,
-          image_local_es: null,
-          category: cardData.category,
-          illustrator: cardData.illustrator,
-          rarity: cardData.rarity,
-          hp: cardData.hp ?? null,
-          stage: cardData.stage,
-          description_en: locale === 'en' ? cardData.description : '',
-          description_es: locale === 'es' ? cardData.description : '',
-          updated: cardData.updated,
-          
-          // New complex fields as JSON strings
-          types: this.safeStringify(cardData.types),
-          weaknesses: this.safeStringify(cardData.weaknesses),
-          attacks: this.safeStringify(cardData.attacks),
-          boosters: this.safeStringify(cardData.boosters),
-          variants: this.safeStringify(cardData.variants),
-          legal: this.safeStringify(cardData.legal),
-          retreat: cardData.retreat ?? null,
-        };
-
-        // Download image
-        const imageLocal = await this.downloadCardImage(cardData, card.id, setId, locale);
-        if (locale === 'en') merged.image_local_en = imageLocal;
-        if (locale === 'es') merged.image_local_es = imageLocal;
-
-        mergedCards.push(merged);
-        
-        // Rate limit: wait 250ms between requests
-        await new Promise(res => setTimeout(res, 250));
-      }
+      // Download images for cards
+      await this.imageService.downloadImagesForCards(mergedCards, setId);
 
       // Store in database
       await this.tcgRepository.insertCards(mergedCards);
 
       return mergedCards;
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw error;
-      }
-      this.errorService.handleApiError(error, 'Fetch and store cards for set');
+      throw error; // Re-throw as fetchService already handles the error
     }
   }
 
   async fetchAndStoreCardsForSetBothLanguages(setId: string): Promise<any[]> {
     try {
-      this.errorService.validateSetId(setId);
-
-      // Fetch CardBriefs for EN and ES
-      const [enSetRes, esSetRes] = await Promise.all([
-        firstValueFrom(this.httpService.get(this.configService.getSetUrl('en', setId))),
-        firstValueFrom(this.httpService.get(this.configService.getSetUrl('es', setId))),
-      ]);
-
-      const enCards = enSetRes.data.cards || [];
-      const esCards = esSetRes.data.cards || [];
-
-      // Merge CardBriefs by id
-      const cardBriefMap = new Map<string, any>();
-      
-      enCards.forEach((card: any) => {
-        cardBriefMap.set(card.id, {
-          id: card.id,
-          set_id: setId,
-          local_id: card.localId,
-          name_en: card.name,
-          name_es: '',
-          image: card.image,
-        });
-      });
-
-      esCards.forEach((card: any) => {
-        if (cardBriefMap.has(card.id)) {
-          cardBriefMap.get(card.id).name_es = card.name;
-        } else {
-          cardBriefMap.set(card.id, {
-            id: card.id,
-            set_id: setId,
-            local_id: card.localId,
-            name_en: '',
-            name_es: card.name,
-            image: card.image,
-          });
-        }
-      });
-
-      const mergedBriefs = Array.from(cardBriefMap.values());
-
       // Fetch all existing cards for this set
       const existingCards = await this.tcgRepository.getCardsBySetId(setId);
       const existingCardsMap = new Map(existingCards.map(card => [card.id, card]));
 
-      const mergedCards: any[] = [];
+      const mergedCards = await this.fetchService.fetchAndMergeCardsForSet(setId);
 
-      for (const brief of mergedBriefs) {
-        // Fetch EN and ES card data
-        const [enCardRes, esCardRes] = await Promise.all([
-          firstValueFrom(this.httpService.get(this.configService.getCardUrl('en', brief.id))),
-          firstValueFrom(this.httpService.get(this.configService.getCardUrl('es', brief.id))),
-        ]);
-
-        const enCard = enCardRes.data;
-        const esCard = esCardRes.data;
-
-        // Merge card data
-        const merged = {
-          id: brief.id,
-          set_id: setId,
-          local_id: brief.local_id,
-          name_en: enCard.name,
-          name_es: esCard.name,
-          image_local_en: null,
-          image_local_es: null,
-          category: enCard.category,
-          illustrator: enCard.illustrator,
-          rarity: enCard.rarity,
-          hp: enCard.hp ?? null,
-          stage: enCard.stage,
-          description_en: enCard.description,
-          description_es: esCard.description,
-          updated: enCard.updated,
-          
-          // New complex fields as JSON strings
-          types: this.safeStringify(enCard.types),
-          weaknesses: this.safeStringify(enCard.weaknesses),
-          attacks: this.safeStringify(enCard.attacks),
-          boosters: this.safeStringify(enCard.boosters),
-          variants: this.safeStringify(enCard.variants),
-          legal: this.safeStringify(enCard.legal),
-          retreat: enCard.retreat ?? null,
-        };
-
-        // Get existing card info
-        const existingCard = existingCardsMap.get(merged.id);
-
-        // Download images if not already present
-        merged.image_local_en = await this.downloadCardImageIfNotExists(
-          enCard, merged.id, setId, 'en', existingCard?.image_local_en
-        );
-        merged.image_local_es = await this.downloadCardImageIfNotExists(
-          esCard, merged.id, setId, 'es', existingCard?.image_local_es
-        );
-
-        mergedCards.push(merged);
-        
-        // Rate limit: wait 250ms between requests
-        await new Promise(res => setTimeout(res, 250));
-      }
+      // Download images for cards with existing cards check
+      await this.imageService.downloadImagesForCards(mergedCards, setId, existingCardsMap);
 
       // Store in database
       await this.tcgRepository.insertCards(mergedCards);
 
       return mergedCards;
     } catch (error) {
+      throw error; // Re-throw as fetchService already handles the error
+    }
+  }
+// ==================== USER CARDS OPERATIONS ====================
+
+  async getUserCards(userId: string): Promise<any[]> {
+    try {
+      if (!userId || userId.trim().length === 0) {
+        throw new BadRequestException('User ID is required');
+      }
+
+      const userCards = await this.tcgRepository.getUserCards(userId);
+      
+      // Enrich with card details
+      const enrichedCards = [];
+      for (const userCard of userCards) {
+        try {
+          const cardDetails = await this.tcgRepository.findCardById(userCard.card_id);
+          enrichedCards.push({
+            ...userCard,
+            cardName: cardDetails ? (cardDetails.name_en || cardDetails.name_es) : 'Unknown Card',
+            cardImage: cardDetails ? (cardDetails.image_en || cardDetails.image_es) : null,
+          });
+        } catch (error) {
+          // If card details fail, still include the user card with basic info
+          enrichedCards.push({
+            ...userCard,
+            cardName: 'Unknown Card',
+            cardImage: null,
+          });
+        }
+      }
+
+      return enrichedCards;
+    } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
-      this.errorService.handleApiError(error, 'Fetch and store cards for set (both languages)');
+      this.errorService.handleDatabaseError(error, 'Get user cards');
     }
   }
 
-  // ==================== PRIVATE HELPER METHODS ====================
-
-  // Helper method to safely stringify JSON
-  private safeStringify(data: any): string | null {
-    if (!data || (Array.isArray(data) && data.length === 0)) return null;
-    if (typeof data === 'object' && Object.keys(data).length === 0) return null;
-    return JSON.stringify(data);
-  }
-
-  // Helper method to safely parse JSON
-  private safeParse(jsonString: string | null): any {
-    if (!jsonString) return null;
+  async addUserCard(addUserCardDto: AddUserCardDto): Promise<{ success: boolean; message: string }> {
     try {
-      return JSON.parse(jsonString);
+      const { userId, cardId, quantity } = addUserCardDto;
+
+      // Validate card exists
+      const cardExists = await this.tcgRepository.checkIfCardExists(cardId);
+      if (!cardExists) {
+        throw new BadRequestException(`Card with ID ${cardId} does not exist`);
+      }
+
+      // Check if user already has this card
+      const existingUserCard = await this.tcgRepository.getUserCard(userId, cardId);
+      
+      if (existingUserCard) {
+        // Update existing quantity
+        const newQuantity = existingUserCard.quantity + quantity;
+        await this.tcgRepository.updateUserCardQuantity(userId, cardId, newQuantity);
+      } else {
+        // Add new card
+        await this.tcgRepository.addUserCard(userId, cardId, quantity);
+      }
+
+      // Add to history
+      await this.tcgRepository.addUserCardHistory(userId, cardId, quantity);
+
+      return { 
+        success: true, 
+        message: `Added ${quantity} of card ${cardId} to user ${userId}` 
+      };
     } catch (error) {
-      console.warn('[TCG] Failed to parse JSON:', jsonString);
-      return null;
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.errorService.handleDatabaseError(error, 'Add user card');
     }
   }
 
-  private async downloadSetImages(sets: any[]): Promise<void> {
-    for (const set of sets) {
-      const setImgDir = path.join(process.cwd(), 'public', 'img', 'games', 'tcg', 'sets', set.id);
-      await fs.mkdir(setImgDir, { recursive: true });
-
-      // Download logo
-      if (set.logo) {
-        try {
-          const logoUrl = set.logo + '.webp';
-          const logoFilename = path.join(setImgDir, 'logo.webp');
-          const response = await axios.get(logoUrl, { responseType: 'arraybuffer' });
-          await fs.writeFile(logoFilename, response.data);
-          // Store path WITHOUT /public prefix
-          set.logo_local = `/img/games/tcg/sets/${set.id}/logo.webp`;
-        } catch (err) {
-          console.warn(`[TCG] Failed to download logo for set ${set.id}:`, err);
-          set.logo_local = null;
-        }
-      }
-
-      // Download symbol
-      if (set.symbol) {
-        try {
-          const symbolUrl = set.symbol + '.webp';
-          const symbolFilename = path.join(setImgDir, 'symbol.webp');
-          const response = await axios.get(symbolUrl, { responseType: 'arraybuffer' });
-          await fs.writeFile(symbolFilename, response.data);
-          // Store path WITHOUT /public prefix
-          set.symbol_local = `/img/games/tcg/sets/${set.id}/symbol.webp`;
-        } catch (err) {
-          console.warn(`[TCG] Failed to download symbol for set ${set.id}:`, err);
-          set.symbol_local = null;
-        }
-      }
-    }
-  }
-
-  private async downloadCardImage(cardData: any, cardId: string, setId: string, locale: string): Promise<string | null> {
-    if (!cardData.image) return null;
-
+  async updateUserCardQuantity(userId: string, cardId: string, updateDto: UpdateUserCardQuantityDto): Promise<{ success: boolean; message: string }> {
     try {
-      const cardImgDir = path.join(process.cwd(), 'public', 'img', 'games', 'tcg', 'cards', setId);
-      await fs.mkdir(cardImgDir, { recursive: true });
+      if (!userId || userId.trim().length === 0) {
+        throw new BadRequestException('User ID is required');
+      }
+      if (!cardId || cardId.trim().length === 0) {
+        throw new BadRequestException('Card ID is required');
+      }
 
-      const imageUrl = cardData.image + '/high.webp';
-      const imageFilename = path.join(cardImgDir, `${cardId}_${locale}.webp`);
+      const existingUserCard = await this.tcgRepository.getUserCard(userId, cardId);
+      if (!existingUserCard) {
+        throw new NotFoundException(`User ${userId} does not own card ${cardId}`);
+      }
+
+      const quantityChange = updateDto.quantity - existingUserCard.quantity;
       
-      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-      await fs.writeFile(imageFilename, response.data);
-      
-      return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
-    } catch (err) {
-      console.warn(`[TCG] Failed to download ${locale} image for card ${cardId}:`, err);
-      return null;
+      if (updateDto.quantity === 0) {
+        // Remove card entirely
+        await this.tcgRepository.removeUserCard(userId, cardId);
+      } else {
+        // Update quantity
+        await this.tcgRepository.updateUserCardQuantity(userId, cardId, updateDto.quantity);
+      }
+
+      // Add to history if there was a change
+      if (quantityChange !== 0) {
+        await this.tcgRepository.addUserCardHistory(userId, cardId, quantityChange);
+      }
+
+      return { 
+        success: true, 
+        message: `Updated card ${cardId} quantity to ${updateDto.quantity} for user ${userId}` 
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      this.errorService.handleDatabaseError(error, 'Update user card quantity');
     }
   }
 
-  private async downloadCardImageIfNotExists(
-    cardData: any, 
-    cardId: string, 
-    setId: string, 
-    locale: string, 
-    existingImagePath?: string
-  ): Promise<string | null> {
-    // If image already exists in DB, return it
-    if (existingImagePath) {
-      console.log(`[TCG] ${locale.toUpperCase()} image for card ${cardId} already exists: ${existingImagePath}`);
-      return existingImagePath;
-    }
+  async removeUserCard(userId: string, cardId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      if (!userId || userId.trim().length === 0) {
+        throw new BadRequestException('User ID is required');
+      }
+      if (!cardId || cardId.trim().length === 0) {
+        throw new BadRequestException('Card ID is required');
+      }
 
-    // Download new image
-    const imagePath = await this.downloadCardImage(cardData, cardId, setId, locale);
-    if (imagePath) {
-      console.log(`[TCG] ${locale.toUpperCase()} image downloaded for card ${cardId}: ${imagePath}`);
+      const existingUserCard = await this.tcgRepository.getUserCard(userId, cardId);
+      if (!existingUserCard) {
+        throw new NotFoundException(`User ${userId} does not own card ${cardId}`);
+      }
+
+      await this.tcgRepository.removeUserCard(userId, cardId);
+
+      // Add to history (negative of current quantity)
+      await this.tcgRepository.addUserCardHistory(userId, cardId, -existingUserCard.quantity);
+
+      return { 
+        success: true, 
+        message: `Removed card ${cardId} from user ${userId}` 
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException || error instanceof NotFoundException) {
+        throw error;
+      }
+      this.errorService.handleDatabaseError(error, 'Remove user card');
     }
-    
-    return imagePath;
+  }
+
+  async getUserCardHistory(userId: string): Promise<any[]> {
+    try {
+      if (!userId || userId.trim().length === 0) {
+        throw new BadRequestException('User ID is required');
+      }
+
+      const history = await this.tcgRepository.getUserCardHistory(userId);
+      
+      // Enrich with card details
+      const enrichedHistory = [];
+      for (const historyEntry of history) {
+        try {
+          const cardDetails = await this.tcgRepository.findCardById(historyEntry.card_id);
+          enrichedHistory.push({
+            ...historyEntry,
+            cardName: cardDetails ? (cardDetails.name_en || cardDetails.name_es) : 'Unknown Card',
+          });
+        } catch (error) {
+          enrichedHistory.push({
+            ...historyEntry,
+            cardName: 'Unknown Card',
+          });
+        }
+      }
+
+      return enrichedHistory;
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.errorService.handleDatabaseError(error, 'Get user card history');
+    }
   }
 }
