@@ -8,7 +8,7 @@ import { TcgCard } from './entities/tcg-card.entity';
 import { SeriesCardsGroup } from './entities/series-cards-grouped.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { AddUserCardDto, UpdateUserCardQuantityDto } from './dto/user-card.dto';
-import { UserCardEntity, UserCardHistoryEntity } from './entities/user-card.entity';
+import { UserCard, UserCardHistory } from './entities/user-card.entity';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Controller('tools/ptcgp')
@@ -28,7 +28,10 @@ export class TcgController {
   }
 
   private parseCardData(card: any, locale: string): TcgCard {
-
+    if(!card[`image_es`]) {
+      console.warn(`[TCG] No image found for card ${card.id} in locale ${locale}`);
+      return null;
+    }
     return {
       id: card.id,
       setId: card.set_id,
@@ -257,7 +260,7 @@ export class TcgController {
     @Param('setId') setId: string,
     @Query('locale') locale: string = 'en',
   ): Promise<TcgCard[]> {
-    return this.tcgFacade.fetchAndStoreCardsForSet(setId, locale);
+    return await this.tcgFacade.fetchAndStoreCardsForSet(setId, locale);
   }
 
   @Get('fetch/sets/:setId/cards/store')
@@ -275,7 +278,7 @@ export class TcgController {
   async fetchAndStoreCardsForSet(
     @Param('setId') setId: string,
   ): Promise<TcgCard[]> {
-    return this.tcgFacade.fetchAndStoreCardsForSetBothLanguages(setId);
+    return await this.tcgFacade.fetchAndStoreCardsForSetBothLanguages(setId);
   }
 
   // ==================== FETCH BATCH OPERATIONS ====================
@@ -323,6 +326,8 @@ export class TcgController {
     for (const set of sets) {
       let cards = null;
       let error = null;
+
+      console.log(`[TCG] Fetching cards for set ${set.id}...`);
       
       try {
         cards = await this.tcgFacade.fetchAndStoreCardsForSetBothLanguages(set.id);
@@ -354,9 +359,9 @@ export class TcgController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User cards retrieved successfully.',
-    type: [UserCardEntity]
+    type: [UserCard]
   })
-  async getUserCards(@Param('userId') userId: string): Promise<UserCardEntity[]> {
+  async getUserCards(@Param('userId') userId: string): Promise<UserCard[]> {
     return this.tcgFacade.getUserCards(userId);
   }
 
@@ -422,9 +427,9 @@ export class TcgController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User card history retrieved successfully.',
-    type: [UserCardHistoryEntity]
+    type: [UserCardHistory]
   })
-  async getUserCardHistory(@Param('userId') userId: string): Promise<UserCardHistoryEntity[]> {
+  async getUserCardHistory(@Param('userId') userId: string): Promise<UserCardHistory[]> {
     return this.tcgFacade.getUserCardHistory(userId);
   }
 }

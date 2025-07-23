@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class UserCardEntity {
+export class UserCard {
   @ApiProperty({ example: 'user123_tcgp-A1-001', description: 'User card ID' })
   id: string;
 
@@ -9,6 +9,9 @@ export class UserCardEntity {
 
   @ApiProperty({ example: 'tcgp-A1-001', description: 'Card ID' })
   cardId: string;
+
+  @ApiProperty({ example: 'A1', description: 'Set ID' })
+  setId: string;
 
   @ApiProperty({ example: 'Pikachu', description: 'Card name' })
   cardName: string;
@@ -26,7 +29,7 @@ export class UserCardEntity {
   updatedAt: string;
 }
 
-export class UserCardHistoryEntity {
+export class UserCardHistory {
   @ApiProperty({ example: 'user123_tcgp-A1-001_1735200000000', description: 'History entry ID' })
   id: string;
 
@@ -35,6 +38,9 @@ export class UserCardHistoryEntity {
 
   @ApiProperty({ example: 'tcgp-A1-001', description: 'Card ID' })
   cardId: string;
+
+  @ApiProperty({ example: 'A1', description: 'Set ID' })
+  setId: string;
 
   @ApiProperty({ example: 'Pikachu', description: 'Card name' })
   cardName: string;

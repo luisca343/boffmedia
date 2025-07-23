@@ -155,9 +155,11 @@ export class TcgFetchService {
       const mergedCards: any[] = [];
 
       for (const card of cards) {
+        console.log(`Fetching card ${card.id} for set ${setId} in locale ${locale}`);
         // Fetch full card data
         const cardRes = await firstValueFrom(this.httpService.get(this.configService.getCardUrl(locale, card.id)));
         const cardData = cardRes.data;
+        
 
         // Build card object (only for the requested language)
         const merged = {
@@ -175,7 +177,7 @@ export class TcgFetchService {
           stage: cardData.stage,
           description_en: locale === 'en' ? cardData.description : '',
           description_es: locale === 'es' ? cardData.description : '',
-          updated: cardData.updated,
+          updated: cardData.updated ? new Date(cardData.updated) : null,
           
           // New complex fields as JSON strings
           types: this.safeStringify(cardData.types),
@@ -206,14 +208,25 @@ export class TcgFetchService {
     try {
       this.errorService.validateSetId(setId);
 
-      // Fetch CardBriefs for EN and ES
-      const [enSetRes, esSetRes] = await Promise.all([
-        firstValueFrom(this.httpService.get(this.configService.getSetUrl('en', setId))),
-        firstValueFrom(this.httpService.get(this.configService.getSetUrl('es', setId))),
-      ]);
-
+      // Fetch EN first (always available)
+      const enSetRes = await firstValueFrom(this.httpService.get(this.configService.getSetUrl('en', setId)));
       const enCards = enSetRes.data.cards || [];
-      const esCards = esSetRes.data.cards || [];
+
+      // Try to fetch ES, but handle gracefully if it doesn't exist
+      let esCards = [];
+      try {
+        const esSetRes = await firstValueFrom(this.httpService.get(this.configService.getSetUrl('es', setId)));
+        esCards = esSetRes.data.cards || [];
+        console.log(`[TCG] Successfully fetched ES cards for set ${setId}`);
+      } catch (esError) {
+        if (esError.response?.status === 404) {
+          console.warn(`[TCG] ES locale not available for set ${setId}, proceeding with EN only`);
+          esCards = [];
+        } else {
+          // Re-throw if it's not a 404 error
+          throw esError;
+        }
+      }
 
       // Merge CardBriefs by id
       const cardBriefMap = new Map<string, any>();
@@ -247,33 +260,56 @@ export class TcgFetchService {
       const mergedBriefs = Array.from(cardBriefMap.values());
       const mergedCards: any[] = [];
 
-      for (const brief of mergedBriefs) {
-        // Fetch EN and ES card data
-        const [enCardRes, esCardRes] = await Promise.all([
-          firstValueFrom(this.httpService.get(this.configService.getCardUrl('en', brief.id))),
-          firstValueFrom(this.httpService.get(this.configService.getCardUrl('es', brief.id))),
+      console.log(`[TCG] Starting detailed card fetching for ${mergedBriefs.length} cards in set ${setId}`);
+
+      for (let i = 0; i < mergedBriefs.length; i++) {
+        const brief = mergedBriefs[i];
+        console.log(`[TCG] Fetching detailed data for card ${i + 1}/${mergedBriefs.length}: ${brief.id} in set ${setId}`);
+        
+        // Fetch EN card data (always available)
+        const enCardRes = await firstValueFrom(this.httpService.get(this.configService.getCardUrl('en', brief.id)));
+        const enCard = enCardRes.data;
+
+        // Try to fetch ES card data, but handle gracefully if it doesn't exist
+        let esCard = null;
+        try {
+          const esCardRes = await firstValueFrom(this.httpService.get(this.configService.getCardUrl('es', brief.id)));
+          esCard = esCardRes.data;
+        } catch (esCardError) {
+          if (esCardError.response?.status === 404) {
+            console.warn(`[TCG] ES version not available for card ${brief.id}, using EN description`);
+            esCard = enCard; // Use EN data as fallback
+          } else {
+            // For other errors, still use EN as fallback but log the error
+            console.warn(`[TCG] Error fetching ES version for card ${brief.id}:`, esCardError.message);
+            esCard = enCard;
+          }
+        }
+
+        // Download images immediately after fetching card data
+        console.log(`[TCG] Downloading images for card ${brief.id}...`);
+        const [imageLocalEn, imageLocalEs] = await Promise.all([
+          this.downloadCardImage({ image: brief.image }, brief.id, setId, 'en'),
+          this.downloadCardImage({ image: brief.image }, brief.id, setId, 'es')
         ]);
 
-        const enCard = enCardRes.data;
-        const esCard = esCardRes.data;
-
-        // Merge card data
+        // Merge card data with local image paths
         const merged = {
           id: brief.id,
           set_id: setId,
           local_id: brief.local_id,
-          name_en: enCard.name,
-          name_es: esCard.name,
-          image_local_en: null,
-          image_local_es: null,
+          name_en: brief.name_en || enCard.name,
+          name_es: brief.name_es || (esCard ? esCard.name : enCard.name),
+          image_local_en: imageLocalEn,
+          image_local_es: imageLocalEs,
           category: enCard.category,
           illustrator: enCard.illustrator,
           rarity: enCard.rarity,
           hp: enCard.hp ?? null,
           stage: enCard.stage,
           description_en: enCard.description,
-          description_es: esCard.description,
-          updated: enCard.updated,
+          description_es: esCard ? esCard.description : enCard.description,
+          updated: enCard.updated ? new Date(enCard.updated) : null,
           
           // New complex fields as JSON strings
           types: this.safeStringify(enCard.types),
@@ -291,12 +327,35 @@ export class TcgFetchService {
         await new Promise(res => setTimeout(res, 250));
       }
 
+      console.log(`[TCG] Completed detailed card fetching for set ${setId}`);
       return mergedCards;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
       }
       this.errorService.handleApiError(error, 'Fetch and merge cards for set');
+    }
+  }
+
+  // Add this helper method to the TcgFetchService class
+  private async downloadCardImage(cardData: any, cardId: string, setId: string, locale: string): Promise<string | null> {
+    if (!cardData.image) return null;
+
+    try {
+      console.log(`[TCG] Downloading ${locale.toUpperCase()} image for card ${cardId}...`);
+      const cardImgDir = path.join(process.cwd(), 'public', 'img', 'games', 'tcg', 'cards', setId);
+      await fs.mkdir(cardImgDir, { recursive: true });
+
+      const imageUrl = cardData.image + '/high.webp';
+      const imageFilename = path.join(cardImgDir, `${cardId}_${locale}.webp`);
+      
+      const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+      await fs.writeFile(imageFilename, response.data);
+      
+      return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
+    } catch (err) {
+      console.warn(`[TCG] Failed to download ${locale} image for card ${cardId}:`, err);
+      return null;
     }
   }
 

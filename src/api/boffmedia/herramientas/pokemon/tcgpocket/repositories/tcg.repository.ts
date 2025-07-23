@@ -338,7 +338,7 @@ export class TcgRepository implements ITcgRepository {
         user_id: userId,
         card_id: cardId,
         quantity_change: quantityChange,
-        timestamp: new Date(),
+        date: new Date(),
       });
     } catch (error) {
       console.error(`[TcgRepository] Error adding user card history for user ${userId}:`, error);

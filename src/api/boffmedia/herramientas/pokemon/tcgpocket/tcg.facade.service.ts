@@ -18,7 +18,7 @@ export class TcgFacadeService {
   }
 
   async fetchAndStoreCardsForSet(setId: string, locale: string = 'en') {
-    return this.tcgService.fetchAndStoreCardsForSet(setId, locale);
+    return await this.tcgService.fetchAndStoreCardsForSet(setId, locale);
   }
 
   async getAllSeries() {
@@ -38,7 +38,7 @@ export class TcgFacadeService {
   }
 
   async fetchAndStoreCardsForSetBothLanguages(setId: string) {
-    return this.tcgService.fetchAndStoreCardsForSetBothLanguages(setId);
+    return await this.tcgService.fetchAndStoreCardsForSetBothLanguages(setId);
   }
   async getUserCards(userId: string) {
     return this.tcgService.getUserCards(userId);

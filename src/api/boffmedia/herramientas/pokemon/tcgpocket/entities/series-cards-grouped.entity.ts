@@ -27,7 +27,7 @@ export class SeriesCardsGroup {
   cards: TcgCard[];
 }
 
-export class SeriesCardsGroupedEntity {
+export class SeriesCardsGrouped {
   @ApiProperty({ 
     description: 'Success status',
     example: true

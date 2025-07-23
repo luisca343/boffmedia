@@ -46,6 +46,7 @@ export class TcgImageService {
     if (!cardData.image) return null;
 
     try {
+      console.log(`[TCG] Downloading ${locale.toUpperCase()} image for card ${cardId}...`);
       const cardImgDir = path.join(process.cwd(), 'public', 'img', 'games', 'tcg', 'cards', setId);
       await fs.mkdir(cardImgDir, { recursive: true });
 

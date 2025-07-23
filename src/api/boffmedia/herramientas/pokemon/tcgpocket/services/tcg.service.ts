@@ -174,12 +174,11 @@ export class TcgService {
       const existingCards = await this.tcgRepository.getCardsBySetId(setId);
       const existingCardsMap = new Map(existingCards.map(card => [card.id, card]));
 
+      console.log(`[TCG] Fetching cards for set ${setId}...`);
       const mergedCards = await this.fetchService.fetchAndMergeCardsForSet(setId);
 
-      // Download images for cards with existing cards check
-      await this.imageService.downloadImagesForCards(mergedCards, setId, existingCardsMap);
-
-      // Store in database
+      console.log(`[TCG] Storing ${mergedCards.length} cards for set ${setId}...`);
+      // Store in database (images are already downloaded and URLs are set)
       await this.tcgRepository.insertCards(mergedCards);
 
       return mergedCards;
@@ -187,7 +186,8 @@ export class TcgService {
       throw error; // Re-throw as fetchService already handles the error
     }
   }
-// ==================== USER CARDS OPERATIONS ====================
+
+  // ==================== USER CARDS OPERATIONS ====================
 
   async getUserCards(userId: string): Promise<any[]> {
     try {
@@ -204,6 +204,7 @@ export class TcgService {
           const cardDetails = await this.tcgRepository.findCardById(userCard.card_id);
           enrichedCards.push({
             ...userCard,
+            setId: cardDetails ? cardDetails.setId : 'unknown',
             cardName: cardDetails ? (cardDetails.name_en || cardDetails.name_es) : 'Unknown Card',
             cardImage: cardDetails ? (cardDetails.image_en || cardDetails.image_es) : null,
           });
@@ -211,6 +212,7 @@ export class TcgService {
           // If card details fail, still include the user card with basic info
           enrichedCards.push({
             ...userCard,
+            setId: 'unknown',
             cardName: 'Unknown Card',
             cardImage: null,
           });
@@ -350,11 +352,13 @@ export class TcgService {
           const cardDetails = await this.tcgRepository.findCardById(historyEntry.card_id);
           enrichedHistory.push({
             ...historyEntry,
+            setId: cardDetails ? cardDetails.setId : 'unknown',
             cardName: cardDetails ? (cardDetails.name_en || cardDetails.name_es) : 'Unknown Card',
           });
         } catch (error) {
           enrichedHistory.push({
             ...historyEntry,
+            setId: 'unknown',
             cardName: 'Unknown Card',
           });
         }
