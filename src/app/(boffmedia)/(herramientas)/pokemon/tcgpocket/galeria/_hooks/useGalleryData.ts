@@ -35,8 +35,8 @@ export function useGalleryData(username: string) {
       if(!allCardsData || !userCardsData) return  
       
       setAllCards(allCardsData)
-      const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: UserCardEntity) => {
-        acc[`${card.expansion}_${card.cardNumber}`] = card.count
+      const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: any) => {
+        acc[card.cardId] = card.quantity
         return acc
       }, {})
       setUserCards(userCardsMap)
@@ -48,16 +48,30 @@ export function useGalleryData(username: string) {
     }
   }
 
-  const updateUserCards = async (updates: { expansion: string; cardNumber: number; change: number }[]) => {
+  const updateUserCards = async (updates: { cardId: string; change: number }[]) => {
     setLoading(true)
     try {
       // Convert updates to the format expected by the service
       const cardUpdates = updates.map(update => ({
-        cardId: `${update.expansion}_${update.cardNumber}`,
-        count: (userCards[`${update.expansion}_${update.cardNumber}`] || 0) + update.change
+        userId: username,
+        cardId: update.cardId,
+        quantity: Math.max(0, (userCards[update.cardId] || 0) + update.change)
       }))
 
-      await PtcgpService.batchUpdateUserCards(username, cardUpdates)
+      // Use individual update calls since batchUpdateUserCards doesn't exist
+      await Promise.all(cardUpdates.map(async (update) => {
+        if (update.quantity === 0) {
+          await PtcgpService.removeUserCard(update.userId, update.cardId)
+        } else {
+          const existingCard = userCards[update.cardId]
+          if (existingCard) {
+            await PtcgpService.updateUserCardQuantity(update.userId, update.cardId, { quantity: update.quantity })
+          } else {
+            await PtcgpService.addUserCard({ userId: update.userId, cardId: update.cardId, quantity: update.quantity })
+          }
+        }
+      }))
+
       await fetchData()
       toast.success('Cambios guardados exitosamente.')
     } catch (error) {

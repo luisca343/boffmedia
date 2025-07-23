@@ -33,7 +33,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<string>("general")
   const [eventPackData, setEventPackData] = useState<{ bestPack: PackData, allPackProbabilities: AllPackProbabilities, missingEventCards: string[], totalEventCards: number } | null>(null)
-  const [recentUpdates, setRecentUpdates] = useState<RecentUpdate[]>([])
+  const [recentUpdates, setRecentUpdates] = useState<any[]>([])
   const [recentUpdatesLoading, setRecentUpdatesLoading] = useState(false)
   const [recentUpdatesOffset, setRecentUpdatesOffset] = useState(0)
   const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
@@ -92,23 +92,18 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   }
 
   const saveChanges = async () => {
-    const updates = Object.entries(changes).map(([key, change]) => {
-      const [expansion, cardNumber] = key.split('_')
-      return {
-        expansion,
-        cardNumber: parseInt(cardNumber),
-        change,
-      }
-    })
+    const updates = Object.entries(changes).map(([cardId, change]) => ({
+      cardId,
+      change,
+    }))
 
     await updateUserCards(updates)
     const newUpdates = updates.map(update => ({
       id: Date.now(),
-      expansion: update.expansion,
-      cardNumber: update.cardNumber,
+      cardId: update.cardId,
       count: update.change,
       updatedAt: new Date().toISOString(),
-      cardName: allCards.find(card => card.expansion === update.expansion && card.number === update.cardNumber)?.name || t('gallery.unknownCard')
+      cardName: allCards.find(card => card.id === update.cardId)?.name || t('gallery.unknownCard')
     }));
 
     setRecentUpdates(prevUpdates => [...newUpdates, ...prevUpdates]);
@@ -171,7 +166,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
           />
           <div className="mt-8">
             <FilterComponent
-              expansions={Array.from(new Set(allCards.map(card => card.expansion)))}
+              expansions={Array.from(new Set(allCards.map(card => card.setId)))}
               onFilterChange={(name, expansion) => {
                 setNameFilter(name)
                 setExpansionFilter(expansion)
@@ -192,20 +187,20 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                   allCards
                     .filter(card =>
                       (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
-                        card.number.toString().includes(nameFilter)) &&
-                      (expansionFilter === "" || card.expansion === expansionFilter)
+                        card.id.toString().includes(nameFilter)) &&
+                      (expansionFilter === "" || card.setId === expansionFilter)
                     )
-                    .reduce<Record<string, TcgCardEntity[]>>((acc, curr) => {
-                      if (!acc[curr.expansion]) {
-                        acc[curr.expansion] = []
+                    .reduce<Record<string, TcgCard[]>>((acc, curr) => {
+                      if (!acc[curr.setId]) {
+                        acc[curr.setId] = []
                       }
-                      acc[curr.expansion].push(curr)
+                      acc[curr.setId].push(curr)
                       return acc
                     }, {})
-                ).map(([expansion, cards]) => (
+                ).map(([setId, cards]) => (
                   <CollectionGroup
-                    key={expansion}
-                    expansion={expansion}
+                    key={setId}
+                    expansion={setId}
                     cards={cards}
                     userCards={userCards}
                     changes={changes}
