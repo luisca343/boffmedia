@@ -29,35 +29,35 @@ export class EventsService {
    * Get all events
    */
   static getEvents() {
-    return apiGET<Event[]>('/boffmedia/events');
+    return apiGET<Event[]>('/events');
   }
   
   /**
    * Get a specific event by ID
    */
   static getEvent(id: number) {
-    return apiGET<Event>(`/boffmedia/events/event/${id}`);
+    return apiGET<Event>(`/events/event/${id}`);
   }
   
   /**
    * Create a new event
    */
   static createEvent(data: any) {
-    return apiPOST<any>('/boffmedia/events/event', data);
+    return apiPOST<any>('/events/event', data);
   }
   
   /**
    * Update an existing event
    */
   static updateEvent(id: number, data: UpdateEventDto) {
-    return apiPATCH<Event>(`/boffmedia/events/event/${id}`, data);
+    return apiPATCH<Event>(`/events/event/${id}`, data);
   }
   
   /**
    * Delete an event
    */
   static deleteEvent(id: number) {
-    return apiDELETE<SuccessResponse>(`/boffmedia/events/event/${id}`);
+    return apiDELETE<SuccessResponse>(`/events/event/${id}`);
   }
 
   // ==================== GAME OPERATIONS ====================
@@ -66,35 +66,35 @@ export class EventsService {
    * Get all games
    */
   static getGames() {
-    return apiGET<Game[]>('/boffmedia/events/games');
+    return apiGET<Game[]>('/events/games');
   }
   
   /**
    * Get a specific game by ID
    */
   static getGame(id: number) {
-    return apiGET<Game>(`/boffmedia/events/games/${id}`);
+    return apiGET<Game>(`/events/games/${id}`);
   }
   
   /**
    * Create a new game
    */
   static createGame(data: CreateGameDto) {
-    return apiPOST<Game>('/boffmedia/events/games', data);
+    return apiPOST<Game>('/events/games', data);
   }
   
   /**
    * Update an existing game
    */
   static updateGame(id: number, data: UpdateGameDto) {
-    return apiPATCH<Game>(`/boffmedia/events/games/${id}`, data);
+    return apiPATCH<Game>(`/events/games/${id}`, data);
   }
   
   /**
    * Delete a game
    */
   static deleteGame(id: number) {
-    return apiDELETE<SuccessResponse>(`/boffmedia/events/games/${id}`);
+    return apiDELETE<SuccessResponse>(`/events/games/${id}`);
   }
 
   // ==================== ACHIEVEMENT OPERATIONS ====================
@@ -103,28 +103,28 @@ export class EventsService {
    * Get all achievements
    */
   static getAchievements() {
-    return apiGET<Achievement[]>('/boffmedia/events/achievements');
+    return apiGET<Achievement[]>('/events/achievements');
   }
   
   /**
    * Get all achievements for a specific event
    */
   static getEventAchievements(eventId: number) {
-    return apiGET<Achievement[]>(`/boffmedia/events/${eventId}/achievements`);
+    return apiGET<Achievement[]>(`/events/${eventId}/achievements`);
   }
   
   /**
    * Create a new achievement for an event
    */
   static createAchievement(eventId: number, data: CreateAchievementDto) {
-    return apiPOST<Achievement>(`/boffmedia/events/${eventId}/achievements`, data);
+    return apiPOST<Achievement>(`/events/${eventId}/achievements`, data);
   }
   
   /**
    * Update an existing achievement
    */
   static updateAchievement(eventId: number, achievementId: number, data: UpdateAchievementDto) {
-    return apiPATCH<Achievement>(`/boffmedia/events/${eventId}/achievements/${achievementId}`, data);
+    return apiPATCH<Achievement>(`/events/${eventId}/achievements/${achievementId}`, data);
   }
 
   // ==================== TEAM OPERATIONS ====================
@@ -133,56 +133,56 @@ export class EventsService {
    * Get all teams
    */
   static getTeams() {
-    return apiGET<Team[]>('/boffmedia/events/teams');
+    return apiGET<Team[]>('/events/teams');
   }
   
   /**
    * Get all teams for a specific event
    */
   static getEventTeams(eventId: number) {
-    return apiGET<Team[]>(`/boffmedia/events/${eventId}/teams`);
+    return apiGET<Team[]>(`/events/${eventId}/teams`);
   }
   
   /**
    * Get a specific team by ID
    */
   static getTeam(teamId: number) {
-    return apiGET<Team>(`/boffmedia/events/teams/${teamId}`);
+    return apiGET<Team>(`/events/teams/${teamId}`);
   }
   
   /**
    * Get team members
    */
   static getTeamMembers(teamId: number) {
-    return apiGET<TeamMember[]>(`/boffmedia/events/teams/${teamId}/members`);
+    return apiGET<TeamMember[]>(`/events/teams/${teamId}/members`);
   }
   
   /**
    * Create a new team for an event
    */
   static createTeam(eventId: number, data: CreateTeamDto) {
-    return apiPOST<Team>(`/boffmedia/events/${eventId}/teams`, data);
+    return apiPOST<Team>(`/events/${eventId}/teams`, data);
   }
   
   /**
    * Update an existing team
    */
   static updateTeam(eventId: number, teamId: number, data: UpdateTeamDto) {
-    return apiPATCH<Team>(`/boffmedia/events/${eventId}/teams/${teamId}`, data);
+    return apiPATCH<Team>(`/events/${eventId}/teams/${teamId}`, data);
   }
   
   /**
    * Join a team
    */
   static joinTeam(eventId: number, teamId: number, data: JoinTeamDto) {
-    return apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/join`, data);
+    return apiPOST<SuccessResponse>(`/events/${eventId}/teams/${teamId}/join`, data);
   }
   
   /**
    * Leave a team
    */
   static leaveTeam(eventId: number, teamId: number, userId: number) {
-    return apiDELETE<SuccessResponse>(`/boffmedia/events/${eventId}/teams/${teamId}/members/${userId}`);
+    return apiDELETE<SuccessResponse>(`/events/${eventId}/teams/${teamId}/members/${userId}`);
   }
 
   // ==================== PARTICIPANT OPERATIONS ====================
@@ -191,14 +191,14 @@ export class EventsService {
    * Join an event
    */
   static joinEvent(eventId: number, data: any) {
-    return apiPOST<SuccessResponse>(`/boffmedia/events/${eventId}/join`, data);
+    return apiPOST<SuccessResponse>(`/events/${eventId}/join`, data);
   }
   
   /**
    * Get all participants for an event
    */
   static getEventParticipants(eventId: number) {
-    return apiGET<Participant[]>(`/boffmedia/events/${eventId}/participants`);
+    return apiGET<Participant[]>(`/events/${eventId}/participants`);
   }
 
   // ==================== PROGRESS OPERATIONS ====================
@@ -207,21 +207,21 @@ export class EventsService {
    * Get all achievement progress for a participant
    */
   static getParticipantProgress(participantId: number) {
-    return apiGET<AchievementWithProgress[]>(`/boffmedia/events/participants/${participantId}/progress`);
+    return apiGET<AchievementWithProgress[]>(`/events/participants/${participantId}/progress`);
   }
   
   /**
    * Get achievement progress for a participant in a specific event
    */
   static getParticipantProgressByEvent(eventId: number, participantId: number) {
-    return apiGET<AchievementWithProgress[]>(`/boffmedia/events/${eventId}/participants/${participantId}/progress`);
+    return apiGET<AchievementWithProgress[]>(`/events/${eventId}/participants/${participantId}/progress`);
   }
   
   /**
    * Update progress for an achievement
    */
   static updateProgress(eventId: number, data: UpdateProgressDto) {
-    return apiPUT<SuccessResponse>(`/boffmedia/events/${eventId}/progress`, data);
+    return apiPUT<SuccessResponse>(`/events/${eventId}/progress`, data);
   }
 
   // ==================== LEADERBOARD OPERATIONS ====================
@@ -230,21 +230,21 @@ export class EventsService {
    * Get all leaderboards
    */
   static getLeaderboards() {
-    return apiGET<LeaderboardEntry[]>('/boffmedia/events/leaderboards');
+    return apiGET<LeaderboardEntry[]>('/events/leaderboards');
   }
   
   /**
    * Get event leaderboard
    */
   static getLeaderboard(eventId: number) {
-    return apiGET<LeaderboardEntry[]>(`/boffmedia/events/${eventId}/leaderboard`);
+    return apiGET<LeaderboardEntry[]>(`/events/${eventId}/leaderboard`);
   }
   
   /**
    * Get team leaderboard for an event
    */
   static getTeamLeaderboard(eventId: number) {
-    return apiGET<TeamLeaderboardEntry[]>(`/boffmedia/events/${eventId}/teams/leaderboard`);
+    return apiGET<TeamLeaderboardEntry[]>(`/events/${eventId}/teams/leaderboard`);
   }
 
   // ==================== CONVENIENCE METHODS ====================

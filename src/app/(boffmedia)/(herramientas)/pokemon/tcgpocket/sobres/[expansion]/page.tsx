@@ -1,13 +1,8 @@
 "use client";
-import { boffGET } from "@/services/boffAPI";
+import { PtcgpService } from "@/services/api/boffmedia/oldptcgpService";
 import { useEffect, useState } from "react";
 import { CardsList } from "../../_components/CardsList";
-
-interface Card {
-  expansion: string;
-  number: number;
-  name: string;
-}
+import { TcgCard } from "@/generated/api";
 
 export default function Expansions({
   params,
@@ -15,14 +10,13 @@ export default function Expansions({
   params: { expansion: string };
 }) {
   const { expansion } = params;
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<TcgCard[]>([]);
 
   useEffect(() => {
-    boffGET(`/herramientas/ptcgp/cards/${expansion}`).then((data) => {
-      console.log(data);
-      setCards(data.data as Card[]);
+    PtcgpService.getCards(expansion).then((response) => {
+      setCards(response.data || []);
     });
-  }, []);
+  }, [expansion]);
 
   return <CardsList cards={cards} />;
 }

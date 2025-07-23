@@ -1,25 +1,20 @@
 "use client";
 
 import { InternalLink } from "@/components/nav/Link";
-import { boffGET } from "@/services/boffAPI";
+import { PtcgpService } from "@/services/api/boffmedia/oldptcgpService";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-
-interface Card {
-  expansion: string;
-  number: number;
-  name: string;
-}
+import { BoosterPackEntity } from "@/generated/api";
 
 export default function TCGPocket() {
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<BoosterPackEntity[]>([]);
   const trans = useTranslations("tcgpocket");
 
   useEffect(() => {
-    boffGET("/herramientas/ptcgp/boosterpacks").then((data) => {
-      setCards(data.data as Card[]);
+    PtcgpService.getBoosterPacks().then((response) => {
+      setCards(response.data || []);
     });
   }, []);
 

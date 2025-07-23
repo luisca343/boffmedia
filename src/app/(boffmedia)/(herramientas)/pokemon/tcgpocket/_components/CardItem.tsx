@@ -2,17 +2,16 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Plus, Minus } from 'lucide-react'
-import { Card } from '../types'
 import { InternalLink } from "@/components/nav/Link"
-
+import { TcgCard } from "@/generated/api"
 interface CardItemProps {
-  card: Card
+  card: TcgCard
   count?: number
   isMissing?: boolean
   editable?: boolean
   loading?: boolean
-  handleAddCard?: (card: Card) => void
-  handleRemoveCard?: (card: Card) => void
+  handleAddCard?: (card: TcgCard) => void
+  handleRemoveCard?: (card: TcgCard) => void
   trans: (key: string) => string
   showAmounts?: boolean
   linkTo?: string
@@ -36,13 +35,11 @@ export function CardItem({
     <div className={`relative bg-surface-800 rounded-lg sm:rounded-xl overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-xl ${!allColored && isMissing ? 'grayscale' : ''}`}>
       <div className="aspect-[2.5/3.5] relative">
         <Image
-          src={`/img/games/tcgpocket/cards/${card.expansion}/${card.number}.jpg`}
+          src={card.image!}
           alt={card.name}
-          layout="fill"
-          objectFit="contain"
+          fill={true}
           className="transition-transform duration-300 group-hover:scale-110"
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
-          priority
         />
         {!allColored && ((editable && showAmounts && count > 0) || (!editable && count > 0)) && (
           <div className="absolute top-1 right-1 sm:top-2 sm:right-2 bg-surface-600 text-white font-bold rounded-full w-5 h-5 lg:w-8 sm:h-8 flex items-center justify-center shadow-md text-xs">
@@ -55,7 +52,7 @@ export function CardItem({
           <h3 className="text-xs sm:text-sm font-medium truncate">
             {card.name}
           </h3>
-          <p className="text-xs text-surface-300">{trans(card.expansion)} - #{card.number}</p>
+          <p className="text-xs text-surface-300">{card.name} - #{card.id}</p>
           {editable && (
             <div className="flex justify-between items-center mt-1">
               <Button

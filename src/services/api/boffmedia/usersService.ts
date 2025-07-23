@@ -64,28 +64,28 @@ export class UsersService {
    * Create a new BoffMedia user
    */
   static createUser(data: CreateUserDto) {
-    return apiPOST<BoffMediaUserEntity>('/boffmedia/users', data);
+    return apiPOST<BoffMediaUserEntity>('/users', data);
   }
 
   /**
    * Register a new user with Minecraft integration
    */
   static registerMinecraftUser(data: MinecraftRegistrationDto) {
-    return apiPOST<IntegratedUserCreationResultEntity>('/boffmedia/users/minecraft/register', data);
+    return apiPOST<IntegratedUserCreationResultEntity>('/users/minecraft/register', data);
   }
 
   /**
    * Link existing user to Minecraft account
    */
   static linkMinecraftAccount(data: MinecraftLinkDto) {
-    return apiPOST<UserWithIntegrationsEntity>('/boffmedia/users/minecraft/link', data);
+    return apiPOST<UserWithIntegrationsEntity>('/users/minecraft/link', data);
   }
 
   /**
    * Authenticate or create user via Google OAuth
    */
   static googleAuth(data: GoogleAuthDto) {
-    return apiPOST<SessionUserEntity>('/boffmedia/users/google/auth', data);
+    return apiPOST<SessionUserEntity>('/users/google/auth', data);
   }
 
   // ==================== USER RETRIEVAL ====================
@@ -99,7 +99,7 @@ export class UsersService {
     if (offset !== undefined) params.append('offset', offset.toString());
     
     const queryString = params.toString();
-    const url = queryString ? `/boffmedia/users?${queryString}` : '/boffmedia/users';
+    const url = queryString ? `/users?${queryString}` : '/users';
     
     return apiGET<UsersPaginatedResponse>(url);
   }
@@ -108,49 +108,49 @@ export class UsersService {
    * Get user statistics with integrations
    */
   static getStatistics() {
-    return apiGET<UserStatistics>('/boffmedia/users/statistics');
+    return apiGET<UserStatistics>('/users/statistics');
   }
 
   /**
    * Get user by ID
    */
   static getUser(id: number) {
-    return apiGET<BoffMediaUserEntity>(`/boffmedia/users/${id}`);
+    return apiGET<BoffMediaUserEntity>(`/users/${id}`);
   }
 
   /**
    * Get user with all integrations (SmartRotom, Starbank, Roles)
    */
   static getUserWithIntegrations(id: number) {
-    return apiGET<UserWithIntegrationsEntity>(`/boffmedia/users/${id}/integrations`);
+    return apiGET<UserWithIntegrationsEntity>(`/users/${id}/integrations`);
   }
 
   /**
    * Get user by username
    */
   static getUserByUsername(username: string) {
-    return apiGET<BoffMediaUserEntity>(`/boffmedia/users/username/${username}`);
+    return apiGET<BoffMediaUserEntity>(`/users/username/${username}`);
   }
 
   /**
    * Get full user data by username (with SmartRotom data)
    */
   static getFullUserByUsername(username: string) {
-    return apiGET<FullUserEntity>(`/boffmedia/users/username/${username}/full`);
+    return apiGET<FullUserEntity>(`/users/username/${username}/full`);
   }
 
   /**
    * Get user by email
    */
   static getUserByEmail(email: string) {
-    return apiGET<SessionUserEntity>(`/boffmedia/users/email/${email}`);
+    return apiGET<SessionUserEntity>(`/users/email/${email}`);
   }
 
   /**
    * Get user roles
    */
   static getUserRoles(id: number) {
-    return apiGET<UserRolesResponse>(`/boffmedia/users/${id}/roles`);
+    return apiGET<UserRolesResponse>(`/users/${id}/roles`);
   }
 
   // ==================== USER UPDATE ====================
@@ -159,7 +159,7 @@ export class UsersService {
    * Update user by ID
    */
   static updateUser(id: number, data: UpdateUserDto) {
-    return apiPATCH<BoffMediaUserEntity>(`/boffmedia/users/${id}`, data);
+    return apiPATCH<BoffMediaUserEntity>(`/users/${id}`, data);
   }
 
   // ==================== USER DELETION ====================
@@ -168,7 +168,7 @@ export class UsersService {
    * Delete user by ID
    */
   static deleteUser(id: number) {
-    return apiDELETE<SuccessResponse>(`/boffmedia/users/${id}`);
+    return apiDELETE<SuccessResponse>(`/users/${id}`);
   }
 
   // ==================== AUTHENTICATION ====================
@@ -177,7 +177,7 @@ export class UsersService {
    * Authenticate user with username and password
    */
   static login(data: LoginDto) {
-    return apiPOST<AuthenticationResultEntity>('/boffmedia/users/auth/login', data);
+    return apiPOST<AuthenticationResultEntity>('/users/auth/login', data);
   }
 
   // ==================== BATCH OPERATIONS ====================
@@ -186,7 +186,7 @@ export class UsersService {
    * Get multiple users with integrations by IDs
    */
   static getBatchUsersWithIntegrations(data: BatchUsersRequest) {
-    return apiPOST<UserWithIntegrationsEntity[]>('/boffmedia/users/batch', data);
+    return apiPOST<UserWithIntegrationsEntity[]>('/users/batch', data);
   }
 
   // ==================== VALIDATION ====================
@@ -195,7 +195,7 @@ export class UsersService {
    * Validate if user exists by different identifiers
    */
   static validateUserExists(type: 'id' | 'username' | 'email' | 'uuid', identifier: string) {
-    return apiGET<UserValidationResponse>(`/boffmedia/users/validate/${type}/${identifier}`);
+    return apiGET<UserValidationResponse>(`/users/validate/${type}/${identifier}`);
   }
 
   // ==================== CONVENIENCE METHODS ====================

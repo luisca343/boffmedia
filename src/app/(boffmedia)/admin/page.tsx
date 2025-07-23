@@ -20,7 +20,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      `${process.env.NEXT_PUBLIC_API}/herramientas/ptcgp/fetch-status`
+      `${process.env.NEXT_PUBLIC_API}/tools/ptcgp/scrape/status`
     );
     console.log("eventSource:", eventSource);
 
@@ -36,7 +36,7 @@ export default function AdminPage() {
 
   const triggerFetch = async () => {
     try {
-      await boffPOST("/herramientas/ptcgp/fetch", { method: "POST" });
+      await boffPOST("/tools/ptcgp/scrape/refresh", { method: "POST" });
     } catch (error) {
       console.error("Failed to trigger fetch:", error);
     }

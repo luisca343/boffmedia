@@ -10,9 +10,6 @@ import { PlayerGallery } from "../_components/PlayerGallery";
 export default function UserGallery() {
   const { session, status } = useBoffSession();
   const router = useRouter();
-
-  const { allCards, userCards, loading, error, updateUserCards } = useGalleryData(session?.user?.name || "");
-
   // Only handle loading and authentication states
   if (status === "loading") {
     return (
@@ -43,11 +40,6 @@ export default function UserGallery() {
       </div>
     );
   }
-
-  // Let the error boundary handle errors thrown by useGalleryData
-  if (error) {
-    throw new Error(error);
-  }
-
+  
   return <PlayerGallery username={session.user.name!} />;
 }

@@ -37,7 +37,7 @@ export function FilterComponent({ expansions, onFilterChange, t: t }: FilterComp
           <SelectItem value="all">{t('filter.allExpansions')}</SelectItem>
           {expansions.map((expansion) => (
             <SelectItem key={expansion} value={expansion}>
-              {t(expansion)}
+              {expansion}
             </SelectItem>
           ))}
         </SelectContent>

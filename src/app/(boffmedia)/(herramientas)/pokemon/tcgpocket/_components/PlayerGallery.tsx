@@ -12,10 +12,11 @@ import { useGalleryData } from "../galeria/_hooks/useGalleryData"
 import { PlayerGalleryHeader } from "./PlayerGalleryHeader"
 import { RecentUpdates } from "./RecentUpdates"
 import { BestPackDialog } from "./BestPackDialog"
-import { Card, PackProbabilities, RecentUpdate, PackData, AllPackProbabilities } from '../types'
+import { RecentUpdate, PackData, AllPackProbabilities } from '../types'
 import { FilterComponent } from "./FilterComponent"
 import { CollectionGroup } from "./CollectionGroup"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { TcgCard } from "@/generated/api"
 
 interface PlayerGalleryProps {
   username: string
@@ -76,13 +77,13 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
     }
   }
 
-  const handleAddCard = (card: Card) => {
-    const key = `${card.expansion}_${card.number}`
+  const handleAddCard = (card: TcgCard) => {
+    const key = card.id;
     setChanges(prev => ({ ...prev, [key]: (prev[key] || 0) + 1 }))
   }
 
-  const handleRemoveCard = (card: Card) => {
-    const key = `${card.expansion}_${card.number}`
+  const handleRemoveCard = (card: TcgCard) => {
+    const key = card.id;
     const currentCount = userCards[key] || 0
     const changeCount = changes[key] || 0
     if (currentCount + changeCount > 0) {
@@ -194,7 +195,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
                         card.number.toString().includes(nameFilter)) &&
                       (expansionFilter === "" || card.expansion === expansionFilter)
                     )
-                    .reduce<Record<string, Card[]>>((acc, curr) => {
+                    .reduce<Record<string, TcgCardEntity[]>>((acc, curr) => {
                       if (!acc[curr.expansion]) {
                         acc[curr.expansion] = []
                       }

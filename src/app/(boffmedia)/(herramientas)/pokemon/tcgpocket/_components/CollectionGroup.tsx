@@ -2,18 +2,17 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { CardItem } from './CardItem'
-import { Card } from '../types'
-
+import { TcgCard } from '@/generated/api'
 interface CollectionGroupProps {
   expansion: string
-  cards: Card[]
+  cards: TcgCard[]
   userCards: Record<string, number>
   changes: Record<string, number>
   hideMissingCards: boolean
   editable: boolean
   loading: boolean
-  handleAddCard: (card: Card) => void
-  handleRemoveCard: (card: Card) => void
+  handleAddCard: (card: TcgCard) => void
+  handleRemoveCard: (card: TcgCard) => void
   trans: (key: string) => string
   showAmounts: boolean
 }
@@ -38,7 +37,7 @@ export function CollectionGroup({
   const getCardCounts = () => {
     const totalCards = cards.length;
     const currentCards = cards.reduce((count, card) => {
-      const key = `${card.expansion}_${card.number}`;
+      const key = card.id;
       const cardCount = (userCards[key] || 0) + (changes[key] || 0);
       return count + (cardCount > 0 ? 1 : 0);
     }, 0);
@@ -66,7 +65,7 @@ export function CollectionGroup({
           >
             <div className="grid grid-cols-5 gap-1 xl:gap-4 sm:gap-6 p-4 bg-surface-800 rounded-b-lg">
               {cards.map((card) => {
-                const key = `${card.expansion}_${card.number}`
+                const key = card.id;
                 const count = (userCards[key] || 0) + (changes[key] || 0)
                 const isMissing = count === 0
 

@@ -22,15 +22,26 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         try {
           if (!credentials?.username || !credentials?.password) {
-            throw new AuthError("Missing username or password", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
+            console.log("Missing credentials");
+            return null;
           }
-          const response = (await boffPOST(`/auth/login`, credentials)).data as any;
+          
+          console.log("Attempting to authenticate with boffAPI:", credentials.username);
+          const response = (await boffPOST(`/auth/login`, {
+            username: credentials.username,
+            password: credentials.password,
+          })).data as any;
+          
           if (response && !response.error) {
-            return response.user as any // TODO - CREATE FULL USER TYPE
+            console.log("Authentication successful");
+            return response.user as any; // TODO - CREATE FULL USER TYPE
           }
-          throw new AuthError("Invalid credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
+          
+          console.log("Authentication failed - invalid response:", response);
+          return null;
         } catch (error) {
-          throw handleAuthError(error);
+          console.error("Authentication error:", error);
+          return null; // Return null instead of throwing
         }
       }
     }),
@@ -38,7 +49,7 @@ export const authOptions: NextAuthOptions = {
       id: "minecraft",
       name: "Minecraft",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        username: { label: "Username", type: "text", placeholder: "Luisca" },
         uuid: { label: "UUID", type: "text" },
         world: { label: "World", type: "text" }
       },

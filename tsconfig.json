@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,10 +22,31 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "@generated/*": ["./src/generated/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@generated/*": [
+        "./src/generated/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-i18next.config.mjs", "next-i18next.config.js", "src/tools/pmd-sky/sky_dungeonjs", "src/tools/pmd-sky/sky_item.js", "src/tools/pmd-sky/sky_poke.js", "src/tools/pmd-sky/wm.js", "src/tools/pmd-sky/wmgenerate.js", "src/tools/pmd-sky/wmutils.js"],
-  "exclude": ["node_modules", "public"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next-i18next.config.mjs",
+    "next-i18next.config.js",
+    "src/tools/pmd-sky/sky_dungeonjs",
+    "src/tools/pmd-sky/sky_item.js",
+    "src/tools/pmd-sky/sky_poke.js",
+    "src/tools/pmd-sky/wm.js",
+    "src/tools/pmd-sky/wmgenerate.js",
+    "src/tools/pmd-sky/wmutils.js",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "public",
+    ".next"
+  ]
 }
