@@ -7,7 +7,7 @@ import type React from "react" // Import React
 
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab",
-  description: "BoffMedia",
+  description: process.env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab"
 }
 
 export default async function RootLayout({
