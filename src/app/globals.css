@@ -16,10 +16,9 @@
   user-drag: none;
 }
 
-/*
 ::-webkit-scrollbar {
   display: none;
-}*/
+}
 
 .bg-wingull {
   background-image: url("http://i.lizardon.es/pixelmon/img/w2.webp");
@@ -74,44 +73,57 @@
     --accent-950: 74 4 78;
 
     
-    --surface-50: 250 251 252;   /* #FAFBFC - Clean white */
-    --surface-100: 240 242 245;  /* #F0F2F5 - Ice gray */
-    --surface-200: 226 230 234;  /* #E2E6EA - Cool light */
-    --surface-300: 203 209 216;  /* #CBD1D8 - Slate accent */
-    --surface-400: 158 166 176;  /* #9EA6B0 - Balanced gray */
-    --surface-500: 108 117 128;  /* #6C7580 - Neutral slate */
-    --surface-600: 75 84 95;     /* #4B545F - Deep slate */
-    --surface-700: 52 61 72;     /* #343D48 - Rich slate */
-    --surface-800: 33 41 51;     /* #212933 - Deep background */
-    --surface-900: 22 28 36;     /* #161C24 - Darker slate */
-    --surface-950: 13 17 23;     /* #0D1117 - Deepest background */
-    
-    /*
-    --surface-50: 248 250 252;
-    --surface-100: 241 245 249;
-    --surface-200: 226 232 240;
-    --surface-300: 203 213 225;
-    --surface-400: 148 163 184;
-    --surface-500: 100 116 139;
-    --surface-600: 71 85 105;
-    --surface-700: 51 65 85;
-    --surface-800: 30 41 59;
-    --surface-900: 15 23 42;
-    --surface-950: 2 6 23;*/
+  --surface-50:  248 250 252;  /* Lightest - rare use */
+  --surface-100: 241 245 249;  /* Very light backgrounds */
+  --surface-200: 226 232 240;  /* Light accents */
+  --surface-300: 203 213 225;  /* Subtle borders */
+  --surface-400: 148 163 184;  /* Disabled states */
+  --surface-500: 100 116 139;  /* Muted text */
+  --surface-600: 71 85 105;    /* Secondary text */
+  --surface-700: 51 65 85;     /* Card backgrounds (30%) */
+  --surface-800: 30 41 59;     /* Section backgrounds */
+  --surface-900: 15 23 42;     /* Main background (60%) */
+  --surface-950: 2 6 23;       /* Deepest backgrounds */
 
-    --success-50: 236 253 245;
-    --success-100: 209 250 229;
-    --success-200: 167 243 208;
-    --success-300: 110 231 183;
-    --success-400: 52 211 153;
-    --success-500: 16 185 129;
-    --success-600: 5 150 105;
-    --success-700: 4 120 87;
-    --success-800: 6 95 70;
-    --success-900: 6 78 59;
-    --success-950: 2 44 34;
 
-    --warning-50: 255 251 235;
+      /*
+    --surface-50: 250 251 252; 
+    --surface-100: 240 242 245;
+    --surface-200: 226 230 234;
+    --surface-300: 203 209 216;
+    --surface-400: 158 166 176;
+    --surface-500: 108 117 128;
+    --surface-600: 75 84 95;
+    --surface-700: 52 61 72;
+    --surface-800: 33 41 51;
+    --surface-900: 22 28 36;
+    --surface-950: 13 17 23;*/
+
+    --highlight-50: 255 251 235;   /* Light yellow highlight */
+    --highlight-100: 254 243 199;
+    --highlight-200: 253 230 138;
+    --highlight-300: 252 211 77;
+    --highlight-400: 251 191 36;
+    --highlight-500: 245 158 11;
+    --highlight-600: 217 119 6;
+    --highlight-700: 180 83 9;
+    --highlight-800: 146 64 14;
+    --highlight-900: 120 53 15;
+    --highlight-950: 69 26 3;
+
+    --success-50: 240 253 244;     /* Green success palette */
+    --success-100: 220 252 231;
+    --success-200: 187 247 208;
+    --success-300: 134 239 172;
+    --success-400: 74 222 128;
+    --success-500: 34 197 94;
+    --success-600: 22 163 74;
+    --success-700: 21 128 61;
+    --success-800: 22 101 52;
+    --success-900: 20 83 45;
+    --success-950: 5 46 22;
+
+    --warning-50: 255 251 235;     /* Amber warning palette */
     --warning-100: 254 243 199;
     --warning-200: 253 230 138;
     --warning-300: 252 211 77;
@@ -123,7 +135,7 @@
     --warning-900: 120 53 15;
     --warning-950: 69 26 3;
 
-    --error-50: 254 242 242;
+    --error-50: 254 242 242;       /* Red error palette */
     --error-100: 254 226 226;
     --error-200: 254 202 202;
     --error-300: 252 165 165;
@@ -135,17 +147,17 @@
     --error-900: 127 29 29;
     --error-950: 69 10 10;
 
-    --info-50: 245 243 255;
-    --info-100: 237 233 254;
-    --info-200: 221 214 254;
-    --info-300: 196 181 253;
-    --info-400: 167 139 250;
-    --info-500: 139 92 246;
-    --info-600: 124 58 237;
-    --info-700: 109 40 217;
-    --info-800: 91 33 182;
-    --info-900: 76 29 149;
-    --info-950: 46 16 101;
+    --info-50: 236 254 255;        /* Cyan info palette */
+    --info-100: 207 250 254;
+    --info-200: 165 243 252;
+    --info-300: 103 232 249;
+    --info-400: 34 211 238;
+    --info-500: 6 182 212;
+    --info-600: 8 145 178;
+    --info-700: 14 116 144;
+    --info-800: 21 94 117;
+    --info-900: 22 78 99;
+    --info-950: 8 51 68;
   }
 
   .dark {
@@ -355,6 +367,133 @@
     .quests {
       font-family: "Quests", sans-serif;
     }
+
+  .wave-top {
+    clip-path: polygon(0 8%, 3% 7%, 7% 6%, 13% 5%, 20% 6%, 28% 7%, 35% 6%, 42% 5%, 50% 6%, 58% 7%, 65% 6%, 72% 5%, 78% 6%, 85% 7%, 92% 6%, 96% 7%, 100% 8%, 100% 100%, 0 100%);
+    padding-top: 120px;
+    margin-top: -80px;
+  }
+
+  .wave-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 92%, 96% 93%, 92% 94%, 85% 93%, 78% 94%, 72% 95%, 65% 94%, 58% 93%, 50% 94%, 42% 95%, 35% 94%, 28% 93%, 20% 94%, 13% 95%, 7% 94%, 3% 93%, 0 92%);
+    padding-bottom: 120px;
+    margin-bottom: -80px;
+  }
+
+  .wave-both {
+    clip-path: polygon(0 8%, 3% 7%, 7% 6%, 13% 5%, 20% 6%, 28% 7%, 35% 6%, 42% 5%, 50% 6%, 58% 7%, 65% 6%, 72% 5%, 78% 6%, 85% 7%, 92% 6%, 96% 7%, 100% 8%, 100% 92%, 96% 93%, 92% 94%, 85% 93%, 78% 94%, 72% 95%, 65% 94%, 58% 93%, 50% 94%, 42% 95%, 35% 94%, 28% 93%, 20% 94%, 13% 95%, 7% 94%, 3% 93%, 0 92%);
+    padding: 120px 0;
+    margin: -80px 0;
+  }
+
+
+  .wave-subtle-top {
+    clip-path: polygon(0 5%, 5% 4%, 10% 3%, 20% 4%, 30% 5%, 40% 4%, 50% 3%, 60% 4%, 70% 5%, 80% 4%, 90% 3%, 95% 4%, 100% 5%, 100% 100%, 0 100%);
+    padding-top: 80px;
+    margin-top: -40px;
+  }
+
+  .wave-dramatic-top {
+    clip-path: polygon(0 15%, 5% 12%, 10% 8%, 15% 10%, 25% 6%, 35% 12%, 45% 8%, 55% 14%, 65% 10%, 75% 6%, 85% 12%, 90% 8%, 95% 10%, 100% 15%, 100% 100%, 0 100%);
+    padding-top: 160px;
+    margin-top: -120px;
+  }
+
+  .wave-organic-top {
+    clip-path: polygon(0 6%, 10% 4%, 22% 2%, 35% 5%, 50% 3%, 65% 6%, 78% 4%, 90% 7%, 100% 5%, 100% 100%, 0 100%);
+    padding-top: 100px;
+    margin-top: -60px;
+  }
+
+  .wave-organic-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 94%, 90% 93%, 78% 96%, 65% 94%, 50% 97%, 35% 95%, 22% 98%, 10% 96%, 0 94%);
+    padding-bottom: 100px;
+    margin-bottom: -60px;
+  }
+
+  .wave-organic-both {
+    clip-path: polygon(0 6%, 10% 4%, 22% 2%, 35% 5%, 50% 3%, 65% 6%, 78% 4%, 90% 7%, 100% 5%, 100% 94%, 90% 93%, 78% 96%, 65% 94%, 50% 97%, 35% 95%, 22% 98%, 10% 96%, 0 94%);
+    padding: 100px 0;
+    margin: -60px 0;
+  }
+
+  .wave-flow-top {
+    clip-path: polygon(0 8%, 5% 6%, 12% 4%, 20% 7%, 28% 5%, 35% 3%, 42% 6%, 50% 4%, 58% 7%, 65% 5%, 72% 3%, 78% 6%, 85% 4%, 92% 7%, 100% 5%, 100% 100%, 0 100%);
+    padding-top: 120px;
+    margin-top: -70px;
+  }
+
+  .wave-flow-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 95%, 92% 93%, 85% 96%, 78% 94%, 72% 97%, 65% 95%, 58% 93%, 50% 96%, 42% 94%, 35% 97%, 28% 95%, 20% 93%, 12% 96%, 5% 94%, 0 92%);
+    padding-bottom: 120px;
+    margin-bottom: -70px;
+  }
+
+  .wave-flow-both {
+    clip-path: polygon(0 8%, 5% 6%, 12% 4%, 20% 7%, 28% 5%, 35% 3%, 42% 6%, 50% 4%, 58% 7%, 65% 5%, 72% 3%, 78% 6%, 85% 4%, 92% 7%, 100% 5%, 100% 95%, 92% 93%, 85% 96%, 78% 94%, 72% 97%, 65% 95%, 58% 93%, 50% 96%, 42% 94%, 35% 97%, 28% 95%, 20% 93%, 12% 96%, 5% 94%, 0 92%);
+    padding: 120px 0;
+    margin: -70px 0;
+  }
+  .wave-gentle-top {
+    clip-path: polygon(0 7%, 8% 5%, 16% 6%, 25% 4%, 33% 5%, 42% 3%, 50% 4%, 58% 2%, 67% 4%, 75% 3%, 84% 5%, 92% 4%, 100% 6%, 100% 100%, 0 100%);
+    padding-top: 90px;
+    margin-top: -50px;
+  }
+
+  .wave-gentle-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 94%, 92% 96%, 84% 95%, 75% 97%, 67% 96%, 58% 98%, 50% 96%, 42% 97%, 33% 95%, 25% 96%, 16% 94%, 8% 95%, 0 93%);
+    padding-bottom: 90px;
+    margin-bottom: -50px;
+  }
+
+  .wave-gentle-both {
+    clip-path: polygon(0 7%, 8% 5%, 16% 6%, 25% 4%, 33% 5%, 42% 3%, 50% 4%, 58% 2%, 67% 4%, 75% 3%, 84% 5%, 92% 4%, 100% 6%, 100% 94%, 92% 96%, 84% 95%, 75% 97%, 67% 96%, 58% 98%, 50% 96%, 42% 97%, 33% 95%, 25% 96%, 16% 94%, 8% 95%, 0 93%);
+    padding: 90px 0;
+    margin: -50px 0;
+  }
+
+  .wave-svg-like-top {
+    clip-path: polygon(0 7%, 8% 6%, 15% 5%, 25% 6%, 35% 7%, 45% 6%, 55% 5%, 65% 6%, 75% 7%, 85% 6%, 92% 5%, 100% 7%, 100% 100%, 0 100%);
+    padding-top: 100px;
+    margin-top: -60px;
+  }
+
+  .wave-svg-like-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 93%, 92% 95%, 85% 94%, 75% 93%, 65% 94%, 55% 95%, 45% 94%, 35% 93%, 25% 94%, 15% 95%, 8% 94%, 0 93%);
+    padding-bottom: 100px;
+    margin-bottom: -60px;
+  }
+
+  .wave-svg-like-both {
+    clip-path: polygon(0 7%, 8% 6%, 15% 5%, 25% 6%, 35% 7%, 45% 6%, 55% 5%, 65% 6%, 75% 7%, 85% 6%, 92% 5%, 100% 7%, 100% 93%, 92% 95%, 85% 94%, 75% 93%, 65% 94%, 55% 95%, 45% 94%, 35% 93%, 25% 94%, 15% 95%, 8% 94%, 0 93%);
+    padding: 100px 0;
+    margin: -60px 0;
+  }
+
+  .wave-events-bottom {
+    clip-path: polygon(0 0, 100% 0, 100% 92%, 95% 94%, 88% 93%, 82% 95%, 75% 94%, 68% 93%, 60% 95%, 52% 94%, 45% 93%, 38% 95%, 30% 94%, 22% 93%, 15% 95%, 8% 94%, 0 92%);
+    padding-bottom: 120px;
+    margin-bottom: -80px;
+  }
+
+  .wave-community-top {
+    clip-path: polygon(0 8%, 8% 6%, 15% 5%, 22% 7%, 30% 6%, 38% 5%, 45% 7%, 52% 6%, 60% 5%, 68% 7%, 75% 6%, 82% 5%, 88% 7%, 95% 6%, 100% 8%, 100% 100%, 0 100%);
+    padding-top: 120px;
+    margin-top: -80px;
+  }
+
+  .wave-section-end {
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 92% 92%, 84% 91%, 76% 93%, 68% 92%, 60% 90%, 52% 92%, 44% 91%, 36% 93%, 28% 92%, 20% 90%, 12% 92%, 4% 91%, 0 89%);
+    padding-bottom: 140px;
+    margin-bottom: -90px;
+  }
+
+  .wave-section-start {
+    clip-path: polygon(0 11%, 4% 9%, 12% 8%, 20% 10%, 28% 8%, 36% 7%, 44% 9%, 52% 8%, 60% 10%, 68% 8%, 76% 7%, 84% 9%, 92% 8%, 100% 10%, 100% 100%, 0 100%);
+    padding-top: 140px;
+    margin-top: -90px;
+  }
+
   }
 
   @keyframes appear {

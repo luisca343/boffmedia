@@ -36,15 +36,7 @@ export async function CommunitySection() {
   ]
 
   return (
-    <FloatingSection  mainPage={true} className="relative py-24 bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden ">
-      {/* Top SVG Divider */}
-      <div className="absolute top-0 left-0 w-full overflow-hidden">
-        <svg className="relative block w-full h-16" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0V7.23C0,65.52,268.63,112.77,600,112.77S1200,65.52,1200,7.23V0Z" className="fill-surface-800"></path>
-        </svg>
-      </div>
-
-
+    <FloatingSection  mainPage={true} className="relative mt-8 py-32 bg-gradient-to-br from-surface-800 via-surface-800 to-surface-900 overflow-hidden  wave-community-top">
       <div className="relative container mx-auto px-4 z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 mb-6">
