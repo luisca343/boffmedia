@@ -4,6 +4,7 @@ import { HiChevronRight } from "react-icons/hi";
 import { cn } from "@/lib/utils";
 import { GameConfig } from "@/config/gameTools";
 import { useTranslations } from "next-intl";
+import { useState, useEffect, useRef } from "react";
 
 interface SidebarProps {
   gameConfig: GameConfig;
@@ -19,15 +20,41 @@ const Sidebar: React.FC<SidebarProps> = ({
   onMouseLeave
 }) => {
   const pathname = usePathname();
-  const sidebarWidth = isSidebarExpanded ? "w-64" : "w-16";
-  // Use the useTranslations hook to access translations
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const t = useTranslations();
+
+  const [isAnimationComplete, setIsAnimationComplete] = useState(isSidebarExpanded);
+
+  useEffect(() => {
+    if (isSidebarExpanded) {
+      const timer = setTimeout(() => {
+        setIsAnimationComplete(true);
+      }, 150);
+      return () => clearTimeout(timer);
+    } else {
+      setIsAnimationComplete(false);
+    }
+  }, [isSidebarExpanded]);
+
+  const handleMouseEnter = () => {
+    onMouseEnter();
+  };
+
+  const handleMouseLeave = () => {
+    onMouseLeave();
+  };
 
   return (
     <div 
-      className={`hidden md:block ${sidebarWidth} border-r border-surface-700 bg-surface-800 transition-all duration-300 ease-in-out fixed min-h-full z-10`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
+      ref={sidebarRef}
+      className="hidden md:block border-r border-surface-700 bg-surface-800 transition-all duration-300 ease-in-out fixed min-h-full z-30"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        width: isSidebarExpanded ? '16rem' : '4rem',
+        transition: 'width 300ms ease-in-out',
+        willChange: 'width'
+      }}
     >
       <div className={`p-2 space-y-6 ${isSidebarExpanded ? "" : "overflow-hidden"}`}>
         {gameConfig.categories.map((category) => (
@@ -39,21 +66,21 @@ const Sidebar: React.FC<SidebarProps> = ({
                   "text-sm font-medium mb-2 uppercase tracking-wider px-2 block",
                   "transition-all duration-300 ease-in-out",
                   isSidebarExpanded 
-                    ? "opacity-100 h-auto text-surface-100 hover:text-primary-200" 
-                    : "opacity-0 h-0 overflow-hidden"
+                    ? "opacity-100 text-surface-100 hover:text-primary-200" 
+                    : "opacity-100 text-surface-400 text-center"
                 )}
               >
-                {t(category.name)}
+                {isAnimationComplete ? t(category.name) : "..."}
               </Link>
             ) : (
               <div className={cn(
                 "text-sm font-medium mb-2 uppercase tracking-wider px-2",
                 "transition-all duration-300 ease-in-out",
                 isSidebarExpanded 
-                  ? "opacity-100 h-auto text-surface-400" 
-                  : "opacity-0 h-0 overflow-hidden"
+                  ? "opacity-100 text-surface-400" 
+                  : "opacity-100 text-surface-500 text-center"
               )}>
-                {t(category.name)}
+                {isAnimationComplete ? t(category.name) : "..."}
               </div>
             )}
             <ul className="space-y-1">
