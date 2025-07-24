@@ -48,3 +48,4 @@ node_modules/
 
 /src/generated
 src/app/favicon.ico
+*.ico
