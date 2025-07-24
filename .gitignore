@@ -47,3 +47,4 @@ node_modules/
 /playwright/.cache/
 
 /src/generated
+src/app/favicon.ico
