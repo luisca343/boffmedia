@@ -12,7 +12,7 @@ import { useGetNewsById } from "@/hooks/documents/useGetNewsById";
 import PopArtWallpaper from "../../_components/PopArtWallpaper";
 import PopStyles from "../../_components/PopStyles";
 
-const CustomEditor = dynamic(() => import("@/components/editor/TestEditor"), {
+const CustomEditor = dynamic(() => import("@/components/ckeditor/TestEditor"), {
   ssr: false,
 });
 

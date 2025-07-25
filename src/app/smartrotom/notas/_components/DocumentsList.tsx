@@ -11,7 +11,7 @@ import dynamic from "next/dynamic"
 import { useGetDocument } from "@/hooks/documents/useGetDocument"
 
 const CustomEditor = dynamic( () => {
-    return import( '@/components/editor/TestEditor' );
+    return import( '@/components/ckeditor/TestEditor' );
   }, { ssr: false } );
 
   export function DocumentsList() {

@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 
-const CustomEditor = dynamic(() => import('@/components/editor/TestEditor'), { ssr: false });
+const CustomEditor = dynamic(() => import('@/components/ckeditor/TestEditor'), { ssr: false });
 
 export default function EditNote({ params }: { params: { id: string } }) {
   const { id } = params;

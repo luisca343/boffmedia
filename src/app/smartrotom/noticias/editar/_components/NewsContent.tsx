@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import CustomEditor from '@/components/editor/TestEditor'
+import CustomEditor from '@/components/ckeditor/TestEditor'
 
 interface NewsContentProps {
   selectedNewsId: number | null
