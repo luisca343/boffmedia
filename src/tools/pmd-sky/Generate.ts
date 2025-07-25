@@ -157,8 +157,13 @@ export function generateWonderMail(formData: SkyFormData){
 			struct.client = formData.forceClient;
 		}
 		else {
+            if(formData.clientPokemon === 0) {
+                console.error("No client pokemon selected");
+                return null;
+            }
             if(!isValidClient(formData.clientPokemon)){
-                return alert("Invalid client pokemon")
+                console.error("Invalid client pokemon:", formData.clientPokemon);
+                return null; // Return null instead of alert
             }
             
 			const client = formData.clientPokemon;
@@ -178,6 +183,10 @@ export function generateWonderMail(formData: SkyFormData){
 			struct.target = struct.client;
 		}
 		else {
+            if(formData.targetPokemon === 0) {
+                console.error("No target pokemon selected");
+                return null;
+            }
 			var client = formData.targetPokemon;
             const targetF = false
 			struct.target = getTrueMonID(client, targetF);

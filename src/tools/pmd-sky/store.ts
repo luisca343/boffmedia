@@ -56,8 +56,8 @@ export const useFormStore = create<FormState>((set, get) => ({
     europeanVersion: false,
     generatedQuest: 0,
     flavorText: "",
-    clientSprite: "/smartrotom/img/pmd/portrait/0201/0027/Normal.png",
-    targetSprite: "/smartrotom/img/pmd/portrait/0201/0027/Normal.png"
+    clientSprite: "",
+    targetSprite: ""
   },
   targetAvailable: false,
   setFormData: async (data) => {
