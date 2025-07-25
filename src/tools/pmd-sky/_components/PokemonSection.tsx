@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { HiUsers, HiCursorClick, HiInformationCircle } from "react-icons/hi";
+import { UserGroupIcon, UserIcon, CursorArrowRippleIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { SectionHeader } from "@/components/form";
 import { FormField } from "@/components/form";
 import { PokemonSelector } from "./PokemonSelector";
@@ -33,13 +33,13 @@ export function PokemonSection({
   return (
     <div className="mb-8">
       <SectionHeader 
-        icon={<HiUsers className="w-5 h-5" />} 
+        icon={<UserGroupIcon className="w-5 h-5" />} 
         title={t("POKEMON_SETTINGS")} 
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <FormField 
           label={t("CLIENT_POKEMON")} 
-          icon={<HiUsers className="w-4 h-4 text-cyan-400" />}
+          icon={<UserIcon className="w-4 h-4 text-cyan-400" />}
           disabled={isClientForced}
         >
           <PokemonSelector
@@ -51,7 +51,7 @@ export function PokemonSection({
           />
           {isClientForced && (
             <p className="text-xs text-surface-400 mt-1 flex items-center">
-              <HiInformationCircle className="w-3 h-3 mr-1" />
+              <InformationCircleIcon className="w-3 h-3 mr-1" />
               {t("FORCED_BY_QUEST_TYPE")}
             </p>
           )}
@@ -59,7 +59,7 @@ export function PokemonSection({
 
         <FormField 
           label={t("TARGET_POKEMON")} 
-          icon={<HiCursorClick className="w-4 h-4 text-red-400" />}
+          icon={<CursorArrowRippleIcon className="w-4 h-4 text-red-400" />}
           disabled={isTargetDisabled}
         >
           <PokemonSelector
@@ -71,7 +71,7 @@ export function PokemonSection({
           />
           {isTargetDisabled && (
             <p className="text-xs text-surface-400 mt-1 flex items-center">
-              <HiInformationCircle className="w-3 h-3 mr-1" />
+              <InformationCircleIcon className="w-3 h-3 mr-1" />
               {getClientIsTarget(questType) ? t("CLIENT_IS_TARGET") : t("FORCED_BY_QUEST_TYPE")}
             </p>
           )}

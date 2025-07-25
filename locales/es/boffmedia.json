@@ -15,6 +15,12 @@
         },
         "new": "¡Nuevo!"
       },
+      "ui": {
+        "disabled": "Desactivado",
+        "selectElement": "Selecciona un elemento",
+        "searchElement": "Buscar elemento",
+        "noElementFound": "No se encontró ningún elemento"
+      },
       "featuredGames": {
         "title": "Destacados",
         "subtitle": "Descubre las herramientas y juegos más populares de BoffMedia",

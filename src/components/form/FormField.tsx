@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 interface FormFieldProps {
   label: string;
@@ -19,6 +20,8 @@ export function FormField({
   disabled,
   hint 
 }: FormFieldProps) {
+  const t = useTranslations("");
+
   return (
     <div className={className}>
       <label className={`block text-base font-medium mb-3 transition-colors ${
@@ -28,7 +31,7 @@ export function FormField({
           {icon}
           <span>{label}</span>
           {required && <span className="text-red-400">*</span>}
-          {disabled && <Badge variant="outline" className="text-xs">Disabled</Badge>}
+          {disabled && <Badge variant="outline" className="text-xs">{t("boffmedia.ui.disabled")}</Badge>}
         </div>
       </label>
       {children}

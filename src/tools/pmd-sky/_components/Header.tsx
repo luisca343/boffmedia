@@ -15,9 +15,6 @@ export function Header() {
           ✨ {t("WONDER_MAIL_CREATOR")} ✨
         </h1>
         <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 mx-auto rounded-full mb-4"></div>
-        <p className="text-surface-300 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-          {t("WONDER_MAIL_CREATOR_DESCRIPTION")}
-        </p>
       </motion.div>
     </div>
   );

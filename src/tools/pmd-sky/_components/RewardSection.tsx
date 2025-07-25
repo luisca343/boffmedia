@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { HiGift, HiCursorClick } from "react-icons/hi";
+import { GiftIcon, CubeIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { Combobox } from "@/components/ui/combobox";
 import { SectionHeader } from "@/components/form";
 import { FormField } from "@/components/form";
@@ -32,13 +32,13 @@ export function RewardSection({
   return (
     <div className="mb-8">
       <SectionHeader 
-        icon={<HiGift className="w-5 h-5" />} 
+        icon={<TrophyIcon className="w-5 h-5" />} 
         title={t("REWARD_SETTINGS")} 
       />
       <div className="space-y-6">
         <FormField 
           label={t("REWARD_TYPE")} 
-          icon={<HiGift className="w-4 h-4 text-yellow-400" />}
+          icon={<GiftIcon className="w-4 h-4 text-yellow-400" />}
           required
         >
           <Combobox 
@@ -51,7 +51,7 @@ export function RewardSection({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <FormField 
             label={t("TARGET_ITEM")} 
-            icon={<HiCursorClick className="w-4 h-4 text-indigo-400" />}
+            icon={<CubeIcon className="w-4 h-4 text-indigo-400" />}
             disabled={!useTargetItem}
           >
             <Combobox 
@@ -64,7 +64,7 @@ export function RewardSection({
 
           <FormField 
             label={t("REWARD_ITEM")} 
-            icon={<HiGift className="w-4 h-4 text-pink-400" />}
+            icon={<GiftIcon className="w-4 h-4 text-pink-400" />}
             disabled={!rewardGivesItem}
           >
             <Combobox 

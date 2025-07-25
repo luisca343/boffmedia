@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { HiLocationMarker, HiViewBoards } from "react-icons/hi";
+import { MapPinIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
@@ -26,13 +26,13 @@ export function LocationSection({
   return (
     <div className="mb-8">
       <SectionHeader 
-        icon={<HiLocationMarker className="w-5 h-5" />} 
+        icon={<MapPinIcon className="w-5 h-5" />} 
         title={t("LOCATION_SETTINGS")} 
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <FormField 
           label={t("DUNGEON")} 
-          icon={<HiLocationMarker className="w-4 h-4 text-green-400" />}
+          icon={<BuildingOffice2Icon className="w-4 h-4 text-green-400" />}
           required
         >
           <Combobox 
@@ -44,7 +44,7 @@ export function LocationSection({
 
         <FormField 
           label={t("FLOOR")} 
-          icon={<HiViewBoards className="w-4 h-4 text-orange-400" />}
+          icon={<BuildingOffice2Icon className="w-4 h-4 text-orange-400" />}
           required
         >
           <div className="relative">

@@ -50,11 +50,11 @@ export function Combobox({
   
   const variantStyles = {
     default: {
-      button: "bg-surface-700/50 text-surface-50 border-surface-600/50 hover:bg-surface-700 focus:ring-primary-400 transition-colors disabled:opacity-50",
-      content: "bg-surface-700/50 border-surface-600/50",
-      command: "bg-surface-700/50 rounded-md",
-      input: "bg-surface-700/50 text-surface-50 placeholder-surface-400 border-surface-600/50 focus:ring-primary-400",
-      item: "text-surface-50 bg-surface-700/50 hover:bg-surface-700",
+      button: "bg-surface-700 text-surface-50 border-surface-600 hover:bg-surface-700 focus:ring-primary-400 transition-colors disabled:opacity-50",
+      content: "bg-surface-700 border-surface-600",
+      command: "bg-surface-700 rounded-md",
+      input: "bg-surface-700 text-surface-50 placeholder-surface-400 border-surface-600 focus:ring-primary-400",
+      item: "text-surface-50 bg-surface-700 hover:bg-surface-700",
       itemSelected: "bg-surface-700 text-surface-50",
       emptyText: "text-surface-300"
     },

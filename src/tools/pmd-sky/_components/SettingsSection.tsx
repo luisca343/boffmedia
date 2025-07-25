@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { HiLightningBolt } from "react-icons/hi";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 import { SectionHeader } from "@/components/form";
 import { EuropeanVersionToggle } from "./EuropeanVersionToggle";
 
@@ -17,7 +17,7 @@ export function SettingsSection({
   return (
     <div className="mb-8">
       <SectionHeader 
-        icon={<HiLightningBolt className="w-5 h-5" />} 
+        icon={<Cog6ToothIcon className="w-5 h-5" />} 
         title={t("ADDITIONAL_SETTINGS")} 
       />
       
