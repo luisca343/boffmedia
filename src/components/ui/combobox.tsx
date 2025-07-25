@@ -47,16 +47,16 @@ export function Combobox({
     setOpen(false);
     onChange(newValue);
   };
-
+  
   const variantStyles = {
     default: {
-      button: "bg-surface-800 text-primary-400 border-surface-700 hover:bg-surface-700 focus:ring-primary-400",
-      content: "bg-surface-800 border-surface-700",
-      command: "bg-surface-800 rounded-md",
-      input: "bg-surface-800 text-primary-400 placeholder-surface-500 border-surface-700 focus:ring-primary-400",
-      item: "text-primary-400 bg-surface-800 hover:bg-surface-900",
-      itemSelected: "bg-surface-900 text-primary-300",
-      emptyText: "text-primary-300"
+      button: "bg-surface-700/50 text-surface-50 border-surface-600/50 hover:bg-surface-700 focus:ring-primary-400 transition-colors disabled:opacity-50",
+      content: "bg-surface-700/50 border-surface-600/50",
+      command: "bg-surface-700/50 rounded-md",
+      input: "bg-surface-700/50 text-surface-50 placeholder-surface-400 border-surface-600/50 focus:ring-primary-400",
+      item: "text-surface-50 bg-surface-700/50 hover:bg-surface-700",
+      itemSelected: "bg-surface-700 text-surface-50",
+      emptyText: "text-surface-300"
     },
     wingull: {
       button: "bg-blue-900 text-blue-300 border-blue-800 hover:bg-blue-800 focus:ring-blue-400",
@@ -86,7 +86,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-[200px] justify-between",
+            "w-full justify-between min-w-[200px]",
             variantStyles[variant].button,
             className
           )}
@@ -98,10 +98,14 @@ export function Combobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn(
-        "w-[200px] p-0",
-        variantStyles[variant].content
-      )}>
+      <PopoverContent 
+        className={cn(
+          "p-0",
+          variantStyles[variant].content
+        )}
+        style={{ width: 'var(--radix-popover-trigger-width)' }}
+        align="start"
+      >
         <Command className={variantStyles[variant].command}>
           <CommandInput 
             dark={variant === 'orange' || variant === 'wingull'}

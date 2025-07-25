@@ -1,6 +1,6 @@
 export { Header } from './Header';
-export { SectionHeader } from './SectionHeader';
-export { FormField } from './FormField';
+// SectionHeader moved to @/components/form
+// FormField moved to @/components/form
 export { SkyForm } from './SkyForm';
 export { GenerateButton } from './GenerateButton';
 export { EuropeanVersionToggle } from './EuropeanVersionToggle';

@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { HiLightningBolt } from "react-icons/hi";
-import { SectionHeader } from "./SectionHeader";
+import { SectionHeader } from "@/components/form";
 import { EuropeanVersionToggle } from "./EuropeanVersionToggle";
 
 interface SettingsSectionProps {

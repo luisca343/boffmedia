@@ -3,8 +3,8 @@ import { HiLocationMarker, HiViewBoards } from "react-icons/hi";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
-import { SectionHeader } from "./SectionHeader";
-import { FormField } from "./FormField";
+import { SectionHeader } from "@/components/form";
+import { FormField } from "@/components/form";
 import { getFloors, getValidDungeons } from "../DungeonData";
 
 interface LocationSectionProps {
@@ -36,8 +36,6 @@ export function LocationSection({
           required
         >
           <Combobox 
-            variant="orange"
-            className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors"
             data={getValidDungeons(t)}
             value={dungeon.toString()}
             onChange={onDungeonChange}
@@ -54,7 +52,7 @@ export function LocationSection({
               type="number"
               min={1}
               max={maxFloors}
-              className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors pr-16"
+              className="bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors pr-16"
               value={floor}
               onChange={(e) => onFloorChange(Number(e.target.value))}
             />

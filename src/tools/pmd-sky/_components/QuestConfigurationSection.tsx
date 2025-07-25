@@ -1,8 +1,8 @@
 import { useTranslations } from "next-intl";
 import { HiCursorClick, HiViewBoards, HiSparkles } from "react-icons/hi";
 import { Combobox } from "@/components/ui/combobox";
-import { SectionHeader } from "./SectionHeader";
-import { FormField } from "./FormField";
+import { SectionHeader } from "@/components/form";
+import { FormField } from "@/components/form";
 import { getQuestData, getSubQuestData, getForceClient } from "../QuestData";
 
 interface QuestConfigurationSectionProps {
@@ -34,8 +34,6 @@ export function QuestConfigurationSection({
           required
         >
           <Combobox 
-            variant="orange"
-            className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors"
             data={getQuestData(t)}
             value={questType.toString()}
             onChange={onQuestTypeChange}
@@ -48,8 +46,6 @@ export function QuestConfigurationSection({
           disabled={!isClientForced}
         >
           <Combobox 
-            variant="orange"
-            className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors disabled:opacity-50"
             data={getSubQuestData(questType, t)}
             value={specialQuestType.toString()}
             disabled={!isClientForced}

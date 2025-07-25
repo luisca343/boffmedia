@@ -1,8 +1,8 @@
 import { useTranslations } from "next-intl";
 import { HiGift, HiCursorClick } from "react-icons/hi";
 import { Combobox } from "@/components/ui/combobox";
-import { SectionHeader } from "./SectionHeader";
-import { FormField } from "./FormField";
+import { SectionHeader } from "@/components/form";
+import { FormField } from "@/components/form";
 import { getRewardTypes, getUseTargetItem, givesItem } from "../QuestData";
 import { getItemData } from "../ItemData";
 
@@ -42,8 +42,6 @@ export function RewardSection({
           required
         >
           <Combobox 
-            variant="orange"
-            className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors"
             data={getRewardTypes(t)}
             value={rewardType.toString()}
             onChange={onRewardTypeChange}
@@ -57,8 +55,6 @@ export function RewardSection({
             disabled={!useTargetItem}
           >
             <Combobox 
-              variant="orange"
-              className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors disabled:opacity-50"
               data={getItemData()}
               value={targetItem.toString()}
               onChange={onTargetItemChange}
@@ -72,8 +68,6 @@ export function RewardSection({
             disabled={!rewardGivesItem}
           >
             <Combobox 
-              variant="orange"
-              className="w-full bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors disabled:opacity-50"
               data={getItemData()}
               value={rewardItem.toString()}
               onChange={onRewardItemChange}

@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { HiUsers, HiCursorClick, HiInformationCircle } from "react-icons/hi";
-import { SectionHeader } from "./SectionHeader";
-import { FormField } from "./FormField";
+import { SectionHeader } from "@/components/form";
+import { FormField } from "@/components/form";
 import { PokemonSelector } from "./PokemonSelector";
 import { getClientIsTarget, getForceClient } from "../QuestData";
 
