@@ -83,13 +83,13 @@ export const useFormStore = create<FormState>((set, get) => ({
 
     if(data.forceClient !== undefined && data.forceClient > 0) {
       data.clientPokemon = data.forceClient;
-      const clientSprite = (await rotomGET(`/pokemon/pmd/${pmdSkyPokemon[data.clientPokemon]}`)).data as any;
+      const clientSprite = (await rotomGET(`/pokemon/pmd/portrait/${pmdSkyPokemon[data.clientPokemon]}`)).data as any;
       data.clientSprite = clientSprite.url;
     }
 
     if(data.forceTarget !== undefined && data.forceTarget > 0) {
       data.targetPokemon = data.forceTarget;
-      const targetSprite = (await rotomGET(`/pokemon/pmd/${pmdSkyPokemon[data.targetPokemon]}`)).data as any;
+      const targetSprite = (await rotomGET(`/pokemon/pmd/portrait/${pmdSkyPokemon[data.targetPokemon]}`)).data as any;
       data.targetSprite = targetSprite.url;
     }
 
@@ -99,12 +99,12 @@ export const useFormStore = create<FormState>((set, get) => ({
     }
 
     if(data.clientPokemon !== undefined) {
-      const clientSprite = (await rotomGET(`/pokemon/pmd/${pmdSkyPokemon[data.clientPokemon]}`)).data as any;
+      const clientSprite = (await rotomGET(`/pokemon/pmd/portrait/${pmdSkyPokemon[data.clientPokemon]}`)).data as any;
       data.clientSprite = clientSprite.url;
     }
     
     if(data.targetPokemon !== undefined) {
-      const targetSprite = (await rotomGET(`/pokemon/pmd/${pmdSkyPokemon[data.targetPokemon]}`)).data as any;
+      const targetSprite = (await rotomGET(`/pokemon/pmd/portrait/${pmdSkyPokemon[data.targetPokemon]}`)).data as any;
       data.targetSprite = targetSprite.url;
     }
 
