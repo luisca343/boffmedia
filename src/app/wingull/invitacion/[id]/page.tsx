@@ -11,6 +11,8 @@ export default async function Invitacion({
 }) {
   const invitacion = (await wingullGET(`/invites/${params.id}`)).data as any;
 
+  console.log("Invitacion data:", invitacion);
+
   if (!invitacion?.id) return <InvitacionNoEncontrada id={params.id} />;
   if (invitacion.usedAt) return <InvitacionUsada id={params.id} />;
 

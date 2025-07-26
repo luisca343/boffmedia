@@ -21,7 +21,7 @@ export default function LootBoxOpening({ lootBox, wonItem, onComplete }: LootBox
     spinComplete,
     spinnerRef,
     itemsContainerRef,
-    winningIndex,
+    winnerIndex,
     ITEM_WIDTH
   } = useSpinnerAnimation({ lootBox, wonItem });
 
@@ -41,7 +41,7 @@ export default function LootBoxOpening({ lootBox, wonItem, onComplete }: LootBox
           scrollPosition={scrollPosition}
           spinComplete={spinComplete}
           isSpinning={isSpinning}
-          winningIndex={winningIndex}
+          winningIndex={winnerIndex}
           wonItem={wonItem}
           spinnerRef={spinnerRef}
           itemsContainerRef={itemsContainerRef}
