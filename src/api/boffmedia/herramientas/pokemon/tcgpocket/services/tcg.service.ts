@@ -7,6 +7,10 @@ import { TcgFetchService } from './tcg-fetch.service';
 import { TcgImageService } from './tcg-image.service';
 import { AddUserCardDto, UpdateUserCardQuantityDto } from '../dto/user-card.dto';
 import { UserCard, UserCardHistory } from '@/_db/schema/TCG';
+import * as path from 'path';
+import { promises as fsPromises } from 'fs';
+import * as fs from 'fs';
+import { BoffMediaUsersManagementService } from '@api/boffmedia/users/services/users-management.service';
 
 @Injectable()
 export class TcgService {
@@ -16,6 +20,7 @@ export class TcgService {
     private readonly errorService: TcgErrorService,
     private readonly fetchService: TcgFetchService,
     private readonly imageService: TcgImageService,
+    private readonly usersService: BoffMediaUsersManagementService
   ) {}
 
   // ==================== SERIES OPERATIONS ====================
@@ -189,15 +194,18 @@ export class TcgService {
 
   // ==================== USER CARDS OPERATIONS ====================
 
-  async getUserCards(userId: string): Promise<any[]> {
+  async getUserCards(userName: string): Promise<any[]> {
     try {
-      if (!userId || userId.trim().length === 0) {
-        throw new BadRequestException('User ID is required');
+      if (!userName || userName.trim().length === 0) {
+        throw new BadRequestException('User Name is required');
       }
+      
+      const userId = await (await this.usersService.getUserByUsername(userName)).id.toString();
 
       const userCards = await this.tcgRepository.getUserCards(userId);
       
       // Enrich with card details
+      /*
       const enrichedCards = [];
       for (const userCard of userCards) {
         try {
@@ -217,9 +225,9 @@ export class TcgService {
             cardImage: null,
           });
         }
-      }
+      }*/
 
-      return enrichedCards;
+      return userCards;
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw error;
@@ -372,4 +380,47 @@ export class TcgService {
       this.errorService.handleDatabaseError(error, 'Get user card history');
     }
   }
+
+  oldExpansionToSetIdMap: Record<string, string> = {
+    geneticapex: 'A1',      
+    mythicalisland: 'A1a',     
+    'space-timesmackdown': 'A2',  
+    triumphantlight: 'A2a',
+    shiningrevelry: 'A2b',
+    celestialguardians: 'A3', 
+    extradimensionalcrisis: 'A3a', 
+    eeveegrove: 'A3b',             
+    'promo-a': 'P-A',
+  };
+
+  // ==================== MIGRATION ====================
+    async migrateOldUserCards() {
+      try {
+        const filePath = path.join(process.cwd(), 'public/a.json');
+        const data = await fsPromises.readFile(filePath, 'utf-8');
+        const jsonData = JSON.parse(data);
+
+        const newUserCards = jsonData.map((card: any) => {
+          const setId = this.oldExpansionToSetIdMap[card.expansion] || 'unknown';
+          const cardNumber = card.card_number.toString().padStart(3, '0');
+          const card_id = `${setId}-${cardNumber}`;
+          return {
+            user_id: card.user_id,
+            card_id,
+            quantity: card.count,
+          };
+        });
+
+        // Insert each card into the database
+        for (const userCard of newUserCards) {
+          console.log(`Inserting user card: ${userCard.user_id} - ${userCard.card_id} (${userCard.quantity})`);
+          await this.tcgRepository.addUserCard(userCard.user_id, userCard.card_id, userCard.quantity);
+        }
+
+        return { success: true, inserted: newUserCards.length };
+      } catch (error) {
+        this.errorService.handleDatabaseError(error, 'Migrate old user cards');
+      }
+    }
+
 }

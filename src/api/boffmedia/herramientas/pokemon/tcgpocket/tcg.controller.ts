@@ -353,16 +353,16 @@ export class TcgController {
   }
   // ==================== USER CARDS OPERATIONS ====================
 
-  @Get('users/:userId/cards')
+  @Get('users/:userName/cards')
   @ApiOperation({ summary: 'Get user cards' })
-  @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
+  @ApiParam({ name: 'userName', description: 'User Name', example: 'user123' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'User cards retrieved successfully.',
     type: [UserCard]
   })
-  async getUserCards(@Param('userId') userId: string): Promise<UserCard[]> {
-    return this.tcgFacade.getUserCards(userId);
+  async getUserCards(@Param('userName') userName: string): Promise<UserCard[]> {
+    return this.tcgFacade.getUserCards(userName);
   }
 
   @Post('users/cards')
@@ -431,5 +431,17 @@ export class TcgController {
   })
   async getUserCardHistory(@Param('userId') userId: string): Promise<UserCardHistory[]> {
     return this.tcgFacade.getUserCardHistory(userId);
+  }
+
+
+  @Get('migrate')
+  @ApiOperation({ summary: 'Migrate TCG data to new schema' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'TCG data migration completed successfully.',
+    type: SuccessResponse
+  })
+  async migrateData(): Promise<SuccessResponse> {
+    return await this.tcgFacade.migrateOldUserCards();
   }
 }

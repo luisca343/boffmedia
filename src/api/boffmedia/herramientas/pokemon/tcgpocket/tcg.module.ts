@@ -12,9 +12,11 @@ import { TcgConfigService } from './services/tcg-config.service';
 import { TcgFacadeService } from './tcg.facade.service';
 import { TcgRepository } from './repositories/tcg.repository';
 import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { BoffMediaUsersManagementService } from '@api/boffmedia/users/services/users-management.service';
+import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 
 @Module({
-  imports: [HttpModule, DrizzleModule, LoggerModule],
+  imports: [HttpModule, DrizzleModule, LoggerModule, BoffMediaUsersModule],
   controllers: [TcgController],
   providers: [
     TcgService,

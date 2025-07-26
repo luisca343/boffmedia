@@ -40,8 +40,8 @@ export class TcgFacadeService {
   async fetchAndStoreCardsForSetBothLanguages(setId: string) {
     return await this.tcgService.fetchAndStoreCardsForSetBothLanguages(setId);
   }
-  async getUserCards(userId: string) {
-    return this.tcgService.getUserCards(userId);
+  async getUserCards(userName: string) {
+    return this.tcgService.getUserCards(userName);
   }
 
   async addUserCard(addUserCardDto: AddUserCardDto) {
@@ -58,5 +58,9 @@ export class TcgFacadeService {
 
   async getUserCardHistory(userId: string) {
     return this.tcgService.getUserCardHistory(userId);
+  }
+
+  async migrateOldUserCards() {
+    return await this.tcgService.migrateOldUserCards();
   }
 }
