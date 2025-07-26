@@ -42,8 +42,8 @@ export default function KeysTable() {
   const aggregatedKeysArray = Object.values(aggregatedKeys);
 
   return (
-    <FloatingSection className={`flex-1 bg-surface-900 overflow-hidden w-full transition-all duration-300 ease-in-out md:pt-0 pt-16 h-screen`}>
-      <div className="w-full  h-screen overflow-auto pb-16">
+    <FloatingSection className={`flex-1 bg-surface-900 w-full transition-all duration-300 ease-in-out md:pt-0 pt-16`}>
+      <div className="w-full pb-16">
         <div className="max-w-5xl mx-auto">
           <KeysHeader />
           
