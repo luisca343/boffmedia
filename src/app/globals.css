@@ -73,17 +73,17 @@
     --accent-950: 74 4 78;
 
     
-  --surface-50:  248 250 252;  /* Lightest - rare use */
-  --surface-100: 241 245 249;  /* Very light backgrounds */
-  --surface-200: 226 232 240;  /* Light accents */
-  --surface-300: 203 213 225;  /* Subtle borders */
-  --surface-400: 148 163 184;  /* Disabled states */
-  --surface-500: 100 116 139;  /* Muted text */
-  --surface-600: 71 85 105;    /* Secondary text */
-  --surface-700: 51 65 85;     /* Card backgrounds (30%) */
-  --surface-800: 30 41 59;     /* Section backgrounds */
-  --surface-900: 15 23 42;     /* Main background (60%) */
-  --surface-950: 2 6 23;       /* Deepest backgrounds */
+  --surface-50:  248 250 252;
+  --surface-100: 241 245 249; 
+  --surface-200: 226 232 240;
+  --surface-300: 203 213 225;  
+  --surface-400: 148 163 184; 
+  --surface-500: 100 116 139;  
+  --surface-600: 71 85 105; 
+  --surface-700: 51 65 85;  
+  --surface-800: 30 41 59;
+  --surface-900: 15 23 42;
+  --surface-950: 2 6 23; 
 
 
       /*

@@ -43,9 +43,12 @@ export function FloatingBackground({
   return (
     <>
       {/* Main SVG Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        className="fixed top-0 left-0 w-screen h-screen overflow-hidden pointer-events-none"
+        style={{ zIndex: 0 }}
+      >
         <svg
-          className="absolute inset-0 w-full h-full"
+          className="w-full h-full"
           viewBox="0 0 1200 800"
           preserveAspectRatio="xMidYMid slice"
           xmlns="http://www.w3.org/2000/svg"
@@ -131,7 +134,10 @@ export function FloatingBackground({
 
       {/* Additional animated particles */}
       {showParticles && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          className="fixed top-0 left-0 w-screen h-screen overflow-hidden pointer-events-none"
+          style={{ zIndex: 0 }}
+        >
           <div 
             className="absolute w-2 h-2 rounded-full opacity-20 animate-pulse"
             style={{

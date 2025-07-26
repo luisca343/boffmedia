@@ -11,33 +11,38 @@ export function ProbabilityTable({ probabilities }: ProbabilityTableProps) {
   const t = useTranslations('tcgpocket')
   
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t('bestPack.table.packName')}</TableHead>
-          <TableHead>{t('bestPack.table.card', { number: 1 })}</TableHead>
-          <TableHead>{t('bestPack.table.card', { number: 2 })}</TableHead>
-          <TableHead>{t('bestPack.table.card', { number: 3 })}</TableHead>
-          <TableHead>{t('bestPack.table.card', { number: 4 })}</TableHead>
-          <TableHead>{t('bestPack.table.card', { number: 5 })}</TableHead>
-          <TableHead>{t('bestPack.table.total')}</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {Object.entries(probabilities).map(([packName, packProbabilities]) => (
-          <TableRow key={packName}>
-            <TableCell>{t(`packs.${packName}`)}</TableCell>
-            {packProbabilities.newCardProbabilities.map((prob: number, index: number) => (
-              <TableCell key={index}>
-                <PercentageToDecimal value={prob * 100} />
-              </TableCell>
-            ))}
-            <TableCell>
-              <PercentageToDecimal value={packProbabilities.aggregateProbability * 100} />
-            </TableCell>
+    <div className="rounded-lg border border-surface-600/50 overflow-hidden">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-surface-700/50 border-surface-600/50 hover:bg-surface-700/70">
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.packName')}</TableHead>
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.card', { number: 1 })}</TableHead>
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.card', { number: 2 })}</TableHead>
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.card', { number: 3 })}</TableHead>
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.card', { number: 4 })}</TableHead>
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.card', { number: 5 })}</TableHead>
+            <TableHead className="text-surface-200 font-medium">{t('bestPack.table.total')}</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {Object.entries(probabilities).map(([packName, packProbabilities]) => (
+            <TableRow 
+              key={packName} 
+              className="bg-surface-800/50 border-surface-600/30 hover:bg-surface-700/50 transition-colors"
+            >
+              <TableCell className="text-surface-50 font-medium">{t(`packs.${packName}`)}</TableCell>
+              {packProbabilities.newCardProbabilities.map((prob: number, index: number) => (
+                <TableCell key={index} className="text-surface-200">
+                  <PercentageToDecimal value={prob * 100} />
+                </TableCell>
+              ))}
+              <TableCell className="text-surface-50 font-semibold">
+                <PercentageToDecimal value={packProbabilities.aggregateProbability * 100} />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   )
 }
