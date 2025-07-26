@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ExclamationTriangleIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { HiExclamationTriangle, HiUserCircle } from 'react-icons/hi2';
 import { Button } from "@/components/ui/button";
 import { useBoffSession } from "@/services/useBoffSession";
 import { PlayerGallery } from "../_components/PlayerGallery";
@@ -14,11 +14,11 @@ export default function UserGallery() {
 
   if (status === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-full space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="p-4 rounded-full bg-surface-700/50 border border-surface-600/50">
           <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
         </div>
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <h1 className="text-2xl font-semibold text-surface-50 mb-2">Cargando...</h1>
           <p className="text-surface-400">
             Estamos cargando tu galería de cartas. Por favor, espera un momento.
@@ -30,11 +30,11 @@ export default function UserGallery() {
 
   if (!session || !session.user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-full space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
         <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
-          <ExclamationTriangleIcon className="w-8 h-8 text-red-400" />
+          <HiExclamationTriangle className="w-8 h-8 text-red-400" />
         </div>
-        <div className="text-center">
+        <div className="text-center max-w-md">
           <h1 className="text-2xl font-semibold text-surface-50 mb-2">
             Usuario no encontrado
           </h1>
@@ -46,7 +46,7 @@ export default function UserGallery() {
             className="bg-surface-700/50 border border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors"
             variant="outline"
           >
-            <UserCircleIcon className="w-4 h-4 mr-2" />
+            <HiUserCircle className="w-4 h-4 mr-2" />
             Volver al Inicio
           </Button>
         </div>

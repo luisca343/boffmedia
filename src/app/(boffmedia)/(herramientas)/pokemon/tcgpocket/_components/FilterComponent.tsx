@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline'
+import { HiMagnifyingGlass, HiFunnel } from 'react-icons/hi2'
 
 interface FilterComponentProps {
   expansions: string[]
@@ -28,20 +28,26 @@ export function FilterComponent({ expansions, onFilterChange, t }: FilterCompone
             onChange={(e) => setNameFilter(e.target.value)}
             className="w-full pl-10 bg-surface-800/50 border-surface-600/50 text-surface-50 hover:bg-surface-800 focus:border-primary-400 transition-colors"
           />
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 w-4 h-4" />
+          <HiMagnifyingGlass className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 w-4 h-4" />
         </div>
         <div className="relative sm:w-[200px]">
           <Select value={expansionFilter} onValueChange={setExpansionFilter}>
             <SelectTrigger className="w-full bg-surface-800/50 border-surface-600/50 text-surface-50 hover:bg-surface-800 focus:border-primary-400 transition-colors">
               <div className="flex items-center">
-                <FunnelIcon className="w-4 h-4 mr-2 text-surface-400" />
+                <HiFunnel className="w-4 h-4 mr-2 text-surface-400" />
                 <SelectValue placeholder={t('filter.expansionPlaceholder')} />
               </div>
             </SelectTrigger>
-            <SelectContent className="bg-surface-700 border-surface-600">
-              <SelectItem value="all">{t('filter.allExpansions')}</SelectItem>
+            <SelectContent className="bg-surface-700/95 border-surface-600/50 backdrop-blur-sm">
+              <SelectItem value="all" className="text-surface-50 hover:bg-surface-600/50">
+                {t('filter.allExpansions')}
+              </SelectItem>
               {expansions.map((expansion) => (
-                <SelectItem key={expansion} value={expansion}>
+                <SelectItem 
+                  key={expansion} 
+                  value={expansion}
+                  className="text-surface-50 hover:bg-surface-600/50"
+                >
                   {expansion}
                 </SelectItem>
               ))}

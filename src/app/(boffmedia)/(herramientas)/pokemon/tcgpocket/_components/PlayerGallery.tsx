@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Loader2, Save } from 'lucide-react'
 import { useLocale, useTranslations } from "next-intl"
 import { toast } from 'react-toastify'
@@ -13,9 +14,7 @@ import { PlayerGalleryHeader } from "./PlayerGalleryHeader"
 import { RecentUpdates } from "./RecentUpdates"
 import { BestPackDialog } from "./BestPackDialog"
 import { RecentUpdate, PackData, AllPackProbabilities } from '../types'
-import { FilterComponent } from "./FilterComponent"
 import { CollectionGroup } from "./CollectionGroup"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { TcgCard } from "@/generated/api"
 
 interface PlayerGalleryProps {
@@ -39,13 +38,13 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
   const [recentUpdatesError, setRecentUpdatesError] = useState<string | null>(null)
   const [showAmounts, setShowAmounts] = useState(true)
   const [isRecentUpdatesOpen, setIsRecentUpdatesOpen] = useState(false)
-  const t = useTranslations('tcgpocket')
   const [nameFilter, setNameFilter] = useState("")
   const [expansionFilter, setExpansionFilter] = useState("")
+  
+  const t = useTranslations('tcgpocket')
   const locale = useLocale()
-
-  const pathname = usePathname();
-  const editable = pathname === '/pokemon/tcgpocket/galeria';
+  const pathname = usePathname()
+  const editable = pathname === '/pokemon/tcgpocket/galeria'
 
   useEffect(() => {
     const count = Object.values(userCards).reduce((acc, curr) => acc + curr, 0)
@@ -66,8 +65,6 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
       if (updates.length > 0) {
         setRecentUpdates(prevUpdates => [...prevUpdates, ...updates])
         setRecentUpdatesOffset(prevOffset => prevOffset + updates.length)
-      } else {
-        //toast.info('No more updates to load')
       }
     } catch (error) {
       console.error('Error fetching recent updates:', error)
@@ -142,95 +139,105 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
     }
   }
 
+  const handleFilterChange = (name: string, expansion: string) => {
+    setNameFilter(name)
+    setExpansionFilter(expansion)
+  }
+
+  const expansions = Array.from(new Set(allCards.map(card => card.setName)))
+
+  const filteredCards = allCards.filter(card =>
+    (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
+      card.id.toString().includes(nameFilter)) &&
+    (expansionFilter === "" || card.setName === expansionFilter)
+  )
+
+  const groupedCards = filteredCards.reduce<Record<string, TcgCard[]>>((acc, curr) => {
+    if (!acc[curr.setName]) {
+      acc[curr.setName] = []
+    }
+    acc[curr.setName].push(curr)
+    return acc
+  }, {})
+
+  if (Object.keys(userCards).length === 0 && !loading) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h2 className="text-2xl font-bold mb-4 text-surface-50">{t('gallery.notFound.title')}</h2>
+        <p className="text-surface-300">{t('gallery.notFound.description')}</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen text-white">
-      {Object.keys(userCards).length === 0 ? (
-        <div className="container mx-auto px-4 py-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">{t('gallery.notFound.title')}</h2>
-          <p>{t('gallery.notFound.description')}</p>
-        </div>
-      ) : (
-        <div className="container mx-auto px-4 py-8">
-          <PlayerGalleryHeader
-            username={username}
-            cardCount={cardCount}
-            editable={editable}
-            hideMissingCards={hideMissingCards}
-            setHideMissingCards={setHideMissingCards}
-            selectedEvent={selectedEvent}
-            setSelectedEvent={setSelectedEvent}
-            getBestPack={getBestPack}
-            bestPackLoading={bestPackLoading}
-            showAmounts={showAmounts}
-            setShowAmounts={setShowAmounts}
-            onRecentUpdatesClick={() => setIsRecentUpdatesOpen(true)}
-          />
-          <div className="mt-8">
-            <FilterComponent
-              expansions={Array.from(new Set(allCards.map(card => card.setName)))}
-              onFilterChange={(name, expansion) => {
-                setNameFilter(name)
-                setExpansionFilter(expansion)
-              }}
-              t={t}
-            />
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      {/* Header with Controls */}
+      <PlayerGalleryHeader
+        username={username}
+        cardCount={cardCount}
+        editable={editable}
+        hideMissingCards={hideMissingCards}
+        setHideMissingCards={setHideMissingCards}
+        selectedEvent={selectedEvent}
+        setSelectedEvent={setSelectedEvent}
+        getBestPack={getBestPack}
+        bestPackLoading={bestPackLoading}
+        showAmounts={showAmounts}
+        setShowAmounts={setShowAmounts}
+        onRecentUpdatesClick={() => setIsRecentUpdatesOpen(true)}
+        expansions={expansions}
+        onFilterChange={handleFilterChange}
+      />
+
+      {/* Cards Content */}
+      <div>
+        {loading ? (
+          <div className="flex items-center justify-center min-h-[40vh]">
+            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
           </div>
-          <div className="mt-8">
-            {loading ? (
-              <div className="flex items-center justify-center min-h-[50vh]">
-                <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-              </div>
-            ) : allCards.length === 0 ? (
-              <p className="text-center text-surface-300">{t('gallery.noCards')}</p>
-            ) : (
-              <div>
-                {Object.entries(
-                  allCards
-                    .filter(card =>
-                      (card.name.toLowerCase().includes(nameFilter.toLowerCase()) ||
-                        card.id.toString().includes(nameFilter)) &&
-                      (expansionFilter === "" || card.setName === expansionFilter)
-                    )
-                    .reduce<Record<string, TcgCard[]>>((acc, curr) => {
-                      if (!acc[curr.setName]) {
-                        acc[curr.setName] = []
-                      }
-                      acc[curr.setName].push(curr)
-                      return acc
-                    }, {})
-                ).map(([setName, cards]) => (
-                  <CollectionGroup
-                    key={setName}
-                    expansion={setName}
-                    cards={cards}
-                    userCards={userCards}
-                    changes={changes}
-                    hideMissingCards={hideMissingCards}
-                    editable={editable}
-                    loading={loading}
-                    handleAddCard={handleAddCard}
-                    handleRemoveCard={handleRemoveCard}
-                    trans={t}
-                    showAmounts={showAmounts}
-                  />
-                ))}
-              </div>
-            )}
+        ) : allCards.length === 0 ? (
+          <p className="text-center text-surface-300 py-8">{t('gallery.noCards')}</p>
+        ) : (
+          <div className="space-y-6">
+            {Object.entries(groupedCards).map(([setName, cards]) => (
+              <CollectionGroup
+                key={setName}
+                expansion={setName}
+                cards={cards}
+                userCards={userCards}
+                changes={changes}
+                hideMissingCards={hideMissingCards}
+                editable={editable}
+                loading={loading}
+                handleAddCard={handleAddCard}
+                handleRemoveCard={handleRemoveCard}
+                trans={t}
+                showAmounts={showAmounts}
+              />
+            ))}
           </div>
-          {editable && Object.keys(changes).length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="fixed bottom-4 right-4 z-50"
-            >
-              <Button onClick={saveChanges} className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" disabled={loading}>
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-                {t('gallery.saveChanges')}
-              </Button>
-            </motion.div>
-          )}
-        </div>
+        )}
+      </div>
+
+      {/* Save Button */}
+      {editable && Object.keys(changes).length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-4 right-4 z-50"
+        >
+          <Button 
+            onClick={saveChanges} 
+            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" 
+            disabled={loading}
+          >
+            {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+            {t('gallery.saveChanges')}
+          </Button>
+        </motion.div>
       )}
+
+      {/* Dialogs */}
       <BestPackDialog
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
@@ -238,10 +245,11 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
         bestPackData={bestPackData}
         eventPackData={eventPackData}
       />
+      
       <Dialog open={isRecentUpdatesOpen} onOpenChange={setIsRecentUpdatesOpen}>
-        <DialogContent className="bg-surface-800 text-white max-h-[70vh] overflow-hidden">
+        <DialogContent className="bg-surface-800/95 border-surface-600/50 text-white max-h-[70vh] overflow-hidden backdrop-blur-sm">
           <DialogHeader>
-            <DialogTitle>{t('gallery.recentCards')}</DialogTitle>
+            <DialogTitle className="text-surface-50">{t('gallery.recentCards')}</DialogTitle>
           </DialogHeader>
           <RecentUpdates
             recentUpdates={recentUpdates}
