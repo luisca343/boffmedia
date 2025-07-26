@@ -54,7 +54,7 @@ export class InventoryService {
       const isConsumable = consumableTypes.includes(item.itemType);
 
       const key = isConsumable
-        ? `${item.itemId}_${item.sourceType || 'unknown'}`
+        ? `${item.itemId}`
         : `${item.itemId}_${item.used}_${item.sourceType || 'unknown'}`;
 
       if (!acc[key]) {
