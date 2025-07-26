@@ -1,136 +1,185 @@
-import { useState } from "react"
-import { Users, UserX, Trophy, Search, XCircle } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Users, Minus, Trophy, Search, XCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { SectionHeader } from "@/components/form";
 
-type ParticipantsListProps = {
-  participants: string[]
-  previousWinners: string[]
-  onRemove: (name: string) => void
+interface ParticipantsListProps {
+  participants: string[];
+  previousWinners: string[];
+  onRemove: (name: string) => void;
 }
 
-export default function ParticipantsList({ 
+export function ParticipantsList({ 
   participants, 
   previousWinners,
   onRemove 
 }: ParticipantsListProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [activeTab, setActiveTab] = useState<"participants" | "winners">("participants")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeTab, setActiveTab] = useState<"participants" | "winners">("participants");
   
   const filteredParticipants = participants.filter(name => 
     name.toLowerCase().includes(searchTerm.toLowerCase())
-  ).sort((a, b) => a.localeCompare(b))
+  ).sort((a, b) => a.localeCompare(b));
   
   return (
-    <div className="bg-surface-800/70 backdrop-blur-sm border border-surface-700 rounded-xl p-6 shadow-lg h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-bold text-surface-50">
-          {activeTab === "participants" ? "Participantes" : "Ganadores Previos"}
-        </h3>
+    <div className="bg-gradient-to-br from-surface-800/90 to-surface-900/90 border border-surface-700/50 rounded-2xl p-6 shadow-2xl backdrop-blur-sm h-full">
+      
+      {/* Header with Tabs */}
+      <div className="flex items-center justify-between mb-6">
+        <SectionHeader 
+          icon={activeTab === "participants" ? <Users className="w-5 h-5" /> : <Trophy className="w-5 h-5" />} 
+          title={activeTab === "participants" ? "Participantes" : "Ganadores Previos"} 
+        />
         <div className="flex gap-2">
           <button
             onClick={() => setActiveTab("participants")}
-            className={`p-2 rounded-md ${
+            className={`p-2 rounded-lg transition-all duration-200 ${
               activeTab === "participants" 
-                ? "bg-primary-500 text-white" 
-                : "bg-surface-700 text-surface-300 hover:bg-surface-600"
+                ? "bg-orange-500 text-white shadow-lg" 
+                : "bg-surface-700/50 text-surface-300 hover:bg-surface-600/50"
             }`}
-            title="Ver participantes"
+            title="Ver participantes actuales"
           >
-            <Users size={16} />
+            <Users className="w-4 h-4" />
           </button>
           <button
             onClick={() => setActiveTab("winners")}
-            className={`p-2 rounded-md ${
+            className={`p-2 rounded-lg transition-all duration-200 ${
               activeTab === "winners" 
-                ? "bg-yellow-500 text-white" 
-                : "bg-surface-700 text-surface-300 hover:bg-surface-600"
+                ? "bg-yellow-500 text-white shadow-lg" 
+                : "bg-surface-700/50 text-surface-300 hover:bg-surface-600/50"
             }`}
             title="Ver ganadores previos"
           >
-            <Trophy size={16} />
+            <Trophy className="w-4 h-4" />
           </button>
         </div>
       </div>
       
+      {/* Search */}
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-2.5 h-4 w-4 text-surface-400" />
+        <Search className="absolute left-3 top-2.5 w-4 h-4 text-surface-400" />
         <Input
-          placeholder="Buscar..."
+          placeholder={activeTab === "participants" ? "Buscar participantes..." : "Buscar ganadores..."}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9 bg-surface-700 border-surface-600 text-surface-50"
+          className="pl-10 pr-10 bg-surface-700/50 border-surface-600/50 text-surface-50 placeholder:text-surface-400"
         />
         {searchTerm && (
           <button 
             onClick={() => setSearchTerm("")}
-            className="absolute right-3 top-2.5 text-surface-400 hover:text-surface-50"
+            className="absolute right-3 top-2.5 text-surface-400 hover:text-surface-50 transition-colors duration-200"
           >
-            <XCircle className="h-4 w-4" />
+            <XCircle className="w-4 h-4" />
           </button>
         )}
       </div>
       
+      {/* Content */}
       <div className="h-[500px] overflow-y-auto pr-2 custom-scrollbar">
         {activeTab === "participants" ? (
           <>
-            <div className="text-sm text-surface-400 mb-2">
-              {filteredParticipants.length} participantes
+            {/* Stats */}
+            <div className="flex items-center gap-2 mb-4">
+              <Badge 
+                variant="secondary" 
+                className="bg-orange-500/20 text-orange-300 border-orange-500/30"
+              >
+                {filteredParticipants.length} de {participants.length}
+              </Badge>
+              {searchTerm && (
+                <Badge variant="outline" className="text-surface-400 border-surface-600">
+                  Filtrado: "{searchTerm}"
+                </Badge>
+              )}
             </div>
+
+            {/* Participants List */}
             {filteredParticipants.length > 0 ? (
-              <ul className="space-y-2">
-                {filteredParticipants.map((name) => (
-                  <li 
+              <div className="space-y-2">
+                {filteredParticipants.map((name, index) => (
+                  <div 
                     key={name}
-                    className="flex items-center justify-between p-3 bg-surface-700 rounded-md group hover:bg-surface-600"
+                    className="group flex items-center justify-between p-4 bg-surface-700/30 hover:bg-surface-600/50 rounded-xl border border-surface-600/30 hover:border-surface-500/50 transition-all duration-200"
                   >
-                    <span className="text-surface-50 truncate">{name}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+                        {index + 1}
+                      </div>
+                      <span className="text-surface-50 font-medium truncate">{name}</span>
+                    </div>
                     <button 
                       onClick={() => onRemove(name)}
-                      className="text-surface-400 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-opacity"
-                      title="Eliminar participante"
+                      className="text-surface-400 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all duration-200 p-2 rounded-lg hover:bg-red-500/10"
+                      title={`Eliminar a ${name}`}
                     >
-                      <UserX size={16} />
+                      <Minus className="w-4 h-4" />
                     </button>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-60 text-center text-surface-400">
-                <Users size={48} className="mb-4 opacity-50" />
+              <div className="flex flex-col items-center justify-center h-60 text-center">
+                <div className="w-16 h-16 bg-surface-700/50 rounded-2xl flex items-center justify-center mb-4">
+                  <Users className="w-8 h-8 text-surface-400" />
+                </div>
                 {searchTerm ? (
-                  <p>No se encontraron participantes que coincidan con "{searchTerm}"</p>
+                  <div>
+                    <p className="text-surface-400 mb-2">No se encontraron participantes</p>
+                    <p className="text-sm text-surface-500">que coincidan con "{searchTerm}"</p>
+                  </div>
                 ) : (
-                  <p>Añade participantes para comenzar</p>
+                  <div>
+                    <p className="text-surface-400 mb-2">Sin participantes</p>
+                    <p className="text-sm text-surface-500">Añade participantes para comenzar el sorteo</p>
+                  </div>
                 )}
               </div>
             )}
           </>
         ) : (
           <>
-            <div className="text-sm text-surface-400 mb-2">
-              {previousWinners.length} ganadores previos
+            {/* Winners Stats */}
+            <div className="flex items-center gap-2 mb-4">
+              <Badge 
+                variant="secondary" 
+                className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
+              >
+                {previousWinners.length} ganador{previousWinners.length !== 1 ? 'es' : ''}
+              </Badge>
             </div>
+
+            {/* Winners List */}
             {previousWinners.length > 0 ? (
-              <ul className="space-y-2">
+              <div className="space-y-2">
                 {previousWinners.map((name, index) => (
-                  <li 
+                  <div 
                     key={`${name}-${index}`}
-                    className="flex items-center p-3 bg-gradient-to-r from-yellow-900/30 to-surface-700 rounded-md"
+                    className="flex items-center gap-3 p-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl"
                   >
-                    <Trophy size={16} className="text-yellow-500 mr-3" />
-                    <span className="text-yellow-100">{name}</span>
-                  </li>
+                    <div className="w-8 h-8 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
+                      <Trophy className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-yellow-100 font-medium">{name}</span>
+                    <Badge variant="outline" className="ml-auto text-xs text-yellow-400 border-yellow-500/30">
+                      Ganador #{index + 1}
+                    </Badge>
+                  </div>
                 ))}
-              </ul>
+              </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-60 text-center text-surface-400">
-                <Trophy size={48} className="mb-4 opacity-50" />
-                <p>Todavía no hay ganadores</p>
+              <div className="flex flex-col items-center justify-center h-60 text-center">
+                <div className="w-16 h-16 bg-surface-700/50 rounded-2xl flex items-center justify-center mb-4">
+                  <Trophy className="w-8 h-8 text-surface-400" />
+                </div>
+                <p className="text-surface-400 mb-2">Sin ganadores aún</p>
+                <p className="text-sm text-surface-500">Los ganadores aparecerán aquí después de cada sorteo</p>
               </div>
             )}
           </>
         )}
       </div>
     </div>
-  )
+  );
 }

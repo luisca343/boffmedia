@@ -1,121 +1,162 @@
-import { useState } from "react"
-import { UserPlus, Upload, Play, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import { UserPlus, Upload, Play, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SectionHeader } from "@/components/form";
+import { ActionButton } from "@/components/actions";
 
-type GiveawayControlsProps = {
-  onAddParticipant: (name: string) => void
-  onUploadList: (list: string[]) => void
-  onStartGiveaway: () => void
-  participantCount: number
+interface GiveawayControlsProps {
+  onAddParticipant: (name: string) => void;
+  onUploadList: (list: string[]) => void;
+  onStartGiveaway: () => void;
+  participantCount: number;
 }
 
-export default function GiveawayControls({
+export function GiveawayControls({
   onAddParticipant,
   onUploadList,
   onStartGiveaway,
   participantCount
 }: GiveawayControlsProps) {
-  const [newParticipant, setNewParticipant] = useState("")
-  const [participantList, setParticipantList] = useState("")
-  const [activeTab, setActiveTab] = useState("single")
+  const [newParticipant, setNewParticipant] = useState("");
+  const [participantList, setParticipantList] = useState("");
+  const [activeTab, setActiveTab] = useState("single");
   
   const handleAddSingle = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (newParticipant.trim()) {
-      onAddParticipant(newParticipant.trim())
-      setNewParticipant("")
+      onAddParticipant(newParticipant.trim());
+      setNewParticipant("");
     }
-  }
+  };
   
   const handleUploadList = () => {
     const names = participantList
       .split("\n")
       .map(line => line.trim())
-      .filter(Boolean)
+      .filter(Boolean);
     
     if (names.length > 0) {
-      onUploadList(names)
-      setParticipantList("")
+      onUploadList(names);
+      setParticipantList("");
     }
-  }
+  };
   
   return (
-    <Card className="bg-surface-800/70 backdrop-blur-sm border-surface-700">
-      <CardHeader>
-        <CardTitle className="text-2xl text-surface-50">Configurar Sorteo</CardTitle>
-        <CardDescription className="text-surface-400">
+    <Card className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-surface-800/90 to-surface-900/90 border-surface-700/50 backdrop-blur-sm shadow-2xl">
+      
+      {/* Header */}
+      <div className="mb-8">
+        <SectionHeader 
+          icon={<UserPlus className="w-5 h-5" />} 
+          title="Configurar Sorteo" 
+        />
+        <p className="text-surface-400 mt-2">
           Añade participantes individualmente o sube una lista completa
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-2 bg-surface-700">
-            <TabsTrigger value="single" className="data-[state=active]:bg-primary-500">
-              <UserPlus className="mr-2 h-4 w-4" />
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-2 bg-surface-700/50 border border-surface-600/50">
+            <TabsTrigger 
+              value="single" 
+              className="data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all duration-200"
+            >
+              <UserPlus className="mr-2 w-4 h-4" />
               Individual
             </TabsTrigger>
-            <TabsTrigger value="list" className="data-[state=active]:bg-primary-500">
-              <Upload className="mr-2 h-4 w-4" />
-              Lista
+            <TabsTrigger 
+              value="list" 
+              className="data-[state=active]:bg-primary-500 data-[state=active]:text-white transition-all duration-200"
+            >
+              <Upload className="mr-2 w-4 h-4" />
+              Lista Masiva
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="single" className="mt-4">
-            <form onSubmit={handleAddSingle} className="flex gap-2">
+          
+          <TabsContent value="single" className="mt-6">
+            <form onSubmit={handleAddSingle} className="flex gap-3">
               <Input
-                placeholder="Nombre del participante"
+                placeholder="Escribe el nombre del participante..."
                 value={newParticipant}
                 onChange={(e) => setNewParticipant(e.target.value)}
-                className="bg-surface-700 border-surface-600"
+                className="bg-surface-700/50 border-surface-600/50 text-surface-50 placeholder:text-surface-400 hover:bg-surface-700 focus:border-primary-500/50 transition-all duration-200"
               />
-              <Button type="submit" variant="secondary">Añadir</Button>
+              <Button 
+                type="submit" 
+                className="bg-primary-600 hover:bg-primary-700 border-0 px-6 transition-all duration-200"
+              >
+                Añadir
+              </Button>
             </form>
           </TabsContent>
-          <TabsContent value="list" className="mt-4 space-y-4">
+          
+          <TabsContent value="list" className="mt-6 space-y-4">
             <Textarea
-              placeholder="Añade un nombre por línea..."
+              placeholder="Añade un nombre por línea:&#10;&#10;Participante 1&#10;Participante 2&#10;Participante 3&#10;..."
               value={participantList}
               onChange={(e) => setParticipantList(e.target.value)}
-              rows={5}
-              className="bg-surface-700 border-surface-600"
+              rows={6}
+              className="bg-surface-700/50 border-surface-600/50 text-surface-50 placeholder:text-surface-400 hover:bg-surface-700 focus:border-primary-500/50 transition-all duration-200 resize-none"
             />
             <Button 
               onClick={handleUploadList}
-              variant="secondary" 
-              className="w-full"
+              disabled={!participantList.trim()}
+              className="w-full bg-blue-600 hover:bg-blue-700 border-0 transition-all duration-200"
             >
-              <Upload className="mr-2 h-4 w-4" />
-              Cargar Lista
+              <Upload className="mr-2 w-4 h-4" />
+              Cargar Lista ({participantList.split('\n').filter(Boolean).length} nombres)
             </Button>
           </TabsContent>
         </Tabs>
+      </div>
         
-        {participantCount === 0 && (
-          <div className="flex items-center bg-amber-950/50 text-amber-300 p-4 rounded-md mb-6">
-            <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
-            <p className="text-sm">Añade al menos un participante para iniciar el sorteo</p>
+      {/* Warning */}
+      {participantCount === 0 && (
+        <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 text-amber-300 p-4 rounded-xl mb-6">
+          <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-medium mb-1">Faltan participantes</p>
+            <p className="text-sm text-amber-400/80">Añade al menos un participante para poder iniciar el sorteo</p>
           </div>
-        )}
-        
-        <div className="text-center py-4">
-          <p className="text-surface-300 mb-2">
-            {participantCount} participantes listos para el sorteo
+        </div>
+      )}
+      
+      {/* Status */}
+      <div className="text-center py-6 px-4 bg-surface-700/30 rounded-xl border border-surface-600/30 mb-8">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <div className={`w-3 h-3 rounded-full ${participantCount > 0 ? 'bg-green-400' : 'bg-surface-500'} transition-colors duration-200`} />
+          <p className="text-surface-300 font-medium">
+            {participantCount === 0 
+              ? "Sin participantes" 
+              : `${participantCount} participante${participantCount !== 1 ? 's' : ''} listo${participantCount !== 1 ? 's' : ''}`
+            }
           </p>
         </div>
-      </CardContent>
-      <CardFooter>
-        <Button 
-          onClick={onStartGiveaway} 
-          className="w-full bg-gradient-to-r from-primary-500 to-blue-500 hover:from-primary-600 hover:to-blue-600 text-white"
-          disabled={participantCount === 0}
-        >
-          <Play className="mr-2 h-5 w-5" />
-          Iniciar Sorteo
-        </Button>
-      </CardFooter>
+        {participantCount > 0 && (
+          <p className="text-sm text-surface-400">
+            El sorteo seleccionará aleatoriamente a uno de los participantes
+          </p>
+        )}
+      </div>
+
+      {/* Start Button */}
+      <ActionButton
+        onClick={onStartGiveaway}
+        variant="generate"
+        size="lg"
+        fullWidth
+        disabled={participantCount === 0}
+        icon={<Play className="w-5 h-5" />}
+        className="transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {participantCount === 0 ? "Añade participantes para continuar" : "🎲 Iniciar Sorteo"}
+      </ActionButton>
     </Card>
-  )
+  );
 }
