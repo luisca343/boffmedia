@@ -54,9 +54,7 @@ export class InvitesController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve invite.' })
   @ApiParam({ name: 'id', description: 'Invite ID' })
   async getInviteById(@Param('id') id: string) {
-    console.log(`Fetching invite with ID: ${id}`);
     const invite = await this.invitesFacadeService.getInviteById(id);
-    console.log(`Invite fetched:`, invite);
     
     if (!invite) {
       return {
