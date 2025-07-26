@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, asc } from 'drizzle-orm';
+import { eq, and, asc, gt } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { BaseRepositoryImpl } from '@api/_utils/repositories/base-repository';
 import { IArcadeInventoryRepository } from './interfaces/arcade-inventory.repository.interface';
@@ -112,7 +112,8 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
       .from(smartRotomInventory)
       .where(and(
         eq(smartRotomInventory.uuid, uuid),
-        eq(smartRotomInventory.itemId, itemId)
+        eq(smartRotomInventory.itemId, itemId),
+        gt(smartRotomInventory.amount, smartRotomInventory.used || 0)
       ))
       .orderBy(asc(smartRotomInventory.used));
     
