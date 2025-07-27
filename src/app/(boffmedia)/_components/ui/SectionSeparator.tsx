@@ -5,9 +5,9 @@ interface SectionSeparatorProps {
 
 export function SectionSeparator({ variant = 'purple', className = "" }: SectionSeparatorProps) {
   const colors = {
-    default: 'purple-500/50',
-    purple: 'purple-500/50',
-    blue: 'blue-500/50', 
+    default: 'purple-500',
+    purple: 'purple-500',
+    blue: 'blue-500', 
     orange: 'primary-500'
   };
 

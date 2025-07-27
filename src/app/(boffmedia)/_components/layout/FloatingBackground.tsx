@@ -7,8 +7,6 @@ interface FloatingBackgroundProps {
 
 export function FloatingBackground({ 
   variant = 'default', 
-  showParticles = true, 
-  showBlobs = true,
   className = ""
 }: FloatingBackgroundProps) {
   const getColorsByVariant = () => {
@@ -69,11 +67,7 @@ export function FloatingBackground({
               <rect width="100%" height="100%" fill="transparent" />
               <path d="M0,400 Q300,200 600,300 T1200,250 L1200,0 L0,0 Z" fill="url(#gradient1-${variant})" opacity="0.3" />
               <path d="M0,600 Q400,400 800,500 T1200,450 L1200,800 L0,800 Z" fill="url(#gradient1-${variant})" opacity="0.2" />
-              ${showBlobs ? `
-                <circle cx="200" cy="150" r="100" fill="url(#radial1-${variant})" filter="url(#blur1-${variant})" />
-                <circle cx="900" cy="600" r="150" fill="url(#radial2-${variant})" filter="url(#blur2-${variant})" />
-                <circle cx="600" cy="400" r="80" fill="${colors.secondary}" fill-opacity="0.08" filter="url(#blur1-${variant})" />
-              ` : ''}
+
               <g opacity="0.08" stroke="${colors.secondary}" stroke-width="2" fill="none">
                 <path d="M0,300 Q300,100 600,200 T1200,150" />
                 <path d="M0,500 Q400,300 800,400 T1200,350" />
@@ -85,75 +79,6 @@ export function FloatingBackground({
           backgroundPosition: 'center top'
         }}
       />
-
-      {/* Additional animated particles */}
-      {showParticles && (
-        <div
-          className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none"
-          style={{ zIndex: 1 }}
-        >
-          <div 
-            className="absolute w-2 h-2 rounded-full opacity-20 animate-pulse"
-            style={{
-              top: '20%', 
-              left: '10%', 
-              backgroundColor: colors.primary,
-              animationDelay: '0s',
-              animationDuration: '3s'
-            }}
-          />
-          <div 
-            className="absolute w-1 h-1 rounded-full opacity-30 animate-pulse"
-            style={{
-              top: '60%', 
-              left: '80%', 
-              backgroundColor: colors.secondary,
-              animationDelay: '1s',
-              animationDuration: '4s'
-            }}
-          />
-          <div 
-            className="absolute w-3 h-3 rounded-full opacity-15 animate-pulse"
-            style={{
-              top: '80%', 
-              left: '20%', 
-              backgroundColor: colors.accent,
-              animationDelay: '2s',
-              animationDuration: '5s'
-            }}
-          />
-          <div 
-            className="absolute w-2 h-2 rounded-full opacity-25 animate-pulse"
-            style={{
-              top: '40%', 
-              left: '90%', 
-              backgroundColor: colors.secondary,
-              animationDelay: '1.5s',
-              animationDuration: '3.5s'
-            }}
-          />
-          <div 
-            className="absolute w-2 h-2 rounded-full opacity-20 animate-pulse"
-            style={{
-              top: '120%', 
-              left: '30%', 
-              backgroundColor: colors.primary,
-              animationDelay: '3s',
-              animationDuration: '4s'
-            }}
-          />
-          <div 
-            className="absolute w-1 h-1 rounded-full opacity-25 animate-pulse"
-            style={{
-              top: '140%', 
-              left: '70%', 
-              backgroundColor: colors.accent,
-              animationDelay: '2.5s',
-              animationDuration: '3.5s'
-            }}
-          />
-        </div>
-      )}
     </>
   );
 }

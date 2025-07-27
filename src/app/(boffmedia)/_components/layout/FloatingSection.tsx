@@ -2,7 +2,7 @@ import { FloatingBackground } from "./FloatingBackground";
 
 interface FloatingSectionProps {
   children: React.ReactNode;
-  variant?: 'default' | 'warm' | 'cool';
+  variant?: 'default' | 'warm' | 'cool' | 'neutral';
   showParticles?: boolean;
   showBlobs?: boolean;
   className?: string;
@@ -22,11 +22,13 @@ export function FloatingSection({
       className={`relative overflow-hidden ${className}`} 
       style={style}
     >
-      <FloatingBackground 
-        variant={variant}
-        showParticles={showParticles}
-        showBlobs={showBlobs}
-      />
+      {variant !== 'neutral' && (
+        <FloatingBackground 
+          variant={variant}
+          showParticles={showParticles}
+          showBlobs={showBlobs}
+        />
+      )}
       <div className="relative z-10">
         {children}
       </div>
