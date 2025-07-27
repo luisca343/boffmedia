@@ -36,7 +36,7 @@ export async function CommunitySection() {
   ]
 
   return (
-    <FloatingSection  mainPage={true} className="relative mt-8 py-32 bg-gradient-to-br from-surface-800 via-surface-800 to-surface-900 overflow-hidden  wave-community-top">
+    <section className="relative mt-8 py-32 bg-gradient-to-br from-surface-800 via-surface-800 to-surface-900 overflow-hidden  wave-community-top">
       <div className="relative container mx-auto px-4 z-10">
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-3 mb-6">
@@ -96,6 +96,6 @@ export async function CommunitySection() {
           </div>
         </div>
       </div>
-    </FloatingSection>
+    </section>
   )
 }

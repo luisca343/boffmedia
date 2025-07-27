@@ -4,6 +4,7 @@ import { WingullSpotlight } from "./WingullSpotlight";
 import { SmartRotomSpotlight } from "./SmartRotomSpotlight";
 import { GamesGrid } from "./GamesGrid";
 import { SectionSeparator } from "../ui/SectionSeparator";
+import { Float } from "@react-three/drei";
 
 export async function FeaturedGames() {
   const t = await getTranslations("boffmedia");
@@ -27,7 +28,6 @@ export async function FeaturedGames() {
 
   return (
     <FloatingSection
-      mainPage={true}
       className="min-h-[120vh] relative  overflow-hidden flex flex-col justify-center bg-gradient-to-b from-surface-800 via-surface-900 to-surface-800"
     >
       <div className="relative mx-auto px-4 z-10 flex flex-col justify-center h-full ">

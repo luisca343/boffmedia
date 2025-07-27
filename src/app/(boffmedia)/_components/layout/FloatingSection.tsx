@@ -6,8 +6,6 @@ interface FloatingSectionProps {
   showParticles?: boolean;
   showBlobs?: boolean;
   className?: string;
-  mainPage?: boolean;
-
   style?: React.CSSProperties;
 }
 
@@ -17,17 +15,19 @@ export function FloatingSection({
   showParticles = true,
   showBlobs = true,
   className = "",
-  mainPage = false,
   style = {}
 }: FloatingSectionProps) {
   return (
-    <section className={`${className} ${!mainPage && 'relative'}`} style={style}>
+    <section 
+      className={`relative overflow-hidden ${className}`} 
+      style={style}
+    >
       <FloatingBackground 
         variant={variant}
         showParticles={showParticles}
         showBlobs={showBlobs}
       />
-      <div className={`z-10 ${!mainPage && 'relative'}`}>
+      <div className="relative z-10">
         {children}
       </div>
     </section>
