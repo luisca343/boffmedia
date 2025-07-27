@@ -56,7 +56,7 @@ export function EventsSection() {
     <FloatingSection 
       mainPage={true}
       variant="cool"
-      className="relative py-32 bg-gradient-to-br from-surface-950 via-blue-950/20 to-purple-950/30 overflow-hidden wave-svg-like-both"
+      className="relative py-32 bg-gradient-to-b from-surface-900 via-blue-950/20 to-purple-950/30 overflow-hidden"
     >
       <div className="relative container mx-auto px-4 z-10">
         <div className="text-center mb-16">

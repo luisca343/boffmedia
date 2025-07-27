@@ -1,0 +1,97 @@
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+
+interface WingullSpotlightProps {
+  t: (key: string) => string;
+}
+
+export function WingullSpotlight({ t }: WingullSpotlightProps) {
+  return (
+    <section
+      className="mb-24 grid grid-cols-1 md:grid-cols-2 gap-12 items-center"
+      aria-labelledby="wingull-hero-title"
+    >
+      {/* Left Column: Large Wingull Image with Glow */}
+      <div className="flex justify-center items-center relative">
+        <div className="relative group flex items-center justify-center">
+          {/* Glow effect behind the image */}
+          <div
+            className="absolute inset-0 rounded-5xl pointer-events-none opacity-60 group-hover:opacity-80 transition-opacity duration-300 blur-2xl"
+            style={{
+              zIndex: 0,
+              background: "radial-gradient(circle at 55% 40%, rgba(59,130,246,0.35) 40%, transparent 70%)",
+              boxShadow: "0 0 80px 40px rgba(59,130,246,0.18)",
+            }}
+          ></div>
+          <Image
+            src="/img/personajes.webp"
+            alt="Pixelmon Wingull 2"
+            width={900}
+            height={900}
+            priority
+            className="relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-2"
+            style={{ maxWidth: "90%", height: "auto" }}
+          />
+        </div>
+      </div>
+
+      {/* Right Column: Wingull Info Card */}
+      <div className="flex justify-center items-center">
+        <div className="w-full max-w-2xl space-y-8">
+          {/* Logo Section - Centered and Prominent */}
+          <div className="flex justify-center mb-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-2xl"></div>
+              <Image
+                src="/img/wingull2-logo.png"
+                alt="Pixelmon Wingull 2"
+                width={400}
+                height={400}
+                className="relative rounded-xl"
+              />
+            </div>
+          </div>
+          <div className="space-y-6">
+            <p className="text-xl text-surface-300 leading-relaxed text-center">
+              {t("featuredGames.games.wingull.description")}
+            </p>
+            
+            {/* Features List */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4">
+              <div className="flex items-center gap-3 text-surface-300">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span>Nueva generación</span>
+              </div>
+              <div className="flex items-center gap-3 text-surface-300">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span>Pokémon exclusivos</span>
+              </div>
+              <div className="flex items-center gap-3 text-surface-300">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span>Mecánicas mejoradas</span>
+              </div>
+              <div className="flex items-center gap-3 text-surface-300">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span>Mundo renovado</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4">
+            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 flex-1" asChild>
+              <Link href="/wingull" className="flex items-center justify-center gap-3">
+                {t("featuredGames.viewMore")}
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+            <Button variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 px-6 py-3">
+              Notificarme
+            </Button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
