@@ -24,7 +24,7 @@ export async function HeroSection() {
           backgroundPosition: "center",
         }}
       />
-      <div className="relative h-[calc(100vh-4rem)] container mx-auto px-4 py-24 sm:py-32">
+      <div className="relative h-[105vh] container mx-auto px-4 py-24 sm:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-surface-50">
