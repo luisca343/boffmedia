@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { HiBell } from "react-icons/hi2";
 
 interface WingullSpotlightProps {
   t: (key: string) => string;
@@ -59,20 +60,20 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
             </p>
             
             {/* Features List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4">
-              <div className="flex items-center gap-3 text-surface-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 justify-center text-center mx-auto" style={{maxWidth: 700}}>
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span>Nueva generación</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300">
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span>Pokémon exclusivos</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300">
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span>Mecánicas mejoradas</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300">
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span>Mundo renovado</span>
               </div>
@@ -80,14 +81,20 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
           </div>
           
           <div className="flex items-center gap-4">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 flex-1" asChild>
+            <Button
+              className="bg-gradient-to-r from-blue-500 via-sky-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-blue-300 focus:ring-offset-2 focus:outline-none group"
+              asChild
+              aria-label={t("featuredGames.viewMore") + " Pixelmon Wingull 2"}
+            >
               <Link href="/wingull" className="flex items-center justify-center gap-3">
-                {t("featuredGames.viewMore")}
-                <ArrowRight className="h-5 w-5" />
+                <span className="relative z-10">
+                  {t("featuredGames.viewMore")}
+                </span>
+                <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </Button>
             <Button variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 px-6 py-3">
-              Notificarme
+              <HiBell className="w-6 h-6" />
             </Button>
           </div>
         </div>

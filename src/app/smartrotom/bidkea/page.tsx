@@ -54,7 +54,7 @@ export default function BidkeaMenu() {
   const ref = useRef();
 
   return (
-    <div className="min-h-full bg-[#f4e9d7] text-[#3e2723] font-sans">
+    <div className="min-h-full bg-[#f4e9d7] text-[#3e2723]">
       <header className="bg-[#8b4513] text-white p-4 sticky top-0 z-10">
         <div className="container mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">

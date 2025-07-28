@@ -12,7 +12,6 @@ export default async function Home() {
     <div className="flex flex-col main">
       <HeroSection />
       <FeaturedSection />
-      <ToolsSpotlight t={t} />
       <EventsSection />
       <CommunitySection />
       {/*<CtaSection />*/}

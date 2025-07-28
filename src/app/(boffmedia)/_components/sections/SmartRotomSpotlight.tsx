@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { SmartRotomVideo } from "./SmartRotomVideo";
+import { InternalLink } from "@/components/nav/Link";
 
 interface SmartRotomSpotlightProps {
   t: (key: string) => string;
@@ -39,20 +40,20 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
             </p>
             
             {/* Features List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4">
-              <div className="flex items-center gap-3 text-surface-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 justify-center text-center mx-auto" style={{maxWidth: 700}}>
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
                 <span>Disponible en Minecraft como en la web</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300">
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
                 <span>Aplicaciones útiles para tu aventura</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300">
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
                 <span>Interfaz intuitiva y fácil de usar</span>
               </div>
-              <div className="flex items-center gap-3 text-surface-300">
+              <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
                 <span>Actualizaciones constantes</span>
               </div>
@@ -60,14 +61,27 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
           </div>
           
           <div className="flex items-center gap-4">
-            <Button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 flex-1" asChild>
-              <Link href="/smartrotom" className="flex items-center justify-center gap-3">
-                {t("featuredGames.viewMore")}
-                <ArrowRight className="h-5 w-5" />
-              </Link>
+            <Button
+              className="bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 hover:from-orange-700 hover:to-yellow-600 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-orange-300 focus:ring-offset-2 focus:outline-none group"
+              asChild
+              aria-label={t("featuredGames.viewMore") + " SmartRotom"}
+            >
+              <InternalLink href="/blog/posts/smartrotom" className="flex items-center justify-center gap-3">
+                <span className="relative z-10">
+                  {t("featuredGames.viewMore")}
+                </span>
+                <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
+              </InternalLink>
             </Button>
-            <Button variant="outline" className="border-orange-500/30 text-orange-400 hover:bg-orange-500/10 px-6 py-3">
-              Próximamente
+            <Button
+              variant="outline"
+              className="border-orange-500/30 text-orange-500 hover:bg-orange-500/10 px-6 py-3 font-semibold transition-all duration-200"
+              asChild
+              aria-label="Abrir SmartRotom"
+            >
+              <InternalLink href="/smartrotom" className="flex items-center gap-2">
+                <span>Abrir SmartRotom</span>
+              </InternalLink>
             </Button>
           </div>
         </div>

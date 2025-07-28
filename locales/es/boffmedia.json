@@ -1,129 +1,129 @@
 {
-    "boffmedia": {
-      "hero": {
-        "title": {
-          "first": "Tu aventura gaming",
-          "second": "comienza aquí"
-        },
-        "description": "Sumérgete en experiencias de juego inmersivas, compite en torneos épicos y forma parte de una comunidad apasionada de gamers.",
-        "buttons": {
-          "exploreGames": "Explorar Juegos",
-          "joinCommunity": "Unirse a la Comunidad"
-        },
-        "image": {
-          "alt": "Ilustración de Gaming"
-        },
-        "new": "¡Nuevo!"
+  "boffmedia": {
+    "hero": {
+      "title": {
+        "first": "Tu aventura gaming",
+        "second": "comienza aquí"
       },
-      "ui": {
-        "disabled": "Desactivado",
-        "selectElement": "Selecciona un elemento",
-        "searchElement": "Buscar elemento",
-        "noElementFound": "No se encontró ningún elemento"
+      "description": "Sumérgete en experiencias de juego inmersivas, compite en torneos épicos y forma parte de una comunidad apasionada de gamers.",
+      "buttons": {
+        "exploreGames": "Explorar Juegos",
+        "joinCommunity": "Unirse a la Comunidad"
       },
-      "featuredGames": {
-        "title": "Destacados",
-        "subtitle": "Descubre las herramientas y juegos más populares de BoffMedia",
-        "viewMore": "Ver más",
-        "status": {
-          "popular": "Popular",
-          "new": "Nuevo",
-          "comingSoon": "Próximamente"
+      "image": {
+        "alt": "Ilustración de Gaming"
+      },
+      "new": "¡Nuevo!"
+    },
+    "ui": {
+      "disabled": "Desactivado",
+      "selectElement": "Selecciona un elemento",
+      "searchElement": "Buscar elemento",
+      "noElementFound": "No se encontró ningún elemento"
+    },
+    "featuredGames": {
+      "title": "Juegos y Herramientas Destacados",
+      "subtitle": "Descubre las herramientas y juegos más populares de BoffMedia",
+      "viewMore": "Ver más",
+      "status": {
+        "popular": "Popular",
+        "new": "Nuevo",
+        "comingSoon": "Próximamente"
+      },
+      "games": {
+        "wingull": {
+          "title": "Pixelmon Wingull 2",
+          "description": "La última aventura Pokémon en Minecraft. Explora, captura y combate."
         },
-        "games": {
-          "wingull": {
-            "title": "Pixelmon Wingull 2",
-            "description": "La última aventura Pokémon en Minecraft. Explora, captura y combate."
-          },
-          "smartrotom": {
-            "title": "SmartRotom",
-            "description": "Accede a tu smartphone del juego desde cualquier lugar. Mantente conectado al mundo Pixelmon."
-          },
-          "tools": {
-            "title": "Herramientas de Juego",
-            "description": "Mejora tu experiencia de juego con nuestra colección de herramientas útiles."
-          },
-          "zomboff": {
-            "title": "Project ZomBOFF",
-            "description": "Sobrevive al apocalipsis zombi con amigos en nuestros servidores personalizados."
-          },
-          "bingo": {
-            "title": "Minecraft Bingo",
-            "description": "Pon a prueba tu conocimiento y velocidad en Minecraft en eventos competitivos."
+        "smartrotom": {
+          "title": "SmartRotom",
+          "description": "Accede a tu smartphone del juego desde cualquier lugar. Mantente conectado al mundo Pixelmon."
+        },
+        "tools": {
+          "title": "Herramientas de Juego",
+          "description": "Mejora tu experiencia de juego con nuestra colección de herramientas útiles."
+        },
+        "zomboff": {
+          "title": "Project ZomBOFF",
+          "description": "Sobrevive al apocalipsis zombi con amigos en nuestros servidores personalizados."
+        },
+        "bingo": {
+          "title": "Minecraft Bingo",
+          "description": "Pon a prueba tu conocimiento y velocidad en Minecraft en eventos competitivos."
+        }
+      }
+    },
+    "eventsSection": {
+      "locale": "es-ES",
+      "loading": "Cargando eventos...",
+      "errorLoading": "Error al cargar eventos",
+      "retry": "Reintentar",
+      "upcomingEvents": "Próximos Eventos",
+      "participateDescription": "Participa en nuestros eventos y compite con la comunidad",
+      "activeEvents": "Eventos Activos",
+      "eventCalendar": "Calendario de Eventos",
+      "dontMissEvents": "No te pierdas ningún evento de la comunidad",
+      "eventType": "Evento",
+      "serverType": "Servidor",
+      "noUpcomingEvents": "No hay eventos próximos programados",
+      "viewAllEvents": "Ver Todos los Eventos",
+      "community": "Comunidad",
+      "playerRanking": "Ranking de Jugadores",
+      "bestPlayers": "Los mejores jugadores de la temporada",
+      "errorLoadingRanking": "Error al cargar el ranking",
+      "playerPlaceholder": "Jugador {id}",
+      "points": "puntos",
+      "noRankingAvailable": "No hay clasificación disponible",
+      "viewFullRanking": "Ver Clasificación Completa"
+    },
+    "communitySection": {
+      "title": "Únete a la Comunidad",
+      "subtitle": "Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus experiencias",
+      "joinNowButton": "Unirse Ahora",
+      "features": {
+        "events": {
+          "title": "Eventos Especiales",
+          "description": "Participa en eventos exclusivos de la comunidad"
+        },
+        "ranking": {
+          "title": "Ranking de Jugadores",
+          "description": "Compite por el primer lugar en nuestro ranking de jugadores"
+        },
+        "achievements": {
+          "title": "Logros",
+          "description": "Desbloquea logros únicos y muestra tus habilidades"
+        }
+      }
+    },
+    "footer": {
+      "tagline": "Tu plataforma de gaming definitiva",
+      "sections": {
+        "platform": {
+          "title": "Plataforma",
+          "links": {
+            "games": "Juegos",
+            "events": "Eventos",
+            "community": "Comunidad"
+          }
+        },
+        "company": {
+          "title": "Compañía",
+          "links": {
+            "about": "Sobre Nosotros",
+            "blog": "Blog"
           }
         }
       },
-      "eventsSection": {
-        "locale": "es-ES",
-        "loading": "Cargando eventos...",
-        "errorLoading": "Error al cargar eventos",
-        "retry": "Reintentar",
-        "upcomingEvents": "Próximos Eventos",
-        "participateDescription": "Participa en nuestros eventos y compite con la comunidad",
-        "activeEvents": "Eventos Activos",
-        "eventCalendar": "Calendario de Eventos",
-        "dontMissEvents": "No te pierdas ningún evento de la comunidad",
-        "eventType": "Evento",
-        "serverType": "Servidor",
-        "noUpcomingEvents": "No hay eventos próximos programados",
-        "viewAllEvents": "Ver Todos los Eventos",
-        "community": "Comunidad",
-        "playerRanking": "Ranking de Jugadores",
-        "bestPlayers": "Los mejores jugadores de la temporada",
-        "errorLoadingRanking": "Error al cargar el ranking",
-        "playerPlaceholder": "Jugador {id}",
-        "points": "puntos",
-        "noRankingAvailable": "No hay clasificación disponible",
-        "viewFullRanking": "Ver Clasificación Completa"
+      "newsletter": {
+        "title": "Suscríbete al Newsletter",
+        "emailPlaceholder": "Email",
+        "joinButton": "Unirse"
       },
-      "communitySection": {
-        "title": "Únete a la Comunidad",
-        "subtitle": "Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus experiencias",
-        "joinNowButton": "Unirse Ahora",
-        "features": {
-          "events": {
-            "title": "Eventos Especiales",
-            "description": "Participa en eventos exclusivos de la comunidad"
-          },
-          "ranking": {
-            "title": "Ranking de Jugadores",
-            "description": "Compite por el primer lugar en nuestro ranking de jugadores"
-          },
-          "achievements": {
-            "title": "Logros",
-            "description": "Desbloquea logros únicos y muestra tus habilidades"
-          }
-        }
-      },
-      "footer": {
-        "tagline": "Tu plataforma de gaming definitiva",
-        "sections": {
-          "platform": {
-            "title": "Plataforma",
-            "links": {
-              "games": "Juegos",
-              "events": "Eventos",
-              "community": "Comunidad"
-            }
-          },
-          "company": {
-            "title": "Compañía",
-            "links": {
-              "about": "Sobre Nosotros",
-              "blog": "Blog"
-            }
-          }
-        },
-        "newsletter": {
-          "title": "Suscríbete al Newsletter",
-          "emailPlaceholder": "Email",
-          "joinButton": "Unirse"
-        },
-        "copyright": "© {year} BoffMedia. Todos los derechos reservados.",
-        "legal": {
-          "privacy": "Privacidad",
-          "terms": "Términos"
-        }
+      "copyright": "© {year} BoffMedia. Todos los derechos reservados.",
+      "legal": {
+        "privacy": "Privacidad",
+        "terms": "Términos"
       }
     }
   }
+}

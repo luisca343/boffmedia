@@ -36,10 +36,9 @@ export function SmartRotomVideo() {
             : "perspective(1200px) rotateY(-8deg) rotateX(3deg) rotateZ(2deg)",
         }}
       >
-        <source src="/img/rotom_demo2.webm" type="video/webm" />
+        <source src="/img/rotom_demo3.webm" type="video/webm" />
       </video>
 
-      {/* Subtle reflection effect - adjusted for rotation */}
       <div
         className="absolute bottom-0 left-1/2 w-3/4 h-8 bg-gradient-to-b from-orange-500/10 to-transparent rounded-b-2xl blur-lg opacity-30"
         style={{

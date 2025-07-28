@@ -29,7 +29,7 @@ export default function FurretToday() {
       <div className="absolute inset-0">
         <PopArtWallpaper />
       </div>
-      <div className="relative z-10 min-h-full text-black font-sans p-2 md:p-8">
+      <div className="relative z-10 min-h-full text-black  p-2 md:p-8">
         <div className="max-w-7xl mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] border-8 border-black flex flex-col">
           <FurretHeader />
           
