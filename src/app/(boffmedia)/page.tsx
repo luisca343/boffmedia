@@ -1,14 +1,18 @@
 
+import { getTranslations } from "next-intl/server";
 import { CommunitySection } from "./_components/sections/CommunitySection";
 import { EventsSection } from "./_components/sections/EventsSection";
-import { FeaturedGames } from "./_components/sections/FeaturedGames";
+import { FeaturedSection } from "./_components/sections/FeaturedSection";
 import { HeroSection } from "./_components/sections/HeroSection";
+import { ToolsSpotlight } from "./_components/sections/ToolsSpotlight";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations("boffmedia");
   return (
     <div className="flex flex-col main">
       <HeroSection />
-      <FeaturedGames />
+      <FeaturedSection />
+      <ToolsSpotlight t={t} />
       <EventsSection />
       <CommunitySection />
       {/*<CtaSection />*/}

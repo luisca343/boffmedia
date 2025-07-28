@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { SmartRotomVideo } from "./SmartRotomVideo";
 
 interface SmartRotomSpotlightProps {
   t: (key: string) => string;
@@ -14,7 +15,7 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
       aria-labelledby="smartrotom-hero-title"
     >
       {/* Left Column: SmartRotom Info Card */}
-      <div className="flex justify-center items-center order-2 md:order-1">
+      <div className="flex justify-center items-center order-1 md:order-1">
         <div className="w-full max-w-2xl space-y-8">
           {/* Logo Section - Centered and Prominent */}
           <div className="flex justify-center mb-6">
@@ -72,45 +73,8 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
         </div>
       </div>
 
-      {/* Right Column: Video Demo */}
-      <div className="flex justify-center items-center relative order-1 md:order-2">
-        <div className="relative group flex items-center justify-center w-full transform perspective-1000">
-          <div
-            className="absolute inset-0 rounded-2xl pointer-events-none opacity-60 group-hover:opacity-80 transition-opacity duration-300 blur-2xl"
-            style={{
-              zIndex: 0,
-              background: "radial-gradient(circle at 45% 40%, rgba(251,146,60,0.35) 40%, transparent 70%)",
-              boxShadow: "0 0 80px 40px rgba(251,146,60,0.18)",
-              transform: "perspective(1200px) rotateY(-8deg) rotateX(3deg) rotateZ(2deg)",
-            }}
-          ></div>
-          
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="relative z-10 rounded-2xl shadow-2xl border border-orange-500/20 group-hover:border-orange-400/40 transition-all duration-700 group-hover:scale-105 hover:shadow-orange-500/40"
-            style={{ 
-              maxWidth: "90%", 
-              height: "auto",
-              filter: "brightness(1.05) contrast(1.1) saturate(1.1)",
-              transformStyle: "preserve-3d",
-              transform: "perspective(1200px) rotateY(-8deg) rotateX(3deg) rotateZ(2deg)"
-            }}
-          >
-            <source src="/img/smartrotom_demo.webm" type="video/webm" />
-            <source src="/img/smartrotom_demo.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-          
-          {/* Subtle reflection effect - adjusted for rotation */}
-          <div className="absolute bottom-0 left-1/2 w-3/4 h-8 bg-gradient-to-b from-orange-500/10 to-transparent rounded-b-2xl blur-lg opacity-30"
-              style={{
-                transform: "translateX(-50%) translateY(100%) perspective(1200px) rotateY(-8deg) rotateX(-3deg) rotateZ(2deg)"
-              }}
-          ></div>
-        </div>
+      <div className="flex justify-center items-center relative order-2 md:order-2">
+        <SmartRotomVideo />
       </div>
     </section>
   );

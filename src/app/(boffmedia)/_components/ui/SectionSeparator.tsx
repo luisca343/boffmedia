@@ -19,7 +19,7 @@ export function SectionSeparator({ variant = 'purple', className = "" }: Section
   };
 
   return (
-    <div className={`relative mb-24 flex items-center justify-center ${className}`}>
+    <div className={`relative flex items-center justify-center ${className}`}>
       <div className="absolute inset-0 flex items-center">
         <div className={`w-full h-px bg-gradient-to-r from-transparent via-${colors[variant]} to-transparent`}></div>
       </div>

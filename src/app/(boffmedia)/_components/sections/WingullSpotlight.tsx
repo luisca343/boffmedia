@@ -14,7 +14,7 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
       aria-labelledby="wingull-hero-title"
     >
       {/* Left Column: Large Wingull Image with Glow */}
-      <div className="flex justify-center items-center relative">
+      <div className="flex justify-center items-center relative order-2 md:order-1">
         <div className="relative group flex items-center justify-center">
           {/* Glow effect behind the image */}
           <div
@@ -38,7 +38,7 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
       </div>
 
       {/* Right Column: Wingull Info Card */}
-      <div className="flex justify-center items-center">
+      <div className="flex justify-center items-center order-1 md:order-2">
         <div className="w-full max-w-2xl space-y-8">
           {/* Logo Section - Centered and Prominent */}
           <div className="flex justify-center mb-6">
@@ -47,8 +47,8 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
               <Image
                 src="/img/wingull2-logo.png"
                 alt="Pixelmon Wingull 2"
-                width={400}
-                height={400}
+                width={450}
+                height={450}
                 className="relative rounded-xl"
               />
             </div>

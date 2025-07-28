@@ -54,7 +54,7 @@ export function EventsSection() {
 
   return (
     <section 
-      className="relative py-32 bg-gradient-to-b from-surface-900 via-blue-950/20 to-purple-950/30 overflow-hidden"
+      className="relative py-8 bg-gradient-to-b from-surface-900 via-purple-950/30 to-purple-950"
     >
       <div className="relative container mx-auto px-4 z-10">
         <div className="text-center mb-16">
