@@ -62,6 +62,9 @@ import { PokemonShowdownService } from '@api/smartrotom/pokemon/services/pokemon
 import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-manifest.service';
 import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
 import { TcgModule } from '@api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module';
+import { ChatModule } from '@api/deprecated/chat/chat.module';
+import { ChatController } from '@api/deprecated/chat/chat.controller';
+import { ChatService } from '@api/deprecated/chat/chat.service';
 
 @Module({
   imports: [
@@ -105,10 +108,11 @@ import { TcgModule } from '@api/boffmedia/herramientas/pokemon/tcgpocket/tcg.mod
     WingullModule,
     SmartRotomMineModule,
     PokemonModule,
+    ChatModule
   ],
-  controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
+  controllers: [ChatController, AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
-     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
+     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService, ChatService,
     {
     provide: ConfigService,
     useClass: ConfigService,

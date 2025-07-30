@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
@@ -8,7 +8,7 @@ import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';
 import { PokemonFacadeService } from '@api/smartrotom/pokemon/pokemon.facade.service';
 
-let openai: OpenAI;
+let gemini: GoogleGenerativeAI;
 export type FicusMessage = {
   sender: string;
   parts: {
@@ -23,9 +23,10 @@ export class ChatService {
     private pokemonService: PokemonFacadeService,
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>
   ) {}
+
   async start() {
-    if (!openai) {
-      openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    if (!gemini) {
+      gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     }
   }
 
@@ -50,7 +51,6 @@ export class ChatService {
       .orderBy(desc(ficusMessages.id))
       .limit(20)
       .execute();
-    console.log(res);
 
     let mensajes = [];
     res.map((msg: any) => {
@@ -73,177 +73,123 @@ export class ChatService {
   }
 
   async send(uuid: string, mensaje: FicusMessage) {
-    if (mensaje.sender === 'user') this.sendMsg(uuid, mensaje);
-    this.start();
+    if (mensaje.sender === 'user') await this.sendMsg(uuid, mensaje);
+    await this.start();
 
-    const texto = mensaje.parts[0].content;
-    console.log('Enviando mensaje a OpenAI');
-    console.log(mensaje);
-    console.log(texto);
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Eres Profesor Ficus, un asistente creado por el científico del mismo nombre para ayudar a los entrenadores Pokémon de la región de Teras. Si no tienes la información necesaria, di que no te han programado para eso.',
-        }, // Tienes errores de programación graves, a veces te volverás loco y contestarás cosas aleatorias.
-        { role: 'user', content: texto },
-      ],
-      model: 'gpt-4o-mini',
-      /*functions: [
-                {
-                    name: "getPokemon",
-                    description: "Lista de Pokémon de Teras.",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            "cantidad": {
-                                type:"number",
-                                description: "Cantidad de Pokémon a listar."
-                            }
-                        }
-                    }
-                },
-                {
-                    name: "countPokemon",
-                    description: "Cantidad de Pokémon de la región de Teras.",
-                },
-                {
-                    name: "getDatos",
-                    description: "Datos de un Pokémon.",
-                    parameters: {
-                        type: "object",
-                        properties: {
-                            "pokemon": {
-                                type:"string",
-                                description: "Nombre del Pokémon."
-                            },
-                            "dato": {
-                                type:"string",
-                                description: "Dato a obtener. Puede ser 'tipo', 'habitat', 'stats', 'evoluciones', 'movimientos', 'habilidades'." 
-                            },
-                            "tipoMovimientos": {
-                                type:"array",
-                                items: {
-                                    type: "string",
-                                    enum: ["level", "tutor", "egg", "all", "tm", "tr"]
-                                },
-                                description: "Tipo de movimientos a obtener."
-                            }
-                        }
-                    }
-                }
-            ],
-            function_call: "none"*/
-    });
+    const userText = mensaje.parts
+      .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
+      .map(part => part.content)
+      .join('\n');
+      
+    // 1. Define available functions for Gemini (JSON format enforced)
+    const functionDescriptions = `
+      === CONTEXT ===
+        You are Professor Ficus, a Pokémon expert assistant. You help users get information about Pokémon.
 
-    console.log(
-      `OpenAI credits used in prompt: ${completion.usage.prompt_tokens}`,
-    );
-    console.log(
-      `OpenAI credits used in response: ${completion.usage.completion_tokens}`,
-    );
+        IMPORTANT: When a user asks about a specific Pokémon, you MUST use the exact Pokémon name they mentioned.
 
-    const completionResponse = completion.choices[0].message;
-    if (!completionResponse.content) {
-      const functionCallName = completionResponse.function_call.name;
-      console.log(functionCallName);
-      console.log(completionResponse.function_call.arguments);
+        Available functions (respond ONLY with valid JSON array, no other text):
 
-      if (functionCallName === 'getPokemon') {
-        let pkm = this.pokemonService.getPokemonNames();
-        let args = JSON.parse(
-          completion.choices[0].message.function_call.arguments,
-        ) as { cantidad?: number; tipoLista?: string };
-        console.log(args);
+        - sendStats(pkmName): Get base stats for a Pokémon
+        - sendTipo(pkmName): Get the type(s) of a Pokémon  
+        - sendMovimientos(pkmName, tipoMovimientos): Get moves for a Pokémon
+        - sendHabitat(pkmName): Get habitat information for a Pokémon
 
-        let pokemonList = [];
-        let cantidad = args.cantidad || pkm.length;
+        CRITICAL: Always use the EXACT Pokémon name the user mentioned. If they say "Charizard", use "charizard" (lowercase). If they say "Pikachu", use "pikachu".
 
-        let tipoLista = args.tipoLista || 'NUMERADA';
-        // Generate "cantidad" random numbers between 0 and the length of the pokemon list
-        let randomNumbers = [];
-        for (let i = 0; i < cantidad; i++) {
-          let random = Math.floor(Math.random() * pkm.length);
-          if (randomNumbers.includes(random)) {
-            i--;
-          } else {
-            randomNumbers.push(random);
+        If the user's message doesn't require a function call, respond with normal text (not JSON).
+      === END CONTEXT ===
+
+      Answer this based in your knowledge: ${userText}`;
+
+    const geminiMessages = [
+      {
+        role: 'user',
+        parts: [{ text: `${functionDescriptions}` }]
+      }
+    ];
+
+    // 3. Call Gemini
+    const model = gemini.getGenerativeModel({ model: 'gemma-3-27b-it' });
+    const result = await model.generateContent({ contents: geminiMessages });
+
+    const completionResponse =
+      typeof result?.response?.text === 'function'
+        ? await result.response.text()
+        : 'No Gemini response.';
+
+    console.log('Gemini response:')
+    console.log(completionResponse);
+
+    // 4. Parse JSON function call(s)
+    try {
+      // Clean up response: remove leading/trailing whitespace and newlines
+      const cleanedResponse = completionResponse
+        .replace(/```[a-z]*\s*/gi, '') // Remove ```json, ```typescript, etc.
+        .replace(/```/g, '')           // Remove any remaining ```
+        .replace(/^[\s\n]+|[\s\n]+$/g, '') // Trim whitespace/newlines
+        .replace(/,\s*\n*]/g, ']');    
+
+      console.log('Cleaned response:', cleanedResponse);
+
+      const functionCalls = JSON.parse(cleanedResponse);
+      console.log('Parsed function calls:');
+      console.log(functionCalls);
+      if (Array.isArray(functionCalls)) {
+        for (const call of functionCalls) {
+          console.log('Processing function call:', call);
+          if (call.name === 'sendStats') {
+            console.log('Calling sendStats with:', call.parameters.pkmName);
+            return await this.sendStats(uuid, call.parameters.pkmName);
+          }
+          if (call.name === 'sendTipo') {
+            return await this.sendTipo(uuid, call.parameters.pkmName);
+          }
+          if (call.name === 'sendMovimientos') {
+            return await this.sendMovimientos(uuid, { pokemon: call.parameters.pkmName, tipoMovimientos: call.parameters.tipoMovimientos });
+          }
+          if (call.name === 'sendHabitat') {
+            return await this.sendHabitat(uuid, call.parameters.pkmName);
           }
         }
-
-        // Create a list of pokemon names from the random numbers
-
-        randomNumbers.forEach((random, index) => {
-          let separador = tipoLista === 'NUMERADA' ? `${index + 1}.` : '-';
-          pokemonList.push(`${separador} ${pkm[random]}`);
-        });
-
-        /*
-                const completion2 = await openai.chat.completions.create({
-                    messages: [
-                        { role: "system", content: "Responde al entrenador de forma humana con esta lista de Pokémon que habitan la región. Usa solo estos datos y nada más." },
-                        { role: "system", content: pokemonList.join(", ")},
-                        { role: "user", content: mensaje },
-                    ],
-                    model: "gpt-3.5-turbo-0125"
-                  });*/
-
-        const response =
-          'Claro, aquí tienes la lista de Pokémon:\n' +
-          pokemonList.join('\n') +
-          '\n¿Hay algo más en lo que pueda ayudarte?';
-
-        return this.sendMsg(uuid, {
-          sender: 'bot',
-          parts: [{ type: 'text', content: response }],
-        });
-      } else if (functionCallName === 'countPokemon') {
-        let pkm = this.pokemonService.countPokemon();
-        return this.sendMsg(uuid, {
-          sender: 'bot',
-          parts: [
-            {
-              type: 'text',
-              content: `Hasta hoy se conocen ${pkm} especies Pokémon en la región de Teras.`,
-            },
-            {
-              type: 'text',
-              content: '¿Hay algo más en lo que pueda ayudarte?',
-            },
-          ],
-        });
-      } else if (functionCallName === 'getDatos') {
-        let args = JSON.parse(
-          completion.choices[0].message.function_call.arguments,
-        ) as { pokemon: string; dato: string };
-        let pkmName = args.pokemon;
-        let dato = args.dato;
-        if (dato === 'stats') return this.sendStats(uuid, pkmName);
-        if (dato === 'tipo') return this.sendTipo(uuid, pkmName);
-        if (dato === 'movimientos') return this.sendMovimientos(uuid, args);
-        if (dato === 'habitat') return this.sendHabitat(uuid, pkmName);
       }
-
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          { type: 'text', content: 'No puedo contestar por culpa de SrKamina' },
-        ],
-      });
+    } catch (e) {
+      // If not valid JSON, fallback to regex (optional)
+      const match = completionResponse.match(/sendStats\("([^"]+)"\)/);
+      if (match) {
+        return await this.sendStats(uuid, match[1]);
+      }
+      const matchTipo = completionResponse.match(/sendTipo\("([^"]+)"\)/);
+      if (matchTipo) {
+        return await this.sendTipo(uuid, matchTipo[1]);
+      }
+      const matchMov = completionResponse.match(/sendMovimientos\("([^"]+)",\s*\[([^\]]*)\]\)/);
+      if (matchMov) {
+        const tipos = matchMov[2].split(',').map(s => s.replace(/"/g, '').trim());
+        return await this.sendMovimientos(uuid, { pokemon: matchMov[1], tipoMovimientos: tipos });
+      }
+      const matchHabitat = completionResponse.match(/sendHabitat\("([^"]+)"\)/);
+      if (matchHabitat) {
+        return await this.sendHabitat(uuid, matchHabitat[1]);
+      }
     }
-
-    return this.sendMsg(uuid, {
+    // 5. Normal response if no function
+    return await this.sendMsg(uuid, {
       sender: 'bot',
-      parts: [{ type: 'text', content: completionResponse.content }],
+      parts: [{ type: 'text', content: completionResponse }],
     });
   }
 
   sendStats(uuid, pkmName) {
-    let lista = this.pokemonService.getPokemonByName(pkmName) as any;
+    console.log('Fetching stats for Pokémon:', pkmName);
+    let lista = this.pokemonService.searchPokemonByName(pkmName) as any;
+    console.log('Pokemon list:', lista);
     let pokemon = lista[0].item;
     let stats = pokemon.forms[0].battleStats;
+
+    console.log('Stats for', pkmName, ':', stats);
+
     if (stats) {
       return this.sendMsg(uuid, {
         sender: 'bot',
@@ -260,6 +206,7 @@ export class ChatService {
         ],
       });
     } else {
+      console.log('No stats found for', pkmName);
       return this.sendMsg(uuid, {
         sender: 'bot',
         parts: [
