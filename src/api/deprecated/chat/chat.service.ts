@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI, Type } from '@google/genai';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { MySql2Database } from 'drizzle-orm/mysql2';
@@ -8,7 +8,7 @@ import { ficusMessages } from '@/_db/schema/FicusAI';
 import { eq, desc, asc } from 'drizzle-orm';
 import { PokemonFacadeService } from '@api/smartrotom/pokemon/pokemon.facade.service';
 
-let gemini: GoogleGenerativeAI;
+let gemini: GoogleGenAI;
 export type FicusMessage = {
   sender: string;
   parts: {
@@ -26,7 +26,7 @@ export class ChatService {
 
   async start() {
     if (!gemini) {
-      gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      gemini = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     }
   }
 
@@ -76,255 +76,307 @@ export class ChatService {
     if (mensaje.sender === 'user') await this.sendMsg(uuid, mensaje);
     await this.start();
 
-
     const userText = mensaje.parts
       .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
       .map(part => part.content)
       .join('\n');
-      
-    // 1. Define available functions for Gemini (JSON format enforced)
-    const functionDescriptions = `
-      === CONTEXT ===
-        You are Professor Ficus, a Pokémon expert assistant. You help users get information about Pokémon.
 
-        IMPORTANT: When a user asks about a specific Pokémon, you MUST use the exact Pokémon name they mentioned.
-
-        Available functions (respond ONLY with valid JSON array, no other text):
-
-        - sendStats(pkmName): Get base stats for a Pokémon
-        - sendTipo(pkmName): Get the type(s) of a Pokémon  
-        - sendMovimientos(pkmName, tipoMovimientos): Get moves for a Pokémon
-        - sendHabitat(pkmName): Get habitat information for a Pokémon
-
-        CRITICAL: Always use the EXACT Pokémon name the user mentioned. If they say "Charizard", use "charizard" (lowercase). If they say "Pikachu", use "pikachu".
-
-        If the user's message doesn't require a function call, respond with normal text (not JSON).
-      === END CONTEXT ===
-
-      Answer this based in your knowledge: ${userText}`;
-
-    const geminiMessages = [
+    const functionDeclarations = [
       {
-        role: 'user',
-        parts: [{ text: `${functionDescriptions}` }]
-      }
+        name: 'countPokemon',
+        description: 'Counts the total number of Pokémon in the Teras region. This function should ONLY be called when the user asks for "how many Pokémon", "number of Pokémon", or "total Pokémon".',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {},
+        },
+      },
+      {
+        name: 'getPokemonStats',
+        description: 'Returns the base stats of a Pokémon given its name. Only call this when the user asks for stats of a specific Pokémon.',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            pokemon: { type: Type.STRING, description: 'Name of the Pokémon' }
+          },
+          required: ['pokemon'],
+        },
+      },
+      {
+        name: 'getPokemonType',
+        description: 'Returns the type(s) of a Pokémon given its name. Only call this when the user asks for the type of a specific Pokémon.',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            pokemon: { type: Type.STRING, description: 'Name of the Pokémon' }
+          },
+          required: ['pokemon'],
+        },
+      },
+      {
+        name: 'getPokemonMoves',
+        description: 'Returns the moves of a Pokémon given its name and optionally filtered by move type. Only call this when the user asks for the moves of a specific Pokémon.',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            pokemon: { type: Type.STRING, description: 'Name of the Pokémon' },
+            tipoMovimientos: { type: Type.ARRAY, items: { type: Type.STRING }, description: 'Types of moves to filter (level, tutor, egg, tm, tr, hm)' }
+          },
+          required: ['pokemon'],
+        },
+      },
+      {
+        name: 'getPokemonHabitat',
+        description: 'Returns the habitat information of a Pokémon given its name. Only call this when the user asks for the habitat of a specific Pokémon.',
+        parameters: {
+          type: Type.OBJECT,
+          properties: {
+            pokemon: { type: Type.STRING, description: 'Name of the Pokémon' }
+          },
+          required: ['pokemon'],
+        },
+      },
     ];
 
-    // 3. Call Gemini
-    const model = gemini.getGenerativeModel({ model: 'gemma-3-27b-it' });
-    const result = await model.generateContent({ contents: geminiMessages });
+    const response = await gemini.models.generateContent({
+      model: 'gemini-2.5-flash-lite',
+      contents: userText,
+      config: {
+        tools: [{ functionDeclarations }]
+      }
+    });
 
-    const completionResponse =
-      typeof result?.response?.text === 'function'
-        ? await result.response.text()
-        : 'No Gemini response.';
+    console.log('================= Gemini Response ================');
+    console.log(response);
 
-    console.log('Gemini response:')
-    console.log(completionResponse);
+    let botMessages: FicusMessage[] = [];
 
-    // 4. Parse JSON function call(s)
-    try {
-      // Clean up response: remove leading/trailing whitespace and newlines
-      const cleanedResponse = completionResponse
-        .replace(/```[a-z]*\s*/gi, '') // Remove ```json, ```typescript, etc.
-        .replace(/```/g, '')           // Remove any remaining ```
-        .replace(/^[\s\n]+|[\s\n]+$/g, '') // Trim whitespace/newlines
-        .replace(/,\s*\n*]/g, ']');    
+    if (response.functionCalls && response.functionCalls.length > 0) {
+      console.log('Function calls found in Gemini response:', response.functionCalls);
+      console.log('Response text:', response.text);
 
-      console.log('Cleaned response:', cleanedResponse);
+      for (const call of response.functionCalls) {
+        let resultMessage: FicusMessage | null = null;
+        console.log(`Attempting to call: ${call.name} with args:`, call.args);
 
-      const functionCalls = JSON.parse(cleanedResponse);
-      console.log('Parsed function calls:');
-      console.log(functionCalls);
-      if (Array.isArray(functionCalls)) {
-        for (const call of functionCalls) {
-          console.log('Processing function call:', call);
-          if (call.name === 'sendStats') {
-            console.log('Calling sendStats with:', call.parameters.pkmName);
-            return await this.sendStats(uuid, call.parameters.pkmName);
-          }
-          if (call.name === 'sendTipo') {
-            return await this.sendTipo(uuid, call.parameters.pkmName);
-          }
-          if (call.name === 'sendMovimientos') {
-            return await this.sendMovimientos(uuid, { pokemon: call.parameters.pkmName, tipoMovimientos: call.parameters.tipoMovimientos });
-          }
-          if (call.name === 'sendHabitat') {
-            return await this.sendHabitat(uuid, call.parameters.pkmName);
-          }
+        switch (call.name) {
+          case 'getPokemonStats':
+            if (typeof call.args.pokemon === 'string') {
+              resultMessage = await this.sendStats(uuid, call.args.pokemon);
+            } else {
+              console.error('Invalid pokemon argument type for getPokemonStats:', call.args.pokemon);
+              resultMessage = { sender: 'bot', parts: [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de estadísticas.' }] };
+            }
+            break;
+          case 'countPokemon':
+            resultMessage = await this.countPokemon(uuid);
+            break;
+          case 'getPokemonType':
+            if (typeof call.args.pokemon === 'string') {
+              resultMessage = await this.sendTipo(uuid, call.args.pokemon);
+            } else {
+              console.error('Invalid pokemon argument type for getPokemonType:', call.args.pokemon);
+              resultMessage = { sender: 'bot', parts: [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de tipo.' }] };
+            }
+            break;
+          case 'getPokemonMoves':
+            if (typeof call.args.pokemon === 'string') {
+              const tipoMovimientos = Array.isArray(call.args.tipoMovimientos)
+                ? call.args.tipoMovimientos
+                : [];
+              resultMessage = await this.sendMovimientos(uuid, {
+                pokemon: call.args.pokemon,
+                tipoMovimientos: tipoMovimientos
+              });
+            } else {
+              console.error('Invalid pokemon argument type for getPokemonMoves:', call.args.pokemon);
+              resultMessage = { sender: 'bot', parts: [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de movimientos.' }] };
+            }
+            break;
+          case 'getPokemonHabitat':
+            if (typeof call.args.pokemon === 'string') {
+              resultMessage = await this.sendHabitat(uuid, call.args.pokemon);
+            } else {
+              console.error('Invalid pokemon argument type for getPokemonHabitat:', call.args.pokemon);
+              resultMessage = { sender: 'bot', parts: [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de hábitat.' }] };
+            }
+            break;
+          default:
+            console.log(`Unhandled function call: ${call.name}`);
+            resultMessage = {
+              sender: 'bot',
+              parts: [{ type: 'text', content: 'Lo siento, no puedo procesar esa solicitud en este momento.' }],
+            };
+            break;
+        }
+        if (resultMessage) {
+          botMessages.push(resultMessage);
         }
       }
-    } catch (e) {
-      // If not valid JSON, fallback to regex (optional)
-      const match = completionResponse.match(/sendStats\("([^"]+)"\)/);
-      if (match) {
-        return await this.sendStats(uuid, match[1]);
+
+      const combinedParts: { type: string; content: any }[] = [];
+      botMessages.forEach(msg => {
+          msg.parts.forEach(part => {
+              combinedParts.push(part);
+          });
+      });
+
+      if (combinedParts.length > 0) {
+          return {
+              sender: 'bot',
+              parts: combinedParts
+          };
+      } else {
+          return await this.sendMsg(uuid, {
+              sender: 'bot',
+              parts: [{ type: 'text', content: response.text || 'No se pudo obtener información relevante.' }],
+          });
       }
-      const matchTipo = completionResponse.match(/sendTipo\("([^"]+)"\)/);
-      if (matchTipo) {
-        return await this.sendTipo(uuid, matchTipo[1]);
-      }
-      const matchMov = completionResponse.match(/sendMovimientos\("([^"]+)",\s*\[([^\]]*)\]\)/);
-      if (matchMov) {
-        const tipos = matchMov[2].split(',').map(s => s.replace(/"/g, '').trim());
-        return await this.sendMovimientos(uuid, { pokemon: matchMov[1], tipoMovimientos: tipos });
-      }
-      const matchHabitat = completionResponse.match(/sendHabitat\("([^"]+)"\)/);
-      if (matchHabitat) {
-        return await this.sendHabitat(uuid, matchHabitat[1]);
-      }
+
+    } else {
+      console.log('No function calls found in Gemini response. Sending raw text response.');
+      console.log('Response text:', response.text);
+      return await this.sendMsg(uuid, {
+        sender: 'bot',
+        parts: [{ type: 'text', content: response.text || 'No Gemini response.' }],
+      });
     }
-    // 5. Normal response if no function
-    return await this.sendMsg(uuid, {
+  }
+
+  countPokemon(uuid: string) {
+    const count = this.pokemonService.getAllPokemon().length;
+    return this.sendMsg(uuid, {
       sender: 'bot',
-      parts: [{ type: 'text', content: completionResponse }],
+      parts: [
+        {
+          type: 'text',
+          content: `Hay ${count} Pokémon en la región de Teras.`,
+        },
+        {
+          type: 'text',
+          content: '\n¿Hay algo más en lo que pueda ayudarte?',
+        },
+      ],
     });
   }
 
-  sendStats(uuid, pkmName) {
-    console.log('Fetching stats for Pokémon:', pkmName);
-    let lista = this.pokemonService.searchPokemonByName(pkmName) as any;
-    console.log('Pokemon list:', lista);
-    let pokemon = lista[0].item;
-    let stats = pokemon.forms[0].battleStats;
+  sendStats(uuid: string, pkmName: string) {
+    console.log(`[sendStats] Received pkmName: "${pkmName}"`);
+    let lista = this.pokemonService.searchPokemonByName(pkmName);
+    console.log(`[sendStats] Result from pokemonService.searchPokemonByName("${pkmName}"):`, lista);
 
-    console.log('Stats for', pkmName, ':', stats);
-
-    if (stats) {
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          {
-            type: 'text',
-            content: `Aquí tienes las estadísticas base de ${firstLetterToUpperCase(pokemon.name)}:`,
-          },
-          { type: 'pokemonStats', content: stats },
-          {
-            type: 'text',
-            content: '\n¿Hay algo más en lo que pueda ayudarte?',
-          },
-        ],
-      });
+    let responseParts = [];
+    if (!lista || lista.length === 0 || !lista[0].item) {
+        console.log(`[sendStats] Pokémon "${pkmName}" not found or invalid data structure.`);
+        responseParts.push({ type: 'text', content: `Lo siento, no encontré información de estadísticas para "${firstLetterToUpperCase(pkmName)}". ¿Podrías revisar el nombre?` });
     } else {
-      console.log('No stats found for', pkmName);
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          { type: 'text', content: 'No tengo información sobre ese Pokémon.' },
-        ],
-      });
+        let pokemon = lista[0].item;
+        let stats = pokemon.forms[0].battleStats;
+        console.log(`[sendStats] Stats for ${pkmName}:`, stats);
+        if (stats) {
+            responseParts.push({ type: 'text', content: `Aquí tienes las estadísticas base de ${firstLetterToUpperCase(pokemon.name)}:` });
+            responseParts.push({ type: 'pokemonStats', content: stats });
+        } else {
+            responseParts.push({ type: 'text', content: `No tengo información de estadísticas para ${firstLetterToUpperCase(pkmName)}.` });
+        }
     }
+    responseParts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
+    return this.sendMsg(uuid, {
+        sender: 'bot',
+        parts: responseParts,
+    });
   }
 
-  sendTipo(uuid, pkmName) {
-    let lista = this.pokemonService.getPokemonByName(pkmName) as any;
-    let pokemon = lista[0].item;
-    let tipos = pokemon.forms[0].types;
-    if (tipos) {
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          {
-            type: 'text',
-            content: `${firstLetterToUpperCase(pokemon.name)} es un Pokémon de tipo ${tipos.join(' / ')}.`,
-          },
-          {
-            type: 'text',
-            content: '\n¿Hay algo más en lo que pueda ayudarte?',
-          },
-        ],
-      });
+  sendTipo(uuid: string, pkmName: string) {
+    console.log(`[sendTipo] Received pkmName: "${pkmName}"`);
+    let lista = this.pokemonService.searchPokemonByName(pkmName);
+    console.log(`[sendTipo] Result from pokemonService.getPokemonByName("${pkmName}"):`, lista);
+
+    let responseParts = [];
+    if (!lista || lista.length === 0 || !lista[0].item) {
+        console.log(`[sendTipo] Pokémon "${pkmName}" not found or invalid data structure.`);
+        responseParts.push({ type: 'text', content: `Lo siento, no encontré información de tipo para "${firstLetterToUpperCase(pkmName)}". ¿Podrías revisar el nombre?` });
     } else {
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          { type: 'text', content: 'No tengo información sobre ese Pokémon.' },
-        ],
-      });
+        let pokemon = lista[0].item;
+        let tipos = pokemon.forms[0].types;
+        if (tipos && tipos.length > 0) {
+            responseParts.push({ type: 'text', content: `${firstLetterToUpperCase(pokemon.name)} es un Pokémon de tipo ${tipos.join(' / ')}.` });
+        } else {
+            responseParts.push({ type: 'text', content: `No tengo información de tipo para ${firstLetterToUpperCase(pkmName)}.` });
+        }
     }
+    responseParts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
+    return this.sendMsg(uuid, {
+        sender: 'bot',
+        parts: responseParts,
+    });
   }
 
-  sendMovimientos(uuid, args) {
+  sendMovimientos(uuid: string, args: { pokemon: string; tipoMovimientos: string[] }) {
     let pkmName = args.pokemon;
-    let tipoMovimientos = args.tipoMovimientos as string[];
+    let tipoMovimientos = args.tipoMovimientos;
 
-    let lista = this.pokemonService.getPokemonByName(pkmName) as any;
-    let pokemon = lista[0].item;
-    let movimientos = pokemon.forms[0].moves;
+    console.log(`[sendMovimientos] Received pkmName: "${pkmName}", tipoMovimientos:`, tipoMovimientos);
+    let lista = this.pokemonService.searchPokemonByName(pkmName);
+    console.log(`[sendMovimientos] Result from pokemonService.getPokemonByName("${pkmName}"):`, lista);
 
-    const keyMapping = {
-      levelUpMoves: 'level',
-      tutorMoves: 'tutor',
-      eggMoves: 'egg',
-      tmMoves8: 'tm',
-      tmMoves7: 'tm',
-      tmMoves6: 'tm',
-      tmMoves5: 'tm',
-      tmMoves4: 'tm',
-      tmMoves3: 'tm',
-      tmMoves2: 'tm',
-      tmMoves1: 'tm',
-      trMoves: 'tr',
-      hmMoves: 'hm',
-    };
-
-    Object.keys(movimientos).forEach((key) => {
-      if (!tipoMovimientos.includes(keyMapping[key])) {
-        delete movimientos[key];
-      }
-    });
-
-    if (movimientos) {
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          {
-            type: 'text',
-            content: `Aquí tienes la lista de movimientos de ${firstLetterToUpperCase(pokemon.name)}:`,
-          },
-          { type: 'pokemonMoves', content: movimientos },
-          {
-            type: 'text',
-            content: '\n¿Hay algo más en lo que pueda ayudarte?',
-          },
-        ],
-      });
+    let responseParts = [];
+    if (!lista || lista.length === 0 || !lista[0].item) {
+        console.log(`[sendMovimientos] Pokémon "${pkmName}" not found or invalid data structure.`);
+        responseParts.push({ type: 'text', content: `Lo siento, no encontré información de movimientos para "${firstLetterToUpperCase(pkmName)}". ¿Podrías revisar el nombre?` });
     } else {
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          { type: 'text', content: 'No tengo información sobre ese Pokémon.' },
-        ],
-      });
+        let pokemon = lista[0].item;
+        let movimientos = pokemon.forms[0].moves;
+
+        const keyMapping = {
+          levelUpMoves: 'level',
+          tutorMoves: 'tutor',
+          eggMoves: 'egg',
+          tmMoves8: 'tm',
+          tmMoves7: 'tm',
+          tmMoves6: 'tm',
+          tmMoves5: 'tm',
+          tmMoves4: 'tm',
+          tmMoves3: 'tm',
+          tmMoves2: 'tm',
+          tmMoves1: 'tm',
+          trMoves: 'tr',
+          hmMoves: 'hm',
+        };
+
+        let filteredMovimientos: any = {};
+        if (tipoMovimientos && tipoMovimientos.length > 0) {
+            Object.keys(movimientos).forEach((key) => {
+                if (keyMapping[key] && tipoMovimientos.includes(keyMapping[key])) {
+                    filteredMovimientos[key] = movimientos[key];
+                }
+            });
+        } else {
+            filteredMovimientos = movimientos;
+        }
+
+        if (Object.keys(filteredMovimientos).length > 0) {
+            responseParts.push({ type: 'text', content: `Aquí tienes la lista de movimientos de ${firstLetterToUpperCase(pokemon.name)}:` });
+            responseParts.push({ type: 'pokemonMoves', content: filteredMovimientos });
+        } else {
+            responseParts.push({ type: 'text', content: `No tengo información de movimientos (o no se encontraron para el tipo especificado) para ${firstLetterToUpperCase(pkmName)}.` });
+        }
     }
+    responseParts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
+    return this.sendMsg(uuid, {
+        sender: 'bot',
+        parts: responseParts,
+    });
   }
 
-  async sendHabitat(uuid, pkmName) {
-    /*
-    let { biomes, name } =
-      await this.pokemonService.getBiomesByPokemonName(pkmName);
-    if (biomes && biomes.length > 0) {
-      return this.sendMsg(uuid, {
+  async sendHabitat(uuid: string, pkmName: string) {
+    console.log(`[sendHabitat] Received pkmName: "${pkmName}"`);
+    // Placeholder response since the actual implementation is commented out.
+    let responseParts = [];
+    responseParts.push({ type: 'text', content: `Actualmente no tengo información sobre el hábitat de ${firstLetterToUpperCase(pkmName)}. Mis funciones relacionadas con el hábitat están en desarrollo.` });
+    responseParts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
+    return this.sendMsg(uuid, {
         sender: 'bot',
-        parts: [
-          {
-            type: 'text',
-            content: `Los Pokémon de la especie ${name} habitan en los siguientes biomas:`,
-          },
-          { type: 'biomeList', content: biomes },
-          {
-            type: 'text',
-            content: '\n¿Hay algo más en lo que pueda ayudarte?',
-          },
-        ],
-      });
-    } else {
-      return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: [
-          { type: 'text', content: 'No tengo información sobre ese Pokémon.' },
-        ],
-      });
-    }*/
+        parts: responseParts,
+    });
   }
 }

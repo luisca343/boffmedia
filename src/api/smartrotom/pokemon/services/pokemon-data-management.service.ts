@@ -35,10 +35,10 @@ export class PokemonDataManagementService {
     }
   }
 
-  private initializeFuse(): void {
+  private initializeFuse(threshold = 0.3): void {
     const options: IFuseOptions<Pokemon> = {
       keys: ['name', 'dex'],
-      threshold: 0.3,
+      threshold,
     };
     this.fusePokemon = new Fuse(this.pokemonDataService.getAllSpecies(), options);
   }
@@ -59,7 +59,7 @@ export class PokemonDataManagementService {
 
   searchPokemonByName(name: string, amount: number = 16): FuseResult<Pokemon>[] {
     if (!this.fusePokemon) {
-      this.initializeFuse();
+      this.initializeFuse(0.5);
     }
     return this.fusePokemon.search(name, { limit: amount });
   }
