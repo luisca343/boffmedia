@@ -7,6 +7,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { ChartBarIcon, InformationCircleIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getStatColor, getTotalStatColor, getContrastingTextColor, TOTAL_STAT_COLOR_RANGES } from "@/lib/pokemonColors"
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number}) {
   const t = useTranslations("pokedex")
@@ -77,35 +78,16 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
     return { min, max }
   }
 
-  function getStatColor(stat: number): string {
-    // Color ranges for different stat values
-    if (stat < 50) return '#ff4d4d' // Very low - deep red
-    if (stat < 75) return '#ff7c4d' // Low - orange-red
-    if (stat < 90) return '#ffb14d' // Below average - orange
-    if (stat < 110) return '#ffea4d' // Average - yellow
-    if (stat < 130) return '#b1ff4d' // Above average - lime green
-    if (stat < 150) return '#4dffa6' // High - teal
-    return '#4d8aff' // Very high - blue
-  }
-  
-  function getTotalColor(total: number): string {
-    // Color range for total stats
-    if (total < 300) return '#ff4d4d' // Very low
-    if (total < 400) return '#ff7c4d' // Low
-    if (total < 500) return '#ffb14d' // Below average
-    if (total < 540) return '#ffea4d' // Average
-    if (total < 580) return '#b1ff4d' // Above average
-    if (total < 620) return '#4dffa6' // High
-    return '#4d8aff' // Very high
-  }
-
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-col md:flex-row justify-between gap-4 mb-3">
         <div className="flex items-center">
           <div 
             className="inline-flex items-center px-3 py-2 rounded-md text-xl font-medium"
-            style={{ backgroundColor: getTotalColor(statTotal), color: '#000' }}
+            style={{ 
+              backgroundColor: getTotalStatColor(statTotal), 
+              color: getContrastingTextColor(getTotalStatColor(statTotal))
+            }}
           >
             <span className="mr-2">Total:</span>
             <span className="font-bold">{statTotal}</span>
@@ -117,12 +99,11 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
             </HoverCardTrigger>
             <HoverCardContent className="bg-surface-800 text-surface-100 p-3 border border-surface-600">
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Menos de 400:</span> Base muy baja</p>
-                <p><span className="font-medium">400-499:</span> Base baja</p>
-                <p><span className="font-medium">500-539:</span> Base media</p>
-                <p><span className="font-medium">540-579:</span> Base alta</p>
-                <p><span className="font-medium">580-619:</span> Base muy alta</p>
-                <p><span className="font-medium">620+:</span> Base legendaria</p>
+                {TOTAL_STAT_COLOR_RANGES.map((range, index) => (
+                  <p key={index}>
+                    <span className="font-medium">{range.min}-{range.max === 999 ? '620+' : range.max}:</span> {range.description}
+                  </p>
+                ))}
               </div>
             </HoverCardContent>
           </HoverCard>
@@ -300,7 +281,10 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
                         backgroundColor: getStatColor(statValue)
                       }}
                     >
-                      <span className="text-surface-950 text-lg font-bold drop-shadow-sm">
+                      <span 
+                        className="text-lg font-bold drop-shadow-sm"
+                        style={{ color: getContrastingTextColor(getStatColor(statValue)) }}
+                      >
                         {statValue}
                       </span>
                     </div>

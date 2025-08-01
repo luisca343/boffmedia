@@ -2,17 +2,12 @@ import { InternalLink } from "@/components/nav/Link"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService";
 import { getTranslations } from "next-intl/server";
 import { MapPinIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import { getTranslatedBiomeName } from "@/utils/pokemonTranslations";
 
 export default async function Biomas(){
     const t = await getTranslations("pokedex");
     const biomesResponse = await PokemonService.getBiomes();
     const biomes = biomesResponse.data as { name: string; count: number }[];
-    
-    // Format the biome name for display
-    const formatBiomeTitle = (rawBiome: string) => {
-        return t(rawBiome.replace(":", "_").replace(" ", "_"))
-            || rawBiome.replace(/:/g, " ");
-    };
     
     return(
         <div className="bg-surface-800 min-h-full overflow-auto">
@@ -37,7 +32,7 @@ export default async function Biomas(){
                             return b.count - a.count;
                         })
                         .map((biome, index) => {
-                            const biomeName = formatBiomeTitle(biome.name);
+                            const biomeName = getTranslatedBiomeName(biome.name, t);
                             
                             return (
                                 <InternalLink href={`/pokedex/localizacion/${biome.name}`} key={index}>

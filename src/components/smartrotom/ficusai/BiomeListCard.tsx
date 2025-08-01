@@ -1,0 +1,29 @@
+"use client";
+import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
+import { getTranslatedBiomeName } from "@/utils/pokemonTranslations";
+
+interface BiomeListCardProps {
+  biomes: string[];
+}
+
+export default function BiomeListCard({ biomes }: BiomeListCardProps) {
+  const t = useTranslations("pokedex");
+  
+  return (
+    <div className="bg-surface-700/50 rounded-lg p-4 mt-3 border border-surface-600">
+      <h3 className="text-lg font-bold text-surface-100 mb-4">Biomas</h3>
+      <div className="flex flex-wrap gap-2">
+        {biomes.map((biome, index) => (
+          <Badge 
+            key={index}
+            variant="outline"
+            className="bg-green-600/20 border-green-500 text-green-300 hover:bg-green-600/30"
+          >
+            {getTranslatedBiomeName(biome, t)}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  );
+}

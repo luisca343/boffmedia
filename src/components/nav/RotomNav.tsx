@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Badge } from "../ui/badge";
 import { Socket } from "socket.io-client";
 import BreadcrumbNav from "./BreadbrumbNav";
-import FicusAI from "../smartrotom/FicusAI";
+import FicusAI from "../smartrotom/ficusai/FicusAI";
 import { usePathname } from "next/navigation";
 import { getSmartRotomUser } from "@/lib/utils";
 import { Bell, Check, Trash2, X } from "lucide-react";
@@ -16,7 +16,7 @@ import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useSocketStore from "@/stores/useSocketStore";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -176,13 +176,12 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-surface-800 text-surface-50 border-none flex flex-col w-max"
+          className="bg-surface-800 text-surface-50 border-none flex flex-col w-max p-0"
         >
-          <SheetHeader>
-            <SheetTitle className="text-surface-50 text-2xl font-bold">
-              FicusAI
-            </SheetTitle>
-          </SheetHeader>
+          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary-500">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Cerrar</span>
+          </SheetClose>
           <SheetDescription className="h-full overflow-hidden">
             <FicusAI />
           </SheetDescription>

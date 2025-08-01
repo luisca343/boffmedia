@@ -16,7 +16,8 @@
       "tmMoves8": "MT Gen 8",
       "tmMoves9": "MT Gen 9",
       "transferMoves": "Tutor de Transferencia",
-      
+      "levelUpMoves": "Nivel",
+
     "attack_absorb": "Absorber",
     "attack_absorb_description": "Los PS del usuario son restaurados a la mitad el daño recibido por el objetivo.",
     "attack_acid": "Ácido",
