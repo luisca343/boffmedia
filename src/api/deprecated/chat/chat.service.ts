@@ -114,8 +114,9 @@ export class ChatService {
           properties: {
             requestType: { 
               type: Type.STRING, 
-              description: 'What information is requested: "basic" for just showing the Pokémon, "stats" for statistics, "type" for types, "moves" for moves, "habitat" for habitat info',
-              enum: ['basic', 'stats', 'type', 'moves', 'habitat']
+              description: 'What information is requested:  "type" for types, "stats" for statistics, "moves" for moves, "habitat" for habitat info',
+              //description: 'What information is requested: "basic" for just showing the Pokémon, "stats" for statistics, "type" for types, "moves" for moves, "habitat" for habitat info',
+              enum: ['type', 'stats', 'moves', 'habitat']
             }
           },
           required: ['requestType'],
@@ -186,6 +187,20 @@ export class ChatService {
       // Accumulate all parts from function calls
       const allParts: { type: string; content: any }[] = [];
 
+      // Check if we have multiple getRandomPokemon calls - if so, pick one random Pokémon for all of them
+      const randomPokemonCalls = response.functionCalls.filter(call => call.name === 'getRandomPokemon');
+      let sharedRandomPokemon: any = null;
+      
+      if (randomPokemonCalls.length > 1) {
+        // Generate one random Pokémon to be shared across all calls
+        const allPokemon = this.pokemonService.getAllPokemon();
+        if (allPokemon && allPokemon.length > 0) {
+          const randomIndex = Math.floor(Math.random() * allPokemon.length);
+          sharedRandomPokemon = allPokemon[randomIndex];
+          console.log(`[Multiple Random Calls] Selected shared random Pokémon: ${sharedRandomPokemon.name} for ${randomPokemonCalls.length} calls`);
+        }
+      }
+
       for (const call of response.functionCalls) {
         console.log(`Attempting to call: ${call.name} with args:`, call.args);
 
@@ -205,7 +220,13 @@ export class ChatService {
             break;
           case 'getRandomPokemon':
             const requestType = typeof call.args.requestType === 'string' ? call.args.requestType : 'basic';
-            functionParts = await this.getRandomPokemonParts(requestType);
+            if (sharedRandomPokemon) {
+              // Use the shared random Pokémon for consistent results
+              functionParts = await this.getRandomPokemonPartsWithPokemon(sharedRandomPokemon, requestType);
+            } else {
+              // Single random call, use normal method
+              functionParts = await this.getRandomPokemonParts(requestType);
+            }
             break;
           case 'getPokemonType':
             if (typeof call.args.pokemon === 'string') {
@@ -279,10 +300,84 @@ export class ChatService {
     const count = this.pokemonService.getAllPokemon().length;
     return [
       {
+        type: 'pokemonCount',
+        content: {
+          count,
+          pokemonName: null
+        }
+      },
+      {
         type: 'text',
         content: `Hay ${count} Pokémon en la región de Teras.`,
       }
     ];
+  }
+
+  async getRandomPokemonPartsWithPokemon(pokemon: any, requestType: string = 'basic'): Promise<{ type: string; content: any }[]> {
+    console.log(`[getRandomPokemonPartsWithPokemon] Using specific Pokémon: ${pokemon.name} with requestType: ${requestType}`);
+
+    // Handle different request types using the specific Pokémon
+    switch (requestType) {
+      case 'stats':
+        return this.getStatsParts(pokemon.name);
+      case 'type':
+        return this.getTipoParts(pokemon.name);
+      case 'moves':
+        return this.getMovimientosParts({ pokemon: pokemon.name, tipoMovimientos: [] });
+      case 'habitat':
+        return this.getHabitatParts(pokemon.name);
+      case 'basic':
+      default:
+        let responseParts = [];
+        if (pokemon && pokemon.forms && pokemon.forms[0]) {
+          const pokemonData = pokemon.forms[0];
+          responseParts.push({
+            type: 'randomPokemon',
+            content: {
+              name: pokemon.name,
+              types: pokemonData.types || [],
+              stats: pokemonData.battleStats || null,
+              pokemonName: pokemon.name
+            }
+          });
+          const flavorTexts = [
+            `Este Pokémon es una excelente opción para tu equipo.`,
+            `¡Qué interesante elección! Este Pokémon tiene características únicas.`,
+            `¡Perfecto! Este Pokémon podría ser justo lo que estás buscando.`,
+            `¡Genial! Este Pokémon tiene un gran potencial.`,
+            `¡Excelente! Este Pokémon es muy versátil en batalla.`
+          ];
+          const randomFlavorText = flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
+          responseParts.push({
+            type: 'text',
+            content: `¡Te presento a ${firstLetterToUpperCase(pokemon.name)}! 🎲`
+          });
+          responseParts.push({
+            type: 'text',
+            content: randomFlavorText
+          });
+        } else {
+          console.log('[getRandomPokemonPartsWithPokemon] Invalid Pokémon data structure:', pokemon);
+          responseParts.push({
+            type: 'randomPokemon',
+            content: {
+              name: pokemon.name || 'un Pokémon misterioso',
+              types: [],
+              stats: null,
+              pokemonName: pokemon.name || null
+            }
+          });
+          responseParts.push({
+            type: 'text',
+            content: `¡Te presento a ${firstLetterToUpperCase(pokemon.name || 'un Pokémon misterioso')}! 🎲`
+          });
+        }
+        responseParts.push({
+          type: 'text',
+          content: '\n¿Te gustaría saber más sobre este Pokémon o prefieres que elija otro?'
+        });
+        return responseParts;
+    }
   }
 
   async getRandomPokemonParts(requestType: string = 'basic'): Promise<{ type: string; content: any }[]> {
@@ -310,41 +405,26 @@ export class ChatService {
     switch (requestType) {
       case 'stats':
         return this.getStatsParts(randomPokemon.name);
-      
       case 'type':
         return this.getTipoParts(randomPokemon.name);
-      
       case 'moves':
         return this.getMovimientosParts({ pokemon: randomPokemon.name, tipoMovimientos: [] });
-      
       case 'habitat':
         return this.getHabitatParts(randomPokemon.name);
-      
       case 'basic':
       default:
-        // Original behavior for basic random Pokémon display
         let responseParts = [];
-        
         if (randomPokemon && randomPokemon.forms && randomPokemon.forms[0]) {
           const pokemonData = randomPokemon.forms[0];
-          
-          // Add introduction text
-          responseParts.push({
-            type: 'text',
-            content: `¡Te presento a ${firstLetterToUpperCase(randomPokemon.name)}! 🎲`
-          });
-
-          // Add basic info
           responseParts.push({
             type: 'randomPokemon',
             content: {
               name: randomPokemon.name,
               types: pokemonData.types || [],
               stats: pokemonData.battleStats || null,
+              pokemonName: randomPokemon.name
             }
           });
-
-          // Add some flavor text
           const flavorTexts = [
             `Este Pokémon es una excelente opción para tu equipo.`,
             `¡Qué interesante elección! Este Pokémon tiene características únicas.`,
@@ -352,26 +432,35 @@ export class ChatService {
             `¡Genial! Este Pokémon tiene un gran potencial.`,
             `¡Excelente! Este Pokémon es muy versátil en batalla.`
           ];
-          
           const randomFlavorText = flavorTexts[Math.floor(Math.random() * flavorTexts.length)];
+          responseParts.push({
+            type: 'text',
+            content: `¡Te presento a ${firstLetterToUpperCase(randomPokemon.name)}! 🎲`
+          });
           responseParts.push({
             type: 'text',
             content: randomFlavorText
           });
-
         } else {
           console.log('[getRandomPokemonParts] Invalid Pokémon data structure:', randomPokemon);
+          responseParts.push({
+            type: 'randomPokemon',
+            content: {
+              name: randomPokemon.name || 'un Pokémon misterioso',
+              types: [],
+              stats: null,
+              pokemonName: randomPokemon.name || null
+            }
+          });
           responseParts.push({
             type: 'text',
             content: `¡Te presento a ${firstLetterToUpperCase(randomPokemon.name || 'un Pokémon misterioso')}! 🎲`
           });
         }
-
         responseParts.push({
           type: 'text',
           content: '\n¿Te gustaría saber más sobre este Pokémon o prefieres que elija otro?'
         });
-
         return responseParts;
     }
   }
@@ -391,7 +480,7 @@ export class ChatService {
         console.log(`[getStatsParts] Stats for ${pkmName}:`, stats);
         if (stats) {
             responseParts.push({ type: 'text', content: `Aquí tienes las estadísticas base de ${firstLetterToUpperCase(pokemon.name)}:` });
-            responseParts.push({ type: 'pokemonStats', content: stats });
+            responseParts.push({ type: 'pokemonStats', content: { stats, pokemonName: pokemon.name } });
         } else {
             responseParts.push({ type: 'text', content: `No tengo información de estadísticas para ${firstLetterToUpperCase(pkmName)}.` });
         }
@@ -435,7 +524,6 @@ export class ChatService {
     } else {
         let pokemon = lista[0].item;
         let movimientos = pokemon.forms[0].moves;
-
         const keyMapping = {
           levelUpMoves: 'level',
           tutorMoves: 'tutor',
@@ -451,7 +539,6 @@ export class ChatService {
           trMoves: 'tr',
           hmMoves: 'hm',
         };
-
         let filteredMovimientos: any = {};
         if (tipoMovimientos && tipoMovimientos.length > 0) {
             Object.keys(movimientos).forEach((key) => {
@@ -462,10 +549,9 @@ export class ChatService {
         } else {
             filteredMovimientos = movimientos;
         }
-
         if (Object.keys(filteredMovimientos).length > 0) {
             responseParts.push({ type: 'text', content: `Aquí tienes la lista de movimientos de ${firstLetterToUpperCase(pokemon.name)}:` });
-            responseParts.push({ type: 'pokemonMoves', content: filteredMovimientos });
+            responseParts.push({ type: 'pokemonMoves', content: { moves: filteredMovimientos, pokemonName: pokemon.name } });
         } else {
             responseParts.push({ type: 'text', content: `No tengo información de movimientos (o no se encontraron para el tipo especificado) para ${firstLetterToUpperCase(pkmName)}.` });
         }
@@ -486,63 +572,8 @@ export class ChatService {
         responseParts.push({ type: 'text', content: `Lo siento, no encontré información de hábitat para "${firstLetterToUpperCase(pkmName)}". ¿Podrías revisar el nombre?` });
     } else {
         responseParts.push({ type: 'text', content: `Aquí tienes la información de hábitat para ${firstLetterToUpperCase(pkmName)}:` });
-        responseParts.push({ type: 'pokemonHabitat', content: biomes });
+        responseParts.push({ type: 'pokemonHabitat', content: { habitat: biomes, pokemonName: pkmName } });
     }
     return responseParts;
-  }
-
-  // Keep the original methods for backward compatibility (if needed elsewhere)
-  countPokemon(uuid: string) {
-    const parts = this.getCountPokemonParts();
-    parts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-    return this.sendMsg(uuid, {
-      sender: 'bot',
-      parts: parts,
-    });
-  }
-
-  async getRandomPokemon(uuid: string, requestType: string = 'basic') {
-    const parts = await this.getRandomPokemonParts(requestType);
-    parts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-    return this.sendMsg(uuid, {
-      sender: 'bot',
-      parts: parts,
-    });
-  }
-
-  sendStats(uuid: string, pkmName: string) {
-    const parts = this.getStatsParts(pkmName);
-    parts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-    return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: parts,
-    });
-  }
-
-  sendTipo(uuid: string, pkmName: string) {
-    const parts = this.getTipoParts(pkmName);
-    parts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-    return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: parts,
-    });
-  }
-
-  sendMovimientos(uuid: string, args: { pokemon: string; tipoMovimientos: string[] }) {
-    const parts = this.getMovimientosParts(args);
-    parts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-    return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: parts,
-    });
-  }
-
-  async sendHabitat(uuid: string, pkmName: string) {
-    const parts = this.getHabitatParts(pkmName);
-    parts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-    return this.sendMsg(uuid, {
-        sender: 'bot',
-        parts: parts,
-    });
   }
 }
