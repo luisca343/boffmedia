@@ -100,7 +100,7 @@ export class ChatService {
     const functionDeclarations = [
       {
         name: 'countPokemon',
-        description: 'Counts the total number of Pokémon in the Teras region. This function should ONLY be called when the user asks for "how many Pokémon", "number of Pokémon", or "total Pokémon".',
+        description: 'Counts the total number of Pokémon in the Teras region. This function should be called when the user asks for "how many Pokémon", "number of Pokémon", or "total Pokémon".',
         parameters: {
           type: Type.OBJECT,
           properties: {},
@@ -186,13 +186,13 @@ export class ChatService {
 
       // Accumulate all parts from function calls
       const allParts: { type: string; content: any }[] = [];
+      const requestedTypes: Set<string> = new Set();
+      let pokemonNames: Set<string> = new Set();
 
       // Check if we have multiple getRandomPokemon calls - if so, pick one random Pokémon for all of them
       const randomPokemonCalls = response.functionCalls.filter(call => call.name === 'getRandomPokemon');
       let sharedRandomPokemon: any = null;
-      
       if (randomPokemonCalls.length > 1) {
-        // Generate one random Pokémon to be shared across all calls
         const allPokemon = this.pokemonService.getAllPokemon();
         if (allPokemon && allPokemon.length > 0) {
           const randomIndex = Math.floor(Math.random() * allPokemon.length);
@@ -203,13 +203,13 @@ export class ChatService {
 
       for (const call of response.functionCalls) {
         console.log(`Attempting to call: ${call.name} with args:`, call.args);
-
         let functionParts: { type: string; content: any }[] = [];
-
         switch (call.name) {
           case 'getPokemonStats':
             if (typeof call.args.pokemon === 'string') {
               functionParts = await this.getStatsParts(call.args.pokemon);
+              requestedTypes.add('estadísticas');
+              pokemonNames.add(call.args.pokemon);
             } else {
               console.error('Invalid pokemon argument type for getPokemonStats:', call.args.pokemon);
               functionParts = [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de estadísticas.' }];
@@ -217,20 +217,27 @@ export class ChatService {
             break;
           case 'countPokemon':
             functionParts = this.getCountPokemonParts();
+            requestedTypes.add('conteo');
             break;
           case 'getRandomPokemon':
             const requestType = typeof call.args.requestType === 'string' ? call.args.requestType : 'basic';
             if (sharedRandomPokemon) {
-              // Use the shared random Pokémon for consistent results
               functionParts = await this.getRandomPokemonPartsWithPokemon(sharedRandomPokemon, requestType);
+              pokemonNames.add(sharedRandomPokemon.name);
             } else {
-              // Single random call, use normal method
               functionParts = await this.getRandomPokemonParts(requestType);
+              // Try to get name from result
+              if (functionParts.length > 0 && functionParts[0].content?.pokemonName) {
+                pokemonNames.add(functionParts[0].content.pokemonName);
+              }
             }
+            requestedTypes.add(requestType);
             break;
           case 'getPokemonType':
             if (typeof call.args.pokemon === 'string') {
               functionParts = this.getTipoParts(call.args.pokemon);
+              requestedTypes.add('tipo');
+              pokemonNames.add(call.args.pokemon);
             } else {
               console.error('Invalid pokemon argument type for getPokemonType:', call.args.pokemon);
               functionParts = [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de tipo.' }];
@@ -245,6 +252,8 @@ export class ChatService {
                 pokemon: call.args.pokemon,
                 tipoMovimientos: tipoMovimientos
               });
+              requestedTypes.add('movimientos');
+              pokemonNames.add(call.args.pokemon);
             } else {
               console.error('Invalid pokemon argument type for getPokemonMoves:', call.args.pokemon);
               functionParts = [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de movimientos.' }];
@@ -253,6 +262,8 @@ export class ChatService {
           case 'getPokemonHabitat':
             if (typeof call.args.pokemon === 'string') {
               functionParts = this.getHabitatParts(call.args.pokemon);
+              requestedTypes.add('hábitat');
+              pokemonNames.add(call.args.pokemon);
             } else {
               console.error('Invalid pokemon argument type for getPokemonHabitat:', call.args.pokemon);
               functionParts = [{ type: 'text', content: 'Lo siento, el nombre del Pokémon no es válido para esta solicitud de hábitat.' }];
@@ -263,20 +274,29 @@ export class ChatService {
             functionParts = [{ type: 'text', content: 'Lo siento, no puedo procesar esa solicitud en este momento.' }];
             break;
         }
-
-        // Add function parts to accumulated parts
         allParts.push(...functionParts);
       }
 
-      // Add the final help message only once
       if (allParts.length > 0) {
+        console.log('All parts collected from function calls:', allParts);
+        let intro = '';
+        const showIntro = ['estadísticas', 'movimientos', 'tipo', 'hábitat'].some(type => requestedTypes.has(type));
+        if (showIntro) {
+          const namesList = Array.from(pokemonNames).map(n => firstLetterToUpperCase(n)).join(', ');
+          if (namesList) {
+            intro = `Aquí tienes la información solicitada para ${namesList}:`;
+          } else {
+            intro = `Aquí tienes la información solicitada:`;
+          }
+        }
+        if (intro) {
+          allParts.unshift({ type: 'text', content: intro });
+        }
         allParts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
-        
         const finalMessage = {
           sender: 'bot',
           parts: allParts
         };
-
         return await this.sendMsg(uuid, finalMessage);
       } else {
         return await this.sendMsg(uuid, {
@@ -479,7 +499,6 @@ export class ChatService {
         let stats = pokemon.forms[0].battleStats;
         console.log(`[getStatsParts] Stats for ${pkmName}:`, stats);
         if (stats) {
-            responseParts.push({ type: 'text', content: `Aquí tienes las estadísticas base de ${firstLetterToUpperCase(pokemon.name)}:` });
             responseParts.push({ type: 'pokemonStats', content: { stats, pokemonName: pokemon.name } });
         } else {
             responseParts.push({ type: 'text', content: `No tengo información de estadísticas para ${firstLetterToUpperCase(pkmName)}.` });
@@ -550,7 +569,6 @@ export class ChatService {
             filteredMovimientos = movimientos;
         }
         if (Object.keys(filteredMovimientos).length > 0) {
-            responseParts.push({ type: 'text', content: `Aquí tienes la lista de movimientos de ${firstLetterToUpperCase(pokemon.name)}:` });
             responseParts.push({ type: 'pokemonMoves', content: { moves: filteredMovimientos, pokemonName: pokemon.name } });
         } else {
             responseParts.push({ type: 'text', content: `No tengo información de movimientos (o no se encontraron para el tipo especificado) para ${firstLetterToUpperCase(pkmName)}.` });
@@ -571,7 +589,6 @@ export class ChatService {
         console.log(`[getHabitatParts] No biomes found for Pokémon "${pkmName}".`);
         responseParts.push({ type: 'text', content: `Lo siento, no encontré información de hábitat para "${firstLetterToUpperCase(pkmName)}". ¿Podrías revisar el nombre?` });
     } else {
-        responseParts.push({ type: 'text', content: `Aquí tienes la información de hábitat para ${firstLetterToUpperCase(pkmName)}:` });
         responseParts.push({ type: 'pokemonHabitat', content: { habitat: biomes, pokemonName: pkmName } });
     }
     return responseParts;
