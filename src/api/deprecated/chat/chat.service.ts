@@ -76,10 +76,26 @@ export class ChatService {
     if (mensaje.sender === 'user') await this.sendMsg(uuid, mensaje);
     await this.start();
 
-    const userText = mensaje.parts
-      .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
-      .map(part => part.content)
-      .join('\n');
+    // Get last 5 messages for context
+    const lastMessages = await this.getMessages(uuid);
+    const contextMessages = lastMessages.slice(-5).map(msg => {
+      // Flatten all text parts for context
+      return msg.parts
+        .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
+        .map(part => part.content)
+        .join('\n');
+    }).join('\n');
+
+    const globalContext = 'Eres Profesor Ficus, el asistente virtual para la región ficticia de Teras en este servidor Pokémon. Responde como un experto y guía amigable.';
+
+    const userText = [
+      globalContext,
+      contextMessages,
+      mensaje.parts
+        .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
+        .map(part => part.content)
+        .join('\n')
+    ].filter(Boolean).join('\n');
 
     const functionDeclarations = [
       {
@@ -299,7 +315,7 @@ export class ChatService {
         let pokemon = lista[0].item;
         let tipos = pokemon.forms[0].types;
         if (tipos && tipos.length > 0) {
-            responseParts.push({ type: 'text', content: `${firstLetterToUpperCase(pokemon.name)} es un Pokémon de tipo ${tipos.join(' / ')}.` });
+            responseParts.push({ type: 'pokemonTypes', content: {types: tipos, pokemonName: pokemon.name} });
         } else {
             responseParts.push({ type: 'text', content: `No tengo información de tipo para ${firstLetterToUpperCase(pkmName)}.` });
         }
@@ -370,9 +386,19 @@ export class ChatService {
 
   async sendHabitat(uuid: string, pkmName: string) {
     console.log(`[sendHabitat] Received pkmName: "${pkmName}"`);
-    // Placeholder response since the actual implementation is commented out.
+    
+    let lista = this.pokemonService.searchPokemonByName(pkmName);
+    const pokemon = lista[0]?.item;
+    const biomes = this.pokemonService.getBiomesByPokemon(`${pokemon?.name.toLowerCase()}_base`);
+
     let responseParts = [];
-    responseParts.push({ type: 'text', content: `Actualmente no tengo información sobre el hábitat de ${firstLetterToUpperCase(pkmName)}. Mis funciones relacionadas con el hábitat están en desarrollo.` });
+    if (!biomes || biomes.length === 0) {
+        console.log(`[sendHabitat] No biomes found for Pokémon "${pkmName}".`);
+        responseParts.push({ type: 'text', content: `Lo siento, no encontré información de hábitat para "${firstLetterToUpperCase(pkmName)}". ¿Podrías revisar el nombre?` });
+    } else {
+        responseParts.push({ type: 'text', content: `Aquí tienes la información de hábitat para ${firstLetterToUpperCase(pkmName)}:` });
+        responseParts.push({ type: 'pokemonHabitat', content: biomes });
+    }
     responseParts.push({ type: 'text', content: '\n¿Hay algo más en lo que pueda ayudarte?' });
     return this.sendMsg(uuid, {
         sender: 'bot',
