@@ -37,7 +37,7 @@ export class PokemonDataManagementService {
 
   private initializeFuse(threshold = 0.3): void {
     const options: IFuseOptions<Pokemon> = {
-      keys: ['name', 'dex'],
+      keys: ['name', 'dex', 'nickname'],
       threshold,
     };
     this.fusePokemon = new Fuse(this.pokemonDataService.getAllSpecies(), options);
