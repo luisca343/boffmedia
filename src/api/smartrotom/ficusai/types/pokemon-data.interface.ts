@@ -13,4 +13,6 @@ export interface PokemonData {
   stats?: PokemonStats;
   moves?: Record<string, any>;
   habitat?: string[];
+  id?: number;
+  form?: string;
 }

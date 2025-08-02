@@ -278,8 +278,8 @@ export class FicusAIFacadeService {
         .join(', ');
       
       const intro = namesList 
-        ? `Aquí tienes la información solicitada para ${namesList}:`
-        : `Aquí tienes la información solicitada:`;
+        ? `Aquí tienes la información solicitada para ${namesList}: \n\n`
+        : `Aquí tienes la información solicitada:\n\n`;
       
       allParts.unshift({ type: MessagePartType.TEXT, content: intro });
     }

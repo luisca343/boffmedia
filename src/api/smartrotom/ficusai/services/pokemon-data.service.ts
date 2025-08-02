@@ -93,6 +93,9 @@ export class PokemonDataService {
           break;
       }
     }
+    
+    consolidatedData.id = pokemonData.dex;
+    consolidatedData.form = pokemonForm.name || 'base'
 
     // Return single consolidated part
     return [{
@@ -128,7 +131,7 @@ export class PokemonDataService {
         const consolidatedData: PokemonData = {
           pokemonName: pokemon.name,
           types: pokemon.forms[0].types || [],
-          stats: this.mapPokemonStats(pokemon.forms[0].battleStats)
+          stats: this.mapPokemonStats(pokemon.forms[0].battleStats),
         };
 
         responseParts.push({
