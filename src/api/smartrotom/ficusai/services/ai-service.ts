@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { GoogleGenAI, Type } from '@google/genai';
 import { FicusMessageContentDto } from '../dto/ficus-message-content.dto';
+import { MessagePartType } from '../dto/message-part.dto';
+import { MessageSender } from '../enums/message-sender.enum';
 
 @Injectable()
 export class AIService {
@@ -18,18 +20,14 @@ export class AIService {
   ): Promise<any> {
     await this.initialize();
 
-    const globalContext = `Eres Profesor Ficus, el asistente virtual para la región ficticia de Teras en este servidor Pokémon. 
+    const globalContext = `Eres Profesor Ficus, asistente virtual para la región ficticia de Teras en este servidor Pokémon.
+      REGLAS CRÍTICAS:
 
-    REGLAS CRÍTICAS - NUNCA VIOLES ESTAS REGLAS:
-    1. NUNCA inventes, crees o imagines información sobre Pokémon, ubicaciones, estadísticas, movimientos o cualquier dato que no obtengas directamente de las funciones disponibles.
-    2. SIEMPRE usa las funciones proporcionadas para obtener información. Si no tienes una función para responder algo específico, di claramente "No tengo esa información disponible en mi base de datos".
-    3. NUNCA proporciones datos específicos (números, ubicaciones exactas, listas de movimientos, etc.) sin haberlos obtenido primero de una función.
-    4. Si el usuario pregunta sobre ubicaciones, localización, dónde encontrar un Pokémon o Digimon, o su hábitat, SIEMPRE llama a getPokemonData con dataTypes que incluya "habitat".
-    5. Si no puedes obtener información mediante las funciones, responde honestamente que no tienes acceso a esa información.
-    6. NUNCA asumas información que no has verificado mediante las funciones disponibles.
-    7. Si una función falla o no retorna datos, informa al usuario que no pudiste acceder a esa información en este momento.
-
-    Responde como un experto y guía amigable, pero siempre basándote únicamente en datos verificados mediante las funciones disponibles.`;
+      NUNCA inventes información sobre Pokémon, ubicaciones, estadísticas o movimientos
+      SIEMPRE usa las funciones disponibles para obtener datos de Pokémon, incluso para nombres raros como "Bowser"
+      Para preguntas sobre ubicaciones/hábitat, usa getPokemonData con dataTypes "habitat"
+      Si no tienes función para algo específico, di: "No tengo esa información disponible"
+      Si una función falla, informa que no pudiste acceder a esa información`;
 
     const contextText = contextMessages.map(msg => {
       return msg.parts
@@ -58,6 +56,82 @@ export class AIService {
     });
 
     return response;
+  }
+
+  // New method to generate fallback response using Gemma
+  async generateFallbackResponse(
+    pokemonName: string, 
+    similarPokemon: string[], 
+    userMessage: FicusMessageContentDto,
+    contextMessages: FicusMessageContentDto[]
+  ): Promise<FicusMessageContentDto> {
+    await this.initialize();
+
+    const contextText = contextMessages
+      .slice(-3) // Only last 3 messages for context
+      .map(msg => {
+        return msg.parts
+          .filter(part => part.type === 'text' && typeof part.content === 'string')
+          .map(part => part.content)
+          .join(' ');
+      })
+      .join('\n');
+
+    const userText = userMessage.parts
+      .filter(part => part.type === 'text' && typeof part.content === 'string')
+      .map(part => part.content)
+      .join(' ');
+
+    const fallbackPrompt = `Eres Profesor Ficus, un asistente virtual amigable para la región de Teras.
+
+    Un usuario preguntó sobre "${pokemonName}" pero ese Pokémon no existe en nuestra base de datos de la región de Teras.
+
+    Mensaje del usuario: "${userText}"
+
+    ${similarPokemon.length > 0 ? `Pokémon similares disponibles en Teras: ${similarPokemon.join(', ')}` : 'No encontré Pokémon similares.'}
+
+    Contexto de la conversación:
+    ${contextText}
+
+    Responde de manera amigable y útil:
+    1. Informa que "${pokemonName}" no está disponible en la región de Teras
+    2. ${similarPokemon.length > 0 ? 'Sugiere los Pokémon similares que encontré' : 'Pregunta si se refería a otro Pokémon'}
+    3. Ofrecer ayuda alternativa
+    4. Mantén un tono profesional pero amigable como Profesor Ficus
+
+    Responde en el mismo idioma que el usuario y mantén la respuesta concisa pero útil.`;
+
+    try {
+      const response = await this.gemini.models.generateContent({
+        model: 'gemma-3-12b-it',
+        contents: fallbackPrompt,
+        config: {
+          maxOutputTokens: 200,
+          temperature: 0.7,
+        }
+      });
+
+      const responseText = response.text || `Lo siento, no encontré información sobre "${pokemonName}" en la región de Teras. ${similarPokemon.length > 0 ? `¿Te refieres a alguno de estos?: ${similarPokemon.join(', ')}` : '¿Podrías revisar el nombre del Pokémon?'}`;
+
+      return {
+        sender: MessageSender.BOT,
+        parts: [{
+          type: MessagePartType.TEXT,
+          content: responseText
+        }]
+      };
+    } catch (error) {
+      console.error('Error generating fallback response with Gemma:', error);
+      
+      // Fallback to basic response if Gemma fails
+      return {
+        sender: MessageSender.BOT,
+        parts: [{
+          type: MessagePartType.TEXT,
+          content: `Lo siento, no encontré información sobre "${pokemonName}" en la región de Teras. ${similarPokemon.length > 0 ? `¿Te refieres a alguno de estos Pokémon?: ${similarPokemon.join(', ')}` : '¿Podrías revisar el nombre del Pokémon?'}`
+        }]
+      };
+    }
   }
 
   deduplicateFunctionCalls(functionCalls: any[]): any[] {

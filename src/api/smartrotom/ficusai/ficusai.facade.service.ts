@@ -8,9 +8,14 @@ import { GetMessagesDto } from './dto/get-messages.dto';
 import { MessageSender } from './enums/message-sender.enum';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { MessagePartType } from './dto/message-part.dto';
+import { PokemonNotFoundError } from './errors/pokemon-not-found.error';
 
 @Injectable()
 export class FicusAIFacadeService {
+  // Store current message and context for fallback responses
+  private currentUserMessage: FicusMessageContentDto;
+  private currentContextMessages: FicusMessageContentDto[];
+
   constructor(
     private readonly messageService: MessageService,
     private readonly aiService: AIService,
@@ -54,11 +59,12 @@ export class FicusAIFacadeService {
 
   private async generateAIResponse(uuid: string, userMessage: FicusMessageContentDto): Promise<FicusMessageContentDto> {
     try {
-      // Get context messages
-      const contextMessages = await this.messageService.getMessagesForContext(uuid, 5);
+      // Store current message and context for potential fallback responses
+      this.currentUserMessage = userMessage;
+      this.currentContextMessages = await this.messageService.getMessagesForContext(uuid, 5);
       
       // Generate AI response
-      const geminiResponse = await this.aiService.generateResponse(userMessage, contextMessages);
+      const geminiResponse = await this.aiService.generateResponse(userMessage, this.currentContextMessages);
       
       console.log('================= Gemini Response ================');
       console.log(geminiResponse);
@@ -109,11 +115,34 @@ export class FicusAIFacadeService {
     for (const call of uniqueCalls) {
       console.log(`Processing function call: ${call.name} with args:`, call.args);
       
-      const functionParts = await this.executeFunctionCall(call, sharedRandomPokemon);
-      allParts.push(...functionParts);
+      try {
+        const functionParts = await this.executeFunctionCall(call, sharedRandomPokemon);
+        allParts.push(...functionParts);
 
-      // Track requested types and Pokemon names for intro text
-      this.trackRequestedData(call, requestedTypes, pokemonNames, functionParts);
+        // Track requested types and Pokemon names for intro text
+        this.trackRequestedData(call, requestedTypes, pokemonNames, functionParts);
+      } catch (error) {
+        if (error instanceof PokemonNotFoundError) {
+          console.log(`Handling Pokémon not found: ${error.pokemonName}`);
+          
+          // Generate intelligent response using Gemma
+          const fallbackResponse = await this.aiService.generateFallbackResponse(
+            error.pokemonName,
+            error.similarPokemon,
+            this.currentUserMessage,
+            this.currentContextMessages
+          );
+          
+          // Return the fallback response directly
+          return fallbackResponse;
+        } else {
+          console.error('Error executing function call:', error);
+          allParts.push({
+            type: MessagePartType.TEXT,
+            content: 'Lo siento, ocurrió un error al procesar tu solicitud.'
+          });
+        }
+      }
     }
 
     // Build final response
@@ -165,7 +194,21 @@ export class FicusAIFacadeService {
             : ['type', 'stats', 'moves', 'habitat'];
           const moveTypes = Array.isArray(call.args.moveTypes) ? call.args.moveTypes : [];
           
-          return this.pokemonDataService.getPokemonDataParts(call.args.pokemon, dataTypes, moveTypes);
+          // Try to get Pokemon data
+          const pokemonData = this.pokemonDataService.getPokemonDataParts(call.args.pokemon, dataTypes, moveTypes);
+          
+          // If Pokémon not found, throw error to trigger fallback response
+          if (pokemonData === null) {
+            console.log(`Pokémon "${call.args.pokemon}" not found, will generate fallback response with Gemma`);
+            
+            // Get similar Pokémon suggestions
+            const similarPokemon = this.pokemonDataService.getSimilarPokemonNames(call.args.pokemon, 3);
+            
+            // Throw custom error to be caught by processFunctionCalls
+            throw new PokemonNotFoundError(call.args.pokemon, similarPokemon);
+          }
+          
+          return pokemonData;
         } else {
           console.error('Invalid pokemon argument type for getPokemonData:', call.args.pokemon);
           return [{ 

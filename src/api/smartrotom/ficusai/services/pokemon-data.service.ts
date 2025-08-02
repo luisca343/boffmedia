@@ -47,17 +47,16 @@ export class PokemonDataService {
     return { pokemon: randomPokemon, parts };
   }
 
-  getPokemonDataParts(pokemonName: string, dataTypes: string[], moveTypes: string[] = []): MessagePartDto[] {
+  // Modified to return null when Pokémon is not found instead of error message  
+  getPokemonDataParts(pokemonName: string, dataTypes: string[], moveTypes: string[] = []): MessagePartDto[] | null {
     const pokemon = this.pokemonService.searchPokemonByName(pokemonName);
-    const responseParts: MessagePartDto[] = [];
 
     if (!pokemon || pokemon.length === 0 || !pokemon[0].item) {
-      responseParts.push({ 
-        type: MessagePartType.TEXT,
-        content: `Lo siento, no encontré información para "${firstLetterToUpperCase(pokemonName)}". ¿Podrías revisar el nombre?` 
-      });
-      return responseParts;
+      // Return null instead of error message - let the AI service handle this
+      return null;
     }
+
+    const responseParts: MessagePartDto[] = [];
 
     const pokemonData = pokemon[0].item;
     const pokemonForm = pokemonData.forms[0];
@@ -122,7 +121,9 @@ export class PokemonDataService {
     const specificDataTypes = dataTypes.filter(type => type !== 'basic');
     if (specificDataTypes.length > 0) {
       const dataParts = this.getPokemonDataParts(pokemon.name, specificDataTypes);
-      responseParts.push(...dataParts);
+      if (dataParts) {
+        responseParts.push(...dataParts);
+      }
     }
 
     if (dataTypes.includes('basic')) {
@@ -221,5 +222,61 @@ export class PokemonDataService {
         content: `No tengo información de hábitat para ${firstLetterToUpperCase(pokemonName)}.` 
       }];
     }
+  }
+
+  // Add method to check if Pokémon exists
+  pokemonExists(pokemonName: string): boolean {
+    const pokemon = this.pokemonService.searchPokemonByName(pokemonName);
+    return !!(pokemon && pokemon.length > 0 && pokemon[0].item);
+  }
+
+  // Add method to get similar Pokémon names for suggestions
+  getSimilarPokemonNames(pokemonName: string, limit: number = 5): string[] {
+    const allPokemon = this.pokemonService.getAllPokemon();
+    if (!allPokemon) return [];
+
+    const searchTerm = pokemonName.toLowerCase();
+    const suggestions: { name: string; score: number }[] = [];
+
+    for (const pokemon of allPokemon) {
+      const name = pokemon.name.toLowerCase();
+      
+      // Exact match (shouldn't happen if we reach here, but just in case)
+      if (name === searchTerm) continue;
+      
+      // Calculate similarity score
+      let score = 0;
+      
+      // Contains the search term
+      if (name.includes(searchTerm)) {
+        score += 10;
+      }
+      
+      // Starts with search term
+      if (name.startsWith(searchTerm)) {
+        score += 5;
+      }
+      
+      // Length similarity
+      const lengthDiff = Math.abs(name.length - searchTerm.length);
+      score += Math.max(0, 5 - lengthDiff);
+      
+      // Character similarity (simple)
+      let commonChars = 0;
+      for (const char of searchTerm) {
+        if (name.includes(char)) commonChars++;
+      }
+      score += commonChars;
+      
+      if (score > 0) {
+        suggestions.push({ name: pokemon.name, score });
+      }
+    }
+
+    // Sort by score and return top suggestions
+    return suggestions
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(s => s.name);
   }
 }
