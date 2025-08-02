@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PokemonFacadeService } from '@api/smartrotom/pokemon/pokemon.facade.service';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { MessagePartDto, MessagePartType } from '../dto/message-part.dto';
+import { PokemonData, PokemonStats } from '../types/pokemon-data.interface';
 import Fuse from 'fuse.js';
 
 @Injectable()
@@ -48,7 +49,7 @@ export class PokemonDataService {
     return { pokemon: randomPokemon, parts };
   }
 
-  // Modified to return null when Pokémon is not found instead of error message  
+  // Modified to return consolidated PokemonData instead of separate parts
   getPokemonDataParts(pokemonName: string, dataTypes: string[], moveTypes: string[] = []): MessagePartDto[] | null {
     const pokemon = this.pokemonService.searchPokemonByName(pokemonName);
 
@@ -57,29 +58,47 @@ export class PokemonDataService {
       return null;
     }
 
-    const responseParts: MessagePartDto[] = [];
-
     const pokemonData = pokemon[0].item;
     const pokemonForm = pokemonData.forms[0];
 
+    // Build consolidated pokemon data object
+    const consolidatedData: PokemonData = {
+      pokemonName: pokemonData.name
+    };
+
+    // Add requested data types to the consolidated object
     for (const dataType of dataTypes) {
       switch (dataType) {
         case 'type':
-          responseParts.push(...this.getPokemonTypeParts(pokemonForm, pokemonData.name));
+          if (pokemonForm.types && pokemonForm.types.length > 0) {
+            consolidatedData.types = pokemonForm.types;
+          }
           break;
         case 'stats':
-          responseParts.push(...this.getPokemonStatsParts(pokemonForm, pokemonData.name));
+          if (pokemonForm.battleStats) {
+            consolidatedData.stats = this.mapPokemonStats(pokemonForm.battleStats);
+          }
           break;
         case 'moves':
-          responseParts.push(...this.getPokemonMovesParts(pokemonForm, pokemonData.name, moveTypes));
+          const moves = this.getFilteredMoves(pokemonForm.moves, moveTypes);
+          if (moves && Object.keys(moves).length > 0) {
+            consolidatedData.moves = moves;
+          }
           break;
         case 'habitat':
-          responseParts.push(...this.getPokemonHabitatParts(pokemonData.name));
+          const biomes = this.pokemonService.getBiomesByPokemon(`${pokemonData.name.toLowerCase()}_base`);
+          if (biomes && biomes.length > 0) {
+            consolidatedData.habitat = biomes;
+          }
           break;
       }
     }
 
-    return responseParts;
+    // Return single consolidated part
+    return [{
+      type: MessagePartType.POKEMON_DATA,
+      content: consolidatedData
+    }];
   }
 
   private getRandomPokemonParts(pokemon: any, dataTypes: string[]): MessagePartDto[] {
@@ -87,17 +106,6 @@ export class PokemonDataService {
 
     if (dataTypes.includes('basic')) {
       if (pokemon && pokemon.forms && pokemon.forms[0]) {
-        const pokemonData = pokemon.forms[0];
-        responseParts.push({
-          type: MessagePartType.RANDOM_POKEMON,
-          content: {
-            name: pokemon.name,
-            types: pokemonData.types || [],
-            stats: pokemonData.battleStats || null,
-            pokemonName: pokemon.name
-          }
-        });
-        
         const flavorTexts = [
           `Este Pokémon es una excelente opción para tu equipo.`,
           `¡Qué interesante elección! Este Pokémon tiene características únicas.`,
@@ -114,6 +122,18 @@ export class PokemonDataService {
         responseParts.push({
           type: MessagePartType.TEXT,
           content: randomFlavorText
+        });
+
+        // Create consolidated pokemon data for random pokemon
+        const consolidatedData: PokemonData = {
+          pokemonName: pokemon.name,
+          types: pokemon.forms[0].types || [],
+          stats: this.mapPokemonStats(pokemon.forms[0].battleStats)
+        };
+
+        responseParts.push({
+          type: MessagePartType.POKEMON_DATA,
+          content: consolidatedData
         });
       }
     }
@@ -137,38 +157,22 @@ export class PokemonDataService {
     return responseParts;
   }
 
-  private getPokemonTypeParts(pokemonForm: any, pokemonName: string): MessagePartDto[] {
-    const tipos = pokemonForm.types;
-    if (tipos && tipos.length > 0) {
-      return [{ 
-        type: MessagePartType.POKEMON_TYPES, 
-        content: { types: tipos, pokemonName } 
-      }];
-    } else {
-      return [{ 
-        type: MessagePartType.TEXT, 
-        content: `No tengo información de tipo para ${firstLetterToUpperCase(pokemonName)}.` 
-      }];
-    }
+  private mapPokemonStats(battleStats: any): PokemonStats | undefined {
+    if (!battleStats) return undefined;
+    
+    return {
+      hp: battleStats.hp || 0,
+      attack: battleStats.attack || 0,
+      defense: battleStats.defense || 0,
+      specialAttack: battleStats.specialAttack || 0,
+      specialDefense: battleStats.specialDefense || 0,
+      speed: battleStats.speed || 0
+    };
   }
 
-  private getPokemonStatsParts(pokemonForm: any, pokemonName: string): MessagePartDto[] {
-    const stats = pokemonForm.battleStats;
-    if (stats) {
-      return [{ 
-        type: MessagePartType.POKEMON_STATS,
-        content: { stats, pokemonName } 
-      }];
-    } else {
-      return [{ 
-        type: MessagePartType.TEXT,
-        content: `No tengo información de estadísticas para ${firstLetterToUpperCase(pokemonName)}.` 
-      }];
-    }
-  }
+  private getFilteredMoves(moves: any, moveTypes: string[]): Record<string, any> | null {
+    if (!moves) return null;
 
-  private getPokemonMovesParts(pokemonForm: any, pokemonName: string, moveTypes: string[]): MessagePartDto[] {
-    const movimientos = pokemonForm.moves;
     const keyMapping = {
       levelUpMoves: 'level',
       tutorMoves: 'tutor',
@@ -185,44 +189,18 @@ export class PokemonDataService {
       hmMoves: 'hm',
     };
 
-    let filteredMovimientos: any = {};
+    let filteredMoves: any = {};
     if (moveTypes && moveTypes.length > 0) {
-      Object.keys(movimientos).forEach((key) => {
+      Object.keys(moves).forEach((key) => {
         if (keyMapping[key] && moveTypes.includes(keyMapping[key])) {
-          filteredMovimientos[key] = movimientos[key];
+          filteredMoves[key] = moves[key];
         }
       });
     } else {
-      filteredMovimientos = movimientos;
+      filteredMoves = moves;
     }
 
-    if (Object.keys(filteredMovimientos).length > 0) {
-      return [{ 
-        type: MessagePartType.POKEMON_MOVES,
-        content: { moves: filteredMovimientos, pokemonName } 
-      }];
-    } else {
-      const moveTypeText = moveTypes.length > 0 ? ` del tipo especificado` : '';
-      return [{ 
-        type: MessagePartType.TEXT,
-        content: `No tengo información de movimientos${moveTypeText} para ${firstLetterToUpperCase(pokemonName)}.` 
-      }];
-    }
-  }
-
-  private getPokemonHabitatParts(pokemonName: string): MessagePartDto[] {
-    const biomes = this.pokemonService.getBiomesByPokemon(`${pokemonName.toLowerCase()}_base`);
-    if (biomes && biomes.length > 0) {
-      return [{ 
-        type: MessagePartType.POKEMON_HABITAT,
-        content: { habitat: biomes, pokemonName } 
-      }];
-    } else {
-      return [{ 
-        type: MessagePartType.TEXT, 
-        content: `No tengo información de hábitat para ${firstLetterToUpperCase(pokemonName)}.` 
-      }];
-    }
+    return Object.keys(filteredMoves).length > 0 ? filteredMoves : null;
   }
 
   // Add method to check if Pokémon exists

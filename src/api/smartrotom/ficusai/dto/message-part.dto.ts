@@ -3,6 +3,7 @@ import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 
 export enum MessagePartType {
   TEXT = 'text',
+  POKEMON_DATA = 'pokemonData',
   POKEMON_TYPES = 'pokemonTypes',
   POKEMON_STATS = 'pokemonStats',
   POKEMON_MOVES = 'pokemonMoves',
