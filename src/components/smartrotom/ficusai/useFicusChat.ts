@@ -16,7 +16,7 @@ function mapDtoToMensaje(dto: any): Mensaje {
   };
 }
 import { useState, useEffect, useMemo } from "react";
-import { FicusAIService, FicusMessageContent } from "@/services/api/smartrotom/ficusAiService";
+import { FicusAIService } from "@/services/api/smartrotom/ficusAiService";
 import { useBoffSession } from "@/services/useBoffSession";
 import { Mensaje } from "./types";
 
