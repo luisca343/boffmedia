@@ -15,12 +15,15 @@ import { Button } from "@/components/ui/button";
 import { useMemo } from "react";
 
 export interface PokemonData {
+  id: number;
+  form?: string;
   pokemonName: string;
   types?: string[];
   stats?: PokemonStats;
   moves?: Record<string, any>;
   habitat?: string[];
 }
+import { useSpriteManifestStore } from "@/stores/spriteManifestStore";
 
 interface PokemonDataCardProps {
   data: PokemonData;
@@ -30,7 +33,11 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
   const t = useTranslations("pokedex");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { pokemonName, types, stats, moves, habitat } = data;
+  const { id, form = "base", pokemonName, types, stats, moves, habitat } = data;
+
+  // Sprite manifest
+  const { getSprite } = useSpriteManifestStore();
+  const spriteInfo = getSprite({ id, form });
 
   // Determine which tabs to show based on available data
   const availableTabs = useMemo(() => {
@@ -435,6 +442,15 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
     <div className="bg-surface-700/50 rounded-lg p-6 mt-3 border border-surface-600 max-w-4xl">
       {/* Pokemon Header */}
       <div className="text-center mb-6">
+        {spriteInfo && (
+          <img
+            src={spriteInfo.path}
+            alt={pokemonName}
+            className="mx-auto mb-2 h-24 w-24 object-contain"
+            loading="lazy"
+            style={{ imageRendering: "pixelated" }}
+          />
+        )}
         <h2 className="text-2xl font-bold text-surface-100 mb-3">
           {pokemonName}
         </h2>

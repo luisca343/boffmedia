@@ -45,10 +45,11 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
       
       case "pokemonData":
         return (
-          <CompletePokemonCard 
-            key={index} 
-            data={part.content as any} 
-          />
+          <div key={index} className="mt-3 mb-3 mx-auto max-w-2xl w-full flex-shrink-0">
+            <CompletePokemonCard 
+              data={part.content as any} 
+            />
+          </div>
         );
       
       default:
