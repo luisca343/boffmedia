@@ -449,17 +449,19 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
 
       {/* Dynamic Tabbed Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full grid-cols-${availableTabs.length} mb-6 bg-surface-600/50`}>
-          {availableTabs.map((tab) => (
-            <TabsTrigger 
-              key={tab.id} 
-              value={tab.id} 
-              className="data-[state=active]:bg-primary-600"
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {availableTabs.length > 1 && (
+          <TabsList className={`grid w-full grid-cols-${availableTabs.length} mb-6 bg-surface-600/50`}>
+            {availableTabs.map((tab) => (
+              <TabsTrigger 
+                key={tab.id} 
+                value={tab.id} 
+                className="data-[state=active]:bg-primary-600"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        )}
 
         <div className="min-h-[300px]">
           <TabsContent value="overview" className="mt-0">
