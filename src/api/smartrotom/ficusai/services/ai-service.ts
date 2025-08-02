@@ -18,7 +18,18 @@ export class AIService {
   ): Promise<any> {
     await this.initialize();
 
-    const globalContext = 'Eres Profesor Ficus, el asistente virtual para la región ficticia de Teras en este servidor Pokémon. Responde como un experto y guía amigable. Cuando el usuario pregunte sobre la ubicación, localización, o dónde encontrar un Pokémon, siempre llama a la función getPokemonData con dataTypes que incluya "habitat".';
+    const globalContext = `Eres Profesor Ficus, el asistente virtual para la región ficticia de Teras en este servidor Pokémon. 
+
+    REGLAS CRÍTICAS - NUNCA VIOLES ESTAS REGLAS:
+    1. NUNCA inventes, crees o imagines información sobre Pokémon, ubicaciones, estadísticas, movimientos o cualquier dato que no obtengas directamente de las funciones disponibles.
+    2. SIEMPRE usa las funciones proporcionadas para obtener información. Si no tienes una función para responder algo específico, di claramente "No tengo esa información disponible en mi base de datos".
+    3. NUNCA proporciones datos específicos (números, ubicaciones exactas, listas de movimientos, etc.) sin haberlos obtenido primero de una función.
+    4. Si el usuario pregunta sobre ubicaciones, localización, dónde encontrar un Pokémon o Digimon, o su hábitat, SIEMPRE llama a getPokemonData con dataTypes que incluya "habitat".
+    5. Si no puedes obtener información mediante las funciones, responde honestamente que no tienes acceso a esa información.
+    6. NUNCA asumas información que no has verificado mediante las funciones disponibles.
+    7. Si una función falla o no retorna datos, informa al usuario que no pudiste acceder a esa información en este momento.
+
+    Responde como un experto y guía amigable, pero siempre basándote únicamente en datos verificados mediante las funciones disponibles.`;
 
     const contextText = contextMessages.map(msg => {
       return msg.parts
@@ -82,7 +93,7 @@ export class AIService {
       },
       {
         name: 'getRandomPokemon',
-        description: 'Returns a random Pokémon from the Teras region. Call this when the user asks for a "random Pokémon", "surprise me with a Pokémon", "pick a Pokémon for me", or when they want information about a random Pokémon (like "stats of a random Pokémon", "type of a random Pokémon", etc.).',
+        description: 'Returns a random Pokémon from the Teras region. Call this when the user asks for a "random Pokémon", "surprise me with a Pokémon", "pick a Pokémon for me", or when they want information about a random Pokémon (like "stats of a random Pokémon", "type of a random Pokémon", etc.). IMPORTANT: Only return information that is provided by this function - never supplement with invented data.',
         parameters: {
           type: Type.OBJECT,
           properties: {
@@ -97,7 +108,7 @@ export class AIService {
       },
       {
         name: 'getPokemonData',
-        description: 'Returns comprehensive data about a specific Pokémon. ALWAYS use this function when users ask about a specific Pokémon\'s location, where to find it, where it spawns, its habitat, or any other information. Keywords that should trigger this function include: "dónde", "donde", "encontrar", "spawnea", "ubicación", "localización", "habitat", "lugar", "zona", "área", "región", "where", "location", "find", "spawn".',
+        description: 'Returns comprehensive data about a specific Pokémon. ALWAYS use this function when users ask about a specific Pokémon\'s information. CRITICAL: Only provide information that is returned by this function - never add invented details. Keywords that should trigger this function include: "dónde", "donde", "encontrar", "spawnea", "ubicación", "localización", "habitat", "lugar", "zona", "área", "región", "where", "location", "find", "spawn", or any question about a specific Pokémon.',
         parameters: {
           type: Type.OBJECT,
           properties: {
