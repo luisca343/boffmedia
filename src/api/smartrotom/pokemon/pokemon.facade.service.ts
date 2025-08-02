@@ -58,6 +58,7 @@ export class PokemonFacadeService {
 
   searchPokemonByName(name: string, amount: number = 16): FuseResult<Pokemon>[] {
     try {
+      
       return this.pokemonDataService.searchPokemonByName(name, amount);
     } catch (error) {
       console.error(`Error searching Pokemon by name ${name}:`, error);
