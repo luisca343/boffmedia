@@ -8,7 +8,7 @@ import {
 
 // Define our own message part interface without the enum
 export interface MessagePart {
-  type: 'text' | 'pokemonTypes' | 'pokemonStats' | 'pokemonMoves' | 'pokemonHabitat' | 'randomPokemon' | 'pokemonCount';
+  type: 'text' | 'pokemonData' | 'biomeList' | 'randomPokemon' | 'pokemonCount';
   content: any;
 }
 
@@ -198,6 +198,27 @@ export class FicusAIService {
     return {
       sender,
       parts
+    };
+  }
+
+  /**
+   * Create a complete Pokemon message
+   */
+  static createCompletePokemonMessage(pokemonData: {
+    pokemonName: string;
+    types?: string[];
+    stats?: any;
+    moves?: Record<string, any>;
+    habitat?: string[];
+  }): FicusMessageContent {
+    return {
+      sender: 'bot',
+      parts: [
+        {
+          type: 'pokemonData',
+          content: pokemonData
+        }
+      ]
     };
   }
 }

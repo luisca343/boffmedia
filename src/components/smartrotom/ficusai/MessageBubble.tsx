@@ -4,11 +4,8 @@ import { Bot, User } from "lucide-react";
 import { Mensaje, MessagePart, PokemonStats } from "./types";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import PokemonStatsCard from "./PokemonStatsCard";
-import PokemonMovesCard from "./PokemonMovesCard";
 import BiomeListCard from "./BiomeListCard";
-import PokemonTypesCard from "./PokemonTypesCard";
-import PokemonHabitatCard from "./PokemonHabitatCard";
+import CompletePokemonCard from "./CompletePokemonCard";
 import { cn } from "@/lib/utils";
 
 interface MessageBubbleProps {
@@ -38,22 +35,6 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
           </div>
         );
       
-      case "pokemonStats":
-        return (
-          <PokemonStatsCard 
-            key={index} 
-            data={part.content as { stats: PokemonStats; pokemonName: string }} 
-          />
-        );
-      
-      case "pokemonMoves":
-        return (
-          <PokemonMovesCard 
-            key={index} 
-            data={part.content as { moves: Record<string, any>; pokemonName: string }} 
-          />
-        );
-      
       case "biomeList":
         return (
           <BiomeListCard 
@@ -62,19 +43,11 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
           />
         );
       
-      case "pokemonTypes":
+      case "pokemonData":
         return (
-          <PokemonTypesCard 
+          <CompletePokemonCard 
             key={index} 
-            data={part.content as { types: string[]; pokemonName: string }} 
-          />
-        );
-      
-      case "pokemonHabitat":
-        return (
-          <PokemonHabitatCard 
-            key={index} 
-            data={part.content as { habitat: string[]; pokemonName: string }} 
+            data={part.content as any} 
           />
         );
       

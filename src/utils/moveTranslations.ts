@@ -8,7 +8,7 @@
  * @returns The formatted translation key
  */
 export function getMoveTranslationKey(moveName: string): string {
-  return `attack_${moveName.toLowerCase().replaceAll(" ", "_")}`;
+  return `attack_${moveName.toLowerCase().replace(/ /g, "_")}`;
 }
 
 /**

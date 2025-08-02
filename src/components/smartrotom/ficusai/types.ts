@@ -4,7 +4,7 @@ export type Mensaje = {
 };
 
 export type MessagePart = {
-  type: "text" | "pokemonStats" | "pokemonMoves" | "biomeList" | "pokemonTypes" | "pokemonHabitat";
+  type: "text" | "pokemonData" | "biomeList";
   content: string | PokemonStats | any;
 };
 
