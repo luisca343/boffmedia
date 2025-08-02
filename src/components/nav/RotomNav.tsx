@@ -176,9 +176,9 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-surface-800 text-surface-50 border-none flex flex-col w-max p-0"
+          className="bg-surface-800 text-surface-50 border-none flex flex-col p-0 max-w-3xl"
         >
-          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary-500">
+          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary-500 z-10">
             <X className="h-4 w-4" />
             <span className="sr-only">Cerrar</span>
           </SheetClose>

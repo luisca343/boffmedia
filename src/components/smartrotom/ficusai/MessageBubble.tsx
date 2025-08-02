@@ -2,6 +2,8 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Bot, User } from "lucide-react";
 import { Mensaje, MessagePart, PokemonStats } from "./types";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import PokemonStatsCard from "./PokemonStatsCard";
 import PokemonMovesCard from "./PokemonMovesCard";
 import BiomeListCard from "./BiomeListCard";
@@ -22,8 +24,17 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
     switch (part.type) {
       case "text":
         return (
-          <div key={index} className="whitespace-pre-wrap">
-            {part.content as string}
+          <div key={index} className="prose prose-invert max-w-none prose-ul:list-disc prose-ul:ml-4 prose-li:mb-1 prose-p:mb-4 prose-p:last:mb-0">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                ul: ({ children }) => <ul className="list-disc ml-4 space-y-1 mb-4">{children}</ul>,
+                li: ({ children }) => <li className="mb-1">{children}</li>,
+                p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>
+              }}
+            >
+              {(part.content as string).trim()}
+            </ReactMarkdown>
           </div>
         );
       
@@ -92,10 +103,9 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
           ? "bg-primary-600 text-white rounded-tr-md" 
           : "bg-surface-700 text-surface-100 rounded-tl-md"
       )}>
-        <div className="space-y-2">
+        <div className="prose prose-invert max-w-none space-y-2">
           {message.parts.map((part, index) => renderMessagePart(part, index))}
         </div>
-        
         {isTyping && !isUser && (
           <div className="flex items-center gap-1 mt-2 opacity-70">
             <div className="flex gap-1">
