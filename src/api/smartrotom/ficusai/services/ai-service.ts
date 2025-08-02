@@ -27,14 +27,19 @@ export class AIService {
       SIEMPRE usa las funciones disponibles para obtener datos de Pokémon, incluso para nombres raros como "Bowser"
       Para preguntas sobre ubicaciones/hábitat, usa getPokemonData con dataTypes "habitat"
       Si no tienes función para algo específico, di: "No tengo esa información disponible"
-      Si una función falla, informa que no pudiste acceder a esa información`;
+      Si una función falla, informa que no pudiste acceder a esa información
+      
+      IMPORTANTE: Solo responde al mensaje ACTUAL del usuario. NO hagas llamadas a funciones basadas en mensajes anteriores del contexto.
+      El contexto se proporciona solo para entender el flujo de conversación, pero debes responder únicamente al último mensaje del usuario.`;
 
-    const contextText = contextMessages.map(msg => {
-      return msg.parts
-        .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
-        .map(part => part.content)
-        .join('\n');
-    }).join('\n');
+    const contextText = contextMessages.length > 0 
+      ? `Contexto de conversación anterior (solo para referencia, NO respondas a estos mensajes):\n${contextMessages.map(msg => {
+          return msg.parts
+            .filter(part => part.type === 'text' && typeof part.content === 'string' && part.content.trim() !== '')
+            .map(part => part.content)
+            .join('\n');
+        }).join('\n')}\n\nMensaje ACTUAL del usuario (responde SOLO a este):`
+      : 'Mensaje del usuario:';
 
     const userText = [
       globalContext,
