@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PokemonFacadeService } from '@api/smartrotom/pokemon/pokemon.facade.service';
 import { firstLetterToUpperCase } from '@/_utils/stringUtils';
 import { MessagePartDto, MessagePartType } from '../dto/message-part.dto';
+import Fuse from 'fuse.js';
 
 @Injectable()
 export class PokemonDataService {
@@ -232,51 +233,17 @@ export class PokemonDataService {
 
   // Add method to get similar Pokémon names for suggestions
   getSimilarPokemonNames(pokemonName: string, limit: number = 5): string[] {
+    // Use Fuse.js for fuzzy matching with less restrictive params
     const allPokemon = this.pokemonService.getAllPokemon();
     if (!allPokemon) return [];
 
-    const searchTerm = pokemonName.toLowerCase();
-    const suggestions: { name: string; score: number }[] = [];
-
-    for (const pokemon of allPokemon) {
-      const name = pokemon.name.toLowerCase();
-      
-      // Exact match (shouldn't happen if we reach here, but just in case)
-      if (name === searchTerm) continue;
-      
-      // Calculate similarity score
-      let score = 0;
-      
-      // Contains the search term
-      if (name.includes(searchTerm)) {
-        score += 10;
-      }
-      
-      // Starts with search term
-      if (name.startsWith(searchTerm)) {
-        score += 5;
-      }
-      
-      // Length similarity
-      const lengthDiff = Math.abs(name.length - searchTerm.length);
-      score += Math.max(0, 5 - lengthDiff);
-      
-      // Character similarity (simple)
-      let commonChars = 0;
-      for (const char of searchTerm) {
-        if (name.includes(char)) commonChars++;
-      }
-      score += commonChars;
-      
-      if (score > 0) {
-        suggestions.push({ name: pokemon.name, score });
-      }
-    }
-
-    // Sort by score and return top suggestions
-    return suggestions
-      .sort((a, b) => b.score - a.score)
-      .slice(0, limit)
-      .map(s => s.name);
+    const fuse = new Fuse(allPokemon, {
+      keys: ['name'],
+      threshold: 0.75,
+      distance: 200,
+      minMatchCharLength: 2,
+    });
+    const results = fuse.search(pokemonName, { limit });
+    return results.map((result: any) => result.item.name);
   }
 }
