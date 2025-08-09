@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { GameSpotlightCard } from "./GameSpotlightCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -17,52 +17,39 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
     >
       {/* Left Column: SmartRotom Info Card */}
       <div className="flex justify-center items-center order-1 md:order-1">
-        <div className="w-full max-w-2xl space-y-8">
-          {/* Logo Section - Centered and Prominent */}
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 bg-orange-500/20 rounded-2xl blur-2xl"></div>
-              <Image
-                src="/img/smartrotom.png"
-                alt="SmartRotom"
-                width={120}
-                height={120}
-                className="relative rounded-xl"
-              />
+        <GameSpotlightCard
+          iconSrc="/img/smartrotom.png"
+          iconAlt="SmartRotom"
+          title={t("featuredGames.games.smartrotom.title")}
+          titleGradientClass="bg-gradient-to-r from-primary-400 to-primary-300"
+          iconBgClass="from-primary-500 to-primary-700"
+          underlineClass="from-primary-400 to-primary-300"
+        >
+          <p className="text-xl text-surface-300 leading-relaxed mb-8 text-left">
+            {t("featuredGames.games.smartrotom.description")}
+          </p>
+          {/* Features List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
+            <div className="flex items-center gap-3 text-surface-300">
+              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+              <span>Disponible en Minecraft como en la web</span>
+            </div>
+            <div className="flex items-center gap-3 text-surface-300">
+              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+              <span>Aplicaciones útiles para tu aventura</span>
+            </div>
+            <div className="flex items-center gap-3 text-surface-300">
+              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+              <span>Interfaz intuitiva y fácil de usar</span>
+            </div>
+            <div className="flex items-center gap-3 text-surface-300">
+              <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+              <span>Actualizaciones constantes</span>
             </div>
           </div>
-          <div className="space-y-6">
-            <h3 id="smartrotom-hero-title" className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-400">
-              {t("featuredGames.games.smartrotom.title")}
-            </h3>
-            <p className="text-xl text-surface-300 leading-relaxed text-center">
-              {t("featuredGames.games.smartrotom.description")}
-            </p>
-            
-            {/* Features List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 justify-center text-center mx-auto" style={{maxWidth: 700}}>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                <span>Disponible en Minecraft como en la web</span>
-              </div>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                <span>Aplicaciones útiles para tu aventura</span>
-              </div>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                <span>Interfaz intuitiva y fácil de usar</span>
-              </div>
-              <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                <span>Actualizaciones constantes</span>
-              </div>
-            </div>
-          </div>
-          
           <div className="flex items-center gap-4">
             <Button
-              className="bg-gradient-to-r from-orange-600 via-amber-500 to-yellow-500 hover:from-orange-700 hover:to-yellow-600 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-orange-300 focus:ring-offset-2 focus:outline-none group"
+              className="bg-gradient-to-r from-primary-600 via-amber-500 to-yellow-500 hover:from-primary-700 hover:to-yellow-600 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-primary-300 focus:ring-offset-2 focus:outline-none group"
               asChild
               aria-label={t("featuredGames.viewMore") + " SmartRotom"}
             >
@@ -75,7 +62,7 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
             </Button>
             <Button
               variant="outline"
-              className="border-orange-500/30 text-orange-500 hover:bg-orange-500/10 px-6 py-3 font-semibold transition-all duration-200"
+              className="border-primary-500/30 text-primary-500 hover:bg-primary-500/10 px-6 py-3 font-semibold transition-all duration-200"
               asChild
               aria-label="Abrir SmartRotom"
             >
@@ -84,7 +71,7 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
               </InternalLink>
             </Button>
           </div>
-        </div>
+        </GameSpotlightCard>
       </div>
 
       <div className="flex justify-center items-center relative order-2 md:order-2">

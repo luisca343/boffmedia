@@ -1,108 +1,149 @@
-import Image from "next/image";
+import { GameSpotlightCard } from "./GameSpotlightCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { ToolsSpotlightVideoBg } from "./ToolSpotlightVideoBg";
+import { ArrowRight, Wrench, Calculator, Cog, BarChart3, Server, Filter, Zap } from "lucide-react";
+import { InternalLink } from "@/components/nav/Link";
 
 interface ToolsSpotlightProps {
   t: (key: string) => string;
 }
 
 export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
+  const toolCategories = [
+    { icon: Calculator, name: "Calculadoras", color: "from-emerald-500 to-green-600" },
+    { icon: Cog, name: "Generadores", color: "from-green-500 to-teal-600" },
+    { icon: BarChart3, name: "Análisis", color: "from-teal-500 to-emerald-600" },
+    { icon: Server, name: "Utilidades", color: "from-emerald-600 to-green-700" },
+    { icon: Filter, name: "Filtros", color: "from-green-600 to-teal-700" },
+    { icon: Zap, name: "Automatización", color: "from-teal-600 to-emerald-700" },
+  ];
+
   return (
     <section
-      className="relative w-full pt-32 -mb-16 flex flex-col items-center justify-center overflow-hidden"
+      className="mb-24 relative min-h-[600px] overflow-hidden"
       aria-labelledby="tools-hero-title"
     >
-      <ToolsSpotlightVideoBg />
 
-      {/* Main content */}
-      <div className="relative z-10 flex flex-col items-center w-full aspect-[2/1]">
-        {/* Logo */}
-        <div className="mb-8">
-          <div className="relative flex items-center justify-center">
-            <div className="absolute inset-0 bg-yellow-500/20 rounded-2xl blur-2xl w-40 h-40"></div>
-            <Image
-              src="/img/tools.png"
-              alt="Tools"
-              width={160}
-              height={160}
-              className="relative rounded-xl"
-              priority
-            />
+      {/* Main content - two sections */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 h-full items-center px-6 py-16">
+        {/* Left Section: Floating Tools Cloud */}
+        <div className="order-2 lg:order-1 flex items-center justify-center relative h-[34rem]">
+          <div className="relative w-full h-full">
+            {/* Animated rings - must be behind the tools and not block pointer events */}
+            <div className="absolute top-1/2 left-1/2 w-[22rem] h-[22rem] border border-emerald-500/20 rounded-full animate-spin pointer-events-none" style={{animationDuration: '20s', transform: 'translate(-50%, -50%)'}}></div>
+            <div className="absolute top-1/2 left-1/2 w-[28rem] h-[28rem] border border-green-500/10 rounded-full animate-spin pointer-events-none" style={{animationDuration: '30s', animationDirection: 'reverse', transform: 'translate(-50%, -50%)'}}></div>
+
+            {/* Central hub */}
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-2xl z-10">
+              <Wrench className="w-14 h-14 text-white animate-pulse" />
+            </div>
+
+            {/* Orbiting tools */}
+            {toolCategories.map((tool, index) => {
+              const angle = (index * 60) * (Math.PI / 180); // 60 degrees apart
+              const radius = 180;
+              const x = Math.cos(angle) * radius;
+              const y = Math.sin(angle) * radius;
+              return (
+                <div
+                  key={tool.name}
+                  className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 animate-pulse hover:scale-125 transition-all duration-300 cursor-pointer group z-30"
+                  style={{
+                    left: `calc(50% + ${x}px)`,
+                    top: `calc(50% + ${y}px)`,
+                    animationDelay: `${index * 0.3}s`,
+                    animationDuration: '3s'
+                  }}
+                >
+                  <div className={`w-full h-full bg-gradient-to-br ${tool.color} rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-2xl transition-all duration-300`}>
+                    <tool.icon className="w-10 h-10 text-white" />
+                  </div>
+                  {/* Connecting line to center */}
+                  <div 
+                    className="absolute w-0.5 bg-gradient-to-r from-emerald-400/20 to-transparent origin-left opacity-50 group-hover:opacity-100 transition-opacity duration-300"
+                    style={{
+                      height: `${radius}px`,
+                      transform: `rotate(${angle + Math.PI}rad)`,
+                      left: '50%',
+                      top: '50%',
+                    }}
+                  ></div>
+                  {/* Tool name tooltip - ensure above wrench */}
+                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-30">
+                    <span className="text-xs text-emerald-400 font-medium bg-surface-900/80 px-2 py-1 rounded-full">
+                      {tool.name}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
-        {/* Title & Description */}
-        <h3
-          id="tools-hero-title"
-          className="text-6xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-400 mb-6 drop-shadow-lg"
-        >
-          {t("featuredGames.games.tools.title")}
-        </h3>
-        <p className="text-2xl md:text-3xl text-surface-200 leading-relaxed text-center mb-14 max-w-5xl mx-auto drop-shadow">
-          {t("featuredGames.games.tools.description")}
-        </p>
 
-        {/* Features - spread horizontally */}
-        <div className="flex flex-wrap justify-center gap-x-16 gap-y-6 mb-16 w-full text-xl font-semibold">
-          <Feature text="Calculadoras y generadores" />
-          <Feature text="Bases de datos de juegos" />
-          <Feature text="Herramientas para la comunidad" />
-          <Feature text="Actualizaciones frecuentes" />
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center gap-8">
-          <Button className="bg-yellow-500 hover:bg-yellow-600 text-white px-12 py-5 text-xl font-bold shadow-lg" asChild>
-            <Link href="/herramientas" className="flex items-center justify-center gap-3">
-              {t("featuredGames.viewMore")}
-              <ArrowRight className="h-6 w-6" />
-            </Link>
-          </Button>
-          <Button
-            variant="outline"
-            className="border-yellow-500/30 text-yellow-500 hover:bg-yellow-500/10 px-10 py-5 text-xl font-bold"
+        {/* Right Section: Main Info Card */}
+        <div className="order-1 lg:order-2 flex justify-center items-center">
+          <GameSpotlightCard
+            iconSrc="/img/tools.png"
+            iconAlt="Herramientas"
+            title={t("featuredGames.games.tools.title")}
+            titleGradientClass="bg-gradient-to-r from-highlight-400 to-highlight-300"
+            iconBgClass="from-highlight-500 to-highlight-700"
+            underlineClass="from-highlight-400 to-highlight-300"
           >
-            {t("featuredGames.status.new")}
-          </Button>
+            <p className="text-lg text-surface-300 leading-relaxed mb-8 text-left">
+              {t("featuredGames.games.tools.description")}
+            </p>
+            {/* Feature bullets */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
+              {[
+                "Calculadoras especializadas para Minecraft",
+                "Generadores automáticos de contenido", 
+                "Herramientas de análisis avanzado",
+                "Utilidades para administradores"
+              ].map((feature, index) => (
+                <div key={index} className="flex items-center gap-3 text-surface-300">
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                  <span>{feature}</span>
+                </div>
+              ))}
+            </div>
+            {/* Action buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button
+                className="bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white px-6 py-3 flex-1 shadow-xl rounded-full font-semibold transition-all duration-200 transform hover:scale-105 group"
+                asChild
+              >
+                <InternalLink href="/herramientas" className="flex items-center justify-center gap-2">
+                  <span>{t("featuredGames.viewMore")}</span>
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                </InternalLink>
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 px-6 py-3"
+                asChild
+              >
+              </Button>
+            </div>
+          </GameSpotlightCard>
         </div>
       </div>
-      <div className="absolute top-0 left-0 w-full overflow-hidden z-10 pointer-events-none">
-          <svg
-            className="relative block w-full h-20 rotate-180"
-            data-name="Layer 1"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z"
-              className="fill-surface-900"
-            ></path>
-            <path
-              d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z"
-              className="fill-surface-700"
-            ></path>
-          </svg>
-        </div>
 
-        
-      {/* Bottom SVG Wave */}
-      <div className="absolute bottom-16 left-0 w-full overflow-hidden z-10">
-        <svg className="relative block w-full h-20" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" className="fill-surface-800" ></path>
-          <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V120H0Z" className="fill-surface-900 "></path>
-        </svg>
+      {/* Floating particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-emerald-400/30 rounded-full animate-ping"
+            style={{
+              top: `${20 + (i * 10)}%`,
+              left: `${10 + (i * 12)}%`,
+              animationDelay: `${i * 0.5}s`,
+              animationDuration: '4s'
+            }}
+          ></div>
+        ))}
       </div>
     </section>
-  );
-}
-
-function Feature({ text }: { text: string }) {
-  return (
-    <div className="flex items-center gap-3 text-yellow-300 text-xl font-semibold whitespace-nowrap">
-      <span className="w-3 h-3 bg-yellow-400 rounded-full"></span>
-      <span>{text}</span>
-    </div>
   );
 }

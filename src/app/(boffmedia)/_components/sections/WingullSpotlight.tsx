@@ -44,7 +44,7 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
           {/* Logo Section - Centered and Prominent */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-2xl"></div>
+              <div className="absolute inset-0 bg-secondary-500/20 rounded-2xl blur-2xl"></div>
               <Image
                 src="/img/wingull2-logo.png"
                 alt="Pixelmon Wingull 2"
@@ -62,19 +62,19 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
             {/* Features List */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 justify-center text-center mx-auto" style={{maxWidth: 700}}>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
                 <span>Nueva generación</span>
               </div>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
                 <span>Pokémon exclusivos</span>
               </div>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
                 <span>Mecánicas mejoradas</span>
               </div>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
                 <span>Mundo renovado</span>
               </div>
             </div>
@@ -82,7 +82,7 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
           
           <div className="flex items-center gap-4">
             <Button
-              className="bg-gradient-to-r from-blue-500 via-sky-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-blue-300 focus:ring-offset-2 focus:outline-none group"
+              className="bg-gradient-to-r from-secondary-500 via-sky-500 to-secondary-700 hover:from-secondary-600 hover:to-secondary-800 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-secondary-300 focus:ring-offset-2 focus:outline-none group"
               asChild
               aria-label={t("featuredGames.viewMore") + " Pixelmon Wingull 2"}
             >
@@ -93,7 +93,7 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
                 <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </Button>
-            <Button variant="outline" className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 px-6 py-3">
+            <Button variant="outline" className="border-secondary-500/30 text-secondary-400 hover:bg-secondary-500/10 px-6 py-3">
               <HiBell className="w-6 h-6" />
             </Button>
           </div>

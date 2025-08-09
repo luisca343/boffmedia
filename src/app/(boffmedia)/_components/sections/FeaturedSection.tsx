@@ -43,6 +43,8 @@ export async function FeaturedSection() {
         <WingullSpotlight t={t} />
         <SectionSeparator variant="orange" />
         <SmartRotomSpotlight t={t} />
+        <SectionSeparator variant="purple" />
+        <ToolsSpotlight t={t} />
       </div>       
       {/* Bottom SVG Wave */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden z-10">
