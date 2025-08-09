@@ -88,7 +88,7 @@ export default function EventSummaryPage() {
     } else if (end && now > end) {
       return { label: 'Finalizado', color: 'from-surface-500 to-surface-600', icon: Calendar }
     } else {
-      return { label: 'En Curso', color: 'from-highlight-500 to-emerald-600', icon: Zap }
+      return { label: 'En Curso', color: 'from-success-500 to-emerald-600', icon: Zap }
     }
   }
 
@@ -338,12 +338,12 @@ export default function EventSummaryPage() {
               <Card className="bg-surface-800/60 backdrop-blur-sm border-accent-500/20">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-lg flex items-center gap-2">
-                    <Target className="w-5 h-5 text-highlight-400" />
+                    <Target className="w-5 h-5 text-accent-400" />
                     Tipo
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-xl font-bold text-highlight-400">
+                  <div className="text-xl font-bold text-accent-400">
                     {event.type === Event.type.EVENT ? 'Evento' : 'Servidor'}
                   </div>
                   <p className="text-surface-400 text-sm">Modalidad de juego</p>

@@ -133,15 +133,15 @@ export async function EventsSection() {
         {/* Section Header */}
         <div className="text-center mb-16">
           <div className="inline-block relative">
-            <h2 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-highlight-400 to-info-400 mb-4">
+            <h2 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
               Eventos Activos
             </h2>
-            <div className="h-1 w-32 bg-gradient-to-r from-accent-500 to-highlight-400 mx-auto rounded-full"></div>
+            <div className="h-1 w-32 bg-gradient-to-r from-accent-500 to-secondary-400 mx-auto rounded-full"></div>
             {/* Floating icons around title */}
-            <div className="absolute -top-6 -left-12 w-8 h-8 bg-gradient-to-br from-accent-500 to-highlight-600 rounded-full flex items-center justify-center animate-bounce">
+            <div className="absolute -top-6 -left-12 w-8 h-8 bg-gradient-to-br from-accent-500 to-secondary-600 rounded-full flex items-center justify-center animate-bounce">
               <Trophy className="w-4 h-4 text-white" />
             </div>
-            <div className="absolute -top-6 -right-12 w-8 h-8 bg-gradient-to-br from-secondary-500 to-info-600 rounded-full flex items-center justify-center animate-bounce" style={{animationDelay: '0.5s'}}>
+            <div className="absolute -top-6 -right-12 w-8 h-8 bg-gradient-to-br from-secondary-500 to-accent-600 rounded-full flex items-center justify-center animate-bounce" style={{animationDelay: '0.5s'}}>
               <Star className="w-4 h-4 text-white" />
             </div>
           </div>
@@ -214,7 +214,7 @@ export async function EventsSection() {
                     <div className="bg-surface-700/50 rounded-xl p-4 border border-accent-500/20">
                       <div className="text-center">
                         <div className="text-sm text-surface-400 mb-2">Tiempo restante</div>
-                        <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-highlight-400">
+                        <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
                           {getTimeUntilEvent(featuredEvent.startDate)}
                         </div>
                       </div>
@@ -222,7 +222,7 @@ export async function EventsSection() {
                   )}
 
                   <div className="flex gap-4">
-                    <Button className="bg-gradient-to-r from-accent-600 to-highlight-600 hover:from-accent-700 hover:to-highlight-700 flex-1">
+                    <Button className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 flex-1">
                       Unirse al Evento
                     </Button>
                     <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
@@ -233,10 +233,10 @@ export async function EventsSection() {
 
                 {/* Event Visual */}
                 <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent-500/20 to-highlight-500/20 rounded-2xl blur-xl"></div>
-                  <div className="relative bg-gradient-to-br from-accent-600/10 to-highlight-600/10 rounded-2xl p-8 border border-accent-500/20 h-full flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent-500/20 to-secondary-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative bg-gradient-to-br from-accent-600/10 to-secondary-600/10 rounded-2xl p-8 border border-accent-500/20 h-full flex items-center justify-center">
                     <div className="text-center">
-                      <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-highlight-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                      <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
                         <Trophy className="w-12 h-12 text-white" />
                       </div>
                       <h4 className="text-xl font-bold text-white mb-2">¡Evento Épico!</h4>
@@ -364,7 +364,7 @@ export async function EventsSection() {
               Explora todos nuestros eventos pasados, presentes y futuros. Encuentra el evento perfecto para ti.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-gradient-to-r from-accent-600 to-info-600 hover:from-accent-700 hover:to-info-700">
+              <Button className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700">
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
                   Ver Todos los Eventos

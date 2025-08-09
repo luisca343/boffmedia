@@ -122,8 +122,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
     <Button
       className={
         isRegistered 
-          ? "w-full bg-gradient-to-r from-highlight-600 to-emerald-600 hover:from-highlight-700 hover:to-emerald-700 font-semibold shadow-lg" 
-          : "w-full bg-gradient-to-r from-accent-600 to-indigo-600 hover:from-accent-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+          ? "w-full bg-gradient-to-r from-success-600 to-emerald-600 hover:from-success-700 hover:to-emerald-700 font-semibold shadow-lg" 
+          : "w-full bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
       }
       onClick={handleRegistration}
       disabled={isRegistering}

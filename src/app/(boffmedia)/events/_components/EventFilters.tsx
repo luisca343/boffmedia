@@ -60,7 +60,7 @@ export function EventFilters({ filter, onFilterChange, eventsCount }: EventFilte
       {/* Events Count Badge */}
       <div className="flex items-center gap-2">
         <span className="text-surface-400 text-sm font-medium">Eventos:</span>
-        <Badge className="bg-gradient-to-r from-accent-500/20 to-info-500/20 text-accent-400 border border-accent-500/30 font-bold">
+        <Badge className="bg-gradient-to-r from-accent-500/20 to-secondary-500/20 text-accent-400 border border-accent-500/30 font-bold">
           {eventsCount}
         </Badge>
       </div>

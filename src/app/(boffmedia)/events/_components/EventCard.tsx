@@ -42,8 +42,8 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
-      case APIEvent.type.EVENT: return 'from-accent-500 to-info-600';
-      case APIEvent.type.SERVER: return 'from-secondary-500 to-info-600';
+      case APIEvent.type.EVENT: return 'from-accent-500 to-secondary-600';
+      case APIEvent.type.SERVER: return 'from-secondary-500 to-accent-600';
       default: return 'from-surface-500 to-surface-600';
     }
   };
@@ -51,7 +51,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
   const getStatusColorClass = (status: any) => {
     switch (status.label) {
       case 'En Curso': return 'bg-gradient-to-r from-success-500 to-success-600';
-      case 'Próximo': return 'bg-gradient-to-r from-secondary-500 to-info-600';
+      case 'Próximo': return 'bg-gradient-to-r from-secondary-500 to-secondary-600';
       case 'Finalizado': return 'bg-gradient-to-r from-surface-500 to-surface-600';
       default: return 'bg-gradient-to-r from-surface-500 to-surface-600';
     }
@@ -92,7 +92,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <div className="w-20 h-20 bg-gradient-to-br from-accent-600 to-info-600 rounded-2xl flex items-center justify-center">
+            <div className="w-20 h-20 bg-gradient-to-br from-accent-600 to-secondary-600 rounded-2xl flex items-center justify-center">
               <TypeIcon className="w-10 h-10 text-white" />
             </div>
           </div>
@@ -171,7 +171,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
         
         <CardFooter className="px-6 py-4 border-t border-surface-700/50 bg-surface-800/30">
           <div className="flex gap-3 w-full">
-            <Button asChild className="flex-1 bg-gradient-to-r from-accent-600 to-info-600 hover:from-accent-700 hover:to-info-700 font-semibold">
+            <Button asChild className="flex-1 bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold">
               <Link href={`/events/${event.id}`} className="flex items-center justify-center gap-2">
                 Ver detalles
                 <ChevronRight className="w-4 h-4" />

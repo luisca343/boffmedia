@@ -273,11 +273,11 @@ export default function EventAchievementsPage() {
 
           {/* Progress Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-surface-800/60 backdrop-blur-sm border border-highlight-500/20 rounded-2xl p-6 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-highlight-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-secondary-600 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Trophy className="h-6 w-6 text-white" />
               </div>
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-highlight-400 to-emerald-400">
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
                 {unlockedCount}
               </div>
               <div className="text-sm text-surface-400">Desbloqueados</div>
@@ -357,7 +357,7 @@ export default function EventAchievementsPage() {
                 size="sm"
                 onClick={() => setActiveFilter('unlocked')}
                 className={`px-6 ${activeFilter === 'unlocked'
-                  ? "bg-gradient-to-r from-highlight-600 to-emerald-600 text-white"
+                  ? "bg-gradient-to-r from-success-600 to-emerald-600 text-white"
                   : "text-surface-300 hover:text-white hover:bg-surface-600"
                 }`}
               >

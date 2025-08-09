@@ -7,11 +7,11 @@ export function EventsLoading() {
           <div className="relative">
             <div className="w-20 h-20 border-4 border-accent-500/20 rounded-full"></div>
             <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-accent-500 rounded-full animate-spin"></div>
-            <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-highlight-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+            <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-secondary-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
           </div>
           
           {/* Loading text with gradient */}
-          <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-highlight-400">
+          <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
             Cargando eventos...
           </h2>
           <p className="mt-2 text-surface-400">Preparando experiencias épicas</p>
