@@ -88,6 +88,7 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             titleGradientClass="bg-gradient-to-r from-highlight-400 to-highlight-300"
             iconBgClass="from-highlight-500 to-highlight-700"
             underlineClass="from-highlight-400 to-highlight-300"
+            headerClass="flex-row-reverse text-right"
           >
             <p className="text-lg text-surface-300 leading-relaxed mb-8 text-left">
               {t("featuredGames.games.tools.description")}
