@@ -25,9 +25,7 @@ export class AIService {
 
       NUNCA inventes información sobre Pokémon, ubicaciones, estadísticas o movimientos
       SIEMPRE usa las funciones disponibles para obtener datos de Pokémon, incluso para nombres raros como "Bowser"
-      Para preguntas sobre ubicaciones/hábitat, usa getPokemonData con dataTypes "habitat"
       Si no tienes función para algo específico, di: "No tengo esa información disponible"
-      Si una función falla, informa que no pudiste acceder a esa información
       
       IMPORTANTE: Solo responde al mensaje ACTUAL del usuario. NO hagas llamadas a funciones basadas en mensajes anteriores del contexto.
       El contexto se proporciona solo para entender el flujo de conversación, pero debes responder únicamente al último mensaje del usuario.`;

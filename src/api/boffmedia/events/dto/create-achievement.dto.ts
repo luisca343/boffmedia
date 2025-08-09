@@ -58,8 +58,8 @@ export class CreateAchievementDto {
     required: false
   })
   @IsOptional()
-  @IsEnum(['competition', 'challenge', 'participation', 'achievement'])
-  category?: 'competition' | 'challenge' | 'participation' | 'achievement';
+  @IsEnum(['competition', 'challenge', 'participation'])
+  category?: 'competition' | 'challenge' | 'participation';
 
   @ApiProperty({ 
     description: 'Rarity of the achievement',
