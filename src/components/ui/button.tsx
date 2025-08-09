@@ -17,12 +17,12 @@ const buttonVariants = cva(
         link: "text-primary-400 underline-offset-4 hover:underline focus-visible:ring-primary-400",
 
         // Wingull variants
-        wingull: "bg-blue-500 text-blue-950 hover:bg-blue-400 focus-visible:ring-blue-400",
-        wingullDestructive: "bg-red-600 text-blue-50 hover:bg-red-600/90 focus-visible:ring-red-600",
-        wingullOutline: "border border-blue-400 bg-transparent hover:bg-blue-400/10 text-blue-400 focus-visible:ring-blue-400",
-        wingullSecondary: "bg-blue-800 text-blue-400 hover:bg-blue-700 focus-visible:ring-blue-400",
-        wingullGhost: "hover:bg-blue-400/10 text-blue-400 focus-visible:ring-blue-400",
-        wingullLink: "text-blue-400 underline-offset-4 hover:underline focus-visible:ring-blue-400",
+        wingull: "bg-secondary-500 text-secondary-950 hover:bg-secondary-400 focus-visible:ring-secondary-400",
+        wingullDestructive: "bg-red-600 text-secondary-50 hover:bg-red-600/90 focus-visible:ring-red-600",
+        wingullOutline: "border border-secondary-400 bg-transparent hover:bg-secondary-400/10 text-secondary-400 focus-visible:ring-secondary-400",
+        wingullSecondary: "bg-secondary-800 text-secondary-400 hover:bg-secondary-700 focus-visible:ring-secondary-400",
+        wingullGhost: "hover:bg-secondary-400/10 text-secondary-400 focus-visible:ring-secondary-400",
+        wingullLink: "text-secondary-400 underline-offset-4 hover:underline focus-visible:ring-secondary-400",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -29,7 +29,7 @@ export async function FeaturedSection() {
 
   return (
     <section
-      className="min-h-screen pb-20 relative overflow-hidden flex flex-col bg-gradient-to-b from-surface-800 via-blue-900/50 to-surface-700"
+      className="min-h-screen pb-20 relative overflow-hidden flex flex-col bg-gradient-to-b from-surface-800 via-secondary-900/50 to-surface-700"
     >
       <div className="relative mx-auto z-10 flex flex-col h-full">
       <div className="text-center mb-6">

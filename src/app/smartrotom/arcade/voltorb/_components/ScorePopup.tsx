@@ -24,7 +24,7 @@ function ScorePopup({ scoreIncrease }: ScorePopupProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-10 left-0 right-0 mx-auto bg-green-500 text-white font-bold py-2 px-4 rounded-full shadow-lg whitespace-nowrap w-max"
+          className="fixed bottom-10 left-0 right-0 mx-auto bg-highlight-500 text-white font-bold py-2 px-4 rounded-full shadow-lg whitespace-nowrap w-max"
         >
           +{scoreIncrease} monedas!
         </motion.div>

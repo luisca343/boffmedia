@@ -224,7 +224,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
               <button
                 type="button"
                 onClick={() => setMode('choice')}
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white p-2 rounded transition-colors"
+                className="flex-1 bg-surface-500 hover:bg-surface-600 text-white p-2 rounded transition-colors"
                 disabled={isLoading}
               >
                 Volver
@@ -314,7 +314,7 @@ export function MinecraftAuthForm({ mcUserData }: MinecraftAuthFormProps) {
               <button
                 type="button"
                 onClick={() => setMode('choice')}
-                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white p-2 rounded transition-colors"
+                className="flex-1 bg-surface-500 hover:bg-surface-600 text-white p-2 rounded transition-colors"
                 disabled={isLoading}
               >
                 Volver

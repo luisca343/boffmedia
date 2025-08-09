@@ -34,7 +34,7 @@ export default function Pasaporte(){
     return(
       <section className=" bg-yellow-200 flex bg-center bg-no-repeat bg-fixed bg-cover">
           <Book setBook={setBook}>
-            <Page dataDensity="hard" book={book} number={page++} className="font-vinque bg-blue-600 flex  flex-col bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/pasaporte.png)`}} />
+            <Page dataDensity="hard" book={book} number={page++} className="font-vinque bg-secondary-600 flex  flex-col bg-center bg-no-repeat bg-fixed bg-cover" style={{backgroundImage: `url(/smartrotom/img/apps/pasaporte/pasaporte.png)`}} />
             <Page book={book} number={page++} >
               <PageTitle title="Indice"/>
               <IndexPage book={book} badgePage={badgePage} achievements={achievements} obtainedBadges={obtainedBadges}/>
@@ -98,7 +98,7 @@ export default function Pasaporte(){
             <span className="right-0 text-sm 2xl:text-base ">Obtenida: {parseDate(achievement.completedAt)}</span>
             {achievement.replay && (
               <Popover>
-                <PopoverTrigger className="text-base self-end ml-2 hover:text-blue-500">Ver Reptición</PopoverTrigger>
+                <PopoverTrigger className="text-base self-end ml-2 hover:text-secondary-500">Ver Reptición</PopoverTrigger>
                 <PopoverContent className="ml-12 w-fit h-fit page border border-surface-950 shadow-2xl">
                   <Game battleName={achievement.id}/>
                 </PopoverContent>

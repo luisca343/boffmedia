@@ -31,10 +31,10 @@ export const getIconColor = (slotType: EquipmentType): string => {
   const colors: Record<EquipmentType, string> = {
     'weapon': "text-red-400",
     'secondaryWeapon': "text-orange-400",
-    'head': "text-blue-400",
-    'chest': "text-green-400",
+    'head': "text-secondary-400",
+    'chest': "text-highlight-400",
     'arms': "text-yellow-400",
-    'waist': "text-purple-400",
+    'waist': "text-accent-400",
     'legs': "text-cyan-400",
     'charm': "text-amber-400",
   };
@@ -78,15 +78,15 @@ export const getRarityFilterStyle = (rarity: number): string => {
 export const getRarityStyle = (rarity: number): string => {
   switch (true) {
     case rarity === 3:
-      return "border-green-400 text-green-300";
+      return "border-highlight-400 text-highlight-300";
     case rarity === 4:
-      return "border-green-600 text-green-500";
+      return "border-highlight-600 text-highlight-500";
     case rarity === 5:
       return "border-cyan-500 text-cyan-400";
     case rarity === 6:
-      return "border-blue-500 text-blue-400";
+      return "border-secondary-500 text-secondary-400";
     case rarity === 7:
-      return "border-purple-500 text-purple-400";
+      return "border-accent-500 text-accent-400";
     case rarity >= 8:
       return "border-orange-500 text-orange-400";
     default:
@@ -100,13 +100,13 @@ export const getElementColor = (elementType: string): string => {
   
   const colors: Record<string, string> = {
     fire: "text-red-400",
-    water: "text-blue-400",
+    water: "text-secondary-400",
     thunder: "text-yellow-400",
     ice: "text-cyan-400",
-    dragon: "text-purple-400"
+    dragon: "text-accent-400"
   };
   
-  return colors[elementType.toLowerCase()] || "text-gray-400";
+  return colors[elementType.toLowerCase()] || "text-surface-400";
 };
 
 // Helper to get defense value regardless of format
@@ -218,11 +218,11 @@ export function getStatusColor(statusType: string | undefined): string {
   
   switch (statusType.toLowerCase()) {
     case 'poison':
-      return 'text-purple-400';
+      return 'text-accent-400';
     case 'paralysis':
       return 'text-yellow-300';
     case 'sleep':
-      return 'text-blue-300';
+      return 'text-secondary-300';
     case 'blast':
       return 'text-orange-400';
     case 'stun':

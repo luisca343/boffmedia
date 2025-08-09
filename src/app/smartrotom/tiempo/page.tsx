@@ -41,9 +41,9 @@ export default function Component() {
       case "nublado":
         return <Cloud className="h-12 w-12 text-surface-400" />;
       case "lluvia":
-        return <CloudRain className="h-12 w-12 text-blue-500" />;
+        return <CloudRain className="h-12 w-12 text-secondary-500" />;
       case "tormenta":
-        return <CloudLightning className="h-12 w-12 text-purple-500" />;
+        return <CloudLightning className="h-12 w-12 text-accent-500" />;
       case "noche":
         return <Moon className="h-12 w-12 text-indigo-300" />;
       default:
@@ -53,11 +53,11 @@ export default function Component() {
 
   return (
     <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-lg overflow-hidden">
-      <div className="bg-blue-500 p-3 flex justify-between items-center">
+      <div className="bg-secondary-500 p-3 flex justify-between items-center">
         <h2 className="text-white text-lg font-semibold">Clima de Minecraft</h2>
         <button
           onClick={refreshWeather}
-          className="text-white hover:bg-blue-600 rounded-full p-1"
+          className="text-white hover:bg-secondary-600 rounded-full p-1"
         >
           <RefreshCw className="h-5 w-5" />
         </button>

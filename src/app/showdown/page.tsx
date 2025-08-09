@@ -189,7 +189,7 @@ export default function ShowdownPage() {
           className="border p-2 mr-2"
         />
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-secondary-500 hover:bg-secondary-700 text-white font-bold py-2 px-4 rounded"
           onClick={handleLogin}
           disabled={!isConnected || !challstr}
         >
@@ -198,7 +198,7 @@ export default function ShowdownPage() {
       </div>
       <div className="mb-4">
         <button
-          className={`bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2 ${
+          className={`bg-highlight-500 hover:bg-highlight-700 text-white font-bold py-2 px-4 rounded mr-2 ${
             !isConnected && 'opacity-50 cursor-not-allowed'
           }`}
           onClick={() => sendMessage('|/join lobby')}
@@ -217,9 +217,9 @@ export default function ShowdownPage() {
         {messages.map((msg, index) => (
           <p key={index} className={`${
             msg.type === 'error' ? 'text-red-500' :
-            msg.type === 'sent' ? 'text-blue-500' :
-            msg.type === 'received' ? 'text-green-500' :
-            'text-gray-700'
+            msg.type === 'sent' ? 'text-secondary-500' :
+            msg.type === 'received' ? 'text-highlight-500' :
+            'text-surface-700'
           }`}>
             {msg.content}
           </p>

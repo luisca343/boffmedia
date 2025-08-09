@@ -67,7 +67,7 @@ export default function GameGrid({ grid, rowInfo, colInfo, onCellClick }: GameGr
           {row.map((cell, colIndex) => (
             <motion.div
               key={`cell-${rowIndex}-${colIndex}`}
-              className="aspect-square bg-blue-500 rounded-md cursor-pointer"
+              className="aspect-square bg-secondary-500 rounded-md cursor-pointer"
               onClick={() => handleCellClick(rowIndex, colIndex)}
               animate={{ rotateY: flippedCells[`${rowIndex}-${colIndex}`] ? 180 : 0 }}
               transition={{ duration: 0.6 }}

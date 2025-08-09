@@ -21,18 +21,18 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="z-50 absolute mb-10 w-full max-w-md bg-gray-900/90 rounded-xl p-6 border-4 border-cyan-500/50 shadow-xl"
+      className="z-50 absolute mb-10 w-full max-w-md bg-surface-900/90 rounded-xl p-6 border-4 border-cyan-500/50 shadow-xl"
     >
       {/* Cabinet top */}
-      <div className="bg-gradient-to-r from-gray-800 to-gray-900 -mt-6 -mx-6 mb-6 py-2 px-4 border-b-2 border-gray-700 flex justify-center">
-        <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 animate-text-shine px-4 text-center">
+      <div className="bg-gradient-to-r from-surface-800 to-surface-900 -mt-6 -mx-6 mb-6 py-2 px-4 border-b-2 border-surface-700 flex justify-center">
+        <div className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-400 animate-text-shine px-4 text-center">
           ¡Objeto Obtenido!
         </div>
       </div>
       
       {/* Cabinet screws */}
-      <div className="absolute left-4 top-4 h-2 w-2 rounded-full bg-gray-600 shadow-inner"></div>
-      <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-gray-600 shadow-inner"></div>
+      <div className="absolute left-4 top-4 h-2 w-2 rounded-full bg-surface-600 shadow-inner"></div>
+      <div className="absolute right-4 top-4 h-2 w-2 rounded-full bg-surface-600 shadow-inner"></div>
       
       <div className={`flex flex-col items-center p-4 rounded-lg ${config.bgColor} border-2 ${config.borderColor} ${config.glow}`}>
         <h3 className={`text-xl font-bold ${config.textColor} mb-2 text-center`}>
@@ -68,11 +68,11 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
           )}
         </div>
         
-        <div className={`px-3 py-1 rounded-full ${config.textColor} bg-gray-950/60 mb-4 text-center font-bold uppercase tracking-wider text-sm`}>
+        <div className={`px-3 py-1 rounded-full ${config.textColor} bg-surface-950/60 mb-4 text-center font-bold uppercase tracking-wider text-sm`}>
           {wonItem.rarity}
         </div>
         
-        <p className="text-gray-200 text-center mb-4 bg-black/40 p-3 rounded-lg border border-gray-800">
+        <p className="text-surface-200 text-center mb-4 bg-black/40 p-3 rounded-lg border border-surface-800">
           {getItemDescription(t, wonItem.id)}
         </p>
       </div>
@@ -83,7 +83,7 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 10, delay: 1 }}
         onClick={onComplete}
-        className="w-full mt-6 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white px-6 py-3 rounded-md flex items-center justify-center space-x-2 font-bold shadow-lg border-2 border-green-500/50"
+        className="w-full mt-6 bg-gradient-to-r from-highlight-600 to-emerald-600 hover:from-highlight-500 hover:to-emerald-500 text-white px-6 py-3 rounded-md flex items-center justify-center space-x-2 font-bold shadow-lg border-2 border-highlight-500/50"
       >
         <Check className="w-5 h-5" />
         <span>¡Añadir a colección!</span>

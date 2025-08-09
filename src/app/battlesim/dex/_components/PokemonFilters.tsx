@@ -47,33 +47,33 @@ export default function PokemonFilters() {
         {activeFilters.abilities.map(ability => (
           <span
             key={`ability-${ability}`}
-            className="bg-purple-900 text-purple-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
+            className="bg-accent-900 text-accent-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
             onClick={() => removeFilter('abilities', ability)}
           >
             {ability}
-            <span className="text-purple-300">×</span>
+            <span className="text-accent-300">×</span>
           </span>
         ))}
         
         {activeFilters.eggGroups.map(eggGroup => (
           <span
             key={`egg-${eggGroup}`}
-            className="bg-green-900 text-green-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
+            className="bg-highlight-900 text-highlight-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
             onClick={() => removeFilter('eggGroups', eggGroup)}
           >
             {eggGroup}
-            <span className="text-green-300">×</span>
+            <span className="text-highlight-300">×</span>
           </span>
         ))}
         
         {activeFilters.tiers.map(tier => (
           <span
             key={`tier-${tier}`}
-            className="bg-blue-900 text-blue-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
+            className="bg-secondary-900 text-secondary-100 text-xs px-2 py-1 rounded flex items-center gap-1 cursor-pointer"
             onClick={() => removeFilter('tiers', tier)}
           >
             {tier}
-            <span className="text-blue-300">×</span>
+            <span className="text-secondary-300">×</span>
           </span>
         ))}
       </div>

@@ -10,7 +10,7 @@ const tableData = [] as {
 export function ClassificationSection() {
   return (
     <section className="mb-16 md:mb-24">
-      <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+      <h2 className="text-3xl md:text-4xl font-bold mb-8 md:mb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-highlight-400 to-secondary-500">
         Tabla de Clasificación
       </h2>
       <div className="bg-surface-800/50 backdrop-blur-sm p-8 rounded-2xl border border-surface-700 shadow-lg overflow-x-auto">

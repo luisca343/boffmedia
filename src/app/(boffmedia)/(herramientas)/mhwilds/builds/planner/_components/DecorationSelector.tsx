@@ -123,10 +123,10 @@ export function DecorationSelector({
   // Get color class based on decoration slot size
   const getSlotColorClass = (size: number) => {
     switch(size) {
-      case 4: return "bg-purple-400"; // Level 4 slots (purple)
-      case 3: return "bg-blue-400";   // Level 3 slots (blue)
+      case 4: return "bg-accent-400"; // Level 4 slots (purple)
+      case 3: return "bg-secondary-400";   // Level 3 slots (blue)
       case 2: return "bg-yellow-400"; // Level 2 slots (yellow)
-      case 1: default: return "bg-gray-400"; // Level 1 slots (white/gray)
+      case 1: default: return "bg-surface-400"; // Level 1 slots (white/gray)
     }
   };
 
@@ -165,7 +165,7 @@ export function DecorationSelector({
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <CardTitle className="flex items-center text-xl">
-            <Gem className="h-5 w-5 text-green-400 mr-2" />
+            <Gem className="h-5 w-5 text-highlight-400 mr-2" />
             {t("build_planner.select_decoration")}
             <div className={`w-5 h-5 rounded-full ml-3 ${getSlotColorClass(slotSize)}`}>
               <span className="flex items-center justify-center text-xs text-surface-900">{slotSize}</span>
@@ -256,7 +256,7 @@ export function DecorationSelector({
                       variant="ghost"
                       className={`w-full justify-start p-3 h-auto ${
                         currentDecoration?.id === decoration.id
-                          ? "bg-green-900/20 text-white border border-green-600"
+                          ? "bg-highlight-900/20 text-white border border-highlight-600"
                           : "bg-surface-700/50 hover:bg-surface-700"
                       }`}
                       onClick={() => assignDecoration(decoration)}
@@ -269,10 +269,10 @@ export function DecorationSelector({
                           <div className="flex justify-between w-full">
                             <span className="font-medium text-surface-100">{decoration.name}</span>
                             {currentDecoration?.id === decoration.id && (
-                              <Check className="h-4 w-4 text-green-400" />
+                              <Check className="h-4 w-4 text-highlight-400" />
                             )}
                           </div>
-                          <div className="flex flex-wrap text-xs text-green-400 mt-1">
+                          <div className="flex flex-wrap text-xs text-highlight-400 mt-1">
                             {decoration.skills.map((skillInfo, idx) => (
                               <span key={`${decoration.id}-skill-${idx}`} className="mr-3">
                                 {skillInfo.skill.name} +{skillInfo.level}

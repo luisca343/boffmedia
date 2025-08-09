@@ -49,9 +49,9 @@ export default function ToolsLandingPage() {
         { name: "Builds", count: 1 },
       ],
       href: "/mhwilds",
-      color: "from-green-400 to-green-600",
-      gradient: "bg-gradient-to-br from-green-400/20 to-green-600/20",
-      borderGlow: "shadow-green-500/50",
+      color: "from-highlight-400 to-highlight-600",
+      gradient: "bg-gradient-to-br from-highlight-400/20 to-highlight-600/20",
+      borderGlow: "shadow-highlight-500/50",
     },
     {
       title: "Otros",
@@ -62,9 +62,9 @@ export default function ToolsLandingPage() {
         { name: "Claves de Steam", count: 1 },
       ],
       href: "/otros",
-      color: "from-blue-400 to-blue-600",
-      gradient: "bg-gradient-to-br from-blue-400/20 to-blue-600/20",
-      borderGlow: "shadow-blue-500/50",
+      color: "from-secondary-400 to-secondary-600",
+      gradient: "bg-gradient-to-br from-secondary-400/20 to-secondary-600/20",
+      borderGlow: "shadow-secondary-500/50",
     }
   ];
 

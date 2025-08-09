@@ -33,7 +33,7 @@ const TabsList = React.forwardRef<
   
   const variantStyles = {
     default: "bg-surface-800 text-surface-400",
-    wingull: "bg-blue-900 text-blue-400"
+    wingull: "bg-secondary-900 text-secondary-400"
   }
   
   return (
@@ -58,7 +58,7 @@ const TabsTrigger = React.forwardRef<
   
   const variantStyles = {
     default: "ring-offset-surface-950 focus-visible:ring-primary-300 data-[state=active]:bg-surface-700 data-[state=active]:text-primary-300",
-    wingull: "ring-offset-blue-950 focus-visible:ring-blue-300 data-[state=active]:bg-blue-800 data-[state=active]:text-blue-300"
+    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-300 data-[state=active]:bg-secondary-800 data-[state=active]:text-secondary-300"
   }
   
   return (
@@ -83,7 +83,7 @@ const TabsContent = React.forwardRef<
   
   const variantStyles = {
     default: "ring-offset-surface-950 focus-visible:ring-primary-300 text-primary-400",
-    wingull: "ring-offset-blue-950 focus-visible:ring-blue-300 text-blue-300"
+    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-300 text-secondary-300"
   }
   
   return (

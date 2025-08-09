@@ -34,23 +34,23 @@ export default function FurretToday() {
           <FurretHeader />
           
           {/* Improved navigation */}
-          <nav className="bg-gradient-to-r from-blue-600 to-blue-400 p-4 flex flex-wrap justify-center gap-4 relative">
+          <nav className="bg-gradient-to-r from-secondary-600 to-secondary-400 p-4 flex flex-wrap justify-center gap-4 relative">
             {/* Comic style splash behind buttons */}
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22%3E%3Cpath d=%22M0 20 L20 0 L40 20 L20 40 Z%22 fill=%22%23FFF%22 fill-opacity=%220.1%22 /%3E%3C%2Fsvg%3E')] bg-repeat"></div>
             
             <Button onClick={() => setIsMenuOpen(!isMenuOpen)} 
-                  className="md:hidden bg-yellow-300 text-blue-500 font-bold text-xl transition-all border-4 border-black hover:bg-yellow-100 button-pop-shadow rounded-full px-4 py-2">
+                  className="md:hidden bg-yellow-300 text-secondary-500 font-bold text-xl transition-all border-4 border-black hover:bg-yellow-100 button-pop-shadow rounded-full px-4 py-2">
               {isMenuOpen ? '✕ Cerrar' : '☰ Menú'}
             </Button>
             
             <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0 w-full md:w-auto items-center`}>
-              <InternalLink href="/noticias" className="bg-yellow-300 text-blue-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow border-4 border-black">
+              <InternalLink href="/noticias" className="bg-yellow-300 text-secondary-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow border-4 border-black">
                 Inicio
               </InternalLink>
-              <InternalLink href="/noticias/editar" className="bg-yellow-300 text-blue-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow border-4 border-black">
+              <InternalLink href="/noticias/editar" className="bg-yellow-300 text-secondary-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow border-4 border-black">
                 Editar Noticias
               </InternalLink>
-              <InternalLink href="/" className="bg-yellow-300 text-blue-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow border-4 border-black">
+              <InternalLink href="/" className="bg-yellow-300 text-secondary-500 font-bold text-xl transform hover:scale-110 transition-transform hover:bg-white px-4 py-2 rounded-full button-pop-shadow border-4 border-black">
                 SmartRotom
               </InternalLink>
             </div>
@@ -58,7 +58,7 @@ export default function FurretToday() {
 
           <div className="flex-grow">
             {/* Featured news section with improved styling */}
-            <div className="bg-blue-100 pt-6 px-4 pb-2">
+            <div className="bg-secondary-100 pt-6 px-4 pb-2">
               <div className="flex items-center mb-4">
                 <div className="h-1 bg-black flex-grow"></div>
                 <h2 className="text-4xl font-bold mx-4 text-pink-500 pop-shadow px-6 py-2 bg-yellow-300 border-4 border-black transform -rotate-2">
@@ -82,7 +82,7 @@ export default function FurretToday() {
               <section className="p-6">
                 <div className="flex items-center mb-6">
                   <div className="h-1 bg-black flex-grow"></div>
-                  <h2 className="text-4xl font-bold mx-4 text-blue-500 pop-shadow">
+                  <h2 className="text-4xl font-bold mx-4 text-secondary-500 pop-shadow">
                     Más Noticias
                   </h2>
                   <div className="h-1 bg-black flex-grow"></div>

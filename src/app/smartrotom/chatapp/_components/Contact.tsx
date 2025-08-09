@@ -50,7 +50,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
         <p className="text-sm flex items-center">
           {msg.uuid === getSmartRotomUser(session).uuid ? (
             <ArrowUpRight
-              className="mr-2 text-green-500"
+              className="mr-2 text-highlight-500"
               height={20}
               width={20}
               strokeWidth={2}

@@ -68,7 +68,7 @@ export default function Badges({ achievementData, book, pageType = 0 }: {
             <span className="font-bold">Progreso del Entrenador</span>
             <span>{completedAchievements}/{totalAchievements} ({completionPercentage}%)</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full bg-surface-200 rounded-full h-3">
             <div className="bg-amber-500 h-3 rounded-full" style={{ width: `${completionPercentage}%` }} />
           </div>
         </div>
@@ -85,9 +85,9 @@ export default function Badges({ achievementData, book, pageType = 0 }: {
                 <span>{completed}/{section.data.length} ({sectionPercentage}%)</span>
               </div>
               
-              <div className="w-full bg-gray-200 rounded-full h-1 mb-2">
+              <div className="w-full bg-surface-200 rounded-full h-1 mb-2">
                 <div 
-                  className={`${completed === section.data.length ? 'bg-green-500' : 'bg-blue-500'} h-1 rounded-full`}
+                  className={`${completed === section.data.length ? 'bg-highlight-500' : 'bg-secondary-500'} h-1 rounded-full`}
                   style={{ width: `${sectionPercentage}%` }} 
                 />
               </div>
@@ -112,7 +112,7 @@ export default function Badges({ achievementData, book, pageType = 0 }: {
         const sectionPercentage = Math.round((completed / section.data.length) * 100);
         
         return (
-          <div key={section.title} className="space-y-3 bg-white/80 rounded-lg p-4 shadow-sm border border-gray-100">
+          <div key={section.title} className="space-y-3 bg-white/80 rounded-lg p-4 shadow-sm border border-surface-100">
             <div className="flex justify-between items-center">
               <h3 className="text-xl font-bold tracking-tight border-b border-black/10 pb-2">
                 {section.title}
@@ -123,9 +123,9 @@ export default function Badges({ achievementData, book, pageType = 0 }: {
             </div>
             
             {/* Progress bar for this section */}
-            <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+            <div className="w-full bg-surface-200 rounded-full h-2 mb-3">
               <div 
-                className={`${completed === section.data.length ? 'bg-green-500' : 'bg-blue-500'} h-2 rounded-full`}
+                className={`${completed === section.data.length ? 'bg-highlight-500' : 'bg-secondary-500'} h-2 rounded-full`}
                 style={{ width: `${sectionPercentage}%` }} 
               />
             </div>
@@ -163,7 +163,7 @@ function MicroBadge({ data, book, badges }: { data: SmartRotomAchievement; book:
               {/* Status indicator */}
               {!data.completed &&  (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Lock className="w-3 h-3 text-gray-500 opacity-80" />
+                  <Lock className="w-3 h-3 text-surface-500 opacity-80" />
                 </div>
               )}
             </div>
@@ -187,12 +187,12 @@ function MicroBadge({ data, book, badges }: { data: SmartRotomAchievement; book:
           
           <div>
             <h4 className="font-bold text-base border-b border-black/10 pb-0.5">{data.name}</h4>
-            <p className="text-xs text-gray-700 line-clamp-2">{data.description}</p>
+            <p className="text-xs text-surface-700 line-clamp-2">{data.description}</p>
             <p className="text-xs font-medium mt-1">
               {data.completed ? (
-                <span className="text-green-700">Obtenida: {parseDate(data.completedAt)}</span>
+                <span className="text-highlight-700">Obtenida: {parseDate(data.completedAt)}</span>
               ) : (
-                <span className="text-gray-500">No completado</span>
+                <span className="text-surface-500">No completado</span>
               )}
             </p>
           </div>
@@ -228,7 +228,7 @@ function Badge({ data, book, badges }: { data: SmartRotomAchievement; book: any;
               {/* Status indicator */}
               {!data.completed &&  (
                 <div className="absolute inset-0 flex items-center justify-center z-20">
-                  <Lock className="w-5 h-5 text-gray-500 opacity-80" />
+                  <Lock className="w-5 h-5 text-surface-500 opacity-80" />
                 </div>
               )}
             </div>
@@ -252,15 +252,15 @@ function Badge({ data, book, badges }: { data: SmartRotomAchievement; book: any;
           
           <div className="flex flex-col space-y-2">
             <h4 className="font-bold text-xl border-b border-black/10 pb-1">{data.name}</h4>
-            <p className="text-sm text-gray-700">{data.description}</p>
+            <p className="text-sm text-surface-700">{data.description}</p>
             <p className="text-sm font-medium">
               {data.completed ? (
-                <span className="text-green-700 flex items-center gap-1">
+                <span className="text-highlight-700 flex items-center gap-1">
                   <Medal className="w-4 h-4" />
                   Obtenida: {parseDate(data.completedAt)}
                 </span>
               ) : (
-                <span className="text-gray-500 flex items-center gap-1">
+                <span className="text-surface-500 flex items-center gap-1">
                   <Lock className="w-4 h-4" />
                   No completado
                 </span>

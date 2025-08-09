@@ -55,7 +55,7 @@ const AlertDialogContent = React.forwardRef<
 
   const variantStyles = {
     default: "border-surface-800 bg-surface-800",
-    wingull: "border-blue-900 bg-blue-900"
+    wingull: "border-secondary-900 bg-secondary-900"
   }
 
   return (
@@ -111,7 +111,7 @@ const AlertDialogTitle = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-300",
-    wingull: "text-blue-300"
+    wingull: "text-secondary-300"
   }
   
   return (
@@ -132,7 +132,7 @@ const AlertDialogDescription = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-200"
+    wingull: "text-secondary-200"
   }
   
   return (

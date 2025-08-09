@@ -6,8 +6,8 @@
  :root {
 	--ck-sample-base-spacing: 2em;
 	--ck-sample-color-surface-50: #fff;
-	--ck-sample-color-green: #279863;
-	--ck-sample-color-blue: #1a9aef;
+	--ck-sample-color-highlight: #279863;
+	--ck-sample-color-secondary: #1a9aef;
 	--ck-sample-container-width: 1285px;
 	--ck-sample-sidebar-width: 350px;
 	--ck-sample-editor-min-height: 400px;
@@ -245,12 +245,12 @@ body[data-editor='InlineEditor'] .collaboration-demo__row {
 	margin-right: 1em;
 	outline-offset: 2px;
 	outline-width: 2px;
-	background-color: var( --ck-sample-color-blue );
+	background-color: var( --ck-sample-color-secondary );
 }
 
 .collaboration-demo__topbar .btn:focus,
 .collaboration-demo__topbar .btn:hover {
-	border-color: var( --ck-sample-color-blue );
+	border-color: var( --ck-sample-color-secondary );
 }
 
 .collaboration-demo__share {
@@ -463,7 +463,7 @@ header nav ul li a:hover {
 
 main .message {
 	padding: 0 0 var(--ck-sample-base-spacing);
-	background: var(--ck-sample-color-green);
+	background: var(--ck-sample-color-highlight);
 	color: var(--ck-sample-color-surface-50);
 }
 
@@ -473,7 +473,7 @@ main .message::after {
 	display: block;
 	height: 10em;
 	width: 100%;
-	background: var(--ck-sample-color-green);
+	background: var(--ck-sample-color-highlight);
 	position: absolute;
 	left: 0;
 }
@@ -502,8 +502,8 @@ main .message h2 {
 	user-select: none;
 	border-radius: 4px;
 	transition: color .2s ease-in-out,background-color .2s ease-in-out,border-color .2s ease-in-out,opacity .2s ease-in-out;
-	background-color: var(--ck-sample-color-button-blue);
-	border-color: var(--ck-sample-color-button-blue);
+	background-color: var(--ck-sample-color-button-secondary);
+	border-color: var(--ck-sample-color-button-secondary);
 	color: var(--ck-sample-color-main-50);
 	display: inline-block;
 }

@@ -9,11 +9,11 @@ interface ToolsSpotlightProps {
 
 export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
   const toolCategories = [
-    { icon: Calculator, name: "Calculadoras", color: "from-emerald-500 to-green-600" },
-    { icon: Cog, name: "Generadores", color: "from-green-500 to-teal-600" },
+    { icon: Calculator, name: "Calculadoras", color: "from-emerald-500 to-highlight-600" },
+    { icon: Cog, name: "Generadores", color: "from-highlight-500 to-teal-600" },
     { icon: BarChart3, name: "Análisis", color: "from-teal-500 to-emerald-600" },
-    { icon: Server, name: "Utilidades", color: "from-emerald-600 to-green-700" },
-    { icon: Filter, name: "Filtros", color: "from-green-600 to-teal-700" },
+    { icon: Server, name: "Utilidades", color: "from-emerald-600 to-highlight-700" },
+    { icon: Filter, name: "Filtros", color: "from-highlight-600 to-teal-700" },
     { icon: Zap, name: "Automatización", color: "from-teal-600 to-emerald-700" },
   ];
 
@@ -30,10 +30,10 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
           <div className="relative w-full h-full">
             {/* Animated rings - must be behind the tools and not block pointer events */}
             <div className="absolute top-1/2 left-1/2 w-[22rem] h-[22rem] border border-emerald-500/20 rounded-full animate-spin pointer-events-none" style={{animationDuration: '20s', transform: 'translate(-50%, -50%)'}}></div>
-            <div className="absolute top-1/2 left-1/2 w-[28rem] h-[28rem] border border-green-500/10 rounded-full animate-spin pointer-events-none" style={{animationDuration: '30s', animationDirection: 'reverse', transform: 'translate(-50%, -50%)'}}></div>
+            <div className="absolute top-1/2 left-1/2 w-[28rem] h-[28rem] border border-highlight-500/10 rounded-full animate-spin pointer-events-none" style={{animationDuration: '30s', animationDirection: 'reverse', transform: 'translate(-50%, -50%)'}}></div>
 
             {/* Central hub */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 bg-gradient-to-br from-emerald-500 to-green-600 rounded-full flex items-center justify-center shadow-2xl z-10">
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-28 h-28 bg-gradient-to-br from-emerald-500 to-highlight-600 rounded-full flex items-center justify-center shadow-2xl z-10">
               <Wrench className="w-14 h-14 text-white animate-pulse" />
             </div>
 
@@ -110,7 +110,7 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             {/* Action buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                className="bg-gradient-to-r from-emerald-600 via-green-500 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white px-6 py-3 flex-1 shadow-xl rounded-full font-semibold transition-all duration-200 transform hover:scale-105 group"
+                className="bg-gradient-to-r from-emerald-600 via-highlight-500 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white px-6 py-3 flex-1 shadow-xl rounded-full font-semibold transition-all duration-200 transform hover:scale-105 group"
                 asChild
               >
                 <InternalLink href="/herramientas" className="flex items-center justify-center gap-2">

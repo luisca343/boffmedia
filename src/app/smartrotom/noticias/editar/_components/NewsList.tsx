@@ -82,18 +82,18 @@ export default function NewsList({
                       ? 'bg-yellow-300 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' 
                       : isPublished || isFeatured
                         ? 'bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' 
-                        : 'bg-gray-100 border-4 border-dashed border-gray-500'
+                        : 'bg-surface-100 border-4 border-dashed border-surface-500'
                     }`}
                 >
                   <div className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-blue-500 flex-shrink-0" />
+                    <FileText className="h-5 w-5 mr-2 text-secondary-500 flex-shrink-0" />
                     <h3 className="font-bold text-lg truncate">{item.title}</h3>
                   </div>
                   
                   <div className="flex justify-between items-center mt-3">
                     <div 
                       className={`flex items-center px-2 py-1 rounded-full border-2 border-black
-                        ${isPublished ? 'bg-blue-100' : 'bg-gray-100'}`}
+                        ${isPublished ? 'bg-secondary-100' : 'bg-surface-100'}`}
                       onClick={(e) => e.stopPropagation()}
                       style={{ minWidth: '110px' }}
                     >
@@ -113,7 +113,7 @@ export default function NewsList({
                     
                     <div 
                       className={`flex items-center px-2 py-1 rounded-full border-2 border-black
-                        ${isFeatured ? 'bg-yellow-100' : 'bg-gray-100'}`}
+                        ${isFeatured ? 'bg-yellow-100' : 'bg-surface-100'}`}
                       onClick={(e) => e.stopPropagation()}
                       style={{ minWidth: '110px' }}
                     >

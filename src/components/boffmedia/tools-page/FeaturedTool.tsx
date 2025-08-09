@@ -59,7 +59,7 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
                     {tool.title}
                   </h2>
                   {tool.isNew && (
-                    <Badge className="bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg">
+                    <Badge className="bg-gradient-to-r from-highlight-500 to-highlight-600 text-white shadow-lg">
                       <Sparkles className="w-3 h-3 mr-1" />
                       Nuevo
                     </Badge>
@@ -115,12 +115,12 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
                   {/* Dynamic color overlay based on tool theme */}
                   <div className={`absolute inset-0 bg-gradient-to-br ${
                     overlayColor === 'yellow' ? 'from-yellow-500/10 via-transparent to-orange-500/5' :
-                    overlayColor === 'green' ? 'from-green-500/10 via-transparent to-emerald-500/5' :
-                    overlayColor === 'blue' ? 'from-blue-500/10 via-transparent to-cyan-500/5' :
+                    overlayColor === 'green' ? 'from-highlight-500/10 via-transparent to-emerald-500/5' :
+                    overlayColor === 'blue' ? 'from-secondary-500/10 via-transparent to-cyan-500/5' :
                     overlayColor === 'red' ? 'from-red-500/10 via-transparent to-rose-500/5' :
-                    overlayColor === 'purple' ? 'from-purple-500/10 via-transparent to-violet-500/5' :
+                    overlayColor === 'purple' ? 'from-accent-500/10 via-transparent to-violet-500/5' :
                     overlayColor === 'orange' ? 'from-orange-500/10 via-transparent to-red-500/5' :
-                    'from-blue-500/10 via-transparent to-cyan-500/5'
+                    'from-secondary-500/10 via-transparent to-cyan-500/5'
                   }`}></div>
                   
                   {/* Bottom gradient for badge readability */}
@@ -129,12 +129,12 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
                   {/* Corner accent gradient */}
                   <div className={`absolute inset-0 bg-gradient-to-tl ${
                     overlayColor === 'yellow' ? 'from-yellow-400/15' :
-                    overlayColor === 'green' ? 'from-green-400/15' :
-                    overlayColor === 'blue' ? 'from-blue-400/15' :
+                    overlayColor === 'green' ? 'from-highlight-400/15' :
+                    overlayColor === 'blue' ? 'from-secondary-400/15' :
                     overlayColor === 'red' ? 'from-red-400/15' :
-                    overlayColor === 'purple' ? 'from-purple-400/15' :
+                    overlayColor === 'purple' ? 'from-accent-400/15' :
                     overlayColor === 'orange' ? 'from-orange-400/15' :
-                    'from-blue-400/15'
+                    'from-secondary-400/15'
                   } via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
                 </div>
               </>

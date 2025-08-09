@@ -31,14 +31,14 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
           </h3>
           <button 
             onClick={onClose}
-            className="bg-gray-800 hover:bg-gray-700 text-white p-1 rounded-full border border-gray-700"
+            className="bg-surface-800 hover:bg-surface-700 text-white p-1 rounded-full border border-surface-700"
           >
             <X size={16} />
           </button>
         </div>
         
         <div className="flex flex-col items-center mb-6">
-          <div className="w-48 h-48 mb-4 flex items-center justify-center bg-black/30 rounded-lg border border-gray-700">
+          <div className="w-48 h-48 mb-4 flex items-center justify-center bg-black/30 rounded-lg border border-surface-700">
             <ItemDisplay
               type={getItemType(item)}
               itemId={item.itemId}
@@ -49,7 +49,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
           </div>
           
           {item.amount && item.amount > 1 && (
-            <div className="mb-2 px-3 py-1 bg-black/50 rounded-md border border-gray-700">
+            <div className="mb-2 px-3 py-1 bg-black/50 rounded-md border border-surface-700">
               <span className={`${config.textColor}`}>
                 Cantidad: <strong>{item.amount}</strong>
               </span>
@@ -60,14 +60,14 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
             {getItemRarity(t, item.rarity)}
           </span>
           
-          <p className="text-gray-200 text-center bg-black/30 p-4 rounded-lg border border-gray-800">
+          <p className="text-surface-200 text-center bg-black/30 p-4 rounded-lg border border-surface-800">
             {getItemDescription(t, item.itemId) || `Un objeto ${item.rarity} de la colección.`}
           </p>
         </div>
         
         <button
           onClick={onClose}
-          className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-lg border border-gray-700 font-bold"
+          className="w-full bg-surface-800 hover:bg-surface-700 text-white py-3 rounded-lg border border-surface-700 font-bold"
         >
           Cerrar
         </button>

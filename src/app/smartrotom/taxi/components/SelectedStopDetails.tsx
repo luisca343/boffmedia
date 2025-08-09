@@ -36,7 +36,7 @@ export default function SelectedStopDetails({
   
   return (
     <div className="absolute left-4 right-4 bottom-4 bg-white/10 backdrop-blur-lg rounded-xl shadow-2xl overflow-hidden border-2 border-yellow-400 z-30 animate-appear">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-3 text-white">
+      <div className="bg-gradient-to-r from-secondary-600 to-secondary-800 p-3 text-white">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <div className="p-2 rounded-full bg-yellow-400 mr-3">
@@ -55,11 +55,11 @@ export default function SelectedStopDetails({
       </div>
       
       <div className="p-4">
-        <p className="text-blue-100 mb-4">{selectedStop.description || "Sin descripción disponible"}</p>
+        <p className="text-secondary-100 mb-4">{selectedStop.description || "Sin descripción disponible"}</p>
         
         <div className="grid grid-cols-3 gap-4 mb-4">
           <div className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20">
-            <div className="flex items-center justify-center mb-1 text-blue-300">
+            <div className="flex items-center justify-center mb-1 text-secondary-300">
               <FaMapMarkerAlt className="mr-1" />
               <span className="font-medium">Ubicación</span>
             </div>
@@ -69,7 +69,7 @@ export default function SelectedStopDetails({
           </div>
           
           <div className="bg-white/10 p-3 rounded-lg text-center backdrop-blur-sm border border-white/20">
-            <div className="flex items-center justify-center mb-1 text-blue-300">
+            <div className="flex items-center justify-center mb-1 text-secondary-300">
               <FaWalking className="mr-1" /> 
               <span className="font-medium">Distancia</span>
             </div>
@@ -83,7 +83,7 @@ export default function SelectedStopDetails({
               <FaCoins className="mr-1" /> 
               <span className="font-medium">Precio</span>
             </div>
-            <div className={`font-bold ${canAfford ? 'text-green-400' : 'text-red-400'}`}>
+            <div className={`font-bold ${canAfford ? 'text-highlight-400' : 'text-red-400'}`}>
               {formatMoney(price)}
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function SelectedStopDetails({
             w-full py-3 rounded-lg font-medium flex items-center justify-center
             ${canAfford && !isLoading
               ? 'bg-yellow-500 hover:bg-yellow-600 text-[#041F4E] shadow-md' // Changed from text-white to text-[#041F4E]
-              : 'bg-gray-600/50 text-gray-400 cursor-not-allowed'
+              : 'bg-surface-600/50 text-surface-400 cursor-not-allowed'
             }
           `}
         >

@@ -20,10 +20,10 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
 
     function getRarityColor(rarity: number){
         if(rarity < 1) return 'bg-pink-800'
-        if(rarity <= 10) return 'bg-purple-600'
+        if(rarity <= 10) return 'bg-accent-600'
         if(rarity <= 100) return 'bg-red-800'
         if(rarity <= 200) return 'bg-yellow-800'
-        if(rarity <= 300) return 'bg-green-800'
+        if(rarity <= 300) return 'bg-highlight-800'
         return ''
     }
 

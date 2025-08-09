@@ -47,8 +47,8 @@ const DropdownMenuSubTrigger = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-gray-100 data-[state=open]:bg-gray-100 dark:focus:bg-gray-800 dark:data-[state=open]:bg-gray-800",
-    wingull: "focus:bg-blue-800/50 data-[state=open]:bg-blue-800 text-blue-100"
+    default: "focus:bg-surface-100 data-[state=open]:bg-surface-100 dark:focus:bg-surface-800 dark:data-[state=open]:bg-surface-800",
+    wingull: "focus:bg-secondary-800/50 data-[state=open]:bg-secondary-800 text-secondary-100"
   }
   
   return (
@@ -77,8 +77,8 @@ const DropdownMenuSubContent = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "border-gray-200 bg-white text-gray-950 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50",
-    wingull: "border-blue-800 bg-blue-900 text-blue-100"
+    default: "border-surface-200 bg-white text-surface-950 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-50",
+    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100"
   }
   
   return (
@@ -103,8 +103,8 @@ const DropdownMenuContent = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "border-gray-200 bg-white text-gray-950 dark:border-gray-800 dark:bg-gray-950 dark:text-gray-50",
-    wingull: "border-blue-800 bg-blue-900 text-blue-100"
+    default: "border-surface-200 bg-white text-surface-950 dark:border-surface-800 dark:bg-surface-950 dark:text-surface-50",
+    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100"
   }
   
   return (
@@ -133,8 +133,8 @@ const DropdownMenuItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "text-surface-50 focus:bg-gray-100 focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50",
-    wingull: "focus:bg-blue-800/50 focus:text-blue-200"
+    default: "text-surface-50 focus:bg-surface-100 focus:text-surface-900 dark:focus:bg-surface-800 dark:focus:text-surface-50",
+    wingull: "focus:bg-secondary-800/50 focus:text-secondary-200"
   }
   
   return (
@@ -159,8 +159,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-gray-100 focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50",
-    wingull: "focus:bg-blue-800/50 focus:text-blue-200"
+    default: "focus:bg-surface-100 focus:text-surface-900 dark:focus:bg-surface-800 dark:focus:text-surface-50",
+    wingull: "focus:bg-secondary-800/50 focus:text-secondary-200"
   }
   
   return (
@@ -193,8 +193,8 @@ const DropdownMenuRadioItem = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "focus:bg-gray-100 focus:text-gray-900 dark:focus:bg-gray-800 dark:focus:text-gray-50",
-    wingull: "focus:bg-blue-800/50 focus:text-blue-200"
+    default: "focus:bg-surface-100 focus:text-surface-900 dark:focus:bg-surface-800 dark:focus:text-surface-50",
+    wingull: "focus:bg-secondary-800/50 focus:text-secondary-200"
   }
   
   return (
@@ -228,7 +228,7 @@ const DropdownMenuLabel = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-50 text-sm font-semibold",
-    wingull: "text-blue-300 font-semibold"
+    wingull: "text-secondary-300 font-semibold"
   }
   
   return (
@@ -253,8 +253,8 @@ const DropdownMenuSeparator = React.forwardRef<
   const variant = useDropdownMenuVariant()
   
   const variantStyles = {
-    default: "bg-gray-100 dark:bg-gray-800",
-    wingull: "bg-blue-700"
+    default: "bg-surface-100 dark:bg-surface-800",
+    wingull: "bg-secondary-700"
   }
   
   return (
@@ -275,7 +275,7 @@ const DropdownMenuShortcut = ({
   
   const variantStyles = {
     default: "opacity-60",
-    wingull: "opacity-60 text-blue-300"
+    wingull: "opacity-60 text-secondary-300"
   }
   
   return (

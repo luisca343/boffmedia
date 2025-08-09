@@ -42,11 +42,11 @@ export const KeysDataTable = ({
       <Table>
         <TableHeader>
           <TableRow className="bg-surface-900 border-b border-surface-700">
-            <TableHead className="text-blue-400 font-medium w-[60px]">#</TableHead>
-            <TableHead className="text-blue-400 font-medium w-[80px]">Imagen</TableHead>
-            <TableHead className="text-blue-400 font-medium">Juego</TableHead>
-            {/*<TableHead className="text-blue-400 font-medium">Bundle</TableHead>*/}
-            <TableHead className="text-blue-400 font-medium w-[120px]">Estado</TableHead>
+            <TableHead className="text-secondary-400 font-medium w-[60px]">#</TableHead>
+            <TableHead className="text-secondary-400 font-medium w-[80px]">Imagen</TableHead>
+            <TableHead className="text-secondary-400 font-medium">Juego</TableHead>
+            {/*<TableHead className="text-secondary-400 font-medium">Bundle</TableHead>*/}
+            <TableHead className="text-secondary-400 font-medium w-[120px]">Estado</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

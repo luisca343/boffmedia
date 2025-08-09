@@ -15,7 +15,7 @@ export default function Page() {
       <main className="flex-grow container mx-auto px-4 py-8 relative">
         <div className="text-center mb-16 relative text-shadow-border2">
           <div className="relative mb-8">
-            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-blue-400/20 rounded-lg blur-3xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-secondary-400/20 rounded-lg blur-3xl"></div>
             <Image
               src="/img/win-full.png"
               alt="Logo de Pixelmon Wingull"
@@ -29,7 +29,7 @@ export default function Page() {
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-yellow-300 drop-shadow-lg">
               Bienvenido a Pixelmon Wingull
             </h1>
-            <p className="text-xl sm:text-2xl text-blue-100 mb-8 leading-relaxed">
+            <p className="text-xl sm:text-2xl text-secondary-100 mb-8 leading-relaxed">
               ¡Explora la región de Teras y experimenta el choque de eras!
             </p>
             
@@ -45,15 +45,15 @@ export default function Page() {
 
         {/* Features Section */}
         <div className="grid lg:grid-cols-2 gap-8 mb-16 text-shadow-border1">
-          <div className="group relative bg-blue-900/40 backdrop-blur-sm border border-blue-500/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-400/20 rounded-lg p-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 to-yellow-400/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="group relative bg-secondary-900/40 backdrop-blur-sm border border-secondary-500/30 hover:border-yellow-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-yellow-400/20 rounded-lg p-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-secondary-600/10 to-yellow-400/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-blue-600">
+                <div className="p-3 rounded-full bg-gradient-to-r from-secondary-500 to-secondary-600">
                   <Clock className="h-6 w-6 text-white" />
                 </div>
-                <Badge variant="secondary" className="bg-blue-500/20 text-blue-300 border-blue-500/30">
+                <Badge variant="secondary" className="bg-secondary-500/20 text-secondary-300 border-secondary-500/30">
                   El Pasado
                 </Badge>
               </div>
@@ -61,7 +61,7 @@ export default function Page() {
                 Fukitsu-Gansolia
               </h3>
               
-              <p className="text-blue-100 text-base sm:text-lg leading-relaxed group-hover:text-blue-50 transition-colors duration-300 mb-6">
+              <p className="text-secondary-100 text-base sm:text-lg leading-relaxed group-hover:text-secondary-50 transition-colors duration-300 mb-6">
                 Sumérgete en los antiguos misterios y legendarias tradiciones de
                 Fukitsu-Gansolia. Desvela Pokémon ancestrales y enfrenta desafíos
                 épicos forjados en la historia.
@@ -69,12 +69,12 @@ export default function Page() {
             </div>
           </div>
 
-          <div className="group relative bg-blue-900/40 border border-blue-500/30 hover:border-cyan-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-400/20 rounded-lg p-6">
-            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/10 to-blue-400/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          <div className="group relative bg-secondary-900/40 border border-secondary-500/30 hover:border-cyan-400/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl hover:shadow-cyan-400/20 rounded-lg p-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-cyan-600/10 to-secondary-400/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-3 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500">
+                <div className="p-3 rounded-full bg-gradient-to-r from-cyan-500 to-secondary-500">
                   <Sparkles className="h-6 w-6 text-white" />
                 </div>
                 <Badge variant="secondary" className="bg-cyan-500/20 text-cyan-300 border-cyan-500/30">
@@ -85,7 +85,7 @@ export default function Page() {
                 Narukami-Akina
               </h3>
               
-              <p className="text-blue-100 text-base sm:text-lg leading-relaxed group-hover:text-blue-50 transition-colors duration-300 mb-6">
+              <p className="text-secondary-100 text-base sm:text-lg leading-relaxed group-hover:text-secondary-50 transition-colors duration-300 mb-6">
                 Abraza la tecnología de vanguardia y los paisajes futuristas de
                 Narukami-Akina. Domina la ciencia avanzada en el arte del
                 entrenamiento Pokémon y reta a la élite tecnológica en combates
@@ -97,31 +97,31 @@ export default function Page() {
 
         {/* Server Info Section */}
         <div className="mb-16">
-          <div className="relative bg-blue-900/60 backdrop-blur-sm border border-yellow-400/50 rounded-lg p-6 shadow-lg">
+          <div className="relative bg-secondary-900/60 backdrop-blur-sm border border-yellow-400/50 rounded-lg p-6 shadow-lg">
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-yellow-300 mb-2">
                 Información del Servidor
               </h2>
-              <p className="text-blue-100">
+              <p className="text-secondary-100">
                 Todo lo que necesitas saber para comenzar tu aventura
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
               <div className="space-y-2">
                 <div className="text-2xl font-bold text-yellow-300">18</div>
-                <div className="text-blue-100 text-sm font-medium">Pueblos</div>
+                <div className="text-secondary-100 text-sm font-medium">Pueblos</div>
               </div>
               <div className="space-y-2">
                 <div className="text-2xl font-bold text-yellow-300">???</div>
-                <div className="text-blue-100 text-sm font-medium">Pokémon Únicos</div>
+                <div className="text-secondary-100 text-sm font-medium">Pokémon Únicos</div>
               </div>
               <div className="space-y-2">
                 <div className="text-2xl font-bold text-yellow-300">???</div>
-                <div className="text-blue-100 text-sm font-medium">Misiones y Eventos</div>
+                <div className="text-secondary-100 text-sm font-medium">Misiones y Eventos</div>
               </div>
               <div className="space-y-2">
                 <div className="text-2xl font-bold text-yellow-300">∞</div>
-                <div className="text-blue-100 text-sm font-medium">Aventuras</div>
+                <div className="text-secondary-100 text-sm font-medium">Aventuras</div>
               </div>
             </div>
           </div>

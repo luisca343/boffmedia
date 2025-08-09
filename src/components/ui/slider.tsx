@@ -22,9 +22,9 @@ const Slider = React.forwardRef<
       thumb: "border-primary-300 bg-surface-800 ring-offset-surface-900 focus-visible:ring-primary-300"
     },
     wingull: {
-      track: "bg-blue-900",
-      range: "bg-blue-400",
-      thumb: "border-blue-400 bg-blue-950 ring-offset-blue-950 focus-visible:ring-blue-300"
+      track: "bg-secondary-900",
+      range: "bg-secondary-400",
+      thumb: "border-secondary-400 bg-secondary-950 ring-offset-secondary-950 focus-visible:ring-secondary-300"
     }
   }
 

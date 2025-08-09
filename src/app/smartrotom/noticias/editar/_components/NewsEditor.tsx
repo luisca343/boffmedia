@@ -63,8 +63,8 @@ export default function NewsEditor() {
           <FurretHeader />
           
           {/* Navigation breadcrumbs */}
-          <div className="bg-blue-100 p-4 flex flex-wrap items-center font-comic">
-            <InternalLink href="/noticias" className="text-blue-500 hover:underline">
+          <div className="bg-secondary-100 p-4 flex flex-wrap items-center font-comic">
+            <InternalLink href="/noticias" className="text-secondary-500 hover:underline">
               Inicio
             </InternalLink>
             <span className="mx-2"> &gt; </span>
@@ -75,7 +75,7 @@ export default function NewsEditor() {
               <Button
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges}
-                className={`bg-green-300 text-blue-500 hover:bg-green-400 font-bold text-lg transform hover:scale-105 transition-transform button-pop-shadow border-4 border-black ${
+                className={`bg-highlight-300 text-secondary-500 hover:bg-highlight-400 font-bold text-lg transform hover:scale-105 transition-transform button-pop-shadow border-4 border-black ${
                   !hasUnsavedChanges ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
@@ -91,7 +91,7 @@ export default function NewsEditor() {
               <div className="p-4">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="w-full bg-yellow-300 text-blue-500 hover:bg-yellow-400 font-bold text-xl transform hover:scale-105 transition-transform button-pop-shadow border-4 border-black">
+                    <Button className="w-full bg-yellow-300 text-secondary-500 hover:bg-yellow-400 font-bold text-xl transform hover:scale-105 transition-transform button-pop-shadow border-4 border-black">
                       ✨ Nueva Noticia
                     </Button>
                   </DialogTrigger>
@@ -109,7 +109,7 @@ export default function NewsEditor() {
               
               {/* Comic style title banner */}
               <div className="bg-yellow-300 py-2 border-y-4 border-black">
-                <h2 className="text-center text-blue-500 text-xl font-bold pop-shadow">
+                <h2 className="text-center text-secondary-500 text-xl font-bold pop-shadow">
                   LISTA DE NOTICIAS
                 </h2>
               </div>

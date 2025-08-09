@@ -109,25 +109,25 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
   if (claimableItems.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-        <div className="bg-gray-900 border-2 border-gray-800 rounded-lg p-6 max-w-md w-full">
+        <div className="bg-surface-900 border-2 border-surface-800 rounded-lg p-6 max-w-md w-full">
           <div className="flex justify-between items-start mb-4">
             <h3 className="text-xl font-bold text-white">Reclamar Recompensas</h3>
             <button 
               onClick={onClose}
-              className="bg-gray-800 hover:bg-gray-700 text-white p-1 rounded-full border border-gray-700"
+              className="bg-surface-800 hover:bg-surface-700 text-white p-1 rounded-full border border-surface-700"
             >
               <X size={16} />
             </button>
           </div>
 
-          <div className="bg-gray-800/60 rounded-lg p-4 flex flex-col items-center justify-center min-h-[200px]">
-            <AlertCircle size={32} className="text-gray-400 mb-3" />
-            <p className="text-gray-300 text-center">No tienes objetos para reclamar en este momento</p>
+          <div className="bg-surface-800/60 rounded-lg p-4 flex flex-col items-center justify-center min-h-[200px]">
+            <AlertCircle size={32} className="text-surface-400 mb-3" />
+            <p className="text-surface-300 text-center">No tienes objetos para reclamar en este momento</p>
           </div>
 
           <button
             onClick={onClose}
-            className="w-full mt-4 bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-lg border border-gray-700 font-bold"
+            className="w-full mt-4 bg-surface-800 hover:bg-surface-700 text-white py-3 rounded-lg border border-surface-700 font-bold"
           >
             Cerrar
           </button>
@@ -141,30 +141,30 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
-      <div className="bg-gray-900 border-2 border-gray-800 rounded-lg p-6 max-w-2xl w-full">
+      <div className="bg-surface-900 border-2 border-surface-800 rounded-lg p-6 max-w-2xl w-full">
         <div className="flex justify-between items-start mb-4">
           <h3 className="text-xl font-bold text-white">Reclamar Recompensas</h3>
           <button 
             onClick={onClose}
-            className="bg-gray-800 hover:bg-gray-700 text-white p-1 rounded-full border border-gray-700"
+            className="bg-surface-800 hover:bg-surface-700 text-white p-1 rounded-full border border-surface-700"
           >
             <X size={16} />
           </button>
         </div>
 
-        <p className="text-gray-300 mb-4">
+        <p className="text-surface-300 mb-4">
           Selecciona las recompensas que deseas reclamar. Los cofres no se pueden reclamar.
         </p>
 
         {/* Display chest calculation info if we have selected non-Pokémon items */}
         {selectedNonPokemon.length > 0 && (
-          <div className="bg-blue-900/30 border border-blue-700/50 rounded-lg p-3 mb-4 flex items-center">
-            <Box size={20} className="text-blue-400 mr-2" />
+          <div className="bg-secondary-900/30 border border-secondary-700/50 rounded-lg p-3 mb-4 flex items-center">
+            <Box size={20} className="text-secondary-400 mr-2" />
             <div>
-              <p className="text-blue-300">
+              <p className="text-secondary-300">
                 <span className="font-semibold">{selectedNonPokemon.length}</span> {selectedNonPokemon.length === 1 ? 'objeto' : 'objetos'} de Minecraft seleccionados
               </p>
-              <p className="text-blue-300 text-sm">
+              <p className="text-secondary-300 text-sm">
                 Ocuparán <span className="font-semibold">{chestCalculation.slots}</span> {chestCalculation.slots === 1 ? 'espacio' : 'espacios'} en 
                 <span className="font-semibold"> {chestCalculation.chests}</span> {chestCalculation.chests === 1 ? 'cofre' : 'cofres'}
               </p>
@@ -174,18 +174,18 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
 
         {/* Display Pokémon count if any selected */}
         {selectedPokemon.length > 0 && (
-          <div className="bg-green-900/30 border border-green-700/50 rounded-lg p-3 mb-4">
-            <p className="text-green-300">
+          <div className="bg-highlight-900/30 border border-highlight-700/50 rounded-lg p-3 mb-4">
+            <p className="text-highlight-300">
               <span className="font-semibold">{selectedPokemon.length}</span> {selectedPokemon.length === 1 ? 'Pokémon' : 'Pokémon'} seleccionados
             </p>
           </div>
         )}
 
         {/* Split display into two sections: Pokémon and non-Pokémon */}
-        <div className="bg-gray-800/60 rounded-lg p-4 max-h-[400px] overflow-y-auto">
+        <div className="bg-surface-800/60 rounded-lg p-4 max-h-[400px] overflow-y-auto">
           {pokemonItems.length > 0 && (
             <div className="mb-4">
-              <h4 className="text-cyan-300 font-medium mb-2 border-b border-gray-700 pb-1">Pokémon</h4>
+              <h4 className="text-cyan-300 font-medium mb-2 border-b border-surface-700 pb-1">Pokémon</h4>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {pokemonItems.map(item => {
                   const isSelected = selectedItems.some(i => i.id === item.id);
@@ -212,7 +212,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
 
           {nonPokemonItems.length > 0 && (
             <div>
-              <h4 className="text-amber-300 font-medium mb-2 border-b border-gray-700 pb-1">Objetos de Minecraft</h4>
+              <h4 className="text-amber-300 font-medium mb-2 border-b border-surface-700 pb-1">Objetos de Minecraft</h4>
               <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 {nonPokemonItems.map(item => {
                   const isSelected = selectedItems.some(i => i.id === item.id);
@@ -239,7 +239,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
         </div>
 
         <div className="flex justify-between items-center mt-4">
-          <span className="text-gray-300">
+          <span className="text-surface-300">
             {selectedItems.length === 0 
               ? 'No has seleccionado objetos' 
               : `${selectedItems.length} ${selectedItems.length === 1 ? 'objeto' : 'objetos'} seleccionado${selectedItems.length === 1 ? '' : 's'}`
@@ -249,7 +249,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
           <div className="flex space-x-3">
             <button
               onClick={onClose}
-              className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg border border-gray-700"
+              className="bg-surface-800 hover:bg-surface-700 text-white px-4 py-2 rounded-lg border border-surface-700"
             >
               Cancelar
             </button>
@@ -259,7 +259,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
               disabled={selectedItems.length === 0 || isClaiming}
               className={`flex items-center px-4 py-2 rounded-lg font-bold ${
                 selectedItems.length === 0 || isClaiming
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed border border-gray-600'
+                  ? 'bg-surface-700 text-surface-400 cursor-not-allowed border border-surface-600'
                   : 'bg-cyan-700 hover:bg-cyan-600 text-white border border-cyan-500'
               }`}
             >

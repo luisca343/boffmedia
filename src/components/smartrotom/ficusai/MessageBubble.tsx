@@ -64,7 +64,7 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
     )}>
       <Avatar className={cn(
         "w-8 h-8 flex-shrink-0",
-        isUser ? "bg-primary-600" : "bg-green-600"
+        isUser ? "bg-primary-600" : "bg-highlight-600"
       )}>
         <AvatarFallback className="text-white">
           {isUser ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}

@@ -18,7 +18,7 @@ const Checkbox = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: "border-primary-400 ring-offset-surface-900 focus-visible:ring-primary-400 data-[state=checked]:bg-primary-400 data-[state=checked]:text-surface-900",
-    wingull: "border-blue-300 ring-offset-blue-900 focus-visible:ring-blue-300 data-[state=checked]:bg-blue-300 data-[state=checked]:text-blue-900",
+    wingull: "border-secondary-300 ring-offset-secondary-900 focus-visible:ring-secondary-300 data-[state=checked]:bg-secondary-300 data-[state=checked]:text-secondary-900",
   }
 
   return (

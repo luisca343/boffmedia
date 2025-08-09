@@ -36,17 +36,17 @@ export function CodeDisplay({
         <div className="text-center mb-6">
           {title && (
             <div className="flex items-center justify-center gap-3 mb-3">
-              {icon && <span className="text-blue-400">{icon}</span>}
-              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+              {icon && <span className="text-secondary-400">{icon}</span>}
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary-400 to-cyan-400">
                 {title}
               </h2>
-              {icon && <span className="text-blue-400">{icon}</span>}
+              {icon && <span className="text-secondary-400">{icon}</span>}
             </div>
           )}
           {badge && (
             <Badge 
               variant={badge.variant || "secondary"} 
-              className={`bg-blue-500/20 text-blue-300 border-blue-500/30 ${badge.className || ''}`}
+              className={`bg-secondary-500/20 text-secondary-300 border-secondary-500/30 ${badge.className || ''}`}
             >
               {badge.text}
             </Badge>
@@ -74,7 +74,7 @@ export function CodeDisplay({
             className="absolute top-3 right-3 p-2 rounded-lg bg-surface-700/50 hover:bg-surface-600/50 border border-surface-600/30 transition-colors"
           >
             {copied ? (
-              <HiCheckCircle className="w-5 h-5 text-green-400" />
+              <HiCheckCircle className="w-5 h-5 text-highlight-400" />
             ) : (
               <HiClipboardCopy className="w-5 h-5 text-surface-300" />
             )}

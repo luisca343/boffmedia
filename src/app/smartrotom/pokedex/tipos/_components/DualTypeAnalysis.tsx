@@ -72,7 +72,7 @@ export default function DualTypeAnalysis({ type1, type2 }: DualTypeAnalysisProps
             
             <div>
                 <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-green-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">½×</span>
+                    <span className="bg-highlight-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">½×</span>
                     Resistente contra:
                 </h3>
                 <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
@@ -88,7 +88,7 @@ export default function DualTypeAnalysis({ type1, type2 }: DualTypeAnalysisProps
             
             <div>
                 <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-blue-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">¼×</span>
+                    <span className="bg-secondary-500 text-white px-2 py-1 rounded-lg mr-2 font-bold">¼×</span>
                     Muy resistente contra:
                 </h3>
                 <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">
@@ -104,7 +104,7 @@ export default function DualTypeAnalysis({ type1, type2 }: DualTypeAnalysisProps
             
             <div>
                 <h3 className="text-lg font-medium text-surface-100 mb-2 flex items-center">
-                    <span className="bg-purple-600 text-white px-2 py-1 rounded-lg mr-2 font-bold">0×</span>
+                    <span className="bg-accent-600 text-white px-2 py-1 rounded-lg mr-2 font-bold">0×</span>
                     Inmune contra:
                 </h3>
                 <div className="bg-surface-700/50 rounded-lg p-3 min-h-12 flex flex-wrap gap-2">

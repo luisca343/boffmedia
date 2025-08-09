@@ -7,8 +7,8 @@ interface GameSpotlightCardProps {
   iconAlt: string;
   title: string;
   titleGradientClass: string;
-  iconBgClass?: string; // e.g. 'from-emerald-600 to-green-700' or 'from-orange-500 to-amber-500'
-  underlineClass?: string; // e.g. 'from-emerald-500 to-green-400' or 'from-orange-400 to-amber-400'
+  iconBgClass?: string; // e.g. 'from-emerald-600 to-highlight-700' or 'from-orange-500 to-amber-500'
+  underlineClass?: string; // e.g. 'from-emerald-500 to-highlight-400' or 'from-orange-400 to-amber-400'
   headerClass?: string; // extra classes for header row (flex-row-reverse, text-right, etc)
   children: ReactNode;
 }
@@ -18,8 +18,8 @@ export function GameSpotlightCard({
   iconAlt,
   title,
   titleGradientClass,
-  iconBgClass = 'from-emerald-600 to-green-700',
-  underlineClass = 'from-emerald-500 to-green-400',
+  iconBgClass = 'from-emerald-600 to-highlight-700',
+  underlineClass = 'from-emerald-500 to-highlight-400',
   headerClass = '',
   children,
 }: GameSpotlightCardProps) {

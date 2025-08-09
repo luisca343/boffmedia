@@ -108,7 +108,7 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
     
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
-      <span className="text-blue-400">Def: {defenseValue}</span>
+      <span className="text-secondary-400">Def: {defenseValue}</span>
       
       {/* Show decoration slots */}
       {armor.slots && armor.slots.length > 0 && (
@@ -119,7 +119,7 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
       
       {/* Show set name if available */}
       {armor.armorSet?.name && (
-        <span className="text-purple-400 truncate max-w-[200px]">
+        <span className="text-accent-400 truncate max-w-[200px]">
           {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
@@ -135,7 +135,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
       <span className="text-red-400">Atk: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}</span>
-      <span className={`${weapon.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+      <span className={`${weapon.affinity >= 0 ? 'text-highlight-400' : 'text-red-400'}`}>
         {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       

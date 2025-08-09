@@ -121,9 +121,9 @@ export function AchievementsSummary({ eventId }: any) {
   const getRarityColor = (rarity?: string | null) => {
     switch (rarity?.toLowerCase()) {
       case 'diamond': return 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10'
-      case 'platinum': return 'text-purple-400 border-purple-500/30 bg-purple-500/10'
+      case 'platinum': return 'text-accent-400 border-accent-500/30 bg-accent-500/10'
       case 'gold': return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
-      case 'silver': return 'text-gray-300 border-gray-400/30 bg-gray-400/10'
+      case 'silver': return 'text-surface-300 border-surface-400/30 bg-surface-400/10'
       case 'bronze': return 'text-amber-600 border-amber-600/30 bg-amber-600/10'
       default: return 'text-surface-400 border-surface-500/30 bg-surface-500/10'
     }

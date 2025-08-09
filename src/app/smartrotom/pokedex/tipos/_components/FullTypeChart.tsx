@@ -20,16 +20,16 @@ export default function FullTypeChart() {
         let effectivenessText = "";
         
         if (effectiveness === 2) {
-            bgColor = "bg-green-700";
-            textColor = "text-green-100";
+            bgColor = "bg-highlight-700";
+            textColor = "text-highlight-100";
             effectivenessText = "2×";
         } else if (effectiveness === 0.5) {
             bgColor = "bg-red-700";
             textColor = "text-red-100";
             effectivenessText = "½×";
         } else if (effectiveness === 0) {
-            bgColor = "bg-slate-900";
-            textColor = "text-slate-400";
+            bgColor = "bg-surface-900";
+            textColor = "text-surface-400";
             effectivenessText = "0";
         }
         
@@ -109,7 +109,7 @@ export default function FullTypeChart() {
                     <h3 className="text-base font-medium text-surface-100 mb-3">Leyenda</h3>
                     <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2">
-                            <div className="bg-green-700 text-green-100 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">2×</div>
+                            <div className="bg-highlight-700 text-highlight-100 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">2×</div>
                             <span className="text-sm text-surface-200">Super efectivo</span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export default function FullTypeChart() {
                             <span className="text-sm text-surface-200">Poco efectivo</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="bg-slate-900 text-slate-400 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">0</div>
+                            <div className="bg-surface-900 text-surface-400 h-7 w-9 flex items-center justify-center rounded-sm text-xs font-bold">0</div>
                             <span className="text-sm text-surface-200">Sin efecto</span>
                         </div>
                     </div>

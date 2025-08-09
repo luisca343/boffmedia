@@ -299,7 +299,7 @@ export default function PokeathonHurdleGame() {
   };
 
   return (
-    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-blue-400 to-blue-600">
+    <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-secondary-400 to-secondary-600">
       <h1 className="text-4xl font-bold mb-4 text-white">
         Pokéathlon Hurdle Game
       </h1>
@@ -325,9 +325,9 @@ export default function PokeathonHurdleGame() {
                   bottom: `${hurdle.position}px`,
                 }}
               >
-                <div className="absolute bottom-0 w-full h-[10px] bg-blue-800"></div>
-                <div className="absolute bottom-[10px] left-[5px] w-[2px] h-[50px] bg-blue-800"></div>
-                <div className="absolute bottom-[10px] right-[5px] w-[2px] h-[50px] bg-blue-800"></div>
+                <div className="absolute bottom-0 w-full h-[10px] bg-secondary-800"></div>
+                <div className="absolute bottom-[10px] left-[5px] w-[2px] h-[50px] bg-secondary-800"></div>
+                <div className="absolute bottom-[10px] right-[5px] w-[2px] h-[50px] bg-secondary-800"></div>
                 <div className="absolute top-0 w-full h-[5px] bg-yellow-400"></div>
               </div>
             ))}
@@ -364,7 +364,7 @@ export default function PokeathonHurdleGame() {
         <p className="text-lg font-semibold">Game State: {gameState}</p>
         {gameState === "ready" && (
           <button
-            className="mt-4 px-6 py-3 bg-yellow-500 text-blue-900 rounded-full font-bold text-lg shadow-lg hover:bg-yellow-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-50"
+            className="mt-4 px-6 py-3 bg-yellow-500 text-secondary-900 rounded-full font-bold text-lg shadow-lg hover:bg-yellow-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-50"
             onClick={handleStartGame}
           >
             Start Game
@@ -381,7 +381,7 @@ export default function PokeathonHurdleGame() {
               </p>
             ))}
             <button
-              className="mt-4 px-6 py-3 bg-yellow-500 text-blue-900 rounded-full font-bold text-lg shadow-lg hover:bg-yellow-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-50"
+              className="mt-4 px-6 py-3 bg-yellow-500 text-secondary-900 rounded-full font-bold text-lg shadow-lg hover:bg-yellow-400 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-yellow-600 focus:ring-opacity-50"
               onClick={handleStartGame}
             >
               Play Again

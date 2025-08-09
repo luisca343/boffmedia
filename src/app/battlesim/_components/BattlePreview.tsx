@@ -53,9 +53,9 @@ export const EnhancedBattlePreview = ({
       onMouseLeave={() => setIsHovering(false)}
     >
       {/* Dynamic background with battle arena */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-900 via-indigo-900 to-purple-900 z-0 transition-all duration-500">
+      <div className="absolute inset-0 bg-gradient-to-b from-secondary-900 via-indigo-900 to-accent-900 z-0 transition-all duration-500">
         {/* Battle arena floor */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-gray-800 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-surface-800 to-transparent"></div>
 
         {/* Animated particles */}
         <div className={`stars ${isHovering ? 'stars-hover' : ''}`}></div>

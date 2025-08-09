@@ -10,7 +10,7 @@ const textareaVariants = cva(
       variant: {
         default: "border-input bg-surface-800 text-foreground placeholder:text-muted-foreground",
         dark: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-900 placeholder:text-surface-400 focus-visible:ring-primary-300",
-        wingull: "border-blue-700 bg-blue-900 text-blue-300 ring-offset-blue-950 placeholder:text-blue-500 focus-visible:ring-blue-300",
+        wingull: "border-secondary-700 bg-secondary-900 text-secondary-300 ring-offset-secondary-950 placeholder:text-secondary-500 focus-visible:ring-secondary-300",
       },
       size: {
         default: "px-3 py-2",

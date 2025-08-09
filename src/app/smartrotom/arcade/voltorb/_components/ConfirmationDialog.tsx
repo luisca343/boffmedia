@@ -67,7 +67,7 @@ export default function ConfirmationDialog({
               </AlertDialogAction>
               <AlertDialogCancel 
                 onClick={onClose}
-                className="py-3 px-6 rounded-lg font-bold text-white bg-blue-500 hover:bg-blue-600 active:bg-blue-700 transition-colors duration-200 pixel-corners"
+                className="py-3 px-6 rounded-lg font-bold text-white bg-secondary-500 hover:bg-secondary-600 active:bg-secondary-700 transition-colors duration-200 pixel-corners"
               >
                 {cancelText}
               </AlertDialogCancel>

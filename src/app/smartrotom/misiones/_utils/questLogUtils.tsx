@@ -10,7 +10,7 @@ export function getStatusStyles(status: QuestStatus) {
     case QuestStatus.ACTIVE:
       return "bg-emerald-700 text-emerald-100"
     case QuestStatus.COMPLETED:
-      return "bg-blue-700 text-blue-100"
+      return "bg-secondary-700 text-secondary-100"
     case QuestStatus.FAILED:
       return "bg-red-700 text-red-100"
     case QuestStatus.AVAILABLE:
@@ -40,7 +40,7 @@ export function QuestDetails({ quest, dialogs, npcs }: { quest: QuestData; dialo
                 {quest.status}
                 </span>
                 {quest.repeatable && (
-                <span className="bg-purple-700 text-purple-100 px-3 py-1 rounded-full text-sm font-bold">
+                <span className="bg-accent-700 text-accent-100 px-3 py-1 rounded-full text-sm font-bold">
                     Repetible
                 </span>
                 )}

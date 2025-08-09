@@ -111,8 +111,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   
   if (isLoading) {
     return (
-      <Button disabled className="w-full bg-surface-700/50 border border-purple-500/30">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin text-purple-400" />
+      <Button disabled className="w-full bg-surface-700/50 border border-accent-500/30">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin text-accent-400" />
         <span className="text-surface-300">Verificando registro...</span>
       </Button>
     );
@@ -122,8 +122,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
     <Button
       className={
         isRegistered 
-          ? "w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-semibold shadow-lg" 
-          : "w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+          ? "w-full bg-gradient-to-r from-highlight-600 to-emerald-600 hover:from-highlight-700 hover:to-emerald-700 font-semibold shadow-lg" 
+          : "w-full bg-gradient-to-r from-accent-600 to-indigo-600 hover:from-accent-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
       }
       onClick={handleRegistration}
       disabled={isRegistering}

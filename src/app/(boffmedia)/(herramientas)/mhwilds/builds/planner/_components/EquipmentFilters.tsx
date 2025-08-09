@@ -48,10 +48,10 @@ export const EquipmentFilters = ({ filters, setFilters, slotType, sortDirection,
   const getElementColor = (element: string) => {
     const colorMap: Record<string, string> = {
       fire: "text-red-400 border-red-500",
-      water: "text-blue-400 border-blue-500",
+      water: "text-secondary-400 border-secondary-500",
       thunder: "text-yellow-400 border-yellow-500",
       ice: "text-cyan-400 border-cyan-500",
-      dragon: "text-purple-400 border-purple-500",
+      dragon: "text-accent-400 border-accent-500",
     };
     
     return colorMap[element] || "text-surface-400";

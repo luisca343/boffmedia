@@ -45,7 +45,7 @@ export function BoxAnimation({ lootBox }: BoxAnimationProps) {
         transition={{ delay: 0.5 }}
         className="absolute -bottom-16 inset-x-0 text-center"
       >
-        <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400 animate-text-shine">
+        <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-secondary-400 animate-text-shine">
           Abriendo {lootBox.name}...
         </h3>
       </motion.div>

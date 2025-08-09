@@ -135,17 +135,17 @@ export default function StarBank() {
           <BankSectionHeader>Balance de cuenta</BankSectionHeader>
           <BankSectionContent>
             <div className="flex flex-col h-full justify-center">
-              <div className="text-4xl 2xl:text-5xl font-bold text-blue-700">
+              <div className="text-4xl 2xl:text-5xl font-bold text-secondary-700">
                 {formatMoney(getActiveAccountBalance(accounts!, activeAccount))}
               </div>
-              <div className="text-sm text-blue-500 mt-2">
+              <div className="text-sm text-secondary-500 mt-2">
                 Cuenta {accounts?.find((acc: any) => acc.id === activeAccount)?.name || "Principal"}
               </div>
             </div>
           </BankSectionContent>
           <BankSectionFooter>
             <div className="flex flex-col w-full justify-center">
-              <span className="text-xs xl:text-lg text-blue-800">
+              <span className="text-xs xl:text-lg text-secondary-800">
                 Cambiar de Cuenta
               </span>
               <AccountSelect
@@ -170,17 +170,17 @@ export default function StarBank() {
           <BankSectionHeader>Acciones Rápidas</BankSectionHeader>
           <BankSectionContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InternalLink href="/starbank/enviar" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <DollarSign className="mr-2 text-blue-700" /> 
-                <span className="text-blue-900 font-medium">Transferir Dinero</span>
+              <InternalLink href="/starbank/enviar" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
+                <DollarSign className="mr-2 text-secondary-700" /> 
+                <span className="text-secondary-900 font-medium">Transferir Dinero</span>
               </InternalLink>
-              <InternalLink href="/starbank/cuentas" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <CreditCard className="mr-2 text-blue-700" /> 
-                <span className="text-blue-900 font-medium">Administrar Cuentas</span>
+              <InternalLink href="/starbank/cuentas" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
+                <CreditCard className="mr-2 text-secondary-700" /> 
+                <span className="text-secondary-900 font-medium">Administrar Cuentas</span>
               </InternalLink>
-              <InternalLink href="/starbank/facturas" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <Send className="mr-2 text-blue-700" /> 
-                <span className="text-blue-900 font-medium">Pagar Facturas</span>
+              <InternalLink href="/starbank/facturas" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
+                <Send className="mr-2 text-secondary-700" /> 
+                <span className="text-secondary-900 font-medium">Pagar Facturas</span>
               </InternalLink>
             </div>
           </BankSectionContent>
@@ -198,7 +198,7 @@ export default function StarBank() {
           </BankSectionContent>
           <BankSectionFooter>
             <BankSectionButton
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="mt-4 w-full bg-secondary-600 hover:bg-secondary-700 text-white"
               onClick={() => {
                 router.push("/smartrotom/starbank/transacciones");
               }}
@@ -244,7 +244,7 @@ function TransfersShort({
                 className={`text-right my-auto mx-2 ${
                   esPagador(transfer, activeAccount)
                     ? "text-red-800"
-                    : "text-green-700"
+                    : "text-highlight-700"
                 }`}
               >
                 <div className="font-bold text-lg text-shadow-border05">
@@ -272,13 +272,13 @@ function TablaTransacciones({
   return (
     <div className="relative overflow-x-auto shadow-sm rounded-lg">
       <table className="min-w-full divide-y divide-surface-200">
-        <thead className="sticky top-0 z-10 bg-blue-50">
+        <thead className="sticky top-0 z-10 bg-secondary-50">
           <tr>
-            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">Información</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+            <th colSpan={2} className="px-6 py-3 text-left text-xs font-medium text-secondary-800 uppercase tracking-wider">Información</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-secondary-800 uppercase tracking-wider">
               Cantidad
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-blue-800 uppercase tracking-wider">
+            <th className="px-6 py-3 text-left text-xs font-medium text-secondary-800 uppercase tracking-wider">
               Fecha
             </th>
           </tr>
@@ -287,13 +287,13 @@ function TablaTransacciones({
           {transactions.map((transaction: any) => {
             const isPayer = esPagador(transaction, activeAccount);
             return (
-              <tr key={transaction.id} className="hover:bg-blue-50 transition-colors">
+              <tr key={transaction.id} className="hover:bg-secondary-50 transition-colors">
                 <td className="py-4 pl-6 whitespace-nowrap">
                   <AccountImage type={transaction.type} name={transaction.name} />
                 </td>
                 <td className="pr-6 py-4">
-                  <div className="text-sm font-medium text-blue-900">{transaction.reason}</div>
-                  <div className="text-xs text-blue-500">{transaction.name}</div>
+                  <div className="text-sm font-medium text-secondary-900">{transaction.reason}</div>
+                  <div className="text-xs text-secondary-500">{transaction.name}</div>
                 </td>
                 <td className={`px-6 py-4 whitespace-nowrap font-medium ${
                   isPayer ? "text-red-600" : "text-emerald-600"
@@ -303,7 +303,7 @@ function TablaTransacciones({
                     {formatMoney(transaction.amount)}
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-900">
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-secondary-900">
                   {strToDate(transaction.date)}
                 </td>
               </tr>
@@ -334,7 +334,7 @@ function TablaTransacciones({
               className={`text-right my-auto ${
                 esPagador(transaction, activeAccount)
                   ? "text-red-800"
-                  : "text-green-700"
+                  : "text-highlight-700"
               }`}
             >
               <div className="font-bold text-xl text-shadow-border05">

@@ -61,14 +61,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
   }
 
   return (
-      <Card className="w-full max-w-4xl shadow-xl bg-blue-800 bg-opacity-70 text-white rounded-xl overflow-hidden relative z-10">
-        <CardHeader className="border-b border-blue-700">
+      <Card className="w-full max-w-4xl shadow-xl bg-secondary-800 bg-opacity-70 text-white rounded-xl overflow-hidden relative z-10">
+        <CardHeader className="border-b border-secondary-700">
           <div className="flex justify-between items-center">
             <CardTitle className="text-2xl font-bold text-yellow-300">Invitación: Plan de Desarrollo de Teras</CardTitle>
             <Star className="text-yellow-300 h-6 w-6" />
           </div>
-          <div className="flex items-center mt-2 text-blue-100">
-            <div className="mr-2 w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center text-blue-800 font-bold">
+          <div className="flex items-center mt-2 text-secondary-100">
+            <div className="mr-2 w-8 h-8 bg-yellow-300 rounded-full flex items-center justify-center text-secondary-800 font-bold">
               TP
             </div>
             <div>
@@ -77,26 +77,26 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
             </div>
           </div>
           <div className="flex space-x-2 mt-4">
-            <Button variant="ghost" size="sm" className="text-blue-200 hover:bg-blue-700 hover:text-yellow-300 transition-colors duration-300">
+            <Button variant="ghost" size="sm" className="text-secondary-200 hover:bg-secondary-700 hover:text-yellow-300 transition-colors duration-300">
               <Reply className="h-4 w-4 mr-2" /> Responder
             </Button>
-            <Button variant="ghost" size="sm" className="text-blue-200 hover:bg-blue-700 hover:text-yellow-300 transition-colors duration-300">
+            <Button variant="ghost" size="sm" className="text-secondary-200 hover:bg-secondary-700 hover:text-yellow-300 transition-colors duration-300">
               <ReplyAll className="h-4 w-4 mr-2" /> Responder a todos
             </Button>
-            <Button variant="ghost" size="sm" className="text-blue-200 hover:bg-blue-700 hover:text-yellow-300 transition-colors duration-300">
+            <Button variant="ghost" size="sm" className="text-secondary-200 hover:bg-secondary-700 hover:text-yellow-300 transition-colors duration-300">
               <Forward className="h-4 w-4 mr-2" /> Reenviar
             </Button>
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="space-y-4 text-blue-100">
+          <div className="space-y-4 text-secondary-100">
             <p className="text-lg">¡Hola, {invitacion.username}!</p>
             <p>Nos complace informarle que le ha sido otorgada una plaza para participar en el Plan de Desarrollo de Teras. 
             En caso de querer colaborar con el desarrollo de la región, por favor, rellene el siguiente formulario.</p>
             <p>Muchas gracias por su interés. El destino de la región de Teras depende de usted.</p>
           </div>
-          <Separator className="my-6 bg-blue-700" />
-          <div className="bg-blue-900 bg-opacity-50 p-6 rounded-xl border border-blue-700 mt-4">
+          <Separator className="my-6 bg-secondary-700" />
+          <div className="bg-secondary-900 bg-opacity-50 p-6 rounded-xl border border-secondary-700 mt-4">
             <h3 className="text-xl font-bold mb-4 text-yellow-300">¡Únete a la aventura de Teras!</h3>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -110,7 +110,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   />
                   <div>
                     <h2 className="text-xl font-bold text-yellow-300">{invitacion.username}</h2>
-                    <p className="text-blue-200">Aventurero de Minecraft</p>
+                    <p className="text-secondary-200">Aventurero de Minecraft</p>
                   </div>
                 </div>
                 <FormField
@@ -118,14 +118,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-blue-100 font-semibold">Tu nombre de aventurero</FormLabel>
+                      <FormLabel className="text-secondary-100 font-semibold">Tu nombre de aventurero</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300" size={18} />
-                          <Input placeholder="¿Cómo quieres que te llamemos?" {...field} className="pl-10 bg-blue-800 bg-opacity-50 border-blue-600 text-blue-100 placeholder-blue-300 focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-300" size={18} />
+                          <Input placeholder="¿Cómo quieres que te llamemos?" {...field} className="pl-10 bg-secondary-800 bg-opacity-50 border-secondary-600 text-secondary-100 placeholder-secondary-300 focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-blue-200">Este será tu nombre en Teras</FormDescription>
+                      <FormDescription className="text-secondary-200">Este será tu nombre en Teras</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -135,14 +135,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="mc_username"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-blue-100 font-semibold">Tu nombre en Minecraft</FormLabel>
+                      <FormLabel className="text-secondary-100 font-semibold">Tu nombre en Minecraft</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300" size={18} />
-                          <Input placeholder="Tu nombre en Minecraft" {...field} disabled readOnly className="pl-10 bg-blue-700 bg-opacity-50 border-blue-600 text-blue-100 rounded-lg" />
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-300" size={18} />
+                          <Input placeholder="Tu nombre en Minecraft" {...field} disabled readOnly className="pl-10 bg-secondary-700 bg-opacity-50 border-secondary-600 text-secondary-100 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-blue-200">Este es tu nombre actual en Minecraft</FormDescription>
+                      <FormDescription className="text-secondary-200">Este es tu nombre actual en Minecraft</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -152,14 +152,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-blue-100 font-semibold">Tu correo electrónico</FormLabel>
+                      <FormLabel className="text-secondary-100 font-semibold">Tu correo electrónico</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300" size={18} />
-                          <Input placeholder="¿Dónde podemos contactarte?" {...field} className="pl-10 bg-blue-800 bg-opacity-50 border-blue-600 text-blue-100 placeholder-blue-300 focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
+                          <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-300" size={18} />
+                          <Input placeholder="¿Dónde podemos contactarte?" {...field} className="pl-10 bg-secondary-800 bg-opacity-50 border-secondary-600 text-secondary-100 placeholder-secondary-300 focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-blue-200">Te mantendremos informado de todas las novedades</FormDescription>
+                      <FormDescription className="text-secondary-200">Te mantendremos informado de todas las novedades</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -169,14 +169,14 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-blue-100 font-semibold">Tu contraseña secreta</FormLabel>
+                      <FormLabel className="text-secondary-100 font-semibold">Tu contraseña secreta</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-300" size={18} />
-                          <Input placeholder="Crea una contraseña segura" type="password" {...field} className="pl-10 bg-blue-800 bg-opacity-50 border-blue-600 text-blue-100 placeholder-blue-300 focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
+                          <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-secondary-300" size={18} />
+                          <Input placeholder="Crea una contraseña segura" type="password" {...field} className="pl-10 bg-secondary-800 bg-opacity-50 border-secondary-600 text-secondary-100 placeholder-secondary-300 focus:ring-yellow-300 focus:border-yellow-300 rounded-lg" />
                         </div>
                       </FormControl>
-                      <FormDescription className="text-blue-200">Asegúrate de que sea segura y fácil de recordar</FormDescription>
+                      <FormDescription className="text-secondary-200">Asegúrate de que sea segura y fácil de recordar</FormDescription>
                       <FormMessage className="text-red-300" />
                     </FormItem>
                   )}
@@ -185,7 +185,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
                   <Button 
                     type="submit" 
                     disabled={isSubmitting} 
-                    className="bg-yellow-300 text-blue-900 hover:bg-yellow-400 disabled:opacity-50 px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                    className="bg-yellow-300 text-secondary-900 hover:bg-yellow-400 disabled:opacity-50 px-6 py-3 rounded-lg text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                   >
                     {isSubmitting ? '¡Embarcando..!' : '¡Comenzar la aventura!'}
                     <Send className="ml-2 h-5 w-5" />
@@ -195,7 +195,7 @@ export default function InvitacionForm({ invitacion }: { invitacion: Invitacion 
             </Form>
           </div>
         </CardContent>
-        <CardFooter className="border-t border-blue-700 flex justify-between items-center text-blue-200">
+        <CardFooter className="border-t border-secondary-700 flex justify-between items-center text-secondary-200">
           <div className="flex items-center space-x-2">
             <Mail className="h-5 w-5" />
             <span className="text-sm font-medium">Invitación #{invitacion.id}</span>

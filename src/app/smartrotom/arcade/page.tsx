@@ -54,7 +54,7 @@ export default function CentroArcade() {
   };
   
   return (
-    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-purple-950 to-violet-950 flex flex-col items-center p-4 relative overflow-auto font-mono">
+    <div className="min-h-full w-full bg-gradient-to-b from-indigo-950 via-accent-950 to-violet-950 flex flex-col items-center p-4 relative overflow-auto font-mono">
       <StarsBackground />
       
       {/* Toast container for notifications */}
@@ -80,8 +80,8 @@ export default function CentroArcade() {
         </div>
         
         {/* Decorative cabinet screws */}
-        <div className="absolute left-4 top-4 h-3 w-3 rounded-full bg-gray-400 shadow-inner"></div>
-        <div className="absolute right-4 top-4 h-3 w-3 rounded-full bg-gray-400 shadow-inner"></div>
+        <div className="absolute left-4 top-4 h-3 w-3 rounded-full bg-surface-400 shadow-inner"></div>
+        <div className="absolute right-4 top-4 h-3 w-3 rounded-full bg-surface-400 shadow-inner"></div>
       </div>
       
       {/* Animated reward overlay */}
@@ -90,7 +90,7 @@ export default function CentroArcade() {
         <div className="relative flex flex-col items-center">
           {/* Animated background effects */}
           <div className="absolute inset-0 animate-pulse-slow -z-10">
-            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20 rounded-full scale-150 blur-3xl"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-accent-600/20 rounded-full scale-150 blur-3xl"></div>
           </div>
           
           {/* Animated stars around the reward */}
@@ -110,7 +110,7 @@ export default function CentroArcade() {
           
           {/* Main reward container with improved visuals */}
           <div className="animate-bounce-gentle flex flex-col items-center">
-            <div className="text-center bg-gradient-to-b from-indigo-900/80 to-purple-900/80 px-10 py-6 rounded-2xl backdrop-blur-md shadow-xl shadow-indigo-500/30 border-2 border-indigo-400/30">
+            <div className="text-center bg-gradient-to-b from-indigo-900/80 to-accent-900/80 px-10 py-6 rounded-2xl backdrop-blur-md shadow-xl shadow-indigo-500/30 border-2 border-indigo-400/30">
               {/* Item icon with improved display - centered */}
               <div className="relative mb-6 flex justify-center">
                 <div className="absolute -inset-4 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-full blur-md"></div>
@@ -171,28 +171,28 @@ export default function CentroArcade() {
         <div className="w-full mb-8 relative">
           <InternalLink 
             href="/arcade/loot"
-            className="group block w-full bg-gradient-to-r from-blue-900/90 to-indigo-900/90 rounded-xl overflow-hidden border-4 border-blue-700/50 shadow-2xl transition-all hover:shadow-blue-500/20 hover:border-blue-600/70"
+            className="group block w-full bg-gradient-to-r from-secondary-900/90 to-indigo-900/90 rounded-xl overflow-hidden border-4 border-secondary-700/50 shadow-2xl transition-all hover:shadow-secondary-500/20 hover:border-secondary-600/70"
           >
             <div className="absolute inset-0 bg-[url('/images/treasure-pattern.png')] opacity-10 group-hover:opacity-20 transition-opacity"></div>
             
             <div className="relative flex flex-col md:flex-row items-center p-4 md:p-6">
               {/* Left side - Chest icon */}
-              <div className="flex-shrink-0 bg-gradient-to-br from-blue-800/80 to-blue-600/60 p-4 md:p-6 rounded-full border-2 border-blue-400/30 shadow-inner shadow-blue-700/50 group-hover:shadow-blue-400/50 transition-all mb-4 md:mb-0 md:mr-6">
+              <div className="flex-shrink-0 bg-gradient-to-br from-secondary-800/80 to-secondary-600/60 p-4 md:p-6 rounded-full border-2 border-secondary-400/30 shadow-inner shadow-secondary-700/50 group-hover:shadow-secondary-400/50 transition-all mb-4 md:mb-0 md:mr-6">
                 <div className="relative">
-                  <Package className="h-12 w-12 md:h-16 md:w-16 text-blue-300 group-hover:text-blue-200 transition-colors" />
+                  <Package className="h-12 w-12 md:h-16 md:w-16 text-secondary-300 group-hover:text-secondary-200 transition-colors" />
                   <div className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-yellow-400 flex items-center justify-center text-xs font-bold shadow-md animate-pulse">!</div>
                 </div>
               </div>
               
               {/* Right side - Content */}
               <div className="flex-grow text-center md:text-left">
-                <h2 className="text-2xl md:text-3xl font-bold text-blue-300 mb-2 group-hover:text-blue-200">
+                <h2 className="text-2xl md:text-3xl font-bold text-secondary-300 mb-2 group-hover:text-secondary-200">
                   Inventario de Cajas
                 </h2>
-                <p className="text-blue-200/80 mb-3 max-w-xl">
+                <p className="text-secondary-200/80 mb-3 max-w-xl">
                   Accede a tu inventario de cajas y desbloquea recompensas especiales. ¡Colecciona objetos raros para tu aventura!
                 </p>
-                <div className="inline-flex items-center gap-2 bg-blue-700/50 px-4 py-2 rounded-lg text-blue-200 font-bold group-hover:bg-blue-600/60 transition-colors">
+                <div className="inline-flex items-center gap-2 bg-secondary-700/50 px-4 py-2 rounded-lg text-secondary-200 font-bold group-hover:bg-secondary-600/60 transition-colors">
                   <Box className="h-5 w-5" /> 
                   <span>VER INVENTARIO</span>
                   <span className="bg-yellow-500 text-yellow-900 text-xs px-2 py-0.5 rounded-full font-bold">NUEVO</span>
@@ -205,10 +205,10 @@ export default function CentroArcade() {
         {/* Games Section Title with Enhanced Style */}
         <div className="w-full text-center mb-8">
           <div className="inline-block relative">
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 pb-1">
+            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent-400 pb-1">
               Juegos Arcade
             </h2>
-            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full"></div>
+            <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-accent-500 rounded-full"></div>
           </div>
         </div>
         
@@ -245,7 +245,7 @@ export default function CentroArcade() {
         <div className="lg:hidden w-full mb-8">
           <InternalLink
             href="/arcade/loot"
-            className="block w-full bg-gradient-to-r from-blue-800 to-blue-600 py-4 rounded-lg shadow-lg text-center text-white font-bold text-lg flex items-center justify-center gap-2"
+            className="block w-full bg-gradient-to-r from-secondary-800 to-secondary-600 py-4 rounded-lg shadow-lg text-center text-white font-bold text-lg flex items-center justify-center gap-2"
           >
             <Package className="h-5 w-5" />
             Acceder al Inventario de Cajas
@@ -253,21 +253,21 @@ export default function CentroArcade() {
         </div>
         
         {/* Retro cabinet footer */}
-        <div className="w-full bg-gray-900/70 rounded-lg border border-gray-700 p-4 text-center">
+        <div className="w-full bg-surface-900/70 rounded-lg border border-surface-700 p-4 text-center">
           <p className="text-cyan-400 font-bold mb-1">
             Arcade v1.0 • SmartRotom Experience
           </p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-surface-400 text-sm">
             ¡Gana estrellas y desbloquea recompensas jugando cada día!
           </p>
           
           {/* Pixel art decoration */}
           <div className="flex justify-center gap-6 mt-4">
-            <div className="h-4 w-4 bg-blue-500"></div>
+            <div className="h-4 w-4 bg-secondary-500"></div>
             <div className="h-4 w-4 bg-red-500"></div>
             <div className="h-4 w-4 bg-yellow-500"></div>
-            <div className="h-4 w-4 bg-green-500"></div>
-            <div className="h-4 w-4 bg-purple-500"></div>
+            <div className="h-4 w-4 bg-highlight-500"></div>
+            <div className="h-4 w-4 bg-accent-500"></div>
           </div>
         </div>
       </div>
@@ -318,9 +318,9 @@ export default function CentroArcade() {
           --yellow-rgb: 253, 224, 71;
           --orange-rgb: 249, 115, 22;
           --pink-rgb: 236, 72, 153;
-          --blue-rgb: 59, 130, 246;
-          --purple-rgb: 168, 85, 247;
-          --green-rgb: 16, 185, 129;
+          --secondary-rgb: 59, 130, 246;
+          --accent-rgb: 168, 85, 247;
+          --highlight-rgb: 16, 185, 129;
         }
   
         @keyframes bounce-gentle {

@@ -143,16 +143,16 @@ export default function EventAchievementsPage() {
     switch (rarity?.toLowerCase()) {
       case 'diamond': 
         return { 
-          color: 'from-cyan-400 to-blue-500',
+          color: 'from-cyan-400 to-secondary-500',
           bg: 'bg-cyan-500/10',
           border: 'border-cyan-500/30',
           icon: <Gem className="w-4 h-4" />
         }
       case 'platinum': 
         return { 
-          color: 'from-purple-400 to-pink-500',
-          bg: 'bg-purple-500/10',
-          border: 'border-purple-500/30',
+          color: 'from-accent-400 to-pink-500',
+          bg: 'bg-accent-500/10',
+          border: 'border-accent-500/30',
           icon: <Crown className="w-4 h-4" />
         }
       case 'gold': 
@@ -164,9 +164,9 @@ export default function EventAchievementsPage() {
         }
       case 'silver': 
         return { 
-          color: 'from-gray-300 to-gray-500',
-          bg: 'bg-gray-400/10',
-          border: 'border-gray-400/30',
+          color: 'from-surface-300 to-surface-500',
+          bg: 'bg-surface-400/10',
+          border: 'border-surface-400/30',
           icon: <Medal className="w-4 h-4" />
         }
       case 'bronze': 
@@ -205,12 +205,12 @@ export default function EventAchievementsPage() {
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="flex flex-col items-center justify-center py-32">
             <div className="relative">
-              <div className="w-20 h-20 border-4 border-purple-500/20 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-purple-500 rounded-full animate-spin"></div>
+              <div className="w-20 h-20 border-4 border-accent-500/20 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-accent-500 rounded-full animate-spin"></div>
               <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
             </div>
             
-            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400">
               Cargando logros...
             </h2>
             <p className="mt-2 text-surface-400">Preparando tus conquistas épicas</p>
@@ -224,8 +224,8 @@ export default function EventAchievementsPage() {
     <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-accent-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-2xl"></div>
       </div>
 
@@ -233,17 +233,17 @@ export default function EventAchievementsPage() {
         {/* Header */}
         <div className="mb-12">
           <Link href={`/events/${eventId}`}>
-            <Button variant="ghost" className="mb-6 text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-purple-500/30">
+            <Button variant="ghost" className="mb-6 text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver al evento
             </Button>
           </Link>
           
           {/* Hero Section */}
-          <div className="bg-gradient-to-r from-surface-800/80 via-purple-900/40 to-surface-800/80 backdrop-blur-sm border border-purple-500/20 rounded-3xl p-8 mb-8">
+          <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl p-8 mb-8">
             <div className="flex flex-col md:flex-row items-center gap-6">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-2xl">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent-600 to-indigo-600 flex items-center justify-center shadow-2xl">
                   {event?.icon ? (
                     <img src={event.icon} alt="" className="w-16 h-16 object-cover rounded-xl" />
                   ) : (
@@ -257,12 +257,12 @@ export default function EventAchievementsPage() {
               </div>
               
               <div className="flex-1 text-center md:text-left">
-                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 mb-2">
+                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-pink-400 to-indigo-400 mb-2">
                   Logros Épicos
                 </h1>
                 <p className="text-xl text-surface-300 mb-4">{event?.title}</p>
                 <div className="flex items-center justify-center md:justify-start gap-2">
-                  <Badge className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-purple-400 border border-purple-500/30">
+                  <Badge className="bg-gradient-to-r from-accent-500/20 to-indigo-500/20 text-accent-400 border border-accent-500/30">
                     <Trophy className="w-3 h-3 mr-1" />
                     {totalCount} logros disponibles
                   </Badge>
@@ -273,21 +273,21 @@ export default function EventAchievementsPage() {
 
           {/* Progress Overview */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-surface-800/60 backdrop-blur-sm border border-green-500/20 rounded-2xl p-6 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-highlight-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-highlight-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Trophy className="h-6 w-6 text-white" />
               </div>
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-highlight-400 to-emerald-400">
                 {unlockedCount}
               </div>
               <div className="text-sm text-surface-400">Desbloqueados</div>
             </div>
             
-            <div className="bg-surface-800/60 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-6 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-secondary-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Target className="h-6 w-6 text-white" />
               </div>
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-secondary-400 to-cyan-400">
                 {totalCount}
               </div>
               <div className="text-sm text-surface-400">Total</div>
@@ -303,11 +303,11 @@ export default function EventAchievementsPage() {
               <div className="text-sm text-surface-400">Puntos</div>
             </div>
             
-            <div className="bg-surface-800/60 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Zap className="h-6 w-6 text-white" />
               </div>
-              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-indigo-400">
                 {completionRate.toFixed(1)}%
               </div>
               <div className="text-sm text-surface-400">Completado</div>
@@ -315,10 +315,10 @@ export default function EventAchievementsPage() {
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-surface-800/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6">
+          <div className="bg-surface-800/40 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-3">
               <span className="text-lg font-semibold text-white">Progreso General</span>
-              <span className="text-purple-400 font-bold">{unlockedCount}/{totalCount}</span>
+              <span className="text-accent-400 font-bold">{unlockedCount}/{totalCount}</span>
             </div>
             <Progress 
               value={completionRate} 
@@ -328,7 +328,7 @@ export default function EventAchievementsPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-surface-800/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 mb-8">
+        <div className="bg-surface-800/40 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-surface-400" />
@@ -336,7 +336,7 @@ export default function EventAchievementsPage() {
                 placeholder="Buscar logros épicos..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 h-12 bg-surface-700/50 border-surface-600 text-white placeholder-surface-400 text-lg focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+                className="pl-12 h-12 bg-surface-700/50 border-surface-600 text-white placeholder-surface-400 text-lg focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500"
               />
             </div>
             
@@ -346,7 +346,7 @@ export default function EventAchievementsPage() {
                 size="sm"
                 onClick={() => setActiveFilter('all')}
                 className={`px-6 ${activeFilter === 'all' 
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white" 
+                  ? "bg-gradient-to-r from-accent-600 to-indigo-600 text-white" 
                   : "text-surface-300 hover:text-white hover:bg-surface-600"
                 }`}
               >
@@ -357,7 +357,7 @@ export default function EventAchievementsPage() {
                 size="sm"
                 onClick={() => setActiveFilter('unlocked')}
                 className={`px-6 ${activeFilter === 'unlocked'
-                  ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white"
+                  ? "bg-gradient-to-r from-highlight-600 to-emerald-600 text-white"
                   : "text-surface-300 hover:text-white hover:bg-surface-600"
                 }`}
               >
@@ -368,7 +368,7 @@ export default function EventAchievementsPage() {
                 size="sm"
                 onClick={() => setActiveFilter('locked')}
                 className={`px-6 ${activeFilter === 'locked'
-                  ? "bg-gradient-to-r from-gray-600 to-gray-700 text-white"
+                  ? "bg-gradient-to-r from-surface-600 to-surface-700 text-white"
                   : "text-surface-300 hover:text-white hover:bg-surface-600"
                 }`}
               >
@@ -392,7 +392,7 @@ export default function EventAchievementsPage() {
                 }}
                 className={`group bg-surface-800/60 backdrop-blur-sm border rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl opacity-0 ${
                   achievement.isUnlocked 
-                    ? 'border-purple-500/30 hover:border-purple-400/50 hover:shadow-purple-500/20' 
+                    ? 'border-accent-500/30 hover:border-accent-400/50 hover:shadow-accent-500/20' 
                     : 'border-surface-700/50 opacity-75 hover:border-surface-600'
                 }`}
               >
@@ -447,10 +447,10 @@ export default function EventAchievementsPage() {
 
                 {/* Achievement Meta */}
                 <div className="flex items-center gap-3 mb-4">
-                  <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-400">
+                  <Badge variant="outline" className="text-xs border-accent-500/30 text-accent-400">
                     {achievement.itemType}
                   </Badge>
-                  <Badge variant="outline" className="text-xs border-blue-500/30 text-blue-400">
+                  <Badge variant="outline" className="text-xs border-secondary-500/30 text-secondary-400">
                     {achievement.category}
                   </Badge>
                 </div>
@@ -460,7 +460,7 @@ export default function EventAchievementsPage() {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-surface-400">Progreso</span>
-                      <span className="text-sm font-semibold text-purple-400">
+                      <span className="text-sm font-semibold text-accent-400">
                         {achievement.currentProgress}/{achievement.maxProgress}
                       </span>
                     </div>
@@ -496,15 +496,15 @@ export default function EventAchievementsPage() {
         {filteredAchievements.length === 0 && (
           <div className="text-center py-20">
             <div className="relative inline-block mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-2xl flex items-center justify-center border border-purple-500/20">
-                <Trophy className="h-12 w-12 text-purple-400" />
+              <div className="w-24 h-24 bg-gradient-to-br from-accent-600/20 to-indigo-600/20 rounded-2xl flex items-center justify-center border border-accent-500/20">
+                <Trophy className="h-12 w-12 text-accent-400" />
               </div>
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center">
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-surface-500 to-surface-600 rounded-full flex items-center justify-center">
                 <Search className="w-3 h-3 text-white" />
               </div>
             </div>
             
-            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-4">
+            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400 mb-4">
               No se encontraron logros
             </h3>
             <p className="text-surface-400 max-w-md mx-auto">

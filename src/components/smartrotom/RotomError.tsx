@@ -83,7 +83,7 @@ export function RotomError(props: RotomErrorProps) {
     } else if (severity === ERROR_SEVERITIES.WARNING) {
       return <AlertCircle className="w-8 h-8 text-amber-500 mr-2" />;
     } else if (severity === ERROR_SEVERITIES.INFO) {
-      return <AlertCircle className="w-8 h-8 text-blue-500 mr-2" />;
+      return <AlertCircle className="w-8 h-8 text-secondary-500 mr-2" />;
     } else {
       return <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />;
     }
@@ -144,7 +144,7 @@ export function RotomError(props: RotomErrorProps) {
                   href={errorDocs.supportLink} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline text-sm"
+                  className="text-secondary-600 hover:underline text-sm"
                 >
                   Más información
                 </a>

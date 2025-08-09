@@ -27,7 +27,7 @@ export default function ArcadeTopBar({
             <span className="text-sm">Arcade</span>
           </InternalLink>
           
-          <div className="h-4 border-r border-gray-700 mx-1"></div>
+          <div className="h-4 border-r border-surface-700 mx-1"></div>
           
           <div className="flex items-center">
             <Joystick className="h-5 w-5 text-cyan-400 mr-1.5" />

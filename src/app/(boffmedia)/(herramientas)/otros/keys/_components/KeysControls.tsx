@@ -37,7 +37,7 @@ export const KeysControls = ({
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             placeholder="Buscar por nombre de juego o bundle..."
-            className="bg-surface-700 border-surface-600 text-surface-100 pl-9 py-5 focus-visible:ring-blue-500"
+            className="bg-surface-700 border-surface-600 text-surface-100 pl-9 py-5 focus-visible:ring-secondary-500"
           />
         </div>
         <div className="flex items-center gap-3">
@@ -49,14 +49,14 @@ export const KeysControls = ({
                 onChange={() => setShowClaimed(!showClaimed)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-surface-600 rounded-full transition peer-checked:bg-blue-500 peer-focus:ring-4 peer-focus:ring-blue-400/25"></div>
+              <div className="w-11 h-6 bg-surface-600 rounded-full transition peer-checked:bg-secondary-500 peer-focus:ring-4 peer-focus:ring-secondary-400/25"></div>
               <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-5 peer-checked:bg-surface-900"></div>
             </div>
-            <span className="text-sm md:text-base font-medium text-blue-300 group-hover:text-blue-400 transition">
+            <span className="text-sm md:text-base font-medium text-secondary-300 group-hover:text-secondary-400 transition">
               {showClaimed ? "Ocultar reclamadas" : "Mostrar reclamadas"}
             </span>
           </label>
-          <Button variant="outline" size="icon" className="border-surface-600 text-surface-300 hover:text-blue-400">
+          <Button variant="outline" size="icon" className="border-surface-600 text-surface-300 hover:text-secondary-400">
             <Filter className="h-4 w-4" />
           </Button>
         </div>
@@ -67,8 +67,8 @@ export const KeysControls = ({
           <Badge className="bg-surface-700 text-surface-300 hover:bg-surface-600">
             Todos los juegos ({totalCount})
           </Badge>
-          <Badge className="bg-green-600/20 text-green-400 hover:bg-green-700/30 flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-green-400"></div>
+          <Badge className="bg-highlight-600/20 text-highlight-400 hover:bg-highlight-700/30 flex items-center gap-1">
+            <div className="w-2 h-2 rounded-full bg-highlight-400"></div>
             Disponibles ({availableCount})
           </Badge>
           <Badge className="bg-red-600/20 text-red-400 hover:bg-red-700/30 flex items-center gap-1">
@@ -76,7 +76,7 @@ export const KeysControls = ({
             Reclamados ({claimedCount})
           </Badge>
         </div>
-        <Button variant="ghost" size="sm" className="text-surface-400 hover:text-blue-400">
+        <Button variant="ghost" size="sm" className="text-surface-400 hover:text-secondary-400">
           <ArrowDownUp className="h-3 w-3 mr-1" />
           Ordenar
         </Button>

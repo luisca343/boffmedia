@@ -55,12 +55,12 @@ const DialogContent = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-800 text-surface-100 ring-offset-surface-900 focus:ring-primary-300",
-    wingull: "border-blue-800 bg-blue-900 text-blue-100 ring-offset-blue-950 focus:ring-blue-300",
+    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100 ring-offset-secondary-950 focus:ring-secondary-300",
   }
   
   const closeButtonStyles = {
     default: "text-surface-400 focus:ring-primary-300 ring-offset-surface-900 data-[state=open]:bg-surface-800",
-    wingull: "text-blue-400 focus:ring-blue-300 ring-offset-blue-950 data-[state=open]:bg-blue-900",
+    wingull: "text-secondary-400 focus:ring-secondary-300 ring-offset-secondary-950 data-[state=open]:bg-secondary-900",
   }
   
   return (
@@ -125,7 +125,7 @@ const DialogTitle = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-300",
-    wingull: "text-blue-300",
+    wingull: "text-secondary-300",
   }
   
   return (
@@ -146,7 +146,7 @@ const DialogDescription = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-400",
+    wingull: "text-secondary-400",
   }
   
   return (

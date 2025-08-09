@@ -52,13 +52,13 @@ export default function BindingOfIsaacMaze() {
   const getRoomColor = (room: string) => {
     switch (room) {
       case "start":
-        return "bg-green-500"
+        return "bg-highlight-500"
       case "room":
-        return "bg-blue-500"
+        return "bg-secondary-500"
       case "boss":
         return "bg-red-500"
       default:
-        return "bg-gray-300"
+        return "bg-surface-300"
     }
   }
 
@@ -154,7 +154,7 @@ export default function BindingOfIsaacMaze() {
       </div>
       <div
         ref={gridRef}
-        className="grid gap-0 border border-gray-400 mx-auto"
+        className="grid gap-0 border border-surface-400 mx-auto"
         style={{
           gridTemplateColumns: `repeat(${size}, ${cellSize}px)`,
           width: `${size * cellSize}px`,
@@ -167,7 +167,7 @@ export default function BindingOfIsaacMaze() {
           row.map((room, x) => (
             <div
               key={`${x},${y}`}
-              className={`flex items-center justify-center ${getRoomColor(room)} border border-gray-400`}
+              className={`flex items-center justify-center ${getRoomColor(room)} border border-surface-400`}
               style={{ width: `${cellSize}px`, height: `${cellSize}px` }}
             >
               {getRoomIcon(room)}
@@ -178,7 +178,7 @@ export default function BindingOfIsaacMaze() {
       {showDebug && (
         <div className="mt-4">
           <h2 className="text-xl font-bold mb-2">Debug View</h2>
-          <pre className="bg-gray-100 p-4 rounded">
+          <pre className="bg-surface-100 p-4 rounded">
             {maze.map((row) => row.map((room) => room[0].toUpperCase()).join(" ")).join("\n")}
           </pre>
         </div>

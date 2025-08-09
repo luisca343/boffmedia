@@ -14,9 +14,9 @@ export default function StreakHeader({
   isLoading 
 }: StreakHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-blue-900 to-purple-900 px-5 py-3 flex items-center justify-between flex-wrap">
+    <div className="bg-gradient-to-r from-secondary-900 to-accent-900 px-5 py-3 flex items-center justify-between flex-wrap">
       <div className="flex items-center">
-        <Calendar className="h-5 w-5 text-blue-300 mr-2" />
+        <Calendar className="h-5 w-5 text-secondary-300 mr-2" />
         <h2 className="text-lg font-bold text-white">Progreso de Racha Diaria</h2>
       </div>
       <div className="flex items-center">

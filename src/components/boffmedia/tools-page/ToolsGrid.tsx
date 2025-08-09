@@ -57,7 +57,7 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
                       {tool.title}
                     </CardTitle>
                     {tool.isNew && (
-                      <Badge variant="secondary" className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">
+                      <Badge variant="secondary" className="bg-highlight-500/20 text-highlight-400 border-highlight-500/30 text-xs">
                         Nuevo
                       </Badge>
                     )}

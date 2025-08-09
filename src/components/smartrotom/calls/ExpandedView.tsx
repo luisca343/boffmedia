@@ -22,7 +22,7 @@ export function ExpandedView({
       <div className="w-full h-full flex flex-col items-center pt-12 pb-24">
         <div className="absolute top-4 right-4">
           <ArrowsPointingInIcon
-            className="cursor-pointer hover:text-gray-300"
+            className="cursor-pointer hover:text-surface-300"
             height={30}
             width={30}
             strokeWidth={2}
@@ -41,7 +41,7 @@ export function ExpandedView({
                 className={`border-4 rounded-full transition-colors duration-200 ease-in-out
                 ${
                   user.status === UserStatus.IN_CALL
-                    ? "border-green-500"
+                    ? "border-highlight-500"
                     : user.status === UserStatus.RINGING
                     ? "border-yellow-500"
                     : "border-red-500"
@@ -67,7 +67,7 @@ export function ExpandedView({
           />
           {activeCall.users.find((user) => user.uuid === currentUserUuid)?.status === UserStatus.RINGING && (
             <PhoneIcon
-              className="text-green-500 hover:text-green-600 cursor-pointer"
+              className="text-highlight-500 hover:text-highlight-600 cursor-pointer"
               height={50}
               width={50}
               strokeWidth={2}

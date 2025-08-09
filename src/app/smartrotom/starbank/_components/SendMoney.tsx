@@ -132,8 +132,8 @@ export function SendMoney() {
   if (allAccountsLoading || myAccountsLoading) {
     return (
       <div className="flex flex-col items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
-        <p className="mt-4 text-blue-800">Cargando información de cuentas...</p>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary-700"></div>
+        <p className="mt-4 text-secondary-800">Cargando información de cuentas...</p>
       </div>
     );
   }
@@ -166,7 +166,7 @@ export function SendMoney() {
   return (
     <div className="w-full max-w-2xl mx-auto">
       {success && (
-        <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative flex items-center" role="alert">
+        <div className="mb-6 bg-highlight-100 border border-highlight-400 text-highlight-700 px-4 py-3 rounded relative flex items-center" role="alert">
           <CheckIcon className="h-5 w-5 mr-2" />
           <span>{success}</span>
         </div>
@@ -181,8 +181,8 @@ export function SendMoney() {
 
       {isConfirming ? (
         // Confirmation view
-        <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
-          <h3 className="text-lg font-medium text-blue-900 mb-4">Confirmar Transferencia</h3>
+        <div className="bg-secondary-50 p-6 rounded-lg border border-secondary-200">
+          <h3 className="text-lg font-medium text-secondary-900 mb-4">Confirmar Transferencia</h3>
           
           <div className="space-y-4">
             <div className="flex justify-between items-center">
@@ -195,11 +195,11 @@ export function SendMoney() {
                 />
                 <div className="ml-3">
                   <p className="text-sm font-medium">{myAccount?.name}</p>
-                  <p className="text-xs text-blue-500">Mi cuenta</p>
+                  <p className="text-xs text-secondary-500">Mi cuenta</p>
                 </div>
               </div>
               
-              <ArrowRightIcon className="h-5 w-5 text-blue-500" />
+              <ArrowRightIcon className="h-5 w-5 text-secondary-500" />
               
               <div className="flex items-center">
                 <AccountImage 
@@ -210,19 +210,19 @@ export function SendMoney() {
                 />
                 <div className="ml-3">
                   <p className="text-sm font-medium">{targetAccount?.name}</p>
-                  <p className="text-xs text-blue-500">Destinatario</p>
+                  <p className="text-xs text-secondary-500">Destinatario</p>
                 </div>
               </div>
             </div>
             
-            <div className="bg-white p-4 rounded border border-blue-100">
+            <div className="bg-white p-4 rounded border border-secondary-100">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-blue-500">Monto</p>
+                  <p className="text-xs text-secondary-500">Monto</p>
                   <p className="font-medium">{formatMoney(amount)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-blue-500">Concepto</p>
+                  <p className="text-xs text-secondary-500">Concepto</p>
                   <p className="font-medium">{concept || "Transferencia"}</p>
                 </div>
               </div>
@@ -233,7 +233,7 @@ export function SendMoney() {
                 variant="outline" 
                 onClick={handleCancel}
                 disabled={transferLoading}
-                className="border-blue-200"
+                className="border-secondary-200"
               >
                 Cancelar
               </Button>
@@ -241,7 +241,7 @@ export function SendMoney() {
               <BankSectionButton 
                 onClick={sendMoney} 
                 disabled={transferLoading}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-secondary-600 hover:bg-secondary-700 text-white"
               >
                 {transferLoading ? (
                   <>
@@ -258,7 +258,7 @@ export function SendMoney() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <Label htmlFor="from-account" className="mb-2 block text-blue-800">
+              <Label htmlFor="from-account" className="mb-2 block text-secondary-800">
                 Desde mi cuenta
               </Label>
               <div className="space-y-2">
@@ -270,7 +270,7 @@ export function SendMoney() {
                   className="w-full"
                 />
                 {myAccount && (
-                  <div className="text-sm text-blue-600">
+                  <div className="text-sm text-secondary-600">
                     Balance disponible: {formatMoney(myAccount.balance)}
                   </div>
                 )}
@@ -278,7 +278,7 @@ export function SendMoney() {
             </div>
             
             <div>
-              <Label htmlFor="to-account" className="mb-2 block text-blue-800">
+              <Label htmlFor="to-account" className="mb-2 block text-secondary-800">
                 Para cuenta
               </Label>
               <AccountSelect
@@ -292,11 +292,11 @@ export function SendMoney() {
           </div>
           
           <div>
-            <Label htmlFor="amount" className="mb-2 block text-blue-800">
+            <Label htmlFor="amount" className="mb-2 block text-secondary-800">
               Monto a transferir
             </Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500">¥</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary-500">¥</span>
               <Input
                 id="amount"
                 type="number"
@@ -312,7 +312,7 @@ export function SendMoney() {
           </div>
           
           <div>
-            <Label htmlFor="concept" className="mb-2 block text-blue-800">
+            <Label htmlFor="concept" className="mb-2 block text-secondary-800">
               Concepto de la transferencia
             </Label>
             <Input
@@ -323,7 +323,7 @@ export function SendMoney() {
               maxLength={50}
               variant={"wingull"}
             />
-            <p className="text-xs text-blue-500 mt-1">
+            <p className="text-xs text-secondary-500 mt-1">
               {concept.length}/50 caracteres
             </p>
           </div>
@@ -331,7 +331,7 @@ export function SendMoney() {
           <div className="pt-4">
             <BankSectionButton
               onClick={handleConfirm}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              className="w-full bg-secondary-600 hover:bg-secondary-700 text-white"
               disabled={isSending}
             >
               Continuar

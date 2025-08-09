@@ -11,10 +11,10 @@ export function Header() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600 drop-shadow-lg">
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-secondary-400 via-cyan-400 to-secondary-600 drop-shadow-lg">
           ✨ {t("WONDER_MAIL_CREATOR")} ✨
         </h1>
-        <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 mx-auto rounded-full mb-4"></div>
+        <div className="w-32 h-1 bg-gradient-to-r from-secondary-400 to-cyan-400 mx-auto rounded-full mb-4"></div>
       </motion.div>
     </div>
   );

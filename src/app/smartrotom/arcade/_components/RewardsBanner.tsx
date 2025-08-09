@@ -54,7 +54,7 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
 
   if (loadingRewards || loading) {
     return (
-      <div className="w-full bg-gray-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8 p-8">
+      <div className="w-full bg-surface-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8 p-8">
         <div className="flex flex-col items-center justify-center">
           <Loader2 className="h-10 w-10 text-cyan-400 animate-spin mb-4" />
           <p className="text-cyan-300">Cargando recompensas...</p>
@@ -83,24 +83,24 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
       case 'boxes':
         return { 
           icon: <Gift className="h-10 w-10 text-violet-400" />, 
-          bgColor: 'from-violet-800/70 to-purple-900/70',
+          bgColor: 'from-violet-800/70 to-accent-900/70',
           borderColor: 'border-violet-500/50',
           textColor: 'text-violet-300'
         };
       case 'item':
       case 'items':
         return { 
-          icon: <Award className="h-10 w-10 text-blue-400" />, 
-          bgColor: 'from-blue-800/70 to-indigo-900/70',
-          borderColor: 'border-blue-500/50',
-          textColor: 'text-blue-300'
+          icon: <Award className="h-10 w-10 text-secondary-400" />, 
+          bgColor: 'from-secondary-800/70 to-indigo-900/70',
+          borderColor: 'border-secondary-500/50',
+          textColor: 'text-secondary-300'
         };
       default:
         return { 
-          icon: <Gift className="h-10 w-10 text-green-400" />, 
-          bgColor: 'from-green-800/70 to-emerald-900/70',
-          borderColor: 'border-green-500/50',
-          textColor: 'text-green-300'
+          icon: <Gift className="h-10 w-10 text-highlight-400" />, 
+          bgColor: 'from-highlight-800/70 to-emerald-900/70',
+          borderColor: 'border-highlight-500/50',
+          textColor: 'text-highlight-300'
         };
     }
   };
@@ -108,16 +108,16 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
   const visuals = getRewardVisuals(activeReward);
 
   return (
-    <div className="w-full bg-gray-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8">
-      <div className="bg-gradient-to-r from-blue-900 to-purple-900 px-5 py-3 flex items-center">
-        <Calendar className="h-5 w-5 text-blue-300 mr-2" />
+    <div className="w-full bg-surface-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8">
+      <div className="bg-gradient-to-r from-secondary-900 to-accent-900 px-5 py-3 flex items-center">
+        <Calendar className="h-5 w-5 text-secondary-300 mr-2" />
         <h2 className="text-lg font-bold text-white">Recompensas por Racha Diaria</h2>
         <div className="ml-auto text-sm text-cyan-300 font-mono">
           {rewardsConfig.totalDays} Días
         </div>
       </div>
       
-      <div className="p-6 bg-gray-900">
+      <div className="p-6 bg-surface-900">
         {/* Reward showcase */}
         <div className="flex flex-col md:flex-row items-center gap-6">
           {/* Reward preview */}
@@ -126,7 +126,7 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1),transparent_70%)] opacity-50"></div>
             
             {/* Day indicator */}
-            <div className="absolute top-3 left-3 bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-bold">
+            <div className="absolute top-3 left-3 bg-surface-800 text-white px-3 py-1 rounded-full text-sm font-bold">
               Día {activeReward.day}
             </div>
             
@@ -166,24 +166,24 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
               <h3 className="text-xl font-bold text-cyan-300 mb-1">
                 Recompensa del Día {activeReward.day}
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-surface-400 text-sm">
                 Mantén tu racha para desbloquear todas las recompensas. 
                 ¡Conéctate cada día para reclamarlas!
               </p>
             </div>
             
             {/* Days progress */}
-            <div className="w-full bg-gray-800/60 rounded-lg p-4 mt-2">
+            <div className="w-full bg-surface-800/60 rounded-lg p-4 mt-2">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-gray-400 text-sm">Progreso</span>
+                <span className="text-surface-400 text-sm">Progreso</span>
                 <span className="text-cyan-300 text-sm font-mono">
                   {currentDay}/{rewardsConfig.totalDays} días
                 </span>
               </div>
               
-              <div className="relative h-2 w-full bg-gray-700 rounded-full overflow-hidden">
+              <div className="relative h-2 w-full bg-surface-700 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-gradient-to-r from-cyan-500 to-blue-500"
+                  className="h-full bg-gradient-to-r from-cyan-500 to-secondary-500"
                   style={{ width: `${(currentDay / rewardsConfig.totalDays) * 100}%` }}
                 ></div>
               </div>
@@ -202,9 +202,9 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
                     reward.day <= currentDay 
                       ? 'bg-cyan-400' 
                       : isSpecial 
-                      ? 'bg-purple-500' 
-                      : 'bg-gray-500'
-                    } ${reward.day === currentDay + 1 ? 'ring-2 ring-yellow-500 ring-offset-1 ring-offset-gray-900' : ''}`}
+                      ? 'bg-accent-500' 
+                      : 'bg-surface-500'
+                    } ${reward.day === currentDay + 1 ? 'ring-2 ring-yellow-500 ring-offset-1 ring-offset-surface-900' : ''}`}
                     style={{ left: `${position}%` }}
                     onClick={() => setActiveIndex(index)}
                   ></div>
@@ -220,8 +220,8 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
                 disabled={activeIndex === 0}
                 className={`px-4 py-2 rounded-md flex items-center gap-2 ${
                   activeIndex === 0 
-                    ? 'text-gray-500 cursor-not-allowed' 
-                    : 'text-cyan-300 hover:bg-gray-800'
+                    ? 'text-surface-500 cursor-not-allowed' 
+                    : 'text-cyan-300 hover:bg-surface-800'
                 }`}
               >
                 <ChevronLeft className="h-5 w-5" /> Anterior
@@ -232,8 +232,8 @@ export default function RewardsBanner({ currentDay, loading }: RewardsBannerProp
                 disabled={!rewardsConfig || activeIndex >= rewardsConfig.rewards.length - 1}
                 className={`px-4 py-2 rounded-md flex items-center gap-2 ${
                   !rewardsConfig || activeIndex >= rewardsConfig.rewards.length - 1 
-                    ? 'text-gray-500 cursor-not-allowed' 
-                    : 'text-cyan-300 hover:bg-gray-800'
+                    ? 'text-surface-500 cursor-not-allowed' 
+                    : 'text-cyan-300 hover:bg-surface-800'
                 }`}
               >
                 Siguiente <ChevronRight className="h-5 w-5" />

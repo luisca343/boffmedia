@@ -41,9 +41,9 @@ export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
 
   const celebrationItems = [
     { icon: Trophy, color: "text-yellow-400", position: "top-8 left-8", delay: 0 },
-    { icon: Sparkles, color: "text-blue-400", position: "top-8 right-8", delay: 0.5 },
-    { icon: Trophy, color: "text-green-400", position: "bottom-8 left-8", delay: 1 },
-    { icon: Sparkles, color: "text-purple-400", position: "bottom-8 right-8", delay: 1.5 }
+    { icon: Sparkles, color: "text-secondary-400", position: "top-8 right-8", delay: 0.5 },
+    { icon: Trophy, color: "text-highlight-400", position: "bottom-8 left-8", delay: 1 },
+    { icon: Sparkles, color: "text-accent-400", position: "bottom-8 right-8", delay: 1.5 }
   ];
 
   return (

@@ -109,7 +109,7 @@ export function CharmSelector({
             
             <div className="flex flex-wrap gap-x-2 text-xs">
               {charm.skills?.map((skill, idx) => (
-                <span key={idx} className="text-green-400">
+                <span key={idx} className="text-highlight-400">
                   {skill.skill.name} +{skill.level}
                 </span>
               ))}

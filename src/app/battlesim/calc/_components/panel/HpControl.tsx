@@ -44,7 +44,7 @@ export default function HpControl({
       {/* HP Bar visualization */}
       <div className="w-full h-1.5 bg-surface-700 mt-1 rounded overflow-hidden">
         <div 
-          className="h-full bg-green-500" 
+          className="h-full bg-highlight-500" 
           style={{ 
             width: `${currentHpPercent}%`,
             backgroundColor: currentHpPercent > 50 ? '#10B981' : currentHpPercent > 20 ? '#F59E0B' : '#EF4444'

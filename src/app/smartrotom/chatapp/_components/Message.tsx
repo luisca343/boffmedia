@@ -61,7 +61,7 @@ export function Message({
           />
         )}
         {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-gray-400 self-end" : "text-gray-500"} mb-1`}>
+          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
             {timestamp}
           </span>
         )}
@@ -69,7 +69,7 @@ export function Message({
           className={`px-4 py-2 ${getBubbleShape()} ${
             sender === "user"
                 ? "bg-primary-400 text-neutral-800"
-                : "bg-gray-300 text-neutral-800"
+                : "bg-surface-300 text-neutral-800"
           }`}
         >
           <span className="break-words">{content}</span>
@@ -81,8 +81,8 @@ export function Message({
 
 export function SystemMessage({ content }: { content: string }) {
   return (
-    <div className="flex justify-center text-sm text-gray-500">
-      <span className="px-2 my-1 bg-gray-200 rounded-lg">{content}</span>
+    <div className="flex justify-center text-sm text-surface-500">
+      <span className="px-2 my-1 bg-surface-200 rounded-lg">{content}</span>
     </div>
   )
 }

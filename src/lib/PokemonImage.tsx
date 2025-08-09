@@ -81,8 +81,8 @@ export const PokemonImage = ({
         {showDetails && (
           <div className="flex flex-col">
             <span className="font-medium text-sm">{pokemonSpec.species}</span>
-            {pokemonSpec.level && <span className="text-xs text-gray-600">Lv.{pokemonSpec.level}</span>}
-            {pokemonSpec.form && <span className="text-xs text-gray-500">{pokemonSpec.form}</span>}
+            {pokemonSpec.level && <span className="text-xs text-surface-600">Lv.{pokemonSpec.level}</span>}
+            {pokemonSpec.form && <span className="text-xs text-surface-500">{pokemonSpec.form}</span>}
           </div>
         )}
       </div>

@@ -21,11 +21,11 @@ export default function MinecraftWeatherWidget() {
 
   return (
     <div className="w-full min-w-[460px]  bg-white bg-opacity-80 rounded-2xl shadow-lg overflow-hidden">
-      <div className="bg-blue-500 p-3 flex justify-between items-center">
+      <div className="bg-secondary-500 p-3 flex justify-between items-center">
         <h2 className="text-white text-lg font-semibold">El tiempo en Teras</h2>
         <button
           onClick={refreshWeather}
-          className="text-white hover:bg-blue-600 rounded-full p-1"
+          className="text-white hover:bg-secondary-600 rounded-full p-1"
         >
           <RefreshCw className="h-5 w-5" />
         </button>

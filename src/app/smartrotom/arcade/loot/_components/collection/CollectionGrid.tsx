@@ -16,20 +16,20 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-gray-400 py-12">
+      <div className="flex flex-col items-center justify-center text-surface-400 py-12">
         {totalItems === 0 ? (
           <div className="text-center">
-            <Archive className="h-16 w-16 mx-auto text-gray-600 mb-3" />
+            <Archive className="h-16 w-16 mx-auto text-surface-600 mb-3" />
             <p className="text-xl mb-2">Aún no has coleccionado ningún objeto</p>
-            <p className="text-gray-500">
+            <p className="text-surface-500">
               Abre cajas para empezar a coleccionar objetos raros
             </p>
           </div>
         ) : (
           <div className="text-center">
-            <Search className="h-16 w-16 mx-auto text-gray-600 mb-3" />
+            <Search className="h-16 w-16 mx-auto text-surface-600 mb-3" />
             <p className="text-xl mb-2">No hay objetos que coincidan con tu búsqueda</p>
-            <p className="text-gray-500">
+            <p className="text-surface-500">
               Intenta con otros términos o filtros
             </p>
           </div>

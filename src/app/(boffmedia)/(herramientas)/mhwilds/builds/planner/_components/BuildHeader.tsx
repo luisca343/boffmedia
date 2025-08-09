@@ -123,12 +123,12 @@ export function BuildHeader({
           )}
           {completeData.head && (
             <div className="bg-surface-700/30 p-2 rounded">
-              <span className="font-medium text-blue-400">{t("head")}:</span> {completeData.head.name}
+              <span className="font-medium text-secondary-400">{t("head")}:</span> {completeData.head.name}
             </div>
           )}
           {completeData.chest && (
             <div className="bg-surface-700/30 p-2 rounded">
-              <span className="font-medium text-green-400">{t("chest")}:</span> {completeData.chest.name}
+              <span className="font-medium text-highlight-400">{t("chest")}:</span> {completeData.chest.name}
             </div>
           )}
           {completeData.arms && (
@@ -138,7 +138,7 @@ export function BuildHeader({
           )}
           {completeData.waist && (
             <div className="bg-surface-700/30 p-2 rounded">
-              <span className="font-medium text-purple-400">{t("waist")}:</span> {completeData.waist.name}
+              <span className="font-medium text-accent-400">{t("waist")}:</span> {completeData.waist.name}
             </div>
           )}
           {completeData.legs && (
@@ -157,7 +157,7 @@ export function BuildHeader({
             .map((skill) => (
               <div key={skill.id} className="bg-surface-700/30 p-2 rounded flex justify-between">
                 <span>{skill.name}</span>
-                <span className={skill.level > skill.maxLevel ? "text-yellow-400" : "text-green-400"}>
+                <span className={skill.level > skill.maxLevel ? "text-yellow-400" : "text-highlight-400"}>
                   Nv. {Math.min(skill.level, skill.maxLevel)}/{skill.maxLevel}
                 </span>
               </div>
@@ -170,7 +170,7 @@ export function BuildHeader({
         <div className="grid grid-cols-2 gap-2">
           <div className="bg-surface-700/30 p-2 rounded flex justify-between">
             <span>{t("defense")}</span>
-            <span className="text-blue-400">{stats.defenseMin}</span>
+            <span className="text-secondary-400">{stats.defenseMin}</span>
           </div>
           <div className="bg-surface-700/30 p-2 rounded flex justify-between">
             <span>{t("attack")}</span>
@@ -178,14 +178,14 @@ export function BuildHeader({
           </div>
           <div className="bg-surface-700/30 p-2 rounded flex justify-between">
             <span>{t("affinity")}</span>
-            <span className={stats.affinity >= 0 ? "text-green-400" : "text-red-400"}>
+            <span className={stats.affinity >= 0 ? "text-highlight-400" : "text-red-400"}>
               {stats.affinity >= 0 ? '+' : ''}{stats.affinity}%
             </span>
           </div>
           {stats.element && (
             <div className="bg-surface-700/30 p-2 rounded flex justify-between">
               <span>{t("element")}</span>
-              <span className="text-purple-400">{stats.element.type} {stats.element.damage}</span>
+              <span className="text-accent-400">{stats.element.type} {stats.element.damage}</span>
             </div>
           )}
           {stats.status && (
@@ -227,9 +227,9 @@ export function BuildHeader({
       {notification.type && (
         <Alert
           className={`mb-3 ${
-            notification.type === "success" ? "bg-green-900/20 text-green-400" : 
+            notification.type === "success" ? "bg-highlight-900/20 text-highlight-400" : 
             notification.type === "error" ? "bg-red-900/20 text-red-400" : 
-            "bg-blue-900/20 text-blue-400"
+            "bg-secondary-900/20 text-secondary-400"
           }`}
         >
           <AlertDescription>{notification.message}</AlertDescription>
@@ -238,7 +238,7 @@ export function BuildHeader({
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center">
-          <LuShield className="mr-2 h-6 w-6 text-green-400 hidden sm:block" />
+          <LuShield className="mr-2 h-6 w-6 text-highlight-400 hidden sm:block" />
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-surface-50">
               {t("build_planner.title")}
@@ -261,7 +261,7 @@ export function BuildHeader({
             <Button 
               variant="outline" 
               size="sm" 
-              className="text-green-400 border-green-500"
+              className="text-highlight-400 border-highlight-500"
               onClick={handleSave}
             >
               <Save className="mr-1 h-4 w-4" /> {t("build_planner.save")}
@@ -270,7 +270,7 @@ export function BuildHeader({
             <Button
               variant="outline"
               size="sm"
-              className="text-blue-400 border-blue-500"
+              className="text-secondary-400 border-secondary-500"
               onClick={openSavedBuildsManager}
             >
               <FolderOpen className="mr-1 h-4 w-4" /> {t("build_planner.open")}

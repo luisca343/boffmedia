@@ -60,7 +60,7 @@ const navigationMenuTriggerStyle = cva(
         default: "",
         boffmedia: "bg-transparent hover:bg-transparent focus:bg-transparent data-[active]:bg-transparent data-[state=open]:bg-transparent text-primary-300 hover:text-primary-100 focus:text-primary-300  px-0 font-normal text-base h-auto relative",
         boffmedia2: "bg-transparent hover:bg-transparent focus:bg-transparent focus:text-primary-300 text-primary-300 hover:text-primary-100 px-0 font-normal text-base h-auto relative",
-        wingull: "bg-blue-900 hover:bg-blue-800 focus:bg-blue-800 data-[active]:bg-blue-800/50 data-[state=open]:bg-blue-800/50 text-blue-100 hover:text-blue-50 focus:text-blue-50",
+        wingull: "bg-secondary-900 hover:bg-secondary-800 focus:bg-secondary-800 data-[active]:bg-secondary-800/50 data-[state=open]:bg-secondary-800/50 text-secondary-100 hover:text-secondary-50 focus:text-secondary-50",
       },
     },
     defaultVariants: {
@@ -99,7 +99,7 @@ const NavigationMenuTrigger = React.forwardRef<
       )}
       {effectiveVariant === "wingull" && (
         <span
-          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-blue-400 to-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
+          className="absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-secondary-400 to-secondary-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-in-out"
           aria-hidden="true"
         />
       )}
@@ -116,7 +116,7 @@ const NavigationMenuContent = React.forwardRef<
   
   const variantStyles = {
     default: "bg-white dark:bg-surface-950 dark:text-surface-50 border-surface-700",
-    wingull: "bg-blue-900 text-blue-100 border-blue-800"
+    wingull: "bg-secondary-900 text-secondary-100 border-secondary-800"
   }
   
   return (
@@ -142,7 +142,7 @@ const NavigationMenuViewport = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-800 text-primary-300",
-    wingull: "border-blue-800 bg-blue-900 text-blue-100"
+    wingull: "border-secondary-800 bg-secondary-900 text-secondary-100"
   }
   
   return (
@@ -169,7 +169,7 @@ const NavigationMenuIndicator = React.forwardRef<
   
   const indicatorStyles = {
     default: "bg-surface-800",
-    wingull: "bg-blue-900"
+    wingull: "bg-secondary-900"
   }
   
   return (

@@ -33,15 +33,15 @@ function Calendar({
       navButtonColor: "text-surface-600",
     },
     wingull: {
-      daySelected: "bg-blue-100 text-blue-800 hover:bg-blue-200 hover:text-blue-900 focus:bg-blue-100 focus:text-blue-800",
-      dayToday: "bg-blue-50 text-blue-900 border-2 border-blue-400",
-      headCell: "text-blue-700 rounded-md w-9 font-medium text-[0.8rem]",
-      dayOutside: "day-outside text-blue-300 aria-selected:bg-blue-50/80 aria-selected:text-blue-400",
-      dayDisabled: "text-blue-200 opacity-50",
-      dayRangeMiddle: "aria-selected:bg-blue-50 aria-selected:text-blue-800",
-      cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-blue-50/80 [&:has([aria-selected])]:bg-blue-50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-      captionLabel: "text-sm font-medium text-blue-700",
-      navButtonColor: "text-blue-500",
+      daySelected: "bg-secondary-100 text-secondary-800 hover:bg-secondary-200 hover:text-secondary-900 focus:bg-secondary-100 focus:text-secondary-800",
+      dayToday: "bg-secondary-50 text-secondary-900 border-2 border-secondary-400",
+      headCell: "text-secondary-700 rounded-md w-9 font-medium text-[0.8rem]",
+      dayOutside: "day-outside text-secondary-300 aria-selected:bg-secondary-50/80 aria-selected:text-secondary-400",
+      dayDisabled: "text-secondary-200 opacity-50",
+      dayRangeMiddle: "aria-selected:bg-secondary-50 aria-selected:text-secondary-800",
+      cell: "h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-secondary-50/80 [&:has([aria-selected])]:bg-secondary-50 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+      captionLabel: "text-sm font-medium text-secondary-700",
+      navButtonColor: "text-secondary-500",
     }
   }
 

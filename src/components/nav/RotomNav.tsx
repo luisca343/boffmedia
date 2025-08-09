@@ -73,7 +73,7 @@ export default function RotomNav({
             <Bell className="text-surface-300" size={20} />
             <h2 className="text-surface-100 font-semibold">Notificaciones</h2>
           </div>
-          <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+          <span className="bg-secondary-500 text-white px-2 py-1 rounded-full text-xs">
             {unreadCount}
           </span>
         </header>
@@ -90,7 +90,7 @@ export default function RotomNav({
               <div className="flex justify-between items-start mb-2">
                 <span className="flex-grow">{notif.content?.toString()}</span>
                 {!notif.read && (
-                  <span className="bg-blue-500 w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1"></span>
+                  <span className="bg-secondary-500 w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1"></span>
                 )}
               </div>
               <div className="flex justify-end space-x-2">

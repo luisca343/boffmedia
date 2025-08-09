@@ -176,7 +176,7 @@ export function BuildDisplay({
         name: t("head"),
         icon: HelmetIconComponent, 
         component: currentBuild.head, 
-        iconColor: "text-blue-400",
+        iconColor: "text-secondary-400",
         hasCustomIcon: !!currentBuild.head 
       },
       { 
@@ -184,7 +184,7 @@ export function BuildDisplay({
         name: t("chest"),
         icon: ChestIconComponent, 
         component: currentBuild.chest, 
-        iconColor: "text-green-400",
+        iconColor: "text-highlight-400",
         hasCustomIcon: !!currentBuild.chest 
       },
       { 
@@ -200,7 +200,7 @@ export function BuildDisplay({
         name: t("waist"),
         icon: WaistIconComponent, 
         component: currentBuild.waist, 
-        iconColor: "text-purple-400",
+        iconColor: "text-accent-400",
         hasCustomIcon: !!currentBuild.waist 
       },
       { 
@@ -361,7 +361,7 @@ export function BuildDisplay({
                         </div>
                         <span className="text-xs text-surface-200">{decorationSlot.decoration.name}</span>
                       </div>
-                      <div className="text-xs text-green-400">
+                      <div className="text-xs text-highlight-400">
                         {decorationSlot.decoration.skills.map(skill => (
                           <span key={skill.id || `skill-${skill.skill.name}`}>
                             {skill.skill.name} +{skill.level}

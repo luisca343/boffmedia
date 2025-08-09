@@ -28,9 +28,9 @@ export function AnimatedToggle({
   };
 
   const gradients = {
-    default: "from-blue-500 to-cyan-500",
-    feature: "from-purple-500 to-pink-500",
-    setting: "from-green-500 to-emerald-500"
+    default: "from-secondary-500 to-cyan-500",
+    feature: "from-accent-500 to-pink-500",
+    setting: "from-highlight-500 to-emerald-500"
   };
 
   return (

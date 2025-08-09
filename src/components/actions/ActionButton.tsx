@@ -27,12 +27,12 @@ export function ActionButton({
   fullWidth = false
 }: ActionButtonProps) {
   const variantStyles = {
-    primary: "bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 hover:from-blue-600 hover:via-cyan-600 hover:to-blue-700",
+    primary: "bg-gradient-to-r from-secondary-500 via-cyan-500 to-secondary-600 hover:from-secondary-600 hover:via-cyan-600 hover:to-secondary-700",
     secondary: "bg-surface-700 hover:bg-surface-600",
-    success: "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700",
+    success: "bg-gradient-to-r from-highlight-500 to-emerald-600 hover:from-highlight-600 hover:to-emerald-700",
     warning: "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700",
     danger: "bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700",
-    generate: "bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 hover:from-blue-600 hover:via-cyan-600 hover:to-blue-700"
+    generate: "bg-gradient-to-r from-secondary-500 via-cyan-500 to-secondary-600 hover:from-secondary-600 hover:via-cyan-600 hover:to-secondary-700"
   };
 
   const sizeStyles = {

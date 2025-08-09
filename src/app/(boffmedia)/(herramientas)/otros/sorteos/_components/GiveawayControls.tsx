@@ -107,7 +107,7 @@ export function GiveawayControls({
             <Button 
               onClick={handleUploadList}
               disabled={!participantList.trim()}
-              className="w-full bg-blue-600 hover:bg-blue-700 border-0 transition-all duration-200"
+              className="w-full bg-secondary-600 hover:bg-secondary-700 border-0 transition-all duration-200"
             >
               <Upload className="mr-2 w-4 h-4" />
               Cargar Lista ({participantList.split('\n').filter(Boolean).length} nombres)
@@ -130,7 +130,7 @@ export function GiveawayControls({
       {/* Status */}
       <div className="text-center py-6 px-4 bg-surface-700/30 rounded-xl border border-surface-600/30 mb-8">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <div className={`w-3 h-3 rounded-full ${participantCount > 0 ? 'bg-green-400' : 'bg-surface-500'} transition-colors duration-200`} />
+          <div className={`w-3 h-3 rounded-full ${participantCount > 0 ? 'bg-highlight-400' : 'bg-surface-500'} transition-colors duration-200`} />
           <p className="text-surface-300 font-medium">
             {participantCount === 0 
               ? "Sin participantes" 

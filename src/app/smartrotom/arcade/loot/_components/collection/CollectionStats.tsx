@@ -15,7 +15,7 @@ export function CollectionStats({
   selectedRarity 
 }: CollectionStatsProps) {
   return (
-    <div className="text-gray-300 mb-4 flex items-center justify-between">
+    <div className="text-surface-300 mb-4 flex items-center justify-between">
       <span>
         Mostrando {displayedCount} de {filteredCount} objetos
         {selectedRarity !== "all" && ` (filtrado por ${

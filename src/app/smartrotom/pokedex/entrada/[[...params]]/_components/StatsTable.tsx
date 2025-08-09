@@ -261,7 +261,7 @@ export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: n
               const natureMultiplier = natures[nature as keyof typeof natures][stat.toLowerCase() as keyof typeof natures.neutral]
               const statTextClass = 
                 natureMultiplier === 1.1 ? "text-red-300 font-medium" : 
-                natureMultiplier === 0.9 ? "text-blue-300" : 
+                natureMultiplier === 0.9 ? "text-secondary-300" : 
                 "text-surface-50"
               
               // Range calculations

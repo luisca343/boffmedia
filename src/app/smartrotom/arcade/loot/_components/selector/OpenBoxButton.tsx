@@ -32,7 +32,7 @@ export function OpenBoxButton({
         className={`flex items-center space-x-2 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg ${
           hasCurrentBox
             ? `bg-gradient-to-r ${currentBoxTheme.buttonGradient} ${currentBoxTheme.buttonHover} border-2 ${currentBoxTheme.border}` 
-            : 'bg-gray-700 border-2 border-gray-600 cursor-not-allowed opacity-70'
+            : 'bg-surface-700 border-2 border-surface-600 cursor-not-allowed opacity-70'
         }`}
         onClick={onOpenBox}
         disabled={!hasCurrentBox}

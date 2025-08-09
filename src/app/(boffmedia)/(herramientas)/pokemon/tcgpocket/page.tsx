@@ -48,10 +48,10 @@ export default function TCGPocket() {
       description: t("cardsList.description"),
       icon: CreditCard,
       href: "/pokemon/tcgpocket/cartas",
-      iconBg: "bg-gradient-to-br from-blue-400 to-cyan-500",
-      textColor: "text-blue-400",
-      hoverColor: "hover:text-blue-300",
-      bg: "bg-gradient-to-br from-blue-900/20 to-cyan-900/30"
+      iconBg: "bg-gradient-to-br from-secondary-400 to-cyan-500",
+      textColor: "text-secondary-400",
+      hoverColor: "hover:text-secondary-300",
+      bg: "bg-gradient-to-br from-secondary-900/20 to-cyan-900/30"
     },
     {
       title: t("battles.title"),

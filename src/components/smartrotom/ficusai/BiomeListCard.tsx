@@ -18,7 +18,7 @@ export default function BiomeListCard({ biomes }: BiomeListCardProps) {
           <Badge 
             key={index}
             variant="outline"
-            className="bg-green-600/20 border-green-500 text-green-300 hover:bg-green-600/30"
+            className="bg-highlight-600/20 border-highlight-500 text-highlight-300 hover:bg-highlight-600/30"
           >
             {getTranslatedBiomeName(biome, t)}
           </Badge>

@@ -12,14 +12,14 @@ export default function TerminalHeader({
   showDate = true 
 }: TerminalHeaderProps) {
   return (
-    <div className="border border-green-700 rounded-t-md bg-green-900/30 px-4 py-1 flex justify-between items-center">
+    <div className="border border-highlight-700 rounded-t-md bg-highlight-900/30 px-4 py-1 flex justify-between items-center">
       <div className="flex space-x-2 items-center">
         <div className="w-3 h-3 rounded-full bg-red-500"></div>
         <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+        <div className="w-3 h-3 rounded-full bg-highlight-500"></div>
       </div>
-      <div className="text-xs text-green-400">{`${title}@${username}:~`}</div>
-      {showDate && <div className="text-xs text-green-400">{new Date().toISOString().split('T')[0]}</div>}
+      <div className="text-xs text-highlight-400">{`${title}@${username}:~`}</div>
+      {showDate && <div className="text-xs text-highlight-400">{new Date().toISOString().split('T')[0]}</div>}
     </div>
   );
 }

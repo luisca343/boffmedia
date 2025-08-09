@@ -22,7 +22,7 @@ export function WonderMailDisplay({
       badge={{
         text: isEuropean ? "European Version" : "US/Japanese Version",
         variant: "secondary",
-        className: "bg-blue-500/20 text-blue-300 border-blue-500/30"
+        className: "bg-secondary-500/20 text-secondary-300 border-secondary-500/30"
       }}
       onCopy={onCopy}
       copied={copied}

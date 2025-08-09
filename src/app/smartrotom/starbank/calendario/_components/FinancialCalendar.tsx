@@ -107,7 +107,7 @@ export function FinancialCalendar({
       <div className="grid grid-cols-7 gap-1">
         {/* Weekday headers */}
         {['lu', 'ma', 'mi', 'ju', 'vi', 'sá', 'do'].map((day) => (
-          <div key={day} className="h-10 flex items-center justify-center font-medium text-blue-900">
+          <div key={day} className="h-10 flex items-center justify-center font-medium text-secondary-900">
             {day}
           </div>
         ))}
@@ -142,21 +142,21 @@ export function FinancialCalendar({
                 key={index}
                 onClick={() => setSelectedDay(day)}
                 className={cn(
-                  "min-h-14 p-1 cursor-pointer border border-transparent hover:border-blue-200 hover:bg-blue-50 rounded-md",
+                  "min-h-14 p-1 cursor-pointer border border-transparent hover:border-secondary-200 hover:bg-secondary-50 rounded-md",
                   !isCurrentMonth && "opacity-50",
-                  isSelected && "bg-blue-100 border-blue-300",
-                  isToday(day) && "border-blue-500"
+                  isSelected && "bg-secondary-100 border-secondary-300",
+                  isToday(day) && "border-secondary-500"
                 )}
               >
                 <div className="flex items-center justify-between">
                   <span className={cn(
                     "text-sm",
-                    isToday(day) && "font-semibold text-blue-600"
+                    isToday(day) && "font-semibold text-secondary-600"
                   )}>
                     {format(day, "d")}
                   </span>
                   {dayTransactions.length > 0 && (
-                    <span className="text-xs font-medium bg-blue-100 text-blue-800 rounded-full px-1.5">
+                    <span className="text-xs font-medium bg-secondary-100 text-secondary-800 rounded-full px-1.5">
                       {dayTransactions.length}
                     </span>
                   )}
@@ -165,7 +165,7 @@ export function FinancialCalendar({
                 {dayTransactions.length > 0 && (
                   <div className="mt-1">
                     {incomeTotal > 0 && (
-                      <div className="h-1 bg-green-300 rounded-sm mt-0.5" />
+                      <div className="h-1 bg-highlight-300 rounded-sm mt-0.5" />
                     )}
                     {expenseTotal > 0 && (
                       <div className="h-1 bg-red-300 rounded-sm mt-0.5" />

@@ -82,7 +82,7 @@ export default function StatDisplay({
             className={`grid ${gridColumns} gap-2 mb-1 text-xs items-center`}
           >
             <div>
-              <span className={`${hasNatureBuff ? 'text-red-500 font-medium' : ''} ${hasNatureNerf ? 'text-blue-400 font-medium' : ''} text-surface-200`}>
+              <span className={`${hasNatureBuff ? 'text-red-500 font-medium' : ''} ${hasNatureNerf ? 'text-secondary-400 font-medium' : ''} text-surface-200`}>
                 {label}
               </span>
             </div>

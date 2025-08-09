@@ -19,12 +19,12 @@ type Cell = {
 const typeColors: { [key: string]: string } = {
   Normal: 'bg-surface-400',
   Fire: 'bg-red-500',
-  Water: 'bg-blue-500',
+  Water: 'bg-secondary-500',
   Electric: 'bg-yellow-400',
-  Grass: 'bg-green-500',
+  Grass: 'bg-highlight-500',
   Ice: 'bg-cyan-400',
   Fairy: 'bg-pink-400',
-  Poison: 'bg-purple-500',
+  Poison: 'bg-accent-500',
   Ground: 'bg-amber-600',
 }
 
@@ -298,7 +298,7 @@ export default function TypeDoku() {
   }, [handleKeyDown])
 
   return (
-    <div className="min-h-full w-full bg-gradient-to-b from-indigo-900 to-purple-900 text-white font-mono flex flex-col relative overflow-hidden">
+    <div className="min-h-full w-full bg-gradient-to-b from-indigo-900 to-accent-900 text-white font-mono flex flex-col relative overflow-hidden">
       <StarsBackground />
       <main className="flex-grow p-6 container mx-auto max-w-4xl relative z-10">
       <RainbowText text="PokéDoku: Apasionante Sudoku Temático Arcade" />
@@ -370,21 +370,21 @@ export default function TypeDoku() {
         <div className="flex flex-wrap justify-center space-x-4 mb-8">
           <Button
             onClick={newGame}
-            className="bg-yellow-400 text-purple-900 hover:bg-yellow-300 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-yellow-500 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
+            className="bg-yellow-400 text-accent-900 hover:bg-yellow-300 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-yellow-500 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center"
           >
             <RefreshCw className="mr-2" /> Nuevo Juego (N)
           </Button>
           <Button
             onClick={handleUndo}
             disabled={history.length <= 1}
-            className="bg-blue-500 text-white hover:bg-blue-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-blue-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
+            className="bg-secondary-500 text-white hover:bg-secondary-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-secondary-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
           >
             <Undo className="mr-2" /> Deshacer (Ctrl+Z)
           </Button>
           <Button
             onClick={handleRedo}
             disabled={futureStates.length === 0}
-            className="bg-green-500 text-white hover:bg-green-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-green-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
+            className="bg-highlight-500 text-white hover:bg-highlight-400 text-lg px-6 py-3 rounded-lg shadow-md border-2 border-highlight-600 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center disabled:opacity-50"
           >
             <Redo className="mr-2" /> Rehacer (Ctrl+Y)
           </Button>
@@ -403,7 +403,7 @@ export default function TypeDoku() {
           <Button
             onClick={toggleNotesMode}
             className={`text-white text-lg px-6 py-3 rounded-lg shadow-md border-2 transition-all duration-200 ease-in-out transform hover:scale-105 flex items-center ${
-              isNotesMode ? 'bg-pink-500 hover:bg-pink-400 border-pink-600' : 'bg-purple-500 hover:bg-purple-400 border-purple-600'
+              isNotesMode ? 'bg-pink-500 hover:bg-pink-400 border-pink-600' : 'bg-accent-500 hover:bg-accent-400 border-accent-600'
             }`}
           >
             <PencilLine className="mr-2" /> {isNotesMode ? 'Modo Notas: ON (M)' : 'Modo Notas: OFF (M)'}
@@ -411,7 +411,7 @@ export default function TypeDoku() {
         </div>
 
         {isComplete && (
-          <div className="mt-8 p-6 bg-green-500 bg-opacity-90 rounded-lg shadow-xl border-2 border-yellow-500 animate-pulse">
+          <div className="mt-8 p-6 bg-highlight-500 bg-opacity-90 rounded-lg shadow-xl border-2 border-yellow-500 animate-pulse">
             <p className="text-center font-bold text-white text-2xl">
               ¡Felicidades! Has completado el TypeDoku
             </p>

@@ -127,7 +127,7 @@ export default function SteamDialog({
                     target.style.display = 'none';
                     const parent = target.parentElement;
                     if (parent) {
-                      parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-surface-800"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg></div>';
+                      parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-surface-800"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg></div>';
                     }
                   }}
                 />
@@ -139,7 +139,7 @@ export default function SteamDialog({
                 </h2>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   {selectedGame.developers && selectedGame.developers[0] && (
-                    <span className="text-sm text-blue-400">
+                    <span className="text-sm text-secondary-400">
                       {selectedGame.developers[0]}
                     </span>
                   )}
@@ -156,21 +156,21 @@ export default function SteamDialog({
           <TabsList className="grid w-full grid-cols-3 bg-surface-800">
             <TabsTrigger
               value="info"
-              className="text-surface-300 data-[state=active]:text-blue-400 data-[state=active]:bg-surface-700"
+              className="text-surface-300 data-[state=active]:text-secondary-400 data-[state=active]:bg-surface-700"
             >
               <Info className="w-4 h-4 mr-2" />
               Información
             </TabsTrigger>
             <TabsTrigger
               value="pricing"
-              className="text-surface-300 data-[state=active]:text-blue-400 data-[state=active]:bg-surface-700"
+              className="text-surface-300 data-[state=active]:text-secondary-400 data-[state=active]:bg-surface-700"
             >
               <ShoppingBag className="w-4 h-4 mr-2" />
               Precios
             </TabsTrigger>
             <TabsTrigger
               value="media"
-              className="text-surface-300 data-[state=active]:text-blue-400 data-[state=active]:bg-surface-700"
+              className="text-surface-300 data-[state=active]:text-secondary-400 data-[state=active]:bg-surface-700"
             >
               <Video className="w-4 h-4 mr-2" />
               Media
@@ -182,14 +182,14 @@ export default function SteamDialog({
             {/* Game Details */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
-                <h3 className="text-lg font-semibold mb-3 text-blue-400 flex items-center">
+                <h3 className="text-lg font-semibold mb-3 text-secondary-400 flex items-center">
                   <Info className="w-5 h-5 mr-2" />
                   Descripción
                 </h3>
                 <ScrollArea className="h-[250px] md:h-[300px] rounded-md border border-surface-700 p-4 bg-surface-800/50">
                   <div 
                     dangerouslySetInnerHTML={{ __html: selectedGame.description }}
-                    className="text-surface-300 prose prose-invert max-w-none prose-headings:text-blue-400 prose-a:text-blue-400"
+                    className="text-surface-300 prose prose-invert max-w-none prose-headings:text-secondary-400 prose-a:text-secondary-400"
                   />
                 </ScrollArea>
               </div>
@@ -200,7 +200,7 @@ export default function SteamDialog({
                   {/* Developers */}
                   {selectedGame.developers && selectedGame.developers.length > 0 && (
                     <div className="flex items-start gap-3">
-                      <Users className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <Users className="w-5 h-5 text-secondary-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="text-sm font-medium text-surface-400">Desarrollador</h4>
                         <p className="text-surface-100">{selectedGame.developers.join(', ')}</p>
@@ -211,7 +211,7 @@ export default function SteamDialog({
                   {/* Publishers */}
                   {selectedGame.publishers && selectedGame.publishers.length > 0 && (
                     <div className="flex items-start gap-3">
-                      <ShoppingBag className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <ShoppingBag className="w-5 h-5 text-secondary-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="text-sm font-medium text-surface-400">Editor</h4>
                         <p className="text-surface-100">{selectedGame.publishers.join(', ')}</p>
@@ -222,7 +222,7 @@ export default function SteamDialog({
                   {/* Release Date */}
                   {selectedGame.releaseDate && (
                     <div className="flex items-start gap-3">
-                      <Calendar className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <Calendar className="w-5 h-5 text-secondary-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="text-sm font-medium text-surface-400">Fecha de lanzamiento</h4>
                         <p className="text-surface-100">{formatReleaseDate(selectedGame.releaseDate)}</p>
@@ -233,22 +233,22 @@ export default function SteamDialog({
                   {/* Platforms */}
                   {selectedGame.platforms && (
                     <div className="flex items-start gap-3">
-                      <Monitor className="w-5 h-5 text-blue-400 mt-0.5 flex-shrink-0" />
+                      <Monitor className="w-5 h-5 text-secondary-400 mt-0.5 flex-shrink-0" />
                       <div>
                         <h4 className="text-sm font-medium text-surface-400">Plataformas</h4>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {selectedGame.platforms.windows && (
-                            <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+                            <Badge variant="outline" className="border-secondary-500/30 text-secondary-400">
                               Windows
                             </Badge>
                           )}
                           {selectedGame.platforms.mac && (
-                            <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+                            <Badge variant="outline" className="border-secondary-500/30 text-secondary-400">
                               macOS
                             </Badge>
                           )}
                           {selectedGame.platforms.linux && (
-                            <Badge variant="outline" className="border-blue-500/30 text-blue-400">
+                            <Badge variant="outline" className="border-secondary-500/30 text-secondary-400">
                               Linux
                             </Badge>
                           )}
@@ -261,7 +261,7 @@ export default function SteamDialog({
                 {/* Genres */}
                 {selectedGame.genres && selectedGame.genres.length > 0 && (
                   <div className="bg-surface-800 border border-surface-700 rounded-lg p-4">
-                    <h3 className="text-md font-semibold mb-3 text-blue-400 flex items-center">
+                    <h3 className="text-md font-semibold mb-3 text-secondary-400 flex items-center">
                       <Tag className="w-4 h-4 mr-2" />
                       Géneros
                     </h3>
@@ -284,7 +284,7 @@ export default function SteamDialog({
                     href={selectedGame.website} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-center bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    className="text-center bg-secondary-600 hover:bg-secondary-700 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   >
                     <ExternalLink className="w-4 h-4" />
                     Visitar sitio web
@@ -300,7 +300,7 @@ export default function SteamDialog({
               {/* Current Price Card */}
               <div className="flex flex-col items-center justify-center">
                 {selectedGame.normalPrice !== selectedGame.currentPrice && (
-                  <div className="bg-green-600/20 text-green-400 py-1 px-3 rounded-full text-sm mb-2 flex items-center">
+                  <div className="bg-highlight-600/20 text-highlight-400 py-1 px-3 rounded-full text-sm mb-2 flex items-center">
                     <Star className="w-3.5 h-3.5 mr-1" />
                     <span>-{selectedGame.discountPercent}% de descuento</span>
                   </div>
@@ -314,7 +314,7 @@ export default function SteamDialog({
                         {selectedGame.normalPrice}
                       </span>
                     )}
-                    <span className="text-3xl font-bold text-blue-400">
+                    <span className="text-3xl font-bold text-secondary-400">
                       {selectedGame.currentPrice === '0€' ? 'Gratis' : selectedGame.currentPrice}
                     </span>
                   </div>
@@ -323,7 +323,7 @@ export default function SteamDialog({
               
               {/* Price History Card */}
               <div className="mt-8 border-t border-surface-700 pt-8">
-                <h3 className="text-lg font-semibold mb-4 text-blue-400 flex items-center">
+                <h3 className="text-lg font-semibold mb-4 text-secondary-400 flex items-center">
                   <DollarSign className="w-5 h-5 mr-2" />
                   Información de precio
                 </h3>
@@ -341,7 +341,7 @@ export default function SteamDialog({
                   {selectedGame.normalPrice !== selectedGame.currentPrice && (
                     <div className="flex justify-between items-center p-3 bg-surface-700/50 rounded-lg">
                       <span className="text-surface-300">Precio en oferta:</span>
-                      <span className="font-medium text-green-400">
+                      <span className="font-medium text-highlight-400">
                         {selectedGame.currentPrice}
                       </span>
                     </div>
@@ -351,7 +351,7 @@ export default function SteamDialog({
                   {selectedGame.normalPrice !== selectedGame.currentPrice && (
                     <div className="flex justify-between items-center p-3 bg-surface-700/50 rounded-lg">
                       <span className="text-surface-300">Descuento:</span>
-                      <span className="font-medium text-green-400">
+                      <span className="font-medium text-highlight-400">
                         {selectedGame.discountPercent} %
                       </span>
                     </div>
@@ -383,7 +383,7 @@ export default function SteamDialog({
                 {/* Loading spinner */}
                 {isImageLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-surface-900/80 z-10">
-                    <div className="animate-spin w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full"></div>
+                    <div className="animate-spin w-8 h-8 border-3 border-secondary-500 border-t-transparent rounded-full"></div>
                   </div>
                 )}
                 
@@ -459,7 +459,7 @@ export default function SteamDialog({
                         <motion.div
                           key={index}
                           className={`relative cursor-pointer rounded overflow-hidden ${
-                            index === selectedMediaIndex ? "ring-2 ring-blue-500" : ""
+                            index === selectedMediaIndex ? "ring-2 ring-secondary-500" : ""
                           }`}
                           initial={{ opacity: 0, scale: 0.8 }}
                           animate={{ opacity: 1, scale: 1 }}
@@ -495,7 +495,7 @@ export default function SteamDialog({
           <DialogClose asChild>
             <Button
               variant="secondary"
-              className="mt-4 w-full bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200"
+              className="mt-4 w-full bg-secondary-600 text-white hover:bg-secondary-700 transition-colors duration-200"
             >
               Cerrar
             </Button>

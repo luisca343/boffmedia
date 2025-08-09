@@ -108,7 +108,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
         {/* Countdown Badge */}
         {timeUntil && status.label === 'Próximo' && (
           <div className="absolute top-4 left-4">
-            <Badge className="bg-blue-500/90 text-white text-xs font-bold px-3 py-1">
+            <Badge className="bg-secondary-500/90 text-white text-xs font-bold px-3 py-1">
               {timeUntil}
             </Badge>
           </div>
@@ -140,14 +140,14 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
               )}
             </div>
             <div>
-              <span className="text-sm font-medium text-purple-400">{game?.title || `Juego #${event.gameId}`}</span>
+              <span className="text-sm font-medium text-accent-400">{game?.title || `Juego #${event.gameId}`}</span>
               <div className="text-xs text-surface-500">
                 {event.type === APIEvent.type.EVENT ? 'Evento' : 'Servidor'}
               </div>
             </div>
           </div>
           
-          <h3 className="text-xl font-bold text-white mb-3 group-hover:text-purple-400 transition-colors line-clamp-2">
+          <h3 className="text-xl font-bold text-white mb-3 group-hover:text-accent-400 transition-colors line-clamp-2">
             {event.title}
           </h3>
           
@@ -157,12 +157,12 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
           
           <div className="space-y-2 text-sm text-surface-400">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-400" />
+              <Clock className="w-4 h-4 text-accent-400" />
               <span>{formatDate(event.startDate)}</span>
             </div>
             {event.endDate && (
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-purple-400" />
+                <Calendar className="w-4 h-4 text-accent-400" />
                 <span>Hasta {formatDate(event.endDate)}</span>
               </div>
             )}

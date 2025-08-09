@@ -31,7 +31,7 @@ export default function SpinnerAnimation({ participants, winner, onComplete }: S
   
   return (
     <div className="flex flex-col items-center">
-      <h2 className="text-2xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-blue-400">
+      <h2 className="text-2xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-400">
         ¡Sorteando!
       </h2>
       

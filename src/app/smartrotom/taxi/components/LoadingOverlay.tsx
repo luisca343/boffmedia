@@ -8,11 +8,11 @@ export default function LoadingOverlay() {
           <div className="w-24 h-24 mx-auto">
             <div className="absolute inset-0 bg-yellow-400 rounded-full animate-ping opacity-20"></div>
             <FaTaxi className="text-yellow-400 text-5xl absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-bounce" />
-            <div className="w-16 h-16 border-t-4 border-b-4 border-blue-500 rounded-full animate-spin absolute top-4 left-4"></div>
+            <div className="w-16 h-16 border-t-4 border-b-4 border-secondary-500 rounded-full animate-spin absolute top-4 left-4"></div>
           </div>
         </div>
         <p className="text-xl font-medium text-white">Tu taxi está en camino...</p>
-        <p className="text-blue-200 mt-2">Por favor espera un momento</p>
+        <p className="text-secondary-200 mt-2">Por favor espera un momento</p>
       </div>
     </div>
   )

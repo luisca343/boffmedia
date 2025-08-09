@@ -121,7 +121,7 @@ export async function EventsSection() {
   };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-surface-950 via-purple-900/30 to-surface-800 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-b from-surface-950 via-accent-900/30 to-surface-800 relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-accent-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -165,7 +165,7 @@ export async function EventsSection() {
                       })()}
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-purple-400 uppercase tracking-wide">Evento Destacado</span>
+                      <span className="text-sm font-medium text-accent-400 uppercase tracking-wide">Evento Destacado</span>
                       <div className={`inline-block px-3 py-1 bg-gradient-to-r ${getStatusColor(featuredEvent.status)} text-white text-xs font-bold rounded-full ml-3`}>
                         {getStatusText(featuredEvent.status)}
                       </div>
@@ -314,7 +314,7 @@ export async function EventsSection() {
             {upcomingEvents.map((event, index) => (
               <div 
                 key={event.id} 
-                className="bg-surface-800/40 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-6 hover:scale-105 hover:border-blue-400/40 transition-all duration-300 group"
+                className="bg-surface-800/40 backdrop-blur-sm border border-secondary-500/20 rounded-2xl p-6 hover:scale-105 hover:border-secondary-400/40 transition-all duration-300 group"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="flex items-center justify-between mb-4">

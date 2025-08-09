@@ -180,7 +180,7 @@ export const PmdSprite = forwardRef<PmdSpriteRef, PmdSpriteProps>(
     }
 
     if (!currentAnimation) {
-      return <div className="text-blue-500 font-bold">Loading...</div>;
+      return <div className="text-secondary-500 font-bold">Loading...</div>;
     }
 
     const currentAnim = loadedAnimations.find(
@@ -262,20 +262,20 @@ export function PmdSpriteWithControls({ num }: { num: number }) {
       <PmdSprite ref={spriteRef} num={num} animations={["Walk"]} />
       <div className="mt-4 flex space-x-2">
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-center"
+          className="px-4 py-2 bg-secondary-500 text-white rounded flex items-center justify-center"
           onClick={rotateLeft}
         >
           Rotate Left
         </button>
         <button
-          className="px-4 py-2 bg-green-500 text-white rounded flex items-center justify-center"
+          className="px-4 py-2 bg-highlight-500 text-white rounded flex items-center justify-center"
           onClick={handleJump}
           disabled={currentAnimation === "Hop"}
         >
           Jump
         </button>
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded flex items-center justify-center"
+          className="px-4 py-2 bg-secondary-500 text-white rounded flex items-center justify-center"
           onClick={rotateRight}
         >
           Rotate Right

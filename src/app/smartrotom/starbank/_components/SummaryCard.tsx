@@ -13,11 +13,11 @@ type SummaryCardProps = {
 
 export function SummaryCard({ title, value, icon, change, className = '' }: SummaryCardProps) {
   return (
-    <div className={`bg-white rounded-lg border border-blue-200 p-5 ${className}`}>
+    <div className={`bg-white rounded-lg border border-secondary-200 p-5 ${className}`}>
       <div className="flex justify-between">
         <div>
-          <p className="text-sm text-blue-600 font-medium">{title}</p>
-          <p className="text-2xl font-bold text-blue-900 mt-2">{value}</p>
+          <p className="text-sm text-secondary-600 font-medium">{title}</p>
+          <p className="text-2xl font-bold text-secondary-900 mt-2">{value}</p>
           
           {change && (
             <div className="flex items-center mt-2">
@@ -28,13 +28,13 @@ export function SummaryCard({ title, value, icon, change, className = '' }: Summ
               >
                 {change.isPositive ? '▲' : '▼'} {Math.abs(change.value)}%
               </span>
-              <span className="text-xs text-blue-500 ml-1">desde el mes pasado</span>
+              <span className="text-xs text-secondary-500 ml-1">desde el mes pasado</span>
             </div>
           )}
         </div>
         
         {icon && (
-          <div className="h-12 w-12 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700">
+          <div className="h-12 w-12 rounded-lg bg-secondary-100 flex items-center justify-center text-secondary-700">
             {icon}
           </div>
         )}

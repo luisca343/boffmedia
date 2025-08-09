@@ -118,18 +118,18 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
     
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
-      <span className="text-blue-400">Def: {defenseValue}</span>
+      <span className="text-secondary-400">Def: {defenseValue}</span>
       
       {/* Show set name if available */}
       {armor.armorSet?.name && (
-        <span className="text-purple-400 truncate max-w-[200px]">
+        <span className="text-accent-400 truncate max-w-[200px]">
           {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
       
       {/* Show skills if available */}
       {armor.skills && armor.skills.length > 0 && (
-        <span className="text-green-400">
+        <span className="text-highlight-400">
           {armor.skills.map((s, i) => (
             <span key={i}>
               {s.skill?.name || s.name} +{s.level}
@@ -153,7 +153,7 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
         {t('attack')}: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}
       </span>
       
-      <span className={`${weapon.affinity >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+      <span className={`${weapon.affinity >= 0 ? 'text-highlight-400' : 'text-red-400'}`}>
         {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
       
@@ -181,7 +181,7 @@ const CharmStats = ({ charm }: { charm: Charm }) => {
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
       {charm.skills && charm.skills.length > 0 && (
-        <span className="text-green-400">
+        <span className="text-highlight-400">
           {charm.skills.map((s, i) => (
             <span key={i}>
               {s.skill?.name} +{s.level}

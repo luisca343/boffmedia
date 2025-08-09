@@ -173,7 +173,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
           <Button
             type="button"
             onClick={handleGoogleSignIn}
-            className="w-full bg-white text-gray-700 hover:bg-gray-100 transition-all duration-200 font-semibold py-2 rounded-md flex items-center justify-center"
+            className="w-full bg-white text-surface-700 hover:bg-surface-100 transition-all duration-200 font-semibold py-2 rounded-md flex items-center justify-center"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path

@@ -32,7 +32,7 @@ export function LocationSection({
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <FormField 
           label={t("DUNGEON")} 
-          icon={<BuildingOffice2Icon className="w-4 h-4 text-green-400" />}
+          icon={<BuildingOffice2Icon className="w-4 h-4 text-highlight-400" />}
           required
         >
           <Combobox 

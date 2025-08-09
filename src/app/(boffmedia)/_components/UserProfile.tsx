@@ -257,7 +257,7 @@ export default function UserProfile() {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="p-3 rounded-full bg-gradient-to-r from-green-500 to-emerald-500">
+                    <div className="p-3 rounded-full bg-gradient-to-r from-highlight-500 to-emerald-500">
                       <User className="h-6 w-6 text-white" />
                     </div>
                     <div>
@@ -274,7 +274,7 @@ export default function UserProfile() {
                     ) : (
                       <Button
                         variant="outline"
-                        className="border-green-500 text-green-400 hover:bg-green-500/10"
+                        className="border-highlight-500 text-highlight-400 hover:bg-highlight-500/10"
                       >
                         <LinkIcon className="mr-2 h-4 w-4" />
                         Link Minecraft

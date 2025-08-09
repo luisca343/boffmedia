@@ -97,11 +97,11 @@ export default function PlayerAppManagement() {
 
   if (loading || playerAppsLoading || allAppsLoading) {
     return (
-      <div className="w-full min-h-screen bg-black text-green-400 font-mono p-4 flex flex-col items-center justify-center">
+      <div className="w-full min-h-screen bg-black text-highlight-400 font-mono p-4 flex flex-col items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="text-green-500 text-xl mb-2">Cargando sistema...</div>
-          <div className="w-40 h-1 bg-green-700/30 rounded">
-            <div className="h-1 bg-green-500 rounded animate-[loadingBar_2s_ease-in-out_infinite]" style={{width: '60%'}}></div>
+          <div className="text-highlight-500 text-xl mb-2">Cargando sistema...</div>
+          <div className="w-40 h-1 bg-highlight-700/30 rounded">
+            <div className="h-1 bg-highlight-500 rounded animate-[loadingBar_2s_ease-in-out_infinite]" style={{width: '60%'}}></div>
           </div>
         </div>
         <style jsx>{`
@@ -145,10 +145,10 @@ export default function PlayerAppManagement() {
               value={selectedPlayerUuid} 
               onValueChange={handlePlayerChange}
             >
-              <SelectTrigger className="bg-black text-green-400 border-green-700 focus:border-green-500 w-full">
+              <SelectTrigger className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 w-full">
                 <SelectValue placeholder="Seleccionar jugador" />
               </SelectTrigger>
-              <SelectContent className="bg-black text-green-400 border-green-700">
+              <SelectContent className="bg-black text-highlight-400 border-highlight-700">
                 {allUsers && allUsers.length > 0 ? (
                   allUsers
                     .filter(user => user.id > 0)
@@ -156,10 +156,10 @@ export default function PlayerAppManagement() {
                       <SelectItem 
                         key={user.uuid} 
                         value={user.uuid} 
-                        className="hover:bg-green-900/30"
+                        className="hover:bg-highlight-900/30"
                       >
                         <div className="flex items-center">
-                          <UserIcon className="w-4 h-4 mr-2 text-green-600" />
+                          <UserIcon className="w-4 h-4 mr-2 text-highlight-600" />
                           <span>{user.username || `Usuario ${user.id}`}</span>
                         </div>
                       </SelectItem>
@@ -172,7 +172,7 @@ export default function PlayerAppManagement() {
           </div>
           <Button 
             onClick={handleRefresh} 
-            className="bg-green-900/30 hover:bg-green-800/50 text-green-400 border border-green-700 hover:shadow-neon transition-all"
+            className="bg-highlight-900/30 hover:bg-highlight-800/50 text-highlight-400 border border-highlight-700 hover:shadow-neon transition-all"
           >
             <RefreshCw className="w-4 h-4 mr-2" /> Actualizar
           </Button>
@@ -180,9 +180,9 @@ export default function PlayerAppManagement() {
         
         {selectedPlayerUuid && (
           <div className="mt-3 text-sm flex items-center">
-            <span className="text-green-600 mr-2">Jugador activo:</span>
-            <span className="text-green-400 font-bold">{getSelectedPlayerName()}</span>
-            <span className="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            <span className="text-highlight-600 mr-2">Jugador activo:</span>
+            <span className="text-highlight-400 font-bold">{getSelectedPlayerName()}</span>
+            <span className="ml-2 w-2 h-2 bg-highlight-500 rounded-full animate-pulse"></span>
           </div>
         )}
       </TerminalCard>
@@ -198,7 +198,7 @@ export default function PlayerAppManagement() {
             {extraApps.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {extraApps.map(app => (
-                  <div key={app.id} className="flex flex-col items-center bg-black/40 p-3 border border-green-900/30 rounded hover:border-green-700 transition-all">
+                  <div key={app.id} className="flex flex-col items-center bg-black/40 p-3 border border-highlight-900/30 rounded hover:border-highlight-700 transition-all">
                     <App app={app as SmartRotomApp} withLink={false} size='small'/>
                     <Button
                       onClick={() => handleRemoveApp(app.id)}
@@ -226,11 +226,11 @@ export default function PlayerAppManagement() {
             {availableApps.length > 0 ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {availableApps.map(app => (
-                  <div key={app.id} className="flex flex-col items-center bg-black/40 p-3 border border-green-900/30 rounded hover:border-green-700 transition-all">
+                  <div key={app.id} className="flex flex-col items-center bg-black/40 p-3 border border-highlight-900/30 rounded hover:border-highlight-700 transition-all">
                     <App app={app as SmartRotomApp} withLink={false} size='small'/>
                     <Button
                       onClick={() => handleAddApp(app.id)}
-                      className="mt-2 bg-green-900/60 hover:bg-green-800 text-green-100 border border-green-700 hover:shadow-neon transition-all"
+                      className="mt-2 bg-highlight-900/60 hover:bg-highlight-800 text-highlight-100 border border-highlight-700 hover:shadow-neon transition-all"
                       disabled={isAdding}
                     >
                       <Plus className="w-4 h-4 mr-2" /> Añadir

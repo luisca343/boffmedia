@@ -166,17 +166,17 @@ function CompactSkillItem({ skill, serverSkillData, isOverallocated, isLast = fa
         case "attack":
           return "text-red-400";
         case "defense":
-          return "text-blue-400";
+          return "text-secondary-400";
         case "element":
-          return "text-purple-400";
+          return "text-accent-400";
         case "utility":
-          return "text-green-400";
+          return "text-highlight-400";
         default:
-          return "text-green-400";
+          return "text-highlight-400";
       }
     }
     
-    return "text-green-400";
+    return "text-highlight-400";
   };
   
   // Get skill description from server data

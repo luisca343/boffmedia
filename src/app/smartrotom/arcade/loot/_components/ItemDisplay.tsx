@@ -48,7 +48,7 @@ export const ItemDisplay = ({
         />
         
         {count > 1 && showCountBadge && (
-          <span className="absolute bottom-0 right-0 bg-gray-900/80 text-white text-xs px-1.5 py-0.5 rounded-md border border-gray-700">
+          <span className="absolute bottom-0 right-0 bg-surface-900/80 text-white text-xs px-1.5 py-0.5 rounded-md border border-surface-700">
             x{count}
           </span>
         )}
@@ -66,7 +66,7 @@ export const ItemDisplay = ({
         )}
 
         {selectable && isChest && (
-          <div className="absolute inset-0 bg-gray-800/60 rounded-md flex items-center justify-center">
+          <div className="absolute inset-0 bg-surface-800/60 rounded-md flex items-center justify-center">
             <span className="text-xs text-white bg-black/70 px-2 py-1 rounded">No seleccionable</span>
           </div>
         )}
