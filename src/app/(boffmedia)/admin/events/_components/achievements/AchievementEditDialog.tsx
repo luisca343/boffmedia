@@ -6,6 +6,7 @@ import { toast } from "react-toastify"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
 import type { Achievement } from "@/types/events"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { CreateAchievementDto } from "@/generated/api"
 
 interface AchievementEditDialogProps {
   open: boolean
@@ -20,16 +21,25 @@ export function AchievementEditDialog({ open, onOpenChange, achievement, onSucce
   const formDefaultValues = {
     id: achievement.id,
     name: achievement.name,
-    description: achievement.description || undefined,
-    icon: achievement.icon || undefined,
+    description: achievement.description || "",
+    icon: achievement.icon || "",
     eventId: achievement.eventId,
     points: achievement.points,
+    maxProgress: achievement.maxProgress,
+    itemType: achievement.itemType as CreateAchievementDto.itemType,
+    category: achievement.category as CreateAchievementDto.category,
+    rarity: achievement.rarity as CreateAchievementDto.rarity || undefined,
+    order: achievement.order,
+    active: 1, // Default to active for existing achievements
   }
 
   const handleSubmit = async (data: AchievementFormValues) => {
     setIsSubmitting(true)
     try {
-      await EventsService.updateAchievement(achievement.eventId, achievement.id!, data)
+      // Remove id and eventId from data for update
+      const { id, eventId, ...updateData } = data
+      
+      await EventsService.updateAchievement(achievement.eventId, achievement.id!, updateData as any)
       toast.success(`El logro "${data.name}" ha sido actualizado con éxito.`)
       onSuccess()
     } catch (error) {

@@ -1,101 +1,179 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Users, Calendar, Trophy, Award } from "lucide-react"
-import { getTranslations } from "next-intl/server"
-import Link from "next/link"
-import { FloatingSection } from "../layout/FloatingSection"
+"use client"
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Users, MessageCircle, Heart, Gamepad2, Code, Zap } from "lucide-react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 
-export async function CommunitySection() {
-  const t = await getTranslations("boffmedia.communitySection");
+export function CommunitySection() {
+  const t = useTranslations("boffmedia");
 
-  const features = [
-    {
-      title: t("features.events.title"),
-      description: t("features.events.description"),
-      icon: Calendar,
-      color: "from-primary-500 to-orange-500",
-      hoverColor: "hover:border-primary-500/50",
-      shadowColor: "hover:shadow-primary-500/20"
-    },
-    {
-      title: t("features.ranking.title"),
-      description: t("features.ranking.description"),
-      icon: Trophy,
-      color: "from-orange-500 to-amber-500",
-      hoverColor: "hover:border-orange-500/50",
-      shadowColor: "hover:shadow-orange-500/20"
-    },
-    {
-      title: t("features.achievements.title"),
-      description: t("features.achievements.description"),
-      icon: Award,
-      color: "from-amber-500 to-yellow-500",
-      hoverColor: "hover:border-amber-500/50",
-      shadowColor: "hover:shadow-amber-500/20"
-    },
-  ]
+  const communityElements = [
+    { icon: Users, name: "Jugadores", color: "from-cyan-500 to-blue-600" },
+    { icon: MessageCircle, name: "Discusiones", color: "from-blue-500 to-indigo-600" },
+    { icon: Heart, name: "Colaboración", color: "from-indigo-500 to-purple-600" },
+    { icon: Gamepad2, name: "Gaming", color: "from-purple-500 to-pink-600" },
+    { icon: Code, name: "Desarrollo", color: "from-pink-500 to-rose-600" },
+    { icon: Zap, name: "Innovación", color: "from-rose-500 to-orange-600" },
+  ];
 
   return (
-    <section className="relative mt-8 py-32 bg-gradient-to-br from-surface-800 via-surface-800 to-surface-900 overflow-hidden  wave-community-top">
-      <div className="relative container mx-auto px-4 z-10">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="h-px bg-gradient-to-r from-transparent via-primary-500 to-transparent flex-1"></div>
-            <Users className="h-8 w-8 text-primary-500" />
-            <div className="h-px bg-gradient-to-r from-transparent via-primary-500 to-transparent flex-1"></div>
+    <section className="relative overflow-hidden bg-gradient-to-b from-surface-800 via-surface-900 to-surface-950">
+      {/* Top Wave Transition */}
+      <div className="absolute top-0 left-0 w-full overflow-hidden">
+        <svg className="relative block w-full h-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" className="fill-surface-800"></path>
+        </svg>
+      </div>
+
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 30%, rgba(6, 182, 212, 0.15) 0%, transparent 50%), 
+                           radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.15) 0%, transparent 50%)`
+        }}></div>
+      </div>
+
+      <div className="relative container mx-auto px-4 py-24 sm:py-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Left Section: Community Info */}
+          <div className="text-center lg:text-left order-2 lg:order-1">
+            <h2 className="text-5xl sm:text-6xl font-bold mb-6 leading-tight">
+              <span className="text-surface-50">{t("community.title.first")}</span>
+              <span className="block bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+                {t("community.title.second")}
+              </span>
+            </h2>
+            <p className="text-xl text-surface-200 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+              {t("community.description")}
+            </p>
+
+            {/* Feature highlights */}
+            <div className="space-y-4 mb-12">
+              <div className="flex items-center gap-4 justify-center lg:justify-start">
+                <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
+                <span className="text-surface-300 text-lg">Conecta con desarrolladores y jugadores apasionados</span>
+              </div>
+              <div className="flex items-center gap-4 justify-center lg:justify-start">
+                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                <span className="text-surface-300 text-lg">Participa en proyectos colaborativos únicos</span>
+              </div>
+              <div className="flex items-center gap-4 justify-center lg:justify-start">
+                <div className="w-3 h-3 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
+                <span className="text-surface-300 text-lg">Accede a recursos exclusivos y eventos especiales</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-xl group px-8 py-4"
+                asChild
+              >
+                <Link href="/community">
+                  {t("community.buttons.joinNow")}
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
+                </Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 px-8 py-4"
+                asChild
+              >
+                <Link href="/discord">{t("community.buttons.discord")}</Link>
+              </Button>
+            </div>
           </div>
-          <h2 className="text-5xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-orange-400 to-amber-400">
-            {t("title")}
-          </h2>
-          <p className="text-xl text-surface-300 max-w-3xl mx-auto leading-relaxed">
-            {t("subtitle")}
-          </p>
-        </div>
 
-        <div className="grid sm:grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          {features.map((feature, index) => (
-            <Card 
-              key={feature.title} 
-              className={`group relative bg-gradient-to-br from-surface-800 to-surface-900 border-surface-700 ${feature.hoverColor} transition-all duration-500 hover:scale-105 hover:shadow-2xl ${feature.shadowColor}`}
-            >
-              <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-500`}></div>
+          {/* Right Section: Community Visualization */}
+          <div className="relative order-1 lg:order-2">
+            <div className="relative h-[500px] flex items-center justify-center">
               
-              <CardHeader className="relative z-10 text-center">
-                <div className="relative mx-auto mb-4">
-                  <div className={`absolute inset-0 bg-gradient-to-r ${feature.color} rounded-full blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500`}></div>
-                  <div className={`relative p-4 rounded-full bg-gradient-to-r ${feature.color} group-hover:scale-110 transition-transform duration-300`}>
-                    <feature.icon className="h-8 w-8 text-white" />
-                  </div>
-                </div>
-                <CardTitle className="text-xl text-surface-50 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary-400 group-hover:to-orange-400 transition-all duration-300">
-                  {feature.title}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="relative z-10 text-center">
-                <CardDescription className="text-surface-300 group-hover:text-surface-200 transition-colors duration-300 leading-relaxed">
-                  {feature.description}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              {/* Central Community Hub */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-2xl z-20">
+                <Users className="w-20 h-20 text-white animate-pulse" />
+              </div>
 
-        <div className="text-center">
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-orange-500 rounded-lg blur-xl opacity-30"></div>
-            <Button 
-              size="lg" 
-              className="relative text-lg bg-gradient-to-r from-primary-500 to-orange-500 hover:from-primary-600 hover:to-orange-600 text-white border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 px-8 py-4" 
-              asChild
-            >
-              <Link href="/community" className="flex items-center gap-2">
-                {t("joinNowButton")}
-                <Users className="h-5 w-5" />
-              </Link>
-            </Button>
+              {/* Animated rings */}
+              <div className="absolute top-1/2 left-1/2 w-72 h-72 border border-cyan-500/20 rounded-full animate-spin pointer-events-none" style={{animationDuration: '30s', transform: 'translate(-50%, -50%)'}}></div>
+              <div className="absolute top-1/2 left-1/2 w-96 h-96 border border-blue-500/10 rounded-full animate-spin pointer-events-none" style={{animationDuration: '40s', animationDirection: 'reverse', transform: 'translate(-50%, -50%)'}}></div>
+              <div className="absolute top-1/2 left-1/2 w-[28rem] h-[28rem] border border-indigo-500/5 rounded-full animate-spin pointer-events-none" style={{animationDuration: '50s', transform: 'translate(-50%, -50%)'}}></div>
+
+              {/* Orbiting community elements */}
+              {communityElements.map((element, index) => {
+                const angle = (index * 60) * (Math.PI / 180);
+                const radius = 180;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                return (
+                  <div
+                    key={element.name}
+                    className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 animate-float hover:scale-125 transition-all duration-300 cursor-pointer group z-30"
+                    style={{
+                      left: `calc(50% + ${x}px)`,
+                      top: `calc(50% + ${y}px)`,
+                      animationDelay: `${index * 0.5}s`,
+                      animationDuration: '4s'
+                    }}
+                  >
+                    <div className={`w-full h-full bg-gradient-to-br ${element.color} rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:rotate-12`}>
+                      <element.icon className="w-10 h-10 text-white" />
+                    </div>
+                    {/* Connecting line */}
+                    <div 
+                      className="absolute w-0.5 bg-gradient-to-r from-cyan-400/20 to-transparent origin-left opacity-40 group-hover:opacity-80 transition-opacity duration-300"
+                      style={{
+                        height: `${radius}px`,
+                        transform: `rotate(${angle + Math.PI}rad)`,
+                        left: '50%',
+                        top: '50%',
+                      }}
+                    ></div>
+                    {/* Tooltip */}
+                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-30">
+                      <span className="text-sm text-cyan-400 font-medium bg-surface-900/90 px-3 py-2 rounded-lg shadow-lg border border-cyan-500/20">
+                        {element.name}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Floating particles */}
+              {[...Array(15)].map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute w-1.5 h-1.5 bg-cyan-400/40 rounded-full animate-ping"
+                  style={{
+                    top: `${10 + (i * 6)}%`,
+                    left: `${5 + (i * 6)}%`,
+                    animationDelay: `${i * 0.4}s`,
+                    animationDuration: '5s'
+                  }}
+                ></div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Bottom Wave for next section */}
+      <div className="absolute bottom-0 left-0 w-full overflow-hidden">
+        <svg className="relative block w-full h-20" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V120H0Z" className="fill-surface-950"></path>
+        </svg>
+      </div>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
+      `}</style>
     </section>
-  )
+  );
 }

@@ -24,8 +24,11 @@ export function AchievementCreateDialog({
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await (await EventsService.createAchievement(data.eventId, data)).data
-      toast.success(`El logro "${data.name}" ha sido creado con éxito.`)
+      // Separate eventId from the rest of the data for creation
+      const { id, eventId, ...createData } = data
+      
+      await (await EventsService.createAchievement(eventId, createData as any)).data
+      toast.success(`El logro "${createData.name}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {
       toast.error("Ocurrió un error al intentar crear el logro.")

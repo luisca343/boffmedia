@@ -209,11 +209,10 @@ export default function EventAchievementsPage() {
               <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-accent-500 rounded-full animate-spin"></div>
               <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
             </div>
-            
             <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400">
               Cargando logros...
             </h2>
-            <p className="mt-2 text-surface-400">Preparando tus conquistas épicas</p>
+            <p className="mt-2 text-surface-400">Preparando tus logros</p>
           </div>
         </div>
       </div>
@@ -258,7 +257,7 @@ export default function EventAchievementsPage() {
               
               <div className="flex-1 text-center md:text-left">
                 <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-pink-400 to-indigo-400 mb-2">
-                  Logros Épicos
+                  Logros del evento
                 </h1>
                 <p className="text-xl text-surface-300 mb-4">{event?.title}</p>
                 <div className="flex items-center justify-center md:justify-start gap-2">
@@ -333,7 +332,7 @@ export default function EventAchievementsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-surface-400" />
               <Input
-                placeholder="Buscar logros épicos..."
+                placeholder="Buscar logros..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 h-12 bg-surface-700/50 border-surface-600 text-white placeholder-surface-400 text-lg focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500"
