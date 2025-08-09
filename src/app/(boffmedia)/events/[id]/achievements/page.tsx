@@ -9,7 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { 
   ArrowLeft, Trophy, Award, Search, Filter, Lock, 
-  Calendar, Target, Users, Star 
+  Calendar, Target, Users, Star, Crown, Gem, Medal,
+  Sparkles, Clock, ChevronRight, Zap
 } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, Event, UserProgress, EventParticipant } from "@/types/events"
@@ -27,11 +28,10 @@ export default function EventAchievementsPage() {
   const eventId = parseInt(params.id as string)
   const { session } = useBoffSession()
   
-  // Extract userId to a stable reference
   const userId = session?.user?.id
   
   const [event, setEvent] = useState<any>(null)
-  const [achievements, setAchievements] = useState<any>()
+  const [achievements, setAchievements] = useState<any[]>([])
   const [progressData, setProgressData] = useState<any[]>([])
   const [participantId, setParticipantId] = useState<number | null>(null)
   const [filteredAchievements, setFilteredAchievements] = useState<any[]>([])
@@ -44,16 +44,14 @@ export default function EventAchievementsPage() {
       try {
         setIsLoading(true)
         
-        // Fetch event and achievements in parallel
         const [eventResponse, achievementsResponse] = await Promise.all([
           EventsService.getEvent(eventId),
           EventsService.getEventAchievements(eventId)
         ])
         
         setEvent(eventResponse.data)
-        setAchievements(achievementsResponse.data)
+        setAchievements(achievementsResponse.data || [])
 
-        // Get current user's participant ID and progress
         if (userId) {
           try {
             const participantsResponse = await EventsService.getEventParticipants(eventId) as any
@@ -64,14 +62,12 @@ export default function EventAchievementsPage() {
             if (participant) {
               setParticipantId(participant.id)
               
-              // Fetch user progress if participant exists
               const progressResponse = await EventsService.getParticipantProgressByEvent(
                 eventId, 
                 participant.id
               )
-              setProgressData(progressResponse.data!)
+              setProgressData(progressResponse.data || [])
             } else {
-              // Reset progress data if user is not a participant
               setParticipantId(null)
               setProgressData([])
             }
@@ -81,7 +77,6 @@ export default function EventAchievementsPage() {
             setProgressData([])
           }
         } else {
-          // Reset progress data if no user
           setParticipantId(null)
           setProgressData([])
         }
@@ -92,13 +87,11 @@ export default function EventAchievementsPage() {
       }
     }
 
-    // Only run if eventId is valid
     if (eventId && !isNaN(eventId)) {
       fetchData()
     }
-  }, [eventId, userId]) // Use userId instead of session?.user?.id
+  }, [eventId, userId])
 
-  // Merge achievements with progress data
   const achievementsWithProgress: AchievementWithProgress[] = useMemo(() => {
     return achievements.map((achievement: any) => {
       const progress = progressData.find(p => p.achievementId === achievement.id)
@@ -114,14 +107,12 @@ export default function EventAchievementsPage() {
   useEffect(() => {
     let filtered = achievementsWithProgress
 
-    // Filter by status
     if (activeFilter === "unlocked") {
       filtered = filtered.filter(a => a.isUnlocked)
     } else if (activeFilter === "locked") {
       filtered = filtered.filter(a => !a.isUnlocked)
     }
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(a => 
         a.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -148,40 +139,81 @@ export default function EventAchievementsPage() {
     })
   }
 
-  const getRarityColor = (rarity?: string | null) => {
+  const getRarityInfo = (rarity?: string | null) => {
     switch (rarity?.toLowerCase()) {
-      case 'diamond': return 'text-cyan-400 border-cyan-500/30 bg-cyan-500/10'
-      case 'platinum': return 'text-purple-400 border-purple-500/30 bg-purple-500/10'
-      case 'gold': return 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10'
-      case 'silver': return 'text-gray-300 border-gray-400/30 bg-gray-400/10'
-      case 'bronze': return 'text-amber-600 border-amber-600/30 bg-amber-600/10'
-      default: return 'text-surface-400 border-surface-500/30 bg-surface-500/10'
+      case 'diamond': 
+        return { 
+          color: 'from-cyan-400 to-blue-500',
+          bg: 'bg-cyan-500/10',
+          border: 'border-cyan-500/30',
+          icon: <Gem className="w-4 h-4" />
+        }
+      case 'platinum': 
+        return { 
+          color: 'from-purple-400 to-pink-500',
+          bg: 'bg-purple-500/10',
+          border: 'border-purple-500/30',
+          icon: <Crown className="w-4 h-4" />
+        }
+      case 'gold': 
+        return { 
+          color: 'from-yellow-400 to-orange-500',
+          bg: 'bg-yellow-500/10',
+          border: 'border-yellow-500/30',
+          icon: <Trophy className="w-4 h-4" />
+        }
+      case 'silver': 
+        return { 
+          color: 'from-gray-300 to-gray-500',
+          bg: 'bg-gray-400/10',
+          border: 'border-gray-400/30',
+          icon: <Medal className="w-4 h-4" />
+        }
+      case 'bronze': 
+        return { 
+          color: 'from-amber-600 to-amber-800',
+          bg: 'bg-amber-600/10',
+          border: 'border-amber-600/30',
+          icon: <Award className="w-4 h-4" />
+        }
+      default: 
+        return { 
+          color: 'from-surface-400 to-surface-600',
+          bg: 'bg-surface-500/10',
+          border: 'border-surface-500/30',
+          icon: <Star className="w-4 h-4" />
+        }
     }
   }
 
   const getCategoryIcon = (category: string, itemType: string) => {
     if (itemType === "medal") {
-      return <Award className="h-4 w-4" />
+      return <Award className="h-5 w-5" />
     }
     
     switch (category) {
-      case 'competition': return <Trophy className="h-4 w-4" />
-      case 'challenge': return <Target className="h-4 w-4" />
-      case 'participation': return <Users className="h-4 w-4" />
-      default: return <Star className="h-4 w-4" />
+      case 'competition': return <Trophy className="h-5 w-5" />
+      case 'challenge': return <Target className="h-5 w-5" />
+      case 'participation': return <Users className="h-5 w-5" />
+      default: return <Star className="h-5 w-5" />
     }
   }
 
   if (isLoading) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 bg-surface-700 rounded w-1/3"></div>
-          <div className="h-32 bg-surface-700 rounded"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-48 bg-surface-700 rounded"></div>
-            ))}
+      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+        <div className="container mx-auto p-6 max-w-7xl">
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="relative">
+              <div className="w-20 h-20 border-4 border-purple-500/20 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-purple-500 rounded-full animate-spin"></div>
+              <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+            </div>
+            
+            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              Cargando logros...
+            </h2>
+            <p className="mt-2 text-surface-400">Preparando tus conquistas épicas</p>
           </div>
         </div>
       </div>
@@ -189,183 +221,313 @@ export default function EventAchievementsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      {/* Header */}
-      <div className="mb-8">
-        <Link href={`/events/${eventId}`}>
-          <Button variant="ghost" className="mb-4 text-surface-300 hover:text-surface-50">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver al evento
-          </Button>
-        </Link>
-        
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 rounded-lg bg-surface-700 flex items-center justify-center">
-            {event?.icon ? (
-              <img src={event.icon} alt="" className="w-full h-full object-cover rounded-lg" />
-            ) : (
-              <Trophy className="h-8 w-8 text-amber-500" />
-            )}
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-surface-50">Logros</h1>
-            <p className="text-surface-300">{event?.title}</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      {/* Background Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-2xl"></div>
+      </div>
 
-        {/* Progress Overview */}
-        <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-surface-50">{unlockedCount}</div>
+      <div className="relative z-10 container mx-auto p-6 max-w-7xl">
+        {/* Header */}
+        <div className="mb-12">
+          <Link href={`/events/${eventId}`}>
+            <Button variant="ghost" className="mb-6 text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-purple-500/30">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver al evento
+            </Button>
+          </Link>
+          
+          {/* Hero Section */}
+          <div className="bg-gradient-to-r from-surface-800/80 via-purple-900/40 to-surface-800/80 backdrop-blur-sm border border-purple-500/20 rounded-3xl p-8 mb-8">
+            <div className="flex flex-col md:flex-row items-center gap-6">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center shadow-2xl">
+                  {event?.icon ? (
+                    <img src={event.icon} alt="" className="w-16 h-16 object-cover rounded-xl" />
+                  ) : (
+                    <Trophy className="h-10 w-10 text-white" />
+                  )}
+                </div>
+                {/* Floating sparkles */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center animate-bounce">
+                  <Sparkles className="w-3 h-3 text-white" />
+                </div>
+              </div>
+              
+              <div className="flex-1 text-center md:text-left">
+                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 mb-2">
+                  Logros Épicos
+                </h1>
+                <p className="text-xl text-surface-300 mb-4">{event?.title}</p>
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <Badge className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 text-purple-400 border border-purple-500/30">
+                    <Trophy className="w-3 h-3 mr-1" />
+                    {totalCount} logros disponibles
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-green-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Trophy className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400">
+                {unlockedCount}
+              </div>
               <div className="text-sm text-surface-400">Desbloqueados</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-surface-50">{totalCount}</div>
+            
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Target className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                {totalCount}
+              </div>
               <div className="text-sm text-surface-400">Total</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-surface-50">{earnedPoints}</div>
+            
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-yellow-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Star className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+                {earnedPoints}
+              </div>
               <div className="text-sm text-surface-400">Puntos</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-surface-50">{completionRate.toFixed(1)}%</div>
+            
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 text-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Zap className="h-6 w-6 text-white" />
+              </div>
+              <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
+                {completionRate.toFixed(1)}%
+              </div>
               <div className="text-sm text-surface-400">Completado</div>
             </div>
           </div>
-          <div className="mt-4">
-            <Progress value={completionRate} className="h-3" />
+
+          {/* Progress Bar */}
+          <div className="bg-surface-800/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-lg font-semibold text-white">Progreso General</span>
+              <span className="text-purple-400 font-bold">{unlockedCount}/{totalCount}</span>
+            </div>
+            <Progress 
+              value={completionRate} 
+              className="h-4 bg-surface-700"
+            />
           </div>
         </div>
-      </div>
 
-      {/* Filters and Search */}
-      <div className="mb-6 flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
-          <Input
-            placeholder="Buscar logros..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        {/* Filters and Search */}
+        <div className="bg-surface-800/40 backdrop-blur-sm border border-purple-500/20 rounded-2xl p-6 mb-8">
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-surface-400" />
+              <Input
+                placeholder="Buscar logros épicos..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-12 h-12 bg-surface-700/50 border-surface-600 text-white placeholder-surface-400 text-lg focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500"
+              />
+            </div>
+            
+            <div className="flex bg-surface-700/50 rounded-xl p-1 border border-surface-600">
+              <Button
+                variant={activeFilter === 'all' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setActiveFilter('all')}
+                className={`px-6 ${activeFilter === 'all' 
+                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white" 
+                  : "text-surface-300 hover:text-white hover:bg-surface-600"
+                }`}
+              >
+                Todos ({totalCount})
+              </Button>
+              <Button
+                variant={activeFilter === 'unlocked' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setActiveFilter('unlocked')}
+                className={`px-6 ${activeFilter === 'unlocked'
+                  ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white"
+                  : "text-surface-300 hover:text-white hover:bg-surface-600"
+                }`}
+              >
+                Desbloqueados ({unlockedCount})
+              </Button>
+              <Button
+                variant={activeFilter === 'locked' ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setActiveFilter('locked')}
+                className={`px-6 ${activeFilter === 'locked'
+                  ? "bg-gradient-to-r from-gray-600 to-gray-700 text-white"
+                  : "text-surface-300 hover:text-white hover:bg-surface-600"
+                }`}
+              >
+                Bloqueados ({totalCount - unlockedCount})
+              </Button>
+            </div>
+          </div>
         </div>
-        
-        <Tabs value={activeFilter} onValueChange={setActiveFilter}>
-          <TabsList>
-            <TabsTrigger value="all">Todos ({totalCount})</TabsTrigger>
-            <TabsTrigger value="unlocked">Desbloqueados ({unlockedCount})</TabsTrigger>
-            <TabsTrigger value="locked">Bloqueados ({totalCount - unlockedCount})</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
 
-      {/* Achievements Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredAchievements.map((achievement) => (
-          <div 
-            key={achievement.id} 
-            className={`bg-surface-800/50 border rounded-lg p-6 transition-all hover:bg-surface-800/70 ${
-              achievement.isUnlocked 
-                ? 'border-surface-600' 
-                : 'border-surface-700 opacity-75'
-            }`}
-          >
-            <div className="flex items-start gap-4 mb-4">
-              <div className={`w-16 h-16 rounded-lg flex items-center justify-center ${
-                achievement.isUnlocked 
-                  ? 'bg-amber-500/20' 
-                  : 'bg-surface-700'
-              }`}>
-                {achievement.isUnlocked ? (
-                  achievement.icon ? (
-                    <img src={achievement.icon} alt="" className="w-12 h-12" />
-                  ) : (
-                    getCategoryIcon(achievement.category, achievement.itemType)
-                  )
-                ) : (
-                  <Lock className="h-8 w-8 text-surface-500" />
-                )}
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className={`font-semibold ${
-                    achievement.isUnlocked ? 'text-surface-50' : 'text-surface-400'
+        {/* Achievements Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredAchievements.map((achievement, index) => {
+            const rarityInfo = getRarityInfo(achievement.rarity)
+            
+            return (
+              <div 
+                key={achievement.id}
+                style={{ 
+                  animationDelay: `${index * 0.1}s`,
+                  animation: 'fadeInUp 0.6s ease-out forwards'
+                }}
+                className={`group bg-surface-800/60 backdrop-blur-sm border rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl opacity-0 ${
+                  achievement.isUnlocked 
+                    ? 'border-purple-500/30 hover:border-purple-400/50 hover:shadow-purple-500/20' 
+                    : 'border-surface-700/50 opacity-75 hover:border-surface-600'
+                }`}
+              >
+                {/* Achievement Header */}
+                <div className="flex items-start gap-4 mb-4">
+                  <div className={`relative w-16 h-16 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                    achievement.isUnlocked 
+                      ? `bg-gradient-to-br ${rarityInfo.color} shadow-lg` 
+                      : 'bg-surface-700 group-hover:bg-surface-600'
                   }`}>
-                    {achievement.name}
-                  </h3>
-                  {achievement.rarity && (
-                    <Badge className={getRarityColor(achievement.rarity)}>
-                      {achievement.rarity}
-                    </Badge>
-                  )}
+                    {achievement.isUnlocked ? (
+                      achievement.icon ? (
+                        <img src={achievement.icon} alt="" className="w-12 h-12 rounded-lg" />
+                      ) : (
+                        getCategoryIcon(achievement.category, achievement.itemType)
+                      )
+                    ) : (
+                      <Lock className="h-6 w-6 text-surface-500" />
+                    )}
+                    
+                    {/* Sparkle effect for unlocked achievements */}
+                    {achievement.isUnlocked && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                        <Sparkles className="w-2 h-2 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className={`font-bold text-lg truncate ${
+                        achievement.isUnlocked ? 'text-white' : 'text-surface-400'
+                      }`}>
+                        {achievement.name}
+                      </h3>
+                      {achievement.rarity && (
+                        <Badge className={`${rarityInfo.bg} ${rarityInfo.border} text-xs`}>
+                          <span className={`text-transparent bg-clip-text bg-gradient-to-r ${rarityInfo.color}`}>
+                            {achievement.rarity}
+                          </span>
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    <p className={`text-sm leading-relaxed ${
+                      achievement.isUnlocked ? 'text-surface-300' : 'text-surface-500'
+                    }`}>
+                      {achievement.description}
+                    </p>
+                  </div>
                 </div>
-                
-                <p className={`text-sm ${
-                  achievement.isUnlocked ? 'text-surface-300' : 'text-surface-500'
-                }`}>
-                  {achievement.description}
-                </p>
 
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="outline" className="text-xs">
+                {/* Achievement Meta */}
+                <div className="flex items-center gap-3 mb-4">
+                  <Badge variant="outline" className="text-xs border-purple-500/30 text-purple-400">
                     {achievement.itemType}
                   </Badge>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs border-blue-500/30 text-blue-400">
                     {achievement.category}
                   </Badge>
                 </div>
-              </div>
-            </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 text-amber-500" />
-                  <span className="text-sm text-surface-300">{achievement.points}</span>
-                </div>
-                
+                {/* Progress Section */}
                 {achievement.maxProgress > 1 && (
-                  <div className="flex items-center gap-1">
-                    <Target className="h-4 w-4 text-primary-500" />
-                    <span className="text-sm text-surface-300">
-                      {achievement.currentProgress}/{achievement.maxProgress}
-                    </span>
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-surface-400">Progreso</span>
+                      <span className="text-sm font-semibold text-purple-400">
+                        {achievement.currentProgress}/{achievement.maxProgress}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={(achievement.currentProgress / achievement.maxProgress) * 100} 
+                      className="h-2 bg-surface-700"
+                    />
                   </div>
                 )}
-              </div>
-              
-              {achievement.isUnlocked && achievement.userProgress?.completedAt && (
-                <div className="text-xs text-surface-400">
-                  {formatDate(achievement.userProgress.completedAt)}
-                </div>
-              )}
-            </div>
 
-            {achievement.maxProgress > 1 && (
-              <div className="mt-3">
-                <Progress 
-                  value={(achievement.currentProgress / achievement.maxProgress) * 100} 
-                  className="h-2"
-                />
+                {/* Footer */}
+                <div className="flex items-center justify-between pt-4 border-t border-surface-700/50">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <Star className="h-4 w-4 text-yellow-500" />
+                      <span className="text-sm font-semibold text-yellow-400">{achievement.points}</span>
+                    </div>
+                  </div>
+                  
+                  {achievement.isUnlocked && achievement.userProgress?.completedAt && (
+                    <div className="flex items-center gap-1 text-xs text-surface-400">
+                      <Clock className="h-3 w-3" />
+                      {formatDate(achievement.userProgress.completedAt)}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
+            )
+          })}
+        </div>
+
+        {/* Empty State */}
+        {filteredAchievements.length === 0 && (
+          <div className="text-center py-20">
+            <div className="relative inline-block mb-8">
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 rounded-2xl flex items-center justify-center border border-purple-500/20">
+                <Trophy className="h-12 w-12 text-purple-400" />
+              </div>
+              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-gray-500 to-gray-600 rounded-full flex items-center justify-center">
+                <Search className="w-3 h-3 text-white" />
+              </div>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-4">
+              No se encontraron logros
+            </h3>
+            <p className="text-surface-400 max-w-md mx-auto">
+              {searchTerm 
+                ? "Intenta con términos de búsqueda diferentes o cambia los filtros." 
+                : "No hay logros disponibles para este filtro."}
+            </p>
           </div>
-        ))}
+        )}
       </div>
 
-      {filteredAchievements.length === 0 && (
-        <div className="text-center py-12">
-          <Trophy className="h-16 w-16 text-surface-500 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-surface-50 mb-2">No se encontraron logros</h3>
-          <p className="text-surface-400">
-            {searchTerm 
-              ? "Intenta con términos de búsqueda diferentes" 
-              : "No hay logros disponibles para este filtro"}
-          </p>
-        </div>
-      )}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   )
 }

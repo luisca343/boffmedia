@@ -1,312 +1,390 @@
-"use client"
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Award, Calendar, Medal, Trophy, Users, ArrowRight, Clock, Star } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { useGetEvents } from "@/hooks/events/useGetEvents"
-import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
-import { InternalLink } from "@/components/nav/Link"
-import { LeaderboardEntry } from "@/types/events"
-import { useTranslations } from "next-intl"
-import { FloatingSection } from "../layout/FloatingSection"
+import { getTranslations } from "next-intl/server";
+import { Calendar, MapPin, Users, Trophy, Clock, Star, Zap, Gift, Server, Calendar as CalendarIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { InternalLink } from "@/components/nav/Link";
+import { SectionSeparator } from "../ui/SectionSeparator";
+import { Event } from "@/generated/api/models/Event";
 
-export function EventsSection() {
-  const t = useTranslations("boffmedia.eventsSection");
-  const { events, error, isLoading, refetch } = useGetEvents()
-  const { leaderboards, error: leaderboardError, isLoading: leaderboardLoading } = useGetLeaderboards()
-  
-  if (isLoading) return (
-    <section className="relative py-24 bg-gradient-to-br from-surface-950 via-purple-950/20 to-surface-950 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-cyan-500/5"></div>
-      <div className="container mx-auto px-4 text-center relative z-10">
-        <div className="flex justify-center mb-6">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-r-2 border-transparent bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></div>
-            <div className="absolute top-2 left-2 animate-spin rounded-full h-12 w-12 border-t-2 border-l-2 border-cyan-400"></div>
-          </div>
-        </div>
-        <p className="text-xl text-surface-300 font-medium">{t("loading")}</p>
-      </div>
-    </section>
-  )
-  
-  if (error) return (
-    <section className="relative py-24 bg-gradient-to-br from-surface-950 via-red-950/20 to-surface-950 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-red-500/5 via-orange-500/5 to-yellow-500/5"></div>
-      <div className="container mx-auto px-4 text-center relative z-10">
-        <div className="mb-6">
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-red-500/20 rounded-full blur-2xl"></div>
-            <div className="relative bg-red-500/10 backdrop-blur-sm border border-red-500/20 rounded-full p-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-400">
-                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-                <path d="M12 9v4"></path>
-                <path d="M12 17h.01"></path>
-              </svg>
-            </div>
-          </div>
-        </div>
-        <p className="text-xl text-surface-300 mb-6">{t("errorLoading")}: {error}</p>
-        <Button 
-          onClick={refetch} 
-          className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white px-8 py-3 rounded-full font-semibold shadow-xl transition-all duration-200 hover:scale-105"
-        >
-          {t("retry")}
-        </Button>
-      </div>
-    </section>
-  )
+export async function EventsSection() {
+  const t = await getTranslations("boffmedia");
 
-  // Filter for upcoming events
-  const upcomingEvents = events
-    //.filter(event => new Date(event.endDate) >= new Date())
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-    .slice(0, 5)
+  // Mock events data - replace with actual API call
+  const events: Event[] = [
+    {
+      id: 1,
+      title: 'Torneo de Batalla Pokémon',
+      description: 'Enfréntate a los mejores entrenadores en batallas épicas y gana premios exclusivos.',
+      gameId: 1,
+      gameName: 'Pixelmon',
+      icon: '/img/tournament-icon.png',
+      banner: '/img/tournament-banner.jpg',
+      startDate: '2024-08-15T18:00:00Z',
+      endDate: '2024-08-15T22:00:00Z',
+      status: Event.status.UPCOMING,
+      visibility: Event.visibility.PUBLIC,
+      type: Event.type.EVENT,
+      createdAt: '2024-08-01T00:00:00Z',
+      updatedAt: '2024-08-01T00:00:00Z'
+    },
+    {
+      id: 2,
+      title: 'Construcción Comunitaria',
+      description: 'Únete a la comunidad para construir una nueva ciudad en el servidor.',
+      gameId: 2,
+      gameName: 'Minecraft',
+      icon: '/img/building-icon.png',
+      startDate: '2024-08-10T00:00:00Z',
+      endDate: '2024-08-20T23:59:59Z',
+      status: Event.status.ACTIVE,
+      visibility: Event.visibility.PUBLIC,
+      type: Event.type.SERVER,
+      createdAt: '2024-08-01T00:00:00Z',
+      updatedAt: '2024-08-01T00:00:00Z'
+    },
+    {
+      id: 3,
+      title: 'Caza del Tesoro Mensual',
+      description: 'Explora el mundo y encuentra pistas para obtener recompensas especiales.',
+      gameId: 1,
+      gameName: 'Pixelmon',
+      icon: '/img/treasure-icon.png',
+      startDate: '2024-08-18T16:00:00Z',
+      status: Event.status.UPCOMING,
+      visibility: Event.visibility.PUBLIC,
+      type: Event.type.EVENT,
+      createdAt: '2024-08-01T00:00:00Z',
+      updatedAt: '2024-08-01T00:00:00Z'
+    }
+  ];
 
-  // Get top players from the global leaderboards
-  const topPlayers = leaderboards && Array.isArray(leaderboards)
-    ? [...leaderboards].sort((a: any, b: any) => b.totalPoints - a.totalPoints).slice(0, 3) as any[]
-    : []
+  const featuredEvent = events.find(event => event.status === Event.status.ACTIVE) || events[0];
+  const upcomingEvents = events.filter(event => event.status === Event.status.UPCOMING).slice(0, 3);
+  const activeEvents = events.filter(event => event.status === Event.status.ACTIVE);
+
+  const getEventTypeIcon = (type: Event.type) => {
+    switch (type) {
+      case Event.type.EVENT: return Trophy;
+      case Event.type.SERVER: return Server;
+      default: return Calendar;
+    }
+  };
+
+  const getEventTypeColor = (type: Event.type) => {
+    switch (type) {
+      case Event.type.EVENT: return 'from-accent-500 to-accent-600';
+      case Event.type.SERVER: return 'from-secondary-500 to-secondary-600';
+      default: return 'from-surface-500 to-surface-600';
+    }
+  };
+
+  const getStatusColor = (status: Event.status) => {
+    switch (status) {
+      case Event.status.ACTIVE: return 'from-success-500 to-success-600';
+      case Event.status.UPCOMING: return 'from-secondary-500 to-secondary-600';
+      case Event.status.COMPLETED: return 'from-surface-500 to-surface-600';
+      default: return 'from-surface-500 to-surface-600';
+    }
+  };
+
+  const getStatusText = (status: Event.status) => {
+    switch (status) {
+      case Event.status.ACTIVE: return 'EN VIVO';
+      case Event.status.UPCOMING: return 'PRÓXIMAMENTE';
+      case Event.status.COMPLETED: return 'FINALIZADO';
+      default: return 'DESCONOCIDO';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const getTimeUntilEvent = (dateString: string) => {
+    const now = new Date().getTime();
+    const eventTime = new Date(dateString).getTime();
+    const difference = eventTime - now;
+
+    if (difference < 0) return 'En vivo';
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  };
 
   return (
-    <section className="relative py-24 bg-gradient-to-b from-surface-950 via-purple-950/10 to-surface-950 overflow-hidden">
-      {/* Background Elements */}
+    <section className="py-20 bg-gradient-to-b from-surface-950 via-purple-900/30 to-surface-800 relative overflow-hidden">
+      {/* Background Effects */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-accent-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-info-500/5 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
-        {/* Header */}
-        <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-4 mb-8">
-            <div className="h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent flex-1 max-w-32"></div>
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur-xl opacity-60 group-hover:opacity-80 transition-opacity duration-300"></div>
-              <div className="relative bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-500/30 rounded-2xl p-4">
-                <Calendar className="h-10 w-10 text-blue-400" />
-              </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <div className="inline-block relative">
+            <h2 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-highlight-400 to-info-400 mb-4">
+              Eventos Activos
+            </h2>
+            <div className="h-1 w-32 bg-gradient-to-r from-accent-500 to-highlight-400 mx-auto rounded-full"></div>
+            {/* Floating icons around title */}
+            <div className="absolute -top-6 -left-12 w-8 h-8 bg-gradient-to-br from-accent-500 to-highlight-600 rounded-full flex items-center justify-center animate-bounce">
+              <Trophy className="w-4 h-4 text-white" />
             </div>
-            <div className="h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent flex-1 max-w-32"></div>
+            <div className="absolute -top-6 -right-12 w-8 h-8 bg-gradient-to-br from-secondary-500 to-info-600 rounded-full flex items-center justify-center animate-bounce" style={{animationDelay: '0.5s'}}>
+              <Star className="w-4 h-4 text-white" />
+            </div>
           </div>
-          
-          <h2 className="text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 leading-tight">
-            {t("upcomingEvents")}
-          </h2>
-          <p className="text-2xl text-surface-300 max-w-3xl mx-auto leading-relaxed">
-            {t("participateDescription")}
+          <p className="text-xl text-surface-300 mt-6 max-w-3xl mx-auto">
+            Únete a eventos emocionantes, compite con otros jugadores y gana recompensas exclusivas en nuestros servidores.
           </p>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 mb-16">
-          {/* Events Card */}
-          <div className="group relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-            <div className="relative bg-gradient-to-br from-surface-800/80 to-surface-900/80 backdrop-blur-lg border border-surface-700/50 rounded-3xl p-8 hover:border-blue-500/30 transition-all duration-500 shadow-2xl">
-              {/* Card Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Trophy className="relative h-8 w-8 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
+        {/* Featured Event - Hero Style */}
+        {featuredEvent && (
+          <div className="mb-16 relative">
+            <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+                {/* Event Info */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${getEventTypeColor(featuredEvent.type)} rounded-xl flex items-center justify-center`}>
+                      {(() => {
+                        const Icon = getEventTypeIcon(featuredEvent.type);
+                        return <Icon className="w-6 h-6 text-white" />;
+                      })()}
+                    </div>
+                    <div>
+                      <span className="text-sm font-medium text-purple-400 uppercase tracking-wide">Evento Destacado</span>
+                      <div className={`inline-block px-3 py-1 bg-gradient-to-r ${getStatusColor(featuredEvent.status)} text-white text-xs font-bold rounded-full ml-3`}>
+                        {getStatusText(featuredEvent.status)}
+                      </div>
+                    </div>
                   </div>
-                  <span className="text-xl font-bold text-blue-400">{t("activeEvents")}</span>
-                </div>
-                <h3 className="text-3xl font-bold text-surface-50 mb-3 group-hover:text-blue-300 transition-colors duration-300">
-                  {t("eventCalendar")}
-                </h3>
-                <p className="text-lg text-surface-300 leading-relaxed">
-                  {t("dontMissEvents")}
-                </p>
-              </div>
 
-              {/* Events List */}
-              {upcomingEvents.length > 0 ? (
-                <div className="space-y-4 mb-8">
-                  {upcomingEvents.map((event, index) => {
-                    const startDate = new Date(event.startDate);
-                    const endDate = new Date(event.endDate!);
-                    const formattedStartDate = startDate.toLocaleDateString(t("locale"), {day: '2-digit', month: 'short'});
-                    const formattedEndDate = endDate.toLocaleDateString(t("locale"), {day: '2-digit', month: 'short'});
+                  <h3 className="text-3xl font-bold text-white">{featuredEvent.title}</h3>
+                  <p className="text-lg text-surface-300 leading-relaxed">{featuredEvent.description}</p>
 
-                    return (
-                      <div
-                        key={event.id}
-                        className="group/item relative overflow-hidden rounded-2xl bg-gradient-to-r from-surface-700/30 to-surface-800/30 backdrop-blur-sm border border-surface-600/30 hover:border-blue-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"></div>
-                        <div className="relative p-6 flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="relative">
-                              {event.icon ? (
-                                <div className="relative">
-                                  <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-md"></div>
-                                  <img 
-                                    src={event.icon} 
-                                    alt={event.title} 
-                                    className="relative h-14 w-14 rounded-full object-cover border-2 border-blue-400/40 group-hover/item:border-blue-400/60 transition-colors duration-300" 
-                                  />
-                                </div>
-                              ) : (
-                                <div className="relative">
-                                  <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-md"></div>
-                                  <Calendar className="relative h-10 w-10 text-blue-400 p-2 bg-blue-500/10 rounded-xl"/>
-                                </div>
-                              )}
-                              <div className="absolute -top-1 -right-1 h-4 w-4 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full animate-pulse shadow-lg"></div>
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-xl text-surface-50 group-hover/item:text-blue-300 transition-colors duration-300">
-                                {event.title}
-                              </h4>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Clock className="h-4 w-4 text-surface-400" />
-                                <p className="text-surface-300 font-medium">
-                                  {formattedStartDate} {event.endDate !== event.startDate && `- ${formattedEndDate}`}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <Badge className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 text-blue-300 border-blue-500/30 font-semibold px-3 py-1">
-                            {event.type === 'event' ? t("eventType") : t("serverType")}
-                          </Badge>
+                  {/* Event Details Grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 text-surface-300">
+                      <Clock className="w-5 h-5 text-accent-400" />
+                      <div>
+                        <div className="text-sm text-surface-400">Inicia</div>
+                        <div className="font-semibold">{formatDate(featuredEvent.startDate)}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-surface-300">
+                      <MapPin className="w-5 h-5 text-accent-400" />
+                      <div>
+                        <div className="text-sm text-surface-400">Juego</div>
+                        <div className="font-semibold">{featuredEvent.gameName}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 text-surface-300">
+                      <CalendarIcon className="w-5 h-5 text-accent-400" />
+                      <div>
+                        <div className="text-sm text-surface-400">Tipo</div>
+                        <div className="font-semibold">{featuredEvent.type === Event.type.EVENT ? 'Evento' : 'Servidor'}</div>
+                      </div>
+                    </div>
+                    {featuredEvent.endDate && (
+                      <div className="flex items-center gap-3 text-surface-300">
+                        <Clock className="w-5 h-5 text-accent-400" />
+                        <div>
+                          <div className="text-sm text-surface-400">Finaliza</div>
+                          <div className="font-semibold">{formatDate(featuredEvent.endDate)}</div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12 mb-8">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-surface-500/10 rounded-full blur-2xl"></div>
-                    <Calendar className="relative h-16 w-16 mx-auto text-surface-500 opacity-50" />
+                    )}
                   </div>
-                  <p className="text-xl text-surface-400">{t("noUpcomingEvents")}</p>
+
+                  {/* Countdown Timer */}
+                  {featuredEvent.status === Event.status.UPCOMING && (
+                    <div className="bg-surface-700/50 rounded-xl p-4 border border-accent-500/20">
+                      <div className="text-center">
+                        <div className="text-sm text-surface-400 mb-2">Tiempo restante</div>
+                        <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-highlight-400">
+                          {getTimeUntilEvent(featuredEvent.startDate)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-4">
+                    <Button className="bg-gradient-to-r from-accent-600 to-highlight-600 hover:from-accent-700 hover:to-highlight-700 flex-1">
+                      Unirse al Evento
+                    </Button>
+                    <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
+                      Más Info
+                    </Button>
+                  </div>
                 </div>
-              )}
-              
-              {/* CTA Button */}
-              <Button 
-                className="w-full bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-600 hover:from-blue-600 hover:to-cyan-600 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-blue-500/30 group/btn"
-                asChild
-              >
-                <InternalLink href="/events" className="flex items-center justify-center gap-3">
-                  <span>{t("viewAllEvents")}</span>
-                  <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover/btn:translate-x-1" />
-                </InternalLink>
-              </Button>
+
+                {/* Event Visual */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent-500/20 to-highlight-500/20 rounded-2xl blur-xl"></div>
+                  <div className="relative bg-gradient-to-br from-accent-600/10 to-highlight-600/10 rounded-2xl p-8 border border-accent-500/20 h-full flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-highlight-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                        <Trophy className="w-12 h-12 text-white" />
+                      </div>
+                      <h4 className="text-xl font-bold text-white mb-2">¡Evento Épico!</h4>
+                      <p className="text-surface-300">Prepárate para la aventura</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          
-          {/* Leaderboard Card */}
-          <div className="group relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
-            <div className="relative bg-gradient-to-br from-surface-800/80 to-surface-900/80 backdrop-blur-lg border border-surface-700/50 rounded-3xl p-8 hover:border-purple-500/30 transition-all duration-500 shadow-2xl">
-              {/* Card Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-purple-500/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Users className="relative h-8 w-8 text-purple-400 group-hover:scale-110 transition-transform duration-300" />
-                  </div>
-                  <span className="text-xl font-bold text-purple-400">{t("community")}</span>
-                </div>
-                <h3 className="text-3xl font-bold text-surface-50 mb-3 group-hover:text-purple-300 transition-colors duration-300">
-                  {t("playerRanking")}
-                </h3>
-                <p className="text-lg text-surface-300 leading-relaxed">
-                  {t("bestPlayers")}
-                </p>
-              </div>
+        )}
 
-              {/* Leaderboard Content */}
-              {leaderboardLoading ? (
-                <div className="flex justify-center py-12 mb-8">
-                  <div className="relative">
-                    <div className="animate-spin h-12 w-12 border-2 border-purple-500/30 rounded-full border-t-purple-500"></div>
-                    <div className="absolute top-2 left-2 animate-spin h-8 w-8 border-2 border-pink-400/50 rounded-full border-t-pink-400"></div>
+        <SectionSeparator variant="purple" />
+
+        {/* Active Events */}
+        {activeEvents.length > 0 && (
+          <div className="mb-16">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-3 h-3 bg-success-500 rounded-full animate-pulse"></div>
+              <h3 className="text-2xl font-bold text-white">Eventos Activos</h3>
+              <div className="flex-1 h-px bg-gradient-to-r from-success-500/50 to-transparent"></div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {activeEvents.map((event) => (
+                <div key={event.id} className="bg-surface-800/60 backdrop-blur-sm border border-success-500/20 rounded-2xl p-6 hover:scale-105 transition-all duration-300 group">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-10 h-10 bg-gradient-to-br ${getEventTypeColor(event.type)} rounded-lg flex items-center justify-center`}>
+                      {(() => {
+                        const Icon = getEventTypeIcon(event.type);
+                        return <Icon className="w-5 h-5 text-white" />;
+                      })()}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
+                      <span className="text-success-400 text-sm font-medium">ACTIVO</span>
+                    </div>
                   </div>
-                </div>
-              ) : leaderboardError ? (
-                <div className="text-center py-12 mb-8">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-red-500/10 rounded-full blur-2xl"></div>
-                    <Trophy className="relative h-16 w-16 mx-auto text-red-400 opacity-50" />
+                  
+                  <h4 className="text-xl font-bold text-white mb-2 group-hover:text-success-400 transition-colors">
+                    {event.title}
+                  </h4>
+                  <p className="text-surface-300 text-sm mb-4 line-clamp-2">{event.description}</p>
+                  
+                  <div className="space-y-2 text-sm text-surface-400">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      <span>{event.gameName}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="w-4 h-4" />
+                      <span>{event.type === Event.type.EVENT ? 'Evento' : 'Servidor'}</span>
+                    </div>
                   </div>
-                  <p className="text-xl text-surface-400">{t("errorLoadingRanking")}</p>
+                  
+                  <Button className="w-full mt-4 bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700">
+                    <Zap className="w-4 h-4 mr-2" />
+                    Unirse Ahora
+                  </Button>
                 </div>
-              ) : topPlayers.length > 0 ? (
-                <div className="space-y-4 mb-8 roboto-mono">
-                  {topPlayers.map((player, index) => {
-                    const rankColors = ['from-yellow-400 to-orange-400', 'from-gray-300 to-gray-400', 'from-orange-400 to-yellow-600'];
-                    const bgColors = ['from-yellow-500/10 to-orange-500/10', 'from-gray-400/10 to-gray-500/10', 'from-orange-400/10 to-yellow-500/10'];
-                    
-                    return (
-                      <div
-                        key={player.userId || index}
-                        className="group/player relative overflow-hidden rounded-2xl bg-gradient-to-r from-surface-700/30 to-surface-800/30 backdrop-blur-sm border border-surface-600/30 hover:border-purple-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
-                      >
-                        <div className={`absolute inset-0 bg-gradient-to-r ${bgColors[index] || 'from-purple-500/5 to-transparent'} opacity-0 group-hover/player:opacity-100 transition-opacity duration-300`}></div>
-                        <div className="relative p-6 flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="relative">
-                              <div className={`absolute inset-0 bg-gradient-to-r ${rankColors[index] || 'from-purple-400 to-pink-400'} rounded-xl blur-lg opacity-60`}></div>
-                              <div className={`relative bg-gradient-to-r ${rankColors[index] || 'from-purple-400 to-pink-400'} rounded-xl p-3 font-black text-2xl text-surface-900 min-w-[3rem] text-center`}>
-                                #{index + 1}
-                              </div>
-                            </div>
-                            <div>
-                              <h4 className="font-bold text-xl text-surface-50 group-hover/player:text-purple-300 transition-colors duration-300">
-                                {player.nickname || t("playerPlaceholder", {id: player.userId})}
-                              </h4>
-                              <p className="text-surface-300 font-semibold text-lg">
-                                {player.totalPoints?.toLocaleString() || 0} {t("points")}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-6">
-                            <div className="flex items-center gap-2 bg-yellow-500/10 rounded-xl px-3 py-2 border border-yellow-500/20">
-                              <Medal className="h-5 w-5 text-yellow-400" />
-                              <span className="text-lg font-bold text-surface-50">{player.medalCount || 0}</span>
-                            </div>
-                            <div className="flex items-center gap-2 bg-orange-500/10 rounded-xl px-3 py-2 border border-orange-500/20">
-                              <Award className="h-5 w-5 text-orange-400" />
-                              <span className="text-lg font-bold text-surface-50">{player.achievementCount || 0}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-12 mb-8">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-surface-500/10 rounded-full blur-2xl"></div>
-                    <Trophy className="relative h-16 w-16 mx-auto text-surface-500 opacity-50" />
-                  </div>
-                  <p className="text-xl text-surface-400">{t("noRankingAvailable")}</p>
-                </div>
-              )}
-              
-              {/* CTA Button */}
-              <Button 
-                variant="outline"
-                className="w-full border-2 border-purple-500/40 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400/60 px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-purple-500/30 group/btn"
-                asChild
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Upcoming Events */}
+        <div className="mb-16">
+          <div className="flex items-center gap-3 mb-8">
+            <Clock className="w-6 h-6 text-secondary-400" />
+            <h3 className="text-2xl font-bold text-white">Próximos Eventos</h3>
+            <div className="flex-1 h-px bg-gradient-to-r from-secondary-500/50 to-transparent"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {upcomingEvents.map((event, index) => (
+              <div 
+                key={event.id} 
+                className="bg-surface-800/40 backdrop-blur-sm border border-blue-500/20 rounded-2xl p-6 hover:scale-105 hover:border-blue-400/40 transition-all duration-300 group"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <InternalLink href="/leaderboard" className="flex items-center justify-center gap-3">
-                  <span>{t("viewFullRanking")}</span>
-                  <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover/btn:translate-x-1" />
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-10 h-10 bg-gradient-to-br ${getEventTypeColor(event.type)} rounded-lg flex items-center justify-center`}>
+                    {(() => {
+                      const Icon = getEventTypeIcon(event.type);
+                      return <Icon className="w-5 h-5 text-white" />;
+                    })()}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-xs text-surface-400">Inicia en</div>
+                    <div className="text-sm font-bold text-secondary-400">{getTimeUntilEvent(event.startDate)}</div>
+                  </div>
+                </div>
+                
+                <h4 className="text-xl font-bold text-white mb-2 group-hover:text-secondary-400 transition-colors">
+                  {event.title}
+                </h4>
+                <p className="text-surface-300 text-sm mb-4 line-clamp-2">{event.description}</p>
+                
+                <div className="space-y-2 text-sm text-surface-400 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    <span>{formatDate(event.startDate)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    <span>{event.gameName}</span>
+                  </div>
+                </div>
+                
+                <Button variant="outline" className="w-full border-secondary-500/30 text-secondary-400 hover:bg-secondary-500/10">
+                  Recordarme
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-accent-800/20 via-info-800/20 to-secondary-800/20 backdrop-blur-sm border border-accent-500/30 rounded-3xl p-8">
+            <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
+              ¿Quieres ver más eventos?
+            </h3>
+            <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
+              Explora todos nuestros eventos pasados, presentes y futuros. Encuentra el evento perfecto para ti.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button className="bg-gradient-to-r from-accent-600 to-info-600 hover:from-accent-700 hover:to-info-700">
+                <InternalLink href="/eventos" className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5" />
+                  Ver Todos los Eventos
+                </InternalLink>
+              </Button>
+              <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
+                <InternalLink href="/eventos/crear" className="flex items-center gap-2">
+                  <Star className="w-5 h-5" />
+                  Organizar Evento
                 </InternalLink>
               </Button>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Bottom decoration */}
+      <div className="absolute bottom-0 left-0 w-full">
+        <div className="h-1 bg-gradient-to-r from-transparent via-accent-500 to-transparent opacity-50"></div>
+      </div>
     </section>
-  )
+  );
 }

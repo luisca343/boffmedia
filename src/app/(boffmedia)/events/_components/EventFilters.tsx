@@ -1,6 +1,7 @@
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Filter, Gamepad2 } from "lucide-react";
 import type { Game } from "@/types/events";
 
 interface EventFiltersProps {
@@ -14,28 +15,52 @@ export function EventFilters({ filter, onFilterChange, eventsCount }: EventFilte
   
   return (
     <div className="flex items-center gap-4">
-      <div className="flex-1">
+      {/* Game Filter */}
+      <div className="relative">
         <Select 
           value={filter || 'all'} 
           onValueChange={(value) => onFilterChange(value === 'all' ? null : value)}
         >
-          <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50 w-full md:w-[180px]">
-            <SelectValue placeholder="Todos los juegos" />
+          <SelectTrigger className="w-[200px] h-11 bg-surface-700/50 border-surface-600 text-surface-50 hover:bg-surface-600/50 transition-colors">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-accent-400" />
+              <SelectValue placeholder="Filtrar por juego" />
+            </div>
           </SelectTrigger>
-          <SelectContent className="bg-surface-800 border-surface-700">
-            <SelectItem value="all">Todos los juegos</SelectItem>
+          <SelectContent className="bg-surface-800 border-surface-700 backdrop-blur-sm">
+            <SelectItem 
+              value="all" 
+              className="text-surface-50 hover:bg-surface-700 focus:bg-surface-700"
+            >
+              <div className="flex items-center gap-2">
+                <Gamepad2 className="h-4 w-4 text-accent-400" />
+                Todos los juegos
+              </div>
+            </SelectItem>
             {!isLoading && games?.map((game: any) => (
-              <SelectItem key={game.id} value={game.id.toString()}>
-                {game.title}
+              <SelectItem 
+                key={game.id} 
+                value={game.id.toString()}
+                className="text-surface-50 hover:bg-surface-700 focus:bg-surface-700"
+              >
+                <div className="flex items-center gap-2">
+                  {game.icon ? (
+                    <img src={game.icon} alt="" className="w-4 h-4 rounded" />
+                  ) : (
+                    <div className="w-4 h-4 bg-surface-600 rounded"></div>
+                  )}
+                  {game.title}
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       
-      <div className="hidden md:flex items-center">
-        <span className="text-surface-300 text-sm mr-2">Eventos:</span>
-        <Badge className="bg-primary-500/20 text-primary-400 border border-primary-500/30">
+      {/* Events Count Badge */}
+      <div className="flex items-center gap-2">
+        <span className="text-surface-400 text-sm font-medium">Eventos:</span>
+        <Badge className="bg-gradient-to-r from-accent-500/20 to-info-500/20 text-accent-400 border border-accent-500/30 font-bold">
           {eventsCount}
         </Badge>
       </div>

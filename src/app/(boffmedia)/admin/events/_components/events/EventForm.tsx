@@ -12,7 +12,7 @@ import type { Event } from "@/types/events"
 
 const eventSchema = z.object({
   id: z.number().optional(),
-  parentId: z.number().default(0),
+  parentId: z.number().optional(),
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
   icon: z.string().optional(),
@@ -58,7 +58,7 @@ export function EventForm({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       ...defaultValues,
-      parentId: parentEvent?.id || (defaultValues?.parentId ?? 0),
+      parentId: parentEvent?.id,
       type: defaultValues?.type || (parentEvent ? "event" : "server"),
     },
   })

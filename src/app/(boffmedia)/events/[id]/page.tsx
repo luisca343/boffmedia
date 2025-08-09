@@ -1,269 +1,530 @@
 "use client"
 
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useParams } from "next/navigation"
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { 
-  Calendar, ArrowLeft, Clock, Users, MapPin, 
-  Calendar as CalendarIcon, Share2, AlertCircle 
-} from "lucide-react";
-import { EventsLoading } from "../_components/EventsLoading";
-import { EventsError } from "../_components/EventsError";
-import { Badge } from "@/components/ui/badge";
-import { useGetGames } from "@/hooks/events/useGetGames";
-import Link from "next/link";
-import { Event, Game } from "@/types/events";
-import { EventsService } from "@/services/api/boffmedia/eventsService";
-import { EventRegistrationButton } from "../_components/EventRegistrationButton";
-import { Markdown } from "@/components/Markdown";
-import { getEventStatus } from "@/lib/events";
-import { AchievementsSummary } from "./_components/AchievementsSummary";
+  ArrowLeft, Calendar, Clock, Users, MapPin, Trophy, Star, 
+  Award, Target, Share2, Bookmark, ChevronRight, Zap, 
+  Server, Crown, Medal, Sparkles, ExternalLink, User,
+  GamepadIcon as Gamepad2
+} from "lucide-react"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { useBoffSession } from "@/services/useBoffSession"
+import { EventRegistrationButton } from "../_components/EventRegistrationButton"
+import Link from "next/link"
+import { Event } from "@/generated/api/models/Event"
 
-// Extend the Event interface to include child events
-interface EventWithChildren extends Event {
-  childEvents?: Event[];
-}
-
-export default function EventPage() {
-  const params = useParams();
-  const router = useRouter();
-  const eventId = params.id as string;
-  const [event, setEvent] = useState<EventWithChildren | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { games } = useGetGames();
+export default function EventSummaryPage() {
+  const params = useParams()
+  const eventId = parseInt(params.id as string)
+  const { session } = useBoffSession()
+  
+  const [event, setEvent] = useState<any>(null)
+  const [participants, setParticipants] = useState<any[]>([])
+  const [achievements, setAchievements] = useState<any[]>([])
+  const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("overview")
 
   useEffect(() => {
-    async function fetchEvent() {
+    async function fetchEventData() {
       try {
-        setIsLoading(true);
-        const response = await EventsService.getEvent(parseInt(eventId));
-        console.log("Fetched event:", response.data);
-        setEvent(response.data as EventWithChildren);
-        setError(null);
-      } catch (err) {
-        setError("No se pudo cargar el evento. Inténtalo de nuevo más tarde.");
-        console.error("Error fetching event:", err);
+        setIsLoading(true)
+        
+        const [eventResponse, participantsResponse, achievementsResponse] = await Promise.all([
+          EventsService.getEvent(eventId),
+          EventsService.getEventParticipants(eventId),
+          EventsService.getEventAchievements(eventId)
+        ])
+        
+        setEvent(eventResponse.data)
+        setParticipants(participantsResponse.data || [])
+        setAchievements(achievementsResponse.data || [])
+        
+        // Mock leaderboard data - replace with actual API call when available
+        const mockLeaderboard = participantsResponse.data?.slice(0, 10).map((participant: any, index: number) => ({
+          ...participant,
+          position: index + 1,
+          points: Math.floor(Math.random() * 1000) + 100,
+          achievementsUnlocked: Math.floor(Math.random() * achievementsResponse.data?.length || 5)
+        })) || []
+        
+        setLeaderboard(mockLeaderboard)
+        
+      } catch (error) {
+        console.error("Error fetching event data:", error)
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
     }
 
-    if (eventId) {
-      fetchEvent();
+    if (eventId && !isNaN(eventId)) {
+      fetchEventData()
     }
-  }, [eventId]);
+  }, [eventId])
 
-  const status = event ? getEventStatus(event.startDate, event.endDate) : { label: "Desconocido", class: "" };
-  
-  const game = event ? games?.find((g: any) => g.id === event.gameId) : null;
-
-  const formatDate = (dateString?: string | null) => {
-    if (!dateString) return "No definida";
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
-      year: 'numeric', 
-      month: 'long', 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    });
-  };
+    })
+  }
 
-  const hasChildEvents = event?.childEvents && event.childEvents.length > 0;
+  const getEventStatus = (startDate: string, endDate?: string) => {
+    const now = new Date()
+    const start = new Date(startDate)
+    const end = endDate ? new Date(endDate) : null
 
-  if (isLoading) return <EventsLoading />;
-  if (error || !event) return <EventsError error={error || "Evento no encontrado"} onRetry={() => router.refresh()} />;
+    if (now < start) {
+      return { label: 'Próximo', color: 'from-blue-500 to-cyan-600', icon: Clock }
+    } else if (end && now > end) {
+      return { label: 'Finalizado', color: 'from-gray-500 to-gray-600', icon: Calendar }
+    } else {
+      return { label: 'En Curso', color: 'from-green-500 to-emerald-600', icon: Zap }
+    }
+  }
+
+  const getEventTypeIcon = (type: string) => {
+    switch (type) {
+      case Event.type.EVENT: return Trophy
+      case Event.type.SERVER: return Server
+      default: return Calendar
+    }
+  }
+
+  const getTimeUntilEvent = (dateString: string) => {
+    const now = new Date().getTime()
+    const eventTime = new Date(dateString).getTime()
+    const difference = eventTime - now
+
+    if (difference < 0) return null
+
+    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+
+    if (days > 0) return `En ${days} días`
+    if (hours > 0) return `En ${hours} horas`
+    return 'Muy pronto'
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+        <div className="container mx-auto p-6 max-w-7xl">
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="relative">
+              <div className="w-20 h-20 border-4 border-purple-500/20 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-purple-500 rounded-full animate-spin"></div>
+              <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+            </div>
+            
+            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+              Cargando evento...
+            </h2>
+            <p className="mt-2 text-surface-400">Preparando una experiencia épica</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+        <div className="container mx-auto p-6 max-w-7xl">
+          <div className="text-center py-20">
+            <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
+            <Link href="/events">
+              <Button className="bg-gradient-to-r from-purple-600 to-indigo-600">
+                Volver a eventos
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const status = getEventStatus(event.startDate, event.endDate)
+  const timeUntil = getTimeUntilEvent(event.startDate)
+  const TypeIcon = getEventTypeIcon(event.type)
+  const StatusIcon = status.icon
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <Link href="/events" passHref>
-        <Button 
-          variant="ghost" 
-          className="mb-6 text-surface-300 hover:text-surface-50"
-          asChild
-        >
-          <div>
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a eventos
-          </div>
-        </Button>
-      </Link>
-
-      {/* Event Banner */}
-      <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden mb-8">
-        {event.banner ? (
-          <img 
-            src={event.banner} 
-            alt={event.title} 
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-surface-700">
-            <Calendar className="h-24 w-24 text-surface-500" />
-          </div>
-        )}
-        <Badge className={`absolute top-6 right-6 ${status.class} px-3 py-1 text-lg`}>
-          {status.label}
-        </Badge>
+    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      {/* Background Effects */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-indigo-500/5 rounded-full blur-2xl"></div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Event Details */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Header */}
-          <div>
-            <div className="flex items-center gap-4 mb-6">
-              {/* Game Icon */}
-              <div className="relative mt-1">
-                <div className="w-12 h-12 rounded-full bg-surface-700 flex items-center justify-center overflow-hidden border-2 border-surface-600">
-                  {game?.icon ? (
-                    <img src={game.icon} alt={game?.title || "Game"} className="w-full h-full object-cover" />
+      <div className="relative z-10 container mx-auto p-6 max-w-7xl">
+        {/* Navigation */}
+        <div className="mb-8">
+          <Link href="/events">
+            <Button variant="ghost" className="text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-purple-500/30">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Volver a eventos
+            </Button>
+          </Link>
+        </div>
+
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-surface-800/80 via-purple-900/40 to-surface-800/80 backdrop-blur-sm border border-purple-500/20 rounded-3xl overflow-hidden mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
+            {/* Event Info */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                  {event.icon ? (
+                    <img src={event.icon} alt="" className="w-12 h-12 rounded-xl" />
                   ) : (
-                    <div className="w-full h-full bg-surface-600 flex items-center justify-center">
-                      <Calendar className="h-6 w-6 text-surface-400" />
-                    </div>
+                    <TypeIcon className="w-8 h-8 text-white" />
                   )}
                 </div>
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-surface-800 rounded-full px-2 py-0.5 border border-surface-600 text-xs font-medium text-surface-300 whitespace-nowrap">
-                  {game?.title || event.gameName || "Game"}
+                <div>
+                  <Badge className={`bg-gradient-to-r ${status.color} text-white px-4 py-2 text-sm font-bold`}>
+                    <StatusIcon className="w-4 h-4 mr-2" />
+                    {status.label}
+                  </Badge>
+                  {timeUntil && (
+                    <div className="text-blue-400 text-sm mt-1 font-medium">{timeUntil}</div>
+                  )}
                 </div>
               </div>
 
-              {/* Event Icon */}
-              <div className="relative">
-                <div className="w-16 h-16 rounded-lg bg-surface-700 flex items-center justify-center overflow-hidden border-2 border-primary-600/30">
-                  {event.icon ? (
-                    <img src={event.icon} alt={event.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <Calendar className="h-8 w-8 text-primary-400" />
-                  )}
+              <div>
+                <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 mb-4">
+                  {event.title}
+                </h1>
+                <p className="text-lg text-surface-300 leading-relaxed">{event.description}</p>
+              </div>
+
+              {/* Event Details Grid */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-3 text-surface-300">
+                  <Clock className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <div className="text-sm text-surface-400">Inicia</div>
+                    <div className="font-semibold">{formatDate(event.startDate)}</div>
+                  </div>
+                </div>
+                {event.endDate && (
+                  <div className="flex items-center gap-3 text-surface-300">
+                    <Calendar className="w-5 h-5 text-purple-400" />
+                    <div>
+                      <div className="text-sm text-surface-400">Finaliza</div>
+                      <div className="font-semibold">{formatDate(event.endDate)}</div>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-3 text-surface-300">
+                  <Users className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <div className="text-sm text-surface-400">Participantes</div>
+                    <div className="font-semibold">{participants.length}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-surface-300">
+                  <Gamepad2 className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <div className="text-sm text-surface-400">Juego</div>
+                    <div className="font-semibold">{event.gameName || `Juego #${event.gameId}`}</div>
+                  </div>
                 </div>
               </div>
-              
-              <div className="flex-1">
-                <h1 className="text-3xl md:text-4xl font-bold text-surface-50">{event.title}</h1>
-                {event.type === "server" && (
-                  <div className="flex items-center mt-1 text-sm text-surface-300">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    <span className="capitalize">{event.type}</span>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <EventRegistrationButton event={event} />
+                <Button variant="outline" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                  <Share2 className="w-4 h-4 mr-2" />
+                  Compartir
+                </Button>
+                <Button variant="outline" className="border-purple-500/30 text-purple-400 hover:bg-purple-500/10">
+                  <Bookmark className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Event Visual */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl blur-xl"></div>
+              <div className="relative bg-gradient-to-br from-purple-600/10 to-pink-600/10 rounded-2xl p-8 border border-purple-500/20 h-full flex items-center justify-center">
+                {event.banner ? (
+                  <img 
+                    src={event.banner} 
+                    alt={event.title} 
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                ) : (
+                  <div className="text-center">
+                    <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl flex items-center justify-center mb-6 mx-auto">
+                      <TypeIcon className="w-16 h-16 text-white" />
+                    </div>
+                    <h4 className="text-2xl font-bold text-white mb-2">¡Evento Épico!</h4>
+                    <p className="text-surface-300">Prepárate para la aventura</p>
                   </div>
                 )}
               </div>
             </div>
-          
-          {/* Rich Content Section */}
-          {event.description && (
-              <Markdown>{event.description}</Markdown>
-          )}
           </div>
-
-          {/* Child Events Section */}
-          {event.type === "server" && hasChildEvents && (
-            <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
-              <h3 className="text-xl font-semibold text-surface-50 mb-4 flex items-center">
-                <Calendar className="mr-2 h-5 w-5 text-primary-500" />
-                Eventos Relacionados
-              </h3>
-              <div className="space-y-4">
-                <div className="grid gap-4">
-                  {event.childEvents?.map((childEvent) => (
-                    <div key={childEvent.id} className="border border-surface-700 rounded-lg overflow-hidden">
-                      <Link href={`/events/${childEvent.id}`}>
-                        <div className="flex items-center p-4 hover:bg-surface-700/50 transition-colors">
-                          <div className="w-12 h-12 rounded-full bg-surface-700 flex items-center justify-center overflow-hidden mr-4">
-                            {childEvent.icon ? (
-                              <img src={childEvent.icon} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <Calendar className="h-6 w-6 text-surface-500" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-surface-50 font-semibold mb-1">{childEvent.title}</h4>
-                            <div className="flex items-center text-sm text-surface-400">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {formatDate(childEvent.startDate)}
-                            </div>
-                          </div>
-                          <Badge className={`ml-2 ${getEventStatus(childEvent.startDate, childEvent.endDate).class}`}>
-                            {getEventStatus(childEvent.startDate, childEvent.endDate).label}
-                          </Badge>
-                        </div>
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Event Meta Information */}
-        <div className="space-y-6">
-          <div className="bg-surface-800/50 border border-surface-700 rounded-lg p-6">
-            <h3 className="text-xl font-semibold text-surface-50 mb-4">Detalles</h3>
-            
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <CalendarIcon className="h-5 w-5 text-primary-500 mr-3 mt-0.5" />
-                <div>
-                  <span className="block text-surface-50">Fecha de inicio</span>
-                  <span className="text-surface-300">{formatDate(event.startDate)}</span>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <Clock className="h-5 w-5 text-primary-500 mr-3 mt-0.5" />
-                <div>
-                  <span className="block text-surface-50">Fecha de finalización</span>
-                  <span className="text-surface-300">{formatDate(event.endDate)}</span>
-                </div>
-              </div>
-              
-              <div className="flex items-start">
-                <MapPin className="h-5 w-5 text-primary-500 mr-3 mt-0.5" />
-                <div>
-                  <span className="block text-surface-50">Tipo</span>
-                  <span className="text-surface-300 capitalize">{event.type}</span>
-                </div>
-              </div>
+        {/* Tabs Content */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <TabsList className="bg-surface-800/40 backdrop-blur-sm border border-purple-500/20 p-1">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600">
+              <Trophy className="w-4 h-4 mr-2" />
+              Resumen
+            </TabsTrigger>
+            <TabsTrigger value="participants" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600">
+              <Users className="w-4 h-4 mr-2" />
+              Participantes ({participants.length})
+            </TabsTrigger>
+            <TabsTrigger value="achievements" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600">
+              <Award className="w-4 h-4 mr-2" />
+              Logros ({achievements.length})
+            </TabsTrigger>
+            <TabsTrigger value="leaderboard" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-600">
+              <Crown className="w-4 h-4 mr-2" />
+              Clasificación
+            </TabsTrigger>
+          </TabsList>
 
-              {event.parentId > 0 && (
-                <div className="flex items-start">
-                  <Users className="h-5 w-5 text-primary-500 mr-3 mt-0.5" />
-                  <div>
-                    <span className="block text-surface-50">Evento principal</span>
-                    <Link 
-                      href={`/events/${event.parentId}`}
-                      className="text-primary-400 hover:text-primary-300 hover:underline"
-                    >
-                      Ver evento principal
-                    </Link>
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Stats Cards */}
+              <Card className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-400" />
+                    Participantes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                    {participants.length}
                   </div>
-                </div>
-              )}
+                  <p className="text-surface-400 text-sm">Aventureros registrados</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-400" />
+                    Logros
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+                    {achievements.length}
+                  </div>
+                  <p className="text-surface-400 text-sm">Conquistas disponibles</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Target className="w-5 h-5 text-green-400" />
+                    Tipo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-xl font-bold text-green-400">
+                    {event.type === Event.type.EVENT ? 'Evento' : 'Servidor'}
+                  </div>
+                  <p className="text-surface-400 text-sm">Modalidad de juego</p>
+                </CardContent>
+              </Card>
             </div>
-          </div>
 
-          {/* Achievements Summary */}
-          <AchievementsSummary eventId={parseInt(eventId)} />
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Award className="w-5 h-5 text-purple-400" />
+                    Explora los Logros
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-surface-300 mb-4">
+                    Descubre todos los logros disponibles en este evento y sigue tu progreso.
+                  </p>
+                  <Link href={`/events/${eventId}/achievements`}>
+                    <Button className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
+                      Ver Logros
+                      <ChevronRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
 
-          <EventRegistrationButton event={event} />
-          
-          <div className="flex justify-center">
-            <Button 
-              variant="outline" 
-              className="w-full border-surface-600"
-              onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-              }}
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              Compartir Evento
-            </Button>
-          </div>
-        </div>
+              <Card className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Crown className="w-5 h-5 text-yellow-400" />
+                    Tabla de Clasificación
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-surface-300 mb-4">
+                    Compite con otros jugadores y escala posiciones en la clasificación.
+                  </p>
+                  <Button 
+                    onClick={() => setActiveTab('leaderboard')}
+                    className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700"
+                  >
+                    Ver Clasificación
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Participants Tab */}
+          <TabsContent value="participants" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {participants.map((participant, index) => (
+                <Card key={participant.id} className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20 hover:scale-105 transition-transform">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="w-12 h-12 border-2 border-purple-500/30">
+                        <AvatarImage src={participant.avatar} />
+                        <AvatarFallback className="bg-purple-600 text-white">
+                          {participant.nickname?.charAt(0)?.toUpperCase() || <User className="w-6 h-6" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-white truncate">
+                          {participant.nickname || 'Jugador Anónimo'}
+                        </h3>
+                        <p className="text-surface-400 text-sm">
+                          Participante #{index + 1}
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Achievements Tab */}
+          <TabsContent value="achievements" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {achievements.slice(0, 6).map((achievement) => (
+                <Card key={achievement.id} className="bg-surface-800/60 backdrop-blur-sm border-purple-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        {achievement.icon ? (
+                          <img src={achievement.icon} alt="" className="w-8 h-8" />
+                        ) : (
+                          <Trophy className="w-6 h-6 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-white mb-1">{achievement.name}</h3>
+                        <p className="text-surface-300 text-sm">{achievement.description}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="border-yellow-500/30 text-yellow-400">
+                        <Star className="w-3 h-3 mr-1" />
+                        {achievement.points} pts
+                      </Badge>
+                      <Badge variant="outline" className="border-purple-500/30 text-purple-400">
+                        {achievement.rarity || 'Común'}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {achievements.length > 6 && (
+              <div className="text-center">
+                <Link href={`/events/${eventId}/achievements`}>
+                  <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700">
+                    Ver Todos los Logros ({achievements.length})
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Leaderboard Tab */}
+          <TabsContent value="leaderboard" className="space-y-6">
+            <div className="space-y-4">
+              {leaderboard.slice(0, 10).map((entry, index) => (
+                <Card key={entry.id} className={`bg-surface-800/60 backdrop-blur-sm transition-all hover:scale-105 ${
+                  index < 3 
+                    ? 'border-yellow-500/30 shadow-lg shadow-yellow-500/10' 
+                    : 'border-purple-500/20'
+                }`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${
+                        index === 0 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black' :
+                        index === 1 ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-black' :
+                        index === 2 ? 'bg-gradient-to-br from-amber-600 to-amber-800 text-white' :
+                        'bg-gradient-to-br from-purple-600 to-indigo-600 text-white'
+                      }`}>
+                        {index < 3 ? (
+                          index === 0 ? <Crown className="w-6 h-6" /> :
+                          index === 1 ? <Medal className="w-6 h-6" /> :
+                          <Award className="w-6 h-6" />
+                        ) : (
+                          entry.position
+                        )}
+                      </div>
+                      
+                      <Avatar className="w-12 h-12 border-2 border-purple-500/30">
+                        <AvatarImage src={entry.avatar} />
+                        <AvatarFallback className="bg-purple-600 text-white">
+                          {entry.nickname?.charAt(0)?.toUpperCase() || <User className="w-6 h-6" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-white">
+                          {entry.nickname || 'Jugador Anónimo'}
+                        </h3>
+                        <p className="text-surface-400 text-sm">
+                          {entry.achievementsUnlocked} logros desbloqueados
+                        </p>
+                      </div>
+                      
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+                          {entry.points}
+                        </div>
+                        <div className="text-surface-400 text-sm">puntos</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
-  );
+  )
 }

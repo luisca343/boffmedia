@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useBoffSession } from "@/services/useBoffSession";
-import { User, UserPlus, Loader2 } from "lucide-react";
+import { User, UserPlus, Loader2, Lock, CheckCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import type { Event } from "@/types/events";
@@ -59,7 +59,6 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
       
       if (isRegistered) {
         // TODO: Implement unregister logic if needed
-        // For now, we'll just show a toast message
         toast.info("La cancelación de registro no está disponible en este momento");
         setIsRegistering(false);
         return;
@@ -70,7 +69,6 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
         userId: parseInt(session.user.id),
         nickname: session.user.username || session.user.name || "",
         avatar: session.user.image || undefined,
-        // Optional comment can be added if needed
       };
       
       const response = await EventsService.joinEvent(event.id, joinEventData);
@@ -104,8 +102,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
 
   if (!canRegister) {
     return (
-      <Button disabled className="w-full bg-surface-700 text-surface-300 cursor-not-allowed">
-        <User className="mr-2 h-4 w-4" />
+      <Button disabled className="w-full bg-surface-700/50 text-surface-400 cursor-not-allowed border border-surface-600">
+        <Lock className="mr-2 h-4 w-4" />
         Registro Cerrado
       </Button>
     );
@@ -113,16 +111,20 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   
   if (isLoading) {
     return (
-      <Button disabled className="w-full bg-surface-700">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-        Verificando registro...
+      <Button disabled className="w-full bg-surface-700/50 border border-purple-500/30">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin text-purple-400" />
+        <span className="text-surface-300">Verificando registro...</span>
       </Button>
     );
   }
   
   return (
     <Button
-      className={isRegistered ? "w-full bg-success-600 hover:bg-success-700" : "w-full bg-primary-500 hover:bg-primary-600"}
+      className={
+        isRegistered 
+          ? "w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-semibold shadow-lg" 
+          : "w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+      }
       onClick={handleRegistration}
       disabled={isRegistering}
     >
@@ -133,13 +135,13 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
         </>
       ) : isRegistered ? (
         <>
-          <User className="mr-2 h-4 w-4" />
-          Registrado
+          <CheckCircle className="mr-2 h-4 w-4" />
+          ¡Registrado!
         </>
       ) : (
         <>
           <UserPlus className="mr-2 h-4 w-4" />
-          Registrarse
+          {isActive ? 'Unirse Ahora' : 'Registrarse'}
         </>
       )}
     </Button>
