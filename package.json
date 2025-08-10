@@ -50,7 +50,7 @@
     "@pkmn/randoms": "^0.9.5",
     "@pkmn/sim": "^0.9.5",
     "@pkmn/view": "^0.6.25",
-    "@scalar/nestjs-api-reference": "^0.3.172",
+    "@scalar/nestjs-api-reference": "^0.5.12",
     "abort-controller": "^3.0.0",
     "axios": "^1.10.0",
     "bcrypt": "^5.1.1",

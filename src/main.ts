@@ -109,7 +109,10 @@ async function bootstrap() {
       '/reference',
       apiReference({
         spec: {
-          content: document,
+          url: '/api-json', // Use the OpenAPI JSON endpoint
+        },
+        configuration: {
+          hideTestRequestButton: false, // Ensure the button is visible
         },
       }),
     );
