@@ -71,8 +71,13 @@ export default function OptimizedFicusNav() {
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text">
-            BoffMedia
+          <span className="relative inline-block">
+            <span className="absolute -top-2 -right-6 translate-x-1/4 px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-orange-900 shadow-lg border border-yellow-200 select-none z-10 tracking-wide drop-shadow-md" style={{letterSpacing: '0.05em'}}>
+              BETA
+            </span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text">
+              BoffMedia
+            </span>
           </span>
         </Link>
         <div className="hidden md:flex items-center space-x-6">
