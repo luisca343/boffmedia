@@ -10,22 +10,22 @@ import { LeaderboardHeader } from "./_components/LeaderboardHeader"
 import { LeaderboardTabs } from "./_components/leaderboard/LeaderboardTabs"
 export default function FullLeaderboardComponent() {
   const { leaderboards, error, isLoading, refetch } = useGetLeaderboards()
-  const [filteredPlayers, setFilteredPlayers] = useState<LeaderboardEntry[]>([])
+  const [filteredPlayers, setFilteredPlayers] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [sortBy, setSortBy] = useState<"score" | "medals" | "achievements">("score")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
   const playersPerPage = 10
 
+  console.log(leaderboards)
+
   const calculateTotalScore = useCallback((player: any) => {
     return (Number.parseInt(player.medalPoints) || 0) + (Number.parseInt(player.achievementPoints) || 0)
   }, [])
 
   useEffect(() => {
-    /*
-    TODO: Implement LEADERBOARD SORTING AND FILTERING
     if (leaderboards && Array.isArray(leaderboards)) {
-      let sorted = [...leaderboards]
+      let sorted = [...leaderboards] as any[]
 
       sorted.sort((a, b) => {
         const modifier = sortDirection === "desc" ? -1 : 1
@@ -33,20 +33,22 @@ export default function FullLeaderboardComponent() {
           return (calculateTotalScore(a) - calculateTotalScore(b)) * modifier
         }
         if (sortBy === "medals") {
-          return ((a.medalCount || 0) - (b.medalCount || 0)) * modifier
+          return ((Number.parseInt(a.medalCount) || 0) - (Number.parseInt(b.medalCount) || 0)) * modifier
         }
-        return ((a.achievementCount || 0) - (b.achievementCount || 0)) * modifier
+        return ((Number.parseInt(a.achievementCount) || 0) - (Number.parseInt(b.achievementCount) || 0)) * modifier
       })
 
       if (searchTerm) {
         sorted = sorted.filter((player) =>
-          (player.username || `Player ${player.userId}`).toLowerCase().includes(searchTerm.toLowerCase()),
+          (player.nickname || `Player ${player.userId}`).toLowerCase().includes(searchTerm.toLowerCase()),
         )
       }
 
       setFilteredPlayers(sorted)
       setCurrentPage(1)
-    }*/
+    } else {
+      setFilteredPlayers([])
+    }
   }, [leaderboards, searchTerm, sortBy, sortDirection, calculateTotalScore])
 
   const totalPages = Math.ceil(filteredPlayers.length / playersPerPage)
@@ -62,58 +64,75 @@ export default function FullLeaderboardComponent() {
 
   if (isLoading)
     return (
-      <section className="py-16 bg-gradient-to-br from-surface-800 to-surface-900 min-h-[calc(100vh-22rem)]">
-        <div className="container mx-auto px-4 text-center">
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-500"></div>
+      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+        <div className="container mx-auto p-6 max-w-7xl">
+          <div className="flex flex-col items-center justify-center py-32">
+            <div className="relative">
+              <div className="w-20 h-20 border-4 border-accent-500/20 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-accent-500 rounded-full animate-spin"></div>
+              <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+            </div>
+            
+            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400">
+              Cargando clasificación...
+            </h2>
+            <p className="mt-2 text-surface-400">Preparando la tabla de posiciones</p>
           </div>
-          <p className="mt-4 text-surface-300">Cargando clasificación global...</p>
         </div>
-      </section>
+      </div>
     )
 
   if (error)
     return (
-      <section className="py-16 bg-gradient-to-br from-surface-800 to-surface-900 min-h-[calc(100vh-22rem)]">
-        <div className="container mx-auto px-4 text-center">
-          <div className="text-warning-500 mb-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mx-auto"
+      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+        <div className="container mx-auto p-6 max-w-7xl">
+          <div className="text-center py-20">
+            <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-surface-400"
+              >
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                <path d="M12 9v4"></path>
+                <path d="M12 17h.01"></path>
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-4">Error al cargar la clasificación</h1>
+            <p className="text-surface-400 mb-6">{error}</p>
+            <Button 
+              onClick={refetch} 
+              className="bg-gradient-to-r from-accent-600 to-indigo-600 hover:from-accent-700 hover:to-indigo-700"
             >
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-              <path d="M12 9v4"></path>
-              <path d="M12 17h.01"></path>
-            </svg>
+              Reintentar
+            </Button>
           </div>
-          <p className="text-xl text-surface-300">Error al cargar la clasificación: {error}</p>
-          <Button onClick={refetch} className="mt-4 bg-primary-500 hover:bg-primary-600 text-white">
-            Reintentar
-          </Button>
         </div>
-      </section>
+      </div>
     )
 
   return (
-    <section className="py-16 bg-gradient-to-br from-surface-800 to-surface-900 min-h-[calc(100vh-22rem)]">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      <div className="relative z-10 container mx-auto p-6 max-w-7xl">
+        {/* Header Section */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 text-surface-50">Clasificación Global</h1>
-          <p className="text-xl text-surface-300 max-w-3xl mx-auto">
-            Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la
-            clasificación.
+          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-pink-400 to-indigo-400 mb-4">
+            Clasificación Global
+          </h1>
+          <p className="text-lg text-surface-300 max-w-3xl mx-auto leading-relaxed">
+            Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación.
           </p>
         </div>
 
-        <Card className="bg-surface-800 mb-8">
+        {/* Search and Filter */}
+        <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl p-6 mb-8">
           <LeaderboardHeader
             playerCount={filteredPlayers.length}
             searchTerm={searchTerm}
@@ -123,24 +142,27 @@ export default function FullLeaderboardComponent() {
             setSortBy={setSortBy}
             setSortDirection={setSortDirection}
           />
+        </div>
 
-          <CardContent>
-            <LeaderboardTabs
-              currentPlayers={currentPlayers}
-              getPlayerRank={getPlayerRank}
-              calculateTotalScore={calculateTotalScore}
-              searchTerm={searchTerm}
-              setSearchTerm={setSearchTerm}
-              filteredPlayers={filteredPlayers}
-              currentPage={currentPage}
-              playersPerPage={playersPerPage}
-            />
+        {/* Leaderboard Content */}
+        <div className="space-y-8">
+          <LeaderboardTabs
+            currentPlayers={currentPlayers}
+            getPlayerRank={getPlayerRank}
+            calculateTotalScore={calculateTotalScore}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            filteredPlayers={filteredPlayers}
+            currentPage={currentPage}
+            playersPerPage={playersPerPage}
+          />
 
-            {currentPlayers.length > 0 && (
-              <div className="flex items-center justify-between mt-6">
+          {/* Pagination */}
+          {currentPlayers.length > 0 && (
+            <div className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <p className="text-surface-400 text-sm">
-                  Mostrando {(currentPage - 1) * playersPerPage + 1} -{" "}
-                  {Math.min(currentPage * playersPerPage, filteredPlayers.length)} de {filteredPlayers.length} jugadores
+                  Mostrando {(currentPage - 1) * playersPerPage + 1} - {Math.min(currentPage * playersPerPage, filteredPlayers.length)} de {filteredPlayers.length} jugadores
                 </p>
 
                 <div className="flex items-center gap-2">
@@ -149,7 +171,7 @@ export default function FullLeaderboardComponent() {
                     size="sm"
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="border-surface-600 text-surface-300"
+                    className="border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -175,8 +197,8 @@ export default function FullLeaderboardComponent() {
                           onClick={() => setCurrentPage(pageNum)}
                           className={
                             currentPage === pageNum
-                              ? "bg-primary-500 text-white"
-                              : "border-surface-600 text-surface-300"
+                              ? "bg-gradient-to-r from-accent-600 to-indigo-600 text-white border-accent-500/50"
+                              : "border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                           }
                         >
                           {pageNum}
@@ -191,7 +213,7 @@ export default function FullLeaderboardComponent() {
                           variant="outline"
                           size="sm"
                           onClick={() => setCurrentPage(totalPages)}
-                          className="border-surface-600 text-surface-300"
+                          className="border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                         >
                           {totalPages}
                         </Button>
@@ -204,17 +226,17 @@ export default function FullLeaderboardComponent() {
                     size="sm"
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="border-surface-600 text-surface-300"
+                    className="border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          )}
+        </div>
       </div>
-    </section>
+    </div>
   )
 }
 

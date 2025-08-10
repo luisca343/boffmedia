@@ -26,20 +26,29 @@ export function LeaderboardTabs({
   playersPerPage,
 }: LeaderboardTabsProps) {
   return (
-    <Tabs defaultValue="general" className="mb-6">
-      <TabsList className="bg-surface-700">
-        <TabsTrigger value="general" className="data-[state=active]:bg-primary-500">
+    <Tabs defaultValue="general" className="space-y-6">
+      <TabsList className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 p-1">
+        <TabsTrigger 
+          value="general" 
+          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
+        >
           Puntuación General
         </TabsTrigger>
-        <TabsTrigger value="medals" className="data-[state=active]:bg-primary-500">
+        <TabsTrigger 
+          value="medals" 
+          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
+        >
           Medallas
         </TabsTrigger>
-        <TabsTrigger value="achievements" className="data-[state=active]:bg-primary-500">
+        <TabsTrigger 
+          value="achievements" 
+          className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
+        >
           Logros
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="general" className="mt-4">
+      <TabsContent value="general" className="space-y-4">
         <GeneralLeaderboard
           currentPlayers={currentPlayers}
           getPlayerRank={getPlayerRank}
@@ -49,7 +58,7 @@ export function LeaderboardTabs({
         />
       </TabsContent>
 
-      <TabsContent value="medals" className="mt-4">
+      <TabsContent value="medals" className="space-y-4">
         <MedalsLeaderboard
           currentPlayers={currentPlayers}
           getPlayerRank={getPlayerRank}
@@ -59,7 +68,7 @@ export function LeaderboardTabs({
         />
       </TabsContent>
 
-      <TabsContent value="achievements" className="mt-4">
+      <TabsContent value="achievements" className="space-y-4">
         <AchievementsLeaderboard
           currentPlayers={currentPlayers}
           getPlayerRank={getPlayerRank}

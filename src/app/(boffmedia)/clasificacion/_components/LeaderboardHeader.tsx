@@ -1,5 +1,4 @@
 import { Trophy, Search, Filter } from "lucide-react"
-import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
@@ -23,54 +22,55 @@ export function LeaderboardHeader({
   setSortDirection,
 }: LeaderboardHeaderProps) {
   return (
-    <CardHeader>
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <Trophy className="h-6 w-6 text-primary-500" />
-            <span className="text-lg font-semibold text-primary-500">Ranking Global</span>
-          </div>
-          <CardTitle className="text-2xl text-surface-50">Tabla de Clasificación</CardTitle>
-          <CardDescription className="text-surface-300">{playerCount} jugadores en la clasificación</CardDescription>
+    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+      <div className="flex items-center gap-4">
+        <div className="w-16 h-16 bg-gradient-to-br from-accent-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl">
+          <Trophy className="w-8 h-8 text-white" />
         </div>
-
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <div className="relative w-full md:w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
-            <Input
-              placeholder="Buscar jugador..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-surface-700 border-surface-600 text-surface-50"
-            />
-          </div>
-
-          <Select
-            value={`${sortBy}-${sortDirection}`}
-            onValueChange={(val) => {
-              const [newSortBy, newSortDir] = val.split("-") as ["score" | "medals" | "achievements", "asc" | "desc"]
-              setSortBy(newSortBy)
-              setSortDirection(newSortDir)
-            }}
-          >
-            <SelectTrigger className="w-full sm:w-40 bg-surface-700 border-surface-600 text-surface-50">
-              <div className="flex items-center">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Ordenar por" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="bg-surface-800 border-surface-700">
-              <SelectItem value="score-desc">Mayor puntuación</SelectItem>
-              <SelectItem value="score-asc">Menor puntuación</SelectItem>
-              <SelectItem value="medals-desc">Más medallas</SelectItem>
-              <SelectItem value="medals-asc">Menos medallas</SelectItem>
-              <SelectItem value="achievements-desc">Más logros</SelectItem>
-              <SelectItem value="achievements-asc">Menos logros</SelectItem>
-            </SelectContent>
-          </Select>
+        <div>
+          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-indigo-400">
+            Ranking Global
+          </h2>
+          <p className="text-surface-400">{playerCount} jugadores en la clasificación</p>
         </div>
       </div>
-    </CardHeader>
+
+      <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+        <div className="relative w-full lg:w-64">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
+          <Input
+            placeholder="Buscar jugador..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-surface-800/60 border-accent-500/30 text-surface-50 placeholder:text-surface-400 focus:border-accent-500/50 focus:ring-accent-500/20"
+          />
+        </div>
+
+        <Select
+          value={`${sortBy}-${sortDirection}`}
+          onValueChange={(val) => {
+            const [newSortBy, newSortDir] = val.split("-") as ["score" | "medals" | "achievements", "asc" | "desc"]
+            setSortBy(newSortBy)
+            setSortDirection(newSortDir)
+          }}
+        >
+          <SelectTrigger className="w-full sm:w-48 bg-surface-800/60 border-accent-500/30 text-surface-50 focus:border-accent-500/50 focus:ring-accent-500/20">
+            <div className="flex items-center">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Ordenar por" />
+            </div>
+          </SelectTrigger>
+          <SelectContent className="bg-surface-800 border-accent-500/30">
+            <SelectItem value="score-desc">Mayor puntuación</SelectItem>
+            <SelectItem value="score-asc">Menor puntuación</SelectItem>
+            <SelectItem value="medals-desc">Más medallas</SelectItem>
+            <SelectItem value="medals-asc">Menos medallas</SelectItem>
+            <SelectItem value="achievements-desc">Más logros</SelectItem>
+            <SelectItem value="achievements-asc">Menos logros</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   )
 }
 

@@ -100,7 +100,7 @@ export default function EventSummaryPage() {
           />
 
           <ParticipantsGrid participants={participants} />
-          {/*<Leaderboard leaderboard={leaderboard} />*/}
+          <Leaderboard leaderboard={leaderboard} />
         </div>
       </div>
     </div>
