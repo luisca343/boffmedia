@@ -78,11 +78,11 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
   return (
     <Card className={cn(
       "group bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 overflow-hidden transition-all duration-300 hover:scale-105 hover:border-accent-400/40 hover:shadow-2xl hover:shadow-accent-500/20",
-      isListLayout && "flex flex-col md:flex-row"
+      isListLayout && "flex md:flex-row"
     )}>
       <div className={cn(
         "relative bg-gradient-to-br from-accent-500/20 to-secondary-500/20",
-        isListLayout ? "w-full md:w-80 h-48" : "h-48"
+        isListLayout ? "w-full md:w-96 h-32 md:h-auto flex-shrink-0" : "h-48"
       )}>
         {event.banner ? (
           <img 
@@ -129,7 +129,12 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
         "flex flex-col",
         isListLayout && "flex-1"
       )}>
-        <CardContent className={cn("p-6", isListLayout && "flex-1")}>
+        <CardContent
+          className={cn(
+            "p-6",
+            isListLayout ? "flex-1" : "min-h-[320px] flex flex-col"
+          )}
+        >
           {/* Game Info */}
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-lg bg-surface-700 flex items-center justify-center overflow-hidden border border-surface-600">
@@ -155,7 +160,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
             {event.description}
           </p>
           
-          <div className="space-y-2 text-sm text-surface-400">
+          <div className="space-y-2 text-sm text-surface-400 mt-auto">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-accent-400" />
               <span>{formatDate(event.startDate)}</span>

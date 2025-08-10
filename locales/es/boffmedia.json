@@ -76,23 +76,20 @@
       "noRankingAvailable": "No hay clasificación disponible",
       "viewFullRanking": "Ver Clasificación Completa"
     },
-    "communitySection": {
-      "title": "Únete a la Comunidad",
-      "subtitle": "Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus experiencias",
-      "joinNowButton": "Unirse Ahora",
-      "features": {
-        "events": {
-          "title": "Eventos Especiales",
-          "description": "Participa en eventos exclusivos de la comunidad"
-        },
-        "ranking": {
-          "title": "Ranking de Jugadores",
-          "description": "Compite por el primer lugar en nuestro ranking de jugadores"
-        },
-        "achievements": {
-          "title": "Logros",
-          "description": "Desbloquea logros únicos y muestra tus habilidades"
-        }
+    "community": {
+      "title": {
+        "first": "Únete a una",
+        "second": "comunidad creciente"
+      },
+      "description": "Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus experiencias.",
+      "buttons": {
+        "joinNow": "Unirse Ahora",
+        "discord": "Unirse a Discord"
+      },
+      "highlights": {
+        "connect": "Conecta con desarrolladores y jugadores apasionados",
+        "collaborate": "Participa en proyectos colaborativos únicos",
+        "resources": "Accede a recursos exclusivos y eventos especiales"
       }
     },
     "footer": {

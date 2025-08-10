@@ -175,8 +175,6 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
       .slice(0, 3)
   }, [actualAchievements])
 
-  console.log('ShowAchievements:', showAchievements)
-  console.log('ShowMedals:', showMedals)
   if (!showAchievements && !showMedals) {
     return (
           <div className="text-center py-12">

@@ -409,9 +409,9 @@ export async function EventsSection() {
                 </InternalLink>
               </Button>
               <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
-                <InternalLink href="/eventos" className="flex items-center gap-2">
+                <InternalLink href="/eventos/sugerir" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
-                  Explorar Eventos
+                  Sugerir un Evento
                 </InternalLink>
               </Button>
             </div>

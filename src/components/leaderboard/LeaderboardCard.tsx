@@ -88,17 +88,7 @@ export function LeaderboardCard({
             {getRankIcon(rankIndex)}
           </div>
           
-          {/* Player Avatar */}
-          {useProfileImage ? (
-            <ProfileImage userId={player.userId} />
-          ) : (
-            <Avatar className="w-12 h-12 border-2 border-accent-500/30">
-              <AvatarImage src={player.avatar} />
-              <AvatarFallback className="bg-accent-600 text-white">
-                {player.nickname?.charAt(0)?.toUpperCase() || <User className="w-6 h-6" />}
-              </AvatarFallback>
-            </Avatar>
-          )}
+          <ProfileImage userId={player.userId} size={48} />
           
           {/* Player Info */}
           <div className="flex-1">

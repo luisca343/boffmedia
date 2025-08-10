@@ -46,15 +46,15 @@ export function CommunitySection() {
             <div className="space-y-4 mb-12">
               <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-                <span className="text-surface-300 text-lg">Conecta con desarrolladores y jugadores apasionados</span>
+                <span className="text-surface-300 text-lg">{t("community.highlights.connect")}</span>
               </div>
               <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                <span className="text-surface-300 text-lg">Participa en proyectos colaborativos únicos</span>
+                <span className="text-surface-300 text-lg">{t("community.highlights.collaborate")}</span>
               </div>
               <div className="flex items-center gap-4 justify-center lg:justify-start">
                 <div className="w-3 h-3 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-                <span className="text-surface-300 text-lg">Accede a recursos exclusivos y eventos especiales</span>
+                <span className="text-surface-300 text-lg">{t("community.highlights.resources")}</span>
               </div>
             </div>
 

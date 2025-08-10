@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { User } from "lucide-react"
+import { ProfileImage } from "@/components/ProfileImage"
 
 interface ParticipantsGridProps {
   participants: any[]
@@ -33,12 +34,7 @@ export function ParticipantsGrid({ participants }: ParticipantsGridProps) {
           <Card key={participant.id} className="bg-surface-800/60 backdrop-blur-sm border-accent-500/20 hover:scale-105 transition-transform">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <Avatar className="w-12 h-12 border-2 border-accent-500/30">
-                  <AvatarImage src={participant.avatar} />
-                  <AvatarFallback className="bg-accent-600 text-white">
-                    {participant.nickname?.charAt(0)?.toUpperCase() || <User className="w-6 h-6" />}
-                  </AvatarFallback>
-                </Avatar>
+                <ProfileImage userId={participant.userId} size={48} />
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-white truncate">
                     {participant.nickname || 'Jugador Anónimo'}
