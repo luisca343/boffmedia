@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { getEventStatus } from "@/lib/events";
 import type { Event } from "@/types/events";
 import { Event as APIEvent } from "@/generated/api/models/Event";
+import { InternalLink } from "@/components/nav/Link";
 
 interface EventCardProps {
   event: Event;
@@ -172,10 +173,10 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
         <CardFooter className="px-6 py-4 border-t border-surface-700/50 bg-surface-800/30">
           <div className="flex gap-3 w-full">
             <Button asChild className="flex-1 bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold">
-              <Link href={`/events/${event.id}`} className="flex items-center justify-center gap-2">
+              <InternalLink href={`/${event.id}`} className="flex items-center justify-center gap-2">
                 Ver detalles
                 <ChevronRight className="w-4 h-4" />
-              </Link>
+              </InternalLink>
             </Button>
             <Button variant="outline" size="icon" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
               <Star className="w-4 h-4" />

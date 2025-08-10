@@ -16,6 +16,7 @@ import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, Event, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
+import { InternalLink } from "@/components/nav/Link"
 
 interface AchievementWithProgress extends Achievement {
   userProgress?: UserProgress
@@ -231,12 +232,12 @@ export default function EventAchievementsPage() {
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
         {/* Header */}
         <div className="mb-12">
-          <Link href={`/events/${eventId}`}>
+          <InternalLink href={`/${eventId}`}>
             <Button variant="ghost" className="mb-6 text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver al evento
             </Button>
-          </Link>
+          </InternalLink>
           
           {/* Hero Section */}
           <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl p-8 mb-8">

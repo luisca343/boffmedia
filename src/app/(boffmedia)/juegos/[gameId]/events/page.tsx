@@ -21,6 +21,7 @@ import Link from "next/link"
 import { format } from "date-fns"
 import { useBoffSession } from "@/services/useBoffSession"
 import { CreateEventDto } from "@/generated/api"
+import { InternalLink } from "@/components/nav/Link"
 
 export default function GameEvents({ params }: { params: { gameId: string } }) {
   const { gameId } = params
@@ -123,9 +124,9 @@ export default function GameEvents({ params }: { params: { gameId: string } }) {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <Link href="/games" className="flex items-center text-primary-500 hover:text-primary-600 mb-2">
+          <InternalLink href="/juegos" className="flex items-center text-primary-500 hover:text-primary-600 mb-2">
             <ArrowLeft className="mr-2 h-4 w-4" /> Volver a Juegos
-          </Link>
+          </InternalLink>
           <h1 className="text-3xl font-bold text-surface-50">Eventos de {game?.title}</h1>
         </div>
         {isBoffAdmin() && (

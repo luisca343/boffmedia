@@ -14,6 +14,7 @@ import { ParticipantsGrid } from "./_components/ParticipantsGrid"
 import { AchievementsSection } from "./_components/AchievementsSection"
 import { Leaderboard } from "./_components/Leaderboard"
 import { LoadingSpinner } from "./_components/LoadingSpinner"
+import { InternalLink } from "@/components/nav/Link"
 
 export default function EventSummaryPage() {
   const params = useParams()
@@ -73,11 +74,11 @@ export default function EventSummaryPage() {
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
             <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
-            <Link href="/events">
+            <InternalLink href="/eventos">
               <Button className="bg-gradient-to-r from-accent-600 to-indigo-600">
                 Volver a eventos
               </Button>
-            </Link>
+            </InternalLink>
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import { Trophy, Star, ExternalLink, Sparkles, Users, Lock, CheckCircle, Clock }
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
+import { InternalLink } from "@/components/nav/Link"
 
 interface AchievementWithProgress {
   id: number
@@ -362,12 +363,12 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
 
           {/* View All Achievements Button */}
           <div className="text-center pt-4 border-t border-surface-600/30">
-            <Link href={`/events/${eventId}/achievements`}>
+            <InternalLink href={`/${eventId}/logros`}>
               <Button variant="ghost" className="text-accent-400 hover:text-accent-300 hover:bg-accent-500/10">
                 Ver mis logros
                 <ExternalLink className="w-4 h-4 ml-2" />
               </Button>
-            </Link>
+            </InternalLink>
           </div>
         </div>
       </div>

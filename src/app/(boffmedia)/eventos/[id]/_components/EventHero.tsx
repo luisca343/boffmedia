@@ -10,6 +10,7 @@ import {
 import { Event } from "@/generated/api/models/Event"
 import { EventRegistrationButton } from "../../_components/EventRegistrationButton"
 import Link from "next/link"
+import { InternalLink } from "@/components/nav/Link"
 
 interface EventHeroProps {
   event: any
@@ -73,12 +74,12 @@ export function EventHero({ event, participants }: EventHeroProps) {
     <>
       {/* Navigation */}
       <div className="mb-8">
-        <Link href="/events">
+        <InternalLink href="/eventos">
           <Button variant="ghost" className="text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Volver a eventos
           </Button>
-        </Link>
+        </InternalLink>
       </div>
 
       {/* Hero Section */}

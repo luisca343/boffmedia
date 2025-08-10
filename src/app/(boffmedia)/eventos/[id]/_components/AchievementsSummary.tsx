@@ -9,6 +9,7 @@ import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
+import { InternalLink } from "@/components/nav/Link"
 
 interface AchievementWithProgress extends Achievement {
   userProgress?: UserProgress
@@ -136,12 +137,12 @@ export function AchievementsSummary({ eventId }: any) {
           <Trophy className="mr-2 h-5 w-5 text-amber-500" />
           Logros
         </h3>
-        <Link href={`/events/${eventId}/achievements`}>
+        <InternalLink href={`/${eventId}/logros`}>
           <Button variant="ghost" size="sm" className="text-primary-400 hover:text-primary-300">
             Ver todos
             <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
-        </Link>
+        </InternalLink>
       </div>
 
       {/* Progress Overview */}

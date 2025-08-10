@@ -21,6 +21,7 @@ import type { CreateGameDto } from "@/types/dto/create-game.dto"
 import type { Game } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
+import { InternalLink } from "@/components/nav/Link"
 
 export default function ExploreGames() {
   const { games, isLoading, error, refetch } = useGetGames()
@@ -151,11 +152,11 @@ export default function ExploreGames() {
               </div>
             </CardContent>
             <CardFooter className="justify-between">
-              <Link href={`/games/${game.id}/events`}>
+              <InternalLink href={`/juegos/${game.id}/eventos`}>
                 <Button variant="secondary" size="sm">
                   <Calendar className="mr-2 h-4 w-4" /> Ver Eventos
                 </Button>
-              </Link>
+              </InternalLink>
               {isBoffAdmin() && (
                 <Button variant="outline" size="sm" onClick={() => openEditDialog(game)}>
                   <Edit className="mr-2 h-4 w-4" /> Editar
