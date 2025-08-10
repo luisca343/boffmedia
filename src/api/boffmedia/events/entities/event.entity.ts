@@ -86,6 +86,13 @@ export class Event {
   })
   gameName?: string;
 
+  @ApiProperty({
+    example: 'Pixelmon Wingull 2',
+    description: 'Name of the parent event',
+    required: false
+  })
+  parentEventName?: string;
+
   @ApiProperty({ 
     example: '2024-01-01T00:00:00.000Z', 
     description: 'When the event was created' 
