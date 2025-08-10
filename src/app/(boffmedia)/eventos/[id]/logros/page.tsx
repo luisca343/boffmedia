@@ -22,6 +22,7 @@ interface AchievementWithProgress extends Achievement {
   userProgress?: UserProgress
   isUnlocked: boolean
   currentProgress: number
+  itemType: "achievement" | "medal"
 }
 
 export default function EventAchievementsPage() {
@@ -94,15 +95,17 @@ export default function EventAchievementsPage() {
   }, [eventId, userId])
 
   const achievementsWithProgress: AchievementWithProgress[] = useMemo(() => {
-    return achievements.map((achievement: any) => {
-      const progress = progressData.find(p => p.achievementId === achievement.id)
-      return {
-        ...achievement,
-        userProgress: progress,
-        isUnlocked: progress?.isCompleted === 1 || false,
-        currentProgress: progress?.currentProgress || 0,
-      }
-    })
+    return achievements
+      .filter((achievement: any) => achievement.itemType === 'achievement') // Only show achievements, not medals
+      .map((achievement: any) => {
+        const progress = progressData.find(p => p.achievementId === achievement.id)
+        return {
+          ...achievement,
+          userProgress: progress,
+          isUnlocked: progress?.isCompleted === 1 || false,
+          currentProgress: progress?.currentProgress || 0,
+        }
+      })
   }, [achievements, progressData])
 
   useEffect(() => {

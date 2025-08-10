@@ -95,26 +95,19 @@ export default function EventSummaryPage() {
       </div>
 
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
-        {/* Hero Section */}
         <EventHero event={event} participants={participants} />
+        
+        {/*<EventStats event={event} participants={participants} achievements={achievements} />*/}
 
-        {/* Event Stats */}
-        <EventStats event={event} participants={participants} achievements={achievements} />
-
-        {/* Main Content - Steam Style Layout */}
         <div className="space-y-12">
-          {/* Achievements Section */}
           <AchievementsSection 
             eventId={eventId} 
             achievements={achievements} 
             participants={participants} 
           />
 
-          {/* Participants Section */}
           <ParticipantsGrid participants={participants} />
-
-          {/* Leaderboard Section */}
-          <Leaderboard leaderboard={leaderboard} />
+          {/*<Leaderboard leaderboard={leaderboard} />*/}
         </div>
       </div>
     </div>

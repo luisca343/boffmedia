@@ -161,6 +161,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
           </div>
 
           {/* Event Visual */}
+          
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-accent-500/20 to-pink-500/20 rounded-2xl blur-xl"></div>
             <div className="relative bg-gradient-to-br from-accent-600/10 to-pink-600/10 rounded-2xl p-8 border border-accent-500/20 h-full flex items-center justify-center">
