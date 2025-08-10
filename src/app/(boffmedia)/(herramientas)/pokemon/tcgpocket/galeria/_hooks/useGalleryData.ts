@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { PtcgpService } from '@/services/api/boffmedia/ptcgpService'
 import { toast } from 'react-toastify'
-import { TcgCard, UserCardEntity } from '@/generated/api'
+import { TcgCard } from '@/generated/api'
 import { useLocale } from 'next-intl'
 
 interface Card {

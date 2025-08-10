@@ -1,5 +1,5 @@
+import { Event } from "@/generated/api";
 import { EventCard } from "./EventCard";
-import type { Event } from "@/types/events";
 
 export function EventsGrid({ events }: { events: Event[] }) {
   return (

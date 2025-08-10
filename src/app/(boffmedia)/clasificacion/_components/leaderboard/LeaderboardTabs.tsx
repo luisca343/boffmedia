@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GeneralLeaderboard } from "./GeneralLeaderboard"
 import { MedalsLeaderboard } from "./MedalsLeaderboard"
 import { AchievementsLeaderboard } from "./AchievementsLeaderboard"
-import type { LeaderboardEntry } from "@/types/events"
+import { LeaderboardEntry } from "@/generated/api"
 
 type LeaderboardTabsProps = {
   currentPlayers: LeaderboardEntry[]

@@ -6,8 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { cn } from "@/lib/utils";
 import { getEventStatus } from "@/lib/events";
-import type { Event } from "@/types/events";
-import { Event as APIEvent } from "@/generated/api/models/Event";
+import { Event } from "@/generated/api";
 import { InternalLink } from "@/components/nav/Link";
 
 interface EventCardProps {
@@ -35,16 +34,16 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
 
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case APIEvent.type.EVENT: return Trophy;
-      case APIEvent.type.SERVER: return Server;
+      case Event.type.EVENT: return Trophy;
+      case Event.type.SERVER: return Server;
       default: return Calendar;
     }
   };
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
-      case APIEvent.type.EVENT: return 'from-accent-500 to-secondary-600';
-      case APIEvent.type.SERVER: return 'from-secondary-500 to-accent-600';
+      case Event.type.EVENT: return 'from-accent-500 to-secondary-600';
+      case Event.type.SERVER: return 'from-secondary-500 to-accent-600';
       default: return 'from-surface-500 to-surface-600';
     }
   };
@@ -143,7 +142,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
             <div>
               <span className="text-sm font-medium text-accent-400">{game?.title || `Juego #${event.gameId}`}</span>
               <div className="text-xs text-surface-500">
-                {event.type === APIEvent.type.EVENT ? 'Evento' : 'Servidor'}
+                {event.type === Event.type.EVENT ? 'Evento' : 'Servidor'}
               </div>
             </div>
           </div>

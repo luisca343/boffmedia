@@ -8,7 +8,6 @@ import { EventsList } from './_components/EventsList';
 import { EventsEmpty } from './_components/EventsEmpty';
 import { EventsLoading } from './_components/EventsLoading';
 import { EventsError } from './_components/EventsError';
-import type { Event } from '@/types/events';
 
 export default function EventsPage() {
   const { events, error, isLoading, refetch } = useGetEvents();

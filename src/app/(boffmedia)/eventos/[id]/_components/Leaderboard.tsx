@@ -1,17 +1,7 @@
 "use client"
 
 import { LeaderboardList } from "@/components/leaderboard"
-
-interface LeaderboardEntry {
-  userId: number
-  nickname: string
-  achievementPoints: number
-  medalPoints: number
-  totalPoints: number
-  achievementCount: number
-  medalCount: number
-  avatar?: string
-}
+import { LeaderboardEntry } from "@/generated/api"
 
 interface LeaderboardProps {
   leaderboard: LeaderboardEntry[]

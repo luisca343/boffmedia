@@ -1,5 +1,5 @@
 import { LeaderboardList } from "@/components/leaderboard"
-import type { LeaderboardEntry } from "@/types/events"
+import { LeaderboardEntry } from "@/generated/api"
 
 type MedalsLeaderboardProps = {
   currentPlayers: LeaderboardEntry[]
