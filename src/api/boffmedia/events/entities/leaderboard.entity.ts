@@ -32,6 +32,30 @@ export class LeaderboardEntry {
   achievementPoints: number;
 
   @ApiProperty({ 
+    example: 100, 
+    description: 'Total medal points' 
+  })
+  medalPoints: number;
+
+  @ApiProperty({ 
+    example: 350, 
+    description: 'Total points (achievements + medals)' 
+  })
+  totalPoints: number;
+
+  @ApiProperty({ 
+    example: 5, 
+    description: 'Number of achievements completed' 
+  })
+  achievementCount: number;
+
+  @ApiProperty({ 
+    example: 2, 
+    description: 'Number of medals earned' 
+  })
+  medalCount: number;
+
+  @ApiProperty({ 
     example: 1, 
     description: 'Current rank position' 
   })

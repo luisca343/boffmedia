@@ -62,7 +62,8 @@ export class LeaderboardsService {
         medalPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('medal_points'),
         totalPoints: sql<number>`COALESCE(SUM(CASE WHEN ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaAchievements.points} ELSE 0 END), 0)`.as('total_points'),
         achievementCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('achievement_count'),
-        medalCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('medal_count')
+        medalCount: sql<number>`COALESCE(COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' AND ${boffMediaParticipantProgress.isCompleted} = 1 THEN ${boffMediaParticipantProgress.achievementId} END), 0)`.as('medal_count'),
+        lastUpdated: sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as('last_updated')
       })
       .from(boffMediaParticipants)
       .leftJoin(
@@ -89,7 +90,10 @@ export class LeaderboardsService {
         boffMediaParticipants.avatar,
         boffMediaParticipants.userId
       )
-      .orderBy(desc(sql<number>`total_points`));
+      .orderBy(
+        desc(sql<number>`total_points`),
+        desc(sql<Date>`last_updated`)
+      );
 
     // Add ranking
     return this.addRankingToResults(results);
@@ -109,7 +113,8 @@ export class LeaderboardsService {
         medalPoints: sql<number>`SUM(CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaAchievements.points} ELSE 0 END)`.as('medal_points'),
         totalPoints: sql<number>`SUM(${boffMediaAchievements.points})`.as('total_points'),
         achievementCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'achievement' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('achievement_count'),
-        medalCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('medal_count')
+        medalCount: sql<number>`COUNT(DISTINCT CASE WHEN ${boffMediaAchievements.itemType} = 'medal' THEN ${boffMediaParticipantProgress.achievementId} END)`.as('medal_count'),
+        lastUpdated: sql<Date>`COALESCE(MAX(${boffMediaParticipantProgress.lastUpdated}), NULL)`.as('last_updated')
       })
       .from(boffMediaParticipantProgress)
       .innerJoin(
@@ -130,7 +135,10 @@ export class LeaderboardsService {
         boffMediaParticipants.avatar, 
         boffMediaParticipants.userId
       )
-      .orderBy(desc(sql<number>`total_points`));
+      .orderBy(
+        desc(sql<number>`total_points`),
+        desc(sql<Date>`last_updated`)
+      );
 
     // Add ranking
     return this.addRankingToResults(results);
