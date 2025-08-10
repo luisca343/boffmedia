@@ -1,13 +1,13 @@
 "use client"
 
+import { LeaderboardEntry } from "@/generated/api"
 import { LeaderboardCard } from "./LeaderboardCard"
 import { LeaderboardEmptyState } from "./LeaderboardEmptyState"
-import type { BaseLeaderboardEntry } from "./types"
 
 interface LeaderboardListProps {
-  players: BaseLeaderboardEntry[]
-  getRank?: (player: BaseLeaderboardEntry, index: number) => number | string
-  calculateTotalScore?: (player: BaseLeaderboardEntry) => number
+  players: LeaderboardEntry[]
+  getRank?: (player: LeaderboardEntry, index: number) => number | string
+  calculateTotalScore?: (player: LeaderboardEntry) => number
   showDetailedBreakdown?: boolean
   useProfileImage?: boolean
   emptyStateTitle?: string

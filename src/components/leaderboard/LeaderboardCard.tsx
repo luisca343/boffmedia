@@ -4,10 +4,10 @@ import { Crown, Medal, Award, User } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ProfileImage } from "@/components/ProfileImage"
-import type { BaseLeaderboardEntry } from "./types"
+import { LeaderboardEntry } from "@/generated/api"
 
 interface LeaderboardCardProps {
-  player: BaseLeaderboardEntry
+  player: LeaderboardEntry
   rank: number | string
   totalScore?: number
   showDetailedBreakdown?: boolean
@@ -62,7 +62,7 @@ export function LeaderboardCard({
     if (scoreType === 'achievement') {
       return {
         score: displayScore,
-        label: customScoreLabel || "logros",
+        label: customScoreLabel || "puntos",
         breakdown: `${player.achievementPoints || 0} puntos`,
         gradient: "from-yellow-400 to-orange-400"
       }
