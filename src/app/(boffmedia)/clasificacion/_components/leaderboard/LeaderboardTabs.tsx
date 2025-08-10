@@ -7,7 +7,6 @@ import type { LeaderboardEntry } from "@/types/events"
 type LeaderboardTabsProps = {
   currentPlayers: LeaderboardEntry[]
   getPlayerRank: (playerId: number) => number | string
-  calculateTotalScore: (player: LeaderboardEntry) => number
   searchTerm: string
   setSearchTerm: (term: string) => void
   filteredPlayers: LeaderboardEntry[]
@@ -18,7 +17,6 @@ type LeaderboardTabsProps = {
 export function LeaderboardTabs({
   currentPlayers,
   getPlayerRank,
-  calculateTotalScore,
   searchTerm,
   setSearchTerm,
   filteredPlayers,
@@ -52,7 +50,6 @@ export function LeaderboardTabs({
         <GeneralLeaderboard
           currentPlayers={currentPlayers}
           getPlayerRank={getPlayerRank}
-          calculateTotalScore={calculateTotalScore}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
         />

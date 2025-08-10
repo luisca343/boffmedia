@@ -1,42 +1,25 @@
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-export function ProfileImage({ userId, size }: { userId: number , size?: number}) {
-    const [imageExists, setImageExists] = useState(() => {
-        const cached = localStorage.getItem(`profile-image-${userId}`)
-        return cached ? JSON.parse(cached) : false
-    })
+export function ProfileImage({ userId, size }: { userId: number, size?: number }) {
+    const [errored, setErrored] = useState(false)
     const imagePath = `/uploads/profiles/${userId}.jpg`
-    
-    useEffect(() => {
-        const cacheKey = `profile-image-${userId}`
-        const cached = localStorage.getItem(cacheKey)
-        
-        // Only check if not cached
-        if (!cached) {
-            const checkImage = async () => {
-                try {
-                    const response = await fetch(imagePath)
-                    const exists = response.ok
-                    setImageExists(exists)
-                    localStorage.setItem(cacheKey, JSON.stringify(exists))
-                } catch (error) {
-                    setImageExists(false)
-                    localStorage.setItem(cacheKey, 'false')
-                }
-            }
-            
-            checkImage()
-        }
-    }, [userId, imagePath])
+    const dimension = size || 48
 
     return (
-        <Image 
-            src={imageExists ? imagePath : '/profile.png'} 
-            alt="profile"
-            className="rounded-full object-cover"
-            width={size || 40}
-            height={size || 40}
-        />
+        <div
+            style={{ width: dimension, height: dimension }}
+            className="rounded-full overflow-hidden aspect-square flex items-center justify-center bg-surface-700"
+        >
+            <Image
+                src={errored ? '/profile.png' : imagePath}
+                alt="profile"
+                className="w-full h-full object-cover rounded-full"
+                width={dimension}
+                height={dimension}
+                onError={() => setErrored(true)}
+                unoptimized
+            />
+        </div>
     )
 }

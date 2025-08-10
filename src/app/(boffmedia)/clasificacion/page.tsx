@@ -1,11 +1,9 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { Card, CardContent } from "@/components/ui/card"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
-import type { LeaderboardEntry } from "@/types/events"
 import { LeaderboardHeader } from "./_components/LeaderboardHeader"
 import { LeaderboardTabs } from "./_components/leaderboard/LeaderboardTabs"
 export default function FullLeaderboardComponent() {
@@ -19,9 +17,7 @@ export default function FullLeaderboardComponent() {
 
   console.log(leaderboards)
 
-  const calculateTotalScore = useCallback((player: any) => {
-    return (Number.parseInt(player.medalPoints) || 0) + (Number.parseInt(player.achievementPoints) || 0)
-  }, [])
+
 
   useEffect(() => {
     if (leaderboards && Array.isArray(leaderboards)) {
@@ -30,7 +26,7 @@ export default function FullLeaderboardComponent() {
       sorted.sort((a, b) => {
         const modifier = sortDirection === "desc" ? -1 : 1
         if (sortBy === "score") {
-          return (calculateTotalScore(a) - calculateTotalScore(b)) * modifier
+          return (Number(a.totalPoints) - Number(b.totalPoints)) * modifier
         }
         if (sortBy === "medals") {
           return ((Number.parseInt(a.medalCount) || 0) - (Number.parseInt(b.medalCount) || 0)) * modifier
@@ -49,15 +45,14 @@ export default function FullLeaderboardComponent() {
     } else {
       setFilteredPlayers([])
     }
-  }, [leaderboards, searchTerm, sortBy, sortDirection, calculateTotalScore])
+  }, [leaderboards, searchTerm, sortBy, sortDirection])
 
   const totalPages = Math.ceil(filteredPlayers.length / playersPerPage)
   const currentPlayers = filteredPlayers.slice((currentPage - 1) * playersPerPage, currentPage * playersPerPage)
 
   const getPlayerRank = (playerId: number) => {
     if (!leaderboards || !Array.isArray(leaderboards)) return "-"
-
-    const sortedLeaderboard = [...leaderboards].sort((a, b) => calculateTotalScore(b) - calculateTotalScore(a))
+    const sortedLeaderboard = [...leaderboards].sort((a, b) => Number(b.totalPoints) - Number(a.totalPoints))
     const rank = sortedLeaderboard.findIndex((player) => player.userId === playerId) + 1
     return rank
   }
@@ -149,7 +144,6 @@ export default function FullLeaderboardComponent() {
           <LeaderboardTabs
             currentPlayers={currentPlayers}
             getPlayerRank={getPlayerRank}
-            calculateTotalScore={calculateTotalScore}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
             filteredPlayers={filteredPlayers}
