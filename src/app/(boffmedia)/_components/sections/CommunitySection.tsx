@@ -1,6 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, MessageCircle, Heart, Gamepad2, Code, Zap } from "lucide-react";
+import { OrbitingElementsCloud } from "@/components/display/OrbitingElementsCloud";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
@@ -8,16 +9,16 @@ export function CommunitySection() {
   const t = useTranslations("boffmedia");
 
   const communityElements = [
-    { icon: Users, name: "Jugadores", color: "from-cyan-500 to-blue-600" },
-    { icon: MessageCircle, name: "Discusiones", color: "from-blue-500 to-indigo-600" },
-    { icon: Heart, name: "Colaboración", color: "from-indigo-500 to-purple-600" },
-    { icon: Gamepad2, name: "Gaming", color: "from-purple-500 to-pink-600" },
-    { icon: Code, name: "Desarrollo", color: "from-pink-500 to-rose-600" },
-    { icon: Zap, name: "Innovación", color: "from-rose-500 to-orange-600" },
+    { icon: <Users className="w-10 h-10 text-white" />, name: "Jugadores", color: "from-cyan-500 to-blue-600" },
+    { icon: <MessageCircle className="w-10 h-10 text-white" />, name: "Discusiones", color: "from-blue-500 to-indigo-600" },
+    { icon: <Heart className="w-10 h-10 text-white" />, name: "Colaboración", color: "from-indigo-500 to-purple-600" },
+    { icon: <Gamepad2 className="w-10 h-10 text-white" />, name: "Gaming", color: "from-purple-500 to-pink-600" },
+    { icon: <Code className="w-10 h-10 text-white" />, name: "Desarrollo", color: "from-pink-500 to-rose-600" },
+    { icon: <Zap className="w-10 h-10 text-white" />, name: "Innovación", color: "from-rose-500 to-orange-600" },
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-surface-800 via-surface-700 to-primary-500/50">
+    <section className="relative overflow-hidden bg-gradient-to-b from-surface-900 via-secondary-700 to-secondary-500/10">
 
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
@@ -82,72 +83,22 @@ export function CommunitySection() {
 
           {/* Right Section: Community Visualization */}
           <div className="relative order-1 lg:order-2">
-            <div className="relative h-[500px] flex items-center justify-center">
-              
-              {/* Central Community Hub */}
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-36 h-36 bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500 rounded-full flex items-center justify-center shadow-2xl z-20">
-                <Users className="w-20 h-20 text-white animate-pulse" />
-              </div>
-
-              {/* Animated rings */}
-              <div className="absolute top-1/2 left-1/2 w-72 h-72 border border-cyan-500/20 rounded-full animate-spin pointer-events-none" style={{animationDuration: '30s', transform: 'translate(-50%, -50%)'}}></div>
-              <div className="absolute top-1/2 left-1/2 w-96 h-96 border border-blue-500/10 rounded-full animate-spin pointer-events-none" style={{animationDuration: '40s', animationDirection: 'reverse', transform: 'translate(-50%, -50%)'}}></div>
-              <div className="absolute top-1/2 left-1/2 w-[28rem] h-[28rem] border border-indigo-500/5 rounded-full animate-spin pointer-events-none" style={{animationDuration: '50s', transform: 'translate(-50%, -50%)'}}></div>
-
-              {/* Orbiting community elements */}
-              {communityElements.map((element, index) => {
-                const angle = (index * 60) * (Math.PI / 180);
-                const radius = 180;
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-                return (
-                  <div
-                    key={element.name}
-                    className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 animate-float hover:scale-125 transition-all duration-300 cursor-pointer group z-30"
-                    style={{
-                      left: `calc(50% + ${x}px)`,
-                      top: `calc(50% + ${y}px)`,
-                      animationDelay: `${index * 0.5}s`,
-                      animationDuration: '4s'
-                    }}
-                  >
-                    <div className={`w-full h-full bg-gradient-to-br ${element.color} rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:rotate-12`}>
-                      <element.icon className="w-10 h-10 text-white" />
-                    </div>
-                    {/* Connecting line */}
-                    <div 
-                      className="absolute w-0.5 bg-gradient-to-r from-cyan-400/20 to-transparent origin-left opacity-40 group-hover:opacity-80 transition-opacity duration-300"
-                      style={{
-                        height: `${radius}px`,
-                        transform: `rotate(${angle + Math.PI}rad)`,
-                        left: '50%',
-                        top: '50%',
-                      }}
-                    ></div>
-                    {/* Tooltip */}
-                    <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-30">
-                      <span className="text-sm text-cyan-400 font-medium bg-surface-900/90 px-3 py-2 rounded-lg shadow-lg border border-cyan-500/20">
-                        {element.name}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* Floating particles */}
-              {[...Array(15)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute w-1.5 h-1.5 bg-cyan-400/40 rounded-full animate-ping"
-                  style={{
-                    top: `${10 + (i * 6)}%`,
-                    left: `${5 + (i * 6)}%`,
-                    animationDelay: `${i * 0.4}s`,
-                    animationDuration: '5s'
-                  }}
-                ></div>
-              ))}
-            </div>
+            <OrbitingElementsCloud
+              centralIcon={<Users className="w-20 h-20 text-white animate-pulse" />}
+              centralBg="bg-gradient-to-br from-cyan-500 via-blue-500 to-indigo-500"
+              orbitingElements={communityElements}
+              ringConfigs={[
+                { size: "w-72 h-72", border: "border border-cyan-500/20", duration: "30s" },
+                { size: "w-96 h-96", border: "border border-blue-500/10", duration: "40s", direction: "reverse" },
+                { size: "w-[28rem] h-[28rem]", border: "border border-indigo-500/5", duration: "50s" },
+              ]}
+              particleCount={15}
+              particleColorClass="bg-cyan-400/40"
+              particleSize="w-1.5 h-1.5"
+              particleDuration="5s"
+              particleDelayStep={0.4}
+              radius={180}
+            />
           </div>
         </div>
       </div>

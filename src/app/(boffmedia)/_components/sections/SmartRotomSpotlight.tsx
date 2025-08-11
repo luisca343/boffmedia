@@ -1,7 +1,6 @@
 import { GameSpotlightCard } from "./GameSpotlightCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 import { SmartRotomVideo } from "./SmartRotomVideo";
 import { InternalLink } from "@/components/nav/Link";
 

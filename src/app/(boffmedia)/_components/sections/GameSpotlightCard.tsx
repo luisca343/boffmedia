@@ -3,13 +3,14 @@ import React, { ReactNode } from "react";
 
 
 interface GameSpotlightCardProps {
-  iconSrc: string;
-  iconAlt: string;
-  title: string;
-  titleGradientClass: string;
+  iconSrc?: string;
+  iconAlt?: string;
+  title?: string;
+  titleGradientClass?: string;
   iconBgClass?: string; // e.g. 'from-emerald-600 to-highlight-700' or 'from-orange-500 to-amber-500'
   underlineClass?: string; // e.g. 'from-emerald-500 to-highlight-400' or 'from-orange-400 to-amber-400'
   headerClass?: string; // extra classes for header row (flex-row-reverse, text-right, etc)
+  centeredImageHeader?: ReactNode; // for special centered image header (like Wingull)
   children: ReactNode;
 }
 
@@ -21,23 +22,40 @@ export function GameSpotlightCard({
   iconBgClass = 'from-emerald-600 to-highlight-700',
   underlineClass = 'from-emerald-500 to-highlight-400',
   headerClass = '',
+  centeredImageHeader,
   children,
 }: GameSpotlightCardProps) {
   // If headerClass includes flex-row-reverse, align underline and features to right
   const isRightAligned = headerClass.includes('flex-row-reverse');
+
+  // Special case: centered image header (for Wingull)
+  if (centeredImageHeader) {
+    return (
+      <div className="w-full max-w-2xl space-y-8 mx-auto px-2 sm:px-4 md:px-8">
+        {/* Centered image header (e.g. logo) */}
+        <div className="flex justify-center mb-6">
+          {centeredImageHeader}
+        </div>
+        {children}
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-3xl space-y-8 mx-auto px-2 sm:px-4 md:px-8">
       <div className={`flex items-center gap-4 mb-6 ${headerClass}`}>
         <div className="relative">
           <div className={`absolute inset-0 ${iconBgClass.includes('orange') ? 'bg-orange-500/30' : 'bg-emerald-500/30'} rounded-2xl blur-xl`}></div>
           <div className={`relative bg-gradient-to-br ${iconBgClass} p-4 rounded-xl`}>
-            <Image
-              src={iconSrc}
-              alt={iconAlt}
-              width={60}
-              height={60}
-              className="rounded-lg"
-            />
+            {iconSrc && (
+              <Image
+                src={iconSrc}
+                alt={iconAlt || ''}
+                width={60}
+                height={60}
+                className="rounded-lg"
+              />
+            )}
           </div>
         </div>
         <div className={isRightAligned ? 'text-right' : ''}>

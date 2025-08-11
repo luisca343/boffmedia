@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { GiveawayHeader } from "./_components/GiveawayHeader";
+import { SectionHeader } from "@/components/sections/SectionHeader";
+import { Gift } from "lucide-react";
 import { ParticipantsList } from "./_components/ParticipantsList";
 import { GiveawayControls } from "./_components/GiveawayControls";
 import SpinnerAnimation from "./_components/SpinnerAnimation";
@@ -90,9 +91,15 @@ export default function Sorteo() {
       animate="visible"
     >
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
         <motion.div variants={itemVariants}>
-          <GiveawayHeader />
+          <SectionHeader
+            title="Sorteo BoffMedia"
+            variant="orange"
+            leftIcon={<Gift className="w-8 h-8 text-orange-400" />}
+            rightIcon={<Gift className="w-8 h-8 text-yellow-400" />}
+            leftIconBg={" "}
+            rightIconBg={" "}
+          />
         </motion.div>
 
         {/* Main Content */}

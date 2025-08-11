@@ -1,10 +1,7 @@
 import { getTranslations } from "next-intl/server";
-import { FloatingSection } from "../layout/FloatingSection";
 import { WingullSpotlight } from "./WingullSpotlight";
 import { SmartRotomSpotlight } from "./SmartRotomSpotlight";
-import { GamesGrid } from "./GamesGrid";
 import { SectionSeparator } from "../ui/SectionSeparator";
-import { Float } from "@react-three/drei";
 import { ToolsSpotlight } from "./ToolsSpotlight";
 
 export async function FeaturedSection() {
