@@ -36,8 +36,9 @@ export function useGalleryData(username: string) {
 
       if(!allCardsData || !userCardsData) return  
       
-      setAllCards(allCardsData)
-      
+      const filteredCards = allCardsData.filter(card => card !== null)
+      setAllCards(filteredCards)
+
       const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: any) => {
         acc[card.card_id] = card.quantity
         return acc
