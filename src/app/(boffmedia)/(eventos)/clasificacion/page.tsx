@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
-import { LeaderboardHeader } from "./_components/LeaderboardHeader"
+import { SectionHeader, SectionLoading } from '@/components/sections';
+import { LeaderboardFilters } from "../_components/LeaderboardFilters"
 import { LeaderboardTabs } from "./_components/leaderboard/LeaderboardTabs"
 export default function FullLeaderboardComponent() {
   const { leaderboards, error, isLoading, refetch } = useGetLeaderboards()
@@ -58,24 +59,7 @@ export default function FullLeaderboardComponent() {
   }
 
   if (isLoading)
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
-        <div className="container mx-auto p-6 max-w-7xl">
-          <div className="flex flex-col items-center justify-center py-32">
-            <div className="relative">
-              <div className="w-20 h-20 border-4 border-accent-500/20 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-accent-500 rounded-full animate-spin"></div>
-              <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
-            </div>
-            
-            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400">
-              Cargando clasificación...
-            </h2>
-            <p className="mt-2 text-surface-400">Preparando la tabla de posiciones</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <SectionLoading text="Cargando clasificación..." subtext="Preparando la tabla de posiciones" gradientFrom="from-accent-400" gradientTo="to-indigo-400" />
 
   if (error)
     return (
@@ -116,28 +100,22 @@ export default function FullLeaderboardComponent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
-        {/* Header Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-pink-400 to-indigo-400 mb-4">
-            Clasificación Global
-          </h1>
-          <p className="text-lg text-surface-300 max-w-3xl mx-auto leading-relaxed">
-            Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación.
-          </p>
-        </div>
+        <SectionHeader 
+          title="Clasificación Global"
+          subtitle="Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación."
+          gradientFrom="from-accent-400"
+          gradientTo="to-indigo-400"
+        />
 
-        {/* Search and Filter */}
-        <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl p-6 mb-8">
-          <LeaderboardHeader
-            playerCount={filteredPlayers.length}
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            sortBy={sortBy}
-            sortDirection={sortDirection}
-            setSortBy={setSortBy}
-            setSortDirection={setSortDirection}
-          />
-        </div>
+        <LeaderboardFilters 
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          sortBy={sortBy}
+          sortDirection={sortDirection}
+          setSortBy={setSortBy}
+          setSortDirection={setSortDirection}
+          playerCount={filteredPlayers.length}
+        />
 
         {/* Leaderboard Content */}
         <div className="space-y-8">

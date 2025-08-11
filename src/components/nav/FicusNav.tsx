@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from "next/dynamic"
-import { Home, Menu } from "lucide-react"
+import { Home, Menu, Trophy, Gamepad2 } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
@@ -41,6 +41,7 @@ export default function OptimizedFicusNav() {
 
   const NAV_LINKS = [
     { href: "/", label: t("links.home"), icon: <Home className="h-5 w-5" /> },
+    { href: "/eventos", label: t("links.events"), icon: <Trophy className="h-5 w-5" /> },
     { href: "/herramientas", label: t("links.tools"), override: <HerramientasMenu /> },
     { href: "/wingull", label: t("links.pixelmonWingull"), override: <WingullMenu /> },
   ]
@@ -89,7 +90,7 @@ export default function OptimizedFicusNav() {
                 <InternalLink
                   app={href === "/" ? "" : null}
                   href={href}
-                  className={`text-surface-300 hover:text-primary-400 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
+                  className={`text-surface-300 hover:text-primary-400 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 text-sm ${
                     inPage(href) ? "font-medium text-primary-400" : ""
                   }`}
                   onClick={handleMenuItemClick}

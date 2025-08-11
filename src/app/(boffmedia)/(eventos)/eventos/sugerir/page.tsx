@@ -1,7 +1,9 @@
+
 "use client"
 
 import { useState } from "react"
-import { SuggestEventHeader } from "./_components/SuggestEventHeader"
+import { SectionHeader } from "@/components/sections/SectionHeader"
+import { Sparkles, Star } from "lucide-react"
 import { SuggestEventForm } from "./_components/SuggestEventForm"
 import { SuggestEventSuccess } from "./_components/SuggestEventSuccess"
 import { SuggestEventGuidelines } from "./_components/SuggestEventGuidelines"
@@ -76,15 +78,20 @@ export default function SuggestEventPage() {
       </div>
 
       <div className="relative z-10 container mx-auto p-6 max-w-4xl">
-        <SuggestEventHeader />
-        
+        <SectionHeader
+          title="Sugerir Evento"
+          subtitle="¿Tienes una idea increíble para un evento? ¡Compártela con nosotros y podríamos hacerla realidad!"
+          leftIcon={<Sparkles className="w-4 h-4 text-white" />}
+          rightIcon={<Star className="w-4 h-4 text-white" />}
+        />
+
         <SuggestEventForm
           formData={formData}
           onInputChange={handleInputChange}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
         />
-        
+
         <SuggestEventGuidelines />
       </div>
     </div>

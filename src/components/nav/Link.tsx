@@ -36,10 +36,11 @@ export const InternalLink = forwardRef<HTMLAnchorElement, InternalLinkProps>(
     const isSubdomain = useMemo(() => subdomains.includes(subdomain), [subdomain])
 
     const finalHref = useMemo(() => {
-      if (app === '') return href
-      if (isSubdomain) return href
-      return `${app || currentApp ? `/${app || currentApp}` : ''}${appendSlash(href)}`
-    }, [href, app, isSubdomain, currentApp])
+      if (href.startsWith('/')) return href;
+      if (app === '') return href;
+      if (isSubdomain) return href;
+      return `${app || currentApp ? `/${app || currentApp}` : ''}${appendSlash(href)}`;
+    }, [href, app, isSubdomain, currentApp]);
 
     function appendSlash(path: string) {
       if (path[0] === '/') return path

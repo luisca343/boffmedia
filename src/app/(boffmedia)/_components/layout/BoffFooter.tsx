@@ -23,7 +23,7 @@ export async function BoffFooter() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href="/games"
+                  href="/juegos"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
                   {t("sections.platform.links.games")}
@@ -31,7 +31,7 @@ export async function BoffFooter() {
               </li>
               <li>
                 <Link
-                  href="/events"
+                  href="/eventos"
                   className="text-surface-300 hover:text-primary-400 transition-colors"
                 >
                   {t("sections.platform.links.events")}
