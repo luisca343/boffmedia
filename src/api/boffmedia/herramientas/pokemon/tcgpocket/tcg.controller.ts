@@ -285,7 +285,7 @@ export class TcgController {
 
   @Get('fetch/series/:seriesId/cards/store')
   @ApiOperation({ summary: 'Fetch and store all cards for series' })
-  @ApiParam({ name: 'seriesId', description: 'Series ID', example: 'A1' })
+  @ApiParam({ name: 'seriesId', description: 'Series ID', example: 'tcgp' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Cards fetched and stored for all sets in series.',

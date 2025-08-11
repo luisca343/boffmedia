@@ -287,10 +287,9 @@ export class TcgFetchService {
         }
 
         // Download images immediately after fetching card data
-        console.log(`[TCG] Downloading images for card ${brief.id}...`);
         const [imageLocalEn, imageLocalEs] = await Promise.all([
-          this.downloadCardImage({ image: brief.image }, brief.id, setId, 'en'),
-          this.downloadCardImage({ image: brief.image }, brief.id, setId, 'es')
+          this.downloadCardImage({ image: enCard.image }, brief.id, setId, 'en'),
+          this.downloadCardImage({ image: esCard?.image }, brief.id, setId, 'es')
         ]);
 
         // Merge card data with local image paths
