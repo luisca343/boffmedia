@@ -99,11 +99,6 @@ export function GameHero({ game }: GameHeroProps) {
                   {isActive ? 'Disponible' : 'No disponible'}
                 </span>
               </div>
-              
-              <div className="flex justify-between items-center py-2">
-                <span className="text-surface-400">ID del Juego:</span>
-                <span className="text-white font-medium font-mono">#{game.id}</span>
-              </div>
             </div>
           </div>
         </div>

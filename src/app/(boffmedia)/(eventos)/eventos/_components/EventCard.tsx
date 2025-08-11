@@ -177,7 +177,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
         <CardFooter className="px-6 py-4 border-t border-surface-700/50 bg-surface-800/30">
           <div className="flex gap-3 w-full">
             <Button asChild className="flex-1 bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold">
-              <InternalLink href={`/${event.id}`} className="flex items-center justify-center gap-2">
+              <InternalLink href={`/eventos/${event.id}`} className="flex items-center justify-center gap-2">
                 Ver detalles
                 <ChevronRight className="w-4 h-4" />
               </InternalLink>

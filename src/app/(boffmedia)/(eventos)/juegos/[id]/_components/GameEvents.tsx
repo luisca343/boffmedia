@@ -89,7 +89,7 @@ export function GameEvents({ gameId }: GameEventsProps) {
         </div>
         
         <InternalLink href={`/eventos?game=${gameId}`}>
-          <Badge className="bg-gradient-to-r from-accent-500/20 to-secondary-500/20 text-accent-400 border border-accent-500/30 hover:bg-accent-500/30 transition-colors cursor-pointer">
+          <Badge className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 cursor-pointer">
             Ver todos los eventos →
           </Badge>
         </InternalLink>
@@ -150,7 +150,7 @@ export function GameEvents({ gameId }: GameEventsProps) {
                   </div>
 
                   <InternalLink href={`/eventos/${event.id}`}>
-                    <Badge className="w-full justify-center bg-gradient-to-r from-accent-500/20 to-secondary-500/20 text-accent-400 border border-accent-500/30 hover:bg-accent-500/30 transition-colors cursor-pointer py-2">
+                    <Badge className="w-full justify-center bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 cursor-pointer py-2">
                       Ver Evento →
                     </Badge>
                   </InternalLink>

@@ -6,7 +6,6 @@ import { EventsService } from '@/services/api/boffmedia/eventsService'
 import { Game } from '@/generated/api'
 import { SectionLoading, SectionError } from '@/components/sections'
 import { GameHero } from './_components/GameHero'
-import { GameStats } from './_components/GameStats'
 import { GameEvents } from './_components/GameEvents'
 
 export default function GameDetailPage() {
@@ -71,13 +70,6 @@ export default function GameDetailPage() {
         </div>
 
         <div className="space-y-12">
-          <GameStats 
-            game={game}
-            eventsCount={0} // This would be calculated from the events
-            playersCount={0} // This would come from analytics
-            activeEventsCount={0} // This would be calculated from active events
-          />
-
           <GameEvents gameId={gameId} />
         </div>
       </div>
