@@ -90,7 +90,7 @@ export function EventForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="bg-surface-800 border-surface-700">
-                    <SelectItem value="0">Ninguno (Evento independiente)</SelectItem>
+                    <SelectItem value={"-1"}>Ninguno (Evento independiente)</SelectItem>
                     {parentEvents.map((event) => (
                       <SelectItem key={event.id} value={event.id.toString()}>
                         {event.title}
