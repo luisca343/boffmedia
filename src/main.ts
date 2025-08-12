@@ -3,6 +3,7 @@ import * as express from 'express';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { ValidationPipe } from '@nestjs/common';
 import { apiReference } from '@scalar/nestjs-api-reference'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
@@ -10,7 +11,17 @@ import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptio
 const bodyParser = require('body-parser');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['error', 'warn', 'log', 'debug', 'verbose'],
+  });
+
+  // Add global validation pipe for better type generation
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }));
+
   let origin = [
     'http://localhost:3000',
     'http://148.251.3.244:34333',
@@ -21,7 +32,7 @@ async function bootstrap() {
     'https://ficuslab.es',
     'https://blog.ficuslab.es',
   ];
-  app.enableCors({ origin }); // Enable CORS for the specified origin
+  app.enableCors({ origin });
   app.use(bodyParser.json({ limit: '50mb' }));
 
   const configService = app.get(ConfigService);
@@ -32,73 +43,85 @@ async function bootstrap() {
   console.log('EL PUERTO ES: ' + configService.get('PORT'));
 
   if (process.env.NODE_ENV !== 'production') {
-    /*
     const config = new DocumentBuilder()
-      .setTitle('BoffMedia API')
-      .setDescription('The BoffMedia API description')
-      .setVersion('1.0')
+      .setTitle('Ficus Labs API')
+      .setDescription('Comprehensive API for Ficus Labs services including SmartRotom and BoffMedia tools')
+      .setVersion('1.0.0')
+      .setContact('Ficus Labs', 'https://ficuslab.es', 'contact@ficuslab.es')
+      .addServer('https://api.ficuslab.es', 'Development server')
+      .addServer('https://api.boffmedia.es', 'Production server')
+      .addBearerAuth({
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Enter JWT token for authentication',
+      }, 'JWT')
       .build();
-    const document = SwaggerModule.createDocument(app, config);
-    SwaggerModule.setup('api', app, document);*/
 
-    
-    const config = new DocumentBuilder()
-      .setTitle('BoffMedia API')
-      .setDescription('The BoffMedia API description')
-      .setVersion('1.0')
-      .build();
-    const document = SwaggerModule.createDocument(app, config);
-  
-    // Sort tags alphabetically
+    const document = SwaggerModule.createDocument(app, config, {
+      deepScanRoutes: true,
+      operationIdFactory: (controllerKey: string, methodKey: string) => {
+        return `${controllerKey.replace('Controller', '')}${methodKey.charAt(0).toUpperCase() + methodKey.slice(1)}`;
+      },
+    });
 
-    
-    if (document.tags) {
-      document.tags = document.tags.sort((a, b) => a.name.localeCompare(b.name));
-    }
-    
-  
-    // Sort paths alphabetically
-    const sortedPaths = {};
-    Object.keys(document.paths)
-      .sort()
-      .forEach((key) => {
-        sortedPaths[key] = document.paths[key];
-  
-        // Sort methods within each path
-        const methods = ['get', 'post', 'put', 'delete'];
-        const sortedMethods = {};
-        methods.forEach((method) => {
-          if (sortedPaths[key][method]) {
-            sortedMethods[method] = sortedPaths[key][method];
+    // YOUR ORIGINAL TAG SORTING LOGIC - KEPT EXACTLY AS IT WAS
+    if (document.tags && document.tags.length > 0) {
+      document.tags.sort((a, b) => a.name.localeCompare(b.name));
+      console.log('Tags sorted alphabetically:', document.tags.map(tag => tag.name));
+    } else {
+      // Extract tags from paths if they're not in the document.tags array
+      const tagsSet = new Set<string>();
+      
+      Object.values(document.paths).forEach((pathItem: any) => {
+        Object.values(pathItem).forEach((operation: any) => {
+          if (operation.tags && Array.isArray(operation.tags)) {
+            operation.tags.forEach((tag: string) => tagsSet.add(tag));
           }
         });
-        sortedPaths[key] = sortedMethods;
       });
-    document.paths = sortedPaths;
-
-
-    // Sort schemas alphabetically
-    if (document.components && document.components.schemas) {
-      const sortedSchemas = {};
-      Object.keys(document.components.schemas)
-        .sort()
-        .forEach((key) => {
-          sortedSchemas[key] = document.components.schemas[key];
-        });
-      document.components.schemas = sortedSchemas;
+      
+      // Convert to sorted array and add to document
+      document.tags = Array.from(tagsSet)
+        .sort((a, b) => a.localeCompare(b))
+        .map(tag => ({ name: tag }));
+      
+      console.log('Tags extracted and sorted:', document.tags.map(tag => tag.name));
     }
-  
-    //SwaggerModule.setup('api', app, document);
-  
+
+    console.log('Final document structure check:');
+    console.log('Tags count:', document.tags?.length || 0);
+    console.log('Paths count:', Object.keys(document.paths).length);
+    
+    // Set up the standard Swagger endpoints
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true,
+      },
+      customSiteTitle: 'Ficus Labs API Documentation',
+    });
+    
+    // Set up the Scalar API reference
     app.use(
       '/reference',
       apiReference({
         spec: {
-          content: document,
+          url: '/api-json', // Use the OpenAPI JSON endpoint
+        },
+        configuration: {
+          hideTestRequestButton: false, // Ensure the button is visible
         },
       }),
-    )
+    );
 
+    // Log useful URLs for development
+    console.log('\n🚀 API Documentation URLs:');
+    console.log(`📖 Swagger UI: http://localhost:34301/api`);
+    console.log(`📋 Scalar Reference: http://localhost:34301/reference`);
+    console.log(`🔗 OpenAPI JSON: http://localhost:34301/api-json\n`);
   }
 
   await app.listen(34301);

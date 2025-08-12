@@ -8,7 +8,7 @@ import axios from 'axios';
 import { join } from 'path';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('boffmedia')
+@ApiTags('Boffmedia')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
@@ -78,7 +78,6 @@ export class AppController {
   @Post("googlemaps")
   async googlemap(@Body() body: {url: string}) {
     const data = await axios.get(body.url);
-    console.log(data.data);
     return data.data;
   }
 
@@ -89,7 +88,6 @@ export class AppController {
 
   @Post("netfluis")
   async netfluis(@Body() body: {url: string}) {
-    console.log(body);
     return {url: ""};
   }
 
