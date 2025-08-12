@@ -1,6 +1,5 @@
 'use client'
 
-import React from 'react';
 import dynamic from 'next/dynamic';
 import { useGetNewsById } from '@/hooks/documents/useGetNewsById';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"

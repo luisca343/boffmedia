@@ -1,5 +1,4 @@
 "use client"
-import React from 'react'
 import CustomEditor from '@/components/ckeditor/TestEditor'
 
 interface NewsContentProps {

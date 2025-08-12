@@ -11,7 +11,7 @@ export function useGetDocuments() {
     const [selectedNoteId, setSelectedNoteId] = useState<string | null>("")
 
     function newNote() {
-        createNote({title: "New Note", content: "", type: 0, uuid: session?.user.smartRotomUser?.uuid} as CreateDocumentDtoWithUuid).then((res: any) => {
+        createNote({title: "New Note", content: " ", type: 0, uuid: session?.user.smartRotomUser?.uuid} as CreateDocumentDtoWithUuid).then((res: any) => {
             if(res.data.id){
                 refetch()
                 setSelectedNoteId(res.data.id)
