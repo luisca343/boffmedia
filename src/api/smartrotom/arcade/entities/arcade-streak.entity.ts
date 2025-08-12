@@ -42,6 +42,7 @@ export class ArcadeStreak {
   @ApiProperty({ 
     description: 'Next reward information',
     type: 'object',
+    additionalProperties: { type: 'object' },
     example: {
       day: 3,
       type: 'CURRENCY',

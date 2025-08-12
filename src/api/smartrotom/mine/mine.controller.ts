@@ -111,7 +111,6 @@ export class MineController {
   @ApiOperation({ summary: 'Get game history for a player' })
   @ApiExtraModels(PlayerHistory)
   @ApiOkResponse({
-    status: HttpStatus.OK,
     description: 'Player history retrieved successfully.',
     schema: {
       type: 'object',

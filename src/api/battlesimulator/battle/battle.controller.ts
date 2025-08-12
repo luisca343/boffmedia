@@ -142,7 +142,7 @@ export class BattleController {
                 
                 updateLog(turn, html, args, kwArgs, line);
               }
-              battle.update();
+              battle.update({} as Protocol.Request);
             }
           })();
         });

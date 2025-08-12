@@ -301,6 +301,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'Moves learned by leveling up',
     type: 'object',
+    additionalProperties: { type: 'object' },
     example: {
       "Ember": {
         "name": "Ember",
@@ -325,7 +326,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'Moves learned from tutors',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Burning Jealousy": {
         "name": "Burning Jealousy",
@@ -342,7 +343,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'Moves learned from breeding',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Baby-Doll Eyes": {
         "name": "Baby-Doll Eyes",
@@ -359,7 +360,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 8',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Fire Spin": {
         "name": "Fire Spin",
@@ -376,7 +377,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TR moves (Technical Records)',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Body Slam": {
         "name": "Body Slam",
@@ -393,7 +394,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'HM moves (Hidden Machines)',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {}
   })
   hmMoves?: { [moveName: string]: PokemonMoveData };
@@ -401,7 +402,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'Transfer moves from other games',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Bide": {
         "name": "Bide",
@@ -418,7 +419,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 7',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Roar": {
         "name": "Roar",
@@ -435,7 +436,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 6',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Roar": {
         "name": "Roar",
@@ -452,7 +453,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 5',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Roar": {
         "name": "Roar",
@@ -469,7 +470,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 4',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Roar": {
         "name": "Roar",
@@ -486,7 +487,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 3',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Roar": {
         "name": "Roar",
@@ -503,7 +504,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 2',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Headbutt": {
         "name": "Headbutt",
@@ -520,7 +521,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'TM moves from Generation 1',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {
       "Toxic": {
         "name": "Toxic",
@@ -537,7 +538,7 @@ export class PokemonLearnset {
   @ApiProperty({ 
     description: 'Current generation TM moves',
     type: 'object',
-    required: false,
+    additionalProperties: { type: 'object' },
     example: {}
   })
   tmMoves?: { [moveName: string]: PokemonMoveData };

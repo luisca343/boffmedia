@@ -64,25 +64,25 @@ export class MinecraftCustomStats {
 }
 
 export class PlayerStats {
-  @ApiPropertyOptional({ type: 'object', description: 'minecraft:killed stats' })
+  @ApiPropertyOptional({ type: 'object', description: 'minecraft:killed stats', additionalProperties: { type: 'number' } })
   "minecraft:killed"?: Record<string, number>;
 
-  @ApiPropertyOptional({ type: 'object', description: 'minecraft:picked_up stats' })
+  @ApiPropertyOptional({ type: 'object', description: 'minecraft:picked_up stats', additionalProperties: { type: 'number' } })
   "minecraft:picked_up"?: Record<string, number>;
 
-  @ApiPropertyOptional({ type: 'object', description: 'minecraft:crafted stats' })
+  @ApiPropertyOptional({ type: 'object', description: 'minecraft:crafted stats', additionalProperties: { type: 'number' } })
   "minecraft:crafted"?: Record<string, number>;
 
-  @ApiPropertyOptional({ type: 'object', description: 'minecraft:used stats' })
+  @ApiPropertyOptional({ type: 'object', description: 'minecraft:used stats', additionalProperties: { type: 'number' } })
   "minecraft:used"?: Record<string, number>;
 
   @ApiPropertyOptional({ type: () => MinecraftCustomStats, description: 'minecraft:custom stats' })
   "minecraft:custom"?: MinecraftCustomStats;
 
-  @ApiPropertyOptional({ type: 'object', description: 'minecraft:dropped stats' })
+  @ApiPropertyOptional({ type: 'object', description: 'minecraft:dropped stats', additionalProperties: { type: 'number' } })
   "minecraft:dropped"?: Record<string, number>;
 
-  @ApiPropertyOptional({ type: 'object', description: 'minecraft:mined stats' })
+  @ApiPropertyOptional({ type: 'object', description: 'minecraft:mined stats', additionalProperties: { type: 'number' } })
   "minecraft:mined"?: Record<string, number>;
 
   @ApiProperty({ example: 2586, description: 'Minecraft data version' })
