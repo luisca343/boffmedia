@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Calendar, Trophy } from "lucide-react"
 import { InternalLink } from "@/components/nav/Link"
+import { Button } from "@/components/ui/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Event } from "@/generated/api/models/Event"
 import { EventCard } from "@/components/event/EventCard"
@@ -65,7 +66,7 @@ export function GameEvents({ gameId }: GameEventsProps) {
           <p className="text-surface-400">{events.length} eventos disponibles</p>
         </div>
         <InternalLink href={`/eventos?game=${gameId}`}>
-          <span className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 text-white px-4 py-2 rounded-lg cursor-pointer">Ver todos los eventos →</span>
+          <Button variant="accent">Ver todos los eventos →</Button>
         </InternalLink>
       </div>
       {events.length === 0 ? (
@@ -76,9 +77,9 @@ export function GameEvents({ gameId }: GameEventsProps) {
             Aún no hay eventos creados para este juego. ¡Vuelve pronto para descubrir nuevas competiciones!
           </p>
           <InternalLink href="/eventos">
-            <span className="bg-gradient-to-r from-accent-500 to-secondary-500 text-white px-4 py-2 rounded-lg hover:from-accent-600 hover:to-secondary-600 transition-colors cursor-pointer">
+            <Button variant="accent">
               Explorar todos los eventos
-            </span>
+            </Button>
           </InternalLink>
         </div>
       ) : (

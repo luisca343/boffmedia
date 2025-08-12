@@ -77,7 +77,7 @@ const MainCard: React.FC<MainCardProps> = ({ news }) => {
         
         <div className="text-center">
           <InternalLink
-            href={`/noticias/leer/${news.id}`}
+            href={`noticias/leer/${news.id}`}
             className="bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 px-8 rounded-full transform hover:scale-110 transition-transform text-xl button-pop-shadow inline-block border-4 border-black"
           >
             {news.buttonText || "¡Leer la noticia completa!"}

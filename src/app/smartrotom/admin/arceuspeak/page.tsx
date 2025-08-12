@@ -118,7 +118,8 @@ export default function ArceuSpeak() {
                 <Button 
                   onClick={sendMessage} 
                   disabled={sending || !message.trim()} 
-                  className="flex-1 bg-highlight-700 hover:bg-highlight-600 text-black hover:shadow-neon transition-all duration-300 flex items-center justify-center"
+                  variant="highlight"
+                  className="flex-1"
                 >
                   {sending ? 
                     <span className="animate-pulse flex items-center">Transmitiendo...</span> : 
@@ -132,7 +133,7 @@ export default function ArceuSpeak() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button 
-                      className="bg-secondary-700 hover:bg-secondary-600 text-black hover:shadow-neon transition-all duration-300 flex items-center"
+                      variant="highlight"
                     >
                       <UserPlus className="mr-2 w-4 h-4" />
                       Crear Personaje

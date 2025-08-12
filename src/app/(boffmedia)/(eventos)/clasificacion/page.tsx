@@ -88,7 +88,7 @@ export default function FullLeaderboardComponent() {
             <p className="text-surface-400 mb-6">{error}</p>
             <Button 
               onClick={refetch} 
-              className="bg-gradient-to-r from-accent-600 to-indigo-600 hover:from-accent-700 hover:to-indigo-700"
+              variant="accent"
             >
               Reintentar
             </Button>
@@ -139,11 +139,10 @@ export default function FullLeaderboardComponent() {
 
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="outline"
+                    variant="accentOutline"
                     size="sm"
                     onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
-                    className="border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
@@ -164,14 +163,9 @@ export default function FullLeaderboardComponent() {
                       return (
                         <Button
                           key={pageNum}
-                          variant={currentPage === pageNum ? "default" : "outline"}
+                          variant={currentPage === pageNum ? "accent" : "accentOutline"}
                           size="sm"
                           onClick={() => setCurrentPage(pageNum)}
-                          className={
-                            currentPage === pageNum
-                              ? "bg-gradient-to-r from-accent-600 to-indigo-600 text-white border-accent-500/50"
-                              : "border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
-                          }
                         >
                           {pageNum}
                         </Button>
@@ -182,10 +176,9 @@ export default function FullLeaderboardComponent() {
                       <>
                         <span className="text-surface-500">...</span>
                         <Button
-                          variant="outline"
+                          variant="accentOutline"
                           size="sm"
                           onClick={() => setCurrentPage(totalPages)}
-                          className="border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                         >
                           {totalPages}
                         </Button>
@@ -194,11 +187,10 @@ export default function FullLeaderboardComponent() {
                   </div>
 
                   <Button
-                    variant="outline"
+                    variant="accentOutline"
                     size="sm"
                     onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
-                    className="border-accent-500/30 text-surface-300 hover:bg-accent-500/20 hover:border-accent-500/50"
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>

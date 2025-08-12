@@ -20,7 +20,7 @@ export default function ArcadeTopBar({
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
           <InternalLink
-            href="/arcade"
+            href="arcade"
             className="flex items-center text-cyan-300 hover:text-cyan-200"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -42,7 +42,7 @@ export default function ArcadeTopBar({
             {onShowInstructions && (
               <Button 
                 onClick={onShowInstructions}
-                className="bg-indigo-700 hover:bg-indigo-600 text-white h-7 px-2 py-0 text-xs"
+                variant="accent"
                 size="sm"
               >
                 <Info className="h-3 w-3 mr-1" /> Ayuda
@@ -52,7 +52,7 @@ export default function ArcadeTopBar({
             {showResetButton && onReset && (
               <Button 
                 onClick={onReset}
-                className="bg-cyan-600 hover:bg-cyan-500 text-white h-7 px-2 py-0 text-xs"
+                variant="secondary"
                 size="sm"
               >
                 <RefreshCw className="h-3 w-3 mr-1" /> Reiniciar

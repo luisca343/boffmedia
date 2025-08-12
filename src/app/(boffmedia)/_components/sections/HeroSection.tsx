@@ -35,7 +35,7 @@ export async function HeroSection() {
               {t("hero.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button size="lg" className="bg-primary-500 hover:bg-primary-600 text-white" asChild>
+              <Button size="lg" variant="default" asChild>
                 <Link href="/juegos">
                   {t("hero.buttons.exploreGames")}
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -44,7 +44,6 @@ export async function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary-500 text-primary-500 hover:bg-primary-500/10"
                 asChild
               >
                 <Link href="/community">{t("hero.buttons.joinCommunity")}</Link>

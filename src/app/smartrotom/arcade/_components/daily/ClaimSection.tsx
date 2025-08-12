@@ -109,13 +109,9 @@ export default function ClaimSection({
         <Button
           onClick={onClaim}
           disabled={claimed || !isLoggedIn || isLoading}
-          className={`w-full py-3 text-lg font-bold rounded-md uppercase tracking-wider ${
-            isLoading
-              ? 'bg-surface-700 cursor-wait' 
-              : claimed 
-                ? 'bg-surface-600 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-cyan-500 to-secondary-500 hover:from-cyan-600 hover:to-secondary-600 animate-pulse'
-          }`}
+          variant="accent"
+          className="w-full "
+          enhanced
         >
           {isLoading ? (
             <span className="flex items-center justify-center">

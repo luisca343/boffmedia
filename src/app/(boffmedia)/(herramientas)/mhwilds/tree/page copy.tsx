@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWeaponTreeData } from './_hooks/useWeaponTreeData';
+import { Button } from '@/components/ui/button';
 
 export function WeaponElement({ weapon }: { weapon: any }) {
     return (
@@ -53,12 +54,13 @@ export default function WeaponTree() {
     return (
       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4">
         <p>{error}</p>
-        <button 
+        <Button
+          variant="error"
           onClick={() => refreshData()}
-          className="mt-2 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
+          
         >
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }

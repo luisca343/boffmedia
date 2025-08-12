@@ -79,7 +79,7 @@ export default function PokemonList() {
             const isSeen = getDisplayStatus(pokemon.dex, 'base', true);
             return (
               <InternalLink 
-                href={`/pokedex/entrada/${pokemon.dex}`} 
+                href={`pokedex/entrada/${pokemon.dex}`} 
                 key={pokemon.dex}
                 className="block"
               >

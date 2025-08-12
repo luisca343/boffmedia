@@ -32,7 +32,7 @@ export function TeamErrorState({ error, onRetry }: TeamErrorStateProps) {
           </div>
           <h2 className="text-xl font-semibold mb-2 text-surface-50">Error al cargar equipos</h2>
           <p className="text-surface-300 mb-6">{error}</p>
-          <Button onClick={onRetry} className="bg-primary-500 hover:bg-primary-600">
+          <Button onClick={onRetry}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Reintentar
           </Button>

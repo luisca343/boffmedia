@@ -141,7 +141,7 @@ export default function OtherTools() {
                 
                 <Button 
                   onClick={() => router.push(featuredTool.href)}
-                  className={`bg-gradient-to-r ${featuredTool.color} hover:opacity-90 text-white font-medium px-6`}
+                  variant="default"
                 >
                   Acceder a Sorteos <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>

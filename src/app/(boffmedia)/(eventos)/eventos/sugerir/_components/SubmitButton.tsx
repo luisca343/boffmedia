@@ -15,7 +15,8 @@ export function SubmitButton({ onSubmit, isSubmitting, isDisabled }: SubmitButto
       <Button 
         onClick={onSubmit}
         disabled={isSubmitting || isDisabled}
-        className="w-full bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white h-14 text-lg font-medium"
+        variant="accent"
+        className="w-full h-14 text-lg"
       >
         {isSubmitting ? (
           <>

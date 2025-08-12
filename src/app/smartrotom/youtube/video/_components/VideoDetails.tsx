@@ -44,7 +44,7 @@ export const VideoDetails = ({
       
       <div className="mb-6">
         <InternalLink 
-          href={`/youtube/channel/${channelId}`}
+          href={`youtube/channel/${channelId}`}
           className="flex items-center text-lg font-medium hover:text-red-500 transition-colors"
         >
           <User className="h-5 w-5 mr-2 text-red-500" />

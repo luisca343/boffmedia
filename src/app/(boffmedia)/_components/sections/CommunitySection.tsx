@@ -72,8 +72,7 @@ export function CommunitySection() {
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/10 px-8 py-4"
+                variant="secondaryOutline"
                 asChild
               >
                 <Link href="/discord">{t("community.buttons.discord")}</Link>

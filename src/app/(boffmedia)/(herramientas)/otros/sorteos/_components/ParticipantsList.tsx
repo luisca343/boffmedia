@@ -3,6 +3,7 @@ import { Users, Minus, Trophy, Search, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeader } from "@/components/form";
+import { Button } from "@/components/ui/button";
 
 interface ParticipantsListProps {
   participants: string[];
@@ -32,28 +33,20 @@ export function ParticipantsList({
           title={activeTab === "participants" ? "Participantes" : "Ganadores Previos"} 
         />
         <div className="flex gap-2">
-          <button
+          <Button
             onClick={() => setActiveTab("participants")}
-            className={`p-2 rounded-lg transition-all duration-200 ${
-              activeTab === "participants" 
-                ? "bg-orange-500 text-white shadow-lg" 
-                : "bg-surface-700/50 text-surface-300 hover:bg-surface-600/50"
-            }`}
+           variant={activeTab === "participants" ? "default" : "ghost"}
             title="Ver participantes actuales"
           >
             <Users className="w-4 h-4" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setActiveTab("winners")}
-            className={`p-2 rounded-lg transition-all duration-200 ${
-              activeTab === "winners" 
-                ? "bg-yellow-500 text-white shadow-lg" 
-                : "bg-surface-700/50 text-surface-300 hover:bg-surface-600/50"
-            }`}
+            variant={activeTab === "winners" ? "default" : "ghost"}
             title="Ver ganadores previos"
           >
             <Trophy className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
       
@@ -67,12 +60,14 @@ export function ParticipantsList({
           className="pl-10 pr-10 bg-surface-700/50 border-surface-600/50 text-surface-50 placeholder:text-surface-400"
         />
         {searchTerm && (
-          <button 
+          <Button 
             onClick={() => setSearchTerm("")}
+            variant="ghost"
+            size="zero"
             className="absolute right-3 top-2.5 text-surface-400 hover:text-surface-50 transition-colors duration-200"
           >
             <XCircle className="w-4 h-4" />
-          </button>
+          </Button>
         )}
       </div>
       
@@ -109,13 +104,15 @@ export function ParticipantsList({
                       </div>
                       <span className="text-surface-50 font-medium truncate">{name}</span>
                     </div>
-                    <button 
+                    <Button 
                       onClick={() => onRemove(name)}
+                      variant="ghost"
+                      size="zero"
                       className="text-surface-400 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all duration-200 p-2 rounded-lg hover:bg-red-500/10"
                       title={`Eliminar a ${name}`}
                     >
                       <Minus className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>

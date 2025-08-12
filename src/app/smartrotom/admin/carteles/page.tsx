@@ -154,7 +154,8 @@ export default function CartelesAutopista() {
                 <Button 
                   type="button" 
                   onClick={() => handleRemoveDestination(index)} 
-                  className="bg-red-900/60 hover:bg-red-800 text-red-100 border border-red-700 hover:shadow-[0_0_5px_rgba(220,38,38,0.5)] transition-all h-10 mt-auto"
+                  className="h-10 mt-auto"
+                  variant="error"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -166,7 +167,8 @@ export default function CartelesAutopista() {
             <Button 
               type="button" 
               onClick={handleAddDestination} 
-              className="w-full bg-highlight-900/30 hover:bg-highlight-800/50 text-highlight-400 border border-highlight-700 hover:shadow-neon transition-all flex items-center justify-center"
+              className="w-full"
+              variant="highlight"
             >
               <Plus className="mr-2 h-4 w-4" /> Agregar Destino
             </Button>
@@ -185,8 +187,9 @@ export default function CartelesAutopista() {
             />
             <Button
               type="button"
-              variant="ghost"
-              className="absolute inset-y-0 right-0 px-3 flex items-center hover:bg-highlight-900/30 top-4"
+              variant="highlightGhost"
+              size="zero"
+              className="absolute  inset-y-0 right-0 px-3 flex items-center top-10"
               onClick={copyToClipboard}
             >
               {copied ? 

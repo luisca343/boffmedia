@@ -144,7 +144,8 @@ export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
         <Button
           onClick={onReset}
           size="lg"
-          className="bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 border-0 flex items-center gap-3"
+          variant="default"
+          className="px-8 py-3 rounded-xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 border-0 flex items-center gap-3"
         >
           <ArrowRight className="w-5 h-5" />
           Continuar Sorteo

@@ -230,7 +230,7 @@ export default function PlayerAppManagement() {
           </div>
           <Button
             onClick={handleRefresh}
-            className="bg-highlight-900/30 hover:bg-highlight-800/50 text-highlight-400 border border-highlight-700 hover:shadow-neon transition-all"
+            variant="highlight"
           >
             <RefreshCw className="w-4 h-4 mr-2" /> Actualizar
           </Button>
@@ -261,7 +261,7 @@ export default function PlayerAppManagement() {
                     <App app={app as SmartRotomApp} withLink={false} size="small" />
                     <Button
                       onClick={() => handleRemoveApp(app.id)}
-                      className="mt-2 bg-red-900/60 hover:bg-red-800 text-red-100 border border-red-700 hover:shadow-[0_0_5px_rgba(220,38,38,0.5)] transition-all"
+                      variant="error"
                       disabled={isRemoving}
                     >
                       <Minus className="w-4 h-4 mr-2" /> Eliminar
@@ -291,7 +291,7 @@ export default function PlayerAppManagement() {
                     <App app={app as SmartRotomApp} withLink={false} size="small" />
                     <Button
                       onClick={() => handleAddApp(app.id)}
-                      className="mt-2 bg-highlight-900/60 hover:bg-highlight-800 text-highlight-100 border border-highlight-700 hover:shadow-neon transition-all"
+                      variant="highlight"
                       disabled={isAdding}
                     >
                       <Plus className="w-4 h-4 mr-2" /> Añadir

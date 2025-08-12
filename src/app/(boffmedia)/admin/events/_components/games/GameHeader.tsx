@@ -23,7 +23,7 @@ export function GameHeader({ totalGames, searchTerm, onSearchChange, onCreateNew
           <CardDescription className="text-surface-300">Administra los juegos disponibles para eventos</CardDescription>
         </div>
 
-        <Button className="bg-primary-500 hover:bg-primary-600 text-white" onClick={onCreateNew}>
+        <Button onClick={onCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
           Nuevo Juego
         </Button>

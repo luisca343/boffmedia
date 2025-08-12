@@ -48,7 +48,8 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
           </div>
           <div className="flex items-center gap-4">
             <Button
-              className="bg-gradient-to-r from-primary-600 via-amber-500 to-yellow-500 hover:from-primary-700 hover:to-yellow-600 text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-primary-300 focus:ring-offset-2 focus:outline-none group"
+              variant="default"
+              className=" text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-primary-300 focus:ring-offset-2 focus:outline-none group"
               asChild
               aria-label={t("featuredGames.viewMore") + " SmartRotom"}
             >

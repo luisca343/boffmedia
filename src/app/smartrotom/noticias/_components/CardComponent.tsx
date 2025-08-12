@@ -131,7 +131,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ variant, news }) => {
         
         <div className="relative">
           <InternalLink
-            href={`/noticias/leer/${news.id}`}
+            href={`noticias/leer/${news.id}`}
             className={`inline-block mt-2 font-bold py-2 px-4 rounded-full transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black ${buttonClass}`}
           >
             {news.buttonText || "Leer más"}

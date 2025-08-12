@@ -123,12 +123,11 @@ export default function CartasPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
           <p className="text-xl text-red-400">{error}</p>
-          <button 
+          <Button 
             onClick={() => window.location.reload()} 
-            className="mt-4 px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600"
           >
             {t("retry")}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -173,7 +172,6 @@ export default function CartasPage() {
         <div className="text-center mt-8">
           <Button
             onClick={loadMoreCards}
-            className="px-6 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-lg"
           >
             Load More Cards ({totalCards - visibleCardsCount} remaining)
           </Button>

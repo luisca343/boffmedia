@@ -143,7 +143,7 @@ export default function CharacterCreator() {
             <Button
               key={color.code}
               onClick={() => insertCode(color.code)}
-              className="p-1 h-8 border border-highlight-900 hover:border-highlight-700 transition-colors relative overflow-hidden"
+              variant="highlightOutline"
               style={{ 
                 backgroundColor: `#${color.code === '0' ? '000' : color.code === '1' ? '00A' : color.code === '2' ? '0A0' : color.code === '3' ? '0AA' : color.code === '4' ? 'A00' : color.code === '5' ? 'A0A' : color.code === '6' ? 'FA0' : color.code === '7' ? 'AAA' : color.code === '8' ? '555' : color.code === '9' ? '55F' : color.code === 'a' ? '5F5' : color.code === 'b' ? '5FF' : color.code === 'c' ? 'F55' : color.code === 'd' ? 'F5F' : color.code === 'e' ? 'FF5' : 'FFF'}`,
                 color: color.textColor
@@ -166,7 +166,7 @@ export default function CharacterCreator() {
             <Button
               key={style.code}
               onClick={() => insertCode(style.code)}
-              className="bg-black hover:bg-highlight-900/30 border border-highlight-700 hover:border-highlight-500 text-highlight-400 transition-all duration-200 relative"
+              variant="highlightOutline"
             >
               {style.name}
               <span className="absolute bottom-0 right-1 text-xs opacity-50">§{style.code}</span>
@@ -182,14 +182,15 @@ export default function CharacterCreator() {
         </div>
         <div className="bg-black/60 p-3 rounded border border-highlight-700">
           <div className="text-xs text-highlight-600/60 mb-1">&gt; Resultado:</div>
-          <p className="p-2 border border-highlight-900 bg-black rounded font-minecraft" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+          <p className="p-2 border border-highlight-900 bg-[#777] rounded font-minecraft" dangerouslySetInnerHTML={{ __html: previewHtml }} />
         </div>
       </div>
       
       <Button 
         onClick={createCharacter} 
         disabled={creating || !name.trim() || !characterFormat.trim()}
-        className="w-full bg-highlight-700 hover:bg-highlight-600 text-black hover:shadow-neon transition-all duration-300 mt-2 flex items-center justify-center disabled:opacity-50"
+        className="w-full"
+        variant="highlight"
       >
         {creating ? (
           <span className="animate-pulse flex items-center">Procesando...</span>

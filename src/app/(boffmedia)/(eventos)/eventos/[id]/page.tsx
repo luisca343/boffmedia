@@ -75,7 +75,7 @@ export default function EventSummaryPage() {
           <div className="text-center py-20">
             <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
             <InternalLink href="/eventos">
-              <Button className="bg-gradient-to-r from-accent-600 to-indigo-600">
+              <Button variant="accent">
                 Volver a eventos
               </Button>
             </InternalLink>

@@ -43,7 +43,6 @@ export default function UserGallery() {
           </p>
           <Button
             onClick={() => router.push("/")}
-            className="bg-surface-700/50 border border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors"
             variant="outline"
           >
             <HiUserCircle className="w-4 h-4 mr-2" />

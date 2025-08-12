@@ -95,10 +95,10 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
         />
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel} className="border-surface-600 text-surface-300">
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={isSubmitting} className="bg-primary-500 hover:bg-primary-600 text-white">
+          <Button type="submit" disabled={isSubmitting}>
             {submitLabel}
           </Button>
         </div>

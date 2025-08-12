@@ -24,7 +24,7 @@ export default function Localizacion({params} : {params: {id: string}}){
         return (
             <div className="bg-surface-800 min-h-full p-8 flex flex-col items-center justify-center">
                 <div className="text-surface-300 text-xl">No se encontraron datos para este bioma</div>
-                <InternalLink href="/pokedex/localizacion" className="mt-4 text-primary-400 hover:text-primary-300 flex items-center">
+                <InternalLink href="pokedex/localizacion" className="mt-4 text-primary-400 hover:text-primary-300 flex items-center">
                     <ArrowLeftIcon className="h-4 w-4 mr-1" />
                     Volver a la lista de biomas
                 </InternalLink>
@@ -48,7 +48,7 @@ export default function Localizacion({params} : {params: {id: string}}){
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-bold text-surface-50">{biomeTitle}</h1>
                         <InternalLink 
-                            href="/pokedex/localizacion" 
+                            href="pokedex/localizacion" 
                             className="text-primary-400 hover:text-primary-300 text-sm flex items-center"
                         >
                             <ArrowLeftIcon className="h-4 w-4 mr-1" />

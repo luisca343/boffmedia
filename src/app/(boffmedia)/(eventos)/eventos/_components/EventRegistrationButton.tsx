@@ -102,7 +102,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
 
   if (!canRegister) {
     return (
-      <Button disabled className="w-full bg-surface-700/50 text-surface-400 cursor-not-allowed border border-surface-600">
+      <Button disabled variant="accentOutline">
         <Lock className="mr-2 h-4 w-4" />
         Registro Cerrado
       </Button>
@@ -111,7 +111,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   
   if (isLoading) {
     return (
-      <Button disabled className="w-full bg-surface-700/50 border border-accent-500/30">
+      <Button disabled variant="accentOutline" className="w-full">
         <Loader2 className="mr-2 h-4 w-4 animate-spin text-accent-400" />
         <span className="text-surface-300">Verificando registro...</span>
       </Button>
@@ -120,11 +120,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   
   return (
     <Button
-      className={
-        isRegistered 
-          ? "w-full bg-gradient-to-r from-success-600 to-emerald-600 hover:from-success-700 hover:to-emerald-700 font-semibold shadow-lg" 
-          : "w-full bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-      }
+      className={"w-full"}
+      variant={isRegistered ? "success" : "accent"}
       onClick={handleRegistration}
       disabled={isRegistering}
     >

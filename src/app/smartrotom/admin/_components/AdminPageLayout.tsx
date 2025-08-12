@@ -26,7 +26,6 @@ export default function AdminPageLayout({
     <div className={`${(addBackgroundEffects || !isMinecraft()) && 'bg-black'} w-full min-h-screen text-highlight-400 font-mono p-4 flex flex-col relative overflow-auto`}>
       <div className='z-10'>
       
-      {/* Header with Back Button */}
       <div className="flex items-center mb-6">
         <Link href={backLink} className="text-highlight-500 hover:text-highlight-400 transition-colors flex items-center">
           <ArrowLeftCircle className="mr-2 w-5 h-5" />

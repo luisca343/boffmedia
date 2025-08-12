@@ -228,7 +228,7 @@ export function PlayerGallery({ username }: PlayerGalleryProps) {
         >
           <Button 
             onClick={saveChanges} 
-            className="bg-primary-500 hover:bg-primary-600 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105" 
+            variant="default"
             disabled={loading}
           >
             {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}

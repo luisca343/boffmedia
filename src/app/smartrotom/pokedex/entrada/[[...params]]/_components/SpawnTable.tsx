@@ -87,7 +87,7 @@ export function SpawnTable({spawns}: {spawns: SpawnInfo[]}){
                         <PokedexCell className="text-center">
                           {biomas && biomas.length > 0 ? biomas.map((biome, index) => (
                             <span key={biome.biome} className="hover:text-primary-400 transition-colors">
-                              <InternalLink href={`/pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
+                              <InternalLink href={`pokedex/localizacion/${biome.biome}`}>{biome.translated}</InternalLink>
                               {index < biomas.length - 1 ? ', ' : ''}
                             </span>
                           )) : 'Cualquiera'}

@@ -64,7 +64,7 @@ export default function NewsEditor() {
           
           {/* Navigation breadcrumbs */}
           <div className="bg-secondary-100 p-4 flex flex-wrap items-center font-comic">
-            <InternalLink href="/noticias" className="text-secondary-500 hover:underline">
+            <InternalLink href="noticias" className="text-secondary-500 hover:underline">
               Inicio
             </InternalLink>
             <span className="mx-2"> &gt; </span>

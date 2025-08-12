@@ -16,7 +16,7 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
             <div className="w-full flex flex-1 justify-between items-center">
                 {/* Previous Pokemon */}
                 <InternalLink className="flex items-center hover:text-primary-400 transition-colors group" 
-                    href={`/pokedex/entrada/${prev.dex}`}>
+                    href={`pokedex/entrada/${prev.dex}`}>
                     <div className="flex items-center">
                         <PokemonSprite 
                             id={prev.dex} 

@@ -116,7 +116,7 @@ export async function EventsSection() {
               <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
                 Estamos preparando eventos emocionantes para ti. Mantente atento a nuestras redes sociales para no perderte ninguna novedad.
               </p>
-              <Button className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700">
+              <Button variant="accent" asChild>
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
                   Explorar Eventos
@@ -219,7 +219,7 @@ export async function EventsSection() {
 
                   <div className="flex gap-4">
                     <InternalLink href={`/eventos/${featuredEvent.id}`} className="flex-1">
-                      <Button className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 w-full">
+                      <Button variant="accent" className="w-full">
                         {featuredEvent.status === Event.status.ACTIVE ? 'Unirse al Evento' : 'Ver Evento'}
                       </Button>
                     </InternalLink>
@@ -303,13 +303,13 @@ export async function EventsSection() {
               Explora todos nuestros eventos pasados, presentes y futuros. Encuentra el evento perfecto para ti.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700">
+              <Button variant="accent" asChild>
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
                   Ver Todos los Eventos
                 </InternalLink>
               </Button>
-              <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
+              <Button variant="accentOutline">
                 <InternalLink href="/eventos/sugerir" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
                   Sugerir un Evento

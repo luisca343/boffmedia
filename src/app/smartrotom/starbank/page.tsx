@@ -170,15 +170,15 @@ export default function StarBank() {
           <BankSectionHeader>Acciones Rápidas</BankSectionHeader>
           <BankSectionContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InternalLink href="/starbank/enviar" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
+              <InternalLink href="starbank/enviar" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
                 <DollarSign className="mr-2 text-secondary-700" /> 
                 <span className="text-secondary-900 font-medium">Transferir Dinero</span>
               </InternalLink>
-              <InternalLink href="/starbank/cuentas" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
+              <InternalLink href="starbank/cuentas" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
                 <CreditCard className="mr-2 text-secondary-700" /> 
                 <span className="text-secondary-900 font-medium">Administrar Cuentas</span>
               </InternalLink>
-              <InternalLink href="/starbank/facturas" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
+              <InternalLink href="starbank/facturas" className="flex flex-1 items-center justify-center p-6 border border-secondary-200 rounded-xl bg-secondary-50 hover:bg-secondary-100 transition-colors">
                 <Send className="mr-2 text-secondary-700" /> 
                 <span className="text-secondary-900 font-medium">Pagar Facturas</span>
               </InternalLink>
@@ -200,7 +200,7 @@ export default function StarBank() {
             <BankSectionButton
               className="mt-4 w-full bg-secondary-600 hover:bg-secondary-700 text-white"
               onClick={() => {
-                router.push("/smartrotom/starbank/transacciones");
+                router.push("smartrotom/starbank/transacciones");
               }}
             >
               Ver todas las transacciones <ArrowRight className="ml-2 -mr-1 h-4 w-4" />

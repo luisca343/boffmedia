@@ -150,11 +150,11 @@ export function EventHero({ event, participants }: EventHeroProps) {
             {/* Action Buttons */}
             <div className="flex gap-4">
               <EventRegistrationButton event={event} />
-              <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
+              <Button variant="accentOutline">
                 <Share2 className="w-4 h-4 mr-2" />
                 Compartir
               </Button>
-              <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
+              <Button variant="accentOutline">
                 <Bookmark className="w-4 h-4" />
               </Button>
             </div>

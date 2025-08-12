@@ -115,10 +115,10 @@ export default function TopBar({
               
               {/* Actions section */}
               <div className="border-t border-surface-200 pt-1">
-                <InternalLink href="/starbank/cuentas" className="block px-4 py-2 text-sm text-secondary-600 hover:bg-secondary-100">
+                <InternalLink href="starbank/cuentas" className="block px-4 py-2 text-sm text-secondary-600 hover:bg-secondary-100">
                   Gestionar Cuentas
                 </InternalLink>
-                <InternalLink href="/" className="block px-4 py-2 text-sm text-red-600 hover:bg-secondary-100">
+                <InternalLink href="" className="block px-4 py-2 text-sm text-red-600 hover:bg-secondary-100">
                   Cerrar sesión
                 </InternalLink>
               </div>

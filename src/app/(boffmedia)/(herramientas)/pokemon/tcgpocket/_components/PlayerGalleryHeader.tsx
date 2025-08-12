@@ -176,7 +176,6 @@ export function PlayerGalleryHeader({
                 
                 <Button
                   onClick={getBestPack}
-                  className="bg-primary-500 hover:bg-primary-600 text-white transition-colors"
                   disabled={bestPackLoading}
                 >
                   {bestPackLoading ? (
@@ -190,7 +189,6 @@ export function PlayerGalleryHeader({
                 <Button
                   onClick={onRecentUpdatesClick}
                   variant="outline"
-                  className="bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors"
                 >
                   <HiClock className="mr-2 h-4 w-4" />
                   {t('gallery.recentCards')}

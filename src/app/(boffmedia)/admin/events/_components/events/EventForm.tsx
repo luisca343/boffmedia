@@ -312,13 +312,12 @@ export function EventForm({
         />
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel} className="border-surface-600 text-surface-300">
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingGames}
-            className="bg-primary-500 hover:bg-primary-600 text-white"
           >
             {submitLabel}
           </Button>

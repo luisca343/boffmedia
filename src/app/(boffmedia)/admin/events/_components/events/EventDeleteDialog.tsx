@@ -78,10 +78,10 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="error"
             onClick={handleDelete}
             disabled={isSubmitting}
-            className="bg-warning-500 hover:bg-warning-600 text-white ml-2"
+            className="ml-2"
           >
             {isSubmitting ? (
               <>

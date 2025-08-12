@@ -59,7 +59,7 @@ export default function Video({ params }: { params: { id: string } }) {
       <div className="min-h-full bg-surface-900 text-white p-6 flex justify-center items-center overflow-auto">
         <div className="bg-surface-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
           <p className="text-red-500 text-xl mb-4">{error}</p>
-          <InternalLink href="/youtube" className="text-secondary-400 hover:underline">
+          <InternalLink href="youtube" className="text-secondary-400 hover:underline">
             {t("video.returnToSearch")}
           </InternalLink>
         </div>

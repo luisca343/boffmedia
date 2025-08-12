@@ -35,6 +35,62 @@
   font-family: 'Roboto Mono', monospace;
 }
 
+        .button-shine {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .button-shine::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease-in-out;
+        }
+        
+        .button-shine:hover::before {
+            left: 100%;
+        }
+        
+        .button-glow {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .button-glow:hover {
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        .button-glow:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
 @layer base {
   body {
     font-family: "Roboto-Regular", serif;

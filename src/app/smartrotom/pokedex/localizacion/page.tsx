@@ -35,7 +35,7 @@ export default async function Biomas(){
                             const biomeName = getTranslatedBiomeName(biome.name, t);
                             
                             return (
-                                <InternalLink href={`/pokedex/localizacion/${biome.name}`} key={index}>
+                                <InternalLink href={`pokedex/localizacion/${biome.name}`} key={index}>
                                     <div className="flex flex-col items-center justify-center text-center p-4 h-36 
                                                 rounded-lg border border-surface-600 bg-surface-700/50
                                                 hover:bg-surface-600/80 hover:border-surface-500 hover:text-surface-50 transition-all

@@ -131,16 +131,16 @@ export function MoveEffect({effect} : {effect: Effect}){
         case 'Charge':
             return <span>Este movimiento aumenta el poder de los movimientos eléctricos del usuario en un 50% durante 2 turnos</span>
         case 'DefenseCurl':
-            return <span>Este movimiento duplica el poder de <InternalLink href="/pokedex/movimientos/Rollout">Rollout</InternalLink> y <InternalLink href="/pokedex/movimientos/Ice Ball">Ice Ball</InternalLink></span>
+            return <span>Este movimiento duplica el poder de <InternalLink href="pokedex/movimientos/Rollout">Rollout</InternalLink> y <InternalLink href="pokedex/movimientos/Ice Ball">Ice Ball</InternalLink></span>
         case 'Rollout': case 'IceBall':
             return <span>Este movimiento dobla su poder con cada uso consecutivo: 30, 60, 120, 240, 480</span>
         case 'Stockpile':
             return <span>Este movimiento almacena cargas que aumentan la defensa y la especial defensa del usuario en 1 nivel por carga. Puede almacenar hasta 3 cargas</span>
         case 'SpitUp':
-            return <span>Este movimiento consume las cargas almacenadas por <InternalLink href="/pokedex/movimientos/Stockpile">Stockpile</InternalLink> para aumentar su poder.
+            return <span>Este movimiento consume las cargas almacenadas por <InternalLink href="pokedex/movimientos/Stockpile">Stockpile</InternalLink> para aumentar su poder.
                 La potencia será de 100 si hay 1 carga, 200 si hay 2 cargas, 300 si hay 3 cargas</span>
         case 'Swallow':
-            return <span>Este movimiento consume las cargas almacenadas por <InternalLink href="/pokedex/movimientos/Stockpile">Stockpile</InternalLink> para aumentar la vida del usuario.
+            return <span>Este movimiento consume las cargas almacenadas por <InternalLink href="pokedex/movimientos/Stockpile">Stockpile</InternalLink> para aumentar la vida del usuario.
                 Recupera 25% de la vida si hay 1 carga, 50% si hay 2 cargas, 75% si hay 3 cargas</span>
         case 'Spikes':
             return <span>Este movimiento coloca hasta ${effect.maxLayers} de púas que dañan a los Pokémon que entran en el campo</span>
@@ -169,16 +169,16 @@ export function MoveEffect({effect} : {effect: Effect}){
                 <ul>
                     <li>Los Pokémon en el suelo no pueden ser afectados por cambios de estado</li>
                     <li>El daño de loss movimientos de tipo Dragón se reduce a la mitad</li>
-                    <li><InternalLink href="/pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="/pokedex/movimientos/Moonblast">Moonblast</InternalLink></li>
-                    <li><InternalLink href="/pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Hada</li>
-                    <li><InternalLink href="/pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de bajar el ataque especial del objetivo</li>
+                    <li><InternalLink href="pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="pokedex/movimientos/Moonblast">Moonblast</InternalLink></li>
+                    <li><InternalLink href="pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Hada</li>
+                    <li><InternalLink href="pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de bajar el ataque especial del objetivo</li>
                     
                     <li>Si el usuario lleva equipado un Cubresuelos el campo durará 8 turnos</li>
                     <li>Si el usuario lleva equipado Semilla Bruma aumentará su defensa especial en 1 nivel</li>
                     
                     <li>Si el usuario tiene la habilidad Mimetismo se convierte en tipo Hada</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Misty Explosion">Misty Explosion</InternalLink> aumenta su potencia a 150</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Hada y aumenta su potencia a 100</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Misty Explosion">Misty Explosion</InternalLink> aumenta su potencia a 150</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Hada y aumenta su potencia a 100</li>
                 </ul>
             </div>
         case 'GrassyTerrain':
@@ -186,18 +186,18 @@ export function MoveEffect({effect} : {effect: Effect}){
                 <ul>
                     <li>Los Pokémon en el suelo recuperan un 1/16 de su vida al final de cada turno</li>
                     <li>La potencia de los movimientos de tipo Planta de los Pokémon en el suelo se aumenta en un 30%</li>
-                    <li>El daño de los movimientos <InternalLink href="/pokedex/movimientos/Earthquake">Earthquake</InternalLink>, <InternalLink href="/pokedex/movimientos/Bulldoze">Bulldoze</InternalLink> y <InternalLink href="/pokedex/movimientos/Magnitude">Magnitude</InternalLink> se reduce a la mitad</li>
+                    <li>El daño de los movimientos <InternalLink href="pokedex/movimientos/Earthquake">Earthquake</InternalLink>, <InternalLink href="pokedex/movimientos/Bulldoze">Bulldoze</InternalLink> y <InternalLink href="pokedex/movimientos/Magnitude">Magnitude</InternalLink> se reduce a la mitad</li>
                     
-                    <li><InternalLink href="/pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="/pokedex/movimientos/Energy Ball">Energy Ball</InternalLink></li>
-                    <li><InternalLink href="/pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Planta</li>
-                    <li><InternalLink href="/pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de dormir al objetivo</li>
+                    <li><InternalLink href="pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="pokedex/movimientos/Energy Ball">Energy Ball</InternalLink></li>
+                    <li><InternalLink href="pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Planta</li>
+                    <li><InternalLink href="pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de dormir al objetivo</li>
                     <li>Si el usuario lleva equipado un Cubresuelos el campo durará 8 turnos</li>
                     <li>Si el usuario lleva equipado Semilla Hierba aumentará su defensa en 1 nivel</li>
                     <li>Activa la habilidad Fanto Frondoso</li>
                     
                     <li>Si el usuario tiene la habilidad Mimetismo se convierte en tipo Planta</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Grassy Glide">Grassy Glide</InternalLink> tiene prioridad +1</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Planta y aumenta su potencia a 100</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Grassy Glide">Grassy Glide</InternalLink> tiene prioridad +1</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Planta y aumenta su potencia a 100</li>
                 </ul>
             </div>
         case 'PsychicTerrain':
@@ -206,17 +206,17 @@ export function MoveEffect({effect} : {effect: Effect}){
                     <li>Los Pokémon en el suelo no pueden ser afectados por movimientos de prioridad</li>
                     <li>La potencia de los movimientos de tipo Psíquico de los Pokémon en el suelo se aumenta en un 30%</li>
                     
-                    <li><InternalLink href="/pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="/pokedex/movimientos/Psychic">Psychic</InternalLink></li>
-                    <li><InternalLink href="/pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Psíquico</li>
-                    <li><InternalLink href="/pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de bajar la defensa especial del objetivo</li>
+                    <li><InternalLink href="pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="pokedex/movimientos/Psychic">Psychic</InternalLink></li>
+                    <li><InternalLink href="pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Psíquico</li>
+                    <li><InternalLink href="pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de bajar la defensa especial del objetivo</li>
                     <li>Si el usuario lleva equipado un Cubresuelos el campo durará 8 turnos</li>
                     
                     <li>Si el usuario lleva equipado Semilla Psique aumentará su defensa especial en 1 nivel</li>
                     <li>Activa la habilidad Terreno Psíquico</li>
                     
                     <li>Si el usuario tiene la habilidad Mimetismo se convierte en tipo Psíquico</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Expanding Force">Expanding Force</InternalLink> tiene prioridad +1</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Psíquico y aumenta su potencia a 100</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Expanding Force">Expanding Force</InternalLink> tiene prioridad +1</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Psíquico y aumenta su potencia a 100</li>
                 </ul>
             </div>
         case 'ElectricTerrain':
@@ -225,20 +225,20 @@ export function MoveEffect({effect} : {effect: Effect}){
                     <li>Los Pokémon en el suelo no pueden ser paralizados</li>
                     <li>La potencia de los movimientos de tipo Eléctrico de los Pokémon en el suelo se aumenta en un 30%</li>
                     
-                    <li><InternalLink href="/pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="/pokedex/movimientos/Thunderbolt">Thunderbolt</InternalLink></li>
-                    <li><InternalLink href="/pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Eléctrico</li>
-                    <li><InternalLink href="/pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de paralizar al objetivo</li>
+                    <li><InternalLink href="pokedex/movimientos/Nature Power">Nature Power</InternalLink> se convierte en <InternalLink href="pokedex/movimientos/Thunderbolt">Thunderbolt</InternalLink></li>
+                    <li><InternalLink href="pokedex/movimientos/Camouflage">Camouflage</InternalLink> convierte al usuario en tipo Eléctrico</li>
+                    <li><InternalLink href="pokedex/movimientos/Secret Power">Secret Power</InternalLink> tiene un 30% de probabilidades de paralizar al objetivo</li>
                     <li>Si el usuario lleva equipado un Cubresuelos el campo durará 8 turnos</li>
                     
                     <li>Si el usuario lleva equipado Semilla Electro aumentará su velocidad en 1 nivel</li>
                     <li>Activa la habilidad Terreno Eléctrico</li>
                     
                     <li>Si el usuario tiene la habilidad Mimetismo se convierte en tipo Eléctrico</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Rising Voltage">Rising Voltage</InternalLink> tiene prioridad +1</li>
-                    <li>El movimiento <InternalLink href="/pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Eléctrico y aumenta su potencia a 100</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Rising Voltage">Rising Voltage</InternalLink> tiene prioridad +1</li>
+                    <li>El movimiento <InternalLink href="pokedex/movimientos/Terrain Pulse">Terrain Pulse</InternalLink> se convierte en Tipo Eléctrico y aumenta su potencia a 100</li>
 
                     <li>Si el usuario posee la habilidad Carga Cuark, potenciará su estadísica más alta</li>
-                    <li>Hace que el movimiento <InternalLink href="/pokedex/movimientos/Psyblade ">Psyblade</InternalLink> aumente su potencia a 120</li>
+                    <li>Hace que el movimiento <InternalLink href="pokedex/movimientos/Psyblade ">Psyblade</InternalLink> aumente su potencia a 120</li>
                 </ul>
             </div>
         case 'MudSport':

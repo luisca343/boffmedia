@@ -53,7 +53,7 @@ export function EventCard({ event, href, className = "" }: EventCardProps) {
           </div>
         </div>
         <div className="flex-1" />
-        <Button className="w-full mt-2 bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700">
+        <Button variant="accent" className="w-full mt-2">
           Ver Evento
         </Button>
       </div>

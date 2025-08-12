@@ -80,7 +80,7 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
                             <HoverCard>
                               <HoverCardTrigger asChild>
                                 <InternalLink
-                                  href={`/pokedex/movimientos/${key}`}
+                                  href={`pokedex/movimientos/${key}`}
                                   className="hover:text-primary-400 transition-colors inline-flex items-center"
                                 >
                                   <span>{getTranslatedMoveName(key, t)}</span>

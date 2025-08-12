@@ -29,7 +29,7 @@ export function SuggestEventSuccess({ onReset }: SuggestEventSuccessProps) {
           <div className="flex gap-4">
             <Button 
               onClick={onReset}
-              className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700"
+              variant="accent"
             >
               <Star className="w-4 h-4 mr-2" />
               Sugerir Otro Evento

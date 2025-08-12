@@ -345,35 +345,23 @@ export default function EventAchievementsPage() {
             
             <div className="flex bg-surface-700/50 rounded-xl p-1 border border-surface-600">
               <Button
-                variant={activeFilter === 'all' ? "default" : "ghost"}
+                variant={activeFilter === 'all' ? "accent" : "ghost"}
                 size="sm"
                 onClick={() => setActiveFilter('all')}
-                className={`px-6 ${activeFilter === 'all' 
-                  ? "bg-gradient-to-r from-accent-600 to-indigo-600 text-white" 
-                  : "text-surface-300 hover:text-white hover:bg-surface-600"
-                }`}
               >
                 Todos ({totalCount})
               </Button>
               <Button
-                variant={activeFilter === 'unlocked' ? "default" : "ghost"}
+                variant={activeFilter === 'unlocked' ? "success" : "ghost"}
                 size="sm"
                 onClick={() => setActiveFilter('unlocked')}
-                className={`px-6 ${activeFilter === 'unlocked'
-                  ? "bg-gradient-to-r from-success-600 to-emerald-600 text-white"
-                  : "text-surface-300 hover:text-white hover:bg-surface-600"
-                }`}
               >
                 Desbloqueados ({unlockedCount})
               </Button>
               <Button
-                variant={activeFilter === 'locked' ? "default" : "ghost"}
+                variant={activeFilter === 'locked' ? "error" : "ghost"}
                 size="sm"
                 onClick={() => setActiveFilter('locked')}
-                className={`px-6 ${activeFilter === 'locked'
-                  ? "bg-gradient-to-r from-surface-600 to-surface-700 text-white"
-                  : "text-surface-300 hover:text-white hover:bg-surface-600"
-                }`}
               >
                 Bloqueados ({totalCount - unlockedCount})
               </Button>

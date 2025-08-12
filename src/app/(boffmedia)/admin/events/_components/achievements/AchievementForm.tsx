@@ -319,7 +319,6 @@ export function AchievementForm({
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingEvents}
-            className="bg-primary-500 hover:bg-primary-600 text-white"
           >
             {submitLabel}
           </Button>

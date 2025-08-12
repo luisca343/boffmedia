@@ -83,7 +83,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
             
             <div className="flex flex-wrap justify-center gap-4">
               <InternalLink
-                href="/noticias"
+                href="noticias"
                 className="bg-secondary-500 text-white hover:bg-secondary-600 font-bold py-2 px-6 rounded-full text-xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black"
               >
                 Volver a las Noticias
@@ -125,7 +125,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
           
           {/* Navigation breadcrumbs */}
           <div className="bg-secondary-100 p-4 flex flex-wrap items-center font-comic">
-            <InternalLink href="/noticias" className="text-secondary-500 hover:underline">
+            <InternalLink href="noticias" className="text-secondary-500 hover:underline">
               Inicio
             </InternalLink>
             <span className="mx-2"> &gt; </span>
@@ -178,7 +178,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
           {/* Navigation buttons */}
           <div className="bg-secondary-100 p-8 text-center">
             <InternalLink
-              href="/noticias"
+              href="noticias"
               className="bg-secondary-500 text-white hover:bg-secondary-600 font-bold py-4 px-8 rounded-full text-2xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black inline-block"
             >
               Volver a las Noticias

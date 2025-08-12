@@ -19,31 +19,31 @@ export default function PokedexMenu(){
                     <QuickAccessCard 
                         title="Explorar Pokédex" 
                         description="Visualiza todos los Pokémon registrados"
-                        href="/pokedex/entrada"
+                        href="pokedex/entrada"
                         icon={<BookOpenIcon className="h-6 w-6" />}
                     />
                     <QuickAccessCard 
                         title="Localización" 
                         description="Encuentra Pokémon por bioma"
-                        href="/pokedex/localizacion"
+                        href="pokedex/localizacion"
                         icon={<MapIcon className="h-6 w-6" />}
                     />
                     <QuickAccessCard 
                         title="Movimientos" 
                         description="Consulta los movimientos Pokémon"
-                        href="/pokedex/movimientos"
+                        href="pokedex/movimientos"
                         icon={<BoltIcon className="h-6 w-6" />}
                     />
                     <QuickAccessCard 
                         title="Habilidades" 
                         description="Explora las habilidades Pokémon"
-                        href="/pokedex/habilidades"
+                        href="pokedex/habilidades"
                         icon={<SparklesIcon className="h-6 w-6" />}
                     />
                     <QuickAccessCard 
                         title="Tipos" 
                         description="Explora las ventajas y desventajas de tipos"
-                        href="/pokedex/tipos"
+                        href="pokedex/tipos"
                         icon={<div className="h-6 w-6 flex items-center justify-center">
                             <img src="/smartrotom/img/types/dragon.png" alt="Tipos" className="h-5 w-5" />
                         </div>}
@@ -61,7 +61,7 @@ export default function PokedexMenu(){
                 </PokedexSection>
                 
                 <PokedexSection title="Posibles Spawns" btn={
-                    <InternalLink href="/pokedex/spawns" className="text-primary-400 hover:text-primary-300 text-sm font-normal">
+                    <InternalLink href="pokedex/spawns" className="text-primary-400 hover:text-primary-300 text-sm font-normal">
                         Ver más
                     </InternalLink>
                 }>

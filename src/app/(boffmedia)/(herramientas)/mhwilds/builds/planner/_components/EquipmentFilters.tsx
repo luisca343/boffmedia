@@ -209,7 +209,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType, sortDirection,
               {hasActiveFilters && (
                 <Button 
                   onClick={clearFilters} 
-                  variant="destructive" 
+                  variant="error" 
                   size="sm"
                   className="w-full mt-2"
                 >

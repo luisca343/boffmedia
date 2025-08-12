@@ -291,14 +291,13 @@ export default function UserProfile() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Button 
                     onClick={handleSave} 
-                    className="flex-1 bg-gradient-to-r from-primary-500 to-orange-500 hover:from-primary-600 hover:to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                    className="flex-1"
                   >
                     Save Changes
                   </Button>
                   <Button
                     onClick={() => setIsEditing(false)}
                     variant="outline"
-                    className="flex-1 border-surface-600 text-surface-300 hover:bg-surface-700"
                   >
                     Cancel
                   </Button>
@@ -306,7 +305,8 @@ export default function UserProfile() {
               ) : (
                 <Button 
                   onClick={() => setIsEditing(true)} 
-                  className="w-full bg-gradient-to-r from-primary-500 to-orange-500 hover:from-primary-600 hover:to-orange-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
+                  variant="default"
+                  className="w-full"
                 >
                   Edit Profile
                 </Button>

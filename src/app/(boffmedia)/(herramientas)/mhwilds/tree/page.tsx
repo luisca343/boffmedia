@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWeaponTreeData } from './_hooks/useWeaponTreeData';
 import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
 
 export function WeaponElement({ weapon }: { weapon: any }) {
   // Extract element information
@@ -90,12 +91,12 @@ export default function WeaponTree() {
     return (
       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4">
         <p>{error}</p>
-        <button 
+        <Button
+          variant="error"
           onClick={() => refreshData()}
-          className="mt-2 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
         >
           {t('build_planner.retry')}
-        </button>
+        </Button>
       </div>
     );
   }
@@ -368,16 +369,14 @@ export default function WeaponTree() {
         <h2 className="text-lg font-medium text-surface-100 mb-3">{t('weapon_type')}</h2>
         <div className="flex flex-wrap gap-2">
           {weaponTypes.map((type) => (
-            <button
+            <Button
               key={type}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors
-                ${activeWeaponType === type 
-                  ? 'bg-primary-500 text-white' 
-                  : 'bg-surface-700/50 hover:bg-surface-700 text-surface-200'}`}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors`}
+              variant={activeWeaponType === type ? 'default' : 'ghost'}
               onClick={() => setActiveWeaponType(type)}
             >
               {t(`weapons.${type.toLowerCase().replace(' ', '-')}`)}
-            </button>
+            </Button>
           ))}
         </div>
       </div>

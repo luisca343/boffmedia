@@ -83,7 +83,7 @@ export function SectionEmpty({
           {showCreateButton && onCreateNew && (
             <Button
               onClick={onCreateNew}
-              className="bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
+              variant="accent"
             >
               <Plus className="w-4 h-4 mr-2" />
               {createNewLabel}

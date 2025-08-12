@@ -29,7 +29,7 @@ export function FormsSection({ pokemon, pokemonIndex, formIndex }: FormsSectionP
 
           return (
             <InternalLink key={formName} 
-              href={`/pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}
+              href={`pokedex/entrada/${pokemon.dex}/${index + 1}#forms`}
               className={`block w-full max-w-[150px] ${isCurrentForm ? 'pointer-events-none' : ''}`}
             >
               <div className={`flex flex-col justify-center items-center p-3 rounded-lg transition-all

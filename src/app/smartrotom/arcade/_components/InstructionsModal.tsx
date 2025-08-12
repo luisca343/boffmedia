@@ -36,7 +36,7 @@ import {
           <DialogFooter>
             <Button 
               onClick={onClose}
-              className="bg-indigo-700 hover:bg-indigo-600 text-white"
+              variant="accent"
             >
               Cerrar
             </Button>

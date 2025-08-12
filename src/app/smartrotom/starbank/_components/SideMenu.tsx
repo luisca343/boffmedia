@@ -9,43 +9,43 @@ const items = [
     id: 'starbank',
     text: 'General',
     icon: HomeIcon,
-    url: '/starbank/'
+    url: 'starbank/'
   },
   {
     id: 'cuentas',
     text: 'Cuentas',
     icon: CreditCardIcon,
-    url: '/starbank/cuentas'
+    url: 'starbank/cuentas'
   },
   {
     id: 'transacciones',
     text: 'Transacciones',
     icon: CurrencyYenIcon,
-    url: '/starbank/transacciones'
+    url: 'starbank/transacciones'
   },
   {
     id: 'enviar',
     text: 'Enviar Dinero',
     icon: BanknotesIcon,
-    url: '/starbank/enviar'
+    url: 'starbank/enviar'
   },
   {
     id: 'facturas',
     text: 'Facturas',
     icon: TicketIcon,
-    url: '/starbank/facturas'
+    url: 'starbank/facturas'
   },
   {
     id: 'graficas',
     text: 'Gráficas',
     icon: PresentationChartLineIcon,
-    url: '/starbank/graficas'
+    url: 'starbank/graficas'
   },
   {
     id: 'calendario',
     text: 'Calendario de Pagos',
     icon: CalendarIcon,
-    url: '/starbank/calendario'
+    url: 'starbank/calendario'
   }
 ]
 const containerVariants = {

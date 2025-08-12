@@ -108,8 +108,8 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
             {showEvents && (
               <InternalLink href={`/eventos?game=${game.id}`} className="flex-1">
                 <Button 
-                  variant="outline" 
-                  className="w-full border-accent-500/30 text-accent-400 hover:bg-accent-500/10 hover:border-accent-500/50"
+                  variant="accentOutline" 
+                  className="w-full"
                 >
                   <Trophy className="w-4 h-4 mr-2" />
                   Ver Eventos
@@ -118,7 +118,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
             )}
             
             <InternalLink href={`/juegos/${game.id}`} className="flex-1">
-              <Button className="w-full bg-gradient-to-r from-accent-600 to-secondary-600 hover:from-accent-700 hover:to-secondary-700 font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
+              <Button variant="accent" className="w-full">
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Ver Detalles
               </Button>

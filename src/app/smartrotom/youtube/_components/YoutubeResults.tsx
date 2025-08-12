@@ -86,7 +86,7 @@ export default function YoutubeResults() {
             >
               {isLoading ? t("search.searching") : t("search.button")}
             </Button>
-            <InternalLink href="/youtube/history" className="ml-2">
+            <InternalLink href="youtube/history" className="ml-2">
               <Button 
                 variant="ghost" 
                 className="bg-surface-700 hover:bg-surface-600"

@@ -71,7 +71,8 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
-                className="bg-gradient-to-r from-emerald-600 via-highlight-500 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white px-6 py-3 flex-1 shadow-xl rounded-full font-semibold transition-all duration-200 transform hover:scale-105 group"
+                variant="highlight"
+                className="px-6 py-3 flex-1 shadow-xl rounded-full font-semibold transition-all duration-200 transform hover:scale-105 group"
                 asChild
               >
                 <InternalLink href="/herramientas" className="flex items-center justify-center gap-2">

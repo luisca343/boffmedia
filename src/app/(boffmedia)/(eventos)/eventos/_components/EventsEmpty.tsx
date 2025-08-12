@@ -57,7 +57,7 @@ export function EventsEmpty({ searchTerm, onClearSearch }: EventsEmptyProps) {
             </Button>
           )}
           
-          <Button className="bg-gradient-to-r from-accent-600 to-indigo-600 hover:from-accent-700 hover:to-indigo-700 px-6">
+          <Button className="px-6" variant="accent">
             <Calendar className="w-4 h-4 mr-2" />
             Explorar eventos
           </Button>

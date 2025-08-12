@@ -72,7 +72,7 @@ export const HistoryView = () => {
           <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button 
-                variant="destructive" 
+                variant="error" 
                 className="bg-red-600 hover:bg-red-700"
                 onClick={() => setVideoToDelete(null)}
               >

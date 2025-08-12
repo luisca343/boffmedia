@@ -151,21 +151,108 @@ export default function BoffMediaStyleGuide() {
             </div>
           </ComponentSection>
 
-          <ComponentSection title="Button">
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-3">
-                <Button size="sm">Pequeño</Button>
-                <Button>Predeterminado</Button>
-                <Button size="lg">Grande</Button>
+          <ComponentSection title="Button" fullWidth>
+            <div className="space-y-6">
+              {/* Size Examples */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Ejemplos de tamaños</h4>
+                <div className="flex flex-wrap gap-3 items-center">
+                  <Button size="sm">Pequeño</Button>
+                  <Button>Predeterminado</Button>
+                  <Button size="lg">Grande</Button>
+                  <Button size="xl">Extra grande</Button>
+                  <Button size="icon" aria-label="Icono">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Button variant="secondary">Secundario</Button>
-                <Button variant="destructive">Destructivo</Button>
-                <Button variant="outline">Contorno</Button>
+
+              {/* Primary Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Primarios</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="default">Predeterminado</Button>
+                  <Button variant="outline">Contorno</Button>
+                  <Button variant="ghost">Fantasma</Button>
+                  <Button variant="link">Enlace</Button>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Button variant="ghost">Fantasma</Button>
-                <Button variant="link">Enlace</Button>
+
+              {/* Secondary Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Secundarios</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="secondary">Secundario</Button>
+                  <Button variant="secondaryOutline">Sec. Contorno</Button>
+                  <Button variant="secondaryGhost">Sec. Fantasma</Button>
+                  <Button variant="secondaryLink">Sec. Enlace</Button>
+                </div>
+              </div>
+
+              {/* Highlight Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Destacados</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="highlight">Destacado</Button>
+                  <Button variant="highlightOutline">Dest. Contorno</Button>
+                  <Button variant="highlightGhost">Dest. Fantasma</Button>
+                  <Button variant="highlightLink">Dest. Enlace</Button>
+                </div>
+              </div>
+
+              {/* Accent Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Acentos</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="accent">Acento</Button>
+                  <Button variant="accentOutline">Ac. Contorno</Button>
+                  <Button variant="accentGhost">Ac. Fantasma</Button>
+                  <Button variant="accentLink">Ac. Enlace</Button>
+                </div>
+              </div>
+
+              {/* Success Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Éxito</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="success">Éxito</Button>
+                  <Button variant="successOutline">Éx. Contorno</Button>
+                  <Button variant="successGhost">Éx. Fantasma</Button>
+                  <Button variant="successLink">Éx. Enlace</Button>
+                </div>
+              </div>
+
+              {/* Info Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Información</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="info">Información</Button>
+                  <Button variant="infoOutline">Info Contorno</Button>
+                  <Button variant="infoGhost">Info Fantasma</Button>
+                  <Button variant="infoLink">Info Enlace</Button>
+                </div>
+              </div>
+
+              {/* Warning Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Advertencia</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="warning">Advertencia</Button>
+                  <Button variant="warningOutline">Adv. Contorno</Button>
+                  <Button variant="warningGhost">Adv. Fantasma</Button>
+                  <Button variant="warningLink">Adv. Enlace</Button>
+                </div>
+              </div>
+
+              {/* Error Variants */}
+              <div>
+                <h4 className="text-surface-200 text-sm font-medium mb-3">Error</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <Button variant="error">Error</Button>
+                  <Button variant="errorOutline">Error Contorno</Button>
+                  <Button variant="errorGhost">Error Fantasma</Button>
+                  <Button variant="errorLink">Error Enlace</Button>
+                </div>
               </div>
             </div>
           </ComponentSection>

@@ -130,7 +130,6 @@ export default function TCGPocket() {
               <Button 
                 onClick={handleViewGallery} 
                 disabled={!username.trim()}
-                className="bg-primary-500 hover:bg-primary-600"
               >
                 <Search className="mr-2 h-4 w-4" /> {t("quickSearch.searchButton")}
               </Button>

@@ -170,7 +170,7 @@ export default function CentroArcade() {
         {/* Inventory Banner */}
         <div className="w-full mb-8 relative">
           <InternalLink 
-            href="/arcade/loot"
+            href="arcade/loot"
             className="group block w-full bg-gradient-to-r from-secondary-900/90 to-indigo-900/90 rounded-xl overflow-hidden border-4 border-secondary-700/50 shadow-2xl transition-all hover:shadow-secondary-500/20 hover:border-secondary-600/70"
           >
             <div className="absolute inset-0 bg-[url('/images/treasure-pattern.png')] opacity-10 group-hover:opacity-20 transition-opacity"></div>
@@ -217,7 +217,7 @@ export default function CentroArcade() {
           <ArcadeGameCard
             title="Squirdle"
             description="Adivina la palabra oculta en este juego de palabras. ¡Pon a prueba tus conocimientos!"
-            href="/arcade/squirdle"
+            href="arcade/squirdle"
             icon={<WholeWord className="w-20 h-20 text-yellow-400" />}
             color="yellow"
             badge={{ text: "NUEVO", type: "new" }}
@@ -226,7 +226,7 @@ export default function CentroArcade() {
           <ArcadeGameCard
             title="Minería"
             description="Excava profundo y encuentra tesoros ocultos. Consigue objetos valiosos para tu colección."
-            href="/mina"
+            href="mina"
             icon={<Pickaxe className="w-20 h-20 text-orange-400" />}
             color="orange"
           />
@@ -234,7 +234,7 @@ export default function CentroArcade() {
           <ArcadeGameCard
             title="Gira Voltorb"
             description="¡No dejes que explote! Gira las cartas con cuidado y acumula puntos en este emocionante juego."
-            href="/arcade/voltorb"
+            href="arcade/voltorb"
             icon={<div className="scale-150"><VoltorbImage size="xl" /></div>}
             color="pink"
             badge={{ text: "HOT", type: "hot" }}
@@ -244,7 +244,7 @@ export default function CentroArcade() {
         {/* Mobile-friendly Inventory Button */}
         <div className="lg:hidden w-full mb-8">
           <InternalLink
-            href="/arcade/loot"
+            href="arcade/loot"
             className="block w-full bg-gradient-to-r from-secondary-800 to-secondary-600 py-4 rounded-lg shadow-lg text-center text-white font-bold text-lg flex items-center justify-center gap-2"
           >
             <Package className="h-5 w-5" />
