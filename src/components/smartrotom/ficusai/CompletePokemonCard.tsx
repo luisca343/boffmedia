@@ -182,7 +182,7 @@ const MovesSection: FC<{ moves: Record<string, any>; searchTerm: string; setSear
     <div className="space-y-4">
       <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       {Object.keys(filteredMoves).length === 0 && searchTerm ? (
-        <div className="text-center py-8 text-surface-400">No se encontraron movimientos con "{searchTerm}"</div>
+  <div className="text-center py-8 text-surface-400">No se encontraron movimientos con &quot;{searchTerm}&quot;</div>
       ) : (
         Object.entries(filteredMoves).map(([type, moveList], idx) => (
           <MoveCategory key={idx} type={type} moveList={moveList} t={t} />

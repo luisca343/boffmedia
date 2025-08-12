@@ -38,8 +38,36 @@ export function RotomErrorPage(props: RotomErrorProps) {
 }
 
 export function RotomError(props: RotomErrorProps) {
+  // Always call hooks at the top level
   const [showHelp, setShowHelp] = useState(false);
-  
+
+  // For EnhancedErrorProps
+  let errorCode, context, onAction, actionText, initialShowHelp, errorDef, formattedCode, errorDocs;
+  if (isEnhancedErrorProps(props)) {
+    errorCode = props.errorCode;
+    context = props.context ?? {};
+    onAction = props.onAction;
+    actionText = props.actionText ?? "Reintentar";
+    initialShowHelp = props.showHelp ?? false;
+    errorDef = ROTOM_ERROR_CODES[errorCode];
+    formattedCode = getFormattedErrorCode(errorCode);
+    errorDocs = errorCode in ROTOM_ERROR_DOCS ? ROTOM_ERROR_DOCS[errorCode] : undefined;
+  }
+
+  useEffect(() => {
+    if (isEnhancedErrorProps(props)) {
+      logErrorToMonitoring(props.errorCode, props.context ?? {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEnhancedErrorProps(props) ? props.errorCode : undefined, isEnhancedErrorProps(props) ? props.context : undefined]);
+
+  useEffect(() => {
+    if (isEnhancedErrorProps(props)) {
+      setShowHelp(props.showHelp ?? false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEnhancedErrorProps(props) ? props.showHelp : undefined]);
+
   if (!isEnhancedErrorProps(props)) {
     return (
       <motion.div
@@ -63,19 +91,26 @@ export function RotomError(props: RotomErrorProps) {
       </motion.div>
     );
   }
-  
-  const { errorCode, context = {}, onAction, actionText = "Reintentar", showHelp: initialShowHelp = false } = props;
-  const errorDef = ROTOM_ERROR_CODES[errorCode];
-  const formattedCode = getFormattedErrorCode(errorCode);
-  const errorDocs = errorCode in ROTOM_ERROR_DOCS ? ROTOM_ERROR_DOCS[errorCode] : undefined;
-  
-  useEffect(() => {
-    logErrorToMonitoring(errorCode, context);
-  }, [errorCode, context]);
 
-  useEffect(() => {
-    setShowHelp(initialShowHelp);
-  }, [initialShowHelp]);
+  // Fallback if errorDef is undefined
+  if (!errorDef) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-primary-200 p-8 rounded-lg shadow-lg border-2 border-primary-300 max-w-md"
+      >
+        <div className="flex items-center mb-4">
+          <AlertTriangle className="w-8 h-8 text-primary-500 mr-2" />
+          <h1 className="text-2xl font-bold">Error desconocido</h1>
+        </div>
+        <div className="bg-primary-300 p-4 rounded mb-4">
+          <p className="text-sm">No se encontró información para el código de error proporcionado.</p>
+        </div>
+      </motion.div>
+    );
+  }
 
   const getSeverityIcon = (severity: ErrorSeverity) => {
     if (severity === ERROR_SEVERITIES.ERROR) {

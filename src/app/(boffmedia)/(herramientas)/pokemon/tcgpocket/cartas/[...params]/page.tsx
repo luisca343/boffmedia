@@ -273,7 +273,7 @@ export default function Expansions({
             <div className="backdrop-blur-md bg-black/30 rounded-2xl p-8 shadow-xl border border-white/10">
               <h3 className="text-2xl font-bold mb-4 text-white">{t("cardDetail.description")}</h3>
               <p className="text-surface-300 leading-relaxed italic">
-                "{cardData.description}"
+                &quot;{cardData.description}&quot;
               </p>
             </div>
           )}

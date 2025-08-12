@@ -85,7 +85,7 @@ export function ParticipantsList({
               </Badge>
               {searchTerm && (
                 <Badge variant="outline" className="text-surface-400 border-surface-600">
-                  Filtrado: "{searchTerm}"
+                  Filtrado: &quot;{searchTerm}&quot;
                 </Badge>
               )}
             </div>
@@ -124,7 +124,7 @@ export function ParticipantsList({
                 {searchTerm ? (
                   <div>
                     <p className="text-surface-400 mb-2">No se encontraron participantes</p>
-                    <p className="text-sm text-surface-500">que coincidan con "{searchTerm}"</p>
+                    <p className="text-sm text-surface-500">que coincidan con &quot;{searchTerm}&quot;</p>
                   </div>
                 ) : (
                   <div>

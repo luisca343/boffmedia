@@ -46,7 +46,7 @@ export default function FurretFooter() {
           <div className="text-center md:text-right">
             <div className="inline-block bg-yellow-300 border-4 border-black p-3 transform rotate-3 shadow-xl">
               <p className="text-pink-500 font-bold text-xl">
-                "¡Las mejores noticias dibujadas a POP-el y tinta!"
+                &quot;¡Las mejores noticias dibujadas a POP-el y tinta!&quot;
               </p>
             </div>
           </div>

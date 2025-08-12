@@ -23,6 +23,13 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
   // Debug logging
   console.log("PokemonMovesCard received moves:", moves);
   
+  // Filter moves based on search term (always call hooks at the top level)
+  const filteredMoves = useMemo(() => {
+    if (!searchTerm.trim()) return moves;
+
+    const filtered: Record<string, any> = {};
+    const lowerSearchTerm = searchTerm.toLowerCase();
+
   // Check if moves is empty or invalid
   if (!moves || Object.keys(moves).length === 0) {
     return (
@@ -37,13 +44,6 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
       </div>
     );
   }
-
-  // Filter moves based on search term
-  const filteredMoves = useMemo(() => {
-    if (!searchTerm.trim()) return moves;
-
-    const filtered: Record<string, any> = {};
-    const lowerSearchTerm = searchTerm.toLowerCase();
 
     Object.entries(moves).forEach(([type, moveList]) => {
       if (!moveList || (Array.isArray(moveList) && moveList.length === 0)) {
@@ -130,7 +130,7 @@ export default function PokemonMovesCard({ data }: PokemonMovesCardProps) {
       {Object.keys(filteredMoves).length === 0 && searchTerm ? (
         <div className="text-center py-8">
           <p className="text-surface-400 text-sm">
-            No se encontraron movimientos que coincidan con "{searchTerm}"
+            No se encontraron movimientos que coincidan con &quot;{searchTerm}&quot;
           </p>
         </div>
       ) : (
