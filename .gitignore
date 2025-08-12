@@ -46,5 +46,4 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 
-/src/generated
 /src/app/favicon.ico
