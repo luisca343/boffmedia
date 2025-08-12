@@ -21,8 +21,8 @@ const Switch = React.forwardRef<
       thumb: "bg-surface-800"
     },
     wingull: {
-      root: "focus-visible:ring-blue-300 focus-visible:ring-offset-blue-950 data-[state=checked]:bg-blue-300 data-[state=unchecked]:bg-blue-700",
-      thumb: "bg-blue-950"
+      root: "focus-visible:ring-secondary-300 focus-visible:ring-offset-secondary-950 data-[state=checked]:bg-secondary-300 data-[state=unchecked]:bg-secondary-700",
+      thumb: "bg-secondary-950"
     }
   }
 

@@ -86,7 +86,7 @@ export default function PokemonTamagotchi() {
   }, [selectedMenuIndex, performAction])
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-blue-200 to-purple-200">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-secondary-200 to-accent-200">
       <div className="relative w-[26rem] h-[32rem] flex flex-col items-center justify-center">
         {!tabRemoved && (
           <div 

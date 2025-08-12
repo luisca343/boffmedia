@@ -1,10 +1,7 @@
 import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { arcadeService, InventoryItem, RarityRanges } from "@/services/api/smartrotom/arcadeService";
-import { Item, LootBox, Rarity } from "../types";
+import { ArcadeInventoryItem, ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import { useTranslations } from 'next-intl';
-import { getItemDescription, getItemName } from "@/lib/intlUtils";
-import { Weight } from "lucide-react";
+import { LootboxBoxConfig, LootboxItemConfig, RarityRange } from "@/generated/api";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {
@@ -15,10 +12,10 @@ const BOX_TYPE_MAP: Record<string, string> = {
 
 export function useLootBoxInventory(uuid?: string) {
   const t = useTranslations("");
-  const [collection, setCollection] = useState<Item[]>([]);
-  const [ownedBoxes, setOwnedBoxes] = useState<Record<string, InventoryItem>>({});
+  const [collection, setCollection] = useState<ArcadeInventoryItem[]>([]);
+  const [ownedBoxes, setOwnedBoxes] = useState<Record<string, ArcadeInventoryItem>>({});
   const [loadingInventory, setLoadingInventory] = useState(false);
-  const [availableLootBoxes, setAvailableLootBoxes] = useState<LootBox[]>([]);
+  const [availableLootBoxes, setAvailableLootBoxes] = useState<LootboxBoxConfig[]>([]);
   const [loadingLootBoxes, setLoadingLootBoxes] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,28 +23,17 @@ export function useLootBoxInventory(uuid?: string) {
   const fetchInventory = async (userId: string) => {
     try {
       setLoadingInventory(true);
-      const response = await arcadeService.getInventory(userId, '');
+      const response = await ArcadeService.getInventory(userId);
       if (response.data && response.data.items) {
         const serverItems = response.data.items
-          .filter(item => item.used === 0) // Only include unused items
-          .map(item => ({
-            id: item.itemId,
-            name: t(`items.${item.itemId.replace(":", ".")}_name`),
-            source: item.sourceType,
-            image: getItemName(t, item.itemId),
-            weight: 0,
-            rarity: item.rarity as Rarity,
-            count: item.amount,
-            description: getItemDescription(t, item.itemId),
-            serverId: item.id,
-          }));
+          .filter(item => item.used === 0);
         
         setCollection(serverItems);
         
-        const boxes: Record<string, InventoryItem> = {};
+        const boxes: Record<string, ArcadeInventoryItem> = {};
         response.data.items
-          .filter(item => item.used === 0) // Only include unused boxes
           .forEach(item => {
+            item.amount = item.amount - (item.used || 0);
             if (Object.keys(BOX_TYPE_MAP).includes(item.itemId)) {
               boxes[item.itemId] = item;
             }
@@ -60,7 +46,7 @@ export function useLootBoxInventory(uuid?: string) {
     }
   };
   
-  function getRarityFromWeight(rarityRanges: RarityRanges, weight: number): string {
+  function getRarityFromWeight(rarityRanges: Record<string, RarityRange>, weight: number): string {
     for (const [rarity, range] of Object.entries(rarityRanges)) {
       if (weight >= range.min && weight <= range.max) {
         return rarity;
@@ -68,21 +54,22 @@ export function useLootBoxInventory(uuid?: string) {
     }
     return 'common';
   }
+  
   const fetchLootBoxConfig = async () => {
     try {
       setLoadingLootBoxes(true);
-      const {rarityRanges, lootboxConfig} = (await arcadeService.getLootboxConfig()).data!
+      const {rarityRanges, lootboxConfig} = (await ArcadeService.getLootboxConfig()).data!
       
       if (lootboxConfig && lootboxConfig.boxes) {
-        const lootBoxes: LootBox[] = lootboxConfig.boxes.map(box => ({
+        const lootBoxes: LootboxBoxConfig[] = lootboxConfig.boxes.map((box: LootboxBoxConfig) => ({
           id: box.id,
           name: box.name,
           description: box.description,
           image: box.image,
-          items: box.items.map(item => ({
+          items: box.items.map((item: LootboxItemConfig) => ({
             id: item.id,
             weight: item.weight,
-            rarity: getRarityFromWeight(rarityRanges, item.weight) as Rarity,
+            rarity: getRarityFromWeight(rarityRanges, item.weight) as ArcadeInventoryItem.rarity,
           })),
           theme: box.theme || "default"
         }));
@@ -99,7 +86,6 @@ export function useLootBoxInventory(uuid?: string) {
         setError("No se pudieron cargar las cajas de botín. Intente de nuevo más tarde.");
       }
     } catch (err) {
-      console.error("Failed to fetch loot box config:", err);
       setError("Error al cargar las configuraciones de cajas. Por favor, intente de nuevo más tarde.");
     } finally {
       setLoadingLootBoxes(false);
@@ -109,13 +95,13 @@ export function useLootBoxInventory(uuid?: string) {
   // Open a loot box and get a reward
   const openLootBox = async (uuid: string, boxId: string) => {
     try {
-      const response = await arcadeService.openLootBox({
+      const response = await ArcadeService.openLootbox({
         uuid,
         boxId,
       });
       
-      if (!response.data || !response.data.success) {
-        throw new Error(response.data?.message || "Error al abrir la caja");
+      if (!response.data || !response.success) {
+        throw new Error(response?.message || "Error al abrir la caja");
       }
 
       // Update local state to reflect the consumed box
@@ -128,10 +114,11 @@ export function useLootBoxInventory(uuid?: string) {
       }));
       
       // Return the won item
-      const item: Item = {
+      const item: LootboxItemConfig = {
         id: response.data.item!.id,
-        weight: response.data.item!.weight,
-        rarity: response.data.item!.rarity as Rarity,
+        weight: 0, //TODO: FIX THIS
+        //weight: response.data.item!.weight,
+        rarity: response.data.item!.rarity as ArcadeInventoryItem.rarity,
       };
       
       return item;
@@ -168,6 +155,8 @@ export function useLootBoxInventory(uuid?: string) {
     error,
     fetchInventory,
     openLootBox,
-    addItemToCollection: (item: Item) => setCollection(prev => [...prev, item])
+    addItemToCollection: (item: any) => setCollection(prev => {
+      return [...prev, item];
+    })
   };
 }

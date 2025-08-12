@@ -5,7 +5,7 @@ export function useRotomRequest<T>(
   apiFunction: (...args: any[]) => Promise<ApiResponse<T>>,
   ...params: any[]
 ) {
-  const [data, setData] = useState<T | null | undefined>(null)
+  const [data, setData] = useState<T>()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
 
@@ -15,7 +15,7 @@ export function useRotomRequest<T>(
       if (response.error) {
         setError(response.error)
       } else {
-        setData(response.data ?? null)
+        setData(response.data)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))

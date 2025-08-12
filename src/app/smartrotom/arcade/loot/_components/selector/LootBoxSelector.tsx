@@ -1,18 +1,17 @@
 import { useState, useEffect } from "react";
-import { LootBox } from "../../types";
-import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
 import { getThemeColors } from "../../_utils/getThemeColors";
 import { BoxCarousel } from "./BoxCarousel";
 import { BoxInfo } from "./BoxInfo";
 import { OpenBoxButton } from "./OpenBoxButton";
 import { LootBoxOdds } from "../opening/LootBoxOdds";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
 
 interface LootBoxSelectorProps {
-  lootBoxes: LootBox[];
-  selectedBox: LootBox | null;
-  onSelect: (box: LootBox) => void;
+  lootBoxes: LootboxBoxConfig[];
+  selectedBox: LootboxBoxConfig | null;
+  onSelect: (box: LootboxBoxConfig) => void;
   onOpenBox: () => void;
-  ownedBoxes: Record<string, InventoryItem>;
+  ownedBoxes: Record<string, ArcadeInventoryItem>;
 }
 
 export default function LootBoxSelector({ 
@@ -38,7 +37,7 @@ export default function LootBoxSelector({
 
   return (
     <div className="flex flex-col items-center">
-      <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 pb-2 mb-4">
+      <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-accent-400 pb-2 mb-4">
         Selecciona una Caja
       </h2>
       

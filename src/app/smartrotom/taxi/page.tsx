@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useBoffSession } from "@/services/useBoffSession"
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { smartrotomService } from "@/services/api/smartrotom/smartrotomService"
-import { starbankService } from "@/services/api/smartrotom/starbankService"
+import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
+import { StarbankService } from "@/services/api/smartrotom/starbankService"
 import { TaxiStop } from "@/types/dto/taxi-stop.dto"
 import { getMcUserData } from '@/services/mcef/mcefApi'
 import TaxiHeader from './components/TaxiHeader'
@@ -14,9 +14,7 @@ import MapView from './components/MapView'
 import ListView from './components/ListView'
 import LoadingOverlay from './components/LoadingOverlay'
 import SelectedStopDetails from './components/SelectedStopDetails'
-import RecentDestinations from './components/RecentDestinations'
-import TravelHistory from './components/TravelHistory'
-import { FaTimes, FaCarSide } from 'react-icons/fa'
+import { WingullService } from '@/services/api/smartrotom/wingullService'
 
 const MINIMUM_FARE = 100
 const PRICE_PER_BLOCK = 0.5
@@ -71,7 +69,7 @@ export default function TaxiApp() {
       
       setIsLoading(true)
       try {
-        const stopsResponse = await smartrotomService.getTaxiStops()
+        const stopsResponse = await WingullService.getTaxiStops()
         
         if (stopsResponse.data) {
           const stopsArray = Object.values(stopsResponse.data)
@@ -83,7 +81,7 @@ export default function TaxiApp() {
         await updatePlayerPosition()
 
         if (session?.user?.smartRotomUser?.uuid) {
-          const balanceResponse = await starbankService.getBalance(session.user.smartRotomUser.uuid)
+          const balanceResponse = await StarbankService.getUserBalance(session.user.smartRotomUser.uuid)
           if (balanceResponse.data) {
             setPlayerMoney(balanceResponse.data.balance)
           }
@@ -131,14 +129,14 @@ export default function TaxiApp() {
     setIsLoading(true)
     try {
       if (session?.user?.smartRotomUser?.uuid) {
-        await starbankService.transferFromMain({
+        await StarbankService.transferFromMain({
           uuid: session.user.smartRotomUser.uuid,
           to: TAXI_SERVICE_ACCOUNT,
           amount: price,
           concept: `Taxi a ${stop.id}`,
         })
 
-        await smartrotomService.teleportPlayer({
+        await WingullService.teleportPlayer({
           id: stop.id,
           uuid: session.user.smartRotomUser.uuid
         })
@@ -178,7 +176,7 @@ export default function TaxiApp() {
       {/* Decorative elements for a more dynamic look */}
       <div className="absolute top-[20%] left-[5%] w-12 h-12 bg-white/5 rounded-full blur-2xl"></div>
       <div className="absolute bottom-[15%] right-[10%] w-20 h-20 bg-yellow-400/10 rounded-full blur-3xl"></div>
-      <div className="absolute top-[60%] left-[30%] w-32 h-32 bg-blue-300/5 rounded-full blur-2xl"></div>
+      <div className="absolute top-[60%] left-[30%] w-32 h-32 bg-secondary-300/5 rounded-full blur-2xl"></div>
 
       <TaxiHeader 
         playerPosition={playerPosition} 

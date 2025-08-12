@@ -32,11 +32,11 @@ export function getRewardIcon({ type, description = "", size = 24, className = "
       if (description && description.length > 0) {
         return <ItemImage type="item" itemId={description} size={size} />;
       }
-      return <Award className={`h-${size/4} w-${size/4} text-blue-300 ${className}`} />;
+      return <Award className={`h-${size/4} w-${size/4} text-secondary-300 ${className}`} />;
     case 'pokemon':
       return <PokemonImage itemId={description} size={size} />;
     default:
-      return <Gift className={`h-${size/4} w-${size/4} text-green-300 ${className}`} />;
+      return <Gift className={`h-${size/4} w-${size/4} text-highlight-300 ${className}`} />;
   }
 }
 
@@ -58,21 +58,21 @@ export function getRewardVisuals(rewardType: string) {
     case 'crate':
     case 'crates':
       return {
-        bgGradient: "from-violet-700/40 to-purple-800/40",
+        bgGradient: "from-violet-700/40 to-accent-800/40",
         border: "border-violet-500/50",
         textColor: "text-violet-300"
       };
     case 'item':
       return {
-        bgGradient: "from-blue-700/40 to-indigo-800/40",
-        border: "border-blue-500/50",
-        textColor: "text-blue-300"
+        bgGradient: "from-secondary-700/40 to-indigo-800/40",
+        border: "border-secondary-500/50",
+        textColor: "text-secondary-300"
       };
     default:
       return {
-        bgGradient: "from-green-700/40 to-emerald-800/40",
-        border: "border-green-500/50",
-        textColor: "text-green-300"
+        bgGradient: "from-highlight-700/40 to-emerald-800/40",
+        border: "border-highlight-500/50",
+        textColor: "text-highlight-300"
       };
   }
 }

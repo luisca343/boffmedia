@@ -12,7 +12,7 @@ import { useGetNewsById } from "@/hooks/documents/useGetNewsById";
 import PopArtWallpaper from "../../_components/PopArtWallpaper";
 import PopStyles from "../../_components/PopStyles";
 
-const CustomEditor = dynamic(() => import("@/components/editor/TestEditor"), {
+const CustomEditor = dynamic(() => import("@/components/ckeditor/TestEditor"), {
   ssr: false,
 });
 
@@ -25,7 +25,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
       <div className="min-h-full bg-yellow-300 flex items-center justify-center">
         <Card className="w-96 bg-white border-8 border-black transform rotate-2">
           <CardContent className="p-6 text-center">
-            <h2 className="text-4xl font-bold mb-4 pop-shadow text-blue-500">
+            <h2 className="text-4xl font-bold mb-4 pop-shadow text-secondary-500">
               ¡CARGANDO!
             </h2>
             <p className="text-2xl font-comic mb-6">
@@ -33,7 +33,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
             </p>
             <div className="relative h-40 w-full">
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 border-8 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-16 h-16 border-8 border-secondary-500 border-t-transparent rounded-full animate-spin"></div>
               </div>
               <div className="absolute inset-0 flex items-center justify-center">
                 <span className="text-6xl animate-bounce">🔍</span>
@@ -83,14 +83,14 @@ export default function ReadPage({ params }: { params: { id: string } }) {
             
             <div className="flex flex-wrap justify-center gap-4">
               <InternalLink
-                href="/noticias"
-                className="bg-blue-500 text-white hover:bg-blue-600 font-bold py-2 px-6 rounded-full text-xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black"
+                href="noticias"
+                className="bg-secondary-500 text-white hover:bg-secondary-600 font-bold py-2 px-6 rounded-full text-xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black"
               >
                 Volver a las Noticias
               </InternalLink>
               <Button
                 onClick={() => window.location.reload()}
-                className="bg-green-500 text-white hover:bg-green-600 font-bold py-2 px-6 rounded-full text-xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black"
+                className="bg-highlight-500 text-white hover:bg-highlight-600 font-bold py-2 px-6 rounded-full text-xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black"
               >
                 ¡Intentar de Nuevo!
               </Button>
@@ -124,8 +124,8 @@ export default function ReadPage({ params }: { params: { id: string } }) {
           <FurretHeader />
           
           {/* Navigation breadcrumbs */}
-          <div className="bg-blue-100 p-4 flex flex-wrap items-center font-comic">
-            <InternalLink href="/noticias" className="text-blue-500 hover:underline">
+          <div className="bg-secondary-100 p-4 flex flex-wrap items-center font-comic">
+            <InternalLink href="noticias" className="text-secondary-500 hover:underline">
               Inicio
             </InternalLink>
             <span className="mx-2"> &gt; </span>
@@ -149,7 +149,7 @@ export default function ReadPage({ params }: { params: { id: string } }) {
             {/* Comic style border */}
             <div className="border-8 border-black bg-white p-6">
               {/* Ben-Day dot pattern accent border */}
-              <div className="border-8 border-dotted border-blue-200 p-4 relative">
+              <div className="border-8 border-dotted border-secondary-200 p-4 relative">
                 {/* Add comic style elements to the article background */}
                 <div className="absolute top-4 right-4 opacity-10">
                   <svg viewBox="0 0 100 100" width="100" height="100">
@@ -176,10 +176,10 @@ export default function ReadPage({ params }: { params: { id: string } }) {
           </div>
           
           {/* Navigation buttons */}
-          <div className="bg-blue-100 p-8 text-center">
+          <div className="bg-secondary-100 p-8 text-center">
             <InternalLink
-              href="/noticias"
-              className="bg-blue-500 text-white hover:bg-blue-600 font-bold py-4 px-8 rounded-full text-2xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black inline-block"
+              href="noticias"
+              className="bg-secondary-500 text-white hover:bg-secondary-600 font-bold py-4 px-8 rounded-full text-2xl transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black inline-block"
             >
               Volver a las Noticias
             </InternalLink>

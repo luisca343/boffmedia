@@ -44,7 +44,7 @@ const TableHeader = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-900",
-    wingull: "border-blue-900 bg-blue-950"
+    wingull: "border-secondary-900 bg-secondary-950"
   }
   
   return (
@@ -90,7 +90,7 @@ const TableFooter = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-700/50",
-    wingull: "border-blue-200 bg-blue-50"
+    wingull: "border-secondary-200 bg-secondary-50"
   }
   
   return (
@@ -115,7 +115,7 @@ const TableRow = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 hover:bg-surface-700/50 data-[state=selected]:bg-surface-700",
-    wingull: "border-blue-100 data-[state=selected]:bg-blue-100"
+    wingull: "border-secondary-100 data-[state=selected]:bg-secondary-100"
   }
   
   return (
@@ -165,7 +165,7 @@ const TableCell = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-400",
-    wingull: "text-blue-950"
+    wingull: "text-secondary-950"
   }
   
   return (
@@ -190,7 +190,7 @@ const TableCaption = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-500"
+    wingull: "text-secondary-500"
   }
   
   return (

@@ -15,11 +15,11 @@ const eventSchema = z.object({
   parentId: z.number().optional(),
   title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
   description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  icon: z.string().url("Debe ser una URL válida").optional(),
-  banner: z.string().url("Debe ser una URL válida").optional(),
-  game: z.number(),
+  icon: z.string().optional(),
+  banner: z.string().optional(),
+  gameId: z.number(),
   startDate: z.string(),
-  endDate: z.string(),
+  endDate: z.string().optional(),
   type: z.enum(["event", "server"]),
   visibility: z.enum(["public", "private"]),
 })
@@ -45,13 +45,12 @@ export function EventForm({
 }: EventFormProps) {
   const { events, isLoading: isLoadingEvents } = useGetEvents()
   const { games, isLoading: isLoadingGames } = useGetGames()
-
-  // Filter out events that can be parents (only server type events)
+  
   const parentEvents =
     events?.filter(
       (event) =>
         event.type === "server" &&
-        event.id !== defaultValues?.id && // Can't be parent of itself
+        event.id !== defaultValues?.id && 
         !event.parentId, // Only top-level servers can be parents
     ) || []
 
@@ -59,7 +58,7 @@ export function EventForm({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       ...defaultValues,
-      parentId: parentEvent?.id || defaultValues?.parentId,
+      parentId: parentEvent?.id,
       type: defaultValues?.type || (parentEvent ? "event" : "server"),
     },
   })
@@ -73,7 +72,7 @@ export function EventForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-        {!parentEvent && ( // Only show parent selection if not creating from a parent
+        {!parentEvent && ( 
           <FormField
             control={form.control}
             name="parentId"
@@ -91,7 +90,7 @@ export function EventForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="bg-surface-800 border-surface-700">
-                    <SelectItem value="-1">Ninguno (Evento independiente)</SelectItem>
+                    <SelectItem value="0">Ninguno (Evento independiente)</SelectItem>
                     {parentEvents.map((event) => (
                       <SelectItem key={event.id} value={event.id.toString()}>
                         {event.title}
@@ -150,7 +149,7 @@ export function EventForm({
 
         <FormField
           control={form.control}
-          name="game"
+          name="gameId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Juego</FormLabel>
@@ -313,13 +312,12 @@ export function EventForm({
         />
 
         <div className="flex justify-end gap-2 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel} className="border-surface-600 text-surface-300">
+          <Button type="button" variant="outline" onClick={onCancel}>
             Cancelar
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingGames}
-            className="bg-primary-500 hover:bg-primary-600 text-white"
           >
             {submitLabel}
           </Button>

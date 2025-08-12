@@ -1,7 +1,6 @@
 import { useCreateNote } from "@/hooks/documents/useCreateNote";
 import { useGetNotes } from "@/hooks/documents/useGetNotes";
 import { useBoffSession } from "@/services/useBoffSession";
-import { Note, NoteBase } from "@/types/documents";
 import { CreateDocumentDtoWithUuid } from "@/types/dto/create-document.dto";
 import { useState } from "react"
 
@@ -21,8 +20,8 @@ export function useGetDocuments() {
     }
 
     return { notes, setNotes, newNote, fetchDocuments: refetch, selectedNoteId, setSelectedNoteId } as {
-        notes: NoteBase[];
-        setNotes: (documents: Note[]) => void;
+        notes: any[];
+        setNotes: (documents: any[]) => void;
         newNote: (noteData: any) => void;
         fetchDocuments: () => void;
         selectedNoteId: string;

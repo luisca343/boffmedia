@@ -67,7 +67,7 @@ export default function Habilidades() {
                         filteredAbilities.map((ability: AbilityCount) => (
                             <HoverCard key={ability.name}>
                                 <HoverCardTrigger>
-                                    <InternalLink href={`/pokedex/habilidades/${ability.name}`}>
+                                    <InternalLink href={`pokedex/habilidades/${ability.name}`}>
                                         <div className="flex flex-col items-center justify-center text-center p-4 h-32 
                                                     rounded-lg border border-surface-600 bg-surface-700/50
                                                     hover:bg-surface-600/80 hover:border-surface-500 hover:text-surface-50 transition-all

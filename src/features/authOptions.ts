@@ -5,9 +5,6 @@ import { boffPOST } from '@/services/boffAPI';
 import { BoffUser } from "@/types";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
-import { User } from "@/services/api/smartrotom/usersService";
-
-
 
 export const authOptions: NextAuthOptions = {
   pages: {
@@ -25,15 +22,26 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials, req) {
         try {
           if (!credentials?.username || !credentials?.password) {
-            throw new AuthError("Missing username or password", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
+            console.log("Missing credentials");
+            return null;
           }
-          const response = (await boffPOST(`/users/login`, credentials)).data as any;
+          
+          console.log("Attempting to authenticate with boffAPI:", credentials.username);
+          const response = (await boffPOST(`/auth/login`, {
+            username: credentials.username,
+            password: credentials.password,
+          })).data as any;
+          
           if (response && !response.error) {
-            return response;
+            console.log("Authentication successful");
+            return response.user as any; // TODO - CREATE FULL USER TYPE
           }
-          throw new AuthError("Invalid credentials", AUTH_ERROR_CODES.INVALID_CREDENTIALS);
+          
+          console.log("Authentication failed - invalid response:", response);
+          return null;
         } catch (error) {
-          throw handleAuthError(error);
+          console.error("Authentication error:", error);
+          return null; // Return null instead of throwing
         }
       }
     }),
@@ -41,7 +49,7 @@ export const authOptions: NextAuthOptions = {
       id: "minecraft",
       name: "Minecraft",
       credentials: {
-        username: { label: "Username", type: "text", placeholder: "jsmith" },
+        username: { label: "Username", type: "text", placeholder: "Luisca" },
         uuid: { label: "UUID", type: "text" },
         world: { label: "World", type: "text" }
       },
@@ -50,13 +58,14 @@ export const authOptions: NextAuthOptions = {
           if (!credentials?.username || !credentials?.uuid || !credentials?.world) {
             throw new AuthError("Missing required Minecraft credentials", AUTH_ERROR_CODES.MISSING_CREDENTIALS);
           }
-          const response = (await boffPOST(`/users/loginmc`, credentials)).data as any;
+          const response = (await boffPOST(`/auth/loginmc`, credentials)).data as any;
           if (response && !response.error) {
-            const user: User = {
-              id: response.id,
-              name: response.name,
-              email: response.email,
-              image: response.image,
+            const responseData = response.user as any;
+            const user: any = {  // TODO - CREATE FULL USER TYPE
+              id: responseData.id,
+              name: responseData.name,
+              email: responseData.email,
+              image: responseData.image,
               smartRotomUser: {
                 username: credentials.username,
                 uuid: credentials.uuid,
@@ -83,31 +92,20 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log('==== SIGN IN ====');
-      console.log('User:', user);
-      console.log('Account:', account);
-      console.log('Profile:', profile);
       if (account?.provider === 'google') {
-        console.log('Sending Google callback to backend: ', {
-          email: profile?.email,
-          name: profile?.name,
-          picture: profile?.image
-        });
         
         try {
-          const response = (await boffPOST('/users/google/callback', { 
+          const response = (await boffPOST('/auth/google/callback', { 
             email: profile?.email,
             name: profile?.name,
             picture: profile?.image
-          })).data as any;
-          
-          console.log('Google callback response:', response);
+          })) as any;
 
           if (!response.statusCode || response.statusCode !== 200) {
             throw new Error('Failed to authenticate with backend');
           }
 
-          const userData = await response.user;
+          const userData = await response.data.user;
           user.id = userData.id;
           user.roles = userData.roles;
           user.smartRotomUser = userData.smartRotomUser;
@@ -120,17 +118,54 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
+      // If this is a new sign-in, update token with user data
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.name = user.name;
+        token.name = user.username;
         token.roles = user.roles;
         token.smartRotomUser = user.smartRotomUser;
+        token.lastUpdated = Date.now();
       }
+
+      // Refresh user data when:
+      // 1. Explicitly requested (trigger === 'update')
+      // 2. No lastUpdated timestamp exists (first time)
+      // 3. Data is older than 2 minutes
+      // 4. Trigger is undefined (page refresh/reload)
+      const shouldRefresh = trigger === 'update' || 
+        !token.lastUpdated || 
+        (Date.now() - (token.lastUpdated as number) > 2 * 60 * 1000) || // 2 minutes
+        trigger === undefined; // This covers page refresh scenarios
+      
+      if (shouldRefresh && token.id) {
+        try {
+          
+          // Send the token object directly to the backend
+          const response = (await boffPOST('/auth/refresh', { 
+            refresh_token: token // Send the entire token object
+          })) as any;
+          
+          if (response && response.statusCode === 200) {
+            const userData = response.data;
+            
+            token.roles = userData.user.roles;
+            token.name = userData.user.name;
+            token.email = userData.user.email;
+            token.smartRotomUser = userData.user.smartRotomUser;
+            token.lastUpdated = Date.now();
+          }
+        } catch (error) {
+          console.error('Error refreshing user data:', error);
+          // Don't update lastUpdated on error to retry sooner
+        }
+      }
+      
       if (account && account.provider === "google") {
         token.accessToken = account.access_token;
       }
+      
       console.log('JWT token:', token);
       return token;
     },
@@ -176,4 +211,3 @@ export const authOptions: NextAuthOptions = {
     }
   } as Partial<CookiesOptions>,
 };
-

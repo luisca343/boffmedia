@@ -1,9 +1,9 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { playerService } from "@/services/api/smartrotom/playerService"
+import { PlayerService } from "@/services/api/smartrotom/playerService"
 
 export function useGetPlayerStats(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(playerService.getStats, uuid)
-
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(PlayerService.getStats, uuid)
+  
   return {
     playerStats: data?.stats,
     error,

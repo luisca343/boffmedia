@@ -23,7 +23,7 @@ export function EventHeader({ totalEvents, searchTerm, onSearchChange, onCreateN
           <CardDescription className="text-surface-300">Administra los eventos y competiciones</CardDescription>
         </div>
 
-        <Button className="bg-primary-500 hover:bg-primary-600 text-white" onClick={onCreateNew}>
+        <Button onClick={onCreateNew}>
           <Plus className="mr-2 h-4 w-4" />
           Nuevo Evento
         </Button>

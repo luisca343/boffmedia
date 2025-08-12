@@ -1,5 +1,5 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 
 export type NewsArticle = {
   id: string;
@@ -8,7 +8,7 @@ export type NewsArticle = {
 };
 
 export function useGetNewsById(id: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.getNewsById, id);
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.getNewsById, id);
 
   return {
     article: data,

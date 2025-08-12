@@ -12,44 +12,44 @@ interface CardComponentProps {
 
 const variantStyles = {
   blue: {
-    cardClass: "bg-blue-500 text-white",
-    buttonClass: "bg-yellow-300 text-blue-500 hover:bg-white",
+    cardClass: "bg-secondary-500 text-white",
+    buttonClass: "bg-yellow-300 text-secondary-500 hover:bg-white",
     accentColor: "border-yellow-300",
     titleBgColor: "bg-yellow-300",
-    titleTextColor: "text-blue-600",
+    titleTextColor: "text-secondary-600",
   },
   purple: {
-    cardClass: "bg-purple-500 text-white",
-    buttonClass: "bg-yellow-300 text-purple-500 hover:bg-white",
-    accentColor: "border-green-300",
-    titleBgColor: "bg-green-300",
-    titleTextColor: "text-purple-700",
+    cardClass: "bg-accent-500 text-white",
+    buttonClass: "bg-yellow-300 text-accent-500 hover:bg-white",
+    accentColor: "border-highlight-300",
+    titleBgColor: "bg-highlight-300",
+    titleTextColor: "text-accent-700",
   },
   green: {
-    cardClass: "bg-green-500 text-white",
-    buttonClass: "bg-yellow-300 text-green-500 hover:bg-white",
+    cardClass: "bg-highlight-500 text-white",
+    buttonClass: "bg-yellow-300 text-highlight-500 hover:bg-white",
     accentColor: "border-pink-300",
     titleBgColor: "bg-pink-300",
-    titleTextColor: "text-green-700",
+    titleTextColor: "text-highlight-700",
   },
   red: {
     cardClass: "bg-red-500 text-white",
     buttonClass: "bg-yellow-300 text-red-500 hover:bg-white",
-    accentColor: "border-blue-300",
-    titleBgColor: "bg-blue-300",
+    accentColor: "border-secondary-300",
+    titleBgColor: "bg-secondary-300",
     titleTextColor: "text-red-600",
   },
   yellow: {
     cardClass: "bg-yellow-500 text-black",
-    buttonClass: "bg-blue-500 text-yellow-500 hover:bg-white",
+    buttonClass: "bg-secondary-500 text-yellow-500 hover:bg-white",
     accentColor: "border-pink-500",
-    titleBgColor: "bg-blue-300",
+    titleBgColor: "bg-secondary-300",
     titleTextColor: "text-yellow-600",
   },
   pink: {
     cardClass: "bg-pink-500 text-white",
     buttonClass: "bg-yellow-300 text-pink-500 hover:bg-white",
-    accentColor: "border-blue-300",
+    accentColor: "border-secondary-300",
     titleBgColor: "bg-yellow-300",
     titleTextColor: "text-pink-600",
   },
@@ -57,7 +57,7 @@ const variantStyles = {
     cardClass: "bg-white text-black",
     buttonClass: "bg-surface-300 text-black hover:bg-surface-400",
     accentColor: "border-black",
-    titleBgColor: "bg-blue-300",
+    titleBgColor: "bg-secondary-300",
     titleTextColor: "text-black",
   },
 };
@@ -131,7 +131,7 @@ const CardComponent: React.FC<CardComponentProps> = ({ variant, news }) => {
         
         <div className="relative">
           <InternalLink
-            href={`/noticias/leer/${news.id}`}
+            href={`noticias/leer/${news.id}`}
             className={`inline-block mt-2 font-bold py-2 px-4 rounded-full transform hover:scale-110 transition-transform button-pop-shadow border-4 border-black ${buttonClass}`}
           >
             {news.buttonText || "Leer más"}

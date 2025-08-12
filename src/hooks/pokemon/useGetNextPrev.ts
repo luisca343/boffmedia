@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 
 export function useGetNextPrev(id: number) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(pokemonService.getNextPrev, id)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(PokemonService.getNextPrev, id)
 
   return {
     nextPrev: data,

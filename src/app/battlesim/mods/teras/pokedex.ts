@@ -10454,12 +10454,12 @@ export const Pokedex: ModdedSpeciesDataTable = {
       ],
       "otherFormes": [
         "Tinkaglaze-Kiwi",
-        "Tinkaglaze-Blueberry"
+        "Tinkaglaze-secondaryberry"
       ],
       "formeOrder": [
         "Tinkaglaze",
         "Tinkaglaze-Kiwi",
-        "Tinkaglaze-Blueberry"
+        "Tinkaglaze-secondaryberry"
       ],
       "heightm": 0.04,
       "prevo": "Tinkatuff"
@@ -10496,7 +10496,7 @@ export const Pokedex: ModdedSpeciesDataTable = {
     },
     "tinkaglazeblueberry": {
       "num": 9590,
-      "name": "Tinkaglaze-Blueberry",
+      "name": "Tinkaglaze-secondaryberry",
       "baseSpecies": "Tinkaglaze",
       "forme": "Blueberry",
       "types": [

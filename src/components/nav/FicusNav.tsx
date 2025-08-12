@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import dynamic from "next/dynamic"
-import { Home, Menu } from "lucide-react"
+import { Home, Menu, Trophy, Gamepad2 } from "lucide-react"
 import { useLocale, useTranslations } from "next-intl"
 import { HerramientasMenu } from "./ToolsMenu"
 import { WingullMenu } from "./WingullMenu"
@@ -41,6 +41,7 @@ export default function OptimizedFicusNav() {
 
   const NAV_LINKS = [
     { href: "/", label: t("links.home"), icon: <Home className="h-5 w-5" /> },
+    { href: "/eventos", label: t("links.events"), icon: <Trophy className="h-5 w-5" /> },
     { href: "/herramientas", label: t("links.tools"), override: <HerramientasMenu /> },
     { href: "/wingull", label: t("links.pixelmonWingull"), override: <WingullMenu /> },
   ]
@@ -71,8 +72,13 @@ export default function OptimizedFicusNav() {
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text">
-            BoffMedia
+          <span className="relative inline-block">
+            <span className="absolute -top-2 -right-6 translate-x-1/4 px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-gradient-to-r from-yellow-300 via-yellow-400 to-orange-400 text-orange-900 shadow-lg border border-yellow-200 select-none z-10 tracking-wide drop-shadow-md" style={{letterSpacing: '0.05em'}}>
+              BETA
+            </span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text">
+              BoffMedia
+            </span>
           </span>
         </Link>
         <div className="hidden md:flex items-center space-x-6">
@@ -84,7 +90,7 @@ export default function OptimizedFicusNav() {
                 <InternalLink
                   app={href === "/" ? "" : null}
                   href={href}
-                  className={`text-surface-300 hover:text-primary-400 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 ${
+                  className={`text-surface-300 hover:text-primary-400 transition-colors duration-200 ease-in-out relative group flex items-center gap-2 text-sm ${
                     inPage(href) ? "font-medium text-primary-400" : ""
                   }`}
                   onClick={handleMenuItemClick}

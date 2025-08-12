@@ -35,7 +35,7 @@ const PopoverContent = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 bg-surface-800 text-primary-400",
-    wingull: "border-blue-700 bg-blue-800 text-blue-300"
+    wingull: "border-secondary-700 bg-secondary-800 text-secondary-300"
   }
   
   return (

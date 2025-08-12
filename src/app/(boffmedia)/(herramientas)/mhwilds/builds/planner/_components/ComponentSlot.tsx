@@ -70,7 +70,7 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
     return (
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         <span className="text-red-400">{t("attack")}: {weapon.attack || weapon.damage?.display || 0}</span>
-        <span className={weapon.affinity && weapon.affinity >= 0 ? "text-green-400" : "text-red-400"}>
+        <span className={weapon.affinity && weapon.affinity >= 0 ? "text-highlight-400" : "text-red-400"}>
           {t("affinity")}: {weapon.affinity && weapon.affinity > 0 ? '+' : ''}{weapon.affinity || 0}%
         </span>
         
@@ -127,7 +127,7 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
         
         {/* If multiple elements, show total */}
         {elements.length > 1 && (
-          <span className="text-purple-300">
+          <span className="text-accent-300">
             {t("total_element")}: {totalElementalDamage}
           </span>
         )}
@@ -139,7 +139,7 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
 const ArmorDetails: FC<{ armor: ArmorPiece }> = ({ armor }) => {
   const t = useTranslations("mhwilds");
   return <div className="flex gap-3">
-    <span className="text-blue-400">{t("def")}: {armor.defense.base} - {armor.defense.max}</span>
+    <span className="text-secondary-400">{t("def")}: {armor.defense.base} - {armor.defense.max}</span>
     {armor.rarity !== undefined && (
       <span className="text-amber-400">{t("rarity")} {armor.rarity}</span>
     )}
@@ -160,7 +160,7 @@ const CharmDetails: FC<{ charm: Charm }> = ({ charm }) => {
     <span className="text-amber-400">{t("rarity")} {charm.rarity}</span>
     <div className="flex gap-2">
       {charm.skills.map((skill, idx) => (
-        <span key={idx} className="text-green-400">
+        <span key={idx} className="text-highlight-400">
           {skill.skill.name} +{skill.level}
         </span>
       ))}
@@ -179,7 +179,7 @@ const SkillsList: FC<{ skills: SkillRank[] | CharmSkill[] }> = ({ skills }) => {
         return (
           <span 
             key={`${skillRank.id || `skill-${idx}`}`} 
-            className="text-green-400"
+            className="text-highlight-400"
           >
             {skillName} {t("lv")}{skillRank.level}
             {idx < skills.length - 1 && <span className="text-surface-500 ml-1">/</span>}

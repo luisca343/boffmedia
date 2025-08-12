@@ -1,14 +1,17 @@
 "use client"
 import React, { useEffect } from 'react';
-import useSocketStore from './useSocketStore';
 import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import useSocketStore from '@/stores/useSocketStore';
+import { useBoffSession } from '@/services/useBoffSession';
+import { SmartRotomUser } from '@/types';
 
 const SocketStatus = () => {
+  const { session } = useBoffSession();
   const { socket, connect } = useSocketStore();
 
   useEffect(() => {
     if(!socket) {
-      connect();
+      connect(session?.user.smartRotomUser as SmartRotomUser);
       return
     }
     socket.on('patata', () => console.log('Patata'));

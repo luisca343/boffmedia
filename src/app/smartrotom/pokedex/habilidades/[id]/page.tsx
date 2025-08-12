@@ -45,7 +45,7 @@ export default function Habilidad({params} : {params: {id: string}}){
             </h1>
           </div>
           <InternalLink 
-            href="/smartrotom/pokedex/habilidades" 
+            href="smartrotom/pokedex/habilidades" 
             className="text-primary-400 hover:text-primary-300 text-sm flex items-center"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-1" />

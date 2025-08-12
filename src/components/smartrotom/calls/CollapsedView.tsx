@@ -33,7 +33,7 @@ export function CollapsedView({ activeCall, currentUserUuid, onJoinCall, onExitC
         />
         {activeCall.users.find((user) => user.uuid === currentUserUuid)?.status === UserStatus.RINGING && (
           <PhoneIcon
-            className="text-green-500 hover:text-green-600 cursor-pointer"
+            className="text-highlight-500 hover:text-highlight-600 cursor-pointer"
             height={30}
             width={30}
             strokeWidth={2}
@@ -41,7 +41,7 @@ export function CollapsedView({ activeCall, currentUserUuid, onJoinCall, onExitC
           />
         )}
         <ArrowsPointingOutIcon
-          className="cursor-pointer hover:text-gray-300"
+          className="cursor-pointer hover:text-surface-300"
           height={30}
           width={30}
           strokeWidth={2}

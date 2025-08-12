@@ -89,13 +89,13 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
       <CardContent className="space-y-2 p-3">
         {/* Primary stats in a row */}
         <div className="grid grid-cols-3 gap-2">
-          {renderStatItem("defense", "defense", `${stats.defenseMin} - ${stats.defenseMax}`, "text-blue-400")}
+          {renderStatItem("defense", "defense", `${stats.defenseMin} - ${stats.defenseMax}`, "text-secondary-400")}
           {renderStatItem("attack", "attack", attackValue || stats.attack || 0, "text-red-400")}
           {renderStatItem(
             "affinity", 
             "affinity", 
             stats.affinity >= 0 ? `+${stats.affinity || 0}` : stats.affinity || 0, 
-            stats.affinity >= 0 ? 'text-green-400' : 'text-red-400',
+            stats.affinity >= 0 ? 'text-highlight-400' : 'text-red-400',
             <span>%</span>
           )}
         </div>
@@ -165,7 +165,7 @@ export function StatsDisplay({ stats }: {stats: StatsData}) {
                         width={18}
                         height={18}
                       />
-                      <span className="font-medium text-purple-400">
+                      <span className="font-medium text-accent-400">
                         {t(weapon.elderseal)}
                       </span>
                     </div>

@@ -61,7 +61,7 @@ export const KeyRow = ({
       <div className="flex items-center gap-2">
         <span className="flex items-center gap-1 text-surface-50">
           {key.name} {key.count && key.count > 1 && (
-            <Badge variant="outline" className="ml-2 text-xs border-blue-500/30 text-blue-400">
+            <Badge variant="outline" className="ml-2 text-xs border-secondary-500/30 text-secondary-400">
               x{key.count}
             </Badge>
           )}
@@ -69,7 +69,7 @@ export const KeyRow = ({
         <a
           href={`https://store.steampowered.com/app/${key.steamID}`}
           onClick={(e) => e.stopPropagation()}
-          className="text-blue-400 hover:text-blue-300 transition-colors"
+          className="text-secondary-400 hover:text-secondary-300 transition-colors"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -89,7 +89,7 @@ export const KeyRow = ({
         className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-full  ${
           key.claimed === "s" 
             ? "bg-red-500/20 text-red-400 border border-red-500/30"
-            : "bg-green-500/20 text-green-400 border border-green-500/30"
+            : "bg-highlight-500/20 text-highlight-400 border border-highlight-500/30"
         }`}
         whileHover={{ scale: 1.05 }}
         transition={{ duration: 0.2 }}

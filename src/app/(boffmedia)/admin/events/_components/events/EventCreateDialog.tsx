@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface EventCreateDialogProps {
   open: boolean
@@ -14,11 +14,21 @@ interface EventCreateDialogProps {
 
 export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreateDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  
 
   const handleSubmit = async (data: EventFormValues) => {
-    setIsSubmitting(true)
-    try {
-      await (await eventsService.createEvent(data)).data
+      setIsSubmitting(true)
+      try {
+        const { gameId, ...rest } = data;
+        const eventData = {
+          ...rest,
+          gameId,
+          icon: data.icon || '',  // Provide a default value as it's required
+          endDate: data.endDate || data.startDate,  // Provide a default value as it's required
+        };
+        
+      
+      await (await EventsService.createEvent(eventData)).data
       toast.success(`El evento "${data.title}" ha sido creado con éxito.`)
       onSuccess()
     } catch (error) {

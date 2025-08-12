@@ -70,13 +70,13 @@ export const VideoGrid = ({
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {videos.map((video) => {
-          if (video.id?.kind === "youtube#channel") {
+          if (typeof video.id === 'object' && video.id?.kind === "youtube#channel") {
             return (
               <ChannelCard
                 key={video.etag || Math.random().toString()}
                 channelId={video.snippet.channelId}
                 title={video.snippet.title}
-                thumbnailUrl={video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url}
+                thumbnailUrl={video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url || ''}
               />
             );
           }
@@ -94,7 +94,7 @@ export const VideoGrid = ({
               id={videoId}
               title={video.snippet.title}
               channelTitle={video.snippet.channelTitle}
-              thumbnailUrl={video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url}
+              thumbnailUrl={video.snippet.thumbnails.high?.url || video.snippet.thumbnails.medium?.url || ''}
               publishedAt={video.snippet.publishedAt}
               formatDate={dateFormatter}
               timestamp={(video as any).timestamp}

@@ -360,7 +360,7 @@ export default function VoltorbFlipGame() {
               
               <button
                 onClick={() => setShowRulesModal(true)}
-                className="w-full py-1.5 rounded-md bg-purple-800 hover:bg-purple-700 text-white flex items-center justify-center text-sm font-medium"
+                className="w-full py-1.5 rounded-md bg-accent-800 hover:bg-accent-700 text-white flex items-center justify-center text-sm font-medium"
               >
                 <Info className="w-3 h-3 mr-1" /> Ver reglas
               </button>

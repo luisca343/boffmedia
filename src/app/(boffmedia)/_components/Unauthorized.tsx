@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { AlertTriangle } from "lucide-react"
-import BoffLayout from "@/app/(boffmedia)/_components/BoffLayout"
+import BoffLayout from "@/app/(boffmedia)/_components/layout/BoffLayout"
 
 export default function UnauthorizedPage() {
   const router = useRouter()
@@ -18,15 +18,14 @@ export default function UnauthorizedPage() {
           </p>
           <div className="space-y-4">
             <Button
+              variant="default"
               onClick={() => router.push('/')}
-              className="w-full bg-primary-500 hover:bg-primary-600 text-white transition-colors duration-200"
             >
               Volver al Inicio
             </Button>
             <Button
               onClick={() => router.back()}
               variant="outline"
-              className="w-full border-primary-500 text-primary-300 hover:bg-primary-500 hover:text-white transition-colors duration-200"
             >
               Volver Atrás
             </Button>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import type { Event } from "@/types/events"
@@ -27,7 +27,7 @@ export function EventsTab() {
             event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             event.description?.toLowerCase().includes(searchTerm.toLowerCase())
         )
-      : events
+      : events as any
     : []
 
   const handleCreateSuccess = () => {

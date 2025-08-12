@@ -1,12 +1,12 @@
 import React from "react"
 import { getTranslations } from "next-intl/server"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { TreeRenderer } from "./TreeRenderer"
 import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 
 export async function EvoTree({params}: {params: {id: string}}) {
-  const {tree, depth} = (await pokemonService.getEvoTree(parseInt(params.id))).data!
+  const {tree, depth} = (await PokemonService.getEvoTree(parseInt(params.id))).data!
   const t = await getTranslations("");
 
   

@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import { getValidAccountId } from "../bankUtils";
 import { Session } from "next-auth";
-import { Account } from "@/services/api/smartrotom/usersService";
-import { starbankService } from "@/services/api/smartrotom/starbankService";
+import { StarbankService } from "@/services/api/smartrotom/starbankService";
+import { StarBankAccount } from "@/generated/api";
 
 
 interface StarBankState {
-  accounts: Account[];
-  activeAccount: Account | null;
-  setAccounts: (accounts: Account[]) => void;
+  accounts: StarBankAccount[];
+  activeAccount: StarBankAccount | null;
+  setAccounts: (accounts: StarBankAccount[]) => void;
   setActiveAccount: (id: number | null) => void;
   fetchAccounts: (session: Session) => void;
 }
@@ -23,7 +23,7 @@ export const useStarBankStore = create<StarBankState>((set, get) => ({
   },
   fetchAccounts: async (session) => {
     if (session?.user) {
-      const accounts = (await starbankService.getAccounts(session.user.smartRotomUser?.uuid!)).data!;
+      const accounts = (await StarbankService.getUserAccounts(session.user.smartRotomUser?.uuid!)).data!;
       const validAccountId = getValidAccountId(accounts);
       const activeAccount = accounts.find((account: { id: number; }) => account.id === validAccountId) || null;
       set({ accounts: accounts, activeAccount });

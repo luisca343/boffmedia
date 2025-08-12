@@ -1,12 +1,11 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { appsService } from "@/services/api/smartrotom/appsService"
-import type { SuccessResponse } from "@/types"
+import { AppsService } from "@/services/api/smartrotom/appsService"
 
 export function useAddAppToPlayer() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(appsService.addAppToPlayer)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(AppsService.addAppToPlayer)
 
   const addAppToPlayer = (uuid: string, appId: number) => {
-    return appsService.addAppToPlayer(uuid, appId)
+    return AppsService.addAppToPlayer(uuid, appId)
   }
 
   return {

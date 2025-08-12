@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWeaponTreeData } from './_hooks/useWeaponTreeData';
+import { Button } from '@/components/ui/button';
 
 export function WeaponElement({ weapon }: { weapon: any }) {
     return (
@@ -11,10 +12,10 @@ export function WeaponElement({ weapon }: { weapon: any }) {
         {/*
         <p className="text-xs line-clamp-2">{weapon.description}</p>
         <div className="mt-auto">
-          <p className="text-xs text-gray-500">Type: {weapon.type}</p>
-          <p className="text-xs text-gray-500">Attack: {weapon.attack}</p>
-          <p className="text-xs text-gray-500">Element: {weapon.element}</p>
-          <p className="text-xs text-gray-500">Rarity: {weapon.rarity}</p>
+          <p className="text-xs text-surface-500">Type: {weapon.type}</p>
+          <p className="text-xs text-surface-500">Attack: {weapon.attack}</p>
+          <p className="text-xs text-surface-500">Element: {weapon.element}</p>
+          <p className="text-xs text-surface-500">Rarity: {weapon.rarity}</p>
         </div> */}
       </div>
     );
@@ -53,12 +54,13 @@ export default function WeaponTree() {
     return (
       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4">
         <p>{error}</p>
-        <button 
+        <Button
+          variant="error"
           onClick={() => refreshData()}
-          className="mt-2 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded"
+          
         >
           Try Again
-        </button>
+        </Button>
       </div>
     );
   }
@@ -123,7 +125,7 @@ export default function WeaponTree() {
                 {filteredTree.map((weapon: any) => renderTree(weapon))}
             </div>
         ) : (
-            <div className="bg-gray-100 border border-gray-300 text-gray-700 px-4 py-3 rounded my-4">
+            <div className="bg-surface-100 border border-surface-300 text-surface-700 px-4 py-3 rounded my-4">
                 <p>No weapons found for the selected type.</p>
             </div>
         )}

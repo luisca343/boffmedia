@@ -10,10 +10,10 @@ export function ElementalResistances({ stats }: ElementalResistancesProps) {
   const t = useTranslations("mhwilds");
   const resistances = [
     { name: t("fire"), value: stats.fireRes, color: "text-red-400", icon: "fire" },
-    { name: t("water"), value: stats.waterRes, color: "text-blue-400", icon: "water" },
+    { name: t("water"), value: stats.waterRes, color: "text-secondary-400", icon: "water" },
     { name: t("thunder"), value: stats.thunderRes, color: "text-yellow-400", icon: "thunder" },
     { name: t("ice"), value: stats.iceRes, color: "text-cyan-400", icon: "ice" },
-    { name: t("dragon"), value: stats.dragonRes, color: "text-purple-400", icon: "dragon" }
+    { name: t("dragon"), value: stats.dragonRes, color: "text-accent-400", icon: "dragon" }
   ];
   
   return (

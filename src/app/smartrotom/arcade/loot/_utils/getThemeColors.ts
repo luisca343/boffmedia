@@ -11,21 +11,21 @@ interface ThemeColors {
     switch (theme.toLowerCase()) {
       case 'blue':
         return {
-          bgGradient: 'from-blue-900/70 to-indigo-900/70',
-          border: 'border-blue-500/50',
-          text: 'text-blue-300',
-          highlight: 'text-blue-200',
-          buttonGradient: 'from-blue-600 to-indigo-600',
-          buttonHover: 'hover:from-blue-500 hover:to-indigo-500'
+          bgGradient: 'from-secondary-900/70 to-indigo-900/70',
+          border: 'border-secondary-500/50',
+          text: 'text-secondary-300',
+          highlight: 'text-secondary-200',
+          buttonGradient: 'from-secondary-600 to-indigo-600',
+          buttonHover: 'hover:from-secondary-500 hover:to-indigo-500'
         };
       case 'green':
         return {
-          bgGradient: 'from-green-900/70 to-emerald-900/70',
-          border: 'border-green-500/50',
-          text: 'text-green-300',
-          highlight: 'text-green-200',
-          buttonGradient: 'from-green-600 to-emerald-600',
-          buttonHover: 'hover:from-green-500 hover:to-emerald-500'
+          bgGradient: 'from-highlight-900/70 to-emerald-900/70',
+          border: 'border-highlight-500/50',
+          text: 'text-highlight-300',
+          highlight: 'text-highlight-200',
+          buttonGradient: 'from-highlight-600 to-emerald-600',
+          buttonHover: 'hover:from-highlight-500 hover:to-emerald-500'
         };
       case 'red':
         return {
@@ -38,12 +38,12 @@ interface ThemeColors {
         };
       default:
         return {
-          bgGradient: 'from-purple-900/70 to-violet-900/70',
-          border: 'border-purple-500/50',
-          text: 'text-purple-300',
-          highlight: 'text-purple-200',
-          buttonGradient: 'from-purple-600 to-violet-600',
-          buttonHover: 'hover:from-purple-500 hover:to-violet-500'
+          bgGradient: 'from-accent-900/70 to-violet-900/70',
+          border: 'border-accent-500/50',
+          text: 'text-accent-300',
+          highlight: 'text-accent-200',
+          buttonGradient: 'from-accent-600 to-violet-600',
+          buttonHover: 'hover:from-accent-500 hover:to-violet-500'
         };
     }
   }

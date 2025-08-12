@@ -18,16 +18,16 @@ const useSocketStore = create<SocketStore>((set, get) => ({
   socket: null,
   isConnecting: false,
   connect: (user) => {
-    console.log("Connect function called", { existingSocket: !!get().socket, isConnecting: get().isConnecting })
+    //console.log("Connect function called", { existingSocket: !!get().socket, isConnecting: get().isConnecting })
     if (get().socket || get().isConnecting) {
-      console.log("Socket connection already exists or is in progress, skipping connection")
+      //console.log("Socket connection already exists or is in progress, skipping connection")
       return
     }
 
     set({ isConnecting: true })
 
     // Connect to NestJS Socket.io server
-    console.log("Creating new socket connection")
+    //console.log("Creating new socket connection")
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL as string, {
       port: 34304,
       transports: ["websocket"],
@@ -36,14 +36,14 @@ const useSocketStore = create<SocketStore>((set, get) => ({
     })
 
     socket.on("connect", () => {
-      console.log("Socket connected")
+      //console.log("Socket connected")
       set({ user, socket, isConnecting: false })
       // Emit smartrotom:connection event as expected by the gateway
       socket.emit("smartrotom:connection", user)
     })
 
     socket.on("disconnect", (reason) => {
-      console.log("Socket disconnected", reason)
+      //console.log("Socket disconnected", reason)
       if (reason === "io server disconnect") {
         // The disconnection was initiated by the server, you need to reconnect manually
         socket.connect()
@@ -52,16 +52,16 @@ const useSocketStore = create<SocketStore>((set, get) => ({
     })
 
     socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error)
+      //console.error("Socket connection error:", error)
     })
 
     socket.on("reconnect_failed", () => {
-      console.log("Reconnection failed after maximum attempts")
+      //console.log("Reconnection failed after maximum attempts")
       set({ user: null, socket: null, isConnecting: false })
     })
   },
   disconnect: () => {
-    console.log("Disconnect function called")
+    //console.log("Disconnect function called")
     get().socket?.disconnect()
     set({ user: null, socket: null, isConnecting: false })
   },

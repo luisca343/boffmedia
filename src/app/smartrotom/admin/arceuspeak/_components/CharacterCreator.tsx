@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { smartrotomService } from '@/services/api/smartrotom/smartrotomService'
+import { SmartrotomService } from '@/services/api/smartrotom/smartrotomService'
 import { toast } from 'react-toastify'
 import { Plus, Eye, AlertTriangle, Check } from 'lucide-react'
 
@@ -93,7 +93,7 @@ export default function CharacterCreator() {
     console.log(newCharacter)
     
     try {
-      const res = await smartrotomService.postArceuSpeak(newCharacter)
+      const res = await SmartrotomService.postArceuSpeak(newCharacter)
       if(res.statusCode === 200) {
         toast.success('Personaje creado')
         setName('')
@@ -109,20 +109,20 @@ export default function CharacterCreator() {
   }
 
   return (
-    <div className="space-y-4 text-green-400">
-      <div className="text-xs text-green-600 mb-1">
-        <span className="text-green-600/60">{"//"} </span>
+    <div className="space-y-4 text-highlight-400">
+      <div className="text-xs text-highlight-600 mb-1">
+        <span className="text-highlight-600/60">{"//"} </span>
         Identificador
       </div>
       <Input
         placeholder="Nombre del Personaje"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="bg-black text-green-400 border-green-700 focus:border-green-500 focus:ring-0"
+        className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
       />
       
-      <div className="text-xs text-green-600 mb-1">
-        <span className="text-green-600/60">{"//"} </span>
+      <div className="text-xs text-highlight-600 mb-1">
+        <span className="text-highlight-600/60">{"//"} </span>
         Formato de apariencia
       </div>
       <Input
@@ -130,12 +130,12 @@ export default function CharacterCreator() {
         placeholder="Formato (ej: §l§f[§6Nombre del Personaje§f])"
         value={characterFormat}
         onChange={(e) => setCharacterFormat(e.target.value)}
-        className="bg-black text-green-400 border-green-700 focus:border-green-500 focus:ring-0 font-mono"
+        className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0 font-mono"
       />
       
-      <div className="border-t border-green-800/30 pt-3">
-        <div className="text-xs text-green-600 mb-2 flex items-center">
-          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+      <div className="border-t border-highlight-800/30 pt-3">
+        <div className="text-xs text-highlight-600 mb-2 flex items-center">
+          <span className="w-2 h-2 bg-highlight-500 rounded-full mr-2"></span>
           Selección de colores
         </div>
         <div className="grid grid-cols-4 gap-2">
@@ -143,7 +143,7 @@ export default function CharacterCreator() {
             <Button
               key={color.code}
               onClick={() => insertCode(color.code)}
-              className="p-1 h-8 border border-green-900 hover:border-green-700 transition-colors relative overflow-hidden"
+              variant="highlightOutline"
               style={{ 
                 backgroundColor: `#${color.code === '0' ? '000' : color.code === '1' ? '00A' : color.code === '2' ? '0A0' : color.code === '3' ? '0AA' : color.code === '4' ? 'A00' : color.code === '5' ? 'A0A' : color.code === '6' ? 'FA0' : color.code === '7' ? 'AAA' : color.code === '8' ? '555' : color.code === '9' ? '55F' : color.code === 'a' ? '5F5' : color.code === 'b' ? '5FF' : color.code === 'c' ? 'F55' : color.code === 'd' ? 'F5F' : color.code === 'e' ? 'FF5' : 'FFF'}`,
                 color: color.textColor
@@ -156,9 +156,9 @@ export default function CharacterCreator() {
         </div>
       </div>
       
-      <div className="border-t border-green-800/30 pt-3">
-        <div className="text-xs text-green-600 mb-2 flex items-center">
-          <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+      <div className="border-t border-highlight-800/30 pt-3">
+        <div className="text-xs text-highlight-600 mb-2 flex items-center">
+          <span className="w-2 h-2 bg-highlight-500 rounded-full mr-2"></span>
           Estilos de texto
         </div>
         <div className="grid grid-cols-3 gap-2">
@@ -166,7 +166,7 @@ export default function CharacterCreator() {
             <Button
               key={style.code}
               onClick={() => insertCode(style.code)}
-              className="bg-black hover:bg-green-900/30 border border-green-700 hover:border-green-500 text-green-400 transition-all duration-200 relative"
+              variant="highlightOutline"
             >
               {style.name}
               <span className="absolute bottom-0 right-1 text-xs opacity-50">§{style.code}</span>
@@ -175,21 +175,22 @@ export default function CharacterCreator() {
         </div>
       </div>
       
-      <div className="border-t border-green-800/30 pt-3">
-        <div className="text-xs text-green-600 mb-2 flex items-center">
+      <div className="border-t border-highlight-800/30 pt-3">
+        <div className="text-xs text-highlight-600 mb-2 flex items-center">
           <Eye className="w-3 h-3 mr-1" />
           Preview
         </div>
-        <div className="bg-black/60 p-3 rounded border border-green-700">
-          <div className="text-xs text-green-600/60 mb-1">&gt; Resultado:</div>
-          <p className="p-2 border border-green-900 bg-black rounded font-minecraft" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+        <div className="bg-black/60 p-3 rounded border border-highlight-700">
+          <div className="text-xs text-highlight-600/60 mb-1">&gt; Resultado:</div>
+          <p className="p-2 border border-highlight-900 bg-[#777] rounded font-minecraft" dangerouslySetInnerHTML={{ __html: previewHtml }} />
         </div>
       </div>
       
       <Button 
         onClick={createCharacter} 
         disabled={creating || !name.trim() || !characterFormat.trim()}
-        className="w-full bg-green-700 hover:bg-green-600 text-black hover:shadow-neon transition-all duration-300 mt-2 flex items-center justify-center disabled:opacity-50"
+        className="w-full"
+        variant="highlight"
       >
         {creating ? (
           <span className="animate-pulse flex items-center">Procesando...</span>
@@ -201,7 +202,7 @@ export default function CharacterCreator() {
         )}
       </Button>
       
-      <div className="text-xs text-green-700 mt-2 bg-black/40 p-2 border border-green-900/50 rounded">
+      <div className="text-xs text-highlight-700 mt-2 bg-black/40 p-2 border border-highlight-900/50 rounded">
         <div className="flex items-start mb-1">
           <AlertTriangle className="w-3 h-3 mr-1 mt-0.5 flex-shrink-0" />
           <span>Los personajes creados serán visibles para todos los administradores.</span>

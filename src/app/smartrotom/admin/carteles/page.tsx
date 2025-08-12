@@ -83,14 +83,14 @@ export default function CartelesAutopista() {
               onChange={(e) => setHighway(e.target.value)}
               required
               placeholder="ej., A-2"
-              className="bg-black text-green-400 border-green-700 focus:border-green-500 focus:ring-0"
+              className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
             />
           </div>
           
           {destinations.map((dest, index) => (
-            <div key={index} className="space-y-2 border border-green-800/30 p-3 rounded">
-              <h2 className="text-lg font-semibold text-green-400 flex items-center">
-                <span className="text-green-600 w-6">{index + 1}{">"}</span> Destino
+            <div key={index} className="space-y-2 border border-highlight-800/30 p-3 rounded">
+              <h2 className="text-lg font-semibold text-highlight-400 flex items-center">
+                <span className="text-highlight-600 w-6">{index + 1}{">"}</span> Destino
               </h2>
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-1">
@@ -102,7 +102,7 @@ export default function CartelesAutopista() {
                     value={dest.name}
                     onChange={(e) => handleDestinationChange(index, 'name', e.target.value)}
                     placeholder="ej., Madrid"
-                    className="bg-black text-green-400 border-green-700 focus:border-green-500 focus:ring-0"
+                    className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
                   />
                 </div>
                 <div className="flex-1">
@@ -115,7 +115,7 @@ export default function CartelesAutopista() {
                     onChange={(e) => handleDestinationChange(index, 'distance', e.target.value)}
                     placeholder="ej., 300"
                     type="number"
-                    className="bg-black text-green-400 border-green-700 focus:border-green-500 focus:ring-0"
+                    className="bg-black text-highlight-400 border-highlight-700 focus:border-highlight-500 focus:ring-0"
                   />
                 </div>
                 <div className="flex-1">
@@ -126,23 +126,23 @@ export default function CartelesAutopista() {
                     value={dest.direction}
                     onValueChange={(value: any) => handleDestinationChange(index, 'direction', value)}
                   >
-                    <SelectTrigger id={`dir-${index}`} className="bg-black text-green-400 border-green-700">
+                    <SelectTrigger id={`dir-${index}`} className="bg-black text-highlight-400 border-highlight-700">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-black text-green-400 border-green-700 select-content">
-                      <SelectItem value="down" className="hover:bg-green-900/30">
+                    <SelectContent className="bg-black text-highlight-400 border-highlight-700 select-content">
+                      <SelectItem value="down" className="hover:bg-highlight-900/30">
                         <div className="flex items-center">
                           <ArrowDown className="mr-2 h-4 w-4" />
                           <span>Recto</span>
                         </div>
                       </SelectItem>
-                      <SelectItem value="left" className="hover:bg-green-900/30">
+                      <SelectItem value="left" className="hover:bg-highlight-900/30">
                         <div className="flex items-center">
                           <ArrowLeft className="mr-2 h-4 w-4" />
                           <span>Izquierda</span>
                         </div>
                       </SelectItem>
-                      <SelectItem value="right" className="hover:bg-green-900/30">
+                      <SelectItem value="right" className="hover:bg-highlight-900/30">
                         <div className="flex items-center">
                           <ArrowRight className="mr-2 h-4 w-4" />
                           <span>Derecha</span>
@@ -154,7 +154,8 @@ export default function CartelesAutopista() {
                 <Button 
                   type="button" 
                   onClick={() => handleRemoveDestination(index)} 
-                  className="bg-red-900/60 hover:bg-red-800 text-red-100 border border-red-700 hover:shadow-[0_0_5px_rgba(220,38,38,0.5)] transition-all h-10 mt-auto"
+                  className="h-10 mt-auto"
+                  variant="error"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -166,36 +167,38 @@ export default function CartelesAutopista() {
             <Button 
               type="button" 
               onClick={handleAddDestination} 
-              className="w-full bg-green-900/30 hover:bg-green-800/50 text-green-400 border border-green-700 hover:shadow-neon transition-all flex items-center justify-center"
+              className="w-full"
+              variant="highlight"
             >
               <Plus className="mr-2 h-4 w-4" /> Agregar Destino
             </Button>
           )}
           
-          <div className="relative border-t border-green-700/30 pt-4 mt-4">
-            <div className="text-xs text-green-600 mb-2 flex items-center">
-              <span className="animate-pulse text-green-500 mr-2">[URL]</span>
+          <div className="relative border-t border-highlight-700/30 pt-4 mt-4">
+            <div className="text-xs text-highlight-600 mb-2 flex items-center">
+              <span className="animate-pulse text-highlight-500 mr-2">[URL]</span>
               Click para copiar
             </div>
             <Input
               value={signUrl}
               readOnly
-              className="pr-10 bg-black text-green-400 border-green-700 font-mono text-xs"
+              className="pr-10 bg-black text-highlight-400 border-highlight-700 font-mono text-xs"
               onClick={copyToClipboard}
             />
             <Button
               type="button"
-              variant="ghost"
-              className="absolute inset-y-0 right-0 px-3 flex items-center hover:bg-green-900/30 top-4"
+              variant="highlightGhost"
+              size="zero"
+              className="absolute  inset-y-0 right-0 px-3 flex items-center top-10"
               onClick={copyToClipboard}
             >
               {copied ? 
-                <Check className="h-4 w-4 text-green-500" /> : 
-                <Copy className="h-4 w-4 text-green-400" />
+                <Check className="h-4 w-4 text-highlight-500" /> : 
+                <Copy className="h-4 w-4 text-highlight-400" />
               }
             </Button>
-            {copied && <p className="text-sm text-green-500 mt-1 flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+            {copied && <p className="text-sm text-highlight-500 mt-1 flex items-center">
+              <span className="w-2 h-2 bg-highlight-500 rounded-full mr-2 animate-pulse"></span>
               URL copiada al portapapeles
             </p>}
           </div>
@@ -207,7 +210,7 @@ export default function CartelesAutopista() {
         title="Vista Previa"
         className="mt-6"
       >
-        <div className="flex justify-center bg-black/60 p-2 rounded border border-green-900/30">
+        <div className="flex justify-center bg-black/60 p-2 rounded border border-highlight-900/30">
           <HighwaySign highway={highway} destinations={destinations} width={500} height={300} />
         </div>
       </TerminalCard>

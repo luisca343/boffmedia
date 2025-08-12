@@ -94,7 +94,7 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
           <div className={`w-3 h-3 rounded-full inline-block ${
             condition.time.toLowerCase() === 'day' ? 'bg-yellow-400' : 
             condition.time.toLowerCase() === 'night' ? 'bg-indigo-800' : 
-            'bg-gray-400'
+            'bg-surface-400'
           }`}></div>
           <span>{t(`time_${condition.time.toLowerCase()}`)}</span>
         </div>

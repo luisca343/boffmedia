@@ -28,7 +28,8 @@ export function AchievementsList({ achievements, onEdit, onDelete }: Achievement
               <TableHead className="text-surface-300">ID</TableHead>
               <TableHead className="text-surface-300">Logro</TableHead>
               <TableHead className="text-surface-300">Evento</TableHead>
-              <TableHead className="text-surface-300">Puntos</TableHead>
+              <TableHead className="text-surface-300">Puntos & Rareza</TableHead>
+              <TableHead className="text-surface-300">Tipo & Categoría</TableHead>
               <TableHead className="text-surface-300">Completado</TableHead>
               <TableHead className="text-surface-300">Acciones</TableHead>
             </TableRow>

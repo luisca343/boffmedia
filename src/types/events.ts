@@ -2,7 +2,7 @@ export interface Event {
   id: number
   parentId: number
   title: string
-  game: number
+  gameId: number
   gameName: string
   description: string | null
   icon: string
@@ -64,11 +64,12 @@ export interface EventParticipant {
   updatedAt: Date
 }
 
+// Updated UserProgress to match your database schema
 export interface UserProgress {
-  userId: number
+  participantId: number
   achievementId: number
   currentProgress: number
-  isCompleted: number
+  isCompleted: number // 0 or 1 since it's an int in MySQL
   completedAt: Date | null
   lastUpdated: Date
   createdAt: Date
@@ -98,7 +99,7 @@ export interface Game {
 
 export type LeaderboardEntry = {
   userId: number
-  username: string
+  nickname: string
   achievementPoints: number
   medalPoints: number
   totalPoints: number

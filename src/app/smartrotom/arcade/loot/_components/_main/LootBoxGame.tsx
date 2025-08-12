@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { LootBox, Item } from "../../types";
 import LootBoxSelector from "../selector/LootBoxSelector";
 import LootBoxOpening from "../opening/LootBoxOpening";
 import ItemCollection from "../collection/ItemCollection";
@@ -16,6 +15,7 @@ import { LootBoxHeader } from "./LootBoxHeader";
 import { InfoModal } from "./InfoModal";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { Loader2 } from "lucide-react";
+import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
 
 export default function LootBoxGame() {
   const t = useTranslations("");
@@ -40,9 +40,9 @@ export default function LootBoxGame() {
     addItemToCollection
   } = useLootBoxInventory(uuid);
   
-  const [selectedBox, setSelectedBox] = useState<LootBox | null>(null);
+  const [selectedBox, setSelectedBox] = useState<LootboxBoxConfig | null>(null);
   const [isOpening, setIsOpening] = useState(false);
-  const [wonItem, setWonItem] = useState<Item | null>(null);
+  const [wonItem, setWonItem] = useState<LootboxItemConfig | null>(null);
   const [showCollection, setShowCollection] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,7 +57,7 @@ export default function LootBoxGame() {
     }
   }, [availableLootBoxes, selectedBox]);
 
-  const handleSelectBox = (box: LootBox) => {
+  const handleSelectBox = (box: LootboxBoxConfig) => {
     if (!box.items || box.items.length === 0) {
       toast.error(`La caja "${box.name}" no tiene objetos disponibles.`);
       return;
@@ -143,7 +143,7 @@ export default function LootBoxGame() {
 
       {/* Loading loot boxes message */}
       {loadingLootBoxes && (
-        <div className="bg-gray-900/70 text-white p-4 rounded-lg mb-6 text-center border-2 border-gray-500/40 flex justify-center items-center gap-3">
+        <div className="bg-surface-900/70 text-white p-4 rounded-lg mb-6 text-center border-2 border-surface-500/40 flex justify-center items-center gap-3">
           <Loader2 className="animate-spin text-cyan-400" size={24} />
           <span>Cargando cajas de botín...</span>
         </div>

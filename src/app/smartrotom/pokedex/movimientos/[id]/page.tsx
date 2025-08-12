@@ -42,7 +42,7 @@ export default function Movimiento({params} : {params: {id: string}}){
             </h1>
           </div>
           <InternalLink 
-            href="/smartrotom/pokedex/movimientos" 
+            href="smartrotom/pokedex/movimientos" 
             className="text-primary-400 hover:text-primary-300 text-sm flex items-center"
           >
             <ArrowLeftIcon className="h-4 w-4 mr-1" />

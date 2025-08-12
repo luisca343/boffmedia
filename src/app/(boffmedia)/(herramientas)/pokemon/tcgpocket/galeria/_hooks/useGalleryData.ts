@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
-import { boffGET, boffPOST } from "@/services/boffAPI"
+import { PtcgpService } from '@/services/api/boffmedia/ptcgpService'
 import { toast } from 'react-toastify'
+import { TcgCard } from '@/generated/api'
+import { useLocale } from 'next-intl'
 
 interface Card {
   expansion: string
@@ -10,10 +12,11 @@ interface Card {
 }
 
 export function useGalleryData(username: string) {
-  const [allCards, setAllCards] = useState<Card[]>([])
+  const [allCards, setAllCards] = useState<TcgCard[]>([])
   const [userCards, setUserCards] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const locale = useLocale()
 
   useEffect(() => {
     if(!username) return
@@ -22,36 +25,60 @@ export function useGalleryData(username: string) {
 
   const fetchData = async () => {
     try {
-      const [allCardsData, userCardsData] = await Promise.all([
-        /* @ts-ignore */
-        (await boffGET('/herramientas/ptcgp/cards')) as Card[],
-        /* @ts-ignore */
-        (await boffPOST('/herramientas/ptcgp/user-cards', { username })) as Card[],
+      setLoading(true)
+      const [allCardsResponse, userCardsResponse] = await Promise.all([
+        PtcgpService.getAllCardsForSeries('tcgp', locale),
+        PtcgpService.getUserCards(username),
       ])
+
+      const allCardsData = allCardsResponse.data
+      const userCardsData = userCardsResponse.data
+
       if(!allCardsData || !userCardsData) return  
-      setAllCards(allCardsData)
+      
+      const filteredCards = allCardsData.filter(card => card !== null)
+      setAllCards(filteredCards)
+
       const userCardsMap: Record<string, number> = userCardsData.reduce((acc: Record<string, number>, card: any) => {
-        acc[`${card.expansion}_${card.cardNumber}`] = card.count
+        acc[card.card_id] = card.quantity
         return acc
       }, {})
+
+
+      
       setUserCards(userCardsMap)
       setError(null)
     } catch (error) {
-      console.error('Error fetching data:', error)
-      setError('No se pudieron cargar los datos. Por favor, intenta de nuevo.')
-      toast.error('No se pudieron cargar los datos. Por favor, intenta de nuevo.')
+      setError('No se pudieron cargar los datos. Por favor, inténtalo de nuevo.')
     } finally {
       setLoading(false)
     }
   }
 
-  const updateUserCards = async (updates: { expansion: string; cardNumber: number; change: number }[]) => {
+  const updateUserCards = async (updates: { cardId: string; change: number }[]) => {
     setLoading(true)
     try {
-      await boffPOST('/herramientas/ptcgp/update-cards', {
-        username,
-        updates,
-      })
+      // Convert updates to the format expected by the service
+      const cardUpdates = updates.map(update => ({
+        userId: username,
+        cardId: update.cardId,
+        quantity: Math.max(0, (userCards[update.cardId] || 0) + update.change)
+      }))
+
+      // Use individual update calls since batchUpdateUserCards doesn't exist
+      await Promise.all(cardUpdates.map(async (update) => {
+        if (update.quantity === 0) {
+          await PtcgpService.removeUserCard(update.userId, update.cardId)
+        } else {
+          const existingCard = userCards[update.cardId]
+          if (existingCard) {
+            await PtcgpService.updateUserCardQuantity(update.userId, update.cardId, { quantity: update.quantity })
+          } else {
+            await PtcgpService.addUserCard({ userId: update.userId, cardId: update.cardId, quantity: update.quantity })
+          }
+        }
+      }))
+
       await fetchData()
       toast.success('Cambios guardados exitosamente.')
     } catch (error) {

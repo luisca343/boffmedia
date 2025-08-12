@@ -9,7 +9,7 @@ export const Instructions = () => (
     className="mt-8 p-4 md:p-6 bg-surface-800/80 border border-dashed border-surface-700 rounded-lg"
   >
     <h3 className="text-xl font-semibold text-surface-100 mb-3 flex items-center gap-2">
-      <Info className="w-5 h-5 text-blue-400" />
+      <Info className="w-5 h-5 text-secondary-400" />
       Cómo usar las claves
     </h3>
     <ul className="space-y-2 text-surface-300">

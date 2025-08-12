@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { arcadeService, DailyRewardsConfig } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import StreakHeader from "./StreakHeader";
 import StreakNotifications from "./StreakNotifications";
 import DaysGrid from "./DaysGrid";
 import ClaimSection from "./ClaimSection";
+import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
 
 interface WeeklyStreakProps {
   streak: number;
@@ -17,7 +18,7 @@ interface WeeklyStreakProps {
   error?: string | null;
   currentBanner?: string | null;
   lastBanner?: string | null;
-  nextReward?: any;
+  nextReward?: DailyRewardItem ;
   currentDay?: number;
   totalDays?: number;
   uuid?: string;
@@ -71,7 +72,7 @@ export default function WeeklyStreak({
     const fetchRewards = async () => {
       try {
         setLoadingRewards(true);
-        const response = await arcadeService.getRewardsBanner();
+        const response = await ArcadeService.getRewardsBanner();
         setRewardsConfig(response.data!);
       } catch (err) {
         console.error("Failed to fetch rewards banner:", err);
@@ -86,7 +87,7 @@ export default function WeeklyStreak({
   const isComponentLoading = isLoading || loadingRewards;
 
   return (
-    <div className="w-full bg-gray-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8">
+    <div className="w-full bg-surface-900/80 rounded-xl border-2 border-cyan-500/30 shadow-xl overflow-hidden mb-8">
       <StreakHeader
         currentBanner={currentBanner}
         currentDay={currentDay}
@@ -101,7 +102,7 @@ export default function WeeklyStreak({
         timeUntilReset={getTimeUntilReset()}
       />
       
-      <div className="p-6 bg-gray-900">
+      <div className="p-6 bg-surface-900">
         <DaysGrid
           totalDays={totalDays}
           currentDay={currentDay}

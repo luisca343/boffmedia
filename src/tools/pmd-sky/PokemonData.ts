@@ -578,7 +578,11 @@ export function getValidPokemon(): { label: string, value: string }[] {
         return { value: key.toString(), label: pmdSkyPokemon[key] }
     });
 
-    return valid;
+    // Add "Select Pokemon" option at the beginning
+    return [
+        { value: "0", label: "Select a Pokémon" },
+        ...valid
+    ];
 }
 
 export function isValidClient(client: number): boolean {

@@ -65,7 +65,7 @@ export default function ArceuSpeak() {
 
   if (!speakers) return (
     <div className="w-full h-screen flex items-center justify-center">
-      <div className="text-green-400 animate-pulse font-mono">Cargando sistema de comunicación...</div>
+      <div className="text-highlight-400 animate-pulse font-mono">Cargando sistema de comunicación...</div>
     </div>
   )
 
@@ -87,12 +87,12 @@ export default function ArceuSpeak() {
                 </TerminalLabel>
                 
                 <Select onValueChange={setSpeaker} value={speaker}>
-                  <SelectTrigger id="speaker-select" className="w-full bg-black text-green-400 border-green-700">
+                  <SelectTrigger id="speaker-select" className="w-full bg-black text-highlight-400 border-highlight-700">
                     <SelectValue placeholder="Seleccionar emisor" />
                   </SelectTrigger>
-                  <SelectContent className="bg-black text-green-400 border-green-700">
+                  <SelectContent className="bg-black text-highlight-400 border-highlight-700">
                     {speakers.map((s) => (
-                      <SelectItem key={s.value} value={s.value} className="hover:bg-green-900/30">
+                      <SelectItem key={s.value} value={s.value} className="hover:bg-highlight-900/30">
                         <span dangerouslySetInnerHTML={{ __html: formatToHtml(s.format) }} />
                       </SelectItem>
                     ))}
@@ -110,7 +110,7 @@ export default function ArceuSpeak() {
                   placeholder="Escribe tu mensaje aquí"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="bg-black text-green-400 border-green-700 min-h-[100px]"
+                  className="bg-black text-highlight-400 border-highlight-700 min-h-[100px]"
                 />
               </div>
               
@@ -118,7 +118,8 @@ export default function ArceuSpeak() {
                 <Button 
                   onClick={sendMessage} 
                   disabled={sending || !message.trim()} 
-                  className="flex-1 bg-green-700 hover:bg-green-600 text-black hover:shadow-neon transition-all duration-300 flex items-center justify-center"
+                  variant="highlight"
+                  className="flex-1"
                 >
                   {sending ? 
                     <span className="animate-pulse flex items-center">Transmitiendo...</span> : 
@@ -132,16 +133,16 @@ export default function ArceuSpeak() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button 
-                      className="bg-blue-700 hover:bg-blue-600 text-black hover:shadow-neon transition-all duration-300 flex items-center"
+                      variant="highlight"
                     >
                       <UserPlus className="mr-2 w-4 h-4" />
                       Crear Personaje
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="bg-black border-green-500 border">
+                  <DialogContent className="bg-black border-highlight-500 border">
                     <DialogHeader>
-                      <DialogTitle className="text-green-400">
-                        <span className="text-green-600 mr-2">&gt;</span>
+                      <DialogTitle className="text-highlight-400">
+                        <span className="text-highlight-600 mr-2">&gt;</span>
                         Crear Nuevo Personaje
                       </DialogTitle>
                     </DialogHeader>
@@ -150,24 +151,24 @@ export default function ArceuSpeak() {
                 </Dialog>
               </div>
               
-              <div className="mt-4 border-t border-green-700/30 pt-2">
-                <div className="flex justify-between text-xs text-green-700">
+              <div className="mt-4 border-t border-highlight-700/30 pt-2">
+                <div className="flex justify-between text-xs text-highlight-700">
                   <span>ESTADO:</span>
-                  <span className="text-green-400 flex items-center">
+                  <span className="text-highlight-400 flex items-center">
                     CONECTADO
-                    <span className="w-2 h-2 bg-green-500 animate-pulse rounded-full ml-2"></span>
+                    <span className="w-2 h-2 bg-highlight-500 animate-pulse rounded-full ml-2"></span>
                   </span>
                 </div>
-                <div className="flex justify-between text-xs text-green-700">
+                <div className="flex justify-between text-xs text-highlight-700">
                   <span>PERMISOS:</span>
-                  <span className="text-green-400">ROOT</span>
+                  <span className="text-highlight-400">ROOT</span>
                 </div>
               </div>
             </div>
           </>
         </TerminalCard>
         
-        <div className="text-xs text-green-700 mt-2 text-center">
+        <div className="text-xs text-highlight-700 mt-2 text-center">
           ArceuSpeak | Sistema de Comunicación Remota | Acceso Restringido
         </div>
       </div>

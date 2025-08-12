@@ -106,8 +106,8 @@ export default function Transacciones() {
           amount: transaction.amount,
           balance: isActiveAccount ? transaction.fromBalance : transaction.toBalance,
           date: transaction.date,
-          type: isActiveAccount ? transaction.toType : transaction.fromType,
-          name: isActiveAccount ? transaction.toName : transaction.fromName,
+          //type: isActiveAccount ? transaction.toType : transaction.fromType,
+          //name: isActiveAccount ? transaction.toName : transaction.fromName,
         };
       });
 
@@ -144,8 +144,8 @@ export default function Transacciones() {
         <BankSection className="md:col-span-4 mb-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-wrap">
             <div>
-              <h1 className="text-2xl font-bold text-blue-900">Historial de Transacciones</h1>
-              <p className="text-blue-600">
+              <h1 className="text-2xl font-bold text-secondary-900">Historial de Transacciones</h1>
+              <p className="text-secondary-600">
                 Mostrando transacciones para la cuenta <span className="font-medium">{currentAccount?.name || 'Cargando...'}</span>
               </p>
             </div>
@@ -194,26 +194,26 @@ export default function Transacciones() {
       </div>
 
       {/* Search and Filter */}
-      <BankSection className="bg-white rounded-lg border border-blue-200 py-4">
+      <BankSection className="bg-white rounded-lg border border-secondary-200 py-4">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-secondary-500" />
             <Input 
               placeholder="Buscar transacciones..."
               value={searchTerm}
               onChange={handleSearchChange}
-              className="pl-10 bg-blue-50"
+              className="pl-10 bg-secondary-50"
             />
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-blue-700">
+          <div className="flex items-center gap-2 text-sm text-secondary-700">
             <span>Mostrando {table.getFilteredRowModel().rows.length} de {transactions.length} transacciones</span>
           </div>
         </div>
       </BankSection>
 
       {/* Transactions Table */}
-      <BankSection variant="noPadding" className="bg-white rounded-lg overflow-hidden border border-blue-200">
+      <BankSection variant="noPadding" className="bg-white rounded-lg overflow-hidden border border-secondary-200">
         <TransactionsTable
           table={table}
           columnFilters={columnFilters}
@@ -222,7 +222,7 @@ export default function Transacciones() {
       </BankSection>
       
       {/* Pagination */}
-      <div className="flex justify-between items-center bg-white p-4 shadow-sm rounded-md border border-blue-200">
+      <div className="flex justify-between items-center bg-white p-4 shadow-sm rounded-md border border-secondary-200">
         <div className="flex items-center gap-2">
           <BankSectionButton 
             onClick={() => table.previousPage()} 
@@ -240,7 +240,7 @@ export default function Transacciones() {
         </div>
         
         <div className="flex items-center gap-2 text-sm">
-          <span className="text-blue-700">
+          <span className="text-secondary-700">
             Página {table.getState().pagination.pageIndex + 1} de{" "}
             {table.getPageCount() || 1}
           </span>
@@ -248,7 +248,7 @@ export default function Transacciones() {
           <select
             value={table.getState().pagination.pageSize}
             onChange={e => table.setPageSize(Number(e.target.value))}
-            className="px-2 py-1 border border-blue-200 rounded text-sm bg-blue-50"
+            className="px-2 py-1 border border-secondary-200 rounded text-sm bg-secondary-50"
           >
             {[10, 25, 50].map(pageSize => (
               <option key={pageSize} value={pageSize}>

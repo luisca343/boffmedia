@@ -98,7 +98,7 @@ export default function PokemonDetail({ pokemonId }: PokemonDetailProps) {
                   {pokemonData.eggGroups.map((group: string) => (
                     <span
                       key={group}
-                      className="text-xs bg-green-900 text-green-100 px-2 py-1 rounded cursor-pointer"
+                      className="text-xs bg-highlight-900 text-highlight-100 px-2 py-1 rounded cursor-pointer"
                       onClick={() => addFilter('eggGroups', group)}
                     >
                       {group}

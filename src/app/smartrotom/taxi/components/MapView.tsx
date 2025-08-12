@@ -18,6 +18,7 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
   // Initial zoom level set to medium (50), with range now from 5 (very zoomed in) to 500 (shows 10000+ blocks)
   const [zoomLevel, setZoomLevel] = useState(50);
   const [mapCenter, setMapCenter] = useState<Position>(playerPosition);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   
   // Update map center when a stop is selected
   useEffect(() => {
@@ -27,6 +28,21 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
       setMapCenter(playerPosition);
     }
   }, [selectedStop, playerPosition]);
+
+  // Handle mouse wheel zoom
+  const handleWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    
+    // Calculate zoom factor - smaller value for smoother zooming
+    const zoomFactor = 1.1;
+    
+    // Determine zoom direction and calculate new zoom value
+    const newZoom = e.deltaY > 0 
+      ? Math.min(500, zoomLevel * zoomFactor) // Zoom out (increase value)
+      : Math.max(5, zoomLevel / zoomFactor);  // Zoom in (decrease value)
+    
+    setZoomLevel(newZoom);
+  };
 
   // Calculate if a stop is within viewport and get its position
   const calculateStopPosition = (stop: TaxiStop | Position & { id: string }) => {
@@ -107,13 +123,13 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
 
   return (
     <div className="relative bg-white rounded-xl shadow-xl h-full flex flex-col overflow-hidden">
-      <div className="p-4 bg-gradient-to-r from-blue-600 to-blue-800 rounded-t-xl">
+      <div className="p-4 bg-gradient-to-r from-secondary-600 to-secondary-800 rounded-t-xl">
         <div className="flex justify-between items-center">
           <div>
             <h2 className="text-xl font-semibold text-white mb-1">Mapa de Destinos</h2>
-            <p className="text-blue-100">Selecciona un destino en el mapa para viajar</p>
+            <p className="text-secondary-100">Selecciona un destino en el mapa para viajar</p>
           </div>
-          <div className="flex items-center bg-blue-500/50 px-3 py-1 rounded-full">
+          <div className="flex items-center bg-secondary-500/50 px-3 py-1 rounded-full">
             <FaCompass className="text-white mr-2" />
             <span className="text-white font-medium">
               X: {mapCenter.x}, Z: {mapCenter.z}
@@ -122,9 +138,13 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
         </div>
       </div>
       
-      <div className="flex-grow relative bg-gray-50">
+      <div className="flex-grow relative bg-surface-50">
         {/* Map container with enhanced styling */}
-        <div className="absolute inset-0 bg-[#041F4E] overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-[#041F4E] overflow-hidden"
+          ref={mapContainerRef}
+          onWheel={handleWheel}
+        >
           {/* Map Grid Lines with improved visibility */}
           <div className="absolute inset-0" style={{
           backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.07) 1px, transparent 1px)',
@@ -154,8 +174,8 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
             }}
           >
             <div className="relative w-full h-full">
-              <div className="absolute inset-0 bg-blue-400 rounded-full animate-ping opacity-40"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full border-2 border-white flex items-center justify-center shadow-md">
+              <div className="absolute inset-0 bg-secondary-400 rounded-full animate-ping opacity-40"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-secondary-500 to-secondary-700 rounded-full border-2 border-white flex items-center justify-center shadow-md">
                 <span className="text-white font-bold text-xs">TÚ</span>
               </div>
             </div>
@@ -276,7 +296,7 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
                 max="250"
                 value={zoomLevel}
                 onChange={(e) => handleZoomChange(Number(e.target.value))}
-                className="w-full h-2 bg-blue-700 rounded-lg appearance-none cursor-pointer"
+                className="w-full h-2 bg-secondary-700 rounded-lg appearance-none cursor-pointer"
               />
             </div>
 
@@ -289,7 +309,7 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
                   className={`px-2 py-1 text-xs rounded ${
                     Math.abs(zoomLevel - preset.value) < 10
                       ? 'bg-yellow-500 text-[#041F4E]'
-                      : 'bg-blue-700 text-white hover:bg-blue-600'
+                      : 'bg-secondary-700 text-white hover:bg-secondary-600'
                   }`}
                 >
                   {preset.label}
@@ -301,39 +321,44 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
             <div className="flex mb-3">
               <button 
                 onClick={() => handleZoomChange(zoomLevel - 10)}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-l-md mr-px"
+                className="px-3 py-1 bg-secondary-600 hover:bg-secondary-700 text-white rounded-l-md mr-px"
                 title="Zoom in more"
               >
                 ++
               </button>
               <button 
                 onClick={() => handleZoomChange(zoomLevel - 5)}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white mr-px"
+                className="px-3 py-1 bg-secondary-600 hover:bg-secondary-700 text-white mr-px"
                 title="Zoom in"
               >
                 +
               </button>
               <button 
                 onClick={() => handleZoomChange(zoomLevel + 5)}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white mr-px"
+                className="px-3 py-1 bg-secondary-600 hover:bg-secondary-700 text-white mr-px"
                 title="Zoom out"
               >
                 -
               </button>
               <button 
                 onClick={() => handleZoomChange(zoomLevel + 10)}
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-r-md"
+                className="px-3 py-1 bg-secondary-600 hover:bg-secondary-700 text-white rounded-r-md"
                 title="Zoom out more"
               >
                 --
               </button>
             </div>
             
+            {/* Scroll wheel hint */}
+            <div className="text-xs text-center text-secondary-200 mb-3">
+              <span className="bg-secondary-800/70 px-2 py-1 rounded-md">Usa la rueda del ratón para hacer zoom</span>
+            </div>
+            
             {/* Reset view button */}
             {(mapCenter.x !== playerPosition.x || mapCenter.z !== playerPosition.z) && (
               <button
                 onClick={resetMapCenter}
-                className="w-full px-3 py-1.5 bg-blue-600 hover:bg-blue-700 rounded-md text-white text-xs"
+                className="w-full px-3 py-1.5 bg-secondary-600 hover:bg-secondary-700 rounded-md text-white text-xs"
                 title="Center on player"
               >
                 Centrar en TÚ
@@ -344,7 +369,7 @@ export default function MapView({ taxiStops, playerPosition, selectedStop, setSe
             {zoomLevel < 250 && (
               <button
                 onClick={() => handleZoomChange(250)}
-                className="w-full mt-1 px-3 py-1.5 bg-blue-800 hover:bg-blue-700 rounded-md text-blue-200 text-xs"
+                className="w-full mt-1 px-3 py-1.5 bg-secondary-800 hover:bg-secondary-700 rounded-md text-secondary-200 text-xs"
                 title="Maximum zoom out"
               >
                 Ver mundo completo

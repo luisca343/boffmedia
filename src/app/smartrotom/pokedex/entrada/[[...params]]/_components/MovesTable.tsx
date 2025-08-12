@@ -7,8 +7,8 @@ import TypeBadge from "./TypeBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import MoveDataElement from "../../../movimientos/_components/MoveData";
 import { useTranslations } from "next-intl";
-import { BoltIcon } from "@heroicons/react/24/outline";
 import { InternalLink } from "@/components/nav/Link";
+import { getTranslatedMoveName, getTranslatedMoveCategory } from "@/utils/pokemonTranslations";
 
 export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves, sort?: boolean, moveData?: any, title?: string}){
     const t = useTranslations("pokedex");
@@ -28,7 +28,7 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
             value.forEach((move: any) => {
                 const moveId = move
                 if(!sortedMoves[moveId]) sortedMoves[moveId] = []
-                sortedMoves[moveId] = [...sortedMoves[moveId], t(key)]
+                sortedMoves[moveId] = [...sortedMoves[moveId], getTranslatedMoveCategory(key, t)]
             })
         }
     })
@@ -36,8 +36,8 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
     // Sort moves alphabetically by its translated name
     if(sort) {
         const sortedMovesKeys = Object.keys(sortedMoves).sort((a, b) => {
-            const aName = t(`attack_${a.replace(/ /g, '_').toLowerCase()}`)
-            const bName = t(`attack_${b.replace(/ /g, '_').toLowerCase()}`)
+            const aName = getTranslatedMoveName(a, t);
+            const bName = getTranslatedMoveName(b, t);
             return aName.localeCompare(bName)
         })
         const sortedMovesCopy = {} as {[key: string]: any[]}
@@ -47,7 +47,9 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
         sortedMoves = sortedMovesCopy
     }
     
+
     const moveEntries = Object.entries(sortedMoves).filter(([key, _]) => moveData?.[key])
+
     const hasData = moveEntries.length > 0
     
     return (
@@ -78,10 +80,10 @@ export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves
                             <HoverCard>
                               <HoverCardTrigger asChild>
                                 <InternalLink
-                                  href={`/pokedex/movimientos/${key}`}
+                                  href={`pokedex/movimientos/${key}`}
                                   className="hover:text-primary-400 transition-colors inline-flex items-center"
                                 >
-                                  <span>{t(`attack_${key.toLowerCase().replace(" ", "_")}`)}</span>
+                                  <span>{getTranslatedMoveName(key, t)}</span>
                                 </InternalLink>
                               </HoverCardTrigger>
                               <HoverCardContent className="bg-surface-700 text-surface-50 w-[400px] border-surface-950 border font-normal z-50">

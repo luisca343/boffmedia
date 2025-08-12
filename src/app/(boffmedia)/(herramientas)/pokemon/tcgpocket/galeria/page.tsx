@@ -2,70 +2,56 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { HiExclamationTriangle, HiUserCircle } from 'react-icons/hi2';
 import { Button } from "@/components/ui/button";
 import { useBoffSession } from "@/services/useBoffSession";
-import { useGalleryData } from "./_hooks/useGalleryData";
 import { PlayerGallery } from "../_components/PlayerGallery";
-
-interface Card {
-  expansion: string;
-  number: number;
-  name: string;
-  count: number;
-}
+import { Loader2 } from "lucide-react";
 
 export default function UserGallery() {
   const { session, status } = useBoffSession();
   const router = useRouter();
-  const [changes, setChanges] = useState<Record<string, number>>({});
-
-  const { allCards, userCards, loading, error, updateUserCards } = useGalleryData(session?.user?.name || "");
 
   if (status === "loading") {
     return (
-      <div className="flex flex-col items-center justify-center min-h-full">
-        <h1 className="text-3xl font-bold text-orange-300 mb-4">Cargando...</h1>
-        <p className="text-main-300 mb-6 text-center">
-          Estamos cargando tu galería de cartas. Por favor, espera un momento.
-        </p>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+        <div className="p-4 rounded-full bg-surface-700/50 border border-surface-600/50">
+          <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
+        </div>
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-semibold text-surface-50 mb-2">Cargando...</h1>
+          <p className="text-surface-400">
+            Estamos cargando tu galería de cartas. Por favor, espera un momento.
+          </p>
+        </div>
       </div>
     );
   }
 
   if (!session || !session.user) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-full">
-        <h1 className="text-3xl font-bold text-orange-300 mb-4">
-          Usuario no encontrado
-        </h1>
-        <p className="text-main-300 mb-6 text-center">
-          Lo sentimos, no pudimos encontrar tus datos o ocurrió un error al
-          cargar la galería.
-        </p>
-        <Button
-          onClick={() => router.push("/")}
-          className="bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200"
-        >
-          Volver al Inicio
-        </Button>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+        <div className="p-4 rounded-full bg-red-500/10 border border-red-500/20">
+          <HiExclamationTriangle className="w-8 h-8 text-red-400" />
+        </div>
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-semibold text-surface-50 mb-2">
+            Usuario no encontrado
+          </h1>
+          <p className="text-surface-400 mb-6">
+            Lo sentimos, no pudimos encontrar tus datos.
+          </p>
+          <Button
+            onClick={() => router.push("/")}
+            variant="outline"
+          >
+            <HiUserCircle className="w-4 h-4 mr-2" />
+            Volver al Inicio
+          </Button>
+        </div>
       </div>
     );
   }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-3xl font-bold text-orange-300 mb-4">Error</h1>
-        <p className="text-main-300 mb-6 text-center">{error}</p>
-        <Button
-          onClick={() => router.push("/")}
-          className="bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200"
-        >
-          Volver al Inicio
-        </Button>
-      </div>
-    );
-  }
-
+  
   return <PlayerGallery username={session.user.name!} />;
 }

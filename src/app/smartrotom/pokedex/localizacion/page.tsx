@@ -1,17 +1,13 @@
 import { InternalLink } from "@/components/nav/Link"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService";
+import { PokemonService } from "@/services/api/smartrotom/pokemonService";
 import { getTranslations } from "next-intl/server";
 import { MapPinIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";
+import { getTranslatedBiomeName } from "@/utils/pokemonTranslations";
 
 export default async function Biomas(){
     const t = await getTranslations("pokedex");
-    const biomes = await (await pokemonService.getBiomes()).data as Record<string, number>;
-    
-    // Format the biome name for display
-    const formatBiomeTitle = (rawBiome: string) => {
-        return t(rawBiome.replace(":", "_").replace(" ", "_"))
-            || rawBiome.replace(/:/g, " ");
-    };
+    const biomesResponse = await PokemonService.getBiomes();
+    const biomes = biomesResponse.data as { name: string; count: number }[];
     
     return(
         <div className="bg-surface-800 min-h-full overflow-auto">
@@ -29,17 +25,17 @@ export default async function Biomas(){
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {Object.entries(biomes)
-                        .filter(([biome]) => !biome.includes("biomesoplenty") && !biome.includes("terraforged"))
+                    {biomes
+                        .filter((biome) => !biome.name.includes("biomesoplenty") && !biome.name.includes("terraforged"))
                         .sort((a, b) => {
                             // Sort by number of Pokémon in descending order
-                            return b[1] - a[1];
+                            return b.count - a.count;
                         })
-                        .map(([biome, amount], index) => {
-                            const biomeName = formatBiomeTitle(biome);
+                        .map((biome, index) => {
+                            const biomeName = getTranslatedBiomeName(biome.name, t);
                             
                             return (
-                                <InternalLink href={`/pokedex/localizacion/${biome}`} key={index}>
+                                <InternalLink href={`pokedex/localizacion/${biome.name}`} key={index}>
                                     <div className="flex flex-col items-center justify-center text-center p-4 h-36 
                                                 rounded-lg border border-surface-600 bg-surface-700/50
                                                 hover:bg-surface-600/80 hover:border-surface-500 hover:text-surface-50 transition-all
@@ -53,7 +49,7 @@ export default async function Biomas(){
                                         <div className="flex items-center justify-center space-x-2">
                                             <ArchiveBoxIcon className="h-4 w-4 text-amber-400" />
                                             <span className="text-xl text-amber-400 font-medium">
-                                                {amount}
+                                                {biome.count}
                                             </span>
                                         </div>
                                     </div>
@@ -63,7 +59,7 @@ export default async function Biomas(){
                 </div>
                 
                 {/* If there are no valid biomes to display */}
-                {Object.entries(biomes).filter(([biome]) => !biome.includes("biomesoplenty") && !biome.includes("terraforged")).length === 0 && (
+                {biomes.filter((biome) => !biome.name.includes("biomesoplenty") && !biome.name.includes("terraforged")).length === 0 && (
                     <div className="bg-surface-700/30 rounded-lg p-8 text-center border border-surface-600/50">
                         <p className="text-surface-300 text-lg">No se encontraron biomas disponibles</p>
                     </div>

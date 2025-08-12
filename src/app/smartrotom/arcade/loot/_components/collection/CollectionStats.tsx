@@ -1,10 +1,11 @@
-import { Rarity } from "../../types";
+import { ArcadeInventoryItem } from "@/generated/api";
+
 
 interface CollectionStatsProps {
   totalCount: number;
   filteredCount: number;
   displayedCount: number;
-  selectedRarity: Rarity | "all";
+  selectedRarity: ArcadeInventoryItem.rarity | "all";
 }
 
 export function CollectionStats({ 
@@ -14,7 +15,7 @@ export function CollectionStats({
   selectedRarity 
 }: CollectionStatsProps) {
   return (
-    <div className="text-gray-300 mb-4 flex items-center justify-between">
+    <div className="text-surface-300 mb-4 flex items-center justify-between">
       <span>
         Mostrando {displayedCount} de {filteredCount} objetos
         {selectedRarity !== "all" && ` (filtrado por ${

@@ -1,266 +1,89 @@
 "use client";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
-import { useState, useCallback } from "react";
-import { getFloors, getValidDungeons } from "./DungeonData";
-import { getValidPokemon } from "./PokemonData";
-import { useFormStore } from "./store";
-import { generateWonderMail } from "./Generate";
-import { Combobox } from "@/components/ui/combobox";
-import { getItemData } from "./ItemData";
 
+import { motion } from "framer-motion";
+import { useFormStore } from "./store";
+import { 
+  useWonderMail, 
+  useSkyFormHandlers, 
+  useCopyToClipboard 
+} from "./_hooks";
 import {
-  getClientIsTarget,
-  getForceClient,
-  getQuestData,
-  getRewardTypes,
-  getSubQuestData,
-  getUseTargetItem,
-  givesItem,
-} from "./QuestData";
-import { useTranslations } from "next-intl";
-import { Card } from "@/components/ui/card";
+  Header,
+  SkyForm,
+  WonderMailDisplay
+} from "./_components";
 
 export function SkyGenerator() {
-  const [wonderMail, setWonderMail] = useState("");
-  const dungeonsTrans  = useTranslations("");
-  const commonTrans  = useTranslations("");
+  const { formData } = useFormStore();
+  const { wonderMail, generateMail, clearMail } = useWonderMail();
+  const { copied, handleCopy } = useCopyToClipboard();
+  const {
+    handleQuestTypeChange,
+    handleSubQuestChange,
+    handleEuropeanVersionChange,
+    handleGenerateWonderMail,
+    handleItemChange,
+    handleFieldChange,
+  } = useSkyFormHandlers({ generateMail, clearMail });
 
-  const { formData, targetAvailable, setFormData, setTargetAvailable } =
-    useFormStore();
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
-  const handleTargetItemChange = useCallback(
-    (value: string) => {
-      setFormData({ targetItem: Number(value) });
-    },
-    [setFormData]
-  );
-
-  const handleRewardItemChange = useCallback(
-    (value: string) => {
-      setFormData({ rewardItem: Number(value) });
-    },
-    [setFormData]
-  );
-
-  function getWonderMail() {
-    const mail = generateWonderMail(formData) || "";
-    setWonderMail(mail);
-  }
-
-  function updateEuropeanVersion(value: string | boolean) {
-    setFormData({ europeanVersion: value === true });
-    setWonderMail("");
-  }
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
 
   return (
-    <div className="min-h-screen text-primary-100 p-6">
-      <Card className="max-w-4xl mx-auto p-8 rounded-xl">
-        <h1 className="text-4xl font-bold mb-6 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-600">
-          Sky Generator
-        </h1>
+    <motion.div 
+      className="min-h-full text-surface-50 p-4 sm:p-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Enhanced Header */}
+        <motion.div variants={itemVariants}>
+          <Header />
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <FormField label={commonTrans("QUEST_TYPE")}>
-            <Combobox variant="orange"  
-              className="w-full bg-surface-800 border-primary-600 text-primary-100"
-              data={getQuestData(commonTrans)}
-              value={formData.questType.toString()}
-              onChange={(value) =>
-                setFormData({
-                  questType: Number(value),
-                  forceClient: getForceClient(
-                    Number(value),
-                    formData.specialQuestType
-                  ),
-                  forceTarget: getForceClient(
-                    Number(value),
-                    formData.specialQuestType
-                  ),
-                })
-              }
-            />
-          </FormField>
+        {/* Main Form Card */}
+        <motion.div variants={itemVariants}>
+          <SkyForm
+            formData={formData}
+            onQuestTypeChange={handleQuestTypeChange}
+            onSubQuestChange={handleSubQuestChange}
+            onFieldChange={handleFieldChange}
+            onItemChange={handleItemChange}
+            onEuropeanVersionChange={handleEuropeanVersionChange}
+            onGenerateWonderMail={handleGenerateWonderMail}
+          />
+        </motion.div>
 
-          <FormField label={commonTrans("QUEST_SUBTYPE")}>
-            <Combobox variant="orange" 
-              className="w-full bg-surface-800 border-primary-600 text-primary-100"
-              data={getSubQuestData(formData.questType, commonTrans)}
-              value={formData.specialQuestType.toString()}
-              disabled={
-                getForceClient(
-                  formData.questType,
-                  formData.specialQuestType
-                ) === 0
-              }
-              onChange={(value) =>
-                setFormData({
-                  specialQuestType: Number(value),
-                  forceClient: getForceClient(
-                    formData.questType,
-                    Number(value)
-                  ),
-                  forceTarget: getForceClient(
-                    formData.questType,
-                    Number(value)
-                  ),
-                })
-              }
-            />
-          </FormField>
-
-          <FormField label={commonTrans("DUNGEON")}>
-            <Combobox variant="orange"  
-              className="w-full bg-surface-800 border-primary-600 text-primary-100"
-              data={getValidDungeons(dungeonsTrans)}
-              value={formData.dungeon.toString()}
-              onChange={(value) => setFormData({ dungeon: Number(value) })}
-            />
-          </FormField>
-
-          <FormField label="Floor">
-            <Input
-              type="number"
-              min={1}
-              max={getFloors(formData.dungeon)}
-              className="w-full xl:w-24 bg-surface-800 border-primary-600 text-primary-100"
-              value={formData.floor}
-              onChange={(e) => setFormData({ floor: Number(e.target.value) })}
-            />
-          </FormField>
-
-          <FormField label={commonTrans("CLIENT_POKEMON")}>
-            <div className="flex items-center">
-              <Combobox variant="orange" 
-                data={getValidPokemon()}
-                value={formData.clientPokemon.toString()}
-                onChange={(value) =>
-                  setFormData({ clientPokemon: Number(value) })
-                }
-                disabled={
-                  getForceClient(
-                    formData.questType,
-                    formData.specialQuestType
-                  ) > 0
-                }
-                className="flex-grow bg-surface-800 border-primary-600 text-primary-100"
-              />
-              <img
-                width={40}
-                height={40}
-                src={formData.clientSprite}
-                alt="Client Sprite"
-                className="ml-2"
-                style={{ imageRendering: "pixelated" }}
-              />
-            </div>
-          </FormField>
-
-          <FormField label={commonTrans("TARGET_POKEMON")}>
-            <div className="flex items-center">
-              <Combobox variant="orange" 
-                data={getValidPokemon()}
-                value={formData.targetPokemon.toString()}
-                onChange={(value) =>
-                  setFormData({ targetPokemon: Number(value) })
-                }
-                disabled={
-                  getForceClient(
-                    formData.questType,
-                    formData.specialQuestType
-                  ) > 0 || getClientIsTarget(formData.questType)
-                }
-                className="flex-grow bg-surface-800 border-primary-600 text-primary-100"
-              />
-              <img
-                width={40}
-                height={40}
-                src={formData.targetSprite}
-                alt="Target Sprite"
-                className="ml-2"
-                style={{ imageRendering: "pixelated" }}
-              />
-            </div>
-          </FormField>
-
-          <FormField label={commonTrans("REWARD_TYPE")} className="md:col-span-2">
-            <Combobox variant="orange" 
-              className="w-full bg-surface-800 border-primary-600 text-primary-100"
-              data={getRewardTypes(commonTrans)}
-              value={formData.rewardType.toString()}
-              onChange={(value) => setFormData({ rewardType: Number(value) })}
-            />
-          </FormField>
-
-          <FormField label={commonTrans("TARGET_ITEM")}>
-            <Combobox variant="orange" 
-              className="w-full bg-surface-800 border-primary-600 text-primary-100"
-              data={getItemData()}
-              value={formData.targetItem.toString()}
-              onChange={handleTargetItemChange}
-              disabled={!getUseTargetItem(formData.questType)}
-            />
-          </FormField>
-
-          <FormField label={commonTrans("REWARD_ITEM")}>
-            <Combobox variant="orange" 
-              className="w-full bg-surface-800 border-primary-600 text-primary-100"
-              data={getItemData()}
-              value={formData.rewardItem.toString()}
-              onChange={handleRewardItemChange}
-              disabled={!givesItem(formData.rewardType)}
-            />
-          </FormField>
-
-          <FormField label={commonTrans("EUROPEAN")} className="md:col-span-2 mx-auto flex justify-center items-center space-x-2">
-            <Checkbox
-              className="border-primary-600"
-              checked={formData.europeanVersion}
-              onCheckedChange={(value) =>
-                updateEuropeanVersion(value)
-              }
-            />
-          </FormField>
-        </div>
-
-        <Button 
-          onClick={getWonderMail} 
-          className="w-full mb-4 bg-primary-600 hover:bg-primary-700 text-white"
-        >
-          {commonTrans("GENERATE_WONDER_MAIL")}
-        </Button>
-
+        {/* Wonder Mail Result */}
         {wonderMail && (
-          <div className="bg-surface-800 p-4 rounded-lg text-center border border-primary-600">
-            <h2 className="text-2xl font-semibold mb-2 text-primary-400">
-              Correo Secreto {formData.europeanVersion ? "(EU)" : ""}
-            </h2>
-            <div className="text-xl break-all text-primary-100">
-              {wonderMail.split("\n").map((line, index) => (
-                <div key={index}>{line}</div>
-              ))}
-            </div>
-          </div>
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <WonderMailDisplay 
+              mail={wonderMail} 
+              isEuropean={formData.europeanVersion}
+              onCopy={() => handleCopy(wonderMail)}
+              copied={copied}
+            />
+          </motion.div>
         )}
-      </Card>
-    </div>
-  );
-}
-
-function FormField({
-  label,
-  children,
-  className,
-}: {
-  label: string;
-  children: React.ReactNode;
-  className?: string;
-}) {
-  return (
-    <div className={className}>
-      <label className="block text-lg font-medium mb-1 text-primary-300">{label}</label>
-      {children}
-    </div>
+      </div>
+    </motion.div>
   );
 }

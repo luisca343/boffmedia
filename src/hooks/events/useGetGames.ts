@@ -1,8 +1,8 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useGetGames() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(eventsService.getGames)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(EventsService.getGames)
 
   return {
     games: data || [],

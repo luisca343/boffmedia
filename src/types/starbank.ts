@@ -12,6 +12,8 @@ export interface Transaction {
     amount: number;
     balance: number;
     date: string;
+    name?: string;
+    type?: string;
   }
   
   

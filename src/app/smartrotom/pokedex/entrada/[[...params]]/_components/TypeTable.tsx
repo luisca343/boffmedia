@@ -12,7 +12,7 @@ export function TypeTable({list, title, id, className='', badgeType}:
     // Visual styles based on whether this is offensive or defensive
     const headerStyle = badgeType === "offensive" ? 
       "bg-red-900/20 border-red-800/30" : 
-      "bg-blue-900/20 border-blue-800/30"
+      "bg-secondary-900/20 border-secondary-800/30"
     
     return (
         <div className={`m-2 ${className}`} id={id}>

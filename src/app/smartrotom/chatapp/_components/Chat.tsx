@@ -9,7 +9,7 @@ import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
-import { chatAppService } from "@/services/api/smartrotom/chatAppService"
+import { ChatAppService } from "@/services/api/smartrotom/chatAppService"
 import useSocketStore from "@/stores/useSocketStore"
 
 export function Chat({
@@ -65,7 +65,7 @@ export function Chat({
       messages: [newMessage, ...prev.messages],
     }))
 
-    chatAppService
+    ChatAppService
       .createMessage(chat.id, {
         message: message,
         uuid: getSmartRotomUser(session).uuid,
@@ -80,7 +80,7 @@ export function Chat({
   }
 
   function call() {
-    chatAppService.call(chat.id, getSmartRotomUser(session).uuid).then((res) => {
+    ChatAppService.initiateCall(chat.id, { chatId: chat.id, uuid: getSmartRotomUser(session).uuid }).then((res) => {
       if (res.error) return toast.error(res.error)
     })
   }

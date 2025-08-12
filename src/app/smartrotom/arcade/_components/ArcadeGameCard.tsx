@@ -40,24 +40,24 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Cabinet frame and shadow */}
-      <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-slate-800 to-slate-900 z-0 shadow-xl"></div>
+      <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-surface-800 to-surface-900 z-0 shadow-xl"></div>
       
       {/* Main cabinet body */}
-      <div className="relative z-10 bg-gray-900 border-t-8 border-gray-800 rounded-3xl overflow-hidden">
+      <div className="relative z-10 bg-surface-900 border-t-8 border-surface-800 rounded-3xl overflow-hidden">
         {/* Decorative arcade machine lights */}
         <div className="absolute top-0 left-0 right-0 flex justify-between px-3 -mt-[6px] pointer-events-none">
           {[...Array(5)].map((_, i) => (
             <div 
               key={i} 
               className={`h-3 w-3 rounded-full transition-colors duration-100 ${
-                lightsOn ? getRandomColor(i, color) : 'bg-gray-600'
+                lightsOn ? getRandomColor(i, color) : 'bg-surface-600'
               } shadow-lg`}
             ></div>
           ))}
         </div>
         
         {/* Game display screen */}
-        <div className={`relative h-36 overflow-hidden bg-${color}-900/40 border-b-4 border-gray-800`}>
+        <div className={`relative h-36 overflow-hidden bg-${color}-900/40 border-b-4 border-surface-800`}>
           {/* CRT screen effect */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60"></div>
           <div className="absolute inset-0 bg-[url('/images/scan-lines.png')] opacity-10"></div>
@@ -71,7 +71,7 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
           
           {/* Badge */}
           {badge && (
-            <div className={`absolute top-3 right-3 ${badge.type === 'new' ? 'bg-emerald-500' : badge.type === 'hot' ? 'bg-orange-500' : 'bg-purple-500'} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className={`absolute top-3 right-3 ${badge.type === 'new' ? 'bg-emerald-500' : badge.type === 'hot' ? 'bg-orange-500' : 'bg-accent-500'} text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg ${isHovered ? 'animate-pulse' : ''}`}>
               {badge.text}
             </div>
           )}
@@ -81,9 +81,9 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
         </div>
         
         {/* Control panel */}
-        <div className="relative p-4 pt-5 bg-gradient-to-b from-gray-800 to-gray-900">
+        <div className="relative p-4 pt-5 bg-gradient-to-b from-surface-800 to-surface-900">
           {/* Decorative joystick */}
-          <div className="absolute -top-3 left-4 w-6 h-6 bg-black rounded-full border-2 border-gray-700 shadow-inner"></div>
+          <div className="absolute -top-3 left-4 w-6 h-6 bg-black rounded-full border-2 border-surface-700 shadow-inner"></div>
           
           {/* Decorative buttons */}
           <div className="absolute -top-3 right-4 flex space-x-2">
@@ -104,7 +104,7 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
           
           {/* "Insert coin" message */}
           <div className="mt-auto text-center">
-            <span className={`inline-block ${isHovered ? 'animate-blink text-yellow-300' : 'text-gray-400'} text-xs tracking-widest uppercase`}>
+            <span className={`inline-block ${isHovered ? 'animate-blink text-yellow-300' : 'text-surface-400'} text-xs tracking-widest uppercase`}>
               Insertar moneda para jugar
             </span>
           </div>
@@ -118,10 +118,10 @@ export default function ArcadeGameCard({ title, description, href, icon, color, 
 function getRandomColor(index: number, mainColor: string): string {
   const colors = [
     'bg-yellow-400',
-    'bg-blue-400', 
-    'bg-green-400',
+    'bg-secondary-400', 
+    'bg-highlight-400',
     'bg-red-400',
-    'bg-purple-400'
+    'bg-accent-400'
   ];
   
   // Ensure one light always matches the main color
@@ -130,9 +130,9 @@ function getRandomColor(index: number, mainColor: string): string {
       case 'yellow': return 'bg-yellow-400';
       case 'orange': return 'bg-orange-400';
       case 'pink': return 'bg-pink-400';
-      case 'blue': return 'bg-blue-400';
-      case 'purple': return 'bg-purple-400';
-      case 'green': return 'bg-green-400';
+      case 'blue': return 'bg-secondary-400';
+      case 'purple': return 'bg-accent-400';
+      case 'green': return 'bg-highlight-400';
       default: return 'bg-yellow-400';
     }
   }
@@ -142,16 +142,16 @@ function getRandomColor(index: number, mainColor: string): string {
 
 function getButtonColor(type: string, mainColor: string): string {
   if (type === 'red') return 'bg-red-500';
-  if (type === 'green') return 'bg-green-500';
+  if (type === 'green') return 'bg-highlight-500';
   
   // Make the blue button match the main color
   switch (mainColor) {
     case 'yellow': return 'bg-yellow-500';
     case 'orange': return 'bg-orange-500';
     case 'pink': return 'bg-pink-500';
-    case 'blue': return 'bg-blue-500';
-    case 'purple': return 'bg-purple-500';
+    case 'blue': return 'bg-secondary-500';
+    case 'purple': return 'bg-accent-500';
     case 'green': return 'bg-emerald-500';
-    default: return 'bg-blue-500';
+    default: return 'bg-secondary-500';
   }
 }

@@ -5,11 +5,11 @@ import OptimizedFicusNav from "@/components/nav/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 
 import '../globals.css'
-import { BoffFooter } from "./_components/BoffFooter";
+import { BoffFooter } from "./_components/layout/BoffFooter";
 
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab",
-  description: "BoffMedia",
+  description: process.env.NODE_ENV === 'production' ? "BoffMedia" : "FicusLab"
 };
 
 export default async function RootLayout({

@@ -125,7 +125,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
       <div className="min-h-full bg-surface-900 flex justify-center items-center text-white overflow-auto">
         <div className="text-center">
           <p className="text-xl mb-4">{t("channel.notFound")}</p>
-          <InternalLink href="/youtube" className="text-blue-400 hover:underline">
+          <InternalLink href="youtube" className="text-secondary-400 hover:underline">
             {t("channel.returnToSearch")}
           </InternalLink>
         </div>

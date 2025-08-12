@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 
 export function useGetRegistries(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(pokemonService.getRegistries, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(PokemonService.getPokedexRegistries, uuid)
 
   return {
     registries: data,

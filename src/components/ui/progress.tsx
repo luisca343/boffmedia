@@ -21,8 +21,8 @@ const Progress = React.forwardRef<
       indicator: "bg-primary-900 dark:bg-primary-50"
     },
     wingull: {
-      root: "bg-blue-200 dark:bg-blue-800",
-      indicator: "bg-blue-600"
+      root: "bg-secondary-200 dark:bg-secondary-800",
+      indicator: "bg-secondary-600"
     }
   }
   

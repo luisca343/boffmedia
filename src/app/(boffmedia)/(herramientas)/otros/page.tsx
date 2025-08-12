@@ -21,9 +21,9 @@ export default function OtherTools() {
       title: "Sorteos",
       description: "Crea y gestiona sorteos para eventos y comunidades",
       icon: "/img/games/other/raffle.webp",
-      iconFallback: <Ticket className="h-8 w-8 text-purple-400" />,
+      iconFallback: <Ticket className="h-8 w-8 text-accent-400" />,
       href: "/sorteo",
-      color: "from-purple-400 to-indigo-600",
+      color: "from-accent-400 to-indigo-600",
       features: ["Sorteos aleatorios", "Tickets personalizados", "Resultados en tiempo real"],
       featured: true
     },
@@ -31,9 +31,9 @@ export default function OtherTools() {
       title: "Claves de Steam",
       description: "Gestiona y comparte claves de juegos de Steam",
       icon: "/img/games/other/key.webp",
-      iconFallback: <Key className="h-8 w-8 text-blue-400" />,
+      iconFallback: <Key className="h-8 w-8 text-secondary-400" />,
       href: "/otros/keys",
-      color: "from-blue-400 to-cyan-600",
+      color: "from-secondary-400 to-cyan-600",
       features: ["Biblioteca de claves", "Validador", "Historial de canjes"],
       featured: false
     }
@@ -46,7 +46,7 @@ export default function OtherTools() {
         <div className="flex items-center justify-center md:justify-between">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-surface-50 mb-2">
-              Otras <span className="text-blue-400">Herramientas</span>
+              Otras <span className="text-secondary-400">Herramientas</span>
             </h1>
             <p className="text-xl text-surface-300">
               Recursos útiles para gamers y creadores de contenido
@@ -71,7 +71,7 @@ export default function OtherTools() {
                   if (parent) {
                     const fallback = document.createElement('div');
                     fallback.className = 'w-[90px] h-[100px] bg-surface-700/40 rounded-lg flex items-center justify-center';
-                    fallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M12 11v6"/><path d="M9 11h6"/></svg>';
+                    fallback.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary-400"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><path d="M12 11v6"/><path d="M9 11h6"/></svg>';
                     parent.appendChild(fallback);
                   }
                 }}
@@ -133,7 +133,7 @@ export default function OtherTools() {
                 
                 <div className="flex flex-wrap gap-2 mb-6">
                   {featuredTool.features.map(feature => (
-                    <span key={feature} className="bg-surface-700/50 text-purple-300 text-sm py-1 px-3 rounded-full">
+                    <span key={feature} className="bg-surface-700/50 text-accent-300 text-sm py-1 px-3 rounded-full">
                       {feature}
                     </span>
                   ))}
@@ -141,16 +141,16 @@ export default function OtherTools() {
                 
                 <Button 
                   onClick={() => router.push(featuredTool.href)}
-                  className={`bg-gradient-to-r ${featuredTool.color} hover:opacity-90 text-white font-medium px-6`}
+                  variant="default"
                 >
                   Acceder a Sorteos <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
               <div className="md:w-1/3 bg-gradient-to-br from-surface-800 to-surface-900 p-0 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Gift className="h-24 w-24 text-purple-400/30" />
+                  <Gift className="h-24 w-24 text-accent-400/30" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/10 to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-accent-500/10 to-transparent"></div>
               </div>
             </div>
           </Card>
@@ -263,7 +263,7 @@ export default function OtherTools() {
             className="bg-surface-700/30 hover:bg-surface-700/50 p-4 rounded-md transition-colors flex items-center justify-between"
           >
             <span className="text-surface-100">Comunidad de Steam</span>
-            <ArrowRight className="h-4 w-4 text-blue-400" />
+            <ArrowRight className="h-4 w-4 text-secondary-400" />
           </a>
           <a 
             href="https://www.humblebundle.com/" 
@@ -272,7 +272,7 @@ export default function OtherTools() {
             className="bg-surface-700/30 hover:bg-surface-700/50 p-4 rounded-md transition-colors flex items-center justify-between"
           >
             <span className="text-surface-100">Humble Bundle</span>
-            <ArrowRight className="h-4 w-4 text-blue-400" />
+            <ArrowRight className="h-4 w-4 text-secondary-400" />
           </a>
           <a 
             href="https://boffmedia.com/guias" 
@@ -281,7 +281,7 @@ export default function OtherTools() {
             className="bg-surface-700/30 hover:bg-surface-700/50 p-4 rounded-md transition-colors flex items-center justify-between"
           >
             <span className="text-surface-100">Guías de BoffMedia</span>
-            <ArrowRight className="h-4 w-4 text-blue-400" />
+            <ArrowRight className="h-4 w-4 text-secondary-400" />
           </a>
         </div>
       </div>
@@ -289,7 +289,7 @@ export default function OtherTools() {
       {/* Coming soon section */}
       <div className="mt-10 text-center p-8 border border-dashed border-surface-700 rounded-lg bg-surface-800/30">
         <div className="bg-surface-700/20 w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4">
-          <Plus className="h-8 w-8 text-blue-400 opacity-75" />
+          <Plus className="h-8 w-8 text-secondary-400 opacity-75" />
         </div>
         <h3 className="text-2xl font-bold text-surface-100 mb-2">Próximamente más herramientas</h3>
         <p className="text-surface-300 max-w-lg mx-auto">

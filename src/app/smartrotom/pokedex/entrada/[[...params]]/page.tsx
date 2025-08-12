@@ -8,7 +8,7 @@ import { SpawnTable } from "./_components/SpawnTable"
 import { EntryHeader } from "./_components/EntryHeader"
 import { BasicInfo } from "./_components/ClientBasicInfo"
 import { PokedexSection } from "../../_components/PokedexSection"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { LevelMovesTable, OtherMovesTable } from "./_components/MovesTable"
 import { getFormName, getPokemonId } from "../../dexUtils"
 import PokemonList from "./_components/PokemonList"
@@ -22,7 +22,7 @@ export default async function EntradaPokedex({params}: any){
     
     let [pokemonIndex, formIndex] = params.params as [number, number | string]
     
-    const pokemon = (await pokemonService.getPokemonByDex(pokemonIndex)).data as Pokemon
+    const pokemon = (await PokemonService.getPokemonByDex(pokemonIndex)).data as Pokemon
     
     
     if (pokemonIndex === undefined) {
@@ -38,15 +38,15 @@ export default async function EntradaPokedex({params}: any){
         formIndex = parseInt(formIndex+"") - 1;
     }
     
-    const {next, prev} = (await pokemonService.getNextPrev(pokemonIndex)).data!
-    const moves = await (await pokemonService.getMoves(pokemonIndex, formIndex)).data
+    const {next, prev} = (await PokemonService.getNextPrev(pokemonIndex)).data!
+    const moves = await (await PokemonService.getMoves(pokemonIndex, formIndex)).data
     
     if(!pokemon) return <h1>Pokemon no encontrado {pokemonIndex}</h1>
     if(!pokemon.forms[formIndex]) return <h1>Forma no encontrada {formIndex}</h1>
     
     const formName = getFormName(pokemon, formIndex)
     
-    const spawns = (await pokemonService.getSpawnByPokemon(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
+    const spawns = (await PokemonService.getSpawns(getPokemonId(pokemon.name, formName))).data as SpawnInfo[]
 
 
     

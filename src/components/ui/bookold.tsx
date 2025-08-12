@@ -19,7 +19,7 @@ const flipPage = (direction: number) => {
     return (
         <div className="m-auto w-fit flex">
             <button onClick={() => flipPage(-1)}>Anterior</button>
-            <div className={`w-full h-full bg-blue-500 flex`}>
+            <div className={`w-full h-full bg-secondary-500 flex`}>
                 {pages.map((page, index) => (
                     <div key={index} className={`${isActive(page.index) ? 'bg-red-600' : 'bg-yellow-600 '}`}>
                         {page.content}

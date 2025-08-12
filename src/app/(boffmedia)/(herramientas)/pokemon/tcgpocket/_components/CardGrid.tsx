@@ -1,19 +1,19 @@
 import { AnimatePresence } from "framer-motion"
 import { CardItem } from "./CardItem"
-import { Card } from '../types'
+import { TcgCard } from "@/generated/api"
 
 interface CardGridProps {
-  cards: Card[]
+  cards: TcgCard[]
   userCards?: Record<string, number>
   changes?: Record<string, number>
   hideMissingCards?: boolean
   editable?: boolean
   loading?: boolean
-  handleAddCard?: (card: Card) => void
-  handleRemoveCard?: (card: Card) => void
+  handleAddCard?: (card: TcgCard) => void
+  handleRemoveCard?: (card: TcgCard) => void
   trans: (key: string) => string
   showAmounts?: boolean
-  linkTo?: (card: Card) => string
+  linkTo?: (card: TcgCard) => string
   allColored?: boolean
 }
 
@@ -35,7 +35,7 @@ export function CardGrid({
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
       <AnimatePresence>
         {cards.map((card) => {
-          const key = `${card.expansion}_${card.number}`
+          const key = card.id
           const count = (userCards[key] || 0) + (changes[key] || 0)
           const isMissing = !allColored && count === 0
 

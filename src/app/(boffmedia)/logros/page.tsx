@@ -28,13 +28,13 @@ const rarityConfig: Record<
   { icon: any; color: string; bgColor: string }
 > = {
   bronce: { icon: FaAward, color: "text-orange-400", bgColor: "bg-orange-900" },
-  plata: { icon: FaAward, color: "text-gray-300", bgColor: "bg-gray-700" },
+  plata: { icon: FaAward, color: "text-surface-300", bgColor: "bg-surface-700" },
   oro: { icon: FaMedal, color: "text-yellow-400", bgColor: "bg-yellow-900" },
   platino: { icon: FaStar, color: "text-cyan-400", bgColor: "bg-cyan-900" },
   diamante: {
     icon: GiCutDiamond,
-    color: "text-blue-400",
-    bgColor: "bg-blue-900",
+    color: "text-secondary-400",
+    bgColor: "bg-secondary-900",
   },
 };
 
@@ -201,13 +201,13 @@ export default function AchievementList() {
               <h3 className="text-lg font-semibold text-orange-400">
                 {achievement.name}
               </h3>
-              <p className="text-sm text-gray-300">{achievement.description}</p>
+              <p className="text-sm text-surface-300">{achievement.description}</p>
             </div>
             <div className="text-right">
               <span className="text-lg font-bold text-yellow-400">
                 {achievement.points}
               </span>
-              <span className="text-sm text-gray-300 ml-1">pts</span>
+              <span className="text-sm text-surface-300 ml-1">pts</span>
             </div>
           </div>
         ))}

@@ -1,123 +1,129 @@
 {
-    "boffmedia": {
-      "hero": {
-        "title": {
-          "first": "Your gaming adventure",
-          "second": "starts here"
-        },
-        "description": "Immerse yourself in immersive gaming experiences, compete in epic tournaments and be part of a passionate gaming community.",
-        "buttons": {
-          "exploreGames": "Explore Games",
-          "joinCommunity": "Join the Community"
-        },
-        "image": {
-          "alt": "Gaming Illustration"
-        },
-        "new": "New!"
+  "boffmedia": {
+    "hero": {
+      "title": {
+        "first": "Your gaming adventure",
+        "second": "starts here"
       },
-      "featuredGames": {
-        "title": "Featured",
-        "subtitle": "Discover the most popular tools and games from BoffMedia",
-        "viewMore": "See more",
-        "status": {
-          "popular": "Popular",
-          "new": "New",
-          "comingSoon": "Coming Soon"
+      "description": "Immerse yourself in immersive gaming experiences, compete in epic tournaments and be part of a passionate gaming community.",
+      "buttons": {
+        "exploreGames": "Explore Games",
+        "joinCommunity": "Join the Community"
+      },
+      "image": {
+        "alt": "Gaming Illustration"
+      },
+      "new": "New!"
+    },
+    "ui": {
+      "disabled": "Disabled",
+      "selectElement": "Select an element",
+      "searchElement": "Search element",
+      "noElementFound": "No element found"
+    },
+    "featuredGames": {
+      "title": "Featured Games and Tools",
+      "subtitle": "Discover the most popular tools and games from BoffMedia",
+      "viewMore": "See more",
+      "status": {
+        "popular": "Popular",
+        "new": "New",
+        "comingSoon": "Coming Soon"
+      },
+      "games": {
+        "wingull": {
+          "title": "Pixelmon Wingull 2",
+          "description": "The latest Pokémon adventure in Minecraft. Explore, capture, and battle."
         },
-        "games": {
-          "wingull": {
-            "title": "Pixelmon Wingull 2",
-            "description": "The latest Pokémon adventure in Minecraft. Explore, capture, and battle."
-          },
-          "smartrotom": {
-            "title": "SmartRotom",
-            "description": "Access your in-game smartphone from anywhere. Stay connected to the Pixelmon world."
-          },
-          "tools": {
-            "title": "Game Tools",
-            "description": "Enhance your gaming experience with our collection of useful tools."
-          },
-          "zomboff": {
-            "title": "Project ZomBOFF",
-            "description": "Survive the zombie apocalypse with friends on our custom servers."
-          },
-          "bingo": {
-            "title": "Minecraft Bingo",
-            "description": "Test your Minecraft knowledge and speed in competitive events."
+        "smartrotom": {
+          "title": "SmartRotom",
+          "description": "Access your in-game smartphone from anywhere. Stay connected to the Pixelmon world."
+        },
+        "tools": {
+          "title": "Game Tools",
+          "description": "Enhance your gaming experience with our collection of useful tools."
+        },
+        "zomboff": {
+          "title": "Project ZomBOFF",
+          "description": "Survive the zombie apocalypse with friends on our custom servers."
+        },
+        "bingo": {
+          "title": "Minecraft Bingo",
+          "description": "Test your Minecraft knowledge and speed in competitive events."
+        }
+      }
+    },
+    "eventsSection": {
+      "locale": "en-US",
+      "loading": "Loading events...",
+      "errorLoading": "Error loading events",
+      "retry": "Retry",
+      "upcomingEvents": "Upcoming Events",
+      "participateDescription": "Participate in our events and compete with the community",
+      "activeEvents": "Active Events",
+      "eventCalendar": "Event Calendar",
+      "dontMissEvents": "Don't miss any community event",
+      "eventType": "Event",
+      "serverType": "Server",
+      "noUpcomingEvents": "No upcoming events scheduled",
+      "viewAllEvents": "View All Events",
+      "community": "Community",
+      "playerRanking": "Player Ranking",
+      "bestPlayers": "The best players of the season",
+      "errorLoadingRanking": "Error loading ranking",
+      "playerPlaceholder": "Player {id}",
+      "points": "points",
+      "noRankingAvailable": "No ranking available",
+      "viewFullRanking": "View Full Ranking"
+    },
+    "communitySection": {
+      "title": "Join the Community",
+      "subtitle": "Be part of an active community of gamers, participate in special events, and share your experiences",
+      "joinNowButton": "Join Now",
+      "features": {
+        "teams": {
+          "title": "Teams and Clans",
+          "description": "Join a team or create your own"
+        },
+        "events": {
+          "title": "Special Events",
+          "description": "Participate in exclusive community events"
+        },
+        "ranks": {
+          "title": "Ranking System",
+          "description": "Level up and unlock unique rewards"
+        }
+      }
+    },
+    "footer": {
+      "tagline": "Your ultimate gaming platform",
+      "sections": {
+        "platform": {
+          "title": "Platform",
+          "links": {
+            "games": "Games",
+            "events": "Events",
+            "community": "Community"
+          }
+        },
+        "company": {
+          "title": "Company",
+          "links": {
+            "about": "About Us",
+            "blog": "Blog"
           }
         }
       },
-      "eventsSection": {
-        "locale": "en-US",
-        "loading": "Loading events...",
-        "errorLoading": "Error loading events",
-        "retry": "Retry",
-        "upcomingEvents": "Upcoming Events",
-        "participateDescription": "Participate in our events and compete with the community",
-        "activeEvents": "Active Events",
-        "eventCalendar": "Event Calendar",
-        "dontMissEvents": "Don't miss any community event",
-        "eventType": "Event",
-        "serverType": "Server",
-        "noUpcomingEvents": "No upcoming events scheduled",
-        "viewAllEvents": "View All Events",
-        "community": "Community",
-        "playerRanking": "Player Ranking",
-        "bestPlayers": "The best players of the season",
-        "errorLoadingRanking": "Error loading ranking",
-        "playerPlaceholder": "Player {id}",
-        "points": "points",
-        "noRankingAvailable": "No ranking available",
-        "viewFullRanking": "View Full Ranking"
+      "newsletter": {
+        "title": "Subscribe to Newsletter",
+        "emailPlaceholder": "Email",
+        "joinButton": "Join"
       },
-      "communitySection": {
-        "title": "Join the Community",
-        "subtitle": "Be part of an active community of gamers, participate in special events, and share your experiences",
-        "joinNowButton": "Join Now",
-        "features": {
-          "teams": {
-            "title": "Teams and Clans",
-            "description": "Join a team or create your own"
-          },
-          "events": {
-            "title": "Special Events",
-            "description": "Participate in exclusive community events"
-          },
-          "ranks": {
-            "title": "Ranking System",
-            "description": "Level up and unlock unique rewards"
-          }
-        }
-      },
-      "footer": {
-        "tagline": "Your ultimate gaming platform",
-        "sections": {
-          "platform": {
-            "title": "Platform",
-            "links": {
-              "games": "Games",
-              "events": "Events",
-              "community": "Community"
-            }
-          },
-          "company": {
-            "title": "Company",
-            "links": {
-              "about": "About Us",
-              "blog": "Blog"
-            }
-          }
-        },
-        "newsletter": {
-          "title": "Subscribe to Newsletter",
-          "emailPlaceholder": "Email",
-          "joinButton": "Join"
-        },
-        "copyright": "© {year} BoffMedia. All rights reserved.",
-        "legal": {
-          "privacy": "Privacy",
-          "terms": "Terms"
-        }
+      "copyright": "© {year} BoffMedia. All rights reserved.",
+      "legal": {
+        "privacy": "Privacy",
+        "terms": "Terms"
       }
     }
   }
+}

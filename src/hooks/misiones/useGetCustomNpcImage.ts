@@ -1,5 +1,5 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { misionesService } from "@/services/api/smartrotom/misionesService"
+import { MisionesService } from "@/services/api/smartrotom/misionesService"
 
 export function useGetCustomNpcImage() {
   const {
@@ -8,21 +8,21 @@ export function useGetCustomNpcImage() {
     isLoading: renderLoading,
     refetch: refetchRender,
     setData: setRenderData,
-  } = useRotomRequest(misionesService.getCustomNpcRender)
+  } = useRotomRequest(MisionesService.getCustomNpcRender)
   const {
     data: imageData,
     error: imageError,
     isLoading: imageLoading,
     refetch: refetchImage,
     setData: setImageData,
-  } = useRotomRequest(misionesService.getCustomNpcImage)
+  } = useRotomRequest(MisionesService.getCustomNpcImage)
 
   const getRender = (npcName: string) => {
-    return misionesService.getCustomNpcRender(npcName)
+    return MisionesService.getCustomNpcRender(npcName)
   }
 
   const getImage = (npcName: string) => {
-    return misionesService.getCustomNpcImage(npcName)
+    return MisionesService.getCustomNpcImage(npcName)
   }
 
   return {

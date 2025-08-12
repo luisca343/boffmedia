@@ -1,147 +1,68 @@
-"use client"
+"use client";
+import { motion } from "framer-motion";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { GamepadIcon as GameController, Palette, Zap } from "lucide-react"
-
-export default function ThemePreview() {
-  const [theme, setTheme] = useState<string>("default")
+export default function PaletteViewer() {
+  const palettes = [
+    { name: "Surface", varPrefix: "surface", weights: [50,100,200,300,400,500,600,700,800,900,950] },
+    { name: "Primary", varPrefix: "primary", weights: [50,100,200,300,400,500,600,700,800,900] },
+    { name: "Secondary", varPrefix: "secondary", weights: [50,100,200,300,400,500,600,700,800,900] },
+    { name: "Accent", varPrefix: "accent", weights: [50,100,200,300,400,500,600,700,800,900] },
+    { name: "Highlight", varPrefix: "highlight", weights: [50,100,200,300,400,500,600,700,800,900] },
+    { name: "Success", varPrefix: "success", weights: [50,100,200,300,400,500,600,700,800,900,950] },
+    { name: "Info", varPrefix: "info", weights: [50,100,200,300,400,500,600,700,800,900,950] },
+    { name: "Warning", varPrefix: "warning", weights: [50,100,200,300,400,500,600,700,800,900,950] },
+    { name: "Error", varPrefix: "error", weights: [50,100,200,300,400,500,600,700,800,900,950] },
+  ];
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="absolute inset-0 bg-black/50 -z-10"></div>
-
-      <h1 className="text-3xl font-bold mb-6 lexend-mega text-white">Gaming Theme Preview</h1>
-
-      <Tabs defaultValue="default" onValueChange={setTheme} className="mb-8">
-        <TabsList className="grid w-full grid-cols-1 md:grid-cols-3">
-          <TabsTrigger value="default">Default Theme</TabsTrigger>
-          <TabsTrigger value="neon">Neon Theme</TabsTrigger>
-          <TabsTrigger value="retro">Retro Theme</TabsTrigger>
-        </TabsList>
-      </Tabs>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <h2 className="text-2xl font-bold mb-4 lexend-mega text-white">UI Components</h2>
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-primary-500">Game Dashboard</CardTitle>
-                <CardDescription className="text-surface-300">
-                  Preview your gaming components with the new color scheme
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-2">
-                  <Button className="bg-primary-600 hover:bg-primary-700">Play Now</Button>
-                  <Button variant="outline" className="border-secondary-500 text-secondary-500">
-                    Settings
-                  </Button>
-                  <Button variant="ghost" className="text-accent-500 hover:bg-accent-100 hover:text-accent-600">
-                    Leaderboard
-                  </Button>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-surface-100 dark:bg-surface-800 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <GameController className="h-5 w-5 text-primary-500" />
-                    <span className="text-surface-900 dark:text-surface-50">Active Players</span>
-                  </div>
-                  <span className="font-bold text-highlight-500">1,248</span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-surface-100 dark:bg-surface-800 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-secondary-500" />
-                    <span className="text-surface-900 dark:text-surface-50">Server Status</span>
-                  </div>
-                  <span className="font-bold text-success-500">Online</span>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-surface-100 dark:bg-surface-800 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <Palette className="h-5 w-5 text-accent-500" />
-                    <span className="text-surface-900 dark:text-surface-50">Active Theme</span>
-                  </div>
-                  <span className="font-bold capitalize text-surface-900 dark:text-surface-50">{theme}</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 bg-primary-500 text-white rounded-md text-center font-semibold shadow-md">
-                Primary
-              </div>
-              <div className="p-4 bg-secondary-500 text-white rounded-md text-center font-semibold shadow-md">
-                Secondary
-              </div>
-              <div className="p-4 bg-accent-500 text-white rounded-md text-center font-semibold shadow-md">Accent</div>
-              <div className="p-4 bg-highlight-500 text-white rounded-md text-center font-semibold shadow-md">
-                Highlight
-              </div>
+    <div className="container mx-auto p-6">
+      <div className="absolute inset-0 bg-gradient-to-br from-surface-950 via-surface-900 to-surface-800 -z-10" />
+      <h1 className="text-4xl font-extrabold mb-10 text-center text-white tracking-wide drop-shadow-lg">
+        🎮 Color System Preview
+      </h1>
+      <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-3">
+        {palettes.map((palette) => (
+          <motion.div
+            key={palette.varPrefix}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="rounded-xl overflow-hidden border border-surface-600 bg-surface-800/70 backdrop-blur shadow-lg"
+          >
+            <div className="px-5 py-3 flex items-center gap-3 bg-surface-900 border-b border-surface-700">
+              <div
+                className="w-5 h-5 rounded-full shadow"
+                style={{
+                  backgroundColor: `rgb(var(--${palette.varPrefix}-500))`,
+                }}
+              />
+              <h2 className="text-lg font-bold text-white">{palette.name}</h2>
             </div>
-          </div>
-        </div>
+            <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-5 gap-2 p-4">
+              {palette.weights.map((weight) => {
+                const bg = `rgb(var(--${palette.varPrefix}-${weight}))`;
+                const textColor =
+                  weight < 400 ? "text-black" : "text-white"; // auto contrast heuristic
 
-        <div>
-          <h2 className="text-2xl font-bold mb-4 lexend-mega text-white">Color Palette</h2>
-          <div className="space-y-4">
-            <div className="grid grid-cols-5 gap-2">
-              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => (
-                <div
-                  key={`primary-${weight}`}
-                  className="aspect-square rounded-md border border-surface-200 dark:border-surface-700"
-                  style={{ backgroundColor: `rgb(var(--primary-${weight}))` }}
-                ></div>
-              ))}
+                return (
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    key={`${palette.varPrefix}-${weight}`}
+                    className="rounded-md overflow-hidden shadow cursor-pointer group"
+                  >
+                    <div
+                      className={`w-full h-14 flex items-center justify-center text-xs font-semibold ${textColor}`}
+                      style={{ backgroundColor: bg }}
+                    >
+                      {weight}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
-
-            <div className="grid grid-cols-5 gap-2">
-              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => (
-                <div
-                  key={`secondary-${weight}`}
-                  className="aspect-square rounded-md border border-surface-200 dark:border-surface-700"
-                  style={{ backgroundColor: `rgb(var(--secondary-${weight}))` }}
-                ></div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-5 gap-2">
-              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => (
-                <div
-                  key={`accent-${weight}`}
-                  className="aspect-square rounded-md border border-surface-200 dark:border-surface-700"
-                  style={{ backgroundColor: `rgb(var(--accent-${weight}))` }}
-                ></div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-5 gap-2">
-              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900].map((weight) => (
-                <div
-                  key={`highlight-${weight}`}
-                  className="aspect-square rounded-md border border-surface-200 dark:border-surface-700"
-                  style={{ backgroundColor: `rgb(var(--highlight-${weight}))` }}
-                ></div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-5 gap-2">
-              {[50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950].map((weight) => (
-                <div
-                  key={`surface-${weight}`}
-                  className="aspect-square rounded-md border border-surface-200 dark:border-surface-700"
-                  style={{ backgroundColor: `rgb(var(--surface-${weight}))` }}
-                ></div>
-              ))}
-            </div>
-          </div>
-        </div>
+          </motion.div>
+        ))}
       </div>
     </div>
-  )
+  );
 }
-

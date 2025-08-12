@@ -1,12 +1,12 @@
+import { CreateEventDto } from "@/generated/api"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
-import { CreateEventDto } from "@/types/dto/create-event.dto"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useCreateEvent() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(eventsService.createEvent)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(EventsService.createEvent)
 
   const createEvent = (createEventDto: CreateEventDto) => {
-    return eventsService.createEvent(createEventDto)
+    return EventsService.createEvent(createEventDto)
   }
 
   return {

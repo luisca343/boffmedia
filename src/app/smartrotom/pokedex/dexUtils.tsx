@@ -1,7 +1,7 @@
 import type { PokedexData } from "@/types/pokedex"
 import type { Palette, Pokemon } from "@/types/Pokemon"
 import { usePokemonStore } from "@/stores/pokemonStore"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import type { Pokemon as PokemonType } from "@/types/Pokemon"
 
 const SPRITES_BASE_URL = "/smartrotom/packs"
@@ -169,7 +169,7 @@ export function getPokedexStatus(
 }
 
 export async function getItemSprite(name: string) {
-  const img = (await pokemonService.getItemSprite(name)).data
+  const img = (await PokemonService.getItemSprite(name)).data
   return await img
 }
 

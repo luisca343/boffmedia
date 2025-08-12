@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 
 export function useGetNotes(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.getNotes, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.getNotes, uuid)
 
   return {
     notes: data,

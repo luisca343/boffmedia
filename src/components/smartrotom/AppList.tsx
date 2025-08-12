@@ -2,13 +2,13 @@
 import { App } from "./App"
 import { useCallback } from "react"
 import { motion } from "framer-motion"
-import type { OrderedApp } from "@/types/apps"
 import { MouseSensor, useSensor } from "@dnd-kit/core"
 import { useOrderApps } from "@/hooks/apps/useOrderApps"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useGetAppsForPlayer } from "@/hooks/apps/useGetAppsForPlayer"
 import { SortableContext, rectSortingStrategy, arrayMove } from "@dnd-kit/sortable"
 import { DndContext, type DragEndEvent, closestCenter, useSensors } from "@dnd-kit/core"
+import { SmartRotomApp } from "@/generated/api"
 
 export function AppList() {
   const { session } = useBoffSession()
@@ -22,8 +22,8 @@ function SortableGrid({
   setApps,
 }: {
   className?: string
-  apps: OrderedApp[]
-  setApps: (apps: OrderedApp[]) => void
+  apps: SmartRotomApp[]
+  setApps: (apps: SmartRotomApp[]) => void
 }) {
   const { session } = useBoffSession()
   const { orderApps, isLoading } = useOrderApps()
@@ -40,11 +40,11 @@ function SortableGrid({
       if (over && active.id !== over.id) {
         const apps2 = arrayMove(
           apps,
-          apps.indexOf(apps.find((app) => app.id === active.id) as OrderedApp),
-          apps.indexOf(apps.find((app) => app.id === over.id) as OrderedApp),
+          apps.indexOf(apps.find((app) => app.id === active.id) as SmartRotomApp),
+          apps.indexOf(apps.find((app) => app.id === over.id) as SmartRotomApp),
         )
-        const newOrder = apps2.map((app) => ({ id: app.id, order: apps2.indexOf(app) }))
-        orderApps({ newOrder, uuid: session?.user?.smartRotomUser?.uuid! })
+        const order = apps2.map((app) => ({ id: app.id, order: apps2.indexOf(app) }))
+        orderApps({ order, uuid: session?.user?.smartRotomUser?.uuid! })
 
         setApps(apps2)
       }

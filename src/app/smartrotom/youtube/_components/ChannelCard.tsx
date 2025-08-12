@@ -18,7 +18,7 @@ export const ChannelCard = ({
   
   return (
     <InternalLink
-      href={`/youtube/channel/${channelId}`}
+      href={`youtube/channel/${channelId}`}
       className="group bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700 flex flex-col"
     >
       <div className="w-full flex justify-center pt-6 pb-2">

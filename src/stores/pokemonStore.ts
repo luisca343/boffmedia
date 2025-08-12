@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import type { PokedexData } from "@/types/pokedex"
-import { pokemonService } from "@/services/api/smartrotom/pokemonService"
+import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { Pokemon } from "@/types/Pokemon"
 
 interface PokemonState {
@@ -9,12 +9,17 @@ interface PokemonState {
   pokemonByDex: Record<number, Pokemon>
   isLoading: boolean
   error: string | null
-  fetchPokedex: (uuid: string) => Promise<void>
+  fetchingPokedex: boolean
+  currentPokedexUuid: string | null
+  fetchPokedex: (uuid: string) => Promise<PokedexData | void>
   updatePokedexData: (newData: PokedexData) => void
   fetchAllPokemon: () => Promise<void>
   getPokemonByDex: (dex: number) => Promise<Pokemon | undefined>
   getPokedexData: (uuid: string) => Promise<PokedexData | null>
 }
+
+// Store pending promises to avoid duplicate fetches
+const pendingFetches = new Map<string, Promise<PokedexData | void>>()
 
 export const usePokemonStore = create<PokemonState>((set, get) => ({
   console: "PokemonStore initialized",
@@ -23,15 +28,58 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   pokemonByDex: {},
   isLoading: false,
   error: null,
+  fetchingPokedex: false,
+  currentPokedexUuid: null,
 
   fetchPokedex: async (uuid: string) => {
-    set({ isLoading: true, error: null })
-    try {
-      const response = await pokemonService.getPokedexStatus(uuid)
-      set({ pokedexData: response.data, isLoading: false })
-    } catch (error) {
-      set({ error: "Failed to fetch Pokedex data", isLoading: false })
+    const { fetchingPokedex, currentPokedexUuid, pokedexData } = get()
+    
+    // If we already have data for this UUID, don't fetch again
+    if (pokedexData && currentPokedexUuid === uuid) {
+      return
     }
+    
+    // If there's already a fetch in progress for this UUID, wait for it
+    if (pendingFetches.has(uuid)) {
+      return pendingFetches.get(uuid)
+    }
+
+    // If already fetching a different UUID, wait for it to complete
+    if (fetchingPokedex) {
+      return new Promise((resolve) => {
+        const checkComplete = () => {
+          const currentState = get()
+          if (!currentState.fetchingPokedex) {
+            resolve()
+          } else {
+            setTimeout(checkComplete, 100)
+          }
+        }
+        checkComplete()
+      })
+    }
+
+    set({ isLoading: true, error: null, fetchingPokedex: true })
+    
+    const fetchPromise = PokemonService.getDetailedPokedexStatus(uuid)
+      .then(response => {
+        set({ 
+          pokedexData: response.data, 
+          isLoading: false, 
+          fetchingPokedex: false,
+          currentPokedexUuid: uuid
+        })
+        pendingFetches.delete(uuid)
+        return response.data
+      })
+      .catch(error => {
+        set({ error: "Failed to fetch Pokedex data", isLoading: false, fetchingPokedex: false })
+        pendingFetches.delete(uuid)
+        throw error
+      })
+    
+    pendingFetches.set(uuid, fetchPromise)
+    return fetchPromise
   },
 
   updatePokedexData: (newData: PokedexData) => {
@@ -41,7 +89,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   fetchAllPokemon: async () => {
     set({ isLoading: true, error: null })
     try {
-      const response = await pokemonService.getAllPokemon()
+      const response = await PokemonService.getPokemon()
       const pokemonList = response.data as Pokemon[]
       const pokemonMap = pokemonList.reduce(
         (acc, pokemon) => {
@@ -67,7 +115,7 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
     }
     set({ isLoading: true, error: null })
     try {
-      const response = await pokemonService.getPokemonByDex(dex)
+      const response = await PokemonService.getPokemonByDex(dex)
       const pokemon = response.data
       set((state) => ({
         pokemonByDex: { ...state.pokemonByDex, [dex]: pokemon as Pokemon },
@@ -81,10 +129,20 @@ export const usePokemonStore = create<PokemonState>((set, get) => ({
   },
 
   getPokedexData: async (uuid: string) => {
-    const { pokedexData } = get()
-    if (pokedexData) {
+    const { pokedexData, currentPokedexUuid } = get()
+    
+    // If we already have data for this UUID, return it
+    if (pokedexData && currentPokedexUuid === uuid) {
       return pokedexData
     }
+    
+    // If there's a pending fetch for this UUID, wait for it
+    if (pendingFetches.has(uuid)) {
+      const result = await pendingFetches.get(uuid)
+      return get().pokedexData
+    }
+    
+    // Start a new fetch
     await get().fetchPokedex(uuid)
     return get().pokedexData
   },

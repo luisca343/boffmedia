@@ -18,7 +18,7 @@ const teamSchema = z.object({
 export type TeamFormValues = z.infer<typeof teamSchema>
 
 interface TeamFormProps {
-  defaultValues?: Partial<TeamFormValues>
+  defaultValues?: Partial<any>
   isSubmitting?: boolean
   onSubmit: (data: TeamFormValues) => void
   onCancel: () => void
@@ -137,7 +137,6 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingEvents}
-            className="bg-primary-500 hover:bg-primary-600 text-white"
           >
             {submitLabel}
           </Button>

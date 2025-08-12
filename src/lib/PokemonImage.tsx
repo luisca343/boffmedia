@@ -3,7 +3,7 @@ import { formatPokemonSpec, parsePokemonSpec } from "./pokemonSpecParser";
 import { PokemonSprite } from "@/app/smartrotom/pokedex/_components/PokemonSprite";
 import Image from "next/image";
 import { usePokemonStore } from "@/stores/pokemonStore";
-import type { Pokemon } from "@/app/smartrotom/pokedex/_types/pokemon";
+import { Pokemon } from "@/types/Pokemon";
 
 interface PokemonImageProps {
   type?: string;
@@ -81,8 +81,8 @@ export const PokemonImage = ({
         {showDetails && (
           <div className="flex flex-col">
             <span className="font-medium text-sm">{pokemonSpec.species}</span>
-            {pokemonSpec.level && <span className="text-xs text-gray-600">Lv.{pokemonSpec.level}</span>}
-            {pokemonSpec.form && <span className="text-xs text-gray-500">{pokemonSpec.form}</span>}
+            {pokemonSpec.level && <span className="text-xs text-surface-600">Lv.{pokemonSpec.level}</span>}
+            {pokemonSpec.form && <span className="text-xs text-surface-500">{pokemonSpec.form}</span>}
           </div>
         )}
       </div>

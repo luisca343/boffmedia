@@ -59,7 +59,7 @@ export function CreateGroup({ setActiveChat }: { setActiveChat: (id: number) => 
           users: selectedUsers.map((user) => user.uuid),
           name: groupName,
         })
-        setActiveChat(result.data!)
+        setActiveChat(result.data?.chatId!)
       }
       setOpen(false)
     } catch (error) {

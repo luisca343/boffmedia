@@ -12,9 +12,9 @@ import {
 export const getWeatherIcon = (weather: string): JSX.Element => {
   switch (weather) {
     case "rain":
-      return <CloudRain className="h-8 w-8 text-blue-500" />;
+      return <CloudRain className="h-8 w-8 text-secondary-500" />;
     case "storm":
-      return <CloudLightning className="h-8 w-8 text-purple-500" />;
+      return <CloudLightning className="h-8 w-8 text-accent-500" />;
     default:
       return <SunMoon className="h-8 w-8 text-yellow-500" />;
   }

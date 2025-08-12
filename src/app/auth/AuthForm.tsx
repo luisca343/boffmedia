@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from "next-auth/react"
 import { Lock, Mail, User } from 'lucide-react'
 import { useState } from "react"
-import { boffPOST, rotomPOST } from "@/services/boffAPI"
+import { UsersService } from "@/services/api/boffmedia/usersService"
 
 const loginSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -46,12 +46,13 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
     setIsLoading(true)
     if (isRegister) {
       try {
-        const response = await boffPOST('/users/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(values),
-        })
-        if (response.statusCode === 201) {
+        const response = await UsersService.createUser({
+            email: values.email,
+            username: values.username,
+            password: values.password,
+          }
+        )
+        if (response.statusCode === 200) {
           router.push('/auth?mode=login&message=Registration successful. Please log in.')
         } else {
           alert(response.error || 'Registration failed')
@@ -172,7 +173,7 @@ export function AuthForm({ redirect = '/', url = 'boffmedia', message= ''}: { ur
           <Button
             type="button"
             onClick={handleGoogleSignIn}
-            className="w-full bg-white text-gray-700 hover:bg-gray-100 transition-all duration-200 font-semibold py-2 rounded-md flex items-center justify-center"
+            className="w-full bg-white text-surface-700 hover:bg-surface-100 transition-all duration-200 font-semibold py-2 rounded-md flex items-center justify-center"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path

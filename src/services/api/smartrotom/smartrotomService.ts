@@ -15,12 +15,19 @@ export interface ArceuSpeak {
   format: string
 }
 
-export const smartrotomService = {
-  // Existing methods
-  getPerformance: () => rotomGET<Performance>("/performance"),
-  getArceuSpeak: () => rotomGET<ArceuSpeak[]>("/arceuspeak"),
-  postArceuSpeak: ({name, value, format}: ArceuSpeak) => rotomPOST<ApiResponse>('/arceuspeak', {name, value, format}),
-  getTaxiStops: () => rotomGET<Record<string, TaxiStop>>("/taxi/stops"),
-  teleportPlayer: (data: TeleportPlayerDto) => rotomPOST<ApiResponse>("/taxi/teleport", data),
-    
+export class SmartrotomService {
+  
+  /**
+   * Get ArceuSpeak messages
+   */
+  static getArceuSpeak() {
+    return rotomGET<ArceuSpeak[]>("/arceuspeak");
+  }
+
+  /**
+   * Post new ArceuSpeak message
+   */
+  static postArceuSpeak({name, value, format}: ArceuSpeak) {
+    return rotomPOST<ApiResponse>('/arceuspeak', {name, value, format});
+  }
 }

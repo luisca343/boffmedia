@@ -53,7 +53,7 @@ const AlertTitle = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-300",
-    wingull: "text-blue-300",
+    wingull: "text-secondary-300",
   }
 
   return (
@@ -74,7 +74,7 @@ const AlertDescription = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-200",
+    wingull: "text-secondary-200",
   }
 
   return (

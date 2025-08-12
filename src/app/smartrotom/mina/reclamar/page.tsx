@@ -1,17 +1,16 @@
 "use client";
 
 import MenuWrapper from "../_components/MenuWrapper";
-import { rotomPOST } from "@/services/boffAPI";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { SmartRotomButton } from "@/components/smartrotom/ui/button";
 import { isMinecraft, mcefQuery } from "@/services/mcef/mcefHelper";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
-import { UnclaimedReward } from "@/types/mina";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 import { darCaja } from "@/services/mcef/mcefApi";
 import { ItemImage } from "@/lib/ItemImage";
+import { UnclaimedItem } from "@/generated/api";
 
 export default function Reclamar() {
   const { session } = useBoffSession();
@@ -24,12 +23,11 @@ export default function Reclamar() {
       return;
     }
 
-    const response = await minaService.claim({ uuid: session.user.smartRotomUser?.uuid! });
+    const response = await MinaService.claimRewards({ uuid: session.user.smartRotomUser?.uuid! });
     if (response) {  
-      
       const objetosMC = unclaimed.map(reward => ({
         id: reward.itemId,
-        cantidad: reward.amount
+        cantidad: reward.amount ?? 0
       }));
       const cajaResult = await darCaja(objetosMC);
       
@@ -46,14 +44,14 @@ export default function Reclamar() {
     }
   }
 
-  function groupRewardsByType(rewards: UnclaimedReward[]) {
+  function groupRewardsByType(rewards: UnclaimedItem[]) {
     return rewards.reduce((acc, reward) => {
       if (!acc[reward.type]) {
         acc[reward.type] = [];
       }
       acc[reward.type].push(reward);
       return acc;
-    }, {} as Record<string, UnclaimedReward[]>);
+    }, {} as Record<string, UnclaimedItem[]>);
   }
 
   if(!unclaimed) return null;
@@ -75,7 +73,6 @@ export default function Reclamar() {
                         itemId={reward.itemId}
                         amount={reward.amount}
                       />
-                    <span className="ml-2">x{reward.amount}</span>
                   </div>
                 ))}
               </div>

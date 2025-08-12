@@ -5,10 +5,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { Drop, DropByType } from "../_types/Drops";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Drops() {
-  const { drops, totalValue } = (await minaService.getRewardsByType()).data as {drops: DropByType, totalValue: number};
+  const { drops, totalValue } = (await MinaService.getRewardsByType()).data as {drops: DropByType, totalValue: number};
   if(!drops) return <></>
   return (
     <MenuWrapper className="w-full min-h-full overflow-hidden bg-surface-900 text-white pt-4   flex flex-col items-center">

@@ -16,31 +16,31 @@ const getSelectStyles = (variant: SelectVariant = "default") => {
   return {
     trigger: {
       default: "border-surface-700 bg-surface-800 text-primary-400 ring-offset-surface-900 focus:ring-primary-300 placeholder:text-surface-400",
-      wingull: "border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100 focus:ring-blue-400 ring-offset-white placeholder:text-blue-400",
+      wingull: "border-secondary-200 bg-secondary-50 text-secondary-800 hover:bg-secondary-100 focus:ring-secondary-400 ring-offset-white placeholder:text-secondary-400",
     }[variant],
     content: {
       default: "border-surface-700 bg-surface-800 text-primary-400",
-      wingull: "border-blue-200 bg-white text-blue-800 shadow-lg",
+      wingull: "border-secondary-200 bg-white text-secondary-800 shadow-lg",
     }[variant],
     label: {
       default: "text-surface-300",
-      wingull: "text-blue-700 font-medium",
+      wingull: "text-secondary-700 font-medium",
     }[variant],
     item: {
       default: "focus:bg-surface-700 text-primary-400 focus:text-primary-300 data-[highlighted]:bg-surface-700 data-[highlighted]:text-primary-300",
-      wingull: "focus:bg-blue-100 hover:bg-blue-50 text-blue-800 focus:text-blue-900 data-[highlighted]:bg-blue-100 data-[highlighted]:text-blue-900",
+      wingull: "focus:bg-secondary-100 hover:bg-secondary-50 text-secondary-800 focus:text-secondary-900 data-[highlighted]:bg-secondary-100 data-[highlighted]:text-secondary-900",
     }[variant],
     separator: {
       default: "bg-surface-700",
-      wingull: "bg-blue-100",
+      wingull: "bg-secondary-100",
     }[variant],
     icon: {
       default: "text-primary-400",
-      wingull: "text-blue-600",
+      wingull: "text-secondary-600",
     }[variant],
     checkIcon: {
       default: "text-primary-400",
-      wingull: "text-blue-600",
+      wingull: "text-secondary-600",
     }[variant]
   }
 }

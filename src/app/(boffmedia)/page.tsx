@@ -1,14 +1,17 @@
 
-import { CommunitySection } from "./_components/CommunitySection";
-import { EventsSection } from "./_components/EventsSection";
-import { FeaturedGames } from "./_components/FeaturedGames";
-import { HeroSection } from "./_components/HeroSection";
+import { getTranslations } from "next-intl/server";
+import { CommunitySection } from "./_components/sections/CommunitySection";
+import { EventsSection } from "./_components/sections/EventsSection";
+import { FeaturedSection } from "./_components/sections/FeaturedSection";
+import { HeroSection } from "./_components/sections/HeroSection";
+import { ToolsSpotlight } from "./_components/sections/ToolsSpotlight";
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations("boffmedia");
   return (
     <div className="flex flex-col main">
       <HeroSection />
-      <FeaturedGames />
+      <FeaturedSection />
       <EventsSection />
       <CommunitySection />
       {/*<CtaSection />*/}

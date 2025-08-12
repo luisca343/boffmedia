@@ -24,7 +24,7 @@ const Label = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: "text-surface-300",
-    wingull: "text-blue-100",
+    wingull: "text-secondary-100",
   }
 
   return (

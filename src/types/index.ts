@@ -10,6 +10,7 @@ export interface BoffUser { //extends DefaultUser {
   id: string
   email: string
   username: string
+  mcUuid?: string
   roles: string[]
   smartRotomUser?: SmartRotomUser
   discordId?: string

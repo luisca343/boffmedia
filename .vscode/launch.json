@@ -1,45 +1,94 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Next.js: debug server-side",
-        "type": "node-terminal",
-        "request": "launch",
-        "command": "npm run dev"
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "🚀 Next.js Dev",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["dev"],
+      "console": "integratedTerminal",
+      "restart": true,
+      "env": {
+        "NODE_ENV": "development"
       },
-      {
-        "name": "Next.js: debug client-side",
-        "type": "chrome",
-        "request": "launch",
-        "url": "http://localhost:3000"
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "🔍 Next.js Dev Strict",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/typescript/bin/tsc",
+      "args": ["--noEmit", "--skipLibCheck", "--watch"],
+      "console": "integratedTerminal",
+      "restart": true,
+      "env": {
+        "NODE_ENV": "development"
       },
-      {
-        "name": "Next.js: debug client-side (Firefox)",
-        "type": "firefox",
-        "request": "launch",
-        "url": "http://localhost:3000",
-        "reAttach": true,
-        "pathMappings": [
-          {
-            "url": "webpack://_N_E",
-            "path": "${workspaceFolder}"
-          }
-        ]
-      },
-      {
-        "name": "Next.js: debug full stack",
-        "type": "node",
-        "request": "launch",
-        "program": "${workspaceFolder}/node_modules/.bin/next",
-        "runtimeArgs": ["--inspect"],
-        "skipFiles": ["<node_internals>/**"],
-        "serverReadyAction": {
-          "action": "debugWithEdge",
-          "killOnServerStop": true,
-          "pattern": "- Local:.+(https?://.+)",
-          "uriFormat": "%s",
-          "webRoot": "${workspaceFolder}"
-        }
+      "skipFiles": ["<node_internals>/**"],
+      "postDebugTask": {
+        "type": "shell",
+        "command": "${workspaceFolder}/node_modules/next/dist/bin/next dev",
+        "group": "build"
       }
-    ]
-  }
+    },
+    {
+      "name": "🏗️ Next.js Build",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["build"],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "⚡ Next.js Start Production",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["start"],
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_ENV": "production"
+      },
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "🎭 Playwright Tests",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/@playwright/test/cli.js",
+      "args": ["test"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "🕵️ Playwright Tests with Trace",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/@playwright/test/cli.js",
+      "args": ["test", "--trace", "on"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "📊 Playwright Show Report",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/@playwright/test/cli.js",
+      "args": ["show-report"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🏗️ Build and Start Production",
+      "configurations": ["🏗️ Next.js Build", "⚡ Next.js Start Production"],
+      "stopAll": true
+    }
+  ]
+}

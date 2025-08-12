@@ -17,14 +17,14 @@ interface ArcadeFooterProps {
           {title} v{version} • Arcade Edition
         </p>
         {description && (
-          <p className="text-gray-400 text-xs mt-1">
+          <p className="text-surface-400 text-xs mt-1">
             {description}
           </p>
         )}
         
         {showPixelDecoration && (
           <div className="flex justify-center gap-6 mt-2">
-            {['bg-red-500', 'bg-blue-500', 'bg-yellow-500', 'bg-green-500', 'bg-purple-500'].map((color, index) => (
+            {['bg-red-500', 'bg-secondary-500', 'bg-yellow-500', 'bg-highlight-500', 'bg-accent-500'].map((color, index) => (
               <div key={index} className={`h-3 w-3 ${color}`}></div>
             ))}
           </div>

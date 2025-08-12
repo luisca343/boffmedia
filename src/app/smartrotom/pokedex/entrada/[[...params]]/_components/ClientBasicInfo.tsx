@@ -110,7 +110,7 @@ export function BasicInfo({ pokemon, formIndex, formName}: BasicInfoProps) {
                 <HoverCard key={ability} openDelay={300} closeDelay={100}>
                   <HoverCardTrigger asChild>
                     <InternalLink 
-                      href={`/pokedex/habilidades/${ability}`} 
+                      href={`pokedex/habilidades/${ability}`} 
                       className="inline-block"
                     >
                       <span className="bg-surface-700/70 px-3 py-1.5 rounded-md text-surface-50 text-sm flex items-center gap-1 hover:bg-surface-600/70 transition-colors cursor-pointer">
@@ -136,7 +136,7 @@ export function BasicInfo({ pokemon, formIndex, formName}: BasicInfoProps) {
                   <HoverCard key={ability} openDelay={300} closeDelay={100}>
                     <HoverCardTrigger asChild>
                       <InternalLink 
-                        href={`/pokedex/habilidades/${ability}`} 
+                        href={`pokedex/habilidades/${ability}`} 
                         className="inline-block"
                       >
                         <span className="bg-primary-900/50 px-3 py-1.5 rounded-md text-primary-100 text-sm font-medium flex items-center gap-1 hover:bg-primary-900/70 transition-colors cursor-pointer">

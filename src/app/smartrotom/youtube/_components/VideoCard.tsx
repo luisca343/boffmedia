@@ -55,7 +55,7 @@ export const VideoCard = ({
       )}
       
       <InternalLink
-        href={`/youtube/video/${id}`}
+        href={`youtube/video/${id}`}
         className="block bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700"
       >
         <div className="relative">

@@ -55,8 +55,8 @@ const sheetVariants = cva(
       side: {
         top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top",
         bottom: "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm",
-        right: "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm",
+        left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+        right: "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
       },
     },
     defaultVariants: {
@@ -77,12 +77,12 @@ const SheetContent = React.forwardRef<
   
   const variantStyles = {
     default: "bg-surface-800 border-surface-700 text-surface-100",
-    wingull: "bg-blue-900 border-blue-700 text-blue-100"
+    wingull: "bg-secondary-900 border-secondary-700 text-secondary-100"
   }
   
   const closeButtonStyles = {
     default: "ring-offset-surface-900 focus:ring-primary-300 data-[state=open]:bg-surface-800",
-    wingull: "ring-offset-blue-950 focus:ring-blue-300 data-[state=open]:bg-blue-900"
+    wingull: "ring-offset-secondary-950 focus:ring-secondary-300 data-[state=open]:bg-secondary-900"
   }
   
   return (
@@ -143,7 +143,7 @@ const SheetTitle = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-400",
-    wingull: "text-blue-300"
+    wingull: "text-secondary-300"
   }
   
   return (
@@ -164,7 +164,7 @@ const SheetDescription = React.forwardRef<
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-400"
+    wingull: "text-secondary-400"
   }
   
   return (

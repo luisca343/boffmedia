@@ -49,13 +49,13 @@ export default function PokemonStats({ baseStats }: PokemonStatsProps) {
           label="Sp. Atk" 
           value={baseStats.spa} 
           maxValue={maxStat} 
-          color="bg-blue-500" 
+          color="bg-secondary-500" 
         />
         <StatBar 
           label="Sp. Def" 
           value={baseStats.spd} 
           maxValue={maxStat} 
-          color="bg-green-500" 
+          color="bg-highlight-500" 
         />
         <StatBar 
           label="Speed" 

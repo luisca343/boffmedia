@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
 import type { Event } from "@/types/events"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface EventEditDialogProps {
   open: boolean
@@ -17,26 +17,28 @@ interface EventEditDialogProps {
 export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+
   const formatDateForInput = (dateString: string) => {
-    return dateString.split('.')[0] // Remove milliseconds and timezone
+    return dateString?.split('.')[0] || dateString?.split('T')[0] || ""
   }
 
   const formDefaultValues = {
+    id: event.id,
     title: event.title,
     parentId: event.parentId,
     description: event.description || undefined,
     icon: event.icon || undefined,
-    game: event.game,
+    gameId: event.gameId,
     startDate: formatDateForInput(event.startDate),
     endDate: formatDateForInput(event.endDate),
     type: event.type,
     visibility: event.visibility,
   }
   
-  const handleSubmit = async (data: EventFormValues) => {
+  const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
-      await eventsService.updateEvent(event.id!, data)
+      await EventsService.updateEvent(event.id!, data!)
       toast.success(`El evento "${data.title}" ha sido actualizado con éxito.`)
       onSuccess()
     } catch (error) {

@@ -4,6 +4,8 @@
     "openMenu": "Open menu",
     "links": {
       "home": "Home",
+      "games": "Games",
+      "events": "Events",
       "tools": "Tools",
       "pixelmonWingull": "Pixelmon Wingull"
     },

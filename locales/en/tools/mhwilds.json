@@ -143,6 +143,71 @@
     "defense_bonus": "Defense bonus",
     "charm": "Charm",
     "secondary_weapon": "Secondary Weapon",
-    "empty_slot": "Empty slot"
+    "empty_slot": "Empty slot",
+    
+    "header": {
+      "title": {
+        "prefix": "Tools for",
+        "highlight": "Monster Hunter Wilds"
+      },
+      "subtitle": "Optimize your hunt with our specialized tools"
+    },
+    "tools": {
+      "buildPlanner": {
+        "title": "Build Planner",
+        "description": "Create optimal builds by comparing armor, decorations and skills",
+        "features": {
+          "optimizer": "Build optimizer",
+          "calculator": "Damage calculator",
+          "comparison": "Set comparator"
+        }
+      },
+      "weaponTrees": {
+        "title": "Weapon Trees",
+        "description": "Progression trees and statistics for all weapons",
+        "features": {
+          "trees": "Weapon trees",
+          "comparison": "Comparator",
+          "stats": "Detailed statistics"
+        }
+      },
+      "bestiary": {
+        "title": "Bestiary",
+        "description": "Detailed information about weaknesses and rewards",
+        "features": {
+          "weaknesses": "Weakness chart",
+          "materials": "Materials and drops",
+          "locations": "Locations"
+        }
+      },
+      "armor": {
+        "title": "Armor Sets",
+        "description": "Complete database of armor and skills",
+        "features": {
+          "sets": "Complete sets",
+          "skills": "Skills",
+          "defense": "Defense statistics"
+        }
+      },
+      "materials": {
+        "title": "Material Tracker",
+        "description": "Track and calculate materials needed for crafting",
+        "features": {
+          "tracker": "Tracking list",
+          "calculator": "Crafting calculator",
+          "locations": "Where to get"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "Useful Links",
+      "officialWebsite": "Official Website",
+      "redditCommunity": "Reddit Community", 
+      "wiki": "Monster Hunter Wiki",
+      "videos": "YouTube Guides"
+    },
+    "featuredTool": "Featured tool",
+    "accessButton": "Access {tool}",
+    "explore": "Explore"
   }
 }

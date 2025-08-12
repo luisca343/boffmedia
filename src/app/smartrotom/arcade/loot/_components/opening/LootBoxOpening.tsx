@@ -2,11 +2,11 @@ import { useSpinnerAnimation } from "../../_hooks/useSpinnerAnimation";
 import { BoxAnimation } from "./BoxAnimation";
 import { ResultDisplay } from "./ResultDisplayComponent";
 import { Spinner } from "./Spinner";
-import { Item, LootBox } from "../../types";
+import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
 
 interface LootBoxOpeningProps {
-  lootBox: LootBox;
-  wonItem: Item;
+  lootBox: LootboxBoxConfig;
+  wonItem: LootboxItemConfig;
   onComplete: () => void;
 }
 
@@ -21,7 +21,7 @@ export default function LootBoxOpening({ lootBox, wonItem, onComplete }: LootBox
     spinComplete,
     spinnerRef,
     itemsContainerRef,
-    winningIndex,
+    winnerIndex,
     ITEM_WIDTH
   } = useSpinnerAnimation({ lootBox, wonItem });
 
@@ -41,7 +41,7 @@ export default function LootBoxOpening({ lootBox, wonItem, onComplete }: LootBox
           scrollPosition={scrollPosition}
           spinComplete={spinComplete}
           isSpinning={isSpinning}
-          winningIndex={winningIndex}
+          winningIndex={winnerIndex}
           wonItem={wonItem}
           spinnerRef={spinnerRef}
           itemsContainerRef={itemsContainerRef}

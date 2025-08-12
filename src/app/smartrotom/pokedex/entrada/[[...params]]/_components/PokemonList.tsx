@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import { pokemonService } from "@/services/api/smartrotom/pokemonService";
+import { PokemonService } from "@/services/api/smartrotom/pokemonService";
 import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -16,8 +16,8 @@ export default function PokemonList() {
   useEffect(() => {
     async function fetchPokemonList() {
       try {
-        const response = await pokemonService.getAllPokemon();
-        setPokemonList(Array.isArray(response.data) ? response.data : []);
+        const pokemonList = (await PokemonService.getPokemon()).data! as Array<{dex: number, name: string, spriteUrl: string}>;
+        setPokemonList(Array.isArray(pokemonList) ? pokemonList : []);
       } catch (error) {
         console.error("Failed to fetch Pokemon list:", error);
       } finally {
@@ -79,7 +79,7 @@ export default function PokemonList() {
             const isSeen = getDisplayStatus(pokemon.dex, 'base', true);
             return (
               <InternalLink 
-                href={`/pokedex/entrada/${pokemon.dex}`} 
+                href={`pokedex/entrada/${pokemon.dex}`} 
                 key={pokemon.dex}
                 className="block"
               >

@@ -1,6 +1,6 @@
 "use client"
 import React from 'react'
-import CustomEditor from '@/components/editor/TestEditor'
+import CustomEditor from '@/components/ckeditor/TestEditor'
 
 interface NewsContentProps {
   selectedNewsId: number | null
@@ -20,7 +20,7 @@ export default function NewsContent({
       {selectedNewsId !== null && selectedNews ? (
         <>
           {/* Editor header with title */}
-          <div className="bg-blue-500 text-white p-4 border-b-4 border-black">
+          <div className="bg-secondary-500 text-white p-4 border-b-4 border-black">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold pop-shadow truncate pr-4">
                 <span className="text-yellow-300">Editando:</span> {selectedNews.title}
@@ -29,7 +29,7 @@ export default function NewsContent({
           </div>
           
           {/* Editor area */}
-          <div className="flex-grow overflow-hidden p-4 border-8 border-dotted border-blue-200 m-4 bg-white">
+          <div className="flex-grow overflow-hidden p-4 border-8 border-dotted border-secondary-200 m-4 bg-white">
             <CustomEditor
               document={selectedNews}
               documentId={selectedNewsId}
@@ -55,7 +55,7 @@ export default function NewsContent({
             <h1 className="text-5xl font-bold mb-4 text-pink-500 pop-shadow text-center">
               ¡Editor de Noticias!
             </h1>
-            <p className="text-2xl text-blue-500 text-center font-comic">
+            <p className="text-2xl text-secondary-500 text-center font-comic">
               Selecciona una noticia del menú lateral o crea una nueva para
               comenzar a editar.
             </p>

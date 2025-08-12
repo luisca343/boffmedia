@@ -1,9 +1,20 @@
 "use client"
-export default function Error(){
+import { RotomErrorPage } from "@/components/smartrotom/RotomError";
+import { RotomAppError } from "@/components/smartrotom/RotomErrorBoundary";
+
+export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+  if (error instanceof RotomAppError) {
     return (
-        <div className="flex flex-col items-center justify-center h-full">
-            <h1 className="text-5xl font-bold text-shark-500">Error</h1>
-            <p className="text-shark-500">An error occurred while loading the page.</p>
-        </div>
-    )
+      <RotomErrorPage
+        errorCode={error.errorCode as any}
+        context={error.context}
+        onAction={reset}
+        actionText="Reintentar"
+      />
+    );
+  }
+  // fallback for unknown errors
+  return (
+    <RotomErrorPage error={error.message || 'Error desconocido'} onAction={reset} actionText="Reintentar" />
+  );
 }

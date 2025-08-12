@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Item } from "../../types";
 import { getItemName } from "@/lib/intlUtils";
 import { Sparkles } from "lucide-react";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
+import { ArcadeInventoryItem, LootboxItemConfig } from "@/generated/api";
 
 interface SpinnerItemProps {
-  item: Item;
+  item: LootboxItemConfig;
   index: number;
   isWinningItem: boolean;
   winningIndex: number | null;
@@ -16,7 +16,7 @@ interface SpinnerItemProps {
 
 export function SpinnerItem({ item, index, isWinningItem, winningIndex }: SpinnerItemProps) {
   const t = useTranslations("");
-  const config = getRarityConfig(item.rarity);
+  const config = getRarityConfig(item.rarity as ArcadeInventoryItem.rarity);
   
   return (
     <div

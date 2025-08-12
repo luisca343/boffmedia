@@ -1,12 +1,12 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { documentsService } from "@/services/api/smartrotom/documentsService";
+import { DocumentsService } from "@/services/api/smartrotom/documentsService";
 import { CreateDocumentDtoWithUuid } from "@/types/dto/create-document.dto";
 
 export function useCreateNote() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(documentsService.createNote)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.createNote)
 
   const createNote = (noteData: CreateDocumentDtoWithUuid) => {
-    return documentsService.createNote(noteData);
+    return DocumentsService.createNote(noteData);
   }
 
   return {

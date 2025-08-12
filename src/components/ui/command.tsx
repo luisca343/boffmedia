@@ -22,7 +22,7 @@ const Command = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: "bg-surface-800 text-surface-100",
-    wingull: "bg-blue-900 text-blue-100",
+    wingull: "bg-secondary-900 text-secondary-100",
   }
 
   return (
@@ -51,7 +51,7 @@ const CommandDialog = ({ children, variant = "default", ...props }: CommandDialo
   return (
     <Dialog {...props}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
-        <Command variant={variant} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-gray-500 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 dark:[&_[cmdk-group-heading]]:text-gray-400">
+        <Command variant={variant} className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-surface-500 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 dark:[&_[cmdk-group-heading]]:text-surface-400">
           {children}
         </Command>
       </DialogContent>
@@ -72,14 +72,14 @@ const CommandInput = React.forwardRef<
   
   const variantStyles = {
     default: "border-surface-700 text-primary-300 placeholder:text-surface-500",
-    wingull: "border-blue-800 text-blue-300 placeholder:text-blue-500",
+    wingull: "border-secondary-800 text-secondary-300 placeholder:text-secondary-500",
   }
 
   return (
     <div className="relative flex items-center border-b" cmdk-input-wrapper="">
       <Search className={cn(
         "absolute left-3 h-4 w-4 opacity-50",
-        variant === "default" ? "text-primary-400" : "text-blue-400"
+        variant === "default" ? "text-primary-400" : "text-secondary-400"
       )} />
       <CommandPrimitive.Input
         ref={ref}
@@ -117,7 +117,7 @@ const CommandEmpty = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-300",
-    wingull: "text-blue-300",
+    wingull: "text-secondary-300",
   }
 
   return (
@@ -139,7 +139,7 @@ const CommandGroup = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-300 [&_[cmdk-group-heading]]:text-surface-400",
-    wingull: "text-blue-300 [&_[cmdk-group-heading]]:text-blue-400",
+    wingull: "text-secondary-300 [&_[cmdk-group-heading]]:text-secondary-400",
   }
 
   return (
@@ -165,7 +165,7 @@ const CommandSeparator = React.forwardRef<
   
   const variantStyles = {
     default: "bg-surface-700",
-    wingull: "bg-blue-800",
+    wingull: "bg-secondary-800",
   }
 
   return (
@@ -186,7 +186,7 @@ const CommandItem = React.forwardRef<
   
   const variantStyles = {
     default: "text-primary-400 data-[selected=true]:bg-surface-900 data-[selected=true]:text-primary-300",
-    wingull: "text-blue-300 data-[selected=true]:bg-blue-950 data-[selected=true]:text-blue-300",
+    wingull: "text-secondary-300 data-[selected=true]:bg-secondary-950 data-[selected=true]:text-secondary-300",
   }
 
   return (
@@ -212,7 +212,7 @@ const CommandShortcut = ({
   
   const variantStyles = {
     default: "text-surface-400",
-    wingull: "text-blue-400",
+    wingull: "text-secondary-400",
   }
 
   return (

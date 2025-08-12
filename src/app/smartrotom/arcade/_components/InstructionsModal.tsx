@@ -30,13 +30,13 @@ import {
               {title}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-2 text-gray-200">
+          <div className="space-y-2 text-surface-200">
             {children}
           </div>
           <DialogFooter>
             <Button 
               onClick={onClose}
-              className="bg-indigo-700 hover:bg-indigo-600 text-white"
+              variant="accent"
             >
               Cerrar
             </Button>

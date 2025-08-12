@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { starbankService } from "@/services/api/smartrotom/starbankService";
+import { StarbankService } from "@/services/api/smartrotom/starbankService";
 import { CreateTransferDto } from "@/types/dto/create-transfer-dto";
 import { SuccessResponse } from "@/types";
 
@@ -13,7 +13,7 @@ export function useTransfer() {
     setError(null);
     
     try {
-      const result = await starbankService.transfer(transferData);
+      const result = await StarbankService.transfer(transferData);
       setData(result.data ?? null);
       return result;
     } catch (err: any) {

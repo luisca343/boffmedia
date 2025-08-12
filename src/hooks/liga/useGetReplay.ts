@@ -1,8 +1,8 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { ligaService } from "@/services/api/smartrotom/ligaService";
+import { LigaService } from "@/services/api/smartrotom/ligaService";
 
 export function useGetReplay(id: number) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(ligaService.getReplay, id)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(LigaService.getReplay, id)
 
   return {
     replay: data,

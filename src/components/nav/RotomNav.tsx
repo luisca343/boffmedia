@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Badge } from "../ui/badge";
 import { Socket } from "socket.io-client";
 import BreadcrumbNav from "./BreadbrumbNav";
-import FicusAI from "../smartrotom/FicusAI";
+import FicusAI from "../smartrotom/ficusai/FicusAI";
 import { usePathname } from "next/navigation";
 import { getSmartRotomUser } from "@/lib/utils";
 import { Bell, Check, Trash2, X } from "lucide-react";
@@ -16,7 +16,7 @@ import { MinecraftFunctions } from "../smartrotom/MinecraftFunctions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
 import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import useSocketStore from "@/stores/useSocketStore";
 import LanguageSwitcher from "./LanguageSwitcher";
 
@@ -73,7 +73,7 @@ export default function RotomNav({
             <Bell className="text-surface-300" size={20} />
             <h2 className="text-surface-100 font-semibold">Notificaciones</h2>
           </div>
-          <span className="bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+          <span className="bg-secondary-500 text-white px-2 py-1 rounded-full text-xs">
             {unreadCount}
           </span>
         </header>
@@ -90,7 +90,7 @@ export default function RotomNav({
               <div className="flex justify-between items-start mb-2">
                 <span className="flex-grow">{notif.content?.toString()}</span>
                 {!notif.read && (
-                  <span className="bg-blue-500 w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1"></span>
+                  <span className="bg-secondary-500 w-2 h-2 rounded-full flex-shrink-0 ml-2 mt-1"></span>
                 )}
               </div>
               <div className="flex justify-end space-x-2">
@@ -176,13 +176,12 @@ export default function RotomNav({
         </SheetTrigger>
         <SheetContent
           side="right"
-          className="bg-surface-800 text-surface-50 border-none flex flex-col w-max"
+          className="bg-surface-800 text-surface-50 border-none flex flex-col p-0 max-w-3xl"
         >
-          <SheetHeader>
-            <SheetTitle className="text-surface-50 text-2xl font-bold">
-              FicusAI
-            </SheetTitle>
-          </SheetHeader>
+          <SheetClose className="absolute right-4 top-4 rounded-md opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 bg-primary-500 z-10">
+            <X className="h-4 w-4" />
+            <span className="sr-only">Cerrar</span>
+          </SheetClose>
           <SheetDescription className="h-full overflow-hidden">
             <FicusAI />
           </SheetDescription>

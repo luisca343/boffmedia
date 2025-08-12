@@ -38,7 +38,7 @@ export function RecentUpdates({
                   <span className="text-surface-400 ml-2 text-sm">({t(update.expansion)})</span>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className={`font-bold ${update.count > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  <span className={`font-bold ${update.count > 0 ? 'text-highlight-500' : 'text-red-500'}`}>
                     {update.count > 0 ? '+' : ''}{update.count}
                   </span>
                   <span className="text-surface-400 text-sm">{new Date(update.updatedAt).toLocaleString()}</span>
@@ -47,7 +47,7 @@ export function RecentUpdates({
             ))}
             <Button
               onClick={fetchRecentUpdates}
-              className="w-full bg-surface-700 hover:bg-surface-600 text-white font-semibold py-2 px-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+              variant="ghost"
               disabled={recentUpdatesLoading}
             >
               {recentUpdatesLoading ? (

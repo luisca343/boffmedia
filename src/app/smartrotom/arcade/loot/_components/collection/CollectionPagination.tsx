@@ -22,15 +22,15 @@ export function CollectionPagination({
         disabled={currentPage === 0}
         className={`flex items-center space-x-1 px-3 py-1 rounded ${
           currentPage === 0
-            ? "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"
-            : "bg-blue-900/60 text-cyan-300 hover:bg-blue-800/80 border border-blue-700/50"
+            ? "bg-surface-800 text-surface-500 cursor-not-allowed border border-surface-700"
+            : "bg-secondary-900/60 text-cyan-300 hover:bg-secondary-800/80 border border-secondary-700/50"
         }`}
       >
         <ChevronLeft size={16} />
         <span>Anterior</span>
       </button>
       
-      <span className="text-gray-300">
+      <span className="text-surface-300">
         Página {currentPage + 1} de {pageCount}
       </span>
       
@@ -39,8 +39,8 @@ export function CollectionPagination({
         disabled={currentPage >= pageCount - 1}
         className={`flex items-center space-x-1 px-3 py-1 rounded ${
           currentPage >= pageCount - 1
-            ? "bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700"
-            : "bg-blue-900/60 text-cyan-300 hover:bg-blue-800/80 border border-blue-700/50"
+            ? "bg-surface-800 text-surface-500 cursor-not-allowed border border-surface-700"
+            : "bg-secondary-900/60 text-cyan-300 hover:bg-secondary-800/80 border border-secondary-700/50"
         }`}
       >
         <span>Siguiente</span>

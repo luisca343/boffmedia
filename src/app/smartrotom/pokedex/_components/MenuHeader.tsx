@@ -14,7 +14,7 @@ export default function MenuHeader() {
       <div className="max-w-7xl mx-auto">
         <div className="py-2 px-4 flex items-center justify-between">
           <div className="flex items-center">
-            <InternalLink href="/" className="mr-4 hover:text-primary-300 transition-colors">
+            <InternalLink href="" className="mr-4 hover:text-primary-300 transition-colors">
               <ChevronLeftIcon className="h-6 w-6" />
             </InternalLink>
             <h1 className="text-2xl font-bold">Pokédex</h1>

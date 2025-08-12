@@ -136,7 +136,7 @@ export function SavedBuildsManager({ open, onOpenChange, onLoadBuild }: SavedBui
                     {deleteConfirm === build.key ? (
                       <div className="flex items-center gap-2">
                         <Button
-                          variant="destructive"
+                          variant="error"
                           size="sm"
                           onClick={() => handleDeleteBuild(build.key)}
                         >

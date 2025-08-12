@@ -1,11 +1,10 @@
 import { motion } from "framer-motion";
 import { Box } from "lucide-react";
-import { LootBox } from "../../types";
-import { InventoryItem } from "@/services/api/smartrotom/arcadeService";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
 
 interface OpenBoxButtonProps {
-  selectedBox: LootBox | null;
-  ownedBoxes: Record<string, InventoryItem>;
+  selectedBox: LootboxBoxConfig | null;
+  ownedBoxes: Record<string, ArcadeInventoryItem>;
   currentBoxTheme: {
     buttonGradient: string;
     buttonHover: string;
@@ -33,7 +32,7 @@ export function OpenBoxButton({
         className={`flex items-center space-x-2 px-8 py-4 rounded-lg text-white font-bold text-lg shadow-lg ${
           hasCurrentBox
             ? `bg-gradient-to-r ${currentBoxTheme.buttonGradient} ${currentBoxTheme.buttonHover} border-2 ${currentBoxTheme.border}` 
-            : 'bg-gray-700 border-2 border-gray-600 cursor-not-allowed opacity-70'
+            : 'bg-surface-700 border-2 border-surface-600 cursor-not-allowed opacity-70'
         }`}
         onClick={onOpenBox}
         disabled={!hasCurrentBox}

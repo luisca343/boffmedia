@@ -103,7 +103,7 @@ export function Page({children, dataDensity = "soft",  className = 'bg-[#fde3e3]
 
 export function BookLink({children, book, page, className}: {children: React.ReactNode, book: any, page: number, className?: string}){
     return (
-        <button className={`hover:cursor-pointer hover:underline hover:text-gray-700 transition-colors duration-200 font-vinque ${className}`} onClick={(e) => turnPage(book, page, e)}>
+        <button className={`hover:cursor-pointer hover:underline hover:text-surface-700 transition-colors duration-200 font-vinque ${className}`} onClick={(e) => turnPage(book, page, e)}>
             {children}
         </button>
     )

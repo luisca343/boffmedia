@@ -1,14 +1,14 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { eventsService } from "@/services/api/smartrotom/eventsService"
+import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 export function useLeaveTeam(eventId: number, teamId: number) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(
-    (userId) => eventsService.leaveTeam(eventId, teamId, userId),
+    (userId) => EventsService.leaveTeam(eventId, teamId, userId),
     [eventId, teamId],
   )
 
   const leaveTeam = (userId: number) => {
-    return eventsService.leaveTeam(eventId, teamId, userId)
+    return EventsService.leaveTeam(eventId, teamId, userId)
   }
 
   return {

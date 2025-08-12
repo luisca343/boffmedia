@@ -1,12 +1,12 @@
 import { useRotomRequest } from "../useRotomRequest";
-import { starbankService } from "@/services/api/smartrotom/starbankService";
+import { StarbankService } from "@/services/api/smartrotom/starbankService";
 import { CreateAccountDto } from "@/types/dto/create-account-dto";
 
 export function useCreateAccount() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(starbankService.createAccount)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(StarbankService.createAccount)
 
   const createAccount = (accountData: CreateAccountDto) => {
-    return starbankService.createAccount(accountData);
+    return StarbankService.createAccount(accountData);
   }
 
   return {

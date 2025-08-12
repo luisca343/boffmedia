@@ -36,7 +36,7 @@ export const PmdSprite = forwardRef<PmdSpriteRef, PmdSpriteProps>(
     }
 
     if (!currentAnimation) {
-      return <div className="text-blue-500 font-bold">Loading...</div>;
+      return <div className="text-secondary-500 font-bold">Loading...</div>;
     }
 
     const currentAnim = loadedAnimations.find(

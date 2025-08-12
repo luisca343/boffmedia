@@ -18,45 +18,45 @@ export const badgeVariants = cva(
           "border-transparent bg-red-500 text-surface-100",
         outline: "text-primary-300 border border-primary-300",
         success: 
-          "border-transparent bg-green-500 text-surface-100",
+          "border-transparent bg-highlight-500 text-surface-100",
         warning:
           "border-transparent bg-yellow-500 text-surface-900",
       },
       theme: {
         default: "focus:ring-primary-300 focus:ring-offset-surface-900",
-        wingull: "focus:ring-blue-300 focus:ring-offset-blue-950",
+        wingull: "focus:ring-secondary-300 focus:ring-offset-secondary-950",
       }
     },
     compoundVariants: [
       {
         variant: "default",
         theme: "wingull",
-        class: "bg-blue-300 text-blue-950",
+        class: "bg-secondary-300 text-secondary-950",
       },
       {
         variant: "secondary",
         theme: "wingull",
-        class: "bg-blue-800 text-blue-300",
+        class: "bg-secondary-800 text-secondary-300",
       },
       {
         variant: "outline",
         theme: "wingull",
-        class: "text-blue-300 border-blue-300",
+        class: "text-secondary-300 border-secondary-300",
       },
       {
         variant: "destructive",
         theme: "wingull",
-        class: "bg-red-400 text-blue-950",
+        class: "bg-red-400 text-secondary-950",
       },
       {
         variant: "success",
         theme: "wingull",
-        class: "bg-green-400 text-blue-950",
+        class: "bg-highlight-400 text-secondary-950",
       },
       {
         variant: "warning",
         theme: "wingull",
-        class: "bg-yellow-400 text-blue-950",
+        class: "bg-yellow-400 text-secondary-950",
       },
     ],
     defaultVariants: {

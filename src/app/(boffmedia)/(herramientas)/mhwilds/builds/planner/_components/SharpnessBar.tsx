@@ -56,7 +56,7 @@ export function SharpnessBar({ sharpness }: SharpnessProps) {
     
     segments.push({
       key,
-      color: key === "white" ? "bg-gray-100" : `bg-${key}-500`,
+      color: key === "white" ? "bg-surface-100" : `bg-${key}-500`,
       label: t(key),
       value,
       basePortion,

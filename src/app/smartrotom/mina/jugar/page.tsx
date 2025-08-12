@@ -8,9 +8,9 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader } from "@/components
 import { BarraEnergia } from "../_components/BarraEnergia"
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button"
-import { rotomPOST } from "@/services/boffAPI"
 import { useBoffSession } from "@/services/useBoffSession"
 import { RewardEntry } from "@/types/mina"
+import { MinaService } from "@/services/api/smartrotom/minaService"
 
 enum Tool {
     PICKAXE = 1,
@@ -160,7 +160,7 @@ export default function Jugar(){
         if(open) return
         setOpen(true)
         let obtained = obtainedRewards.map(reward => ({id: reward.reward.id, value: reward.reward.value}))
-        await rotomPOST('/mine/endgame', {uuid: session?.user.smartRotomUser?.uuid, rewards: obtained})
+        await MinaService.endGame({uuid: session?.user.smartRotomUser?.uuid!, rewards: obtained})
         await setIndex(index + 1)
     }
 
@@ -253,7 +253,7 @@ export default function Jugar(){
                 </div>
                 </div >
             </div>
-            <div className="bg-blue-400 h-full w-[15%] flex flex-col items-center justify-end pt-72  bg-no-repeat bg-cover" style={{backgroundImage:`url(/smartrotom/img/apps/mina/gui/barraHerramientas.png)`}}>
+            <div className="bg-secondary-400 h-full w-[15%] flex flex-col items-center justify-end pt-72  bg-no-repeat bg-cover" style={{backgroundImage:`url(/smartrotom/img/apps/mina/gui/barraHerramientas.png)`}}>
                 <img onClick={() => setTool(Tool.PICKAXE)} className="m-auto w-full  p-2lg:p-6" src={`/smartrotom/img/apps/mina/gui/btn_azul${tool === Tool.PICKAXE ? '1': '0'}.png`} alt="" />
                 <img onClick={() => setTool(Tool.HAMMER)} className="m-auto  w-full p-2 lg:p-6" src={`/smartrotom/img/apps/mina/gui/btn_rojo${tool === Tool.HAMMER ? '1': '0'}.png`} alt="" />
             </div>

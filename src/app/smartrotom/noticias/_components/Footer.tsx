@@ -25,17 +25,17 @@ export default function FurretFooter() {
             <h3 className="text-2xl font-bold mb-4 pop-shadow text-yellow-300">Enlaces Rápidos</h3>
             <ul className="space-y-2 font-comic">
               <li>
-                <InternalLink href="/noticias" className="hover:text-yellow-300 transition-colors">
+                <InternalLink href="noticias" className="hover:text-yellow-300 transition-colors">
                   Inicio
                 </InternalLink>
               </li>
               <li>
-                <InternalLink href="/noticias/editar" className="hover:text-yellow-300 transition-colors">
+                <InternalLink href="noticias/editar" className="hover:text-yellow-300 transition-colors">
                   Editar Noticias
                 </InternalLink>
               </li>
               <li>
-                <InternalLink href="/" className="hover:text-yellow-300 transition-colors">
+                <InternalLink href="" className="hover:text-yellow-300 transition-colors">
                   Volver a SmartRotom
                 </InternalLink>
               </li>

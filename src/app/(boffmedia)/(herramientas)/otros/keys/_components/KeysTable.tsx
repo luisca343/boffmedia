@@ -6,6 +6,7 @@ import useFetchSteamData from "../_hooks/useFetchSteamData";
 import { KeysHeader } from "./KeysHeader";
 import { KeysControls } from "./KeysControls";
 import { KeysDataTable } from "./KeysDataTable";
+import { FloatingSection } from "@/app/(boffmedia)/_components/layout/FloatingSection";
 
 const SteamDialog = lazy(() => import("./SteamDialog"));
 
@@ -41,35 +42,37 @@ export default function KeysTable() {
   const aggregatedKeysArray = Object.values(aggregatedKeys);
 
   return (
-    <div className="min-h-screen text-surface-100 px-4 py-8 md:p-8">
-      <div className="max-w-5xl mx-auto">
-        <KeysHeader />
-        
-        <KeysControls 
-          filter={filter}
-          setFilter={setFilter}
-          showClaimed={showClaimed}
-          setShowClaimed={setShowClaimed}
-          availableCount={filteredKeys.filter(k => k.claimed !== "s").length}
-          claimedCount={filteredKeys.filter(k => k.claimed === "s").length}
-          totalCount={filteredKeys.length}
-        />
+    <FloatingSection className={`flex-1 bg-surface-900 w-full transition-all duration-300 ease-in-out md:pt-0 pt-16`}>
+      <div className="w-full pb-16">
+        <div className="max-w-5xl mx-auto">
+          <KeysHeader />
+          
+          <KeysControls 
+            filter={filter}
+            setFilter={setFilter}
+            showClaimed={showClaimed}
+            setShowClaimed={setShowClaimed}
+            availableCount={filteredKeys.filter(k => k.claimed !== "s").length}
+            claimedCount={filteredKeys.filter(k => k.claimed === "s").length}
+            totalCount={filteredKeys.length}
+          />
 
-        <KeysDataTable 
-          keys={aggregatedKeysArray}
-          hoveredRow={hoveredRow}
-          setHoveredRow={setHoveredRow}
-          fetchGameData={fetchGameData}
-        />
+          <KeysDataTable 
+            keys={aggregatedKeysArray}
+            hoveredRow={hoveredRow}
+            setHoveredRow={setHoveredRow}
+            fetchGameData={fetchGameData}
+          />
+        </div>
+
+        <Suspense fallback={<div className="fixed inset-0 bg-surface-900/70 flex items-center justify-center">Cargando...</div>}>
+          <SteamDialog
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            selectedGame={selectedGame}
+          />
+        </Suspense>
       </div>
-
-      <Suspense fallback={<div className="fixed inset-0 bg-surface-900/70 flex items-center justify-center">Cargando...</div>}>
-        <SteamDialog
-          isModalVisible={isModalVisible}
-          setIsModalVisible={setIsModalVisible}
-          selectedGame={selectedGame}
-        />
-      </Suspense>
-    </div>
+    </FloatingSection>
   );
 }

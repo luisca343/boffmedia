@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Gamepad2, Calendar, Users, Award } from "lucide-react"
 import { ToastContainer } from "react-toastify"
@@ -11,7 +12,27 @@ import { AchievementsTab } from "./_components/achievements/AchievementsTab"
 import { TeamsTab } from "./_components/teams/TeamsTab"
 
 export default function AdminDashboard() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState("games")
+
+  // Initialize tab from URL on mount
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab')
+    const validTabs = ['games', 'events', 'teams', 'achievements']
+    
+    if (tabFromUrl && validTabs.includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl)
+    }
+  }, [searchParams])
+
+  // Handle tab change and update URL
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', value)
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
@@ -20,7 +41,7 @@ export default function AdminDashboard() {
         <p className="text-surface-300">Gestiona juegos, eventos, equipos y logros del portal.</p>
       </header>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="mb-8 bg-surface-800 p-1">
           <TabsTrigger value="games" className="data-[state=active]:bg-primary-500">
             <Gamepad2 className="h-4 w-4 mr-2" />
@@ -63,4 +84,3 @@ export default function AdminDashboard() {
     </div>
   )
 }
-

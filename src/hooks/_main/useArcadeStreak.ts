@@ -3,14 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
 import { toast } from 'react-toastify';
-import { arcadeService, ArcadeStreak, ClaimRewardResponse } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeInventoryItem, ArcadeService } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeStreak, ArcadeStreakClaim } from '@/generated/api';
 
 interface UseArcadeStreakReturn {
   loading: boolean;
   streak: number;
   claimed: boolean;
   rewardAmount: number;
-  claimReward: () => Promise<ClaimRewardResponse | null>;
+  claimReward: () => Promise<{
+    streak: ArcadeStreak;
+    reward: any;
+    inventoryItems?: ArcadeInventoryItem[];
+  } | null>;
   error: string | null;
   nextReward: any | null;
   currentDay: number;
@@ -63,7 +68,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
 
       try {
         setLoading(true);
-        const response = (await arcadeService.getArcadeStreak(session.user.smartRotomUser?.uuid!)).data as ArcadeStreak;
+        const response = (await ArcadeService.getStreak(session.user.smartRotomUser?.uuid!)).data as ArcadeStreak;
 
         // Use the claimedToday property directly from the server response
         setStreakData({
@@ -73,10 +78,10 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
           nextReward: response.nextReward,
           currentDay: response.currentDay || 1,
           totalDays: response.totalDays || 7,
-          lastClaimed: response.lastClaimed || null,
+          lastClaimed: response.lastClaimed ? new Date(response.lastClaimed) : null,
           currentBanner: response.currentBanner || null,
           lastBanner: response.lastBanner || null,
-          nextResetTime: response.nextResetTime || new Date(),
+          nextResetTime: response.nextResetTime ? new Date(response.nextResetTime) : new Date(),
           bannerChanged: response.bannerChanged || false
         });
       } catch (err) {
@@ -113,7 +118,7 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
   }, [session]);
 
   // Function to claim daily reward
-  const claimReward = async (): Promise<ClaimRewardResponse | null> => {
+  const claimReward = async (): Promise<ArcadeStreakClaim | null> => {
     if (!session) {
       toast.error('Necesitas iniciar sesión para recibir recompensas diarias', {
         position: "top-center",
@@ -127,29 +132,33 @@ export function useArcadeStreak(): UseArcadeStreakReturn {
     }
 
     try {
-      const result = await arcadeService.claimDailyReward(session.user.smartRotomUser?.uuid!);
+      const result = await ArcadeService.claimDailyReward({uuid: session.user.smartRotomUser?.uuid!});
+      const daily = await (await ArcadeService.getStreakStatus(session.user.smartRotomUser?.uuid!)).data!;
+      const { streak } = daily;
+
+      console.log("daily", daily);
       
       if (result.statusCode === 200 && result.data) {
         setStreakData({
-          streak: result.data.newStreak,
+          streak: streak.streak,
           claimed: true,
-          rewardAmount: result.data.rewardGiven.amount,
-          nextReward: result.data.nextReward,
-          currentDay: result.data.currentDay || 1,
-          totalDays: result.data.totalDays || 7,
+          rewardAmount: streak.nextReward?.amount || 50,
+          nextReward: streak.nextReward,
+          currentDay: streak.currentDay || 1,
+          totalDays: streak.totalDays || 7,
           lastClaimed: new Date(),
-          currentBanner: result.data.bannerName || streakData.currentBanner,
+          currentBanner: streak.currentBanner || streakData.currentBanner,
           lastBanner: streakData.currentBanner,
-          nextResetTime: result.data.nextResetTime,
-          bannerChanged: result.data.bannerChanged || false
+          nextResetTime: streak.nextResetTime ? new Date(streak.nextResetTime) : new Date(),
+          bannerChanged: streak.bannerChanged || false
         });
         
         // Also save to localStorage as fallback
         const today = new Date().toISOString().split('T')[0];
         localStorage.setItem("arcadeDailyBonus", today);
-        localStorage.setItem("arcadeBonusStreak", result.data.newStreak.toString());
+        localStorage.setItem("arcadeBonusStreak", result.data.streak.toString());
         
-        toast.success(`¡Recompensa obtenida: +${result.data.rewardGiven.amount} ${result.data.rewardGiven.type}!`, {
+        toast.success(`¡Recompensa obtenida: +${result.data.reward.amount} ${result.data.reward.type}!`, {
           position: "top-center",
           autoClose: 4000,
           hideProgressBar: false,

@@ -27,8 +27,7 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
-      // Note: Delete endpoint needs to be implemented
-      // await eventsService.deleteEvent(event.id)
+      //await eventsService.deleteEvent(event.id)
       toast.success(`El evento "${event.title}" ha sido eliminado con éxito.`)
       onSuccess()
     } catch (error) {
@@ -79,10 +78,10 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="error"
             onClick={handleDelete}
             disabled={isSubmitting}
-            className="bg-warning-500 hover:bg-warning-600 text-white ml-2"
+            className="ml-2"
           >
             {isSubmitting ? (
               <>

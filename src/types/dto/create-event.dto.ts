@@ -1,10 +1,10 @@
 export interface CreateEventDto {
     title: string
     description: string
-    icon: string
+    icon?: string
     banner?: string
     gameId: number
     startDate: string
-    endDate: string
+    endDate?: string
     type: "event" | "server"
   }

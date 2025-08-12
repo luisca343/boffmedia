@@ -17,7 +17,6 @@ export const getItemName = (t: (key: string) => string, itemId: string, source =
       const normalizedId = itemId.replace(":", ".");
       return t(`items.${normalizedId}_name`);
     } catch (error) {
-      console.warn(`Translation not found for item name: ${itemId}`);
       // Fallback: extract and format the item name from its ID
       const namePart = itemId.split(":").pop() || itemId;
       return namePart

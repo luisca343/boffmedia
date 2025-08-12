@@ -143,6 +143,73 @@
     "defense_bonus": "Bonus de defensa",
     "charm": "Amuleto",
     "secondary_weapon": "Arma Secundaria",
-    "empty_slot": "Ranura vacía"
+    "empty_slot": "Ranura vacía",
+
+
+      
+    "header": {
+      "title": {
+        "prefix": "Herramientas de",
+        "highlight": "Monster Hunter Wilds"
+      },
+      "subtitle": "Optimiza tu caza con nuestras herramientas especializadas"
+    },
+    "tools": {
+      "buildPlanner": {
+        "title": "Planificador de Builds",
+        "description": "Crea builds óptimas comparando armaduras, decoraciones y habilidades",
+        "features": {
+          "optimizer": "Optimizador de builds",
+          "calculator": "Calculadora de daño",
+          "comparison": "Comparador de sets"
+        }
+      },
+      "weaponTrees": {
+        "title": "Árboles de Armas",
+        "description": "Árboles de progresión y estadísticas de todas las armas",
+        "features": {
+          "trees": "Árboles de armas",
+          "comparison": "Comparador",
+          "stats": "Estadísticas detalladas"
+        }
+      },
+      "bestiary": {
+        "title": "Bestiario",
+        "description": "Información detallada sobre debilidades y recompensas",
+        "features": {
+          "weaknesses": "Tabla de debilidades",
+          "materials": "Materiales y drops",
+          "locations": "Ubicaciones"
+        }
+      },
+      "armor": {
+        "title": "Sets de Armadura",
+        "description": "Base de datos completa de armaduras y habilidades",
+        "features": {
+          "sets": "Sets completos",
+          "skills": "Habilidades",
+          "defense": "Estadísticas de defensa"
+        }
+      },
+      "materials": {
+        "title": "Rastreador de Materiales",
+        "description": "Rastrea y calcula los materiales necesarios para crafting",
+        "features": {
+          "tracker": "Lista de seguimiento",
+          "calculator": "Calculadora de crafting",
+          "locations": "Dónde conseguir"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "Enlaces Útiles",
+      "officialWebsite": "Sitio Oficial",
+      "redditCommunity": "Reddit Community", 
+      "wiki": "Monster Hunter Wiki",
+      "videos": "Guías en YouTube"
+    },
+    "featuredTool": "Herramienta destacada",
+    "accessButton": "Acceder a {tool}",
+  "explore": "Explorar"
   }
 }

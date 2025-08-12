@@ -1,4 +1,6 @@
 "use client"
+import { GlobalErrorThrower } from "@/components/smartrotom/GlobalErrorThrower"
+import { RotomErrorBoundary } from "@/components/smartrotom/RotomErrorBoundary"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { PokemonProvider } from "@/providers/PokemonProvider"
 import { SpriteManifestProvider } from "@/providers/SpriteManifestProvider"
@@ -7,10 +9,22 @@ export function SmartRotomProviders({ children }: { children: React.ReactNode })
     return (
     <PokemonProvider>
         <TooltipProvider>
-            <SpriteManifestProvider>
-                {children}
-            </SpriteManifestProvider>
+                <SpriteManifestProvider>
+                    <ErrorProviders>
+                        {children}
+                    </ErrorProviders>
+                </SpriteManifestProvider>
         </TooltipProvider>
     </PokemonProvider>
 )
+}
+
+export function ErrorProviders({ children }: { children: React.ReactNode }) {
+    return (
+        <RotomErrorBoundary>
+            <GlobalErrorThrower>
+                {children}
+            </GlobalErrorThrower>
+        </RotomErrorBoundary>
+    )
 }

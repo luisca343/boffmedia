@@ -17,7 +17,7 @@ type BattlesData = {
 };
 
 export default async function CombatesPage() {
-  const data = (await boffGET('/herramientas/ptcgp/solobattles')) as any as BattlesData;
+  const data = (await boffGET('/herramientas/ptcgp/solobattles')).data as any as BattlesData;
   
   return (
     <Card className="border-none shadow-none">

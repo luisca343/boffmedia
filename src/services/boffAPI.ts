@@ -3,6 +3,7 @@ export interface ApiResponse<T = any> {
   message: string;
   data?: T;
   error?: string;
+  success: boolean;
 }
 
 interface Options extends RequestInit {
@@ -125,7 +126,7 @@ export async function rotomPATCH<T>(url: string, data: any): Promise<ApiResponse
   return apiPATCH<T>(`/smartrotom${url}`, data);
 }
 
-export async function rotomDELETE<T>(url: string): Promise<ApiResponse<T>> {
+export async function rotomDELETE<T>(url: string, data?: any): Promise<ApiResponse<T>> {
   return apiDELETE<T>(`/smartrotom${url}`);
 }
 

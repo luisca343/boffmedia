@@ -5,6 +5,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 import { useGetMove } from "@/hooks/pokemon/useGetMove";
+import { getTranslatedMoveName } from "@/utils/pokemonTranslations";
 
 export default function MoveDataElement({id, isFullPage = false} : {id: string, isFullPage?: boolean}){
     const t = useTranslations("pokedex");
@@ -21,7 +22,7 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
             {!isFullPage && (
                 <div className="text-center">
                     <h2 className="text-xl font-bold text-surface-50">
-                        {t(`attack_${move.attackName.toLowerCase().replaceAll(" ", "_")}`)}
+                        {getTranslatedMoveName(move.attackName, t)}
                     </h2>
                 </div>
             )}

@@ -39,7 +39,7 @@ export function PokemonStatus({pokemon, className}: {pokemon: Pokemon | null, cl
                     const multiplier = getBoostMultiplier(value);
                     if (multiplier === 1) return null;
                     const spanClass = multiplier > 1 
-                        ? "flex items-center justify-center text-green-900 border-green-900 bg-green-200 mr-1 rounded-sm px-[3px] mt-[2px]" 
+                        ? "flex items-center justify-center text-highlight-900 border-highlight-900 bg-highlight-200 mr-1 rounded-sm px-[3px] mt-[2px]" 
                         : "flex items-center justify-center text-red-900 border-red-900 bg-red-200 mr-1 rounded-sm px-[3px] mt-[2px]";
                     return <span key={key} className={spanClass} 
                         style={{

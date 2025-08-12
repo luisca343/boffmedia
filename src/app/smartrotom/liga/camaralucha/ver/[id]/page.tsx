@@ -1,14 +1,14 @@
 "use client"
 import { useEffect, useState } from "react";
 import { Game } from "@/app/battlesim/replay/_components/Game";
-import { ligaService } from "@/services/api/smartrotom/ligaService";
+import { LigaService } from "@/services/api/smartrotom/ligaService";
 
 export default function VerPage({ params }: { params: { id: string } }) {
   const [replay, setReplay] = useState(null);
 
   useEffect(() => {
     async function fetchReplay() {
-      const replayData = await ligaService.getReplay(Number(params.id)) as any;
+      const replayData = await LigaService.getReplay(Number(params.id)) as any;
       setReplay(replayData[0]);
     }
 

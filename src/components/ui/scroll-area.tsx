@@ -43,7 +43,7 @@ const ScrollBar = React.forwardRef<
   
   const variantStyles = {
     default: "bg-surface-700",
-    wingull: "bg-blue-700"
+    wingull: "bg-secondary-700"
   }
   
   return (

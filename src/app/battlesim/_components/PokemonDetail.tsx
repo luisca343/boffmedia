@@ -40,7 +40,7 @@ export default function PokemonDetail({
     const showDetailedInfo = showFullInfo || !isOpponent;
     
     const hpPercentage = pokemon.hp > 0 ? (pokemon.hp / pokemon.maxhp * 100) : 0;
-    const hpColorClass = hpPercentage > 50 ? "bg-green-500" : hpPercentage > 20 ? "bg-yellow-500" : "bg-red-500";
+    const hpColorClass = hpPercentage > 50 ? "bg-highlight-500" : hpPercentage > 20 ? "bg-yellow-500" : "bg-red-500";
     
     const stats = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as StatID[];
     const hasBoosts = Object.keys(pokemon.boosts).length > 0;
@@ -81,7 +81,7 @@ export default function PokemonDetail({
                                 <span>{pokemon.hp}/{pokemon.maxhp}</span>
                             )}
                         </div>
-                        <div className="w-full bg-gray-700 rounded-full h-2">
+                        <div className="w-full bg-surface-700 rounded-full h-2">
                             <div className={`${hpColorClass} h-2 rounded-full`} style={{width: `${hpPercentage}%`}}></div>
                         </div>
                     </div>
@@ -125,7 +125,7 @@ export default function PokemonDetail({
                                         <div className="flex flex-wrap gap-1">
                                             {Object.entries(pokemon.boosts).map(([stat, value]) => (
                                                 <div key={stat} className={`px-2 py-0.5 text-xs rounded ${
-                                                    value > 0 ? "bg-green-500/20 text-green-400" : 
+                                                    value > 0 ? "bg-highlight-500/20 text-highlight-400" : 
                                                     value < 0 ? "bg-red-500/20 text-red-400" : "bg-surface-700"
                                                 }`}>
                                                     {stat}: {value > 0 ? `+${value}` : value}
@@ -164,7 +164,7 @@ export default function PokemonDetail({
                                             )}
                                         </div>
                                         {pokemon.ability && (
-                                            <div className="mt-1 text-xs text-green-400">Active: {pokemon.ability}</div>
+                                            <div className="mt-1 text-xs text-highlight-400">Active: {pokemon.ability}</div>
                                         )}
                                     </div>
                                 )}
@@ -195,7 +195,7 @@ export default function PokemonDetail({
                                         stat === 'hp' ? 0 : 0, // Default EVs
                                         1.0 // Neutral nature
                                     );
-                                    const boost = pokemon.boosts?.[stat];
+                                    const boost = stat !== 'hp' ? pokemon.boosts?.[stat as Exclude<StatID, 'hp'>] : undefined;
                                     const baseStatValue = pokemon.species.baseStats[stat];
                                     
                                     return (
@@ -215,7 +215,7 @@ export default function PokemonDetail({
                                                     <>
                                                         {value}
                                                         {boost && boost !== 0 && (
-                                                            <span className={boost > 0 ? "text-green-400 ml-1" : "text-red-400 ml-1"}>
+                                                            <span className={boost > 0 ? "text-highlight-400 ml-1" : "text-red-400 ml-1"}>
                                                                 {boost > 0 ? `+${boost}` : boost}
                                                             </span>
                                                         )}
@@ -295,8 +295,8 @@ function calculateStat(stat: StatID, base: number, level: number, IV: number, EV
 }
 
 function getStatBarColor(value: number) {
-    if (value >= 120) return "bg-blue-500";
-    if (value >= 100) return "bg-green-500";
+    if (value >= 120) return "bg-secondary-500";
+    if (value >= 100) return "bg-highlight-500";
     if (value >= 80) return "bg-lime-500";
     if (value >= 60) return "bg-yellow-500";
     if (value >= 40) return "bg-orange-500";

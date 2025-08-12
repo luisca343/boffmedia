@@ -1,14 +1,14 @@
 import { Archive, Search } from "lucide-react";
-import { Item, Rarity } from "../../types";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemName, getItemRarity } from "@/lib/intlUtils";
+import { ArcadeInventoryItem } from "@/generated/api";
 
 interface CollectionGridProps {
-  items: Item[];
+  items: ArcadeInventoryItem[];
   totalItems: number;
-  onItemClick: (item: Item) => void;
+  onItemClick: (item: ArcadeInventoryItem) => void;
 }
 
 export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGridProps) {
@@ -16,20 +16,20 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center text-gray-400 py-12">
+      <div className="flex flex-col items-center justify-center text-surface-400 py-12">
         {totalItems === 0 ? (
           <div className="text-center">
-            <Archive className="h-16 w-16 mx-auto text-gray-600 mb-3" />
+            <Archive className="h-16 w-16 mx-auto text-surface-600 mb-3" />
             <p className="text-xl mb-2">Aún no has coleccionado ningún objeto</p>
-            <p className="text-gray-500">
+            <p className="text-surface-500">
               Abre cajas para empezar a coleccionar objetos raros
             </p>
           </div>
         ) : (
           <div className="text-center">
-            <Search className="h-16 w-16 mx-auto text-gray-600 mb-3" />
+            <Search className="h-16 w-16 mx-auto text-surface-600 mb-3" />
             <p className="text-xl mb-2">No hay objetos que coincidan con tu búsqueda</p>
-            <p className="text-gray-500">
+            <p className="text-surface-500">
               Intenta con otros términos o filtros
             </p>
           </div>
@@ -51,16 +51,16 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
           >
             <div className="w-full aspect-square mb-2 flex items-center justify-center">
               <ItemDisplay
-                type={item.source!}
-                itemId={item.id}
-                count={item.count}
+                type={item.sourceType!}
+                itemId={item.itemId}
+                count={item.amount}
                 size={96}
                 rarity={item.rarity}
               />
             </div>
             
             <h3 className={`${config.textColor} font-medium text-center text-sm truncate w-full`}>
-              {getItemName(t, item.id, item.source)}
+              {getItemName(t, item.itemId, item.sourceType)}
             </h3>
             <p className={`${config.textColor} text-xs mt-1`}>
               {getItemRarity(t, item.rarity)}

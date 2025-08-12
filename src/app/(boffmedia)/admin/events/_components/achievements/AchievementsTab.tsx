@@ -31,7 +31,7 @@ export function AchievementsTab() {
             ? achievement.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
               achievement.description?.toLowerCase().includes(searchTerm.toLowerCase())
             : true
-        )
+        ) as any
     : []
 
   const handleCreateSuccess = () => {

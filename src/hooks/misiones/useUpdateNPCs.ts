@@ -1,12 +1,12 @@
 import { NPC } from "@/types/misiones";
 import { useRotomRequest } from "../useRotomRequest";
-import { misionesService } from "@/services/api/smartrotom/misionesService";
+import { MisionesService } from "@/services/api/smartrotom/misionesService";
 
 export function useUpdateNPCs() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(misionesService.updateNPCs)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(MisionesService.updateNPCs)
 
   const updateNPCs = (npcs: NPC[]) => {
-    return misionesService.updateNPCs(npcs);
+    return MisionesService.updateNPCs(npcs);
   }
 
   return {

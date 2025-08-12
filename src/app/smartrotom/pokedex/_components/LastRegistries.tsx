@@ -2,7 +2,6 @@
 
 import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
 import { StatusIcon } from "./StatusIcon"
-import { InternalLink } from "@/components/nav/Link"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { Loading } from "@/components/smartrotom/Loading"

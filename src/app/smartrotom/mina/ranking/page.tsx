@@ -1,8 +1,9 @@
+import { RankingEntry } from "@/generated/api";
 import MenuWrapper from "../_components/MenuWrapper";
-import { minaService } from "@/services/api/smartrotom/minaService";
+import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Ranking() {
-  const ranking = await minaService.getRanking();
+  const ranking = (await MinaService.getPlayerRanking()).data;
 
   if(!ranking) return <></>
   return (
@@ -18,15 +19,14 @@ export default async function Ranking() {
             </tr>
           </thead>
           <tbody>
-            {/* 
-            {ranking.map((user: any, i: number) => (
+            
+            {ranking.map((user: RankingEntry, i: number) => (
               <tr key={i} className="border-b border-surface-600">
                 <td className="py-2 text-center">{i + 1}</td>
-                <td className="py-2 text-center">{user.name}</td>
-                <td className="py-2 text-center">{user.value}</td>
+                <td className="py-2 text-center">{user.username}</td>
+                <td className="py-2 text-center">{user.totalValue}</td>
               </tr>
             ))}
-            */}
           </tbody>
         </table>
       </div>

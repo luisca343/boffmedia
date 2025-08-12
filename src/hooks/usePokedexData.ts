@@ -10,14 +10,16 @@ export function usePokedexData() {
   const [error, setError] = useState<string | null>(null)
   const getPokedexData = usePokemonStore((state) => state.getPokedexData)
   const pokedexData = usePokemonStore((state) => state.pokedexData)
+  const fetchingPokedex = usePokemonStore((state) => state.fetchingPokedex)
   
 
   useEffect(() => {
     async function fetchData() {
+      if (fetchingPokedex) return // Don't start a new fetch if one is already in progress
+      
       setIsLoading(true)
       setError(null)
       try {
-        console.log(`Fetching Pokedex data for ${session.user.smartRotomUser?.uuid}`)
         await getPokedexData(session.user.smartRotomUser?.uuid!)
       } catch (err) {
         setError("Failed to fetch Pokedex data")
@@ -26,16 +28,18 @@ export function usePokedexData() {
       }
     }
 
-    if (!pokedexData) {
+    if (!pokedexData && session.user.smartRotomUser?.uuid) {
       fetchData()
     }
-  }, [session, getPokedexData, pokedexData])
+  }, [session.user.smartRotomUser?.uuid, pokedexData, fetchingPokedex])
 
   const refetch = async () => {
+    if (!session.user.smartRotomUser?.uuid) return
+    
     setIsLoading(true)
     setError(null)
     try {
-      await getPokedexData(session.user.smartRotomUser?.uuid!)
+      await getPokedexData(session.user.smartRotomUser.uuid)
     } catch (err) {
       setError("Failed to fetch Pokedex data")
     } finally {

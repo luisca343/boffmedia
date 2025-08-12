@@ -86,7 +86,7 @@ export default function Graficas() {
       if (selectedAccount) {
         // Use changeActiveAccount utility to save to localStorage
         changeActiveAccount(accountId);
-        setActiveAccount(selectedAccount);
+        setActiveAccount(selectedAccount.id);
       }
     }
   }, [accounts, setActiveAccount, currentAccountId]);
@@ -172,7 +172,7 @@ export default function Graficas() {
     return (
       <div className="p-8 text-center">
         <h2 className="text-xl font-semibold text-red-600 mb-2">Error</h2>
-        <p className="text-gray-700">No se pudieron cargar los datos. Por favor, intente nuevamente.</p>
+        <p className="text-surface-700">No se pudieron cargar los datos. Por favor, intente nuevamente.</p>
       </div>
     );
   }
@@ -189,7 +189,7 @@ export default function Graficas() {
                 <AccountSelect 
                   accounts={accounts}
                   activeAccount={activeAccount}
-                  setActiveAccount={(account) => {
+                  setActiveAccount={(account: any) => {
                     if (account) {
                       changeActiveAccount(account);
                     }
@@ -234,7 +234,7 @@ export default function Graficas() {
               />
             ) : (
               <div className="p-8 text-center">
-                <p className="text-gray-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
+                <p className="text-surface-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
               </div>
             )}
           </BankSectionContent>
@@ -252,7 +252,7 @@ export default function Graficas() {
               />
             ) : (
               <div className="p-8 text-center">
-                <p className="text-gray-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
+                <p className="text-surface-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
               </div>
             )}
           </BankSectionContent>
@@ -266,11 +266,11 @@ export default function Graficas() {
           {filteredTransactions && filteredTransactions.length > 0 ? (
             <TransactionTypeDistribution 
               transactions={filteredTransactions} 
-              activeAccount={activeAccount}
+              activeAccount={activeAccount!}
             />
           ) : (
             <div className="p-8 text-center">
-              <p className="text-gray-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
+              <p className="text-surface-700">No hay transacciones para mostrar en el periodo seleccionado.</p>
             </div>
           )}
         </BankSectionContent>

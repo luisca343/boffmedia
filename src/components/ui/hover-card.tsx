@@ -17,10 +17,10 @@ const HoverCardContent = React.forwardRef<
 >(({ className, align = "center", sideOffset = 4, variant = "default", ...props }, ref) => {
   const variantClasses = {
     default: "bg-surface-800 border-surface-600 text-primary-400",
-    info: "bg-blue-900 border-blue-600 text-blue-100",
+    info: "bg-secondary-900 border-secondary-600 text-secondary-100",
     warning: "bg-yellow-900 border-yellow-600 text-yellow-100",
     paper: "page border-2 border-black",
-    wingull: "bg-blue-900 border-blue-600 text-blue-300"
+    wingull: "bg-secondary-900 border-secondary-600 text-secondary-300"
   }
 
   return (

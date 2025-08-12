@@ -7,7 +7,7 @@ interface BackgroundDecorationsProps {
 export function BackgroundDecorations({ includeGradient = true }: BackgroundDecorationsProps) {
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10">
-      {includeGradient && <div className="absolute inset-0 bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500" />}
+      {includeGradient && <div className="absolute inset-0 bg-gradient-to-b from-secondary-300 via-secondary-400 to-secondary-500" />}
       {!includeGradient && <div className="absolute inset-0 bg-[url(/img/w-bg.png)] bg-cover bg-center " />}
       <div className="absolute inset-0 overflow-hidden opacity-60">
         <Image

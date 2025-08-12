@@ -82,8 +82,8 @@ const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
   "mhwilds": {
     name: "games.mhwilds.name",
     icon: "/img/games/mhwilds-icon.webp",
-    color: "from-green-400 to-green-600",
-    bg: "bg-green-900",
+    color: "from-highlight-400 to-highlight-600",
+    bg: "bg-highlight-900",
     categories: [
       {
         name: "games.mhwilds.categories.buildPlanner",

@@ -52,7 +52,7 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
           <div className="flex items-center gap-3 p-4 bg-surface-700/50 rounded-lg mb-4">
             <div className="w-12 h-12 rounded bg-surface-600 flex items-center justify-center overflow-hidden">
               {achievement.icon ? (
-                <img src={`/img/${achievement.icon}`} alt={achievement.name} className="w-full h-full object-cover" />
+                <img src={achievement.icon} alt={achievement.name} className="w-full h-full object-cover" />
               ) : (
                 <Award className="h-6 w-6 text-surface-500" />
               )}
@@ -79,10 +79,10 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
           </Button>
           <Button
             type="button"
-            variant="destructive"
+            variant="error"
             onClick={handleDelete}
             disabled={isSubmitting}
-            className="bg-warning-500 hover:bg-warning-600 text-white ml-2"
+            className="ml-2"
           >
             {isSubmitting ? (
               <>

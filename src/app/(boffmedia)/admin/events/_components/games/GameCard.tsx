@@ -17,7 +17,7 @@ export function GameCard({ game, onEdit, onDelete }: GameCardProps) {
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded bg-surface-700 flex items-center justify-center overflow-hidden">
             {game.icon ? (
-              <img src={`/img/${game.icon}`} alt={game.title} className="w-full h-full object-cover" />
+              <img src={game.icon} alt={game.title} className="w-full h-full object-cover" />
             ) : (
               <Gamepad className="h-6 w-6 text-surface-500" />
             )}
