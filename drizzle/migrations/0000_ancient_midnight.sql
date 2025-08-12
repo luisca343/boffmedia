@@ -415,7 +415,7 @@ CREATE TABLE `tcg_cards` (
 	`stage` varchar(32),
 	`description_en` varchar(1024),
 	`description_es` varchar(1024),
-	`updated` timestamp,
+	`updated` datetime,
 	`types` varchar(255),
 	`weaknesses` varchar(512),
 	`attacks` text,
@@ -454,7 +454,7 @@ CREATE TABLE `user_card_history` (
 	`user_id` varchar(32) NOT NULL,
 	`card_id` varchar(32) NOT NULL,
 	`quantity_change` int NOT NULL,
-	`timestamp` timestamp NOT NULL,
+	`date` datetime NOT NULL,
 	CONSTRAINT `user_card_history_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
@@ -463,9 +463,9 @@ CREATE TABLE `user_cards` (
 	`user_id` varchar(32) NOT NULL,
 	`card_id` varchar(32) NOT NULL,
 	`quantity` int NOT NULL DEFAULT 1,
-	`acquired_date` timestamp NOT NULL,
-	`created_at` timestamp NOT NULL,
-	`updated_at` timestamp NOT NULL,
+	`acquired_date` datetime NOT NULL,
+	`created_at` datetime NOT NULL,
+	`updated_at` datetime NOT NULL,
 	CONSTRAINT `user_cards_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint

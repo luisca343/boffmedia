@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1753217174022,
-      "tag": "0000_talented_gwen_stacy",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1753262290180,
-      "tag": "0001_sleepy_havok",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1753262625210,
-      "tag": "0002_bright_whizzer",
+      "when": 1754985755649,
+      "tag": "0000_ancient_midnight",
       "breakpoints": true
     }
   ]
