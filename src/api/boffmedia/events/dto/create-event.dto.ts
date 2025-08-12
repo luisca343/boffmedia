@@ -9,7 +9,6 @@ export class CreateEventDto {
   })
   @IsOptional()
   @IsInt()
-  @Min(1)
   parentId?: number;
 
   @ApiProperty({ 

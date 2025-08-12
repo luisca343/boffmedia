@@ -1,7 +1,8 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsOptional, Min } from 'class-validator';
 
-export class CreateDocumentDto {
+export class CreateDocumentDto extends BaseDto {
   @ApiProperty({ 
     description: 'Document title',
     example: 'My Important Notes'

@@ -1,7 +1,8 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsInt } from 'class-validator';
 
-export class CreateDocumentDto {
+export class CreateDocumentDto extends BaseDto {
   @ApiProperty({ description: 'Title of the document' })
   @IsString()
   @IsNotEmpty()
