@@ -54,7 +54,7 @@ export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon,
                 
                 {/* Next Pokemon */}
                 <InternalLink className="flex items-center hover:text-primary-400 transition-colors group" 
-                    href={`/pokedex/entrada/${next.dex}`}>
+                    href={`pokedex/entrada/${next.dex}`}>
                     <div className="hidden md:block text-right">#{next.dex} - {getDisplayStatus(next.dex, 'base', true) ? next.name : '???'}</div>
                     <div className="flex items-center">
                         <ChevronRightIcon className="w-6 h-6"/>
