@@ -1,7 +1,16 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsOptional, Min, Max, IsUrl } from 'class-validator';
 
-export class CreateNewsDto {
+export class CreateNewsDto extends BaseDto {
+  @ApiProperty({
+    description: 'Unique identifier for the news article',
+    example: 1
+  })
+  @IsNotEmpty()
+  @IsInt()
+  id: number;
+
   @ApiProperty({ 
     description: 'News title',
     example: 'Exciting New Features Released!'
@@ -63,7 +72,6 @@ export class CreateNewsDto {
     description: 'News content',
     example: 'We are excited to announce the release of new features...'
   })
-  @IsNotEmpty()
   @IsString()
   content: string;
 
