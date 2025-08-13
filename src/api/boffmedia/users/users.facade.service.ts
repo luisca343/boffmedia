@@ -79,23 +79,10 @@ export class BoffMediaUsersFacadeService {
     try {
       console.log('Initializing full user with integrations:', { username: data.username, email: data.email });
 
-      // Create BoffMedia user
-      const boffMediaUserData: CreateUserDto = {
-        email: data.email,
-        username: data.username,
-        password: data.password,
-        uuid: data.minecraft?.uuid,
-        googleId: data.google?.googleId,
-        profilePicture: data.google?.profilePicture
-      };
-
-      const boffMediaResult = await this.findOrCreateUser(boffMediaUserData);
-
       let smartRotomUser: SmartRotomUser | null = null;
       let isNewSmartRotomUser = false;
       let starbankAccounts: any[] = [];
 
-      // If user has Minecraft data, create/find SmartRotom user
       if (data.minecraft) {
         try {
           const smartRotomResult = await this.smartRotomUsersFacadeService.initializeUserAndAccounts({
@@ -117,6 +104,17 @@ export class BoffMediaUsersFacadeService {
           console.error('SmartRotom integration failed, continuing without it:', error);
         }
       }
+
+      const boffMediaUserData: CreateUserDto = {
+        email: data.email,
+        username: data.username,
+        password: data.password,
+        uuid: data.minecraft?.uuid,
+        googleId: data.google?.googleId,
+        profilePicture: data.google?.profilePicture
+      };
+
+      const boffMediaResult = await this.findOrCreateUser(boffMediaUserData);
 
       return {
         boffMediaUser: boffMediaResult.user,

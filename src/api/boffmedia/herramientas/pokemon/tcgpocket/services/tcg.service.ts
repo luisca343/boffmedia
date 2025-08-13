@@ -200,7 +200,7 @@ export class TcgService {
         throw new BadRequestException('User Name is required');
       }
       
-      const userId = await (await this.usersService.getUserByUsername(userName)).id.toString();
+      const userId = await (await this.usersService.getUserByUsername(userName)).id;
 
       const userCards = await this.tcgRepository.getUserCards(userId);
       
@@ -273,9 +273,9 @@ export class TcgService {
     }
   }
 
-  async updateUserCardQuantity(userId: string, cardId: string, updateDto: UpdateUserCardQuantityDto): Promise<{ success: boolean; message: string }> {
+  async updateUserCardQuantity(userId: number, cardId: string, updateDto: UpdateUserCardQuantityDto): Promise<{ success: boolean; message: string }> {
     try {
-      if (!userId || userId.trim().length === 0) {
+      if (!userId) {
         throw new BadRequestException('User ID is required');
       }
       if (!cardId || cardId.trim().length === 0) {
@@ -314,9 +314,9 @@ export class TcgService {
     }
   }
 
-  async removeUserCard(userId: string, cardId: string): Promise<{ success: boolean; message: string }> {
+  async removeUserCard(userId: number, cardId: string): Promise<{ success: boolean; message: string }> {
     try {
-      if (!userId || userId.trim().length === 0) {
+      if (!userId) {
         throw new BadRequestException('User ID is required');
       }
       if (!cardId || cardId.trim().length === 0) {
@@ -345,9 +345,9 @@ export class TcgService {
     }
   }
 
-  async getUserCardHistory(userId: string): Promise<any[]> {
+  async getUserCardHistory(userId: number): Promise<any[]> {
     try {
-      if (!userId || userId.trim().length === 0) {
+      if (!userId) {
         throw new BadRequestException('User ID is required');
       }
 

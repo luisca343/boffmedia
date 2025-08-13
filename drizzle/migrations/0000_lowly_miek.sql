@@ -449,24 +449,24 @@ CREATE TABLE `tcg_sets` (
 	CONSTRAINT `tcg_sets_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `user_card_history` (
+CREATE TABLE `tcg_user_card_history` (
 	`id` varchar(32) NOT NULL,
-	`user_id` varchar(32) NOT NULL,
+	`user_id` int NOT NULL,
 	`card_id` varchar(32) NOT NULL,
 	`quantity_change` int NOT NULL,
 	`date` datetime NOT NULL,
-	CONSTRAINT `user_card_history_id` PRIMARY KEY(`id`)
+	CONSTRAINT `tcg_user_card_history_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
-CREATE TABLE `user_cards` (
+CREATE TABLE `tcg_user_cards` (
 	`id` varchar(32) NOT NULL,
-	`user_id` varchar(32) NOT NULL,
+	`user_id` int NOT NULL,
 	`card_id` varchar(32) NOT NULL,
 	`quantity` int NOT NULL DEFAULT 1,
 	`acquired_date` datetime NOT NULL,
 	`created_at` datetime NOT NULL,
 	`updated_at` datetime NOT NULL,
-	CONSTRAINT `user_cards_id` PRIMARY KEY(`id`)
+	CONSTRAINT `tcg_user_cards_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
 CREATE TABLE `wingull_invites` (

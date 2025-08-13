@@ -48,15 +48,15 @@ export class TcgFacadeService {
     return this.tcgService.addUserCard(addUserCardDto);
   }
 
-  async updateUserCardQuantity(userId: string, cardId: string, updateDto: UpdateUserCardQuantityDto) {
+  async updateUserCardQuantity(userId: number, cardId: string, updateDto: UpdateUserCardQuantityDto) {
     return this.tcgService.updateUserCardQuantity(userId, cardId, updateDto);
   }
 
-  async removeUserCard(userId: string, cardId: string) {
+  async removeUserCard(userId: number, cardId: string) {
     return this.tcgService.removeUserCard(userId, cardId);
   }
 
-  async getUserCardHistory(userId: string) {
+  async getUserCardHistory(userId: number) {
     return this.tcgService.getUserCardHistory(userId);
   }
 

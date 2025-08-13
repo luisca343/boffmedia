@@ -23,11 +23,11 @@ export interface ITcgRepository {
   checkExistingCards(setId: string): Promise<any[]>;
 
   // ==================== USER CARDS OPERATIONS ====================
-  getUserCards(userId: string): Promise<UserCard[]>;
-  getUserCard(userId: string, cardId: string): Promise<UserCard | null>;
-  addUserCard(userId: string, cardId: string, quantity: number): Promise<void>;
-  updateUserCardQuantity(userId: string, cardId: string, quantity: number): Promise<void>;
-  removeUserCard(userId: string, cardId: string): Promise<void>;
-  getUserCardHistory(userId: string): Promise<UserCardHistory[]>;
-  addUserCardHistory(userId: string, cardId: string, quantityChange: number): Promise<void>;
+  getUserCards(userId: number): Promise<UserCard[]>;
+  getUserCard(userId: number, cardId: string): Promise<UserCard | null>;
+  addUserCard(userId: number, cardId: string, quantity: number): Promise<void>;
+  updateUserCardQuantity(userId: number, cardId: string, quantity: number): Promise<void>;
+  removeUserCard(userId: number, cardId: string): Promise<void>;
+  getUserCardHistory(userId: number): Promise<UserCardHistory[]>;
+  addUserCardHistory(userId: number, cardId: string, quantityChange: number): Promise<void>;
 }

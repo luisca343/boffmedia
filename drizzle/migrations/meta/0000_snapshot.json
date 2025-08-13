@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "11e808e5-eb8e-4541-8d68-4700c6a60b48",
+  "id": "e90b87e1-e00a-4cae-a77b-7e1c2b0e2477",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "boffmedia_roles": {
@@ -39,7 +39,8 @@
             "name"
           ]
         }
-      }
+      },
+      "checkConstraint": {}
     },
     "boffmedia_user_roles": {
       "name": "boffmedia_user_roles",
@@ -103,7 +104,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_users": {
       "name": "boffmedia_users",
@@ -239,7 +241,8 @@
             "twitchId"
           ]
         }
-      }
+      },
+      "checkConstraint": {}
     },
     "boffmedia_achievements": {
       "name": "boffmedia_achievements",
@@ -396,7 +399,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_event_participants": {
       "name": "boffmedia_event_participants",
@@ -506,7 +510,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_event_team_members": {
       "name": "boffmedia_event_team_members",
@@ -597,7 +602,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_event_teams": {
       "name": "boffmedia_event_teams",
@@ -710,7 +716,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_events": {
       "name": "boffmedia_events",
@@ -871,7 +878,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_games": {
       "name": "boffmedia_games",
@@ -939,7 +947,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_participant_progress": {
       "name": "boffmedia_participant_progress",
@@ -1051,7 +1060,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "boffmedia_participants": {
       "name": "boffmedia_participants",
@@ -1133,7 +1143,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "discord_users": {
       "name": "discord_users",
@@ -1200,7 +1211,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "ficus_quotes": {
       "name": "ficus_quotes",
@@ -1280,7 +1292,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "ficus_messages": {
       "name": "ficus_messages",
@@ -1340,7 +1353,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "sharex_images": {
       "name": "sharex_images",
@@ -1399,7 +1413,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_achievements": {
       "name": "rotom_achievements",
@@ -1473,7 +1488,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_arcade_streaks": {
       "name": "rotom_arcade_streaks",
@@ -1533,7 +1549,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_arceuspeak": {
       "name": "rotom_arceuspeak",
@@ -1577,7 +1594,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_inventory": {
       "name": "rotom_inventory",
@@ -1674,7 +1692,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_replays": {
       "name": "rotom_replays",
@@ -1755,7 +1774,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_user_achievements": {
       "name": "rotom_user_achievements",
@@ -1844,7 +1864,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_user_replays": {
       "name": "rotom_user_replays",
@@ -1910,7 +1931,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_apps": {
       "name": "rotom_apps",
@@ -1955,7 +1977,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_user_apps": {
       "name": "rotom_user_apps",
@@ -2013,7 +2036,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_users": {
       "name": "rotom_users",
@@ -2080,7 +2104,8 @@
             "uuid"
           ]
         }
-      }
+      },
+      "checkConstraint": {}
     },
     "rotom_chat_message_reads": {
       "name": "rotom_chat_message_reads",
@@ -2130,7 +2155,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_chat_messages": {
       "name": "rotom_chat_messages",
@@ -2217,7 +2243,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_chat_users": {
       "name": "rotom_chat_users",
@@ -2267,7 +2294,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_chats": {
       "name": "rotom_chats",
@@ -2333,7 +2361,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_documents": {
       "name": "rotom_documents",
@@ -2391,7 +2420,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_documents_users": {
       "name": "rotom_documents_users",
@@ -2441,7 +2471,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_news": {
       "name": "rotom_news",
@@ -2543,7 +2574,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_mine_games": {
       "name": "rotom_mine_games",
@@ -2595,7 +2627,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_mine_games_detail": {
       "name": "rotom_mine_games_detail",
@@ -2666,7 +2699,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_mine_rewards": {
       "name": "rotom_mine_rewards",
@@ -2731,7 +2765,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_pokedex": {
       "name": "rotom_pokedex",
@@ -2811,7 +2846,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_bank_accounts": {
       "name": "rotom_bank_accounts",
@@ -2856,7 +2892,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_bank_transactions": {
       "name": "rotom_bank_transactions",
@@ -2962,7 +2999,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "rotom_bank_users_accounts": {
       "name": "rotom_bank_users_accounts",
@@ -3012,7 +3050,8 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "tcg_cards": {
       "name": "tcg_cards",
@@ -3182,7 +3221,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "tcg_series": {
       "name": "tcg_series",
@@ -3233,7 +3273,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "tcg_sets": {
       "name": "tcg_sets",
@@ -3319,10 +3360,11 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
-    "user_card_history": {
-      "name": "user_card_history",
+    "tcg_user_card_history": {
+      "name": "tcg_user_card_history",
       "columns": {
         "id": {
           "name": "id",
@@ -3333,7 +3375,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "varchar(32)",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -3363,17 +3405,18 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "user_card_history_id": {
-          "name": "user_card_history_id",
+        "tcg_user_card_history_id": {
+          "name": "tcg_user_card_history_id",
           "columns": [
             "id"
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
-    "user_cards": {
-      "name": "user_cards",
+    "tcg_user_cards": {
+      "name": "tcg_user_cards",
       "columns": {
         "id": {
           "name": "id",
@@ -3384,7 +3427,7 @@
         },
         "user_id": {
           "name": "user_id",
-          "type": "varchar(32)",
+          "type": "int",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -3429,8 +3472,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "user_cards_id": {
-          "name": "user_cards_id",
+        "tcg_user_cards_id": {
+          "name": "tcg_user_cards_id",
           "columns": [
             "id"
           ]
@@ -3443,7 +3486,8 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     },
     "wingull_invites": {
       "name": "wingull_invites",
@@ -3502,9 +3546,11 @@
           ]
         }
       },
-      "uniqueConstraints": {}
+      "uniqueConstraints": {},
+      "checkConstraint": {}
     }
   },
+  "views": {},
   "_meta": {
     "schemas": {},
     "tables": {},

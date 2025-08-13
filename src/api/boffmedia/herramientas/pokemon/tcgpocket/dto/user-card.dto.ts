@@ -2,9 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNumber, IsPositive, Min } from 'class-validator';
 
 export class AddUserCardDto {
-  @ApiProperty({ description: 'User ID', example: 'user123' })
-  @IsString()
-  userId: string;
+  @ApiProperty({ description: 'User ID', example: 123 })
+  @IsNumber()
+  @IsPositive()
+  userId: number;
 
   @ApiProperty({ description: 'Card ID', example: 'tcgp-A1-001' })
   @IsString()

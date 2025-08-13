@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   async login(fullUser: any) {
-    const user = fullUser.sessionUser;
+    const user = fullUser.sessionUser || fullUser;
     const payload = {
       username: user.name,
       sub: user.id,

@@ -29,7 +29,7 @@ import { MisionesFacadeService } from './misiones.facade.service';
 import { GetQuestsDto } from './dto/get-quests.dto';
 import { GetUserQuestsDto } from './dto/get-user-quests.dto';
 import { UpdateNPCsDto } from './dto/update-npcs.dto';
-import { UploadImageDto } from './dto/upload-image.dto';
+import { UploadNpcImageDto } from './dto/upload-image.dto';
 import { CheckImageDto } from './dto/check-image.dto';
 
 // Import Response Entities
@@ -181,8 +181,8 @@ export class MisionesController {
   })
   @ApiBadRequestResponse({ description: 'Invalid image data or format.' })
   @ApiInternalServerErrorResponse({ description: 'Failed to upload image.' })
-  @ApiBody({ type: UploadImageDto })
-  async uploadCustomNPCImage(@Body() uploadImageDto: UploadImageDto) {
+  @ApiBody({ type: UploadNpcImageDto })
+  async uploadCustomNPCImage(@Body() uploadImageDto: UploadNpcImageDto) {
     return await this.misionesFacadeService.uploadNPCImage(uploadImageDto);
   }
 

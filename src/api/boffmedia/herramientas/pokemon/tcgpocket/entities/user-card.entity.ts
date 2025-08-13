@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserCard {
-  @ApiProperty({ example: 'user123_tcgp-A1-001', description: 'User card ID' })
+  @ApiProperty({ example: '123_tcgp-A1-001', description: 'User card ID' })
   id: string;
 
-  @ApiProperty({ example: 'user123', description: 'User ID' })
-  userId: string;
+  @ApiProperty({ example: 123, description: 'User ID' })
+  userId: number;
 
   @ApiProperty({ example: 'tcgp-A1-001', description: 'Card ID' })
   cardId: string;
@@ -30,11 +30,11 @@ export class UserCard {
 }
 
 export class UserCardHistory {
-  @ApiProperty({ example: 'user123_tcgp-A1-001_1735200000000', description: 'History entry ID' })
+  @ApiProperty({ example: '123_tcgp-A1-001_1735200000000', description: 'History entry ID' })
   id: string;
 
-  @ApiProperty({ example: 'user123', description: 'User ID' })
-  userId: string;
+  @ApiProperty({ example: 123, description: 'User ID' })
+  userId: number;
 
   @ApiProperty({ example: 'tcgp-A1-001', description: 'Card ID' })
   cardId: string;

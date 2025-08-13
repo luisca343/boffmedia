@@ -41,7 +41,7 @@ export class DocumentsController {
 
   // ==================== DOCUMENT ENDPOINTS ====================
 
-  @Get(':id')
+  @Get('document/:id')
   @ApiOperation({ summary: 'Get a document by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Document retrieved successfully.', type: Document })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Document not found.' })
@@ -289,6 +289,8 @@ export class DocumentsController {
       buttonText: updateNewsDto.buttonText,
       imageUrl: updateNewsDto.imageUrl
     };
+
+    
     return await this.documentsFacadeService.updateNews(newsIdNum, updateNewsRequest);
   }
 

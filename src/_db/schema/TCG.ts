@@ -54,9 +54,9 @@ export const tcgCards = mysqlTable("tcg_cards", {
 
 export type TcgCard = typeof tcgCards.$inferSelect;
 
-export const userCards = mysqlTable("user_cards", {
+export const userCards = mysqlTable("tcg_user_cards", {
   id: varchar("id", { length: 32 }).primaryKey(),
-  user_id: varchar("user_id", { length: 32 }).notNull(),
+  user_id: int("user_id").notNull(),
   card_id: varchar("card_id", { length: 32 }).notNull(),
   quantity: int("quantity").default(1).notNull(),
   acquired_date: datetime("acquired_date").notNull(),
@@ -71,9 +71,9 @@ export const userCards = mysqlTable("user_cards", {
 
 export type UserCard = typeof userCards.$inferSelect;
 
-export const userCardHistory = mysqlTable("user_card_history", {
+export const userCardHistory = mysqlTable("tcg_user_card_history", {
   id: varchar("id", { length: 32 }).primaryKey(),
-  user_id: varchar("user_id", { length: 32 }).notNull(),
+  user_id: int("user_id").notNull(),
   card_id: varchar("card_id", { length: 32 }).notNull(),
   quantity_change: int("quantity_change").notNull(), // +/- amount
   date: datetime("date").notNull(),
