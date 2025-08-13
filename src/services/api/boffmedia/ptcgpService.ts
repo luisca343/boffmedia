@@ -9,7 +9,7 @@ import type {
 
 // User cards DTOs
 interface AddUserCardDto {
-  userId: string;
+  userId: number;
   cardId: string;
   quantity?: number;
   variant?: string;
@@ -159,21 +159,21 @@ export class PtcgpService {
   /**
    * Update user card quantity
    */
-  static updateUserCardQuantity(userId: string, cardId: string, data: UpdateUserCardQuantityDto) {
+  static updateUserCardQuantity(userId: number, cardId: string, data: UpdateUserCardQuantityDto) {
     return apiPUT<SuccessResponse>(`/tools/ptcgp/users/${userId}/cards/${cardId}`, data);
   }
 
   /**
    * Remove card from user collection
    */
-  static removeUserCard(userId: string, cardId: string) {
+  static removeUserCard(userId: number, cardId: string) {
     return apiDELETE<SuccessResponse>(`/tools/ptcgp/users/${userId}/cards/${cardId}`);
   }
 
   /**
    * Get user card history
    */
-  static getUserCardHistory(userId: string) {
+  static getUserCardHistory(userId: number) {
     return apiGET<UserCardHistoryEntity[]>(`/tools/ptcgp/users/${userId}/cards/history`);
   }
 

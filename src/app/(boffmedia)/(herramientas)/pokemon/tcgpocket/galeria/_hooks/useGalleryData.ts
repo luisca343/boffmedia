@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { PtcgpService } from '@/services/api/boffmedia/ptcgpService'
 import { toast } from 'react-toastify'
-import { TcgCard } from '@/generated/api'
+import { BoffMediaUserEntity, TcgCard } from '@/generated/api'
 import { useLocale } from 'next-intl'
+import { UsersService } from '@/services/api/boffmedia/usersService'
 
 interface Card {
   expansion: string
@@ -12,6 +13,7 @@ interface Card {
 }
 
 export function useGalleryData(username: string) {
+  const [user, setUser] = useState<BoffMediaUserEntity | null>(null)
   const [allCards, setAllCards] = useState<TcgCard[]>([])
   const [userCards, setUserCards] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
@@ -26,15 +28,17 @@ export function useGalleryData(username: string) {
   const fetchData = async () => {
     try {
       setLoading(true)
-      const [allCardsResponse, userCardsResponse] = await Promise.all([
+      const [userResponse, allCardsResponse, userCardsResponse] = await Promise.all([
+        UsersService.getUserByUsername(username),
         PtcgpService.getAllCardsForSeries('tcgp', locale),
         PtcgpService.getUserCards(username),
       ])
 
+      const userData = userResponse.data
       const allCardsData = allCardsResponse.data
       const userCardsData = userCardsResponse.data
 
-      if(!allCardsData || !userCardsData) return  
+      if(!allCardsData || !userCardsData || !userData) return  
       
       const filteredCards = allCardsData.filter(card => card !== null)
       setAllCards(filteredCards)
@@ -45,7 +49,7 @@ export function useGalleryData(username: string) {
       }, {})
 
 
-      
+      setUser(userData)
       setUserCards(userCardsMap)
       setError(null)
     } catch (error) {
@@ -60,7 +64,7 @@ export function useGalleryData(username: string) {
     try {
       // Convert updates to the format expected by the service
       const cardUpdates = updates.map(update => ({
-        userId: username,
+        userId: user?.id!,
         cardId: update.cardId,
         quantity: Math.max(0, (userCards[update.cardId] || 0) + update.change)
       }))
