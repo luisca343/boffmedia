@@ -88,7 +88,6 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
             <Button 
               onClick={() => router.push(tool.href)}
               size="lg"
-              className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-semibold px-8 py-3 shadow-lg hover:shadow-xl transition-all duration-300"
             >
               {t("accessButton", { tool: tool.title })} 
               <ArrowRight className="ml-2 h-5 w-5" />

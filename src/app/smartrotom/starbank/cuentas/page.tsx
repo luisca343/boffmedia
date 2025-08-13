@@ -45,7 +45,7 @@ export default function Cuentas() {
   // Calculate account statistics
   const totalBalance = accounts?.reduce((sum: number, account: any) => sum + account.balance, 0) || 0;
   const primaryAccounts = accounts?.filter((acc: any) => acc.type === "MAIN") || [];
-  const secondaryAccounts = accounts?.filter((acc: any) => acc.type === "SECONDARY") || [];
+  const blueAccounts = accounts?.filter((acc: any) => acc.type === "blue") || [];
 
   // Check if user already has a MAIN account
   const hasMainAccount = primaryAccounts.length > 0;
@@ -89,8 +89,8 @@ export default function Cuentas() {
         <BankSection className="md:col-span-3">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-secondary-900">Mis Cuentas</h1>
-              <p className="text-secondary-600">Administra tus cuentas bancarias</p>
+              <h1 className="text-2xl font-bold text-blue-900">Mis Cuentas</h1>
+              <p className="text-blue-600">Administra tus cuentas bancarias</p>
             </div>
             
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -111,9 +111,9 @@ export default function Cuentas() {
                 
                 <div className="space-y-4 py-4">
                   {/* Info Alert */}
-                  <div className="bg-secondary-50 border border-secondary-200 rounded-md p-3 flex">
-                    <InformationCircleIcon className="h-5 w-5 text-secondary-500 flex-shrink-0 mr-2" />
-                    <p className="text-sm text-secondary-700">
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3 flex">
+                    <InformationCircleIcon className="h-5 w-5 text-blue-500 flex-shrink-0 mr-2" />
+                    <p className="text-sm text-blue-700">
                       Las cuentas secundarias te permiten organizar tu dinero para diferentes propósitos como ahorros, gastos diarios, viajes, etc.
                     </p>
                   </div>
@@ -129,11 +129,11 @@ export default function Cuentas() {
                     />
                   </div>
                   
-                  <div className="flex items-center p-3 rounded-lg border border-secondary-200 bg-secondary-50">
-                    <BanknotesIcon className="h-8 w-8 text-secondary-700 mr-3" />
+                  <div className="flex items-center p-3 rounded-lg border border-blue-200 bg-blue-50">
+                    <BanknotesIcon className="h-8 w-8 text-blue-700 mr-3" />
                     <div>
-                      <h4 className="font-medium text-secondary-900">Cuenta Secundaria</h4>
-                      <p className="text-xs text-secondary-600">
+                      <h4 className="font-medium text-blue-900">Cuenta Secundaria</h4>
+                      <p className="text-xs text-blue-600">
                         Ideal para ahorrar o separar fondos para fines específicos
                       </p>
                     </div>
@@ -145,7 +145,7 @@ export default function Cuentas() {
                     variant="outline"
                     onClick={() => setIsDialogOpen(false)}
                     disabled={isCreating}
-                    className="border-secondary-200"
+                    className="border-blue-200"
                   >
                     Cancelar
                   </Button>
@@ -184,7 +184,7 @@ export default function Cuentas() {
         
         <SummaryCard 
           title="Cuentas Secundarias"
-          value={`${secondaryAccounts.length} ${secondaryAccounts.length === 1 ? 'cuenta' : 'cuentas'}`}
+          value={`${blueAccounts.length} ${blueAccounts.length === 1 ? 'cuenta' : 'cuentas'}`}
           icon={<BanknotesIcon className="h-6 w-6" />}
           className="md:col-span-1"
         />
@@ -192,7 +192,7 @@ export default function Cuentas() {
 
       {/* Main Account Card */}
       {primaryAccounts.length > 0 && (
-        <BankSection className="bg-gradient-to-r from-secondary-800 to-secondary-600 text-white">
+        <BankSection className="bg-gradient-to-r from-blue-800 to-blue-600 text-white">
           <BankSectionHeader>Cuenta Principal</BankSectionHeader>
           <div className="p-4">
             <div className="flex items-center justify-between">
@@ -210,11 +210,11 @@ export default function Cuentas() {
                     {primaryAccounts[0].name}
                   </h3>
                   <div className="flex items-center">
-                    <p className="text-lg text-secondary-100">
+                    <p className="text-lg text-blue-100">
                       Balance: <span className="font-bold">{formatMoney(primaryAccounts[0].balance)}</span>
                     </p>
-                    <span className="mx-2 text-secondary-300">•</span>
-                    <p className="text-sm text-secondary-100">
+                    <span className="mx-2 text-blue-300">•</span>
+                    <p className="text-sm text-blue-100">
                       Cuenta Principal
                     </p>
                   </div>
@@ -223,10 +223,10 @@ export default function Cuentas() {
               
               <button
                 onClick={() => handleSelectAccount(primaryAccounts[0].id)}
-                className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 ${
+                className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                   activeAccount?.id === primaryAccounts[0].id
-                    ? "bg-white text-secondary-700"
-                    : "bg-secondary-700 text-white border border-secondary-300 hover:bg-secondary-800"
+                    ? "bg-white text-blue-700"
+                    : "bg-blue-700 text-white border border-blue-300 hover:bg-blue-800"
                 }`}
               >
                 {activeAccount?.id === primaryAccounts[0].id ? "Seleccionada" : "Seleccionar"}
@@ -236,7 +236,7 @@ export default function Cuentas() {
         </BankSection>
       )}
 
-      {/* Secondary Accounts List */}
+      {/* blue Accounts List */}
       <BankSection className="min-h-[400px]">
         <div className="flex justify-between items-center mb-4">
           <BankSectionHeader>Cuentas Secundarias</BankSectionHeader>
@@ -245,7 +245,7 @@ export default function Cuentas() {
               variant="ghost" 
               size="sm" 
               onClick={() => fetchAccounts(session)}
-              className="text-secondary-700 hover:text-secondary-900 flex items-center"
+              className="text-blue-700 hover:text-blue-900 flex items-center"
             >
               <ArrowPathIcon className="h-4 w-4 mr-1" />
               Actualizar
@@ -254,7 +254,7 @@ export default function Cuentas() {
               variant="outline" 
               size="sm" 
               onClick={() => setIsDialogOpen(true)}
-              className="text-secondary-700 border-secondary-200 hover:bg-secondary-50 flex items-center"
+              className="text-blue-700 border-blue-200 hover:bg-blue-50 flex items-center"
             >
               <PlusCircleIcon className="h-4 w-4 mr-1" />
               Agregar
@@ -263,16 +263,16 @@ export default function Cuentas() {
         </div>
         
         <AccountsList 
-          accounts={secondaryAccounts} 
+          accounts={blueAccounts} 
           activeAccount={activeAccount} 
           onSelect={handleSelectAccount} 
         />
         
-        {secondaryAccounts.length === 0 && (
-          <div className="py-12 flex flex-col items-center justify-center text-center bg-secondary-50 rounded-lg border border-dashed border-secondary-200">
-            <BanknotesIcon className="h-12 w-12 text-secondary-300 mb-3" />
-            <h3 className="text-lg font-medium text-secondary-800 mb-1">No tienes cuentas secundarias</h3>
-            <p className="text-sm text-secondary-600 max-w-md mb-4">
+        {blueAccounts.length === 0 && (
+          <div className="py-12 flex flex-col items-center justify-center text-center bg-blue-50 rounded-lg border border-dashed border-blue-200">
+            <BanknotesIcon className="h-12 w-12 text-blue-300 mb-3" />
+            <h3 className="text-lg font-medium text-blue-800 mb-1">No tienes cuentas secundarias</h3>
+            <p className="text-sm text-blue-600 max-w-md mb-4">
               Crea cuentas secundarias para organizar tu dinero según tus necesidades.
             </p>
             <BankSectionButton
@@ -303,11 +303,11 @@ function AccountsList({
   }
 
   return (
-    <div className="divide-y divide-secondary-100 rounded-md border border-secondary-200 overflow-hidden bg-white">
+    <div className="divide-y divide-blue-100 rounded-md border border-blue-200 overflow-hidden bg-white">
       {accounts.map((account: any) => (
         <div
           key={account.id}
-          className="p-4 hover:bg-secondary-50 transition duration-150 ease-in-out"
+          className="p-4 hover:bg-blue-50 transition duration-150 ease-in-out"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -315,15 +315,15 @@ function AccountsList({
                 <AccountImage type={account.type} name={account.name} width={56} height={56} />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-secondary-950">
+                <h3 className="text-lg font-medium text-blue-950">
                   {account.name}
                 </h3>
                 <div className="flex items-center">
-                  <p className="text-sm text-secondary-700">
+                  <p className="text-sm text-blue-700">
                     Balance: <span className="font-semibold">{formatMoney(account.balance)}</span>
                   </p>
-                  <span className="mx-2 text-secondary-300">•</span>
-                  <p className="text-xs text-secondary-500">
+                  <span className="mx-2 text-blue-300">•</span>
+                  <p className="text-xs text-blue-500">
                     Cuenta Secundaria
                   </p>
                 </div>
@@ -332,10 +332,10 @@ function AccountsList({
             
             <button
               onClick={() => onSelect(account.id)}
-              className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 ${
+              className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${
                 activeAccount?.id === account.id
-                  ? "bg-secondary-700 text-white"
-                  : "bg-secondary-100 text-secondary-700 hover:bg-secondary-200"
+                  ? "bg-blue-700 text-white"
+                  : "bg-blue-100 text-blue-700 hover:bg-blue-200"
               }`}
             >
               {activeAccount?.id === account.id ? "Seleccionada" : "Seleccionar"}

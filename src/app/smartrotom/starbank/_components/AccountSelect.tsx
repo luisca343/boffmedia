@@ -29,7 +29,7 @@ export function AccountSelect({accounts, activeAccount, setActiveAccount, id, cl
             <SelectValue placeholder={getCurrentAccount()} />
         </SelectTrigger>
         <SelectContent>
-            <Input type="text" placeholder="Buscar cuenta" onChange={(e) => setFilter(e.target.value.toLowerCase())} value={filter} id={id} variant="wingull" className="hover:bg-secondary-400/30"/>
+            <Input type="text" placeholder="Buscar cuenta" onChange={(e) => setFilter(e.target.value.toLowerCase())} value={filter} id={id} variant="wingull" className="hover:bg-blue-400/30"/>
             {filteredAccounts.map((account: any) => (
                 <SelectItem key={account.id} value={account.id}>
                     {getAccount(accounts.indexOf(account))}

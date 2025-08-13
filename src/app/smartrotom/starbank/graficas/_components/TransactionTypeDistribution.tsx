@@ -81,7 +81,7 @@ export default function TransactionTypeDistribution({
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-white p-3 border border-secondary-200 rounded shadow">
+                    <div className="bg-white p-3 border border-blue-200 rounded shadow">
                       <p className="font-medium">{`Tipo: ${label.charAt(0) + label.slice(1).toLowerCase()}`}</p>
                       <p className="text-highlight-700">{`Ingresos: ${formatMoney(data.income)}`}</p>
                       <p className="text-red-700">{`Gastos: ${formatMoney(data.expense)}`}</p>
@@ -98,8 +98,8 @@ export default function TransactionTypeDistribution({
           </BarChart>
         </ResponsiveContainer>
       ) : (
-        <div className="flex items-center justify-center h-full bg-secondary-50 rounded-lg">
-          <p className="text-secondary-800">No hay suficientes datos para mostrar el gráfico</p>
+        <div className="flex items-center justify-center h-full bg-blue-50 rounded-lg">
+          <p className="text-blue-800">No hay suficientes datos para mostrar el gráfico</p>
         </div>
       )}
       

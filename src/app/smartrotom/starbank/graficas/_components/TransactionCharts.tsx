@@ -124,9 +124,9 @@ export default function TransactionCharts({
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="bg-white p-3 border border-secondary-200 rounded shadow">
+                      <div className="bg-white p-3 border border-blue-200 rounded shadow">
                         <p className="font-medium">{`Fecha: ${label}`}</p>
-                        <p className="text-secondary-700">{`Balance: ${formatMoney(data.balance)}`}</p>
+                        <p className="text-blue-700">{`Balance: ${formatMoney(data.balance)}`}</p>
                         <p className="text-sm text-surface-600">{`Concepto: ${data.concept}`}</p>
                         <p className="text-sm text-surface-600">{`Tipo: ${data.type}`}</p>
                       </div>
@@ -147,8 +147,8 @@ export default function TransactionCharts({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex items-center justify-center h-full bg-secondary-50 rounded-lg">
-            <p className="text-secondary-800">No hay suficientes datos para mostrar el gráfico</p>
+          <div className="flex items-center justify-center h-full bg-blue-50 rounded-lg">
+            <p className="text-blue-800">No hay suficientes datos para mostrar el gráfico</p>
           </div>
         )}
       </div>
@@ -187,7 +187,7 @@ export default function TransactionCharts({
           </div>
           
           <div className="w-full md:w-2/5 p-6">
-            <h3 className="text-lg font-semibold mb-4 text-secondary-900">Resumen Financiero</h3>
+            <h3 className="text-lg font-semibold mb-4 text-blue-900">Resumen Financiero</h3>
             
             <div className="space-y-4">
               <div className="bg-highlight-50 p-4 rounded-lg">
@@ -200,8 +200,8 @@ export default function TransactionCharts({
                 <div className="text-2xl font-bold text-red-700">{formatMoney(totalExpense)}</div>
               </div>
               
-              <div className="bg-secondary-50 p-4 rounded-lg">
-                <div className="text-sm text-secondary-600 mb-1">Balance Neto</div>
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="text-sm text-blue-600 mb-1">Balance Neto</div>
                 <div className={`text-2xl font-bold ${totalIncome - totalExpense >= 0 ? 'text-highlight-700' : 'text-red-700'}`}>
                   {formatMoney(totalIncome - totalExpense)}
                 </div>
@@ -210,8 +210,8 @@ export default function TransactionCharts({
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-full bg-secondary-50 rounded-lg">
-          <p className="text-secondary-800">No hay suficientes datos para mostrar el gráfico</p>
+        <div className="flex items-center justify-center h-full bg-blue-50 rounded-lg">
+          <p className="text-blue-800">No hay suficientes datos para mostrar el gráfico</p>
         </div>
       )}
     </div>

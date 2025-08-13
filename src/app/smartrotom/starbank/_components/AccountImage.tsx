@@ -21,7 +21,7 @@ export function AccountImage({type, name, width=48, height=48}: {type: string, n
 }
 
 function getImageURL(type: string, name: string) {
-    if (type === "SECONDARY") {
+    if (type === "blue") {
         return `/smartrotom/img/apps/starbank/cuentas/${name.toLowerCase()}.png`;
     } else {
         return `https://minotar.net/avatar/${name}/80.png`;

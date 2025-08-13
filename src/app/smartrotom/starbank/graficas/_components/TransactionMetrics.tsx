@@ -30,10 +30,10 @@ export default function TransactionMetrics({ metrics, accountName }: MetricsProp
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Income card */}
-      <div className="bg-white rounded-lg border border-secondary-200 p-5 shadow-sm">
+      <div className="bg-white rounded-lg border border-blue-200 p-5 shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-sm text-secondary-600 font-medium">Ingresos Totales</p>
+            <p className="text-sm text-blue-600 font-medium">Ingresos Totales</p>
             <p className="text-2xl font-bold text-highlight-600 mt-1">
               {formatMoney(totalIncome)}
             </p>
@@ -46,10 +46,10 @@ export default function TransactionMetrics({ metrics, accountName }: MetricsProp
       </div>
 
       {/* Expenses card */}
-      <div className="bg-white rounded-lg border border-secondary-200 p-5 shadow-sm">
+      <div className="bg-white rounded-lg border border-blue-200 p-5 shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-sm text-secondary-600 font-medium">Gastos Totales</p>
+            <p className="text-sm text-blue-600 font-medium">Gastos Totales</p>
             <p className="text-2xl font-bold text-red-600 mt-1">
               {formatMoney(totalExpenses)}
             </p>
@@ -62,10 +62,10 @@ export default function TransactionMetrics({ metrics, accountName }: MetricsProp
       </div>
 
       {/* Net Balance card */}
-      <div className="bg-white rounded-lg border border-secondary-200 p-5 shadow-sm">
+      <div className="bg-white rounded-lg border border-blue-200 p-5 shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-sm text-secondary-600 font-medium">Balance Neto</p>
+            <p className="text-sm text-blue-600 font-medium">Balance Neto</p>
             <p className={`text-2xl font-bold mt-1 ${netBalance >= 0 ? 'text-highlight-600' : 'text-red-600'}`}>
               {formatMoney(netBalance)}
             </p>
@@ -78,15 +78,15 @@ export default function TransactionMetrics({ metrics, accountName }: MetricsProp
       </div>
 
       {/* Average Transaction card */}
-      <div className="bg-white rounded-lg border border-secondary-200 p-5 shadow-sm">
+      <div className="bg-white rounded-lg border border-blue-200 p-5 shadow-sm">
         <div className="flex justify-between items-start">
           <div>
-            <p className="text-sm text-secondary-600 font-medium">Transacción Promedio</p>
-            <p className="text-2xl font-bold text-secondary-700 mt-1">
+            <p className="text-sm text-blue-600 font-medium">Transacción Promedio</p>
+            <p className="text-2xl font-bold text-blue-700 mt-1">
               {formatMoney(averageTransaction)}
             </p>
           </div>
-          <div className="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-600">
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
             <BarChart2 className="h-6 w-6" />
           </div>
         </div>

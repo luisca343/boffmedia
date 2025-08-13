@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 
 export default function CameraApp() {
   return (
-    <div className="flex flex-col h-screen bg-black bg-opacity-20 text-white">
+    <div className="flex flex-col h-full bg-black bg-opacity-20 text-white">
       {/* Camera View Area */}
       <div className="flex-1 relative">
         {/* Transparent background for camera view */}

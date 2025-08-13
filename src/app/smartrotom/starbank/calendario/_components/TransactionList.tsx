@@ -16,9 +16,9 @@ export function TransactionList({ transactions, onSelectTransaction }: Transacti
   if (transactions.length === 0) {
     return (
       <div className="h-[550px] flex flex-col items-center justify-center text-center">
-        <CalendarIcon className="h-12 w-12 text-secondary-200 mb-4" />
-        <h3 className="text-lg font-medium text-secondary-900">No hay transacciones</h3>
-        <p className="text-secondary-600 mt-1">
+        <CalendarIcon className="h-12 w-12 text-blue-200 mb-4" />
+        <h3 className="text-lg font-medium text-blue-900">No hay transacciones</h3>
+        <p className="text-blue-600 mt-1">
           No hay transacciones registradas para esta fecha
         </p>
       </div>
@@ -31,7 +31,7 @@ export function TransactionList({ transactions, onSelectTransaction }: Transacti
         {transactions.map((transaction, index) => (
           <Card 
             key={index} 
-            className="p-4 cursor-pointer hover:bg-secondary-50 transition-colors"
+            className="p-4 cursor-pointer hover:bg-blue-50 transition-colors"
             onClick={() => onSelectTransaction(transaction)}
             variant="wingull"
           >

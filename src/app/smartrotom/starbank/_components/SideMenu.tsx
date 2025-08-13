@@ -89,7 +89,7 @@ const MenuItem = ({ isOpened, i, item: { text, Icon, url }, className }: { isOpe
   return (
     <InternalLink href={url} className='z-20'>
       <motion.div 
-        className={`flex items-center text-secondary-100  hover:text-secondary-300 cursor-pointer ${className}`} 
+        className={`flex items-center text-blue-100  hover:text-blue-300 cursor-pointer ${className}`} 
         variants={menuIconVariants}
         custom={i}
         whileHover={{ scale: 1.1 }}
@@ -129,8 +129,8 @@ export const SideMenu = ({currentPage} : {currentPage: string}) => {
         onMouseOver={() => controls.start({ left: 'calc(100% - 2rem)' })}
         onMouseOut={() => !isOpened && controls.start({ left: 'calc(100% - 6rem)' })} 
       >
-        <div className="h-full w-full bg-secondary-950 flex flex-col  relative z-10">
-          <div className="w-full bg-secondary-950 h-20  text-secondary-100 font-bold italic pointer-events-none flex items-center justify-center">
+        <div className="h-full w-full bg-blue-900 flex flex-col  relative z-10">
+          <div className="w-full bg-blue-900 h-20  text-blue-100 font-bold italic pointer-events-none flex items-center justify-center">
             <div className="bg-surface-50 min-w-12 h-12 rounded-full text-center text-9xl flex items-center mx-2">
               <img src="/smartrotom/img/apps/starbank.webp" alt="logo" className="h-12 w-12" />
             </div>
@@ -154,7 +154,7 @@ export const SideMenu = ({currentPage} : {currentPage: string}) => {
           {items.map((item, i) => {
             if (!item.text) return (
               <motion.div 
-                className={`line ${currentPage === item.id && 'bg-secondary-100'}`}
+                className={`line ${currentPage === item.id && 'bg-blue-100'}`}
                 key={i}
                 animate={{ 
                   width: isOpened ? '75%' : '60%',
@@ -168,7 +168,7 @@ export const SideMenu = ({currentPage} : {currentPage: string}) => {
                 item={{ text: item.text.toString(), Icon: item.icon, url: item.url}} 
                 i={i+1}
                 key={i} 
-                className={`${currentPage === item.id && 'bg-secondary-100 rounded-lg text-secondary-900 z-20'}`}
+                className={`${currentPage === item.id && 'bg-blue-100 rounded-lg text-blue-900 z-20'}`}
               />
             )
           })}
@@ -176,14 +176,14 @@ export const SideMenu = ({currentPage} : {currentPage: string}) => {
         </div>
     
         <motion.div 
-          className={`absolute h-14 w-14 top-24  bg-secondary-950 rounded-lg transform rotate-45 text-right pt-1 pr-1.5 text-xl z-10 cursor-pointer `}
+          className={`absolute h-14 w-14 top-24  bg-blue-950 rounded-lg transform rotate-45 text-right pt-1 pr-1.5 text-xl z-10 cursor-pointer `}
           animate={controls}
           initial={{ left: 'calc(100% - 6rem)' }}
           onClick={() => setIsOpened(!isOpened)}
         >
           <motion.div
             animate={{ rotate: isOpened ? 135 : -45, marginLeft: isOpened ? '0' : '0.5rem' }}
-          ><ChevronRightIcon strokeWidth={3} height={48} width={48} className='text-secondary-100'/></motion.div>
+          ><ChevronRightIcon strokeWidth={3} height={48} width={48} className='text-blue-100'/></motion.div>
         </motion.div>
       </motion.div>
     </aside>

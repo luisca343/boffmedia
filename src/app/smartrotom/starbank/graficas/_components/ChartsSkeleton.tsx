@@ -24,7 +24,7 @@ export function ChartsSkeleton() {
       {/* Metrics skeletons */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {Array(4).fill(0).map((_, i) => (
-          <div key={i} className="bg-white rounded-lg border border-secondary-200 p-5 shadow-sm">
+          <div key={i} className="bg-white rounded-lg border border-blue-200 p-5 shadow-sm">
             <div className="flex justify-between items-start">
               <div>
                 <Skeleton className="h-4 w-28 mb-3" />

@@ -15,11 +15,11 @@ export default function EnviarDinero() {
           <BankSection className="h-full">
             <BankSectionHeader>Enviar Dinero</BankSectionHeader>
             <div className="flex items-center mb-4">
-              <div className="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-600">
+              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
                 <BanknotesIcon className="h-6 w-6" />
               </div>
               <div className="ml-3">
-                <p className="text-sm text-secondary-600">
+                <p className="text-sm text-blue-600">
                   Transfiere dinero de forma segura a cualquier cuenta
                 </p>
               </div>
@@ -34,23 +34,23 @@ export default function EnviarDinero() {
         <div className="md:col-span-1">
           <div className="space-y-6">
             {/* Tips section */}
-            <BankSection className="bg-secondary-50">
+            <BankSection className="bg-blue-50">
               <BankSectionHeader>Tips de Transferencia</BankSectionHeader>
-              <ul className="space-y-3 text-sm text-secondary-700">
+              <ul className="space-y-3 text-sm text-blue-700">
                 <li className="flex items-start">
-                  <span className="mr-2 text-secondary-500">•</span>
+                  <span className="mr-2 text-blue-500">•</span>
                   <span>Verifica siempre el nombre del receptor</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 text-secondary-500">•</span>
+                  <span className="mr-2 text-blue-500">•</span>
                   <span>Confirma el monto antes de enviar</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 text-secondary-500">•</span>
+                  <span className="mr-2 text-blue-500">•</span>
                   <span>Las transferencias son instantáneas</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="mr-2 text-secondary-500">•</span>
+                  <span className="mr-2 text-blue-500">•</span>
                   <span>Mantén un historial de tus transferencias</span>
                 </li>
               </ul>
@@ -63,7 +63,7 @@ export default function EnviarDinero() {
                 onClick={() => setShowRecent(!showRecent)}
               >
                 <BankSectionHeader>Transferencias Recientes</BankSectionHeader>
-                <ArrowPathIcon className="h-5 w-5 text-secondary-600" />
+                <ArrowPathIcon className="h-5 w-5 text-blue-600" />
               </div>
               
               {showRecent && (
@@ -95,14 +95,14 @@ export default function EnviarDinero() {
 
 function RecentTransferItem({ name, amount, date }: { name: string; amount: string; date: string }) {
   return (
-    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-secondary-50">
+    <div className="flex items-center justify-between p-2 rounded-lg hover:bg-blue-50">
       <div className="flex items-center">
-        <div className="h-8 w-8 rounded-full bg-secondary-100 flex items-center justify-center text-secondary-600">
+        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
           {name[0]}
         </div>
         <div className="ml-3">
-          <p className="text-sm font-medium text-secondary-900">{name}</p>
-          <p className="text-xs text-secondary-500">{date}</p>
+          <p className="text-sm font-medium text-blue-900">{name}</p>
+          <p className="text-xs text-blue-500">{date}</p>
         </div>
       </div>
       <div className="text-sm font-medium text-red-600">{amount}</div>

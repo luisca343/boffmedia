@@ -5,14 +5,14 @@ export function TransactionSkeleton() {
   return (
     <div className="w-full space-y-6">
       {/* Filter bar skeleton */}
-      <div className="bg-white p-4 rounded-lg border border-secondary-200 flex flex-wrap gap-4">
+      <div className="bg-white p-4 rounded-lg border border-blue-200 flex flex-wrap gap-4">
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-10 w-48" />
         <Skeleton className="h-10 w-40 ml-auto" />
       </div>
       
       {/* Table skeleton */}
-      <div className="bg-white rounded-lg border border-secondary-200 overflow-hidden">
+      <div className="bg-white rounded-lg border border-blue-200 overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -41,7 +41,7 @@ export function TransactionSkeleton() {
       </div>
       
       {/* Pagination skeleton */}
-      <div className="bg-white p-4 rounded-lg border border-secondary-200 flex justify-between">
+      <div className="bg-white p-4 rounded-lg border border-blue-200 flex justify-between">
         <Skeleton className="h-10 w-24" />
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-10 w-24" />
