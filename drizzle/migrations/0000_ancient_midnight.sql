@@ -527,3 +527,11 @@ CREATE INDEX `game_idx` ON `boffmedia_events` (`game`);--> statement-breakpoint
 CREATE INDEX `pp_achievement_idx` ON `boffmedia_participant_progress` (`achievement_id`);--> statement-breakpoint
 CREATE INDEX `pp_participant_idx` ON `boffmedia_participant_progress` (`participant_id`);--> statement-breakpoint
 CREATE INDEX `p_user_idx` ON `boffmedia_participants` (`user_id`);
+
+--> Table Names Fix
+RENAME TABLE `user_card_history` TO `tcg_user_card_history`;--> statement-breakpoint
+RENAME TABLE `user_cards` TO `tcg_user_cards`;--> statement-breakpoint
+ALTER TABLE `tcg_user_card_history` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `tcg_user_cards` DROP PRIMARY KEY;--> statement-breakpoint
+ALTER TABLE `tcg_user_card_history` ADD PRIMARY KEY(`id`);--> statement-breakpoint
+ALTER TABLE `tcg_user_cards` ADD PRIMARY KEY(`id`);

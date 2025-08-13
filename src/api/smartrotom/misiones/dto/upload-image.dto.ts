@@ -2,7 +2,7 @@ import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, Matches, MaxLength } from 'class-validator';
 
-export class UploadImageDto extends BaseDto {
+export class UploadNpcImageDto extends BaseDto {
   @ApiProperty({ 
     description: 'NPC name',
     example: 'professor_oak'

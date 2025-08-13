@@ -54,7 +54,7 @@ export const tcgCards = mysqlTable("tcg_cards", {
 
 export type TcgCard = typeof tcgCards.$inferSelect;
 
-export const userCards = mysqlTable("user_cards", {
+export const userCards = mysqlTable("tcg_user_cards", {
   id: varchar("id", { length: 32 }).primaryKey(),
   user_id: varchar("user_id", { length: 32 }).notNull(),
   card_id: varchar("card_id", { length: 32 }).notNull(),
@@ -71,7 +71,7 @@ export const userCards = mysqlTable("user_cards", {
 
 export type UserCard = typeof userCards.$inferSelect;
 
-export const userCardHistory = mysqlTable("user_card_history", {
+export const userCardHistory = mysqlTable("tcg_user_card_history", {
   id: varchar("id", { length: 32 }).primaryKey(),
   user_id: varchar("user_id", { length: 32 }).notNull(),
   card_id: varchar("card_id", { length: 32 }).notNull(),

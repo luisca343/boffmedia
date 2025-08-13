@@ -10,7 +10,7 @@ export interface CreateNewsRequest {
   subcategory?: string;
   published?: number;
   featured?: number;
-  content: string;
+  content?: string;
   buttonText?: string;
   imageUrl?: string;
 }
@@ -73,8 +73,8 @@ export class NewsService {
   async createNews(createNewsRequest: CreateNewsRequest): Promise<NewsDetails> {
     const { title, content } = createNewsRequest;
 
-    if (!title || !content) {
-      throw new Error('Title and content are required');
+    if (!title) {
+      throw new Error('Title is required');
     }
 
     // Validate URL if provided
@@ -94,7 +94,9 @@ export class NewsService {
   async updateNews(newsId: number, updateNewsRequest: UpdateNewsRequest): Promise<NewsDetails> {
     const existingNews = await this.newsRepository.findNewsById(newsId);
     if (!existingNews) {
-      throw new Error('News not found');
+      const news = await this.createNews(updateNewsRequest as CreateNewsRequest);
+      const id = news.id;
+      return this.getNewsById(id);
     }
 
     // Validate URL if provided

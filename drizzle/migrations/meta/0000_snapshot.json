@@ -3321,8 +3321,8 @@
       },
       "uniqueConstraints": {}
     },
-    "user_card_history": {
-      "name": "user_card_history",
+    "tcg_user_card_history": {
+      "name": "tcg_user_card_history",
       "columns": {
         "id": {
           "name": "id",
@@ -3363,8 +3363,8 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "user_card_history_id": {
-          "name": "user_card_history_id",
+        "tcg_user_card_history_id": {
+          "name": "tcg_user_card_history_id",
           "columns": [
             "id"
           ]
@@ -3372,8 +3372,8 @@
       },
       "uniqueConstraints": {}
     },
-    "user_cards": {
-      "name": "user_cards",
+    "tcg_user_cards": {
+      "name": "tcg_user_cards",
       "columns": {
         "id": {
           "name": "id",
@@ -3429,14 +3429,14 @@
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {
-        "user_cards_id": {
-          "name": "user_cards_id",
+        "tcg_user_cards_id": {
+          "name": "tcg_user_cards_id",
           "columns": [
             "id"
           ]
         },
-        "user_card_unique": {
-          "name": "user_card_unique",
+        "tcg_user_card_unique": {
+          "name": "tcg_user_card_unique",
           "columns": [
             "user_id",
             "card_id"
