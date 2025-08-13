@@ -30,8 +30,8 @@ export class UserAppsService {
       throw new NotFoundException('App not found');
     }
 
-    if (app.active !== AppStatus.ACTIVE) {
-      throw new BadRequestException('App is not active');
+    if (app.active == AppStatus.ACTIVE) {
+      throw new BadRequestException('App is active');
     }
 
     const existingUserApp = await this.userAppsRepository.findUserApp(uuid, appId);
