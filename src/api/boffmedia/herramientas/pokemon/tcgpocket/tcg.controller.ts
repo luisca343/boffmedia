@@ -394,7 +394,7 @@ export class TcgController {
     description: 'User does not own this card.'
   })
   async updateUserCardQuantity(
-    @Param('userId') userId: string,
+    @Param('userId') userId: number,
     @Param('cardId') cardId: string,
     @Body() updateDto: UpdateUserCardQuantityDto
   ): Promise<SuccessResponse> {
@@ -415,7 +415,7 @@ export class TcgController {
     description: 'User does not own this card.'
   })
   async removeUserCard(
-    @Param('userId') userId: string,
+    @Param('userId') userId: number,
     @Param('cardId') cardId: string
   ): Promise<SuccessResponse> {
     return this.tcgFacade.removeUserCard(userId, cardId);
@@ -429,7 +429,7 @@ export class TcgController {
     description: 'User card history retrieved successfully.',
     type: [UserCardHistory]
   })
-  async getUserCardHistory(@Param('userId') userId: string): Promise<UserCardHistory[]> {
+  async getUserCardHistory(@Param('userId') userId: number): Promise<UserCardHistory[]> {
     return this.tcgFacade.getUserCardHistory(userId);
   }
 

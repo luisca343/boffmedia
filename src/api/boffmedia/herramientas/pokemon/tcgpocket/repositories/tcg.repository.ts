@@ -248,7 +248,7 @@ export class TcgRepository implements ITcgRepository {
   }
   // ==================== USER CARDS OPERATIONS ====================
 
-  async getUserCards(userId: string): Promise<UserCard[]> {
+  async getUserCards(userId: number): Promise<UserCard[]> {
     try {
       return await this.db
         .select()
@@ -260,7 +260,7 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async getUserCard(userId: string, cardId: string): Promise<UserCard | null> {
+  async getUserCard(userId: number, cardId: string): Promise<UserCard | null> {
     try {
       const result = await this.db
         .select()
@@ -275,7 +275,7 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async addUserCard(userId: string, cardId: string, quantity: number): Promise<void> {
+  async addUserCard(userId: number, cardId: string, quantity: number): Promise<void> {
     try {
       const now = new Date();
       await this.db.insert(userCards).values({
@@ -293,7 +293,7 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async updateUserCardQuantity(userId: string, cardId: string, quantity: number): Promise<void> {
+  async updateUserCardQuantity(userId: number, cardId: string, quantity: number): Promise<void> {
     try {
       await this.db
         .update(userCards)
@@ -308,7 +308,7 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async removeUserCard(userId: string, cardId: string): Promise<void> {
+  async removeUserCard(userId: number, cardId: string): Promise<void> {
     try {
       await this.db
         .delete(userCards)
@@ -319,7 +319,7 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async getUserCardHistory(userId: string): Promise<UserCardHistory[]> {
+  async getUserCardHistory(userId: number): Promise<UserCardHistory[]> {
     try {
       return await this.db
         .select()
@@ -331,7 +331,7 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
-  async addUserCardHistory(userId: string, cardId: string, quantityChange: number): Promise<void> {
+  async addUserCardHistory(userId: number, cardId: string, quantityChange: number): Promise<void> {
     try {
       await this.db.insert(userCardHistory).values({
         id: `${userId}_${cardId}_${Date.now()}`,
