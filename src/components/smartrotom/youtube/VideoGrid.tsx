@@ -3,7 +3,7 @@
 import { BaseContentGrid } from "../shared/BaseContentGrid";
 import { VideoCard } from "./VideoCard";
 import { ChannelCard } from "./ChannelCard";
-import { Video } from "../../../app/smartrotom/youtube/types";
+import { Video } from "../../../app/smartrotom/mewtube/types";
 
 interface VideoGridProps {
   videos: Video[];

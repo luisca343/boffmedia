@@ -3,8 +3,8 @@
 import { BaseContentGrid } from "../shared/BaseContentGrid";
 import { StreamCard } from "./StreamCard";
 import { GameCard } from "./GameCard";
-import { TwitchStream, TwitchVideo, TwitchClip, TwitchGame } from "../../../app/smartrotom/twitch/types";
-import { HistoryItem } from "../../../app/smartrotom/twitch/_services/historyService";
+import { TwitchStream, TwitchVideo, TwitchClip, TwitchGame } from "../../../app/smartrotom/mewtwotv/types";
+import { HistoryItem } from "../../../app/smartrotom/mewtwotv/_services/historyService";
 
 interface ContentGridProps {
   streams?: TwitchStream[];

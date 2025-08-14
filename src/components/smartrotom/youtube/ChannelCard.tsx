@@ -1,7 +1,7 @@
 "use client";
 
 import { BaseCard } from "../shared/BaseCard";
-import { formatDate } from "../../../app/smartrotom/youtube/types";
+import { formatDate } from "../../../app/smartrotom/mewtube/types";
 
 interface ChannelCardProps {
   channelId: string;
