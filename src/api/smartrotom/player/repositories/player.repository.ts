@@ -28,7 +28,7 @@ export class PlayerRepository {
         }
       );
 
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(`Failed to fetch player stats for UUID ${uuid}:`, error);
       
