@@ -172,7 +172,7 @@ export default function Transacciones() {
           title="Ingresos Totales"
           value={formatMoney(stats.income)}
           icon={<ArrowUpIcon className="h-6 w-6" />}
-          change={{ value: 5.2, isPositive: true }}
+          //change={{ value: 5.2, isPositive: true }}
           className="md:col-span-1"
         />
         
@@ -180,7 +180,7 @@ export default function Transacciones() {
           title="Gastos Totales"
           value={formatMoney(stats.expense)}
           icon={<ArrowDownIcon className="h-6 w-6" />}
-          change={{ value: 2.8, isPositive: false }}
+          //change={{ value: 2.8, isPositive: false }}
           className="md:col-span-1"
         />
         
@@ -188,7 +188,7 @@ export default function Transacciones() {
           title="Total Neto"
           value={formatMoney(stats.net)}
           icon={<ListBulletIcon className="h-6 w-6" />}
-          change={{ value: 1.4, isPositive: stats.net > 0 }}
+          //change={{ value: 1.4, isPositive: stats.net > 0 }}
           className="md:col-span-1"
         />
       </div>

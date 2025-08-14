@@ -45,7 +45,7 @@ export default function Cuentas() {
   // Calculate account statistics
   const totalBalance = accounts?.reduce((sum: number, account: any) => sum + account.balance, 0) || 0;
   const primaryAccounts = accounts?.filter((acc: any) => acc.type === "MAIN") || [];
-  const blueAccounts = accounts?.filter((acc: any) => acc.type === "blue") || [];
+  const secondaryAccounts = accounts?.filter((acc: any) => acc.type === "SECONDARY") || [];
 
   // Check if user already has a MAIN account
   const hasMainAccount = primaryAccounts.length > 0;
@@ -184,7 +184,7 @@ export default function Cuentas() {
         
         <SummaryCard 
           title="Cuentas Secundarias"
-          value={`${blueAccounts.length} ${blueAccounts.length === 1 ? 'cuenta' : 'cuentas'}`}
+          value={`${secondaryAccounts.length} ${secondaryAccounts.length === 1 ? 'cuenta' : 'cuentas'}`}
           icon={<BanknotesIcon className="h-6 w-6" />}
           className="md:col-span-1"
         />
@@ -263,12 +263,12 @@ export default function Cuentas() {
         </div>
         
         <AccountsList 
-          accounts={blueAccounts} 
+          accounts={secondaryAccounts} 
           activeAccount={activeAccount} 
           onSelect={handleSelectAccount} 
         />
         
-        {blueAccounts.length === 0 && (
+        {secondaryAccounts.length === 0 && (
           <div className="py-12 flex flex-col items-center justify-center text-center bg-blue-50 rounded-lg border border-dashed border-blue-200">
             <BanknotesIcon className="h-12 w-12 text-blue-300 mb-3" />
             <h3 className="text-lg font-medium text-blue-800 mb-1">No tienes cuentas secundarias</h3>

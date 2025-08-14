@@ -197,14 +197,12 @@ export default function StarBank() {
             />
           </BankSectionContent>
           <BankSectionFooter>
-            <BankSectionButton
-              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => {
-                router.push("smartrotom/starbank/transacciones");
-              }}
+            <InternalLink
+              href="starbank/transacciones"
+              className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center py-2 rounded-lg transition-colors"
             >
               Ver todas las transacciones <ArrowRight className="ml-2 -mr-1 h-4 w-4" />
-            </BankSectionButton>
+            </InternalLink>
           </BankSectionFooter>
         </BankSection>
       </section>
