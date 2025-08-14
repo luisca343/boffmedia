@@ -65,7 +65,6 @@ export default getRequestConfig(async () => {
     'boffmedia.json',
     'nav.json',
     'items.json',
-    'youtube.json',
     'tools/games.json',
     'tools/mhwilds.json',
     'tools/pokemon.json',
@@ -77,7 +76,9 @@ export default getRequestConfig(async () => {
     'tools/pmdsky/common.json',
     'tools/pmdsky/dungeons.json',
     'tools/tcgpocket/common.json',
-    'twitch.json'
+    'common.json',
+    'twitch.json',
+    'youtube.json',
   ];
   
   // Load translations for the current locale

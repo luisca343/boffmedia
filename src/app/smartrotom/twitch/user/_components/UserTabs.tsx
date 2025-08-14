@@ -32,7 +32,7 @@ export const UserTabs = ({
     // Default to live tab if user is streaming, otherwise videos
     return streamData ? "live" : "videos";
   });
-  const t = useTranslations("twitch");
+  const t = useTranslations("common");
   
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -42,26 +42,26 @@ export const UserTabs = ({
             value="live" 
             className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
           >
-            🔴 {t("live")}
+            🔴 {t("content.live")}
           </TabsTrigger>
         )}
         <TabsTrigger 
           value="videos" 
           className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
         >
-          {t("user.videos")}
+          {t("content.videos")}
         </TabsTrigger>
         <TabsTrigger 
           value="clips" 
           className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
         >
-          {t("user.clips")}
+          {t("content.clips")}
         </TabsTrigger>
         <TabsTrigger 
           value="about" 
           className="data-[state=active]:bg-purple-600 data-[state=active]:text-white"
         >
-          {t("user.about")}
+          {t("content.about")}
         </TabsTrigger>
       </TabsList>
       
@@ -69,7 +69,7 @@ export const UserTabs = ({
         <TabsContent value="live" className="mt-0">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <span className="bg-red-600 h-6 w-1 rounded-full mr-3"></span>
-            🔴 {t("live")}
+            🔴 {t("content.live")}
           </h2>
           
           <div className="bg-surface-800 rounded-lg p-6">
@@ -91,11 +91,11 @@ export const UserTabs = ({
               <div className="flex flex-wrap gap-4 text-sm text-surface-400">
                 <div className="flex items-center">
                   <Users className="h-4 w-4 mr-1 text-red-500" />
-                  <span>{streamData.viewer_count.toLocaleString()} {t("viewers")}</span>
+                  <span>{streamData.viewer_count.toLocaleString()} {t("content.viewers")}</span>
                 </div>
                 <div>
                   <span className="bg-red-600 text-white px-2 py-1 rounded text-xs">
-                    {t("live")}
+                    {t("content.live")}
                   </span>
                 </div>
               </div>
@@ -117,24 +117,24 @@ export const UserTabs = ({
       <TabsContent value="videos" className="mt-0">
         <h2 className="text-2xl font-semibold mb-6 flex items-center">
           <span className="bg-purple-600 h-6 w-1 rounded-full mr-3"></span>
-          {t("user.videos")}
+          {t("content.videos")}
         </h2>
         
         <ContentGrid 
           videos={videos} 
-          emptyMessage={t("user.noVideos")}
+          emptyMessage={t("content.noVideos")}
         />
       </TabsContent>
       
       <TabsContent value="clips" className="mt-0">
         <h2 className="text-2xl font-semibold mb-6 flex items-center">
           <span className="bg-purple-600 h-6 w-1 rounded-full mr-3"></span>
-          {t("user.clips")}
+          {t("content.clips")}
         </h2>
         
         <ContentGrid 
           clips={clips}
-          emptyMessage={t("user.noClips")}
+          emptyMessage={t("content.noClips")}
         />
       </TabsContent>
       
@@ -142,15 +142,15 @@ export const UserTabs = ({
         <div className="bg-surface-800 rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <span className="bg-purple-600 h-6 w-1 rounded-full mr-3"></span>
-            {t("user.about")}
+            {t("content.about")}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
               <div className="bg-surface-700 rounded p-4">
-                <h3 className="text-lg font-medium mb-2">{t("user.description")}</h3>
+                <h3 className="text-lg font-medium mb-2">{t("content.description")}</h3>
                 <p className="text-surface-300 whitespace-pre-line">
-                  {description || t("user.noDescription")}
+                  {description || t("content.noDescription")}
                 </p>
               </div>
             </div>

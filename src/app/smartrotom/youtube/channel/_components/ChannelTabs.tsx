@@ -38,7 +38,7 @@ export const ChannelTabs = ({
   onLoadMore
 }: ChannelTabsProps) => {
   const [activeTab, setActiveTab] = useState("videos");
-  const t = useTranslations("youtube");
+  const t = useTranslations("common");
   
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -47,26 +47,26 @@ export const ChannelTabs = ({
           value="videos" 
           className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
         >
-          {t("channel.videos")}
+          {t("content.videos")}
         </TabsTrigger>
         <TabsTrigger 
           value="popular" 
           className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
         >
-          {t("channel.popularVideos")}
+          {t("content.popularVideos")}
         </TabsTrigger>
         <TabsTrigger 
           value="about" 
           className="data-[state=active]:bg-red-600 data-[state=active]:text-white"
         >
-          {t("channel.about")}
+          {t("content.about")}
         </TabsTrigger>
       </TabsList>
       
       <TabsContent value="videos" className="mt-0">
         <h2 className="text-2xl font-semibold mb-6 flex items-center">
           <span className="bg-red-600 h-6 w-1 rounded-full mr-3"></span>
-          {t("channel.videos")}
+          {t("content.videos")}
         </h2>
         
         <VideoGrid videos={videos} formatDate={formatDate} />
@@ -81,12 +81,12 @@ export const ChannelTabs = ({
               {loadingMore ? (
                 <>
                   <LoadingSpinner size="small" />
-                  {t("channel.loading")}
+                  {t("loading.text")}
                 </>
               ) : (
                 <>
                   <ChevronDown className="h-4 w-4 mr-2" />
-                  {t("channel.loadMore")}
+                  {t("actions.loadMore")}
                 </>
               )}
             </Button>
@@ -97,12 +97,12 @@ export const ChannelTabs = ({
       <TabsContent value="popular" className="mt-0">
         <h2 className="text-2xl font-semibold mb-6 flex items-center">
           <span className="bg-red-600 h-6 w-1 rounded-full mr-3"></span>
-          {t("channel.popularVideos")}
+          {t("content.popularVideos")}
         </h2>
         
         <VideoGrid 
           videos={popularVideos}
-          emptyMessage={t("channel.noPopular")}
+          emptyMessage={t("content.noPopular")}
           formatDate={formatDate}
         />
       </TabsContent>
@@ -111,14 +111,14 @@ export const ChannelTabs = ({
         <div className="bg-surface-800 rounded-lg p-6">
           <h2 className="text-2xl font-semibold mb-6 flex items-center">
             <span className="bg-red-600 h-6 w-1 rounded-full mr-3"></span>
-            {t("channel.about")}
+            {t("content.about")}
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              <h3 className="text-xl font-medium mb-4">{t("channel.description")}</h3>
+              <h3 className="text-xl font-medium mb-4">{t("content.description")}</h3>
               <p className="text-surface-300 whitespace-pre-line">
-                {description || t("channel.noDescription")}
+                {description || t("content.noDescription")}
               </p>
             </div>
             

@@ -32,8 +32,8 @@
       "likes": "me gusta",
       "subscribers": "suscriptores",
       "followers": "seguidores",
-      "videos": "videos",
-      "clips": "clips",
+      "videos": "Vídeos",
+      "clips": "Clips",
       "duration": "Duración",
       "publishedAt": "Publicado",
       "createdAt": "Creado",
@@ -46,7 +46,14 @@
       "streamer": "Streamer",
       "game": "Juego",
       "notFound": "Contenido no encontrado",
-      "returnToSearch": "Volver a la búsqueda"
+      "returnToSearch": "Volver a la búsqueda",
+      "live": "En Directo",
+      "viewers": "espectadores",
+      "about": "Acerca de",
+      "noVideos": "No se encontraron videos",
+      "noClips": "No se encontraron clips",
+      "popularVideos": "Videos Populares",
+      "noPopular": "No se encontraron videos populares"
     },
     "actions": {
       "watchNow": "Ver Ahora",

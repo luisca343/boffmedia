@@ -1,9 +1,10 @@
 "use client";
 
-import { User } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
-import { VideoStats } from "./VideoStats";
+import { BaseDetails } from "@/components/smartrotom/shared/BaseDetails";
+import { BaseStats } from "@/components/smartrotom/shared/BaseStats";
+import { Eye, Clock, Calendar, Globe } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { formatNumber, formatDate } from "../../types";
 
 interface VideoDetailsProps {
   title: string;
@@ -26,35 +27,39 @@ export const VideoDetails = ({
   publishedAt,
   language
 }: VideoDetailsProps) => {
-  const t = useTranslations("twitch");
+  const t = useTranslations("common");
   
+  const stats = [
+    {
+      icon: Eye,
+      label: t("content.views"),
+      value: formatNumber(viewCount)
+    },
+    {
+      icon: Clock,
+      label: t("content.duration"),
+      value: duration
+    },
+    {
+      icon: Calendar,
+      label: t("content.publishedAt"),
+      value: formatDate(publishedAt)
+    },
+    {
+      icon: Globe,
+      label: "Language",
+      value: language.toUpperCase()
+    }
+  ];
+
   return (
-    <div className="bg-surface-800 rounded-lg p-6 shadow-lg">
-      <h1 className="text-2xl font-bold mb-3">{title}</h1>
-      
-      <VideoStats
-        viewCount={viewCount}
-        duration={duration}
-        publishedAt={publishedAt}
-        language={language}
-      />
-      
-      <div className="mb-6">
-        <InternalLink 
-          href={`twitch/user/${streamerName}`}
-          className="flex items-center text-lg font-medium hover:text-purple-500 transition-colors"
-        >
-          <User className="h-5 w-5 mr-2 text-purple-500" />
-          {streamerName}
-        </InternalLink>
-      </div>
-      
-      {description && (
-        <div className="bg-surface-700 rounded p-4">
-          <h3 className="text-lg font-medium mb-2">Description</h3>
-          <p className="text-surface-300 whitespace-pre-line">{description}</p>
-        </div>
-      )}
-    </div>
+    <BaseDetails
+      title={title}
+      creatorName={streamerName}
+      creatorId={streamerId}
+      platform="twitch"
+      description={description}
+      statsComponent={<BaseStats stats={stats} platform="twitch" />}
+    />
   );
 };

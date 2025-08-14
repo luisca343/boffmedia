@@ -16,7 +16,7 @@
       "game": "Loading game..."
     },
     "history": {
-      "title": "History", 
+      "title": "History",
       "empty": "Your history is empty",
       "emptySubtext": "Content you view will appear here",
       "clearButton": "Clear History",
@@ -29,11 +29,11 @@
     },
     "content": {
       "views": "views",
-      "likes": "likes", 
+      "likes": "likes",
       "subscribers": "subscribers",
       "followers": "followers",
-      "videos": "videos",
-      "clips": "clips",
+      "videos": "Videos",
+      "clips": "Clips",
       "duration": "Duration",
       "publishedAt": "Published",
       "createdAt": "Created",
@@ -46,7 +46,14 @@
       "streamer": "Streamer",
       "game": "Game",
       "notFound": "Content not found",
-      "returnToSearch": "Return to search"
+      "returnToSearch": "Return to search",
+      "live": "Live",
+      "viewers": "viewers",
+      "about": "About",
+      "noVideos": "No videos found",
+      "noClips": "No clips found",
+      "popularVideos": "Popular Videos",
+      "noPopular": "No popular videos found"
     },
     "actions": {
       "watchNow": "Watch Now",
