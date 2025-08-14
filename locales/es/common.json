@@ -1,0 +1,59 @@
+{
+  "common": {
+    "search": {
+      "placeholder": "Buscar...",
+      "button": "Buscar",
+      "searching": "Buscando...",
+      "error": "Error en la búsqueda. Intenta de nuevo.",
+      "noResults": "No se encontraron resultados"
+    },
+    "loading": {
+      "content": "Cargando contenido...",
+      "video": "Cargando video...",
+      "stream": "Cargando transmisión...",
+      "channel": "Cargando canal...",
+      "history": "Cargando historial...",
+      "game": "Cargando juego..."
+    },
+    "history": {
+      "title": "Historial",
+      "empty": "Tu historial está vacío",
+      "emptySubtext": "El contenido que veas aparecerá aquí",
+      "clearButton": "Limpiar Historial",
+      "clearConfirm": "¿Limpiar Historial?",
+      "clearDescription": "Esto limpiará todo tu historial. Esta acción no se puede deshacer.",
+      "removeConfirm": "¿Eliminar del historial?",
+      "cancelButton": "Cancelar",
+      "confirmButton": "Limpiar Historial",
+      "removeButton": "Eliminar"
+    },
+    "content": {
+      "views": "visualizaciones",
+      "likes": "me gusta",
+      "subscribers": "suscriptores",
+      "followers": "seguidores",
+      "videos": "videos",
+      "clips": "clips",
+      "duration": "Duración",
+      "publishedAt": "Publicado",
+      "createdAt": "Creado",
+      "joinedAt": "Se unió",
+      "description": "Descripción",
+      "noDescription": "Sin descripción disponible",
+      "stats": "Estadísticas",
+      "totalViews": "Visualizaciones Totales",
+      "channel": "Canal",
+      "streamer": "Streamer",
+      "game": "Juego",
+      "notFound": "Contenido no encontrado",
+      "returnToSearch": "Volver a la búsqueda"
+    },
+    "actions": {
+      "watchNow": "Ver Ahora",
+      "viewChannel": "Ver Canal",
+      "remove": "Eliminar",
+      "loadMore": "Cargar Más",
+      "goBack": "Volver"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "common": {
+    "search": {
+      "placeholder": "Search...",
+      "button": "Search",
+      "searching": "Searching...",
+      "error": "Search failed. Please try again.",
+      "noResults": "No results found"
+    },
+    "loading": {
+      "content": "Loading content...",
+      "video": "Loading video...",
+      "stream": "Loading stream...",
+      "channel": "Loading channel...",
+      "history": "Loading history...",
+      "game": "Loading game..."
+    },
+    "history": {
+      "title": "History", 
+      "empty": "Your history is empty",
+      "emptySubtext": "Content you view will appear here",
+      "clearButton": "Clear History",
+      "clearConfirm": "Clear History?",
+      "clearDescription": "This will clear your entire history. This action cannot be undone.",
+      "removeConfirm": "Remove from history?",
+      "cancelButton": "Cancel",
+      "confirmButton": "Clear History",
+      "removeButton": "Remove"
+    },
+    "content": {
+      "views": "views",
+      "likes": "likes", 
+      "subscribers": "subscribers",
+      "followers": "followers",
+      "videos": "videos",
+      "clips": "clips",
+      "duration": "Duration",
+      "publishedAt": "Published",
+      "createdAt": "Created",
+      "joinedAt": "Joined",
+      "description": "Description",
+      "noDescription": "No description available",
+      "stats": "Stats",
+      "totalViews": "Total Views",
+      "channel": "Channel",
+      "streamer": "Streamer",
+      "game": "Game",
+      "notFound": "Content not found",
+      "returnToSearch": "Return to search"
+    },
+    "actions": {
+      "watchNow": "Watch Now",
+      "viewChannel": "View Channel",
+      "remove": "Remove",
+      "loadMore": "Load More",
+      "goBack": "Go Back"
+    }
+  }
+}
