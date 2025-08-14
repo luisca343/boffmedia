@@ -2,12 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Axios from "axios";
-import { History } from "lucide-react";
 import { VideoGrid } from "@/components/smartrotom/youtube/VideoGrid";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { BaseSearch } from "@/components/smartrotom/shared/BaseSearch";
+import { BaseSearchHeader } from "@/components/smartrotom/shared/BaseSearchHeader";
 import { Video, API_KEY } from "../types";
-import { InternalLink } from "@/components/nav/Link";
 import { useTranslations } from "next-intl";
 
 export default function YoutubeResults() {
@@ -54,28 +52,12 @@ export default function YoutubeResults() {
 
   return (
     <div className="min-h-full bg-surface-900 text-white overflow-auto">
-      <header className="sticky top-0 z-10 bg-surface-800/95 backdrop-blur-sm shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center">
-            <div className="flex-grow">
-              <BaseSearch
-                platform="youtube"
-                onSearch={handleSearch}
-                isLoading={isLoading}
-                placeholder={t("search.placeholder")}
-              />
-            </div>
-            <InternalLink href="youtube/history" className="ml-4">
-              <button 
-                className="bg-surface-700 hover:bg-surface-600 p-2 rounded-lg transition-colors"
-                title={tCommon("history.title")}
-              >
-                <History size={20} />
-              </button>
-            </InternalLink>
-          </div>
-        </div>
-      </header>
+      <BaseSearchHeader
+        platform="youtube"
+        onSearch={handleSearch}
+        isLoading={isLoading}
+        placeholder={t("search.placeholder")}
+      />
       
       <main className="container mx-auto px-4 py-8">
         {error && (

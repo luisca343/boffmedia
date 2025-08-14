@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Users } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { BaseSearchHeader } from "@/components/smartrotom/shared/BaseSearchHeader";
 import { ContentGrid } from "./ContentGrid";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { TwitchStream, TwitchGame, TwitchUser, TwitchSearchChannel } from "../types";
@@ -13,7 +11,6 @@ import { InternalLink } from "@/components/nav/Link";
 
 export default function TwitchResults() {
   const t = useTranslations("twitch");
-  const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState<{
     streams: TwitchStream[];
     users: TwitchSearchChannel[];
@@ -49,17 +46,15 @@ export default function TwitchResults() {
     }
   };
 
-  const handleSearch = async () => {
-    if (!search.trim()) return;
-    
+  const handleSearch = async (query: string) => {
     try {
       setIsLoading(true);
       setError(null);
       
       const [streamsData, usersData, gamesData] = await Promise.all([
-        twitchAPI.searchStreams(search, 20),
-        twitchAPI.searchChannels(search, 10),
-        twitchAPI.searchGames(search, 8)
+        twitchAPI.searchStreams(query, 20),
+        twitchAPI.searchChannels(query, 10),
+        twitchAPI.searchGames(query, 8)
       ]);
       
       setSearchResults({
@@ -75,12 +70,6 @@ export default function TwitchResults() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
   const hasSearchResults = 
     searchResults.streams.length > 0 || 
     searchResults.users.length > 0 || 
@@ -88,42 +77,12 @@ export default function TwitchResults() {
 
   return (
     <div className="min-h-full bg-surface-900 text-white overflow-auto">
-      <header className="sticky top-0 z-10 bg-surface-800/95 backdrop-blur-sm shadow-md">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="relative flex-grow max-w-2xl">
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="flex-grow pr-10 bg-surface-700 text-white placeholder-surface-400 border-surface-600 focus:border-purple-500 focus:ring-1 focus:ring-purple-500"
-                placeholder={t("search.placeholder")}
-                aria-label={t("search.placeholder")}
-              />
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
-            </div>
-            
-            <div className="flex items-center gap-4 ml-4">
-              <Button
-                onClick={handleSearch}
-                className="bg-purple-600 hover:bg-purple-700 transition-colors"
-                disabled={isLoading}
-              >
-                <Search className="h-4 w-4 mr-2" />
-                {t("search.button")}
-              </Button>
-              
-              <InternalLink 
-                href="twitch/history" 
-                className="flex items-center text-surface-300 hover:text-purple-500 transition-colors"
-              >
-                <Users className="h-5 w-5 mr-2" />
-                {t("history.title")}
-              </InternalLink>
-            </div>
-          </div>
-        </div>
-      </header>
+      <BaseSearchHeader
+        platform="twitch"
+        onSearch={handleSearch}
+        isLoading={isLoading}
+        placeholder={t("search.placeholder")}
+      />
       
       <main className="container mx-auto px-4 py-8">
         {error && (

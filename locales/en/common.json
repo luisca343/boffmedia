@@ -1,11 +1,15 @@
 {
   "common": {
     "search": {
-      "placeholder": "Search...",
-      "button": "Search",
-      "searching": "Searching...",
-      "error": "Search failed. Please try again.",
-      "noResults": "No results found"
+        "placeholder": "Search...",
+        "button": "Search",
+        "searching": "Searching...",
+        "error": "Search failed. Please try again.",
+        "noResults": "No results found",
+        "youtubePlaceholder": "Search YouTube...",
+        "twitchPlaceholder": "Search channels, games or streams...",
+        "youtubeButton": "Search YouTube",
+        "twitchButton": "Search Twitch"
     },
     "loading": {
       "content": "Loading content...",
