@@ -1,5 +1,6 @@
 {
     "twitch": {
+        "live": "En directo",
         "search": {
             "placeholder": "Buscar canales, juegos o streams...",
             "button": "Buscar",

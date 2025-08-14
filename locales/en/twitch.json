@@ -1,5 +1,6 @@
 {
     "twitch": {
+        "live": "Live",
         "search": {
             "placeholder": "Search channels, games or streams...",
             "button": "Search",

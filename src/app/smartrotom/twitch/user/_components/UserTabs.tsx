@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users } from "lucide-react";
 import { ContentGrid } from "../../_components/ContentGrid";
 import { UserStats } from "./UserStats";
+import { TwitchPlayer } from "../../stream/_components/TwitchPlayer";
 import { TwitchVideo, TwitchClip, TwitchStream } from "../../types";
 import { useTranslations } from "next-intl";
 
@@ -72,14 +73,13 @@ export const UserTabs = ({
           </h2>
           
           <div className="bg-surface-800 rounded-lg p-6">
-            <div className="aspect-video bg-surface-700 rounded-lg mb-4 overflow-hidden">
-              <iframe
-                src={`https://player.twitch.tv/?channel=${streamData.user_login}&parent=localhost&autoplay=false`}
-                height="100%"
-                width="100%"
-                allowFullScreen
-                className="w-full h-full"
-              ></iframe>
+            <div className="h-full bg-surface-700 rounded-lg mb-4 overflow-hidden">
+              <TwitchPlayer 
+                channel={streamData.user_login}
+                layout="video-with-chat"
+                autoplay={true}
+                height="600px"
+              />
             </div>
             
             <div className="space-y-4">
