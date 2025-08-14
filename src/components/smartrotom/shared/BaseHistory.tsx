@@ -74,14 +74,20 @@ export function BaseHistory<T extends { id: string; type?: string }>({
     return <LoadingSpinner size="large" message={t("loading.history")} platform={platform} />;
   }
 
-  return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{t("history.title")}</h1>
+  const content = (
+    <>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold flex items-center">
+          <span className={`h-8 w-2 rounded-full mr-3 ${platform === 'youtube' ? 'bg-red-600' : 'bg-purple-600'}`}></span>
+          {t("history.title")}
+        </h1>
         {history.length > 0 && (
           <Dialog open={clearDialogOpen} onOpenChange={setClearDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="error" className="flex items-center">
+              <Button 
+                variant="error" 
+                className={`${platform === 'youtube' ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'}`}
+              >
                 <Trash2 className="h-4 w-4 mr-2" />
                 {t("history.clearButton")}
               </Button>
@@ -100,17 +106,21 @@ export function BaseHistory<T extends { id: string; type?: string }>({
                 <Button variant="outline" onClick={() => setClearDialogOpen(false)}>
                   {t("history.cancelButton")}
                 </Button>
-                <Button variant="error" onClick={handleClearHistory}>
+                <Button 
+                  variant="error" 
+                  onClick={handleClearHistory}
+                  className={`${platform === 'youtube' ? 'bg-red-600 hover:bg-red-700' : 'bg-purple-600 hover:bg-purple-700'}`}
+                >
                   {t("history.confirmButton")}
                 </Button>
               </DialogFooter>
-            </DialogContent>
+              </DialogContent>
           </Dialog>
         )}
       </div>
 
       {history.length === 0 ? (
-        <div className="text-center py-20">
+        <div className="text-center py-16 bg-surface-800 rounded-lg">
           <div className="text-6xl mb-4">📺</div>
           <h2 className="text-2xl font-semibold mb-2 text-surface-200">
             {emptyMessage || t("history.empty")}
@@ -151,6 +161,12 @@ export function BaseHistory<T extends { id: string; type?: string }>({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </>
+  );
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {content}
     </div>
   );
 }

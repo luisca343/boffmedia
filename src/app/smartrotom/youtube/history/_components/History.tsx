@@ -1,120 +1,68 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { VideoGrid } from "../../_components/VideoGrid";
-import { LoadingSpinner } from "../../_components/LoadingSpinner";
-import { getHistory, clearHistory, removeFromHistory, HistoryItem } from "../../_services/historyService";
-import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { BaseHistory } from "@/components/smartrotom/shared/BaseHistory";
+import { VideoCard } from "../../_components/VideoCard";
+import { getHistory, clearHistory, removeFromHistory, HistoryItem } from "../../_services/historyService";
+import { formatDate } from "../../types";
 
 export const HistoryView = () => {
   const t = useTranslations("youtube");
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadHistory();
-  }, []);
-
-  const loadHistory = () => {
-    setLoading(true);
-    const historyItems = getHistory();
-    setHistory(historyItems);
-    setLoading(false);
+  // Helper function to reliably extract video ID from any video object structure
+  const extractVideoId = (video: HistoryItem): string => {
+    // Case 1: ID is directly a string
+    if (typeof video.id === 'string') {
+      return video.id;
+    }
+    
+    // Case 2: From search API - ID is in video.id.videoId
+    if (video.id?.videoId) {
+      return video.id.videoId;
+    }
+    
+    // Case 3: From playlist items API - ID is in video.snippet.resourceId.videoId
+    if (video.snippet?.resourceId?.videoId) {
+      return video.snippet.resourceId.videoId;
+    }
+    
+    // Fallback
+    return '';
   };
 
-  const handleClearHistory = () => {
-    clearHistory();
-    setHistory([]);
+  const renderHistoryItem = (item: HistoryItem, onRemove: (id: string) => void) => {
+    const videoId = extractVideoId(item);
+    
+    if (!videoId) {
+      console.error("Could not extract video ID from:", item);
+      return null; // Skip this video if we can't extract an ID
+    }
+    
+    return (
+      <VideoCard
+        key={videoId + item.timestamp}
+        id={videoId}
+        title={item.snippet.title}
+        channelTitle={item.snippet.channelTitle}
+        thumbnailUrl={item.snippet.thumbnails.high?.url || item.snippet.thumbnails.medium?.url || ''}
+        publishedAt={item.snippet.publishedAt}
+        formatDate={formatDate}
+        timestamp={item.timestamp}
+        allowRemove={true}
+        onRemove={() => onRemove(videoId)}
+      />
+    );
   };
-
-  const handleRemoveVideo = (videoId: string) => {
-    removeFromHistory(videoId);
-    setHistory(prev => prev.filter(item => {
-      const id = typeof item.id === 'string' ? item.id : item.id?.videoId || item.snippet.resourceId?.videoId;
-      return id !== videoId;
-    }));
-    setVideoToDelete(null);
-  };
-
-  const confirmDelete = (videoId: string) => {
-    setVideoToDelete(videoId);
-    setDeleteDialogOpen(true);
-  };
-
-  if (loading) {
-    return <LoadingSpinner size="large" message={t("loading.history")} />;
-  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold flex items-center">
-          <span className="bg-red-600 h-8 w-2 rounded-full mr-3"></span>
-          {t("history.title")}
-        </h1>
-        
-        {history.length > 0 && (
-          <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <AlertDialogTrigger asChild>
-              <Button 
-                variant="error" 
-                className="bg-red-600 hover:bg-red-700"
-                onClick={() => setVideoToDelete(null)}
-              >
-                <Trash2 className="h-4 w-4 mr-2" /> {t("history.clearButton")}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t("history.clearConfirm")}</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {videoToDelete 
-                    ? t("history.removeConfirm") 
-                    : t("history.clearDescription")}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{t("history.cancelButton")}</AlertDialogCancel>
-                <AlertDialogAction 
-                  onClick={() => videoToDelete ? handleRemoveVideo(videoToDelete) : handleClearHistory()}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  {videoToDelete ? t("history.removeButton") : t("history.confirmButton")}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </div>
-
-      {history.length === 0 ? (
-        <div className="text-center py-16 bg-surface-800 rounded-lg">
-          <p className="text-xl text-surface-400">{t("history.empty")}</p>
-          <p className="text-surface-500 mt-2">{t("history.emptySubtext")}</p>
-        </div>
-      ) : (
-        <VideoGrid 
-          videos={history} 
-          title="" 
-          allowRemoval={true}
-          onRemoveVideo={confirmDelete}
-        />
-      )}
-    </div>
+    <BaseHistory<HistoryItem & { id: string }>
+      platform="youtube"
+      getHistory={() => getHistory().map(item => ({...item, id: extractVideoId(item)}))}
+      clearHistory={clearHistory}
+      removeFromHistory={removeFromHistory}
+      renderItem={renderHistoryItem}
+      emptyMessage={t("history.empty")}
+      emptySubtext={t("history.emptySubtext")}
+    />
   );
 };
