@@ -1,105 +1,71 @@
 {
     "twitch": {
         "search": {
-            "placeholder": "Search Twitch",
+            "placeholder": "Search channels, games or streams...",
             "button": "Search",
-            "searching": "Searching...",
-            "streams": "Streams",
-            "users": "Streamers",
-            "games": "Games",
-            "streamResults": "Stream Results",
-            "userResults": "Streamer Results",
-            "gameResults": "Game Results",
-            "error": "Failed to fetch content. Please try again.",
-            "noStreams": "No streams found",
-            "noUsers": "No streamers found",
-            "noGames": "No games found"
+            "error": "Error searching Twitch. Please try again.",
+            "streamResults": "Live Streams",
+            "userResults": "Channels found",
+            "gameResults": "Games found"
         },
         "browse": {
-            "topStreams": "Top Live Streams",
-            "topGames": "Top Games",
-            "noStreams": "No streams available",
+            "topStreams": "Popular Streams",
+            "noStreams": "No live streams available",
+            "topGames": "Popular Games",
             "noGames": "No games available"
         },
-        "loading": {
-            "streams": "Loading streams...",
-            "stream": "Loading stream...",
-            "user": "Loading streamer information...",
-            "game": "Loading game information...",
-            "history": "Loading your history...",
-            "search": "Searching content...",
-            "clip": "Loading clip..."
-        },
-        "history": {
-            "title": "Watch History",
-            "empty": "Your watch history is empty",
-            "emptySubtext": "Streams, videos and clips you watch will appear here",
-            "clearButton": "Clear History",
-            "clearConfirm": "Clear Watch History?",
-            "clearDescription": "This will clear your entire watch history. This action cannot be undone.",
-            "removeConfirm": "Remove from History?",
-            "removeDescription": "This will remove this item from your watch history.",
-            "cancelButton": "Cancel",
-            "confirmButton": "Clear History",
-            "removeButton": "Remove"
+        "common": {
+            "streamer": "Streamer",
+            "game": "Game"
         },
         "stream": {
-            "live": "LIVE",
-            "notFound": "Stream not found",
-            "returnToBrowse": "Return to Twitch browse",
+            "live": "Live",
             "viewers": "viewers",
-            "offline": "Stream is offline",
-            "stats": "Stats"
+            "notFound": "Stream not found",
+            "loading": "Loading stream..."
         },
-        "user": {
-            "notFound": "Streamer not found",
-            "returnToBrowse": "Return to Twitch browse",
-            "followers": "followers",
+        "video": {
             "views": "views",
-            "about": "About",
-            "streams": "Streams",
-            "videos": "Videos",
-            "clips": "Clips",
-            "description": "Description",
-            "noDescription": "No description provided.",
-            "stats": "Stats",
-            "joined": "Joined",
-            "totalViews": "Total Views",
-            "noStreams": "No recent streams",
-            "noVideos": "No videos found",
-            "noClips": "No clips found"
+            "duration": "Duration",
+            "publishedAt": "Published at",
+            "notFound": "Video not found",
+            "loading": "Loading video..."
+        },
+        "clip": {
+            "views": "views",
+            "duration": "Duration",
+            "createdAt": "Created at",
+            "creator": "Creator",
+            "notFound": "Clip not found",
+            "publishedAt": "Published at",
+            "loading": "Loading clip..."
         },
         "game": {
             "notFound": "Game not found",
-            "returnToBrowse": "Return to Twitch browse",
-            "streams": "Live Streams",
-            "topClips": "Top Clips",
-            "noStreams": "No live streams for this game",
-            "noClips": "No clips found for this game"
+            "loading": "Loading game..."
         },
-        "video": {
-            "notFound": "Video not found",
-            "returnToBrowse": "Return to Twitch browse",
-            "views": "views",
-            "duration": "Duration",
-            "publishedAt": "Published"
+        "user": {
+            "videos": "Videos",
+            "clips": "Clips",
+            "about": "About",
+            "live": "Live",
+            "noVideos": "No videos available",
+            "noClips": "No clips available",
+            "stats": "Statistics",
+            "joined": "Joined",
+            "totalViews": "Total views",
+            "followers": "Followers",
+            "notFound": "User not found",
+            "loading": "Loading user..."
         },
-        "clip": {
-            "notFound": "Clip not found",
-            "returnToBrowse": "Return to Twitch browse",
-            "views": "views",
-            "duration": "Duration",
-            "createdAt": "Created",
-            "creator": "Clipped by"
+        "history": {
+            "loading": "Loading history..."
         },
-        "common": {
-            "stream": "Stream",
-            "video": "Video",
-            "clip": "Clip",
-            "streamer": "Streamer",
-            "game": "Game",
-            "loading": "Loading...",
-            "error": "Something went wrong"
+        "loading": {
+            "clip": "Loading clip...",
+            "game": "Loading game...",
+            "stream": "Loading stream...",
+            "user": "Loading user..."
         }
     }
 }

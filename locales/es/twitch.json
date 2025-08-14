@@ -1,105 +1,101 @@
 {
     "twitch": {
         "search": {
-            "placeholder": "Buscar en Twitch",
+            "placeholder": "Buscar canales, juegos o streams...",
             "button": "Buscar",
-            "searching": "Buscando...",
-            "streams": "Streams",
-            "users": "Streamers",
-            "games": "Juegos",
-            "streamResults": "Resultados de Streams",
-            "userResults": "Resultados de Streamers",
-            "gameResults": "Resultados de Juegos",
-            "error": "Error al cargar contenido. Intenta de nuevo.",
-            "noStreams": "No se encontraron streams",
-            "noUsers": "No se encontraron streamers",
-            "noGames": "No se encontraron juegos"
+            "error": "Error al buscar en Twitch. Intenta de nuevo.",
+            "streamResults": "Streams en vivo",
+            "userResults": "Canales encontrados",
+            "gameResults": "Juegos encontrados"
         },
         "browse": {
-            "topStreams": "Streams Más Populares",
-            "topGames": "Juegos Más Populares",
-            "noStreams": "No hay streams disponibles",
+            "topStreams": "Streams populares",
+            "noStreams": "No hay streams en vivo disponibles",
+            "topGames": "Juegos populares",
             "noGames": "No hay juegos disponibles"
         },
-        "loading": {
-            "streams": "Cargando streams...",
-            "stream": "Cargando stream...",
-            "user": "Cargando información del streamer...",
-            "game": "Cargando información del juego...",
-            "history": "Cargando tu historial...",
-            "search": "Buscando contenido...",
-            "clip": "Cargando clip..."
-        },
-        "history": {
-            "title": "Historial de Visualización",
-            "empty": "Tu historial está vacío",
-            "emptySubtext": "Los streams, videos y clips que veas aparecerán aquí",
-            "clearButton": "Limpiar Historial",
-            "clearConfirm": "¿Limpiar Historial de Visualización?",
-            "clearDescription": "Esto eliminará todo tu historial de visualización. Esta acción no se puede deshacer.",
-            "removeConfirm": "¿Eliminar del Historial?",
-            "removeDescription": "Esto eliminará este elemento de tu historial de visualización.",
-            "cancelButton": "Cancelar",
-            "confirmButton": "Limpiar Historial",
-            "removeButton": "Eliminar"
+        "common": {
+            "streamer": "Streamer",
+            "game": "Juego"
         },
         "stream": {
-            "live": "EN VIVO",
-            "notFound": "Stream no encontrado",
-            "returnToBrowse": "Volver a explorar Twitch",
+            "live": "En vivo",
             "viewers": "espectadores",
-            "offline": "El stream está desconectado",
-            "stats": "Estadísticas"
+            "notFound": "Stream no encontrado",
+            "loading": "Cargando stream..."
         },
         "user": {
-            "notFound": "Streamer no encontrado",
-            "returnToBrowse": "Volver a explorar Twitch",
-            "followers": "seguidores",
-            "views": "visualizaciones",
-            "about": "Acerca de",
-            "streams": "Streams",
             "videos": "Videos",
             "clips": "Clips",
-            "description": "Descripción",
-            "noDescription": "Sin descripción disponible.",
+            "about": "Acerca de",
+            "live": "En vivo",
+            "noVideos": "No hay videos disponibles",
+            "noClips": "No hay clips disponibles",
             "stats": "Estadísticas",
             "joined": "Se unió",
-            "totalViews": "Visualizaciones Totales",
-            "noStreams": "No hay streams recientes",
-            "noVideos": "No se encontraron videos",
-            "noClips": "No se encontraron clips"
+            "totalViews": "Vistas totales",
+            "followers": "Seguidores",
+            "notFound": "Usuario no encontrado",
+            "loading": "Cargando usuario..."
+        },
+        "clip": {
+            "views": "vistas",
+            "duration": "Duración",
+            "createdAt": "Creado el",
+            "creator": "Creador",
+            "notFound": "Clip no encontrado",
+            "loading": "Cargando clip..."
+        },
+        "video": {
+            "views": "vistas",
+            "duration": "Duración",
+            "publishedAt": "Publicado el",
+            "notFound": "Video no encontrado",
+            "loading": "Cargando video..."
         },
         "game": {
             "notFound": "Juego no encontrado",
-            "returnToBrowse": "Volver a explorar Twitch",
-            "streams": "Streams en Vivo",
-            "topClips": "Mejores Clips",
-            "noStreams": "No hay streams en vivo para este juego",
-            "noClips": "No se encontraron clips para este juego"
+            "loading": "Cargando juego..."
         },
-        "video": {
-            "notFound": "Video no encontrado",
-            "returnToBrowse": "Volver a explorar Twitch",
-            "views": "visualizaciones",
-            "duration": "Duración",
-            "publishedAt": "Publicado"
+        "history": {
+            "title": "Historial de Twitch",
+            "empty": "No hay historial de visualización",
+            "emptySubtext": "Aquí aparecerán los streams, videos y clips que veas.",
+            "loading": "Cargando historial..."
         },
-        "clip": {
-            "notFound": "Clip no encontrado",
-            "returnToBrowse": "Volver a explorar Twitch",
-            "views": "visualizaciones",
-            "duration": "Duración",
-            "createdAt": "Creado",
-            "creator": "Clip por"
-        },
-        "common": {
-            "stream": "Stream",
-            "video": "Video",
-            "clip": "Clip",
-            "streamer": "Streamer",
-            "game": "Juego",
-            "loading": "Cargando...",
-            "error": "Algo salió mal"
+        "loading": {
+            "stream": "Cargando stream...",
+            "user": "Cargando usuario...",
+            "clip": "Cargando clip...",
+            "video": "Cargando video...",
+            "game": "Cargando juego...",
+            "history": "Cargando historial..."
         }
+                },
+                "video": {
+                    "views": "vistas",
+                    "duration": "Duración",
+                    "publishedAt": "Publicado el",
+                    "notFound": "Video no encontrado",
+                    "loading": "Cargando video..."
+                },
+                "clip": {
+                    "views": "vistas",
+                    "duration": "Duración",
+                    "createdAt": "Creado el",
+                    "creator": "Creador",
+                    "notFound": "Clip no encontrado",
+                    "publishedAt": "Publicado el",
+                    "loading": "Cargando clip..."
+                },
+                "game": {
+                    "notFound": "Juego no encontrado",
+                    "loading": "Cargando juego..."
+                },
+                "loading": {
+                    "clip": "Cargando clip...",
+                    "game": "Cargando juego...",
+                    "stream": "Cargando stream...",
+                    "user": "Cargando usuario..."
     }
 }

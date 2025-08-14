@@ -77,6 +77,7 @@ export default getRequestConfig(async () => {
     'tools/pmdsky/common.json',
     'tools/pmdsky/dungeons.json',
     'tools/tcgpocket/common.json',
+    'twitch.json'
   ];
   
   // Load translations for the current locale
