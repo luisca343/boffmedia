@@ -36,12 +36,16 @@ export class DiscordService {
     }
 
     setupInteractionListener() {
-        this.client.on(Events.MessageCreate, async message => {
-            if (message.author.bot) return;
-            if (message.channel.type === ChannelType.DM) return;
+        this.client.on(Events.InteractionCreate, async interaction => {
+            console.log(`Interaction received: ${interaction.channelId}`);
+            if (interaction.isButton()) {
+                console.log(`Button clicked: ${interaction.customId}`);
+                const commandName = interaction.customId.split(':')[0];
 
-            if (message.guild.members.me.voice.channel && message.guild.members.me.voice.channel.id === message.channel.id) {
-                playAudio(message, this.service);
+                if (commandName === 'frases_pagina') {
+                    const frasesCommand = new (require('../commands/global/frases/frases').FrasesCommand)(this.service);
+                    await frasesCommand.handleButton(interaction);
+                }
             }
         });
     }

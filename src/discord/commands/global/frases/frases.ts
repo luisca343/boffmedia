@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Context, SlashCommand, SlashCommandContext, Options } from 'necord';
+import { Context, SlashCommand, SlashCommandContext, Options, Button, ButtonContext, ComponentParam } from 'necord';
 import { CommandsService } from '@/discord/_commands/commands.service';
 import { formatDate } from '@/_utils/stringUtils';
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ButtonInteraction } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import { FrasesDto } from './frases.dto';
 
 @Injectable()
@@ -47,12 +47,12 @@ export class FrasesCommand {
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(`prev_page:${guildId}:${userId}:${page - 1}`)
+        .setCustomId(`frases_pagina/prev/${guildId}/${userId || 'null'}/${page - 1}`)
         .setLabel('Previous')
         .setStyle(ButtonStyle.Primary)
         .setDisabled(page <= 1),
       new ButtonBuilder()
-        .setCustomId(`next_page:${guildId}:${userId}:${page + 1}`)
+        .setCustomId(`frases_pagina/next/${guildId}/${userId || 'null'}/${page + 1}`)
         .setLabel('Next')
         .setStyle(ButtonStyle.Primary)
         .setDisabled(page >= totalPages)
@@ -61,16 +61,25 @@ export class FrasesCommand {
     return { embed, row };
   }
 
-  public async handleButton(interaction: ButtonInteraction) {
-    const [action, guildId, userId, page] = interaction.customId.split(':');
-
-    if (action === 'prev_page' || action === 'next_page') {
+  @Button('frases_pagina/:direction/:guildId/:userId/:page')
+  public async onButton(
+    @Context() [interaction]: ButtonContext,
+    @ComponentParam('direction') direction: string,
+    @ComponentParam('guildId') guildId: string,
+    @ComponentParam('userId') userId: string,
+    @ComponentParam('page') page: string
+  ) {
+    try {
       const newPage = parseInt(page, 10);
-      const { embed, row } = await this.createEmbed(guildId, userId === 'null' ? null : userId, newPage);
+      const userIdParam = userId === 'null' ? null : userId;
+      const { embed, row } = await this.createEmbed(guildId, userIdParam, newPage);
 
       await interaction.update({ embeds: [embed], components: [row] });
-    } else {
-      await interaction.reply({ content: 'Unknown action!', ephemeral: true });
+    } catch (error) {
+      console.error('Error handling button interaction:', error);
+      if (!interaction.replied) {
+        await interaction.reply({ content: 'There was an error while processing the interaction.', ephemeral: true });
+      }
     }
   }
 }
