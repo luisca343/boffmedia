@@ -69,6 +69,8 @@ export class CommandsService {
         .from(discordUsers)
         .where(eq(discordUsers.userId, user.id))
         .limit(1);
+
+        console.log(`User exists: ${userExists.length > 0}`);
         
         if (userExists.length === 0) {
             await this.db.getDrizzle()
@@ -90,7 +92,9 @@ export class CommandsService {
             quote: quote,
             comment: comment
         } as FicusFrase);
-        
+
+        console.log(`Quote inserted: ${quoteInsert}`);
+
         return { content: `Frase añadida correctamente "${quote}" - ${user.globalName}`, ephemeral: false };
         
     }

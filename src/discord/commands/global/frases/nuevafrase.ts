@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { Context, SlashCommand, SlashCommandContext, Options } from 'necord';
 import { CommandsService } from '@/discord/_commands/commands.service';
+import { NuevaFraseDto } from './_dto/nuevafrase.dto';
 
 @Injectable()
 export class NuevaFraseCommand {
@@ -11,12 +12,11 @@ export class NuevaFraseCommand {
     description: 'Añadir una nueva frase',
     guilds: ['516237304101339156'],
   })
-  public async onNuevaFrase(@Context() [interaction]: SlashCommandContext) {
-    const user = interaction.options.getUser('usuario');
-    const quote = interaction.options.getString('frase');
-    const comment = interaction.options.getString('comentario');
-
-    const response = await this.service.addQuote(interaction.guildId, user, quote, comment);
+  public async onNuevaFrase(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { usuario, frase, comentario }: NuevaFraseDto
+  ) {
+    const response = await this.service.addQuote(interaction.guildId, usuario, frase, comentario);
     await interaction.reply(response);
   }
 }

@@ -3,7 +3,7 @@ import { Context, SlashCommand, SlashCommandContext, Options, Button, ButtonCont
 import { CommandsService } from '@/discord/_commands/commands.service';
 import { formatDate } from '@/_utils/stringUtils';
 import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import { FrasesDto } from './frases.dto';
+import { FrasesDto } from './_dto/frases.dto';
 
 @Injectable()
 export class FrasesCommand {
