@@ -63,6 +63,7 @@ import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-m
 import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
 import { TcgModule } from '@api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module';
 import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
+import { AutomationModule } from './automation/automation.module';
 
 @Module({
   imports: [
@@ -106,7 +107,8 @@ import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
     WingullModule,
     SmartRotomMineModule,
     PokemonModule,
-    FicusAIModule
+    FicusAIModule,
+    AutomationModule
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, MySQL2Service, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
