@@ -109,7 +109,7 @@ import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
     FicusAIModule
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, MySQL2Service, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
+  providers: [AppService, MySQL2Service, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
      ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
     {
     provide: ConfigService,
