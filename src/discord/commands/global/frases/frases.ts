@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { Context, SlashCommand, SlashCommandContext, Options } from 'necord';
 import { CommandsService } from '@/discord/_commands/commands.service';
 import { formatDate } from '@/_utils/stringUtils';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ButtonInteraction } from 'discord.js';
+import { FrasesDto } from './frases.dto';
 
 @Injectable()
 export class FrasesCommand {
@@ -13,12 +14,19 @@ export class FrasesCommand {
     description: 'Mostrar las frases',
     guilds: ['516237304101339156'],
   })
-  public async onFrases(@Context() [interaction]: SlashCommandContext) {
-    const user = interaction.options.getUser('usuario') || null;
-    const page = interaction.options.getInteger('page') || 1;
-    const { embed } = await this.createEmbed(interaction.guildId, user?.id, page);
+  public async onFrases(
+    @Context() [interaction]: SlashCommandContext,
+    @Options() { usuario, page }: FrasesDto
+  ) {
+    const guildId = interaction.guildId;
+    const userId = usuario?.id || null; // Extract the ID from the User object
+    const { embed, row } = await this.createEmbed(guildId, userId, page || 1);
 
-    await interaction.reply({ embeds: [embed] });
+    try {
+      await interaction.reply({ embeds: [embed], components: [row] });
+    } catch (error) {
+      console.error('Error replying to interaction:', error);
+    }
   }
 
   private async createEmbed(guildId: string, userId: string | null, page: number) {
@@ -32,11 +40,37 @@ export class FrasesCommand {
       .setColor(`#${frases[0]?.color || '0099ff'}`)
       .setAuthor({
         name: userId ? frases[0]?.discordName : 'Ficus Quotes',
-        iconURL: 'https://cdn.discordapp.com/avatars/1170322183646629900/2eed87d0ae9928401f02ddcd10c2e590.webp?size=32',
+        iconURL: frases[0]?.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png',
       })
       .setTimestamp()
       .addFields(fields);
 
-    return { embed };
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`prev_page:${guildId}:${userId}:${page - 1}`)
+        .setLabel('Previous')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page <= 1),
+      new ButtonBuilder()
+        .setCustomId(`next_page:${guildId}:${userId}:${page + 1}`)
+        .setLabel('Next')
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(page >= totalPages)
+    );
+
+    return { embed, row };
+  }
+
+  public async handleButton(interaction: ButtonInteraction) {
+    const [action, guildId, userId, page] = interaction.customId.split(':');
+
+    if (action === 'prev_page' || action === 'next_page') {
+      const newPage = parseInt(page, 10);
+      const { embed, row } = await this.createEmbed(guildId, userId === 'null' ? null : userId, newPage);
+
+      await interaction.update({ embeds: [embed], components: [row] });
+    } else {
+      await interaction.reply({ content: 'Unknown action!', ephemeral: true });
+    }
   }
 }
