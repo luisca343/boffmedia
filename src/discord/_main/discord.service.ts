@@ -2,16 +2,22 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Client, IntentsBitField, GatewayIntentBits, ButtonInteraction, Events, ChannelType } from 'discord.js';
 import { playAudio } from '../_util/audio';
 import { CommandsService } from '../_commands/commands.service';
+import { ModuleRef } from '@nestjs/core';
+import * as path from 'path';
+import * as fs from 'fs';
 
 @Injectable()
 export class DiscordService {
     private readonly logger = new Logger(DiscordService.name);
     private client: Client;
+    private commandModules = new Map<string, any>();
 
-    constructor(private readonly service: CommandsService) {
+    constructor(
+        private readonly service: CommandsService,
+        private readonly moduleRef: ModuleRef // Inject ModuleRef to resolve providers dynamically
+    ) {
         this.logger.log('DiscordService instantiated');
         this.connect();
-        this.setupInteractionListener();
     }
 
     connect(): Client {
@@ -33,32 +39,5 @@ export class DiscordService {
         }
 
         return this.client;
-    }
-
-    setupInteractionListener() {
-        this.client.on(Events.InteractionCreate, async interaction => {
-            console.log(`Interaction received: ${interaction.channelId}`);
-            if (interaction.isButton()) {
-                console.log(`Button clicked: ${interaction.customId}`);
-                const commandName = interaction.customId.split(':')[0];
-
-                if (commandName === 'frases_pagina') {
-                    const frasesCommand = new (require('../commands/global/frases/frases').FrasesCommand)(this.service);
-                    await frasesCommand.handleButton(interaction);
-                }
-            }
-        });
-    }
-
-    async handleButton(interaction: ButtonInteraction) {
-        // Handle button interactions if needed
-        try {
-            // Custom button handling logic
-            await interaction.reply({ content: 'Button interaction handled!', ephemeral: true });
-        } catch (error) {
-            console.error(`Error executing button interaction: ${interaction.customId}`);
-            console.error(error);
-            await interaction.reply({ content: 'There was an error while executing this interaction!', ephemeral: true });
-        }
     }
 }
