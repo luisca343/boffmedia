@@ -63,6 +63,7 @@
     "googleapis": "^155.0.1",
     "libsodium-wrappers": "^0.7.15",
     "mysql2": "^3.14.3",
+    "necord": "^6.9.1",
     "nestjs-i18n": "^10.5.1",
     "openai": "^5.12.2",
     "passport": "^0.7.0",

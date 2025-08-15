@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { join } from 'path';
 import * as express from 'express';
 import { AppModule } from './app.module';

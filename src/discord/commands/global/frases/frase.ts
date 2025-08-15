@@ -1,49 +1,36 @@
-import { ficusFrases } from "@/_db/schema/Ficus";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, EmbedBuilder } from "discord.js";
-import { eq, or} from 'drizzle-orm';
+import { Injectable } from '@nestjs/common';
+import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { CommandsService } from '@/discord/_commands/commands.service';
+import { formatDate } from '@/_utils/stringUtils';
+import { EmbedBuilder } from 'discord.js';
 
-import { SlashCommandBuilder } from '@discordjs/builders';
-import { CommandsService } from "@/discord/_commands/commands.service";
-import { formatDate } from "@/_utils/stringUtils";
+@Injectable()
+export class FraseCommand {
+  constructor(private readonly service: CommandsService) {}
 
-
-const data = new SlashCommandBuilder()
-.setName('frase')
-.setDescription('Mostrar las frase')
-.addUserOption(option => option.setName('usuario').setDescription('Usuario a buscar'))
-.addIntegerOption(option => 
-    option.setName('num').setDescription('Número de la frase').setRequired(false)
-)
-.addBooleanOption(option => option.setName('global').setDescription('Buscar en todas las frases').setRequired(false));
-
-
-async function execute(interaction, service: CommandsService) {
-    if (!interaction.isCommand()) return;
-  
+  @SlashCommand({
+    name: 'frase',
+    description: 'Mostrar las frase',
+    guilds: ['516237304101339156'],
+  })
+  public async onFrase(@Context() [interaction]: SlashCommandContext) {
     const user = interaction.options.getUser('usuario') || null;
     const num = interaction.options.getInteger('num') || 0;
     const global = interaction.options.getBoolean('global') || false;
-    const frase = await service.getQuote(interaction.guildId, user?.id, num, global);
-    
+    const frase = await this.service.getQuote(interaction.guildId, user?.id, num, global);
 
-    if(!frase){
-        await interaction.reply('No se ha encontrado la frase');
-        return;
+    if (!frase) {
+      await interaction.reply('No se ha encontrado la frase');
+      return;
     }
 
     const embed = new EmbedBuilder()
-    .setColor(`#${frase.color || '0099ff'}`)
-    .setAuthor({name: `${frase.discordName}`, iconURL: `${frase.avatar}`})
-    .setTimestamp()
-    .setDescription(`**"${frase.quote}" **`)
-    .setFooter({ text: `Añadida el ${formatDate(frase.createdAt)}` })
+      .setColor(`#${frase.color || '0099ff'}`)
+      .setAuthor({ name: `${frase.discordName}`, iconURL: `${frase.avatar}` })
+      .setTimestamp()
+      .setDescription(`**"${frase.quote}" **`)
+      .setFooter({ text: `Añadida el ${formatDate(frase.createdAt)}` });
 
-    
-    interaction.reply({ embeds: [embed] });
-
+    await interaction.reply({ embeds: [embed] });
   }
-
-module.exports = {
-    data,
-    execute,
-};
+}

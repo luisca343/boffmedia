@@ -1,26 +1,22 @@
-import { CommandsService } from "@/discord/_commands/commands.service";
-import { SlashCommandBuilder, User } from "discord.js";
+import { Injectable } from '@nestjs/common';
+import { Context, SlashCommand, SlashCommandContext } from 'necord';
+import { CommandsService } from '@/discord/_commands/commands.service';
 
-const data = new SlashCommandBuilder()
-    .setName('nuevafrase')
-    .setDescription('Añadir una nueva frase')
-    .addUserOption(option => option.setName('usuario').setDescription('Usuario a buscar').setRequired(true))
-    .addStringOption(option => option.setName('frase').setDescription('Frase a añadir').setRequired(true))
-    .addStringOption(option => option.setName('comentario').setDescription('Comentario adicional'));
+@Injectable()
+export class NuevaFraseCommand {
+  constructor(private readonly service: CommandsService) {}
 
-async function autocomplete(interaction, db= null){
-    return true
-}
+  @SlashCommand({
+    name: 'nuevafrase',
+    description: 'Añadir una nueva frase',
+    guilds: ['516237304101339156'],
+  })
+  public async onNuevaFrase(@Context() [interaction]: SlashCommandContext) {
+    const user = interaction.options.getUser('usuario');
+    const quote = interaction.options.getString('frase');
+    const comment = interaction.options.getString('comentario');
 
-async function execute(interaction, service: CommandsService) {
-    const user = interaction.options.getUser('usuario') as User;
-    const quote = interaction.options.getString('frase') as string;
-    const comment = interaction.options.getString('comentario') as string;
-    
-    const response = await service.addQuote(interaction.guildId, user, quote, comment);
-    
-    
+    const response = await this.service.addQuote(interaction.guildId, user, quote, comment);
     await interaction.reply(response);
+  }
 }
-
-export { data,autocomplete,  execute };
