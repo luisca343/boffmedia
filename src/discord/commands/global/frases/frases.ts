@@ -47,15 +47,25 @@ export class FrasesCommand {
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
+        .setCustomId(`frases_pagina/first/${guildId}/${userId || 'null'}/1`)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page <= 1)
+        .setEmoji('1179812310534062090'),
+      new ButtonBuilder()
         .setCustomId(`frases_pagina/prev/${guildId}/${userId || 'null'}/${page - 1}`)
-        .setLabel('Previous')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page <= 1),
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page <= 1)
+        .setEmoji('1179812305530277909'),
       new ButtonBuilder()
         .setCustomId(`frases_pagina/next/${guildId}/${userId || 'null'}/${page + 1}`)
-        .setLabel('Next')
-        .setStyle(ButtonStyle.Primary)
+        .setStyle(ButtonStyle.Secondary)
         .setDisabled(page >= totalPages)
+        .setEmoji('1179812307073773568'),
+      new ButtonBuilder()
+        .setCustomId(`frases_pagina/last/${guildId}/${userId || 'null'}/${totalPages}`)
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page >= totalPages)
+        .setEmoji('1179812309338701835')
     );
 
     return { embed, row };
