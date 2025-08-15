@@ -16,9 +16,9 @@ export class FrasesCommand {
   public async onFrases(@Context() [interaction]: SlashCommandContext) {
     const user = interaction.options.getUser('usuario') || null;
     const page = interaction.options.getInteger('page') || 1;
-    const { embed, row } = await this.createEmbed(interaction.guildId, user?.id, page);
+    const { embed } = await this.createEmbed(interaction.guildId, user?.id, page);
 
-    await interaction.reply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed] });
   }
 
   private async createEmbed(guildId: string, userId: string | null, page: number) {
@@ -37,6 +37,6 @@ export class FrasesCommand {
       .setTimestamp()
       .addFields(fields);
 
-    return { embed, row: null }; // Replace `null` with actual row if needed
+    return { embed };
   }
 }
