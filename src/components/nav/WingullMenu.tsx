@@ -4,6 +4,7 @@ import {
   Cpu, 
   BookOpen, 
   Map,
+  MapPin,
   Users,
   Trophy
 } from 'lucide-react'
@@ -36,6 +37,12 @@ export function WingullMenu() {
             label: t("sections.tools.items.guide.label"), 
             description: t("sections.tools.items.guide.description"),
             icon: <BookOpen className="h-5 w-5" />
+          },
+          { 
+            href: "/wingull/pueblos", 
+            label: t("sections.tools.items.pueblos.label"), 
+            description: t("sections.tools.items.pueblos.description"),
+            icon: <MapPin className="h-5 w-5" />
           },
           { 
             href: "/wingull/mapa", 
