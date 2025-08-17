@@ -89,8 +89,8 @@ export function PropertiesSection({ townData, townName }: PropertiesSectionProps
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
-                className="px-8 py-4 rounded-2xl text-white border-2 hover:bg-white/10 transition-all duration-300 hover:scale-105 font-bold"
-                style={{ borderColor: colorOscuro, color: colorOscuro }}
+                className="px-8 py-4 rounded-2xl text-white border-2 hover:bg-white/10 transition-all duration-300 hover:scale-105"
+                style={{ borderColor: colorClaro, color: colorClaro }}
               >
                 Contactar Agente
               </button>

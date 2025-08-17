@@ -15,7 +15,7 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, isExpanded, onToggle, townData, selectedImageIndex, onImageSelect }: PropertyCardProps) {
-  const { color, comodidades } = townData.textos;
+  const { colorClaro, colorMedio, colorOscuro, comodidades } = townData.textos;
   const nearbyAmenities = comodidades?.filter(amenity => 
     property.comodidadesCercanas.includes(amenity.id)
   ) || [];
@@ -34,12 +34,12 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
       {/* Modern card layout with image showcase */}
       <div 
         className="bg-slate-800/40 backdrop-blur-xl rounded-3xl border overflow-hidden transition-all duration-700 hover:shadow-2xl hover:shadow-purple-500/20" 
-        style={{ borderColor: `${color}20` }}
+        style={{ borderColor: `${colorMedio}20` }}
       >
-        {/* Image section - Now taking more space and better aspect ratio */}
+        {/* Image section - More compact */}
         <div className="relative">
           {currentImage ? (
-            <div className="relative h-80 lg:h-96 overflow-hidden">
+            <div className="relative h-64 lg:h-72 overflow-hidden">
               <Image
                 src={currentImage}
                 alt={property.name}
@@ -52,17 +52,18 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
               {/* Enhanced overlay gradients */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
               <div 
-                className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-black/40 opacity-60"
-                style={{ background: `radial-gradient(ellipse at bottom right, ${color}15 0%, transparent 60%)` }}
+                className="absolute inset-0"
+                style={{ background: `radial-gradient(ellipse at bottom right, ${colorClaro}15 0%, transparent 60%)` }}
               />
               
               {/* Property ID badge */}
               <div className="absolute top-6 left-6">
                 <div 
-                  className="px-4 py-2 rounded-2xl backdrop-blur-md border text-white font-bold text-sm shadow-lg"
+                  className="px-4 py-2 rounded-2xl border font-bold text-sm shadow-lg"
                   style={{ 
-                    backgroundColor: `${color}20`, 
-                    borderColor: `${color}40` 
+                    backgroundColor: `${colorClaro}80`, 
+                    borderColor: `${colorOscuro}40`,
+                    color: `${colorOscuro}`
                   }}
                 >
                   Parcela #{property.id}
@@ -103,12 +104,12 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                 </h3>
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2">
-                    <Star className="w-5 h-5" style={{ color }} />
+                    <Star className="w-5 h-5" style={{ color: colorClaro }} />
                     <span className="text-white/90 font-medium">Ubicación Premium</span>
                   </div>
                   <div 
                     className="w-2 h-2 rounded-full" 
-                    style={{ backgroundColor: color }} 
+                    style={{ backgroundColor: colorClaro }} 
                   />
                   <span className="text-white/90 font-medium">Disponible</span>
                 </div>
@@ -117,14 +118,14 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
           ) : (
             /* Fallback for no image */
             <div 
-              className="h-80 lg:h-96 flex items-center justify-center relative overflow-hidden"
-              style={{ background: `linear-gradient(135deg, ${color}20 0%, slate-800 100%)` }}
+              className="h-64 lg:h-72 flex items-center justify-center relative overflow-hidden"
+              style={{ background: `linear-gradient(135deg, ${colorClaro}20 0%, slate-800 100%)` }}
             >
               <div className="text-center space-y-4">
                 <Home className="w-16 h-16 mx-auto text-white/60" />
                 <h3 className="text-3xl font-black text-white">{property.name}</h3>
                 <div className="flex items-center gap-2 justify-center">
-                  <Star className="w-5 h-5" style={{ color }} />
+                  <Star className="w-5 h-5" style={{ color: colorClaro }} />
                   <span className="text-white/90">Parcela #{property.id}</span>
                 </div>
               </div>
@@ -145,7 +146,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                         : 'hover:scale-110 opacity-60 hover:opacity-100'
                     }`}
                     style={{ 
-                      backgroundColor: index === selectedImageIndex ? color : 'white'
+                      backgroundColor: index === selectedImageIndex ? colorClaro : 'white'
                     }}
                   />
                 ))}
@@ -157,33 +158,33 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
           )}
         </div>
 
-        {/* Content section */}
-        <div className="p-8 lg:p-10">
+        {/* Content section - More compact */}
+        <div className="p-6 lg:p-8">
           {/* Quick info and description */}
-          <div className="mb-8">
-            <p className="text-gray-300 text-lg leading-relaxed">
+          <div className="mb-6">
+            <p className="text-gray-300 text-base leading-relaxed">
               {property.info}
             </p>
           </div>
 
           {/* Features grid - more visual */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
             {property.caracteristicas.map((feature, index) => (
               <div 
                 key={index} 
-                className="relative overflow-hidden rounded-2xl p-4 transition-all duration-300 hover:scale-105"
-                style={{ backgroundColor: `${color}10` }}
+                className="relative overflow-hidden rounded-xl p-3 transition-all duration-300 hover:scale-105"
+                style={{ backgroundColor: `${colorMedio}10` }}
               >
                 <div className="flex items-center gap-3">
                   <div 
-                    className="w-3 h-3 rounded-full flex-shrink-0" 
-                    style={{ backgroundColor: color }} 
+                    className="w-2.5 h-2.5 rounded-full flex-shrink-0" 
+                    style={{ backgroundColor: colorMedio }} 
                   />
-                  <span className="text-white font-medium">{feature}</span>
+                  <span className="text-white font-medium text-sm">{feature}</span>
                 </div>
                 <div 
-                  className="absolute -top-2 -right-2 w-8 h-8 rounded-full opacity-20"
-                  style={{ backgroundColor: color }}
+                  className="absolute -top-1 -right-1 w-6 h-6 rounded-full opacity-20"
+                  style={{ backgroundColor: colorMedio }}
                 />
               </div>
             ))}
@@ -191,26 +192,26 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
 
           {/* Nearby amenities */}
           {nearbyAmenities.length > 0 && (
-            <div className="mb-8">
-              <h4 className="text-xl font-bold text-white mb-4 flex items-center gap-3">
-                <MapPin className="w-6 h-6" style={{ color }} />
+            <div className="mb-6">
+              <h4 className="text-lg font-bold text-white mb-3 flex items-center gap-3">
+                <MapPin className="w-5 h-5" style={{ color: colorOscuro }} />
                 Comodidades Cercanas
               </h4>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                 {nearbyAmenities.map((amenity) => {
                   const IconComponent = getIconComponent(amenity.icon);
                   return (
                     <div 
                       key={amenity.id} 
-                      className="group/amenity flex items-center gap-3 bg-slate-700/30 rounded-2xl p-4 transition-all duration-300 hover:bg-slate-600/40 hover:scale-105"
+                      className="group/amenity flex items-center gap-2 bg-slate-700/30 rounded-xl p-3 transition-all duration-300 hover:bg-slate-600/40 hover:scale-105"
                     >
                       <div 
-                        className="p-2 rounded-xl transition-transform duration-300 group-hover/amenity:scale-110"
-                        style={{ backgroundColor: `${color}20` }}
+                        className="p-1.5 rounded-lg transition-transform duration-300 group-hover/amenity:scale-110"
+                        style={{ backgroundColor: `${colorOscuro}20` }}
                       >
-                        <IconComponent className="w-5 h-5" style={{ color }} />
+                        <IconComponent className="w-4 h-4" style={{ color: colorOscuro }} />
                       </div>
-                      <span className="text-gray-200 font-medium text-sm">{amenity.name}</span>
+                      <span className="text-gray-200 font-medium text-xs">{amenity.name}</span>
                     </div>
                   );
                 })}
@@ -218,16 +219,22 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
             </div>
           )}
 
-          {/* Expanded details */}
-          {isExpanded && (
+          {/* Expanded details - Smooth transition */}
+          <div 
+            className="transition-all duration-500 ease-in-out overflow-hidden"
+            style={{ 
+              maxHeight: isExpanded ? '1000px' : '0px',
+              opacity: isExpanded ? 1 : 0
+            }}
+          >
             <div 
-              className="border-t pt-8 mt-8 animate-in slide-in-from-top duration-500" 
-              style={{ borderColor: `${color}20` }}
+              className="border-t pt-6 mt-6" 
+              style={{ borderColor: `${colorMedio}20` }}
             >
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <h4 className="text-xl font-bold text-white mb-4">Detalles Completos</h4>
-                  <p className="text-gray-300 leading-relaxed text-lg">
+                  <h4 className="text-lg font-bold text-white mb-3">Detalles Completos</h4>
+                  <p className="text-gray-300 leading-relaxed">
                     {property.detalle}
                   </p>
                 </div>
@@ -235,12 +242,12 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                 {/* Enhanced image gallery for expanded view */}
                 {allImages.length > 1 && (
                   <div>
-                    <h4 className="text-xl font-bold text-white mb-4">Galería Completa</h4>
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                    <h4 className="text-lg font-bold text-white mb-3">Galería Completa</h4>
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                       {allImages.map((image, index) => (
                         <div 
                           key={index} 
-                          className="relative aspect-video rounded-2xl overflow-hidden group/gallery cursor-pointer"
+                          className="relative aspect-video rounded-xl overflow-hidden group/gallery cursor-pointer"
                           onClick={() => onImageSelect(index)}
                         >
                           <Image
@@ -252,15 +259,15 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                           />
                           <div className="absolute inset-0 bg-black/0 group-hover/gallery:bg-black/30 transition-colors duration-300" />
                           <div 
-                            className={`absolute inset-0 border-4 transition-all duration-300 rounded-2xl ${
+                            className={`absolute inset-0 border-3 transition-all duration-300 rounded-xl ${
                               index === selectedImageIndex 
                                 ? 'opacity-100' 
                                 : 'opacity-0 group-hover/gallery:opacity-60'
                             }`}
-                            style={{ borderColor: color }}
+                            style={{ borderColor: colorClaro }}
                           />
                           {index === selectedImageIndex && (
-                            <div className="absolute top-2 right-2 w-3 h-3 rounded-full" style={{ backgroundColor: color }} />
+                            <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colorClaro }} />
                           )}
                         </div>
                       ))}
@@ -269,22 +276,22 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                 )}
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-8">
+          {/* Action buttons - More compact */}
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <button 
               onClick={onToggle}
-              className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl bg-slate-700/50 text-white hover:bg-slate-600/50 transition-all duration-300 hover:scale-105 font-medium"
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-slate-700/50 text-white hover:bg-slate-600/50 transition-all duration-300 hover:scale-105 font-medium text-sm"
             >
-              <Eye className="w-5 h-5" />
+              <Eye className="w-4 h-4" />
               {isExpanded ? 'Menos detalles' : 'Ver detalles completos'}
             </button>
             <button 
-              className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-white border-2 hover:bg-white/10 transition-all duration-300 hover:scale-105 font-bold shadow-lg" 
-              style={{ borderColor: color, color }}
+              className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-white border-2 hover:bg-white/10 transition-all duration-300 hover:scale-105 shadow-lg text-sm" 
+              style={{ borderColor: colorOscuro }}
             >
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4" />
               Reservar Parcela
             </button>
           </div>

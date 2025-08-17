@@ -14,11 +14,18 @@ export function AmenitiesSection({ townData, townName }: AmenitiesSectionProps) 
 
   return (
     <section
-      className="py-24 relative overflow-hidden"
+      className="pt-0 pb-24 relative overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)`
       }}
     >
+      {/* Top SVG wave transition from HeroSection */}
+      <div className="absolute left-0 right-0 top-0 z-20 pointer-events-none" style={{height: '80px'}}>
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" width="100%" height="80">
+          <path d="M0,40 C480,0 960,80 1440,40 L1440,0 L0,0 Z" fill={colorClaro} />
+          <path d="M0,60 C480,20 960,100 1440,60 L1440,0 L0,0 Z" fill={colorMedio} opacity="0.7" />
+        </svg>
+      </div>
       <div className="absolute inset-0">
         <div 
           className="absolute top-20 left-10 w-72 h-72 rounded-full animate-pulse" 
@@ -33,10 +40,10 @@ export function AmenitiesSection({ townData, townName }: AmenitiesSectionProps) 
       <div className="absolute left-0 right-0 bottom-0 z-20 pointer-events-none" style={{height: '80px'}}>
         <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" width="100%" height="80">
           <path d="M0,40 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill={colorMedio} />
-          <path d="M0,60 C480,100 960,20 1440,60 L1440,80 L0,80 Z" fill={colorOscuro} opacity="0.7" />
+          <path d="M0,65 C480,75 960,45 1440,65 L1440,80 L0,80 Z" fill={colorOscuro} opacity="0.7" />
         </svg>
       </div>
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-40">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-black text-white mb-6">
             <span 

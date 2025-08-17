@@ -106,6 +106,13 @@ export function HeroSection({ townName, townData, onScrollToContent }: HeroSecti
           </div>
         </div>
       </div>
+      {/* SVG wave transition to AmenitiesSection */}
+      <div className="absolute left-0 right-0 bottom-0 z-30 pointer-events-none" style={{height: '80px'}}>
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" width="100%" height="80">
+          <path d="M0,40 C480,80 960,0 1440,40 L1440,80 L0,80 Z" fill={colorClaro} />
+          <path d="M0,65 C480,75 960,45 1440,65 L1440,80 L0,80 Z" fill={colorMedio} opacity="0.7" />
+        </svg>
+      </div>
     </div>
   );
 }
