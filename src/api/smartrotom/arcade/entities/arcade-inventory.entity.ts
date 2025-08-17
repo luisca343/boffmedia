@@ -58,4 +58,18 @@ export class ArcadeInventoryItem {
     description: 'Record creation date' 
   })
   createdAt: Date;
+
+  @ApiProperty({ 
+    example: 3, 
+    description: 'Remaining amount (for consumables)', 
+    required: false 
+  })
+  remainingAmount?: number;
+
+  @ApiProperty({ 
+    example: [1, 2, 3], 
+    description: 'Original database IDs for this aggregated item', 
+    required: false 
+  })
+  originalIds?: number[];
 }
