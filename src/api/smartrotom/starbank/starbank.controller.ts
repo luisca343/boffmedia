@@ -211,7 +211,6 @@ export class StarbankController {
     description: 'Failed to process transfer.' 
   })
   async transferFromMain(@Body(ValidationPipe) transferDto: TransferFromMainDto): Promise<void> {
-    console.log('Transferring from main account with data:', transferDto);
     return await this.starbankFacadeService.transferFromMain(
       transferDto.uuid,
       transferDto.to,
