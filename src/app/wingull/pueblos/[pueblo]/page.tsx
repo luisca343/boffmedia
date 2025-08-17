@@ -15,8 +15,8 @@ function LoadingScreen() {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">
       <div className="text-center space-y-6">
         <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto" />
-        <h2 className="text-2xl font-bold text-white">Cargando información del pueblo...</h2>
-        <p className="text-gray-400">Preparando tu experiencia inmobiliaria</p>
+  <h2 className="text-2xl font-bold" style={{color: '#7EC07C'}}>Cargando información del pueblo...</h2>
+  <p style={{color: '#295228'}}>Preparando tu experiencia inmobiliaria</p>
       </div>
     </div>
   );
@@ -29,8 +29,8 @@ function ErrorScreen({ error, onRetry }: { error: string; onRetry: () => void })
         <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
           <span className="text-2xl">⚠️</span>
         </div>
-        <h2 className="text-2xl font-bold text-white">Error al cargar el pueblo</h2>
-        <p className="text-gray-400">{error}</p>
+  <h2 className="text-2xl font-bold" style={{color: '#7EC07C'}}>Error al cargar el pueblo</h2>
+  <p style={{color: '#295228'}}>{error}</p>
         <button 
           onClick={onRetry}
           className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
