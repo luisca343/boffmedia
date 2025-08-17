@@ -1,7 +1,8 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class TeleportPlayerDto {
+export class TeleportPlayerDto extends BaseDto{
   @ApiProperty({
     description: 'Name of the destination to teleport to',
     example: 'city_center'
