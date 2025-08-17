@@ -7,19 +7,19 @@ export type PlayerStats = {
     /**
      * minecraft:killed stats
      */
-    'minecraft:killed'?: Record<string, any>;
+    'minecraft:killed'?: Record<string, number>;
     /**
      * minecraft:picked_up stats
      */
-    'minecraft:picked_up'?: Record<string, any>;
+    'minecraft:picked_up'?: Record<string, number>;
     /**
      * minecraft:crafted stats
      */
-    'minecraft:crafted'?: Record<string, any>;
+    'minecraft:crafted'?: Record<string, number>;
     /**
      * minecraft:used stats
      */
-    'minecraft:used'?: Record<string, any>;
+    'minecraft:used'?: Record<string, number>;
     /**
      * minecraft:custom stats
      */
@@ -27,11 +27,11 @@ export type PlayerStats = {
     /**
      * minecraft:dropped stats
      */
-    'minecraft:dropped'?: Record<string, any>;
+    'minecraft:dropped'?: Record<string, number>;
     /**
      * minecraft:mined stats
      */
-    'minecraft:mined'?: Record<string, any>;
+    'minecraft:mined'?: Record<string, number>;
     /**
      * Minecraft data version
      */

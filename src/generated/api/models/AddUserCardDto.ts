@@ -6,7 +6,7 @@ export type AddUserCardDto = {
     /**
      * User ID
      */
-    userId: string;
+    userId: number;
     /**
      * Card ID
      */

@@ -20,6 +20,10 @@ export type Game = {
      */
     icon: string;
     /**
+     * Whether the game is active (1 = active, 0 = inactive)
+     */
+    active?: number;
+    /**
      * When the game was created
      */
     createdAt: string;

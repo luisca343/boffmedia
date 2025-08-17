@@ -36,6 +36,8 @@ export type { Chat } from './models/Chat';
 export type { ChatMember } from './models/ChatMember';
 export type { ChatMessage } from './models/ChatMessage';
 export type { CheckAchievementDto } from './models/CheckAchievementDto';
+export type { ClaimItemsDto } from './models/ClaimItemsDto';
+export type { ClaimItemsResponseDto } from './models/ClaimItemsResponseDto';
 export type { ClaimResponse } from './models/ClaimResponse';
 export type { ClaimRewardDto } from './models/ClaimRewardDto';
 export type { ClaimRewardsDto } from './models/ClaimRewardsDto';
@@ -236,6 +238,7 @@ export type { UpdateUserCardQuantityDto } from './models/UpdateUserCardQuantityD
 export type { UpdateUserDto } from './models/UpdateUserDto';
 export type { UploadFileDto } from './models/UploadFileDto';
 export type { UploadImageDto } from './models/UploadImageDto';
+export type { UploadNpcImageDto } from './models/UploadNpcImageDto';
 export type { UserAchievement } from './models/UserAchievement';
 export type { UserCard } from './models/UserCard';
 export type { UserCardHistory } from './models/UserCardHistory';

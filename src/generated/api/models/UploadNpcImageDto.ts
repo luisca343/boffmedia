@@ -2,18 +2,18 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type TeleportPlayerDto = {
+export type UploadNpcImageDto = {
     /**
      * Server UUID (automatically added by middleware)
      */
     server?: string;
     /**
-     * Name of the destination to teleport to
+     * NPC name
      */
-    id: string;
+    npcName: string;
     /**
-     * UUID of the player to teleport
+     * Base64 encoded PNG image
      */
-    uuid: string;
+    image: string;
 };
 

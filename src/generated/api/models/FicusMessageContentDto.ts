@@ -4,6 +4,9 @@
 /* eslint-disable */
 import type { MessageSender } from './MessageSender';
 export type FicusMessageContentDto = {
+    /**
+     * Sender of the message
+     */
     sender: MessageSender;
     /**
      * Parts of the message

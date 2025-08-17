@@ -39,6 +39,14 @@ export type ArcadeInventoryItem = {
      * Record creation date
      */
     createdAt: string;
+    /**
+     * Remaining amount (for consumables)
+     */
+    remainingAmount?: number;
+    /**
+     * Original database IDs for this aggregated item
+     */
+    originalIds?: Array<string>;
 };
 export namespace ArcadeInventoryItem {
     /**
