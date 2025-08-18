@@ -16,6 +16,10 @@ export type ArcadeInventoryItem = {
      */
     itemId: string;
     /**
+     * Item data (used for Pokemon specs)
+     */
+    itemData: string;
+    /**
      * Item type
      */
     itemType: string;

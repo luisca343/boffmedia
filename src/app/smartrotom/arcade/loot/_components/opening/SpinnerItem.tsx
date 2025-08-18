@@ -6,6 +6,7 @@ import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
 import { ArcadeInventoryItem, LootboxItemConfig } from "@/generated/api";
+import { getRewardIcon } from "../../../_util/rewardIcons";
 
 interface SpinnerItemProps {
   item: LootboxItemConfig;
@@ -29,12 +30,9 @@ export function SpinnerItem({ item, index, isWinningItem, winningIndex }: Spinne
         flexBasis: '170px'
       }}
     >
-      <div className="relative w-32 h-32 mb-2">
-        <ItemImage
-          itemId={item.id}
-          size={128}
-        />
-        
+      <div className="relative w-32 h-32 mb-2 items-center flex justify-center">
+        {getRewardIcon({type: item.type, description: item.data || item.id, size: 128})}
+
         {/* Special effects for rare items */}
         {(item.rarity === 'epic' || item.rarity === 'legendary') && (
           <motion.div
@@ -51,7 +49,7 @@ export function SpinnerItem({ item, index, isWinningItem, winningIndex }: Spinne
       </div>
       
       <h3 className={`${config.textColor} font-bold text-center text-sm md:text-base`}>
-        {getItemName(t, item.id)}
+        {getItemName(t, item.id, item.type)}
       </h3>
       
       <div className={`${config.textColor} text-xs uppercase tracking-wider mt-1`}>

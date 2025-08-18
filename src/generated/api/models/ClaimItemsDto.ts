@@ -1,18 +1,20 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
-
-import { ArcadeInventoryItem } from "./ArcadeInventoryItem";
-
 /* eslint-disable */
+import type { ArcadeInventoryItem } from './ArcadeInventoryItem';
 export type ClaimItemsDto = {
+    /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
     /**
      * Player UUID
      */
     uuid: string;
     /**
-     * Array of item IDs to claim
+     * Array of inventory items to claim
      */
-    items: ArcadeInventoryItem[]
+    items: Array<ArcadeInventoryItem>;
 };
 

@@ -4,6 +4,7 @@ import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemDescription, getItemName, getItemRarity } from "@/lib/intlUtils";
 import { ArcadeInventoryItem } from "@/generated/api";
+import { getRewardIcon } from "../../../_util/rewardIcons";
 
 interface ItemDetailModalProps {
   item: ArcadeInventoryItem | null;
@@ -27,7 +28,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
       <div className={`${config.bgColor} border-4 ${config.borderColor} rounded-lg p-6 max-w-md w-full ${config.glow}`}>
         <div className="flex justify-between items-start mb-4">
           <h3 className={`${config.textColor} text-2xl font-bold`}>
-            {getItemName(t, item.itemId)}
+            {getItemName(t, item.itemId, item.itemType)}
           </h3>
           <button 
             onClick={onClose}
@@ -39,13 +40,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
         
         <div className="flex flex-col items-center mb-6">
           <div className="w-48 h-48 mb-4 flex items-center justify-center bg-black/30 rounded-lg border border-surface-700">
-            <ItemDisplay
-              type={getItemType(item)}
-              itemId={item.itemId}
-              count={item.amount}
-              size={160}
-              rarity={item.rarity}
-            />
+            {getRewardIcon({type: item.itemType, description: item.itemData || item.itemId, size: 128})}
           </div>
           
           {item.amount && item.amount > 1 && (
@@ -61,7 +56,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
           </span>
           
           <p className="text-surface-200 text-center bg-black/30 p-4 rounded-lg border border-surface-800">
-            {getItemDescription(t, item.itemId) || `Un objeto ${item.rarity} de la colección.`}
+            {item.itemType === "pokemon" ? item.itemId : getItemDescription(t, item.itemId) || `Un objeto ${item.rarity} de la colección.`}
           </p>
         </div>
         

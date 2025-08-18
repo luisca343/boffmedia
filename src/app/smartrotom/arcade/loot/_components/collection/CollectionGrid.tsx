@@ -4,6 +4,7 @@ import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemName, getItemRarity } from "@/lib/intlUtils";
 import { ArcadeInventoryItem } from "@/generated/api";
+import { getRewardIcon } from "../../../_util/rewardIcons";
 
 interface CollectionGridProps {
   items: ArcadeInventoryItem[];
@@ -50,17 +51,11 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
             className={`${config.bgColor} border-2 ${config.borderColor} rounded-lg p-3 flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200 ${config.glow}`}
           >
             <div className="w-full aspect-square mb-2 flex items-center justify-center">
-              <ItemDisplay
-                type={item.sourceType!}
-                itemId={item.itemId}
-                count={item.amount}
-                size={96}
-                rarity={item.rarity}
-              />
+              {getRewardIcon({type: item.itemType, description: item.itemData || item.itemId, size: 96})}
             </div>
             
             <h3 className={`${config.textColor} font-medium text-center text-sm truncate w-full`}>
-              {getItemName(t, item.itemId, item.sourceType)}
+              {getItemName(t, item.itemId, item.itemType!)}
             </h3>
             <p className={`${config.textColor} text-xs mt-1`}>
               {getItemRarity(t, item.rarity)}

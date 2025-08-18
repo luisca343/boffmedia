@@ -4,11 +4,11 @@
 /* eslint-disable */
 export type ClaimItemsResponseDto = {
     /**
-     * Items that were successfully claimed and consumed
+     * Item IDs that were successfully claimed and consumed
      */
     claimedItems: Array<string>;
     /**
-     * Items that could not be found or consumed
+     * Item IDs that could not be found or consumed
      */
     failedItems: Array<string>;
     /**
