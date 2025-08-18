@@ -107,6 +107,7 @@ export const smartRotomInventory = mysqlTable("rotom_inventory", {
     id: int("id").primaryKey().autoincrement(),
     uuid: char("uuid", { length: 36 }).notNull().references(() => smartrotomUsers.uuid, {onDelete: "cascade", onUpdate: "cascade"}),
     itemId: varchar("item_id", { length: 32 }).notNull(),
+    itemData: varchar("item_data", { length: 255 }).notNull(),
     itemType: varchar("item_type", { length: 32 }).notNull(),
     amount: int("amount").default(1),
     sourceType: varchar("source_type", { length: 32 }),

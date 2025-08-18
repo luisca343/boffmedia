@@ -6,7 +6,6 @@ import { SmartRotomAppsModule } from '@api/smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 import { InvitesModule } from './api/wingull/invites/invites.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
-import { MySQL2Service } from './_utils/MySQL2Service';
 import { PokemonController } from '@api/smartrotom/pokemon/pokemon.controller';
 import { PokemonModule } from '@api/smartrotom/pokemon/pokemon.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -63,6 +62,9 @@ import { SpriteManifestService } from '@api/smartrotom/pokemon/services/sprite-m
 import { SmartRotomMineModule } from '@api/smartrotom/mine/mine.module';
 import { TcgModule } from '@api/boffmedia/herramientas/pokemon/tcgpocket/tcg.module';
 import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
+import { AutomationModule } from './automation/automation.module';
+import { MySQL2Service } from './_utils/MySQL2Service';
+import { WingullSQL2Service } from './_utils/WingullSQL2Service';
 
 @Module({
   imports: [
@@ -106,11 +108,12 @@ import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
     WingullModule,
     SmartRotomMineModule,
     PokemonModule,
-    FicusAIModule
+    FicusAIModule,
+    AutomationModule,
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, MySQL2Service, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, DiscordService, CommandsService, 
-     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService,
+  providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
+     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService, MySQL2Service, WingullSQL2Service,
     {
     provide: ConfigService,
     useClass: ConfigService,

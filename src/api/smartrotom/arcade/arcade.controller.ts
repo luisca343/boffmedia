@@ -8,6 +8,7 @@ import { OpenLootBoxDto, OpenLootBoxResponseDto } from './dto/lottbox.dto';
 import { ClaimRewardDto } from './dto/arcade-streak.dto';
 import { AddInventoryItemDto, ConsumeInventoryItemDto } from './dto/inventory.dto';
 import { GiveLootboxDto } from './dto/lootbox-management.dto';
+import { ClaimItemsDto, ClaimItemsResponseDto } from './dto/claim-items.dto';
 
 // Import entities
 import { ArcadeStreak } from './entities/arcade-streak.entity';
@@ -245,9 +246,24 @@ export class ArcadeController {
 
   // ==================== COMBINED ENDPOINTS ====================
 
+  @Post('claim-items')
+  @ApiOperation({ summary: 'Claim multiple items from inventory and give them to player in-game' })
+  @ApiResponse({ 
+    status: HttpStatus.OK, 
+    description: 'Items claimed and distributed successfully.',
+    type: ClaimItemsResponseDto
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: 'Invalid request or missing parameters.'
+  })
+  @ApiBody({ type: ClaimItemsDto })
+  async claimItems(@Body() claimData: ClaimItemsDto): Promise<ClaimItemsResponseDto> {
+    return this.arcadeFacadeService.claimItems(claimData);
+  }
+
   /*
   @Post('inventory/claim-multiple')
-  @ApiOperation({ summary: 'Claim multiple items at once' })
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Items claimed successfully.',

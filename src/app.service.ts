@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { MySQL2Service } from './_utils/MySQL2Service';
 import { LoggingUtil } from './_utils/LoggingUtils';
 
 import { google, sheets_v4 } from 'googleapis';
@@ -21,11 +20,8 @@ export class AppService {
 
   constructor(
     private configService: ConfigService,
-    private db: MySQL2Service,
     private pokemonService: PokemonDataManagementService,
   ) {
-    db.migrar();
-    //pokemonService.initializeData();
     this.loadCache();
   }
 

@@ -35,6 +35,12 @@ class LootItemDto {
 
   @ApiProperty({ description: 'Server inventory item ID', required: false, example: 456 })
   serverId?: number;
+
+  @ApiProperty({ description: 'Item type', example: 'item' })
+  type?: string;
+
+  @ApiProperty({ description: 'Additional data associated with the item', example: "Pikachu lvl:25" })
+  data?: any;
 }
 
 export class OpenLootBoxResponseDto {

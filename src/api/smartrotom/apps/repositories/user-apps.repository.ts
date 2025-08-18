@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, sql, or } from 'drizzle-orm';
+import { eq, and, sql, or, asc } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { 
   SmartRotomUserApp, 
@@ -93,12 +93,12 @@ export class UserAppsRepository implements IUserAppsRepository {
       eq(smartrotomApps.id, smartrotomUserApps.appId),
       eq(smartrotomUserApps.uuid, uuid)
     ))
-    .where(or(
+    .where(and(
       eq(smartrotomApps.active, 1),
       eq(smartrotomUserApps.uuid, uuid)
     ))
     .orderBy(
-      sql`is_user_app DESC, orden ASC, ${smartrotomApps.name} ASC`
+      asc(smartrotomUserApps.order),
     );
   }
 }

@@ -10,16 +10,20 @@ export class CommandsService {
     constructor(private db: MySQL2Service) {}
     private testServerGUID = '516237304101339156';
     
-    async getFrases(guildID: string, userID?: string, page = 1, maxQuotes = 10) {
+    async getFrases(guildID: string, userID?: string | { id: string }, page = 1, maxQuotes = 10) {
+        console.log(`Fetching quotes for guild: ${guildID}, user: ${userID}, page: ${page}`);
         let condition;
         if (guildID !== this.testServerGUID) {
             condition = eq(ficusFrases.serverID, guildID);
         }
         
-        const finalCondition = userID ?
-        and(condition, eq(ficusFrases.discordId, userID)) :
-        condition;
-        
+        const finalCondition = userID
+            ? and(condition, eq(ficusFrases.discordId, typeof userID === 'string' ? userID : userID.id))
+            : condition;
+
+        console.log('Final condition for fetching quotes:');
+        console.log(finalCondition);
+
         // Count the total number of quotes
         const totalCountQuery = await this.db.getDrizzle().select({
             count: sql`COUNT(*)`
@@ -27,6 +31,7 @@ export class CommandsService {
         .from(ficusFrases)
         .where(finalCondition);
         
+        console.log(`Total quotes found: ${totalCountQuery[0].count}`);
         const totalCount = totalCountQuery[0].count as number;
         const totalPages = Math.ceil(totalCount / maxQuotes);
         
@@ -64,6 +69,8 @@ export class CommandsService {
         .from(discordUsers)
         .where(eq(discordUsers.userId, user.id))
         .limit(1);
+
+        console.log(`User exists: ${userExists.length > 0}`);
         
         if (userExists.length === 0) {
             await this.db.getDrizzle()
@@ -85,7 +92,9 @@ export class CommandsService {
             quote: quote,
             comment: comment
         } as FicusFrase);
-        
+
+        console.log(`Quote inserted: ${quoteInsert}`);
+
         return { content: `Frase añadida correctamente "${quote}" - ${user.globalName}`, ephemeral: false };
         
     }
@@ -177,4 +186,3 @@ export class CommandsService {
             .where(eq(discordUsers.userId, userId));
         }
     }
-    

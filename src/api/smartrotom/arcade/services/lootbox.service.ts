@@ -39,7 +39,8 @@ export class LootboxService {
     const newItemResult = await this.arcadeInventoryRepository.addItem({
       uuid,
       itemId: selectedItem.id,
-      itemType: rarity.toUpperCase(),
+      itemData: selectedItem.data || null,
+      itemType: selectedItem.type || 'lootbox_item',
       amount: 1,
       sourceType: 'arcade',
       used: 0,
@@ -52,11 +53,14 @@ export class LootboxService {
       item => item.id === selectedItem.id && item.isWinningItem
     );
     
+    
     return {
       item: {
         id: selectedItem.id,
         rarity: rarity,
         weight: selectedItem.weight,
+        type: selectedItem.type || 'item',
+        data: selectedItem.data || null
       },
       spinnerItems: spinnerItems,
       winningPosition: winningPosition,
@@ -72,6 +76,7 @@ export class LootboxService {
     await this.arcadeInventoryRepository.addItem({
       uuid,
       itemId: boxId,
+      itemData: undefined, // Lootboxes don't have itemData
       itemType: 'lootbox',
       amount,
       sourceType: 'arcade',
@@ -93,7 +98,9 @@ export class LootboxService {
       description: box.description,
       items: box.items.map(item => ({
         id: item.id,
-        weight: item.weight
+        weight: item.weight,
+        type: item.type || 'item',
+        data: item.data || null
       })),
       theme: box.theme
     }));

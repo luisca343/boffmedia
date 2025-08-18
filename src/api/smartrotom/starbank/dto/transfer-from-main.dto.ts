@@ -19,7 +19,7 @@ export class TransferFromMainDto extends BaseDto {
   })
   @IsNotEmpty({ message: 'Destination account ID is required' })
   @IsNumber({}, { message: 'Destination account ID must be a number' })
-  @Min(1, { message: 'Destination account ID must be at least 1' })
+  @Min(0, { message: 'Destination account ID must be at least 0' })
   to: number;
 
   @ApiProperty({

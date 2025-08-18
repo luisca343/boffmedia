@@ -3,6 +3,7 @@ import { WingullEconomyService } from './services/wingull-economy.service';
 import { WingullPlayerService } from './services/wingull-player.service';
 import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
+import { WingullRepository } from './repositories/wingull.repository';
 import { WingullBalanceDto } from './dto/wingull-balance.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
@@ -15,6 +16,7 @@ export class WingullFacadeService {
     private readonly wingullPlayerService: WingullPlayerService,
     private readonly wingullWorldService: WingullWorldService,
     private readonly wingullTransportService: WingullTransportService,
+    private readonly wingullRepository: WingullRepository
   ) {}
   
   // ==================== ECONOMY OPERATIONS ====================
@@ -154,6 +156,10 @@ export class WingullFacadeService {
     }
   }
   
+  async getWorldGuardWorlds(): Promise<{ id: number; name: string }[]> {
+    return await this.wingullRepository.getWorldGuardWorlds();
+  }
+  
   // ==================== TRANSPORTATION OPERATIONS ====================
   
   async getTaxiStops(): Promise<TaxiStop[]> {
@@ -172,5 +178,13 @@ export class WingullFacadeService {
       console.error(`Error teleporting player ${uuid} to ${id}:`, error);
       throw new Error(`Failed to teleport player: ${error.message}`);
     }
+  }
+
+  async getPlayersOwnedRegions(uuid: string): Promise<{ region_id: string; world_id: number; owner: boolean; name: string; uuid: string }[]> {
+    return await this.wingullRepository.getPlayersOwnedRegions(uuid);
+  }
+
+  async getAllPlots(): Promise<any[]> {
+    return await this.wingullRepository.getAllPlots();
   }
 }

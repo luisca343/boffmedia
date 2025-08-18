@@ -20,6 +20,18 @@ export class LootboxItemConfig {
     enum: ['common', 'uncommon', 'rare', 'epic', 'legendary']
   })
   rarity?: ItemRarity;
+
+  @ApiProperty({
+    example: 'item',
+    description: 'Type of the item',
+  })
+  type?: string;
+
+  @ApiProperty({
+    example: "Pikachu lvl:25",
+    description: 'Additional data associated with the item'
+  })
+  data?: string;
 }
 
 export class LootboxBoxConfig {

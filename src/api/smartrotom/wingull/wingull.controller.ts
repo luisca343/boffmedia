@@ -1,8 +1,7 @@
-import { Body, Controller, Get, Post, HttpStatus, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, HttpStatus, UseInterceptors, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
-import { TeleportPlayerDto } from '../_dto/teleport-player.dto';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Weather } from './entities/weather.entity';
 import { Performance } from './entities/performance.entity';
@@ -11,6 +10,7 @@ import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PlayerStats } from './entities/player-stats.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
+import { WingullWorldService } from './services/wingull-world.service';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -18,6 +18,7 @@ import { PokemonW } from './entities/pokemon-w-.entity';
 export class WingullController {
   constructor(
     private readonly wingullFacadeService: WingullFacadeService,
+    private readonly wingullWorldService: WingullWorldService,
   ) {}
 
   // Town colors configuration
@@ -102,6 +103,15 @@ export class WingullController {
     return await this.wingullFacadeService.getTeam(uuid);
   }
 
+  @Get('taxi/stops')
+  @ApiOperation({ summary: 'Get all taxi stops' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.', type: [TaxiStop] })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve taxi stops.' })
+  async getTaxiStops() {
+    console.log('Fetching all taxi stops');
+    return await this.wingullFacadeService.getTaxiStops();
+  }
+
   @Post('updateDex')
   @ApiOperation({ summary: 'Update player Pokédex' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Player Pokédex updated successfully.' })
@@ -178,24 +188,43 @@ export class WingullController {
     return await this.wingullFacadeService.updateNPCs(data);
   }
 
-  //=====================================================
-  // Transportation endpoints
-  //=====================================================
-
-  @Get('taxi/stops')
-  @ApiOperation({ summary: 'Get all taxi stops' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.', type: [TaxiStop] })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve taxi stops.' })
-  async getTaxiStops() {
-    return await this.wingullFacadeService.getTaxiStops();
+  @Get('worldguard-worlds')
+  @ApiOperation({ summary: 'Fetch all WorldGuard worlds' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'WorldGuard worlds fetched successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to fetch WorldGuard worlds.' })
+  async getWorldGuardWorlds() {
+    return await this.wingullFacadeService.getWorldGuardWorlds();
   }
 
-  @Post('taxi/teleport')
-  @ApiOperation({ summary: 'Teleport player to taxi stop' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Player teleported successfully.', type: SuccessResponse })
-  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to teleport player.' })
-  async teleportPlayer(@Body() { id, uuid }: TeleportPlayerDto) {
-    const result = await this.wingullFacadeService.teleportPlayer(id, uuid);
-    return { success: result };
+  @Get('owned-regions/:uuid')
+  @ApiOperation({ summary: "Fetch player's owned regions by UUID" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Player's owned regions fetched successfully." })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: "Failed to fetch player's owned regions." })
+  async getPlayersOwnedRegions(@Param('uuid') uuid: string) {
+    return await this.wingullFacadeService.getPlayersOwnedRegions(uuid);
+  }
+
+  @Get('plots')
+  @ApiOperation({ summary: 'Fetch all plots' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Plots fetched successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to fetch plots.' })
+  async getAllPlots() {
+    return await this.wingullFacadeService.getAllPlots();
+  }
+
+  @Get('towns')
+  @ApiOperation({ summary: 'Get all available towns' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Towns list retrieved successfully.', type: [String] })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve towns list.' })
+  async getAllTowns() {
+    return await this.wingullWorldService.getAllTowns();
+  }
+
+  @Get('towns/:townName')
+  @ApiOperation({ summary: 'Get information about a specific town' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Town information retrieved successfully.' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Town not found.' })
+  async getTownInfo(@Param('townName') townName: string) {
+    return await this.wingullWorldService.getTownInfo(townName);
   }
 }

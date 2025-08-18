@@ -3,6 +3,8 @@ import { ItemRarity } from "../entities/arcade-inventory.entity";
 interface LootBoxItem {
   id: string;
   weight: number;
+  type: string;
+  data?: string;
 }
 
 export const rarityRanges = {
@@ -44,23 +46,23 @@ export const lootboxConfig: LootBoxConfig = {
       image: "/smartrotom/img/apps/arcade/lootbox/trainer_box.png",
       description: "Una caja básica con objetos esenciales para entrenadores principiantes.",
       items: [
-        { id: "pixelmon:poke_ball", weight: 90 },
-        { id: "pixelmon:potion", weight: 90 },
-        { id: "pixelmon:antidote", weight: 85 },
-        { id: "pixelmon:paralyze_heal", weight: 80 },
-        { id: "pixelmon:awakening", weight: 80 },
-        { id: "pixelmon:great_ball", weight: 45 },
-        { id: "pixelmon:super_potion", weight: 40 },
-        { id: "pixelmon:repel", weight: 35 },
-        { id: "pixelmon:escape_rope", weight: 30 },
-        { id: "pixelmon:ultra_ball", weight: 18 },
-        { id: "pixelmon:hyper_potion", weight: 15 },
-        { id: "pixelmon:revive", weight: 12 },
-        { id: "pixelmon:max_revive", weight: 8 },
-        { id: "pixelmon:max_potion", weight: 6 },
-        { id: "pixelmon:full_restore", weight: 4 },
-        { id: "pixelmon:master_ball", weight: 2 },
-        { id: "pixelmon:sacred_ash", weight: 1 }
+        { id: "Blissey", weight: 90, type: "pokemon", data: "Blissey  lvl:33"  },
+        { id: "pixelmon:potion", type: "item", weight: 90 },
+        { id: "pixelmon:antidote", type: "item", weight: 85 },
+        { id: "pixelmon:paralyze_heal", type: "item", weight: 80 },
+        { id: "pixelmon:awakening", type: "item", weight: 80 },
+        { id: "pixelmon:great_ball", type: "item", weight: 45 },
+        { id: "pixelmon:super_potion", type: "item", weight: 40 },
+        { id: "pixelmon:repel", type: "item", weight: 35 },
+        { id: "pixelmon:escape_rope", type: "item", weight: 30 },
+        { id: "pixelmon:ultra_ball", type: "item", weight: 18 },
+        { id: "pixelmon:hyper_potion", type: "item", weight: 15 },
+        { id: "pixelmon:revive", type: "item", weight: 12 },
+        { id: "pixelmon:max_revive", type: "item", weight: 8 },
+        { id: "pixelmon:max_potion", type: "item", weight: 6 },
+        { id: "pixelmon:full_restore", type: "item", weight: 4 },
+        { id: "pixelmon:master_ball", type: "item", weight: 2 },
+        { id: "pixelmon:sacred_ash", type: "item", weight: 1 }
       ],
       theme: "blue"
     },
@@ -70,21 +72,21 @@ export const lootboxConfig: LootBoxConfig = {
       image: "/smartrotom/img/apps/arcade/lootbox/evolution_box.png",
       description: "Contiene objetos que ayudan a tus Pokémon a evolucionar.",
       items: [
-        { id: "leaf_stone", weight: 100 },
-        { id: "fire_stone", weight: 90 },
-        { id: "water_stone", weight: 90 },
-        { id: "thunder_stone", weight: 80 },
-        { id: "moon_stone", weight: 45 },
-        { id: "sun_stone", weight: 40 },
-        { id: "kings_rock", weight: 35 },
-        { id: "metal_coat", weight: 18 },
-        { id: "dragon_scale", weight: 15 },
-        { id: "upgrade", weight: 12 },
-        { id: "dawn_stone", weight: 8 },
-        { id: "dusk_stone", weight: 6 },
-        { id: "shiny_stone", weight: 4 },
-        { id: "dubious_disc", weight: 2 },
-        { id: "prism_scale", weight: 1 }
+        { id: "leaf_stone", type: "item", weight: 100 },
+        { id: "fire_stone", type: "item", weight: 90 },
+        { id: "water_stone", type: "item", weight: 90 },
+        { id: "thunder_stone", type: "item", weight: 80 },
+        { id: "moon_stone", type: "item", weight: 45 },
+        { id: "sun_stone", type: "item", weight: 40 },
+        { id: "kings_rock", type: "item", weight: 35 },
+        { id: "metal_coat", type: "item", weight: 18 },
+        { id: "dragon_scale", type: "item", weight: 15 },
+        { id: "upgrade", type: "item", weight: 12 },
+        { id: "dawn_stone", type: "item", weight: 8 },
+        { id: "dusk_stone", type: "item", weight: 6 },
+        { id: "shiny_stone", type: "item", weight: 4 },
+        { id: "dubious_disc", type: "item", weight: 2 },
+        { id: "prism_scale", type: "item", weight: 1 }
       ],
       theme: "green"
     },
@@ -94,21 +96,21 @@ export const lootboxConfig: LootBoxConfig = {
       image: "/smartrotom/img/apps/arcade/lootbox/battle_box.png",
       description: "Objetos avanzados para dar ventaja a tus Pokémon en combates competitivos.",
       items: [
-        { id: "x_attack", weight: 100 },
-        { id: "x_defend", weight: 95 },
-        { id: "x_speed", weight: 90 },
-        { id: "x_accuracy", weight: 85 },
-        { id: "dire_hit", weight: 45 },
-        { id: "guard_spec", weight: 40 },
-        { id: "calcium", weight: 35 },
-        { id: "choice_band", weight: 18 },
-        { id: "leftovers", weight: 16 },
-        { id: "focus_sash", weight: 14 },
-        { id: "life_orb", weight: 8 },
-        { id: "assault_vest", weight: 6 },
-        { id: "mega_stone", weight: 4 },
-        { id: "z_crystal", weight: 2 },
-        { id: "dynamax_band", weight: 1 }
+        { id: "x_attack", type: "item", weight: 100 },
+        { id: "x_defend", type: "item", weight: 95 },
+        { id: "x_speed", type: "item", weight: 90 },
+        { id: "x_accuracy", type: "item", weight: 85 },
+        { id: "dire_hit", type: "item", weight: 45 },
+        { id: "guard_spec", type: "item", weight: 40 },
+        { id: "calcium", type: "item", weight: 35 },
+        { id: "choice_band", type: "item", weight: 18 },
+        { id: "leftovers", type: "item", weight: 16 },
+        { id: "focus_sash", type: "item", weight: 14 },
+        { id: "life_orb", type: "item", weight: 8 },
+        { id: "assault_vest", type: "item", weight: 6 },
+        { id: "mega_stone", type: "item", weight: 4 },
+        { id: "z_crystal", type: "item", weight: 2 },
+        { id: "dynamax_band", type: "item", weight: 1 }
       ],
       theme: "red"
     }

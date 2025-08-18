@@ -19,6 +19,8 @@ import { WingullEconomyRepository } from './repositories/wingull-economy.reposit
 import { WingullTransportRepository } from './repositories/wingull-transport.repository';
 import { WingullPlayerRepository } from './repositories/wingull-player.repository';
 import { WingullWorldRepository } from './repositories/wingull-world.repository';
+import { WingullRepository } from './repositories/wingull.repository';
+import { WingullSQL2Service } from '@/_utils/WingullSQL2Service';
 
 @Module({
   imports: [LoggerModule, ResponseModule],
@@ -30,6 +32,7 @@ import { WingullWorldRepository } from './repositories/wingull-world.repository'
     WingullTransportService,
     
     WingullFacadeService,
+    WingullSQL2Service,
 
     {
       provide: WINGULL_ECONOMY_REPOSITORY_TOKEN,
@@ -46,7 +49,8 @@ import { WingullWorldRepository } from './repositories/wingull-world.repository'
     {
       provide: WINGULL_WORLD_REPOSITORY_TOKEN,
       useClass: WingullWorldRepository
-    }
+    },
+    WingullRepository
   ],
   exports: [
     WingullFacadeService,
@@ -60,6 +64,8 @@ import { WingullWorldRepository } from './repositories/wingull-world.repository'
     WINGULL_TRANSPORT_REPOSITORY_TOKEN,
     WINGULL_USER_REPOSITORY_TOKEN,
     WINGULL_WORLD_REPOSITORY_TOKEN,
+
+    WingullRepository,
   ],
 })
 export class WingullModule {}
