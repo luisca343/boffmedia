@@ -1,9 +1,11 @@
 import { ReactNode } from "react";
 import { ItemImage } from "@/lib/ItemImage";
 import { Check } from "lucide-react";
+import { getRewardIcon } from "../../_util/rewardIcons";
 
 interface ItemDisplayProps {
   type: string;
+  itemData: string;
   itemId: string;
   count?: number;
   size?: number;
@@ -20,6 +22,7 @@ interface ItemDisplayProps {
 
 export const ItemDisplay = ({ 
   type, 
+  itemData,
   itemId, 
   count = 0, 
   size = 64, 
@@ -40,12 +43,7 @@ export const ItemDisplay = ({
       onClick={selectable && !isChest ? onClick : undefined}
     >
       <div className="relative flex justify-center items-center">
-        <ItemImage
-          type={type}
-          itemId={itemId}
-          amount={0} 
-          size={size}
-        />
+        {getRewardIcon({type: type, description: itemData || itemId, size})}
         
         {count > 1 && showCountBadge && (
           <span className="absolute bottom-0 right-0 bg-surface-900/80 text-white text-xs px-1.5 py-0.5 rounded-md border border-surface-700">

@@ -2,9 +2,6 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-/**
- * Language/locale to warmup
- */
 export enum Locale {
     ES = 'es',
     EN = 'en',

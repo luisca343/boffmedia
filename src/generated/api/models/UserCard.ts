@@ -10,7 +10,7 @@ export type UserCard = {
     /**
      * User ID
      */
-    userId: string;
+    userId: number;
     /**
      * Card ID
      */

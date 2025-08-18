@@ -102,8 +102,8 @@ export default function PlayerAppManagement() {
     if (!allApps || !playerApps || !selectedPlayerUuid) return { extraApps: [], availableApps: [] };
     const playerAppIds = new Set(playerApps.map((app: SmartRotomApp) => app.id));
     return {
-      extraApps: allApps.filter((app: SmartRotomApp) => app.active === 0 && playerAppIds.has(app.id)),
-      availableApps: allApps.filter((app: SmartRotomApp) => app.active === 0 && !playerAppIds.has(app.id)),
+      extraApps: allApps.filter((app: SmartRotomApp) => app.active === 1 && playerAppIds.has(app.id)),
+      availableApps: allApps.filter((app: SmartRotomApp) => app.active === 1 && !playerAppIds.has(app.id)),
     };
   }, [allApps, playerApps, selectedPlayerUuid]);
 

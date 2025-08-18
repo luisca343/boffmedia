@@ -8,6 +8,9 @@ export type WarmupCacheDto = {
      * Server UUID (automatically added by middleware)
      */
     server?: string;
+    /**
+     * Language/locale to warmup
+     */
     locale?: Locale;
 };
 

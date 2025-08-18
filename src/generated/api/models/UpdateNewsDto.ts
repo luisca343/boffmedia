@@ -4,6 +4,14 @@
 /* eslint-disable */
 export type UpdateNewsDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
+     * Unique identifier for the news article
+     */
+    id: number;
+    /**
      * News title
      */
     title: string;

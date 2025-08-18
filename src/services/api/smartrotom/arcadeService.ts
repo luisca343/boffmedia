@@ -11,7 +11,9 @@ import type {
   SuccessResponse,
   ArcadeStreak,
   ArcadeInventoryResponse,
-  LootboxConfigEntity
+  LootboxConfigEntity,
+  ClaimItemsDto,
+  ClaimItemsResponseDto
 } from '@/generated/api';
 
 export class ArcadeService {
@@ -152,6 +154,12 @@ export class ArcadeService {
   }
 
   // ==================== COMBINED ENDPOINTS ====================
+  /**
+   * Claim multiple items from inventory and give them to player in-game
+   */
+  static claimItems(claimItemsDto: ClaimItemsDto): Promise<ApiResponse<ClaimItemsResponseDto>> {
+    return rotomPOST<ClaimItemsResponseDto>('/arcade/claim-items', claimItemsDto);
+  }
 
   /**
    * Get complete user arcade data

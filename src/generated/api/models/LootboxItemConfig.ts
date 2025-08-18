@@ -15,6 +15,14 @@ export type LootboxItemConfig = {
      * Rarity category of the item
      */
     rarity: LootboxItemConfig.rarity;
+    /**
+     * Type of the item
+     */
+    type: string;
+    /**
+     * Additional data associated with the item
+     */
+    data: any;
 };
 export namespace LootboxItemConfig {
     /**

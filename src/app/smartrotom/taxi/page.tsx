@@ -129,17 +129,23 @@ export default function TaxiApp() {
     setIsLoading(true)
     try {
       if (session?.user?.smartRotomUser?.uuid) {
-        await StarbankService.transferFromMain({
+        const res = await StarbankService.transferFromMain({
           uuid: session.user.smartRotomUser.uuid,
           to: TAXI_SERVICE_ACCOUNT,
           amount: price,
           concept: `Taxi a ${stop.id}`,
         })
 
+        if (!res.success) {
+          toast.error('Error al procesar el pago del taxi')
+          return
+        }
+
         await WingullService.teleportPlayer({
           id: stop.id,
           uuid: session.user.smartRotomUser.uuid
         })
+        
       }
       
       setPlayerPosition({ x: stop.x, z: stop.z })

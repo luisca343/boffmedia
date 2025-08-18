@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type CreateDocumentDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Document title
      */
     title: string;

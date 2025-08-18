@@ -10,7 +10,7 @@ export type UserCardHistory = {
     /**
      * User ID
      */
-    userId: string;
+    userId: number;
     /**
      * Card ID
      */

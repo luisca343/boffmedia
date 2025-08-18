@@ -1,0 +1,70 @@
+{
+  "common": {
+    "search": {
+        "placeholder": "Buscar...",
+        "button": "Buscar",
+        "searching": "Buscando...",
+        "error": "La búsqueda falló. Inténtalo de nuevo.",
+        "noResults": "No se encontraron resultados",
+        "youtubePlaceholder": "Buscar en YouTube...",
+        "twitchPlaceholder": "Buscar canales, juegos o streams...",
+        "youtubeButton": "Buscar en YouTube",
+        "twitchButton": "Buscar en Twitch"
+    },
+    "loading": {
+      "content": "Cargando contenido...",
+      "video": "Cargando video...",
+      "stream": "Cargando transmisión...",
+      "channel": "Cargando canal...",
+      "history": "Cargando historial...",
+      "game": "Cargando juego..."
+    },
+    "history": {
+      "title": "Historial",
+      "empty": "Tu historial está vacío",
+      "emptySubtext": "El contenido que veas aparecerá aquí",
+      "clearButton": "Limpiar Historial",
+      "clearConfirm": "¿Limpiar Historial?",
+      "clearDescription": "Esto limpiará todo tu historial. Esta acción no se puede deshacer.",
+      "removeConfirm": "¿Eliminar del historial?",
+      "cancelButton": "Cancelar",
+      "confirmButton": "Limpiar Historial",
+      "removeButton": "Eliminar"
+    },
+    "content": {
+      "views": "visualizaciones",
+      "likes": "me gusta",
+      "subscribers": "suscriptores",
+      "followers": "seguidores",
+      "videos": "Vídeos",
+      "clips": "Clips",
+      "duration": "Duración",
+      "publishedAt": "Publicado",
+      "createdAt": "Creado",
+      "joinedAt": "Se unió",
+      "description": "Descripción",
+      "noDescription": "Sin descripción disponible",
+      "stats": "Estadísticas",
+      "totalViews": "Visualizaciones Totales",
+      "channel": "Canal",
+      "streamer": "Streamer",
+      "game": "Juego",
+      "notFound": "Contenido no encontrado",
+      "returnToSearch": "Volver a la búsqueda",
+      "live": "En Directo",
+      "viewers": "espectadores",
+      "about": "Acerca de",
+      "noVideos": "No se encontraron videos",
+      "noClips": "No se encontraron clips",
+      "popularVideos": "Videos Populares",
+      "noPopular": "No se encontraron videos populares"
+    },
+    "actions": {
+      "watchNow": "Ver Ahora",
+      "viewChannel": "Ver Canal",
+      "remove": "Eliminar",
+      "loadMore": "Cargar Más",
+      "goBack": "Volver"
+    }
+  }
+}

@@ -15,5 +15,13 @@ export type LootItemDto = {
      * Server inventory item ID
      */
     serverId?: number;
+    /**
+     * Item type
+     */
+    type: string;
+    /**
+     * Additional data associated with the item
+     */
+    data: any;
 };
 

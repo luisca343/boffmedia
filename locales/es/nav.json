@@ -34,6 +34,10 @@
                     "label": "Guía del Jugador",
                     "description": "Todo lo que necesitas saber para empezar"
                   },
+                  "pueblos": {
+                    "label": "Pueblos y Ciudades",
+                    "description": "Explora todos los destinos de la región"
+                  },
                   "map": {
                     "label": "Mapa Interactivo",
                     "description": "Explora el mundo de Wingull"

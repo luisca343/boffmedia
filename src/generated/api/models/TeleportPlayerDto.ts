@@ -4,6 +4,10 @@
 /* eslint-disable */
 export type TeleportPlayerDto = {
     /**
+     * Server UUID (automatically added by middleware)
+     */
+    server?: string;
+    /**
      * Name of the destination to teleport to
      */
     id: string;

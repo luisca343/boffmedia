@@ -9,9 +9,9 @@
  * @param itemId The item identifier (can be in format "namespace:item_name")
  * @returns Localized item name
  */
-export const getItemName = (t: (key: string) => string, itemId: string, source = ''): string => {
+export const getItemName = (t: (key: string) => string, itemId: string, itemType = ''): string => {
     try {
-      if(source === "pokemon") {
+      if(itemType === "pokemon") {
         return t(`pokedex.pixelmon_${itemId.split(" ")[0].toLowerCase()}`);
       }
       const normalizedId = itemId.replace(":", ".");

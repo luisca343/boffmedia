@@ -16,6 +16,8 @@ jobs:
       SECRET: ${{ secrets.SECRET }}
       NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+      NEXT_PUBLIC_TWITCH_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID }}
+      NEXT_PUBLIC_TWITCH_CLIENT_SECRET: ${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_SECRET }}
 
     steps:
       - name: Checkout code
@@ -41,6 +43,8 @@ jobs:
           echo "SECRET=${{secrets.SECRET}}" >> .env.production.local
           echo "NEXTAUTH_SECRET=${{secrets.NEXTAUTH_SECRET}}" >> .env.production.local
           echo "NEXTAUTH_URL=${{secrets.NEXTAUTH_URL}}" >> .env.production.local
+          echo "NEXT_PUBLIC_TWITCH_CLIENT_ID=${{secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID}}" >> .env.production.local
+          echo "NEXT_PUBLIC_TWITCH_CLIENT_SECRET=${{secrets.NEXT_PUBLIC_TWITCH_CLIENT_SECRET}}" >> .env.production.local
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2

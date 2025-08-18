@@ -59,7 +59,9 @@ export function useLootBoxInventory(uuid?: string) {
     try {
       setLoadingLootBoxes(true);
       const {rarityRanges, lootboxConfig} = (await ArcadeService.getLootboxConfig()).data!
-      
+
+      console.log("Fetched loot box config:", lootboxConfig);
+
       if (lootboxConfig && lootboxConfig.boxes) {
         const lootBoxes: LootboxBoxConfig[] = lootboxConfig.boxes.map((box: LootboxBoxConfig) => ({
           id: box.id,
@@ -69,6 +71,8 @@ export function useLootBoxInventory(uuid?: string) {
           items: box.items.map((item: LootboxItemConfig) => ({
             id: item.id,
             weight: item.weight,
+            type: item.type,
+            data: item.data,
             rarity: getRarityFromWeight(rarityRanges, item.weight) as ArcadeInventoryItem.rarity,
           })),
           theme: box.theme || "default"
@@ -117,6 +121,8 @@ export function useLootBoxInventory(uuid?: string) {
       const item: LootboxItemConfig = {
         id: response.data.item!.id,
         weight: 0, //TODO: FIX THIS
+        type: response.data.item!.type,
+        data: response.data.item!.data,
         //weight: response.data.item!.weight,
         rarity: response.data.item!.rarity as ArcadeInventoryItem.rarity,
       };

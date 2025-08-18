@@ -6,6 +6,8 @@ import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
 import { ArcadeInventoryItem, LootItemDto } from "@/generated/api";
+import { getRewardIcon } from "../../../_util/rewardIcons";
+import { Item } from "@radix-ui/react-select";
 
 interface ResultDisplayProps {
   wonItem: LootItemDto;
@@ -36,14 +38,11 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
       
       <div className={`flex flex-col items-center p-4 rounded-lg ${config.bgColor} border-2 ${config.borderColor} ${config.glow}`}>
         <h3 className={`text-xl font-bold ${config.textColor} mb-2 text-center`}>
-          {getItemName(t, wonItem.id)}
+          {getItemName(t, wonItem.id, wonItem.type)}
         </h3>
         
         <div className="relative w-32 h-32 mb-4">
-          <ItemImage
-            itemId={wonItem.id}
-            size={128}
-          />
+          {getRewardIcon({type: wonItem.type, description: wonItem.data || wonItem.id, size: 128})}
           
           {/* Special effects for legendary items */}
           {wonItem.rarity === 'legendary' && (
@@ -73,7 +72,7 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         </div>
         
         <p className="text-surface-200 text-center mb-4 bg-black/40 p-3 rounded-lg border border-surface-800">
-          {getItemDescription(t, wonItem.id)}
+          {wonItem.type === 'pokemon' ? wonItem.id : getItemDescription(t, wonItem.id)}
         </p>
       </div>
       

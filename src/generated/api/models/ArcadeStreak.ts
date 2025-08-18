@@ -30,7 +30,7 @@ export type ArcadeStreak = {
     /**
      * Next reward information
      */
-    nextReward: Record<string, any>;
+    nextReward: Record<string, Record<string, any>>;
     /**
      * Current active banner
      */

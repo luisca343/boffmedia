@@ -75,10 +75,10 @@ export default function DayReward({
       {/* Reward type or item name - will be shown or overlaid */}
       <div className="text-[10px] text-surface-300 truncate px-1 text-center max-w-full">
         {isNamedReward(dayReward?.type || '') && dayReward?.description
-          ? getItemName(t, dayReward.description)
+          ? getItemName(t, dayReward.description, dayReward.type)
           : dayReward?.type === 'coins' 
-            ? 'Estrellas' 
-            : dayReward?.type || 'Estrellas'}
+            ? 'Monedas' 
+            : dayReward?.type || 'Monedas'}
       </div>
 
       {/* Completed overlay */}

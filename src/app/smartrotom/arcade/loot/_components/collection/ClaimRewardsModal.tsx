@@ -3,8 +3,9 @@ import { X, Check, AlertCircle, Box } from 'lucide-react';
 import { ItemDisplay } from '../ItemDisplay';
 import { useTranslations } from 'next-intl';
 import { getItemName } from '@/lib/intlUtils';
-import { ArcadeInventoryItem } from '@/services/api/smartrotom/arcadeService';
+import { ArcadeInventoryItem, ArcadeService } from '@/services/api/smartrotom/arcadeService';
 import { toast } from 'react-toastify';
+import { isMinecraft } from '@/services/mcef/mcefHelper';
 
 interface ClaimRewardsModalProps {
   items: ArcadeInventoryItem[];
@@ -31,19 +32,17 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
   );
   
   // Separate Pokémon from non-Pokémon items
-  const pokemonItems = claimableItems.filter(item => item.sourceType === 'pokemon');
-  const nonPokemonItems = claimableItems.filter(item => item.sourceType !== 'pokemon');
+  const pokemonItems = claimableItems.filter(item => item.itemType === 'pokemon');
+  const nonPokemonItems = claimableItems.filter(item => item.itemType !== 'pokemon');
   
   // Calculate required chests for Minecraft items
   const chestCalculation = useMemo(() => {
     if (selectedItems.length === 0) return { slots: 0, chests: 0 };
     
-    const selectedNonPokemon = selectedItems.filter(item => item.sourceType !== 'pokemon');
+    const selectedNonPokemon = selectedItems.filter(item => item.itemType !== 'pokemon');
     
     // Calculate slots needed
     const requiredSlots = selectedNonPokemon.reduce((total, item) => {
-      // Each item type uses at least one slot
-      // If count is more than 64, calculate additional slots needed
       const itemSlots = Math.ceil((item.amount || 1) / 64);
       return total + itemSlots;
     }, 0);
@@ -67,25 +66,34 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
     
     try {
       setIsClaiming(true);
-      
-      // Create an array of item IDs and types for claiming
-      const claimItems: ClaimItemData[] = selectedItems.map(item => ({
-        id: item.itemId,
-        type: item.sourceType || 'minecraft' // Default to 'minecraft' if source is not specified
-      }));
-      
-      // Send both item IDs and types to the server
-      //TODO: Uncomment the following line when arcadeService is properly set up
-      //const response = await (await arcadeService.claimInventoryItems(uuid, claimItems)).data;
 
-      const response = false;
-      
-      if (response) {
+      if(!isMinecraft()) {
+        toast.error("No puedes reclamar objetos fuera de Minecraft.");
+      }
+
+      const claimItems = selectedItems.map(item => ({
+        id: item.id,
+        uuid: uuid,
+        itemId: item.itemId,
+        itemData: item.itemData,
+        itemType: item.itemType,
+        amount: item.amount,
+        rarity: item.rarity,
+        sourceType: item.sourceType,
+        used: item.used
+      })) as ArcadeInventoryItem[];
+
+      const response = await ArcadeService.claimItems({
+        uuid,
+        items: claimItems
+      });
+
+      if (response.statusCode === 200) {
         // Different messages based on what was claimed
-        if (selectedItems.some(item => item.sourceType === 'pokemon') && 
-            selectedItems.some(item => item.sourceType !== 'pokemon')) {
+        if (selectedItems.some(item => item.itemType === 'pokemon') && 
+            selectedItems.some(item => item.itemType !== 'pokemon')) {
           toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente! Se te entregarán ${chestCalculation.chests} cofre(s) en Minecraft.`);
-        } else if (selectedItems.every(item => item.sourceType === 'pokemon')) {
+        } else if (selectedItems.every(item => item.itemType === 'pokemon')) {
           toast.success(`¡Has reclamado ${selectedItems.length} Pokémon correctamente!`);
         } else {
           toast.success(`¡Has reclamado ${selectedItems.length} objetos correctamente! Se te entregarán ${chestCalculation.chests} cofre(s) en Minecraft.`);
@@ -94,7 +102,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
         // Pass the claimed item IDs to update the local state
         onClaimSuccess(selectedItems.map(item => item.itemId));
       } else {
-        toast.error(response || 'Error al reclamar los objetos');
+        toast.error(response.error || 'Error al reclamar los objetos');
       }
     } catch (error) {
       console.error('Error claiming rewards:', error);
@@ -136,8 +144,8 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
     );
   }
   
-  const selectedNonPokemon = selectedItems.filter(item => item.sourceType !== 'pokemon');
-  const selectedPokemon = selectedItems.filter(item => item.sourceType === 'pokemon');
+  const selectedNonPokemon = selectedItems.filter(item => item.itemType !== 'pokemon');
+  const selectedPokemon = selectedItems.filter(item => item.itemType === 'pokemon');
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm p-4">
@@ -192,12 +200,13 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
                   return (
                     <div key={item.id} className="flex flex-col items-center text-surface-100">
                       <ItemDisplay
-                        type={item.sourceType!}
+                        type={item.itemType!}
+                        itemData={item.itemData || item.itemId}
                         itemId={item.itemId}
                         count={item.amount}
                         size={64}
                         rarity={item.rarity}
-                        name={getItemName(t, item.itemId, item.sourceType)}
+                        name={getItemName(t, item.itemId, item.itemType)}
                         selectable={true}
                         selected={isSelected}
                         isChest={false}
@@ -219,12 +228,13 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
                   return (
                     <div key={item.id} className="flex flex-col items-center text-surface-100">
                       <ItemDisplay
-                        type={item.sourceType!}
+                        type={item.itemType!}
+                        itemData={item.itemData || item.itemId}
                         itemId={item.itemId}
                         count={item.amount}
                         size={64}
                         rarity={item.rarity}
-                        name={getItemName(t, item.itemId, item.sourceType)}
+                        name={getItemName(t, item.itemId, item.itemType)}
                         selectable={true}
                         selected={isSelected}
                         isChest={false}

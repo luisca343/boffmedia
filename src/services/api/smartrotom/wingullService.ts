@@ -138,6 +138,41 @@ export class WingullService {
         return wingullPOST<SuccessResponse>('/updateNPCs', data);
     }
     
+    /**
+     * Fetch all WorldGuard worlds
+     */
+    static getWorldGuardWorlds() {
+        return wingullGET<any>('/worldguard-worlds');
+    }
+    
+    /**
+     * Fetch player's owned regions by UUID
+     */
+    static getPlayersOwnedRegions(uuid: string) {
+        return wingullGET<any>(`/owned-regions/${uuid}`);
+    }
+    
+    /**
+     * Fetch all plots
+     */
+    static getAllPlots() {
+        return wingullGET<any>('/plots');
+    }
+    
+    /**
+     * Get all available towns
+     */
+    static getAllTowns() {
+        return wingullGET<string[]>('/towns');
+    }
+    
+    /**
+     * Get information about a specific town
+     */
+    static getTownInfo(townName: string) {
+        return wingullGET<any>(`/towns/${townName}`);
+    }
+    
     // ==================== TRANSPORTATION ENDPOINTS ====================
     
     /**
