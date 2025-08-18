@@ -274,7 +274,6 @@ function Badge({ data, book, badges }: { data: SmartRotomAchievement; book: any;
 }
 
 function getRedirectPage(achievement: SmartRotomAchievement, badges: { id: string }[]): number {
-  console.log("getRedirectPage", achievement.id)
   
   const index = badges.findIndex((b) => b.id === achievement.id)
   if (index === -1) return 4
