@@ -21,10 +21,12 @@ import {
 
 // Shared modules
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { WingullModule } from '../wingull/wingull.module';
 
 @Module({
   imports: [
     DrizzleModule,
+    WingullModule,
   ],
   controllers: [
     ArcadeController,

@@ -27,6 +27,7 @@ export class ArcadeInventoryRepository
     const result = await this.db.insert(smartRotomInventory).values({
         uuid: data.uuid,
         itemId: data.itemId,
+        itemData: data.itemData,
         itemType: data.itemType,
         amount: data.amount || 1,
         rarity: data.rarity || 'common',
@@ -40,6 +41,7 @@ export class ArcadeInventoryRepository
 async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryItem> {
     const updateData: Partial<SmartRotomInventoryItem> = {};
     if (data.itemId) updateData.itemId = data.itemId;
+    if (data.itemData !== undefined) updateData.itemData = data.itemData;
     if (data.itemType) updateData.itemType = data.itemType;
     if (data.amount) updateData.amount = data.amount;
     if (data.rarity) updateData.rarity = data.rarity;
@@ -78,6 +80,7 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
         .values({
         uuid: inventoryData.uuid,
         itemId: inventoryData.itemId,
+        itemData: inventoryData.itemData,
         itemType: inventoryData.itemType,
         amount: inventoryData.amount || 1,
         rarity: inventoryData.rarity || 'common',
@@ -107,7 +110,9 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
   }
 
   async consumeItem(uuid: string, itemId: string, amount: number): Promise<ArcadeInventoryItem> {
-    // Get all items matching this itemId for the user
+    console.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
+    
+    // Get all items matching this itemId for the user that have available quantity
     const items = await this.db.select()
       .from(smartRotomInventory)
       .where(and(
@@ -115,38 +120,73 @@ async update(id: number, data: UpdateInventoryItemDto): Promise<ArcadeInventoryI
         eq(smartRotomInventory.itemId, itemId),
         gt(smartRotomInventory.amount, smartRotomInventory.used || 0)
       ))
-      .orderBy(asc(smartRotomInventory.used));
-    
+      .orderBy(asc(smartRotomInventory.used), asc(smartRotomInventory.id));
+
+    console.log(`Found items for consumption:`, items);
+
     if (!items.length) {
-      throw new Error('Item not found');
+      throw new Error('Item not found or no available quantity');
     }
     
-    const currentItem = items[0];
-    const consumableTypes = ['box'];
-    const isConsumable = consumableTypes.includes(currentItem.itemType);
+    // Calculate total available quantity
+    const totalAvailable = items.reduce((total, item) => 
+      total + (item.amount - (item.used || 0)), 0
+    );
     
-    if (isConsumable) {
-      // For consumables, we update the "used" count
-      const newUsedCount = (currentItem.used || 0) + amount;
+    if (totalAvailable < amount) {
+      throw new Error(`Insufficient quantity. Available: ${totalAvailable}, Requested: ${amount}`);
+    }
+    
+    let remainingToConsume = amount;
+    let lastUpdatedItem: ArcadeInventoryItem | null = null;
+    
+    // Consume items in order, updating multiple rows as needed
+    for (const item of items) {
+      if (remainingToConsume <= 0) break;
       
-      if (newUsedCount > currentItem.amount) {
-        throw new Error('Insufficient quantity');
+      const availableInThisItem = item.amount - (item.used || 0);
+      const toConsumeFromThisItem = Math.min(remainingToConsume, availableInThisItem);
+      
+      if (toConsumeFromThisItem > 0) {
+        const newUsedCount = (item.used || 0) + toConsumeFromThisItem;
+        
+        console.log(`Updating item ${item.id}: used from ${item.used || 0} to ${newUsedCount}`);
+        
+        // Update this specific row
+        await this.db.update(smartRotomInventory)
+          .set({ used: newUsedCount } as SmartRotomInventoryItem)
+          .where(eq(smartRotomInventory.id, item.id));
+        
+        // Keep track of the last updated item to return
+        lastUpdatedItem = await this.findById(item.id) as ArcadeInventoryItem;
+        
+        remainingToConsume -= toConsumeFromThisItem;
       }
-      
-      // Update the used count
-      await this.db.update(smartRotomInventory)
-        .set({ used: newUsedCount } as SmartRotomInventoryItem)
-        .where(eq(smartRotomInventory.id, currentItem.id));
-      
-      // Fetch the updated item
-      const updatedItem = await this.findById(currentItem.id) as ArcadeInventoryItem;
-      
-      // Add remaining amount information
-      return {
-        ...updatedItem,
-        remainingAmount: updatedItem.amount - newUsedCount
-      } as ArcadeInventoryItem;
     }
+    
+    if (!lastUpdatedItem) {
+      throw new Error('Failed to update any items');
+    }
+    
+    // Calculate total remaining after consumption
+    const updatedItems = await this.db.select()
+      .from(smartRotomInventory)
+      .where(and(
+        eq(smartRotomInventory.uuid, uuid),
+        eq(smartRotomInventory.itemId, itemId)
+      ));
+    
+    const totalRemaining = updatedItems.reduce((total, item) => 
+      total + (item.amount - (item.used || 0)), 0
+    );
+    
+    console.log(`Consumption complete. Total remaining: ${totalRemaining}`);
+    
+    // Return the last updated item with remaining amount information
+    return {
+      ...lastUpdatedItem,
+      remainingAmount: totalRemaining
+    } as ArcadeInventoryItem;
   }
 
   async getTotalItems(uuid: string): Promise<number> {

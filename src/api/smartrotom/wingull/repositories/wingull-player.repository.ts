@@ -151,7 +151,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
     try {
       const response: AxiosResponse = await axios.post(
-        `${this.WINGULL_API_BASE_URL}/givePokemon`,
+        `${this.WINGULL_API_BASE_URL}/givepokemon`,
         request,
         {
           timeout: this.DEFAULT_TIMEOUT,
@@ -167,7 +167,21 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
+ splitItemsForApi(items: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }>, maxAmount = 64) {
+  const result: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }> = [];
+  for (const item of items) {
+    let remaining = item.amount;
+    while (remaining > 0) {
+      const batchAmount = Math.min(remaining, maxAmount);
+      result.push({ ...item, amount: batchAmount });
+      remaining -= batchAmount;
+    }
+  }
+  return result;
+}
+
   async giveItemsInAPI(uuid: string, items: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }>): Promise<any> {
+  const splitItems = this.splitItemsForApi(items, 64);
     if (!uuid || uuid.trim() === '') {
       throw new Error('UUID is required for giving items');
     }
@@ -180,7 +194,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     try {
       const response: AxiosResponse = await axios.post(
         `${this.WINGULL_API_BASE_URL}/giveitems`,
-        { uuid, items },
+        { uuid, items: splitItems },
         {
           timeout: this.DEFAULT_TIMEOUT,
           headers: {

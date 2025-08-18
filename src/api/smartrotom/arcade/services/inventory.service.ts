@@ -9,6 +9,7 @@ import { ArcadeInventoryResponse } from '../entities/inventory-response.entity';
 export interface ClaimItemData {
   uuid: string;
   itemId: string;
+  itemData?: string;
   itemType: string;
   amount: number;
   rarity?: ItemRarity;
@@ -50,7 +51,7 @@ export class InventoryService {
     
     // Aggregate items with the same itemId
     const aggregatedItems = rawItems.reduce((acc, item) => {
-      const consumableTypes = ['box'];
+      const consumableTypes = ['box', 'crate', 'lootbox', 'consumable'];
       const isConsumable = consumableTypes.includes(item.itemType);
 
       const key = isConsumable
@@ -75,7 +76,7 @@ export class InventoryService {
     // Process consumables
     for (const key in aggregatedItems) {
       const item = aggregatedItems[key];
-      const consumableTypes = ['crate', 'lootbox'];
+      const consumableTypes = ['box', 'crate', 'lootbox', 'consumable'];
 
       if (consumableTypes.includes(item.itemType)) {
         item.amount = item.amount - item.used;
@@ -115,6 +116,7 @@ export class InventoryService {
       const createData: CreateInventoryItemDto = {
         uuid: itemData.uuid,
         itemId: itemData.itemId,
+        itemData: itemData.itemData,
         itemType: itemData.itemType,
         amount: itemData.amount,
         rarity: itemData.rarity || 'common',
@@ -145,21 +147,29 @@ export class InventoryService {
 
     try {
       // Get all matching items to calculate total
-      const allItems = await this.arcadeInventoryRepository.getItemsByType(uuid, 'lootbox');
+      const allItems = await this.arcadeInventoryRepository.findUserInventory(uuid);
+      console.log('All Items:', allItems);
       const targetItems = allItems.filter(item => item.itemId === itemId);
+      console.log(`Target Items for ${uuid} with itemId ${itemId}:`, targetItems);
       
       if (!targetItems.length) {
         throw new NotFoundException('Item not found in inventory');
       }
-      
+
+      console.log(`Consuming ${amount} of ${itemId} for ${uuid}`);
+
       const updatedItem = await this.arcadeInventoryRepository.consumeItem(uuid, itemId, amount);
-      
+
+      console.log(`Updated Item for ${uuid} with itemId ${itemId}:`, updatedItem);
+
       // Calculate total remaining across all instances of this item
       const totalRemaining = targetItems.reduce((total, item) => {
         return total + (item.amount - (item.id === updatedItem.id ? 
           (updatedItem.used || 0) : (item.used || 0)));
       }, 0);
-      
+
+      console.log(`Total remaining for ${itemId} after consumption:`, totalRemaining);
+
       return {
         success: true,
         item: updatedItem,

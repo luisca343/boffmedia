@@ -21,6 +21,16 @@ export class CreateInventoryItemDto extends BaseDto {
   itemId: string;
 
   @ApiProperty({ 
+    description: 'Item data (Pokemon specifications for Pokemon items)',
+    example: 'charizard:shiny:adamant',
+    required: false
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  itemData?: string;
+
+  @ApiProperty({ 
     description: 'Item type',
     example: 'consumable'
   })
