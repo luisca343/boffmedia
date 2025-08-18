@@ -4,6 +4,7 @@ import { getItemName } from "@/lib/intlUtils";
 import { ItemImage } from "@/lib/ItemImage";
 import { calculateLootBoxOdds } from "../../_utils/calculateLootBoxOdds";
 import { LootboxBoxConfig } from "@/generated/api";
+import { getRewardIcon } from "../../../_util/rewardIcons";
 
 interface LootBoxOddsProps {
   lootBox: LootboxBoxConfig;
@@ -151,12 +152,9 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
                               border border-surface-700/50"
                   >
                     <div className="flex items-center gap-1.5 min-w-0 flex-shrink">
-                      <ItemImage
-                        itemId={item.id}
-                        size={24}
-                      />
+                      {getRewardIcon({type: item.type, description: item.data || item.id, size: 24})}
                       <span className="text-white text-xs truncate max-w-[100px]">
-                        {getItemName(t, item.id)}
+                        {getItemName(t, item.id, item.type)}
                       </span>
                     </div>
                     <span className="text-xs text-surface-300 font-mono ml-1 whitespace-nowrap">
