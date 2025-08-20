@@ -85,6 +85,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
         .selectDistinct({
           from: starBankTransactions.from,
           to: starBankTransactions.to,
+          isPayer: eq(starBankTransactions.from, accountId),
           amount: starBankTransactions.amount,
           reason: starBankTransactions.reason,
           fromBalance: starBankTransactions.fromBalance,
@@ -276,6 +277,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
     return {
       from: dbResult.from,
       to: dbResult.to,
+      isPayer: dbResult.isPayer,
       amount: dbResult.amount,
       reason: dbResult.reason,
       fromBalance: dbResult.fromBalance,
@@ -285,7 +287,9 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       fromName: dbResult.fromName,
       toName: dbResult.toName,
       fromType: dbResult.fromType,
-      toType: dbResult.toType
+      toType: dbResult.toType,
+      displayName: dbResult.isPayer ? dbResult.toName : dbResult.fromName,
+      displayAccountType: dbResult.isPayer ? dbResult.toType : dbResult.fromType
     };
   }
 }
