@@ -15,11 +15,11 @@ import { TransactionList } from "./_components/TransactionList";
 import { FilterPopover } from "./_components/FilterPopover";
 import { TransactionDialog } from "./_components/TransactionDialog";
 import { AccountSelect } from "../_components/AccountSelect";
-import { FullTransaction } from "@/types/starbank";
+import { StarBankTransaction } from "@/generated/api";
 
 // Group transactions by date
 interface TransactionsByDate {
-  [date: string]: any[];
+  [date: string]: StarBankTransaction[];
 }
 
 export default function Calendario() {
@@ -85,7 +85,7 @@ export default function Calendario() {
         
         acc[dateKey].push({
           ...tx,
-          isIncome: tx.to === activeAccount?.id
+          isPayer: tx.isPayer
         });
         
       } catch (error) {

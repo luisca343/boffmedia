@@ -1,4 +1,4 @@
-import { StarBankAccount } from "@/generated/api";
+import { StarBankAccount, StarBankTransaction } from "@/generated/api";
 
 
 export function getValidAccountId(accounts: StarBankAccount[]): number {
@@ -24,5 +24,10 @@ export function changeActiveAccount(activeAccount: number): number {
 }
 
 export function formatMoney(amount: number): string {
+    if(!amount) return "ERROR ¥";
     return `${Number(amount.toFixed(0)).toLocaleString('es-ES')} ¥`;
+}
+
+export function getTransactionImageName(transaction: StarBankTransaction): string {
+    return transaction.isPayer ? transaction.toName! : transaction.fromName!;
 }

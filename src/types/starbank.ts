@@ -15,20 +15,6 @@ export interface Transaction {
     name?: string;
     type?: string;
   }
-  
-  
-  export interface FullTransaction {
-    from: number;
-    to: number;
-    amount: number;
-    fromBalance: number;
-    toBalance: number;
-    reason: string;
-    type: string;
-    date: string;
-    isPayer: boolean;
-  }
-
   export interface Balance {
     balance: number;
   }

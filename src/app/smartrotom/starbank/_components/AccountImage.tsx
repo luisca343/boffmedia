@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-export function AccountImage({type, name, width=48, height=48}: {type: string, name: string, width?: number, height?: number}) {
+export function AccountImage({type, name, width=48, height=48}: {type?: string, name?: string, width?: number, height?: number}) {
     const [imageExists, setImageExists] = useState(false);
     const src = getImageURL(type, name);
 
@@ -20,9 +20,9 @@ export function AccountImage({type, name, width=48, height=48}: {type: string, n
     );
 }
 
-function getImageURL(type: string, name: string) {
-    if (type === "blue") {
-        return `/smartrotom/img/apps/starbank/cuentas/${name.toLowerCase()}.png`;
+function getImageURL(type?: string, name?: string) {
+    if (type === "SECONDARY") {
+        return `/smartrotom/img/apps/starbank/cuentas/${name!.toLowerCase()}.png`;
     } else {
         return `https://minotar.net/avatar/${name}/80.png`;
     }

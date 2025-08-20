@@ -12,6 +12,10 @@ export type StarBankTransaction = {
      */
     to: number;
     /**
+     * Indicates if the user is the payer
+     */
+    isPayer: boolean;
+    /**
      * Transaction amount in PokéDollars
      */
     amount: number;
@@ -51,6 +55,14 @@ export type StarBankTransaction = {
      * Destination account type
      */
     toType?: string;
+    /**
+     * Display name for the transaction
+     */
+    displayName?: string;
+    /**
+     * Display type for the transaction
+     */
+    displayAccountType?: string;
 };
 export namespace StarBankTransaction {
     /**

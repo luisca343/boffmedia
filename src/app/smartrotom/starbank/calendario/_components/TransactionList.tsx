@@ -5,11 +5,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { formatMoney } from "../../bankUtils";
 import { CalendarIcon } from "lucide-react";
-import { FullTransaction } from "@/types/starbank";
+import { StarBankTransaction } from "@/generated/api";
 
 interface TransactionListProps {
-  transactions: any[];
-  onSelectTransaction: (transaction: any) => void;
+  transactions: StarBankTransaction[];
+  onSelectTransaction: (transaction: StarBankTransaction) => void;
 }
 
 export function TransactionList({ transactions, onSelectTransaction }: TransactionListProps) {
@@ -38,9 +38,9 @@ export function TransactionList({ transactions, onSelectTransaction }: Transacti
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${transaction.isIncome ? 'bg-highlight-500' : 'bg-red-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${!transaction.isPayer ? 'bg-highlight-500' : 'bg-red-500'}`} />
                   <p className="font-medium">
-                    {transaction.isIncome ? 
+                    {!transaction.isPayer ? 
                       `De ${transaction.fromName || 'Desconocido'}` : 
                       `A ${transaction.toName || 'Desconocido'}`}
                   </p>
@@ -50,8 +50,8 @@ export function TransactionList({ transactions, onSelectTransaction }: Transacti
                   {format(new Date(transaction.date), 'HH:mm')}
                 </p>
               </div>
-              <p className={`font-semibold ${transaction.isIncome ? 'text-highlight-600' : 'text-red-600'}`}>
-                {transaction.isIncome ? '+' : '-'} {formatMoney(transaction.amount)}
+              <p className={`font-semibold ${!transaction.isPayer ? 'text-highlight-600' : 'text-red-600'}`}>
+                {!transaction.isPayer ? '+' : '-'} {formatMoney(transaction.amount)}
               </p>
             </div>
           </Card>

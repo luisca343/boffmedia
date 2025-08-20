@@ -5,7 +5,7 @@ import { CreateShopTransactionDto } from '@/types/dto/create-shop-transaction-dt
 import { CreateTransferDto } from '@/types/dto/create-transfer-dto';
 import { TransferFromMainDto } from '@/types/dto/transfer-from-main-dto';
 import { FullTransaction } from '@/types/starbank';
-import { StarBankAccount } from '@/generated/api';
+import { StarBankAccount, StarBankTransaction } from '@/generated/api';
 
 export class StarbankService {
   // ==================== ACCOUNT OPERATIONS ====================
@@ -81,27 +81,27 @@ export class StarbankService {
    * Get transaction history for an account
    */
   static getAccountTransactions(account: number, limit?: number) {
-    return rotomGET<FullTransaction[]>(`/starbank/transactions/${account}${limit ? `?limit=${limit}` : ''}`);
+    return rotomGET<StarBankTransaction[]>(`/starbank/transactions/${account}${limit ? `?limit=${limit}` : ''}`);
   }
 
   /**
    * Get transaction history for a user
    */
   static getUserTransactions(uuid: string, limit?: number) {
-    return rotomGET<FullTransaction[]>(`/starbank/transactions/user/${uuid}${limit ? `?limit=${limit}` : ''}`);
+    return rotomGET<StarBankTransaction[]>(`/starbank/transactions/user/${uuid}${limit ? `?limit=${limit}` : ''}`);
   }
 
   /**
    * Get transfer history for an account
    */
   static getAccountTransfers(account: number) {
-    return rotomGET<FullTransaction[]>(`/starbank/transfers/${account}`);
+    return rotomGET<StarBankTransaction[]>(`/starbank/transfers/${account}`);
   }
 
   /**
    * Get transfer history for a user
    */
   static getUserTransfers(uuid: string) {
-    return rotomGET<FullTransaction[]>(`/starbank/transfers/user/${uuid}`);
+    return rotomGET<StarBankTransaction[]>(`/starbank/transfers/user/${uuid}`);
   }
 }

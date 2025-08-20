@@ -15,12 +15,13 @@ import { BankSection, BankSectionContent, BankSectionHeader } from "../_componen
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { formatMoney, changeActiveAccount } from "../bankUtils";
-import { FullTransaction, StarBankAccount } from "@/types/starbank";
+import { StarBankAccount } from "@/types/starbank";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowRight, ChevronDown } from "lucide-react";
+import { StarBankTransaction } from "@/generated/api";
 
 export default function Graficas() {
   // Date range state
@@ -103,7 +104,7 @@ export default function Graficas() {
   const filteredTransactions = useMemo(() => {
     if (!transactions) return [];
     
-    return transactions.filter((tx: FullTransaction) => {
+    return transactions.filter((tx: StarBankTransaction) => {
       try {
         const txDate = new Date(tx.date);
         return txDate >= selectedDateRange[0] && txDate <= selectedDateRange[1];
@@ -126,7 +127,7 @@ export default function Graficas() {
     let largestIncome = 0;
     let sum = 0;
     
-    filteredTransactions.forEach((transaction: FullTransaction) => {
+    filteredTransactions.forEach((transaction: StarBankTransaction) => {
       const amount = transaction.amount;
       sum += amount;
       

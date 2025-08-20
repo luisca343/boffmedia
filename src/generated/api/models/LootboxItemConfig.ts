@@ -22,7 +22,7 @@ export type LootboxItemConfig = {
     /**
      * Additional data associated with the item
      */
-    data: any;
+    data: string;
 };
 export namespace LootboxItemConfig {
     /**

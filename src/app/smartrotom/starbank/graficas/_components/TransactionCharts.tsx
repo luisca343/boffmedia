@@ -15,7 +15,7 @@ import {
   Cell
 } from "recharts";
 import { formatMoney } from "../../bankUtils";
-import { StarBankAccount, FullTransaction } from "@/types/starbank";
+import { StarBankTransaction } from "@/generated/api";
 
 // Chart colors
 const INCOME_COLOR = '#10b981';
@@ -23,7 +23,7 @@ const EXPENSE_COLOR = '#ef4444';
 const BALANCE_COLOR = '#3b82f6';
 
 interface TransactionChartsProps {
-  transactions: FullTransaction[];
+  transactions: StarBankTransaction[];
   activeAccount: any;
   chartType: 'balance' | 'inout';
 }

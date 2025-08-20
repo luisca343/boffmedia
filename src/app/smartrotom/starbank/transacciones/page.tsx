@@ -20,7 +20,6 @@ import { TransactionsTable, columns } from "./_components/TransactionsTable";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { FullTransaction, Transaction } from "@/types/starbank";
 import { AccountSelect } from "../_components/AccountSelect";
 import { Input } from "@/components/ui/input";
 import { formatMoney, getActiveAccountBalance } from "../bankUtils";
@@ -28,6 +27,7 @@ import { Search } from "lucide-react";
 import { TransactionSkeleton } from "./_components/TransactionSkeleton";
 import { SummaryCard } from "../_components/SummaryCard";
 import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import { StarBankTransaction } from "@/generated/api";
 
 export interface CellDefProps<TData> {
   table: Table<TData>;
@@ -38,7 +38,7 @@ export interface CellDefProps<TData> {
   renderValue: () => any;
 }
 
-function calculateTransactionStats(transactions: Transaction[], activeAccount: number) {
+function calculateTransactionStats(transactions: StarBankTransaction[], activeAccount: number) {
   let income = 0;
   let expense = 0;
 
@@ -55,7 +55,7 @@ function calculateTransactionStats(transactions: Transaction[], activeAccount: n
 
 export default function Transacciones() {
   const { session } = useBoffSession();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
   const [activeAccount, setActiveAccount] = useState(-1);
   const [searchTerm, setSearchTerm] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -98,21 +98,8 @@ export default function Transacciones() {
 
   useEffect(() => {
     if (fetchedTransactions) {
-      const transactionData = fetchedTransactions.map((transaction: FullTransaction) => {
-        const isActiveAccount = transaction.from == activeAccount;
-        return {
-          isPayer: isActiveAccount,
-          reason: transaction.reason,
-          amount: transaction.amount,
-          balance: isActiveAccount ? transaction.fromBalance : transaction.toBalance,
-          date: transaction.date,
-          //type: isActiveAccount ? transaction.toType : transaction.fromType,
-          //name: isActiveAccount ? transaction.toName : transaction.fromName,
-        };
-      });
-
-      setTransactions(transactionData);
-      setStats(calculateTransactionStats(transactionData, activeAccount));
+      setTransactions(fetchedTransactions);
+      setStats(calculateTransactionStats(fetchedTransactions, activeAccount));
     }
   }, [fetchedTransactions, activeAccount]);
 
