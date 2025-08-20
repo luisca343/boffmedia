@@ -127,7 +127,7 @@ export default function Transacciones() {
   return (
     <main className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
       {/* Header with stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <BankSection className="md:col-span-4 mb-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-wrap">
             <div>
@@ -158,7 +158,7 @@ export default function Transacciones() {
         <SummaryCard 
           title="Ingresos Totales"
           value={formatMoney(stats.income)}
-          icon={<ArrowUpIcon className="h-6 w-6" />}
+          icon={<ArrowUpIcon className="h-6 w-6 text-success-500" />}
           //change={{ value: 5.2, isPositive: true }}
           className="md:col-span-1"
         />
@@ -166,18 +166,11 @@ export default function Transacciones() {
         <SummaryCard 
           title="Gastos Totales"
           value={formatMoney(stats.expense)}
-          icon={<ArrowDownIcon className="h-6 w-6" />}
+          icon={<ArrowDownIcon className="h-6 w-6 text-error-500" />}
           //change={{ value: 2.8, isPositive: false }}
           className="md:col-span-1"
         />
-        
-        <SummaryCard 
-          title="Total Neto"
-          value={formatMoney(stats.net)}
-          icon={<ListBulletIcon className="h-6 w-6" />}
-          //change={{ value: 1.4, isPositive: stats.net > 0 }}
-          className="md:col-span-1"
-        />
+  {/* Removed 'Total Neto' card as net is always equal to current balance */}
       </div>
 
       {/* Search and Filter */}
