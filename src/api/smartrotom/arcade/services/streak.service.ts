@@ -198,16 +198,19 @@ export class StreakService {
 
   // ==================== PRIVATE HELPER METHODS ====================
 
+  /* For now, we won't reset streaks */
   private shouldResetStreak(streak: ArcadeStreak): boolean {
-    if (!streak.lastClaimed) return false;
+    return false;
+    /*
+      if (!streak.lastClaimed) return false;
 
-    const now = new Date();
-    const lastClaim = new Date(streak.lastClaimed);
-    
-    // Reset if more than 2 days have passed
-    const daysDifference = Math.floor((now.getTime() - lastClaim.getTime()) / (1000 * 60 * 60 * 24));
-    
-    return daysDifference > 1;
+      const now = new Date();
+      const lastClaim = new Date(streak.lastClaimed);
+      
+      const daysDifference = Math.floor((now.getTime() - lastClaim.getTime()) / (1000 * 60 * 60 * 24));
+      
+      return daysDifference > 1;
+    */
   }
 
   private calculateReward(streakDay: number): any {

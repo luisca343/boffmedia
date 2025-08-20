@@ -32,6 +32,13 @@ export class LootboxItemConfig {
     description: 'Additional data associated with the item'
   })
   data?: string;
+
+  @ApiProperty({
+    example: 1,
+    description: 'Amount of the item',
+    default: 1
+  })
+  amount?: number;
 }
 
 export class LootboxBoxConfig {

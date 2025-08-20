@@ -40,11 +40,11 @@ class LootItemDto {
   type?: string;
 
   @ApiProperty({ description: 'Additional data associated with the item', example: "Pikachu lvl:25" })
-  data?: any;
+  data?: string;
 }
 
 export class OpenLootBoxResponseDto {
-  @ApiProperty({ description: 'The item obtained from the loot box', required: false, type: LootItemDto })
+  @ApiProperty({ description: 'The item obtained from the loot box', required: false, type: LootboxItemConfig })
   item?: LootboxItemConfig;
 
   @ApiProperty({ 
