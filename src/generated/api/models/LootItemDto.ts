@@ -22,6 +22,6 @@ export type LootItemDto = {
     /**
      * Additional data associated with the item
      */
-    data: Record<string, any>;
+    data: string;
 };
 

@@ -156,6 +156,9 @@ export function LootBoxOdds({ lootBox, currentBoxTheme, onClose }: LootBoxOddsPr
                       <span className="text-white text-xs truncate max-w-[100px]">
                         {getItemName(t, item.id, item.type)}
                       </span>
+                        {item.amount !== undefined && item.amount > 1 && (
+                          <span className="text-white text-xs font-semibold ml-1">x{item.amount}</span>
+                        )}
                     </div>
                     <span className="text-xs text-surface-300 font-mono ml-1 whitespace-nowrap">
                       {item.percentage.toFixed(2)}%

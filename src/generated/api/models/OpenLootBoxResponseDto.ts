@@ -2,13 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import { LootboxItemConfig } from './LootboxItemConfig';
 import type { LootItemDto } from './LootItemDto';
 import type { SpinnerItemDto } from './SpinnerItemDto';
 export type OpenLootBoxResponseDto = {
     /**
      * The item obtained from the loot box
      */
-    item?: LootItemDto;
+    item?: LootboxItemConfig;
     /**
      * Array of items to display in the spinner animation
      */

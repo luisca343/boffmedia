@@ -161,7 +161,7 @@ export function ClaimRewardsModal({ items, onClose, onClaimSuccess, uuid }: Clai
         </div>
 
         <p className="text-surface-300 mb-4">
-          Selecciona las recompensas que deseas reclamar. Los cofres no se pueden reclamar.
+          Selecciona las recompensas que deseas reclamar.
         </p>
 
         {/* Display chest calculation info if we have selected non-Pokémon items */}

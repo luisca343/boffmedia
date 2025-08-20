@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, Package, Award, Gift } from "lucide-react";
+import { Star, Package, Award, Gift, Coins, Currency, Banknote } from "lucide-react";
 import { ItemImage } from "@/lib/ItemImage";
 import { PokemonImage } from "@/lib/PokemonImage";
 
@@ -21,8 +21,10 @@ export function getRewardIcon({ type, description = "", size = 24, className = "
   const lowerType = type?.toLowerCase() || '';
   
   switch(lowerType) {
-    case 'currency':
-      return <Star className={`h-${size/4} w-${size/4} text-yellow-300 ${className}`} />;
+    case 'coins':
+      return <Coins className={`h-${size/4} w-${size/4} text-warning-300 ${className}`} />;
+    case 'money':
+      return <Banknote className={`h-${size/4} w-${size/4} text-success-500 ${className}`} />;
     case 'box':
     case 'crate':
       // For boxes/crates, use ItemImage with the description as the itemId
@@ -47,11 +49,17 @@ export function getRewardVisuals(rewardType: string) {
   const lowerType = rewardType?.toLowerCase() || '';
   
   switch(lowerType) {
-    case 'currency':
+    case 'coins':
       return {
-        bgGradient: "from-yellow-700/40 to-amber-800/40",
-        border: "border-yellow-500/50",
-        textColor: "text-yellow-300"
+        bgGradient: "from-warning-700/40 to-warning-800/40",
+        border: "border-warning-500/50",
+        textColor: "text-warning-300"
+      };
+    case 'money':
+      return {
+        bgGradient: "from-success-700/40 to-success-800/40",
+        border: "border-success-500/50",
+        textColor: "text-success-300"
       };
     case 'box':
     case 'boxes':
@@ -82,5 +90,5 @@ export function getRewardVisuals(rewardType: string) {
  */
 export function isNamedReward(type: string): boolean {
   const lowerType = type?.toLowerCase() || '';
-  return lowerType === 'item' || lowerType === 'crate' || lowerType === 'box';
+  return lowerType === 'item' || lowerType === 'crate' || lowerType === 'box' || lowerType === 'pokemon';
 }

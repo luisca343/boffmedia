@@ -21,7 +21,7 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
         {totalItems === 0 ? (
           <div className="text-center">
             <Archive className="h-16 w-16 mx-auto text-surface-600 mb-3" />
-            <p className="text-xl mb-2">Aún no has coleccionado ningún objeto</p>
+            <p className="text-xl mb-2">AÃºn no has coleccionado ningÃºn objeto</p>
             <p className="text-surface-500">
               Abre cajas para empezar a coleccionar objetos raros
             </p>
@@ -29,9 +29,9 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
         ) : (
           <div className="text-center">
             <Search className="h-16 w-16 mx-auto text-surface-600 mb-3" />
-            <p className="text-xl mb-2">No hay objetos que coincidan con tu búsqueda</p>
+            <p className="text-xl mb-2">No hay objetos que coincidan con tu bÃºsqueda</p>
             <p className="text-surface-500">
-              Intenta con otros términos o filtros
+              Intenta con otros tÃ©rminos o filtros
             </p>
           </div>
         )}
@@ -48,8 +48,9 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
           <div
             key={item.id}
             onClick={() => onItemClick(item)}
-            className={`${config.bgColor} border-2 ${config.borderColor} rounded-lg p-3 flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200 ${config.glow}`}
+            className={`${config.bgColor} border-2 ${config.borderColor} rounded-lg p-3 flex flex-col items-center cursor-pointer hover:scale-105 transition-transform duration-200 ${config.glow} relative`}
           >
+            
             <div className="w-full aspect-square mb-2 flex items-center justify-center">
               {getRewardIcon({type: item.itemType, description: item.itemData || item.itemId, size: 96})}
             </div>
@@ -60,6 +61,12 @@ export function CollectionGrid({ items, totalItems, onItemClick }: CollectionGri
             <p className={`${config.textColor} text-xs mt-1`}>
               {getItemRarity(t, item.rarity)}
             </p>
+            
+            {item.amount && item.amount > 1 && (
+              <p className="text-surface-300 text-xs mt-0.5 font-medium">
+                x{item.amount}
+              </p>
+            )}
           </div>
         );
       })}
