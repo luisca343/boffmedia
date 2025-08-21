@@ -33,6 +33,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { SummaryCard } from "../_components/SummaryCard";
 import { Label } from "@/components/ui/label";
+import ImageUpload from "@/components/ui/image-upload";
 
 export default function Cuentas() {
   const { session } = useBoffSession();
@@ -40,6 +41,7 @@ export default function Cuentas() {
   const [isCreating, setIsCreating] = useState(false);
   const [newAccountName, setNewAccountName] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [accountImage, setAccountImage] = useState<File | null>(null);
   const { createAccount, isLoading: createLoading } = useCreateAccount();
 
   // Calculate account statistics
@@ -60,14 +62,14 @@ export default function Cuentas() {
     setIsCreating(true);
     
     try {
-      await createAccount({
+      const res =await createAccount({
         name: newAccountName.trim(),
         uuid: session?.user.smartRotomUser?.uuid!
-      });
-      
-      toast.success("Cuenta secundaria creada exitosamente");
+      }, accountImage ? { image: accountImage } : {});
+
       setNewAccountName("");
-      fetchAccounts(session); // Refresh accounts list
+      setAccountImage(null);
+      fetchAccounts(session);
       setIsDialogOpen(false);
     } catch (error) {
       console.error("Error creating account:", error);
@@ -75,6 +77,14 @@ export default function Cuentas() {
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleImageSelect = (file: File) => {
+    setAccountImage(file);
+  };
+
+  const handleImageRemove = () => {
+    setAccountImage(null);
   };
 
   // Select account handler
@@ -126,6 +136,19 @@ export default function Cuentas() {
                       value={newAccountName}
                       onChange={(e) => setNewAccountName(e.target.value)}
                       className="w-full"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Imagen de la cuenta (opcional)</Label>
+                    <ImageUpload
+                      onImageSelect={handleImageSelect}
+                      onImageRemove={handleImageRemove}
+                      value={accountImage}
+                      maxSizeInMB={2}
+                      placeholder="Sube una imagen personalizada para tu cuenta"
+                      className="w-full"
+                      disabled={isCreating}
                     />
                   </div>
                   

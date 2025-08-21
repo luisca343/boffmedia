@@ -1,10 +1,9 @@
-import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
+import { rotomGET, rotomPOST, ApiResponse, rotomMultipartPOST } from '@/services/boffAPI';
 import { CreateAccountDto } from '@/types/dto/create-account-dto';
 import { TrainerDefeatMoneyDto } from '@/types/dto/trainer-defeat-money-dto';
 import { CreateShopTransactionDto } from '@/types/dto/create-shop-transaction-dto';
 import { CreateTransferDto } from '@/types/dto/create-transfer-dto';
 import { TransferFromMainDto } from '@/types/dto/transfer-from-main-dto';
-import { FullTransaction } from '@/types/starbank';
 import { StarBankAccount, StarBankTransaction } from '@/generated/api';
 
 export class StarbankService {
@@ -20,8 +19,8 @@ export class StarbankService {
   /**
    * Create a new StarBank account
    */
-  static createAccount(data: CreateAccountDto) {
-    return rotomPOST<StarBankAccount>('/starbank/accounts', data);
+  static createAccount(data: CreateAccountDto, images: Record<string, File | Blob> = {}): Promise<ApiResponse<StarBankAccount>> {
+    return rotomMultipartPOST<StarBankAccount>('/starbank/accounts', data, images);
   }
 
   /**

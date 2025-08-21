@@ -56,6 +56,7 @@ export async function multipartPOST<T>(
   // Append text fields
   Object.entries(fields).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
+      console.log(`Appending field to FormData: ${key} = ${value}`);
       formData.append(key, value);
     }
   });
@@ -63,9 +64,17 @@ export async function multipartPOST<T>(
   // Append file fields
   Object.entries(files).forEach(([key, file]) => {
     if (file) {
+      console.log(`Appending file to FormData: ${key}`);
       formData.append(key, file);
     }
   });
+
+  console.log("FormData prepared for multipart POST:", formData);
+  console.log("Sending multipart POST request to:", url);
+    // Log all FormData fields and values for debugging
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`FormData field: ${key}`, value);
+    });
 
   // Use API base URL if not absolute
   const fullUrl = url.startsWith('http') ? url : `${getApiUrl()}${url}`;
@@ -189,6 +198,7 @@ export async function rotomMultipartPOST<T>(
   fields: Record<string, any> = {},
   files: Record<string, File | Blob> = {}
 ): Promise<ApiResponse<T>> {
+  console.log("Preparing FormData for multipart POST:", fields, files);
   fields.server = getServer();
   return multipartPOST<T>(`/smartrotom${url}`, fields, files);
 }

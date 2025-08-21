@@ -5,8 +5,8 @@ import { CreateAccountDto } from "@/types/dto/create-account-dto";
 export function useCreateAccount() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(StarbankService.createAccount)
 
-  const createAccount = (accountData: CreateAccountDto) => {
-    return StarbankService.createAccount(accountData);
+  const createAccount = (accountData: CreateAccountDto, images: Record<string, File | Blob> = {}) => {
+    return StarbankService.createAccount(accountData, images);
   }
 
   return {

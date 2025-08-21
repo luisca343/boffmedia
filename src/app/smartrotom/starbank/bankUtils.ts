@@ -24,7 +24,7 @@ export function changeActiveAccount(activeAccount: number): number {
 }
 
 export function formatMoney(amount: number): string {
-    if(!amount) return "ERROR ¥";
+    if (isNaN(amount)) return "ERROR ¥";
     return `${Number(amount.toFixed(0)).toLocaleString('es-ES')} ¥`;
 }
 
