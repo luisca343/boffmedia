@@ -77,57 +77,60 @@ export default function NewsList({
                 <div
                   key={item.id}
                   onClick={(e) => handleNewsClick(item.id, e)}
-                  className={`p-3 rounded-lg cursor-pointer transition-transform transform hover:scale-105
+                  className={`card-pop p-6 cursor-pointer transition-all duration-240ms animate-button-press relative
                     ${isSelected 
-                      ? 'bg-yellow-300 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' 
+                      ? 'bg-yellow-300 text-black transform rotate-1' 
                       : isPublished || isFeatured
-                        ? 'bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' 
-                        : 'bg-surface-100 border-4 border-dashed border-surface-500'
+                        ? 'bg-white text-black hover:bg-yellow-50' 
+                        : 'bg-gray-100 text-gray-600 border-dashed'
                     }`}
                 >
-                  <div className="flex items-center">
-                    <FileText className="h-5 w-5 mr-2 text-secondary-500 flex-shrink-0" />
-                    <h3 className="font-bold text-lg truncate">{item.title}</h3>
+                  {/* Pop-art accent bar for featured items */}
+                  {isFeatured && (
+                    <div className="absolute top-0 left-0 right-0 h-3 bg-gradient-to-r from-pink-500 to-yellow-400 rounded-t-2xl"></div>
+                  )}
+                  
+                  <div className="flex items-center mb-4">
+                    <div className="w-8 h-8 bg-secondary-500 rounded-full flex items-center justify-center mr-3 border-3 border-black">
+                      <FileText className="h-4 w-4 text-white" />
+                    </div>
+                    <h3 className="font-bold text-pop-lg text-white pr-2 truncate pop-shadow">{item.title}</h3>
                   </div>
                   
-                  <div className="flex justify-between items-center mt-3">
+                  <div className="flex flex-wrap gap-2">
                     <div 
-                      className={`flex items-center px-2 py-1 rounded-full border-2 border-black
-                        ${isPublished ? 'bg-secondary-100' : 'bg-surface-100'}`}
+                      className={`btn-pop-checkmark ${isPublished ? 'active' : ''}`}
                       onClick={(e) => e.stopPropagation()}
-                      style={{ minWidth: '110px' }}
                     >
                       <Checkbox
                         id={`published-${item.id}`}
                         checked={isPublished || isFeatured}
                         onCheckedChange={() => handlePublishToggle(item.id)}
-                        className="mr-1 border-2 border-black"
+                        className="mr-2 border-3 border-black data-[state=checked]:bg-secondary-500"
                       />
                       <label
                         htmlFor={`published-${item.id}`}
-                        className="text-sm font-medium cursor-pointer flex items-center whitespace-nowrap"
+                        className="text-pop-sm font-bold cursor-pointer flex items-center"
                       >
-                        <Eye size={14} className="mr-1" /> Publicado
+                        <Eye size={16} className="mr-1" /> Publicado
                       </label>
                     </div>
                     
                     <div 
-                      className={`flex items-center px-2 py-1 rounded-full border-2 border-black
-                        ${isFeatured ? 'bg-yellow-100' : 'bg-surface-100'}`}
+                      className={`btn-pop-checkmark ${isFeatured ? 'active featured' : ''}`}
                       onClick={(e) => e.stopPropagation()}
-                      style={{ minWidth: '110px' }}
                     >
                       <Checkbox
                         id={`featured-${item.id}`}
                         checked={isFeatured}
                         onCheckedChange={() => handleFeaturedToggle(item.id)}
-                        className="mr-1 border-2 border-black"
+                        className="mr-2 border-3 border-black data-[state=checked]:bg-yellow-500"
                       />
                       <label
                         htmlFor={`featured-${item.id}`}
-                        className="text-sm font-medium cursor-pointer flex items-center whitespace-nowrap"
+                        className="text-pop-sm font-bold cursor-pointer flex items-center"
                       >
-                        <Star size={14} className="mr-1" /> Destacado
+                        <Star size={16} className="mr-1" /> Destacado
                       </label>
                     </div>
                   </div>
