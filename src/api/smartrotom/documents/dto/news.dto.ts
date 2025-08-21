@@ -1,6 +1,7 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsOptional, Min, Max, IsUrl } from 'class-validator';
+import { Base } from 'discord.js';
 
 export class CreateNewsDto extends BaseDto {
   @ApiProperty({
@@ -96,7 +97,7 @@ export class CreateNewsDto extends BaseDto {
 
 export class UpdateNewsDto extends CreateNewsDto {}
 
-export class NewsStatusDto {
+export class NewsStatusDto extends BaseDto {
   @ApiProperty({ 
     description: 'Array of news IDs to publish',
     example: [1, 2, 3],
