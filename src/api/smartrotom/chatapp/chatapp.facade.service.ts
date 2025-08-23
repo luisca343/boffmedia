@@ -202,7 +202,7 @@ export class ChatappFacadeService {
       // Get chat members for targeted message sending
       const chatMembers = chatId === 1 
         ? Array.from(this.socketGateway.users.values()) 
-        : await this.getChatMembersForSocket(chatId);
+        : await this.getChatMembersForSocket(chatId, messageRequest.uuid);
 
       let sentToSelf = false;
 
@@ -254,9 +254,9 @@ export class ChatappFacadeService {
     }
   }
 
-  private async getChatMembersForSocket(chatId: number): Promise<{ uuid: string }[]> {
+  private async getChatMembersForSocket(chatId: number, requestUuid: string): Promise<{ uuid: string }[]> {
     try {
-      return await this.groupService.getGroupById(chatId, 'system').then(group => group.members);
+      return await this.groupService.getGroupById(chatId, requestUuid).then(group => group.members);
     } catch (error) {
       console.error('Error getting chat members for socket:', error);
       return [];
