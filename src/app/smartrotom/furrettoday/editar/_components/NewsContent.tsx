@@ -15,7 +15,7 @@ export default function NewsContent({
   const selectedNews = selectedNewsId !== null ? news.find((item) => item.id === selectedNewsId) : null;
   
   return (
-    <div className="w-full h-full bg-white overflow-hidden flex flex-col overflow-hidden">
+    <div className="w-full h-full bg-white overflow-hidden flex flex-col">
       {selectedNewsId !== null && selectedNews ? (
         <>
           {/* Editor header with title */}
