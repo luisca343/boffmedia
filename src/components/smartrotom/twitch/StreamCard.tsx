@@ -2,7 +2,7 @@
 
 import { BaseCard } from "../shared/BaseCard";
 import { Users } from "lucide-react";
-import { formatNumber, getTimeSince } from "../../../app/smartrotom/mewtwotv/types";
+import { formatNumber, getTimeSince } from "../../../app/smartrotom/mewtwitch/types";
 
 interface StreamCardProps {
   id: string;

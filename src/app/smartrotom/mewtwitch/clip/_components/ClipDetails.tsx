@@ -55,7 +55,7 @@ export const ClipDetails = ({
       <div className="space-y-4">
         <div>
           <InternalLink 
-            href={`twitch/user/${broadcasterName}`}
+            href={`mewtwitch/user/${broadcasterName}`}
             className="flex items-center text-lg font-medium hover:text-purple-500 transition-colors"
           >
             <User className="h-5 w-5 mr-2 text-purple-500" />

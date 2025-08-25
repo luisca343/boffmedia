@@ -114,7 +114,7 @@ export default function TwitchResults() {
                     console.log(user)
                     return <InternalLink
                       key={user.id}
-                      href={`twitch/user/${user.broadcaster_login}`}
+                      href={`mewtwitch/user/${user.broadcaster_login}`}
                       className="group bg-surface-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 hover:bg-surface-700 flex flex-col p-4"
                     >
                       <div className="w-16 h-16 rounded-full overflow-hidden mx-auto mb-3">
