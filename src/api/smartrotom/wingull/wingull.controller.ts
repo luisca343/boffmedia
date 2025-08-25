@@ -11,6 +11,7 @@ import { TaxiStop } from './entities/taxi-stop.entity';
 import { PlayerStats } from './entities/player-stats.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 import { WingullWorldService } from './services/wingull-world.service';
+import { UpdateDex } from './entities/update-dex.entity';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -114,7 +115,7 @@ export class WingullController {
 
   @Post('updateDex')
   @ApiOperation({ summary: 'Update player Pokédex' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Player Pokédex updated successfully.' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player Pokédex updated successfully.', type: [UpdateDex] })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update player Pokédex.' })
   @ApiBody({ type: UuidDto })
   async updateDex(@Body() { uuid }: UuidDto) {

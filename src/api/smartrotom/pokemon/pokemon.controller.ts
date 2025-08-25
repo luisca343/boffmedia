@@ -42,6 +42,7 @@ import { PokedexStatistics, DetailedPokedexStatistics, PokedexRegistry } from '.
 import { EvolutionNode, EvolutionTree } from './entities/pokemon-evolution-tree';
 import { BiomeSpawnCollection } from './entities/biome-spawn-collection.entity';
 import { PokemonBiomes } from './entities/pokemon-biomes';
+import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 @ApiTags('SmartRotom | Pokémon')
 @Controller('smartrotom/pokemon')
@@ -50,6 +51,7 @@ import { PokemonBiomes } from './entities/pokemon-biomes';
 export class PokemonController {  
     constructor(
         private readonly pokemonFacadeService: PokemonFacadeService,
+        private readonly wingullFacadeService: WingullFacadeService, 
     ) {}
     
     // ==================== BASIC POKEMON OPERATIONS ====================
@@ -493,6 +495,31 @@ export class PokemonController {
         });
     }
 
+    @Post('dex/sync')
+    @ApiOperation({ summary: 'Sync Pokédex between Wingull and SmartRotom' })
+    @ApiResponse({ 
+      status: HttpStatus.OK, 
+      description: 'Pokédex synced successfully.',
+      schema: {
+        type: 'object',
+        properties: {
+          success: { type: 'boolean' },
+          message: { type: 'string' },
+          results: { type: 'object' }
+        }
+      }
+    })
+    @ApiBadRequestResponse({ description: 'Invalid sync data.' })
+    @ApiInternalServerErrorResponse({ description: 'Failed to sync Pokédex.' })
+    @ApiBody({ schema: { properties: { uuid: { type: 'string' } } } })
+    async syncDex(@Body() body: { uuid: string }) {
+        const wingullDex = await this.wingullFacadeService.updateDex(body.uuid);
+        return await this.pokemonFacadeService.updateDex(body.uuid, {
+            SEEN: wingullDex.SEEN,
+            CAUGHT: wingullDex.CAUGHT
+        });
+    }
+
     @Get('dex/stats/:uuid')
     @ApiOperation({ summary: 'Get Pokédex statistics for user' })
     @ApiResponse({ 
@@ -534,6 +561,7 @@ export class PokemonController {
     async getPokedexRegistries(@Param('uuid') uuid: string): Promise<PokedexRegistry[]> {
         return await this.pokemonFacadeService.getPokedexRegistries(uuid);
     }
+    
 
     // ==================== INTEGRATION OPERATIONS ====================
 

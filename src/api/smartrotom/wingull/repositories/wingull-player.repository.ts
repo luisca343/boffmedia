@@ -70,7 +70,7 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
     try {
       const response: AxiosResponse = await axios.post(
-        `${this.WINGULL_API_BASE_URL}/updateDex`,
+        `${this.WINGULL_API_BASE_URL}/updatedex`,
         { uuid },
         {
           timeout: this.DEFAULT_TIMEOUT,
