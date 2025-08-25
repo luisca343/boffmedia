@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Property, TownData } from "../types";
 import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield } from "lucide-react";
 import { getIconComponent } from "../utils";
+import { ImageShowcase } from "./ImageShowcase";
 
 interface PropertyCardProps {
   property: Property;
@@ -55,75 +56,34 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
           </div>
         </div>
 
-        {/* Image section with clean design */}
+        {/* Image section with ImageShowcase */}
         <div className="relative">
-          {currentImage ? (
-            <div className="relative h-72 lg:h-80 overflow-hidden">
-              <Image
-                src={currentImage}
-                alt={property.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
-                priority
-              />
-              
-              {/* Simple overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              
-              {/* Clean image navigation */}
-              {allImages.length > 1 && (
+          {allImages.length > 0 ? (
+            <ImageShowcase
+              images={allImages}
+              selectedImageIndex={selectedImageIndex}
+              onImageSelect={onImageSelect}
+              alt={property.name}
+              colorClaro={colorClaro}
+              colorMedio={colorMedio}
+              colorOscuro={colorOscuro}
+              className="h-72 lg:h-80"
+              overlayContent={
                 <>
-                  <div className="absolute top-4 right-4 z-20">
-                    <div className="flex gap-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full px-3 py-2 shadow-sm">
-                      {allImages.slice(0, 4).map((_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => onImageSelect(index)}
-                          className={`w-2.5 h-2.5 rounded-full transition-all duration-200 ${
-                            index === selectedImageIndex 
-                              ? 'scale-125' 
-                              : 'hover:scale-110 opacity-60 hover:opacity-100'
-                          }`}
-                          style={{ 
-                            backgroundColor: index === selectedImageIndex ? colorClaro : '#9CA3AF'
-                          }}
-                        />
-                      ))}
-                      {allImages.length > 4 && (
-                        <span className="text-gray-600 dark:text-gray-300 text-xs ml-1 font-medium">+{allImages.length - 4}</span>
-                      )}
+                  {/* Property title overlay */}
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-xl p-4 shadow-sm">
+                      <h3 className="text-xl lg:text-2xl font-bold" style={{color: colorMedio}}>
+                        {property.name}
+                      </h3>
+                      <p className="text-sm mt-1" style={{color: colorOscuro}}>
+                        Parcela #{property.id}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Navigation arrows */}
-                      <button
-                        onClick={() => onImageSelect(selectedImageIndex > 0 ? selectedImageIndex - 1 : allImages.length - 1)}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-surface-100 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-surface-200 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-sm"
-                      >
-                    <span style={{ color: colorMedio }}>←</span>
-                  </button>
-                      <button
-                        onClick={() => onImageSelect(selectedImageIndex < allImages.length - 1 ? selectedImageIndex + 1 : 0)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-surface-100 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-surface-200 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-sm"
-                      >
-                    <span style={{ color: colorMedio }}>→</span>
-                  </button>
                 </>
-              )}
-
-              {/* Property title overlay */}
-              <div className="absolute bottom-6 left-6 right-6">
-                    <div className="bg-surface-100 backdrop-blur-sm rounded-xl p-4 shadow-sm">
-                  <h3 className="text-xl lg:text-2xl font-bold" style={{color: colorMedio}}>
-                    {property.name}
-                  </h3>
-                  <p className="text-sm mt-1" style={{color: colorOscuro}}>
-                    Parcela #{property.id}
-                  </p>
-                </div>
-              </div>
-            </div>
+              }
+            />
           ) : (
             <div className="relative h-72 lg:h-80 bg-white/80 flex items-center justify-center">
               <div className="text-center">

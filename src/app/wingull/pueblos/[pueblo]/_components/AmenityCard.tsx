@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { getIconComponent } from "../utils";
 import { Amenity } from "../types";
+import { ImageShowcase } from "./ImageShowcase";
+import { useState } from "react";
 
 interface AmenityCardProps {
   amenity: Amenity;
@@ -10,7 +12,13 @@ interface AmenityCardProps {
 }
 
 export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: AmenityCardProps) {
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const IconComponent = getIconComponent(amenity.icon);
+  
+  // Process images with proper path
+  const amenityImages = amenity.images?.map(img => 
+    require('path').join('/smartrotom/data/pueblos', img)
+  ) || [];
   
   return (
     <div className="group relative">
@@ -31,35 +39,35 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
         
         {/* Content container */}
         <div className="relative p-6 h-full flex flex-col">
-          {/* Image section with normal styling */}
-          {amenity.image && (
-            <div className="relative w-full h-48 rounded-xl overflow-hidden mb-6 shadow-md">
-              <Image
-                src="/smartrotom/img/w2.webp"
+          {/* Image section using ImageShowcase */}
+          {amenityImages.length > 0 && (
+            <div className="mb-6">
+              <ImageShowcase
+                images={amenityImages}
+                selectedImageIndex={selectedImageIndex}
+                onImageSelect={setSelectedImageIndex}
                 alt={amenity.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                colorClaro={colorClaro}
+                colorMedio={colorMedio}
+                colorOscuro={colorOscuro}
+                className="h-48"
+                overlayContent={
+                  <div className="absolute top-3 left-3">
+                    <div 
+                      className="p-2.5 rounded-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border shadow-sm"
+                      style={{ borderColor: `${colorMedio}30` }}
+                    >
+                      <IconComponent className="w-5 h-5" style={{ color: colorMedio }} />
+                    </div>
+                  </div>
+                }
               />
-              
-              {/* Simple overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              
-              {/* Icon overlay with town color */}
-              <div className="absolute top-3 right-3">
-                <div 
-                  className="p-2.5 rounded-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border shadow-sm"
-                  style={{ borderColor: `${colorMedio}30` }}
-                >
-                  <IconComponent className="w-5 h-5" style={{ color: colorMedio }} />
-                </div>
-              </div>
             </div>
           )}
           
           {/* Header section with clean styling */}
           <div className="flex items-start gap-4 mb-6">
-            {!amenity.image && (
+            {amenityImages.length === 0 && (
               <div 
                 className="p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border-2 transition-all duration-300 group-hover:scale-105" 
                 style={{ borderColor: `${colorMedio}30` }}

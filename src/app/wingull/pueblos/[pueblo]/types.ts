@@ -20,7 +20,7 @@ export interface Amenity {
   name: string;
   descripcion: string;
   icon: string;
-  image?: string;
+  images?: string[];
   caracteristicas: string[];
 }
 
