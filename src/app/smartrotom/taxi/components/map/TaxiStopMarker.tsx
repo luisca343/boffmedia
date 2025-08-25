@@ -1,8 +1,6 @@
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { TaxiStop } from "@/types/dto/taxi-stop.dto";
-import { StopPosition } from '../../types/map.types';
-import { CoordinateTransformer } from '../../utils/coordinate-utils';
-import { MAP_CONSTANTS } from '../../utils/constants';
+import { StopPosition, BaseMarker, CoordinateTransformer } from '@/components/map';
 
 interface TaxiStopMarkerProps {
   stop: TaxiStop;
@@ -21,25 +19,13 @@ export const TaxiStopMarker = ({
 }: TaxiStopMarkerProps) => {
   if (!pos.isWithinView) return null;
 
-  const mapPos = transformer.worldToMapPixels(stop.x, stop.z);
-  const leftPercent = (mapPos.x / MAP_CONSTANTS.FIXED_MAP_SIZE_X) * 100;
-  const topPercent = (mapPos.z / MAP_CONSTANTS.FIXED_MAP_SIZE_Z) * 100;
-
   return (
-    <div
-      className="absolute z-10 transform -translate-x-1/2 -translate-y-1/2 cursor-pointer waypoint-marker"
-      data-waypoint="true"
-      style={{
-        left: `${leftPercent}%`,
-        top: `${topPercent}%`,
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-        onStopClick(stop);
-      }}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-      }}
+    <BaseMarker
+      worldPosition={{ x: stop.x, z: stop.z }}
+      transformer={transformer}
+      onClick={() => onStopClick(stop)}
+      className="z-10 waypoint-marker"
+      style={{ 'data-waypoint': 'true' } as React.CSSProperties}
     >
       <FaMapMarkerAlt 
         className={`text-3xl ${
@@ -53,6 +39,6 @@ export const TaxiStopMarker = ({
       >
         {stop.id}
       </div>
-    </div>
+    </BaseMarker>
   );
 };

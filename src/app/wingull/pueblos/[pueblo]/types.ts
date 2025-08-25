@@ -1,5 +1,10 @@
 // Types for TownRealEstatePage
 
+export interface TownCoordinates {
+  inicio: { x: number; z: number };
+  fin: { x: number; z: number };
+}
+
 export interface TownData {
   textos: {
     color?: string; // keep for legacy
@@ -8,6 +13,7 @@ export interface TownData {
     colorOscuro: string;
     frasebonita: string;
     descripcion: string;
+    coordenadas?: TownCoordinates;
     comodidades: Amenity[];
     parcelas: Property[];
   };
@@ -22,6 +28,7 @@ export interface Amenity {
   icon: string;
   images?: string[];
   caracteristicas: string[];
+  coordenadas?: { x: number; z: number };
 }
 
 export interface Property {
@@ -32,4 +39,5 @@ export interface Property {
   caracteristicas: string[];
   comodidadesCercanas: string[];
   images?: string[];
+  coordenadas?: { x: number; z: number };
 }

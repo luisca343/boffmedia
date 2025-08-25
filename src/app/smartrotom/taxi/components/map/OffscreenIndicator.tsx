@@ -1,7 +1,11 @@
 import { FaArrowRight } from 'react-icons/fa';
 import { TaxiStop } from "@/types/dto/taxi-stop.dto";
-import { StopPosition, Position } from '../../types/map.types';
-import { calculateDistance } from '../../utils/coordinate-utils';
+import type { StopPosition, Position } from '@/components/map';
+
+// Helper function to calculate distance between two points
+const calculateDistance = (stop: TaxiStop, playerPosition: Position): number => {
+  return Math.round(Math.sqrt(Math.pow(stop.x - playerPosition.x, 2) + Math.pow(stop.z - playerPosition.z, 2)));
+};
 
 interface OffscreenIndicatorProps {
   stop: TaxiStop;

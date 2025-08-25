@@ -1,5 +1,5 @@
 import { FaCompass } from 'react-icons/fa';
-import { Position } from '../../types/map.types';
+import type { Position } from '@/components/map';
 
 interface MapHeaderProps {
   mapCenter: Position;

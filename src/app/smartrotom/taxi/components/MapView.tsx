@@ -1,17 +1,14 @@
 import { TaxiStop } from "@/types/dto/taxi-stop.dto";
 import { useMemo } from 'react';
 
-// Types
-import { Position, MapBounds } from '../types/map.types';
+// Types and Utils
+import { Position, MapBounds, CoordinateTransformer, PositionCalculator } from '@/components/map';
 
 // Hooks
 import { useMapState } from '../hooks/useMapState';
 import { useMapInteractions } from '../hooks/useMapInteractions';
 import { useStopPositions } from '../hooks/useStopPositions';
 import { useViewportDimensions } from '../hooks/useViewportDimensions';
-
-// Utils
-import { CoordinateTransformer, PositionCalculator } from '../utils/coordinate-utils';
 
 // Components
 import { MapHeader } from './map/MapHeader';

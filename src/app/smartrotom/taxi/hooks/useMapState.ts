@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Position, MapBounds } from '../types/map.types';
+import { Position, MapBounds } from '@/components/map';
 import { MAP_CONSTANTS, ZOOM_CONSTANTS } from '../utils/constants';
 
 interface UseMapStateProps {
@@ -11,7 +11,7 @@ export const useMapState = ({ playerPosition, customMapBounds }: UseMapStateProp
   const [zoomLevel, setZoomLevel] = useState(1);
   const [mapCenter, setMapCenter] = useState<Position>(playerPosition);
   const [mapBounds, setMapBounds] = useState(
-    customMapBounds || MAP_CONSTANTS.DEFAULT_MAP_BOUNDS
+    customMapBounds || MAP_CONSTANTS.WORLD_BOUNDS
   );
 
   useEffect(() => {

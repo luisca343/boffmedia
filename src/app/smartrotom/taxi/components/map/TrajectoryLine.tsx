@@ -1,7 +1,6 @@
 import { TaxiStop } from "@/types/dto/taxi-stop.dto";
-import { Position } from '../../types/map.types';
-import { CoordinateTransformer } from '../../utils/coordinate-utils';
-import { MAP_CONSTANTS } from '../../utils/constants';
+import { MAP_CONSTANTS } from '@/components/map';
+import type { Position, CoordinateTransformer } from '@/components/map';
 
 interface TrajectoryLineProps {
   selectedStop: TaxiStop | null;
