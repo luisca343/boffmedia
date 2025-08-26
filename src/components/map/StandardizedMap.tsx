@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 
 // Map constants - same as taxi system
-export const MAP_CONSTANTS = {
+export const MAP_CONSTANTS_OLD = {
   FIXED_MAP_SIZE_X: 2048,
   FIXED_MAP_SIZE_Z: 2048 * 1.09523809524,
   WORLD_BOUNDS: {
@@ -9,6 +9,17 @@ export const MAP_CONSTANTS = {
     maxX: 5631,
     minZ: -6144,
     maxZ: 5631
+  }
+};
+
+export const MAP_CONSTANTS = {
+  FIXED_MAP_SIZE_X: 2048,
+  FIXED_MAP_SIZE_Z: 2048,
+  WORLD_BOUNDS: {
+    minX: -6463,
+    maxX: 6463,
+    minZ: -6463,
+    maxZ: 6463
   }
 };
 
@@ -45,9 +56,9 @@ export class CoordinateTransformer {
   }
 
   worldToMapPixels(worldX: number, worldZ: number): Position {
-    const normalizedX = (worldX - this.mapBounds.minX) / (this.mapBounds.maxX - this.mapBounds.minX);
-    const normalizedZ = (worldZ - this.mapBounds.minZ) / (this.mapBounds.maxZ - this.mapBounds.minZ);
-    
+    const normalizedX = (worldX + 64 - this.mapBounds.minX) / (this.mapBounds.maxX - this.mapBounds.minX);
+    const normalizedZ = (worldZ - 48 - this.mapBounds.minZ) / (this.mapBounds.maxZ - this.mapBounds.minZ);
+
     return {
       x: normalizedX * MAP_CONSTANTS.FIXED_MAP_SIZE_X,
       z: normalizedZ * MAP_CONSTANTS.FIXED_MAP_SIZE_Z
@@ -58,10 +69,10 @@ export class CoordinateTransformer {
     const normalizedX = mapX / MAP_CONSTANTS.FIXED_MAP_SIZE_X;
     const normalizedZ = mapZ / MAP_CONSTANTS.FIXED_MAP_SIZE_Z;
     
-    return {
-      x: this.mapBounds.minX + normalizedX * (this.mapBounds.maxX - this.mapBounds.minX),
-      z: this.mapBounds.minZ + normalizedZ * (this.mapBounds.maxZ - this.mapBounds.minZ)
-    };
+      return {
+        x: this.mapBounds.minX + normalizedX * (this.mapBounds.maxX - this.mapBounds.minX) - 64,
+        z: this.mapBounds.minZ + normalizedZ * (this.mapBounds.maxZ - this.mapBounds.minZ) + 48
+      };
   }
 
   /**
@@ -227,7 +238,7 @@ export function MapImage({ zoomLevel, mapCenter, transformer, children }: MapIma
       }}
     >
       <img
-        src="/smartrotom/img/TERASTEST4.webp"
+        src="/smartrotom/img/TERASv3.avif"
         alt="Minecraft Map"
         className="w-full h-full object-cover"
         draggable={false}
