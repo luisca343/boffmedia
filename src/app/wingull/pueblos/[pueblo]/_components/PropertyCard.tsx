@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Property, TownData } from "../types";
-import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield } from "lucide-react";
+import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield, Building2 } from "lucide-react";
 import { getIconComponent } from "../utils";
 import { ImageShowcase } from "./ImageShowcase";
 
@@ -11,17 +11,18 @@ interface PropertyCardProps {
   townData: TownData;
   selectedImageIndex: number;
   onImageSelect: (index: number) => void;
+  type: 'parcela' | 'negocio'; // New parameter to distinguish property type
 }
 
-export function PropertyCard({ property, isExpanded, onToggle, townData, selectedImageIndex, onImageSelect }: PropertyCardProps) {
+export function PropertyCard({ property, isExpanded, onToggle, townData, selectedImageIndex, onImageSelect, type }: PropertyCardProps) {
   const { colorClaro, colorMedio, colorOscuro, comodidades } = townData.textos;
   const nearbyAmenities = comodidades?.filter(amenity => 
     property.comodidadesCercanas.includes(amenity.id)
   ) || [];
 
-  // Get images for this property
+  // Get images for this property based on type
   const propertyImages = townData.images?.filter(img => 
-    img.includes(`parcela${property.id}`)
+    img.includes(`${type}${property.id}`)
   ) || [];
   
   // If no specific images, use a placeholder or default
@@ -52,7 +53,9 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
             style={{ borderColor: `${colorMedio}30` }}
           >
             <Shield className="w-4 h-4" style={{ color: colorMedio }} />
-            <span style={{ color: colorMedio }}>PARCELA #{property.id}</span>
+            <span style={{ color: colorMedio }}>
+              {type === 'parcela' ? 'PARCELA' : 'LOCAL'} #{property.id}
+            </span>
           </div>
         </div>
 
@@ -77,7 +80,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                         {property.name}
                       </h3>
                       <p className="text-sm mt-1" style={{color: colorOscuro}}>
-                        Parcela #{property.id}
+                        {type === 'parcela' ? 'Parcela' : 'Local'} #{property.id}
                       </p>
                     </div>
                   </div>
@@ -87,7 +90,11 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
           ) : (
             <div className="relative h-72 lg:h-80 bg-white/80 flex items-center justify-center">
               <div className="text-center">
-                <Home className="w-16 h-16 mx-auto mb-4" style={{ color: colorOscuro }} />
+                {type === 'parcela' ? (
+                  <Home className="w-16 h-16 mx-auto mb-4" style={{ color: colorOscuro }} />
+                ) : (
+                  <Building2 className="w-16 h-16 mx-auto mb-4" style={{ color: colorOscuro }} />
+                )}
                 <p style={{ color: colorMedio }}>No hay imágenes disponibles</p>
               </div>
             </div>
@@ -98,7 +105,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
         <div className="p-6 lg:p-8">
           {/* Description */}
           <div className="mb-6">
-            <p className="text-base leading-relaxed" style={{color: colorClaro}}>
+            <p className="text-base leading-relaxed" style={{color: 'white'}}>
               {property.info}
             </p>
           </div>
@@ -108,14 +115,13 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
             {property.caracteristicas.map((feature, index) => (
               <div 
                 key={index} 
-                className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200" 
-                style={{ background: `${colorClaro}50` }}
+                className="flex items-center gap-3 p-3 rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20" 
               >
                 <div 
                   className="w-2 h-2 rounded-full flex-shrink-0" 
-                  style={{ backgroundColor: colorOscuro }} 
+                  style={{ backgroundColor: colorClaro }} 
                 />
-                <span className="text-sm font-medium" style={{ color: colorClaro }}>
+                <span className="text-sm font-medium" style={{ color: 'white' }}>
                   {feature}
                 </span>
               </div>
@@ -125,8 +131,8 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
           {/* Nearby amenities */}
           {nearbyAmenities.length > 0 && (
             <div className="mb-6">
-              <h4 className="text-sm font-semibold uppercase tracking-wider mb-3"
-                style={{ color: colorMedio }}
+              <h4 className="text-sm font-bold uppercase tracking-wider mb-3"
+                style={{ color: 'white' }}
               >
                 Comodidades Cercanas
               </h4>
@@ -136,10 +142,9 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
                   return (
                     <div 
                       key={amenity.id} 
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                      style={{ background: `${colorClaro}50`, color: colorClaro }}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm  bg-white/10 transition-all duration-200 hover:bg-white/20"
                     >
-                      <IconComponent className="w-4 h-4" style={{ color: colorOscuro }} />
+                      <IconComponent className="w-4 h-4" style={{ color: colorClaro }} />
                       <span>{amenity.name}</span>
                     </div>
                   );
@@ -225,7 +230,7 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
               style={{ background: `${colorClaro}10`, color: colorClaro, borderColor: colorClaro }}
             >
               <Sparkles className="w-4 h-4" style={{ color: colorClaro }} />
-              Contactar
+              Comprar
             </button>
           </div>
         </div>

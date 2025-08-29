@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 // Map constants - same as taxi system
 export const MAP_CONSTANTS_OLD = {
@@ -57,7 +57,7 @@ export class CoordinateTransformer {
 
   worldToMapPixels(worldX: number, worldZ: number): Position {
     const normalizedX = (worldX + 64 - this.mapBounds.minX) / (this.mapBounds.maxX - this.mapBounds.minX);
-    const normalizedZ = (worldZ - 48 - this.mapBounds.minZ) / (this.mapBounds.maxZ - this.mapBounds.minZ);
+    const normalizedZ = (worldZ - 32 - this.mapBounds.minZ) / (this.mapBounds.maxZ - this.mapBounds.minZ);
 
     return {
       x: normalizedX * MAP_CONSTANTS.FIXED_MAP_SIZE_X,
@@ -71,7 +71,7 @@ export class CoordinateTransformer {
     
       return {
         x: this.mapBounds.minX + normalizedX * (this.mapBounds.maxX - this.mapBounds.minX) - 64,
-        z: this.mapBounds.minZ + normalizedZ * (this.mapBounds.maxZ - this.mapBounds.minZ) + 48
+        z: this.mapBounds.minZ + normalizedZ * (this.mapBounds.maxZ - this.mapBounds.minZ) + 32
       };
   }
 
@@ -238,7 +238,7 @@ export function MapImage({ zoomLevel, mapCenter, transformer, children }: MapIma
       }}
     >
       <img
-        src="/smartrotom/img/TERASv3.avif"
+        src="/smartrotom/img/TERASv7.avif"
         alt="Minecraft Map"
         className="w-full h-full object-cover"
         draggable={false}
@@ -266,6 +266,27 @@ export function StandardizedMap({
 
   // Create transformer for coordinate conversion
   const transformer = React.useMemo(() => new CoordinateTransformer(mapBounds), [mapBounds]);
+
+  // Enhanced wheel event handling with useEffect for passive: false
+  useEffect(() => {
+    const mapElement = mapRef.current;
+    if (!mapElement) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const delta = e.deltaY > 0 ? -0.5 : 0.5;
+      onZoomChange(Math.max(minZoom, Math.min(maxZoom, zoomLevel + delta)));
+    };
+
+    // Add event listener with passive: false to ensure preventDefault works
+    mapElement.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      mapElement.removeEventListener('wheel', handleWheel);
+    };
+  }, [zoomLevel, onZoomChange, minZoom, maxZoom]);
 
   // Handle mouse events for dragging
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -299,10 +320,42 @@ export function StandardizedMap({
     setDragStart(null);
   };
 
-  const handleWheel = (e: React.WheelEvent) => {
+  // Touch event handlers for mobile support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      setIsDragging(true);
+      setDragStart({
+        x: touch.clientX,
+        y: touch.clientY,
+        centerX: mapCenter.x,
+        centerZ: mapCenter.z
+      });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent page scrolling on touch devices
     e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    onZoomChange(Math.max(minZoom, Math.min(maxZoom, zoomLevel + delta)));
+    
+    if (!isDragging || !dragStart || e.touches.length !== 1) return;
+
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - dragStart.x;
+    const deltaY = touch.clientY - dragStart.y;
+
+    const worldDeltaX = -(deltaX / zoomLevel) * (mapBounds.maxX - mapBounds.minX) / MAP_CONSTANTS.FIXED_MAP_SIZE_X;
+    const worldDeltaZ = -(deltaY / zoomLevel) * (mapBounds.maxZ - mapBounds.minZ) / MAP_CONSTANTS.FIXED_MAP_SIZE_Z;
+
+    onMapCenterChange({
+      x: dragStart.centerX + worldDeltaX,
+      z: dragStart.centerZ + worldDeltaZ,
+    });
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setDragStart(null);
   };
 
   return (
@@ -313,12 +366,20 @@ export function StandardizedMap({
         className={`relative bg-slate-800 rounded-xl overflow-hidden shadow-lg border ${
           isDragging ? 'cursor-grabbing' : 'cursor-grab'
         }`}
-        style={{ height: '100%' }}
+        style={{ 
+          height: '100%',
+          // Prevent text selection during drag
+          userSelect: 'none',
+          // Prevent touch actions that might interfere with map interaction
+          touchAction: 'none'
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <MapImage
           zoomLevel={zoomLevel}
@@ -349,5 +410,3 @@ export function StandardizedMap({
     </div>
   );
 }
-
-// Export everything is already handled above, no need to re-export

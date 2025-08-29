@@ -10,7 +10,7 @@ interface AmenitiesSectionProps {
 }
 
 export function AmenitiesSection({ townData, townName }: AmenitiesSectionProps) {
-  const { colorClaro, colorMedio, colorOscuro, comodidades } = townData.textos;
+  const { colorClaro, colorMedio, colorOscuro, comodidades, nombre } = townData.textos;
 
   if (!comodidades?.length) return null;
 
@@ -61,8 +61,8 @@ export function AmenitiesSection({ townData, townName }: AmenitiesSectionProps) 
         <SectionHeader
           title={<span style={{color: colorClaro}}>Comodidades</span>}
           subtitle={<span style={{color: colorMedio}}>del Pueblo</span>}
-          description={<span>Descubre todas las facilidades que hacen de Pueblo {townName} el lugar perfecto para establecer tu base</span>}
-          townName={townName}
+          description={<span>Descubre todas las facilidades que hacen de {nombre} el lugar perfecto para establecer tu base</span>}
+          townName={nombre}
           colorClaro={colorClaro}
           colorMedio={colorMedio}
           colorOscuro={colorOscuro}

@@ -21,7 +21,7 @@ export const TaxiStopMarker = ({
 
   return (
     <BaseMarker
-      worldPosition={{ x: stop.x, z: stop.z }}
+      worldPosition={{ x: stop.x, z: stop.z - 16 }} // Adjusted for marker position
       transformer={transformer}
       onClick={() => onStopClick(stop)}
       className="z-10 waypoint-marker"

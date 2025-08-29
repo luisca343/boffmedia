@@ -13,7 +13,7 @@ interface PropertiesSectionProps {
 export function PropertiesSection({ townData, townName }: PropertiesSectionProps) {
   const [expandedProperty, setExpandedProperty] = useState<number | null>(null);
   const [selectedImages, setSelectedImages] = useState<{ [key: number]: number }>({});
-  const { colorClaro, colorMedio, colorOscuro, parcelas } = townData.textos;
+  const { colorClaro, colorMedio, colorOscuro, parcelas, nombre } = townData.textos;
 
   if (!parcelas?.length) return null;
 
@@ -64,8 +64,8 @@ export function PropertiesSection({ townData, townName }: PropertiesSectionProps
         <SectionHeader
           title={<span style={{color: colorClaro}}>Parcelas</span>}
           subtitle={<span style={{color: colorMedio}}>Disponibles</span>}
-          description={<span>Encuentra tu hogar perfecto en Pueblo {townName}. Cada parcela ofrece una experiencia única con acceso a diferentes comodidades</span>}
-          townName={townName}
+          description={<span>Encuentra tu hogar perfecto en {nombre}. Cada parcela ofrece una experiencia única con acceso a diferentes comodidades</span>}
+          townName={nombre}
           colorClaro={colorClaro}
           colorMedio={colorMedio}
           colorOscuro={colorOscuro}
@@ -81,11 +81,13 @@ export function PropertiesSection({ townData, townName }: PropertiesSectionProps
               townData={townData}
               selectedImageIndex={selectedImages[property.id] || 0}
               onImageSelect={(imageIndex) => handleImageSelect(property.id, imageIndex)}
+              type="parcela"
             />
           ))}
         </div>
 
         {/* Call to action section */}
+        {/*
         <div className="mt-20 text-center">
               <PropertiesCTA 
                 townName={townName}
@@ -93,7 +95,8 @@ export function PropertiesSection({ townData, townName }: PropertiesSectionProps
                 colorMedio={colorMedio}
                 colorOscuro={colorOscuro}
               />
-        </div>
+        </div> 
+        */}
       </div>
     </section>
   );

@@ -10,7 +10,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ townName, townData, onScrollToContent }: HeroSectionProps) {
-  const { colorClaro, colorMedio, colorOscuro, frasebonita, descripcion } = townData.textos;
+  const { colorClaro, colorMedio, colorOscuro, frasebonita, descripcion, nombre } = townData.textos;
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-900">
@@ -57,7 +57,7 @@ export function HeroSection({ townName, townData, onScrollToContent }: HeroSecti
                 className="block bg-gradient-to-r bg-clip-text text-transparent animate-pulse" 
                 style={{ backgroundImage: `linear-gradient(135deg, white 0%, ${colorClaro} 50%, white 100%)` }}
               >
-                {townName}
+                {nombre}
               </span>
             </h1>
             <p 

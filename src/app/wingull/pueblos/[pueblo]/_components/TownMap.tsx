@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { TownData, Property, Amenity } from '../types';
+import { TownData, Property, Amenity, SelectedMarker } from '../types';
 import { MapPin } from 'lucide-react';
 import { StandardizedMap, CoordinateTransformer, MAP_CONSTANTS } from '@/components/map';
-import { PropertyMarker, AmenityMarker, BoundaryMarker } from './MapMarkers';
+import { PropertyMarker, AmenityMarker, BoundaryMarker, BusinessMarker } from './MapMarkers';
 
 interface TownMapProps {
   townData: TownData;
   townName: string;
-  selectedProperty: Property | null;
-  onPropertySelect: (property: Property | null) => void;
+  selectedMarker: SelectedMarker | null;
+  onMarkerSelect: (marker: SelectedMarker | null) => void;
 }
 
 interface MapPosition {
@@ -16,11 +16,11 @@ interface MapPosition {
   z: number;
 }
 
-export function TownMap({ townData, townName, selectedProperty, onPropertySelect }: TownMapProps) {
-  const [zoomLevel, setZoomLevel] = useState(1);
+export function TownMap({ townData, townName, selectedMarker, onMarkerSelect }: TownMapProps) {
+  const [zoomLevel, setZoomLevel] = useState(6);
   const [mapCenter, setMapCenter] = useState<MapPosition>({ x: 0, z: 0 });
 
-  const { colorClaro, colorMedio, colorOscuro, coordenadas, parcelas, comodidades } = townData.textos;
+  const { colorClaro, colorMedio, colorOscuro, coordenadas, parcelas, comodidades, negocios } = townData.textos;
 
   // Calculate town boundaries and center
   const townBounds = useMemo(() => {
@@ -75,9 +75,33 @@ export function TownMap({ townData, townName, selectedProperty, onPropertySelect
   const centerOnProperty = (property: Property) => {
     if (property.coordenadas) {
       setMapCenter({ x: property.coordenadas.x, z: property.coordenadas.z });
-      onPropertySelect(property);
+      onMarkerSelect({ type: 'property', data: property });
     }
   };
+
+  const centerOnBusiness = (business: Property) => {
+    if (business.coordenadas) {
+      setMapCenter({ x: business.coordenadas.x, z: business.coordenadas.z });
+      onMarkerSelect({ type: 'business', data: business });
+    }
+  };
+
+  const centerOnAmenity = (amenity: Amenity) => {
+    if (amenity.coordenadas) {
+      setMapCenter({ x: amenity.coordenadas.x, z: amenity.coordenadas.z });
+      onMarkerSelect({ type: 'amenity', data: amenity });
+    }
+  };
+
+  // Helper function to check if a marker is selected
+  const isPropertySelected = (propertyId: number) => 
+    selectedMarker?.type === 'property' && (selectedMarker.data as Property).id === propertyId;
+  
+  const isBusinessSelected = (businessId: number) => 
+    selectedMarker?.type === 'business' && (selectedMarker.data as Property).id === businessId;
+  
+  const isAmenitySelected = (amenityId: string) => 
+    selectedMarker?.type === 'amenity' && (selectedMarker.data as Amenity).id === amenityId;
 
   return (
     <div className="relative">
@@ -86,9 +110,10 @@ export function TownMap({ townData, townName, selectedProperty, onPropertySelect
         zoomLevel={zoomLevel}
         onMapCenterChange={setMapCenter}
         onZoomChange={setZoomLevel}
-        className="h-96"
-        minZoom={3}
-        maxZoom={5}
+        className="h-128"
+        minZoom={5}
+        maxZoom={12}
+        
       >
         {/* Town boundaries */}
         <BoundaryMarker
@@ -106,8 +131,25 @@ export function TownMap({ townData, townName, selectedProperty, onPropertySelect
               worldPosition={{ x: property.coordenadas!.x, z: property.coordenadas!.z }}
               transformer={transformer}
               property={property}
-              isSelected={selectedProperty?.id === property.id}
+              isSelected={isPropertySelected(property.id)}
               onClick={() => centerOnProperty(property)}
+              colorClaro={colorClaro}
+              colorMedio={colorMedio}
+              colorOscuro={colorOscuro}
+            />
+          ))}
+
+        {/* Business markers */}
+        {negocios
+          .filter(business => business.coordenadas)
+          .map(business => (
+            <BusinessMarker
+              key={`business-${business.id}`}
+              worldPosition={{ x: business.coordenadas!.x, z: business.coordenadas!.z }}
+              transformer={transformer}
+              business={business}
+              isSelected={isBusinessSelected(business.id)}
+              onClick={() => centerOnBusiness(business)}
               colorClaro={colorClaro}
               colorMedio={colorMedio}
               colorOscuro={colorOscuro}
@@ -123,6 +165,8 @@ export function TownMap({ townData, townName, selectedProperty, onPropertySelect
               worldPosition={{ x: amenity.coordenadas!.x, z: amenity.coordenadas!.z }}
               transformer={transformer}
               amenity={amenity}
+              isSelected={isAmenitySelected(amenity.id)}
+              onClick={() => centerOnAmenity(amenity)}
               colorOscuro={colorOscuro}
             />
           ))}

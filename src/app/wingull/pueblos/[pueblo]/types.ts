@@ -7,6 +7,7 @@ export interface TownCoordinates {
 
 export interface TownData {
   textos: {
+    nombre: string; // Town display name
     color?: string; // keep for legacy
     colorClaro: string;
     colorMedio: string;
@@ -16,6 +17,7 @@ export interface TownData {
     coordenadas?: TownCoordinates;
     comodidades: Amenity[];
     parcelas: Property[];
+    negocios: Property[]; // New property for business plots
   };
   fondo?: string;
   images?: string[];
@@ -41,3 +43,8 @@ export interface Property {
   images?: string[];
   coordenadas?: { x: number; z: number };
 }
+
+export type SelectedMarker = {
+  type: 'property' | 'business' | 'amenity';
+  data: Property | Amenity;
+};

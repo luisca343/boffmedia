@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { TownData, Property } from "../types";
+import { TownData, Property, Amenity, SelectedMarker } from "../types";
 import { TownMap } from "./TownMap";
 import { SectionHeader } from "./SectionHeader";
+import { MarkerDetailsPanel } from "./MarkerDetailsPanel";
 
 interface TownMapSectionProps {
   townData: TownData;
@@ -9,11 +10,14 @@ interface TownMapSectionProps {
 }
 
 export function TownMapSection({ townData, townName }: TownMapSectionProps) {
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const { colorClaro, colorMedio, colorOscuro, coordenadas, parcelas } = townData.textos;
+  const [selectedMarker, setSelectedMarker] = useState<SelectedMarker | null>(null);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const { colorClaro, colorMedio, colorOscuro, coordenadas, parcelas, negocios, nombre } = townData.textos;
 
   // Check if we have coordinates to show the map
-  const hasCoordinates = coordenadas || parcelas.some(p => p.coordenadas);
+  const hasCoordinates = coordenadas || 
+    parcelas.some(p => p.coordenadas) || 
+    negocios.some(b => b.coordenadas);
 
   if (!hasCoordinates) {
     return null;
@@ -59,14 +63,14 @@ export function TownMapSection({ townData, townName }: TownMapSectionProps) {
         <SectionHeader
           title={<span style={{color: colorClaro}}>Mapa</span>}
           subtitle={<span style={{color: colorMedio}}>Interactivo</span>}
-          description={<span>Explora la ubicación de las parcelas disponibles en Pueblo {townName} y navega por el territorio</span>}
-          townName={townName}
+          description={<span>Explora la ubicación de las parcelas disponibles en {nombre} y navega por el territorio</span>}
+          townName={nombre}
           colorClaro={colorClaro}
           colorMedio={colorMedio}
           colorOscuro={colorOscuro}
         />
 
-        <div className="relative backdrop-blur-sm rounded-2xl border p-8 shadow-lg text-slate-100"
+        <div className="relative backdrop-blur-sm rounded-2xl border p-8 shadow-lg text-slate-100 max-w-6xl mx-auto overflow-hidden"
              style={{ background: `${colorMedio}70`, borderColor: colorClaro }}>
           
           {/* Decorative accent bar */}
@@ -81,63 +85,23 @@ export function TownMapSection({ townData, townName }: TownMapSectionProps) {
 
           <TownMap
             townData={townData}
-            townName={townName}
-            selectedProperty={selectedProperty}
-            onPropertySelect={setSelectedProperty}
+            townName={nombre}
+            selectedMarker={selectedMarker}
+            onMarkerSelect={setSelectedMarker}
           />
 
-          {/* Selected property details */}
-          {selectedProperty && (
-            <div className="mt-8 p-6 rounded-xl border-2" style={{ borderColor: colorClaro, backgroundColor: `${colorClaro}20` }}>
-              <h4 className="text-xl font-bold mb-2" style={{ color: colorClaro }}>
-                {selectedProperty.name}
-              </h4>
-              <p className="mb-4" style={{ color: colorMedio }}>
-                {selectedProperty.info}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h5 className="font-semibold mb-2" style={{ color: colorOscuro }}>Características</h5>
-                  <ul className="space-y-1">
-                    {selectedProperty.caracteristicas.map((caracteristica, index) => (
-                      <li key={index} className="flex items-center gap-2 text-sm">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorMedio }} />
-                        <span style={{ color: colorClaro }}>{caracteristica}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                {selectedProperty.coordenadas && (
-                  <div>
-                    <h5 className="font-semibold mb-2" style={{ color: colorOscuro }}>Coordenadas</h5>
-                    <p className="text-sm" style={{ color: colorMedio }}>
-                      X: {selectedProperty.coordenadas.x}<br />
-                      Z: {selectedProperty.coordenadas.z}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+          {/* Selected marker details */}
+          {selectedMarker && (
+            <MarkerDetailsPanel 
+              selectedMarker={selectedMarker}
+              selectedImageIndex={selectedImageIndex}
+              onImageSelect={setSelectedImageIndex}
+              colorClaro={colorClaro}
+              colorMedio={colorMedio}
+              colorOscuro={colorOscuro}
+              townData={townData}
+            />
           )}
-
-          {/* Map instructions */}
-          <div className="mt-6 p-4 rounded-lg bg-black/20 border" style={{ borderColor: `${colorMedio}30` }}>
-            <h5 className="font-semibold mb-2" style={{ color: colorClaro }}>Cómo usar el mapa</h5>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colorClaro }} />
-                <span style={{ color: colorMedio }}>Arrastra para navegar</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colorMedio }} />
-                <span style={{ color: colorMedio }}>Rueda del ratón para zoom</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: colorOscuro }} />
-                <span style={{ color: colorMedio }}>Click en parcelas para detalles</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
