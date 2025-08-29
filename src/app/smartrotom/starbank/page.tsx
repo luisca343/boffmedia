@@ -26,9 +26,10 @@ import { useBoffSession } from "@/services/useBoffSession";
 import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
-import { FullTransaction, Transaction } from "@/types/starbank";
+import { Transaction } from "@/types/starbank";
 import { InternalLink } from "@/components/nav/Link";
 import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
+import { StarBankTransaction } from "@/generated/api";
 
 export default function StarBank() {
   const router = useRouter();
@@ -282,16 +283,16 @@ function TablaTransacciones({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-surface-200">
-          {transactions.map((transaction: any) => {
+          {transactions.map((transaction: StarBankTransaction) => {
             const isPayer = esPagador(transaction, activeAccount);
             return (
-              <tr key={transaction.id} className="hover:bg-blue-50 transition-colors">
+              <tr key={transaction.date} className="hover:bg-blue-50 transition-colors">
                 <td className="py-4 pl-6 whitespace-nowrap">
-                  <AccountImage type={transaction.type} name={transaction.name} />
+                  <AccountImage type={transaction.displayAccountType} name={transaction.displayName}/>
                 </td>
                 <td className="pr-6 py-4">
                   <div className="text-sm font-medium text-blue-900">{transaction.reason}</div>
-                  <div className="text-xs text-blue-500">{transaction.name}</div>
+                  <div className="text-xs text-blue-500">{transaction.displayName}</div>
                 </td>
                 <td className={`px-6 py-4 whitespace-nowrap font-medium ${
                   isPayer ? "text-red-600" : "text-emerald-600"
@@ -354,7 +355,7 @@ function Transactions({
   className?: string;
   fecth?: boolean;
 }) {
-  const [transactions, setTransactions] = useState<FullTransaction[]>([]);
+  const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
   const { transactions: fetchedTransactions, isLoading, error } = useGetTransactions(activeAccount, 100);
 
 

@@ -14,35 +14,35 @@ export class AchievementService {
    * Get all achievements for a player
    */
   static getAchievements(getAchievementsDto: GetAchievementsDto): Promise<ApiResponse<UserAchievement[]>> {
-    return rotomPOST<UserAchievement[]>('/achievements', getAchievementsDto);
+    return rotomPOST<UserAchievement[]>('/achievement/get-achievements', getAchievementsDto);
   }
 
   /**
    * Get a specific achievement for a player
    */
   static getAchievementById(uuid: string, achievementId: string): Promise<ApiResponse<UserAchievement>> {
-    return rotomGET<UserAchievement>(`/achievements/${uuid}/${achievementId}`);
+    return rotomGET<UserAchievement>(`/achievement/${uuid}/${achievementId}`);
   }
 
   /**
    * Save a battle and register its achievement
    */
   static addBattleAchievement(battleAchievementDto: BattleAchievementDto): Promise<ApiResponse<BattleAchievementResponse>> {
-    return rotomPOST<BattleAchievementResponse>('/achievements/battle', battleAchievementDto);
+    return rotomPOST<BattleAchievementResponse>('/achievement/battle', battleAchievementDto);
   }
 
   /**
    * Get replay for a player
    */
   static getReplay(uuid: string, replayId: number): Promise<ApiResponse<Replay>> {
-    return rotomGET<Replay>(`/achievements/replays/${uuid}/${replayId}`);
+    return rotomGET<Replay>(`/achievement/replays/${uuid}/${replayId}`);
   }
 
   /**
    * Check if player has completed a specific achievement
    */
   static checkAchievementStatus(checkDto: GetAchievementByIdDto): Promise<ApiResponse<AchievementStatusResponse>> {
-    return rotomPOST<AchievementStatusResponse>('/achievements/check', checkDto);
+    return rotomPOST<AchievementStatusResponse>('/achievement/check', checkDto);
   }
 
   // ==================== CONVENIENCE METHODS ====================

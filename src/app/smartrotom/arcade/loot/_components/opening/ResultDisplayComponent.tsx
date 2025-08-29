@@ -5,12 +5,12 @@ import { getItemDescription, getItemName } from "@/lib/intlUtils";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
-import { ArcadeInventoryItem, LootItemDto } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxItemConfig, LootItemDto } from "@/generated/api";
 import { getRewardIcon } from "../../../_util/rewardIcons";
 import { Item } from "@radix-ui/react-select";
 
 interface ResultDisplayProps {
-  wonItem: LootItemDto;
+  wonItem: LootboxItemConfig;
   onComplete: () => void;
 }
 
@@ -40,6 +40,11 @@ export function ResultDisplay({ wonItem, onComplete }: ResultDisplayProps) {
         <h3 className={`text-xl font-bold ${config.textColor} mb-2 text-center`}>
           {getItemName(t, wonItem.id, wonItem.type)}
         </h3>
+        {wonItem.amount && wonItem.amount > 1 && (
+          <p className="text-surface-300 text-xs mt-0.5 font-medium">
+            x{wonItem.amount}
+          </p>
+        )}
         
         <div className="relative w-32 h-32 mb-4">
           {getRewardIcon({type: wonItem.type, description: wonItem.data || wonItem.id, size: 128})}

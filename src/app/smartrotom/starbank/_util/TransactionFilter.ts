@@ -57,7 +57,6 @@ function signFilter(operator: string, amount: number, filterAmount: number) {
 function dateFilter(operator: string, term: string, value: string): boolean {
   const dateStr = term.split(operator)[1];
   const dateArr = dateStr.split("/");
-  console.log(dateArr.length);
   if(dateArr.length !== 3) return true;
   const filterDate = new Date(`${dateArr[2]}-${dateArr[1]}-${dateArr[0]}`);
 

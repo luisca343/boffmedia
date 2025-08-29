@@ -14,7 +14,6 @@ import { CellDefProps } from "../page";
 import { Input } from "@/components/ui/input";
 import { strToDate } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
-import { Transaction } from "@/types/starbank";
 import { ArrowDownIcon, ArrowUpIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
 
 // Import shadcn table components
@@ -26,24 +25,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { StarBankTransaction } from "@/generated/api";
 
-export const columns: ColumnDef<Transaction>[] = [
+export const columns: ColumnDef<StarBankTransaction>[] = [
   {
     header: "Cuenta",
     accessorKey: "isPayer",
     enableSorting: false,
-    cell: (props: CellDefProps<Transaction>) => {
+    cell: (props: CellDefProps<StarBankTransaction>) => {
       const { row } = props;
       return (
         <div className="flex items-center gap-2">
           <AccountImage
             height={40}
             width={40}
-            type={row.original.type!}
-            name={row.original.name!}
+            type={row.original.toType!}
+            name={row.original.toName!}
           />
           <div className="hidden md:block">
-            <p className="text-sm font-medium text-blue-900">{row.original.name}</p>
+            <p className="text-sm font-medium text-blue-900">{row.original.toName}</p>
             <p className="text-xs text-blue-600">{row.original.isPayer ? 'Salida' : 'Entrada'}</p>
           </div>
         </div>
@@ -85,7 +85,8 @@ export const columns: ColumnDef<Transaction>[] = [
         </div>
       );
     },
-    accessorKey: "balance",
+    id: "balance",
+    accessorFn: (row) => row.isPayer ? row.fromBalance : row.toBalance,
     filterFn: filterAmount,
     cell: renderBalance,
     sortingFn: "alphanumeric",
@@ -105,7 +106,7 @@ export const columns: ColumnDef<Transaction>[] = [
   },
 ];
 
-function renderMoney(props: CellDefProps<Transaction>) {
+function renderMoney(props: CellDefProps<StarBankTransaction>) {
   const { cell, row } = props;
   const isPayer = row.original.isPayer;
   const amount = cell.getValue() as number;
@@ -123,7 +124,7 @@ function renderMoney(props: CellDefProps<Transaction>) {
   );
 }
 
-function renderBalance(props: CellDefProps<Transaction>) {
+function renderBalance(props: CellDefProps<StarBankTransaction>) {
   const { cell } = props;
   return (
     <div className="font-medium text-blue-900">
@@ -132,7 +133,7 @@ function renderBalance(props: CellDefProps<Transaction>) {
   );
 }
 
-function renderDate(props: CellDefProps<Transaction>) {
+function renderDate(props: CellDefProps<StarBankTransaction>) {
   const { cell } = props;
   return (
     <div className="text-sm text-blue-700">
@@ -147,7 +148,7 @@ export function TransactionsTable({
   updateFilters,
   className,
 }: {
-  table: Table<Transaction>;
+  table: Table<StarBankTransaction>;
   columnFilters: ColumnFiltersState;
   updateFilters: any;
   className?: string;

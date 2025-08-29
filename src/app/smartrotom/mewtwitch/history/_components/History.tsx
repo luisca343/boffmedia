@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { BaseHistory } from "@/components/smartrotom/shared/BaseHistory";
-import { StreamCard } from "@/components/smartrotom/twitch/StreamCard";
+import { StreamCard } from "@/components/smartrotom/mewtwitch/StreamCard";
 import { HistoryItem, getHistory, clearHistory, removeFromHistory } from "../../_services/historyService";
 
 export const HistoryView = () => {

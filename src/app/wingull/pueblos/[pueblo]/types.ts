@@ -1,15 +1,23 @@
 // Types for TownRealEstatePage
 
+export interface TownCoordinates {
+  inicio: { x: number; z: number };
+  fin: { x: number; z: number };
+}
+
 export interface TownData {
   textos: {
+    nombre: string; // Town display name
     color?: string; // keep for legacy
     colorClaro: string;
     colorMedio: string;
     colorOscuro: string;
     frasebonita: string;
     descripcion: string;
+    coordenadas?: TownCoordinates;
     comodidades: Amenity[];
     parcelas: Property[];
+    negocios: Property[]; // New property for business plots
   };
   fondo?: string;
   images?: string[];
@@ -20,8 +28,9 @@ export interface Amenity {
   name: string;
   descripcion: string;
   icon: string;
-  image?: string;
+  images?: string[];
   caracteristicas: string[];
+  coordenadas?: { x: number; z: number };
 }
 
 export interface Property {
@@ -32,4 +41,10 @@ export interface Property {
   caracteristicas: string[];
   comodidadesCercanas: string[];
   images?: string[];
+  coordenadas?: { x: number; z: number };
 }
+
+export type SelectedMarker = {
+  type: 'property' | 'business' | 'amenity';
+  data: Property | Amenity;
+};

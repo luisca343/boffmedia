@@ -46,6 +46,83 @@ export async function POST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return request<T>("POST", url, data);
 }
 
+export async function multipartPOST<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<ApiResponse<T>> {
+  const formData = new FormData();
+
+  // Append text fields
+  Object.entries(fields).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      console.log(`Appending field to FormData: ${key} = ${value}`);
+      formData.append(key, value);
+    }
+  });
+
+  // Append file fields
+  Object.entries(files).forEach(([key, file]) => {
+    if (file) {
+      console.log(`Appending file to FormData: ${key}`);
+      formData.append(key, file);
+    }
+  });
+
+  console.log("FormData prepared for multipart POST:", formData);
+  console.log("Sending multipart POST request to:", url);
+    // Log all FormData fields and values for debugging
+    Array.from(formData.entries()).forEach(([key, value]) => {
+      console.log(`FormData field: ${key}`, value);
+    });
+
+  // Use API base URL if not absolute
+  const fullUrl = url.startsWith('http') ? url : `${getApiUrl()}${url}`;
+  return await multipartPOSTRequest<T>(fullUrl, formData);
+}
+
+// Internal helper for multipart POST requests
+async function multipartPOSTRequest<T>(url: string, formData: FormData): Promise<ApiResponse<T>> {
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      next: { revalidate: 0 },
+    });
+    const contentType = res.headers.get('content-type');
+    if (!res.ok) {
+      let errorText = await res.text();
+      let errorJson;
+      try {
+        errorJson = JSON.parse(errorText);
+      } catch {
+        errorJson = { error: errorText };
+      }
+      return {
+        statusCode: res.status,
+        message: res.statusText,
+        error: errorJson.error || errorText,
+        success: false,
+      } as ApiResponse<T>;
+    }
+    if (contentType && contentType.includes('application/json')) {
+      const result: ApiResponse<T> = await res.json();
+      return result;
+    } else {
+      const text = await res.text();
+      return {
+        statusCode: res.status,
+        message: res.statusText,
+        data: text as any,
+        success: true,
+      } as ApiResponse<T>;
+    }
+  } catch (error) {
+    console.error(`Error in multipartPOST: ${(error as Error).message}`);
+    throw error;
+  }
+}
+
 export async function PUT<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return request<T>("PUT", url, data);
 }
@@ -114,6 +191,24 @@ export async function wingullGET<T>(url: string): Promise<ApiResponse<T>> {
 export async function rotomPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   data.server = getServer();
   return apiPOST<T>(`/smartrotom${url}`, data);
+}
+
+export async function rotomMultipartPOST<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<ApiResponse<T>> {
+  console.log("Preparing FormData for multipart POST:", fields, files);
+  fields.server = getServer();
+  return multipartPOST<T>(`/smartrotom${url}`, fields, files);
+}
+
+export async function apiMultipartPOST<T>(
+  url: string,
+  fields: Record<string, any> = {},
+  files: Record<string, File | Blob> = {}
+): Promise<ApiResponse<T>> {
+  return multipartPOST<T>(url, fields, files);
 }
 
 export async function rotomPUT<T>(url: string, data: any): Promise<ApiResponse<T>> {

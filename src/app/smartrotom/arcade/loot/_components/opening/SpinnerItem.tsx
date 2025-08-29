@@ -55,6 +55,11 @@ export function SpinnerItem({ item, index, isWinningItem, winningIndex }: Spinne
       <div className={`${config.textColor} text-xs uppercase tracking-wider mt-1`}>
         {item.rarity}
       </div>
+          {item.amount !== undefined && item.amount > 1 && (
+            <div className={`${config.textColor} text-xs font-semibold mt-1`}>
+              x{item.amount}
+            </div>
+          )}
     </div>
   );
 }

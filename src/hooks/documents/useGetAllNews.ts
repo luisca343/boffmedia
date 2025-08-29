@@ -22,7 +22,7 @@ export function useGetAllNews() {
   const featured = useMemo(() => data?.featured, [data]);
   const news = useMemo(() => data?.news || [], [data]);
   const published = useMemo(() => 
-    news.filter(n => n.id !== featured?.id),
+    news.filter(n => n.id !== featured?.id).filter(n => n.published === 1),
     [news, featured]
   );
 

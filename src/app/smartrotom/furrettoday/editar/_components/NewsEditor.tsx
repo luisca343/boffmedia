@@ -52,53 +52,54 @@ export default function NewsEditor() {
   }
 
   return (
-    <div className="min-h-full relative overflow-auto">
-      <div className="absolute inset-0">
-        <PopArtWallpaper />
-      </div>
-      
-      <div className="relative z-10 min-h-full p-4 md:p-8 overflow-auto">
-        <div className="w-full max-w-[90%] lg:max-w-[80%] mx-auto bg-white shadow-[20px_20px_0_0_rgba(0,0,0,1)] border-8 border-black flex flex-col">
-          {/* Header */}
-          <FurretHeader />
+      <div className="min-h-full relative overflow-auto">
+        <div className="absolute inset-0">
+          <PopArtWallpaper />
+        </div>
+        <div className="relative z-10 min-h-full text-black p-4 md:p-8">
+          <div className="max-w-7xl mx-auto bg-white card-pop flex flex-col overflow-hidden">
+            <FurretHeader />
           
           {/* Navigation breadcrumbs */}
-          <div className="bg-secondary-100 p-4 flex flex-wrap items-center font-comic">
-            <InternalLink href="noticias" className="text-secondary-500 hover:underline">
-              Inicio
+          <div className="bg-secondary-100 p-6 flex flex-wrap items-center font-comic border-b-4 border-black">
+            <InternalLink href="furrettoday" className="text-secondary-500 hover:underline text-pop-lg pop-focus">
+              🏠 Inicio
             </InternalLink>
-            <span className="mx-2"> &gt; </span>
-            <span className="font-bold text-pink-500">Editor de Noticias</span>
+            <span className="mx-3 text-pop-lg font-bold"> ⚡ </span>
+            <span className="font-bold text-pink-500 text-pop-lg pop-shadow">📝 Editor de Noticias</span>
             
             {/* Action buttons in breadcrumb bar */}
             <div className="ml-auto">
-              <Button
+              <button
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges}
-                className={`bg-highlight-300 text-secondary-500 hover:bg-highlight-400 font-bold text-lg transform hover:scale-105 transition-transform button-pop-shadow border-4 border-black ${
+                className={`btn-pop-primary pop-focus animate-button-press ${
                   !hasUnsavedChanges ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 💾 Guardar Cambios
-              </Button>
+              </button>
             </div>
           </div>
           
           {/* Main editor interface - with proper height and structure */}
           <div className="flex flex-grow flex-col md:flex-row">
             {/* Sidebar - Ensuring it stretches full height */}
-            <div className="w-full md:w-[30%] lg:w-[25%] bg-pink-500 border-r-8 border-black flex flex-col">
-              <div className="p-4">
+            <div className="w-full md:w-[30%] lg:w-[25%] bg-pink-500 border-r-8 border-black editor-sidebar relative">
+              {/* Subtle halftone background */}
+              <div className="absolute inset-0 ben-day-dots-strong"></div>
+              
+              <div className="p-6 relative z-10">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="w-full bg-yellow-300 text-secondary-500 hover:bg-yellow-400 font-bold text-xl transform hover:scale-105 transition-transform button-pop-shadow border-4 border-black">
+                    <button className="btn-pop-secondary w-full pop-focus animate-button-press">
                       ✨ Nueva Noticia
-                    </Button>
+                    </button>
                   </DialogTrigger>
-                  <DialogContent className="bg-yellow-300 border-8 border-black p-6 max-w-3xl w-11/12">
+                  <DialogContent className="bg-yellow-300 border-8 border-black p-6 max-w-3xl w-11/12 card-pop">
                     <Suspense fallback={
-                      <div className="text-3xl font-comic text-center p-8">
-                        Cargando editor...
+                      <div className="text-pop-3xl font-comic text-center p-8">
+                        Cargando editor... 📝
                       </div>
                     }>
                       <NewsManager onClose={() => setIsDialogOpen(false)} />
@@ -108,24 +109,24 @@ export default function NewsEditor() {
               </div>
               
               {/* Comic style title banner */}
-              <div className="bg-yellow-300 py-2 border-y-4 border-black">
-                <h2 className="text-center text-secondary-500 text-xl font-bold pop-shadow">
-                  LISTA DE NOTICIAS
+              <div className="bg-yellow-300 py-4 border-y-4 border-black relative z-10">
+                <h2 className="text-center text-secondary-500 text-pop-xl font-bold pop-shadow">
+                  📰 LISTA DE NOTICIAS
                 </h2>
               </div>
               
               {/* News list - Ensuring it takes all remaining space */}
-              <div className="flex-grow flex flex-col px-4 py-4 overflow-y-auto">
+              <div className="flex-grow flex flex-col px-6 py-4 overflow-y-auto relative z-10">
                 <Suspense fallback={
                   <div className="text-white text-center p-4">
                     <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
-                    Cargando noticias...
+                    <span className="font-comic text-pop-lg">Cargando noticias... 📰</span>
                   </div>
                 }>
                   {isLoading ? (
                     <div className="text-white text-center p-4">
                       <div className="animate-spin h-8 w-8 border-4 border-white border-t-transparent rounded-full mx-auto mb-2"></div>
-                      Cargando noticias...
+                      <span className="font-comic text-pop-lg">Cargando noticias... 📰</span>
                     </div>
                   ) : (
                     <NewsList
@@ -144,8 +145,8 @@ export default function NewsEditor() {
             
             {/* Main content area */}
             <Suspense fallback={
-              <div className="w-full md:w-[70%] lg:w-[75%] bg-white flex items-center justify-center text-3xl font-comic p-8 text-center">
-                <div className="animate-bounce">Cargando editor...</div>
+              <div className="w-full md:w-[70%] lg:w-[75%] bg-white flex items-center justify-center text-pop-3xl font-comic p-8 text-center">
+                <div className="animate-bounce">Cargando editor... ✏️</div>
               </div>
             }>
               <div className="w-full md:w-[70%] lg:w-[75%]">
@@ -164,67 +165,6 @@ export default function NewsEditor() {
       </div>
       
       <PopStyles />
-      <style jsx global>{`
-        @import url("https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap");
-
-        h1, h2, h3 {
-          font-family: "Bangers", cursive;
-          letter-spacing: 2px;
-        }
-
-        .font-comic {
-          font-family: "Comic Neue", cursive;
-        }
-
-        .pop-shadow {
-          text-shadow: 3px 3px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000,
-            -1px 1px 0 #000, 1px 1px 0 #000;
-        }
-
-        .button-pop-shadow {
-          text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000,
-            -1px 1px 0 #000, 1px 1px 0 #000;
-        }
-
-        /* Make scrollbar match theme */
-        ::-webkit-scrollbar {
-          width: 12px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background-color: #fde047;
-          border: 2px solid black;
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background-color: #ec4899;
-          border: 2px solid black;
-          border-radius: 10px;
-        }
-        
-        /* Fix scroll area in pinksidebar */
-        .bg-pink-500 {
-          display: flex;
-          flex-direction: column;
-          min-height: 100%;
-        }
-        
-        /* Ensure proper overflow behaviors */
-        .overflow-y-auto {
-          overflow-y: auto !important;
-        }
-        
-        /* Make sure the content area expands fully */
-        .flex-grow {
-          flex-grow: 1 !important;
-        }
-
-        .ck.ck-editor__editable_inline{
-          overflow: hidden !important;
-          height: 100% !important;
-        }
-
-      `}</style>
     </div>
   )
 }

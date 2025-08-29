@@ -20,7 +20,6 @@ import { TransactionsTable, columns } from "./_components/TransactionsTable";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
-import { FullTransaction, Transaction } from "@/types/starbank";
 import { AccountSelect } from "../_components/AccountSelect";
 import { Input } from "@/components/ui/input";
 import { formatMoney, getActiveAccountBalance } from "../bankUtils";
@@ -28,6 +27,7 @@ import { Search } from "lucide-react";
 import { TransactionSkeleton } from "./_components/TransactionSkeleton";
 import { SummaryCard } from "../_components/SummaryCard";
 import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon, ListBulletIcon } from "@heroicons/react/24/outline";
+import { StarBankTransaction } from "@/generated/api";
 
 export interface CellDefProps<TData> {
   table: Table<TData>;
@@ -38,7 +38,7 @@ export interface CellDefProps<TData> {
   renderValue: () => any;
 }
 
-function calculateTransactionStats(transactions: Transaction[], activeAccount: number) {
+function calculateTransactionStats(transactions: StarBankTransaction[], activeAccount: number) {
   let income = 0;
   let expense = 0;
 
@@ -55,7 +55,7 @@ function calculateTransactionStats(transactions: Transaction[], activeAccount: n
 
 export default function Transacciones() {
   const { session } = useBoffSession();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
   const [activeAccount, setActiveAccount] = useState(-1);
   const [searchTerm, setSearchTerm] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -98,21 +98,8 @@ export default function Transacciones() {
 
   useEffect(() => {
     if (fetchedTransactions) {
-      const transactionData = fetchedTransactions.map((transaction: FullTransaction) => {
-        const isActiveAccount = transaction.from == activeAccount;
-        return {
-          isPayer: isActiveAccount,
-          reason: transaction.reason,
-          amount: transaction.amount,
-          balance: isActiveAccount ? transaction.fromBalance : transaction.toBalance,
-          date: transaction.date,
-          //type: isActiveAccount ? transaction.toType : transaction.fromType,
-          //name: isActiveAccount ? transaction.toName : transaction.fromName,
-        };
-      });
-
-      setTransactions(transactionData);
-      setStats(calculateTransactionStats(transactionData, activeAccount));
+      setTransactions(fetchedTransactions);
+      setStats(calculateTransactionStats(fetchedTransactions, activeAccount));
     }
   }, [fetchedTransactions, activeAccount]);
 
@@ -140,7 +127,7 @@ export default function Transacciones() {
   return (
     <main className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
       {/* Header with stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <BankSection className="md:col-span-4 mb-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 flex-wrap">
             <div>
@@ -171,7 +158,7 @@ export default function Transacciones() {
         <SummaryCard 
           title="Ingresos Totales"
           value={formatMoney(stats.income)}
-          icon={<ArrowUpIcon className="h-6 w-6" />}
+          icon={<ArrowUpIcon className="h-6 w-6 text-success-500" />}
           //change={{ value: 5.2, isPositive: true }}
           className="md:col-span-1"
         />
@@ -179,18 +166,11 @@ export default function Transacciones() {
         <SummaryCard 
           title="Gastos Totales"
           value={formatMoney(stats.expense)}
-          icon={<ArrowDownIcon className="h-6 w-6" />}
+          icon={<ArrowDownIcon className="h-6 w-6 text-error-500" />}
           //change={{ value: 2.8, isPositive: false }}
           className="md:col-span-1"
         />
-        
-        <SummaryCard 
-          title="Total Neto"
-          value={formatMoney(stats.net)}
-          icon={<ListBulletIcon className="h-6 w-6" />}
-          //change={{ value: 1.4, isPositive: stats.net > 0 }}
-          className="md:col-span-1"
-        />
+  {/* Removed 'Total Neto' card as net is always equal to current balance */}
       </div>
 
       {/* Search and Filter */}

@@ -133,7 +133,7 @@ export default function AppWrapper({
   return (
     <section
       id="smartrotom"
-      className={`roboto flex flex-col h-screen max-h-screen overflow-hidden  ${tema} text-black bg-transparent`}
+      className={`roboto flex flex-col min-h-screen ${tema} text-black bg-transparent`}
     >
       <RotomNav setTema={setTema} />
       <ToastContainer position="bottom-right" theme="dark" />

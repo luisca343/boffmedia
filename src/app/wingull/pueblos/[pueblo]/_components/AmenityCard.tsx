@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { getIconComponent } from "../utils";
 import { Amenity } from "../types";
+import { ImageShowcase } from "./ImageShowcase";
+import { useState } from "react";
 
 interface AmenityCardProps {
   amenity: Amenity;
@@ -10,58 +12,64 @@ interface AmenityCardProps {
 }
 
 export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: AmenityCardProps) {
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const IconComponent = getIconComponent(amenity.icon);
+  
+  // Process images with proper path
+  const amenityImages = amenity.images?.map(img => 
+    require('path').join('/smartrotom/data/pueblos', img)
+  ) || [];
   
   return (
     <div className="group relative">
-      {/* Main card with normal background and better shape preservation */}
-  <div className="relative backdrop-blur-sm rounded-2xl border border-slate-700/50 shadow-lg hover:shadow-xl transition-all duration-300 h-full overflow-hidden text-slate-100"
-      style={{ background: `${colorMedio}70`, borderColor: colorClaro }}
+      {/* Clean card with normal background */}
+  <div className="relative backdrop-blur-sm rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-lg text-slate-100 h-full"
+    style={{ background: `${colorMedio}70`, borderColor: colorClaro }}
   >
         
-        {/* Decorative corner accents using town colors */}
-        <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 rounded-tl-xl opacity-70" style={{ borderColor: colorClaro }} />
-        <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 rounded-tr-xl opacity-70" style={{ borderColor: colorClaro }} />
-        
-        {/* Decorative accent bar */}
+        {/* Decorative accent bar using town colors */}
         <div 
           className="absolute top-0 left-0 right-0 h-1"
           style={{ background: `linear-gradient(90deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)` }}
         />
         
+        {/* Decorative corner accents using town colors */}
+        <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 rounded-tl-xl opacity-70" style={{ borderColor: colorClaro }} />
+        <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 rounded-tr-xl opacity-70" style={{ borderColor: colorClaro }} />
+        
         {/* Content container */}
         <div className="relative p-6 h-full flex flex-col">
-          {/* Image section with normal styling */}
-          {amenity.image && (
-            <div className="relative w-full h-48 rounded-xl overflow-hidden mb-6 shadow-md">
-              <Image
-                src="/smartrotom/img/w2.webp"
+          {/* Image section using ImageShowcase */}
+          {amenityImages.length > 0 && (
+            <div className="mb-6">
+              <ImageShowcase
+                images={amenityImages}
+                selectedImageIndex={selectedImageIndex}
+                onImageSelect={setSelectedImageIndex}
                 alt={amenity.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                colorClaro={colorClaro}
+                colorMedio={colorMedio}
+                colorOscuro={colorOscuro}
+                className="h-48"
+                overlayContent={
+                  <div className="absolute top-3 left-3">
+                    <div 
+                      className="p-2.5 rounded-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border shadow-sm"
+                      style={{ borderColor: `${colorMedio}30` }}
+                    >
+                      <IconComponent className="w-5 h-5" style={{ color: colorMedio }} />
+                    </div>
+                  </div>
+                }
               />
-              
-              {/* Simple overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-              
-              {/* Icon overlay with town color */}
-              <div className="absolute top-3 right-3">
-                <div 
-                  className="p-2.5 rounded-lg bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border shadow-sm"
-                  style={{ borderColor: `${colorMedio}30` }}
-                >
-                  <IconComponent className="w-5 h-5" style={{ color: colorMedio }} />
-                </div>
-              </div>
             </div>
           )}
           
           {/* Header section with clean styling */}
           <div className="flex items-start gap-4 mb-6">
-            {!amenity.image && (
+            {amenityImages.length === 0 && (
               <div 
-                className="p-4 rounded-xl bg-gray-50 dark:bg-slate-700/50 border-2 transition-all duration-300 group-hover:scale-105" 
+                className="p-4 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border shadow-sm transition-all duration-300 group-hover:scale-105" 
                 style={{ borderColor: `${colorMedio}30` }}
               >
                 <IconComponent className="w-8 h-8" style={{ color: colorMedio }} />
@@ -69,22 +77,22 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
             )}
             
             <div className="flex-1">
-              <h3 className="text-xl lg:text-2xl font-bold mb-2" style={{color: colorClaro}}>
+              <h3 className="text-xl lg:text-2xl font-bold mb-2 text-white">
                 {amenity.name}
               </h3>
               
               {/* Decorative line under title using town colors */}
               <div className="flex items-center gap-2 mb-2">
-                <div className="h-0.5 flex-1 bg-gray-200 dark:bg-slate-600 rounded-full" />
+                <div className="h-0.5 flex-1 bg-white/20 rounded-full" />
                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorClaro }} />
-                <div className="h-0.5 w-6 bg-gray-200 dark:bg-slate-600 rounded-full" />
+                <div className="h-0.5 w-6 bg-white/20 rounded-full" />
               </div>
             </div>
           </div>
           
           {/* Description with clean typography */}
           <div className="mb-6 flex-1">
-            <p className="text-base leading-relaxed" style={{color: colorClaro}}>
+            <p className="text-base leading-relaxed text-slate-200">
               {amenity.descripcion}
             </p>
           </div>
@@ -98,7 +106,7 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
               {amenity.caracteristicas.map((feature, index) => (
                 <div 
                   key={index} 
-                  className="flex items-center gap-3 p-2 rounded-lg bg-gray-50/50 dark:bg-slate-700/30 transition-all duration-200 hover:bg-gray-100/70 dark:hover:bg-slate-700/50"
+                  className="flex items-center gap-3 p-2 rounded-lg bg-white/10 transition-all duration-200 hover:bg-white/20"
                 >
                   {/* Clean bullet point with town color */}
                   <div 
@@ -106,7 +114,7 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
                     style={{ backgroundColor: colorMedio }} 
                   />
                   
-                  <span className="text-gray-700 dark:text-gray-200 text-sm font-medium">
+                  <span className="text-slate-200 text-sm font-medium">
                     {feature}
                   </span>
                 </div>
@@ -115,7 +123,7 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
           </div>
           
           {/* Bottom decorative element using town colors */}
-          <div className="flex justify-center mt-6 pt-4 border-t border-gray-200/50 dark:border-slate-700/50">
+          <div className="flex justify-center mt-6 pt-4 border-t border-white/10">
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colorOscuro }} />
               <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorMedio }} />

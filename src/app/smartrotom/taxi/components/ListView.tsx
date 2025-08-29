@@ -2,11 +2,7 @@ import { FaMapMarkerAlt, FaInfoCircle, FaArrowRight, FaSearch, FaSortAmountDown,
 import { TaxiStop } from "@/types/dto/taxi-stop.dto"
 import { useState, useMemo } from 'react'
 import { formatMoney } from '../../starbank/bankUtils';
-
-interface Position {
-  x: number;
-  z: number;
-}
+import type { Position } from '@/components/map';
 
 interface ListViewProps {
   taxiStops: TaxiStop[];

@@ -73,6 +73,7 @@ export function useLootBoxInventory(uuid?: string) {
             weight: item.weight,
             type: item.type,
             data: item.data,
+            amount: item.amount,
             rarity: getRarityFromWeight(rarityRanges, item.weight) as ArcadeInventoryItem.rarity,
           })),
           theme: box.theme || "default"
@@ -123,6 +124,7 @@ export function useLootBoxInventory(uuid?: string) {
         weight: 0, //TODO: FIX THIS
         type: response.data.item!.type,
         data: response.data.item!.data,
+        amount: response.data.item!.amount,
         //weight: response.data.item!.weight,
         rarity: response.data.item!.rarity as ArcadeInventoryItem.rarity,
       };

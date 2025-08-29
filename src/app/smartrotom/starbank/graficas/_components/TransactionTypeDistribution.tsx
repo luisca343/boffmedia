@@ -12,10 +12,11 @@ import {
   Legend
 } from "recharts";
 import { formatMoney } from "../../bankUtils";
-import { StarBankAccount, FullTransaction } from "@/types/starbank";
+import { StarBankAccount } from "@/types/starbank";
+import { StarBankTransaction } from "@/generated/api/models/StarBankTransaction";
 
 interface TransactionTypeDistributionProps {
-  transactions: FullTransaction[];
+  transactions: StarBankTransaction[];
   activeAccount: StarBankAccount;
 }
 

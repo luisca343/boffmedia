@@ -33,7 +33,7 @@ export function InfoModal({ isOpen, onClose, hasSession }: InfoModalProps) {
           </p>
           <p className="flex items-start">
             <span className="text-yellow-400 font-bold mr-2 bg-yellow-900/30 w-6 h-6 flex items-center justify-center rounded-full">4</span>
-            <span>Abre cajas para coleccionar todos los objetos posibles y completar tu colección.</span>
+            <span>Abre cajas para coleccionar todos los objetos posibles para tu aventura.</span>
           </p>
           <p className="flex items-start">
             <span className="text-yellow-400 font-bold mr-2 bg-yellow-900/30 w-6 h-6 flex items-center justify-center rounded-full">5</span>

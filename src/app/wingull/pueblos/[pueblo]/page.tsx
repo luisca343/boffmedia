@@ -6,7 +6,9 @@ import { WingullService } from '@/services/api/smartrotom/wingullService';
 import type { TownData, Amenity, Property } from './types';
 import { HeroSection } from './_components/HeroSection';
 import { AmenitiesSection } from './_components/AmmenitiesSection';
+import { TownMapSection } from './_components/TownMapSection';
 import { PropertiesSection } from './_components/PropertiesSection';
+import { BusinessSection } from './_components/BusinessSection';
 import { Loader2 } from 'lucide-react';
 
 
@@ -110,6 +112,8 @@ export default function TownRealEstatePage() {
       <div ref={contentRef}>
         <AmenitiesSection townData={townData} townName={pueblo} />
         <PropertiesSection townData={townData} townName={pueblo} />
+        <BusinessSection townData={townData} townName={pueblo} />
+        <TownMapSection townData={townData} townName={pueblo} />
       </div>
     </div>
   );

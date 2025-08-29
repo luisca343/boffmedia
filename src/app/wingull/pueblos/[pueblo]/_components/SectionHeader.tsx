@@ -20,7 +20,7 @@ export function SectionHeader({
   return (
     <div className="flex justify-center mb-16">
       <div className="relative max-w-4xl w-full">
-  <div className="relative backdrop-blur-sm rounded-2xl p-8 lg:p-10 border shadow-lg transform hover:scale-[1.02] transition-all duration-300 text-slate-100"
+  <div className="relative backdrop-blur-sm rounded-2xl p-8 lg:p-10 border shadow-lg transform hover:scale-[1.02] transition-all duration-300 text-slate-100 overflow-hidden"
     style={{ background: `${colorOscuro}70`, borderColor: `${colorMedio}30` }}
   >
           

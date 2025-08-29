@@ -62,13 +62,13 @@ export const StreamCard = ({
   const getLink = () => {
     switch (type) {
       case 'stream':
-        return `twitch/stream/${streamerName}`;
+        return `mewtwitch/stream/${streamerName}`;
       case 'video':
-        return `twitch/video/${id}`;
+        return `mewtwitch/video/${id}`;
       case 'clip':
-        return `twitch/clip/${id}`;
+        return `mewtwitch/clip/${id}`;
       default:
-        return `twitch/stream/${streamerName}`;
+        return `mewtwitch/stream/${streamerName}`;
     }
   };
 

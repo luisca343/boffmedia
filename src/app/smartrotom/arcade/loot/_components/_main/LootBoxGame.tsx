@@ -52,7 +52,6 @@ export default function LootBoxGame() {
     if (availableLootBoxes.length > 0 && !selectedBox) {
       const firstValidBox = availableLootBoxes.find(box => box.items && box.items.length > 0);
       if (firstValidBox) {
-        console.log("First valid box found:", firstValidBox);
         setSelectedBox(firstValidBox);
       }
     }

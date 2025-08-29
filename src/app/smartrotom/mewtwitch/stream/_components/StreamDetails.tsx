@@ -41,7 +41,7 @@ export const StreamDetails = ({
       
       <div className="mb-6">
         <InternalLink 
-          href={`twitch/user/${streamerName}`}
+          href={`mewtwitch/user/${streamerName}`}
           className="flex items-center text-lg font-medium hover:text-purple-500 transition-colors"
         >
           <User className="h-5 w-5 mr-2 text-purple-500" />
