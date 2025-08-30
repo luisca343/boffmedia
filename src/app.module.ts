@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
@@ -127,6 +127,9 @@ export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(MinecraftMiddleware)
+      .exclude(
+        { path: 'smartrotom/starbank/accounts', method: RequestMethod.POST }
+      )
       .forRoutes('/smartrotom/');
   }
 }

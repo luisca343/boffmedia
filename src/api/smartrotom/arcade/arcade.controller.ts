@@ -238,7 +238,7 @@ export class ArcadeController {
   @ApiResponse({ 
     status: HttpStatus.OK, 
     description: 'Lootbox configuration retrieved successfully.',
-    type: LootboxConfigEntity
+    type: LootboxConfigEntity 
   })
   async getLootboxConfig(): Promise<LootboxConfigEntity> {
     return this.arcadeFacadeService.getLootboxConfig();

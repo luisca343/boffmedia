@@ -1,3 +1,4 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsOptional, IsEnum } from 'class-validator';
 
@@ -8,7 +9,7 @@ export enum MessageType {
   IMAGE = 'image'
 }
 
-export class CreateMessageDto {
+export class CreateMessageDto extends BaseDto {
   @ApiProperty({ 
     description: 'Sender UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
@@ -55,7 +56,7 @@ export class GetMessagesDto {
   limit?: number;
 }
 
-export class UpdateMessageDto {
+export class UpdateMessageDto extends BaseDto {
   @ApiProperty({ 
     description: 'Message ID',
     example: 123
@@ -81,7 +82,7 @@ export class UpdateMessageDto {
   uuid: string;
 }
 
-export class DeleteMessageDto {
+export class DeleteMessageDto extends BaseDto {
   @ApiProperty({ 
     description: 'Message ID',
     example: 123
@@ -99,7 +100,7 @@ export class DeleteMessageDto {
   uuid: string;
 }
 
-export class MarkMessageReadDto {
+export class MarkMessageReadDto extends BaseDto {
   @ApiProperty({ 
     description: 'Message ID',
     example: 123

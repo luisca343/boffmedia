@@ -1,3 +1,4 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsArray, IsOptional, IsInt, IsEnum } from 'class-validator';
 
@@ -8,7 +9,7 @@ export enum ChatType {
   GROUP = 3
 }
 
-export class CreateChatDto {
+export class CreateChatDto extends BaseDto {
   @ApiProperty({ 
     description: 'UUID of the player creating the chat',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
@@ -29,9 +30,9 @@ export class CreateChatDto {
     description: 'Name of the chat',
     example: 'My Group Chat'
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @ApiProperty({ 
     description: 'Chat description',

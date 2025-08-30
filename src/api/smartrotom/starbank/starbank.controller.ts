@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query, HttpStatus, UseInterceptors, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { Body, Controller, Get, Param, Post, Query, HttpStatus, UseInterceptors, ValidationPipe, UploadedFile, Req } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { StarbankFacadeService } from './starbank.facade.service';
 
@@ -13,6 +13,10 @@ import { TransferFromMainDto } from './dto/transfer-from-main.dto';
 // Import Entities
 import { StarBankAccount } from './entities/starbank-account.entity';
 import { StarBankTransaction } from './entities/starbank-transaction.entity';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { mkdir } from 'fs/promises';
 
 @ApiTags('SmartRotom | Starbank')
 @Controller('smartrotom/starbank')
@@ -43,9 +47,38 @@ export class StarbankController {
   @Post('accounts')
   @ApiOperation({ 
     summary: 'Create a new account',
-    description: 'Create a new StarBank account for a user' 
+    description: 'Create a new StarBank account for a user with optional profile image' 
   })
-  @ApiBody({ type: CreateAccountDto })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        uuid: { 
+          type: 'string', 
+          format: 'uuid', 
+          example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
+          description: 'User UUID'
+        },
+        name: { 
+          type: 'string', 
+          example: 'TrainerAsh',
+          description: 'Account name'
+        },
+        server: {
+          type: 'string',
+          example: 'your-mc-world-id',
+          description: 'Minecraft world/server ID'
+        },
+        image: {
+          type: 'string',
+          format: 'binary',
+          description: 'Optional profile image file (jpg, jpeg, png, gif, webp)'
+        }
+      },
+      required: ['uuid', 'name', 'server']
+    }
+  })
   @ApiResponse({ 
     status: HttpStatus.CREATED, 
     description: 'Account created successfully.',
@@ -53,22 +86,46 @@ export class StarbankController {
   })
   @ApiResponse({ 
     status: HttpStatus.BAD_REQUEST, 
-    description: 'Invalid account data.' 
+    description: 'Invalid account data or unsupported image format.' 
   })
   @ApiResponse({ 
     status: HttpStatus.INTERNAL_SERVER_ERROR, 
     description: 'Failed to create account.' 
   })
-  async createAccount(@Body(ValidationPipe) createAccountDto: CreateAccountDto): Promise<StarBankAccount> {
-    console.log('Creating account with data:', createAccountDto);
-    return await this.starbankFacadeService.createAccount(createAccountDto.uuid, createAccountDto.name);
+  @UseInterceptors(FileInterceptor('image', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, 'public/smartrotom/img/apps/starbank/cuentas');
+      },
+      filename: (req, file, cb) => {
+        const name = req.body.name || 'profile';
+        const ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
+        cb(null, name + ext);
+      }
+    })
+  }))
+  async createAccount(
+    @Body('uuid') uuid: string,
+    @Body('name') name: string,
+    @Body('server') server: string,
+    @UploadedFile() image?: Express.Multer.File
+  ): Promise<StarBankAccount> {
+    const mcWorld = process.env.MC_WORLD;
+    if (server !== mcWorld) {
+      throw new Error('You are not authorized to access this route.');
+    }
+    console.log('Creating account with data:', { uuid, name, server, hasImage: !!image });
+    if (image) {
+      console.log('Image details:', {
+        filename: image.filename,
+        path: image.path,
+        size: image.size,
+        mimetype: image.mimetype
+      });
+      console.log('Image processing logic goes here');
+    }
+    return await this.starbankFacadeService.createAccount(uuid, name);
   }
-
-  @Post('accounts/main')
-  @ApiOperation({ 
-    summary: 'Create a main account for a user',
-    description: 'Create the primary account for a user (only one main account per user allowed)' 
-  })
   @ApiBody({ 
     schema: {
       type: 'object',

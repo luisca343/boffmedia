@@ -1,3 +1,4 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt, IsNumber, IsEnum } from 'class-validator';
 
@@ -8,7 +9,7 @@ export enum CallStatus {
   BUSY = 'BUSY'
 }
 
-export class InitiateCallDto {
+export class InitiateCallDto extends BaseDto {
   @ApiProperty({ 
     description: 'Chat ID',
     example: 1
@@ -26,7 +27,7 @@ export class InitiateCallDto {
   uuid: string;
 }
 
-export class EndCallDto {
+export class EndCallDto extends BaseDto {
   @ApiProperty({ 
     description: 'Chat ID',
     example: 1
@@ -44,7 +45,7 @@ export class EndCallDto {
   startTime: number;
 }
 
-export class CallUserResponseDto {
+export class CallUserResponseDto extends BaseDto {
   @ApiProperty({ 
     description: 'User UUID',
     example: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4'
@@ -59,7 +60,7 @@ export class CallUserResponseDto {
   status: CallStatus;
 }
 
-export class CallSessionResponseDto {
+export class CallSessionResponseDto extends BaseDto {
   @ApiProperty({ 
     description: 'Chat ID',
     example: 1

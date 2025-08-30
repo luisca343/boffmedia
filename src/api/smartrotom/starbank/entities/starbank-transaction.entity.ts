@@ -15,6 +15,12 @@ export class StarBankTransaction {
   to: number;
 
   @ApiProperty({ 
+    example: true, 
+    description: 'Indicates if the user is the payer' 
+  })
+  isPayer: boolean;
+
+  @ApiProperty({ 
     example: 500, 
     description: 'Transaction amount in PokéDollars' 
   })
@@ -78,4 +84,18 @@ export class StarBankTransaction {
     required: false
   })
   toType?: string;
+
+  @ApiProperty({
+    example: 'Teras',
+    description: 'Display name for the transaction',
+    required: false
+  })
+  displayName?: string;
+  
+  @ApiProperty({
+    example: 'SECONDARY',
+    description: 'Display type for the transaction',
+    required: false
+  })
+  displayAccountType?: string;
 }

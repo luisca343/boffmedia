@@ -80,14 +80,14 @@ export class WingullWorldService {
       }
 
       const townPath = path.join(process.cwd(), 'public/smartrotom/data/pueblos', townName);
-      const textosPath = path.join(townPath, 'textos.json');
+      const textosPath = path.join(townPath, 'config.json');
 
       if (!fs.existsSync(townPath)) {
         throw new Error(`Town folder for ${townName} does not exist.`);
       }
 
       const textos = JSON.parse(fs.readFileSync(textosPath, 'utf-8'));
-      const images = fs.readdirSync(townPath).filter(file => file !== 'textos.json' && file !== 'fondo.webp');
+      const images = fs.readdirSync(townPath).filter(file => file !== 'config.json' && file !== 'fondo.webp');
 
       return {
         textos,

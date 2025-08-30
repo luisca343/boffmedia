@@ -1,7 +1,8 @@
+import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsInt } from 'class-validator';
 
-export class AddMemberDto {
+export class AddMemberDto extends BaseDto {
   @ApiProperty({ 
     description: 'Group ID',
     example: 1
@@ -27,7 +28,7 @@ export class AddMemberDto {
   requestingUserUuid: string;
 }
 
-export class RemoveMemberDto {
+export class RemoveMemberDto extends BaseDto {
   @ApiProperty({ 
     description: 'Group ID',
     example: 1

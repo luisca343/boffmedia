@@ -46,7 +46,6 @@ export class GroupService {
       throw new Error('Group not found');
     }
 
-    // Validate user has access to this group
     const userInChat = await this.chatMemberRepository.findUserInChat(groupId, requestingUserUuid);
     if (!userInChat && chat.type !== 0) { // Type 0 = public chats
       throw new Error('User does not have access to this group');
@@ -143,7 +142,8 @@ export class GroupService {
       messages: messages.map(msg => ({
         id: msg.id,
         content: msg.content,
-        createdAt: msg.createdAt
+        createdAt: msg.createdAt,
+        uuid: msg.uuid
       })),
       unread: 0, // TODO: Implement unread count logic
       members: members

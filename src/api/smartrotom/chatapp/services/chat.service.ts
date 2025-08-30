@@ -34,7 +34,7 @@ export class ChatService {
       chatType = 1;
     } else if (uuids.length === 2) {
       uuids.sort();
-      chatName = uuids.join('_');
+      chatName = uuids.sort().join('_');
       chatType = 2;
       const existingChat = await this.chatRepository.findChatByName(chatName);
       if (existingChat) return existingChat.id;

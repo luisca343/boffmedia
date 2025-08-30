@@ -3,7 +3,7 @@ import { OpenLootBoxDto, OpenLootBoxResponseDto } from '../dto/lottbox.dto';
 import { lootboxConfig, getRarityFromWeight, rarityRanges } from '../_config/lootboxConfig';
 import { ARCADE_INVENTORY_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IArcadeInventoryRepository } from '../repositories/interfaces/arcade-inventory.repository.interface';
-import { LootboxBoxesCollection, LootboxConfigEntity } from '../entities/lootbox-config.entity';
+import { LootboxBoxesCollection, LootboxConfigEntity, LootboxItemConfig } from '../entities/lootbox-config.entity';
 
 @Injectable()
 export class LootboxService {
@@ -41,7 +41,7 @@ export class LootboxService {
       itemId: selectedItem.id,
       itemData: selectedItem.data || null,
       itemType: selectedItem.type || 'lootbox_item',
-      amount: 1,
+      amount: selectedItem.amount || 1,
       sourceType: 'arcade',
       used: 0,
       rarity: rarity,
@@ -56,11 +56,8 @@ export class LootboxService {
     
     return {
       item: {
-        id: selectedItem.id,
-        rarity: rarity,
-        weight: selectedItem.weight,
-        type: selectedItem.type || 'item',
-        data: selectedItem.data || null
+        ...selectedItem,
+        rarity: rarity
       },
       spinnerItems: spinnerItems,
       winningPosition: winningPosition,
@@ -96,12 +93,7 @@ export class LootboxService {
       name: box.name,
       image: box.image,
       description: box.description,
-      items: box.items.map(item => ({
-        id: item.id,
-        weight: item.weight,
-        type: item.type || 'item',
-        data: item.data || null
-      })),
+      items: box.items,
       theme: box.theme
     }));
     
@@ -115,7 +107,7 @@ export class LootboxService {
     return configEntity;
   }
 
-  private selectRandomItem(items: any[]) {
+  private selectRandomItem(items: LootboxItemConfig[]) {
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
     const randomValue = Math.random() * totalWeight;
     
