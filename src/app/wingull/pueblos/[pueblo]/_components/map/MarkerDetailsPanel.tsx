@@ -1,8 +1,11 @@
 import React from "react";
-import { SelectedMarker, TownData, Property, Amenity } from "../types";
-import { ImageShowcase } from "./ImageShowcase";
-import { getIconComponent } from "../utils";
+import { SelectedMarker, TownData, Property, Amenity } from "../../types";
+import { ImageShowcase } from "../shared/image/ImageShowcase";
+import { getIconComponent } from "../../utils";
 import { MapPin, Home, Building2, Sparkles } from 'lucide-react';
+import { BasicCard } from "../shared/cards/BasicCard";
+import { GradientBar } from "../shared/decorative/GradientBar";
+import { DecorativeCorner } from "../shared/decorative/DecorativeCorner";
 
 interface MarkerDetailsPanelProps {
   selectedMarker: SelectedMarker;
@@ -40,20 +43,6 @@ export function MarkerDetailsPanel({
     }
   };
 
-  // Get the marker type label
-  const getMarkerTypeLabel = () => {
-    switch (type) {
-      case 'property':
-        return 'Parcela';
-      case 'business':
-        return 'Local Comercial';
-      case 'amenity':
-        return 'Comodidad';
-      default:
-        return 'Marcador';
-    }
-  };
-
   // Get images for the selected marker
   const getMarkerImages = () => {
     if (type === 'amenity') {
@@ -73,7 +62,11 @@ export function MarkerDetailsPanel({
   const markerImages = getMarkerImages();
 
   return (
-    <div className="mt-8 overflow-hidden">
+    <BasicCard 
+      colorClaro={colorClaro}
+      colorMedio={colorMedio}
+      colorOscuro={colorOscuro}
+      className="mt-8 overflow-hidden">
       <div 
         className="relative backdrop-blur-sm rounded-2xl border-2 p-6 lg:p-8 shadow-xl overflow-hidden"
         style={{ 
@@ -82,16 +75,18 @@ export function MarkerDetailsPanel({
           backdropFilter: 'blur(10px)'
         }}
       >
-        {/* Decorative accent bar */}
-        <div 
-          className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl"
-          style={{ background: `linear-gradient(90deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)` }}
+
+        <GradientBar 
+          colorClaro={colorClaro}
+          colorMedio={colorMedio}
+          colorOscuro={colorOscuro}
         />
         
-        {/* Corner decorations */}
-        <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 rounded-tl-xl opacity-70" style={{ borderColor: colorClaro }} />
-        <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 rounded-tr-xl opacity-70" style={{ borderColor: colorClaro }} />
-        
+        <DecorativeCorner color={colorOscuro} position="top-left" />
+        <DecorativeCorner color={colorOscuro} position="top-right" />
+        <DecorativeCorner color={colorOscuro} position="bottom-left" />
+        <DecorativeCorner color={colorOscuro} position="bottom-right" />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Image section */}
           {markerImages.length > 0 && (
@@ -222,6 +217,6 @@ export function MarkerDetailsPanel({
           }}
         />
       </div>
-    </div>
+    </BasicCard>
   );
 }

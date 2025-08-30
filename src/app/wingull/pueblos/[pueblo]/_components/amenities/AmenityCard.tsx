@@ -1,8 +1,9 @@
-import Image from "next/image";
-import { getIconComponent } from "../utils";
-import { Amenity } from "../types";
-import { ImageShowcase } from "./ImageShowcase";
+import { getIconComponent } from "../../utils";
+import { Amenity } from "../../types";
+import { ImageShowcase } from "../shared/image/ImageShowcase";
 import { useState } from "react";
+import { BasicCard } from "../shared/cards/BasicCard";
+import { OrnamentalDots } from "../shared/decorative/OrnamentalDots";
 
 interface AmenityCardProps {
   amenity: Amenity;
@@ -21,24 +22,13 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
   ) || [];
   
   return (
-    <div className="group relative">
-      {/* Clean card with normal background */}
-  <div className="relative backdrop-blur-sm rounded-2xl border overflow-hidden transition-all duration-300 hover:shadow-lg text-slate-100 h-full"
-    style={{ background: `${colorMedio}70`, borderColor: colorClaro }}
-  >
-        
-        {/* Decorative accent bar using town colors */}
-        <div 
-          className="absolute top-0 left-0 right-0 h-1"
-          style={{ background: `linear-gradient(90deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)` }}
-        />
-        
-        {/* Decorative corner accents using town colors */}
-        <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 rounded-tl-xl opacity-70" style={{ borderColor: colorClaro }} />
-        <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 rounded-tr-xl opacity-70" style={{ borderColor: colorClaro }} />
-        
-        {/* Content container */}
-        <div className="relative p-6 h-full flex flex-col">
+    <BasicCard
+      colorClaro={colorClaro}
+      colorMedio={colorMedio}
+      colorOscuro={colorOscuro}
+      className="h-full"
+    >
+      <div className="relative p-6 h-full flex flex-col">
           {/* Image section using ImageShowcase */}
           {amenityImages.length > 0 && (
             <div className="mb-6">
@@ -124,24 +114,14 @@ export function AmenityCard({ amenity, colorClaro, colorMedio, colorOscuro }: Am
           
           {/* Bottom decorative element using town colors */}
           <div className="flex justify-center mt-6 pt-4 border-t border-white/10">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colorOscuro }} />
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorMedio }} />
-              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: colorClaro }} />
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: colorMedio }} />
-              <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: colorOscuro }} />
-            </div>
+            <OrnamentalDots
+              colorClaro={colorClaro}
+              colorMedio={colorMedio}
+              colorOscuro={colorOscuro}
+              size="large"
+            />
           </div>
         </div>
-        
-        {/* Subtle glow effect on hover using town colors */}
-        <div 
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none"
-          style={{ 
-            background: `linear-gradient(135deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)`
-          }}
-        />
-      </div>
-    </div>
+      </BasicCard>
   );
 }

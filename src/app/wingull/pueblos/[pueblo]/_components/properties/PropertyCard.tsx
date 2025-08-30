@@ -1,9 +1,8 @@
-import Image from "next/image";
-import { Property, TownData } from "../types";
+import { Property, TownData } from "../../types";
 import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield, Building2 } from "lucide-react";
-import { getIconComponent } from "../utils";
-import { ImageShowcase } from "./ImageShowcase";
-
+import { getIconComponent } from "../../utils";
+import { ImageShowcase } from "../shared/image/ImageShowcase";
+import { BasicCard } from "../shared/cards/BasicCard";
 interface PropertyCardProps {
   property: Property;
   isExpanded: boolean;
@@ -30,24 +29,13 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
   const currentImage = allImages[selectedImageIndex] || allImages[0];
 
   return (
-    <div className="group relative">
-      {/* Clean card with normal background */}
-  <div className="relative backdrop-blur-sm rounded-2xl border  overflow-hidden transition-all duration-300 hover:shadow-lg text-slate-100"
-    style={{ background: `${colorMedio}70`, borderColor: colorClaro }}
-  >
-        
-        {/* Decorative accent bar using town colors */}
-        <div 
-          className="absolute top-0 left-0 right-0 h-1"
-          style={{ background: `linear-gradient(90deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)` }}
-        />
-        
-        {/* Decorative corner accents using town colors */}
-        <div className="absolute top-4 left-4 w-6 h-6 border-l-2 border-t-2 rounded-tl-xl opacity-70 z-20" style={{ borderColor: colorClaro }} />
-        <div className="absolute top-4 right-4 w-6 h-6 border-r-2 border-t-2 rounded-tr-xl opacity-70 z-20" style={{ borderColor: colorClaro }} />
-
-        {/* Property badge with clean design */}
-        <div className="absolute top-6 left-6 z-30">
+    <BasicCard
+      colorClaro={colorClaro}
+      colorMedio={colorMedio}
+      colorOscuro={colorOscuro}
+    >
+      {/* Property badge with clean design */}
+      <div className="absolute top-6 left-6 z-30">
           <div 
             className="px-4 py-2 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border text-sm font-bold tracking-wider flex items-center gap-2 shadow-sm"
             style={{ borderColor: `${colorMedio}30` }}
@@ -234,15 +222,6 @@ export function PropertyCard({ property, isExpanded, onToggle, townData, selecte
             </button>
           </div>
         </div>
-        
-        {/* Subtle glow effect on hover using town colors */}
-        <div 
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-5 transition-opacity duration-300 pointer-events-none"
-          style={{ 
-            background: `linear-gradient(135deg, ${colorClaro} 0%, ${colorMedio} 50%, ${colorOscuro} 100%)`
-          }}
-        />
-      </div>
-    </div>
+    </BasicCard>
   );
 }

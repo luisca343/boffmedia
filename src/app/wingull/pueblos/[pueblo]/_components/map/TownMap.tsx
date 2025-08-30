@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { TownData, Property, Amenity, SelectedMarker } from '../types';
+import { TownData, Property, Amenity, SelectedMarker } from '../../types';
 import { MapPin } from 'lucide-react';
 import { StandardizedMap, CoordinateTransformer, MAP_CONSTANTS } from '@/components/map';
 import { PropertyMarker, AmenityMarker, BoundaryMarker, BusinessMarker } from './MapMarkers';

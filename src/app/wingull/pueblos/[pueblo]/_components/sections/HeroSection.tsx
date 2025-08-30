@@ -1,7 +1,8 @@
 import React from 'react';
 import { Sparkles, Users, ChevronDown } from 'lucide-react';
-import type { TownData } from '../types';
-import Image from 'next/image';
+import type { TownData } from '../../types';
+import { HeroBackground } from '../shared/decorative/HeroBackground';
+import { BackgroundDecorations } from '../shared/decorative/BackgroundDecorations';
 
 interface HeroSectionProps {
   townName: string;
@@ -14,40 +15,18 @@ export function HeroSection({ townName, townData, onScrollToContent }: HeroSecti
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-900">
-    <div className="absolute inset-0" style={{backgroundColor: `${colorClaro}30`}}/>
-      {townData.fondo && (
-        <div 
-          className="absolute inset-0 opacity-40" 
-          style={{ 
-            backgroundImage: `url(${townData.fondo})`, 
-            backgroundSize: 'cover', 
-            backgroundPosition: 'center', 
-            backgroundAttachment: 'fixed' 
-          }} 
-        />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-slate-900/40" />
-      <div 
-        className="absolute inset-0 animate-pulse" 
-        style={{ 
-          background: `radial-gradient(ellipse at center, ${colorClaro}30 0%, transparent 50%), linear-gradient(135deg, ${colorMedio}20 0%, transparent 70%)` 
-        }} 
+      <HeroBackground 
+        townData={townData}
+        colorClaro={colorClaro}
+        colorMedio={colorMedio}
+        colorOscuro={colorOscuro}
       />
-      {/* Floating orbs */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div 
-          className="absolute top-1/4 -right-32 w-96 h-96 rounded-full opacity-20 animate-pulse" 
-          style={{ backgroundColor: colorClaro }} 
-        />
-        <div 
-          className="absolute bottom-1/4 -left-32 w-80 h-80 rounded-full opacity-15 animate-pulse" 
-          style={{ backgroundColor: colorMedio, animationDelay: '1s' }} 
-        />
-        <div 
-          className="absolute top-3/4 right-1/4 w-64 h-64 rounded-full opacity-10 animate-pulse" 
-          style={{ backgroundColor: colorOscuro, animationDelay: '2s' }} 
-        />
-      </div>
+      
+      <BackgroundDecorations 
+        colorClaro={colorClaro}
+        colorMedio={colorMedio}
+        colorOscuro={colorOscuro}
+      />
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
         <div className="text-center space-y-8 max-w-5xl mx-auto">
           <div className="space-y-4">

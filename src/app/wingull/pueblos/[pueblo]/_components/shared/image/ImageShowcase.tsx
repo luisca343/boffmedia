@@ -1,6 +1,8 @@
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
+import { NavigationControls } from "../../map/NavigationControls";
+import { ImageIndicators } from "./ImageIndicators";
 
 interface ImageShowcaseProps {
   images: string[];
@@ -116,39 +118,24 @@ export function ImageShowcase({
       {/* Navigation dots and arrows */}
       {images.length > 1 && showNavigation && (
         <>
-          {/* Dots indicator */}
-                <div className="absolute top-4 right-4 z-20">
-                  <div className="flex gap-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full px-3 py-2 shadow-sm transition-opacity duration-300 group-hover:opacity-30">
-                    {images.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleDotClick(index)}
-                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                          index === selectedImageIndex 
-                            ? 'scale-125' 
-                            : 'hover:scale-110 opacity-60 hover:opacity-100'
-                        }`}
-                        style={{ 
-                          backgroundColor: index === selectedImageIndex ? colorClaro : '#9CA3AF'
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
+          {/* Navigation controls */}
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <NavigationControls
+              onPrevious={handlePrevious}
+              onNext={handleNext}
+              colorClaro={colorClaro}
+              colorMedio={colorMedio}
+            />
+          </div>
 
-          {/* Navigation arrows */}
-          <button
-            onClick={handlePrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-sm"
-          >
-            <span style={{ color: colorMedio }}>←</span>
-          </button>
-          <button
-            onClick={handleNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-sm"
-          >
-            <span style={{ color: colorMedio }}>→</span>
-          </button>
+          {/* Image indicators */}
+          <ImageIndicators
+            totalImages={images.length}
+            selectedIndex={selectedImageIndex}
+            onSelect={handleDotClick}
+            colorClaro={colorClaro}
+            colorMedio={colorMedio}
+          />
         </>
       )}
 
