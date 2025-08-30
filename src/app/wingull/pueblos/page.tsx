@@ -128,10 +128,10 @@ export default function PueblosPage() {
               >
                 <div className="p-8">
                   <Search className="w-12 h-12 mx-auto mb-4 opacity-50 text-surface-400" />
-                  <h3 className="text-xl font-semibold mb-2 text-white">No se encontraron pueblos</h3>
-                  <p className="text-surface-400">
-                    No hay pueblos que coincidan con "{searchTerm}"
-                  </p>
+                    <h3 className="text-xl font-semibold mb-2 text-white">No se encontraron pueblos</h3>
+                    <p className="text-surface-400">
+                      No hay pueblos que coincidan con &quot;{searchTerm}&quot;
+                    </p>
                 </div>
               </BasicCard>
             </div>
