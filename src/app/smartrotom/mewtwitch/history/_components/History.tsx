@@ -2,8 +2,8 @@
 
 import { useTranslations } from "next-intl";
 import { BaseHistory } from "@/components/smartrotom/shared/BaseHistory";
-import { StreamCard } from "@/components/smartrotom/mewtwitch/StreamCard";
 import { HistoryItem, getHistory, clearHistory, removeFromHistory } from "../../_services/historyService";
+import { StreamCard } from "../../_components/StreamCard";
 
 export const HistoryView = () => {
   const t = useTranslations("twitch");
