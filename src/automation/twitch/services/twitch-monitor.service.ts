@@ -26,7 +26,7 @@ export class TwitchMonitorService {
   /**
    * Monitor streams every 2 minutes
    */
-  @Cron('0 */2 * * * *') // Every 2 minutes
+  //@Cron('0 */2 * * * *') // Every 2 minutes
   async checkStreams(): Promise<void> {
     this.logger.log('Starting stream monitoring cycle...');
 
