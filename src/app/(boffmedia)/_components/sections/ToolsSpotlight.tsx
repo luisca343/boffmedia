@@ -1,8 +1,8 @@
 import { GameSpotlightCard } from "./GameSpotlightCard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { ArrowRight, Wrench, Calculator, Cog, BarChart3, Server, Filter, Zap } from "lucide-react";
-import { OrbitingElementsCloud } from "@/components/display/OrbitingElementsCloud";
-import { InternalLink } from "@/components/nav/Link";
+import { OrbitingElementsCloud } from "@/components/ui/display/OrbitingElementsCloud";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 interface ToolsSpotlightProps {
   t: (key: string) => string;

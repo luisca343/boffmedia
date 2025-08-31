@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/primitives/table";
 import { KeyRow } from "./KeyRow";
 
 export interface KeyItem {

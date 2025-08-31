@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
 import { Gift, Ticket, Key, ChevronRight, ArrowRight, ExternalLink, Star, Plus } from "lucide-react";
 
 export default function OtherTools() {

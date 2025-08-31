@@ -1,6 +1,6 @@
 import { FaArrowRight } from 'react-icons/fa';
 import { TaxiStop } from "@/types/dto/taxi-stop.dto";
-import type { StopPosition, Position } from '@/components/map';
+import type { StopPosition, Position } from '@/components/common/map/StandardizedMap';
 
 // Helper function to calculate distance between two points
 const calculateDistance = (stop: TaxiStop, playerPosition: Position): number => {

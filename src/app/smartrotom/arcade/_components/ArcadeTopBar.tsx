@@ -1,6 +1,6 @@
 import { ChevronLeft, Joystick, Info, RefreshCw } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
-import { Button } from "@/components/ui/button";
+import { InternalLink } from "@/components/ui/navigation/Link";
+import { Button } from "@/components/ui/primitives/button";
 
 interface ArcadeTopBarProps {
   title: string;

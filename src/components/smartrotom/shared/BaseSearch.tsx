@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
 import { useTranslations } from "next-intl";
 import { getTheme } from "../themes";
 

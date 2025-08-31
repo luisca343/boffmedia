@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { ArmorPiece, Charm, EquipmentType, Weapon } from "../../../../../../../types/tools/mhwilds";
 import Image from "next/image";
 import { 

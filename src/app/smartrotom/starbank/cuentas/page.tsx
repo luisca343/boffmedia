@@ -7,7 +7,7 @@ import {
   BankSectionButton
 } from "../_components/BankSection";
 import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { changeActiveAccount, formatMoney } from "../bankUtils";
 import {
   Dialog,
@@ -17,13 +17,13 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/primitives/dialog";
+import { Input } from "@/components/ui/primitives/input";
 import { AccountImage } from "../_components/AccountImage";
 import useStarBank from "../_hooks/useStarBank";
 import { useBoffSession } from "@/services/useBoffSession";
 import { useCreateAccount } from "@/hooks/starbank/useCreateAccount";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import { 
   PlusCircleIcon, 
   CreditCardIcon, 
@@ -32,8 +32,8 @@ import {
   InformationCircleIcon
 } from "@heroicons/react/24/outline";
 import { SummaryCard } from "../_components/SummaryCard";
-import { Label } from "@/components/ui/label";
-import ImageUpload from "@/components/ui/image-upload";
+import { Label } from "@/components/ui/primitives/label";
+import ImageUpload from "@/components/ui/primitives/image-upload";
 
 export default function Cuentas() {
   const { session } = useBoffSession();

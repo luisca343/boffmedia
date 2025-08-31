@@ -1,5 +1,4 @@
 // Shared base components
-export { LoadingSpinner } from './LoadingSpinner';
 export { BaseCard } from './BaseCard';
 export { BaseTabs } from './BaseTabs';
 export { BaseContentGrid } from './BaseContentGrid';

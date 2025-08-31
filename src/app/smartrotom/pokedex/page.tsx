@@ -1,5 +1,5 @@
 import MenuHeader from "./_components/MenuHeader";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { LastRegistries } from "./_components/LastRegistries";
 import { PokedexSection } from "./_components/PokedexSection";
 import PokemonSearchBar from "./_components/PokemonSearchBar";

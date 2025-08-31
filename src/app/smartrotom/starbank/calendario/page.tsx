@@ -8,7 +8,7 @@ import useStarBank from "../_hooks/useStarBank";
 import { ChartsSkeleton } from "../graficas/_components/ChartsSkeleton";
 import { BankSection, BankSectionContent, BankSectionHeader } from "../_components/BankSection";
 import { formatMoney, changeActiveAccount } from "../bankUtils";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/primitives/badge";
 import { CalendarIcon, Filter } from "lucide-react";
 import { FinancialCalendar } from "./_components/FinancialCalendar";
 import { TransactionList } from "./_components/TransactionList";

@@ -1,5 +1,5 @@
-import { CardContent } from "@/components/ui/card"
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { CardContent } from "@/components/ui/primitives/card"
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
 import type { Game } from "@/types/events"
 import { GameCard } from "./GameCard"
 import { GameEmptyState } from "./GameEmptyState"

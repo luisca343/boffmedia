@@ -1,6 +1,6 @@
 "use client";
 
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";

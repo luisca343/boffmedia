@@ -1,11 +1,11 @@
 "use client"
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
 import { useForm } from "react-hook-form"
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/primitives/input"
+import { Button } from "@/components/ui/primitives/button"
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from "next-auth/react"
 import { Lock, Mail, User } from 'lucide-react'

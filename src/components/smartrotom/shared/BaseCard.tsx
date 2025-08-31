@@ -1,8 +1,8 @@
 "use client";
 
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { Clock, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { formatDistanceToNow } from "date-fns";
 import { getTheme } from "../themes";
 

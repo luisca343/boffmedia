@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { Calendar, Trophy } from "lucide-react"
-import { InternalLink } from "@/components/nav/Link"
-import { Button } from "@/components/ui/button"
+import { InternalLink } from "@/components/ui/navigation/Link"
+import { Button } from "@/components/ui/primitives/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Event } from "@/generated/api/models/Event"
-import { EventCard } from "@/components/event/EventCard"
+import { EventCard } from "@/components/boffmedia/event/EventCard"
 
 interface GameEventsProps {
   gameId: number

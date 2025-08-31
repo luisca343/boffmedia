@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import { ButtonProps } from "@/components/ui/button"; 
+import { Button } from "@/components/ui/primitives/button";
+import { ButtonProps } from "@/components/ui/primitives/button"; 
 import { ReactNode } from "react";
 
 export function BankSectionHeader({ children = 'Test' }: { children?: string | ReactNode }) {

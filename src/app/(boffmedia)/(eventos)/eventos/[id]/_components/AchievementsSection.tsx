@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+import { Card, CardContent } from "@/components/ui/primitives/card"
+import { Badge } from "@/components/ui/primitives/badge"
+import { Button } from "@/components/ui/primitives/button"
+import { Progress } from "@/components/ui/primitives/progress"
 import { Trophy, Star, ExternalLink, Sparkles, Users, Lock, CheckCircle, Clock, Medal, Award } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 
 interface AchievementWithProgress {
   id: number

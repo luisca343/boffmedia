@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/components/ui/card";
+} from "@/components/ui/primitives/card";
 import {
   Sword,
   Gem,
@@ -26,7 +26,7 @@ import { ComponentSlot } from "./ComponentSlot";
 import Image from "next/image";
 import { getArmorImagePath, getWeaponTypeIcon } from "./equipment-utils";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 
 interface BuildDisplayProps {
   currentBuild: BuildData;

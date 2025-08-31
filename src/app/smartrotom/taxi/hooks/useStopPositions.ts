@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { TaxiStop } from "@/types/dto/taxi-stop.dto";
-import { Position, MapBounds, PositionCalculator, StopPosition } from '@/components/map';
+import { Position, MapBounds, PositionCalculator, StopPosition } from '@/components/common/map/StandardizedMap';
 
 interface UseStopPositionsProps {
   taxiStops: TaxiStop[];

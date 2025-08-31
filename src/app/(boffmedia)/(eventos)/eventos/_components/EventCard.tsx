@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { Calendar, Users, Clock, ChevronRight, Trophy, Server, MapPin, Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/primitives/badge";
+import { Button } from "@/components/ui/primitives/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/primitives/card";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { cn } from "@/lib/utils";
 import { getEventStatus } from "@/lib/events";
 import { Event } from "@/generated/api";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 interface EventCardProps {
   event: Event;

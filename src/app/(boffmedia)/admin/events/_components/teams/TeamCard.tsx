@@ -1,6 +1,6 @@
-import { TableCell, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { TableCell, TableRow } from "@/components/ui/primitives/table"
+import { Button } from "@/components/ui/primitives/button"
+import { Badge } from "@/components/ui/primitives/badge"
 import { Pencil, Trash2, Users } from "lucide-react"
 import type { EventTeam } from "@/types/events"
 

@@ -1,4 +1,4 @@
-import { LeaderboardList } from "@/components/leaderboard"
+import { LeaderboardList } from "@/components/boffmedia/leaderboard/LeaderboardList"
 import { LeaderboardEntry } from "@/generated/api"
 
 type MedalsLeaderboardProps = {

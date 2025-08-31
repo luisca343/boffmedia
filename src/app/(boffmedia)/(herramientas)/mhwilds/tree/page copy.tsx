@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWeaponTreeData } from './_hooks/useWeaponTreeData';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/primitives/button';
 
 export function WeaponElement({ weapon }: { weapon: any }) {
     return (

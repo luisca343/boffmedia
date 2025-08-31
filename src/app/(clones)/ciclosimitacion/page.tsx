@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { Header } from "./_components/Header";
 import { Sidebar } from "./_components/Sidebar";
 import { TopBar } from "./_components/TopBar";

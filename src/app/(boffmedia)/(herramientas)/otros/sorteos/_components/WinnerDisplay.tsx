@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Trophy, ArrowRight, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 
 interface WinnerDisplayProps {
   winner: string;

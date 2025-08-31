@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { Gamepad } from "lucide-react"
 
 interface GameEmptyStateProps {

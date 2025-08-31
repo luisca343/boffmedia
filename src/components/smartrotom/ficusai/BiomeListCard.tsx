@@ -1,5 +1,5 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/primitives/badge";
 import { useTranslations } from "next-intl";
 import { getTranslatedBiomeName } from "@/utils/pokemonTranslations";
 

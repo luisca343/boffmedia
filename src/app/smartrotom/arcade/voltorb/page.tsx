@@ -7,8 +7,8 @@ import ArcadeFooter from "../_components/ArcadeFooter";
 import ArcadeTopBar from "../_components/ArcadeTopBar";
 import VoltorbImage from "./_components/VoltorbIcon";
 import { ChevronLeft, Joystick, Info, RefreshCw } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
-import { Button } from "@/components/ui/button";
+import { InternalLink } from "@/components/ui/navigation/Link";
+import { Button } from "@/components/ui/primitives/button";
 import { useState } from "react";
 
 export default function VoltorbFlip() {

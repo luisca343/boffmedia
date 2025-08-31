@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, Suspense } from 'react'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/primitives/button'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/primitives/dialog'
 import { useNews } from '../_hooks/useNews'
 import FurretHeader from '../../_components/Header'
 import FurretFooter from '../../_components/Footer'
 import PopArtWallpaper from '../../_components/PopArtWallpaper'
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { sendToast } from '@/lib/toast'
 
 const NewsList = React.lazy(() => import('./NewsList'))

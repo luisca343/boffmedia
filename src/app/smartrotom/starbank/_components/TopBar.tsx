@@ -6,7 +6,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useState, useRef, useEffect } from "react";
 import { changeActiveAccount, formatMoney } from "../bankUtils";
 import { StarBankAccount } from "@/types/starbank";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 export default function TopBar({
   currentPage,

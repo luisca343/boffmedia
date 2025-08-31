@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { Upload, AlertCircle } from "lucide-react";
 import { BuildDataWithIds } from "../../../../../../../types/tools/mhwilds";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/primitives/alert";
 import { useTranslations } from "next-intl";
 
 interface BuildImportProps {

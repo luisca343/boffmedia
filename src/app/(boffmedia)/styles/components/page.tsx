@@ -1,13 +1,13 @@
 "use client"
 
 import React from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Button } from "@/components/ui/primitives/button"
+import { Input } from "@/components/ui/primitives/input"
+import { Label } from "@/components/ui/primitives/label"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/primitives/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/primitives/accordion"
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
+} from "@/components/ui/primitives/dialog"
+import { Badge } from "@/components/ui/primitives/badge"
+import { Checkbox } from "@/components/ui/primitives/checkbox"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,24 +29,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Combobox } from "@/components/ui/combobox"
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
-import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/hover-card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Textarea } from "@/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+} from "@/components/ui/primitives/alert-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/primitives/command"
+import { Combobox } from "@/components/ui/primitives/combobox"
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/primitives/collapsible"
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/primitives/hover-card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/primitives/sheet"
+import { Switch } from "@/components/ui/primitives/switch"
+import { Slider } from "@/components/ui/primitives/slider"
+import { Skeleton } from "@/components/ui/primitives/skeleton"
+import { Separator } from "@/components/ui/primitives/separator"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
+import { Textarea } from "@/components/ui/primitives/textarea"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
 import { useForm } from "react-hook-form"
-import { Calendar } from "@/components/ui/calendar"
+import { Calendar } from "@/components/ui/primitives/calendar"
 
 export default function BoffMediaStyleGuide() {
   const [comboboxValue, setComboboxValue] = React.useState("")

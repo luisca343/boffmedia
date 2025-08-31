@@ -2,7 +2,7 @@
 
 import { Diamond, Zap, Database } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { ToolsPageLayout } from "@components/boffmedia/tools-page/ToolsPageLayout";
+import { ToolsPageLayout } from "@/components/boffmedia/tools/ToolsPageLayout";
 
 export default function PokemonPage() {
   const t = useTranslations("pokemon");

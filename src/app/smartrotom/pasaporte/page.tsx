@@ -1,11 +1,11 @@
 'use client'
-import { Book, BookLink, Page, PageFlip, PageTitle, turnPage } from "@/components/ui/book/book";
+import { Book, BookLink, Page, PageFlip, PageTitle, turnPage } from "@/components/common/book/book";
 import './pasaporte.css'
 import { useState } from "react";
 import ActiveTeam from "./_components/ActiveTeam";
 import Badges from "./_components/Badges";
 import { parseDate } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover";
 import { Game } from "@/app/battlesim/replay/_components/Game";
 import { SmartRotomAchievement } from "./_types/Achievement";
 import { useBoffSession } from "@/services/useBoffSession";

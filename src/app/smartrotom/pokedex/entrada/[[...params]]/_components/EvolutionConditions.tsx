@@ -1,6 +1,6 @@
 import React from "react"
 import { Evolution } from "@/types/Pokemon"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card"
 import { InformationCircleIcon } from "@heroicons/react/24/outline"
 import { ItemSprite } from "../../../_components/PokemonSprite"
 

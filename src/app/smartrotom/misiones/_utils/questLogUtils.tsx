@@ -1,5 +1,5 @@
 import React from 'react'
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/components/ui/primitives/progress"
 import { Scroll, Target, Gift, MapPin, User } from 'lucide-react'
 import NpcSkin from "@/components/smartrotom/MinecraftSkin"
 import { ItemSprite } from "../../pokedex/_components/PokemonSprite"

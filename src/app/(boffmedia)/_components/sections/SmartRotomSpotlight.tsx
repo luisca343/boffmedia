@@ -1,8 +1,8 @@
 import { GameSpotlightCard } from "./GameSpotlightCard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { ArrowRight } from "lucide-react";
 import { SmartRotomVideo } from "./SmartRotomVideo";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 interface SmartRotomSpotlightProps {
   t: (key: string) => string;

@@ -3,12 +3,12 @@ import {
   CardHeader, 
   CardTitle, 
   CardContent 
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+} from "@/components/ui/primitives/card";
+import { Separator } from "@/components/ui/primitives/separator";
 import { SharpnessBar } from "./SharpnessBar";
 import { ElementalResistances } from "./ElementalResistances";
 import { EyeOff } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip";
 import { Weapon, StatsData } from "../../../../../../../types/tools/mhwilds";
 import { getAllWeaponElements, getElementColor, getStatusColor } from "./equipment-utils";
 import React, { useState, useEffect } from "react";

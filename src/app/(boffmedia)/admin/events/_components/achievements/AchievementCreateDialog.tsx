@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { toast } from "react-toastify"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"

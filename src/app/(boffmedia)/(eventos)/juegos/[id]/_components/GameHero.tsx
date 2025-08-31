@@ -1,9 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/primitives/button"
+import { Badge } from "@/components/ui/primitives/badge"
 import { ChevronLeft, Gamepad2, Activity, Calendar, Clock } from "lucide-react"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { Game } from "@/generated/api"
 
 interface GameHeroProps {

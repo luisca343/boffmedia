@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/primitives/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { Loader2, Save } from 'lucide-react'
 import { useLocale, useTranslations } from "next-intl"
 import { toast } from 'react-toastify'

@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { AnimatedToggle } from "@/components/inputs";
+import { AnimatedToggle } from "@/components/ui/interactive/AnimatedToggle";
 
 interface EuropeanVersionToggleProps {
   checked: boolean;

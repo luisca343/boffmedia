@@ -1,8 +1,8 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card"
 import { parseDate } from "@/lib/utils"
 import type { SmartRotomAchievement } from "../_types/Achievement"
-import { BookLink } from "@/components/ui/book/book"
-import { Badge as UIBadge } from "@/components/ui/badge"
+import { BookLink } from "@/components/common/book/book"
+import { Badge as UIBadge } from "@/components/ui/primitives/badge"
 import { Medal, Lock } from "lucide-react"
 
 export default function Badges({ achievementData, book, pageType = 0 }: { 

@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
 import { PokemonService } from "@/services/api/smartrotom/pokemonService";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useTranslations } from "next-intl";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { getDisplayStatus } from "../../../dexUtils";

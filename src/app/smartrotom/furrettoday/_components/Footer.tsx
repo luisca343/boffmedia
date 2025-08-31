@@ -1,4 +1,4 @@
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 export default function FurretFooter() {
   return (

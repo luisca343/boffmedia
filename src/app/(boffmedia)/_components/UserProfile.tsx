@@ -1,12 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/primitives/button";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Input } from "@/components/ui/primitives/input";
+import { Label } from "@/components/ui/primitives/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar";
+import { Badge } from "@/components/ui/primitives/badge";
 import { Camera, Gamepad2, LinkIcon, Loader2, User, Mail, Shield, Wifi } from 'lucide-react';
 import useSocketStore from "@/stores/useSocketStore";
 import { useBoffSession } from "@/services/useBoffSession";

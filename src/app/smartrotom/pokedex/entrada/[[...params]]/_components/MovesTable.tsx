@@ -1,13 +1,13 @@
 "use client"
-import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/primitives/table";
 import { LevelUpMove, Moves, Pokemon } from "@/types/Pokemon";
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 
 import TypeBadge from "./TypeBadge";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import MoveDataElement from "../../../movimientos/_components/MoveData";
 import { useTranslations } from "next-intl";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { getTranslatedMoveName, getTranslatedMoveCategory } from "@/utils/pokemonTranslations";
 
 export function MovesTable({moves, sort = false, moveData, title}: {moves: Moves, sort?: boolean, moveData?: any, title?: string}){

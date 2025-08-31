@@ -1,9 +1,10 @@
 import React from 'react';
-import { BaseMarker, MAP_CONSTANTS } from '@/components/map';
-import type { CoordinateTransformer, Position } from '@/components/map';
+import { MAP_CONSTANTS } from '@/components/common/map/StandardizedMap';
+import type { CoordinateTransformer, Position } from '@/components/common/map/StandardizedMap';
 import { CompleteMarker } from './CompleteMarker';
 import { BoundaryOverlay } from './BoundaryOverlay';
 import { PiHouse, PiBuilding, PiSparkle } from "react-icons/pi";
+import { BaseMarker } from '@/components/common/map/BaseMarker';
 
 interface MarkerProps {
   worldPosition: Position;

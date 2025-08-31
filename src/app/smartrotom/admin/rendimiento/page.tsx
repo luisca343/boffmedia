@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { Activity, Users, Server, BarChart2 } from 'lucide-react'
 import { useGetPerformance } from '@/hooks/_main/useGetPerformance'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card"
 import AdminPageLayout from '../_components/AdminPageLayout'
 import TerminalCard from '../_components/TerminalCard'
 import TerminalHeader from '../_components/TerminalHeader'

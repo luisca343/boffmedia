@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Trash2, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import {
   Dialog,
   DialogContent,
@@ -12,8 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { LoadingSpinner } from "./LoadingSpinner";
+} from "@/components/ui/primitives/dialog";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 
 interface BaseHistoryProps<T> {
   platform: "youtube" | "twitch";

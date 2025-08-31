@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import { Users } from "lucide-react";
 import { ContentGrid } from "../../_components/ContentGrid";
 import { UserStats } from "./UserStats";

@@ -1,8 +1,8 @@
 import { Quest, CommonReward } from '../types'
 import { DeckDisplay } from './DeckDisplay'
 import Image from 'next/image'
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/primitives/card"
+import { Separator } from "@/components/ui/primitives/separator"
 
 interface QuestDisplayProps {
   quest: Quest

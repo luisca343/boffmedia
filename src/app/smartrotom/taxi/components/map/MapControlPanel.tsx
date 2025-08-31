@@ -1,4 +1,4 @@
-import type { Position } from '@/components/map';
+import type { Position } from '@/components/common/map/StandardizedMap';
 
 interface MapControlPanelProps {
   calculateVisibleDistance: () => number;

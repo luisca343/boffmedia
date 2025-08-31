@@ -1,6 +1,6 @@
 import type { SmartRotomAchievement } from "../_types/Achievement"
 import { parseDate } from "@/lib/utils"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/primitives/dialog"
 import { Game } from "@/app/battlesim/replay/_components/Game"
 import ActiveTeam from "./ActiveTeam"
 import { AchievementService, UserAchievement, Replay } from "@/services/api/smartrotom/achievementsService"

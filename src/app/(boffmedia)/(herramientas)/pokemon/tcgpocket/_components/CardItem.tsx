@@ -1,8 +1,8 @@
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { Plus, Minus } from 'lucide-react'
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { TcgCard } from "@/generated/api"
 
 interface CardItemProps {

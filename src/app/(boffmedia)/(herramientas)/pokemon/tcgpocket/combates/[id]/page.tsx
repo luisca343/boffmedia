@@ -3,7 +3,7 @@ import { QuestDisplay } from '../_components/QuestDisplay'
 import { calculateTotalRewards } from '../utils/calculateTotalRewards'
 import Image from 'next/image'
 import { PtcgpService } from '@/services/api/boffmedia/ptcgpService'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card'
 import { getTranslations } from 'next-intl/server'
 
 export default async function Combates({params} : {params: {id: string}}) {

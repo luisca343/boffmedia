@@ -1,10 +1,10 @@
 import { useTranslations } from "next-intl";
 import { MapPinIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Combobox } from "@/components/ui/combobox";
-import { SectionHeader } from "@/components/form";
-import { FormField } from "@/components/form";
+import { Input } from "@/components/ui/primitives/input";
+import { Badge } from "@/components/ui/primitives/badge";
+import { Combobox } from "@/components/ui/primitives/combobox";
+import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
+import { FormField } from "@/components/ui/form/FormField";
 import { getFloors, getValidDungeons } from "../DungeonData";
 
 interface LocationSectionProps {

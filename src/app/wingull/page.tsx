@@ -2,8 +2,8 @@ import { MovingSection } from "./_components/MovingSection";
 import { BackgroundDecorations } from "./_components/BackgroundDecorations";
 import Image from "next/image";
 import Footer from "./_components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+import { Badge } from "@/components/ui/primitives/badge";
 import { Clock, Users, MapPin, Sparkles } from "lucide-react";
 
 export default function Page() {

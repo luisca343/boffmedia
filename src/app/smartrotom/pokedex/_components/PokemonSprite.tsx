@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { StatusIconv2 } from "./StatusIcon"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { Loading } from "@/components/smartrotom/Loading"
 import { getItemSprite, getPokemonNameFromIdAndForm, getVisibility, PokedexStatus } from "../dexUtils"

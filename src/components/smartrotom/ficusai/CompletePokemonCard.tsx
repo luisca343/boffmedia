@@ -1,12 +1,12 @@
 "use client";
 import { useState, useMemo, FC } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
+import { Badge } from "@/components/ui/primitives/badge";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { useTranslations } from "next-intl";
 import { Search, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/primitives/input";
+import { Button } from "@/components/ui/primitives/button";
 
 import TypeBadge from "@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge";
 import MoveDataElement from "@/app/smartrotom/pokedex/movimientos/_components/MoveData";

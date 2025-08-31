@@ -1,7 +1,7 @@
-import { TableCell, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+import { TableCell, TableRow } from "@/components/ui/primitives/table"
+import { Badge } from "@/components/ui/primitives/badge"
 import type { LeaderboardEntry } from "@/types/events"
-import { ProfileImage } from "@/components/ProfileImage"
+import { ProfileImage } from "@/components/ui/ProfileImage"
 
 type PlayerCardProps = {
   player: LeaderboardEntry

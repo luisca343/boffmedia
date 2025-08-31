@@ -5,7 +5,7 @@ import { PokemonSpriteLink } from "../../_components/PokemonSprite"
 import { useGetPokemonByAbility } from "@/hooks/pokemon/useGetPokemonByAbility"
 import { useGetAbility } from "@/hooks/pokemon/useGetAbility"
 import { ArrowLeftIcon, BookOpenIcon, SparklesIcon } from "@heroicons/react/24/outline"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { useTranslations } from "next-intl"
 
 export default function Habilidad({params} : {params: {id: string}}){

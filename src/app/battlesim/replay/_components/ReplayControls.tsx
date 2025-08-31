@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/primitives/input";
 import { PlayIcon, PauseIcon, ArrowPathIcon, ChevronLeftIcon, ChevronRightIcon, ArrowsRightLeftIcon, BoltIcon, ArrowRightIcon, PlusIcon } from '@heroicons/react/24/outline';
 import ReplayControlsButton from './ReplayControlsButton';
 import useViewportWidth from "@/services/useViewPortWidth";

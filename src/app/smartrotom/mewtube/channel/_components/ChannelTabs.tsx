@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/primitives/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import { ChevronDown } from "lucide-react";
 import { VideoGrid } from "../../_components/VideoGrid";
-import { LoadingSpinner } from "../../_components/LoadingSpinner";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import { ChannelStats } from "./ChannelStats";
 import { Video } from "../../types";
 import { useTranslations } from "next-intl";

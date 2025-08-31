@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useGetGames } from '@/hooks/events/useGetGames';
-import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/sections';
+import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/boffmedia/sections';
 import { GamesGrid } from './_components/GamesGrid';
 import { GamesList } from './_components/GamesList';
 import { GameFilters } from './_components/GameFilters';

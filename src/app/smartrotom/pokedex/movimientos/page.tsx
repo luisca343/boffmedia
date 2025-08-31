@@ -1,10 +1,10 @@
 "use client"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import MoveDataElement from "./_components/MoveData";
 import { useTranslations } from "next-intl";
 import { useGetAllMoves } from "@/hooks/pokemon/useGetAllMoves";
 import { MoveCount } from "@/services/api/smartrotom/pokemonService";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { BookOpenIcon, BoltIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 

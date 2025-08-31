@@ -5,15 +5,15 @@ import {
   CardHeader, 
   CardTitle, 
   CardContent 
-} from "@/components/ui/card";
+} from "@/components/ui/primitives/card";
 import { HelpCircle, AlertCircle } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { 
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui/primitives/tooltip";
 import { Skill } from "../../../../../../../types/tools/mhwilds";
 import { useTranslations } from "next-intl";
 

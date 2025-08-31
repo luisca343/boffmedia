@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/primitives/label";
 
 interface TerminalLabelProps {
   htmlFor: string;

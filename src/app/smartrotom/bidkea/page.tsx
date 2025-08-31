@@ -1,9 +1,7 @@
 "use client";
 import { Canvas } from "@react-three/fiber";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { useLoader } from "@react-three/fiber";
-import { TextureLoader, MaterialLoader, Texture } from "three";
-import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader.js";
+import { TextureLoader, Texture } from "three";
 import { useEffect, useRef, useState } from "react";
 import {
   CameraShake,
@@ -15,8 +13,10 @@ import {
   useGLTF,
 } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/primitives/button";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
+import { MTLLoader } from "three/addons/loaders/MTLLoader.js";
 
 const furnitureItems = [
   {

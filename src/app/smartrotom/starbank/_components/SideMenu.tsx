@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { BanknotesIcon, CalendarIcon, ChartBarIcon, ChevronRightIcon, ChevronUpIcon, CreditCardIcon, CurrencyYenIcon, HomeIcon, PresentationChartLineIcon, TicketIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
-import { InternalLink } from '@/components/nav/Link';
+import { InternalLink } from '@/components/ui/navigation/Link';
 
 const items = [
   {

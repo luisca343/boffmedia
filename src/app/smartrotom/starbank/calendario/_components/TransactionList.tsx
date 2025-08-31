@@ -1,8 +1,8 @@
 "use client";
 
 import { format } from "date-fns";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
+import { Card } from "@/components/ui/primitives/card";
 import { formatMoney } from "../../bankUtils";
 import { CalendarIcon } from "lucide-react";
 import { StarBankTransaction } from "@/generated/api";

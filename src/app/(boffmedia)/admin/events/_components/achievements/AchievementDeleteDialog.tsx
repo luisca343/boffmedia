@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/primitives/dialog"
+import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Award, RefreshCw } from "lucide-react"
 import type { Achievement } from "@/types/events"

@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { Home, ArrowLeft } from 'lucide-react'
 import "./globals.css"
 

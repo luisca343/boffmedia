@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import PokemonDetail from "./PokemonDetail";
 import { forwardRef, useImperativeHandle } from "react";
 import { Pokemon, Side } from "@pkmn/client";

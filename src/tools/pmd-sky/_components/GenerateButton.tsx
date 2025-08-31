@@ -1,6 +1,6 @@
 import { HiMail, HiSparkles } from "react-icons/hi";
 import { useTranslations } from "next-intl";
-import { ActionButton } from "@/components/actions";
+import { ActionButton } from "@/components/ui/interactive/ActionButton";
 
 interface GenerateButtonProps {
   onClick: () => void;

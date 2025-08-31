@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip";
 
 interface SharpnessProps {
   sharpness: {

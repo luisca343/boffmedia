@@ -3,7 +3,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from "@/components/ui/primitives/collapsible";
 import { Drop, DropByType } from "../_types/Drops";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 

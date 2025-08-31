@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components/ui/primitives/card"
 import { useGetTeams } from "@/hooks/events/useGetTeams"
 import type { EventTeam } from "@/types/events"
 import { TeamHeader } from "./TeamHeader"

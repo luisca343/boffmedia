@@ -2,7 +2,7 @@
 
 import { StreamCard } from "./StreamCard";
 import { GameCard } from "./GameCard";
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import { TwitchStream, TwitchVideo, TwitchClip, TwitchGame, formatDate } from "../types";
 import { HistoryItem } from "../_services/historyService";
 

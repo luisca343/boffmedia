@@ -4,10 +4,10 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/primitives/dialog"
 import { ProbabilityTable } from "./ProbabilityTable"
 import { useTranslations } from "next-intl"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
 import { TrophyIcon } from "@heroicons/react/24/outline"
 
 interface BestPackDialogProps {

@@ -2,11 +2,11 @@
 
 import { useParams } from "next/navigation"
 import { useState, useEffect, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/primitives/button"
+import { Badge } from "@/components/ui/primitives/badge"
+import { Progress } from "@/components/ui/primitives/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
+import { Input } from "@/components/ui/primitives/input"
 import { 
   ArrowLeft, Trophy, Award, Search, Filter, Lock, 
   Calendar, Target, Users, Star, Crown, Gem, Medal,
@@ -16,7 +16,7 @@ import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, Event, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 
 interface AchievementWithProgress extends Achievement {
   userProgress?: UserProgress

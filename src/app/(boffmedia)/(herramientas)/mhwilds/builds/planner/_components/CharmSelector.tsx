@@ -4,16 +4,16 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
 import { 
   ChevronLeft, 
   Loader2,
   X,
   Medal
 } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/primitives/input";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { BuildData, Charm, Filters } from "../../../../../../../types/tools/mhwilds";
 import { CurrentEquipment } from "./CurrentEquipment";
 import { motion } from "framer-motion";

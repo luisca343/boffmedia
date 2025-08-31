@@ -3,8 +3,8 @@
 import React, { useState, useMemo } from "react"
 import { useGetRotomQuests } from "./_hooks/useGetRotomQuests"
 import { QuestData, ICategories, QuestStatus } from "./_types/questTypes"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
+import { Input } from "@/components/ui/primitives/input"
 import { getStatusStyles, QuestDetails, DialogItem } from "./_utils/questLogUtils"
 import { Scroll, Book, MessageSquare, Search, MapPin, ListFilter } from "lucide-react"
 import Fuse from 'fuse.js'

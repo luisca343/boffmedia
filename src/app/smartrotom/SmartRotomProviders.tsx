@@ -1,7 +1,7 @@
 "use client"
 import { GlobalErrorThrower } from "@/components/smartrotom/GlobalErrorThrower"
 import { RotomErrorBoundary } from "@/components/smartrotom/RotomErrorBoundary"
-import { TooltipProvider } from "@/components/ui/tooltip"
+import { TooltipProvider } from "@/components/ui/primitives/tooltip"
 import { PokemonProvider } from "@/providers/PokemonProvider"
 import { SpriteManifestProvider } from "@/providers/SpriteManifestProvider"
 

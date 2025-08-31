@@ -1,5 +1,5 @@
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
 import TypeBadge from "./TypeBadge"
 
 export function TypeTable({list, title, id, className='', badgeType}: 

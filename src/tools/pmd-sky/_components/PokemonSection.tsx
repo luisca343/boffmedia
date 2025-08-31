@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { UserGroupIcon, UserIcon, CursorArrowRippleIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
-import { SectionHeader } from "@/components/form";
-import { FormField } from "@/components/form";
+import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
+import { FormField } from "@/components/ui/form/FormField";
 import { PokemonSelector } from "./PokemonSelector";
 import { getClientIsTarget, getForceClient } from "../QuestData";
 

@@ -11,7 +11,7 @@ import {
   filterReason,
 } from "../../_util/TransactionFilter";
 import { CellDefProps } from "../page";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/primitives/input";
 import { strToDate } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
 import { ArrowDownIcon, ArrowUpIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
@@ -24,7 +24,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/primitives/table";
 import { StarBankTransaction } from "@/generated/api";
 
 export const columns: ColumnDef<StarBankTransaction>[] = [

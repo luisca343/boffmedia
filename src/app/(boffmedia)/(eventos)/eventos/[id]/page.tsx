@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
@@ -14,7 +14,7 @@ import { ParticipantsGrid } from "./_components/ParticipantsGrid"
 import { AchievementsSection } from "./_components/AchievementsSection"
 import { Leaderboard } from "./_components/Leaderboard"
 import { LoadingSpinner } from "./_components/LoadingSpinner"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 
 export default function EventSummaryPage() {
   const params = useParams()

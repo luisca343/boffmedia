@@ -4,7 +4,7 @@ import { PokemonSprite } from "../../../_components/PokemonSprite";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getDisplayStatus, getPokemonNameAndForm } from "../../../dexUtils";
 import { Pokemon } from "@/types/Pokemon";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useTranslations } from "next-intl";
 
 export function EntryHeader({pokemon, formName, prev, next} : {pokemon: Pokemon, formName: string, prev: {dex: number, name: string, spriteUrl: string}, next: {dex: number, name: string, spriteUrl: string}}) {

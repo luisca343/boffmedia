@@ -1,4 +1,4 @@
-import { ComboboxWithPreview } from "@/components/inputs";
+import { ComboboxWithPreview } from "@/components/ui/interactive/ComboboxWithPreview";
 import { getValidPokemon } from "../PokemonData";
 
 interface PokemonSelectorProps {

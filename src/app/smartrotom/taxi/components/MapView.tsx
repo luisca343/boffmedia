@@ -2,7 +2,7 @@ import { TaxiStop } from "@/types/dto/taxi-stop.dto";
 import { useMemo } from 'react';
 
 // Types and Utils
-import { Position, MapBounds, CoordinateTransformer, PositionCalculator } from '@/components/map';
+import { Position, MapBounds, CoordinateTransformer, PositionCalculator, MapImage } from '@/components/common/map/StandardizedMap';
 
 // Hooks
 import { useMapState } from '../hooks/useMapState';
@@ -12,7 +12,6 @@ import { useViewportDimensions } from '../hooks/useViewportDimensions';
 
 // Components
 import { MapHeader } from './map/MapHeader';
-import { MapImage } from './map/MapImage';
 import { PlayerMarker } from './map/PlayerMarker';
 import { TaxiStopMarker } from './map/TaxiStopMarker';
 import { OffscreenIndicator } from './map/OffscreenIndicator';

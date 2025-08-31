@@ -1,7 +1,7 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/primitives/badge";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
+import { Input } from "@/components/ui/primitives/input";
 import MoveDataElement from "@/app/smartrotom/pokedex/movimientos/_components/MoveData";
 import { useTranslations } from "next-intl";
 import { getTranslatedMoveName, getTranslatedMoveCategory } from "@/utils/pokemonTranslations";

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { Users } from "lucide-react"
 
 interface TeamEmptyStateProps {

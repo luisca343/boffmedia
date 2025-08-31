@@ -1,6 +1,6 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/primitives/button"
+import { Input } from "@/components/ui/primitives/input"
 import { Gamepad } from "lucide-react"
 import { getTranslations } from "next-intl/server"
 

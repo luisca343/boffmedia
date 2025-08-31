@@ -1,5 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
 import { Search, Home, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { BackgroundDecorations } from "@/app/wingull/_components/BackgroundDecorations";

@@ -1,15 +1,15 @@
 "use client"
 import { PossibleSpawns } from "../_components/PossibleSpawns"
 import { useState } from "react"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/primitives/label"
+import { Switch } from "@/components/ui/primitives/switch"
 import { 
   AdjustmentsHorizontalIcon, 
   EyeIcon, 
   EyeSlashIcon, 
   InformationCircleIcon 
 } from "@heroicons/react/24/outline"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
 
 type PossibleSpawn = {
   dex: number

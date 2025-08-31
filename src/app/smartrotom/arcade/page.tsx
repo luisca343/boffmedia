@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { WholeWord, Pickaxe, Package, Box, Star } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import StarsBackground from "./_components/StarsBackground";
 import WeeklyStreak from "./_components/daily/WeeklyStreak";
 import ArcadeGameCard from "./_components/ArcadeGameCard";

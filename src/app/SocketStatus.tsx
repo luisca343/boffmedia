@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect } from 'react';
-import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tooltip, TooltipProvider, TooltipContent, TooltipTrigger } from '@/components/ui/primitives/tooltip';
 import useSocketStore from '@/stores/useSocketStore';
 import { useBoffSession } from '@/services/useBoffSession';
 import { SmartRotomUser } from '@/types';

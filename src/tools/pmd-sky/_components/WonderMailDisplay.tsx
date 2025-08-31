@@ -1,5 +1,5 @@
 import { HiMail } from "react-icons/hi";
-import { CodeDisplay } from "@/components/display";
+import { CodeDisplay } from "@/components/ui/display/CodeDisplay";
 
 interface WonderMailDisplayProps {
   mail: string;

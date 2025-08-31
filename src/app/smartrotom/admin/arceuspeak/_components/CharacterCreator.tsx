@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/primitives/input"
+import { Button } from "@/components/ui/primitives/button"
 import { SmartrotomService } from '@/services/api/smartrotom/smartrotomService'
 import { toast } from 'react-toastify'
 import { Plus, Eye, AlertTriangle, Check } from 'lucide-react'

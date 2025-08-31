@@ -1,9 +1,9 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent } from "@/components/ui/primitives/card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
 import { User } from "lucide-react"
-import { ProfileImage } from "@/components/ProfileImage"
+import { ProfileImage } from "@/components/ui/ProfileImage"
 
 interface ParticipantsGridProps {
   participants: any[]

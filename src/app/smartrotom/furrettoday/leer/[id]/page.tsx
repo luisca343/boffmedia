@@ -2,9 +2,9 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { InternalLink } from "@/components/nav/Link";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import Image from "next/image";
 import FurretHeader from "../../_components/Header";
 import FurretFooter from "../../_components/Footer";
@@ -12,7 +12,7 @@ import { useGetNewsById } from "@/hooks/documents/useGetNewsById";
 import PopArtWallpaper from "../../_components/PopArtWallpaper";
 import PopStyles from "../../_components/PopStyles";
 
-const CustomEditor = dynamic(() => import("@/components/ckeditor/TestEditor"), {
+const CustomEditor = dynamic(() => import("@/components/common/ckeditor/TestEditor"), {
   ssr: false,
 });
 

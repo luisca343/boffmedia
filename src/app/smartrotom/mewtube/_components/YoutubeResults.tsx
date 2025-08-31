@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import Axios from "axios";
 import { VideoGrid } from "@/components/smartrotom/youtube/VideoGrid";
-import { LoadingSpinner } from "./LoadingSpinner";
 import { BaseSearchHeader } from "@/components/smartrotom/shared/BaseSearchHeader";
 import { Video, API_KEY } from "../types";
 import { useTranslations } from "next-intl";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 
 export default function YoutubeResults() {
   const t = useTranslations("youtube");

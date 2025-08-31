@@ -2,7 +2,7 @@
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
-import { InternalLink } from "../nav/Link"
+import { InternalLink } from "../ui/navigation/Link"
 import { useSortable } from "@dnd-kit/sortable"
 import { SmartRotomApp } from "@/generated/api"
 

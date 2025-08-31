@@ -5,7 +5,7 @@ import { PokemonSpriteLink } from "../../_components/PokemonSprite"
 import { useGetPokemonByMove } from "@/hooks/pokemon/useGetPokemonByMove"
 import { useGetMove } from "@/hooks/pokemon/useGetMove"
 import { ArrowLeftIcon, BookOpenIcon } from "@heroicons/react/24/outline"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { useTranslations } from "next-intl"
 
 export default function Movimiento({params} : {params: {id: string}}){

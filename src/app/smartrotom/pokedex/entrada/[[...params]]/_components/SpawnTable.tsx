@@ -1,8 +1,8 @@
-import { TableBody } from "@/components/ui/table";
+import { TableBody } from "@/components/ui/primitives/table";
 import { SpawnInfo } from "../../../_types/spawnInfo";
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 import { PokemonSprite } from "../../../_components/PokemonSprite";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useTranslations } from "next-intl";
 import { MapPinIcon } from "@heroicons/react/24/outline";
 

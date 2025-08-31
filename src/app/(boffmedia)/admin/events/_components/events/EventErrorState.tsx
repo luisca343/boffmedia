@@ -1,5 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/primitives/card"
+import { Button } from "@/components/ui/primitives/button"
 import { RefreshCw } from "lucide-react"
 
 interface EventErrorStateProps {

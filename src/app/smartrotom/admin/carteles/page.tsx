@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/primitives/button"
+import { Input } from "@/components/ui/primitives/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { ArrowDown, ArrowLeft, ArrowRight, Plus, Minus, Copy, Check } from 'lucide-react'
 import HighwaySign from './_components/HighwaySign'
 

@@ -1,6 +1,6 @@
 "use client"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { getForm, getDisplayStatus } from "../../../dexUtils"
 import { useTranslations } from "next-intl"
 import { PokedexSection } from "../../../_components/PokedexSection"

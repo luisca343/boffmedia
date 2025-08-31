@@ -1,8 +1,8 @@
 import { useTranslations } from "next-intl";
 import { GiftIcon, CubeIcon, TrophyIcon } from "@heroicons/react/24/outline";
-import { Combobox } from "@/components/ui/combobox";
-import { SectionHeader } from "@/components/form";
-import { FormField } from "@/components/form";
+import { Combobox } from "@/components/ui/primitives/combobox";
+import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
+import { FormField } from "@/components/ui/form/FormField";
 import { getRewardTypes, getUseTargetItem, givesItem } from "../QuestData";
 import { getItemData } from "../ItemData";
 

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Users, Minus, Trophy, Search, XCircle } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { SectionHeader } from "@/components/form";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/primitives/input";
+import { Badge } from "@/components/ui/primitives/badge";
+import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
+import { Button } from "@/components/ui/primitives/button";
 
 interface ParticipantsListProps {
   participants: string[];

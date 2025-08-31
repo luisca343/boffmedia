@@ -4,8 +4,8 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
 import { 
   ArrowDown,
   ArrowUp,
@@ -13,7 +13,7 @@ import {
   Loader2,
   X,
 } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { ArmorPiece, BuildData, Charm, EquipmentType, Filters, Weapon } from "../../../../../../../types/tools/mhwilds";
 import { getEquipmentDisplayName, getEquipmentIcon, getIconColor } from "./equipment-utils";
 import { EquipmentFilters } from "./EquipmentFilters";

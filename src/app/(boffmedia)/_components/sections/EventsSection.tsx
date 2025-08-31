@@ -1,14 +1,14 @@
 import { getTranslations } from "next-intl/server";
 import { Calendar, MapPin, Trophy, Clock, Star, Server, Calendar as CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { InternalLink } from "@/components/nav/Link";
+import { Button } from "@/components/ui/primitives/button";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { SectionSeparator } from "../ui/SectionSeparator";
 import { EventImage } from "../ui/EventImage";
 import { Event } from "@/generated/api/models/Event";
 import { EventsService } from "@/services/api/boffmedia/eventsService";
-import { SectionHeader } from "@/components/sections";
+import { SectionHeader } from "@/components/boffmedia/sections";
 
-import { EventCard } from "@/components/event/EventCard";
+import { EventCard } from "@/components/boffmedia/event/EventCard";
 
 export async function EventsSection() {
   const t = await getTranslations("boffmedia");

@@ -1,9 +1,9 @@
 import { Game } from "@/generated/api";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+import { Badge } from "@/components/ui/primitives/badge";
+import { Button } from "@/components/ui/primitives/button";
 import { Calendar, Users, Trophy, ExternalLink, Gamepad2 } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { cn } from "@/lib/utils";
 
 interface GameCardProps {

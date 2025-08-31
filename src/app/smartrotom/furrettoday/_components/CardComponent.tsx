@@ -1,6 +1,6 @@
 import React from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { InternalLink } from "@/components/nav/Link";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { NewsItem } from "../page";
 import { getPreview } from "../_util";
 import Image from "next/image";

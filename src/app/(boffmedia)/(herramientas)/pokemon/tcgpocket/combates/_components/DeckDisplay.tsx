@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Card } from '../types'
-import { Card as ShadcnCard, CardContent } from "@/components/ui/card"
+import { Card as ShadcnCard, CardContent } from "@/components/ui/primitives/card"
 
 interface DeckDisplayProps {
   deckListing: Card[]

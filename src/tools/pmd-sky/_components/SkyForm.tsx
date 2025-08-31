@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "@/components/ui/primitives/card";
 import { SkyFormData } from "../store";
 import {
   QuestConfigurationSection,

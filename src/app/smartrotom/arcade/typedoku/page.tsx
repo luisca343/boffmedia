@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import {  RefreshCw, Undo, Redo, Lightbulb, PencilLine, HelpCircle } from 'lucide-react'
 import StarsBackground from '../_components/StarsBackground'
 import {RainbowText} from '../_components/RainbowText'

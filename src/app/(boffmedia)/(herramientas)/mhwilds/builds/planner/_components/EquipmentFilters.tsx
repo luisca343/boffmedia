@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
 import { Search, ArrowUpDown, Filter, ArrowUp, ArrowDown } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/primitives/badge";
 import { X } from "lucide-react";
 import { 
   DropdownMenu,
@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/primitives/dropdown-menu";
 import { Filters, EquipmentType } from "../../../../../../../types/tools/mhwilds";
 import { useTranslations } from "next-intl";
 

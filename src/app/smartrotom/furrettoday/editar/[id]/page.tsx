@@ -2,15 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import { useGetNewsById } from '@/hooks/documents/useGetNewsById';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/primitives/alert"
 import { AlertCircle, Loader2 } from 'lucide-react'
 import FurretHeader from '../../_components/Header';
 import FurretFooter from '../../_components/Footer';
 import PopArtWallpaper from '../../_components/PopArtWallpaper';
 import PopStyles from '../../_components/PopStyles';
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
-const CustomEditor = dynamic(() => import('@/components/ckeditor/TestEditor'), { ssr: false });
+const CustomEditor = dynamic(() => import('@/components/common/ckeditor/TestEditor'), { ssr: false });
 
 export default function EditNote({ params }: { params: { id: string } }) {
   const { id } = params;

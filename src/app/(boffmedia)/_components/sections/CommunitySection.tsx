@@ -1,7 +1,7 @@
 "use client"
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { ArrowRight, Users, MessageCircle, Heart, Gamepad2, Code, Zap } from "lucide-react";
-import { OrbitingElementsCloud } from "@/components/display/OrbitingElementsCloud";
+import { OrbitingElementsCloud } from "@/components/ui/display/OrbitingElementsCloud";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 

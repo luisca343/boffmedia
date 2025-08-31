@@ -3,11 +3,11 @@
 import { useState, useEffect } from "react";
 import { BaseSearchHeader } from "@/components/smartrotom/shared/BaseSearchHeader";
 import { ContentGrid } from "./ContentGrid";
-import { LoadingSpinner } from "./LoadingSpinner";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import { TwitchStream, TwitchGame, TwitchUser, TwitchSearchChannel } from "../types";
 import { twitchAPI } from "../_services/twitchAPI";
 import { useTranslations } from "next-intl";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 export default function TwitchResults() {
   const t = useTranslations("twitch");

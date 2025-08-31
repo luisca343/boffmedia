@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Award, Users, Trophy, Target, ChevronRight, Medal } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/primitives/badge"
+import { Button } from "@/components/ui/primitives/button"
+import { Progress } from "@/components/ui/primitives/progress"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Achievement, UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 
 interface AchievementWithProgress extends Achievement {
   userProgress?: UserProgress

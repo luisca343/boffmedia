@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card"
 import { Users, Trophy, Target } from "lucide-react"
 import { Event } from "@/generated/api/models/Event"
 

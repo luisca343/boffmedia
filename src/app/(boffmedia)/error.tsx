@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import Link from "next/link";
 import { FloatingBackground } from "./_components/layout/FloatingBackground";

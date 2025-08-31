@@ -1,7 +1,7 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/primitives/button"
+import { Badge } from "@/components/ui/primitives/badge"
 import { 
   ArrowLeft, Calendar, Clock, Users, Trophy, 
   Share2, Bookmark, Zap, Server, 
@@ -10,7 +10,7 @@ import {
 import { Event } from "@/generated/api/models/Event"
 import { EventRegistrationButton } from "../../_components/EventRegistrationButton"
 import Link from "next/link"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 
 interface EventHeroProps {
   event: any

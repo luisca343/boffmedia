@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/primitives/table";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -21,7 +21,7 @@ import {
   Info,
   ChevronLeft
 } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import Fuse from "fuse.js";
 import { useGetWordlePokemon } from "../_hooks/useGetWordlePokemon";
 import StarsBackground from "../../_components/StarsBackground";

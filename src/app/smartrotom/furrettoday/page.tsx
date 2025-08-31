@@ -4,12 +4,12 @@ import React from 'react';
 import MainCard from "./_components/MainCard";
 import CardComponent from "./_components/CardComponent";
 import PopStyles from "./_components/PopStyles";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import FurretHeader from './_components/Header';
 import FurretFooter from './_components/Footer';
 import PopArtWallpaper from './_components/PopArtWallpaper';
 import { useGetAllNews } from '@/hooks/documents/useGetAllNews';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 
 export interface NewsItem {
   id: number;

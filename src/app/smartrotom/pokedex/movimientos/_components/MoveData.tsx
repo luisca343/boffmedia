@@ -1,7 +1,7 @@
 "use client"
 import TypeBadge from "../../entrada/[[...params]]/_components/TypeBadge";
 import { MoveEffect } from "./MoveEffect";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 import { useGetMove } from "@/hooks/pokemon/useGetMove";

@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
 import { GeneralLeaderboard } from "./GeneralLeaderboard"
 import { MedalsLeaderboard } from "./MedalsLeaderboard"
 import { AchievementsLeaderboard } from "./AchievementsLeaderboard"

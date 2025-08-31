@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { Loader2 } from "lucide-react";
 import { getItemName } from "@/lib/intlUtils";
 import { useTranslations } from "next-intl";

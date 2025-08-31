@@ -1,8 +1,8 @@
 "use client"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useGetPokedex } from "@/hooks/pokemon/useGetPokedex"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { InternalLink } from "@/components/nav/Link"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { ChevronLeftIcon } from "@heroicons/react/24/outline"
 
 export default function MenuHeader() {

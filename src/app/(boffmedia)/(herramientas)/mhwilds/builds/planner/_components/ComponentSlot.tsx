@@ -11,7 +11,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui/primitives/tooltip";
 import { 
   EquipmentType, 
   EquipmentComponent,

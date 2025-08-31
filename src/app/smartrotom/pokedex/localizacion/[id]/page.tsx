@@ -1,8 +1,8 @@
 "use client"
 import { PossibleSpawnsSection } from "../../_components/PossibleSpawns";
 import { useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/primitives/switch";
+import { Label } from "@/components/ui/primitives/label";
 import { useTranslations } from "next-intl";
 import { useGetPokemonByBiome } from "@/hooks/pokemon/useGetPokemonByBiome";
 import { 
@@ -10,7 +10,7 @@ import {
     EyeIcon, 
     ArrowLeftIcon 
 } from "@heroicons/react/24/outline";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 
 export default function Localizacion({params} : {params: {id: string}}){
     const { id } = params;

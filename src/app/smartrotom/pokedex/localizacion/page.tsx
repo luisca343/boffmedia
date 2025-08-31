@@ -1,4 +1,4 @@
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService";
 import { getTranslations } from "next-intl/server";
 import { MapPinIcon, ArchiveBoxIcon } from "@heroicons/react/24/outline";

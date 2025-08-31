@@ -21,7 +21,7 @@ import { useBoffSession } from "@/services/useBoffSession";
 import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { AccountSelect } from "../_components/AccountSelect";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/primitives/input";
 import { formatMoney, getActiveAccountBalance } from "../bankUtils";
 import { Search } from "lucide-react";
 import { TransactionSkeleton } from "./_components/TransactionSkeleton";

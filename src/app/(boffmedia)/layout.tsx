@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import OptimizedFicusNav from "@/components/nav/FicusNav";
+import { FicusNav } from "@/components/ui/navigation/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 
 import '../globals.css'
@@ -20,7 +20,7 @@ export default async function RootLayout({
   return (
     <GlobalProviders>
       <ToastContainer position="bottom-right" theme="dark" />
-      <OptimizedFicusNav />
+      <FicusNav />
       <section className="border-solid no-scrollbar flex-1 pt-16 bg-surface-900">
           <section className="flex-1 [&>*]:min-h-[calc(100vh-22rem)] [&>*:not(.main)]:py-8">
             {children}

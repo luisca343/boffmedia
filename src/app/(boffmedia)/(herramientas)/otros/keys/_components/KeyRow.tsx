@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { TableCell, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { TableCell, TableRow } from "@/components/ui/primitives/table";
+import { Badge } from "@/components/ui/primitives/badge";
 import { Gift, Key, ExternalLink, Clock } from "lucide-react";
 import { KeyItem } from "./KeysDataTable";
 

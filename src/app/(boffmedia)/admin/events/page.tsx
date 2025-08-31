@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
 import { Gamepad2, Calendar, Users, Award } from "lucide-react"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"

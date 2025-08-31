@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Save, Share2, RefreshCw, Copy, Download, Link, Camera, ChevronLeft, FolderOpen } from "lucide-react";
 import { LuShield } from "react-icons/lu";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
 import { useTranslations } from "next-intl";
 import { BuildDataWithIds, BuildData, StatsData, Skill } from "@/types/tools/mhwilds";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Alert, AlertDescription } from "@/components/ui/primitives/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/primitives/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "@/components/ui/primitives/dropdown-menu";
 import { exportBuildAsJson, generateShareableLink, saveBuildToLocalStorage } from "../_utils/buildUtils";
 import { SavedBuildsManager } from "./SavedBuildsManager";
 

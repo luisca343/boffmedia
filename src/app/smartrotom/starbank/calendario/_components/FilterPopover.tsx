@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/primitives/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover";
+import { Checkbox } from "@/components/ui/primitives/checkbox";
+import { Label } from "@/components/ui/primitives/label";
 import { Filter } from "lucide-react";
 
 interface FilterPopoverProps {

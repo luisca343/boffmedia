@@ -1,6 +1,6 @@
 "use client";
 
-import { ToolsPageLayout } from "@/components/boffmedia/tools-page/ToolsPageLayout";
+import { ToolsPageLayout } from "@/components/boffmedia/tools/ToolsPageLayout";
 import { Sword, Shield, Hammer, Axe } from "lucide-react";
 import { useTranslations } from "next-intl";
 

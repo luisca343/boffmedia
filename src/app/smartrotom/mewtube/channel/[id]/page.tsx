@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Axios from "axios";
-import { InternalLink } from "@/components/nav/Link";
-import { LoadingSpinner } from "../../_components/LoadingSpinner";
+import { InternalLink } from "@/components/ui/navigation/Link";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import { ChannelHeader } from "../_components/ChannelHeader";
 import { ChannelTabs } from "../_components/ChannelTabs";
 import { ChannelInfo, Video, API_KEY, formatNumber, formatDate } from "../../types";

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
+import { Textarea } from "@/components/ui/primitives/textarea";
 import { NewsItem } from "../page";
 import { useUpdateActiveNews } from "@/hooks/documents/useUpdateActiveNews";
 import { CreateNewsDto } from "@/types/dto/create-news-dto";

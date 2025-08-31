@@ -27,7 +27,7 @@ import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
 import { Transaction } from "@/types/starbank";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
 import { StarBankTransaction } from "@/generated/api";
 

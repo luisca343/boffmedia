@@ -1,12 +1,12 @@
 "use client"
-import { TableBody } from "@/components/ui/table"
+import { TableBody } from "@/components/ui/primitives/table"
 import { BattleStats, EvYields, Pokemon } from '@/types/Pokemon'
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from '../../../_components/PokedexTable'
 import { useTranslations } from "next-intl"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card"
 import { ChartBarIcon, InformationCircleIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { getStatColor, getTotalStatColor, getContrastingTextColor, TOTAL_STAT_COLOR_RANGES } from "@/lib/pokemonColors"
 
 export function StatsTable({pokemon, formIndex}: {pokemon: Pokemon, formIndex: number}) {

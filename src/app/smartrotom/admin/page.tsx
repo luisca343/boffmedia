@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card"
 import { Terminal, Wifi, Shield, Database, AlertTriangle } from "lucide-react"
 import GlitchStyles from './_components/GlitchStyles'
 import MatrixRain from './_components/MatrixRain'

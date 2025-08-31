@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import { EventsService } from '@/services/api/boffmedia/eventsService'
 import { Game } from '@/generated/api'
-import { SectionLoading, SectionError } from '@/components/sections'
+import { SectionLoading, SectionError } from '@/components/boffmedia/sections'
 import { GameHero } from './_components/GameHero'
 import { GameEvents } from './_components/GameEvents'
 

@@ -2,8 +2,8 @@
 
 import { VideoCard } from "./VideoCard";
 import { ChannelCard } from "./ChannelCard";
-import { LoadingSpinner } from "./LoadingSpinner";
 import { Video, formatDate } from "../types";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 
 interface VideoGridProps {
   videos: Video[];

@@ -1,7 +1,7 @@
 "use client";
 
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import React from "react";
-import { LoadingSpinner } from "./LoadingSpinner";
 
 interface BaseContentGridProps {
   children: React.ReactNode;

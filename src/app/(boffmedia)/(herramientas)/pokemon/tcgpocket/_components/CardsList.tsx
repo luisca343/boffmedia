@@ -1,6 +1,6 @@
 "use client"
 
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { TcgCard } from "@/generated/api";

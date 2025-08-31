@@ -1,6 +1,9 @@
 /* generated using openapi-typescript-codegen -- do not edit */
 /* istanbul ignore file */
 /* tslint:disable */
+
+import { ArcadeInventoryItem } from "./ArcadeInventoryItem";
+
 /* eslint-disable */
 export type ArcadeStreak = {
     /**
@@ -30,7 +33,7 @@ export type ArcadeStreak = {
     /**
      * Next reward information
      */
-    nextReward: Record<string, Record<string, any>>;
+    nextReward: ArcadeInventoryItem;
     /**
      * Current active banner
      */

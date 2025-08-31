@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/primitives/input"
 import { PokemonSprite, PokemonSpriteLink } from "./PokemonSprite"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline"

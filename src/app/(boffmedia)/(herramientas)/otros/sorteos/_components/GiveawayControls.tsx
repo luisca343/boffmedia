@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { UserPlus, Upload, Play, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SectionHeader } from "@/components/form";
-import { ActionButton } from "@/components/actions";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
+import { Textarea } from "@/components/ui/primitives/textarea";
+import { Card } from "@/components/ui/primitives/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
+import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
 
 interface GiveawayControlsProps {
   onAddParticipant: (name: string) => void;

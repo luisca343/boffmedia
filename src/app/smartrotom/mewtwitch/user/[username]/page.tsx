@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { InternalLink } from "@/components/nav/Link";
-import { LoadingSpinner } from "../../_components/LoadingSpinner";
+import { InternalLink } from "@/components/ui/navigation/Link";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import { UserHeader } from "../_components/UserHeader";
 import { UserTabs } from "../_components/UserTabs";
 import { TwitchUser, TwitchVideo, TwitchClip, TwitchStream } from "../../types";

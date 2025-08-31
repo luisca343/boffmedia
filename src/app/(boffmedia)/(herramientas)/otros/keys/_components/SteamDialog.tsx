@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-} from "@/components/ui/dialog";
+} from "@/components/ui/primitives/dialog";
 import { 
   DollarSign, 
   Gift, 
@@ -20,10 +20,10 @@ import {
   Star,
   ShoppingBag
 } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
+import { Button } from "@/components/ui/primitives/button";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
+import { Badge } from "@/components/ui/primitives/badge";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SteamGame } from "../_hooks/useFetchSteamData";

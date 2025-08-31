@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Search, History } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
 import { useTranslations } from "next-intl";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { getTheme } from "../themes";
 
 interface BaseSearchHeaderProps {

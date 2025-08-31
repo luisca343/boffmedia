@@ -1,5 +1,5 @@
 "use client";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/components/ui/primitives/progress";
 import { PokemonStats } from "./types";
 import { getStatColor, statToPercentage } from "@/lib/pokemonColors";
 

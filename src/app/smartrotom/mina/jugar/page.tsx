@@ -4,10 +4,10 @@
 import { useEffect, useState } from "react"
 import { generateGame, jugar } from "../utils"
 import {motion, useAnimation}     from 'framer-motion'
-import { AlertDialog, AlertDialogContent, AlertDialogHeader } from "@/components/ui/alert-dialog"
+import { AlertDialog, AlertDialogContent, AlertDialogHeader } from "@/components/ui/primitives/alert-dialog"
 import { BarraEnergia } from "../_components/BarraEnergia"
 import { useRouter } from 'next/navigation';
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { useBoffSession } from "@/services/useBoffSession"
 import { RewardEntry } from "@/types/mina"
 import { MinaService } from "@/services/api/smartrotom/minaService"

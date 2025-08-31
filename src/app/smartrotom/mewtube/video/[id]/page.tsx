@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Axios from "axios";
-import { InternalLink } from "@/components/nav/Link";
-import { LoadingSpinner } from "../../_components/LoadingSpinner";
+import { InternalLink } from "@/components/ui/navigation/Link";
+import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
 import { VideoPlayer } from "../_components/VideoPlayer";
 import { VideoDetails } from "../_components/VideoDetails";
 import { VideoDetails as VideoDetailsType, API_KEY, formatNumber, formatLongDate } from "../../types";

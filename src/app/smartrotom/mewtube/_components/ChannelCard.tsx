@@ -1,6 +1,6 @@
 "use client";
 
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useTranslations } from "next-intl";
 
 interface ChannelCardProps {

@@ -1,7 +1,7 @@
 "use client"
 
 import { Send } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 
 interface SubmitButtonProps {
   onSubmit: () => void

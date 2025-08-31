@@ -1,5 +1,5 @@
 import { Camera, FlipHorizontal, Flashlight, Image } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 
 export default function CameraApp() {
   return (

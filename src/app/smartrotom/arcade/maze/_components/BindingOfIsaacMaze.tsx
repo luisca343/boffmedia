@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect, useMemo } from "react"
 import { generateMaze } from "../utils/mazeGenerator"
 import { Home, Square, Crown } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/primitives/button"
+import { Input } from "@/components/ui/primitives/input"
+import { Label } from "@/components/ui/primitives/label"
 
 type Room = "start" | "room" | "boss" | "wall"
 type Position = [number, number]

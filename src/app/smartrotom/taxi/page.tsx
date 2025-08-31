@@ -15,7 +15,7 @@ import ListView from './components/ListView'
 import LoadingOverlay from './components/LoadingOverlay'
 import SelectedStopDetails from './components/SelectedStopDetails'
 import { WingullService } from '@/services/api/smartrotom/wingullService'
-import { MINIMUM_FARE, POSITION_REFRESH_INTERVAL, PRICE_PER_BLOCK, TAXI_SERVICE_ACCOUNT } from './utils'
+import { MINIMUM_FARE, POSITION_REFRESH_INTERVAL, PRICE_PER_BLOCK, TAXI_SERVICE_ACCOUNT } from './utils/constants'
 
 interface Position {
   x: number

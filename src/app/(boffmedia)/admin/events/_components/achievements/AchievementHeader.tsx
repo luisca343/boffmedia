@@ -1,9 +1,9 @@
-import { CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives/card"
+import { Button } from "@/components/ui/primitives/button"
+import { Input } from "@/components/ui/primitives/input"
+import { Badge } from "@/components/ui/primitives/badge"
 import { Plus, Search, Award } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 
 interface AchievementHeaderProps {

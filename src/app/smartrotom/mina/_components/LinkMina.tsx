@@ -1,5 +1,5 @@
 "use client"
-import { InternalLink } from '@/components/nav/Link';
+import { InternalLink } from '@/components/ui/navigation/Link';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 export function LinkMina({href, children, className} : {href: string, children: any, className?: string}){

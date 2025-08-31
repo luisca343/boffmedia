@@ -1,5 +1,5 @@
-import { InternalLink } from "@/components/nav/Link"
-import { Slider } from "@/components/ui/slider"
+import { InternalLink } from "@/components/ui/navigation/Link"
+import { Slider } from "@/components/ui/primitives/slider"
 import { useState } from "react"
 
 

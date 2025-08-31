@@ -2,7 +2,7 @@
 "use client"
 
 import { useState } from "react"
-import { SectionHeader } from "@/components/sections/SectionHeader"
+import { SectionHeader } from "@/components/boffmedia/sections/SectionHeader"
 import { Sparkles, Star } from "lucide-react"
 import { SuggestEventForm } from "./_components/SuggestEventForm"
 import { SuggestEventSuccess } from "./_components/SuggestEventSuccess"

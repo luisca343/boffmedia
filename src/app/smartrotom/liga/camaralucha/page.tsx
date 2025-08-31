@@ -3,7 +3,7 @@ import { strToDate } from "@/lib/utils";
 import { PokemonSprite } from "../../pokedex/_components/PokemonSprite";
 import { getBattleConfig } from "../utils";
 import { PokemonData } from "../_types/Pokemon";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useBoffSession } from "@/services/useBoffSession";
 
 export default function CamaraLucha(){

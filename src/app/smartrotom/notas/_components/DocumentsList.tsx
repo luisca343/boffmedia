@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react"
 import { strToDate } from "@/lib/utils"
 import { useGetDocuments } from "../_hooks/useGetDocuments"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/primitives/button"
 import { FileText, PlusCircle } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Input } from "@/components/ui/primitives/input"
+import { ScrollArea } from "@/components/ui/primitives/scroll-area"
 import dynamic from "next/dynamic"
 import { useGetDocument } from "@/hooks/documents/useGetDocument"
 
 const CustomEditor = dynamic( () => {
-    return import( '@/components/ckeditor/TestEditor' );
+    return import( '@/components/common/ckeditor/TestEditor' );
   }, { ssr: false } );
 
   export function DocumentsList() {

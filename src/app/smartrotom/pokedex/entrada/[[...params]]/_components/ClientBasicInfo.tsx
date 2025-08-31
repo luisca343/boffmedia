@@ -1,16 +1,16 @@
 "use client"
 
 import type { Abilities, Pokemon } from "@/types/Pokemon"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
 import TypeBadge from "./TypeBadge"
 import { useTranslations } from "next-intl"
 import { InformationCircleIcon, StarIcon } from "@heroicons/react/24/outline"
 import { getDisplayStatus } from "../../../dexUtils"
-import { Badge } from "@/components/ui/badge"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Badge } from "@/components/ui/primitives/badge"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
 import AbilityDataElement from "../../../habilidades/_components/AbilityData"
-import { InternalLink } from "@/components/nav/Link"
+import { InternalLink } from "@/components/ui/navigation/Link"
 
 interface BasicInfoProps {
   pokemon: Pokemon

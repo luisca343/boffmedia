@@ -1,7 +1,7 @@
 import { TypeBadgeSmall } from "@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/primitives/tabs";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { Pokemon } from "@pkmn/client";
 import { StatID } from "@pkmn/data";
 import { useState } from "react";

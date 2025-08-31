@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/primitives/calendar";
+import { Button } from "@/components/ui/primitives/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover";
 import { cn } from "@/lib/utils";
 import { CalendarIcon, ChevronDown } from "lucide-react";
 

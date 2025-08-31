@@ -14,13 +14,13 @@ import {
   SelectLabel,
   SelectTrigger, 
   SelectValue 
-} from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "@/components/ui/primitives/select"
+import { Button } from "@/components/ui/primitives/button"
+import { Switch } from "@/components/ui/primitives/switch"
+import { Label } from "@/components/ui/primitives/label"
+import { Input } from "@/components/ui/primitives/input"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
 import { ArrowLeft, Plus, X } from "lucide-react"
 import Link from "next/link"
 

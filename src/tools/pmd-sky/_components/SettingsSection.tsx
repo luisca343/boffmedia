@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { SectionHeader } from "@/components/form";
+import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
 import { EuropeanVersionToggle } from "./EuropeanVersionToggle";
 
 interface SettingsSectionProps {

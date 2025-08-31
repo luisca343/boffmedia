@@ -1,5 +1,5 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select";
+import { Badge } from "@/components/ui/primitives/badge";
 import { Filter, Activity, Gamepad2 } from "lucide-react";
 
 interface GameFiltersProps {

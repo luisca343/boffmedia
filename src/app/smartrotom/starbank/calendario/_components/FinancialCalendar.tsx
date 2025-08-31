@@ -15,7 +15,7 @@ import {
   getDay 
 } from "date-fns";
 import { es } from "date-fns/locale";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/primitives/button";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";

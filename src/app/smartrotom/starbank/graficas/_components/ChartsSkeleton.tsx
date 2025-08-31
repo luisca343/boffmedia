@@ -1,5 +1,5 @@
 import { BankSection, BankSectionHeader, BankSectionContent } from "../../_components/BankSection";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/primitives/skeleton";
 
 export function ChartsSkeleton() {
   return (

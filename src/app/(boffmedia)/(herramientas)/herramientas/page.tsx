@@ -10,9 +10,9 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
 import { Search, Gamepad2, ChevronRight, SwordIcon, BarChart, Settings, Zap, Users, Trophy } from "lucide-react";
 import Image from "next/image";
 

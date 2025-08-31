@@ -1,7 +1,7 @@
 "use client";
 
 import { User } from "lucide-react";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useTranslations } from "next-intl";
 import { getTheme } from "../themes";
 

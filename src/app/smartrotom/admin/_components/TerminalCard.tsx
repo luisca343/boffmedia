@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives/card";
 import TerminalHeader from './TerminalHeader';
 
 interface TerminalCardProps {

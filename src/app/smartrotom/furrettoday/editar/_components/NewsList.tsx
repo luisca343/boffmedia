@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Input } from '@/components/ui/input'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/primitives/input'
+import { Checkbox } from '@/components/ui/primitives/checkbox'
 import { FileText, Star, Eye } from 'lucide-react'
 
 interface NewsItem {

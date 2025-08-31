@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components/ui/primitives/card"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import type { Achievement } from "@/types/events"
 import { AchievementHeader } from "./AchievementHeader"

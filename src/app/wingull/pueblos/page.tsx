@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { MapPin, Compass, Search, ChevronRight } from "lucide-react"
 import { WingullService } from "@/services/api/smartrotom/wingullService"
-import { Input } from "@/components/ui/input"
+import { Input } from "@/components/ui/primitives/input"
 import Link from "next/link"
 import { BasicCard } from "./[pueblo]/_components/shared/cards/BasicCard"
 import { SectionTemplate } from "./[pueblo]/_components/shared/section/SectionTemplate"

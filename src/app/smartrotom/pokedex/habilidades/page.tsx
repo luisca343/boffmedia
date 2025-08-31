@@ -1,9 +1,9 @@
 "use client"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { useTranslations } from "next-intl";
 import { useGetAllAbilities } from "@/hooks/pokemon/useGetAllAbilities";
 import { AbilityCount } from "@/services/api/smartrotom/pokemonService";
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { BookOpenIcon, SparklesIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import AbilityDataElement from "./_components/AbilityData";

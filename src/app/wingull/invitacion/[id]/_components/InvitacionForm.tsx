@@ -7,11 +7,11 @@ import { z } from "zod"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { wingullPOST } from "@/services/boffAPI"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
+import { Input } from "@/components/ui/primitives/input"
+import { Button } from "@/components/ui/primitives/button"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/primitives/card"
+import { Separator } from "@/components/ui/primitives/separator"
 import { Mail, Paperclip, User, AtSign, Key, Send, Star, Reply, ReplyAll, Forward } from 'lucide-react'
 import { BackgroundDecorations } from '../../../_components/BackgroundDecorations'
 

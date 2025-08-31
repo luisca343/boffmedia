@@ -1,6 +1,6 @@
 "use client";
 
-import { InternalLink } from "@/components/nav/Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { useState, useEffect } from "react";
 import { LightbulbIcon } from "lucide-react";
 

@@ -22,7 +22,7 @@ export class DocumentsService {
    * Get a document by ID
    */
   static getDocument(id: number) {
-    return rotomGET<Document>(`/documents/document${id}`);
+    return rotomGET<Document>(`/documents/document/${id}`);
   }
   
   /**

@@ -6,10 +6,10 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/components/ui/primitives/dialog";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { Trash2, Clock, FileDown, Search, Loader2, FolderOpen } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { BuildDataWithIds } from "@/types/tools/mhwilds";

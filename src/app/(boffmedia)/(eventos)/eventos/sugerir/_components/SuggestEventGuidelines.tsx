@@ -1,7 +1,7 @@
 "use client"
 
 import { Star, Trophy, Users, Clock, Sparkles } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/primitives/card"
 
 export function SuggestEventGuidelines() {
   const guidelines = [

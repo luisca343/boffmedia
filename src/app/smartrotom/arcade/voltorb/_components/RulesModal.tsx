@@ -4,8 +4,8 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
+} from "@/components/ui/primitives/dialog";
+import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { RainbowText } from "../../_components/RainbowText";
 
 interface RulesModalProps {

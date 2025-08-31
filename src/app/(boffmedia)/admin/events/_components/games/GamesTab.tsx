@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
+import { Card } from "@/components/ui/primitives/card"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import type { Game } from "@/types/events"
 import { GameHeader } from "./GameHeader"

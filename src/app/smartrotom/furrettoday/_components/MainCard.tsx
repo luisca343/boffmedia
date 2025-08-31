@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { InternalLink } from "@/components/nav/Link";
+import { Card, CardContent } from "@/components/ui/primitives/card";
+import { Button } from "@/components/ui/primitives/button";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { NewsItem } from "../page";
 import { getPreview } from "../_util";
 
