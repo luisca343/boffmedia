@@ -1,8 +1,8 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
-import { PlayerService } from "@/services/api/smartrotom/playerService"
+import { WingullService } from "@/services/api/smartrotom/wingullService"
 
 export function useGetPlayerTeam(uuid: string) {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(PlayerService.getTeam, uuid)
+  const { data, error, isLoading, refetch, setData } = useRotomRequest(WingullService.getTeam, uuid)
 
   return {
     playerTeam: data,

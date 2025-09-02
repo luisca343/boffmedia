@@ -1,9 +1,9 @@
 import type { ActiveTeam as ActiveTeamType } from "@/types/Pokemon"
 import { PokemonSprite } from "../../pokedex/_components/PokemonSprite"
 import { useTranslations } from "next-intl"
-import { Pokemon } from "@/services/api/smartrotom/playerService";
+import { PokemonW } from "@/generated/api";
 
-export default function ActiveTeam({ team, className }: { team: Pokemon[]; className?: string }) {
+export default function ActiveTeam({ team, className }: { team: PokemonW[]; className?: string }) {
   const t = useTranslations("pokedex")
 
   return (
