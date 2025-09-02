@@ -172,18 +172,18 @@ export const usePokemonMovement = ({
 
     const newTeamData = [...teamData]
     
-    // If destination has a Pokemon, swap them
-    if (newTeamData[destination.index] && newTeamData[source.index]) {
-      const temp = newTeamData[source.index]
-      newTeamData[source.index] = newTeamData[destination.index]
-      newTeamData[destination.index] = temp
-      setTeamData(newTeamData)
-    } else {
-      // Simple move to empty slot
-      const [movedPokemon] = newTeamData.splice(source.index, 1)
-      newTeamData.splice(destination.index, 0, movedPokemon)
-      setTeamData(newTeamData)
-    }
+    // Always do a direct position swap/move without shifting other elements
+    const sourcePokemon = newTeamData[source.index]
+    const destinationPokemon = newTeamData[destination.index]
+    
+    // Place source Pokemon at destination
+    newTeamData[destination.index] = sourcePokemon
+    
+    // If destination had a Pokemon, place it at source position
+    // If destination was empty, source position becomes empty
+    newTeamData[source.index] = destinationPokemon || null
+    
+    setTeamData(newTeamData)
   }, [teamData, setTeamData])
 
   // Main move handler
