@@ -20,8 +20,9 @@ export default function BoxSelectionPopup({
 
   const getBoxStatus = (count: number) => {
     if (count === 0) return { color: 'from-gray-600 to-gray-700', text: 'Vacía' }
-    if (count < 10) return { color: 'from-green-600 to-green-700', text: 'Pocos' }
-    if (count < 20) return { color: 'from-yellow-600 to-yellow-700', text: 'Media' }
+    if (count < 10) return { color: 'from-green-600 to-green-700', text: 'Poco llena' }
+    if (count < 20) return { color: 'from-yellow-600 to-yellow-700', text: 'Medio llena' }
+    if (count < 30) return { color: 'from-orange-600 to-orange-700', text: 'Casi llena' }
     return { color: 'from-red-600 to-red-700', text: 'Llena' }
   }
 

@@ -125,14 +125,14 @@ export default function BattleTeamsPanel({
 
   if (!battleTeamsData) {
     return (
-      <div className="bg-gradient-to-br from-yellow-800/20 via-orange-800/20 to-red-800/20 backdrop-blur-sm rounded-b-2xl rounded-tl-2xl border border-yellow-400/30 border-t-0 shadow-2xl h-full flex items-center justify-center">
+      <div className="bg-gradient-to-br from-yellow-800/20 via-orange-800/20 to-red-800/20 backdrop-blur-sm rounded-b-2xl border border-yellow-400/30 border-t-0 shadow-2xl h-full flex items-center justify-center">
         <p className="text-yellow-300">Cargando equipos de batalla...</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-gradient-to-br from-yellow-800/20 via-orange-800/20 to-red-800/20 backdrop-blur-sm rounded-b-2xl rounded-tl-2xl border border-yellow-400/30 border-t-0 shadow-2xl h-full flex flex-col">
+    <div className="bg-gradient-to-br from-yellow-800/20 via-orange-800/20 to-red-800/20 backdrop-blur-sm rounded-b-2xl border border-yellow-400/30 border-t-0 shadow-2xl h-full flex flex-col">
       {/* Header */}
       <div className="bg-gradient-to-r from-yellow-700/50 to-orange-700/50 p-3 border-b border-yellow-400/30 flex-shrink-0">
         <div className="flex items-center justify-between">

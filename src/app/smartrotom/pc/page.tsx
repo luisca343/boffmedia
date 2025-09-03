@@ -10,20 +10,21 @@ import 'react-toastify/dist/ReactToastify.css'
 import { ROWS_PER_BOX, COLS_PER_ROW } from './utils/constants'
 import { useGetBattleTeams } from '@/hooks/player/useGetBattleTeams'
 import { usePCManagement } from './hooks/usePCManagement'
-import PCHeader from './components/PCHeader'
-import BoxNavigation from './components/BoxNavigation'
-import TeamPanel from './components/TeamPanel'
-import BattleTeamsPanel from './components/BattleTeamsPanel'
-import PokemonGrid from './components/PokemonGrid'
-import PokemonDetails from './components/PokemonDetails'
-import LoadingOverlay from './components/LoadingOverlay'
+import PCHeader from './components/layout/PCHeader'
+import BoxNavigation from './components/box/BoxNavigation'
+import TeamPanel from './components/team/TeamPanel'
+import BattleTeamsPanel from './components/team/BattleTeamsPanel'
+import DualBoxGrid from './components/box/DualBoxGrid'
+import PokemonDetails from './components/details/PokemonDetails'
+import LoadingOverlay from './components/layout/LoadingOverlay'
 
 export default function PCPage() {
   const { session } = useBoffSession()
   const [pcData, setPcData] = useState<PCPokemon[]>([])
-  const [teamData, setTeamData] = useState<PokemonW[]>([])
+  const [teamData, setTeamData] = useState<(PokemonW | null)[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'team' | 'battleTeams'>('team')
+  const [showBoxSelection, setShowBoxSelection] = useState(false)
 
   const uuid = session?.user?.smartRotomUser?.uuid || ''
   const { battleTeamsData, refetch: refetchBattleTeams } = useGetBattleTeams(uuid)
@@ -31,14 +32,19 @@ export default function PCPage() {
   // Use the PC management hook
   const {
     currentBox,
+    secondaryBox,
+    isDualBoxMode,
     boxes,
     totalBoxes,
     currentBoxData,
+    secondaryBoxData,
     selectedPokemon,
     selectedTeamPokemon,
     handlePokemonClick,
     handleTeamPokemonClick,
     handleBoxChange,
+    handleSecondaryBoxChange,
+    toggleDualBoxMode,
     handlePokemonMove,
     clearSelections
   } = usePCManagement({
@@ -114,21 +120,83 @@ export default function PCPage() {
     }
   }
 
+  // Navigation functions for PokemonDetails
+  const handleNavigatePrevious = () => {
+    if (!selectedPokemon) return
+    
+    const currentBoxPokemon = currentBoxData.pokemon.filter(p => p !== null) as PCPokemon[]
+    const currentIndex = currentBoxPokemon.findIndex(p => 
+      p.box === selectedPokemon.box && p.index === selectedPokemon.index
+    )
+    
+    // Circular navigation: if at first, go to last
+    if (currentIndex <= 0) {
+      const lastPokemon = currentBoxPokemon[currentBoxPokemon.length - 1]
+      handlePokemonClick(lastPokemon)
+    } else {
+      const previousPokemon = currentBoxPokemon[currentIndex - 1]
+      handlePokemonClick(previousPokemon)
+    }
+  }
+
+  const handleNavigateNext = () => {
+    if (!selectedPokemon) return
+    
+    const currentBoxPokemon = currentBoxData.pokemon.filter(p => p !== null) as PCPokemon[]
+    const currentIndex = currentBoxPokemon.findIndex(p => 
+      p.box === selectedPokemon.box && p.index === selectedPokemon.index
+    )
+    
+    // Circular navigation: if at last, go to first
+    if (currentIndex >= currentBoxPokemon.length - 1) {
+      const firstPokemon = currentBoxPokemon[0]
+      handlePokemonClick(firstPokemon)
+    } else {
+      const nextPokemon = currentBoxPokemon[currentIndex + 1]
+      handlePokemonClick(nextPokemon)
+    }
+  }
+
+  const canNavigatePrevious = () => {
+    if (!selectedPokemon) return false
+    const currentBoxPokemon = currentBoxData.pokemon.filter(p => p !== null) as PCPokemon[]
+    return currentBoxPokemon.length > 1 // Can navigate if there's more than one Pokémon
+  }
+
+  const canNavigateNext = () => {
+    if (!selectedPokemon) return false
+    const currentBoxPokemon = currentBoxData.pokemon.filter(p => p !== null) as PCPokemon[]
+    return currentBoxPokemon.length > 1 // Can navigate if there's more than one Pokémon
+  }
+
   return (
-    <div className="relative h-full w-full bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 overflow-hidden flex flex-col">
+    <div className="relative h-full w-full bg-gradient-to-br from-indigo-900 via-purple-600 to-indigo-900 backdrop-blur-sm overflow-hidden flex flex-col">
       <PCHeader 
         currentBox={currentBox}
         totalBoxes={totalBoxes}
         pokemonCount={pcData.length}
         teamCount={teamData.length}
+        isDualBoxMode={isDualBoxMode}
         onRefresh={fetchAllData}
+        onShowBoxSelection={() => setShowBoxSelection(true)}
+        onToggleDualBoxMode={toggleDualBoxMode}
       />
       
       <BoxNavigation
         currentBox={currentBox}
+        secondaryBox={secondaryBox}
+        isDualBoxMode={isDualBoxMode}
         totalBoxes={totalBoxes}
         boxes={boxes}
         onBoxChange={handleBoxChange}
+        onSecondaryBoxChange={handleSecondaryBoxChange}
+        selectedPokemon={selectedPokemon}
+        onPokemonClick={handlePokemonClick}
+        onPokemonMove={handlePokemonMove}
+        battleTeams={battleTeamsData?.teams}
+        onAddToBattleTeam={handleAddToBattleTeam}
+        showBoxSelection={showBoxSelection}
+        onShowBoxSelection={setShowBoxSelection}
       />
 
       <div className="flex-1 flex gap-4 p-4 overflow-hidden min-h-0">
@@ -179,12 +247,15 @@ export default function PCPage() {
 
         {/* PC Grid */}
         <div className="flex-1 min-w-0 min-h-0">
-          <PokemonGrid 
-            boxData={currentBoxData}
+          <DualBoxGrid 
+            primaryBoxData={currentBoxData}
+            secondaryBoxData={isDualBoxMode ? secondaryBoxData : null}
             selectedPokemon={selectedPokemon}
             onPokemonClick={handlePokemonClick}
             onPokemonMove={handlePokemonMove}
-            currentBox={currentBox}
+            totalBoxes={totalBoxes}
+            onPrimaryBoxChange={handleBoxChange}
+            onSecondaryBoxChange={handleSecondaryBoxChange}
             rows={ROWS_PER_BOX}
             cols={COLS_PER_ROW}
             battleTeams={battleTeamsData?.teams}
@@ -198,6 +269,10 @@ export default function PCPage() {
           pokemon={selectedPokemon}
           teamPokemon={selectedTeamPokemon}
           onClose={clearSelections}
+          onNavigatePrevious={handleNavigatePrevious}
+          onNavigateNext={handleNavigateNext}
+          canNavigatePrevious={canNavigatePrevious()}
+          canNavigateNext={canNavigateNext()}
         />
       )}
 

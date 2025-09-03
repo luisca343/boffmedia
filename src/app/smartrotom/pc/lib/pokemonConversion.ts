@@ -6,19 +6,7 @@ import { PokemonW } from '@/generated/api'
  */
 export const convertPCToTeam = (pcPokemon: PCPokemon): PokemonW => {
   return {
-    dex: pcPokemon.pokemon.dex,
-    nature: pcPokemon.pokemon.nature,
-    species: pcPokemon.pokemon.species,
-    form: pcPokemon.pokemon.form || undefined,
-    palette: pcPokemon.pokemon.palette || undefined,
-    name: pcPokemon.pokemon.name,
-    level: pcPokemon.pokemon.level,
-    item: pcPokemon.pokemon.item,
-    ability: pcPokemon.pokemon.ability,
-    moves: pcPokemon.pokemon.moves.filter(move => move !== null) as string[],
-    ivs: pcPokemon.pokemon.ivs.map(iv => iv.toString()),
-    evs: pcPokemon.pokemon.evs.map(ev => ev.toString()),
-    stats: pcPokemon.pokemon.stats.map(stat => stat.toString())
+    ...pcPokemon.pokemon
   }
 }
 
@@ -26,26 +14,13 @@ export const convertPCToTeam = (pcPokemon: PCPokemon): PokemonW => {
  * Converts a Team Pokemon to a PC Pokemon format
  */
 export const convertTeamToPC = (
-  teamPokemon: PokemonW,
+  teamPokemon: PokemonW ,
   index: number,
   boxNumber: number
 ): PCPokemon => {
   return {
     pokemon: {
-      dex: teamPokemon.dex,
-      nature: teamPokemon.nature,
-      species: teamPokemon.species,
-      form: teamPokemon.form || '',
-      palette: teamPokemon.palette || 'none',
-      name: teamPokemon.name,
-      level: teamPokemon.level,
-      item: teamPokemon.item,
-      ability: teamPokemon.ability,
-      moves: [...teamPokemon.moves, null, null, null, null].slice(0, 4) as (string | null)[],
-      ivs: teamPokemon.ivs.map(iv => parseInt(iv)),
-      evs: teamPokemon.evs.map(ev => parseInt(ev)),
-      stats: teamPokemon.stats.map(stat => parseInt(stat)),
-      types: []
+     ...teamPokemon
     },
     index,
     box: boxNumber

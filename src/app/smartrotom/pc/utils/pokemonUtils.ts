@@ -1,11 +1,6 @@
 import { PokemonW } from '@/generated/api'
 
-export function createPokemonSpec(pokemon: {
-  species: string
-  form?: string
-  palette: string
-  level: number
-}): string {
+export function createPokemonSpec(pokemon: PokemonW): string {
   const { species, form, palette, level } = pokemon
   const isShiny = palette === 'shiny'
   const formPart = form ? ` f:${form}` : ''

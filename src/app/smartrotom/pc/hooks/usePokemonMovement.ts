@@ -13,9 +13,9 @@ import {
 interface UsePokemonMovementProps {
   uuid: string
   pcData: PCPokemon[]
-  teamData: PokemonW[]
+  teamData: (PokemonW | null)[]
   setPcData: (data: PCPokemon[]) => void
-  setTeamData: (data: PokemonW[]) => void
+  setTeamData: (data: (PokemonW | null)[]) => void
 }
 
 export const usePokemonMovement = ({
@@ -75,9 +75,12 @@ export const usePokemonMovement = ({
       newTeamData[destination.index] = teamPokemon
       
       // Add replaced Pokemon back to PC at the source location
-      const replacedPcPokemon = convertTeamToPC(replacedPokemon, source.index, source.boxNumber!)
-      
-      setPcData([...newPcData, replacedPcPokemon])
+      if (replacedPokemon) {
+        const replacedPcPokemon = convertTeamToPC(replacedPokemon, source.index, source.boxNumber!)
+        setPcData([...newPcData, replacedPcPokemon])
+      } else {
+        setPcData([...newPcData])
+      }
       setTeamData(newTeamData)
     } else {
       // Add to team if there's space
@@ -120,9 +123,9 @@ export const usePokemonMovement = ({
         return
       }
       
-      // Move to empty slot
+      // Move to empty slot - FIXED: Set slot to null instead of removing
       const newTeamData = [...teamData]
-      newTeamData.splice(source.index, 1)
+      newTeamData[source.index] = null  // Keep the slot but make it empty
       setTeamData(newTeamData)
       
       const newPcPokemon = convertTeamToPC(sourcePokemon, destination.index, destination.boxNumber!)

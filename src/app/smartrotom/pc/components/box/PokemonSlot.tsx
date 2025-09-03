@@ -2,11 +2,12 @@ import { useState } from 'react'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { PokemonImage } from '@/lib/PokemonImage'
 import { FaStar, FaMars, FaVenus, FaTrophy, FaPlus } from 'react-icons/fa'
-import { createPokemonSpec } from '../utils/pokemonUtils'
+import { createPokemonSpec } from '../../utils/pokemonUtils'
 import { BattleTeam } from '@/types/dto/battle-team.dto'
-import { useBoxSlotDragDrop } from '../hooks/useDragDrop'
-import { useBattleTeamContextMenu } from '../hooks/useContextMenu'
-import { DragSource, DragDestination } from '../types/dragDrop'
+import { useBoxSlotDragDrop } from '../../hooks/useDragDrop'
+import { useBattleTeamContextMenu } from '../../hooks/useContextMenu'
+import { DragSource, DragDestination } from '../../types/dragDrop'
+import { PokemonItemImage } from '@/components/common/pokemon/PokemonItemImage'
 
 interface PokemonSlotProps {
   pokemon: PCPokemon | null;
@@ -93,9 +94,6 @@ export default function PokemonSlot({
           <div className="text-gray-500 group-hover:text-gray-400 transition-colors">
             <div className="w-8 h-8 border-2 border-dashed border-current rounded-full opacity-50"></div>
           </div>
-          <div className="absolute bottom-1 right-1 bg-gray-700/80 text-gray-300 text-xs px-1.5 py-0.5 rounded">
-            {index + 1}
-          </div>
         </div>
       </div>
     )
@@ -104,9 +102,9 @@ export default function PokemonSlot({
   const isShiny = pokemon.pokemon.palette === 'shiny'
 
   return (
-    <div className="relative w-20 h-20 sm:w-24 sm:h-24">
+    <div className="relative w-20 h-20 sm:w-24 sm:h-24 ">
       <div 
-        className={`absolute inset-0 bg-surface-50/20 order-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg ${
+        className={`absolute inset-0 bg-surface-50/20 hover:bg-surface-50/30 order-2 rounded-xl cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-lg ${
           isDragOver
             ? 'border-green-400 bg-green-400/20 scale-105 shadow-green-400/50 shadow-lg'
             : isSelected 
@@ -125,7 +123,7 @@ export default function PokemonSlot({
         <div className="absolute inset-1 flex items-center justify-center">
           <PokemonImage
             itemId={createPokemonSpec(pokemon.pokemon)}
-            size={48}
+            size={64}
           />
         </div>
 
@@ -141,15 +139,26 @@ export default function PokemonSlot({
           {getGenderIcon(pokemon.pokemon.gender)}
         </div>
 
+        <div className="absolute bottom-1 left-2">
+          {pokemon.pokemon.item != 'item.minecraft.air' && (
+            <PokemonItemImage itemId={pokemon.pokemon.item} size={24} />
+          )}
+        </div>
+
+
         {/* Level */}
+        {/*
         <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded font-bold">
           {pokemon.pokemon.level}
         </div>
+         */}
 
         {/* Index */}
+        {/*
         <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-1.5 py-0.5 rounded">
           {index + 1}
         </div>
+         */}
 
         {/* Selected overlay */}
         {isSelected && (

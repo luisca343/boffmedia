@@ -1,11 +1,16 @@
 import { FaDesktop, FaSyncAlt, FaDatabase } from 'react-icons/fa'
+import { LuGrid3X3 } from 'react-icons/lu'
+import { FaExchangeAlt } from 'react-icons/fa'
 
 interface PCHeaderProps {
   currentBox: number;
   totalBoxes: number;
   pokemonCount: number;
   teamCount: number;
+  isDualBoxMode?: boolean;
   onRefresh: () => void;
+  onShowBoxSelection?: () => void;
+  onToggleDualBoxMode?: () => void;
 }
 
 export default function PCHeader({ 
@@ -13,10 +18,13 @@ export default function PCHeader({
   totalBoxes, 
   pokemonCount,
   teamCount, 
-  onRefresh 
+  isDualBoxMode = false,
+  onRefresh,
+  onShowBoxSelection,
+  onToggleDualBoxMode
 }: PCHeaderProps) {
   return (
-    <div className="bg-gradient-to-r from-purple-800/90 via-indigo-800/90 to-blue-800/90 backdrop-blur-md border-b-2 border-purple-500/50 shadow-xl">
+    <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-indigo-900 backdrop-blur-md border-b-2 border-purple-500/50 shadow-xl">
       <div className="px-6 py-4">
         <div className="flex justify-between items-center flex-wrap gap-4">
           <div className="flex items-center space-x-4">
@@ -34,6 +42,7 @@ export default function PCHeader({
           </div>
           
           <div className="flex items-center space-x-4">
+            {/* 
             <div className="flex items-center bg-indigo-700/50 px-4 py-2 rounded-xl border border-indigo-400/30">
               <FaDatabase className="text-indigo-300 mr-2" />
               <div className="text-center">
@@ -57,6 +66,37 @@ export default function PCHeader({
                 <div className="text-blue-200 text-xs">Caja Actual</div>
               </div>
             </div>
+            */}
+            
+            {/* Dual box mode toggle */}
+            {onToggleDualBoxMode && (
+              <button
+                onClick={onToggleDualBoxMode}
+                className={`px-4 py-2 rounded-xl flex items-center space-x-2 border transition-all duration-200 hover:scale-105 shadow-lg ${
+                  isDualBoxMode 
+                    ? 'bg-green-600 hover:bg-green-700 text-white border-green-400/30' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-400/30'
+                }`}
+                title={isDualBoxMode ? "Cambiar a modo caja única" : "Activar modo dual caja"}
+              >
+                <FaExchangeAlt />
+                <span className="hidden md:inline">
+                  {isDualBoxMode ? "Una Caja" : "Dos Cajas"}
+                </span>
+              </button>
+            )}
+
+            {/* Box selection button */}
+            {onShowBoxSelection && (
+              <button
+                onClick={onShowBoxSelection}
+                className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-xl flex items-center space-x-2 border border-yellow-400/30 transition-all duration-200 hover:scale-105 shadow-lg"
+                title="Ver todas las cajas"
+              >
+                <LuGrid3X3 />
+                <span className="hidden md:inline">Ver Todas</span>
+              </button>
+            )}
             
             <button
               onClick={onRefresh}
@@ -64,7 +104,7 @@ export default function PCHeader({
               title="Actualizar datos del PC"
             >
               <FaSyncAlt className="text-sm" />
-              <span className="hidden sm:inline">Actualizar</span>
+              <span className="hidden md:inline">Actualizar</span>
             </button>
           </div>
         </div>

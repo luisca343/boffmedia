@@ -1,21 +1,7 @@
+import { PokemonW } from "@/generated/api";
+
 export interface PCPokemon {
-  pokemon: {
-    dex: number;
-    nature: string;
-    species: string;
-    form: string;
-    palette: string;
-    name: string;
-    level: number;
-    item: string;
-    ability: string;
-    moves: (string | null)[];
-    ivs: number[];
-    evs: number[];
-    stats: number[];
-    gender?: string;
-    types?: string[];
-  };
+  pokemon: PokemonW;
   index: number;
   box: number;
 }

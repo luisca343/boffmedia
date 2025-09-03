@@ -44,7 +44,7 @@ export default function ActiveTeam({ team, className }: { team: PokemonW[]; clas
               <div className="space-y-1 text-sm">
                 {pokemon.moves.map((move, idx) => (
                   <p key={idx} className="font-medium">
-                    {move ? t(`attack_${move.toLowerCase().replace(" ", "_")}`) : "-"}
+                    {move ? t(`attack_${move.name.toLowerCase().replace(" ", "_")}`) : "-"}
                   </p>
                 ))}
               </div>
