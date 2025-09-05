@@ -17,6 +17,9 @@ import BattleTeamsPanel from './components/team/BattleTeamsPanel'
 import DualBoxGrid from './components/box/DualBoxGrid'
 import PokemonDetails from './components/details/PokemonDetails'
 import LoadingOverlay from './components/layout/LoadingOverlay'
+import PlayOnMountAudio from '@components/common/PlayOnMountAudio'
+import PlayOnUnmountAudio from '@components/common/PlayOnUnmountAudio'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function PCPage() {
   const { session } = useBoffSession()
@@ -169,84 +172,169 @@ export default function PCPage() {
     return currentBoxPokemon.length > 1 // Can navigate if there's more than one Pokémon
   }
 
-  return (
-    <div className="relative h-full w-full bg-gradient-to-br from-indigo-900 via-purple-600 to-indigo-900 backdrop-blur-sm overflow-hidden flex flex-col">
-      <PCHeader 
-        currentBox={currentBox}
-        totalBoxes={totalBoxes}
-        pokemonCount={pcData.length}
-        teamCount={teamData.length}
-        isDualBoxMode={isDualBoxMode}
-        onRefresh={fetchAllData}
-        onShowBoxSelection={() => setShowBoxSelection(true)}
-        onToggleDualBoxMode={toggleDualBoxMode}
-      />
-      
-      <BoxNavigation
-        currentBox={currentBox}
-        secondaryBox={secondaryBox}
-        isDualBoxMode={isDualBoxMode}
-        totalBoxes={totalBoxes}
-        boxes={boxes}
-        onBoxChange={handleBoxChange}
-        onSecondaryBoxChange={handleSecondaryBoxChange}
-        selectedPokemon={selectedPokemon}
-        onPokemonClick={handlePokemonClick}
-        onPokemonMove={handlePokemonMove}
-        battleTeams={battleTeamsData?.teams}
-        onAddToBattleTeam={handleAddToBattleTeam}
-        showBoxSelection={showBoxSelection}
-        onShowBoxSelection={setShowBoxSelection}
-      />
+  const pageVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        staggerChildren: 0.1
+      }
+    }
+  }
 
-      <div className="flex-1 flex gap-4 p-4 overflow-hidden min-h-0">
+  const sectionVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.3 }
+    }
+  }
+
+  const tabVariants = {
+    active: {
+      scale: 1,
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+      transition: { duration: 0.2 }
+    },
+    inactive: {
+      scale: 0.98,
+      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+      transition: { duration: 0.2 }
+    }
+  }
+
+  return (
+    <motion.div 
+      className="relative h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 backdrop-blur-sm overflow-hidden flex flex-col"
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      {/* Subtle animated background pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-700/10 via-transparent to-transparent pointer-events-none" />
+      
+      <PlayOnMountAudio src="/smartrotom/audio/apps/pc/TURN_ON.wav" volume={0.25} />
+      <PlayOnUnmountAudio src="/smartrotom/audio/apps/pc/TURN_OFF.wav" volume={0.25} />
+      
+      <motion.div variants={sectionVariants}>
+        <PCHeader 
+          currentBox={currentBox}
+          totalBoxes={totalBoxes}
+          pokemonCount={pcData.length}
+          teamCount={teamData.length}
+          isDualBoxMode={isDualBoxMode}
+          onRefresh={fetchAllData}
+          onShowBoxSelection={() => setShowBoxSelection(true)}
+          onToggleDualBoxMode={toggleDualBoxMode}
+        />
+      </motion.div>
+      
+      <motion.div variants={sectionVariants}>
+        <BoxNavigation
+          currentBox={currentBox}
+          secondaryBox={secondaryBox}
+          isDualBoxMode={isDualBoxMode}
+          totalBoxes={totalBoxes}
+          boxes={boxes}
+          onBoxChange={handleBoxChange}
+          onSecondaryBoxChange={handleSecondaryBoxChange}
+          selectedPokemon={selectedPokemon}
+          onPokemonClick={handlePokemonClick}
+          onPokemonMove={handlePokemonMove}
+          battleTeams={battleTeamsData?.teams}
+          onAddToBattleTeam={handleAddToBattleTeam}
+          showBoxSelection={showBoxSelection}
+          onShowBoxSelection={setShowBoxSelection}
+        />
+      </motion.div>
+
+      <motion.div 
+        className="flex-1 flex gap-4 p-4 overflow-hidden min-h-0"
+        variants={sectionVariants}
+      >
         {/* Side Panel - Team or Battle Teams */}
         <div className="w-80 flex-shrink-0 min-h-0 flex flex-col">
-          {/* Tab Buttons */}
-          <div className="bg-black/20 rounded-t-2xl border border-purple-400/30 flex overflow-hidden mb-0 flex-shrink-0">
-            <button
+          {/* Enhanced Tab Buttons */}
+          <motion.div 
+            className="relative bg-slate-900/40 backdrop-blur-sm rounded-t-2xl border border-slate-500/30 flex overflow-hidden mb-0 flex-shrink-0"
+            variants={sectionVariants}
+          >
+            {/* Tab background indicator */}
+            <motion.div
+              className="absolute top-0 bottom-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 backdrop-blur-sm border border-slate-500/40 rounded-t-xl"
+              animate={{
+                left: activeTab === 'team' ? '0%' : '50%',
+                width: '50%'
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            />
+            
+            <motion.button
               onClick={() => setActiveTab('team')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              className={`relative flex-1 px-4 py-3 text-sm font-medium transition-colors z-10 ${
                 activeTab === 'team'
-                  ? 'bg-green-700/50 text-white border-b-2 border-green-400'
-                  : 'text-purple-300 hover:text-white hover:bg-purple-700/30'
+                  ? 'text-white'
+                  : 'text-slate-300 hover:text-white'
               }`}
+              variants={tabVariants}
+              animate={activeTab === 'team' ? 'active' : 'inactive'}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               Equipo Activo
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               onClick={() => setActiveTab('battleTeams')}
-              className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+              className={`relative flex-1 px-4 py-3 text-sm font-medium transition-colors z-10 ${
                 activeTab === 'battleTeams'
-                  ? 'bg-yellow-700/50 text-white border-b-2 border-yellow-400'
-                  : 'text-purple-300 hover:text-white hover:bg-purple-700/30'
+                  ? 'text-white'
+                  : 'text-slate-300 hover:text-white'
               }`}
+              variants={tabVariants}
+              animate={activeTab === 'battleTeams' ? 'active' : 'inactive'}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               Equipos de Batalla
-            </button>
-          </div>
+            </motion.button>
+          </motion.div>
 
-          {/* Panel Content */}
-          <div className="flex-1 min-h-0">
-            {activeTab === 'team' ? (
-              <TeamPanel 
-                teamData={teamData}
-                selectedPokemon={selectedTeamPokemon}
-                onPokemonClick={handleTeamPokemonClick}
-                onPokemonMove={handlePokemonMove}
-              />
-            ) : (
-              <BattleTeamsPanel
-                battleTeamsData={battleTeamsData}
-                uuid={uuid}
-                onTeamsUpdate={refetchBattleTeams}
-              />
-            )}
-          </div>
+          {/* Panel Content with smooth transitions */}
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={activeTab}
+              className="flex-1 min-h-0"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === 'team' ? (
+                <TeamPanel 
+                  teamData={teamData}
+                  selectedPokemon={selectedTeamPokemon}
+                  onPokemonClick={handleTeamPokemonClick}
+                  onPokemonMove={handlePokemonMove}
+                />
+              ) : (
+                <BattleTeamsPanel
+                  battleTeamsData={battleTeamsData}
+                  uuid={uuid}
+                  onTeamsUpdate={refetchBattleTeams}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* PC Grid */}
-        <div className="flex-1 min-w-0 min-h-0">
+        <motion.div 
+          className="flex-1 min-w-0 min-h-0"
+          variants={sectionVariants}
+        >
           <DualBoxGrid 
             primaryBoxData={currentBoxData}
             secondaryBoxData={isDualBoxMode ? secondaryBoxData : null}
@@ -261,23 +349,30 @@ export default function PCPage() {
             battleTeams={battleTeamsData?.teams}
             onAddToBattleTeam={handleAddToBattleTeam}
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {(selectedPokemon || selectedTeamPokemon) && (
-        <PokemonDetails
-          pokemon={selectedPokemon}
-          teamPokemon={selectedTeamPokemon}
-          onClose={clearSelections}
-          onNavigatePrevious={handleNavigatePrevious}
-          onNavigateNext={handleNavigateNext}
-          canNavigatePrevious={canNavigatePrevious()}
-          canNavigateNext={canNavigateNext()}
-        />
-      )}
+      {/* Pokemon Details Modal */}
+      <AnimatePresence>
+        {(selectedPokemon || selectedTeamPokemon) && (
+          <PokemonDetails
+            pokemon={selectedPokemon}
+            teamPokemon={selectedTeamPokemon}
+            onClose={clearSelections}
+            onNavigatePrevious={handleNavigatePrevious}
+            onNavigateNext={handleNavigateNext}
+            canNavigatePrevious={canNavigatePrevious()}
+            canNavigateNext={canNavigateNext()}
+          />
+        )}
+      </AnimatePresence>
 
-      {isLoading && <LoadingOverlay />}
+      {/* Loading Overlay */}
+      <AnimatePresence>
+        {isLoading && <LoadingOverlay />}
+      </AnimatePresence>
       
+      {/* Enhanced Toast Container */}
       <ToastContainer 
         position="top-center"
         autoClose={3000}
@@ -289,7 +384,9 @@ export default function PCPage() {
         draggable
         pauseOnHover
         theme="dark"
+        toastClassName="!bg-slate-800/90 !backdrop-blur-sm !border !border-slate-500/30 !text-slate-100"
+        progressClassName="!bg-blue-400"
       />
-    </div>
+    </motion.div>
   )
 }

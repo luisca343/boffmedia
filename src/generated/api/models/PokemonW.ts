@@ -42,7 +42,7 @@ export type PokemonW = {
     /**
      * Moveset (up to 4 moves)
      */
-    moves: Array<{ name: string, type: string, power: number, accuracy: number }>;
+    moves: Array<{ name: string, type: string, category: string, power: number, accuracy: number }>;
     /**
      * IVs (HP, Atk, Def, SpA, SpD, Spe)
      */

@@ -1,11 +1,33 @@
 import { PokemonW } from "@/generated/api"
 import { PokemonImage } from '@/lib/PokemonImage'
 import { createPokemonSpecFromTeam } from "../../utils/pokemonUtils"
-import { PiHeartFill, PiGenderMaleBold, PiGenderFemaleBold, PiGenderNeuterBold, PiStarFill, PiSkull, PiFire, PiLightning, PiSnowflake, PiBed, PiSkullFill } from "react-icons/pi"
+import { PiStarFill, PiSkullFill } from "react-icons/pi"
 import { PokemonItemImage } from "@/components/common/pokemon/PokemonItemImage"
-import { getStatusColor } from "@/app/(boffmedia)/(herramientas)/mhwilds/builds/planner/_components/equipment-utils"
 import { motion } from "framer-motion"
-import { useState } from "react"
+import { useState, useMemo, useCallback } from "react"
+import { handlePokemonDragOver, handlePokemonDragStart, handlePokemonDrop, useDragDropState } from "@/lib/smartrotom/dragDropUtils"
+import { calculatePokemonHP, getGenderIcon, getHPBarColor, getStatusColor, getStatusIcon } from "@/lib/smartrotom/pokemonDisplayUtils"
+import { BACKGROUND_PATTERNS, getHPBarContainerClasses, getLevelClasses, getPokemonSlotClasses, getPokemonTextClasses, getStatusIndicatorClasses } from "@/lib/smartrotom/pokemonStyles"
+
+// Optimized animation variants
+const OPTIMIZED_SLOT_VARIANTS = {
+  idle: { 
+    scale: 1,
+    transition: { duration: 0.1 }
+  },
+  hover: { 
+    scale: 1.01,
+    transition: { duration: 0.1, ease: "easeOut" }
+  },
+  selected: {
+    scale: 1.01,
+    transition: { duration: 0.1 }
+  },
+  dragOver: {
+    scale: 1.02,
+    transition: { duration: 0.1 }
+  }
+}
 
 export function TeamSlot({ 
   pokemon, 
@@ -25,214 +47,228 @@ export function TeamSlot({
 }) {
   
   const [isHovered, setIsHovered] = useState(false)
+  const { isDragOver, handleDragEnter, handleDragLeave, handleDrop } = useDragDropState()
+
+  // Memoize expensive calculations
+  const pokemonData = useMemo(() => {
+    if (!pokemon) return null
+    return calculatePokemonHP(pokemon)
+  }, [pokemon?.hp, pokemon?.stats])
   
-  const handleDragStart = (e: React.DragEvent) => {
+  const handleDragStart = useCallback((e: React.DragEvent) => {
     if (!pokemon) return
-    
-    e.dataTransfer.setData('application/json', JSON.stringify({
-      pokemon,
-      source: 'team',
-      sourceIndex: index
-    }))
-    e.dataTransfer.effectAllowed = 'move'
-  }
+    handlePokemonDragStart(e, pokemon, 'team', index)
+  }, [pokemon, index])
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'move'
-  }
+  const handleDragOverEvent = useCallback((e: React.DragEvent) => {
+    handlePokemonDragOver(e)
+    handleDragEnter()
+  }, [handleDragEnter])
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    
-    try {
-      const dragData = JSON.parse(e.dataTransfer.getData('application/json'))
-      
-      if (dragData.source === 'box') {
-        // Handle dropping from box to team
-        onPokemonMove(
-          { 
-            type: 'box', 
-            boxNumber: dragData.boxNumber, 
-            index: dragData.sourceIndex 
-          },
-          { 
-            type: 'team', 
-            index: index 
-          }
-        )
-      } else if (dragData.source === 'team') {
-        // Handle team reordering
-        onPokemonMove(
-          { 
-            type: 'team', 
-            index: dragData.sourceIndex 
-          },
-          { 
-            type: 'team', 
-            index: index 
-          }
-        )
-      }
-    } catch (error) {
-      console.error('Error handling drop:', error)
-    }
-  }
+  const handleDragLeaveEvent = useCallback(() => {
+    handleDragLeave()
+  }, [handleDragLeave])
 
-  // Calculate HP percentage and max HP
-  const maxHP = pokemon?.stats?.[0] || 0
-  const currentHP = pokemon?.hp || 0
-  const hpPercentage = maxHP > 0 ? (currentHP / maxHP) * 100 : 0
+  const handleDropEvent = useCallback((e: React.DragEvent) => {
+    handleDrop()
+    handlePokemonDrop(e, 'team', index, onPokemonMove)
+  }, [handleDrop, index, onPokemonMove])
 
-  // Determine if Pokemon is fainted
-  const isFainted = pokemon?.status?.toLowerCase() === 'fainted' || currentHP === 0
+  // Determine animation state efficiently
+  const animationState = useMemo(() => {
+    if (isDragOver) return 'dragOver'
+    if (isSelected) return 'selected'
+    if (isHovered) return 'hover'
+    return 'idle'
+  }, [isDragOver, isSelected, isHovered])
 
-  // Animation variants for Pokémon bounce
-  const bounceVariants = {
-    idle: { y: 0 },
-    bounce: {
-      y: [0, -5, 0],
-      transition: {
-        duration: 0.25,
-        ease: "easeInOut",
-        repeat: Infinity
-      }
-    }
+  const { currentHP, maxHP, hpPercentage, isFainted } = pokemonData || { 
+    currentHP: 0, maxHP: 0, hpPercentage: 0, isFainted: false 
   }
 
   return (
-    <div
-      className={`group relative h-20 bg-indigo-700 hover:bg-indigo-600 shadow-md hover:bg-secondary-200/20 rounded-xl border-2 transition-all duration-200 cursor-pointer select-none ${
-        isSelected
-          ? 'border-yellow-400 bg-yellow-400/10 shadow-yellow-400/50 shadow-lg'
-          : pokemon
-          ? isFainted
-            ? 'border-red-400/50 bg-gradient-to-r from-red-600/30 to-red-700/30 hover:border-red-400/80 hover:shadow-lg'
-            : 'border-green-400/50 bg-gradient-to-r from-green-600/30 to-emerald-600/30 hover:border-green-400/80 hover:shadow-lg'
-          : 'border-gray-500/30 bg-gray-600/10 border-dashed hover:border-gray-400/50'
-      }`}
+    <motion.div
+      className={getPokemonSlotClasses(isSelected, pokemon, isFainted, isDragOver)}
+      variants={OPTIMIZED_SLOT_VARIANTS}
+      animate={animationState}
       onClick={onClick}
       draggable={!!pokemon}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
+      onDragStart={(e) => {
+        const dragEvent = e as unknown as React.DragEvent;
+        handleDragStart(dragEvent);
+      }}
+      onDragOver={(e) => {
+        const dragEvent = e as unknown as React.DragEvent;
+        handleDragOverEvent(dragEvent);
+      }}
+      onDragLeave={handleDragLeaveEvent}
+      onDrop={(e) => {
+        const dragEvent = e as unknown as React.DragEvent;
+        handleDropEvent(dragEvent);
+      }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      role="button"
+      aria-label={pokemon ? `${pokemon.name}, Level ${pokemon.level}, ${Math.round(hpPercentage)}% HP, Status: ${pokemon.status}` : `Empty party slot ${index + 1}`}
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
     >
+      {/* Subtle background pattern */}
+      <div className={BACKGROUND_PATTERNS.subtle} />
+      
       {pokemon ? (
-        <div className="flex items-center h-full p-2">
+        <div className="flex items-center h-full p-2 relative z-10">
           {/* Pokemon Image */}
-          <div className={`w-14 h-14 bg-white/10 rounded-full flex items-center justify-center mr-3 flex-shrink-0 relative ${
-            isFainted ? 'opacity-50 grayscale' : ''
-          }`}>
-            <motion.div
-              variants={bounceVariants}
-              animate={pokemon && !isFainted && isHovered ? 'bounce' : 'idle'}
+          <div className="relative flex-shrink-0">
+            <div 
+              className={`w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center mr-3 relative overflow-hidden ${
+                isFainted ? 'opacity-70' : ''
+              }`}
             >
-              <PokemonImage
-                itemId={createPokemonSpecFromTeam(pokemon)}
-                size={48}
-              />
-            </motion.div>
-            {isFainted && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-red-500 text-base font-bold">💀</div>
+              {/* Simplified Pokemon Image - removed infinite bounce animation */}
+              <div
+                style={{
+                  transform: isFainted ? 'scale(0.9)' : 'scale(1)',
+                  opacity: isFainted ? 0.5 : 1,
+                  filter: isFainted ? 'grayscale(1)' : 'none',
+                  transition: 'all 0.2s ease-out'
+                }}
+              >
+                <PokemonImage
+                  itemId={createPokemonSpecFromTeam(pokemon)}
+                  size={48}
+                />
+              </div>
+              {/* Fainted overlay */}
+              {isFainted && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl">
+                  <PiSkullFill className="text-red-400 text-lg" />
+                </div>
+              )}
+              {/* Simplified Shiny indicator - no infinite rotation */}
+              {pokemon.palette === 'shiny' && (
+                <motion.div
+                  className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-lg"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <PiStarFill className="text-white text-xs" />
+                </motion.div>
+              )}
+            </div>
+            
+            {/* Item Indicator - simplified without hover animation */}
+            {pokemon.item && pokemon.item !== 'item.minecraft.air' && (
+              <div 
+                className="absolute top-0 left-0 p-0.5"
+                title={`Held item: ${pokemon.item}`}
+              >
+                <PokemonItemImage itemId={pokemon.item} size={24} />
               </div>
             )}
           </div>
 
           {/* Pokemon Info */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-0.5">
-              <div className="flex items-center space-x-1">
-                <h4 className={`font-medium text-sm truncate ${
-                  isFainted ? 'text-red-300' : 'text-white'
-                }`}>
+          <div className="flex-1 min-w-0 space-y-1">
+            {/* Name and Level Row */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-1 min-w-0">
+                <h4 className={`font-semibold text-sm truncate ${getPokemonTextClasses(isFainted, 'primary')}`}>
                   {pokemon.name}
                 </h4>
+                {/* Gender indicator moved here */}
                 {getGenderIcon(pokemon.gender)}
-                {pokemon.palette === 'shiny' && (
-                  <PiStarFill className="text-yellow-400 text-xs animate-pulse" />
-                )}
+              </div>
+              <div className={getLevelClasses(isFainted)}>
+                Nv. {pokemon.level}
               </div>
             </div>
             
-            <div className={`text-xs mb-1 ${
-              isFainted ? 'text-red-200' : 'text-green-200'
-            }`}>
-              Nv. {pokemon.level} • {pokemon.species}
+            {/* Species and Form */}
+            <div className={`text-xs truncate ${getPokemonTextClasses(isFainted, 'secondary')}`}>
+              {pokemon.species}
               {pokemon.form && ` (${pokemon.form})`}
             </div>
 
-            {/* HP Bar */}
-            <div className="flex items-center space-x-2 mb-1">
-              {getStatusIcon(pokemon.status)}
-              <div className="flex-1 bg-gray-700 rounded-full h-1.5">
-                <div
-                  className={`h-full rounded-full transition-all duration-300 ${getHPBarColor(hpPercentage)}`}
-                  style={{ width: `${Math.max(0, Math.min(100, hpPercentage))}%` }}
-                />
+            {/* HP and Status Bar */}
+            <div className="flex items-center space-x-2">
+              
+              {/* HP Bar with animation */}
+              <div className="flex-1 space-y-0.5">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-slate-400 font-medium">HP</span>
+                  <span className="text-[10px] text-slate-300 font-mono">
+                    {currentHP}/{maxHP}
+                  </span>
+                </div>
+                <div className={getHPBarContainerClasses()}>
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${getHPBarColor(hpPercentage)}`}
+                    style={{
+                      width: `${Math.max(0, Math.min(100, hpPercentage))}%`
+                    }}
+                  />
+                </div>
               </div>
-              <span className="text-xs text-gray-300">
-                {currentHP}/{maxHP}
-              </span>
+
+              {/* Status indicator with enhanced design */}
+              
+              <div className={getStatusIndicatorClasses(pokemon.status)}>
+                {getStatusIcon(pokemon.status)}
+                <span className={`text-[10px] font-medium ${getStatusColor(pokemon.status).replace('border-', 'text-')}`}>
+                  {pokemon.status.charAt(0).toUpperCase() + pokemon.status.slice(1)}
+                </span>
+              </div>
             </div>
           </div>
-
-          {/* Item Indicator */}
-          {pokemon.item && pokemon.item !== 'item.minecraft.air' && (
-            <div className="absolute top-1 right-1">
-                <PokemonItemImage itemId={pokemon.item} size={36} />
-            </div>
-          )}
         </div>
       ) : (
-        <div className="flex items-center justify-center h-full select-none bg-indigo-600/40 border border-indigo-400/40 rounded-xl">
+        <div className="flex items-center justify-center h-full select-none">
           <div className="text-center">
-            <div className="w-6 h-6 border-2 border-dashed border-gray-400 rounded-full mx-auto mb-1 opacity-50"></div>
-            <span className="text-gray-400 text-xs">Slot {index + 1}</span>
+            <div 
+              className="w-8 h-8 border-2 border-dashed border-slate-500/50 rounded-full mx-auto mb-1 flex items-center justify-center"
+              style={{
+                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                borderColor: isHovered ? 'rgba(148, 163, 184, 0.7)' : 'rgba(148, 163, 184, 0.5)',
+                transition: 'all 0.1s ease-out'
+              }}
+            >
+              <span className="text-slate-500 text-lg font-light">+</span>
+            </div>
+            <span className="text-slate-500 text-xs font-medium">Slot {index + 1}</span>
           </div>
         </div>
       )}
-    </div>
+      
+      {/* Simplified Selection indicator */}
+      {isSelected && (
+        <div
+          className="absolute inset-0 border-2 border-blue-400 rounded-2xl pointer-events-none"
+          style={{
+            opacity: 1,
+            transform: 'scale(1)',
+            transition: 'opacity 0.1s ease-out'
+          }}
+        >
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
+        </div>
+      )}
+      
+      {/* Simplified Drag over indicator */}
+      {isDragOver && (
+        <div
+          className="absolute inset-0 bg-green-400/10 border-2 border-green-400 rounded-2xl pointer-events-none backdrop-blur-sm"
+          style={{
+            opacity: 1,
+            transition: 'opacity 0.1s ease-out'
+          }}
+        />
+      )}
+    </motion.div>
   )
-}
-
-function getStatusIcon(status: string) {
-  switch (status.toLowerCase()) {
-    case 'poison':
-      return <PiSkullFill className={`text-xs text-purple-400`} />
-    case 'burned':
-      return <PiFire className={`text-xs text-red-400`} />
-    case 'paralyzed':
-      return <PiLightning className={`text-xs text-yellow-400`} />
-    case 'frozen':
-      return <PiSnowflake className={`text-xs text-blue-400`} />
-    case 'sleeping':
-      return <PiBed className={`text-xs text-gray-400`} />
-    case 'fainted':
-      return <PiSkull className={`text-xs text-red-600`} />
-    case 'healthy':
-    default:
-      return <PiHeartFill className={`text-xs text-green-400`} />
-  }
-}
-
-function getGenderIcon(gender?: string) {
-  switch (gender?.toLowerCase()) {
-    case 'male':
-      return <PiGenderMaleBold className="text-blue-400 text-xs" />
-    case 'female':
-      return <PiGenderFemaleBold className="text-pink-400 text-xs" />
-    case 'genderless':
-      return <PiGenderNeuterBold className="text-gray-400 text-xs" />
-    default:
-      return null
-  }
-}
-
-function getHPBarColor(hpPercentage: number): string {
-  if (hpPercentage > 50) return 'bg-green-500'
-  if (hpPercentage > 20) return 'bg-yellow-500'
-  return 'bg-red-500'
 }

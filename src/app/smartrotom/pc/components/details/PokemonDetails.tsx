@@ -8,7 +8,9 @@ import { getPokemonDefense } from '../../../pokedex/dexUtils';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog";
 import { useTranslations } from 'next-intl'
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa'
+import { PiArchive, PiInfo } from 'react-icons/pi'
 import { useEffect } from 'react'
+import { motion } from 'framer-motion'
 
 interface PokemonDetailsProps {
   pokemon?: PCPokemon | null;
@@ -108,65 +110,78 @@ export default function PokemonDetails({
   }, [isFromPC, onNavigatePrevious, onNavigateNext, canNavigatePrevious, canNavigateNext, onClose]);
 
   return (
-      <Dialog open={true} onOpenChange={open => { if (!open) onClose(); }}>
-        <DialogContent className="max-w-5xl p-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 rounded-2xl shadow-2xl border-2 border-purple-400/30 overflow-hidden">
-          <DialogHeader>
-            <DialogTitle>
-              <div className="bg-gradient-to-r from-purple-800 to-indigo-800 p-4 relative border-b border-purple-400/30">
-                <div className="flex items-center justify-center">
-                  {/* Navigation Buttons - Left */}
-                  <div className="flex items-center space-x-2">
-                    {isFromPC && onNavigatePrevious && (
-                      <button
-                        onClick={onNavigatePrevious}
-                        disabled={!canNavigatePrevious}
-                        className={`p-2 rounded-lg border transition-all duration-200 ${
-                          canNavigatePrevious 
-                            ? 'bg-purple-600 hover:bg-purple-700 border-purple-400/50 text-white hover:scale-105' 
-                            : 'bg-gray-600 border-gray-500 text-gray-400 cursor-not-allowed'
-                        }`}
-                        title="Pokémon anterior (← flecha izquierda)"
-                      >
-                        <FaChevronLeft className="text-sm" />
-                      </button>
-                    )}
-                  </div>
+    <Dialog open={true} onOpenChange={open => { if (!open) onClose(); }}>
+      <DialogContent className="max-w-7xl p-0 bg-slate-900/40 backdrop-blur-sm rounded-2xl shadow-2xl border border-slate-500/30 overflow-hidden">
+        <DialogHeader>
+          <DialogTitle>
+            <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
+              {/* Background pattern */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+              
+              <div className="relative flex items-center justify-center space-x-16">
+                {/* Navigation Buttons - Left */}
+                <div className="flex items-center space-x-2">
+                  {isFromPC && onNavigatePrevious && (
+                    <motion.button
+                      onClick={onNavigatePrevious}
+                      disabled={!canNavigatePrevious}
+                      className={`p-3 rounded-xl border backdrop-blur-sm transition-all duration-200 ${
+                        canNavigatePrevious 
+                          ? 'bg-purple-600/20 hover:bg-purple-600/30 border-purple-400/50 text-white hover:scale-105' 
+                          : 'bg-slate-600/20 border-slate-500/30 text-slate-400 cursor-not-allowed'
+                      }`}
+                      title="Pokémon anterior (← flecha izquierda)"
+                      whileHover={canNavigatePrevious ? { scale: 1.05 } : {}}
+                      whileTap={canNavigatePrevious ? { scale: 0.95 } : {}}
+                    >
+                      <FaChevronLeft className="text-sm" />
+                    </motion.button>
+                  )}
+                </div>
 
-                  {/* Title */}
-                  <div className="text-center mx-8">
+                {/* Title */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center space-x-3 mb-1">
                     <h2 className="text-white text-xl font-bold">Información del Pokémon</h2>
-                    {isFromPC && (
-                      <p className="text-purple-200 text-sm mt-1">
+                  </div>
+                  {isFromPC && (
+                    <div className="flex items-center justify-center space-x-2">
+                      <PiArchive className="text-purple-300 text-sm" />
+                      <p className="text-purple-200 text-sm">
                         Caja {pokemon!.box + 1} • Posición {pokemon!.index + 1}
                       </p>
-                    )}
-                  </div>
+                    </div>
+                  )}
+                </div>
 
-                  {/* Navigation Buttons - Right */}
-                  <div className="flex items-center space-x-2">
-                    {isFromPC && onNavigateNext && (
-                      <button
-                        onClick={onNavigateNext}
-                        disabled={!canNavigateNext}
-                        className={`p-2 rounded-lg border transition-all duration-200 ${
-                          canNavigateNext 
-                            ? 'bg-purple-600 hover:bg-purple-700 border-purple-400/50 text-white hover:scale-105' 
-                            : 'bg-gray-600 border-gray-500 text-gray-400 cursor-not-allowed'
-                        }`}
-                        title="Siguiente Pokémon"
-                      >
-                        <FaChevronRight className="text-sm" />
-                      </button>
-                    )}
-                  </div>
+                {/* Navigation Buttons - Right */}
+                <div className="flex items-center space-x-2">
+                  {isFromPC && onNavigateNext && (
+                    <motion.button
+                      onClick={onNavigateNext}
+                      disabled={!canNavigateNext}
+                      className={`p-3 rounded-xl border backdrop-blur-sm transition-all duration-200 ${
+                        canNavigateNext 
+                          ? 'bg-purple-600/20 hover:bg-purple-600/30 border-purple-400/50 text-white hover:scale-105' 
+                          : 'bg-slate-600/20 border-slate-500/30 text-slate-400 cursor-not-allowed'
+                      }`}
+                      title="Siguiente Pokémon (→ flecha derecha)"
+                      whileHover={canNavigateNext ? { scale: 1.05 } : {}}
+                      whileTap={canNavigateNext ? { scale: 0.95 } : {}}
+                    >
+                      <FaChevronRight className="text-sm" />
+                    </motion.button>
+                  )}
                 </div>
               </div>
-            </DialogTitle>
-          </DialogHeader>
-          <div className="p-6 overflow-y-auto h-[85vh]">
-            <div className="flex gap-6">
-              {/* Left Column - Pokemon Card */}
-              <div className="w-1/2">
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="p-6 overflow-y-auto max-h-[85vh]">
+          <div className="space-y-6">
+            <div className="grid grid-cols-5 gap-6">
+              <div className="col-span-2">
                 <PokemonCard
                   pokemonData={pokemonData}
                   isFromTeam={isFromTeam}
@@ -179,15 +194,27 @@ export default function PokemonDetails({
                   types={types}
                 />
               </div>
-              {/* Right Column - Stats and other info */}
-              <div className="w-1/2 space-y-6">
-                <PokemonStats stats={pokemonData.stats} ivs={pokemonData.ivs} evs={pokemonData.evs} />
-                <PokemonTypeEffectiveness weaknesses={weaknesses} resistances={resistances} immunities={immunities} />
+              
+              <div className="col-span-3">
+                <PokemonStats 
+                  stats={pokemonData.stats} 
+                  ivs={pokemonData.ivs} 
+                  evs={pokemonData.evs} 
+                />
               </div>
             </div>
-            <PokemonMoves moves={pokemonData.moves} />
+
+                <PokemonTypeEffectiveness 
+                  weaknesses={weaknesses} 
+                  resistances={resistances} 
+                  immunities={immunities} 
+                />
+              
+                <PokemonMoves moves={pokemonData.moves} />
+
           </div>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

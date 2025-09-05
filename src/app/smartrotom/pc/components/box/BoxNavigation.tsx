@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { PCBoxData, PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { BattleTeam } from '@/types/dto/battle-team.dto'
 import BoxSelectionPopup from './BoxSelectionPopup'
+import { AnimatePresence } from 'framer-motion'
 
 interface BoxNavigationProps {
   currentBox: number;
@@ -44,22 +45,21 @@ export default function BoxNavigation({
     onShowBoxSelection?.(false)
   }
 
-  // Only render if showBoxSelection is true
-  if (!showBoxSelection) {
-    return null
+  const handleClose = () => {
+    onShowBoxSelection?.(false)
+    setSelectingForSecondary(false)
   }
 
   return (
-    <>
-      <BoxSelectionPopup
-        boxes={boxes}
-        currentBox={selectingForSecondary ? (secondaryBox || currentBox) : currentBox}
-        onBoxSelect={handleBoxSelect}
-        onClose={() => {
-          onShowBoxSelection?.(false)
-          setSelectingForSecondary(false)
-        }}
-      />
-    </>
+    <AnimatePresence>
+      {showBoxSelection && (
+        <BoxSelectionPopup
+          boxes={boxes}
+          currentBox={selectingForSecondary ? (secondaryBox || currentBox) : currentBox}
+          onBoxSelect={handleBoxSelect}
+          onClose={handleClose}
+        />
+      )}
+    </AnimatePresence>
   )
 }
