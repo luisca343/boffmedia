@@ -1,6 +1,6 @@
 import { FaTimes, FaArchive } from 'react-icons/fa'
+import { PiTarget } from 'react-icons/pi'
 import { PCBoxData } from '@/types/dto/pc-pokemon.dto'
-import { motion, AnimatePresence } from 'framer-motion'
 
 interface BoxSelectionPopupProps {
   boxes: PCBoxData[];
@@ -21,237 +21,150 @@ export default function BoxSelectionPopup({
 
   const getBoxStatus = (count: number) => {
     if (count === 0) return { 
-      color: 'from-slate-600 to-slate-700', 
-      text: 'Vacía',
-      bgColor: 'bg-slate-600/20',
-      borderColor: 'border-slate-500/40'
+      color: 'from-gray-600 to-gray-700', 
+      text: 'EMPTY',
+      bgColor: 'bg-gray-200',
+      borderColor: 'border-gray-600'
     }
     if (count < 10) return { 
-      color: 'from-green-600 to-green-700', 
-      text: 'Poco llena',
-      bgColor: 'bg-green-600/20',
-      borderColor: 'border-green-500/40'
+      color: 'from-gray-500 to-gray-600', 
+      text: 'LOW',
+      bgColor: 'bg-gray-100',
+      borderColor: 'border-gray-500'
     }
     if (count < 20) return { 
-      color: 'from-amber-600 to-amber-700', 
-      text: 'Medio llena',
-      bgColor: 'bg-amber-600/20',
-      borderColor: 'border-amber-500/40'
+      color: 'from-gray-400 to-gray-500', 
+      text: 'MEDIUM',
+      bgColor: 'bg-white',
+      borderColor: 'border-gray-400'
     }
     if (count < 30) return { 
-      color: 'from-orange-600 to-orange-700', 
-      text: 'Casi llena',
-      bgColor: 'bg-orange-600/20',
-      borderColor: 'border-orange-500/40'
+      color: 'from-gray-600 to-gray-700', 
+      text: 'HIGH',
+      bgColor: 'bg-gray-300',
+      borderColor: 'border-gray-600'
     }
     return { 
-      color: 'from-red-600 to-red-700', 
-      text: 'Llena',
-      bgColor: 'bg-red-600/20',
-      borderColor: 'border-red-500/40'
+      color: 'from-black to-gray-800', 
+      text: 'FULL',
+      bgColor: 'bg-gray-400',
+      borderColor: 'border-black'
     }
-  }
-
-  const overlayVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 }
-  }
-
-  const modalVariants = {
-    hidden: { opacity: 0, scale: 0.9, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        duration: 0.3,
-        ease: "easeOut",
-        staggerChildren: 0.1
-      }
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.9,
-      y: 20,
-      transition: { duration: 0.2 }
-    }
-  }
-
-  const gridVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.05
-      }
-    }
-  }
-
-  const boxVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
   }
 
   return (
-    <motion.div 
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-md p-4"
-      variants={overlayVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-    >
-      <motion.div 
-        className="bg-slate-900/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-slate-500/30 max-w-4xl w-full max-h-[90vh] overflow-hidden"
-        variants={modalVariants}
-      >
-        {/* Enhanced Header */}
-        <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
-          
-          <div className="relative z-10 flex justify-between items-center">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-300 border-4 border-black max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        {/* Header */}
+        <div className="bg-gray-400 border-b-4 border-black p-4">
+          <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <motion.div 
-                initial={{ rotate: -10, scale: 0.8 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-white/20 backdrop-blur-sm flex items-center justify-center"
-              >
-                <FaArchive className="text-blue-300 text-xl" />
-              </motion.div>
+              <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
+                <FaArchive className="text-white text-lg" />
+              </div>
               <div>
-                <h3 className="text-xl font-bold text-white">Seleccionar Caja</h3>
-                <p className="text-slate-300 text-sm font-medium">Elige una caja para navegar</p>
+                <h3 className="text-black font-mono font-bold text-xl">BOX SELECTOR</h3>
+                <p className="text-gray-700 font-mono text-sm">CHOOSE A BOX TO NAVIGATE</p>
               </div>
             </div>
-            <motion.button 
+            <button 
               onClick={onClose}
-              className="text-white hover:bg-white/10 p-3 rounded-xl transition-colors backdrop-blur-sm border border-slate-500/30"
-              aria-label="Cerrar selector"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="bg-gray-600 hover:bg-gray-500 border-2 border-gray-500 hover:border-gray-400 text-white p-2 transition-all duration-150 active:scale-95"
+              aria-label="CLOSE SELECTOR"
             >
               <FaTimes />
-            </motion.button>
+            </button>
           </div>
         </div>
 
         {/* Box Grid */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-160px)]">
-          <motion.div 
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4"
-            variants={gridVariants}
-            initial="hidden"
-            animate="visible"
-          >
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {boxes.map((box, index) => {
               const pokemonCount = getPokemonCount(box)
               const status = getBoxStatus(pokemonCount)
               const isCurrentBox = index === currentBox
 
               return (
-                <motion.button
+                <button
                   key={index}
                   onClick={() => onBoxSelect(index)}
-                  className={`relative bg-gradient-to-br ${status.color} backdrop-blur-sm p-4 rounded-2xl border-2 transition-all duration-200 shadow-lg overflow-hidden ${
+                  className={`relative ${status.bgColor} border-4 p-4 transition-all duration-150 hover:scale-105 active:scale-95 ${
                     isCurrentBox
-                      ? 'border-amber-400/60 shadow-amber-400/30 shadow-lg scale-105'
-                      : `${status.borderColor} hover:border-slate-400/60 hover:shadow-xl`
+                      ? 'border-black bg-gray-500'
+                      : `${status.borderColor} hover:border-gray-800`
                   }`}
-                  variants={boxVariants}
-                  whileHover={{ scale: isCurrentBox ? 1.05 : 1.03 }}
-                  whileTap={{ scale: 0.98 }}
                 >
-                  {/* Background pattern */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/3 via-transparent to-black/5 pointer-events-none" />
-                  
                   {/* Current box indicator */}
                   {isCurrentBox && (
-                    <motion.div 
-                      className="absolute -top-2 -right-2 bg-amber-400 text-amber-900 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg"
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-                    >
-                      ★
-                    </motion.div>
+                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-black border-2 border-gray-600 flex items-center justify-center">
+                      <PiTarget className="text-white text-sm" />
+                    </div>
                   )}
 
                   {/* Box icon */}
-                  <div className="flex justify-center mb-3 relative z-10">
-                    <motion.div
-                      className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 flex items-center justify-center"
-                      whileHover={{ rotate: 5 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <FaArchive className="text-white text-lg" />
-                    </motion.div>
+                  <div className="flex justify-center mb-3">
+                    <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center">
+                      <FaArchive className="text-black text-lg" />
+                    </div>
                   </div>
 
                   {/* Box info */}
-                  <div className="relative z-10">
-                    <div className="text-white font-bold text-lg mb-1">
-                      Caja {index + 1}
+                  <div>
+                    <div className="text-black font-mono font-bold text-lg mb-1">
+                      BOX {index + 1}
                     </div>
                     
-                    <div className="text-white/90 text-sm mb-3 font-medium">
-                      {pokemonCount}/30 Pokémon
+                    <div className="text-gray-700 font-mono text-sm mb-3">
+                      {pokemonCount}/30 POKEMON
                     </div>
 
                     {/* Status indicator */}
-                    <div className="bg-black/30 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/20 mb-3">
+                    <div className="bg-white border-2 border-black text-black font-mono text-xs px-2 py-1 mb-3">
                       {status.text}
                     </div>
 
                     {/* Progress bar */}
-                    <div className="bg-slate-700/50 backdrop-blur-sm rounded-full h-2 border border-slate-600/30">
-                      <motion.div 
-                        className="bg-white/80 h-2 rounded-full"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${(pokemonCount / 30) * 100}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut", delay: index * 0.02 }}
+                    <div className="bg-white border-2 border-black h-3">
+                      <div 
+                        className="bg-black h-full transition-all duration-500"
+                        style={{ width: `${(pokemonCount / 30) * 100}%` }}
                       />
                     </div>
                   </div>
-                </motion.button>
+                </button>
               )
             })}
-          </motion.div>
+          </div>
         </div>
 
-        {/* Enhanced Footer */}
-        <motion.div 
-          className="relative bg-slate-800/50 backdrop-blur-sm p-4 border-t border-slate-500/30"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 pointer-events-none" />
-          
-          <div className="relative flex items-center justify-between text-sm">
-            <div className="text-slate-300">
-              Caja actual: <span className="text-white font-bold">Caja {currentBox + 1}</span>
+        {/* Footer */}
+        <div className="bg-gray-400 border-t-4 border-black p-4">
+          <div className="flex items-center justify-between text-sm">
+            <div className="text-gray-700 font-mono">
+              CURRENT BOX: <span className="text-black font-bold">BOX {currentBox + 1}</span>
             </div>
-            <div className="flex items-center space-x-4 text-slate-300">
+            <div className="flex items-center space-x-4 text-gray-700 font-mono text-xs">
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-slate-600 rounded-full border border-slate-500/30" />
-                <span>Vacía</span>
+                <div className="w-3 h-3 bg-gray-200 border border-gray-600" />
+                <span>EMPTY</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-600 rounded-full border border-green-500/30" />
-                <span>Pocos</span>
+                <div className="w-3 h-3 bg-gray-100 border border-gray-500" />
+                <span>LOW</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-amber-600 rounded-full border border-amber-500/30" />
-                <span>Media</span>
+                <div className="w-3 h-3 bg-white border border-gray-400" />
+                <span>MEDIUM</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-600 rounded-full border border-red-500/30" />
-                <span>Llena</span>
+                <div className="w-3 h-3 bg-black border border-black" />
+                <span>FULL</span>
               </div>
             </div>
           </div>
-        </motion.div>
-      </motion.div>
-    </motion.div>
+        </div>
+      </div>
+    </div>
   )
 }

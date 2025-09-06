@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { toast } from 'react-toastify'
-import { DragSource, DragDestination } from '../types/dragDrop'
+import { DragSource, DragDestination } from '../types/common'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { PokemonW } from '@/generated/api'
 import { WingullService } from '@/services/api/smartrotom/wingullService'

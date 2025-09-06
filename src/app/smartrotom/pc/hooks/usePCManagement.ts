@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import { PCPokemon, PCBoxData } from '@/types/dto/pc-pokemon.dto'
 import { PokemonW } from '@/generated/api'
-import { DragSource, DragDestination } from '../types/dragDrop'
+import { DragSource, DragDestination } from '../types/common'
 import { usePokemonMovement } from './usePokemonMovement'
 import { POKEMON_PER_BOX, TOTAL_BOXES } from '../utils/constants'
 

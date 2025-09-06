@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react'
-import { ContextMenuPosition } from '../types/dragDrop'
+import { ContextMenuPosition } from '../types/common'
 
 interface UseContextMenuProps {
   onAction?: (action: string, data?: any) => void

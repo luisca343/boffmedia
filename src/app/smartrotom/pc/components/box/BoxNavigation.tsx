@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { PCBoxData, PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { BattleTeam } from '@/types/dto/battle-team.dto'
 import BoxSelectionPopup from './BoxSelectionPopup'
-import { AnimatePresence } from 'framer-motion'
 
 interface BoxNavigationProps {
   currentBox: number;
@@ -51,7 +50,7 @@ export default function BoxNavigation({
   }
 
   return (
-    <AnimatePresence>
+    <>
       {showBoxSelection && (
         <BoxSelectionPopup
           boxes={boxes}
@@ -60,6 +59,6 @@ export default function BoxNavigation({
           onClose={handleClose}
         />
       )}
-    </AnimatePresence>
+    </>
   )
 }
