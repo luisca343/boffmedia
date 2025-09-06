@@ -385,7 +385,7 @@ export default function PCPage() {
                 itemId={
                   activeDragItem.type === 'team' 
                     ? createPokemonSpecFromTeam(activeDragItem.pokemon)
-                    : createPokemonSpec(activeDragItem.pokemon)
+                    : createPokemonSpec(activeDragItem.pokemon.pokemon || activeDragItem.pokemon)
                 }
                 size={48}
               />
