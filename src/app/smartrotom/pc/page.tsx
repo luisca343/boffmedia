@@ -31,6 +31,7 @@ import {
   PointerSensor,
   KeyboardSensor,
   closestCenter,
+  defaultDropAnimationSideEffects,
 } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 
@@ -56,6 +57,12 @@ export default function PCPage() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // Drop animation configuration to prevent jumping
+  const dropAnimation = {
+    duration: 0, // Disable animation completely
+    easing: 'ease',
+  }
 
   const uuid = session?.user?.smartRotomUser?.uuid || ''
   const { battleTeamsData, refetch: refetchBattleTeams } = useGetBattleTeams(uuid)
@@ -378,7 +385,7 @@ export default function PCPage() {
         progressClassName="!bg-black"
       />
 
-        <DragOverlay>
+        <DragOverlay dropAnimation={null}>
           {activeDragItem && activeDragItem.pokemon && (
             <div className="w-16 h-16 bg-white border-4 border-black flex items-center justify-center opacity-90">
               <PokemonImage

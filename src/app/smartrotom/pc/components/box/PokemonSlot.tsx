@@ -89,8 +89,8 @@ const PokemonSlot = memo(function PokemonSlot({
   })
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: isDragging ? 'none' : CSS.Transform.toString(transform),
+    transition: isDragging ? 'none' : transition,
   }
 
   // Handle battle team context menu

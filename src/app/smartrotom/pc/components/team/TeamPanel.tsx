@@ -2,7 +2,7 @@ import { PokemonW } from '@/generated/api'
 import { TeamSlot } from './TeamSlot';
 import { PiUsers, PiInfo } from 'react-icons/pi';
 import { SortableContext } from '@dnd-kit/sortable'
-import { noReorderStrategy } from '@/lib/drag-and-drop';
+import { noReorderStrategy, stablePositionStrategy } from '@/lib/drag-and-drop';
 
 interface TeamPanelProps {
   teamData: (PokemonW | null)[];
@@ -45,7 +45,7 @@ export default function TeamPanel({
         </div>
 
         {/* Team Slots */}
-        <SortableContext items={slotIds} strategy={noReorderStrategy}>
+        <SortableContext items={slotIds} strategy={stablePositionStrategy}>
           <div className="flex flex-col justify-between flex-1 p-3 space-y-2 overflow-hidden">
             {teamSlots.map((pokemon, index) => (
               <div

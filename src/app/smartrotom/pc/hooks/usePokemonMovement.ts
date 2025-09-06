@@ -189,18 +189,19 @@ export const usePokemonMovement = ({
     setTeamData(newTeamData)
   }, [teamData, setTeamData])
 
-  // Main move handler
+  // Main move handler with optimistic updates
   const handlePokemonMove = useCallback(async (
     source: DragSource,
     destination: DragDestination
   ) => {
     console.log(`Movimiento registrado: ${source.type}[${source.index}] → ${destination.type}[${destination.index}]`)
 
-    try {
-      // Make API call first for better UX
-      await moveWithAPI(source, destination)
+    // Store current state for potential rollback
+    const previousPcData = [...pcData]
+    const previousTeamData = [...teamData]
 
-      // Update local state based on move type
+    try {
+      // 1. Update local state immediately (optimistic update)
       if (source.type === 'box' && destination.type === 'team') {
         handleBoxToTeamMove(source, destination)
       } else if (source.type === 'team' && destination.type === 'box') {
@@ -211,25 +212,26 @@ export const usePokemonMovement = ({
         handleTeamToTeamMove(source, destination)
       }
 
-      // Success feedback is minimal to avoid spam
+      // 2. Then make API call to persist the change
+      await moveWithAPI(source, destination)
+
+      // Success - the optimistic update was correct, no need to do anything
       // toast.success('Pokémon movido exitosamente')
     } catch (error) {
       console.error('Error moving Pokemon:', error)
       
-      // Fallback to local state update only
-      if (source.type === 'box' && destination.type === 'team') {
-        handleBoxToTeamMove(source, destination)
-      } else if (source.type === 'team' && destination.type === 'box') {
-        handleTeamToBoxMove(source, destination)
-      } else if (source.type === 'box' && destination.type === 'box') {
-        handleBoxToBoxMove(source, destination)
-      } else if (source.type === 'team' && destination.type === 'team') {
-        handleTeamToTeamMove(source, destination)
-      }
+      // 3. Rollback the optimistic update on failure
+      setPcData(previousPcData)
+      setTeamData(previousTeamData)
 
-      // toast.info('Movimiento aplicado localmente')
+      // Show error feedback
+      // toast.error('Error al mover Pokémon - cambio revertido')
     }
   }, [
+    pcData,
+    teamData,
+    setPcData,
+    setTeamData,
     moveWithAPI,
     handleBoxToTeamMove,
     handleTeamToBoxMove,

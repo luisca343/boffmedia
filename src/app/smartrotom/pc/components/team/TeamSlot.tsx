@@ -50,8 +50,8 @@ export function TeamSlot({
   })
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: isDragging ? 'none' : CSS.Transform.toString(transform),
+    transition: isDragging ? 'none' : transition,
   }
 
   const { currentHP, maxHP, hpPercentage, isFainted } = pokemonData || { 
