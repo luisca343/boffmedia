@@ -35,10 +35,10 @@ export default function PCHeader({
               </div>
               <div>
                 <h1 className="text-2xl font-mono font-bold text-black">
-                  PC STORAGE SYSTEM
+                  PC DE FICUS
                 </h1>
                 <p className="text-gray-700 font-mono text-sm">
-                  MANAGE YOUR CAPTURED POKEMON
+                  ADMINISTRA TUS POKEMON CAPTURADOS
                 </p>
               </div>
             </div>
@@ -57,16 +57,16 @@ export default function PCHeader({
             <div className="flex items-center bg-gray-200 border-2 border-black px-3 py-2">
               <div className="text-center">
                 <div className="text-black font-mono font-bold text-sm">{teamCount}/6</div>
-                <div className="text-gray-700 font-mono text-xs">TEAM</div>
+                <div className="text-gray-700 font-mono text-xs">EQUIPO</div>
               </div>
             </div>
             
             <div className="flex items-center bg-gray-200 border-2 border-black px-3 py-2">
               <div className="text-center">
                 <div className="text-black font-mono font-bold text-sm">
-                  BOX {currentBox + 1} / {totalBoxes}
+                  CAJA {currentBox + 1} / {totalBoxes}
                 </div>
-                <div className="text-gray-700 font-mono text-xs">CURRENT BOX</div>
+                <div className="text-gray-700 font-mono text-xs">CAJA ACTUAL</div>
               </div>
             </div>
             
@@ -79,7 +79,7 @@ export default function PCHeader({
               >
                 <FaExchangeAlt />
                 <span className="hidden md:inline">
-                  {isDualBoxMode ? "ONE BOX" : "TWO BOXES"}
+                  {isDualBoxMode ? "UNA CAJA" : "DOS CAJAS"}
                 </span>
               </button>
             )}
@@ -91,7 +91,7 @@ export default function PCHeader({
                 title="VIEW ALL BOXES"
               >
                 <LuGrid3X3 />
-                <span className="hidden md:inline">VIEW ALL</span>
+                <span className="hidden md:inline">VER TODO</span>
               </button>
             )}
             
@@ -103,7 +103,7 @@ export default function PCHeader({
               <div className="animate-spin">
                 <FaSyncAlt className="text-sm" />
               </div>
-              <span className="hidden md:inline">REFRESH</span>
+              <span className="hidden md:inline">REFRESCAR</span>
             </button>
           </div>
         </div>

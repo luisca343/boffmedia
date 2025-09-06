@@ -84,7 +84,7 @@ export function PokemonCard({ pokemonData, isFromTeam, isFromPC, isShiny, isFain
               ? 'bg-gray-200 border-gray-600 text-gray-700' 
               : 'text-black'
           }`}>
-            LV.{pokemonData.level} • {pokemonData.species}{pokemonData.form && ` (${pokemonData.form})`}
+            NV.{pokemonData.level} • {pokemonData.species}{pokemonData.form && ` (${pokemonData.form})`}
           </div>
         </div>
 
@@ -101,11 +101,11 @@ export function PokemonCard({ pokemonData, isFromTeam, isFromPC, isShiny, isFain
         <div className="space-y-2">
           <div className="grid grid-cols-1 gap-2 text-xs">
             <div className="bg-white border-2 border-black p-2">
-              <div className="font-mono font-bold text-gray-700">NATURE:</div>
+              <div className="font-mono font-bold text-gray-700">NATURALEZA:</div>
               <div className="text-black font-mono">{t(`pokedex.nature_${pokemonData.nature.toLowerCase()}`)}</div>
             </div>
             <div className="bg-white border-2 border-black p-2">
-              <div className="font-mono font-bold text-gray-700">ABILITY:</div>
+              <div className="font-mono font-bold text-gray-700">HABILIDAD:</div>
               <div className="text-black font-mono">{t(`pokedex.ability_${pokemonData.ability.replaceAll(' ', '')}`)}</div>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function PokemonCard({ pokemonData, isFromTeam, isFromPC, isShiny, isFain
                 }`}>
                   <FaHeart className={`text-sm ${isFainted ? 'text-gray-200' : 'text-white'}`} />
                 </div>
-                <span className="text-black font-mono font-bold">HP</span>
+                <span className="text-black font-mono font-bold">PS</span>
               </div>
               <div className="text-right">
                 <div className="text-black font-mono font-bold">{currentHP}/{maxHP}</div>

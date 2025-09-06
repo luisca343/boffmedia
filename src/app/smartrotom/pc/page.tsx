@@ -293,23 +293,23 @@ export default function PCPage() {
             
             <button
               onClick={() => setActiveTab('team')}
-              className={`relative flex-1 px-4 py-3 font-mono text-sm font-bold transition-all duration-150 z-10 active:scale-95 ${
+              className={`relative flex-1 py-3 font-mono text-xs font-bold transition-all duration-150 z-10 active:scale-95 ${
                 activeTab === 'team'
                   ? 'text-white'
                   : 'text-black hover:text-white'
               }`}
             >
-              CURRENT TEAM
+              EQUIPO ACTUAL
             </button>
             <button
               onClick={() => setActiveTab('battleTeams')}
-              className={`relative flex-1 px-4 py-3 font-mono text-sm font-bold transition-all duration-150 z-10 active:scale-95 ${
+              className={`relative flex-1 py-3 font-mono text-xs font-bold transition-all duration-150 z-10 active:scale-95 ${
                 activeTab === 'battleTeams'
                   ? 'text-white'
                   : 'text-black hover:text-white'
               }`}
             >
-              BATTLE TEAMS
+              EQUIPOS DE COMBATE
             </button>
           </div>
 

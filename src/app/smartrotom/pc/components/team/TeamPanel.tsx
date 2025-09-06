@@ -28,17 +28,14 @@ export default function TeamPanel({
   return (
     <div className="bg-white border-4 border-black h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-300 border-b-4 border-black p-3">
+      <div className="bg-gray-300 border-b-4 border-black p-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
                 <PiUsers className="text-white text-lg" />
               </div>
               <div>
-                <h3 className="text-black font-mono font-bold text-lg">CURRENT TEAM</h3>
-                <p className="text-gray-700 font-mono text-xs">
-                  {teamData.length}/6 POKEMON IN PARTY
-                </p>
+                <h3 className="text-black font-mono font-bold text-lg">EQUIPO ACTUAL</h3>
               </div>
             </div>
           </div>
@@ -76,7 +73,7 @@ export default function TeamPanel({
             <div className="flex items-center space-x-2">
               <PiInfo className="text-black text-sm" />
               <span className="text-black font-mono text-xs">
-                DRAG POKEMON TO REORGANIZE PARTY
+                ARRASTRA POKEMON PARA REORGANIZAR
               </span>
             </div>
           </div>

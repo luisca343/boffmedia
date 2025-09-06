@@ -22,31 +22,31 @@ export default function BoxSelectionPopup({
   const getBoxStatus = (count: number) => {
     if (count === 0) return { 
       color: 'from-gray-600 to-gray-700', 
-      text: 'EMPTY',
+      text: 'VACÍA',
       bgColor: 'bg-gray-200',
       borderColor: 'border-gray-600'
     }
     if (count < 10) return { 
       color: 'from-gray-500 to-gray-600', 
-      text: 'LOW',
+      text: 'CASI VACÍA',
       bgColor: 'bg-gray-100',
       borderColor: 'border-gray-500'
     }
     if (count < 20) return { 
       color: 'from-gray-400 to-gray-500', 
-      text: 'MEDIUM',
+      text: 'MEDIO LLENA',
       bgColor: 'bg-white',
       borderColor: 'border-gray-400'
     }
     if (count < 30) return { 
       color: 'from-gray-600 to-gray-700', 
-      text: 'HIGH',
+      text: 'CASI LLENA',
       bgColor: 'bg-gray-300',
       borderColor: 'border-gray-600'
     }
     return { 
       color: 'from-black to-gray-800', 
-      text: 'FULL',
+      text: 'LLENA',
       bgColor: 'bg-gray-400',
       borderColor: 'border-black'
     }
@@ -54,7 +54,7 @@ export default function BoxSelectionPopup({
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-300 border-4 border-black max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div className="bg-gray-300 border-4 border-black max-w-5xl  overflow-hidden">
         {/* Header */}
         <div className="bg-gray-400 border-b-4 border-black p-4">
           <div className="flex justify-between items-center">
@@ -63,8 +63,8 @@ export default function BoxSelectionPopup({
                 <FaArchive className="text-white text-lg" />
               </div>
               <div>
-                <h3 className="text-black font-mono font-bold text-xl">BOX SELECTOR</h3>
-                <p className="text-gray-700 font-mono text-sm">CHOOSE A BOX TO NAVIGATE</p>
+                <h3 className="text-black font-mono font-bold text-xl">SELECTOR DE CAJAS</h3>
+                <p className="text-gray-700 font-mono text-sm">ELIGE UNA CAJA PARA NAVEGAR</p>
               </div>
             </div>
             <button 
@@ -112,7 +112,7 @@ export default function BoxSelectionPopup({
                   {/* Box info */}
                   <div>
                     <div className="text-black font-mono font-bold text-lg mb-1">
-                      BOX {index + 1}
+                      CAJA {index + 1}
                     </div>
                     
                     <div className="text-gray-700 font-mono text-sm mb-3">
@@ -142,24 +142,24 @@ export default function BoxSelectionPopup({
         <div className="bg-gray-400 border-t-4 border-black p-4">
           <div className="flex items-center justify-between text-sm">
             <div className="text-gray-700 font-mono">
-              CURRENT BOX: <span className="text-black font-bold">BOX {currentBox + 1}</span>
+              CAJA ACTUAL: <span className="text-black font-bold">CAJA {currentBox + 1}</span>
             </div>
             <div className="flex items-center space-x-4 text-gray-700 font-mono text-xs">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-gray-200 border border-gray-600" />
-                <span>EMPTY</span>
+                <span>VACÍA</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-gray-100 border border-gray-500" />
-                <span>LOW</span>
+                <span>BAJA</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-white border border-gray-400" />
-                <span>MEDIUM</span>
+                <span>MEDIA</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-black border border-black" />
-                <span>FULL</span>
+                <span>LLENA</span>
               </div>
             </div>
           </div>

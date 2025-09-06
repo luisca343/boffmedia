@@ -63,7 +63,7 @@ export default function BoxHeader({
           </div>
           <div>
             <h3 className="text-black font-mono font-bold text-lg">
-              BOX {boxData.boxNumber + 1}
+              CAJA {boxData.boxNumber + 1}
             </h3>
             <p className="text-gray-700 font-mono text-xs">
               {pokemonCount}/30 POKEMON
@@ -81,7 +81,7 @@ export default function BoxHeader({
                 ? 'bg-gray-600 hover:bg-gray-500 border-gray-500 hover:border-gray-400' 
                 : 'bg-gray-600 hover:bg-gray-500 border-gray-500 hover:border-gray-400'
             } border-2 text-white p-2 transition-all duration-150 active:scale-95`}
-            title="NEXT BOX"
+            title="SIGUIENTE CAJA"
           >
             <FaChevronRight className="text-sm" />
           </button>
@@ -91,7 +91,7 @@ export default function BoxHeader({
             <button
               onClick={onDeselect}
               className="bg-red-600 hover:bg-red-500 border-2 border-red-500 hover:border-red-400 text-white p-2 transition-all duration-150 active:scale-95"
-              title="CLOSE SECONDARY BOX"
+              title="CERRAR CAJA SECUNDARIA"
             >
               <FaTimes className="text-sm" />
             </button>

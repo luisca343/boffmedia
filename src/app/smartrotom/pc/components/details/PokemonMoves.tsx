@@ -29,9 +29,9 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
 
   const getCategoryName = (category: string) => {
     const categoryMap = {
-      'PHYSICAL': 'PHY',
-      'SPECIAL': 'SPC',
-      'STATUS': 'STA'
+      'PHYSICAL': 'FÍS',
+      'SPECIAL': 'ESP',
+      'STATUS': 'EST'
     };
     return categoryMap[category] || category;
   };
@@ -45,9 +45,9 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
             <PiSwordFill className="text-white text-lg" />
           </div>
           <div>
-            <h3 className="text-black font-mono font-bold text-lg">MOVES</h3>
+            <h3 className="text-black font-mono font-bold text-lg">MOVIMIENTOS</h3>
             <p className="text-gray-700 font-mono text-sm">
-              {moves.filter(m => m).length}/4 MOVES LEARNED
+              {moves.filter(m => m).length}/4 MOVIMIENTOS APRENDIDOS
             </p>
           </div>
         </div>
@@ -60,8 +60,8 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
             <div className="w-12 h-12 mx-auto mb-4 bg-white border-2 border-black flex items-center justify-center">
               <PiSwordFill className="text-2xl opacity-50" />
             </div>
-            <h4 className="font-mono font-bold mb-2">NO MOVES</h4>
-            <p className="font-mono text-xs text-gray-600">THIS POKEMON HAS NO REGISTERED MOVES</p>
+            <h4 className="font-mono font-bold mb-2">SIN MOVIMIENTOS</h4>
+            <p className="font-mono text-xs text-gray-600">ESTE POKÉMON NO TIENE MOVIMIENTOS REGISTRADOS</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -105,11 +105,11 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
                       <div className="space-y-2">
                         <div className="grid grid-cols-2 gap-2">
                           <div className="bg-gray-200 border border-black p-1">
-                            <div className="text-xs text-gray-700 font-mono">PWR:</div>
+                            <div className="text-xs text-gray-700 font-mono">POTENCIA:</div>
                             <div className="text-xs text-black font-mono font-bold">{move.power || '-'}</div>
                           </div>
                           <div className="bg-gray-200 border border-black p-1">
-                            <div className="text-xs text-gray-700 font-mono">ACC:</div>
+                            <div className="text-xs text-gray-700 font-mono">PRECISIÓN:</div>
                             <div className="text-xs text-black font-mono font-bold">
                               {move.accuracy && move.accuracy > 0 ? `${move.accuracy}%` : '-'}
                             </div>
@@ -127,7 +127,7 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
                     ) : (
                       <div className="text-center py-4">
                         <PiGear className="text-gray-500 text-2xl mx-auto mb-2 opacity-50" />
-                        <span className="text-gray-600 font-mono text-xs">EMPTY</span>
+                        <span className="text-gray-600 font-mono text-xs">VACÍO</span>
                       </div>
                     )}
                   </div>

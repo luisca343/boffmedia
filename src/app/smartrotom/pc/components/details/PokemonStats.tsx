@@ -33,8 +33,8 @@ export function PokemonStats({ stats, ivs, evs }: PokemonStatsProps) {
             <PiChartBar className="text-white text-lg" />
           </div>
           <div>
-            <h3 className="text-black font-mono font-bold text-lg">STATS</h3>
-            <p className="text-gray-700 font-mono text-sm">BASE STATS, IVS & EVS</p>
+            <h3 className="text-black font-mono font-bold text-lg">ESTADÍSTICAS</h3>
+            <p className="text-gray-700 font-mono text-sm">ESTADÍSTICAS BASE, IVS & EVS</p>
           </div>
         </div>
       </div>

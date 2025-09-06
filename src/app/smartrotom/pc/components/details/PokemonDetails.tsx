@@ -126,7 +126,7 @@ export default function PokemonDetails({
                           ? 'bg-gray-600 hover:bg-gray-500 border-gray-500 hover:border-gray-400 text-white' 
                           : 'bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
-                      title="PREVIOUS POKEMON (← LEFT ARROW)"
+                      title="POKÉMON ANTERIOR (← LEFT ARROW)"
                     >
                       <FaChevronLeft className="text-sm" />
                     </button>
@@ -139,13 +139,13 @@ export default function PokemonDetails({
                     <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
                       <PiInfo className="text-white text-lg" />
                     </div>
-                    <h2 className="text-black font-mono font-bold text-xl">POKEMON INFO</h2>
+                    <h2 className="text-black font-mono font-bold text-xl">INFORMACIÓN DEL POKÉMON</h2>
                   </div>
                   {isFromPC && (
                     <div className="flex items-center justify-center space-x-2">
                       <PiArchive className="text-gray-700 text-sm" />
                       <p className="text-gray-700 font-mono text-sm">
-                        BOX {pokemon!.box + 1} • SLOT {pokemon!.index + 1}
+                        CAJA {pokemon!.box + 1} • SLOT {pokemon!.index + 1}
                       </p>
                     </div>
                   )}
@@ -162,7 +162,7 @@ export default function PokemonDetails({
                           ? 'bg-gray-600 hover:bg-gray-500 border-gray-500 hover:border-gray-400 text-white' 
                           : 'bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed'
                       }`}
-                      title="NEXT POKEMON (→ RIGHT ARROW)"
+                      title="SIGUIENTE POKÉMON (→ RIGHT ARROW)"
                     >
                       <FaChevronRight className="text-sm" />
                     </button>

@@ -35,8 +35,8 @@ export function PokemonTypeEffectiveness({ weaknesses, resistances, immunities }
             <PiShield className="text-white text-lg" />
           </div>
           <div>
-            <h3 className="text-black font-mono font-bold text-lg">TYPE EFFECTIVENESS</h3>
-            <p className="text-gray-700 font-mono text-sm">WEAKNESSES, RESISTANCES & IMMUNITIES</p>
+            <h3 className="text-black font-mono font-bold text-lg">EFECTIVIDADES DE TIPO</h3>
+            <p className="text-gray-700 font-mono text-sm">DEBILIDADES, RESISTENCIAS & INMUNIDADES</p>
           </div>
         </div>
       </div>
@@ -48,8 +48,8 @@ export function PokemonTypeEffectiveness({ weaknesses, resistances, immunities }
             <div className="w-12 h-12 mx-auto mb-4 bg-white border-2 border-black flex items-center justify-center">
               <PiShield className="text-2xl opacity-50" />
             </div>
-            <h4 className="font-mono font-bold mb-2">NO TYPE MODIFIERS</h4>
-            <p className="font-mono text-xs text-gray-600">THIS POKEMON HAS NO SPECIAL TYPE ADVANTAGES</p>
+            <h4 className="font-mono font-bold mb-2">NINGÚN MODIFICADOR DE TIPO</h4>
+            <p className="font-mono text-xs text-gray-600">ESTE POKÉMON NO TIENE DEBILIDADES, RESISTENCIAS NI INMUNIDADES</p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -60,7 +60,7 @@ export function PokemonTypeEffectiveness({ weaknesses, resistances, immunities }
                   <div className="w-6 h-6 bg-black border-2 border-gray-600 flex items-center justify-center">
                     <PiShieldWarning className="text-white text-xs" />
                   </div>
-                  <h4 className="text-black font-mono font-bold">WEAK TO</h4>
+                  <h4 className="text-black font-mono font-bold">DÉBIL A</h4>
                   <div className="h-1 bg-black flex-1" />
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -90,7 +90,7 @@ export function PokemonTypeEffectiveness({ weaknesses, resistances, immunities }
                   <div className="w-6 h-6 bg-gray-600 border-2 border-gray-500 flex items-center justify-center">
                     <PiShieldCheck className="text-white text-xs" />
                   </div>
-                  <h4 className="text-gray-700 font-mono font-bold">RESISTS</h4>
+                  <h4 className="text-gray-700 font-mono font-bold">RESISTE</h4>
                   <div className="h-1 bg-gray-600 flex-1" />
                 </div>
                 <div className="flex flex-wrap gap-3">
@@ -120,7 +120,7 @@ export function PokemonTypeEffectiveness({ weaknesses, resistances, immunities }
                   <div className="w-6 h-6 bg-gray-500 border-2 border-gray-400 flex items-center justify-center">
                     <PiShield className="text-white text-xs" />
                   </div>
-                  <h4 className="text-gray-600 font-mono font-bold">IMMUNE TO</h4>
+                  <h4 className="text-gray-600 font-mono font-bold">INMUNE A</h4>
                   <div className="h-1 bg-gray-500 flex-1" />
                 </div>
                 <div className="flex flex-wrap gap-3">

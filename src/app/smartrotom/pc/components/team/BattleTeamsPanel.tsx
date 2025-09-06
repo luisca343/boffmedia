@@ -129,7 +129,7 @@ export default function BattleTeamsPanel({
       <div className="bg-white border-4 border-black h-full flex items-center justify-center">
         <div className="flex items-center space-x-3">
           <div className="w-8 h-8 border-2 border-black rounded-full border-t-transparent animate-spin" />
-          <p className="text-black font-mono text-sm">LOADING BATTLE TEAMS...</p>
+          <p className="text-black font-mono text-sm">CARGANDO EQUIPOS DE COMBATE...</p>
         </div>
       </div>
     )
@@ -145,15 +145,15 @@ export default function BattleTeamsPanel({
               <FaTrophy className="text-white text-sm" />
             </div>
             <div>
-              <h3 className="text-black font-mono font-bold text-lg">BATTLE TEAMS</h3>
+              <h3 className="text-black font-mono font-bold text-lg">EQUIPOS DE COMBATE</h3>
               <div className="flex items-center space-x-2">
                 <p className="text-gray-700 font-mono text-xs">
-                  {battleTeamsData.teams.length}/{battleTeamsData.maxTeams} TEAMS
+                  {battleTeamsData.teams.length}/{battleTeamsData.maxTeams} EQUIPOS
                 </p>
                 {battleTeamsData.teams.find(t => t.isActive) && (
                   <div className="flex items-center space-x-1">
                     <div className="w-2 h-2 bg-black animate-pulse" />
-                    <span className="text-xs text-black font-mono">ACTIVE</span>
+                    <span className="text-xs text-black font-mono">ACTIVO</span>
                   </div>
                 )}
               </div>
@@ -164,7 +164,7 @@ export default function BattleTeamsPanel({
             onClick={() => setShowCreateForm(!showCreateForm)}
             className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 border-2 border-green-500 hover:border-green-400 disabled:border-gray-500 text-white p-2 transition-all duration-150 active:scale-95"
             disabled={battleTeamsData.teams.length >= battleTeamsData.maxTeams}
-            title="CREATE NEW BATTLE TEAM"
+            title="CREAR NUEVO EQUIPO DE COMBATE"
           >
             <FaPlus className="text-sm" />
           </button>
@@ -212,7 +212,7 @@ export default function BattleTeamsPanel({
               }}
               className="bg-red-600 hover:bg-red-500 border-2 border-red-500 hover:border-red-400 text-white px-3 py-1 font-mono text-sm transition-all duration-150 active:scale-95"
             >
-              CANCEL
+              CANCELAR
             </button>
           </div>
         </div>
@@ -225,8 +225,8 @@ export default function BattleTeamsPanel({
             <div className="w-12 h-12 mx-auto mb-4 bg-blue-800 border-2 border-blue-700 flex items-center justify-center">
               <FaTrophy className="text-2xl opacity-50" />
             </div>
-            <h4 className="font-mono font-bold mb-2">NO BATTLE TEAMS</h4>
-            <p className="font-mono text-xs text-blue-400">CREATE YOUR FIRST TEAM FOR BATTLE FRONTIER</p>
+            <h4 className="font-mono font-bold mb-2">NO HAY EQUIPOS DE COMBATE</h4>
+            <p className="font-mono text-xs text-blue-400">CREA TU PRIMER EQUIPO PARA EL FRENTE DE BATALLA</p>
           </div>
         ) : (
           <div className="space-y-2">
