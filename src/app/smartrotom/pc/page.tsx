@@ -19,6 +19,8 @@ import PokemonDetails from './components/details/PokemonDetails'
 import LoadingOverlay from './components/layout/LoadingOverlay'
 import PlayOnMountAudio from '@components/common/PlayOnMountAudio'
 import PlayOnUnmountAudio from '@components/common/PlayOnUnmountAudio'
+import { PokemonImage } from '@/lib/PokemonImage'
+import { createPokemonSpec, createPokemonSpecFromTeam } from './utils/pokemonUtils'
 import {
   DndContext,
   DragEndEvent,
@@ -378,11 +380,14 @@ export default function PCPage() {
 
         <DragOverlay>
           {activeDragItem && activeDragItem.pokemon && (
-            <div className="w-12 h-12 bg-gray-300 border-2 border-black flex items-center justify-center opacity-75">
-              <img
-                src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${activeDragItem.pokemon.id}.png`}
-                alt={activeDragItem.pokemon.name}
-                className="w-8 h-8 pixelated"
+            <div className="w-16 h-16 bg-white border-4 border-black flex items-center justify-center opacity-90">
+              <PokemonImage
+                itemId={
+                  activeDragItem.type === 'team' 
+                    ? createPokemonSpecFromTeam(activeDragItem.pokemon)
+                    : createPokemonSpec(activeDragItem.pokemon)
+                }
+                size={48}
               />
             </div>
           )}
