@@ -387,15 +387,38 @@ export default function PCPage() {
 
         <DragOverlay dropAnimation={null}>
           {activeDragItem && activeDragItem.pokemon && (
-            <div className="w-16 h-16 bg-white border-4 border-black flex items-center justify-center opacity-90">
-              <PokemonImage
-                itemId={
-                  activeDragItem.type === 'team' 
-                    ? createPokemonSpecFromTeam(activeDragItem.pokemon)
-                    : createPokemonSpec(activeDragItem.pokemon.pokemon || activeDragItem.pokemon)
-                }
-                size={48}
-              />
+            <div className={`
+              ${activeDragItem.type === 'team' 
+                ? 'w-72 h-20 bg-white border-2 border-black p-2 opacity-90' 
+                : 'w-16 h-16 bg-white border-4 border-black opacity-90'
+              } 
+              flex items-center justify-center
+            `}>
+              {activeDragItem.type === 'team' ? (
+                // Team slot layout for drag preview
+                <div className="flex items-center w-full space-x-3">
+                  <div className="w-12 h-12 bg-gray-200 border-2 border-black flex items-center justify-center flex-shrink-0">
+                    <PokemonImage
+                      itemId={createPokemonSpecFromTeam(activeDragItem.pokemon)}
+                      size={40}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-black font-mono font-bold text-sm truncate">
+                      {activeDragItem.pokemon.name}
+                    </div>
+                    <div className="text-gray-600 font-mono text-xs">
+                      LV. {activeDragItem.pokemon.level}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                // Box slot layout for drag preview (existing)
+                <PokemonImage
+                  itemId={createPokemonSpec(activeDragItem.pokemon.pokemon || activeDragItem.pokemon)}
+                  size={48}
+                />
+              )}
             </div>
           )}
         </DragOverlay>
