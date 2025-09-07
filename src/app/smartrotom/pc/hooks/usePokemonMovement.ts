@@ -97,9 +97,9 @@ export const usePokemonMovement = ({
   const handleTeamToBoxMove = useCallback((
     source: DragSource,
     destination: DragDestination
-  ) => {
+  ): boolean => {
     const sourcePokemon = teamData[source.index]
-    if (!sourcePokemon) return
+    if (!sourcePokemon) return false
 
     const destinationPokemon = pcData.find(p => p.box === destination.boxNumber && p.index === destination.index)
     
@@ -116,11 +116,12 @@ export const usePokemonMovement = ({
       
       setPcData(newPcData)
       setTeamData(newTeamData)
+      return false
     } else {
       // Don't allow team to be completely empty
       if (teamData.filter(p => p !== null).length <= 1) {
         toast.error('No puedes dejar el equipo completamente vacío')
-        return
+        return true
       }
       
       // Move to empty slot - FIXED: Set slot to null instead of removing
@@ -131,6 +132,7 @@ export const usePokemonMovement = ({
       const newPcPokemon = convertTeamToPC(sourcePokemon, destination.index, destination.boxNumber!)
       const newPcData = [...pcData, newPcPokemon]
       setPcData(newPcData)
+      return false
     }
   }, [pcData, teamData, setPcData, setTeamData])
 
@@ -200,17 +202,21 @@ export const usePokemonMovement = ({
     const previousPcData = [...pcData]
     const previousTeamData = [...teamData]
 
+    let stop = false
+
     try {
       // 1. Update local state immediately (optimistic update)
       if (source.type === 'box' && destination.type === 'team') {
         handleBoxToTeamMove(source, destination)
       } else if (source.type === 'team' && destination.type === 'box') {
-        handleTeamToBoxMove(source, destination)
+        stop = handleTeamToBoxMove(source, destination)
       } else if (source.type === 'box' && destination.type === 'box') {
         handleBoxToBoxMove(source, destination)
       } else if (source.type === 'team' && destination.type === 'team') {
         handleTeamToTeamMove(source, destination)
       }
+
+      if (stop) return
 
       // 2. Then make API call to persist the change
       await moveWithAPI(source, destination)
