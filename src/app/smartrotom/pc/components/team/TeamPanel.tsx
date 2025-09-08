@@ -26,59 +26,62 @@ export default function TeamPanel({
   const slotIds = teamSlots.map((_, index) => `team-slot-${index}`)
 
   return (
-    <div className="bg-white border-4 border-black h-full flex flex-col overflow-hidden">
+    <div className="bg-slate-900/40 backdrop-blur-sm rounded-b-2xl border border-slate-500/30 border-t-0 shadow-2xl h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-300 border-b-4 border-black p-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
-                <PiUsers className="text-white text-lg" />
-              </div>
-              <div>
-                <h3 className="text-black font-mono font-bold text-lg">EQUIPO ACTUAL</h3>
-              </div>
+      <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-3 border-b border-slate-500/30 flex-shrink-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none" />
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-green-500/20 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm">
+              <PiUsers className="text-white text-xl" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">Equipo Actual</h3>
+              <p className="text-slate-300 text-sm font-medium">
+                {teamData.length}/6 Pokémon en el equipo
+              </p>
             </div>
           </div>
         </div>
-
-        {/* Team Slots */}
-        <SortableContext items={slotIds} strategy={stablePositionStrategy}>
-          <div className="flex flex-col justify-between flex-1 p-3 space-y-2 overflow-hidden">
-            {teamSlots.map((pokemon, index) => (
-              <div
-                key={index}
-                className="relative"
-              >
-                <TeamSlot
-                  id={`team-slot-${index}`}
-                  pokemon={pokemon}
-                  index={index}
-                  isSelected={selectedPokemon === pokemon}
-                  onClick={() => onPokemonClick(pokemon)}
-                />
-                
-                {!pokemon && (
-                  <div className="absolute left-2 top-2 w-4 h-4 bg-white border border-black flex items-center justify-center">
-                    <span className="text-black text-xs font-mono font-bold">{index + 1}</span>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </SortableContext>
-
-        {/* Footer Info */}
-        <div className="bg-gray-300 border-t-4 border-black p-2">
-          <div className="flex items-center justify-center">
-            <div className="flex items-center space-x-2">
-              <PiInfo className="text-black text-sm" />
-              <span className="text-black font-mono text-xs">
-                ARRASTRA POKEMON PARA REORGANIZAR
-              </span>
-            </div>
-          </div>
-        </div>
-        
       </div>
+
+      {/* Team Slots */}
+      <SortableContext items={slotIds} strategy={stablePositionStrategy}>
+        <div className="flex flex-col justify-between flex-1 p-4 space-y-3 overflow-hidden">
+          {teamSlots.map((pokemon, index) => (
+            <div
+              key={index}
+              className="relative"
+            >
+              <TeamSlot
+                id={`team-slot-${index}`}
+                pokemon={pokemon}
+                index={index}
+                isSelected={selectedPokemon === pokemon}
+                onClick={() => onPokemonClick(pokemon)}
+              />
+              {!pokemon && (
+                <div className="absolute left-2 top-2 w-5 h-5 bg-slate-700/50 border border-slate-500/30 rounded-full flex items-center justify-center backdrop-blur-sm">
+                  <span className="text-slate-400 text-xs font-bold">{index + 1}</span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </SortableContext>
+
+      {/* Footer Info */}
+      <div className="relative p-3 mt-auto flex-shrink-0 bg-slate-800/50 border-t border-slate-500/30">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-green-500/5 pointer-events-none" />
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <PiInfo className="text-slate-400 text-sm" />
+            <span className="text-slate-300 text-xs font-medium">
+              Arrastra Pokémon para reorganizar el equipo
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

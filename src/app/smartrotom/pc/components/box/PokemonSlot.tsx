@@ -24,7 +24,7 @@ interface PokemonSlotProps {
 
 // Separate component for shiny indicator
 const ShinyIndicator = memo(() => (
-  <div className="absolute top-0 left-0 w-4 h-4 bg-black border border-gray-600 flex items-center justify-center z-20">
+  <div className="absolute top-1 left-1 z-20">
     <FaStar className="text-white text-xs" />
   </div>
 ))
@@ -35,16 +35,20 @@ const GenderIndicator = memo(({ gender }: { gender: any }) => {
   if (!icon) return null
   
   return (
-    <div className="absolute top-0 right-0 w-4 h-4 bg-white border border-black flex items-center justify-center z-20">
-      <div className="text-black text-xs">{icon}</div>
+    <div className="absolute top-1 right-1 z-20">
+      <div className="w-4 h-4 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center border border-white/20">
+        {icon}
+      </div>
     </div>
   )
 })
 
 // Separate component for item indicator
 const ItemIndicator = memo(({ item }: { item: string }) => (
-  <div className="absolute bottom-0 left-0 w-6 h-6 bg-white border border-black flex items-center justify-center z-20">
-    <div className="w-3 h-3 bg-black" />
+  <div className="absolute bottom-1 left-1 z-20">
+    <div className="w-6 h-6 bg-black/50 backdrop-blur-sm rounded-lg flex items-center justify-center border border-white/20">
+      <PokemonItemImage itemId={item} size={20} />
+    </div>
   </div>
 ))
 
@@ -123,17 +127,19 @@ const PokemonSlot = memo(function PokemonSlot({
         {...listeners}
       >
         <div 
-          className={`absolute inset-0 bg-gray-200 border-4 cursor-pointer transition-all duration-150 ${
+          className={`absolute inset-0 bg-gradient-to-br from-gray-600/20 to-gray-800/20 border-2 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer group backdrop-blur-sm ${
             isOver 
-              ? 'border-black bg-gray-300' 
-              : 'border-gray-600 hover:border-gray-500'
+              ? 'border-green-400 bg-green-400/20 shadow-green-400/50 shadow-lg' 
+              : 'border-gray-500/30 hover:border-gray-400/50'
           }`}
+          onDragOver={undefined}
+          onDragLeave={undefined}
+          onDrop={undefined}
         >
-          <div className="flex items-center justify-center h-full">
-            <div className="text-black group-hover:text-gray-700 transition-colors">
-              <div className="w-8 h-8 border-2 border-dashed border-current flex items-center justify-center">
-                <div className="w-2 h-2 bg-current opacity-60"></div>
-              </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 pointer-events-none rounded-xl" />
+          <div className="text-gray-500 group-hover:text-gray-400 transition-colors relative z-10">
+            <div className="w-8 h-8 border-2 border-dashed border-current rounded-full opacity-50 flex items-center justify-center">
+              <div className="w-2 h-2 bg-current rounded-full opacity-60"></div>
             </div>
           </div>
         </div>
@@ -151,25 +157,25 @@ const PokemonSlot = memo(function PokemonSlot({
       {...listeners}
     >
       <div 
-        className={`absolute inset-0 bg-white border-4 cursor-pointer transition-all duration-150 overflow-hidden ${
+        className={`absolute inset-0 bg-gradient-to-br from-surface-50/20 to-surface-100/30 border-2 rounded-xl cursor-pointer transition-all duration-200 backdrop-blur-sm overflow-hidden ${
           isOver
-            ? 'border-black bg-gray-300'
+            ? 'border-green-400 bg-green-400/20'
             : isSelected 
-            ? 'border-black bg-gray-200' 
-            : 'border-gray-600 hover:border-gray-500 hover:bg-gray-100'
-        } ${isHovered ? 'scale-105' : 'scale-100'} ${
-          isDragging ? 'opacity-50' : 'opacity-100'
+            ? 'border-yellow-400 bg-yellow-400/10' 
+            : 'border-white/30 hover:border-white/60 bg-slate-800/20 hover:bg-slate-800/30'
         }`}
         onClick={onClick}
         onContextMenu={handleContextMenu}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        {/* Subtle background pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none" />
         {/* Pokemon Image */}
         <div className="absolute inset-1 flex items-center justify-center z-10">
           <PokemonImage
             itemId={createPokemonSpec(pokemon.pokemon)}
-            size={isHovered ? 70 : 64}
+            size={64}
           />
         </div>
 
@@ -178,17 +184,10 @@ const PokemonSlot = memo(function PokemonSlot({
         <GenderIndicator gender={pokemon.pokemon.gender} />
         {hasItem && <ItemIndicator item={pokemon.pokemon.item} />}
 
-        {/* Selection indicator */}
-        {isSelected && (
-          <div className="absolute inset-0 border-4 border-black pointer-events-none">
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-black" />
-          </div>
-        )}
-
         {/* Drag over indicator */}
         {isOver && (
-          <div className="absolute inset-0 bg-gray-500/30 border-4 border-black pointer-events-none">
-            <div className="absolute inset-2 border-2 border-dashed border-black" />
+          <div className="absolute inset-0 bg-green-400/15 border-2 border-green-400 rounded-xl pointer-events-none backdrop-blur-sm">
+            <div className="absolute inset-2 border border-dashed border-green-400/60 rounded-lg opacity-75" />
           </div>
         )}
       </div>

@@ -3,10 +3,32 @@ import { PokemonImage } from '@/lib/PokemonImage'
 import { createPokemonSpecFromTeam } from "../../utils/pokemonUtils"
 import { PiStarFill, PiSkullFill } from "react-icons/pi"
 import { PokemonItemImage } from "@/components/common/pokemon/PokemonItemImage"
-import { useState, useMemo, useCallback } from "react"
-import { calculatePokemonHP, getGenderIcon } from "@/lib/smartrotom/pokemonDisplayUtils"
+import { useState, useMemo } from "react"
+import { calculatePokemonHP, getGenderIcon, getHPBarColor, getStatusColor, getStatusIcon } from "@/lib/smartrotom/pokemonDisplayUtils"
+import { BACKGROUND_PATTERNS, getHPBarContainerClasses, getLevelClasses, getPokemonSlotClasses, getPokemonTextClasses, getStatusIndicatorClasses } from "@/lib/smartrotom/pokemonStyles"
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { motion } from "framer-motion"
+
+// Optimized animation variants from old.tsx
+const OPTIMIZED_SLOT_VARIANTS = {
+  idle: { 
+    scale: 1,
+    transition: { duration: 0.1 }
+  },
+  hover: { 
+    scale: 1.01,
+    transition: { duration: 0.1, ease: "easeOut" }
+  },
+  selected: {
+    scale: 1.01,
+    transition: { duration: 0.1 }
+  },
+  dragOver: {
+    scale: 1.02,
+    transition: { duration: 0.1 }
+  }
+}
 
 export function TeamSlot({ 
   id,
@@ -54,37 +76,25 @@ export function TeamSlot({
     transition: isDragging ? 'none' : transition,
   }
 
+  // Determine animation state efficiently (from old.tsx)
+  const animationState = useMemo(() => {
+    if (isOver) return 'dragOver'
+    if (isSelected) return 'selected'
+    if (isHovered) return 'hover'
+    return 'idle'
+  }, [isOver, isSelected, isHovered])
+
   const { currentHP, maxHP, hpPercentage, isFainted } = pokemonData || { 
     currentHP: 0, maxHP: 0, hpPercentage: 0, isFainted: false 
   }
 
-  // Get HP bar color (Gen 1 black and white style)
-  const getHPColor = (percentage: number) => {
-    // In Gen 1 GB, HP was just black bars on white background
-    return 'bg-black'
-  }
-
-  // Get status color (Gen 1 black and white style)
-  const getStatusColor = (status: string) => {
-    // In Gen 1 GB, all status conditions were just black text on white
-    return 'text-black bg-white border-black'
-  }
-
-  const slotClasses = `
-    relative border-2 p-2 cursor-pointer transition-all duration-150 
-    ${isSelected ? 'border-black bg-gray-300' : 'border-gray-600 hover:border-gray-500'} 
-    ${pokemon ? (isFainted ? 'bg-gray-800 border-gray-700' : 'bg-white hover:bg-gray-100') : 'bg-gray-200 border-dashed border-gray-500'} 
-    ${isOver ? 'border-black bg-gray-300' : ''} 
-    ${isHovered ? 'scale-[1.01]' : 'scale-100'}
-    ${isDragging ? 'opacity-50' : 'opacity-100'}
-    active:scale-[0.99]
-  `
-
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
-      className={slotClasses}
+      className={`${getPokemonSlotClasses(isSelected, pokemon, isFainted, isOver)} ${isDragging ? 'opacity-50' : 'opacity-100'}`}
+      variants={OPTIMIZED_SLOT_VARIANTS}
+      animate={animationState}
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -100,39 +110,57 @@ export function TeamSlot({
       aria-label={pokemon ? `${pokemon.name}, Level ${pokemon.level}, ${Math.round(hpPercentage)}% HP, Status: ${pokemon.status}` : `Empty party slot ${index + 1}`}
       tabIndex={0}
     >
+      {/* Subtle background pattern from old.tsx */}
+      <div className={BACKGROUND_PATTERNS.subtle} />
+      
       {pokemon ? (
-        <div className="flex items-center h-full relative">
+        <div className="flex items-center h-full p-2 relative z-10">
           {/* Pokemon Image */}
           <div className="relative flex-shrink-0">
-            <div className={`w-12 h-12 bg-white border-2 border-black flex items-center justify-center mr-3 relative ${
-              isFainted ? 'opacity-50 grayscale' : ''
-            }`}>
-              <PokemonImage
-                itemId={createPokemonSpecFromTeam(pokemon)}
-                size={40}
-              />
-              
+            <div 
+              className={`w-14 h-14 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl flex items-center justify-center mr-3 relative overflow-hidden ${
+                isFainted ? 'opacity-70' : ''
+              }`}
+            >
+              {/* Simplified Pokemon Image - removed infinite bounce animation */}
+              <div
+                style={{
+                  transform: isFainted ? 'scale(0.9)' : 'scale(1)',
+                  opacity: isFainted ? 0.5 : 1,
+                  filter: isFainted ? 'grayscale(1)' : 'none',
+                  transition: 'all 0.2s ease-out'
+                }}
+              >
+                <PokemonImage
+                  itemId={createPokemonSpecFromTeam(pokemon)}
+                  size={48}
+                />
+              </div>
               {/* Fainted overlay */}
               {isFainted && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                  <PiSkullFill className="text-white text-lg" />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-xl">
+                  <PiSkullFill className="text-red-400 text-lg" />
                 </div>
               )}
-              
-              {/* Shiny indicator - Gen 1 style */}
+              {/* Simplified Shiny indicator - no infinite rotation */}
               {pokemon.palette === 'shiny' && (
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-black border border-gray-600 flex items-center justify-center">
+                <motion.div
+                  className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-lg"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <PiStarFill className="text-white text-xs" />
-                </div>
+                </motion.div>
               )}
             </div>
             
-            {/* Item Indicator - Gen 1 style */}
+            {/* Item Indicator - simplified without hover animation */}
             {pokemon.item && pokemon.item !== 'item.minecraft.air' && (
-              <div className="absolute top-0 left-0">
-                <div className="w-5 h-5 bg-black border border-gray-600 flex items-center justify-center">
-                  <div className="w-3 h-3 bg-white" />
-                </div>
+              <div 
+                className="absolute top-0 left-0 p-0.5"
+                title={`Held item: ${pokemon.item}`}
+              >
+                <PokemonItemImage itemId={pokemon.item} size={24} />
               </div>
             )}
           </div>
@@ -142,45 +170,37 @@ export function TeamSlot({
             {/* Name and Level Row */}
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-1 min-w-0">
-                <h4 className={`font-mono font-bold text-sm truncate ${
-                  isFainted ? 'text-gray-600' : 'text-black'
-                }`}>
+                <h4 className={`font-semibold text-sm truncate ${getPokemonTextClasses(isFainted, 'primary')}`}>
                   {pokemon.name}
                 </h4>
-                {getGenderIcon(pokemon.gender) && (
-                  <div className="text-black">
-                    {getGenderIcon(pokemon.gender)}
-                  </div>
-                )}
+                {/* Gender indicator moved here */}
+                {getGenderIcon(pokemon.gender)}
               </div>
-              <div className={`font-mono text-xs px-1 border ${
-                isFainted ? 'text-gray-600 border-gray-500 bg-gray-300' : 'text-black border-black bg-white'
-              }`}>
-                L{pokemon.level}
+              <div className={getLevelClasses(isFainted)}>
+                Lv. {pokemon.level}
               </div>
             </div>
             
             {/* Species and Form */}
-            <div className={`font-mono text-xs truncate ${
-              isFainted ? 'text-gray-600' : 'text-gray-700'
-            }`}>
+            <div className={`text-xs truncate ${getPokemonTextClasses(isFainted, 'secondary')}`}>
               {pokemon.species}
               {pokemon.form && ` (${pokemon.form})`}
             </div>
 
             {/* HP and Status Bar */}
             <div className="flex items-center space-x-2">
-              {/* HP Bar - Gen 1 style */}
-              <div className="flex-1 space-y-1">
+              
+              {/* HP Bar with animation */}
+              <div className="flex-1 space-y-0.5">
                 <div className="flex justify-between items-center">
-                  <span className="font-mono text-[10px] text-black">HP</span>
-                  <span className="font-mono text-[10px] text-black">
+                  <span className="text-[10px] text-slate-400 font-medium">HP</span>
+                  <span className="text-[10px] text-slate-300 font-mono">
                     {currentHP}/{maxHP}
                   </span>
                 </div>
-                <div className="h-1 bg-white border border-black">
+                <div className={getHPBarContainerClasses()}>
                   <div
-                    className={`h-full transition-all duration-300 ${getHPColor(hpPercentage)}`}
+                    className={`h-full rounded-full transition-all duration-500 ${getHPBarColor(hpPercentage)}`}
                     style={{
                       width: `${Math.max(0, Math.min(100, hpPercentage))}%`
                     }}
@@ -188,10 +208,13 @@ export function TeamSlot({
                 </div>
               </div>
 
-              {/* Status indicator - Gen 1 style */}
+              {/* Status indicator with enhanced design */}
               {pokemon.status !== 'none' && (
-                <div className={`px-1 py-0.5 border font-mono text-[8px] ${getStatusColor(pokemon.status)}`}>
-                  {pokemon.status.toUpperCase().slice(0, 3)}
+                <div className={getStatusIndicatorClasses(pokemon.status)}>
+                  {getStatusIcon(pokemon.status)}
+                  <span className={`text-[10px] font-medium ${getStatusColor(pokemon.status).replace('border-', 'text-')}`}>
+                    {pokemon.status.charAt(0).toUpperCase() + pokemon.status.slice(1)}
+                  </span>
                 </div>
               )}
             </div>
@@ -200,27 +223,45 @@ export function TeamSlot({
       ) : (
         <div className="flex items-center justify-center h-full select-none">
           <div className="text-center">
-            <div className={`w-8 h-8 border-2 border-dashed border-gray-600 mx-auto mb-1 flex items-center justify-center transition-all duration-150 ${
-              isHovered ? 'border-black scale-105' : 'border-gray-600 scale-100'
-            }`}>
-              <span className="text-black font-mono text-lg">+</span>
+            <div 
+              className="w-8 h-8 border-2 border-dashed border-slate-500/50 rounded-full mx-auto mb-1 flex items-center justify-center"
+              style={{
+                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                borderColor: isHovered ? 'rgba(148, 163, 184, 0.7)' : 'rgba(148, 163, 184, 0.5)',
+                transition: 'all 0.1s ease-out'
+              }}
+            >
+              <span className="text-slate-500 text-lg font-light">+</span>
             </div>
-            <span className="text-black font-mono text-xs">SLOT {index + 1}</span>
+            <span className="text-slate-500 text-xs font-medium">Slot {index + 1}</span>
           </div>
         </div>
       )}
       
-      {/* Selection indicator - Gen 1 style */}
+      {/* Simplified Selection indicator */}
       {isSelected && (
-        <div className="absolute inset-0 border-2 border-black pointer-events-none">
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-black" />
+        <div
+          className="absolute inset-0 border-2 border-blue-400 rounded-2xl pointer-events-none"
+          style={{
+            opacity: 1,
+            transform: 'scale(1)',
+            transition: 'opacity 0.1s ease-out'
+          }}
+        >
+          <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-400 rounded-full animate-pulse" />
         </div>
       )}
       
-      {/* Drag over indicator - Gen 1 style */}
+      {/* Simplified Drag over indicator */}
       {isOver && (
-        <div className="absolute inset-0 bg-gray-400/50 border-2 border-black pointer-events-none" />
+        <div
+          className="absolute inset-0 bg-green-400/10 border-2 border-green-400 rounded-2xl pointer-events-none backdrop-blur-sm"
+          style={{
+            opacity: 1,
+            transition: 'opacity 0.1s ease-out'
+          }}
+        />
       )}
-    </div>
+    </motion.div>
   )
 }

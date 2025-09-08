@@ -3,7 +3,7 @@ import { BattleTeam } from '@/types/dto/battle-team.dto'
 import PokemonSlot from './PokemonSlot'
 import BoxHeader from './BoxHeader'
 import { SortableContext } from '@dnd-kit/sortable'
-import { noReorderStrategy } from '@/lib/drag-and-drop'
+import { noReorderStrategy, stablePositionStrategy } from '@/lib/drag-and-drop'
 
 interface DualBoxGridProps {
   primaryBoxData: PCBoxData;
@@ -84,7 +84,7 @@ export default function DualBoxGrid({
     }
     
     return (
-      <SortableContext items={slotIds} strategy={noReorderStrategy}>
+      <SortableContext items={slotIds} strategy={stablePositionStrategy}>
         <div className="space-y-2 animate-fade-in">
           {slots}
         </div>
@@ -95,7 +95,7 @@ export default function DualBoxGrid({
   // Single box view
   if (!secondaryBoxData) {
     return (
-      <div className="bg-white border-4 border-black h-full flex flex-col overflow-hidden animate-fade-in">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Box Header */}
         <BoxHeader
           boxData={primaryBoxData}
@@ -105,7 +105,7 @@ export default function DualBoxGrid({
         />
 
         {/* Grid Container */}
-        <div className="flex-1 flex items-center justify-center p-4 bg-gray-100">
+        <div className="bg-slate-900/40 flex-1 flex items-center justify-center p-3 min-h-0">
           {renderBoxGrid(primaryBoxData)}
         </div>
       </div>
@@ -114,11 +114,11 @@ export default function DualBoxGrid({
 
   // Dual box view
   return (
-    <div className="flex flex-col gap-3 h-full animate-fade-in">
+    <div className="flex flex-col gap-3 h-full  animate-fade-in">
       {/* Boxes Container */}
       <div className="flex gap-3 flex-1 min-h-0">
         {/* Primary Box */}
-        <div className="flex-1 bg-white border-4 border-black flex flex-col overflow-hidden animate-slide-in-left">
+        <div className="flex-1  flex flex-col overflow-hidden animate-slide-in-left">
           {/* Box Header */}
           <BoxHeader
             boxData={primaryBoxData}
@@ -128,13 +128,13 @@ export default function DualBoxGrid({
           />
 
           {/* Grid Container */}
-          <div className="flex-1 flex items-center justify-center p-3 min-h-0 bg-gray-100">
+          <div className="bg-slate-900/40 flex-1 flex items-center justify-center p-3 min-h-0">
             {renderBoxGrid(primaryBoxData)}
           </div>
         </div>
 
         {/* Secondary Box */}
-        <div className="flex-1 bg-white border-4 border-gray-600 flex flex-col overflow-hidden animate-slide-in-right">
+        <div className="flex-1 flex flex-col overflow-hidden animate-slide-in-right">
           {/* Box Header */}
           <BoxHeader
             boxData={secondaryBoxData}
@@ -145,7 +145,7 @@ export default function DualBoxGrid({
           />
 
           {/* Grid Container */}
-          <div className="flex-1 flex items-center justify-center p-3 min-h-0 bg-gray-100">
+          <div className="bg-slate-900/40  flex-1 flex items-center justify-center p-3 min-h-0">
             {renderBoxGrid(secondaryBoxData)}
           </div>
         </div>
@@ -153,53 +153,3 @@ export default function DualBoxGrid({
     </div>
   )
 }
-
-/* Add these CSS classes to your global CSS file */
-/*
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slide-in-left {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
-}
-
-.animate-slide-in-left {
-  animation: slide-in-left 0.4s ease-out;
-}
-
-.animate-slide-in-right {
-  animation: slide-in-right 0.4s ease-out 0.1s both;
-}
-
-.bg-blue-850 {
-  background-color: rgb(30 58 138 / 0.8);
-}
-*/

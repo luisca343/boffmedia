@@ -1,3 +1,4 @@
+
 import { PokemonTypeIcon } from '@/components/common/pokemon/PokemonTypeIcon';
 import { useTranslations } from 'next-intl';
 import { PiSwordFill, PiSparkle, PiGear } from 'react-icons/pi';
@@ -11,11 +12,11 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
   
   const getMoveTypeColor = (moveType: string) => {
     const moveTypeColors: { [key: string]: string } = {
-      physical: 'bg-red-900 border-red-700',
-      special: 'bg-blue-900 border-blue-700',
-      status: 'bg-slate-900 border-slate-700'
+      physical: 'from-red-600/80 to-red-700/80',
+      special: 'from-blue-600/80 to-blue-700/80',
+      status: 'from-gray-600/80 to-gray-700/80'
     };
-    return moveTypeColors[moveType?.toLowerCase()] || 'bg-purple-900 border-purple-700';
+    return moveTypeColors[moveType?.toLowerCase()] || 'from-purple-600/80 to-purple-700/80';
   };
 
   const getMoveIcon = (moveType: string) => {
@@ -24,7 +25,7 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
       special: PiSparkle,
       status: PiGear
     };
-    return iconMap[moveType?.toLowerCase()] || PiGear;
+    return iconMap[moveType?.toLowerCase() as keyof typeof iconMap] || PiGear;
   };
 
   const getCategoryName = (category: string) => {
@@ -33,38 +34,39 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
       'SPECIAL': 'ESP',
       'STATUS': 'EST'
     };
-    return categoryMap[category] || category;
+    return categoryMap[category as keyof typeof categoryMap] || category;
   };
 
   return (
-    <div className="bg-white border-4 border-black overflow-hidden">
+    <div className="bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-slate-500/30 shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-300 border-b-4 border-black p-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
-            <PiSwordFill className="text-white text-lg" />
+      <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-red-500/5 pointer-events-none" />
+        <div className="relative flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm">
+            <PiSwordFill className="text-orange-300 text-xl" />
           </div>
           <div>
-            <h3 className="text-black font-mono font-bold text-lg">MOVIMIENTOS</h3>
-            <p className="text-gray-700 font-mono text-sm">
-              {moves.filter(m => m).length}/4 MOVIMIENTOS APRENDIDOS
+            <h3 className="text-xl font-bold text-white">Movimientos</h3>
+            <p className="text-slate-300 text-sm">
+              {moves.filter(m => m).length}/4 movimientos aprendidos
             </p>
           </div>
         </div>
       </div>
 
       {/* Moves Grid */}
-      <div className="p-4">
+      <div className="p-6">
         {moves.length === 0 ? (
-          <div className="text-center text-gray-700 py-8">
-            <div className="w-12 h-12 mx-auto mb-4 bg-white border-2 border-black flex items-center justify-center">
-              <PiSwordFill className="text-2xl opacity-50" />
+          <div className="text-center text-slate-400 py-8">
+            <div className="w-16 h-16 mx-auto mb-4 bg-slate-700/30 rounded-2xl flex items-center justify-center">
+              <PiSwordFill className="text-3xl opacity-50" />
             </div>
-            <h4 className="font-mono font-bold mb-2">SIN MOVIMIENTOS</h4>
-            <p className="font-mono text-xs text-gray-600">ESTE POKÉMON NO TIENE MOVIMIENTOS REGISTRADOS</p>
+            <h4 className="text-lg font-semibold mb-2">Sin movimientos</h4>
+            <p className="text-sm text-slate-500">Este Pokémon no tiene movimientos registrados</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {Array.from({ length: 4 }, (_, index) => {
               const move = moves[index];
               const IconComponent = move ? getMoveIcon(move.category) : PiGear;
@@ -74,62 +76,65 @@ export function PokemonMoves({ moves }: PokemonMovesProps) {
                   key={index}
                   className="relative"
                 >
-                  <div className={`border-4 p-3 text-black font-mono overflow-hidden ${
-                    move ? 'bg-white border-black' : 'bg-gray-200 border-gray-600'
+                  <div className={`relative rounded-xl p-4 text-white font-semibold shadow-lg border border-white/10 backdrop-blur-sm overflow-hidden ${
+                    move ? `bg-gradient-to-br ${getMoveTypeColor(move.category)}` : 'bg-slate-700/50'
                   }`}>
-                    {/* Move Header */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center space-x-2 min-w-0">
-                        {move?.type && (
-                          <div className="bg-white border-2 border-black p-1">
-                            <PokemonTypeIcon type={move.type} size={20}/>
+                    {/* Background pattern */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none" />
+                    
+                    <div className="relative">
+                      {/* Move Header */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-2 min-w-0">
+                          {move?.type && (
+                            <PokemonTypeIcon type={move.type} size={24}/>
+                          )}
+                          <span className="text-sm font-medium truncate">
+                            {move ? t(`pokedex.attack_${move.name.toLowerCase().replaceAll(' ', '_')}`) : `Slot ${index + 1}`}
+                          </span>
+                        </div>
+                        
+                        {move?.category && (
+                          <div className="flex items-center space-x-1 bg-black/20 backdrop-blur-sm rounded-lg px-2 py-1 border border-white/10">
+                            <IconComponent className="text-xs" />
+                            <span className="text-xs uppercase font-bold">
+                              {getCategoryName(move.category)}
+                            </span>
                           </div>
                         )}
-                        <span className="text-xs font-bold truncate">
-                          {move ? t(`pokedex.attack_${move.name.toLowerCase().replaceAll(' ', '_')}`) : `SLOT ${index + 1}`}
-                        </span>
                       </div>
                       
-                      {move?.category && (
-                        <div className="flex items-center space-x-1 bg-gray-300 border-2 border-black px-2 py-1">
-                          <IconComponent className="text-xs" />
-                          <span className="text-xs font-bold">
-                            {getCategoryName(move.category)}
-                          </span>
+                      {/* Move Stats */}
+                      {move ? (
+                        <div className="space-y-2 ">
+                          <div className="flex justify-between items-center">
+                            <div className="text-xs text-white/80">
+                              <span className="font-medium">Poder:</span>
+                              <span className="ml-1 font-mono">{move.power || '-'}</span>
+                            </div>
+                            <div className="text-xs text-white/80">
+                              <span className="font-medium">Precisión:</span>
+                              <span className="ml-1 font-mono">
+                                {move.accuracy && move.accuracy > 0 ? `${move.accuracy}%` : '-'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* PP Info if available */}
+                          {move.pp && (
+                            <div className="text-xs text-white/60">
+                              <span className="font-medium">PP:</span>
+                              <span className="ml-1 font-mono">{move.pp}</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-center py-4">
+                          <PiGear className="text-slate-500 text-2xl mx-auto mb-2 opacity-50" />
+                          <span className="text-slate-500 text-xs">Vacío</span>
                         </div>
                       )}
                     </div>
-                    
-                    {/* Move Stats */}
-                    {move ? (
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="bg-gray-200 border border-black p-1">
-                            <div className="text-xs text-gray-700 font-mono">POTENCIA:</div>
-                            <div className="text-xs text-black font-mono font-bold">{move.power || '-'}</div>
-                          </div>
-                          <div className="bg-gray-200 border border-black p-1">
-                            <div className="text-xs text-gray-700 font-mono">PRECISIÓN:</div>
-                            <div className="text-xs text-black font-mono font-bold">
-                              {move.accuracy && move.accuracy > 0 ? `${move.accuracy}%` : '-'}
-                            </div>
-                          </div>
-                        </div>
-                        
-                        {/* PP Info if available */}
-                        {move.pp && (
-                          <div className="bg-gray-200 border border-black p-1">
-                            <div className="text-xs text-gray-700 font-mono">PP:</div>
-                            <div className="text-xs text-black font-mono font-bold">{move.pp}</div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="text-center py-4">
-                        <PiGear className="text-gray-500 text-2xl mx-auto mb-2 opacity-50" />
-                        <span className="text-gray-600 font-mono text-xs">VACÍO</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               );

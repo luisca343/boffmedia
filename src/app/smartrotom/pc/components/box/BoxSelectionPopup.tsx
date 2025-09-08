@@ -21,64 +21,70 @@ export default function BoxSelectionPopup({
 
   const getBoxStatus = (count: number) => {
     if (count === 0) return { 
-      color: 'from-gray-600 to-gray-700', 
-      text: 'VACÍA',
-      bgColor: 'bg-gray-200',
-      borderColor: 'border-gray-600'
+      color: 'from-slate-600 to-slate-700', 
+      text: 'Vacía',
+      bgColor: 'bg-slate-600/20',
+      borderColor: 'border-slate-500/40'
     }
     if (count < 10) return { 
-      color: 'from-gray-500 to-gray-600', 
-      text: 'CASI VACÍA',
-      bgColor: 'bg-gray-100',
-      borderColor: 'border-gray-500'
+      color: 'from-green-600 to-green-700', 
+      text: 'Poco llena',
+      bgColor: 'bg-green-600/20',
+      borderColor: 'border-green-500/40'
     }
     if (count < 20) return { 
-      color: 'from-gray-400 to-gray-500', 
-      text: 'MEDIO LLENA',
-      bgColor: 'bg-white',
-      borderColor: 'border-gray-400'
+      color: 'from-amber-600 to-amber-700', 
+      text: 'Medio llena',
+      bgColor: 'bg-amber-600/20',
+      borderColor: 'border-amber-500/40'
     }
     if (count < 30) return { 
-      color: 'from-gray-600 to-gray-700', 
-      text: 'CASI LLENA',
-      bgColor: 'bg-gray-300',
-      borderColor: 'border-gray-600'
+      color: 'from-orange-600 to-orange-700', 
+      text: 'Casi llena',
+      bgColor: 'bg-orange-600/20',
+      borderColor: 'border-orange-500/40'
     }
     return { 
-      color: 'from-black to-gray-800', 
-      text: 'LLENA',
-      bgColor: 'bg-gray-400',
-      borderColor: 'border-black'
+      color: 'from-red-600 to-red-700', 
+      text: 'Llena',
+      bgColor: 'bg-red-600/20',
+      borderColor: 'border-red-500/40'
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-300 border-4 border-black max-w-5xl  overflow-hidden">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div 
+        className="bg-slate-900/95 border border-slate-500/30 max-w-5xl w-full max-h-[90vh] overflow-hidden">
         {/* Header */}
-        <div className="bg-gray-400 border-b-4 border-black p-4">
-          <div className="flex justify-between items-center">
+        <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+          
+          <div className="relative z-10 flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
-                <FaArchive className="text-white text-lg" />
+              <div 
+                className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl border border-white/20 backdrop-blur-sm flex items-center justify-center"
+              >
+                <FaArchive className="text-blue-300 text-xl" />
               </div>
               <div>
-                <h3 className="text-black font-mono font-bold text-xl">SELECTOR DE CAJAS</h3>
-                <p className="text-gray-700 font-mono text-sm">ELIGE UNA CAJA PARA NAVEGAR</p>
+                <h3 className="text-xl font-bold text-white">Seleccionar Caja</h3>
+                <p className="text-slate-300 text-sm font-medium">Elige una caja para navegar</p>
               </div>
             </div>
             <button 
               onClick={onClose}
-              className="bg-gray-600 hover:bg-gray-500 border-2 border-gray-500 hover:border-gray-400 text-white p-2 transition-all duration-150 active:scale-95"
-              aria-label="CLOSE SELECTOR"
+              className="text-white hover:bg-white/10 p-3 rounded-xl transition-colors backdrop-blur-sm border border-slate-500/30"
+              aria-label="Cerrar selector"
             >
               <FaTimes />
             </button>
           </div>
         </div>
 
+
         {/* Box Grid */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-160px)]">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             {boxes.map((box, index) => {
               const pokemonCount = getPokemonCount(box)
@@ -89,45 +95,48 @@ export default function BoxSelectionPopup({
                 <button
                   key={index}
                   onClick={() => onBoxSelect(index)}
-                  className={`relative ${status.bgColor} border-4 p-4 transition-all duration-150 hover:scale-105 active:scale-95 ${
+                  className={`relative bg-gradient-to-br ${status.color} backdrop-blur-sm p-4 rounded-2xl border-2 transition-all duration-200 shadow-lg overflow-hidden hover:scale-105 active:scale-95 ${
                     isCurrentBox
-                      ? 'border-black bg-gray-500'
-                      : `${status.borderColor} hover:border-gray-800`
+                      ? 'border-amber-400/60 shadow-amber-400/30 shadow-lg scale-105'
+                      : `${status.borderColor} hover:border-slate-400/60 hover:shadow-xl`
                   }`}
                 >
+                  {/* Background pattern */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/3 via-transparent to-black/5 pointer-events-none" />
+                  
                   {/* Current box indicator */}
                   {isCurrentBox && (
-                    <div className="absolute -top-2 -right-2 w-6 h-6 bg-black border-2 border-gray-600 flex items-center justify-center">
+                    <div className="absolute -top-2 -right-2 bg-amber-400 text-amber-900 text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg">
                       <PiTarget className="text-white text-sm" />
                     </div>
                   )}
 
                   {/* Box icon */}
-                  <div className="flex justify-center mb-3">
-                    <div className="w-8 h-8 bg-white border-2 border-black flex items-center justify-center">
-                      <FaArchive className="text-black text-lg" />
+                  <div className="flex justify-center mb-3 relative z-10">
+                    <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded-xl border border-white/30 flex items-center justify-center">
+                      <FaArchive className="text-white text-lg" />
                     </div>
                   </div>
 
                   {/* Box info */}
-                  <div>
-                    <div className="text-black font-mono font-bold text-lg mb-1">
+                  <div className="relative z-10">
+                    <div className="text-white font-bold text-lg mb-1">
                       CAJA {index + 1}
                     </div>
                     
-                    <div className="text-gray-700 font-mono text-sm mb-3">
-                      {pokemonCount}/30 POKEMON
+                    <div className="text-white/90 text-sm mb-3 font-medium">
+                      {pokemonCount}/30 POKÉMON
                     </div>
 
                     {/* Status indicator */}
-                    <div className="bg-white border-2 border-black text-black font-mono text-xs px-2 py-1 mb-3">
+                    <div className="bg-black/30 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full border border-white/20 mb-3">
                       {status.text}
                     </div>
 
                     {/* Progress bar */}
-                    <div className="bg-white border-2 border-black h-3">
+                    <div className="bg-slate-700/50 backdrop-blur-sm rounded-full h-2 border border-slate-600/30">
                       <div 
-                        className="bg-black h-full transition-all duration-500"
+                        className="bg-white/80 h-2 rounded-full transition-all duration-500"
                         style={{ width: `${(pokemonCount / 30) * 100}%` }}
                       />
                     </div>
@@ -139,27 +148,31 @@ export default function BoxSelectionPopup({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-400 border-t-4 border-black p-4">
-          <div className="flex items-center justify-between text-sm">
-            <div className="text-gray-700 font-mono">
-              CAJA ACTUAL: <span className="text-black font-bold">CAJA {currentBox + 1}</span>
+        <div 
+          className="relative bg-slate-800/50 backdrop-blur-sm p-4 border-t border-slate-500/30"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 pointer-events-none" />
+          
+          <div className="relative flex items-center justify-between text-sm">
+            <div className="text-slate-300">
+              Caja actual: <span className="text-white font-bold">Caja {currentBox + 1}</span>
             </div>
-            <div className="flex items-center space-x-4 text-gray-700 font-mono text-xs">
+            <div className="flex items-center space-x-4 text-slate-300">
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-gray-200 border border-gray-600" />
-                <span>VACÍA</span>
+                <div className="w-3 h-3 bg-slate-600 rounded-full border border-slate-500/30" />
+                <span>Vacía</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-gray-100 border border-gray-500" />
-                <span>BAJA</span>
+                <div className="w-3 h-3 bg-green-600 rounded-full border border-green-500/30" />
+                <span>Pocos</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-white border border-gray-400" />
-                <span>MEDIA</span>
+                <div className="w-3 h-3 bg-amber-600 rounded-full border border-amber-500/30" />
+                <span>Media</span>
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-black border border-black" />
-                <span>LLENA</span>
+                <div className="w-3 h-3 bg-red-600 rounded-full border border-red-500/30" />
+                <span>Llena</span>
               </div>
             </div>
           </div>

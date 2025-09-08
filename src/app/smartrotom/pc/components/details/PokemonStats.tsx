@@ -1,3 +1,4 @@
+
 import { PiChartBar } from 'react-icons/pi';
 
 interface PokemonStatsProps {
@@ -8,61 +9,56 @@ interface PokemonStatsProps {
 
 export function PokemonStats({ stats, ivs, evs }: PokemonStatsProps) {
   const getStatName = (index: number) => {
-    const statNames = ['HP', 'ATK', 'DEF', 'SPA', 'SPD', 'SPE'];
-    return statNames[index] || `ST${index + 1}`;
+    const statNames = ['PS', 'Ataque', 'Defensa', 'Ataque Especial', 'Defensa Especial', 'Velocidad'];
+    return statNames[index] || `Stat ${index + 1}`;
   };
 
   const getStatBarColor = (index: number) => {
     const colors = [
-      'bg-pink-400',     // HP
-      'bg-red-400',      // Attack
-      'bg-yellow-400',   // Defense
-      'bg-blue-400',     // Sp. Attack
-      'bg-green-400',    // Sp. Defense
-      'bg-purple-400'    // Speed
+      'bg-pink-500',     // HP
+      'bg-red-500',      // Attack
+      'bg-yellow-500',   // Defense
+      'bg-blue-500',     // Sp. Attack
+      'bg-green-500',    // Sp. Defense
+      'bg-purple-500'    // Speed
     ];
-    return colors[index] || 'bg-gray-400';
+    return colors[index] || 'bg-gray-500';
   };
 
   return (
-    <div className="bg-white border-4 border-black overflow-hidden">
+    <div className="bg-slate-900/40  border border-slate-500/30 shadow-2xl overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-300 border-b-4 border-black p-3">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
-            <PiChartBar className="text-white text-lg" />
+      <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
+        <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+        <div className="relative flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm">
+            <PiChartBar className="text-green-300 text-xl" />
           </div>
           <div>
-            <h3 className="text-black font-mono font-bold text-lg">ESTADÍSTICAS</h3>
-            <p className="text-gray-700 font-mono text-sm">ESTADÍSTICAS BASE, IVS & EVS</p>
+            <h3 className="text-xl font-bold text-white">Estadísticas</h3>
+            <p className="text-slate-300 text-sm">Stats base, IVs y EVs</p>
           </div>
         </div>
       </div>
 
       {/* Stats Content */}
-      <div className="p-4">
+      <div className="p-6">
         <div className="space-y-3">
           {stats.map((stat, index) => (
             <div key={index} className="flex items-center">
-              <div className="w-12 text-right text-sm text-black font-mono font-bold">{getStatName(index)}</div>
-              <div className="w-12 text-center text-sm font-bold text-black font-mono ml-4">{stat}</div>
+              <div className="w-28 text-right text-sm text-slate-300 font-medium">{getStatName(index)}</div>
+              <div className="w-12 text-center text-sm font-bold text-white ml-4">{stat}</div>
               <div className="flex-1 ml-4">
-                <div className="bg-gray-200 border-2 border-black h-4">
+                <div className="bg-slate-700/30 rounded-full h-3 border border-slate-600/30">
                   <div 
-                    className="bg-black h-full transition-all duration-500" 
+                    className={`${getStatBarColor(index)} h-3 rounded-full transition-all duration-300`} 
                     style={{ width: `${Math.min((stat / 255) * 100, 100)}%` }}
                   />
                 </div>
               </div>
-              <div className="ml-4 flex flex-col text-xs text-gray-700 font-mono w-16">
-                <div className="bg-white border border-black px-1 mb-1">
-                  <span>IV:</span>
-                  <span className="text-black font-bold ml-1">{ivs?.[index] ?? '-'}</span>
-                </div>
-                <div className="bg-white border border-black px-1">
-                  <span>EV:</span>
-                  <span className="text-black font-bold ml-1">{evs?.[index] ?? '-'}</span>
-                </div>
+              <div className="ml-4 flex flex-col text-xs text-slate-400 w-14">
+                <span>IV: <span className="text-blue-300 font-bold">{ivs?.[index] ?? '-'}</span></span>
+                <span>EV: <span className="text-green-300 font-bold">{evs?.[index] ?? '-'}</span></span>
               </div>
             </div>
           ))}

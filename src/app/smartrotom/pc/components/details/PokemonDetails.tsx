@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl'
 import { FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa'
 import { PiArchive, PiInfo } from 'react-icons/pi'
 import { useEffect } from 'react'
+import { motion } from 'framer-motion'
 
 interface PokemonDetailsProps {
   pokemon?: PCPokemon | null;
@@ -110,42 +111,43 @@ export default function PokemonDetails({
 
   return (
     <Dialog open={true} onOpenChange={open => { if (!open) onClose(); }}>
-      <DialogContent className="max-w-7xl p-0 bg-gray-300 border-4 border-black overflow-hidden">
+      <DialogContent className="max-w-7xl p-0 bg-slate-900/40  border border-slate-500/30 overflow-hidden">
         <DialogHeader>
           <DialogTitle>
-            <div className="bg-gray-400 border-b-4 border-black p-4">
-              <div className="flex items-center justify-center space-x-16">
+            <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
+              {/* Background pattern */}
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-blue-500/5 pointer-events-none" />
+              <div className="relative flex items-center justify-center space-x-16">
                 {/* Navigation Buttons - Left */}
                 <div className="flex items-center space-x-2">
                   {isFromPC && onNavigatePrevious && (
-                    <button
+                    <motion.button
                       onClick={onNavigatePrevious}
                       disabled={!canNavigatePrevious}
-                      className={`p-2 border-2 transition-all duration-150 active:scale-95 ${
+                      className={`p-3 rounded-xl border backdrop-blur-sm transition-all duration-200 ${
                         canNavigatePrevious 
-                          ? 'bg-gray-600 hover:bg-gray-500 border-gray-500 hover:border-gray-400 text-white' 
-                          : 'bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed'
+                          ? 'bg-purple-600/20 hover:bg-purple-600/30 border-purple-400/50 text-white hover:scale-105' 
+                          : 'bg-slate-600/20 border-slate-500/30 text-slate-400 cursor-not-allowed'
                       }`}
-                      title="POKÉMON ANTERIOR (← LEFT ARROW)"
+                      title="Pokémon anterior (← flecha izquierda)"
+                      whileHover={canNavigatePrevious ? { scale: 1.05 } : {}}
+                      whileTap={canNavigatePrevious ? { scale: 0.95 } : {}}
                     >
                       <FaChevronLeft className="text-sm" />
-                    </button>
+                    </motion.button>
                   )}
                 </div>
 
                 {/* Title */}
                 <div className="text-center">
                   <div className="flex items-center justify-center space-x-3 mb-1">
-                    <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
-                      <PiInfo className="text-white text-lg" />
-                    </div>
-                    <h2 className="text-black font-mono font-bold text-xl">INFORMACIÓN DEL POKÉMON</h2>
+                    <h2 className="text-white text-xl font-bold">Información del Pokémon</h2>
                   </div>
                   {isFromPC && (
                     <div className="flex items-center justify-center space-x-2">
-                      <PiArchive className="text-gray-700 text-sm" />
-                      <p className="text-gray-700 font-mono text-sm">
-                        CAJA {pokemon!.box + 1} • SLOT {pokemon!.index + 1}
+                      <PiArchive className="text-purple-300 text-sm" />
+                      <p className="text-purple-200 text-sm">
+                        Caja {pokemon!.box + 1} • Posición {pokemon!.index + 1}
                       </p>
                     </div>
                   )}
@@ -154,18 +156,20 @@ export default function PokemonDetails({
                 {/* Navigation Buttons - Right */}
                 <div className="flex items-center space-x-2">
                   {isFromPC && onNavigateNext && (
-                    <button
+                    <motion.button
                       onClick={onNavigateNext}
                       disabled={!canNavigateNext}
-                      className={`p-2 border-2 transition-all duration-150 active:scale-95 ${
+                      className={`p-3 rounded-xl border backdrop-blur-sm transition-all duration-200 ${
                         canNavigateNext 
-                          ? 'bg-gray-600 hover:bg-gray-500 border-gray-500 hover:border-gray-400 text-white' 
-                          : 'bg-gray-700 border-gray-600 text-gray-400 cursor-not-allowed'
+                          ? 'bg-purple-600/20 hover:bg-purple-600/30 border-purple-400/50 text-white hover:scale-105' 
+                          : 'bg-slate-600/20 border-slate-500/30 text-slate-400 cursor-not-allowed'
                       }`}
-                      title="SIGUIENTE POKÉMON (→ RIGHT ARROW)"
+                      title="Siguiente Pokémon (→ flecha derecha)"
+                      whileHover={canNavigateNext ? { scale: 1.05 } : {}}
+                      whileTap={canNavigateNext ? { scale: 0.95 } : {}}
                     >
                       <FaChevronRight className="text-sm" />
-                    </button>
+                    </motion.button>
                   )}
                 </div>
               </div>
@@ -173,7 +177,7 @@ export default function PokemonDetails({
           </DialogTitle>
         </DialogHeader>
         
-        <div className="p-6 overflow-y-auto max-h-[85vh] bg-gray-100">
+        <div className="p-6 overflow-y-auto max-h-[85vh]">
           <div className="space-y-6">
             <div className="grid grid-cols-5 gap-6">
               <div className="col-span-2">
