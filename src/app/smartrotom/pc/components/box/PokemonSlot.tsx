@@ -122,7 +122,7 @@ const PokemonSlot = memo(function PokemonSlot({
       <div 
         ref={setNodeRef} 
         style={style} 
-        className="relative w-20 h-20 sm:w-24 sm:h-24"
+        className="relative 2xl:w-24 2xl:h-24 w-16 h-16"
         {...attributes}
         {...listeners}
       >
@@ -152,7 +152,7 @@ const PokemonSlot = memo(function PokemonSlot({
     <div 
       ref={setNodeRef} 
       style={style} 
-      className="relative w-20 h-20 sm:w-24 sm:h-24"
+      className="relative 2xl:w-24 2xl:h-24 w-16 h-16"
       {...attributes}
       {...listeners}
     >

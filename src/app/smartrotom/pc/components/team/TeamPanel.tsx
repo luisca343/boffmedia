@@ -28,7 +28,7 @@ export default function TeamPanel({
   return (
     <div className="bg-slate-900/40 backdrop-blur-sm rounded-b-2xl border border-slate-500/30 border-t-0 shadow-2xl h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-3 border-b border-slate-500/30 flex-shrink-0">
+      <div className="hidden 2xl:block relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-3 border-b border-slate-500/30 flex-shrink-0">
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none" />
         <div className="relative flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -71,7 +71,7 @@ export default function TeamPanel({
       </SortableContext>
 
       {/* Footer Info */}
-      <div className="relative p-3 mt-auto flex-shrink-0 bg-slate-800/50 border-t border-slate-500/30">
+      <div className="hidden 2xl:block relative p-3 mt-auto flex-shrink-0 bg-slate-800/50 border-t border-slate-500/30">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-green-500/5 pointer-events-none" />
         <div className="relative flex items-center justify-between">
           <div className="flex items-center space-x-2">
