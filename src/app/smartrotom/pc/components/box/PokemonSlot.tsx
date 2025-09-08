@@ -147,7 +147,6 @@ const PokemonSlot = memo(function PokemonSlot({
     )
   }
 
-  // Filled slot with Gen 1 retro style
   return (
     <div 
       ref={setNodeRef} 

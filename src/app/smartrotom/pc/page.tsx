@@ -20,10 +20,13 @@ import LoadingOverlay from './components/layout/LoadingOverlay'
 import PlayOnMountAudio from '@components/common/PlayOnMountAudio'
 import PlayOnUnmountAudio from '@components/common/PlayOnUnmountAudio'
 import { motion, AnimatePresence } from 'framer-motion'
-import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, useSensors, useSensor, PointerSensor, KeyboardSensor, closestCenter } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, useSensors, useSensor, PointerSensor, KeyboardSensor, closestCenter, pointerWithin, Active, ClientRect, DroppableContainer } from '@dnd-kit/core'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
 import { TeamSlot } from './components/team/TeamSlot'
 import PokemonSlot from './components/box/PokemonSlot'
+import { snapCenterToCursor } from '@dnd-kit/modifiers'
+import { RectMap } from '@dnd-kit/core/dist/store'
+import { Coordinates } from '@dnd-kit/core/dist/types'
 
 export default function PCPage() {
   const { session } = useBoffSession()
@@ -260,6 +263,19 @@ export default function PCPage() {
     }
   }
 
+    const customCollisionDetection = (args: { active: Active; collisionRect: ClientRect; droppableRects: RectMap; droppableContainers: DroppableContainer[]; pointerCoordinates: Coordinates | null }) => {
+    // First, check if the pointer is within any droppable area
+    const pointerCollisions = pointerWithin(args)
+    
+    // If there are pointer collisions, use those
+    if (pointerCollisions.length > 0) {
+      return pointerCollisions
+    }
+    
+    // Fallback to closestCenter if no pointer collisions
+    return closestCenter(args)
+  }
+
   return (
     <motion.div 
       className="relative h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 backdrop-blur-sm overflow-hidden flex flex-col"
@@ -274,7 +290,7 @@ export default function PCPage() {
       <PlayOnUnmountAudio src="/smartrotom/audio/apps/pc/TURN_OFF.wav" volume={0.25} />
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={customCollisionDetection}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
@@ -438,30 +454,33 @@ export default function PCPage() {
           toastClassName="!bg-slate-800/90 !backdrop-blur-sm !border !border-slate-500/30 !text-slate-100"
           progressClassName="!bg-blue-400"
         />
-        <DragOverlay dropAnimation={null}>
-          {activeDragItem && activeDragItem.pokemon && (
-            <div>
-              {activeDragItem.type === 'team' ? (
-                <TeamSlot
-                  id={activeDragItem.pokemon.id}
-                  pokemon={activeDragItem.pokemon}
-                  index={-1}
-                  isSelected={false}
-                  onClick={() => {}}
-                />
-              ) : (
-                <PokemonSlot
-                  id={activeDragItem.pokemon.id}
-                  pokemon={activeDragItem.pokemon}
-                  index={activeDragItem.pokemon.index}
-                  isSelected={false}
-                  onClick={() => {}}
-                  currentBox={activeDragItem.boxNumber}
-                />
-              )}
-            </div>
-          )}
-        </DragOverlay>
+      <DragOverlay 
+        dropAnimation={null}
+        modifiers={[snapCenterToCursor]}
+      >
+        {activeDragItem && activeDragItem.pokemon && (
+          <div>
+            {activeDragItem.type === 'team' ? (
+              <TeamSlot
+                id={activeDragItem.pokemon.id}
+                pokemon={activeDragItem.pokemon}
+                index={-1}
+                isSelected={false}
+                onClick={() => {}}
+              />
+            ) : (
+              <PokemonSlot
+                id={activeDragItem.pokemon.id}
+                pokemon={activeDragItem.pokemon}
+                index={activeDragItem.pokemon.index}
+                isSelected={false}
+                onClick={() => {}}
+                currentBox={activeDragItem.boxNumber}
+              />
+            )}
+          </div>
+        )}
+      </DragOverlay>
       </DndContext>
     </motion.div>
   )
