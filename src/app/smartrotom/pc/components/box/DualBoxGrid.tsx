@@ -21,6 +21,9 @@ interface DualBoxGridProps {
   cols: number;
   battleTeams?: BattleTeam[];
   onAddToBattleTeam?: (teamId: string, position: number, pokemon: PCPokemon) => void;
+  onShowBoxSelection?: () => void;
+
+  onShowSecondaryBoxSelection?: () => void;
 }
 
 export default function DualBoxGrid({ 
@@ -35,7 +38,9 @@ export default function DualBoxGrid({
   rows,
   cols,
   battleTeams,
-  onAddToBattleTeam
+  onAddToBattleTeam,
+  onShowBoxSelection,
+  onShowSecondaryBoxSelection
 }: DualBoxGridProps) {
   
   const renderBoxGrid = (boxData: PCBoxData) => {
@@ -102,6 +107,7 @@ export default function DualBoxGrid({
           totalBoxes={totalBoxes}
           isSecondary={false}
           onBoxChange={onPrimaryBoxChange}
+          onShowBoxSelection={onShowBoxSelection}
         />
 
         {/* Grid Container */}
@@ -125,6 +131,7 @@ export default function DualBoxGrid({
             totalBoxes={totalBoxes}
             isSecondary={false}
             onBoxChange={onPrimaryBoxChange}
+            onShowBoxSelection={onShowBoxSelection}
           />
 
           {/* Grid Container */}
@@ -142,6 +149,7 @@ export default function DualBoxGrid({
             isSecondary={true}
             onBoxChange={(boxNumber) => onSecondaryBoxChange?.(boxNumber)}
             onDeselect={() => onSecondaryBoxChange?.(null)}
+            onShowBoxSelection={onShowSecondaryBoxSelection}
           />
 
           {/* Grid Container */}

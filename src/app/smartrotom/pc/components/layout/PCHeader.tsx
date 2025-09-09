@@ -1,5 +1,4 @@
 import { FaDesktop, FaSyncAlt, FaDatabase } from 'react-icons/fa'
-import { LuGrid3X3 } from 'react-icons/lu'
 import { FaExchangeAlt } from 'react-icons/fa'
 import { motion } from 'framer-motion'
 
@@ -10,7 +9,6 @@ interface PCHeaderProps {
   teamCount: number;
   isDualBoxMode?: boolean;
   onRefresh: () => void;
-  onShowBoxSelection?: () => void;
   onToggleDualBoxMode?: () => void;
 }
 
@@ -21,7 +19,6 @@ export default function PCHeader({
   teamCount, 
   isDualBoxMode = false,
   onRefresh,
-  onShowBoxSelection,
   onToggleDualBoxMode
 }: PCHeaderProps) {
   const containerVariants = {
@@ -93,29 +90,7 @@ export default function PCHeader({
               <FaDatabase className="text-slate-300 mr-2" />
               <div className="text-center">
                 <div className="text-white font-bold text-sm">{pokemonCount}</div>
-                <div className="text-slate-300 text-xs">PC</div>
-              </div>
-            </motion.div>
-
-            <motion.div 
-              className="flex items-center bg-slate-800/40 backdrop-blur-sm px-3 py-2 rounded-xl border border-slate-500/40"
-              variants={buttonVariants}
-            >
-              <div className="text-center">
-                <div className="text-white font-bold text-sm">{teamCount}/6</div>
-                <div className="text-slate-300 text-xs">Equipo</div>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              className="flex items-center bg-slate-800/40 backdrop-blur-sm px-3 py-2 rounded-xl border border-slate-500/40"
-              variants={buttonVariants}
-            >
-              <div className="text-center">
-                <div className="text-white font-bold text-sm">
-                  Caja {currentBox + 1} / {totalBoxes}
-                </div>
-                <div className="text-slate-300 text-xs">Caja Actual</div>
+                <div className="text-slate-300 text-xs">Pokémon</div>
               </div>
             </motion.div>
             
@@ -139,20 +114,6 @@ export default function PCHeader({
                 </span>
               </motion.button>
             )}
-
-            {onShowBoxSelection && (
-              <motion.button
-                onClick={onShowBoxSelection}
-                className="bg-amber-600/80 hover:bg-amber-600 text-white px-4 py-2 rounded-xl flex items-center space-x-2 border border-amber-400/30 transition-all duration-200 shadow-lg backdrop-blur-sm"
-                title="Ver todas las cajas"
-                variants={buttonVariants}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <LuGrid3X3 />
-                <span className="hidden md:inline font-medium">Ver Todas</span>
-              </motion.button>
-            )}
             
             <motion.button
               onClick={onRefresh}
@@ -162,13 +123,9 @@ export default function PCHeader({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                style={{ display: 'inline-block' }}
-              >
+              <div style={{ display: 'inline-block' }} >
                 <FaSyncAlt className="text-sm" />
-              </motion.div>
+              </div>
               <span className="hidden md:inline font-medium">Actualizar</span>
             </motion.button>
           </motion.div>

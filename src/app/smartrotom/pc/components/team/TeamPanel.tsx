@@ -2,7 +2,7 @@ import { PokemonW } from '@/generated/api'
 import { TeamSlot } from './TeamSlot';
 import { PiUsers, PiInfo } from 'react-icons/pi';
 import { SortableContext } from '@dnd-kit/sortable'
-import { noReorderStrategy, stablePositionStrategy } from '@/lib/drag-and-drop';
+import { stablePositionStrategy } from '@/lib/drag-and-drop';
 
 interface TeamPanelProps {
   teamData: (PokemonW | null)[];

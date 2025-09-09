@@ -1,4 +1,4 @@
-import { FaArchive, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa'
+import { FaArchive, FaChevronLeft, FaChevronRight, FaTimes, FaDatabase } from 'react-icons/fa'
 import { PCBoxData } from '@/types/dto/pc-pokemon.dto'
 
 interface BoxHeaderProps {
@@ -7,6 +7,7 @@ interface BoxHeaderProps {
   isSecondary?: boolean
   onBoxChange: (boxNumber: number) => void
   onDeselect?: () => void
+  onShowBoxSelection?: () => void
 }
 
 export default function BoxHeader({ 
@@ -14,7 +15,8 @@ export default function BoxHeader({
   totalBoxes, 
   isSecondary = false, 
   onBoxChange,
-  onDeselect 
+  onDeselect,
+  onShowBoxSelection 
 }: BoxHeaderProps) {
   const getPokemonCount = (boxData: PCBoxData) => {
     return boxData.pokemon.filter(p => p !== null).length
@@ -76,6 +78,17 @@ export default function BoxHeader({
         </div>
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
+          {/* Box Selection Button */}
+          {onShowBoxSelection && (
+            <button
+              onClick={onShowBoxSelection}
+              className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border space-x-2`}
+              title="Ver todas las cajas"
+            >
+              <FaDatabase className="text-sm" />
+              <span className="hidden sm:inline text-xs font-medium">Ver Todas</span>
+            </button>
+          )}
           {/* Next Button */}
           <button
             onClick={handleNext}

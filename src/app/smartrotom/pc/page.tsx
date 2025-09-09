@@ -11,7 +11,7 @@ import { ROWS_PER_BOX, COLS_PER_ROW } from './utils/constants'
 import { useGetBattleTeams } from '@/hooks/player/useGetBattleTeams'
 import { usePCManagement } from './hooks/usePCManagement'
 import PCHeader from './components/layout/PCHeader'
-import BoxNavigation from './components/box/BoxNavigation'
+import BoxSelectionDialog from './components/box/BoxSelectionDialog'
 import TeamPanel from './components/team/TeamPanel'
 import BattleTeamsPanel from './components/team/BattleTeamsPanel'
 import DualBoxGrid from './components/box/DualBoxGrid'
@@ -33,6 +33,7 @@ export default function PCPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'team' | 'battleTeams'>('team')
   const [showBoxSelection, setShowBoxSelection] = useState(false)
+  const [showSecondaryBoxSelection, setShowSecondaryBoxSelection] = useState(false)
 
   const uuid = session?.user?.smartRotomUser?.uuid || ''
   const { battleTeamsData, refetch: refetchBattleTeams } = useGetBattleTeams(uuid)
@@ -265,27 +266,11 @@ export default function PCPage() {
             teamCount={teamData.length}
             isDualBoxMode={isDualBoxMode}
             onRefresh={fetchAllData}
-            onShowBoxSelection={() => setShowBoxSelection(true)}
             onToggleDualBoxMode={toggleDualBoxMode}
           />
         </motion.div>
         <motion.div variants={sectionVariants}>
-          <BoxNavigation
-            currentBox={currentBox}
-            secondaryBox={secondaryBox}
-            isDualBoxMode={isDualBoxMode}
-            totalBoxes={totalBoxes}
-            boxes={boxes}
-            onBoxChange={handleBoxChange}
-            onSecondaryBoxChange={handleSecondaryBoxChange}
-            selectedPokemon={selectedPokemon}
-            onPokemonClick={handlePokemonClick}
-            onPokemonMove={handlePokemonMove}
-            battleTeams={battleTeamsData?.teams}
-            onAddToBattleTeam={handleAddToBattleTeam}
-            showBoxSelection={showBoxSelection}
-            onShowBoxSelection={setShowBoxSelection}
-          />
+          {/* BoxSelectionDialog now handles its own state management */}
         </motion.div>
         <motion.div 
           className="flex-1 flex gap-4 p-4 overflow-hidden min-h-0"
@@ -381,9 +366,26 @@ export default function PCPage() {
               cols={COLS_PER_ROW}
               battleTeams={battleTeamsData?.teams}
               onAddToBattleTeam={handleAddToBattleTeam}
+              onShowBoxSelection={() => setShowBoxSelection(true)}
+              onShowSecondaryBoxSelection={() => setShowSecondaryBoxSelection(true)}
             />
           </motion.div>
         </motion.div>
+        {/* Box Selection Dialog */}
+        <BoxSelectionDialog
+          isOpen={showBoxSelection}
+          boxes={boxes}
+          currentBox={currentBox}
+          onBoxSelect={handleBoxChange}
+          onClose={() => setShowBoxSelection(false)}
+        />
+        <BoxSelectionDialog
+          isOpen={showSecondaryBoxSelection}
+          boxes={boxes}
+          currentBox={secondaryBox!}
+          onBoxSelect={handleSecondaryBoxChange}
+          onClose={() => setShowSecondaryBoxSelection(false)}
+        />
         {/* Pokemon Details Modal */}
         <AnimatePresence>
           {(selectedPokemon || selectedTeamPokemon) && (
