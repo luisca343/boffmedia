@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useBoffSession } from "@/services/useBoffSession"
 import { WingullService } from '@/services/api/smartrotom/wingullService'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
@@ -20,13 +20,11 @@ import LoadingOverlay from './components/layout/LoadingOverlay'
 import PlayOnMountAudio from '@components/common/PlayOnMountAudio'
 import PlayOnUnmountAudio from '@components/common/PlayOnUnmountAudio'
 import { motion, AnimatePresence } from 'framer-motion'
-import { DndContext, DragEndEvent, DragStartEvent, DragOverlay, useSensors, useSensor, PointerSensor, KeyboardSensor, closestCenter, pointerWithin, Active, ClientRect, DroppableContainer } from '@dnd-kit/core'
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable'
+import { DndContext, DragOverlay } from '@dnd-kit/core'
 import { TeamSlot } from './components/team/TeamSlot'
 import PokemonSlot from './components/box/PokemonSlot'
 import { snapCenterToCursor } from '@dnd-kit/modifiers'
-import { RectMap } from '@dnd-kit/core/dist/store'
-import { Coordinates } from '@dnd-kit/core/dist/types'
+import { useActiveDragItem, useDndSensors, COLLISION_STRATEGIES, DROP_ANIMATIONS } from '@/lib/dnd-kit-setup'
 
 export default function PCPage() {
   const { session } = useBoffSession()
@@ -35,27 +33,6 @@ export default function PCPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'team' | 'battleTeams'>('team')
   const [showBoxSelection, setShowBoxSelection] = useState(false)
-
-  // Drag and drop state
-  const [activeDragItem, setActiveDragItem] = useState<any>(null)
-
-  // DnD Kit sensors
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  // Drop animation configuration to prevent jumping
-  const dropAnimation = {
-    duration: 0, // Disable animation completely
-    easing: 'ease',
-  }
 
   const uuid = session?.user?.smartRotomUser?.uuid || ''
   const { battleTeamsData, refetch: refetchBattleTeams } = useGetBattleTeams(uuid)
@@ -85,6 +62,36 @@ export default function PCPage() {
     setPcData,
     setTeamData
   })
+
+  // Drag and drop setup using the lib
+  const { activeDragItem, handleDragStart, handleDragEnd } = useActiveDragItem()
+  const sensors = useDndSensors()
+
+  // Custom drag end handler for PC functionality
+  const onDragEnd = useCallback((event: any) => {
+    const { active, over } = event
+
+    if (!over || !active.data.current || !over.data.current) {
+      return
+    }
+
+    const activeData = active.data.current
+    const overData = over.data.current
+
+    // Call the existing handlePokemonMove function with the appropriate parameters
+    handlePokemonMove(
+      {
+        type: activeData.type,
+        boxNumber: activeData.boxNumber,
+        index: activeData.index
+      },
+      {
+        type: overData.type,
+        boxNumber: overData.boxNumber,
+        index: overData.index
+      }
+    )
+  }, [handlePokemonMove])
 
   const fetchPCData = async () => {
     if (!session?.user?.smartRotomUser?.uuid) return
@@ -200,37 +207,6 @@ export default function PCPage() {
     return currentBoxPokemon.length > 1 // Can navigate if there's more than one Pokémon
   }
 
-  // Drag and drop handlers
-  const handleDragStart = (event: DragStartEvent) => {
-    setActiveDragItem(event.active.data.current)
-  }
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
-    setActiveDragItem(null)
-
-    if (!over || !active.data.current || !over.data.current) {
-      return
-    }
-
-    const activeData = active.data.current
-    const overData = over.data.current
-
-    // Call the existing handlePokemonMove function with the appropriate parameters
-    handlePokemonMove(
-      {
-        type: activeData.type,
-        boxNumber: activeData.boxNumber,
-        index: activeData.index
-      },
-      {
-        type: overData.type,
-        boxNumber: overData.boxNumber,
-        index: overData.index
-      }
-    )
-  }
-
   // Animation variants from old page
   const pageVariants = {
     hidden: { opacity: 0 },
@@ -263,19 +239,6 @@ export default function PCPage() {
     }
   }
 
-    const customCollisionDetection = (args: { active: Active; collisionRect: ClientRect; droppableRects: RectMap; droppableContainers: DroppableContainer[]; pointerCoordinates: Coordinates | null }) => {
-    // First, check if the pointer is within any droppable area
-    const pointerCollisions = pointerWithin(args)
-    
-    // If there are pointer collisions, use those
-    if (pointerCollisions.length > 0) {
-      return pointerCollisions
-    }
-    
-    // Fallback to closestCenter if no pointer collisions
-    return closestCenter(args)
-  }
-
   return (
     <motion.div 
       className="relative h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 backdrop-blur-sm overflow-hidden flex flex-col"
@@ -290,9 +253,9 @@ export default function PCPage() {
       <PlayOnUnmountAudio src="/smartrotom/audio/apps/pc/TURN_OFF.wav" volume={0.25} />
       <DndContext
         sensors={sensors}
-        collisionDetection={customCollisionDetection}
+        collisionDetection={COLLISION_STRATEGIES.custom}
         onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragEnd={(event) => handleDragEnd(event, onDragEnd)}
       >
         <motion.div variants={sectionVariants}>
           <PCHeader 
@@ -455,7 +418,7 @@ export default function PCPage() {
           progressClassName="!bg-blue-400"
         />
       <DragOverlay 
-        dropAnimation={null}
+        dropAnimation={DROP_ANIMATIONS.none}
         modifiers={[snapCenterToCursor]}
       >
         {activeDragItem && activeDragItem.pokemon && (

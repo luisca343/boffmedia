@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/primitives/button";
 import { Plus, Minus, RefreshCw, UserSearch, User as UserIcon, AlertTriangle } from "lucide-react";
 import { AppsService } from "@/services/api/smartrotom/appsService";
-import { App } from "@/components/smartrotom/App";
+import { App } from "@/components/smartrotom/apps/App";
 import { useBoffSession } from "@/services/useBoffSession";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select";
 import { UsersService } from "@/services/api/smartrotom/usersService";

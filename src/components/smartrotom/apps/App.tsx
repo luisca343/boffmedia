@@ -2,8 +2,7 @@
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
-import { InternalLink } from "../ui/navigation/Link"
-import { useSortable } from "@dnd-kit/sortable"
+import { InternalLink } from "../../ui/navigation/Link"
 import { SmartRotomApp } from "@/generated/api"
 
 interface AppIconProps {
@@ -45,30 +44,14 @@ function AppIcon({ app, size, withLink = true }: AppIconProps) {
 }
 
 export function App({ app, size = "normal", withLink = true }: AppIconProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, active, isDragging } = useSortable({ id: app.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
 
   return (
     <li
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className={`flex flex-col items-center justify-center m-auto hover:cursor-pointer mb-2 ${isDragging ? "opacity-50" : ""}`}
+      className={`flex flex-col items-center justify-center m-auto hover:cursor-pointer mb-2`}
     >
-      {active ? (
-        <motion.div whileHover={{ scale: 1 }} key={app.id} className="flex flex-col items-center">
-          <AppIcon app={app} size={size} withLink={false} />
+      <motion.div whileHover={{ scale: 1 }} key={app.id} className="flex flex-col items-center">
+          <AppIcon app={app} size={size} withLink={true} />
         </motion.div>
-      ) : (
-        <motion.div whileHover={{ scale: 1.1 }} key={app.id} className="flex flex-col items-center">
-          <AppIcon app={app} size={size} withLink={withLink} />
-        </motion.div>
-      )}
     </li>
   )
 }
