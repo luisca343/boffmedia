@@ -9,32 +9,27 @@ export const useContextMenu = ({ onAction }: UseContextMenuProps = {}) => {
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState<ContextMenuPosition>({ x: 0, y: 0 })
 
-  // Show context menu at specific position
   const showContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     setPosition({ x: e.clientX, y: e.clientY })
     setIsVisible(true)
   }, [])
 
-  // Hide context menu
   const hideContextMenu = useCallback(() => {
     setIsVisible(false)
   }, [])
 
-  // Handle context menu action
   const handleAction = useCallback((action: string, data?: any) => {
     onAction?.(action, data)
     hideContextMenu()
   }, [onAction, hideContextMenu])
 
-  // Handle global clicks to close context menu
   useEffect(() => {
     if (isVisible) {
       const handleGlobalClick = () => {
         hideContextMenu()
       }
 
-      // Add slight delay to prevent immediate closure
       const timeoutId = setTimeout(() => {
         document.addEventListener('click', handleGlobalClick, { once: true })
       }, 0)
@@ -46,7 +41,6 @@ export const useContextMenu = ({ onAction }: UseContextMenuProps = {}) => {
     }
   }, [isVisible, hideContextMenu])
 
-  // Handle escape key to close context menu
   useEffect(() => {
     if (isVisible) {
       const handleEscape = (e: KeyboardEvent) => {
@@ -69,7 +63,6 @@ export const useContextMenu = ({ onAction }: UseContextMenuProps = {}) => {
   }
 }
 
-// Specialized hook for battle team context menu
 export const useBattleTeamContextMenu = (
   onAddToBattleTeam: (teamId: string, position: number) => void
 ) => {

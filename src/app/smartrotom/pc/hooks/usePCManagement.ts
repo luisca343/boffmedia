@@ -26,7 +26,6 @@ export const usePCManagement = ({
   const [selectedPokemon, setSelectedPokemon] = useState<PCPokemon | null>(null)
   const [selectedTeamPokemon, setSelectedTeamPokemon] = useState<PokemonW | null>(null)
 
-  // Use the movement hook
   const { handlePokemonMove } = usePokemonMovement({
     uuid,
     pcData,
@@ -35,15 +34,12 @@ export const usePCManagement = ({
     setTeamData
   })
 
-  // Organize Pokemon by box - includes all boxes (even empty ones)
   const organizedBoxes = useCallback((): PCBoxData[] => {
     const boxes: PCBoxData[] = []
     
-    // Create all boxes from 0 to TOTAL_BOXES - 1
     for (let boxNum = 0; boxNum < TOTAL_BOXES; boxNum++) {
       const boxPokemon: (PCPokemon | null)[] = new Array(POKEMON_PER_BOX).fill(null)
       
-      // Fill with actual Pokemon data if it exists
       const pokemonInBox = pcData.filter(p => p.box === boxNum)
       pokemonInBox.forEach(pokemon => {
         if (pokemon.index >= 0 && pokemon.index < POKEMON_PER_BOX) {
@@ -71,7 +67,6 @@ export const usePCManagement = ({
     pokemon: new Array(POKEMON_PER_BOX).fill(null) 
   }) : null
 
-  // Handle Pokemon selection
   const handlePokemonClick = useCallback((pokemon: PCPokemon | null) => {
     setSelectedPokemon(pokemon)
     setSelectedTeamPokemon(null)
@@ -82,46 +77,78 @@ export const usePCManagement = ({
     setSelectedPokemon(null)
   }, [])
 
-  // Handle box navigation
-  const handleBoxChange = useCallback((boxNumber: number) => {
-    if (boxNumber >= 0 && boxNumber < totalBoxes) {
-      setCurrentBox(boxNumber)
-      setSelectedPokemon(null)
-      setSelectedTeamPokemon(null)
+  const findAvailableBox = useCallback((requestedBox: number, otherBox: number | null, isMovingForward: boolean = true): number => {
+    if (otherBox === null || requestedBox !== otherBox) {
+      return requestedBox
     }
+
+    let newBox = requestedBox
+    
+    if (isMovingForward) {
+      newBox = (requestedBox + 1) % totalBoxes
+      if (newBox === otherBox) {
+        newBox = (requestedBox - 1 + totalBoxes) % totalBoxes
+      }
+    } else {
+      newBox = (requestedBox - 1 + totalBoxes) % totalBoxes
+      if (newBox === otherBox) {
+        newBox = (requestedBox + 1) % totalBoxes
+      }
+    }
+    
+    return newBox
   }, [totalBoxes])
 
-  // Handle secondary box change
-  const handleSecondaryBoxChange = useCallback((boxNumber: number | null) => {
-    if (boxNumber === null || (boxNumber >= 0 && boxNumber < totalBoxes)) {
-      setSecondaryBox(boxNumber)
-      setSelectedPokemon(null)
-      setSelectedTeamPokemon(null)
-    }
-  }, [totalBoxes, currentBox])
+  const boxChange = useCallback((boxNumber: number | null, boxType: 'primary' | 'secondary') => {
+    if( boxNumber === null ) return;
+    const setChangedBox = boxType === 'primary' ? setCurrentBox : setSecondaryBox
+    const currentBoxValue = boxType === 'primary' ? currentBox : secondaryBox
+    const otherBox = boxType === 'primary' ? secondaryBox : currentBox
 
-  // Toggle dual box mode
+    const safeCurrentBoxValue = currentBoxValue ?? 0
+    const isMovingForward = boxNumber > safeCurrentBoxValue || 
+                           (boxNumber === 0 && safeCurrentBoxValue === totalBoxes - 1)
+
+    let adjustedBoxNumber = boxNumber
+    if (boxNumber < 0) {
+      adjustedBoxNumber = totalBoxes - 1
+    } else if (boxNumber >= totalBoxes) {
+      adjustedBoxNumber = 0
+    }
+
+    const finalBoxNumber = findAvailableBox(adjustedBoxNumber, otherBox, isMovingForward)
+
+    setChangedBox(finalBoxNumber)
+    setSelectedPokemon(null)
+    setSelectedTeamPokemon(null)
+  }, [totalBoxes, currentBox, secondaryBox, findAvailableBox])
+
+  const handleBoxChange = useCallback((boxNumber: number) => {
+    boxChange(boxNumber, 'primary')
+  }, [boxChange])
+
+  const handleSecondaryBoxChange = useCallback((boxNumber: number | null) => {
+    boxChange(boxNumber, 'secondary')
+  }, [boxChange])
+
   const toggleDualBoxMode = useCallback(() => {
     if (isDualBoxMode) {
       setSecondaryBox(null)
       setIsDualBoxMode(false)
     } else {
-      // Set secondary box to next box if available
-      const nextBox = currentBox + 1 < totalBoxes ? currentBox + 1 : (currentBox > 0 ? currentBox - 1 : null)
+      const nextBox = findAvailableBox((currentBox + 1) % totalBoxes, currentBox, true)
       setSecondaryBox(nextBox)
       setIsDualBoxMode(true)
     }
     setSelectedPokemon(null)
     setSelectedTeamPokemon(null)
-  }, [isDualBoxMode, currentBox, totalBoxes])
+  }, [isDualBoxMode, currentBox, totalBoxes, findAvailableBox])
 
-  // Clear selections
   const clearSelections = useCallback(() => {
     setSelectedPokemon(null)
     setSelectedTeamPokemon(null)
   }, [])
 
-  // Wrapper for Pokemon move that uses the proper type
   const handleMove = useCallback((
     source: { type: 'box' | 'team', boxNumber?: number, index: number },
     destination: { type: 'box' | 'team', boxNumber?: number, index: number }
@@ -130,7 +157,6 @@ export const usePCManagement = ({
   }, [handlePokemonMove])
 
   return {
-    // State
     currentBox,
     secondaryBox,
     isDualBoxMode,
@@ -141,7 +167,6 @@ export const usePCManagement = ({
     selectedPokemon,
     selectedTeamPokemon,
 
-    // Actions
     handlePokemonClick,
     handleTeamPokemonClick,
     handleBoxChange,

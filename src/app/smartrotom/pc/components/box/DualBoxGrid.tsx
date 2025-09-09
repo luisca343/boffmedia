@@ -3,7 +3,7 @@ import { BattleTeam } from '@/types/dto/battle-team.dto'
 import PokemonSlot from './PokemonSlot'
 import BoxHeader from './BoxHeader'
 import { SortableContext } from '@dnd-kit/sortable'
-import { noReorderStrategy, stablePositionStrategy } from '@/lib/drag-and-drop'
+import { stablePositionStrategy } from '@/lib/drag-and-drop'
 
 interface DualBoxGridProps {
   primaryBoxData: PCBoxData;
