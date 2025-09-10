@@ -62,19 +62,33 @@ export default function BoxSelectionDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl w-full max-h-[90vh] bg-slate-900/95 border-slate-500/30 flex flex-col p-0">
-        {/* Fixed Header */}
-        <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30 flex-shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
-          <div className="relative z-10 flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm">
-              <FaDatabase className="text-blue-300 text-xl" />
+        {/* Fixed Header - matches PokemonDetails */}
+        <DialogHeader>
+          <DialogTitle>
+            <div className="relative bg-gradient-to-r from-slate-800/80 to-slate-700/80 p-4 border-b border-slate-500/30">
+              {/* Background pattern */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 pointer-events-none" />
+              <div className="relative flex items-center justify-center space-x-16">
+                {/* Navigation Buttons - Left (none for box selector) */}
+                <div className="flex items-center space-x-2 min-w-[48px] min-h-[48px]" />
+
+                {/* Title */}
+                <div className="text-center">
+                  <div className="flex items-center justify-center space-x-3 mb-1">
+                    <span className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm">
+                      <FaDatabase className="text-blue-300 text-xl" />
+                    </span>
+                    <h2 className="text-white text-xl font-bold">Selector de Cajas</h2>
+                  </div>
+                  <p className="text-slate-300 text-sm">Selecciona una caja para navegar</p>
+                </div>
+
+                {/* Navigation Buttons - Right (none for box selector) */}
+                <div className="flex items-center space-x-2 min-w-[48px] min-h-[48px]" />
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-white">Selector de Cajas</h2>
-              <p className="text-slate-300 text-sm">Selecciona una caja para navegar</p>
-            </div>
-          </div>
-        </div>
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Scrollable Box Grid */}
         <div className="flex-1 overflow-y-auto p-6">

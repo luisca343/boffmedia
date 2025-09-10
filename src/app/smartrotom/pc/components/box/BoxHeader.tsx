@@ -22,14 +22,40 @@ export default function BoxHeader({
     return boxData.pokemon.filter(p => p !== null).length
   }
 
+  const playClickSound = () => {
+    try {
+      const audio = new Audio('/smartrotom/audio/apps/PC/CLICK.ogg')
+      audio.volume = 0.5 // Adjust volume as needed
+      audio.play().catch(console.error)
+    } catch (error) {
+      console.error('Error playing click sound:', error)
+    }
+  }
+
   const handlePrevious = () => {
+    playClickSound()
     const newBox = boxData.boxNumber === 0 ? totalBoxes - 1 : boxData.boxNumber - 1
     onBoxChange(newBox)
   }
 
   const handleNext = () => {
+    playClickSound()
     const newBox = boxData.boxNumber === totalBoxes - 1 ? 0 : boxData.boxNumber + 1
     onBoxChange(newBox)
+  }
+
+  const handleBoxSelection = () => {
+    playClickSound()
+    if (onShowBoxSelection) {
+      onShowBoxSelection()
+    }
+  }
+
+  const handleDeselect = () => {
+    playClickSound()
+    if (onDeselect) {
+      onDeselect()
+    }
   }
 
   const pokemonCount = getPokemonCount(boxData)
@@ -81,7 +107,7 @@ export default function BoxHeader({
           {/* Box Selection Button */}
           {onShowBoxSelection && (
             <button
-              onClick={onShowBoxSelection}
+              onClick={handleBoxSelection}
               className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border space-x-2`}
               title="Ver todas las cajas"
             >
@@ -100,7 +126,7 @@ export default function BoxHeader({
           {/* Deselect Button (only for secondary box) */}
           {isSecondary && onDeselect && (
             <button
-              onClick={onDeselect}
+              onClick={handleDeselect}
               className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl transition-colors backdrop-blur-sm border border-white/10"
               title="Cerrar caja secundaria"
             >
