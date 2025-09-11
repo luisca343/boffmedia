@@ -80,6 +80,19 @@ export default function PCPage() {
   const { activeDragItem, handleDragStart, handleDragEnd } = useActiveDragItem()
   const sensors = useDndSensors()
 
+  // Helper function to safely get original position from filterBoxData
+  const getOriginalPosition = useCallback((filterBoxData: any, index: number) => {
+    if (!filterBoxData?.originalPositions) return null
+    
+    if (filterBoxData.originalPositions instanceof Map) {
+      return filterBoxData.originalPositions.get(index)
+    } else if (typeof filterBoxData.originalPositions === 'object') {
+      return filterBoxData.originalPositions[index.toString()]
+    }
+    
+    return null
+  }, [])
+
   // Custom drag end handler for PC functionality
   const onDragEnd = useCallback(async (event: any, filterBoxRenderProps?: any) => {
     const { active, over } = event
@@ -116,7 +129,7 @@ export default function PCPage() {
         activeData.isFilterBox) {
       
       const { filterBoxData } = filterBoxRenderProps
-      const originalPos = filterBoxData.originalPositions.get(activeData.index)
+      const originalPos = getOriginalPosition(filterBoxData, activeData.index)
       
       if (originalPos) {
         sourceInfo = {

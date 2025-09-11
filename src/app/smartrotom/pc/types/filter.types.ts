@@ -60,8 +60,8 @@ export interface FilterBoxData {
     currentPage: number
     totalPages: number
   }
-  // Map from filter slot index to original position
-  originalPositions: Map<number, { box: number; index: number }>
+  // Map from filter slot index to original position - can be Map or object after serialization
+  originalPositions: Map<number, { box: number; index: number }> | Record<string, { box: number; index: number }>
 }
 
 // POKEMON TYPES for filtering
