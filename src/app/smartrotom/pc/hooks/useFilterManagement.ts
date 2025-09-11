@@ -1,3 +1,8 @@
+// Default filters for PC filter system
+export const DEFAULT_FILTERS: PokemonFilter = {
+  minLevel: 1,
+  maxLevel: 100
+}
 import { useState, useCallback, useMemo } from 'react'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { 
@@ -28,14 +33,14 @@ export function useFilterManagement({
   currentBox, 
   onBoxDataUpdate 
 }: UseFilterManagementProps) {
-  const [filterState, setFilterState] = useState<FilterState>({
-    isActive: false,
-    searchTerm: '',
-    filters: {},
-    sort: { field: 'dex', direction: 'asc' },
-    currentPage: 1,
-    resultsPerPage: RESULTS_PER_PAGE
-  })
+    const [filterState, setFilterState] = useState<FilterState>({
+      isActive: false,
+      searchTerm: '',
+      filters: { ...DEFAULT_FILTERS },
+      sort: { field: 'dex', direction: 'asc' },
+      currentPage: 1,
+      resultsPerPage: RESULTS_PER_PAGE
+    })
 
   // Memoized filter options based on all Pokemon
   const filterOptions = useMemo(() => 
@@ -208,14 +213,14 @@ export function useFilterManagement({
 
   // Clear all filters and return to normal box view
   const clearFilters = useCallback(() => {
-    setFilterState({
+    setFilterState(prev => ({
+      ...prev,
       isActive: false,
       searchTerm: '',
-      filters: {},
-      sort: { field: 'dex', direction: 'asc' },
-      currentPage: 1,
-      resultsPerPage: RESULTS_PER_PAGE
-    })
+      filters: { ...DEFAULT_FILTERS },
+      currentPage: 1
+    }))
+    // ...existing code...
   }, [])
 
   // Update sort without changing filters
