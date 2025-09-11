@@ -1,4 +1,5 @@
 import { PCBoxData, PCPokemon } from '@/types/dto/pc-pokemon.dto'
+import { FilterBoxData } from '../../types/filter.types'
 import { BattleTeam } from '@/types/dto/battle-team.dto'
 import PokemonSlot from './PokemonSlot'
 import BoxHeader from './BoxHeader'
@@ -6,8 +7,8 @@ import { SortableContext } from '@dnd-kit/sortable'
 import { stablePositionStrategy } from '@/lib/drag-and-drop'
 
 interface DualBoxGridProps {
-  primaryBoxData: PCBoxData;
-  secondaryBoxData?: PCBoxData | null;
+  primaryBoxData: PCBoxData | FilterBoxData;
+  secondaryBoxData?: PCBoxData | FilterBoxData | null;
   selectedPokemon: PCPokemon | null;
   onPokemonClick: (pokemon: PCPokemon | null) => void;
   onPokemonMove: (
@@ -22,8 +23,11 @@ interface DualBoxGridProps {
   battleTeams?: BattleTeam[];
   onAddToBattleTeam?: (teamId: string, position: number, pokemon: PCPokemon) => void;
   onShowBoxSelection?: () => void;
-
   onShowSecondaryBoxSelection?: () => void;
+  onShowSearch?: () => void;
+  onShowFilters?: () => void;
+  onClearFilters?: () => void;
+  onNavigateFilterPage?: (direction: 'prev' | 'next') => void;
 }
 
 export default function DualBoxGrid({ 
@@ -40,10 +44,15 @@ export default function DualBoxGrid({
   battleTeams,
   onAddToBattleTeam,
   onShowBoxSelection,
-  onShowSecondaryBoxSelection
+  onShowSecondaryBoxSelection,
+  onShowSearch,
+  onShowFilters,
+  onClearFilters,
+  onNavigateFilterPage
 }: DualBoxGridProps) {
   
-  const renderBoxGrid = (boxData: PCBoxData) => {
+  const renderBoxGrid = (boxData: PCBoxData | FilterBoxData) => {
+    const isFilterBox = 'type' in boxData && boxData.type === 'filter'
     const slots = []
     const slotIds = []
     
@@ -71,6 +80,7 @@ export default function DualBoxGrid({
             currentBox={boxData.boxNumber}
             battleTeams={battleTeams}
             onAddToBattleTeam={onAddToBattleTeam}
+            isFilterBox={isFilterBox}
           />
         )
       }
@@ -108,6 +118,9 @@ export default function DualBoxGrid({
           isSecondary={false}
           onBoxChange={onPrimaryBoxChange}
           onShowBoxSelection={onShowBoxSelection}
+          onShowSearch={onShowSearch}
+          onShowFilters={onShowFilters}
+          onClearFilters={onClearFilters}
         />
 
         {/* Grid Container */}
@@ -132,6 +145,9 @@ export default function DualBoxGrid({
             isSecondary={false}
             onBoxChange={onPrimaryBoxChange}
             onShowBoxSelection={onShowBoxSelection}
+            onShowSearch={onShowSearch}
+            onShowFilters={onShowFilters}
+            onClearFilters={onClearFilters}
           />
 
           {/* Grid Container */}

@@ -1,13 +1,18 @@
 import { FaArchive, FaChevronLeft, FaChevronRight, FaTimes, FaDatabase } from 'react-icons/fa'
+import { PiMagnifyingGlass, PiSliders, PiX, PiTarget } from 'react-icons/pi'
 import { PCBoxData } from '@/types/dto/pc-pokemon.dto'
+import { FilterBoxData } from '../../types/filter.types'
 
 interface BoxHeaderProps {
-  boxData: PCBoxData
+  boxData: PCBoxData | FilterBoxData
   totalBoxes: number
   isSecondary?: boolean
   onBoxChange: (boxNumber: number) => void
   onDeselect?: () => void
   onShowBoxSelection?: () => void
+  onShowSearch?: () => void
+  onShowFilters?: () => void
+  onClearFilters?: () => void
 }
 
 export default function BoxHeader({ 
@@ -16,10 +21,19 @@ export default function BoxHeader({
   isSecondary = false, 
   onBoxChange,
   onDeselect,
-  onShowBoxSelection 
+  onShowBoxSelection,
+  onShowSearch,
+  onShowFilters,
+  onClearFilters
 }: BoxHeaderProps) {
-  const getPokemonCount = (boxData: PCBoxData) => {
-    return boxData.pokemon.filter(p => p !== null).length
+  const isFilterBox = 'type' in boxData && boxData.type === 'filter'
+  
+  const getPokemonCount = (boxData: PCBoxData | FilterBoxData) => {
+    if (isFilterBox) {
+      const filterBox = boxData as FilterBoxData
+      return `${filterBox.resultSummary.currentPage}/${filterBox.resultSummary.totalPages} (${filterBox.resultSummary.totalResults} total)`
+    }
+    return (boxData as PCBoxData).pokemon.filter(p => p !== null).length
   }
 
   const playClickSound = () => {
@@ -34,14 +48,30 @@ export default function BoxHeader({
 
   const handlePrevious = () => {
     playClickSound()
-    const newBox = boxData.boxNumber === 0 ? totalBoxes - 1 : boxData.boxNumber - 1
-    onBoxChange(newBox)
+    if (isFilterBox) {
+      const filterBox = boxData as FilterBoxData
+      if (filterBox.resultSummary.currentPage > 1) {
+        // Navigate to previous filter results page
+        onBoxChange(boxData.boxNumber - 1)
+      }
+    } else {
+      const newBox = boxData.boxNumber === 0 ? totalBoxes - 1 : boxData.boxNumber - 1
+      onBoxChange(newBox)
+    }
   }
 
   const handleNext = () => {
     playClickSound()
-    const newBox = boxData.boxNumber === totalBoxes - 1 ? 0 : boxData.boxNumber + 1
-    onBoxChange(newBox)
+    if (isFilterBox) {
+      const filterBox = boxData as FilterBoxData
+      if (filterBox.resultSummary.currentPage < filterBox.resultSummary.totalPages) {
+        // Navigate to next filter results page
+        onBoxChange(boxData.boxNumber + 1)
+      }
+    } else {
+      const newBox = boxData.boxNumber === totalBoxes - 1 ? 0 : boxData.boxNumber + 1
+      onBoxChange(newBox)
+    }
   }
 
   const handleBoxSelection = () => {
@@ -59,7 +89,24 @@ export default function BoxHeader({
   }
 
   const pokemonCount = getPokemonCount(boxData)
-  const colorScheme = isSecondary ? {
+  
+  // Determine if navigation buttons should be enabled
+  const canNavigatePrevious = isFilterBox 
+    ? (boxData as FilterBoxData).resultSummary.currentPage > 1
+    : boxData.boxNumber > 0
+    
+  const canNavigateNext = isFilterBox
+    ? (boxData as FilterBoxData).resultSummary.currentPage < (boxData as FilterBoxData).resultSummary.totalPages
+    : boxData.boxNumber < totalBoxes - 1
+  const colorScheme = isFilterBox ? {
+    // Special colors for filter boxes
+    bg: 'from-purple-800/80 to-purple-700/80',
+    accent: 'from-purple-500/10 via-transparent to-pink-500/10',
+    iconBg: 'from-purple-500/20 to-pink-500/20',
+    text: 'text-purple-300',
+    button: 'bg-purple-600 hover:bg-purple-700 border-white/10',
+    progress: 'bg-purple-400'
+  } : isSecondary ? {
     bg: 'from-slate-800/80 to-slate-700/80',
     accent: 'from-green-500/5 via-transparent to-emerald-500/5',
     iconBg: 'from-green-500/20 to-emerald-500/20',
@@ -76,7 +123,9 @@ export default function BoxHeader({
   }
 
   return (
-    <div className={`relative bg-gradient-to-r ${colorScheme.bg} p-4 flex-shrink-0 rounded-t-2xl`}>
+    <div className={`relative bg-gradient-to-r ${colorScheme.bg} p-4 flex-shrink-0 rounded-t-2xl ${
+      isFilterBox ? 'border-2 border-purple-400/30 shadow-lg shadow-purple-400/20' : ''
+    }`}>
       {/* Enhanced background pattern */}
       <div className={`absolute inset-0 bg-gradient-to-br ${colorScheme.accent} pointer-events-none rounded-t-2xl`} />
       <div className="relative flex items-center justify-between">
@@ -84,28 +133,69 @@ export default function BoxHeader({
         <button
           onClick={handlePrevious}
           className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border`}
-          title="Caja anterior"
+          title={isFilterBox ? "Página anterior" : "Caja anterior"}
         >
           <FaChevronLeft className="text-sm" />
         </button>
+        
         {/* Box Info */}
         <div className="flex items-center space-x-3">
           <div
             className={`w-10 h-10 bg-gradient-to-br ${colorScheme.iconBg} rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm`}
           >
-            <FaArchive className={`${colorScheme.text} text-lg`} />
+            {isFilterBox ? (
+              <PiTarget className={`${colorScheme.text} text-lg`} />
+            ) : (
+              <FaArchive className={`${colorScheme.text} text-lg`} />
+            )}
           </div>
           <div>
-            <h3 className="text-white font-bold text-xl">Caja {boxData.boxNumber + 1}</h3>
+            <h3 className="text-white font-bold text-xl">
+              {isFilterBox 
+                ? (boxData as FilterBoxData).title 
+                : `Caja ${boxData.boxNumber + 1}`
+              }
+            </h3>
             <p className="text-slate-300 text-sm font-medium">
-              {pokemonCount}/30 Pokémon
+              {isFilterBox 
+                ? pokemonCount 
+                : `${pokemonCount}/30 Pokémon`
+              }
             </p>
           </div>
         </div>
+        
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
+          {/* Filter Box: Clear Filters Button */}
+          {isFilterBox && onClearFilters && (
+            <button
+              onClick={onClearFilters}
+              className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border border-white/10 space-x-2"
+              title="Limpiar filtros"
+            >
+              <PiX className="text-sm" />
+              <span className="hidden sm:inline text-xs font-medium">Limpiar</span>
+            </button>
+          )}
+          
+          {/* Normal Box: Search and Filter Buttons */}
+          {!isFilterBox && (
+            <>
+              {onShowFilters && (
+                <button
+                  onClick={onShowFilters}
+                  className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border`}
+                  title="Filtrar Pokémon"
+                >
+                  <PiSliders className="text-sm" />
+                </button>
+              )}
+            </>
+          )}
+          
           {/* Box Selection Button */}
-          {onShowBoxSelection && (
+          {onShowBoxSelection && !isFilterBox && (
             <button
               onClick={handleBoxSelection}
               className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border space-x-2`}
@@ -115,14 +205,17 @@ export default function BoxHeader({
               <span className="hidden sm:inline text-xs font-medium">Ver Todas</span>
             </button>
           )}
+          
           {/* Next Button */}
           <button
             onClick={handleNext}
-            className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border`}
-            title="Siguiente caja"
+            className={`${colorScheme.button} text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border
+            }`}
+            title={isFilterBox ? "Página siguiente" : "Siguiente caja"}
           >
             <FaChevronRight className="text-sm" />
           </button>
+          
           {/* Deselect Button (only for secondary box) */}
           {isSecondary && onDeselect && (
             <button

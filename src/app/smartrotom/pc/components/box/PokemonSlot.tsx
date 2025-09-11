@@ -20,6 +20,7 @@ interface PokemonSlotProps {
   currentBox: number;
   battleTeams?: BattleTeam[];
   onAddToBattleTeam?: (teamId: string, position: number, pokemon: PCPokemon) => void;
+  isFilterBox?: boolean; // New prop to indicate if this is in a filter box
 }
 
 // Separate component for shiny indicator
@@ -61,7 +62,8 @@ const PokemonSlot = memo(function PokemonSlot({
   onClick, 
   currentBox,
   battleTeams,
-  onAddToBattleTeam 
+  onAddToBattleTeam,
+  isFilterBox = false
 }: PokemonSlotProps) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -87,9 +89,10 @@ const PokemonSlot = memo(function PokemonSlot({
       type: 'box',
       boxNumber: currentBox,
       index,
-      pokemon
+      pokemon,
+      isFilterBox // Include this in data for drop validation
     },
-    disabled: !pokemon // Only allow dragging if there's a pokemon
+    disabled: !pokemon || (isFilterBox && !pokemon) // Only allow dragging FROM filter boxes, not TO them
   })
 
   const style = {
@@ -124,24 +127,49 @@ const PokemonSlot = memo(function PokemonSlot({
         style={style} 
         className="relative 2xl:w-24 2xl:h-24 w-16 h-16"
         {...attributes}
-        {...listeners}
+        {...(isFilterBox ? {} : listeners)} // Disable listeners for filter boxes
       >
         <div 
-          className={`absolute inset-0 bg-gradient-to-br from-gray-600/20 to-gray-800/20 border-2 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer group backdrop-blur-sm ${
-            isOver 
-              ? 'border-green-400 bg-green-400/20 shadow-green-400/50 shadow-lg' 
-              : 'border-gray-500/30 hover:border-gray-400/50'
+          className={`absolute inset-0 bg-gradient-to-br rounded-xl flex items-center justify-center transition-all duration-200 backdrop-blur-sm ${
+            isFilterBox 
+              ? 'from-red-600/20 to-red-800/20 border-2 border-red-500/50 cursor-not-allowed' 
+              : `from-gray-600/20 to-gray-800/20 border-2 cursor-pointer group ${
+                  isOver 
+                    ? 'border-green-400 bg-green-400/20 shadow-green-400/50 shadow-lg' 
+                    : 'border-gray-500/30 hover:border-gray-400/50'
+                }`
           }`}
-          onDragOver={undefined}
-          onDragLeave={undefined}
-          onDrop={undefined}
+          title={isFilterBox ? "No se puede mover Pokémon a una caja de filtros. Limpia los filtros para habilitar." : undefined}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 pointer-events-none rounded-xl" />
-          <div className="text-gray-500 group-hover:text-gray-400 transition-colors relative z-10">
-            <div className="w-8 h-8 border-2 border-dashed border-current rounded-full opacity-50 flex items-center justify-center">
-              <div className="w-2 h-2 bg-current rounded-full opacity-60"></div>
+          
+          {isFilterBox ? (
+            // Filter box warning icon
+            <div className="text-red-400 relative z-10">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <span className="text-2xl">🚫</span>
+              </div>
             </div>
-          </div>
+          ) : (
+            // Normal empty slot
+            <div className="text-gray-500 group-hover:text-gray-400 transition-colors relative z-10">
+              <div className="w-8 h-8 border-2 border-dashed border-current rounded-full opacity-50 flex items-center justify-center">
+                <div className="w-2 h-2 bg-current rounded-full opacity-60"></div>
+              </div>
+            </div>
+          )}
+          
+          {/* Filter box overlay when dragging over */}
+          {isFilterBox && isOver && (
+            <div className="absolute inset-0 bg-red-500/20 border-2 border-red-500 rounded-xl pointer-events-none backdrop-blur-sm">
+              <div className="absolute inset-2 border border-dashed border-red-500/60 rounded-lg opacity-75" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-red-300 text-xs font-bold bg-red-900/50 px-2 py-1 rounded">
+                  No Permitido
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     )
