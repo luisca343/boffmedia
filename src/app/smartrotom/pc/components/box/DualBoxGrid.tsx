@@ -27,6 +27,7 @@ interface DualBoxGridProps {
   onShowSearch?: () => void;
   onShowFilters?: () => void;
   onClearFilters?: () => void;
+  onModifyFilters?: () => void;
   onNavigateFilterPage?: (direction: 'prev' | 'next') => void;
 }
 
@@ -48,6 +49,7 @@ export default function DualBoxGrid({
   onShowSearch,
   onShowFilters,
   onClearFilters,
+  onModifyFilters,
   onNavigateFilterPage
 }: DualBoxGridProps) {
   
@@ -121,6 +123,7 @@ export default function DualBoxGrid({
           onShowSearch={onShowSearch}
           onShowFilters={onShowFilters}
           onClearFilters={onClearFilters}
+          onModifyFilters={onModifyFilters}
           onNavigateFilterPage={onNavigateFilterPage}
         />
 
@@ -149,6 +152,7 @@ export default function DualBoxGrid({
             onShowSearch={onShowSearch}
             onShowFilters={onShowFilters}
             onClearFilters={onClearFilters}
+            onModifyFilters={onModifyFilters}
             onNavigateFilterPage={onNavigateFilterPage}
           />
 

@@ -13,6 +13,7 @@ interface BoxHeaderProps {
   onShowSearch?: () => void
   onShowFilters?: () => void
   onClearFilters?: () => void
+  onModifyFilters?: () => void
   onNavigateFilterPage?: (direction: 'prev' | 'next') => void
 }
 
@@ -26,6 +27,7 @@ export default function BoxHeader({
   onShowSearch,
   onShowFilters,
   onClearFilters,
+  onModifyFilters,
   onNavigateFilterPage
 }: BoxHeaderProps) {
   const isFilterBox = 'type' in boxData && boxData.type === 'filter'
@@ -167,16 +169,30 @@ export default function BoxHeader({
         
         {/* Action Buttons */}
         <div className="flex items-center space-x-2">
-          {/* Filter Box: Clear Filters Button */}
-          {isFilterBox && onClearFilters && (
-            <button
-              onClick={onClearFilters}
-              className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border border-white/10 space-x-2"
-              title="Limpiar filtros"
-            >
-              <PiX className="text-sm" />
-              <span className="hidden sm:inline text-xs font-medium">Limpiar</span>
-            </button>
+          {/* Filter Box: Clear Filters and Modify Filters Buttons */}
+          {isFilterBox && (
+            <>
+              {onModifyFilters && (
+                <button
+                  onClick={onModifyFilters}
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border border-white/10 space-x-2"
+                  title="Modificar filtros"
+                >
+                  <PiSliders className="text-sm" />
+                  <span className="hidden sm:inline text-xs font-medium">Filtros</span>
+                </button>
+              )}
+              {onClearFilters && (
+                <button
+                  onClick={onClearFilters}
+                  className="bg-red-600 hover:bg-red-700 text-white p-3 rounded-xl transition-colors flex items-center justify-center backdrop-blur-sm border border-white/10 space-x-2"
+                  title="Limpiar filtros"
+                >
+                  <PiX className="text-sm" />
+                  <span className="hidden sm:inline text-xs font-medium">Limpiar</span>
+                </button>
+              )}
+            </>
           )}
           
           {/* Normal Box: Search and Filter Buttons */}

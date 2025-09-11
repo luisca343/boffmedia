@@ -55,10 +55,9 @@ export function usePCWithFilters({
     setShowFilterPanel(true)
   }, [])
 
-  const handleApplyFilters = useCallback((filters: PokemonFilter) => {
-    applySearchAndFilters(filterState.searchTerm, filters)
-    setShowFilterPanel(false)
-  }, [applySearchAndFilters, filterState.searchTerm])
+  const handleApplyFilters = useCallback((searchTerm: string, filters: PokemonFilter, sort?: FilterSort) => {
+    applySearchAndFilters(searchTerm, filters, sort)
+  }, [applySearchAndFilters])
 
   // Handle clearing filters
   const handleClearFilters = useCallback(() => {

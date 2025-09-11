@@ -500,6 +500,7 @@ export default function PCPage() {
                       onShowSearch={handleShowFilters}
                       onShowFilters={handleShowFilters}
                       onClearFilters={handleClearFilters}
+                      onModifyFilters={handleShowFilters}
                       onNavigateFilterPage={navigateFilterPage}
                     />
                   </motion.div>
@@ -540,13 +541,12 @@ export default function PCPage() {
                     searchTerm={filterState.searchTerm}
                     sort={filterState.sort}
                     onFiltersChange={(filters) => {
-                      // Don't apply filters immediately - only when Apply button is clicked
+                      // Update the filters immediately for preview purposes
+                      // This allows users to see changes as they make them
                     }}
                     onSortChange={updateSort}
                     onApply={(searchTerm, filters, sort) => {
-                      const combinedFilters = { ...filters, search: searchTerm }
-                      handleApplyFilters(combinedFilters)
-                      updateSort(sort)
+                      handleApplyFilters(searchTerm, filters, sort)
                       setShowFilterPanel(false)
                     }}
                     filterOptions={filterOptions}

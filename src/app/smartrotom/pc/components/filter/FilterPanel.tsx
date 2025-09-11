@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
-  PiSliders, PiX, PiCaretDown, PiCaretUp, PiCheck, 
+  PiSliders, PiX, PiCheck, 
   PiStar, PiGenderMale, PiGenderFemale, PiGenderNeuter,
   PiMagnifyingGlass, PiSortAscending, PiSortDescending
 } from 'react-icons/pi'
@@ -41,27 +41,18 @@ export function FilterPanel({
   const [localFilters, setLocalFilters] = useState<PokemonFilter>(filters)
   const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm)
   const [localSort, setLocalSort] = useState(sort)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['search', 'types', 'level']))
 
-  // Update local state when props change (when dialog opens)
+  // Update local state when props change
   useEffect(() => {
     setLocalFilters(filters)
     setLocalSearchTerm(searchTerm)
     setLocalSort(sort)
-  }, [filters, searchTerm, sort, isOpen])
-
-  const toggleSection = (section: string) => {
-    const newExpanded = new Set(expandedSections)
-    if (newExpanded.has(section)) {
-      newExpanded.delete(section)
-    } else {
-      newExpanded.add(section)
-    }
-    setExpandedSections(newExpanded)
-  }
+  }, [filters, searchTerm, sort])
 
   const updateFilters = (updates: Partial<PokemonFilter>) => {
-    setLocalFilters(prev => ({ ...prev, ...updates }))
+    const newFilters = { ...localFilters, ...updates }
+    setLocalFilters(newFilters)
+    // Don't notify parent immediately - only when Apply is clicked
   }
 
   const toggleType = (type: string) => {
@@ -69,15 +60,19 @@ export function FilterPanel({
     const newTypes = currentTypes.includes(type)
       ? currentTypes.filter(t => t !== type)
       : [...currentTypes, type]
-    setLocalFilters(prev => ({ 
-      ...prev, 
+    const newFilters = { 
+      ...localFilters, 
       types: newTypes.length > 0 ? newTypes : undefined 
-    }))
+    }
+    setLocalFilters(newFilters)
+    // Don't notify parent immediately - only when Apply is clicked
   }
 
   const clearAllFilters = () => {
-    setLocalFilters({})
+    const emptyFilters = {}
+    setLocalFilters(emptyFilters)
     setLocalSearchTerm('')
+    // Don't notify parent immediately - only when Apply is clicked
   }
 
   const handleApply = () => {
@@ -148,33 +143,42 @@ export function FilterPanel({
           <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
             <div className="space-y-6">
               
-              {/* Search Section */}
-              <FilterSection
-                title="Búsqueda y Orden"
-                isExpanded={expandedSections.has('search')}
-                onToggle={() => toggleSection('search')}
-                activeCount={localSearchTerm ? 1 : 0}
-              >
-                <div className="space-y-4">
-                  <SearchBar
-                    value={localSearchTerm}
-                    onChange={setLocalSearchTerm}
-                    placeholder="Buscar por nombre, apodo o número..."
-                  />
-                  <SortDropdown
-                    sort={localSort}
-                    onSortChange={setLocalSort}
-                  />
+              {/* Search and Sort Section */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <PiMagnifyingGlass className="text-blue-400 text-lg" />
+                  <h4 className="text-white font-medium">Búsqueda y Orden</h4>
+                  {localSearchTerm && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      1
+                    </span>
+                  )}
                 </div>
-              </FilterSection>
+                <SearchBar
+                  value={localSearchTerm}
+                  onChange={(value) => {
+                    setLocalSearchTerm(value)
+                    // Don't update filters immediately - only when Apply is clicked
+                  }}
+                  placeholder="Buscar por nombre, apodo o número..."
+                />
+                <SortDropdown
+                  sort={localSort}
+                  onSortChange={setLocalSort}
+                />
+              </div>
 
               {/* Types Filter */}
-              <FilterSection
-                title="Tipos de Pokémon"
-                isExpanded={expandedSections.has('types')}
-                onToggle={() => toggleSection('types')}
-                activeCount={localFilters.types?.length || 0}
-              >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="w-4 h-4 bg-gradient-to-br from-red-500 to-blue-500 rounded"></div>
+                  <h4 className="text-white font-medium">Tipos de Pokémon</h4>
+                  {localFilters.types && localFilters.types.length > 0 && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      {localFilters.types.length}
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
                   {POKEMON_TYPES.map(type => (
                     <button
@@ -196,59 +200,65 @@ export function FilterPanel({
                     </button>
                   ))}
                 </div>
-              </FilterSection>
+              </div>
 
               {/* Level Range */}
-              <FilterSection
-                title="Rango de Nivel"
-                isExpanded={expandedSections.has('level')}
-                onToggle={() => toggleSection('level')}
-                activeCount={localFilters.minLevel || localFilters.maxLevel ? 1 : 0}
-              >
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm text-slate-300 mb-2">Nivel Mínimo</label>
-                      <input
-                        type="number"
-                        min={filterOptions.levelRange.min}
-                        max={filterOptions.levelRange.max}
-                        value={localFilters.minLevel || ''}
-                        onChange={(e) => updateFilters({ 
-                          minLevel: e.target.value ? parseInt(e.target.value) : undefined 
-                        })}
-                        className="w-full bg-slate-700/50 border border-slate-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-400/50"
-                        placeholder={filterOptions.levelRange.min.toString()}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm text-slate-300 mb-2">Nivel Máximo</label>
-                      <input
-                        type="number"
-                        min={filterOptions.levelRange.min}
-                        max={filterOptions.levelRange.max}
-                        value={localFilters.maxLevel || ''}
-                        onChange={(e) => updateFilters({ 
-                          maxLevel: e.target.value ? parseInt(e.target.value) : undefined 
-                        })}
-                        className="w-full bg-slate-700/50 border border-slate-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-400/50"
-                        placeholder={filterOptions.levelRange.max.toString()}
-                      />
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-400">
-                    Rango disponible: {filterOptions.levelRange.min} - {filterOptions.levelRange.max}
-                  </p>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <PiSortAscending className="text-green-400 text-lg" />
+                  <h4 className="text-white font-medium">Rango de Nivel</h4>
+                  {(localFilters.minLevel || localFilters.maxLevel) && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      1
+                    </span>
+                  )}
                 </div>
-              </FilterSection>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm text-slate-300 mb-2">Nivel Mínimo</label>
+                    <input
+                      type="number"
+                      min={filterOptions.levelRange.min}
+                      max={filterOptions.levelRange.max}
+                      value={localFilters.minLevel || ''}
+                      onChange={(e) => updateFilters({ 
+                        minLevel: e.target.value ? parseInt(e.target.value) : undefined 
+                      })}
+                      className="w-full bg-slate-700/50 border border-slate-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-400/50"
+                      placeholder={filterOptions.levelRange.min.toString()}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-slate-300 mb-2">Nivel Máximo</label>
+                    <input
+                      type="number"
+                      min={filterOptions.levelRange.min}
+                      max={filterOptions.levelRange.max}
+                      value={localFilters.maxLevel || ''}
+                      onChange={(e) => updateFilters({ 
+                        maxLevel: e.target.value ? parseInt(e.target.value) : undefined 
+                      })}
+                      className="w-full bg-slate-700/50 border border-slate-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-400/50"
+                      placeholder={filterOptions.levelRange.max.toString()}
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Rango disponible: {filterOptions.levelRange.min} - {filterOptions.levelRange.max}
+                </p>
+              </div>
 
               {/* Special Status */}
-              <FilterSection
-                title="Estado Especial"
-                isExpanded={expandedSections.has('special')}
-                onToggle={() => toggleSection('special')}
-                activeCount={[localFilters.isShiny, localFilters.isLegendary, localFilters.hasItem, localFilters.isFavorited].filter(Boolean).length}
-              >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <PiStar className="text-yellow-400 text-lg" />
+                  <h4 className="text-white font-medium">Estado Especial</h4>
+                  {[localFilters.isShiny, localFilters.isLegendary, localFilters.hasItem, localFilters.isFavorited].filter(Boolean).length > 0 && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      {[localFilters.isShiny, localFilters.isLegendary, localFilters.hasItem, localFilters.isFavorited].filter(Boolean).length}
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 gap-3">
                   <FilterToggle
                     label="Shiny"
@@ -275,15 +285,19 @@ export function FilterPanel({
                     onChange={(checked) => updateFilters({ isFavorited: checked ? true : undefined })}
                   />
                 </div>
-              </FilterSection>
+              </div>
 
               {/* Gender */}
-              <FilterSection
-                title="Género"
-                isExpanded={expandedSections.has('gender')}
-                onToggle={() => toggleSection('gender')}
-                activeCount={localFilters.gender ? 1 : 0}
-              >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <PiGenderMale className="text-blue-400 text-lg" />
+                  <h4 className="text-white font-medium">Género</h4>
+                  {localFilters.gender && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      1
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-3 gap-3">
                   <FilterToggle
                     label="Macho"
@@ -304,15 +318,19 @@ export function FilterPanel({
                     onChange={(checked) => updateFilters({ gender: checked ? 'genderless' : undefined })}
                   />
                 </div>
-              </FilterSection>
+              </div>
 
               {/* Nature Filter */}
-              <FilterSection
-                title="Naturaleza"
-                isExpanded={expandedSections.has('nature')}
-                onToggle={() => toggleSection('nature')}
-                activeCount={localFilters.nature ? 1 : 0}
-              >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="w-4 h-4 bg-green-400 rounded-full"></div>
+                  <h4 className="text-white font-medium">Naturaleza</h4>
+                  {localFilters.nature && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      1
+                    </span>
+                  )}
+                </div>
                 <select
                   value={localFilters.nature || ''}
                   onChange={(e) => updateFilters({ nature: e.target.value || undefined })}
@@ -323,15 +341,19 @@ export function FilterPanel({
                     <option key={nature} value={nature}>{nature}</option>
                   ))}
                 </select>
-              </FilterSection>
+              </div>
 
               {/* Ability Filter */}
-              <FilterSection
-                title="Habilidad"
-                isExpanded={expandedSections.has('ability')}
-                onToggle={() => toggleSection('ability')}
-                activeCount={localFilters.ability ? 1 : 0}
-              >
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 mb-3">
+                  <div className="w-4 h-4 bg-purple-400 rounded-sm"></div>
+                  <h4 className="text-white font-medium">Habilidad</h4>
+                  {localFilters.ability && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                      1
+                    </span>
+                  )}
+                </div>
                 <select
                   value={localFilters.ability || ''}
                   onChange={(e) => updateFilters({ ability: e.target.value || undefined })}
@@ -342,7 +364,7 @@ export function FilterPanel({
                     <option key={ability} value={ability}>{ability}</option>
                   ))}
                 </select>
-              </FilterSection>
+              </div>
 
             </div>
 
@@ -369,59 +391,7 @@ export function FilterPanel({
   )
 }
 
-// Helper components
-function FilterSection({ 
-  title, 
-  isExpanded, 
-  onToggle, 
-  activeCount, 
-  children 
-}: {
-  title: string
-  isExpanded: boolean
-  onToggle: () => void
-  activeCount: number
-  children: React.ReactNode
-}) {
-  return (
-    <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-500/30 overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 hover:bg-slate-700/30 transition-colors duration-200"
-      >
-        <div className="flex items-center space-x-2">
-          <h4 className="text-white font-medium">{title}</h4>
-          {activeCount > 0 && (
-            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-              {activeCount}
-            </span>
-          )}
-        </div>
-        {isExpanded ? (
-          <PiCaretUp className="text-slate-400 text-lg" />
-        ) : (
-          <PiCaretDown className="text-slate-400 text-lg" />
-        )}
-      </button>
-      <AnimatePresence>
-        {isExpanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-slate-500/30"
-          >
-            <div className="p-4">
-              {children}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  )
-}
-
+// Helper component for toggle buttons
 function FilterToggle({
   label,
   icon,

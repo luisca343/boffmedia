@@ -140,7 +140,7 @@ export function useFilterManagement({
       ...filters,
       search: searchTerm || undefined
     }
-    
+
     applyFilters(combinedFilters, sort)
   }, [applyFilters, filterState.sort])
 

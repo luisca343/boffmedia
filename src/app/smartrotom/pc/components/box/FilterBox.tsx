@@ -33,7 +33,7 @@ export interface FilterBoxRenderProps {
 
   // Handlers
   handleShowFilters: () => void
-  handleApplyFilters: (filters: any) => void
+  handleApplyFilters: (searchTerm: string, filters: any, sort?: any) => void
   handleClearFilters: () => void
   handlePokemonRemovedFromFilter: (filterSlotIndex: number) => void
 
