@@ -66,27 +66,42 @@ export default function DualBoxGrid({
         const pokemon = boxData.pokemon[index]
         const slotId = `box-${boxData.boxNumber}-slot-${index}`
         slotIds.push(slotId)
-        
+
         const isSelected = selectedPokemon && pokemon && 
           selectedPokemon.index === pokemon.index && 
           selectedPokemon.box === pokemon.box || false
-        
+
         rowSlots.push(
-          <PokemonSlot
-            key={slotId}
-            id={slotId}
-            pokemon={pokemon}
-            index={index}
-            isSelected={isSelected}
-            onClick={() => onPokemonClick(pokemon)}
-            currentBox={boxData.boxNumber}
-            battleTeams={battleTeams}
-            onAddToBattleTeam={onAddToBattleTeam}
-            isFilterBox={isFilterBox}
-          />
+          <div key={slotId} className="relative">
+            <PokemonSlot
+              id={slotId}
+              pokemon={pokemon}
+              index={index}
+              isSelected={isSelected}
+              onClick={() => onPokemonClick(pokemon)}
+              currentBox={boxData.boxNumber}
+              battleTeams={battleTeams}
+              onAddToBattleTeam={onAddToBattleTeam}
+              isFilterBox={isFilterBox}
+            />
+            {/* Show original box name if filter box and pokemon exists */}
+            {isFilterBox && pokemon && boxData.originalPositions && (
+              <div className="absolute top-1 right-1 bg-slate-800/80 text-xs text-white px-2 py-0.5 rounded shadow">
+                Caja {(() => {
+                  let orig = null;
+                  if (boxData.originalPositions instanceof Map) {
+                    orig = boxData.originalPositions.get(index)
+                  } else if (typeof boxData.originalPositions === 'object') {
+                    orig = boxData.originalPositions[index.toString()]
+                  }
+                  return orig && typeof orig.box === 'number' ? orig.box + 1 : '?'
+                })()}
+              </div>
+            )}
+          </div>
         )
       }
-      
+
       slots.push(
         <div 
           key={row} 
