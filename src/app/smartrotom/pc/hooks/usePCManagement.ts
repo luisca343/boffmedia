@@ -173,6 +173,9 @@ export const usePCManagement = ({
     handleSecondaryBoxChange,
     toggleDualBoxMode,
     handlePokemonMove: handleMove,
-    clearSelections
+    clearSelections,
+    
+    // Export direct setters for advanced use cases (like filter-aware navigation)
+    setSecondaryBox
   }
 }

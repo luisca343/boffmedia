@@ -57,7 +57,8 @@ export default function PCPage() {
     handleSecondaryBoxChange,
     toggleDualBoxMode,
     handlePokemonMove,
-    clearSelections
+    clearSelections,
+    setSecondaryBox
   } = usePCManagement({
     uuid,
     pcData,
@@ -368,6 +369,27 @@ export default function PCPage() {
                 ? filterBoxData 
                 : currentBoxData
               
+              // Create a filter-aware secondary box change handler
+              const filterAwareSecondaryBoxChange = useCallback((boxNumber: number | null) => {
+                if (boxNumber === null) {
+                  handleSecondaryBoxChange(null)
+                  return
+                }
+
+                // If primary box is showing filters, allow secondary box to use the original box
+                // that's being filtered since it's not actually occupied
+                if (isFilterActive && boxNumber === currentBox) {
+                  // Bypass conflict detection - use direct setter since the primary box
+                  // is showing filters, not the actual box data
+                  setSecondaryBox(boxNumber)
+                  // Clear selections when changing boxes
+                  clearSelections()
+                } else {
+                  // Use normal logic which includes conflict detection
+                  handleSecondaryBoxChange(boxNumber)
+                }
+              }, [isFilterActive, currentBox, handleSecondaryBoxChange, setSecondaryBox, clearSelections])
+              
               const calculatedSecondaryBoxData = isDualBoxMode 
                 ? (secondaryBox !== null ? (boxes[secondaryBox] || { 
                     boxNumber: secondaryBox, 
@@ -468,7 +490,7 @@ export default function PCPage() {
                       onPokemonMove={optimisticPokemonMove}
                       totalBoxes={totalBoxes}
                       onPrimaryBoxChange={handleBoxChange}
-                      onSecondaryBoxChange={handleSecondaryBoxChange}
+                      onSecondaryBoxChange={filterAwareSecondaryBoxChange}
                       rows={ROWS_PER_BOX}
                       cols={COLS_PER_ROW}
                       battleTeams={battleTeamsData?.teams}
@@ -529,6 +551,15 @@ export default function PCPage() {
                     }}
                     filterOptions={filterOptions}
                   />
+
+                  {/* Secondary Box Selection Dialog - moved inside to access filter state */}
+                  <BoxSelectionDialog
+                    isOpen={showSecondaryBoxSelection}
+                    boxes={boxes}
+                    currentBox={secondaryBox!}
+                    onBoxSelect={filterAwareSecondaryBoxChange}
+                    onClose={() => setShowSecondaryBoxSelection(false)}
+                  />
                 </DndContext>
               )
             }}
@@ -541,13 +572,6 @@ export default function PCPage() {
           currentBox={currentBox}
           onBoxSelect={handleBoxChange}
           onClose={() => setShowBoxSelection(false)}
-        />
-        <BoxSelectionDialog
-          isOpen={showSecondaryBoxSelection}
-          boxes={boxes}
-          currentBox={secondaryBox!}
-          onBoxSelect={handleSecondaryBoxChange}
-          onClose={() => setShowSecondaryBoxSelection(false)}
         />
         {/* Pokemon Details Modal */}
         <AnimatePresence>
