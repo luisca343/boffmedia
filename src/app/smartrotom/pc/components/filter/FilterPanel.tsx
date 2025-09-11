@@ -17,7 +17,6 @@ interface FilterPanelProps {
   searchTerm: string
   sort: FilterSort
   onFiltersChange: (filters: PokemonFilter) => void
-  onSearchChange: (searchTerm: string) => void
   onSortChange: (sort: FilterSort) => void
   onApply: (searchTerm: string, filters: PokemonFilter, sort: FilterSort) => void
   filterOptions: {
@@ -35,7 +34,6 @@ export function FilterPanel({
   searchTerm,
   sort,
   onFiltersChange,
-  onSearchChange,
   onSortChange,
   onApply,
   filterOptions 

@@ -5,13 +5,12 @@ import { useBoffSession } from "@/services/useBoffSession"
 import { WingullService } from '@/services/api/smartrotom/wingullService'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { PokemonW } from '@/generated/api'
-import { FilterBoxData } from './types/filter.types'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ROWS_PER_BOX, COLS_PER_ROW } from './utils/constants'
 import { useGetBattleTeams } from '@/hooks/player/useGetBattleTeams'
 import { usePCManagement } from './hooks/usePCManagement'
-import { usePCWithFilters } from './hooks/usePCWithFilters'
+import { FilterBox } from './components/box/FilterBox'
 import PCHeader from './components/layout/PCHeader'
 import BoxSelectionDialog from './components/box/BoxSelectionDialog'
 import TeamPanel from './components/team/TeamPanel'
@@ -55,7 +54,7 @@ export default function PCPage() {
     handlePokemonClick,
     handleTeamPokemonClick,
     handleBoxChange,
-    handleSecondaryBoxChange: originalHandleSecondaryBoxChange,
+    handleSecondaryBoxChange,
     toggleDualBoxMode,
     handlePokemonMove,
     clearSelections
@@ -67,163 +66,21 @@ export default function PCPage() {
     setTeamData
   })
 
-  // Filter system integration
-  const {
-    isFilterActive,
-    filterBoxData,
-    filterState,
-    filterOptions,
-    showSearchDialog,
-    showFilterPanel,
-    setShowSearchDialog,
-    setShowFilterPanel,
-    handleShowSearch,
-    handleSearch,
-    handleShowFilters,
-    handleApplyFilters,
-    handleClearFilters,
-    canDropIntoSlot,
-    updateSort,
-    navigateFilterPage,
-    handlePokemonRemovedFromFilter,
-    triggerFilterRefresh,
-    optimisticFilterUpdate,
-    rollbackFilter
-  } = usePCWithFilters({
-    uuid,
-    pcData,
-    onPCDataUpdate: setPcData,
-    currentBox,
-    onBoxChange: handleBoxChange
-  })
-
-  // Create filter-aware secondary box change handler
-  const handleSecondaryBoxChange = useCallback((boxNumber: number | null) => {
-    if (boxNumber === null) {
-      originalHandleSecondaryBoxChange(null)
-      return
-    }
-
-    // Check if we're trying to set the same box number
-    if (boxNumber === currentBox) {
-      // Allow it if one of the boxes is a filter box
-      const isPrimaryFilterBox = isFilterActive && filterBoxData && filterBoxData.boxNumber === currentBox
-      const wouldBeSecondaryFilterBox = isFilterActive && filterBoxData && filterBoxData.boxNumber === boxNumber
-      
-      if (isPrimaryFilterBox || wouldBeSecondaryFilterBox) {
-        // One box is showing filtered results, the other is showing normal box
-        // Allow them to have the same box number since they're different views
-        originalHandleSecondaryBoxChange(boxNumber)
-        return
-      }
-    }
-
-    // Use the original handler for all other cases (including the automatic conflict resolution)
-    originalHandleSecondaryBoxChange(boxNumber)
-  }, [originalHandleSecondaryBoxChange, currentBox, isFilterActive, filterBoxData])
-
-  // Helper function to simulate Pokemon move for optimistic filter updates
-  const simulatePokemonMove = useCallback((
-    currentPcData: PCPokemon[],
-    currentTeamData: (PokemonW | null)[],
-    source: { type: 'box' | 'team', boxNumber?: number, index: number },
-    destination: { type: 'box' | 'team', boxNumber?: number, index: number }
-  ): PCPokemon[] => {
-    if (source.type === 'box' && destination.type === 'box') {
-      // Box to box move
-      const sourcePokemon = currentPcData.find(p => p.box === source.boxNumber && p.index === source.index)
-      const destinationPokemon = currentPcData.find(p => p.box === destination.boxNumber && p.index === destination.index)
-      
-      if (!sourcePokemon) return currentPcData
-
-      if (destinationPokemon) {
-        // Swap positions
-        return currentPcData.map(p => {
-          if (p.box === source.boxNumber && p.index === source.index) {
-            return { ...p, box: destination.boxNumber!, index: destination.index }
-          } else if (p.box === destination.boxNumber && p.index === destination.index) {
-            return { ...p, box: source.boxNumber!, index: source.index }
-          }
-          return p
-        })
-      } else {
-        // Move to empty slot
-        return currentPcData.map(p => 
-          p.box === source.boxNumber && p.index === source.index
-            ? { ...p, box: destination.boxNumber!, index: destination.index }
-            : p
-        )
-      }
-    } else if (source.type === 'team' && destination.type === 'box') {
-      // Team to box move - Pokemon is added to PC
-      const sourcePokemon = currentTeamData[source.index]
-      if (!sourcePokemon) return currentPcData
-
-      const destinationPokemon = currentPcData.find(p => p.box === destination.boxNumber && p.index === destination.index)
-      
-      if (destinationPokemon) {
-        // Swap - remove destination Pokemon from PC (it goes to team)
-        return currentPcData.filter(p => !(p.box === destination.boxNumber && p.index === destination.index))
-      } else {
-        // Add team Pokemon to PC (simplified - we'd need full conversion logic)
-        // For filter purposes, we just add a placeholder that will match the real result
-        const newPcPokemon: PCPokemon = {
-          box: destination.boxNumber!,
-          index: destination.index,
-          pokemon: sourcePokemon as any // Simplified for filter simulation
-        }
-        return [...currentPcData, newPcPokemon]
-      }
-    } else if (source.type === 'box' && destination.type === 'team') {
-      // Box to team move - Pokemon is removed from PC
-      return currentPcData.filter(p => !(p.box === source.boxNumber && p.index === source.index))
-    }
-
-    // Team to team moves don't affect PC data
-    return currentPcData
-  }, [])
-
-  // Optimistic Pokemon move handler with filter updates
-  const optimisticPokemonMove = useCallback(async (
+  // Create async wrapper for handlePokemonMove
+  const asyncHandlePokemonMove = useCallback(async (
     source: { type: 'box' | 'team', boxNumber?: number, index: number },
     destination: { type: 'box' | 'team', boxNumber?: number, index: number }
   ) => {
-    // Store current filter state for potential rollback
-    let previousFilterBoxData: FilterBoxData | null = null
-    if (isFilterActive && filterBoxData) {
-      previousFilterBoxData = JSON.parse(JSON.stringify(filterBoxData))
-    }
+    return handlePokemonMove(source, destination)
+  }, [handlePokemonMove])
 
-    try {
-      // 1. Simulate what the PC data will look like after the move for filter update
-      if (isFilterActive) {
-        const simulatedPcData = simulatePokemonMove(pcData, teamData, source, destination)
-        optimisticFilterUpdate(simulatedPcData)
-      }
-
-      // 2. Perform the actual Pokemon move (optimistic update)
-      await handlePokemonMove(source, destination)
-
-      // Success - both Pokemon move and filter update were successful
-    } catch (error) {
-      console.error('Error in optimistic Pokemon move:', error)
-      
-      // 3. Rollback filter state if it was updated
-      if (previousFilterBoxData && isFilterActive) {
-        rollbackFilter(previousFilterBoxData)
-      }
-      
-      // Pokemon move rollback is handled by usePokemonMovement
-      throw error // Re-throw to maintain error handling flow
-    }
-  }, [handlePokemonMove, isFilterActive, filterBoxData, optimisticFilterUpdate, rollbackFilter, pcData, teamData, simulatePokemonMove])
 
   // Drag and drop setup using the lib
   const { activeDragItem, handleDragStart, handleDragEnd } = useActiveDragItem()
   const sensors = useDndSensors()
 
   // Custom drag end handler for PC functionality
-  const onDragEnd = useCallback(async (event: any) => {
+  const onDragEnd = useCallback(async (event: any, filterBoxRenderProps?: any) => {
     const { active, over } = event
 
     if (!over || !active.data.current || !over.data.current) {
@@ -233,13 +90,15 @@ export default function PCPage() {
     const activeData = active.data.current
     const overData = over.data.current
 
-    // Check if trying to drop into a filter box
-    if (overData.type === 'box' && !canDropIntoSlot(overData.boxNumber, overData.index)) {
+    // Check if trying to drop into a filter box (not allowed)
+    if (filterBoxRenderProps?.canDropIntoSlot && 
+        overData.type === 'box' && 
+        !filterBoxRenderProps.canDropIntoSlot(overData.boxNumber, overData.index)) {
       toast.error('No puedes mover Pokémon a una caja de filtros. Solo puedes sacar Pokémon de estas cajas.')
       return
     }
 
-    // Check if dragging from a filter box - need to use original position
+    // Check if dragging from a filter box and get the original position
     let sourceInfo = {
       type: activeData.type,
       boxNumber: activeData.boxNumber,
@@ -249,9 +108,15 @@ export default function PCPage() {
     let isFromFilterBox = false
     let filterSlotIndex = -1
 
-    // If dragging from a filter box, get the original position
-    if (filterBoxData && activeData.type === 'box' && activeData.boxNumber === filterBoxData.boxNumber) {
+    // If we have filter box data and this is a drag from a filter box
+    if (filterBoxRenderProps?.isFilterActive && 
+        filterBoxRenderProps?.filterBoxData && 
+        activeData.type === 'box' && 
+        activeData.isFilterBox) {
+      
+      const { filterBoxData } = filterBoxRenderProps
       const originalPos = filterBoxData.originalPositions.get(activeData.index)
+      
       if (originalPos) {
         sourceInfo = {
           type: 'box',
@@ -264,28 +129,36 @@ export default function PCPage() {
     }
 
     try {
-      // Call the optimistic move function instead of the regular one
-      await optimisticPokemonMove(
-        sourceInfo,
-        {
-          type: overData.type,
-          boxNumber: overData.boxNumber,
-          index: overData.index
+      // Use the optimistic Pokemon move function from FilterBox if available
+      if (filterBoxRenderProps?.optimisticPokemonMove) {
+        await filterBoxRenderProps.optimisticPokemonMove(
+          sourceInfo,
+          {
+            type: overData.type,
+            boxNumber: overData.boxNumber,
+            index: overData.index
+          }
+        )
+
+        // If we moved from filter box, remove it from the filter display
+        if (isFromFilterBox && filterSlotIndex >= 0 && filterBoxRenderProps?.handlePokemonRemovedFromFilter) {
+          filterBoxRenderProps.handlePokemonRemovedFromFilter(filterSlotIndex)
         }
-      )
-
-      // If we moved from filter box, remove it from the filter display
-      if (isFromFilterBox && filterSlotIndex >= 0) {
-        handlePokemonRemovedFromFilter(filterSlotIndex)
+      } else {
+        // Fallback to regular Pokemon move function
+        await asyncHandlePokemonMove(
+          sourceInfo,
+          {
+            type: overData.type,
+            boxNumber: overData.boxNumber,
+            index: overData.index
+          }
+        )
       }
-
-      // No need for manual refresh - optimistic update handles this
     } catch (error) {
-      // Handle any errors from Pokemon movement
       console.error('Error during Pokemon move:', error)
-      // The error handling in optimisticPokemonMove will already handle rollback
     }
-  }, [optimisticPokemonMove, canDropIntoSlot, filterBoxData, handlePokemonRemovedFromFilter])
+  }, [asyncHandlePokemonMove])
 
   const fetchPCData = async () => {
     if (!session?.user?.smartRotomUser?.uuid) return
@@ -445,23 +318,17 @@ export default function PCPage() {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-700/10 via-transparent to-transparent pointer-events-none" />
       <PlayOnMountAudio src="/smartrotom/audio/apps/pc/TURN_ON.wav" volume={0.25} />
       <PlayOnUnmountAudio src="/smartrotom/audio/apps/pc/TURN_OFF.wav" volume={0.25} />
-      <DndContext
-        sensors={sensors}
-        collisionDetection={COLLISION_STRATEGIES.custom}
-        onDragStart={handleDragStart}
-        onDragEnd={(event) => handleDragEnd(event, onDragEnd)}
-      >
-        <motion.div variants={sectionVariants}>
-          <PCHeader 
-            currentBox={currentBox}
-            totalBoxes={totalBoxes}
-            pokemonCount={pcData.length}
-            teamCount={teamData.length}
-            isDualBoxMode={isDualBoxMode}
-            onRefresh={fetchAllData}
-            onToggleDualBoxMode={toggleDualBoxMode}
-          />
-        </motion.div>
+      <motion.div variants={sectionVariants}>
+        <PCHeader 
+          currentBox={currentBox}
+          totalBoxes={totalBoxes}
+          pokemonCount={pcData.length}
+          teamCount={teamData.length}
+          isDualBoxMode={isDualBoxMode}
+          onRefresh={fetchAllData}
+          onToggleDualBoxMode={toggleDualBoxMode}
+        />
+      </motion.div>
         <motion.div variants={sectionVariants}>
           {/* BoxSelectionDialog now handles its own state management */}
         </motion.div>
@@ -469,104 +336,201 @@ export default function PCPage() {
           className="flex-1 flex gap-4 p-4 overflow-hidden min-h-0"
           variants={sectionVariants}
         >
-          {/* Side Panel - Team or Battle Teams */}
-          <div className="w-80 flex-shrink-0 min-h-0 flex flex-col">
-            {/* Enhanced Tab Buttons */}
-            <motion.div 
-              className="relative bg-slate-900/40 backdrop-blur-sm rounded-t-2xl border border-slate-500/30 flex overflow-hidden mb-0 flex-shrink-0"
-              variants={sectionVariants}
-            >
-              {/* Tab background indicator */}
-              <motion.div
-                className="absolute top-0 bottom-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 backdrop-blur-sm border border-slate-500/40 rounded-t-xl"
-                animate={{
-                  left: activeTab === 'team' ? '0%' : '50%',
-                  width: '50%'
-                }}
-                transition={{ duration: 0.3, ease: "easeInOut" }}
-              />
-              <motion.button
-                onClick={() => setActiveTab('team')}
-                className={`relative flex-1 px-4 py-3 text-sm font-medium transition-colors z-10 ${
-                  activeTab === 'team'
-                    ? 'text-white'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                variants={tabVariants}
-                animate={activeTab === 'team' ? 'active' : 'inactive'}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Equipo Activo
-              </motion.button>
-              <motion.button
-                onClick={() => setActiveTab('battleTeams')}
-                className={`relative flex-1 px-4 py-3 text-sm font-medium transition-colors z-10 ${
-                  activeTab === 'battleTeams'
-                    ? 'text-white'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-                variants={tabVariants}
-                animate={activeTab === 'battleTeams' ? 'active' : 'inactive'}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                Equipos de Batalla
-              </motion.button>
-            </motion.div>
-            {/* Panel Content with smooth transitions */}
-            <AnimatePresence mode="wait">
-              <motion.div 
-                key={activeTab}
-                className="flex-1 min-h-0"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.2 }}
-              >
-                {activeTab === 'team' ? (
-                  <TeamPanel 
-                    teamData={teamData}
-                    selectedPokemon={selectedTeamPokemon}
-                    onPokemonClick={handleTeamPokemonClick}
-                    onPokemonMove={handlePokemonMove}
-                  />
-                ) : (
-                  <BattleTeamsPanel
-                    battleTeamsData={battleTeamsData}
-                    uuid={uuid}
-                    onTeamsUpdate={refetchBattleTeams}
-                  />
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
-          {/* PC Grid */}
-          <motion.div 
-            className="flex-1 min-w-0 min-h-0"
-            variants={sectionVariants}
+          <FilterBox
+            uuid={uuid}
+            pcData={pcData}
+            teamData={teamData}
+            onPCDataUpdate={setPcData}
+            currentBox={currentBox}
+            onBoxChange={handleBoxChange}
+            onPokemonMove={asyncHandlePokemonMove}
           >
-            <DualBoxGrid 
-              primaryBoxData={filterBoxData && filterBoxData.boxNumber === currentBox ? filterBoxData : currentBoxData}
-              secondaryBoxData={isDualBoxMode ? (filterBoxData && filterBoxData.boxNumber === secondaryBox ? filterBoxData : secondaryBoxData) : null}
-              selectedPokemon={selectedPokemon}
-              onPokemonClick={handlePokemonClick}
-              onPokemonMove={handlePokemonMove}
-              totalBoxes={totalBoxes}
-              onPrimaryBoxChange={handleBoxChange}
-              onSecondaryBoxChange={handleSecondaryBoxChange}
-              rows={ROWS_PER_BOX}
-              cols={COLS_PER_ROW}
-              battleTeams={battleTeamsData?.teams}
-              onAddToBattleTeam={handleAddToBattleTeam}
-              onShowBoxSelection={() => setShowBoxSelection(true)}
-              onShowSecondaryBoxSelection={() => setShowSecondaryBoxSelection(true)}
-              onShowSearch={handleShowFilters}
-              onShowFilters={handleShowFilters}
-              onClearFilters={handleClearFilters}
-              onNavigateFilterPage={navigateFilterPage}
-            />
-          </motion.div>
+            {(filterBoxRenderProps) => {
+              const { 
+                isFilterActive,
+                filterBoxData,
+                filterState,
+                filterOptions,
+                showFilterPanel,
+                setShowFilterPanel,
+                handleShowFilters,
+                handleClearFilters,
+                handleApplyFilters,
+                updateSort,
+                navigateFilterPage,
+                optimisticPokemonMove,
+                handlePokemonRemovedFromFilter,
+                canDropIntoSlot
+              } = filterBoxRenderProps
+
+              // Calculate the box data based on filter state
+              const primaryBoxData = isFilterActive && filterBoxData && filterBoxData.boxNumber === currentBox 
+                ? filterBoxData 
+                : currentBoxData
+              
+              const calculatedSecondaryBoxData = isDualBoxMode 
+                ? (isFilterActive && filterBoxData && filterBoxData.boxNumber === secondaryBox 
+                    ? filterBoxData 
+                    : secondaryBoxData)
+                : null
+
+              return (
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={COLLISION_STRATEGIES.custom}
+                  onDragStart={handleDragStart}
+                  onDragEnd={(event) => onDragEnd(event, filterBoxRenderProps)}
+                >
+                  {/* Side Panel - Team or Battle Teams */}
+                  <div className="w-80 flex-shrink-0 min-h-0 flex flex-col">
+                    {/* Enhanced Tab Buttons */}
+                    <motion.div 
+                      className="relative bg-slate-900/40 backdrop-blur-sm rounded-t-2xl border border-slate-500/30 flex overflow-hidden mb-0 flex-shrink-0"
+                      variants={sectionVariants}
+                    >
+                      {/* Tab background indicator */}
+                      <motion.div
+                        className="absolute top-0 bottom-0 bg-gradient-to-r from-slate-700/60 to-slate-600/60 backdrop-blur-sm border border-slate-500/40 rounded-t-xl"
+                        animate={{
+                          left: activeTab === 'team' ? '0%' : '50%',
+                          width: '50%'
+                        }}
+                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                      />
+                      <motion.button
+                        onClick={() => setActiveTab('team')}
+                        className={`relative flex-1 px-4 py-3 text-sm font-medium transition-colors z-10 ${
+                          activeTab === 'team'
+                            ? 'text-white'
+                            : 'text-slate-300 hover:text-white'
+                        }`}
+                        variants={tabVariants}
+                        animate={activeTab === 'team' ? 'active' : 'inactive'}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Equipo Activo
+                      </motion.button>
+                      <motion.button
+                        onClick={() => setActiveTab('battleTeams')}
+                        className={`relative flex-1 px-4 py-3 text-sm font-medium transition-colors z-10 ${
+                          activeTab === 'battleTeams'
+                            ? 'text-white'
+                            : 'text-slate-300 hover:text-white'
+                        }`}
+                        variants={tabVariants}
+                        animate={activeTab === 'battleTeams' ? 'active' : 'inactive'}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Equipos de Batalla
+                      </motion.button>
+                    </motion.div>
+                    {/* Panel Content with smooth transitions */}
+                    <AnimatePresence mode="wait">
+                      <motion.div 
+                        key={activeTab}
+                        className="flex-1 min-h-0"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {activeTab === 'team' ? (
+                          <TeamPanel 
+                            teamData={teamData}
+                            selectedPokemon={selectedTeamPokemon}
+                            onPokemonClick={handleTeamPokemonClick}
+                            onPokemonMove={optimisticPokemonMove}
+                          />
+                        ) : (
+                          <BattleTeamsPanel
+                            battleTeamsData={battleTeamsData}
+                            uuid={uuid}
+                            onTeamsUpdate={refetchBattleTeams}
+                          />
+                        )}
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  {/* PC Grid */}
+                  <motion.div 
+                    className="flex-1 min-w-0 min-h-0"
+                    variants={sectionVariants}
+                  >
+                    <DualBoxGrid 
+                      primaryBoxData={primaryBoxData}
+                      secondaryBoxData={calculatedSecondaryBoxData}
+                      selectedPokemon={selectedPokemon}
+                      onPokemonClick={handlePokemonClick}
+                      onPokemonMove={optimisticPokemonMove}
+                      totalBoxes={totalBoxes}
+                      onPrimaryBoxChange={handleBoxChange}
+                      onSecondaryBoxChange={handleSecondaryBoxChange}
+                      rows={ROWS_PER_BOX}
+                      cols={COLS_PER_ROW}
+                      battleTeams={battleTeamsData?.teams}
+                      onAddToBattleTeam={handleAddToBattleTeam}
+                      onShowBoxSelection={() => setShowBoxSelection(true)}
+                      onShowSecondaryBoxSelection={() => setShowSecondaryBoxSelection(true)}
+                      onShowSearch={handleShowFilters}
+                      onShowFilters={handleShowFilters}
+                      onClearFilters={handleClearFilters}
+                      onNavigateFilterPage={navigateFilterPage}
+                    />
+                  </motion.div>
+
+                  <DragOverlay 
+                    dropAnimation={DROP_ANIMATIONS.none}
+                    modifiers={[snapCenterToCursor]}
+                  >
+                    {activeDragItem && activeDragItem.pokemon && (
+                      <div>
+                        {activeDragItem.type === 'team' ? (
+                          <TeamSlot
+                            id={activeDragItem.pokemon.id}
+                            pokemon={activeDragItem.pokemon}
+                            index={-1}
+                            isSelected={false}
+                            onClick={() => {}}
+                          />
+                        ) : (
+                          <PokemonSlot
+                            id={activeDragItem.pokemon.id}
+                            pokemon={activeDragItem.pokemon}
+                            index={activeDragItem.pokemon.index}
+                            isSelected={false}
+                            onClick={() => {}}
+                            currentBox={activeDragItem.boxNumber}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </DragOverlay>
+
+                  {/* Unified Filter Dialog */}
+                  <FilterPanel
+                    isOpen={showFilterPanel}
+                    onClose={() => setShowFilterPanel(false)}
+                    filters={filterState.filters}
+                    searchTerm={filterState.searchTerm}
+                    sort={filterState.sort}
+                    onFiltersChange={(filters) => {
+                      handleApplyFilters(filters)
+                    }}
+                    onSortChange={updateSort}
+                    onApply={(searchTerm, filters, sort) => {
+                      const combinedFilters = { ...filters, search: searchTerm }
+                      handleApplyFilters(combinedFilters)
+                      updateSort(sort)
+                    }}
+                    filterOptions={filterOptions}
+                  />
+                </DndContext>
+              )
+            }}
+          </FilterBox>
         </motion.div>
         {/* Box Selection Dialog */}
         <BoxSelectionDialog
@@ -616,56 +580,6 @@ export default function PCPage() {
           toastClassName="!bg-slate-800/90 !backdrop-blur-sm !border !border-slate-500/30 !text-slate-100"
           progressClassName="!bg-blue-400"
         />
-      <DragOverlay 
-        dropAnimation={DROP_ANIMATIONS.none}
-        modifiers={[snapCenterToCursor]}
-      >
-        {activeDragItem && activeDragItem.pokemon && (
-          <div>
-            {activeDragItem.type === 'team' ? (
-              <TeamSlot
-                id={activeDragItem.pokemon.id}
-                pokemon={activeDragItem.pokemon}
-                index={-1}
-                isSelected={false}
-                onClick={() => {}}
-              />
-            ) : (
-              <PokemonSlot
-                id={activeDragItem.pokemon.id}
-                pokemon={activeDragItem.pokemon}
-                index={activeDragItem.pokemon.index}
-                isSelected={false}
-                onClick={() => {}}
-                currentBox={activeDragItem.boxNumber}
-              />
-            )}
-          </div>
-        )}
-      </DragOverlay>
-      </DndContext>
-
-      {/* Unified Filter Dialog */}
-      <FilterPanel
-        isOpen={showFilterPanel}
-        onClose={() => setShowFilterPanel(false)}
-        filters={filterState.filters}
-        searchTerm={filterState.searchTerm}
-        sort={filterState.sort}
-        onFiltersChange={(filters) => {
-          handleApplyFilters(filters)
-        }}
-        onSearchChange={(searchTerm) => {
-          handleSearch(searchTerm, filterState.sort)
-        }}
-        onSortChange={updateSort}
-        onApply={(searchTerm, filters, sort) => {
-          const combinedFilters = { ...filters, search: searchTerm }
-          handleApplyFilters(combinedFilters)
-          updateSort(sort)
-        }}
-        filterOptions={filterOptions}
-      />
     </motion.div>
   )
 }

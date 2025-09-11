@@ -50,16 +50,6 @@ export function usePCWithFilters({
   //   }
   // }, [pcData, isFilterActive, refreshFilterResults])
 
-  // Handle search dialog
-  const handleShowSearch = useCallback(() => {
-    setShowSearchDialog(true)
-  }, [])
-
-  const handleSearch = useCallback((searchTerm: string, sort: FilterSort) => {
-    quickSearch(searchTerm, sort)
-    setShowSearchDialog(false)
-  }, [quickSearch])
-
   // Handle filter panel
   const handleShowFilters = useCallback(() => {
     setShowFilterPanel(true)
@@ -142,8 +132,6 @@ export function usePCWithFilters({
     setShowFilterPanel,
 
     // Handlers
-    handleShowSearch,
-    handleSearch,
     handleShowFilters,
     handleApplyFilters,
     handleClearFilters,
