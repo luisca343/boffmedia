@@ -143,13 +143,27 @@ export function FilterBox({
         return [...currentPcData, newPcPokemon]
       }
     } else if (source.type === 'box' && destination.type === 'team') {
-        const sourcePokemon = currentPcData.find(p => p.box === source.boxNumber && p.index === source.index)
+      // Box to team move - Pokemon is removed from PC or swapped
+      const sourcePokemon = currentPcData.find(p => p.box === source.boxNumber && p.index === source.index)
+      if (!sourcePokemon) return currentPcData
+
+      const destinationTeamPokemon = currentTeamData[destination.index]
+      
+      if (destinationTeamPokemon) {
+        // Swap - replace PC Pokemon with team Pokemon
         return currentPcData.map(p => {
-            if (p.box === source.boxNumber && p.index === source.index) {
-                return { ...p, pokemon: currentTeamData[destination.index] as any }
+          if (p.box === source.boxNumber && p.index === source.index) {
+            return { 
+              ...p, 
+              pokemon: destinationTeamPokemon as any 
             }
-            return p
+          }
+          return p
         })
+      } else {
+        // Move to empty team slot - remove Pokemon from PC
+        return currentPcData.filter(p => !(p.box === source.boxNumber && p.index === source.index))
+      }
     }
 
     // Team to team moves don't affect PC data
