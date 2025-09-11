@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { FilterBoxData, PokemonFilter, FilterSort } from '../types/filter.types'
+import { FilterBoxData, PokemonFilter, FilterSort, isFilterBox, getFilterPageFromBoxNumber } from '../types/filter.types'
 import { useFilterManagement } from './useFilterManagement'
 
 interface UsePCWithFiltersProps {
@@ -56,7 +56,6 @@ export function usePCWithFilters({
   }, [])
 
   const handleApplyFilters = useCallback((filters: PokemonFilter) => {
-    // Combine current search term with new filters
     applySearchAndFilters(filterState.searchTerm, filters)
     setShowFilterPanel(false)
   }, [applySearchAndFilters, filterState.searchTerm])
@@ -78,33 +77,34 @@ export function usePCWithFilters({
   const handleFilterNavigation = useCallback((boxNumber: number) => {
     if (!isFilterActive || !filterBoxData) return
 
+    // Check if this is a filter box navigation
+    if (!isFilterBox(boxNumber)) return
+
+    const targetPage = getFilterPageFromBoxNumber(boxNumber)
     const currentPage = filterBoxData.resultSummary.currentPage
     const totalPages = filterBoxData.resultSummary.totalPages
 
-    if (boxNumber > currentBox) {
-      // Navigate to next page
-      if (currentPage < totalPages) {
+    // Navigate to the target page if it's valid
+    if (targetPage >= 1 && targetPage <= totalPages && targetPage !== currentPage) {
+      if (targetPage > currentPage) {
         navigateFilterPage('next')
-      }
-    } else {
-      // Navigate to previous page
-      if (currentPage > 1) {
+      } else {
         navigateFilterPage('prev')
       }
     }
-  }, [isFilterActive, filterBoxData, currentBox, navigateFilterPage])
+  }, [isFilterActive, filterBoxData, navigateFilterPage])
 
   // Validate if a drop operation is allowed
   const canDropIntoSlot = useCallback((
     targetBoxNumber: number,
     targetIndex: number
   ): boolean => {
-    // Can't drop into filter boxes
-    if (filterBoxData && targetBoxNumber === filterBoxData.boxNumber) {
+    // Can't drop into filter boxes (they're virtual)
+    if (isFilterBox(targetBoxNumber)) {
       return false
     }
     return true
-  }, [filterBoxData])
+  }, [])
 
   // Get the current box data (either normal or filter)
   const getCurrentBoxData = useCallback(() => {

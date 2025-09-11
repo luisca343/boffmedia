@@ -4,7 +4,8 @@ import {
   PokemonFilter, 
   FilterSort, 
   FilterState, 
-  FilterBoxData 
+  FilterBoxData,
+  getFilterBoxNumber 
 } from '../types/filter.types'
 import { 
   filterAndSortPokemon, 
@@ -100,7 +101,7 @@ export function useFilterManagement({
 
     const filterBoxData: FilterBoxData = {
       type: 'filter',
-      boxNumber: currentBox,
+      boxNumber: getFilterBoxNumber(paginatedResults.currentPage),
       title: getFilterTitle(filters, paginatedResults.currentPage),
       pokemon: paddedPokemon,
       originalBoxNumber: currentBox,
@@ -143,13 +144,21 @@ export function useFilterManagement({
     applyFilters(combinedFilters, sort)
   }, [applyFilters, filterState.sort])
 
-  // Navigate between filter result pages
+  // Navigate between filter result pages (with looping)
   const navigateFilterPage = useCallback((direction: 'prev' | 'next') => {
     if (!filterState.isActive) return
 
-    const newPage = direction === 'prev' 
-      ? Math.max(1, filterState.currentPage - 1)
-      : Math.min(filteredResults.totalPages, filterState.currentPage + 1)
+    const totalPages = filteredResults.totalPages
+    if (totalPages <= 1) return // No navigation needed with only one page
+
+    let newPage: number
+    if (direction === 'prev') {
+      // Loop to last page if at first page, otherwise go to previous
+      newPage = filterState.currentPage === 1 ? totalPages : filterState.currentPage - 1
+    } else {
+      // Loop to first page if at last page, otherwise go to next
+      newPage = filterState.currentPage === totalPages ? 1 : filterState.currentPage + 1
+    }
 
     if (newPage === filterState.currentPage) return
 
@@ -181,7 +190,7 @@ export function useFilterManagement({
 
     const filterBoxData: FilterBoxData = {
       type: 'filter',
-      boxNumber: currentBox,
+      boxNumber: getFilterBoxNumber(newPage),
       title: getFilterTitle(filterState.filters, newPage),
       pokemon: paddedPokemon,
       originalBoxNumber: currentBox,
@@ -251,7 +260,7 @@ export function useFilterManagement({
 
     const filterBoxData: FilterBoxData = {
       type: 'filter',
-      boxNumber: currentBox,
+      boxNumber: getFilterBoxNumber(filterState.currentPage),
       title: getFilterTitle(filterState.filters, filterState.currentPage),
       pokemon: paddedPokemon,
       originalBoxNumber: currentBox,

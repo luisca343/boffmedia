@@ -121,6 +121,7 @@ export default function DualBoxGrid({
           onShowSearch={onShowSearch}
           onShowFilters={onShowFilters}
           onClearFilters={onClearFilters}
+          onNavigateFilterPage={onNavigateFilterPage}
         />
 
         {/* Grid Container */}
@@ -148,6 +149,7 @@ export default function DualBoxGrid({
             onShowSearch={onShowSearch}
             onShowFilters={onShowFilters}
             onClearFilters={onClearFilters}
+            onNavigateFilterPage={onNavigateFilterPage}
           />
 
           {/* Grid Container */}
@@ -166,6 +168,7 @@ export default function DualBoxGrid({
             onBoxChange={(boxNumber) => onSecondaryBoxChange?.(boxNumber)}
             onDeselect={() => onSecondaryBoxChange?.(null)}
             onShowBoxSelection={onShowSecondaryBoxSelection}
+            onNavigateFilterPage={onNavigateFilterPage}
           />
 
           {/* Grid Container */}

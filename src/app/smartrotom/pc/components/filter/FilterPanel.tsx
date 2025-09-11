@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   PiSliders, PiX, PiCaretDown, PiCaretUp, PiCheck, 
@@ -43,6 +43,13 @@ export function FilterPanel({
   const [localSort, setLocalSort] = useState(sort)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['search', 'types', 'level']))
 
+  // Update local state when props change (when dialog opens)
+  useEffect(() => {
+    setLocalFilters(filters)
+    setLocalSearchTerm(searchTerm)
+    setLocalSort(sort)
+  }, [filters, searchTerm, sort, isOpen])
+
   const toggleSection = (section: string) => {
     const newExpanded = new Set(expandedSections)
     if (newExpanded.has(section)) {
@@ -54,7 +61,7 @@ export function FilterPanel({
   }
 
   const updateFilters = (updates: Partial<PokemonFilter>) => {
-    onFiltersChange({ ...filters, ...updates })
+    setLocalFilters(prev => ({ ...prev, ...updates }))
   }
 
   const toggleType = (type: string) => {
@@ -62,14 +69,30 @@ export function FilterPanel({
     const newTypes = currentTypes.includes(type)
       ? currentTypes.filter(t => t !== type)
       : [...currentTypes, type]
-    updateFilters({ types: newTypes.length > 0 ? newTypes : undefined })
+    setLocalFilters(prev => ({ 
+      ...prev, 
+      types: newTypes.length > 0 ? newTypes : undefined 
+    }))
   }
 
   const clearAllFilters = () => {
-    onFiltersChange({})
+    setLocalFilters({})
+    setLocalSearchTerm('')
   }
 
-  const hasActiveFilters = Object.keys(filters).length > 0
+  const handleApply = () => {
+    onApply(localSearchTerm, localFilters, localSort)
+  }
+
+  const handleCancel = () => {
+    // Reset to original values
+    setLocalFilters(filters)
+    setLocalSearchTerm(searchTerm)
+    setLocalSort(sort)
+    onClose()
+  }
+
+  const hasActiveFilters = Object.keys(localFilters).length > 0 || localSearchTerm.length > 0
 
   if (!isOpen) return null
 
@@ -112,7 +135,7 @@ export function FilterPanel({
                   </button>
                 )}
                 <button
-                  onClick={onClose}
+                  onClick={handleCancel}
                   className="w-8 h-8 bg-slate-600/50 hover:bg-slate-500/50 rounded-lg flex items-center justify-center transition-colors duration-200"
                 >
                   <PiX className="text-slate-300 text-lg" />
@@ -158,14 +181,14 @@ export function FilterPanel({
                       key={type}
                       onClick={() => toggleType(type)}
                       className={`relative flex flex-col items-center p-2 rounded-lg border transition-all duration-200 ${
-                        filters.types?.includes(type)
+                        localFilters.types?.includes(type)
                           ? 'border-blue-400 bg-blue-400/20 shadow-lg'
                           : 'border-slate-500/30 bg-slate-700/30 hover:border-slate-400/50 hover:bg-slate-600/30'
                       }`}
                     >
                       <PokemonTypeIcon type={type} size={24} />
                       <span className="text-xs text-white mt-1 capitalize">{type}</span>
-                      {filters.types?.includes(type) && (
+                      {localFilters.types?.includes(type) && (
                         <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-400 rounded-full flex items-center justify-center">
                           <PiCheck className="text-xs text-white" />
                         </div>
@@ -180,7 +203,7 @@ export function FilterPanel({
                 title="Rango de Nivel"
                 isExpanded={expandedSections.has('level')}
                 onToggle={() => toggleSection('level')}
-                activeCount={0}
+                activeCount={localFilters.minLevel || localFilters.maxLevel ? 1 : 0}
               >
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -190,7 +213,7 @@ export function FilterPanel({
                         type="number"
                         min={filterOptions.levelRange.min}
                         max={filterOptions.levelRange.max}
-                        value={filters.minLevel || ''}
+                        value={localFilters.minLevel || ''}
                         onChange={(e) => updateFilters({ 
                           minLevel: e.target.value ? parseInt(e.target.value) : undefined 
                         })}
@@ -204,7 +227,7 @@ export function FilterPanel({
                         type="number"
                         min={filterOptions.levelRange.min}
                         max={filterOptions.levelRange.max}
-                        value={filters.maxLevel || ''}
+                        value={localFilters.maxLevel || ''}
                         onChange={(e) => updateFilters({ 
                           maxLevel: e.target.value ? parseInt(e.target.value) : undefined 
                         })}
@@ -224,31 +247,31 @@ export function FilterPanel({
                 title="Estado Especial"
                 isExpanded={expandedSections.has('special')}
                 onToggle={() => toggleSection('special')}
-                activeCount={0}
+                activeCount={[localFilters.isShiny, localFilters.isLegendary, localFilters.hasItem, localFilters.isFavorited].filter(Boolean).length}
               >
                 <div className="grid grid-cols-2 gap-3">
                   <FilterToggle
                     label="Shiny"
                     icon={<PiStar className="text-yellow-400" />}
-                    checked={filters.isShiny}
+                    checked={localFilters.isShiny}
                     onChange={(checked) => updateFilters({ isShiny: checked ? true : undefined })}
                   />
                   <FilterToggle
                     label="Legendario"
                     icon={<PiStar className="text-purple-400" />}
-                    checked={filters.isLegendary}
+                    checked={localFilters.isLegendary}
                     onChange={(checked) => updateFilters({ isLegendary: checked ? true : undefined })}
                   />
                   <FilterToggle
                     label="Con Objeto"
                     icon={<div className="w-4 h-4 bg-amber-400 rounded-sm" />}
-                    checked={filters.hasItem}
+                    checked={localFilters.hasItem}
                     onChange={(checked) => updateFilters({ hasItem: checked ? true : undefined })}
                   />
                   <FilterToggle
                     label="Favorito"
                     icon={<PiStar className="text-red-400" />}
-                    checked={filters.isFavorited}
+                    checked={localFilters.isFavorited}
                     onChange={(checked) => updateFilters({ isFavorited: checked ? true : undefined })}
                   />
                 </div>
@@ -259,25 +282,25 @@ export function FilterPanel({
                 title="Género"
                 isExpanded={expandedSections.has('gender')}
                 onToggle={() => toggleSection('gender')}
-                activeCount={0}
+                activeCount={localFilters.gender ? 1 : 0}
               >
                 <div className="grid grid-cols-3 gap-3">
                   <FilterToggle
                     label="Macho"
                     icon={<PiGenderMale className="text-blue-400" />}
-                    checked={filters.gender === 'male'}
+                    checked={localFilters.gender === 'male'}
                     onChange={(checked) => updateFilters({ gender: checked ? 'male' : undefined })}
                   />
                   <FilterToggle
                     label="Hembra"
                     icon={<PiGenderFemale className="text-pink-400" />}
-                    checked={filters.gender === 'female'}
+                    checked={localFilters.gender === 'female'}
                     onChange={(checked) => updateFilters({ gender: checked ? 'female' : undefined })}
                   />
                   <FilterToggle
                     label="Sin Género"
                     icon={<PiGenderNeuter className="text-gray-400" />}
-                    checked={filters.gender === 'genderless'}
+                    checked={localFilters.gender === 'genderless'}
                     onChange={(checked) => updateFilters({ gender: checked ? 'genderless' : undefined })}
                   />
                 </div>
@@ -288,10 +311,10 @@ export function FilterPanel({
                 title="Naturaleza"
                 isExpanded={expandedSections.has('nature')}
                 onToggle={() => toggleSection('nature')}
-                activeCount={0}
+                activeCount={localFilters.nature ? 1 : 0}
               >
                 <select
-                  value={filters.nature || ''}
+                  value={localFilters.nature || ''}
                   onChange={(e) => updateFilters({ nature: e.target.value || undefined })}
                   className="w-full bg-slate-700/50 border border-slate-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-400/50"
                 >
@@ -307,10 +330,10 @@ export function FilterPanel({
                 title="Habilidad"
                 isExpanded={expandedSections.has('ability')}
                 onToggle={() => toggleSection('ability')}
-                activeCount={0}
+                activeCount={localFilters.ability ? 1 : 0}
               >
                 <select
-                  value={filters.ability || ''}
+                  value={localFilters.ability || ''}
                   onChange={(e) => updateFilters({ ability: e.target.value || undefined })}
                   className="w-full bg-slate-700/50 border border-slate-500/30 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-blue-400/50"
                 >
@@ -321,6 +344,23 @@ export function FilterPanel({
                 </select>
               </FilterSection>
 
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end space-x-3 pt-6 border-t border-slate-500/30 mt-6">
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-slate-600/50 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors duration-200"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleApply}
+                className="px-6 py-2 bg-blue-600/80 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors duration-200 flex items-center space-x-2"
+              >
+                <PiCheck className="text-lg" />
+                <span>Aplicar Filtros</span>
+              </button>
             </div>
           </div>
         </motion.div>

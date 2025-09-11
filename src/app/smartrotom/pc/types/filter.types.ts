@@ -50,7 +50,7 @@ export interface FilterResult {
 
 export interface FilterBoxData {
   type: 'filter'
-  boxNumber: number
+  boxNumber: number // This will be a virtual filter box number (e.g., 1000, 1001, 1002...)
   title: string
   pokemon: (PCPokemon | null)[]
   originalBoxNumber: number // The box that was filtered
@@ -80,3 +80,9 @@ export const LEGENDARY_POKEMON_IDS = [
   377, 378, 379, 380, 381, 382, 383, 384, // Gen 3 legendaries
   480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, // Gen 4 legendaries
 ] as const
+
+// FILTER BOX CONSTANTS
+export const FILTER_BOX_START = 1000 // Filter boxes start at 1000 to avoid conflicts with normal boxes
+export const isFilterBox = (boxNumber: number) => boxNumber >= FILTER_BOX_START
+export const getFilterBoxNumber = (page: number) => FILTER_BOX_START + page - 1
+export const getFilterPageFromBoxNumber = (boxNumber: number) => boxNumber - FILTER_BOX_START + 1

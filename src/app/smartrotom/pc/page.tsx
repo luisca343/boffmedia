@@ -7,7 +7,7 @@ import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
 import { PokemonW } from '@/generated/api'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { ROWS_PER_BOX, COLS_PER_ROW } from './utils/constants'
+import { ROWS_PER_BOX, COLS_PER_ROW, POKEMON_PER_BOX } from './utils/constants'
 import { useGetBattleTeams } from '@/hooks/player/useGetBattleTeams'
 import { usePCManagement } from './hooks/usePCManagement'
 import { FilterBox } from './components/box/FilterBox'
@@ -364,14 +364,15 @@ export default function PCPage() {
               } = filterBoxRenderProps
 
               // Calculate the box data based on filter state
-              const primaryBoxData = isFilterActive && filterBoxData && filterBoxData.boxNumber === currentBox 
+              const primaryBoxData = isFilterActive && filterBoxData 
                 ? filterBoxData 
                 : currentBoxData
               
               const calculatedSecondaryBoxData = isDualBoxMode 
-                ? (isFilterActive && filterBoxData && filterBoxData.boxNumber === secondaryBox 
-                    ? filterBoxData 
-                    : secondaryBoxData)
+                ? (secondaryBox !== null ? (boxes[secondaryBox] || { 
+                    boxNumber: secondaryBox, 
+                    pokemon: new Array(POKEMON_PER_BOX).fill(null) 
+                  }) : null)
                 : null
 
               return (
@@ -517,13 +518,14 @@ export default function PCPage() {
                     searchTerm={filterState.searchTerm}
                     sort={filterState.sort}
                     onFiltersChange={(filters) => {
-                      handleApplyFilters(filters)
+                      // Don't apply filters immediately - only when Apply button is clicked
                     }}
                     onSortChange={updateSort}
                     onApply={(searchTerm, filters, sort) => {
                       const combinedFilters = { ...filters, search: searchTerm }
                       handleApplyFilters(combinedFilters)
                       updateSort(sort)
+                      setShowFilterPanel(false)
                     }}
                     filterOptions={filterOptions}
                   />

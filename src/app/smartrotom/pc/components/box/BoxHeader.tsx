@@ -1,7 +1,7 @@
 import { FaArchive, FaChevronLeft, FaChevronRight, FaTimes, FaDatabase } from 'react-icons/fa'
 import { PiMagnifyingGlass, PiSliders, PiX, PiTarget } from 'react-icons/pi'
 import { PCBoxData } from '@/types/dto/pc-pokemon.dto'
-import { FilterBoxData } from '../../types/filter.types'
+import { FilterBoxData, isFilterBox } from '../../types/filter.types'
 
 interface BoxHeaderProps {
   boxData: PCBoxData | FilterBoxData
@@ -13,6 +13,7 @@ interface BoxHeaderProps {
   onShowSearch?: () => void
   onShowFilters?: () => void
   onClearFilters?: () => void
+  onNavigateFilterPage?: (direction: 'prev' | 'next') => void
 }
 
 export default function BoxHeader({ 
@@ -24,7 +25,8 @@ export default function BoxHeader({
   onShowBoxSelection,
   onShowSearch,
   onShowFilters,
-  onClearFilters
+  onClearFilters,
+  onNavigateFilterPage
 }: BoxHeaderProps) {
   const isFilterBox = 'type' in boxData && boxData.type === 'filter'
   
@@ -49,10 +51,9 @@ export default function BoxHeader({
   const handlePrevious = () => {
     playClickSound()
     if (isFilterBox) {
-      const filterBox = boxData as FilterBoxData
-      if (filterBox.resultSummary.currentPage > 1) {
-        // Navigate to previous filter results page
-        onBoxChange(boxData.boxNumber - 1)
+      // Use filter page navigation
+      if (onNavigateFilterPage) {
+        onNavigateFilterPage('prev')
       }
     } else {
       const newBox = boxData.boxNumber === 0 ? totalBoxes - 1 : boxData.boxNumber - 1
@@ -63,10 +64,9 @@ export default function BoxHeader({
   const handleNext = () => {
     playClickSound()
     if (isFilterBox) {
-      const filterBox = boxData as FilterBoxData
-      if (filterBox.resultSummary.currentPage < filterBox.resultSummary.totalPages) {
-        // Navigate to next filter results page
-        onBoxChange(boxData.boxNumber + 1)
+      // Use filter page navigation
+      if (onNavigateFilterPage) {
+        onNavigateFilterPage('next')
       }
     } else {
       const newBox = boxData.boxNumber === totalBoxes - 1 ? 0 : boxData.boxNumber + 1
@@ -92,11 +92,11 @@ export default function BoxHeader({
   
   // Determine if navigation buttons should be enabled
   const canNavigatePrevious = isFilterBox 
-    ? (boxData as FilterBoxData).resultSummary.currentPage > 1
+    ? (boxData as FilterBoxData).resultSummary.totalPages > 1 // Always allow navigation if multiple pages (looping)
     : boxData.boxNumber > 0
     
   const canNavigateNext = isFilterBox
-    ? (boxData as FilterBoxData).resultSummary.currentPage < (boxData as FilterBoxData).resultSummary.totalPages
+    ? (boxData as FilterBoxData).resultSummary.totalPages > 1 // Always allow navigation if multiple pages (looping)
     : boxData.boxNumber < totalBoxes - 1
   const colorScheme = isFilterBox ? {
     // Special colors for filter boxes
