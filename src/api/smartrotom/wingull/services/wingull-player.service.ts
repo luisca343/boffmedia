@@ -30,7 +30,25 @@ export class WingullPlayerService {
       throw new Error(`Team retrieval failed: ${error.message}`);
     }
   }
-  
+
+  async getPC(uuid: string): Promise<any> {
+    try {
+      return await this.wingullPlayerRepository.getPCFromAPI(uuid);
+    } catch (error) {
+      console.error(`Failed to get PC for ${uuid}:`, error);
+      throw new Error(`PC retrieval failed: ${error.message}`);
+    }
+  }
+
+  async movePokemon(movePokemonDto: any): Promise<any> {
+    try {
+      return await this.wingullPlayerRepository.movePokemonInAPI(movePokemonDto);
+    } catch (error) {
+      console.error(`Failed to move Pokémon:`, error);
+      throw new Error(`Pokémon move failed: ${error.message}`);
+    }
+  }
+
   async updateDex(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerRepository.updateDexInAPI(uuid);

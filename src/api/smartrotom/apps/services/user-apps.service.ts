@@ -39,8 +39,15 @@ export class UserAppsService {
       throw new ConflictException('App already added to player');
     }
 
-    await this.userAppsRepository.addUserApp(uuid, appId);
-    
+    const appOrder = await this.userAppsRepository.findByPlayerUuid(uuid);
+    let order = 1;
+    const usedOrders = new Set(appOrder.map(a => a.order));
+    while (usedOrders.has(order) && order <= 36) {
+      order++;
+    }
+
+    await this.userAppsRepository.addUserApp(uuid, appId, order);
+
     return { success: true };
   }
 

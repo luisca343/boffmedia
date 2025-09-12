@@ -8,6 +8,9 @@ import { PokemonW } from '../../entities/pokemon-w-.entity';
 export interface IWingullPlayerRepository {
   getStatsFromAPI(uuid: string): Promise<PlayerStats>;
   getTeamFromAPI(uuid: string): Promise<PokemonW[]>;
+
+  getPCFromAPI(uuid: string): Promise<any>;
+  movePokemonInAPI(movePokemonDto: any): Promise<any>;
   updateDexInAPI(uuid: string): Promise<SuccessResponse>;
   getQuestsFromAPI(uuid: string): Promise<any>;
   sendMessageInAPI(request: MessageRequestDto): Promise<SuccessResponse>;

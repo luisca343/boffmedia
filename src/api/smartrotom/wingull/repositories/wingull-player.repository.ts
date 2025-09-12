@@ -61,6 +61,56 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
+  async getPCFromAPI(uuid: string): Promise<any> {
+    if (!uuid || uuid.trim() === '') {
+      throw new Error('UUID is required for getting PC');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/pc`,
+        { uuid },
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error(`Failed to get PC for UUID ${uuid}:`, error);
+      throw new Error(`PC retrieval failed: ${error.message}`);
+    }
+  }
+
+  async movePokemonInAPI(movePokemonDto: any): Promise<any> {
+    if (!movePokemonDto || typeof movePokemonDto !== 'object') {
+      throw new Error('Invalid move Pokémon request');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/pc/move`,
+        movePokemonDto,
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error(`Failed to move Pokémon:`, error);
+      throw new Error(`Pokémon move failed: ${error.message}`);
+    }
+  }
+
   async updateDexInAPI(uuid: string): Promise<any> {
     if (!uuid || uuid.trim() === '') {
       throw new Error('UUID is required for updating dex');

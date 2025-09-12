@@ -85,7 +85,7 @@ export class UserAppsRepository implements IUserAppsRepository {
       id: smartrotomApps.id,
       url: smartrotomApps.url,
       name: smartrotomApps.name,
-      orden: sql`COALESCE(${smartrotomUserApps.order}, 999)`.as('orden'),
+      order: sql`COALESCE(${smartrotomUserApps.order}, 999)`.as('order'),
       is_user_app: sql`CASE WHEN ${smartrotomUserApps.uuid} IS NOT NULL THEN 1 ELSE 0 END`.as('is_user_app')
     })
     .from(smartrotomApps)

@@ -104,6 +104,26 @@ export class WingullController {
     return await this.wingullFacadeService.getTeam(uuid);
   }
 
+  
+
+  @Post('pc')
+  @ApiOperation({ summary: 'Get player PC' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Player PC retrieved successfully.', type: [PokemonW] })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve player PC.' })
+  @ApiBody({ type: UuidDto })
+  async getPC(@Body() { uuid }: UuidDto) {
+    return await this.wingullFacadeService.getPC(uuid);
+  }
+
+  @Post('pc/move')
+  @ApiOperation({ summary: 'Move Pokémon inside the PC' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Pokémon moved successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to move Pokémon.' })
+  @ApiBody({ type: Object })
+  async movePokemon(@Body() movePokemonDto: any) {
+    return await this.wingullFacadeService.movePokemon(movePokemonDto);
+  }
+
   @Get('taxi/stops')
   @ApiOperation({ summary: 'Get all taxi stops' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.', type: [TaxiStop] })

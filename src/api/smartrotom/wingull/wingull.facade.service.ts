@@ -67,7 +67,25 @@ export class WingullFacadeService {
       throw new Error(`Failed to get team: ${error.message}`);
     }
   }
-  
+
+  async getPC(uuid: string): Promise<any> {
+    try {
+      return await this.wingullPlayerService.getPC(uuid);
+    } catch (error) {
+      console.error(`Error getting PC for ${uuid}:`, error);
+      throw new Error(`Failed to get PC: ${error.message}`);
+    }
+  }
+
+  async movePokemon(movePokemonDto: any): Promise<any> {
+    try {
+      return await this.wingullPlayerService.movePokemon(movePokemonDto);
+    } catch (error) {
+      console.error(`Error moving Pokémon:`, error);
+      throw new Error(`Failed to move Pokémon: ${error.message}`);
+    }
+  }
+
   async updateDex(uuid: string): Promise<any> {
     try {
       return await this.wingullPlayerService.updateDex(uuid);
