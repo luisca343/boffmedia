@@ -124,6 +124,18 @@ export class WingullController {
     return await this.wingullFacadeService.movePokemon(movePokemonDto);
   }
 
+  @Post('battleteams')
+  @ApiOperation({ summary: 'Get all battle teams' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle teams retrieved successfully.', type: [String] })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle teams.' })
+  async getBattleTeams(@Body() { uuid }: UuidDto) {
+    return {
+      teams: [],
+      maxTeams: 5,
+      activeTeamId: null,
+    }
+  }
+
   @Get('taxi/stops')
   @ApiOperation({ summary: 'Get all taxi stops' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Taxi stops retrieved successfully.', type: [TaxiStop] })
