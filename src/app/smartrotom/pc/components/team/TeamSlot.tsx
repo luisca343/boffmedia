@@ -10,7 +10,6 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { motion } from "framer-motion"
 
-// Optimized animation variants from old.tsx
 const OPTIMIZED_SLOT_VARIANTS = {
   idle: { 
     scale: 1,
@@ -145,11 +144,11 @@ export function TeamSlot({
               {/* Simplified Shiny indicator - no infinite rotation */}
               {pokemon.palette === 'shiny' && (
                 <motion.div
-                  className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-yellow-300 to-yellow-500 rounded-full flex items-center justify-center shadow-lg"
+                  className="absolute -top-0 -right-0 w-4 h-4 flex items-center justify-center shadow-lg"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <PiStarFill className="text-white text-xs" />
+                  <PiStarFill className="text-yellow-400 text-xs" />
                 </motion.div>
               )}
             </div>

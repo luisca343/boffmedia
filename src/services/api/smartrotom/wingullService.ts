@@ -198,8 +198,11 @@ export class WingullService {
     /**
     * Get player's battle teams
     */
-    static getBattleTeams(uuid: string) {
-        return wingullPOST<BattleTeamData>('/battleteams', { uuid });
+    static async getBattleTeams(uuid: string) {
+        console.log('Fetching battle teams for UUID:', uuid);
+        const response = await wingullPOST<BattleTeamData>('/battleteams', { uuid });
+        console.log(response);
+        return response;
     }
     
     /**
