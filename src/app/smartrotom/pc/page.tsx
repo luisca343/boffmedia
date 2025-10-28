@@ -112,6 +112,50 @@ export default function PCPage() {
       return
     }
 
+    // Handle battle team drops
+    if (overData.type === 'battleTeam') {
+      try {
+        await handleBattleTeamPokemonMove(
+          {
+            type: activeData.type,
+            boxNumber: activeData.boxNumber,
+            teamId: activeData.teamId,
+            index: activeData.index
+          },
+          {
+            type: overData.type,
+            teamId: overData.teamId,
+            index: overData.index
+          }
+        )
+      } catch (error) {
+        console.error('Error during battle team Pokemon move:', error)
+      }
+      return
+    }
+
+    // Handle battle team sources
+    if (activeData.type === 'battleTeam') {
+      try {
+        await handleBattleTeamPokemonMove(
+          {
+            type: activeData.type,
+            teamId: activeData.teamId,
+            index: activeData.index
+          },
+          {
+            type: overData.type,
+            boxNumber: overData.boxNumber,
+            teamId: overData.teamId,
+            index: overData.index
+          }
+        )
+      } catch (error) {
+        console.error('Error during battle team Pokemon move:', error)
+      }
+      return
+    }
+
     // Check if dragging from a filter box and get the original position
     let sourceInfo = {
       type: activeData.type,
@@ -159,7 +203,6 @@ export default function PCPage() {
           filterBoxRenderProps.handlePokemonRemovedFromFilter(filterSlotIndex)
         }
       } else {
-        // Fallback to regular Pokemon move function
         await asyncHandlePokemonMove(
           sourceInfo,
           {
@@ -219,16 +262,24 @@ export default function PCPage() {
 
   // Handle adding Pokemon to battle team
   const handleAddToBattleTeam = async (teamId: string, position: number, pokemon: PCPokemon) => {
-    if (!uuid) return
+    if (!uuid || !battleTeamsData) return
 
     try {
-      // For now, we'll create a unique identifier for the pokemon
-      const pokemonId = `${pokemon.box}-${pokemon.index}`
-      
-      await WingullService.addPokemonToBattleTeam(uuid, {
-        teamId,
-        position,
-        pokemonId
+      // Find the target team
+      const targetTeam = battleTeamsData.teams.find(team => team.id === teamId)
+      if (!targetTeam) {
+        toast.error('Equipo de batalla no encontrado')
+        return
+      }
+
+      // Create a new pokemon array for the team
+      const updatedPokemon = [...targetTeam.pokemon]
+      updatedPokemon[position] = pokemon.pokemon // Add the Pokemon to the specified position
+
+      // Update the entire team using the simplified flow
+      await WingullService.updateBattleTeam(uuid, {
+        id: teamId,
+        pokemon: updatedPokemon
       })
 
       await refetchBattleTeams()
@@ -236,6 +287,119 @@ export default function PCPage() {
     } catch (error) {
       console.error('Error adding Pokemon to battle team:', error)
       toast.error('Error al añadir Pokémon al equipo de batalla')
+    }
+  }
+
+  // Handle battle team Pokemon moves
+  const handleBattleTeamPokemonMove = async (
+    source: { type: 'box' | 'team' | 'battleTeam', boxNumber?: number, teamId?: string, index: number },
+    destination: { type: 'box' | 'team' | 'battleTeam', boxNumber?: number, teamId?: string, index: number }
+  ) => {
+    console.log('handleBattleTeamPokemonMove called with:', { source, destination })
+    
+    if (!uuid || !battleTeamsData) {
+      console.log('Early return - missing data:', { uuid: !!uuid, battleTeamsData: !!battleTeamsData })
+      return
+    }
+
+    try {
+      // Handle moves within battle teams or from PC to battle teams
+      if (source.type === 'box' && destination.type === 'battleTeam') {
+        console.log('Moving from PC to battle team')
+        
+        // Moving from PC to battle team
+        const pokemon = source.boxNumber !== undefined ? 
+          pcData.find(p => p.box === source.boxNumber && p.index === source.index) : null
+        
+        console.log('Found pokemon:', !!pokemon, pokemon?.pokemon?.name)
+        console.log('Battle teams data:', battleTeamsData?.teams?.length, 'teams')
+        console.log('Looking for team ID:', destination.teamId)
+        console.log('Available team IDs:', battleTeamsData?.teams?.map(t => t.id))
+        
+        if (pokemon && destination.teamId) {
+          // Find the target team
+          const targetTeam = battleTeamsData.teams.find(team => team.id === destination.teamId)
+          console.log('Found target team:', !!targetTeam, targetTeam?.name)
+          
+          if (!targetTeam) {
+            console.log('Target team not found! Returning early.')
+            return
+          }
+
+          // Create a new pokemon array for the team
+          const updatedPokemon = [...targetTeam.pokemon]
+          updatedPokemon[destination.index] = pokemon.pokemon
+
+          // we need to create a pokemonSlot for the pokemon, with its box and index
+          const pokemonSlot = {
+            box: pokemon.box,
+            slot: pokemon.index,
+          }
+
+          console.log('About to call updateBattleTeam with:', {
+            teamId: destination.teamId,
+            pokemonCount: updatedPokemon.filter(p => p !== null).length
+          })
+
+          // Update the entire team
+          await WingullService.updateBattleTeam(uuid, {
+            id: destination.teamId,
+            teamSlot: destination.index,
+            pokemon: pokemonSlot
+          })
+        }
+      } else if (source.type === 'battleTeam' && destination.type === 'battleTeam') {
+        // Moving within battle teams or between battle teams
+        if (source.teamId && destination.teamId && battleTeamsData) {
+          const sourceTeam = battleTeamsData.teams.find(team => team.id === source.teamId)
+          const destinationTeam = battleTeamsData.teams.find(team => team.id === destination.teamId)
+          
+          if (!sourceTeam || !destinationTeam) return
+
+          const sourcePokemon = sourceTeam.pokemon[source.index]
+
+          if (source.teamId === destination.teamId) {
+            // Moving within the same team
+            const updatedPokemon = [...sourceTeam.pokemon]
+            // Remove from source position
+            updatedPokemon[source.index] = null
+            // Add to destination position
+            updatedPokemon[destination.index] = sourcePokemon
+
+            await WingullService.updateBattleTeam(uuid, {
+              id: source.teamId,
+              pokemon: updatedPokemon
+            })
+          } else {
+            // Moving between different teams - need to update both teams
+            const updatedSourcePokemon = [...sourceTeam.pokemon]
+            const updatedDestinationPokemon = [...destinationTeam.pokemon]
+            
+            // Remove from source team
+            updatedSourcePokemon[source.index] = null
+            // Add to destination team
+            updatedDestinationPokemon[destination.index] = sourcePokemon
+
+            // Update both teams
+            await Promise.all([
+              WingullService.updateBattleTeam(uuid, {
+                id: source.teamId,
+                pokemon: updatedSourcePokemon
+              }),
+              WingullService.updateBattleTeam(uuid, {
+                id: destination.teamId,
+                pokemon: updatedDestinationPokemon
+              })
+            ])
+          }
+        }
+      }
+      
+      await Promise.all([fetchPCData(), fetchTeamData(), refetchBattleTeams()])
+      toast.success('Pokémon movido exitosamente')
+    } catch (error) {
+      toast.error('Error al mover Pokémon')
+      console.error('Error moving battle team pokemon:', error)
     }
   }
 
@@ -484,6 +648,7 @@ export default function PCPage() {
                             battleTeamsData={battleTeamsData}
                             uuid={uuid}
                             onTeamsUpdate={refetchBattleTeams}
+                            onBattleTeamPokemonMove={handleBattleTeamPokemonMove}
                           />
                         )}
                       </motion.div>

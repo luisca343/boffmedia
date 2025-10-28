@@ -5,9 +5,9 @@ export interface BattleTeam {
   name: string
   description?: string
   pokemon: (PokemonW | null)[]
-  isActive: boolean
-  createdAt: string
-  updatedAt: string
+  isActive?: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface BattleTeamSlot {
@@ -25,18 +25,7 @@ export interface UpdateBattleTeamRequest {
   id: string
   name?: string
   description?: string
-  pokemon?: (PokemonW | null)[]
-}
-
-export interface AddPokemonToBattleTeamRequest {
-  teamId: string
-  position: number
-  pokemonId: string // This will be the identifier from PC
-}
-
-export interface RemovePokemonFromBattleTeamRequest {
-  teamId: string
-  position: number
+  pokemon?: (PokemonW | null)[] // This will handle all Pokemon operations
 }
 
 export interface BattleTeamData {

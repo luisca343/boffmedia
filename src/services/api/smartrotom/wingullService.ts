@@ -6,9 +6,7 @@ import {
     BattleTeamData, 
     BattleTeam, 
     CreateBattleTeamRequest, 
-    UpdateBattleTeamRequest,
-    AddPokemonToBattleTeamRequest,
-    RemovePokemonFromBattleTeamRequest
+    UpdateBattleTeamRequest
 } from '@/types/dto/battle-team.dto';
 
 
@@ -199,9 +197,7 @@ export class WingullService {
     * Get player's battle teams
     */
     static async getBattleTeams(uuid: string) {
-        console.log('Fetching battle teams for UUID:', uuid);
         const response = await wingullPOST<BattleTeamData>('/battleteams', { uuid });
-        console.log(response);
         return response;
     }
     
@@ -224,20 +220,6 @@ export class WingullService {
     */
     static deleteBattleTeam(uuid: string, teamId: string) {
         return wingullPOST<SuccessResponse>('/battleteams/delete', { uuid, teamId });
-    }
-    
-    /**
-    * Add Pokemon to battle team
-    */
-    static addPokemonToBattleTeam(uuid: string, data: AddPokemonToBattleTeamRequest) {
-        return wingullPOST<SuccessResponse>('/battleteams/addpokemon', { uuid, ...data });
-    }
-    
-    /**
-    * Remove Pokemon from battle team
-    */
-    static removePokemonFromBattleTeam(uuid: string, data: RemovePokemonFromBattleTeamRequest) {
-        return wingullPOST<SuccessResponse>('/battleteams/removepokemon', { uuid, ...data });
     }
     
     /**

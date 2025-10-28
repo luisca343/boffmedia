@@ -5,20 +5,27 @@ import { FaTrophy, FaPlus, FaEdit, FaTrash, FaStar, FaRegStar } from 'react-icon
 import { PiUsers, PiTarget, PiInfo } from 'react-icons/pi'
 import { toast } from 'react-toastify'
 import { WingullService } from '@/services/api/smartrotom/wingullService'
-import { PokemonSprite } from '@/app/smartrotom/pokedex/_components/PokemonSprite'
+import { BattleTeamSlot } from './BattleTeamSlot'
+import { SortableContext } from '@dnd-kit/sortable'
+import { stablePositionStrategy } from '@/lib/drag-and-drop'
 
 interface BattleTeamsPanelProps {
   battleTeamsData: BattleTeamData | undefined
   uuid: string
   onTeamsUpdate: () => void
   onPokemonAddToBattleTeam?: (teamId: string, position: number) => void
+  onBattleTeamPokemonMove?: (
+    source: { type: 'box' | 'team' | 'battleTeam', boxNumber?: number, teamId?: string, index: number },
+    destination: { type: 'box' | 'team' | 'battleTeam', boxNumber?: number, teamId?: string, index: number }
+  ) => void
 }
 
 export default function BattleTeamsPanel({ 
   battleTeamsData, 
   uuid, 
   onTeamsUpdate,
-  onPokemonAddToBattleTeam 
+  onPokemonAddToBattleTeam,
+  onBattleTeamPokemonMove 
 }: BattleTeamsPanelProps) {
   const [selectedTeam, setSelectedTeam] = useState<BattleTeam | null>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
@@ -109,7 +116,23 @@ export default function BattleTeamsPanel({
 
   const handleRemovePokemonFromTeam = async (teamId: string, position: number) => {
     try {
-      await WingullService.removePokemonFromBattleTeam(uuid, { teamId, position })
+      // Find the target team
+      const targetTeam = battleTeamsData?.teams.find(team => team.id === teamId)
+      if (!targetTeam) {
+        toast.error('Equipo de batalla no encontrado')
+        return
+      }
+
+      // Create a new pokemon array with the Pokemon removed (set to null)
+      const updatedPokemon = [...targetTeam.pokemon]
+      updatedPokemon[position] = null
+
+      // Update the entire team using the simplified flow
+      await WingullService.updateBattleTeam(uuid, {
+        id: teamId,
+        pokemon: updatedPokemon
+      })
+
       onTeamsUpdate()
       toast.success('Pokémon removido del equipo de batalla')
     } catch (error) {
@@ -126,265 +149,229 @@ export default function BattleTeamsPanel({
 
   if (!battleTeamsData) {
     return (
-      <div className="bg-white border-4 border-black h-full flex items-center justify-center">
+      <div className="bg-slate-900/40 backdrop-blur-sm rounded-b-2xl border border-slate-500/30 border-t-0 shadow-2xl h-full flex items-center justify-center">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 border-2 border-black rounded-full border-t-transparent animate-spin" />
-          <p className="text-black font-mono text-sm">CARGANDO EQUIPOS DE COMBATE...</p>
+          <div className="w-8 h-8 border-2 border-slate-400 rounded-full border-t-transparent animate-spin" />
+          <p className="text-slate-300 font-medium text-sm">Cargando equipos de combate...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="bg-white border-4 border-black h-full flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="bg-gray-300 border-b-4 border-black p-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-black border-2 border-gray-600 flex items-center justify-center">
-              <FaTrophy className="text-white text-sm" />
-            </div>
-            <div>
-              <h3 className="text-black font-mono font-bold text-lg">EQUIPOS DE COMBATE</h3>
-              <div className="flex items-center space-x-2">
-                <p className="text-gray-700 font-mono text-xs">
-                  {battleTeamsData.teams.length}/{battleTeamsData.maxTeams} EQUIPOS
-                </p>
-                {battleTeamsData.teams.find(t => t.isActive) && (
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-black animate-pulse" />
-                    <span className="text-xs text-black font-mono">ACTIVO</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          
-          <button
-            onClick={() => setShowCreateForm(!showCreateForm)}
-            className="bg-green-600 hover:bg-green-500 disabled:bg-gray-600 border-2 border-green-500 hover:border-green-400 disabled:border-gray-500 text-white p-2 transition-all duration-150 active:scale-95"
-            disabled={battleTeamsData.teams.length >= battleTeamsData.maxTeams}
-            title="CREAR NUEVO EQUIPO DE COMBATE"
-          >
-            <FaPlus className="text-sm" />
-          </button>
-        </div>
-      </div>
+    <div className="h-full flex flex-col space-y-3 overflow-y-auto">
+      {/* Create Team Button */}
+      <button
+        onClick={() => setShowCreateForm(!showCreateForm)}
+        disabled={battleTeamsData.teams.length >= battleTeamsData.maxTeams}
+        className="bg-gradient-to-r from-green-600/80 to-emerald-600/80 hover:from-green-500 hover:to-emerald-500 disabled:from-slate-600/50 disabled:to-slate-600/50 border border-green-500/50 hover:border-green-400 disabled:border-slate-500/30 text-white p-3 rounded-xl transition-all duration-150 active:scale-95 backdrop-blur-sm shadow-lg flex items-center justify-center space-x-2"
+      >
+        <FaPlus className="text-sm" />
+        <span className="font-medium text-sm">
+          {battleTeamsData.teams.length >= battleTeamsData.maxTeams 
+            ? `Límite alcanzado (${battleTeamsData.maxTeams})`
+            : 'Crear Equipo de Batalla'
+          }
+        </span>
+      </button>
 
       {/* Create/Edit Form */}
-      <div className={`bg-blue-800 border-b-4 border-blue-700 transition-all duration-300 overflow-hidden ${
-        (showCreateForm || editingTeam) ? 'max-h-40 p-3' : 'max-h-0 p-0'
-      }`}>
-        <div className="space-y-2">
-          <div>
-            <input
-              type="text"
-              placeholder="TEAM NAME"
-              value={newTeamName}
-              onChange={(e) => setNewTeamName(e.target.value)}
-              className="w-full p-2 bg-blue-900 border-2 border-blue-600 text-yellow-200 font-mono text-sm focus:border-yellow-400 transition-colors"
-              maxLength={20}
-            />
-          </div>
-          <div>
-            <textarea
-              placeholder="DESCRIPTION (OPTIONAL)"
-              value={newTeamDescription}
-              onChange={(e) => setNewTeamDescription(e.target.value)}
-              className="w-full p-2 bg-blue-900 border-2 border-blue-600 text-yellow-200 font-mono text-sm focus:border-yellow-400 transition-colors resize-none"
-              rows={2}
-              maxLength={100}
-            />
-          </div>
-          <div className="flex space-x-2">
-            <button
-              onClick={editingTeam ? handleUpdateTeam : handleCreateTeam}
-              className="bg-green-600 hover:bg-green-500 border-2 border-green-500 hover:border-green-400 text-white px-3 py-1 font-mono text-sm transition-all duration-150 active:scale-95"
-            >
-              {editingTeam ? 'UPDATE' : 'CREATE'}
-            </button>
-            <button
-              onClick={() => {
-                setShowCreateForm(false)
-                setEditingTeam(null)
-                setNewTeamName('')
-                setNewTeamDescription('')
-              }}
-              className="bg-red-600 hover:bg-red-500 border-2 border-red-500 hover:border-red-400 text-white px-3 py-1 font-mono text-sm transition-all duration-150 active:scale-95"
-            >
-              CANCELAR
-            </button>
+      {(showCreateForm || editingTeam) && (
+        <div className="bg-slate-800/60 border border-slate-600/30 rounded-xl backdrop-blur-sm p-4">
+          <div className="space-y-3">
+            <div>
+              <input
+                type="text"
+                placeholder="Nombre del equipo"
+                value={newTeamName}
+                onChange={(e) => setNewTeamName(e.target.value)}
+                className="w-full p-3 bg-slate-900/60 border border-slate-600/50 text-slate-100 placeholder-slate-400 font-medium text-sm focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/20 transition-all duration-200 rounded-xl backdrop-blur-sm"
+                maxLength={20}
+              />
+            </div>
+            <div>
+              <textarea
+                placeholder="Descripción (opcional)"
+                value={newTeamDescription}
+                onChange={(e) => setNewTeamDescription(e.target.value)}
+                className="w-full p-3 bg-slate-900/60 border border-slate-600/50 text-slate-100 placeholder-slate-400 font-medium text-sm focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/20 transition-all duration-200 resize-none rounded-xl backdrop-blur-sm"
+                rows={2}
+                maxLength={100}
+              />
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={editingTeam ? handleUpdateTeam : handleCreateTeam}
+                className="flex-1 bg-green-600/80 hover:bg-green-500 border border-green-500/50 hover:border-green-400 text-white px-4 py-2 font-medium text-sm transition-all duration-150 active:scale-95 rounded-xl backdrop-blur-sm"
+              >
+                {editingTeam ? 'Actualizar' : 'Crear'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowCreateForm(false)
+                  setEditingTeam(null)
+                  setNewTeamName('')
+                  setNewTeamDescription('')
+                }}
+                className="flex-1 bg-red-600/80 hover:bg-red-500 border border-red-500/50 hover:border-red-400 text-white px-4 py-2 font-medium text-sm transition-all duration-150 active:scale-95 rounded-xl backdrop-blur-sm"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Teams List */}
-      <div className="flex-1 p-3 space-y-2 overflow-y-auto">
-        {battleTeamsData.teams.length === 0 ? (
-          <div className="text-center text-blue-300 py-8">
-            <div className="w-12 h-12 mx-auto mb-4 bg-blue-800 border-2 border-blue-700 flex items-center justify-center">
-              <FaTrophy className="text-2xl opacity-50" />
-            </div>
-            <h4 className="font-mono font-bold mb-2">NO HAY EQUIPOS DE COMBATE</h4>
-            <p className="font-mono text-xs text-blue-400">CREA TU PRIMER EQUIPO PARA EL FRENTE DE BATALLA</p>
+      {/* Teams as Individual Panels */}
+      {battleTeamsData.teams.length === 0 ? (
+        <div className="bg-slate-900/40 backdrop-blur-sm rounded-xl border border-slate-500/30 shadow-xl p-8 text-center text-slate-300">
+          <div className="w-16 h-16 mx-auto mb-4 bg-slate-800/50 border border-slate-600/30 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+            <FaTrophy className="text-3xl opacity-50" />
           </div>
-        ) : (
-          <div className="space-y-2">
-            {battleTeamsData.teams.map((team) => (
+          <h4 className="font-bold text-lg mb-2">No hay equipos de batalla</h4>
+          <p className="font-medium text-sm text-slate-400">Crea tu primer equipo para el frente de batalla</p>
+        </div>
+      ) : (
+        battleTeamsData.teams.map((team) => (
               <div
                 key={team.id}
-                className={`border-2 p-3 cursor-pointer transition-all duration-150 hover:scale-[1.01] active:scale-[0.99] ${
+                className={`relative bg-gradient-to-br from-slate-800/40 to-slate-900/40 backdrop-blur-sm border rounded-2xl cursor-pointer transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] overflow-hidden ${
                   selectedTeam?.id === team.id
-                    ? 'border-yellow-400 bg-blue-800'
-                    : 'border-blue-700 hover:border-blue-600 bg-blue-850'
-                } ${team.isActive ? 'bg-green-900 border-green-600' : ''}`}
+                    ? 'border-blue-400/50 bg-gradient-to-br from-blue-900/20 to-slate-900/40 shadow-lg shadow-blue-500/10'
+                    : 'border-slate-600/30 hover:border-slate-500/40'
+                } ${team.isActive ? 'border-green-400/50 bg-gradient-to-br from-green-900/20 to-slate-900/40 shadow-lg shadow-green-500/10' : ''}`}
                 onClick={() => setSelectedTeam(selectedTeam?.id === team.id ? null : team)}
               >
-                {/* Team Header */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2">
-                    <div className={`w-6 h-6 border flex items-center justify-center ${
-                      team.isActive 
-                        ? 'bg-green-400 border-green-300' 
-                        : 'bg-yellow-400 border-yellow-300'
-                    }`}>
-                      {team.isActive ? (
-                        <FaStar className="text-green-800 text-xs" />
-                      ) : (
-                        <FaRegStar className="text-yellow-800 text-xs" />
-                      )}
+                {/* Glassmorphism overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/10 pointer-events-none" />
+                
+                {/* Team Header with Name, Description and Actions all in one section */}
+                <div className="relative bg-gradient-to-r from-slate-800/60 to-slate-700/60 p-3 border-b border-slate-600/30">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center space-x-3 flex-1">
+                      <div className={`w-8 h-8 rounded-xl border flex items-center justify-center backdrop-blur-sm flex-shrink-0 ${
+                        team.isActive 
+                          ? 'bg-green-500/20 border-green-400/50' 
+                          : 'bg-yellow-500/20 border-yellow-400/50'
+                      }`}>
+                        {team.isActive ? (
+                          <FaStar className="text-green-400 text-sm" />
+                        ) : (
+                          <FaRegStar className="text-yellow-400 text-sm" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-white font-bold text-lg truncate">{team.name}</h4>
+                        {team.description && (
+                          <p className="text-slate-300 font-medium text-xs mt-0.5 line-clamp-1">
+                            {team.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="text-yellow-200 font-mono font-bold">{team.name}</h4>
-                      {team.isActive && (
-                        <div className="flex items-center space-x-1">
-                          <PiTarget className="text-green-400 text-xs" />
-                          <span className="text-green-400 text-xs font-mono">ACTIVE TEAM</span>
-                        </div>
+                    
+                    {/* Action Buttons */}
+                    <div className="flex items-center space-x-1 flex-shrink-0 ml-2">
+                      {!team.isActive && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleSetActiveTeam(team.id)
+                          }}
+                          className="text-yellow-400 hover:text-yellow-300 p-2 border border-transparent hover:border-yellow-400/30 rounded-xl transition-all duration-150 active:scale-90 backdrop-blur-sm hover:bg-yellow-400/10"
+                          title="Establecer como equipo activo"
+                        >
+                          <FaRegStar className="text-sm" />
+                        </button>
                       )}
-                    </div>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex items-center space-x-1">
-                    {!team.isActive && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          handleSetActiveTeam(team.id)
+                          startEdit(team)
                         }}
-                        className="text-yellow-400 hover:text-yellow-300 p-1 border border-transparent hover:border-yellow-400 transition-all duration-150 active:scale-90"
-                        title="SET AS ACTIVE TEAM"
+                        className="text-blue-400 hover:text-blue-300 p-2 border border-transparent hover:border-blue-400/30 rounded-xl transition-all duration-150 active:scale-90 backdrop-blur-sm hover:bg-blue-400/10"
+                        title="Editar equipo"
                       >
-                        <FaRegStar className="text-sm" />
+                        <FaEdit className="text-sm" />
                       </button>
-                    )}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        startEdit(team)
-                      }}
-                      className="text-blue-400 hover:text-blue-300 p-1 border border-transparent hover:border-blue-400 transition-all duration-150 active:scale-90"
-                      title="EDIT TEAM"
-                    >
-                      <FaEdit className="text-sm" />
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteTeam(team.id)
-                      }}
-                      className="text-red-400 hover:text-red-300 p-1 border border-transparent hover:border-red-400 transition-all duration-150 active:scale-90"
-                      title="DELETE TEAM"
-                    >
-                      <FaTrash className="text-sm" />
-                    </button>
-                  </div>
-                </div>
-                
-                {/* Team Description */}
-                {team.description && (
-                  <p className="text-blue-200 font-mono text-xs mb-3 bg-blue-900 border border-blue-700 p-2">
-                    {team.description}
-                  </p>
-                )}
-                
-                {/* Pokemon Grid */}
-                <div className="grid grid-cols-6 gap-1 mb-2">
-                  {Array.from({ length: 6 }, (_, index) => {
-                    const pokemon = team.pokemon[index]
-                    return (
-                      <div
-                        key={index}
-                        className={`aspect-square border-2 flex items-center justify-center cursor-pointer transition-all duration-150 hover:scale-105 active:scale-95 ${
-                          pokemon 
-                            ? 'border-green-500 bg-green-900 hover:border-green-400 hover:bg-green-800' 
-                            : 'border-blue-600 bg-blue-800 border-dashed hover:border-blue-500'
-                        }`}
+                      <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          if (pokemon) {
-                            handleRemovePokemonFromTeam(team.id, index)
-                          } else if (onPokemonAddToBattleTeam) {
-                            onPokemonAddToBattleTeam(team.id, index)
-                          }
+                          handleDeleteTeam(team.id)
                         }}
+                        className="text-red-400 hover:text-red-300 p-2 border border-transparent hover:border-red-400/30 rounded-xl transition-all duration-150 active:scale-90 backdrop-blur-sm hover:bg-red-400/10"
+                        title="Eliminar equipo"
                       >
-                        {pokemon ? (
-                          <div className="relative w-full h-full flex items-center justify-center">
-                            <PokemonSprite
-                              id={pokemon.dex}
-                              form={pokemon.form || 'base'}
-                              palette={pokemon.palette || 'none'}
-                              width={28}
-                              height={28}
-                              showStatus={false}
-                            />
-                            {/* Position indicator */}
-                            <div className="absolute -top-1 -left-1 w-3 h-3 bg-blue-800 border border-blue-600 flex items-center justify-center">
-                              <span className="text-blue-200 text-[8px] font-mono font-bold">{index + 1}</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col items-center">
-                            <FaPlus className="text-blue-400 text-xs mb-1" />
-                            <span className="text-blue-400 text-[8px] font-mono font-bold">{index + 1}</span>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-                
-                {/* Team Stats */}
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1">
-                      <PiUsers className="text-blue-400" />
-                      <span className="text-blue-200 font-mono">
-                        {team.pokemon.filter(p => p !== null).length}/6 POKEMON
-                      </span>
+                        <FaTrash className="text-sm" />
+                      </button>
                     </div>
                   </div>
                   
-                  <div className="flex space-x-1">
-                    {Array.from({ length: 6 }, (_, i) => (
-                      <div
-                        key={i}
-                        className={`w-2 h-2 border ${
-                          i < team.pokemon.filter(p => p !== null).length 
-                            ? 'bg-green-400 border-green-300' 
-                            : 'bg-blue-800 border-blue-600'
-                        }`}
-                      />
-                    ))}
+                  {/* Active Status & Team Stats in Header */}
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center space-x-3">
+                      {team.isActive && (
+                        <div className="flex items-center space-x-1">
+                          <PiTarget className="text-green-400 text-sm" />
+                          <span className="text-green-400 font-medium">Equipo activo</span>
+                        </div>
+                      )}
+                      <div className="flex items-center space-x-2">
+                        <PiUsers className="text-slate-400" />
+                        <span className="text-slate-300 font-medium">
+                          {team.pokemon.filter(p => p !== null).length}/6 Pokémon
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex space-x-1">
+                      {Array.from({ length: 6 }, (_, i) => (
+                        <div
+                          key={i}
+                          className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                            i < team.pokemon.filter(p => p !== null).length 
+                              ? 'bg-green-400 shadow-sm shadow-green-400/50' 
+                              : 'bg-slate-700 border border-slate-600/50'
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
+                
+                {/* Pokemon Slots Grid */}
+                <div className="relative p-3 space-y-1.5">
+                  <SortableContext 
+                    items={Array.from({ length: 6 }, (_, i) => `battle-team-slot-${team.id}-${i}`)} 
+                    strategy={stablePositionStrategy}
+                  >
+                    {Array.from({ length: 6 }, (_, index) => {
+                      const pokemon = team.pokemon[index]
+                      return (
+                        <div key={index} className="w-full">
+                          <BattleTeamSlot
+                            id={`battle-team-slot-${team.id}-${index}`}
+                            teamId={team.id}
+                            pokemon={pokemon}
+                            index={index}
+                            onClick={(e) => {
+                              e?.stopPropagation?.()
+                              if (pokemon) {
+                                handleRemovePokemonFromTeam(team.id, index)
+                              } else if (onPokemonAddToBattleTeam) {
+                                onPokemonAddToBattleTeam(team.id, index)
+                              }
+                            }}
+                            showPositionIndicator={true}
+                          />
+                        </div>
+                      )
+                    })}
+                  </SortableContext>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            ))
+      )}
     </div>
   )
 }
