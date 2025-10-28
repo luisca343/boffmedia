@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { IWingullPlayerRepository } from './interfaces/wingull-player.repository.interface';
 import { PokemonGiveRequestDto } from '../dto/pokemon-give-request.dto';
 import { MessageRequestDto } from '../dto/message-request.dto';
+import { UpdateBattleTeamDto } from '../dto/battle-team.dto';
 import { PlayerStats } from '../entities/player-stats.entity';
 import { PokemonW } from '../entities/pokemon-w-.entity';
 
@@ -256,6 +257,60 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     } catch (error) {
       console.error(`Failed to give items to UUID ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
+    }
+  }
+
+  async getBattleTeamsFromAPI(uuid: string): Promise<any> {
+    if (!uuid || uuid.trim() === '') {
+      throw new Error('UUID is required for getting battle teams');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/getallbattleteams`,
+        { uuid },
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error(`Failed to get battle teams for UUID ${uuid}:`, error);
+      throw new Error(`Battle teams retrieval failed: ${error.message}`);
+    }
+  }
+
+  async updateBattleTeamInAPI(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
+    if (!updateBattleTeamDto || typeof updateBattleTeamDto !== 'object') {
+      throw new Error('UpdateBattleTeamDto is required for updating battle team');
+    }
+    if (!updateBattleTeamDto.uuid || updateBattleTeamDto.uuid.trim() === '') {
+      throw new Error('UUID is required for updating battle team');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/updatebattleteam`,
+        updateBattleTeamDto,
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      
+      return response.data.data;
+    } catch (error) {
+      console.error(`Failed to update battle team for UUID ${updateBattleTeamDto.uuid}:`, error);
+      throw new Error(`Battle team update failed: ${error.message}`);
     }
   }
 }

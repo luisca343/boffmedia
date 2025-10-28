@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MessageRequestDto } from '../dto/message-request.dto';
 import { PokemonGiveRequestDto } from '../dto/pokemon-give-request.dto';
+import { UpdateBattleTeamDto } from '../dto/battle-team.dto';
 import { WINGULL_USER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IWingullPlayerRepository } from '../repositories/interfaces/wingull-player.repository.interface';
 import { PlayerStats } from '../entities/player-stats.entity';
@@ -98,6 +99,24 @@ export class WingullPlayerService {
     } catch (error) {
       console.error(`Failed to give items to ${uuid}:`, error);
       throw new Error(`Items giving failed: ${error.message}`);
+    }
+  }
+
+  async getBattleTeams(uuid: string): Promise<any> {
+    try {
+      return await this.wingullPlayerRepository.getBattleTeamsFromAPI(uuid);
+    } catch (error) {
+      console.error(`Failed to get battle teams for ${uuid}:`, error);
+      throw new Error(`Battle teams retrieval failed: ${error.message}`);
+    }
+  }
+
+  async updateBattleTeam(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
+    try {
+      return await this.wingullPlayerRepository.updateBattleTeamInAPI(updateBattleTeamDto);
+    } catch (error) {
+      console.error('Failed to update battle team:', error);
+      throw new Error(`Battle team update failed: ${error.message}`);
     }
   }
 }

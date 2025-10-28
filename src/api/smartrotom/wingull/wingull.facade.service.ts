@@ -5,6 +5,7 @@ import { WingullWorldService } from './services/wingull-world.service';
 import { WingullTransportService } from './services/wingull-transport.service';
 import { WingullRepository } from './repositories/wingull.repository';
 import { WingullBalanceDto } from './dto/wingull-balance.dto';
+import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 import { TaxiStop } from './entities/taxi-stop.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 import { PlayerStats } from './entities/player-stats.entity';
@@ -133,6 +134,43 @@ export class WingullFacadeService {
     } catch (error) {
       console.error(`Error giving items to ${uuid}:`, error);
       throw new Error(`Failed to give items: ${error.message}`);
+    }
+  }
+
+  async getBattleTeams(uuid: string): Promise<any> {
+    try {
+      const data = await this.wingullPlayerService.getBattleTeams(uuid);
+      
+      // The battleteam is already an array of pokemon, wrap it as a single team
+      if (data && data.battleteam) {
+        const pokemon = Array.isArray(data.battleteam) ? data.battleteam : [data.battleteam];
+        
+        return {
+          teams: [
+            {
+              id: 1,
+              name: "battleteam",
+              pokemon: pokemon
+            }
+          ],
+          maxTeams: 5,
+          activeTeamId: -1
+        };
+      }
+      
+      return data;
+    } catch (error) {
+      console.error(`Error getting battle teams for ${uuid}:`, error);
+      throw new Error(`Failed to get battle teams: ${error.message}`);
+    }
+  }
+
+  async updateBattleTeam(updateBattleTeamDto: UpdateBattleTeamDto): Promise<any> {
+    try {
+      return await this.wingullPlayerService.updateBattleTeam(updateBattleTeamDto);
+    } catch (error) {
+      console.error('Error updating battle team:', error);
+      throw new Error(`Failed to update battle team: ${error.message}`);
     }
   }
   

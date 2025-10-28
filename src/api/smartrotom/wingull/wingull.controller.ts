@@ -12,6 +12,7 @@ import { PlayerStats } from './entities/player-stats.entity';
 import { PokemonW } from './entities/pokemon-w-.entity';
 import { WingullWorldService } from './services/wingull-world.service';
 import { UpdateDex } from './entities/update-dex.entity';
+import { UpdateBattleTeamDto } from './dto/battle-team.dto';
 
 @ApiTags('SmartRotom | Wingull')
 @Controller('wingull')
@@ -126,14 +127,20 @@ export class WingullController {
 
   @Post('battleteams')
   @ApiOperation({ summary: 'Get all battle teams' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Battle teams retrieved successfully.', type: [String] })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle teams retrieved successfully.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to retrieve battle teams.' })
+  @ApiBody({ type: UuidDto })
   async getBattleTeams(@Body() { uuid }: UuidDto) {
-    return {
-      teams: [],
-      maxTeams: 5,
-      activeTeamId: null,
-    }
+    return await this.wingullFacadeService.getBattleTeams(uuid);
+  }
+
+  @Post('battleteams/update')
+  @ApiOperation({ summary: 'Update a battle team' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Battle team updated successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to update battle team.' })
+  @ApiBody({ type: UpdateBattleTeamDto })
+  async updateBattleTeam(@Body() updateBattleTeamDto: UpdateBattleTeamDto) {
+    return await this.wingullFacadeService.updateBattleTeam(updateBattleTeamDto);
   }
 
   @Get('taxi/stops')

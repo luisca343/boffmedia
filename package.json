@@ -23,7 +23,8 @@
     "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push",
     "generate-api": "openapi --input http://localhost:34301/api-json --output ./src/generated/api --client axios",
-    "generate:models": "openapi --input http://localhost:34301/api-json --output ./src/generated --exportModels true --exportServices false --exportCore false"
+    "generate:models": "openapi --input http://localhost:34301/api-json --output ./src/generated --exportModels true --exportServices false --exportCore false",
+    "fix-pnpm": "powershell -ExecutionPolicy Bypass -File ./fix-pnpm.ps1"
   },
   "dependencies": {
     "@discordjs/voice": "^0.18.0",
@@ -57,6 +58,7 @@
     "bcrypt": "^6.0.0",
     "cheerio": "^1.1.2",
     "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "discord.js": "^14.21.0",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",
@@ -73,7 +75,10 @@
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "socket.io": "^4.8.1",
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.25",
+    "xml2js": "^0.6.2",
+    "youtube-transcript": "^1.2.1",
+    "youtubei.js": "^16.0.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.10",

@@ -66,6 +66,7 @@ import { AutomationModule } from './automation/automation.module';
 import { MySQL2Service } from './_utils/MySQL2Service';
 import { WingullSQL2Service } from './_utils/WingullSQL2Service';
 import { PokemonLogModule } from '@api/boffmedia/util/showdown/pokemon-log.module';
+import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.module';
 
 @Module({
   imports: [
@@ -111,7 +112,8 @@ import { PokemonLogModule } from '@api/boffmedia/util/showdown/pokemon-log.modul
     PokemonModule,
     FicusAIModule,
     AutomationModule,
-    PokemonLogModule
+    PokemonLogModule,
+    YoutubeModule
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
