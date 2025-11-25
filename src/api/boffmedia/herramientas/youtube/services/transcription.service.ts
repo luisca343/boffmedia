@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+// Type-only import - this won't be emitted in JavaScript
+import type { Innertube } from 'youtubei.js';
 
 export interface TranscriptSegment {
   text: string;
@@ -33,20 +35,15 @@ export interface VideoInfoResult {
 
 @Injectable()
 export class TranscriptionService {
-  private youtubeClient: any = null;
-  private Innertube: any = null;
+  private youtubeClient: Innertube | null = null;
 
   // ==================== CLIENT INITIALIZATION ====================
 
-  private async getYoutubeClient(): Promise<any> {
+  private async getYoutubeClient(): Promise<Innertube> {
     if (!this.youtubeClient) {
-      // Dynamic import for ES Module using Function constructor to prevent TypeScript from transforming it
-      if (!this.Innertube) {
-        const importDynamic = new Function('specifier', 'return import(specifier)');
-        const youtubeModule = await importDynamic('youtubei.js');
-        this.Innertube = youtubeModule.Innertube;
-      }
-      this.youtubeClient = await this.Innertube.create();
+      // Dynamic import at runtime
+      const { Innertube: InnertubeClass } = await eval('import("youtubei.js")');
+      this.youtubeClient = await InnertubeClass.create();
     }
     return this.youtubeClient;
   }
