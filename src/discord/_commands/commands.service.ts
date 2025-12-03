@@ -98,6 +98,7 @@ export class CommandsService {
         return { content: `Frase añadida correctamente "${quote}" - ${user.globalName}`, ephemeral: false };
         
     }
+    
     async getQuote(guildID: string, userId: string, quoteNum: number = 0, global = false) {
         if (quoteNum === 0) {
             console.log('Getting random quote');
@@ -166,7 +167,6 @@ export class CommandsService {
         }
         
         async getTTSVoice(userId: string) {
-            
             const data = await this.db.getDrizzle().select({voice: discordUsers.ttsVoice})
             .from(discordUsers)
             .where(eq(discordUsers.userId, userId))

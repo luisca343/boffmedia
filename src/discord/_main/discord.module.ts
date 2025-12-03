@@ -12,6 +12,8 @@ import { FrasesCommand } from '../commands/global/frases/frases';
 import { NuevaFraseCommand } from '../commands/global/frases/nuevafrase';
 import { JoinCommand } from '../commands/global/voz/join';
 import { SetVozCommand } from '../commands/global/voz/setVoz';
+import { SetVozAutocompleteInterceptor } from '../commands/global/voz/setVoz.interceptor';
+import { MessageListener } from './message.listener';
 
 console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD_KEY);
 
@@ -43,6 +45,8 @@ console.log('[DEBUG] Initializing NecordModule with token:', process.env.DISCORD
     NuevaFraseCommand,
     JoinCommand,
     SetVozCommand,
+    SetVozAutocompleteInterceptor,
+    MessageListener,
   ],
 })
 export class DiscordModule {}

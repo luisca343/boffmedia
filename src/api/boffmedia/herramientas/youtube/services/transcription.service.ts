@@ -90,6 +90,7 @@ export class TranscriptionService {
 
       // Get transcript
       const transcriptData = await info.getTranscript();
+      
 
       if (!transcriptData || !transcriptData.transcript) {
         return {
@@ -97,6 +98,7 @@ export class TranscriptionService {
           message: 'Transcription not available for this video'
         };
       }
+      
 
       // Format transcript
       const transcript: TranscriptSegment[] = transcriptData.transcript.content?.body?.initial_segments?.map((segment: any) => ({
