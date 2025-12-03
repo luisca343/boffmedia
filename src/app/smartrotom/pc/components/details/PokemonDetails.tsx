@@ -33,6 +33,27 @@ export default function PokemonDetails({
 }: PokemonDetailsProps) {
   const t = useTranslations();
 
+  // Keyboard navigation - must be called before any early returns
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowLeft' && pokemon && onNavigatePrevious && canNavigatePrevious) {
+        event.preventDefault();
+        onNavigatePrevious();
+      } else if (event.key === 'ArrowRight' && pokemon && onNavigateNext && canNavigateNext) {
+        event.preventDefault();
+        onNavigateNext();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [pokemon, onNavigatePrevious, onNavigateNext, canNavigatePrevious, canNavigateNext, onClose]);
+
   // Determine which pokemon data to use
   const activePokemon = pokemon || teamPokemon
   if (!activePokemon) return null
@@ -87,27 +108,6 @@ export default function PokemonDetails({
       return { weaknesses, resistances, immunities };
     };
     const { weaknesses, resistances, immunities } = getTypeEffectiveness();
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowLeft' && isFromPC && onNavigatePrevious && canNavigatePrevious) {
-        event.preventDefault();
-        onNavigatePrevious();
-      } else if (event.key === 'ArrowRight' && isFromPC && onNavigateNext && canNavigateNext) {
-        event.preventDefault();
-        onNavigateNext();
-      } else if (event.key === 'Escape') {
-        event.preventDefault();
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isFromPC, onNavigatePrevious, onNavigateNext, canNavigatePrevious, canNavigateNext, onClose]);
 
   return (
     <Dialog open={true} onOpenChange={open => { if (!open) onClose(); }}>

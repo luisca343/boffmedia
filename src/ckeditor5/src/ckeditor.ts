@@ -216,4 +216,6 @@ class Editor extends ClassicEditor {
 	};
 }
 
-export default { Editor, EditorWatchdog };
+const CKEditorExport = { Editor, EditorWatchdog };
+
+export default CKEditorExport;

@@ -23,7 +23,7 @@ export default function CameraApp() {
       {/* Bottom controls */}
       <div className="h-24 bg-black flex items-center justify-between px-8">
         <Button variant="ghost" size="icon" className="rounded-full">
-          <Image className="h-8 w-8" />
+          <Image className="h-8 w-8" alt="Gallery" />
         </Button>
         <Button variant="ghost" size="icon" className="rounded-full border-4 border-white p-1">
           <div className="bg-white rounded-full h-16 w-16"></div>

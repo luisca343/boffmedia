@@ -30,7 +30,7 @@ export function PokemonSprite({ pokemon, className, scale = 1 }: { pokemon: Poke
         <div className="flex justify-center items-center" style={{ 
             width: 24 * scale , height: 24 * scale, opacity: `${pokemon?.fainted ? 0.5 : 1}`, filter: `${pokemon?.fainted ? 'brightness(0.2)' : 'brightness(1)'}`
             }}>
-            <img src={url} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
+            <img src={url} alt={pokemon?.species?.name || 'Pokemon'} className={className} width={size * getScaleMultiplier()} height={size * getScaleMultiplier()} />
         </div>
     );
 }

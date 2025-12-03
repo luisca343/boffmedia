@@ -75,6 +75,21 @@ export default function PCPage() {
     return handlePokemonMove(source, destination)
   }, [handlePokemonMove])
 
+  // Filter-aware secondary box change handler - must be at component level
+  const filterAwareSecondaryBoxChange = useCallback((newSecondaryBox: number | null, isFilterActive: boolean) => {
+    if (newSecondaryBox === null) {
+      handleSecondaryBoxChange(null)
+      return
+    }
+
+    // If primary box is showing filters, allow secondary box to use the original box
+    if (isFilterActive && newSecondaryBox === currentBox) {
+      setSecondaryBox(newSecondaryBox)
+      clearSelections()
+    } else {
+      handleSecondaryBoxChange(newSecondaryBox)
+    }
+  }, [currentBox, handleSecondaryBoxChange, setSecondaryBox, clearSelections])
 
   // Drag and drop setup using the lib
   const { activeDragItem, handleDragStart, handleDragEnd } = useActiveDragItem()
@@ -546,27 +561,6 @@ export default function PCPage() {
                 ? filterBoxData 
                 : currentBoxData
               
-              // Create a filter-aware secondary box change handler
-              const filterAwareSecondaryBoxChange = useCallback((boxNumber: number | null) => {
-                if (boxNumber === null) {
-                  handleSecondaryBoxChange(null)
-                  return
-                }
-
-                // If primary box is showing filters, allow secondary box to use the original box
-                // that's being filtered since it's not actually occupied
-                if (isFilterActive && boxNumber === currentBox) {
-                  // Bypass conflict detection - use direct setter since the primary box
-                  // is showing filters, not the actual box data
-                  setSecondaryBox(boxNumber)
-                  // Clear selections when changing boxes
-                  clearSelections()
-                } else {
-                  // Use normal logic which includes conflict detection
-                  handleSecondaryBoxChange(boxNumber)
-                }
-              }, [isFilterActive, currentBox, handleSecondaryBoxChange, setSecondaryBox, clearSelections])
-              
               const calculatedSecondaryBoxData = isDualBoxMode 
                 ? (secondaryBox !== null ? (boxes[secondaryBox] || { 
                     boxNumber: secondaryBox, 
@@ -668,7 +662,7 @@ export default function PCPage() {
                       onPokemonMove={optimisticPokemonMove}
                       totalBoxes={totalBoxes}
                       onPrimaryBoxChange={handleBoxChange}
-                      onSecondaryBoxChange={filterAwareSecondaryBoxChange}
+                      onSecondaryBoxChange={(boxNumber) => filterAwareSecondaryBoxChange(boxNumber, isFilterActive)}
                       rows={ROWS_PER_BOX}
                       cols={COLS_PER_ROW}
                       battleTeams={battleTeamsData?.teams}
@@ -735,7 +729,7 @@ export default function PCPage() {
                     isOpen={showSecondaryBoxSelection}
                     boxes={boxes}
                     currentBox={secondaryBox!}
-                    onBoxSelect={filterAwareSecondaryBoxChange}
+                    onBoxSelect={(boxNumber) => filterAwareSecondaryBoxChange(boxNumber, isFilterActive)}
                     onClose={() => setShowSecondaryBoxSelection(false)}
                   />
                 </DndContext>
