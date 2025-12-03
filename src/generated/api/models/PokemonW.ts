@@ -42,18 +42,34 @@ export type PokemonW = {
     /**
      * Moveset (up to 4 moves)
      */
-    moves: Array<string>;
+    moves: Array<{ name: string, type: string, category: string, power: number, accuracy: number }>;
     /**
      * IVs (HP, Atk, Def, SpA, SpD, Spe)
      */
-    ivs: Array<string>;
+    ivs: Array<number>;
     /**
      * EVs (HP, Atk, Def, SpA, SpD, Spe)
      */
-    evs: Array<string>;
+    evs: Array<number>;
     /**
      * Stats (HP, Atk, Def, SpA, SpD, Spe)
      */
-    stats: Array<string>;
+    stats: Array<number>;
+    /**
+     * Gender
+     */
+    gender?: string;
+    /**
+     * Types
+     */
+    types: Array<string>;
+    /**
+     * Current HP
+     */
+    hp: number;
+    /**
+     * Current status (e.g. "healthy", "poisoned", etc.)
+     */
+    status: string;
 };
 

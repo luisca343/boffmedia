@@ -1,7 +1,13 @@
-import { TeleportPlayerDto, Weather } from '@/generated/api';
+import { PokemonW, TeleportPlayerDto, Weather } from '@/generated/api';
 import { wingullGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
 import { SuccessResponse } from '@/types';
 import { TaxiStop } from '@/types/dto/taxi-stop.dto';
+import { 
+    BattleTeamData, 
+    BattleTeam, 
+    CreateBattleTeamRequest, 
+    UpdateBattleTeamRequest
+} from '@/types/dto/battle-team.dto';
 
 
 export interface Performance {
@@ -27,17 +33,6 @@ export type PlayerStats = {
     badges: number;
     pokemonCaught: number;
     pokemonSeen: number;
-};
-
-export type PokemonW = {
-    species: string;
-    nickname: string;
-    level: number;
-    gender: string;
-    nature: string;
-    ability: string;
-    form: string;
-    shiny: boolean;
 };
 
 export class WingullService {
@@ -79,7 +74,14 @@ export class WingullService {
     static getTeam(uuid: string) {
         return wingullPOST<PokemonW[]>('/team', { uuid });
     }
-    
+
+    /**
+     * Get player PC
+     */
+    static getPC(uuid: string) {
+        return wingullPOST<any[]>('/pc', { uuid });
+    }
+
     /**
     * Update player Pokédex
     */
@@ -187,5 +189,59 @@ export class WingullService {
     */
     static teleportPlayer(data: TeleportPlayerDto) {
         return rotomPOST<ApiResponse>("/taxi/teleport", data);
+    }
+
+    // ==================== BATTLE TEAMS ENDPOINTS ====================
+    
+    /**
+    * Get player's battle teams
+    */
+    static async getBattleTeams(uuid: string) {
+        const response = await wingullPOST<BattleTeamData>('/battleteams', { uuid });
+        return response;
+    }
+    
+    /**
+    * Create a new battle team
+    */
+    static createBattleTeam(uuid: string, teamData: CreateBattleTeamRequest) {
+        return wingullPOST<BattleTeam>('/battleteams/create', { uuid, ...teamData });
+    }
+    
+    /**
+    * Update battle team details
+    */
+    static updateBattleTeam(uuid: string, teamData: UpdateBattleTeamRequest) {
+        return wingullPOST<BattleTeam>('/battleteams/update', { uuid, ...teamData });
+    }
+    
+    /**
+    * Delete a battle team
+    */
+    static deleteBattleTeam(uuid: string, teamId: string) {
+        return wingullPOST<SuccessResponse>('/battleteams/delete', { uuid, teamId });
+    }
+    
+    /**
+    * Set active battle team
+    */
+    static setActiveBattleTeam(uuid: string, teamId: string) {
+        return wingullPOST<SuccessResponse>('/battleteams/setactive', { uuid, teamId });
+    }
+
+    // ==================== PC MANAGEMENT ENDPOINTS ====================
+    
+    /**
+    * Move Pokemon between PC boxes and party
+    * Use box = -1 for party moves
+    */
+    static movePokemonInPC(uuid: string, data: {
+        sourceBox: number;
+        sourceIndex: number;
+        destinationBox: number;
+        destinationIndex: number;
+    }) {
+        console.log('Moving Pokemon with data:', { uuid, ...data });
+        return wingullPOST<SuccessResponse>('/pc/move', { uuid, ...data });
     }
 }

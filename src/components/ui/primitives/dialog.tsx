@@ -59,7 +59,7 @@ const DialogContent = React.forwardRef<
   }
   
   const closeButtonStyles = {
-    default: "text-surface-400 focus:ring-primary-300 ring-offset-surface-900 data-[state=open]:bg-surface-800",
+    default: "text-surface-400 focus:ring-primary-300 ring-offset-surface-900 data-[state=open]:bg-surface-800 absolute top-4 right-4 text-purple-300 hover:text-white rounded-full p-2 border shadow-lg transition-all duration-200",
     wingull: "text-secondary-400 focus:ring-secondary-300 ring-offset-secondary-950 data-[state=open]:bg-secondary-900",
   }
   
