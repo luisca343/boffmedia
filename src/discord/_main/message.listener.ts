@@ -24,8 +24,17 @@ export class MessageListener {
       return;
     }
 
-    // Check if the bot is in the same voice channel or can join
     const voiceChannel = message.member.voice.channel;
+    
+    // Check if the bot is in the same voice channel as the user
+    const botMember = message.guild?.members.cache.get(message.client.user.id);
+    if (!botMember?.voice?.channel) {
+      return;
+    }
+
+    if (botMember.voice.channelId !== voiceChannel.id) {
+      return;
+    }
     
     try {
       this.logger.log(`Playing audio for message: ${message.content} in channel: ${voiceChannel.name}`);
