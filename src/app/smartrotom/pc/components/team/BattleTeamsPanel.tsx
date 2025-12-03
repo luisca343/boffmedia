@@ -158,6 +158,11 @@ export default function BattleTeamsPanel({
     )
   }
 
+  return <>
+    
+  </>
+
+
   return (
     <div className="h-full flex flex-col space-y-3 overflow-y-auto">
       {/* Create Team Button */}
