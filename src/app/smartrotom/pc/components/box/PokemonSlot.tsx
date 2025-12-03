@@ -29,6 +29,7 @@ const ShinyIndicator = memo(() => (
     <FaStar className="text-white text-xs" />
   </div>
 ))
+ShinyIndicator.displayName = 'ShinyIndicator'
 
 // Separate component for gender indicator
 const GenderIndicator = memo(({ gender }: { gender: any }) => {
@@ -43,6 +44,7 @@ const GenderIndicator = memo(({ gender }: { gender: any }) => {
     </div>
   )
 })
+GenderIndicator.displayName = 'GenderIndicator'
 
 // Separate component for item indicator
 const ItemIndicator = memo(({ item }: { item: string }) => (
@@ -52,6 +54,7 @@ const ItemIndicator = memo(({ item }: { item: string }) => (
     </div>
   </div>
 ))
+ItemIndicator.displayName = 'ItemIndicator'
 
 // Main component with Gen 1 style
 const PokemonSlot = memo(function PokemonSlot({ 

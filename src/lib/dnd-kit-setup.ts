@@ -66,28 +66,30 @@ export const createCustomCollisionDetection = (): CollisionDetection => {
   }
 }
 
-// Hook for setting up DnD Kit sensors
-export const useDndSensors = (configs: SensorConfig[] = [DEFAULT_SENSOR_CONFIGS.pointer, DEFAULT_SENSOR_CONFIGS.keyboard]) => {
-  return useSensors(
-    ...configs.map(config => {
-      switch (config.type) {
-        case 'pointer':
-          return useSensor(PointerSensor, {
-            activationConstraint: config.activationConstraint,
-          })
-        case 'mouse':
-          return useSensor(MouseSensor, {
-            activationConstraint: config.activationConstraint,
-          })
-        case 'keyboard':
-          return useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-          })
-        default:
-          throw new Error(`Unknown sensor type: ${config.type}`)
-      }
-    })
-  )
+// Hook for setting up DnD Kit sensors with default configuration
+export function useDndSensors() {
+  const pointerSensor = useSensor(PointerSensor, {
+    activationConstraint: DEFAULT_SENSOR_CONFIGS.pointer.activationConstraint,
+  })
+  
+  const keyboardSensor = useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  })
+  
+  return useSensors(pointerSensor, keyboardSensor)
+}
+
+// Hook for setting up DnD Kit sensors with mouse instead of pointer
+export function useDndSensorsWithMouse() {
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: DEFAULT_SENSOR_CONFIGS.mouse.activationConstraint,
+  })
+  
+  const keyboardSensor = useSensor(KeyboardSensor, {
+    coordinateGetter: sortableKeyboardCoordinates,
+  })
+  
+  return useSensors(mouseSensor, keyboardSensor)
 }
 
 // Hook for managing active drag item state
@@ -167,19 +169,18 @@ export const COLLISION_STRATEGIES = {
   custom: createCustomCollisionDetection(),
 } as const
 
-// Utility function to create complete DnD setup
-export const createDndSetup = (options: {
+// Utility function to create complete DnD setup - renamed to avoid hook rules
+export function createDndContextConfig(options: {
   sensorConfigs?: SensorConfig[]
   collisionDetection?: CollisionDetection
   onDragStart?: (event: DragStartEvent) => void
   onDragEnd?: (event: DragEndEvent) => void
-}) => {
-  const sensors = useDndSensors(options.sensorConfigs)
-  const collisionDetection = options.collisionDetection || COLLISION_STRATEGIES.closestCenter
-  
+}) {
+  // Note: This function returns configuration, not hooks
+  // Components should call useDndSensors directly
   return {
-    sensors,
-    collisionDetection,
+    sensorConfigs: options.sensorConfigs,
+    collisionDetection: options.collisionDetection || COLLISION_STRATEGIES.closestCenter,
     onDragStart: options.onDragStart,
     onDragEnd: options.onDragEnd,
   }

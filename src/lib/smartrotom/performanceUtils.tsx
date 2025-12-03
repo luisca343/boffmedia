@@ -21,6 +21,7 @@ export const ConditionalMotion = memo(({
   const { motion } = require('framer-motion')
   return <motion.div {...motionProps}>{children}</motion.div>
 })
+ConditionalMotion.displayName = 'ConditionalMotion'
 
 // Hook to determine if animations should be enabled
 export function usePerformanceSettings() {
