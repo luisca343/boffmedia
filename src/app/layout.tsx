@@ -5,6 +5,9 @@ import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
 import type React from "react" // Import React
 
+// Force dynamic rendering for all pages since we use cookies for locale detection
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab",
   description: process.env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab"
