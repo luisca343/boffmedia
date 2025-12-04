@@ -72,7 +72,7 @@
     "next": "16.0.7",
     "next-auth": "^4.24.6",
     "next-i18next": "^15.2.0",
-    "next-intl": "^4.0.2",
+    "next-intl": "^4.5.8",
     "next-themes": "^0.3.0",
     "noise-map": "^1.1.0",
     "react": "19.2.1",

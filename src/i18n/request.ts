@@ -75,7 +75,8 @@ const getLocaleFromHeaders = async (): Promise<SupportedLocale> => {
       }
     }
   } catch (error) {
-    console.warn('Failed to read Accept-Language header:', error);
+    // During static generation, headers are not available - use default locale
+    // This is expected behavior and not an error
   }
   
   return DEFAULT_LOCALE;
@@ -90,8 +91,8 @@ const getLocaleFromCookies = async (): Promise<SupportedLocale | null> => {
     const localeCookie = cookieStore.get('NEXT_LOCALE')?.value;
     return localeCookie ? validateLocale(localeCookie) : null;
   } catch (error) {
-    // Cookies might not be available during static generation
-    console.warn('Failed to read locale cookie:', error);
+    // During static generation, cookies are not available - this is expected
+    // Return null to fall back to default locale
     return null;
   }
 };
