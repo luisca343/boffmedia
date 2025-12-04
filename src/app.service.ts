@@ -57,10 +57,22 @@ export class AppService {
         external: `${Math.round(process.memoryUsage().external / 1024 / 1024)}MB`,
       },
       responseTime: `${Date.now() - startTime}ms`,
+      cacheSize: Object.keys(this.imageCache).length,
     };
 
     // Set overall status based on critical services
     if (health.connections.database.status === 'error') {
+      health.status = 'degraded';
+    }
+
+    if (health.connections.wingullApi.status === 'error') {
+      health.status = 'degraded';
+    }
+
+    // Check memory usage
+    const heapUsedMB = process.memoryUsage().heapUsed / 1024 / 1024;
+    if (heapUsedMB > 1024) { // More than 1GB
+      console.warn('⚠️ High memory usage detected:', heapUsedMB.toFixed(2), 'MB');
       health.status = 'degraded';
     }
 

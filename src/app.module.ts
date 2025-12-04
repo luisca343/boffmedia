@@ -15,6 +15,7 @@ import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { NetfluisService } from '@api/smartrotom/netfluis/netfluis.service';
 import { NetfluisModule } from '@api/smartrotom/netfluis/netfluis.module';
 import { MinecraftMiddleware } from './minecraft.middleware';
+import { TimeoutMiddleware } from './_utils/TimeoutMiddleware';
 import { DocumentsModule } from '@api/smartrotom/documents/documents.module';
 import { ChatappController } from '@api/smartrotom/chatapp/chatapp.controller';
 import { ChatappModule } from '@api/smartrotom/chatapp/chatapp.module';
@@ -65,6 +66,7 @@ import { FicusAIModule } from '@api/smartrotom/ficusai/ficusai.module';
 import { AutomationModule } from './automation/automation.module';
 import { MySQL2Service } from './_utils/MySQL2Service';
 import { WingullSQL2Service } from './_utils/WingullSQL2Service';
+import { CircuitBreakerService } from './_utils/CircuitBreakerService';
 import { PokemonLogModule } from '@api/boffmedia/util/showdown/pokemon-log.module';
 import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.module';
 
@@ -117,7 +119,7 @@ import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.modul
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, // CommandsService, 
-     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService, MySQL2Service, WingullSQL2Service,
+     ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService, MySQL2Service, WingullSQL2Service, CircuitBreakerService,
     {
     provide: ConfigService,
     useClass: ConfigService,
@@ -125,10 +127,14 @@ import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.modul
     EventsFacadeService,
 
 ],
-  exports: [ConfigService]
+  exports: [ConfigService, CircuitBreakerService]
 })
 export class AppModule implements NestModule{
   configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(TimeoutMiddleware)
+      .forRoutes('*');
+    
     consumer
       .apply(MinecraftMiddleware)
       .exclude(
