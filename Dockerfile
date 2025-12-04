@@ -23,6 +23,4 @@ COPY boffmedia-a39cdd7a63c7.json ./boffmedia-a39cdd7a63c7.json
 COPY --from=build /app/dist ./dist
 EXPOSE 3000
 
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
 CMD ["npm", "run", "start:prod"]
