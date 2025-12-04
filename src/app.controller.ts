@@ -42,6 +42,11 @@ export class AppController {
     }
   }
 
+  @Get('health')
+  async getHealth() {
+    return this.appService.getHealth();
+  }
+
   @Get()
   getDBPort(): number {
     return this.appService.getDBPort();

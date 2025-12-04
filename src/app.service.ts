@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggingUtil } from './_utils/LoggingUtils';
 
@@ -8,6 +8,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import axios from 'axios';
 import { PokemonDataManagementService } from '@api/smartrotom/pokemon/services/pokemon-data-management.service';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { MySql2Database } from 'drizzle-orm/mysql2';
 
 @Injectable()
 export class AppService {
@@ -21,6 +23,7 @@ export class AppService {
   constructor(
     private configService: ConfigService,
     private pokemonService: PokemonDataManagementService,
+    @Inject(DRIZZLE) private db: MySql2Database,
   ) {
     this.loadCache();
   }
@@ -35,6 +38,82 @@ export class AppService {
 
   toggleLogging() {
     return LoggingUtil.getInstance().toggleLogging();
+  }
+
+  async getHealth() {
+    const startTime = Date.now();
+    const health = {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      connections: {
+        database: await this.checkDatabaseConnection(),
+        wingullApi: await this.checkWingullApi(),
+      },
+      memory: {
+        rss: `${Math.round(process.memoryUsage().rss / 1024 / 1024)}MB`,
+        heapTotal: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`,
+        heapUsed: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
+        external: `${Math.round(process.memoryUsage().external / 1024 / 1024)}MB`,
+      },
+      responseTime: `${Date.now() - startTime}ms`,
+    };
+
+    // Set overall status based on critical services
+    if (health.connections.database.status === 'error') {
+      health.status = 'degraded';
+    }
+
+    return health;
+  }
+
+  private async checkDatabaseConnection(): Promise<{ status: string; responseTime?: string; error?: string }> {
+    const startTime = Date.now();
+    try {
+      // Execute a simple query to check database connectivity
+      await this.db.execute('SELECT 1');
+      return {
+        status: 'ok',
+        responseTime: `${Date.now() - startTime}ms`,
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        error: error.message,
+      };
+    }
+  }
+
+  private async checkWingullApi(): Promise<{ status: string; responseTime?: string; error?: string }> {
+    const wingullApiUrl = process.env.WINGULL_API;
+    
+    if (!wingullApiUrl) {
+      return {
+        status: 'not_configured',
+      };
+    }
+
+    const startTime = Date.now();
+    try {
+      await axios.get(`${wingullApiUrl}/health`, {
+        timeout: 5000,
+      });
+      return {
+        status: 'ok',
+        responseTime: `${Date.now() - startTime}ms`,
+      };
+    } catch (error) {
+      if (error.code === 'ECONNABORTED') {
+        return {
+          status: 'timeout',
+          error: 'Request timeout after 5s',
+        };
+      }
+      return {
+        status: 'error',
+        error: error.message,
+      };
+    }
   }
 
   async blogicons() {
