@@ -28,10 +28,10 @@ import { BattleModule } from './api/battlesimulator/battle/battle.module';
 import { SharexModule } from './api/boffmedia/util/sharex/sharex.module';
 import { ArcadeModule } from '@api/smartrotom/arcade/arcade.module';
 import { ArcadeController } from '@api/smartrotom/arcade/arcade.controller';
-// import { DiscordService } from './discord/_main/discord.service';
-// import { DiscordModule } from './discord/_main/discord.module';
-// import { CommandsService } from './discord/_commands/commands.service';
-// import { CommandsModule } from './discord/_commands/commands.module';
+import { DiscordService } from './discord/_main/discord.service';
+import { DiscordModule } from './discord/_main/discord.module';
+import { CommandsService } from './discord/_commands/commands.service';
+import { CommandsModule } from './discord/_commands/commands.module';
 import { LigaModule } from '@api/smartrotom/liga/liga.module';
 import { ResponseService } from './api/_utils/response/response.service';
 import { ResponseModule } from './api/_utils/response/response.module';
@@ -91,8 +91,8 @@ import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.modul
     BattleModule,
     SharexModule,
     ArcadeModule,
-    // DiscordModule,
-    // CommandsModule,
+    DiscordModule,
+    CommandsModule,
     LigaModule,
     ResponseModule,
     LoggerModule,
@@ -116,7 +116,7 @@ import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.modul
     YoutubeModule
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
-  providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, // CommandsService, 
+  providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
      ShowdownGateway, BattleService, PlayerService, SmartrotomService, PokemonShowdownService, SpriteManifestService, MySQL2Service, WingullSQL2Service,
     {
     provide: ConfigService,

@@ -13,17 +13,6 @@ import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptio
 
 const bodyParser = require('body-parser');
 
-// Global error handlers to prevent 502 errors
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
-  // Don't exit the process, just log the error
-});
-
-process.on('uncaughtException', (error) => {
-  console.error('❌ Uncaught Exception:', error);
-  // Don't exit the process immediately, allow graceful handling
-});
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
