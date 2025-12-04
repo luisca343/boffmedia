@@ -42,6 +42,9 @@ importers:
       '@pkmn/client':
         specifier: ^0.6.25
         version: 0.6.33
+      '@pkmn/data':
+        specifier: ^0.10.3
+        version: 0.10.3
       '@pkmn/dex':
         specifier: ^0.9.34
         version: 0.9.38
@@ -1260,8 +1263,14 @@ packages:
   '@pkmn/client@0.6.33':
     resolution: {integrity: sha512-sleQ7Aqt/LHm6EGEfJT81Hvl2bXt52cbAcTg/CurAq0oHQwQb9gyI4cigooy8g0VP3N91hGVfnsV/uhmPxssWA==}
 
+  '@pkmn/data@0.10.3':
+    resolution: {integrity: sha512-GAYpGfdT1tjPN4rO5+1MU3m45H+JwtUB+VAGo790L3F+GkHmLKWxpWTNWMQWfHWZUNLUFywLi47nGXiRvxnUUQ==}
+
   '@pkmn/data@0.9.38':
     resolution: {integrity: sha512-bU1frHR5mnT7J5dLw90Pe3dMg4qJHh+NaP9L2JSylxq/CCIZxO4ZTWD8RWHkWG7ECGppGtt+XOKXC0CNL1FPnQ==}
+
+  '@pkmn/dex-types@0.10.3':
+    resolution: {integrity: sha512-om7H8vwHa7hUwN1p/LFY1ikeCEDKp25h9T70+MWXlxUPm4AswNit6LaP0t2h4kiyT4SR1/u1sgSFDjQgXY4pCQ==}
 
   '@pkmn/dex-types@0.9.38':
     resolution: {integrity: sha512-kzR+ib80JGaLMkNKCUAZ4Lf02Eg3FfkExoDKustWHqt30BC/SkR22aBdXm/Gbk8tnqPgRFSJRmCytaRI3scHBw==}
@@ -5464,6 +5473,8 @@ snapshots:
       '@ckeditor/ckeditor5-utils': 46.1.1
       ckeditor5: 46.1.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-editor-multi-root@46.1.1':
     dependencies:
@@ -5494,6 +5505,8 @@ snapshots:
     dependencies:
       '@ckeditor/ckeditor5-utils': 46.1.1
       es-toolkit: 1.39.5
+    transitivePeerDependencies:
+      - supports-color
 
   '@ckeditor/ckeditor5-enter@46.1.1':
     dependencies:
@@ -5780,8 +5793,6 @@ snapshots:
       '@ckeditor/ckeditor5-ui': 46.1.1
       '@ckeditor/ckeditor5-utils': 46.1.1
       ckeditor5: 46.1.1
-    transitivePeerDependencies:
-      - supports-color
 
   '@ckeditor/ckeditor5-restricted-editing@46.1.1':
     dependencies:
@@ -6455,9 +6466,17 @@ snapshots:
       '@pkmn/data': 0.9.38
       '@pkmn/protocol': 0.6.33
 
+  '@pkmn/data@0.10.3':
+    dependencies:
+      '@pkmn/dex-types': 0.10.3
+
   '@pkmn/data@0.9.38':
     dependencies:
       '@pkmn/dex-types': 0.9.38
+
+  '@pkmn/dex-types@0.10.3':
+    dependencies:
+      '@pkmn/types': 4.0.0
 
   '@pkmn/dex-types@0.9.38':
     dependencies:
