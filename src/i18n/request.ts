@@ -32,8 +32,8 @@ const isObject = (item: unknown): item is Record<string, any> => {
 };
 
 // Get system locale from Accept-Language header
-const getSystemLocale = (): string => {
-  const headersList = headers();
+const getSystemLocale = async (): Promise<string> => {
+  const headersList = await headers();
   const acceptLanguage = headersList.get('Accept-Language') || '';
   
   // Parse the Accept-Language header to get the preferred language
@@ -55,8 +55,8 @@ const getSystemLocale = (): string => {
 
 export default getRequestConfig(async () => {
   // Get locale from cookies or use system locale
-  const cookieStore = cookies();
-  const systemLocale = getSystemLocale();
+  const cookieStore = await cookies();
+  const systemLocale = await getSystemLocale();
   const locale = cookieStore.get('NEXT_LOCALE')?.value || systemLocale;
   const defaultLocale = 'en';
   
