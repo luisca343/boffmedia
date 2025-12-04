@@ -29,7 +29,6 @@ export class MySQL2Service {
         connectionLimit: 10,
         queueLimit: 0,
         connectTimeout: 10000,
-        acquireTimeout: 10000,
         enableKeepAlive: true,
         keepAliveInitialDelay: 0,
       });
@@ -37,16 +36,8 @@ export class MySQL2Service {
       this.db = drizzle(this.pool);
 
       // Test the connection
-      await new Promise((resolve, reject) => {
-        this.pool.getConnection((err, connection) => {
-          if (err) {
-            reject(err);
-          } else {
-            connection.release();
-            resolve(true);
-          }
-        });
-      });
+      const connection = await this.pool.getConnection();
+      connection.release();
 
       console.log('✅ Main database connection established successfully');
       this.isConnected = true;
