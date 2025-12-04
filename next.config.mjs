@@ -12,6 +12,16 @@ const nextConfig = {
     reactStrictMode: false,
     output: "standalone",
     
+    // Production optimizations
+    compress: true,
+    poweredByHeader: false,
+    generateEtags: true,
+    
+    // Enable experimental features for better performance
+    experimental: {
+        optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
+    },
+    
     typescript: {
         "ignoreBuildErrors": true
     },
@@ -49,8 +59,9 @@ const nextConfig = {
             }
         ]
     },
-    webpack: (config, { isServer }) => {
-        if (!isServer) {
+    webpack: (config, { isServer, dev }) => {
+        if (!isServer && !dev) {
+            // Only inline large assets in production
             config.module.rules.push({
                 test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$/,
                 use: {
