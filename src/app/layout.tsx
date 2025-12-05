@@ -5,6 +5,9 @@ import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
 import type React from "react" // Import React
 
+// Revalidate every 60 seconds for locale changes instead of forcing dynamic
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: process.env.NODE_ENV === "production" ? "BoffMedia" : "FicusLab",
   description: "BoffMedia",

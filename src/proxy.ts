@@ -5,7 +5,7 @@ import { getValidSubdomain } from '@/lib/subdomain';
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   // Clone the URL
   const url = req.nextUrl.clone();
 
@@ -24,3 +24,17 @@ export async function middleware(req: NextRequest) {
 
   return NextResponse.rewrite(url);
 }
+
+// Configure which paths should be processed by the middleware
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public files (images, etc.)
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+};

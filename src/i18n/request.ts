@@ -1,6 +1,11 @@
 import { getRequestConfig } from 'next-intl/server';
-import { cookies } from 'next/headers';
-import { headers } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+
+// Supported locales
+const SUPPORTED_LOCALES = ['en', 'es'] as const;
+const DEFAULT_LOCALE = 'es';
+
+type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 
 // Helper function for deep merging objects
 interface DeepMergeable {
@@ -31,34 +36,83 @@ const isObject = (item: unknown): item is Record<string, any> => {
   return item !== null && typeof item === 'object' && !Array.isArray(item);
 };
 
-// Get system locale from Accept-Language header
-const getSystemLocale = (): string => {
-  const headersList = headers();
-  const acceptLanguage = headersList.get('Accept-Language') || '';
+/**
+ * Validate and normalize locale
+ */
+const validateLocale = (locale: string | undefined): SupportedLocale => {
+  if (!locale) return DEFAULT_LOCALE;
   
-  // Parse the Accept-Language header to get the preferred language
-  const languages = acceptLanguage.split(',')
-    .map(lang => {
-      const [language, priority = '1.0'] = lang.trim().split(';q=');
-      return { language: language.split('-')[0], priority: parseFloat(priority) };
-    })
-    .sort((a, b) => b.priority - a.priority);
-  
-  // If we have a preferred language, use it
-  if (languages.length > 0) {
-    return languages[0].language;
+  const normalizedLocale = locale.toLowerCase().split('-')[0];
+  return SUPPORTED_LOCALES.includes(normalizedLocale as SupportedLocale) 
+    ? normalizedLocale as SupportedLocale 
+    : DEFAULT_LOCALE;
+};
+
+/**
+ * Get locale from Accept-Language header with fallback
+ */
+const getLocaleFromHeaders = async (): Promise<SupportedLocale> => {
+  try {
+    const headersList = await headers();
+    const acceptLanguage = headersList.get('Accept-Language') || '';
+    
+    // Parse Accept-Language header
+    const languages = acceptLanguage
+      .split(',')
+      .map(lang => {
+        const [language, priority = '1.0'] = lang.trim().split(';q=');
+        return { 
+          language: language.split('-')[0].toLowerCase(), 
+          priority: parseFloat(priority) 
+        };
+      })
+      .sort((a, b) => b.priority - a.priority);
+    
+    // Return first supported language
+    for (const { language } of languages) {
+      if (SUPPORTED_LOCALES.includes(language as SupportedLocale)) {
+        return language as SupportedLocale;
+      }
+    }
+  } catch (error) {
+    // During static generation, headers are not available - use default locale
+    // This is expected behavior and not an error
   }
   
-  // Fallback to 'en' if no language preference is detected
-  return 'en';
+  return DEFAULT_LOCALE;
+};
+
+/**
+ * Get locale from cookies with fallback
+ */
+const getLocaleFromCookies = async (): Promise<SupportedLocale | null> => {
+  try {
+    const cookieStore = await cookies();
+    const localeCookie = cookieStore.get('NEXT_LOCALE')?.value;
+    return localeCookie ? validateLocale(localeCookie) : null;
+  } catch (error) {
+    // During static generation, cookies are not available - this is expected
+    // Return null to fall back to default locale
+    return null;
+  }
+};
+
+/**
+ * Determine the current locale
+ */
+const determineLocale = async (): Promise<SupportedLocale> => {
+  // Try to get locale from cookie first (user preference)
+  const cookieLocale = await getLocaleFromCookies();
+  if (cookieLocale) return cookieLocale;
+  
+  // Fallback to Accept-Language header
+  const headerLocale = await getLocaleFromHeaders();
+  return headerLocale;
 };
 
 export default getRequestConfig(async () => {
-  // Get locale from cookies or use system locale
-  const cookieStore = cookies();
-  const systemLocale = getSystemLocale();
-  const locale = cookieStore.get('NEXT_LOCALE')?.value || systemLocale;
-  const defaultLocale = 'en';
+  // Determine locale with proper error handling
+  const locale = await determineLocale();
   
   // Define paths to import
   const paths = [
@@ -83,10 +137,13 @@ export default getRequestConfig(async () => {
   
   // Load translations for the current locale
   const imports = await Promise.all(
-    paths.map(path => import(`../../locales/${locale}/${path}`).catch(err => {
-      console.error(`Failed to load translation: ${path} for locale ${locale}`, err);
-      return { default: {} };
-    }))
+    paths.map(path => 
+      import(`../../locales/${locale}/${path}`)
+        .catch(err => {
+          console.warn(`Failed to load translation: ${path} for locale ${locale}`, err.message);
+          return { default: {} };
+        })
+    )
   );
   
   // Deep merge current locale messages
@@ -98,13 +155,16 @@ export default getRequestConfig(async () => {
   // If current locale is not the default, load default locale as fallback
   let messages = currentLocaleMessages;
   
-  if (locale !== defaultLocale) {
+  if (locale !== DEFAULT_LOCALE) {
     // Load default locale translations
     const defaultImports = await Promise.all(
-      paths.map(path => import(`../../locales/${defaultLocale}/${path}`).catch(err => {
-        console.error(`Failed to load translation: ${path} for default locale ${defaultLocale}`, err);
-        return { default: {} };
-      }))
+      paths.map(path => 
+        import(`../../locales/${DEFAULT_LOCALE}/${path}`)
+          .catch(err => {
+            console.warn(`Failed to load translation: ${path} for default locale ${DEFAULT_LOCALE}`, err.message);
+            return { default: {} };
+          })
+      )
     );
     
     // Deep merge default locale messages
@@ -119,6 +179,6 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages
+    messages,
   };
 });
