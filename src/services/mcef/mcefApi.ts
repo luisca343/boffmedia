@@ -75,3 +75,45 @@ export async function darCaja(objetos: ObjetoMC[]): Promise<QueryResult<any>> {
     }
     return result;
 }
+
+export interface ScreenshotOptions {
+  includeUI?: boolean;      // Include Minecraft HUD/UI elements
+  format?: 'png' | 'jpeg';  // Image format
+  quality?: number;         // JPEG quality (1-100), ignored for PNG
+}
+
+export interface ScreenshotResponse {
+  success: boolean;
+  image?: string;  // Data URL (data:image/png;base64,...)
+  error?: string;
+}
+
+/**
+ * Captures a screenshot of the Minecraft game window
+ * @param options Screenshot options
+ * @returns Promise with the screenshot as a base64 data URL
+ */
+export async function takeScreenshot(
+  options: ScreenshotOptions = {}
+): Promise<ScreenshotResponse> {
+  const result = await mcefQuery<{status: string, data: string}>('TAKE_SCREENSHOT', {
+    includeUI: options.includeUI ?? true,
+    format: options.format ?? 'png',
+    quality: options.quality ?? 90
+  });
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  const data  = result.data as {status: string, data: string};
+
+
+  return {
+    success: true,
+    image: data.data  // Data URL from Java
+  };
+}

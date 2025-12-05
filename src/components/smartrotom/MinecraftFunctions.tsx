@@ -1,8 +1,11 @@
+import { takeScreenshot } from "@/services/mcef/mcefApi";
 import { useRouter } from "next/navigation";
+import { useCameraGalleryStore } from "@/stores/cameraGalleryStore";
 
 declare global {
     interface Window {
         openDex: (species:string, form:string) => void;
+        takeScreenshot: () => Promise<void>;
         refresh: () => void;
     }
 }
@@ -22,7 +25,21 @@ function sound(name: string) {
 
 export function MinecraftFunctions(){
     const router = useRouter()
+    const { addScreenshot } = useCameraGalleryStore()
+    
     window.openDex = (species: string, form:string) => openDex(species, form);
+    window.takeScreenshot = async () => {
+        const result = await takeScreenshot({
+            includeUI: false,
+            format: 'png',
+            quality: 90
+        });
+        if (result.success && result.image) {
+            addScreenshot(result.image);
+        } else {
+            alert('Error taking screenshot: ' + result.error);
+        }
+    };
     window.refresh = () => refresh();
 
 
