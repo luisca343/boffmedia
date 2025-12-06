@@ -101,7 +101,8 @@ export class ChatappController {
 
     const createMessageRequest: CreateChatMessageRequest = {
       uuid: createMessageDto.uuid,
-      message: createMessageDto.message
+      message: createMessageDto.message,
+      type: createMessageDto.type
     };
 
     return await this.chatappFacadeService.createMessage(chatIdNum, createMessageRequest);

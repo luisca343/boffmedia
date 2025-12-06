@@ -117,17 +117,17 @@ export class GroupService {
     } else if (chat.type === 1) {
       // Single user chat (saved messages)
       chatName = 'Mensajes guardados';
-      chatImage = `https://crafatar.com/avatars/${requestingUserUuid}`;
+      chatImage = `https://mc-heads.net/avatar/${requestingUserUuid}`;
     } else if (chat.type === 2) {
       // Private chat - get other user's name
       const otherPlayerUUID = chat.name.split('_').filter(name => name !== requestingUserUuid)[0];
       if (otherPlayerUUID) {
         const otherUser = await this.chatUserRepository.findUserByUuid(otherPlayerUUID);
         chatName = otherUser?.username || 'Unknown User';
-        chatImage = `https://crafatar.com/avatars/${otherPlayerUUID}`;
+        chatImage = `https://mc-heads.net/avatar/${otherPlayerUUID}`;
       } else {
         chatName = 'Private Chat';
-        chatImage = `https://crafatar.com/avatars/${requestingUserUuid}`;
+        chatImage = `https://mc-heads.net/avatar/${requestingUserUuid}`;
       }
     }
 
@@ -139,12 +139,7 @@ export class GroupService {
       image: chatImage,
       createdAt: chat.createdAt,
       updatedAt: chat.updatedAt,
-      messages: messages.map(msg => ({
-        id: msg.id,
-        content: msg.content,
-        createdAt: msg.createdAt,
-        uuid: msg.uuid
-      })),
+      messages,
       unread: 0, // TODO: Implement unread count logic
       members: members
     };

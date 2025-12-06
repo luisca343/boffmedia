@@ -10,6 +10,7 @@ import { Group } from './entities/group.entity';
 export interface CreateChatMessageRequest {
   uuid: string;
   message: string;
+type: string;
 }
 
 @Injectable()
@@ -70,12 +71,11 @@ export class ChatappFacadeService {
     try {
       const { messageId, message } = await this.messageService.createMessage(
         chatId,
-        createMessageRequest.message,
-        createMessageRequest.uuid
+        createMessageRequest
       );
 
       // Emit message to all chat members via WebSocket
-      await this.emitMessageToChat(chatId, messageId, createMessageRequest);
+      await this.emitMessageToChat(chatId, messageId, message, createMessageRequest);
 
       return message;
     } catch (error) {
@@ -196,29 +196,31 @@ export class ChatappFacadeService {
   private async emitMessageToChat(
     chatId: number, 
     messageId: number, 
-    messageRequest: CreateChatMessageRequest
+    message: RotomMessage,
+    createMessageRequest: CreateChatMessageRequest
   ): Promise<void> {
     try {
       // Get chat members for targeted message sending
       const chatMembers = chatId === 1 
         ? Array.from(this.socketGateway.users.values()) 
-        : await this.getChatMembersForSocket(chatId, messageRequest.uuid);
+        : await this.getChatMembersForSocket(chatId, createMessageRequest.uuid);
 
-      let sentToSelf = false;
+      let sentToSelf = message.type === 'image' ? true : false;
 
       for (const member of chatMembers) {
         const socket = this.socketGateway.users.get(member.uuid);
         
-        if (socket && (member.uuid !== messageRequest.uuid || !sentToSelf)) {
+        if (socket && (member.uuid !== createMessageRequest.uuid || !sentToSelf)) {
           this.socketGateway.server.to(socket.socketId).emit('chat:message', {
             chatId,
             id: messageId,
-            content: messageRequest.message,
+            type: createMessageRequest.type,
+            content: message.text,
             createdAt: new Date(),
-            uuid: messageRequest.uuid
+            uuid: createMessageRequest.uuid
           });
 
-          if (member.uuid === messageRequest.uuid) {
+          if (member.uuid === createMessageRequest.uuid) {
             sentToSelf = true;
           }
         }
