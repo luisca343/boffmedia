@@ -35,7 +35,7 @@ export function MinecraftFunctions(){
             quality: 90
         });
         if (result.success && result.image) {
-            addScreenshot(result.image);
+            addScreenshot(result.image, result.location, result.entities);
         } else {
             alert('Error taking screenshot: ' + result.error);
         }

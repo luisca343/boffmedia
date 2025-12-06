@@ -82,9 +82,67 @@ export interface ScreenshotOptions {
   quality?: number;         // JPEG quality (1-100), ignored for PNG
 }
 
+export interface Position {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface BlockInfo {
+  x: number;
+  y: number;
+  z: number;
+  block: string;
+}
+
+export interface LocationData {
+  playerPosition: Position;
+  lookingAt?: BlockInfo;
+}
+
+export interface PokemonEntity {
+  type: 'pokemon';
+  species: string;
+  dex: number;
+  form: string;
+  palette: string;
+  distance: number;
+  coverage: number;
+  position: Position;
+}
+
+export interface StatueEntity {
+  type: 'statue';
+  species: string;
+  dex: number;
+  distance: number;
+  coverage: number;
+  position: Position;
+}
+
+export interface NPCEntity {
+  type: 'npc';
+  name: string;
+  distance: number;
+  coverage: number;
+  position: Position;
+}
+
+export interface OtherEntity {
+  type: 'other';
+  name: string;
+  distance: number;
+  coverage: number;
+  position: Position;
+}
+
+export type DetectedEntity = PokemonEntity | StatueEntity | OtherEntity | NPCEntity;
+
 export interface ScreenshotResponse {
   success: boolean;
   image?: string;  // Data URL (data:image/png;base64,...)
+  location?: LocationData;
+  entities?: DetectedEntity[];
   error?: string;
 }
 
@@ -96,7 +154,11 @@ export interface ScreenshotResponse {
 export async function takeScreenshot(
   options: ScreenshotOptions = {}
 ): Promise<ScreenshotResponse> {
-  const result = await mcefQuery<{status: string, data: string}>('TAKE_SCREENSHOT', {
+  const result = await mcefQuery<{
+    image: string;
+    location: LocationData;
+    entities: DetectedEntity[];
+  }>('TAKE_SCREENSHOT', {
     includeUI: options.includeUI ?? true,
     format: options.format ?? 'png',
     quality: options.quality ?? 90
@@ -109,11 +171,74 @@ export async function takeScreenshot(
     };
   }
 
-  const data  = result.data as {status: string, data: string};
+  const data = result.data  as ScreenshotResponse
 
 
   return {
     success: true,
-    image: data.data  // Data URL from Java
+    image: data.image,
+    location: data.location,
+    entities: data.entities
+  } as ScreenshotResponse
+}
+
+export interface ZoomLevelResponse {
+  success: boolean;
+  level?: number;
+  multiplier?: number;
+  factor?: number;
+  error?: string;
+}
+
+/**
+ * Gets the current zoom level from Minecraft
+ * @returns Promise with the current zoom level (0-4)
+ */
+export async function getZoomLevel(): Promise<ZoomLevelResponse> {
+  const result = await mcefQuery<{
+    level: number;
+    multiplier: number;
+    factor: number;
+  }>('GET_ZOOM_LEVEL');
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  return {
+    success: true,
+    level: result.data?.level,
+    multiplier: result.data?.multiplier,
+    factor: result.data?.factor
+  };
+}
+
+/**
+ * Sets the zoom level in Minecraft
+ * @param level Zoom level (0-4): 0 = 1x, 1 = 1.5x, 2 = 2x, 3 = 3x, 4 = 4x
+ * @returns Promise with the new zoom level
+ */
+export async function setZoomLevel(level: number): Promise<ZoomLevelResponse> {
+  const result = await mcefQuery<{
+    level: number;
+    multiplier: number;
+    factor: number;
+  }>('SET_ZOOM_LEVEL', { level });
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  return {
+    success: true,
+    level: result.data?.level,
+    multiplier: result.data?.multiplier,
+    factor: result.data?.factor
   };
 }
