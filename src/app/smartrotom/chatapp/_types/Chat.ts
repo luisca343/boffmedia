@@ -1,3 +1,10 @@
+import type { Screenshot } from "@/stores/cameraGalleryStore";
+
+export interface ImageMessageData {
+        screenshot: Screenshot;
+        caption?: string;
+}
+
 export type Message = {
     id: number;
     content: string;
