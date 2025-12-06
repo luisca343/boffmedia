@@ -30,8 +30,8 @@ export interface ImageMessageData {
         timestamp: number;
         location?: ImageLocation;
         entities?: ImageEntity[];
+        caption?: string;
     };
-    caption?: string;
 }
 
 export type Message = {

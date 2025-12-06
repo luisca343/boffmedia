@@ -1,6 +1,7 @@
 import { getSmartRotomUser, strToTime } from "@/lib/utils"
 import type { Message as MessageType, ImageMessageData } from "../_types/Chat"
-import { MapPin, Users } from "lucide-react"
+import { MapPin, Users, ChevronDown } from "lucide-react"
+import { useState } from "react"
 
 export function parseSystemMessage(message: MessageType) {
   if (message.type === "call") return `Llamada de ${message.content} segundos`
@@ -140,7 +141,7 @@ export function ImageMessage({
   // New DB format: { imageUrl, meta: { id, timestamp, location?, entities? }, caption? }
   const imageUrl = imageData.imageUrl
   const meta = imageData.meta
-  const caption = imageData.caption
+  const caption = imageData.meta.caption
 
   const getBubbleShape = () => {
     if (isSender) {
@@ -190,28 +191,79 @@ export function ImageMessage({
               <span className="break-words text-neutral-800">{caption}</span>
             </div>
           )}
+
           {(meta?.location || (meta?.entities && meta.entities.length > 0)) && (
-            <div className="px-3 py-2 border-t border-black/10 text-xs space-y-1">
-              {meta?.location && (
-                <div className="flex items-center gap-1 text-neutral-700">
-                  <MapPin className="h-3 w-3" />
-                  <span>
-                    X: {meta.location.playerPosition.x.toFixed(0)}, Y: {" "}
-                    {meta.location.playerPosition.y.toFixed(0)}, Z: {" "}
-                    {meta.location.playerPosition.z.toFixed(0)}
-                  </span>
-                </div>
-              )}
-              {meta?.entities && meta.entities.length > 0 && (
-                <div className="flex items-center gap-1 text-neutral-700">
-                  <Users className="h-3 w-3" />
-                  <span>{meta.entities.length} entidad{meta.entities.length !== 1 ? "es" : ""}</span>
-                </div>
-              )}
-            </div>
+            <MetaDropdown meta={meta} />
           )}
         </div>
       </div>
+    </div>
+  )
+}
+
+function MetaDropdown({ meta }: { meta: ImageMessageData['meta'] }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="px-3 py-2 border-t border-black/10 text-xs bg-transparent">
+      <button
+        type="button"
+        onClick={() => setOpen((s) => !s)}
+        className="w-full flex items-center justify-between gap-2 text-neutral-600 px-2 py-1 hover:bg-black/5 rounded"
+      >
+        <div className="flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          <span className="font-medium">Detalles</span>
+        </div>
+        <div className="text-neutral-500 truncate max-w-[160px]">{meta?.id}</div>
+        <ChevronDown className={`h-4 w-4 transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div className="mt-2 space-y-2 text-neutral-700">
+          {meta?.timestamp && (
+            <div className="text-neutral-500 text-[11px]">{new Date(meta.timestamp).toLocaleString()}</div>
+          )}
+
+          {meta?.location && (
+            <div className="flex items-start gap-2">
+              <MapPin className="h-4 w-4 mt-0.5 text-neutral-600" />
+              <div className="leading-tight text-neutral-700">
+                <div>
+                  <span className="font-medium">Jugador:</span>{" "}
+                  X: {meta.location.playerPosition.x.toFixed(1)}, Y: {meta.location.playerPosition.y.toFixed(1)}, Z: {meta.location.playerPosition.z.toFixed(1)}
+                </div>
+                <div className="text-neutral-600 text-[12px]">
+                  <span className="font-medium">Mirando a:</span>{" "}
+                  X: {meta.location.lookingAt.x.toFixed(1)}, Y: {meta.location.lookingAt.y.toFixed(1)}, Z: {meta.location.lookingAt.z.toFixed(1)}
+                  {meta.location.lookingAt.block ? <span>{" — "}{meta.location.lookingAt.block}</span> : null}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {meta?.entities && meta.entities.length > 0 && (
+            <div>
+              <div className="text-neutral-600 font-medium text-[12px] mb-1">Entidades ({meta.entities.length})</div>
+              <ul className="space-y-1">
+                {meta.entities.map((e, i) => (
+                  <li key={i} className="flex items-center justify-between text-neutral-700">
+                    <div className="truncate">
+                      <div className="font-medium">{e.name}</div>
+                      <div className="text-neutral-500 text-[12px] truncate">
+                        {e.type} • {e.distance}m • {e.coverage}%
+                      </div>
+                    </div>
+                    <div className="ml-3 text-neutral-500 text-[12px]">
+                      {`[${e.position.x.toFixed(1)}, ${e.position.y.toFixed(1)}, ${e.position.z.toFixed(1)}]`}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

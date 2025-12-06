@@ -84,7 +84,7 @@ export function Chat({
   }
 
   function sendImage(screenshot: any, caption?: string) {
-    const imageData: any = { screenshot, caption }
+    const imageData: any = { caption, screenshot }
 
     ChatAppService
       .createMessage(chat.id, {
