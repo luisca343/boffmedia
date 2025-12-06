@@ -85,7 +85,7 @@ export function Message({
       >
         {sender !== "user" && img && isLastInSequence && (
           <img
-            src={`https://crafatar.com/avatars/${message.uuid}`}
+            src={`https://mc-heads.net/avatar/${message.uuid}`}
             alt={`profile picture for ${message.uuid}`}
             className="w-6 h-6 rounded-full absolute -left-4 -bottom-2"
           />
@@ -184,11 +184,12 @@ export function ImageMessage({
           <img
             src={imageUrl}
             alt="Screenshot"
-            className="w-full max-w-md object-cover"
+            className="w-full object-contain"
+            style={{ maxHeight: caption && caption.length > 100 ? '300px' : '500px' }}
           />
           {caption && (
-            <div className="px-4 py-2">
-              <span className="break-words text-neutral-800">{caption}</span>
+            <div className="px-4 py-2 max-h-32 overflow-y-auto">
+              <p className="break-words whitespace-pre-wrap text-neutral-800 leading-relaxed">{caption}</p>
             </div>
           )}
 
@@ -246,19 +247,24 @@ function MetaDropdown({ meta }: { meta: ImageMessageData['meta'] }) {
             <div>
               <div className="text-neutral-600 font-medium text-[12px] mb-1">Entidades ({meta.entities.length})</div>
               <ul className="space-y-1">
-                {meta.entities.map((e, i) => (
-                  <li key={i} className="flex items-center justify-between text-neutral-700">
-                    <div className="truncate">
-                      <div className="font-medium">{e.name}</div>
-                      <div className="text-neutral-500 text-[12px] truncate">
-                        {e.type} • {e.distance}m • {e.coverage}%
+                {meta.entities.map((e, i) => {
+                  const ent: any = e
+                  const isNPC = ent.type === "npc"
+                  const title = isNPC ? ent.name : ent.species || ent.name || "Unknown"
+                  return (
+                    <li key={i} className="flex items-center justify-between text-neutral-700">
+                      <div className="truncate">
+                        <div className="font-medium">{title}</div>
+                        <div className="text-neutral-500 text-[12px] truncate">
+                          {ent.type} {ent.type === "pokemon" && ent.dex ? `• #${ent.dex}` : ""} • {ent.distance}m • {ent.coverage}%
+                        </div>
                       </div>
-                    </div>
-                    <div className="ml-3 text-neutral-500 text-[12px]">
-                      {`[${e.position.x.toFixed(1)}, ${e.position.y.toFixed(1)}, ${e.position.z.toFixed(1)}]`}
-                    </div>
-                  </li>
-                ))}
+                      <div className="ml-3 text-neutral-500 text-[12px]">
+                        {`[${ent.position.x.toFixed(1)}, ${ent.position.y.toFixed(1)}, ${ent.position.z.toFixed(1)}]`}
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           )}

@@ -19,8 +19,19 @@ export interface ImageEntity {
     distance: number;
     coverage: number;
     position: Position;
-    type: string;
+}
+
+export interface NPCEntity extends ImageEntity {
+    type: 'npc';
     name: string;
+}
+
+export interface PokemonEntity extends ImageEntity {
+    type: 'pokemon';
+    species: string;
+    dex: number;
+    form: string;
+    palette: string;
 }
 
 export interface ImageMessageData {
@@ -29,7 +40,7 @@ export interface ImageMessageData {
         id: string;
         timestamp: number;
         location?: ImageLocation;
-        entities?: ImageEntity[];
+        entities?: (NPCEntity | PokemonEntity)[];
         caption?: string;
     };
 }
