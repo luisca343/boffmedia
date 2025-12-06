@@ -83,25 +83,8 @@ export function Chat({
       })
   }
 
-  function sendImage(screenshot: Screenshot, caption?: string) {
-    const imageData: ImageMessageData = {
-      screenshot,
-      caption,
-    }
-
-    const newMessage: MessageType = {
-      id: Date.now(),
-      content: JSON.stringify(imageData),
-      createdAt: new Date().toISOString(),
-      uuid: getSmartRotomUser(session).uuid,
-      chatId: chat.id,
-      type: "image",
-    }
-
-    setChat((prev) => ({
-      ...prev,
-      messages: [newMessage, ...prev.messages],
-    }))
+  function sendImage(screenshot: any, caption?: string) {
+    const imageData: any = { screenshot, caption }
 
     ChatAppService
       .createMessage(chat.id, {

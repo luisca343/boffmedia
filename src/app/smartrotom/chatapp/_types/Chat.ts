@@ -1,8 +1,37 @@
 import type { Screenshot } from "@/stores/cameraGalleryStore";
 
+export interface Position {
+    x: number;
+    y: number;
+    z: number;
+}
+
+export interface LookingAt extends Position {
+    block?: string;
+}
+
+export interface ImageLocation {
+    playerPosition: Position;
+    lookingAt: LookingAt;
+}
+
+export interface ImageEntity {
+    distance: number;
+    coverage: number;
+    position: Position;
+    type: string;
+    name: string;
+}
+
 export interface ImageMessageData {
-        screenshot: Screenshot;
-        caption?: string;
+    imageUrl: string;
+    meta: {
+        id: string;
+        timestamp: number;
+        location?: ImageLocation;
+        entities?: ImageEntity[];
+    };
+    caption?: string;
 }
 
 export type Message = {
