@@ -42,13 +42,15 @@ export class MessageService {
     console.log(`Message type: ${createMessageRequest.type}`);
     console.log(`Message content (truncated): ${createMessageRequest.message.substring(0, 200)}...`);
 
-    return;
+    
     // If message is an image payload, parse it and save the decoded image to disk
     let contentToStore = createMessageRequest.message;
     if (createMessageRequest.type === 'image') {
       try {
         const parsed = JSON.parse(createMessageRequest.message);
         const screenshot = parsed?.screenshot;
+        const caption = parsed?.caption;
+
         if (screenshot && typeof screenshot.image === 'string') {
           const matches = screenshot.image.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
           if (matches) {
@@ -67,7 +69,10 @@ export class MessageService {
 
             const publicUrl = `/uploads/chat-screenshots/${filename}`;
 
-            const meta = { ...screenshot };
+            const meta: Record<string, unknown> = { ...screenshot };
+            if (caption !== undefined) {
+              meta.caption = caption;
+            }
             delete meta.image;
 
             contentToStore = JSON.stringify({ imageUrl: publicUrl, meta });
