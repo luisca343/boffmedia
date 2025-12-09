@@ -177,6 +177,14 @@ export class WingullController {
   async sendMessage(@Body() { uuid, message }: { uuid: string, message: string }) {
     return await this.wingullFacadeService.sendMessage(uuid, message);
   }
+
+  @Post('globalchat')
+  @ApiOperation({ summary: 'Send message to player' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Message sent successfully.' })
+  @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Failed to send message.' })
+  async globalchat(@Body() { uuid, message }: { uuid: string, message: string }) {
+    return await this.wingullFacadeService.globalchat(uuid, message);
+  }
   
   @Post('givePokemon')
   @ApiOperation({ summary: 'Give a Pokémon to a player' })

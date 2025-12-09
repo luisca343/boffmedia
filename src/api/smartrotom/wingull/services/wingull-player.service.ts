@@ -77,6 +77,16 @@ export class WingullPlayerService {
       throw new Error(`Message sending failed: ${error.message}`);
     }
   }
+
+  async globalchat(uuid: string, message: string): Promise<any> {
+    try {
+      const request: MessageRequestDto = { uuid, message };
+      return await this.wingullPlayerRepository.globalchatInAPI(request);
+    } catch (error) {
+      console.error(`Failed to send global chat message for ${uuid}:`, error);
+      throw new Error(`Global chat message sending failed: ${error.message}`);
+    }
+  }
   
   async givePokemon(uuid: string, pokespec: string, sendMessage: boolean = true): Promise<any> {
     try {

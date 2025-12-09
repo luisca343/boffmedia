@@ -190,6 +190,34 @@ export class WingullPlayerRepository implements IWingullPlayerRepository {
     }
   }
 
+  async globalchatInAPI(request: MessageRequestDto): Promise<any> {
+    if (!request.uuid || request.uuid.trim() === '') {
+      throw new Error('UUID is required for sending global chat message');
+    }
+    if (!request.message || request.message.trim() === '') {
+      throw new Error('Message is required');
+    }
+    if (!this.WINGULL_API_BASE_URL) {
+      throw new Error('WINGULL_API environment variable is not configured');
+    }
+    try {
+      const response: AxiosResponse = await axios.post(
+        `${this.WINGULL_API_BASE_URL}/globalchat`,
+        request,
+        {
+          timeout: this.DEFAULT_TIMEOUT,
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      console.error(`Failed to send global chat message for UUID ${request.uuid}:`, error);
+      throw new Error(`Global chat message sending failed: ${error.message}`);
+    }
+  }
+
   async givePokemonInAPI(request: PokemonGiveRequestDto): Promise<any> {
     if (!request.uuid || request.uuid.trim() === '') {
       throw new Error('UUID is required for giving Pokémon');

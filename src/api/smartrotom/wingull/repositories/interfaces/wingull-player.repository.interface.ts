@@ -15,6 +15,7 @@ export interface IWingullPlayerRepository {
   updateDexInAPI(uuid: string): Promise<SuccessResponse>;
   getQuestsFromAPI(uuid: string): Promise<any>;
   sendMessageInAPI(request: MessageRequestDto): Promise<SuccessResponse>;
+  globalchatInAPI(request: MessageRequestDto): Promise<SuccessResponse>;
   givePokemonInAPI(request: PokemonGiveRequestDto): Promise<SuccessResponse>;
   giveItemsInAPI(uuid: string, items: Array<{ id: string, amount: number, display_name?: string, lore?: string[] }>): Promise<SuccessResponse>;
   getBattleTeamsFromAPI(uuid: string): Promise<any>;

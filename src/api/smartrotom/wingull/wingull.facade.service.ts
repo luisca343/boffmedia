@@ -113,6 +113,15 @@ export class WingullFacadeService {
       throw new Error(`Failed to send message: ${error.message}`);
     }
   }
+
+  async globalchat(uuid: string, message: string): Promise<any> {
+    try {
+      return await this.wingullPlayerService.globalchat(uuid, message);
+    } catch (error) {
+      console.error(`Error sending global chat message for ${uuid}:`, error);
+      throw new Error(`Failed to send global chat message: ${error.message}`);
+    }
+  }
   
   async givePokemon(uuid: string, pokespec: string, sendMessage: boolean = true): Promise<any> {
     try {
