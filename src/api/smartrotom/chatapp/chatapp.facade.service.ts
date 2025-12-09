@@ -242,7 +242,7 @@ export class ChatappFacadeService {
         ? Array.from(this.socketGateway.users.values()) 
         : await this.getChatMembersForSocket(chatId, createMessageRequest.uuid);
 
-      let sentToSelf = message.type === 'image' ? true : false;
+      let sentToSelf = true;
 
       for (const member of chatMembers) {
         const socket = this.socketGateway.users.get(member.uuid);
