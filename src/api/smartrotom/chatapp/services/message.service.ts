@@ -65,15 +65,23 @@ export class MessageService {
             const publicUrl = `/uploads/chat-screenshots/${filename}`;
 
             const meta: Record<string, unknown> = { ...screenshot };
+            delete meta.image;
             if (caption !== undefined) {
               meta.caption = caption;
             }
-            delete meta.image;
 
             contentToStore = JSON.stringify({ imageUrl: publicUrl, meta });
             console.log(`Saved chat image to ${filePath}`);
           } else {
-            console.warn('Image payload did not match data URL pattern');
+            // Image is already a URL path, not base64
+            const meta: Record<string, unknown> = { ...screenshot };
+            delete meta.image;
+            if (caption !== undefined) {
+              meta.caption = caption;
+            }
+            
+            contentToStore = JSON.stringify({ imageUrl: screenshot.image, meta });
+            console.log(`Using existing image URL: ${screenshot.image}`);
           }
         } else {
           console.warn('Image payload missing screenshot.image');
