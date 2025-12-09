@@ -6,6 +6,8 @@ import type { ChatData, Message as MessageType, ImageMessageData } from "../_typ
 import { Phone, Send, X, Image as ImageIcon } from "lucide-react"
 import { Input } from "@/components/ui/primitives/input"
 import { ImageGalleryPicker } from "./ImageGalleryPicker"
+import { EmojiPicker } from "./EmojiPicker"
+import { StickerPicker } from "./StickerPicker"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/primitives/button"
@@ -31,6 +33,7 @@ export function Chat({
   const { session } = useBoffSession()
 
   const messagesStartRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const scrollToBottom = () => {
     messagesStartRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
@@ -50,10 +53,28 @@ export function Chat({
     }
   }, [activeChat, chats, socket])
 
+  function isEmojiOnly(text: string): boolean {
+    // Remove all whitespace first
+    const trimmed = text.trim()
+    if (trimmed.length === 0) return false
+    
+    // Match emojis, emoji sequences, and variation selectors
+    // This regex matches most emojis including compound emojis with ZWJ
+    const emojiRegex = /[\p{Emoji}\u200d\ufe0f]/gu
+    const textWithoutEmojis = trimmed.replace(emojiRegex, '').trim()
+    console.log("Text without emojis:", textWithoutEmojis);
+    
+    // If nothing remains after removing emojis, it's emoji-only
+    return textWithoutEmojis.length === 0
+  }
+
   function sendMessage() {
     if (!message.trim()) {
       return
     }
+
+    const messageType = isEmojiOnly(message) ? "emoji" : "text"
+    
 
     const newMessage: MessageType = {
       id: Date.now(), // Temporary ID
@@ -61,7 +82,7 @@ export function Chat({
       createdAt: new Date().toISOString(),
       uuid: getSmartRotomUser(session).uuid,
       chatId: chat.id,
-      type: "text",
+      type: messageType
     }
 
     setChat((prev) => ({
@@ -73,6 +94,7 @@ export function Chat({
       .createMessage(chat.id, {
         message: message,
         uuid: getSmartRotomUser(session).uuid,
+        type: messageType === "emoji" ? CreateMessageDto.type.EMOJI : CreateMessageDto.type.TEXT,
       })
       .then(() => {
         setMessage("")
@@ -105,6 +127,41 @@ export function Chat({
     ChatAppService.initiateCall(chat.id, { chatId: chat.id, uuid: getSmartRotomUser(session).uuid }).then((res) => {
       if (res.error) return toast.error(res.error)
     })
+  }
+
+  function handleEmojiSelect(emoji: string) {
+    setMessage((prev) => prev + emoji)
+    inputRef.current?.focus()
+  }
+
+  function sendSticker(stickerPath: string) {
+    const newMessage: MessageType = {
+      id: Date.now(),
+      content: stickerPath,
+      createdAt: new Date().toISOString(),
+      uuid: getSmartRotomUser(session).uuid,
+      chatId: chat.id,
+      type: "sticker"
+    }
+
+    setChat((prev) => ({
+      ...prev,
+      messages: [newMessage, ...prev.messages],
+    }))
+
+    ChatAppService
+      .createMessage(chat.id, {
+        message: stickerPath,
+        uuid: getSmartRotomUser(session).uuid,
+        type: CreateMessageDto.type.STICKER,
+      })
+      .then(() => {
+        console.log("Sticker sent successfully")
+      })
+      .catch((error) => {
+        console.error("Failed to send sticker:", error)
+        toast.error("Failed to send sticker. Please try again.")
+      })
   }
 
   return (
@@ -154,7 +211,10 @@ export function Chat({
         >
           <ImageIcon className="h-5 w-5" />
         </Button>
+        <StickerPicker onStickerSelect={sendSticker} />
+        <EmojiPicker onEmojiSelect={handleEmojiSelect} />
         <Input
+          ref={inputRef}
           variant="neutral"
           value={message}
           onChange={(e) => setMessage(e.target.value)}

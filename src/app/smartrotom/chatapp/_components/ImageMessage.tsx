@@ -34,7 +34,7 @@ export function ImageMessage({
     try {
       addScreenshot(
         imageUrl,
-        meta?.location,
+        meta?.location as any,
         meta?.entities
       )
       toast.success("Imagen guardada en la galería")

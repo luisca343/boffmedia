@@ -3,6 +3,8 @@ import type { Message as MessageType, ImageMessageData } from "../_types/Chat"
 import { SystemMessage } from "./SystemMessage"
 import { ImageMessage } from "./ImageMessage"
 import { TextMessage } from "./TextMessage"
+import { EmojiMessage } from "./EmojiMessage"
+import { StickerMessage } from "./StickerMessage"
 
 export function parseSystemMessage(message: MessageType) {
   if (message.type === "call") return `Llamada de ${message.content} segundos`
@@ -57,8 +59,6 @@ export function Message({
     <SystemMessage content={content} />
   )
 
-  console.log("Rendering message:", message);
-
   if (message.type === "image") {
     const imageData = parseImageMessage(message.content)
     if (imageData) {
@@ -75,6 +75,34 @@ export function Message({
         />
       )
     }
+  }
+
+  if (message.type === "emoji") {
+    return (
+      <EmojiMessage
+        message={message}
+        content={content}
+        sender={sender}
+        timestamp={timestamp}
+        img={img}
+        isFirstInSequence={isFirstInSequence}
+        isLastInSequence={isLastInSequence}
+      />
+    )
+  }
+
+  if (message.type === "sticker") {
+    return (
+      <StickerMessage
+        message={message}
+        content={content}
+        sender={sender}
+        timestamp={timestamp}
+        img={img}
+        isFirstInSequence={isFirstInSequence}
+        isLastInSequence={isLastInSequence}
+      />
+    )
   }
 
   return (
