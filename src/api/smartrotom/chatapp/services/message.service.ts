@@ -37,11 +37,6 @@ export class MessageService {
     if (!chat) {
       throw new Error('Chat not found');
     }
-
-    console.log(`Creating message in chat ${chatId} from user ${createMessageRequest.uuid}`);
-    console.log(`Message type: ${createMessageRequest.type}`);
-    console.log(`Message content (truncated): ${createMessageRequest.message.substring(0, 200)}...`);
-
     
     // If message is an image payload, parse it and save the decoded image to disk
     let contentToStore = createMessageRequest.message;

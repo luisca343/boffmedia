@@ -111,10 +111,10 @@ export class ArcadeStreakRepository
     if (!streak || !streak.lastClaimed) return true;
 
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day
+    today.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
     
     const lastClaim = new Date(streak.lastClaimed);
-    lastClaim.setHours(0, 0, 0, 0); // Reset to start of day
+    lastClaim.setUTCHours(0, 0, 0, 0); // Reset to start of day in UTC
     
     return today.getTime() !== lastClaim.getTime();
   }
