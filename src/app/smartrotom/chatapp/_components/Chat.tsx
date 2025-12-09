@@ -56,15 +56,20 @@ export function Chat({
   }, [activeChat, chats, socket])
 
   function isEmojiOnly(text: string): boolean {
-    // Remove all whitespace first
     const trimmed = text.trim()
     if (trimmed.length === 0) return false
     
-    // Match emojis, emoji sequences, and variation selectors
-    // This regex matches most emojis including compound emojis with ZWJ
-    const emojiRegex = /[\p{Emoji}\u200d\ufe0f]/gu
-    const textWithoutEmojis = trimmed.replace(emojiRegex, '').trim()
-    console.log("Text without emojis:", textWithoutEmojis);
+    // More precise emoji regex that excludes text and numbers
+    // \p{Emoji_Presentation} matches only characters that are explicitly emoji presentation
+    // We also need to exclude common non-emoji characters like digits and punctuation
+    const emojiRegex = /\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu
+    
+    // Extract all emojis
+    const emojis = trimmed.match(emojiRegex)
+    if (!emojis || emojis.length === 0) return false
+    
+    // Remove emojis and check if anything remains (letters, numbers, etc.)
+    const textWithoutEmojis = trimmed.replace(emojiRegex, '').replace(/[\u200d\ufe0f\s]/g, '').trim()
     
     // If nothing remains after removing emojis, it's emoji-only
     return textWithoutEmojis.length === 0
