@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useCameraGalleryStore, type Screenshot } from "@/stores/cameraGalleryStore"
 import {
   Dialog,
@@ -22,7 +22,8 @@ interface ImageGalleryPickerProps {
 }
 
 export function ImageGalleryPicker({ open, onOpenChange, onSendImage }: ImageGalleryPickerProps) {
-  const { gallery } = useCameraGalleryStore()
+  const { gallery, addScreenshot } = useCameraGalleryStore()
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [selectedImage, setSelectedImage] = useState<Screenshot | null>(null)
   const [caption, setCaption] = useState("")
 
@@ -52,6 +53,49 @@ export function ImageGalleryPicker({ open, onOpenChange, onSendImage }: ImageGal
             </Button>
           </DialogTitle>
         </DialogHeader>
+
+        <div className="mb-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (!file) return
+              const reader = new FileReader()
+              reader.onload = () => {
+                const dataUrl = reader.result as string
+                const newScreenshot: Screenshot = {
+                  id: `screenshot-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  image: dataUrl,
+                  timestamp: Date.now(),
+                  location: undefined,
+                  entities: undefined,
+                }
+                try {
+                  addScreenshot(dataUrl)
+                } catch (err) {
+                  // non-fatal if store fails
+                  console.error("Failed to add uploaded image to gallery store", err)
+                }
+                setSelectedImage(newScreenshot)
+                // clear the input so the same file can be re-selected later
+                if (fileInputRef.current) fileInputRef.current.value = ""
+              }
+              reader.readAsDataURL(file)
+            }}
+          />
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              className="border-neutral-700"
+            >
+              Subir imagen desde PC
+            </Button>
+          </div>
+        </div>
 
         {gallery.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-neutral-500">
