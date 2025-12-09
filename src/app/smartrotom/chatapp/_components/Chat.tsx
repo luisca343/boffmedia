@@ -111,7 +111,17 @@ export function Chat({
   }
 
   function sendImage(screenshot: any, caption?: string) {
-    const imageData: any = { caption, screenshot }
+    // Format the image data to match the database structure
+    const imageData = {
+      imageUrl: screenshot.image, // The base64 or URL
+      meta: {
+        id: screenshot.id,
+        timestamp: screenshot.timestamp,
+        location: screenshot.location,
+        entities: screenshot.entities,
+        ...(caption ? { caption } : {})
+      }
+    }
 
     const newMessage: MessageType = {
       id: Date.now(),
@@ -125,9 +135,11 @@ export function Chat({
     // Update parent chats list
     onMessageSent?.(newMessage, activeChat)
 
+    // Send to backend with the original format it expects
+    const backendImageData: any = { caption, screenshot }
     ChatAppService
       .createMessage(chat.id, {
-        message: JSON.stringify(imageData),
+        message: JSON.stringify(backendImageData),
         uuid: getSmartRotomUser(session).uuid,
         type: CreateMessageDto.type.IMAGE,
       })
