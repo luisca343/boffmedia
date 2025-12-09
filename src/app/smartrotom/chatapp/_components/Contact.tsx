@@ -7,6 +7,8 @@ import {
   Image as ImageIcon,
   Video,
   Volume2,
+  Smile,
+  Sticker,
 } from "lucide-react";
 
 export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatData, activeChat: number, setActiveChat: (id: number) => void, session: any}) {
@@ -45,7 +47,7 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
   function LastMessage(chat: ChatData, session: any) {
     let msg = chat?.messages[0] || null;
     if (!msg) return <p className="text-sm">No hay mensajes</p>;
-    if (msg.type === "text")
+    if (msg.type === "text" || msg.type === "chat")
       return (
         <p className="text-sm flex items-center">
           {msg.uuid === getSmartRotomUser(session).uuid ? (
@@ -81,6 +83,32 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
             strokeWidth={2}
           />
           <span>Imagen</span>
+        </p>
+      );
+
+    if (msg.type === "emoji")
+      return (
+        <p className="text-sm flex items-center">
+          <Smile
+            className="mr-2 text-neutral-50"
+            height={20}
+            width={20}
+            strokeWidth={2}
+          />
+          <span>Emoji</span>
+        </p>
+      );
+
+    if (msg.type === "sticker")
+      return (
+        <p className="text-sm flex items-center">
+          <Sticker
+            className="mr-2 text-neutral-50"
+            height={20}
+            width={20}
+            strokeWidth={2}
+          />
+          <span>Sticker</span>
         </p>
       );
 

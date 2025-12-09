@@ -22,7 +22,7 @@ const stickers = [
   { name: "Slowbro Sweat", path: "/smartrotom/img/apps/chatapp/stickers/slowbro_sweat.webp" },
   { name: "Squirtle Cry", path: "/smartrotom/img/apps/chatapp/stickers/squirtle_cry.webp" },
   { name: "Squirtle Glasses", path: "/smartrotom/img/apps/chatapp/stickers/squirtle_glasses.webp" },
-  {name: "Togepi Eepy", path: "/smartrotom/img/apps/chatapp/stickers/togepi_eepy.webp"},
+  { name: "Togepi Eepy", path: "/smartrotom/img/apps/chatapp/stickers/togepi_eepy.webp" },
   { name: "Togepi Evil", path: "/smartrotom/img/apps/chatapp/stickers/togepi_evil.webp" },
   { name: "Torchic Run", path: "/smartrotom/img/apps/chatapp/stickers/torchic_run.webp" },
   { name: "Wooper Choose", path: "/smartrotom/img/apps/chatapp/stickers/wooper_choose.webp" },
