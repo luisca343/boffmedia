@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { Button } from "@/components/ui/primitives/button"
 import {
   Popover,
@@ -27,14 +27,38 @@ const emojiCategories = {
 
 export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
   const [open, setOpen] = useState(false)
+  const preventCloseRef = useRef(false)
 
-  const handleEmojiClick = (emoji: string) => {
+  const handleEmojiClick = (emoji: string, shiftKey: boolean) => {
+    if (shiftKey) {
+      // Set flag BEFORE selecting emoji to prevent any close events
+      preventCloseRef.current = true
+    }
+    
     onEmojiSelect(emoji)
-    setOpen(false)
+    
+    if (!shiftKey) {
+      setOpen(false)
+    }
+    
+    // Reset flag after a delay to allow the next click
+    if (shiftKey) {
+      setTimeout(() => {
+        preventCloseRef.current = false
+      }, 100)
+    }
+  }
+
+  const handleOpenChange = (newOpen: boolean) => {
+    // Block ALL close attempts when shift-clicking
+    if (!newOpen && preventCloseRef.current) {
+      return // Don't allow closing
+    }
+    setOpen(newOpen)
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
@@ -59,7 +83,7 @@ export function EmojiPicker({ onEmojiSelect }: EmojiPickerProps) {
                 {emojis.map((emoji, index) => (
                   <button
                     key={`${emoji}-${index}`}
-                    onClick={() => handleEmojiClick(emoji)}
+                    onClick={(e) => handleEmojiClick(emoji, e.shiftKey)}
                     className="text-2xl p-2 hover:bg-neutral-800 rounded transition-colors flex items-center justify-center"
                     title={emoji}
                   >
