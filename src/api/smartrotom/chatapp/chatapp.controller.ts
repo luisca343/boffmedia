@@ -108,6 +108,25 @@ export class ChatappController {
     return await this.chatappFacadeService.createMessage(chatIdNum, createMessageRequest);
   }
 
+  @Post('global-message')
+  @ApiOperation({ summary: 'Create a new global message' })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Global message created successfully.', type: CreateMessageResponse })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid global message data.' })
+  @ApiBody({ type: CreateMessageDto })
+  async createGlobalMessage(
+    @Body() createMessageDto: CreateMessageDto
+  ): Promise<RotomMessage> {
+
+    const createMessageRequest: CreateChatMessageRequest = {
+      uuid: createMessageDto.uuid,
+      message: createMessageDto.message,
+      type: createMessageDto.type
+    };
+
+    return await this.chatappFacadeService.createGlobalMessage(createMessageRequest);
+    
+  }
+
   @Put('message/:messageId')
   @ApiOperation({ summary: 'Update a message' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Message updated successfully.', type: RotomMessage })

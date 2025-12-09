@@ -8,7 +8,9 @@ export enum MessageType {
   SYSTEM = 'system',
   IMAGE = 'image',
   STICKER = 'sticker',
-  EMOJI = 'emoji'
+  EMOJI = 'emoji',
+  // From the Pixelmon Chat
+  CHAT = 'chat',
 }
 
 export class CreateMessageDto extends BaseDto {

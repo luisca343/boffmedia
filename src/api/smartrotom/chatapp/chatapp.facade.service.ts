@@ -84,6 +84,24 @@ export class ChatappFacadeService {
     }
   }
 
+  async createGlobalMessage(
+    createMessageRequest: CreateChatMessageRequest
+  ): Promise<RotomMessage> {
+    try {
+      const { messageId, message } = await this.messageService.createGlobalMessage(
+        createMessageRequest
+      );
+
+      // Emit global message via WebSocket
+      await this.emitGlobalMessage(messageId, message, createMessageRequest);
+
+      return message;
+    } catch (error) {
+      console.error('Error creating global message:', error);
+      throw new Error(`Failed to create global message: ${error.message}`);
+    }
+  }
+
   async updateMessage(
     messageId: number, 
     content: string, 
@@ -227,6 +245,31 @@ export class ChatappFacadeService {
       }
     } catch (error) {
       console.error('Error emitting message to chat:', error);
+      // Don't throw error here as message was already saved
+    }
+  }
+
+  private async emitGlobalMessage(
+    messageId: number, 
+    message: RotomMessage,
+    createMessageRequest: CreateChatMessageRequest
+  ): Promise<void> {
+    try {
+      for (const socketData of this.socketGateway.users.values()) {
+        const socket = this.socketGateway.users.get(socketData.uuid);
+        if (socket) {
+          this.socketGateway.server.to(socket.socketId).emit('chat:message', {
+            chatId: 0,
+            id: messageId,
+            type: createMessageRequest.type,
+            content: message.text,
+            createdAt: new Date(),
+            uuid: createMessageRequest.uuid
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error emitting global message:', error);
       // Don't throw error here as message was already saved
     }
   }

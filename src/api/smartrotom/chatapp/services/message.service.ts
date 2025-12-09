@@ -40,17 +40,7 @@ export class MessageService {
     
     // If message is an image payload, parse it and save the decoded image to disk
     let contentToStore = createMessageRequest.message;
-    if (createMessageRequest.type === 'sticker') {
-      // Sticker handling - message should contain the sticker filename
-      try {
-        const stickerName = createMessageRequest.message;
-        const stickerUrl = `/smartrotom/img/apps/chatapp/emojis/${stickerName}`;
-        contentToStore = JSON.stringify({ stickerUrl, stickerName });
-        console.log(`Stored sticker: ${stickerName}`);
-      } catch (err) {
-        console.error('Failed to process sticker message', err);
-      }
-    } else if (createMessageRequest.type === 'image') {
+    if (createMessageRequest.type === 'image') {
       try {
         const parsed = JSON.parse(createMessageRequest.message);
         const screenshot = parsed?.screenshot;
@@ -75,23 +65,15 @@ export class MessageService {
             const publicUrl = `/uploads/chat-screenshots/${filename}`;
 
             const meta: Record<string, unknown> = { ...screenshot };
-            delete meta.image;
             if (caption !== undefined) {
               meta.caption = caption;
             }
+            delete meta.image;
 
             contentToStore = JSON.stringify({ imageUrl: publicUrl, meta });
             console.log(`Saved chat image to ${filePath}`);
           } else {
-            // Image is already a URL path, not base64
-            const meta: Record<string, unknown> = { ...screenshot };
-            delete meta.image;
-            if (caption !== undefined) {
-              meta.caption = caption;
-            }
-            
-            contentToStore = JSON.stringify({ imageUrl: screenshot.image, meta });
-            console.log(`Using existing image URL: ${screenshot.image}`);
+            console.warn('Image payload did not match data URL pattern');
           }
         } else {
           console.warn('Image payload missing screenshot.image');
@@ -122,7 +104,14 @@ export class MessageService {
     };
   }
 
-  async updateMessage(messageId: number, content: string, senderUuid: string): Promise<RotomMessage> {
+  async createGlobalMessage(
+    createMessageRequest: { message: string; uuid: string; type: string }
+  ): Promise<{ messageId: number; message: RotomMessage }> {
+    return this.createMessage(-1, createMessageRequest);
+  }
+
+  async updateMessage
+  (messageId: number, content: string, senderUuid: string): Promise<RotomMessage> {
     const existingMessage = await this.chatMessageRepository.findMessageById(messageId);
     if (!existingMessage) {
       throw new Error('Message not found');
