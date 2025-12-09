@@ -23,13 +23,15 @@ import { ChatappFacadeService } from './chatapp.facade.service';
 // Import controller
 import { ChatappController } from './chatapp.controller';
 import { SocketsModule } from '@api/_utils/sockets/sockets.module';
+import { WingullModule } from '../wingull/wingull.module';
 
 @Module({
   imports: [
     forwardRef(() => SocketsModule),
     ResponseModule,
     LoggerModule,
-    DrizzleModule
+    DrizzleModule,
+    WingullModule
   ],
   controllers: [ChatappController],
   providers: [

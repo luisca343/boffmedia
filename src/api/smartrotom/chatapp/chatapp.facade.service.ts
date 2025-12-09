@@ -6,6 +6,7 @@ import { CallService, CallSession } from './services/call.service';
 import { SocketsGateway } from '../../_utils/sockets/sockets.gateway';
 import { RotomMessage } from './entities/message.entity';
 import { Group } from './entities/group.entity';
+import { WingullFacadeService } from '../wingull/wingull.facade.service';
 
 export interface CreateChatMessageRequest {
   uuid: string;
@@ -22,6 +23,7 @@ export class ChatappFacadeService {
     private readonly callService: CallService,
     @Inject(forwardRef(() => SocketsGateway))
     private readonly socketGateway: SocketsGateway,
+    private readonly wingullFacadeService: WingullFacadeService,
   ) {}
 
   // ==================== CHAT MANAGEMENT ====================
@@ -77,6 +79,20 @@ export class ChatappFacadeService {
       // Emit message to all chat members via WebSocket
       await this.emitMessageToChat(chatId, messageId, message, createMessageRequest);
 
+      // If this is a text message sent to global chat (chatId -1), broadcast to Minecraft
+      if (chatId === -1 && createMessageRequest.type === 'text') {
+        try {
+          await this.wingullFacadeService.globalchat(
+            createMessageRequest.uuid,
+            createMessageRequest.message
+          );
+          console.log(`Broadcasted global chat message to Minecraft from ${createMessageRequest.uuid}`);
+        } catch (minecraftError) {
+          console.error('Error broadcasting to Minecraft:', minecraftError);
+          // Don't throw - message was already saved and sent to web clients
+        }
+      }
+
       return message;
     } catch (error) {
       console.error(`Error creating message in chat ${chatId}:`, error);
@@ -88,9 +104,12 @@ export class ChatappFacadeService {
     createMessageRequest: CreateChatMessageRequest
   ): Promise<RotomMessage> {
     try {
+      console.log('Creating global message:', createMessageRequest);
       const { messageId, message } = await this.messageService.createGlobalMessage(
         createMessageRequest
       );
+
+      console.log('Created global message with ID:', messageId);
 
       // Emit global message via WebSocket
       await this.emitGlobalMessage(messageId, message, createMessageRequest);
@@ -255,11 +274,15 @@ export class ChatappFacadeService {
     createMessageRequest: CreateChatMessageRequest
   ): Promise<void> {
     try {
+      console.log('Emitting global message via WebSocket');
+      console.log('Current connected users:', Array.from(this.socketGateway.users.keys()));
       for (const socketData of this.socketGateway.users.values()) {
+        console.log('Emitting global message to:', socketData.uuid);
         const socket = this.socketGateway.users.get(socketData.uuid);
+        console.log('Socket data:', socket);
         if (socket) {
           this.socketGateway.server.to(socket.socketId).emit('chat:message', {
-            chatId: 0,
+            chatId: -1,
             id: messageId,
             type: createMessageRequest.type,
             content: message.text,
@@ -270,7 +293,6 @@ export class ChatappFacadeService {
       }
     } catch (error) {
       console.error('Error emitting global message:', error);
-      // Don't throw error here as message was already saved
     }
   }
 
