@@ -6,7 +6,9 @@ export enum MessageType {
   TEXT = 'text',
   CALL = 'call',
   SYSTEM = 'system',
-  IMAGE = 'image'
+  IMAGE = 'image',
+  STICKER = 'sticker',
+  EMOJI = 'emoji'
 }
 
 export class CreateMessageDto extends BaseDto {

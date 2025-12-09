@@ -40,7 +40,17 @@ export class MessageService {
     
     // If message is an image payload, parse it and save the decoded image to disk
     let contentToStore = createMessageRequest.message;
-    if (createMessageRequest.type === 'image') {
+    if (createMessageRequest.type === 'sticker') {
+      // Sticker handling - message should contain the sticker filename
+      try {
+        const stickerName = createMessageRequest.message;
+        const stickerUrl = `/smartrotom/img/apps/chatapp/emojis/${stickerName}`;
+        contentToStore = JSON.stringify({ stickerUrl, stickerName });
+        console.log(`Stored sticker: ${stickerName}`);
+      } catch (err) {
+        console.error('Failed to process sticker message', err);
+      }
+    } else if (createMessageRequest.type === 'image') {
       try {
         const parsed = JSON.parse(createMessageRequest.message);
         const screenshot = parsed?.screenshot;
