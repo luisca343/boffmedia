@@ -44,6 +44,7 @@ export default function ChatApp() {
             chats={chats!}
             activeChat={activeChat}
             setActiveChat={setActiveChat}
+            onMessageSent={updateChats}
           />
         ) : (
           <div className="h-full flex items-center justify-center text-neutral-50">

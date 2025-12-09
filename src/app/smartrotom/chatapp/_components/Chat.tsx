@@ -21,10 +21,12 @@ export function Chat({
   chats,
   activeChat,
   setActiveChat,
+  onMessageSent,
 }: {
   chats: ChatData[]
   activeChat: number
   setActiveChat: (id: number) => void
+  onMessageSent?: (message: MessageType, activeChat: number) => void
 }) {
   const [chat, setChat] = useState(chats[0] as ChatData)
   const [message, setMessage] = useState("")
@@ -85,10 +87,8 @@ export function Chat({
       type: messageType
     }
 
-    setChat((prev) => ({
-      ...prev,
-      messages: [newMessage, ...prev.messages],
-    }))
+    // Update parent chats list
+    onMessageSent?.(newMessage, activeChat)
 
     ChatAppService
       .createMessage(chat.id, {
@@ -107,6 +107,18 @@ export function Chat({
 
   function sendImage(screenshot: any, caption?: string) {
     const imageData: any = { caption, screenshot }
+
+    const newMessage: MessageType = {
+      id: Date.now(),
+      content: JSON.stringify(imageData),
+      createdAt: new Date().toISOString(),
+      uuid: getSmartRotomUser(session).uuid,
+      chatId: chat.id,
+      type: "image"
+    }
+
+    // Update parent chats list
+    onMessageSent?.(newMessage, activeChat)
 
     ChatAppService
       .createMessage(chat.id, {
@@ -144,10 +156,8 @@ export function Chat({
       type: "sticker"
     }
 
-    setChat((prev) => ({
-      ...prev,
-      messages: [newMessage, ...prev.messages],
-    }))
+    // Update parent chats list
+    onMessageSent?.(newMessage, activeChat)
 
     ChatAppService
       .createMessage(chat.id, {

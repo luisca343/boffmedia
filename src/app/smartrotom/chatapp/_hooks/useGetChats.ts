@@ -25,7 +25,12 @@ function useChatAppGetChatsWithUpdate(): useChatAppGetChatsWithUpdateReturnType 
       if (!prev) return prev;
       const chat = prev.find((chat: ChatData) => chat.id == message.chatId); 
       if (!chat) return prev;
-      chat.messages.unshift({ id: message.id, chatId: message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type });
+      
+      // Check if message already exists to prevent duplicates
+      const messageExists = chat.messages.some((m: Message) => m.id === message.id);
+      if (!messageExists) {
+        chat.messages.unshift({ id: message.id, chatId: message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type });
+      }
 
       chat.unread++;
       return [...prev].sort((a, b) => {
