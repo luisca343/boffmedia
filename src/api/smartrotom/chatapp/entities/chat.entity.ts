@@ -6,6 +6,13 @@ export class ChatMember {
     description: 'Member UUID'
   })
   uuid: string;
+
+  @ApiProperty({
+    example: 'john_doe',
+    description: 'Member username',
+    required: false
+  })
+  username?: string;
 }
 
 export class ChatMessage {

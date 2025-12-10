@@ -119,6 +119,64 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
         }
       })
     }
+
+    @SubscribeMessage("chat:typing:start")
+    async handleTypingStart(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { chatId: number; uuid: string; username?: string },
+    ): Promise<void> {
+      
+      try {
+        // Get chat members to broadcast to
+        const chatMembers = await this.chatAppService.getChatById(data.chatId, data.uuid)
+
+        console.log(`Typing started by ${data.uuid} in chat ${data.chatId} with username ${data.username}`)
+        
+        // Broadcast typing indicator to all other members in the chat
+        chatMembers.members.forEach((member) => {
+          if (member.uuid !== data.uuid) {
+            const userSocket = this.users.get(member.uuid)
+            if (userSocket) {
+              this.server.to(userSocket.socketId).emit("chat:typing:start", {
+                chatId: data.chatId,
+                uuid: data.uuid,
+                username: data.username
+              })
+            }
+          }
+        })
+      } catch (error) {
+        console.error('Error broadcasting typing start:', error)
+      }
+    }
+
+    @SubscribeMessage("chat:typing:stop")
+    async handleTypingStop(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { chatId: number; uuid: string },
+    ): Promise<void> {
+      console.log(`Typing stopped by ${data.uuid} in chat ${data.chatId}`)
+      
+      try {
+        // Get chat members to broadcast to
+        const chatMembers = await this.chatAppService.getChatById(data.chatId, data.uuid)
+        
+        // Broadcast typing stop to all other members in the chat
+        chatMembers.members.forEach((member) => {
+          if (member.uuid !== data.uuid) {
+            const userSocket = this.users.get(member.uuid)
+            if (userSocket) {
+              this.server.to(userSocket.socketId).emit("chat:typing:stop", {
+                chatId: data.chatId,
+                uuid: data.uuid
+              })
+            }
+          }
+        })
+      } catch (error) {
+        console.error('Error broadcasting typing stop:', error)
+      }
+    }
   }
   
   
