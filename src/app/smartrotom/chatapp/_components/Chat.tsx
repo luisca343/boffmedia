@@ -3,16 +3,17 @@
 import { Message } from "./Message"
 import { toast } from "react-toastify"
 import type { ChatData, Message as MessageType, ImageMessageData } from "../_types/Chat"
-import { Phone, Send, X, Image as ImageIcon } from "lucide-react"
+import { Phone, Send, X, Image as ImageIcon, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/primitives/input"
 import { ImageGalleryPicker } from "./ImageGalleryPicker"
 import { EmojiPicker } from "./EmojiPicker"
 import { StickerPicker } from "./StickerPicker"
 import { WaypointPicker } from "./WaypointPicker"
+import { VirtualizedMessageList } from "./VirtualizedMessageList"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/primitives/button"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService"
 import { CreateMessageDto } from "@/generated/api"
@@ -23,38 +24,114 @@ export function Chat({
   activeChat,
   setActiveChat,
   onMessageSent,
+  typingUsers,
+  onTypingChange,
 }: {
   chats: ChatData[]
   activeChat: number
   setActiveChat: (id: number) => void
   onMessageSent?: (message: MessageType, activeChat: number) => void
+  typingUsers?: Set<string>
+  onTypingChange?: (isTyping: boolean) => void
 }) {
   const [chat, setChat] = useState(chats[0] as ChatData)
   const [message, setMessage] = useState("")
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false)
   const { socket } = useSocketStore()
   const { session } = useBoffSession()
+  
+  // Infinite scroll state
+  const [page, setPage] = useState(0)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [hasMoreMessages, setHasMoreMessages] = useState(true)
+  const PAGE_SIZE = 50
 
-  const messagesStartRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null) // For VirtualizedMessageList
 
-  const scrollToBottom = () => {
-    messagesStartRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
-  }
+  // Load older messages for infinite scroll
+  const loadOlderMessages = useCallback(async () => {
+    if (!chat || isLoadingMore || !hasMoreMessages) return
+    
+    setIsLoadingMore(true)
+    try {
+      const offset = (page + 1) * PAGE_SIZE
+      const totalLimit = PAGE_SIZE + offset
+      const res = await ChatAppService.getMessages(chat.id, totalLimit)
+      
+      if (res.data && res.data.length > offset) {
+        // Extract only the new older messages
+        const olderMessages = res.data.slice(offset).map(msg => ({
+          id: msg.id,
+          content: msg.text || "",
+          createdAt: msg.date || new Date().toISOString(),
+          uuid: msg.uuid,
+          chatId: chat.id,
+          type: msg.type || "text"
+        } as MessageType))
+        
+        // Prepend older messages to the end of the array (since we reverse the display)
+        setChat(prev => ({
+          ...prev!,
+          messages: [...prev!.messages, ...olderMessages]
+        }))
+        setPage(prev => prev + 1)
+        
+        if (olderMessages.length < PAGE_SIZE) {
+          setHasMoreMessages(false)
+        }
+      } else {
+        setHasMoreMessages(false)
+      }
+    } catch (error) {
+      console.error("Failed to load older messages:", error)
+      toast.error("Failed to load older messages")
+    } finally {
+      setIsLoadingMore(false)
+    }
+  }, [chat, page, isLoadingMore, hasMoreMessages])
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [chat.messages, chat]) // Added chat to dependencies
+  // Handle typing indicator
+  const handleTyping = useCallback(() => {
+    if (!socket || !chat) return
+    
+    // Emit typing start
+    socket.emit("chat:typing:start", { chatId: chat.id, uuid: getSmartRotomUser(session).uuid })
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    
+    // Set timeout to emit typing stop
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("chat:typing:stop", { chatId: chat.id, uuid: getSmartRotomUser(session).uuid })
+    }, 2000)
+  }, [socket, chat, session])
 
   useEffect(() => {
     const chat = chats.find((chat) => chat.id === activeChat)
     if (!chat) return
     setChat(chat)
+    
+    // Reset pagination when switching chats
+    setPage(0)
+    setHasMoreMessages(true)
 
     if (socket) {
       // Socket logic here if needed
     }
   }, [activeChat, chats, socket])
+
+  // Cleanup typing timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [])
 
   function isEmojiOnly(text: string): boolean {
     const trimmed = text.trim()
@@ -307,26 +384,16 @@ export function Chat({
           <X className="h-5 w-5" />
         </Button>
       </div>
-      <div
-        className="flex-1 overflow-y-auto p-4 flex flex-col-reverse"
-        style={{
-          backgroundImage: "url('/smartrotom/img/fondoChat2.avif')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <div ref={messagesStartRef} />
-        {chat.messages.map((message, index) => (
-          <Message
-            key={message.id}
-            message={message}
-            session={session}
-            img={chat.type !== 1}
-            prev={index < chat.messages.length - 1 ? chat.messages[index + 1] : null}
-            next={index > 0 ? chat.messages[index - 1] : null}
-          />
-        ))}
-      </div>
+      <VirtualizedMessageList
+        messages={chat.messages}
+        session={session}
+        isGroup={chat.type !== 1}
+        isLoadingMore={isLoadingMore}
+        hasMoreMessages={hasMoreMessages}
+        onLoadMore={loadOlderMessages}
+        typingUsers={typingUsers}
+        scrollRef={messagesContainerRef}
+      />
       <div className="p-4 bg-neutral-800 flex items-center space-x-2 border-t border-black">
         <Button
           variant="ghost"
@@ -343,7 +410,11 @@ export function Chat({
           ref={inputRef}
           variant="neutral"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value)
+            handleTyping()
+            onTypingChange?.(true)
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault()

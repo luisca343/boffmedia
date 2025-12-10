@@ -13,6 +13,7 @@ export default function ChatApp() {
   const { session, chats, refresh, updateChats, isLoading } = useGetChats();
   const [activeChat, setActiveChat] = useState(0);
   const {socket} = useSocket()
+  const [typingUsers, setTypingUsers] = useState<Map<number, Set<string>>>(new Map())
 
   useEffect(() => {
     if (socket) {
@@ -20,8 +21,42 @@ export default function ChatApp() {
         console.log("chat:message event received", message);
         updateChats(message, activeChat);
       });
+
+      // Typing indicator events
+      socket.on("chat:typing:start", (data: { chatId: number; uuid: string }) => {
+        console.log("typing:start", data);
+        setTypingUsers(prev => {
+          const newMap = new Map(prev);
+          if (!newMap.has(data.chatId)) {
+            newMap.set(data.chatId, new Set());
+          }
+          newMap.get(data.chatId)!.add(data.uuid);
+          return newMap;
+        });
+      });
+
+      socket.on("chat:typing:stop", (data: { chatId: number; uuid: string }) => {
+        console.log("typing:stop", data);
+        setTypingUsers(prev => {
+          const newMap = new Map(prev);
+          const chatTypers = newMap.get(data.chatId);
+          if (chatTypers) {
+            chatTypers.delete(data.uuid);
+            if (chatTypers.size === 0) {
+              newMap.delete(data.chatId);
+            }
+          }
+          return newMap;
+        });
+      });
+
+      return () => {
+        socket.off("chat:message");
+        socket.off("chat:typing:start");
+        socket.off("chat:typing:stop");
+      };
     }
-  }, [socket]);
+  }, [socket, activeChat, updateChats]);
 
   if (!chats) return null;
   
@@ -45,6 +80,7 @@ export default function ChatApp() {
             activeChat={activeChat}
             setActiveChat={setActiveChat}
             onMessageSent={updateChats}
+            typingUsers={typingUsers.get(activeChat)}
           />
         ) : (
           <div className="h-full flex items-center justify-center text-neutral-50">
