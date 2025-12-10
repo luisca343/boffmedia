@@ -11,7 +11,14 @@ import { ChatMember } from '../entities/chat.entity';
 export class ChatMemberRepository implements IMemberRepository {
   constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
 
-  async findChatMembers(chatId: number): Promise<ChatMember[]> {
+  async findChatMembers(chatId: number): Promise<ChatMember[]> {  
+    if (chatId <= 0) {
+      return this.db.select({ 
+      uuid: rotomChatUsers.uuid,
+      username: smartrotomUsers.username
+    }).from(rotomChatUsers).leftJoin(smartrotomUsers, eq(rotomChatUsers.uuid, smartrotomUsers.uuid));
+    }
+
     return this.db.select({ 
       uuid: rotomChatUsers.uuid,
       username: smartrotomUsers.username
