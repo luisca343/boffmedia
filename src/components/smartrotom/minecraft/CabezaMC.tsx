@@ -7,22 +7,36 @@ export function CabezaJugador({uuid, nombreNPC, autoRotate = true, tag = false, 
     useEffect(() => {
         const canvas = document.getElementById(`skin_container_${uuid}`) as HTMLCanvasElement
         if (!canvas) return
-        const skinViewer = new SkinViewer(
-            {
-                canvas: canvas,
-                width: 200,
-                height: 400,
-                skin: `https://crafatar.com/skins/${uuid}`,
-                enableControls: false
-                
-            })
-        skinViewer.width = width
-        skinViewer.height = height
-        skinViewer.animation = new IdleAnimation()
-        skinViewer.autoRotate = autoRotate
-        skinViewer.camera.setViewOffset(200,400, 25, 0, 150, 150)
-        if(tag) 
-          skinViewer.nameTag = new NameTagObject(nombreNPC, { textStyle: 'white' }) 
+        
+        try {
+            const skinViewer = new SkinViewer(
+                {
+                    canvas: canvas,
+                    width: 200,
+                    height: 400,
+                    skin: `https://mc-heads.net/skin/${uuid}`,
+                    enableControls: false
+                    
+                })
+            skinViewer.width = width
+            skinViewer.height = height
+            skinViewer.animation = new IdleAnimation()
+            skinViewer.autoRotate = autoRotate
+            skinViewer.camera.setViewOffset(200,400, 25, 0, 150, 150)
+            if(tag) 
+              skinViewer.nameTag = new NameTagObject(nombreNPC, { textStyle: 'white' })
+              
+            // Add error handler for skin loading
+            skinViewer.loadSkin(`https://mc-heads.net/skin/${uuid}`).catch((err) => {
+                console.warn(`Failed to load skin for ${uuid}:`, err);
+                // Optionally load a default skin
+                skinViewer.loadSkin('https://mc-heads.net/skin/steve').catch(() => {
+                    // Silently fail if even default skin fails
+                });
+            });
+        } catch (error) {
+            console.error(`Error initializing skin viewer for ${uuid}:`, error);
+        }
     }, [props])
   
     return (
