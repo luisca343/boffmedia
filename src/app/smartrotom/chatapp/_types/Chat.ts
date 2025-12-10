@@ -51,6 +51,12 @@ export interface VideoMessageData {
     title?: string;
 }
 
+export interface DocumentMessageData {
+    documentId: number;
+    title: string;
+    content?: string;
+}
+
 export type Message = {
     id: number;
     content: string;

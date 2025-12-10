@@ -9,12 +9,16 @@ import { Input } from "@/components/ui/primitives/input"
 import { ScrollArea } from "@/components/ui/primitives/scroll-area"
 import dynamic from "next/dynamic"
 import { useGetDocument } from "@/hooks/documents/useGetDocument"
+import { ShareDocumentDialog } from "./ShareDocumentDialog"
+import { useSearchParams } from "next/navigation"
 
 const CustomEditor = dynamic( () => {
     return import( '@/components/common/ckeditor/TestEditor' );
   }, { ssr: false } );
 
   export function DocumentsList() {
+    const searchParams = useSearchParams()
+    const docId = searchParams?.get("doc")
     const { notes, newNote, fetchDocuments, selectedNoteId, setSelectedNoteId } = useGetDocuments()
     const [searchTerm, setSearchTerm] = useState("")
     const [filteredDocuments, setFilteredDocuments] = useState(notes)
@@ -28,6 +32,12 @@ const CustomEditor = dynamic( () => {
             )
         )
     }, [notes, searchTerm])
+
+    useEffect(() => {
+        if (docId && notes) {
+            setSelectedNoteId(docId)
+        }
+    }, [docId, notes])
 
     const handleNoteClick = (id: string) => {
         setSelectedNoteId(id)
@@ -63,7 +73,7 @@ const CustomEditor = dynamic( () => {
                         <div className="space-y-1">
                             {filteredDocuments.map((doc: any) => (
                                 <div 
-                                    key={doc.uuid} 
+                                    key={doc.id} 
                                     onClick={() => handleNoteClick(doc.id)}
                                     className={`p-3 rounded-md transition-colors cursor-pointer flex flex-col ${
                                         selectedNoteId === doc.id 
@@ -92,13 +102,23 @@ const CustomEditor = dynamic( () => {
             
             <div className="flex-1 bg-white overflow-hidden flex flex-col">
                 {selectedNoteId !== "" ? (
-                    <div className="w-full h-full">
-                        <CustomEditor
-                            document={selectedNote}
-                            documentId={selectedNoteId}
-                            documentType={0}
-                            refresh={fetchDocuments}
-                        />
+                    <div className="w-full h-full flex flex-col">
+                        <div className="border-b border-surface-200 px-4 py-3 flex items-center justify-between bg-surface-50">
+                            <h2 className="text-lg font-semibold text-surface-900">
+                                {selectedNote?.title || "Cargando..."}
+                            </h2>
+                            {selectedNote && (
+                                <ShareDocumentDialog document={selectedNote} />
+                            )}
+                        </div>
+                        <div className="flex-1 overflow-auto">
+                            <CustomEditor
+                                document={selectedNote}
+                                documentId={selectedNoteId}
+                                documentType={0}
+                                refresh={fetchDocuments}
+                            />
+                        </div>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full p-6 bg-surface-50">

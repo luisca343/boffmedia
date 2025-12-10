@@ -28,6 +28,7 @@ export namespace CreateMessageDto {
         EMOJI = 'emoji',
         STICKER = 'sticker',
         VIDEO = 'video',
+        DOCUMENT = 'document',
     }
 }
 

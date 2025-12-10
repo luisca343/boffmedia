@@ -9,6 +9,7 @@ import {
   Volume2,
   Smile,
   Sticker,
+  FileText,
 } from "lucide-react";
 
 export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatData, activeChat: number, setActiveChat: (id: number) => void, session: any}) {
@@ -109,6 +110,19 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
             strokeWidth={2}
           />
           <span>Sticker</span>
+        </p>
+      );
+
+    if (msg.type === "document")
+      return (
+        <p className="text-sm flex items-center">
+          <FileText
+            className="mr-2 text-neutral-50"
+            height={20}
+            width={20}
+            strokeWidth={2}
+          />
+          <span>Documento</span>
         </p>
       );
 

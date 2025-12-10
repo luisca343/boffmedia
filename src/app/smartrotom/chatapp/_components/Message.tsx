@@ -1,8 +1,9 @@
 import { getSmartRotomUser, strToTime } from "@/lib/utils"
-import type { Message as MessageType, ImageMessageData, VideoMessageData } from "../_types/Chat"
+import type { Message as MessageType, ImageMessageData, VideoMessageData, DocumentMessageData } from "../_types/Chat"
 import { SystemMessage } from "./SystemMessage"
 import { ImageMessage } from "./ImageMessage"
 import { VideoMessage } from "./VideoMessage"
+import { DocumentMessage } from "./DocumentMessage"
 import { TextMessage } from "./TextMessage"
 import { EmojiMessage } from "./EmojiMessage"
 import { StickerMessage } from "./StickerMessage"
@@ -23,6 +24,14 @@ export function parseImageMessage(content: string): ImageMessageData | null {
 export function parseVideoMessage(content: string): VideoMessageData | null {
   try {
     return JSON.parse(content) as VideoMessageData
+  } catch {
+    return null
+  }
+}
+
+export function parseDocumentMessage(content: string): DocumentMessageData | null {
+  try {
+    return JSON.parse(content) as DocumentMessageData
   } catch {
     return null
   }
@@ -92,6 +101,24 @@ export function Message({
       return (
         <VideoMessage
           videoData={videoData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if (message.type === "document") {
+    const documentData = parseDocumentMessage(message.content)
+    if (documentData) {
+      return (
+        <DocumentMessage
+          documentData={documentData}
           sender={sender}
           timestamp={timestamp}
           isSender={isSender}
