@@ -11,6 +11,7 @@ export enum MessageType {
   EMOJI = 'emoji',
   VIDEO = 'video',
   DOCUMENT = 'document',
+  WAYPOINT = 'waypoint',
   // From the Pixelmon Chat
   CHAT = 'chat',
 }
