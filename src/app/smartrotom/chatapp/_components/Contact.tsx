@@ -13,8 +13,36 @@ import {
   MapPin,
 } from "lucide-react";
 
-export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatData, activeChat: number, setActiveChat: (id: number) => void, session: any}) {
-    return (
+export function Contact({
+  chat,
+  activeChat,
+  setActiveChat,
+  session,
+  typingUsers,
+}: {
+  chat: ChatData;
+  activeChat: number;
+  setActiveChat: (id: number) => void;
+  session: any;
+  typingUsers?: Map<string, string>;
+}) {
+  const getTypingText = () => {
+    if (!typingUsers || typingUsers.size === 0) return null;
+    
+    const usernames = Array.from(typingUsers.values());
+    
+    if (usernames.length === 1) {
+      return `${usernames[0]} is typing...`;
+    } else if (usernames.length === 2) {
+      return `${usernames[0]} and ${usernames[1]} are typing...`;
+    } else {
+      return `${usernames.length} people are typing...`;
+    }
+  };
+  
+  const typingText = getTypingText();
+  
+  return (
       <div>
         <div
           className={`${
@@ -31,7 +59,18 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
           />
           <div className="h-1/2  ml-4 text-neutral-50  flex flex-col justify-between items-start ">
             <p className="text-sm font-bold">{chat.name}</p>
-            {LastMessage(chat, session)}
+            {typingText ? (
+              <p className="text-sm flex items-center text-primary-400 italic">
+                <span className="flex gap-1 mr-2">
+                  <span className="w-1 h-1 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "1s" }} />
+                  <span className="w-1 h-1 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "200ms", animationDuration: "1s" }} />
+                  <span className="w-1 h-1 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "400ms", animationDuration: "1s" }} />
+                </span>
+                {typingText}
+              </p>
+            ) : (
+              LastMessage(chat, session)
+            )}
           </div>
           <div className="h-1/2  ml-auto mr-4 text-neutral-50 flex flex-col justify-between items-end ">
             <p className="text-sm">{strToDate(chat.messages[0]?.createdAt)}</p>

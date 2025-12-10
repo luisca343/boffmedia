@@ -69,7 +69,14 @@ export default function ChatApp() {
         </div>
         <div className="flex flex-col h-full  overflow-auto bg-neutral-800">
           {chats!.map((chat:any) => (
-            <Contact chat={chat} key={chat.id} activeChat={activeChat} setActiveChat={setChat} session={session}/>
+            <Contact 
+              chat={chat} 
+              key={chat.id} 
+              activeChat={activeChat} 
+              setActiveChat={setChat} 
+              session={session}
+              typingUsers={typingUsers.get(chat.id)}
+            />
           ))}
         </div>
       </div>
