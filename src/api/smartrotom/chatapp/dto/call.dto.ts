@@ -62,6 +62,12 @@ export class CallUserResponseDto extends BaseDto {
 
 export class CallSessionResponseDto extends BaseDto {
   @ApiProperty({ 
+    description: 'Unique call identifier',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+  })
+  callId: string;
+
+  @ApiProperty({ 
     description: 'Chat ID',
     example: 1
   })

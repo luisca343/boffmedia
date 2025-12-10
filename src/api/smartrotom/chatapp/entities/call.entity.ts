@@ -17,6 +17,12 @@ export class CallUser {
 
 export class CallSession {
   @ApiProperty({ 
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+    description: 'Unique call identifier'
+  })
+  callId: string;
+
+  @ApiProperty({ 
     example: 1,
     description: 'Chat ID'
   })

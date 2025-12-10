@@ -303,6 +303,7 @@ export class ChatappFacadeService {
       // Get caller socket
       const callerSocket = this.socketGateway.users.get(caller);
       if (callerSocket) {
+        console.log('Emitting call to caller:', caller);
         this.socketGateway.server.to(callerSocket.socketId).emit('chat:call', callSession);
       }
 

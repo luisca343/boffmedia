@@ -34,6 +34,7 @@ export interface ChatMessage {
 
 export interface ChatMember {
   uuid: string;
+  username?: string;
 }
 
 export interface UserProfile {

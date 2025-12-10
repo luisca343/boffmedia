@@ -3,13 +3,16 @@ import { CHAT_REPOSITORY_TOKEN, CHAT_MEMBER_REPOSITORY_TOKEN, CHAT_MESSAGE_REPOS
 import { IChatRepository } from '../repositories/interfaces/chat.repository.interface';
 import { IMemberRepository } from '../repositories/interfaces/chat-member.repository.interface';
 import { IMessageRepository } from '../repositories/interfaces/chat-message.repository.interface';
+import { randomUUID } from 'crypto';
 
 export interface CallUser {
   uuid: string;
+  username?: string;
   status: 'RINGING' | 'IN_CALL' | 'DECLINED' | 'BUSY';
 }
 
 export interface CallSession {
+  callId: string;
   chatId: number;
   caller: string;
   users: CallUser[];
@@ -49,11 +52,12 @@ export class CallService {
 
     // Build call users list
     const callUsers: CallUser[] = [
-      { uuid: callerUuid, status: 'IN_CALL' },
-      ...otherMembers.map(member => ({ uuid: member.uuid, status: 'RINGING' as const }))
+      { uuid: callerUuid, username: allMembers.find(m => m.uuid === callerUuid)?.username, status: 'IN_CALL' },
+      ...otherMembers.map(member => ({ uuid: member.uuid, username: member.username, status: 'RINGING' as const }))
     ];
 
     return {
+      callId: randomUUID(),
       chatId,
       caller: callerUuid,
       users: callUsers

@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { rotomChatUsers, RotomChatUser } from '@/_db/schema/SmartRotomChat';
+import { smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { IMemberRepository } from './interfaces/chat-member.repository.interface';
 import { and, eq } from 'drizzle-orm';
 import { ChatMember } from '../entities/chat.entity';
@@ -11,8 +12,12 @@ export class ChatMemberRepository implements IMemberRepository {
   constructor(@Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>) {}
 
   async findChatMembers(chatId: number): Promise<ChatMember[]> {
-    return this.db.select({ uuid: rotomChatUsers.uuid })
+    return this.db.select({ 
+      uuid: rotomChatUsers.uuid,
+      username: smartrotomUsers.username
+    })
       .from(rotomChatUsers)
+      .leftJoin(smartrotomUsers, eq(rotomChatUsers.uuid, smartrotomUsers.uuid))
       .where(eq(rotomChatUsers.chatId, chatId));
   }
 
