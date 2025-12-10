@@ -68,7 +68,6 @@ export function ShareDocumentDialog({ document }: ShareDocumentDialogProps) {
       const documentData = {
         documentId: document.id,
         title: document.title,
-        content: document.content?.substring(0, 200) // Send preview of content
       }
 
       // Send document message
@@ -78,10 +77,6 @@ export function ShareDocumentDialog({ document }: ShareDocumentDialogProps) {
         type: CreateMessageDto.type.DOCUMENT,
       })
 
-      console.log("Document message sent")
-      console.log("Adding document to user's notes")
-      console.log("Document ID:", document.id)
-      console.log("User UUID:", selectedUser.uuid)
       await DocumentsService.addNoteToUser(document.id, selectedUser.uuid)
 
       toast.success(`Documento compartido con ${selectedUser.username}`)

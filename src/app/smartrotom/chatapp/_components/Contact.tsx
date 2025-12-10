@@ -10,6 +10,7 @@ import {
   Smile,
   Sticker,
   FileText,
+  MapPin,
 } from "lucide-react";
 
 export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatData, activeChat: number, setActiveChat: (id: number) => void, session: any}) {
@@ -123,6 +124,19 @@ export function Contact({chat, activeChat, setActiveChat, session}: {chat: ChatD
             strokeWidth={2}
           />
           <span>Documento</span>
+        </p>
+      );
+
+    if (msg.type === "waypoint")
+      return (
+        <p className="text-sm flex items-center">
+          <MapPin
+            className="mr-2 text-neutral-50"
+            height={20}
+            width={20}
+            strokeWidth={2}
+          />
+          <span>Ubicación</span>
         </p>
       );
 

@@ -57,6 +57,15 @@ export interface DocumentMessageData {
     content?: string;
 }
 
+export interface WaypointMessageData {
+    name: string;
+    x: number;
+    y: number;
+    z: number;
+    dimension?: string;
+    color?: string;
+}
+
 export type Message = {
     id: number;
     content: string;

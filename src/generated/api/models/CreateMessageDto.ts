@@ -29,6 +29,7 @@ export namespace CreateMessageDto {
         STICKER = 'sticker',
         VIDEO = 'video',
         DOCUMENT = 'document',
+        WAYPOINT = 'waypoint',
     }
 }
 

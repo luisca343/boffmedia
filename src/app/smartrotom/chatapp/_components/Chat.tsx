@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/primitives/input"
 import { ImageGalleryPicker } from "./ImageGalleryPicker"
 import { EmojiPicker } from "./EmojiPicker"
 import { StickerPicker } from "./StickerPicker"
+import { WaypointPicker } from "./WaypointPicker"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/primitives/button"
@@ -251,6 +252,43 @@ export function Chat({
       })
   }
 
+  function sendWaypoint(waypoint: { name: string; x: number; y: number; z: number; dimension?: string; color?: string }) {
+    const waypointData = {
+      name: waypoint.name,
+      x: waypoint.x,
+      y: waypoint.y,
+      z: waypoint.z,
+      dimension: waypoint.dimension,
+      color: waypoint.color
+    }
+
+    const newMessage: MessageType = {
+      id: Date.now(),
+      content: JSON.stringify(waypointData),
+      createdAt: new Date().toISOString(),
+      uuid: getSmartRotomUser(session).uuid,
+      chatId: chat.id,
+      type: "waypoint"
+    }
+
+    // Update parent chats list
+    onMessageSent?.(newMessage, activeChat)
+
+    ChatAppService
+      .createMessage(chat.id, {
+        message: JSON.stringify(waypointData),
+        uuid: getSmartRotomUser(session).uuid,
+        type: CreateMessageDto.type.WAYPOINT,
+      })
+      .then(() => {
+        console.log("Waypoint sent successfully")
+      })
+      .catch((error) => {
+        console.error("Failed to send waypoint:", error)
+        toast.error("Failed to send waypoint. Please try again.")
+      })
+  }
+
   return (
     <div className="flex flex-col w-full h-full">
       <div className="h-16 px-4 w-full bg-neutral-800 flex items-center border-b border-neutral-900 shadow-sm">
@@ -299,6 +337,7 @@ export function Chat({
           <ImageIcon className="h-5 w-5" />
         </Button>
         <StickerPicker onStickerSelect={sendSticker} />
+        <WaypointPicker onWaypointSelect={sendWaypoint} />
         <EmojiPicker onEmojiSelect={handleEmojiSelect} />
         <Input
           ref={inputRef}
