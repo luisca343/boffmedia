@@ -1,7 +1,7 @@
 import { DefaultSession, DefaultUser } from "next-auth"
 
 export type SmartRotomUser = {
-  name: string
+  username: string
   uuid: string
   world: string | null
 }

@@ -12,7 +12,7 @@ import { WaypointPicker } from "./WaypointPicker"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/primitives/button"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService"
 import { CreateMessageDto } from "@/generated/api"
@@ -23,11 +23,13 @@ export function Chat({
   activeChat,
   setActiveChat,
   onMessageSent,
+  typingUsers,
 }: {
   chats: ChatData[]
   activeChat: number
   setActiveChat: (id: number) => void
   onMessageSent?: (message: MessageType, activeChat: number) => void
+  typingUsers?: Map<string, string>
 }) {
   const [chat, setChat] = useState(chats[0] as ChatData)
   const [message, setMessage] = useState("")
@@ -37,6 +39,23 @@ export function Chat({
 
   const messagesStartRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Get usernames for typing users
+  const getTypingUsernames = useCallback(() => {
+    if (!typingUsers || typingUsers.size === 0) return [];
+    
+    const currentUserUuid = getSmartRotomUser(session).uuid;
+    const usernames: string[] = [];
+    
+    typingUsers.forEach((username, uuid) => {
+      if (uuid !== currentUserUuid) {
+        usernames.push(username);
+      }
+    });
+    
+    return usernames;
+  }, [typingUsers, session]);
 
   const scrollToBottom = () => {
     messagesStartRef.current?.scrollIntoView({ behavior: "smooth", block: "end" })
@@ -55,6 +74,38 @@ export function Chat({
       // Socket logic here if needed
     }
   }, [activeChat, chats, socket])
+
+  // Handle typing indicator
+  const handleTyping = useCallback(() => {
+    if (!socket || !chat) return
+    
+    const userData = { chatId: chat.id, uuid: getSmartRotomUser(session).uuid, username: getSmartRotomUser(session).username };
+    console.log("handleTyping called with userData:", userData);
+
+    // Emit typing start
+    console.log("Emitting chat:typing:start", userData);
+    socket.emit("chat:typing:start", userData);
+    
+    // Clear existing timeout
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current)
+    }
+    
+    // Set timeout to emit typing stop
+    typingTimeoutRef.current = setTimeout(() => {
+      console.log("Emitting chat:typing:stop", userData);
+      socket.emit("chat:typing:stop", userData);
+    }, 2000)
+  }, [socket, chat, session])
+
+  // Cleanup typing timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
+      }
+    }
+  }, [])
 
   function isEmojiOnly(text: string): boolean {
     const trimmed = text.trim()
@@ -286,8 +337,22 @@ export function Chat({
       .catch((error) => {
         console.error("Failed to send waypoint:", error)
         toast.error("Failed to send waypoint. Please try again.")
-      })
+      });
   }
+
+  // Memoize messages to prevent re-rendering on every keystroke
+  const renderedMessages = useMemo(() => {
+    return chat.messages.map((message, index) => (
+      <Message
+        key={message.id}
+        message={message}
+        session={session}
+        img={chat.type !== 1}
+        prev={index < chat.messages.length - 1 ? chat.messages[index + 1] : null}
+        next={index > 0 ? chat.messages[index - 1] : null}
+      />
+    ));
+  }, [chat.messages, chat.type, session]);
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -316,16 +381,39 @@ export function Chat({
         }}
       >
         <div ref={messagesStartRef} />
-        {chat.messages.map((message, index) => (
-          <Message
-            key={message.id}
-            message={message}
-            session={session}
-            img={chat.type !== 1}
-            prev={index < chat.messages.length - 1 ? chat.messages[index + 1] : null}
-            next={index > 0 ? chat.messages[index - 1] : null}
-          />
-        ))}
+        {(() => {
+          const typingUsernames = getTypingUsernames();
+          
+          if (typingUsernames.length === 0) return null;
+          
+          const displayText = (() => {
+            if (typingUsernames.length === 1) {
+              return `${typingUsernames[0]} is typing`;
+            } else if (typingUsernames.length === 2) {
+              return `${typingUsernames[0]} and ${typingUsernames[1]} are typing`;
+            } else if (typingUsernames.length === 3) {
+              return `${typingUsernames[0]}, ${typingUsernames[1]}, and ${typingUsernames[2]} are typing`;
+            } else {
+              return `${typingUsernames[0]}, ${typingUsernames[1]}, and ${typingUsernames.length - 2} others are typing`;
+            }
+          })();
+          
+          return (
+            <div className="flex items-start gap-3 px-4 py-2 mb-2 animate-fade-in">
+              <div className="flex items-center gap-2 bg-neutral-800/80 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg border border-neutral-700/50">
+                <div className="flex gap-1">
+                  <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "0ms", animationDuration: "1s" }} />
+                  <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "200ms", animationDuration: "1s" }} />
+                  <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: "400ms", animationDuration: "1s" }} />
+                </div>
+                <span className="text-sm text-neutral-300 font-medium">
+                  {displayText}...
+                </span>
+              </div>
+            </div>
+          );
+        })()}
+        {renderedMessages}
       </div>
       <div className="p-4 bg-neutral-800 flex items-center space-x-2 border-t border-black">
         <Button
@@ -343,7 +431,10 @@ export function Chat({
           ref={inputRef}
           variant="neutral"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value)
+            handleTyping()
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault()
