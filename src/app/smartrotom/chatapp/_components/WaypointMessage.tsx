@@ -1,7 +1,8 @@
 "use client"
 
-import { MapPin, Copy } from "lucide-react"
+import { MapPin, Copy, Plus } from "lucide-react"
 import { toast } from "react-toastify"
+import { addWaypoint } from "@/services/mcef/mcefApi"
 import type { Message as MessageType, WaypointMessageData } from "../_types/Chat"
 
 interface WaypointMessageProps {
@@ -43,6 +44,27 @@ export function WaypointMessage({
     const coords = `${waypointData.x} ${waypointData.y} ${waypointData.z}`
     navigator.clipboard.writeText(coords)
     toast.success("Coordenadas copiadas al portapapeles")
+  }
+
+  async function handleAddWaypoint() {
+    try {
+      const result = await addWaypoint({
+        name: waypointData.name,
+        x: waypointData.x,
+        y: waypointData.y,
+        z: waypointData.z,
+        color: waypointData.color || '#FFFFFF'
+      })
+
+      if (result.success) {
+        toast.success(`Waypoint "${waypointData.name}" añadido`)
+      } else {
+        toast.error(result.error || "Error al añadir waypoint")
+      }
+    } catch (error) {
+      console.error("Failed to add waypoint:", error)
+      toast.error("Error al añadir waypoint")
+    }
   }
 
   return (
@@ -97,13 +119,20 @@ export function WaypointMessage({
           </div>
 
           {/* Action Bar */}
-          <div className="px-3 py-2 border-t border-black/10 bg-neutral-850 flex items-center justify-end">
+          <div className="px-3 py-2 border-t border-black/10 bg-neutral-850 flex items-center justify-end gap-2">
             <button
               onClick={copyCoordinates}
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-neutral-700 hover:bg-neutral-600 text-neutral-100 rounded transition-colors"
             >
               <Copy className="h-3.5 w-3.5" />
               Copiar coordenadas
+            </button>
+            <button
+              onClick={handleAddWaypoint}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary-400 hover:bg-primary-500 text-black rounded transition-colors"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Añadir Waypoint
             </button>
           </div>
         </div>
