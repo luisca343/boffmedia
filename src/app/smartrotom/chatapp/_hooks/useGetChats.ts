@@ -23,15 +23,26 @@ function useChatAppGetChatsWithUpdate(): useChatAppGetChatsWithUpdateReturnType 
   const updateChats = (message: Message, activeChat: number) => {
     setChats((prev: any) => {
       if (!prev) return prev;
-      const chat = prev.find((chat: ChatData) => chat.id == message.chatId); 
-      if (!chat) return prev;
-      chat.messages.unshift({ id: message.id, chatId: message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type });
-
-      chat.unread++;
-      return [...prev].sort((a, b) => {
+      
+      return prev.map((chat: ChatData) => {
+        if (chat.id !== message.chatId) return chat;
+        
+        // Check if message already exists to prevent duplicates
+        const messageExists = chat.messages.some((m: Message) => m.id === message.id);
+        if (messageExists) return chat;
+        
+        // Create a new chat object with updated messages (immutable)
+        return {
+          ...chat,
+          messages: [
+            { id: message.id, chatId: message.chatId, content: message.content, createdAt: message.createdAt, uuid: message.uuid, type: message.type },
+            ...chat.messages
+          ],
+          unread: chat.unread + 1
+        };
+      }).sort((a: ChatData, b: ChatData) => {
         const aDate = new Date(a.messages[0]?.createdAt) || new Date();
         const bDate = new Date(b.messages[0]?.createdAt) || new Date();
-
         return bDate.getTime() - aDate.getTime();
       });
     });

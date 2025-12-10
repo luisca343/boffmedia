@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Axios from "axios";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
@@ -9,7 +9,8 @@ import { ChannelTabs } from "../_components/ChannelTabs";
 import { ChannelInfo, Video, API_KEY, formatNumber, formatDate } from "../../types";
 import { useTranslations } from "next-intl";
 
-export default function YoutubeChannel({ params }: { params: { id: string } }) {
+export default function YoutubeChannel({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const t = useTranslations("youtube");
   const [channelInfo, setChannelInfo] = useState<ChannelInfo | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
@@ -20,13 +21,13 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
 
   useEffect(() => {
     fetchChannelInfo();
-  }, [params.id]);
+  }, [id]);
 
   const fetchChannelInfo = async () => {
     try {
       setLoading(true);
       const response = await Axios.get(
-        `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id=${params.id}&key=${API_KEY}`
+        `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics,brandingSettings&id=${id}&key=${API_KEY}`
       );
       
       if (response.data.items && response.data.items.length > 0) {
@@ -44,7 +45,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
   const fetchUploadsPlaylistId = async () => {
     try {
       const response = await Axios.get(
-        `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${params.id}&key=${API_KEY}`
+        `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&id=${id}&key=${API_KEY}`
       );
 
       const uploadsPlaylistId =
@@ -95,7 +96,7 @@ export default function YoutubeChannel({ params }: { params: { id: string } }) {
   const fetchPopularVideos = async () => {
     try {
       const response = await Axios.get(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${params.id}&maxResults=10&order=viewCount&type=video&key=${API_KEY}`
+        `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${id}&maxResults=10&order=viewCount&type=video&key=${API_KEY}`
       );
 
       if (response.data.items) {

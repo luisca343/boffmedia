@@ -216,6 +216,85 @@ export async function getZoomLevel(): Promise<ZoomLevelResponse> {
   };
 }
 
+export interface Waypoint {
+  name: string;
+  x: number;
+  y: number;
+  z: number;
+  color?: string;
+  dimension?: string;
+}
+
+export interface WaypointsResponse {
+  success: boolean;
+  waypoints?: Waypoint[];
+  error?: string;
+}
+
+/**
+ * Gets all waypoints from Xaero's Minimap/Worldmap
+ * @returns Promise with the list of waypoints
+ */
+export async function getWaypoints(): Promise<WaypointsResponse> {
+  const result = await mcefQuery<{
+    status: string;
+    waypoints: Waypoint[];
+  }>('GET_WAYPOINTS');
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  return {
+    success: true,
+    waypoints: result.data?.waypoints || []
+  };
+}
+
+export interface AddWaypointParams {
+  name?: string;
+  x: number;
+  y: number;
+  z: number;
+  color?: string;
+}
+
+export interface AddWaypointResponse {
+  success: boolean;
+  error?: string;
+}
+
+/**
+ * Adds a new waypoint to Xaero's Minimap/Worldmap
+ * @param params Waypoint parameters (name, x, y, z, color)
+ * @returns Promise indicating success or failure
+ */
+export async function addWaypoint(params: AddWaypointParams): Promise<AddWaypointResponse> {
+  const result = await mcefQuery<{
+    status: string;
+  }>('ADD_WAYPOINT', {
+    name: params.name || 'waypoint',
+    x: params.x,
+    y: params.y,
+    z: params.z,
+    color: params.color || '#FFFFFF'
+  });
+
+  if (result.error) {
+    return {
+      success: false,
+      error: result.error
+    };
+  }
+
+  return {
+    success: true
+  };
+}
+
 /**
  * Sets the zoom level in Minecraft
  * @param level Zoom level (0-4): 0 = 1x, 1 = 1.5x, 2 = 2x, 3 = 3x, 4 = 4x

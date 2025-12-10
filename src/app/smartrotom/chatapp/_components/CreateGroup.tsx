@@ -32,7 +32,10 @@ export function CreateGroup({ setActiveChat }: { setActiveChat: (id: number) => 
   function handleOpenChange(open: boolean) {
     setOpen(open)
     if (open) {
-      refetchUsers()
+      refetchUsers().catch((err) => {
+        console.error("Error fetching users:", err);
+        toast.error("Error al cargar la lista de usuarios");
+      });
     } else {
       setSelectedUsers([])
       setGroupName("")
@@ -63,6 +66,7 @@ export function CreateGroup({ setActiveChat }: { setActiveChat: (id: number) => 
       }
       setOpen(false)
     } catch (error) {
+      console.error("Error creating chat:", error);
       toast.error("Error al crear el chat")
     }
   }
@@ -139,7 +143,7 @@ export function CreateGroup({ setActiveChat }: { setActiveChat: (id: number) => 
                         <Checkbox
                           id={user.uuid}
                           className="border-neutral-700"
-                          onCheckedChange={(checked: boolean) => {
+                          onCheckedChange={(checked) => {
                             if (checked) {
                               setSelectedUsers((prev) => [...prev, user])
                             } else {

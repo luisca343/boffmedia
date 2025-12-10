@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import Axios from "axios";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { LoadingSpinner } from "@/components/ui/display/LoadingSpinner";
@@ -10,7 +10,8 @@ import { VideoDetails as VideoDetailsType, API_KEY, formatNumber, formatLongDate
 import { addToHistory } from "../../_services/historyService";
 import { useTranslations } from "next-intl";
 
-export default function Video({ params }: { params: { id: string } }) {
+export default function Video({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const t = useTranslations("youtube");
   const [videoDetails, setVideoDetails] = useState<VideoDetailsType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -20,8 +21,10 @@ export default function Video({ params }: { params: { id: string } }) {
     async function fetchVideoDetails() {
       try {
         const response = await Axios.get(
-          `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${params.id}&key=${API_KEY}`
+          `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${id}&key=${API_KEY}`
         );
+
+        console.log("Video details response:", response.data);
         
         if (response.data.items && response.data.items.length > 0) {
           const details = response.data.items[0];
@@ -30,7 +33,7 @@ export default function Video({ params }: { params: { id: string } }) {
           // Add to watch history
           addToHistory({
             ...details,
-            id: params.id
+            id: id
           });
         } else {
           setError(t("video.notFound"));
@@ -44,7 +47,7 @@ export default function Video({ params }: { params: { id: string } }) {
     }
     
     fetchVideoDetails();
-  }, [params.id, t]);
+  }, [id, t]);
 
   if (loading) {
     return (
@@ -71,7 +74,7 @@ export default function Video({ params }: { params: { id: string } }) {
     <div className="min-h-full bg-surface-900 text-white overflow-auto">
       <div className="container mx-auto px-4 py-6">
         <div className="mb-6">
-          <VideoPlayer videoId={params.id} title={videoDetails?.snippet.title || ""} />
+          <VideoPlayer videoId={id} title={videoDetails?.snippet.title || ""} />
         </div>
 
         {videoDetails && (

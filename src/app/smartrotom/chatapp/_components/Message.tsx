@@ -1,9 +1,63 @@
 import { getSmartRotomUser, strToTime } from "@/lib/utils"
-import type { Message as MessageType } from "../_types/Chat"
+import type { Message as MessageType, ImageMessageData, VideoMessageData, DocumentMessageData, WaypointMessageData, CallMessageData } from "../_types/Chat"
+import { SystemMessage } from "./SystemMessage"
+import { ImageMessage } from "./ImageMessage"
+import { VideoMessage } from "./VideoMessage"
+import { DocumentMessage } from "./DocumentMessage"
+import { WaypointMessage } from "./WaypointMessage"
+import { CallMessage } from "./CallMessage"
+import { TextMessage } from "./TextMessage"
+import { EmojiMessage } from "./EmojiMessage"
+import { StickerMessage } from "./StickerMessage"
 
 export function parseSystemMessage(message: MessageType) {
-  if (message.type === "call") return `Llamada de ${message.content} segundos`
   return message.content
+}
+
+export function parseImageMessage(content: string): ImageMessageData | null {
+  try {
+    return JSON.parse(content) as ImageMessageData
+  } catch {
+    return null
+  }
+}
+
+export function parseVideoMessage(content: string): VideoMessageData | null {
+  try {
+    return JSON.parse(content) as VideoMessageData
+  } catch {
+    return null
+  }
+}
+
+export function parseDocumentMessage(content: string): DocumentMessageData | null {
+  try {
+    return JSON.parse(content) as DocumentMessageData
+  } catch {
+    return null
+  }
+}
+
+export function parseWaypointMessage(content: string): WaypointMessageData | null {
+  try {
+    return JSON.parse(content) as WaypointMessageData
+  } catch {
+    return null
+  }
+}
+
+export function parseCallMessage(content: string): CallMessageData | null {
+  try {
+    // If content is just a number (duration in seconds), parse it
+    const duration = parseInt(content, 10)
+    if (!isNaN(duration)) {
+      return { duration }
+    }
+    // Otherwise try to parse as JSON
+    return JSON.parse(content) as CallMessageData
+  } catch {
+    return null
+  }
 }
 
 export function Message({
@@ -19,6 +73,8 @@ export function Message({
   prev: MessageType | null
   next: MessageType | null
 }) {
+
+  console.log("Rendering message:", message)
   const isSender = message.uuid === getSmartRotomUser(session).uuid
   const sender = message.uuid === "system" ? "system" : isSender ? "user" : "other"
   const content = message.uuid === "system" ? parseSystemMessage(message) : message.content
@@ -28,7 +84,6 @@ export function Message({
   const isLastInSequence = !next || next.uuid !== message.uuid
 
   const getBubbleShape = () => {
-    if (sender === "system") return "rounded-lg"
     if (isSender) {
       if (isFirstInSequence && isLastInSequence) return "rounded-3xl"
       if (isLastInSequence) return "rounded-b-3xl rounded-tl-3xl rounded-tr-lg"
@@ -42,47 +97,137 @@ export function Message({
     }
   }
 
-  if(sender === "system") return (
+  if(sender === "system" && message.type !== "call") return (
     <SystemMessage content={content} />
   )
 
-  return (
-    <div className={`flex w-full ${sender === "user" ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`relative flex flex-col mb-0.5 min-w-16  text-lg max-w-3xl mx-2 ${
-          isLastInSequence ? "mb-1" : ""
-        } ${isFirstInSequence ? "mt-1" : ""}`}
-      >
-        {sender !== "user" && img && isLastInSequence && (
-          <img
-            src={`https://crafatar.com/avatars/${message.uuid}`}
-            alt={`profile picture for ${message.uuid}`}
-            className="w-6 h-6 rounded-full absolute -left-4 -bottom-2"
-          />
-        )}
-        {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
-            {timestamp}
-          </span>
-        )}
-        <div
-          className={`px-4 py-2 ${getBubbleShape()} ${
-            sender === "user"
-                ? "bg-primary-400 text-neutral-800"
-                : "bg-surface-300 text-neutral-800"
-          }`}
-        >
-          <span className="break-words">{content}</span>
-        </div>
-      </div>
-    </div>
-  )
-}
+  if (message.type === "image") {
+    const imageData = parseImageMessage(message.content)
+    if (imageData) {
+      return (
+        <ImageMessage
+          imageData={imageData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
 
-export function SystemMessage({ content }: { content: string }) {
+  if (message.type === "video") {
+    const videoData = parseVideoMessage(message.content)
+    if (videoData) {
+      return (
+        <VideoMessage
+          videoData={videoData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if (message.type === "document") {
+    const documentData = parseDocumentMessage(message.content)
+    if (documentData) {
+      return (
+        <DocumentMessage
+          documentData={documentData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if (message.type === "waypoint") {
+    const waypointData = parseWaypointMessage(message.content)
+    if (waypointData) {
+      return (
+        <WaypointMessage
+          waypointData={waypointData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if (message.type === "call") {
+    const callData = parseCallMessage(message.content)
+    if (callData) {
+      return (
+        <CallMessage
+          callData={callData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if (message.type === "emoji") {
+    return (
+      <EmojiMessage
+        message={message}
+        content={content}
+        sender={sender}
+        timestamp={timestamp}
+        img={img}
+        isFirstInSequence={isFirstInSequence}
+        isLastInSequence={isLastInSequence}
+      />
+    )
+  }
+
+  if (message.type === "sticker") {
+    return (
+      <StickerMessage
+        message={message}
+        content={content}
+        sender={sender}
+        timestamp={timestamp}
+        img={img}
+        isFirstInSequence={isFirstInSequence}
+        isLastInSequence={isLastInSequence}
+      />
+    )
+  }
+
   return (
-    <div className="flex justify-center text-sm text-surface-500">
-      <span className="px-2 my-1 bg-surface-200 rounded-lg">{content}</span>
-    </div>
+    <TextMessage
+      message={message}
+      content={content}
+      sender={sender}
+      timestamp={timestamp}
+      img={img}
+      isFirstInSequence={isFirstInSequence}
+      isLastInSequence={isLastInSequence}
+    />
   )
 }

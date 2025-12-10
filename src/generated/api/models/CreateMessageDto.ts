@@ -25,6 +25,11 @@ export namespace CreateMessageDto {
         CALL = 'call',
         SYSTEM = 'system',
         IMAGE = 'image',
+        EMOJI = 'emoji',
+        STICKER = 'sticker',
+        VIDEO = 'video',
+        DOCUMENT = 'document',
+        WAYPOINT = 'waypoint',
     }
 }
 
