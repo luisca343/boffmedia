@@ -129,9 +129,6 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
       try {
         // Get chat members to broadcast to
         const chatMembers = await this.chatAppService.getChatById(data.chatId, data.uuid)
-
-        console.log(`Typing started by ${data.uuid} in chat ${data.chatId}`)
-        console.log("Chat members: ", chatMembers.members)
         
         // Broadcast typing indicator to all other members in the chat
         chatMembers.members.forEach((member) => {
