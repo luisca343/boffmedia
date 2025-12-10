@@ -66,6 +66,11 @@ export interface WaypointMessageData {
     color?: string;
 }
 
+export interface CallMessageData {
+    duration: number;
+    participants?: string[];
+}
+
 export type Message = {
     id: number;
     content: string;

@@ -73,20 +73,18 @@ export function ImageMessage({
           />
         )}
         {isFirstInSequence && (
-          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-300"} mb-1`}>
+          <span className={`text-xs ${sender === "user" ? "text-surface-400 self-end" : "text-surface-500"} mb-1`}>
             {timestamp}
           </span>
         )}
         <div
-          className={`overflow-hidden  border-2 border-neutral-900 ${getBubbleShape()} ${
-            sender === "user" ? "bg-primary-400" : "bg-surface-300"
-          }`}
+          className={`overflow-hidden border-2 border-neutral-900 ${getBubbleShape()}`}
         >
           <div className="relative group">
             <img
               src={imageUrl}
               alt="Screenshot"
-              className="w-full object-contain "
+              className="w-full object-contain bg-neutral-900"
               style={{ maxHeight: caption && caption.length > 100 ? '300px' : '500px' }}
             />
             <button
@@ -98,8 +96,8 @@ export function ImageMessage({
             </button>
           </div>
           {caption && (
-            <div className="px-4 py-2 max-h-32 overflow-y-auto">
-              <p className="break-words whitespace-pre-wrap text-neutral-800 leading-relaxed">{caption}</p>
+            <div className="px-4 py-2 max-h-32 overflow-y-auto bg-neutral-800">
+              <p className="break-words whitespace-pre-wrap text-neutral-100 leading-relaxed">{caption}</p>
             </div>
           )}
 
@@ -116,60 +114,62 @@ function MetaDropdown({ meta }: { meta: ImageMessageData['meta'] }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="px-3 py-2 border-t border-black/10 text-xs bg-transparent">
+    <div className="px-3 py-2 border-t border-black/10 text-xs bg-neutral-800">
       <button
         type="button"
         onClick={() => setOpen((s) => !s)}
-        className="w-full flex items-center justify-between gap-2 text-neutral-600 px-2 py-1 hover:bg-black/5 rounded"
+        className="w-full flex items-center justify-between gap-2 text-neutral-400 px-2 py-1 hover:bg-neutral-700 rounded"
       >
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4" />
           <span className="font-medium">Detalles</span>
         </div>
-        <div className="text-neutral-500 truncate max-w-[160px]">{meta?.id}</div>
+        <div className="text-neutral-400 truncate max-w-[160px]">{meta?.id}</div>
         <ChevronDown className={`h-4 w-4 transform ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
-        <div className="mt-2 space-y-2 text-neutral-700">
+        <div className="mt-2 space-y-2 text-neutral-200">
           {meta?.timestamp && (
-            <div className="text-neutral-500 text-[11px]">{new Date(meta.timestamp).toLocaleString()}</div>
+            <div className="text-neutral-400 text-[11px]">{new Date(meta.timestamp).toLocaleString()}</div>
           )}
 
           {meta?.location && (
             <div className="flex items-start gap-2">
-              <MapPin className="h-4 w-4 mt-0.5 text-neutral-600" />
-              <div className="leading-tight text-neutral-700">
+              <MapPin className="h-4 w-4 mt-0.5 text-neutral-400" />
+              <div className="leading-tight text-neutral-200">
                 <div>
                   <span className="font-medium">Jugador:</span>{" "}
                   X: {meta.location.playerPosition.x.toFixed(1)}, Y: {meta.location.playerPosition.y.toFixed(1)}, Z: {meta.location.playerPosition.z.toFixed(1)}
                 </div>
-                <div className="text-neutral-600 text-[12px]">
-                  <span className="font-medium">Mirando a:</span>{" "}
-                  X: {meta.location.lookingAt.x.toFixed(1)}, Y: {meta.location.lookingAt.y.toFixed(1)}, Z: {meta.location.lookingAt.z.toFixed(1)}
-                  {meta.location.lookingAt.block ? <span>{" — "}{meta.location.lookingAt.block}</span> : null}
-                </div>
+                {meta.location.lookingAt && (
+                  <div className="text-neutral-400 text-[12px]">
+                    <span className="font-medium">Mirando a:</span>{" "}
+                    X: {meta.location.lookingAt.x.toFixed(1)}, Y: {meta.location.lookingAt.y.toFixed(1)}, Z: {meta.location.lookingAt.z.toFixed(1)}
+                    {meta.location.lookingAt.block ? <span>{" — "}{meta.location.lookingAt.block}</span> : null}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
           {meta?.entities && meta.entities.length > 0 && (
             <div>
-              <div className="text-neutral-600 font-medium text-[12px] mb-1">Entidades ({meta.entities.length})</div>
+              <div className="text-neutral-400 font-medium text-[12px] mb-1">Entidades ({meta.entities.length})</div>
               <ul className="space-y-1">
                 {meta.entities.map((e, i) => {
                   const ent: any = e
                   const isNPC = ent.type === "npc"
                   const title = isNPC ? ent.name : ent.species || ent.name || "Unknown"
                   return (
-                    <li key={i} className="flex items-center justify-between text-neutral-700">
+                    <li key={i} className="flex items-center justify-between text-neutral-200">
                       <div className="truncate">
                         <div className="font-medium">{title}</div>
-                        <div className="text-neutral-500 text-[12px] truncate">
+                        <div className="text-neutral-400 text-[12px] truncate">
                           {ent.type} {ent.type === "pokemon" && ent.dex ? `• #${ent.dex}` : ""} • {ent.distance}m • {ent.coverage}%
                         </div>
                       </div>
-                      <div className="ml-3 text-neutral-500 text-[12px]">
+                      <div className="ml-3 text-neutral-400 text-[12px]">
                         {`[${ent.position.x.toFixed(1)}, ${ent.position.y.toFixed(1)}, ${ent.position.z.toFixed(1)}]`}
                       </div>
                     </li>

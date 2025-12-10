@@ -56,7 +56,7 @@ export function TextMessage({
           className={`px-4 py-2  border-2 border-neutral-900 ${getBubbleShape()} ${
             sender === "user"
                 ? "bg-primary-400 text-neutral-800"
-                : "bg-surface-300 text-neutral-800"
+                : "bg-neutral-800 text-neutral-100"
           }`}
         >
           <span className="break-words">{content}</span>

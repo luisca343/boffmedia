@@ -7,6 +7,7 @@ export enum UserStatus {
   export interface UserData {
     uuid: string
     status: UserStatus
+    username: string
   }
   
   export interface CallData {

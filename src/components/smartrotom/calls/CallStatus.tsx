@@ -183,9 +183,11 @@ export function CallStatus() {
 
   return (
     <nav
-      className={`flex flex-col items-center justify-center absolute ${
-        isExpanded ? "right-0 w-full h-full" : "left-0 w-60 h-12"
-      } bg-surface-800 text-surface-50 font-bold z-20 ${activeCall || isExpanded ? "" : "hidden"}`}
+      className={`flex flex-col items-center justify-center fixed transition-all duration-300 ease-in-out ${
+        isExpanded 
+          ? "inset-0 w-full h-full bg-surface-900/95 backdrop-blur-sm z-50" 
+          : "top-14 left-2 w-64 bg-surface-800/95 backdrop-blur-sm rounded-lg shadow-xl border border-surface-700 z-30"
+      } text-surface-50 font-medium ${activeCall.caller ? "" : "hidden"}`}
     >
       <audio ref={audioRef} src="/smartrotom/audio/apps/chatapp/denden.mp3" preload="auto"></audio>
       {isExpanded ? (
@@ -195,6 +197,7 @@ export function CallStatus() {
           onJoinCall={() => joinCall()}
           onExitCall={exitCall}
           onCollapse={() => setIsExpanded(false)}
+          callStartTime={callStartTime}
         />
       ) : (
         <CollapsedView
@@ -203,6 +206,7 @@ export function CallStatus() {
           onJoinCall={() => joinCall()}
           onExitCall={exitCall}
           onExpand={() => setIsExpanded(true)}
+          callStartTime={callStartTime}
         />
       )}
     </nav>

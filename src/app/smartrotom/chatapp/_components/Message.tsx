@@ -1,16 +1,16 @@
 import { getSmartRotomUser, strToTime } from "@/lib/utils"
-import type { Message as MessageType, ImageMessageData, VideoMessageData, DocumentMessageData, WaypointMessageData } from "../_types/Chat"
+import type { Message as MessageType, ImageMessageData, VideoMessageData, DocumentMessageData, WaypointMessageData, CallMessageData } from "../_types/Chat"
 import { SystemMessage } from "./SystemMessage"
 import { ImageMessage } from "./ImageMessage"
 import { VideoMessage } from "./VideoMessage"
 import { DocumentMessage } from "./DocumentMessage"
 import { WaypointMessage } from "./WaypointMessage"
+import { CallMessage } from "./CallMessage"
 import { TextMessage } from "./TextMessage"
 import { EmojiMessage } from "./EmojiMessage"
 import { StickerMessage } from "./StickerMessage"
 
 export function parseSystemMessage(message: MessageType) {
-  if (message.type === "call") return `Llamada de ${message.content} segundos`
   return message.content
 }
 
@@ -46,6 +46,20 @@ export function parseWaypointMessage(content: string): WaypointMessageData | nul
   }
 }
 
+export function parseCallMessage(content: string): CallMessageData | null {
+  try {
+    // If content is just a number (duration in seconds), parse it
+    const duration = parseInt(content, 10)
+    if (!isNaN(duration)) {
+      return { duration }
+    }
+    // Otherwise try to parse as JSON
+    return JSON.parse(content) as CallMessageData
+  } catch {
+    return null
+  }
+}
+
 export function Message({
   message,
   session,
@@ -59,6 +73,8 @@ export function Message({
   prev: MessageType | null
   next: MessageType | null
 }) {
+
+  console.log("Rendering message:", message)
   const isSender = message.uuid === getSmartRotomUser(session).uuid
   const sender = message.uuid === "system" ? "system" : isSender ? "user" : "other"
   const content = message.uuid === "system" ? parseSystemMessage(message) : message.content
@@ -68,7 +84,6 @@ export function Message({
   const isLastInSequence = !next || next.uuid !== message.uuid
 
   const getBubbleShape = () => {
-    if (sender === "system") return "rounded-lg"
     if (isSender) {
       if (isFirstInSequence && isLastInSequence) return "rounded-3xl"
       if (isLastInSequence) return "rounded-b-3xl rounded-tl-3xl rounded-tr-lg"
@@ -82,7 +97,7 @@ export function Message({
     }
   }
 
-  if(sender === "system") return (
+  if(sender === "system" && message.type !== "call") return (
     <SystemMessage content={content} />
   )
 
@@ -146,6 +161,24 @@ export function Message({
       return (
         <WaypointMessage
           waypointData={waypointData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if (message.type === "call") {
+    const callData = parseCallMessage(message.content)
+    if (callData) {
+      return (
+        <CallMessage
+          callData={callData}
           sender={sender}
           timestamp={timestamp}
           isSender={isSender}
