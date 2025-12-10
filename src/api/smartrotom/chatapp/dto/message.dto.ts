@@ -9,6 +9,7 @@ export enum MessageType {
   IMAGE = 'image',
   STICKER = 'sticker',
   EMOJI = 'emoji',
+  VIDEO = 'video',
   // From the Pixelmon Chat
   CHAT = 'chat',
 }
