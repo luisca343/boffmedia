@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, gt, inArray } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { SmartRotomUser, smartrotomUsers } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from '../dto/create-user.dto';
@@ -17,6 +17,10 @@ export class UsersRepository
     @Inject(DRIZZLE) db: MySql2Database<Record<string, never>>,
   ) {
     super(db, smartrotomUsers);
+  }
+
+  async findAll(): Promise<SmartRotomUser[]> {
+    return this.db.select().from(smartrotomUsers).where(gt(smartrotomUsers.id, 0));
   }
 
   async create(createUserDto: CreateSmartrotomUserDto): Promise<SmartRotomUser> {
