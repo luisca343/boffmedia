@@ -75,9 +75,69 @@ export function Chat({
     return textWithoutEmojis.length === 0
   }
 
+  function extractYouTubeId(url: string): string | null {
+    // Match various YouTube URL formats
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/shorts\/([^&\n?#]+)/,
+    ]
+    
+    for (const pattern of patterns) {
+      const match = url.match(pattern)
+      if (match && match[1]) {
+        return match[1]
+      }
+    }
+    return null
+  }
+
+  function isYouTubeUrl(text: string): boolean {
+    const trimmed = text.trim()
+    return /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)/.test(trimmed)
+  }
+
   function sendMessage() {
     if (!message.trim()) {
       return
+    }
+
+    // Check if message is a YouTube URL
+    if (isYouTubeUrl(message)) {
+      const videoId = extractYouTubeId(message)
+      if (videoId) {
+        const videoData = {
+          videoId,
+          url: message.trim(),
+          title: "YouTube Video"
+        }
+
+        const newMessage: MessageType = {
+          id: Date.now(),
+          content: JSON.stringify(videoData),
+          createdAt: new Date().toISOString(),
+          uuid: getSmartRotomUser(session).uuid,
+          chatId: chat.id,
+          type: "video"
+        }
+
+        // Update parent chats list
+        onMessageSent?.(newMessage, activeChat)
+
+        ChatAppService
+          .createMessage(chat.id, {
+            message: JSON.stringify(videoData),
+            uuid: getSmartRotomUser(session).uuid,
+            type: CreateMessageDto.type.VIDEO,
+          })
+          .then(() => {
+            setMessage("")
+          })
+          .catch((error) => {
+            console.error("Failed to send video message:", error)
+            toast.error("Failed to send video. Please try again.")
+          })
+        return
+      }
     }
 
     const messageType = isEmojiOnly(message) ? "emoji" : "text"

@@ -27,6 +27,7 @@ export namespace CreateMessageDto {
         IMAGE = 'image',
         EMOJI = 'emoji',
         STICKER = 'sticker',
+        VIDEO = 'video',
     }
 }
 

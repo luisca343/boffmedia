@@ -45,6 +45,12 @@ export interface ImageMessageData {
     };
 }
 
+export interface VideoMessageData {
+    videoId: string;
+    url: string;
+    title?: string;
+}
+
 export type Message = {
     id: number;
     content: string;
