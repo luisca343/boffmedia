@@ -74,6 +74,33 @@ export class StarbankTransactionService {
     return await this.transfer(createTransferDto);
   }
 
+  async transferFromSystem(accountId: number, amount: number, concept: string): Promise<void> {
+    // Validate transfer data
+    if (amount <= 0) {
+      throw new Error('Transfer amount must be positive');
+    }
+
+    // Validate account exists
+    const toAccount = await this.accountRepository.findById(accountId);
+    if (!toAccount) {
+      throw new Error('Destination account not found');
+    }
+
+    const transactionData = {
+      from: 0, // System account
+      to: accountId,
+      amount: amount,
+      reason: concept,
+      type: TransactionType.TRANSFERENCIA
+    };
+
+    const result = await this.transactionRepository.create(transactionData);
+    
+    if (!result.success) {
+      throw new Error(result.message || 'System transfer failed');
+    }
+  }
+
   async processShopTransaction(shopDto: CreateShopTransactionDto): Promise<void> {
     const mainAccount = await this.accountRepository.findUserMainAccount(shopDto.uuid);
     if (!mainAccount) {

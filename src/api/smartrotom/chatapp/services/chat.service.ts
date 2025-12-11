@@ -29,8 +29,13 @@ export class ChatService {
     let chatType = 1;
 
     if (uuids.length === 1) {
-      const existingChat = await this.chatRepository.findChatByName(chatName);
-      if (existingChat) return existingChat.id;
+      // For single-user chats (like "Mensajes Guardados"), check if THIS user already has one
+      const existingChats = await this.chatRepository.findUserChats(uuids[0]);
+      const existingChat = existingChats.find(chat => chat.name === chatName && chat.type === 1);
+      if (existingChat) {
+        console.log(`User ${uuids[0]} already has a "${chatName}" chat (ID: ${existingChat.id})`);
+        return existingChat.id;
+      }
       chatType = 1;
     } else if (uuids.length === 2) {
       uuids.sort();
@@ -52,6 +57,7 @@ export class ChatService {
       await this.chatMemberRepository.addChatMember(newChat.insertId, uuid);
     }
 
+    console.log(`Created new chat "${chatName}" (ID: ${newChat.insertId}) for user(s): ${uuids.join(', ')}`);
     return newChat.insertId;
   }
 

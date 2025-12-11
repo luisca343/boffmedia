@@ -72,20 +72,24 @@ export class StarbankFacadeService {
 
     await this.transactionService.transfer(transferDto);
 
-    // Update balance in game after successful transfer
-    const fromAccount = await this.getAccountInfo(from);
-    const toAccount = await this.getAccountInfo(to);
+    // Update balance in game after successful transfer (non-blocking)
+    try {
+      const fromAccount = await this.getAccountInfo(from);
+      const toAccount = await this.getAccountInfo(to);
 
-    const accounts = [fromAccount, toAccount].filter(acc => acc && acc.type === AccountType.MAIN);
+      const accounts = [fromAccount, toAccount].filter(acc => acc && acc.type === AccountType.MAIN);
 
-    for (const account of accounts) {
-      if (account && account.uuid) {
-        await this.updateBalance({
-          balance: account.balance,
-          type: account.type,
-          uuid: account.uuid
-        });
+      for (const account of accounts) {
+        if (account && account.uuid) {
+          await this.updateBalance({
+            balance: account.balance,
+            type: account.type,
+            uuid: account.uuid
+          });
+        }
       }
+    } catch (error) {
+      console.warn('Failed to update balance in game after transfer, continuing anyway:', error.message);
     }
   }
 
@@ -99,28 +103,54 @@ export class StarbankFacadeService {
 
     await this.transactionService.transferFromMain(transferDto);
 
-    // Update balance in game after successful transfer
-    const mainAccount = await this.getMainAccount(uuid);
-    if (mainAccount) {
-      await this.updateBalance({
-        balance: mainAccount.balance,
-        type: AccountType.MAIN,
-        uuid
-      });
+    // Update balance in game after successful transfer (non-blocking)
+    try {
+      const mainAccount = await this.getMainAccount(uuid);
+      if (mainAccount) {
+        await this.updateBalance({
+          balance: mainAccount.balance,
+          type: AccountType.MAIN,
+          uuid
+        });
+      }
+    } catch (error) {
+      console.warn(`Failed to update balance in game for user ${uuid}, continuing anyway:`, error.message);
+    }
+  }
+
+  async transferFromSystem(accountId: number, amount: number, concept: string): Promise<void> {
+    await this.transactionService.transferFromSystem(accountId, amount, concept);
+
+    // Update balance in game after successful transfer (non-blocking)
+    try {
+      const account = await this.getAccountInfo(accountId);
+      if (account && account.type === AccountType.MAIN && account.uuid) {
+        await this.updateBalance({
+          balance: account.balance,
+          type: account.type,
+          uuid: account.uuid
+        });
+      }
+    } catch (error) {
+      console.warn(`Failed to update balance in game for account ${accountId}, continuing anyway:`, error.message);
     }
   }
 
   async shop(shopData: CreateShopTransactionDto): Promise<void> {
     await this.transactionService.processShopTransaction(shopData);
 
-    // Update balance in game after successful transaction
-    const mainAccount = await this.getMainAccount(shopData.uuid);
-    if (mainAccount) {
-      await this.updateBalance({
-        balance: mainAccount.balance,
-        type: AccountType.MAIN,
-        uuid: shopData.uuid
-      });
+    // Update balance in game after successful transaction (non-blocking)
+    try {
+      const mainAccount = await this.getMainAccount(shopData.uuid);
+      if (mainAccount) {
+        await this.updateBalance({
+          balance: mainAccount.balance,
+          type: AccountType.MAIN,
+          uuid: shopData.uuid
+        });
+      }
+    } catch (error) {
+      console.warn(`Failed to update balance in game after shop transaction for user ${shopData.uuid}, continuing anyway:`, error.message);
     }
   }
 

@@ -8,9 +8,10 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { StarbankModule } from '../starbank/starbank.module';
 import { USERS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { ChatappModule } from '../chatapp/chatapp.module';
 
 @Module({
-  imports: [LoggerModule, DrizzleModule, StarbankModule],
+  imports: [LoggerModule, DrizzleModule, StarbankModule, ChatappModule],
   controllers: [UsersController],
   providers: [
     UsersFacadeService,

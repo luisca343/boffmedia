@@ -4,6 +4,7 @@ import { SmartRotomUser } from '@/_db/schema/SmartRotom';
 import { CreateSmartrotomUserDto } from './dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from './dto/update-user.dto';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
+import { ChatappFacadeService } from '../chatapp/chatapp.facade.service';
 
 export interface UserInitializationData {
   uuid: string;
@@ -28,6 +29,7 @@ export class UsersFacadeService {
   constructor(
     private readonly usersService: UsersService,
     private readonly starbankService: StarbankFacadeService,
+    private readonly chatAppService: ChatappFacadeService
   ) {}
 
   // ==================== USER MANAGEMENT ====================
@@ -74,11 +76,22 @@ export class UsersFacadeService {
     let accounts = await this.starbankService.getAccounts(data.uuid);
     let isNewAccount = false;
 
-    // Create main account if none exist
+    // Create main StarBank account if none exist
     if (accounts.length === 0) {
       await this.starbankService.createMainAccount(data.uuid, data.username);
-      accounts = await this.starbankService.getAccounts(data.uuid);
       isNewAccount = true;
+
+      const mainAccount = await this.starbankService.getMainAccount(data.uuid);
+      await this.starbankService.transferFromSystem(mainAccount.id, 1000, 'Ingreso de Bienvenida');
+      console.log(`Welcome bonus credited to user ${data.uuid}`);
+    }
+
+    // Create saved messages chat (non-blocking)
+    try {
+      await this.chatAppService.createChat({player: data.uuid, users: [], name: 'Mensajes Guardados'});
+      console.log(`Saved Messages chat created for user ${data.uuid}`);
+    } catch (error) {
+      console.warn(`Failed to create Saved Messages chat for user ${data.uuid}, continuing anyway:`, error.message);
     }
 
     return {
