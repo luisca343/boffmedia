@@ -7,6 +7,7 @@ export const starBankAccounts = mysqlTable("rotom_bank_accounts", {
     name: varchar("name", { length: 32 }).notNull(),
     balance: bigint("balance", { mode: 'number' }).default(0),
     type: varchar("type", { length: 32 }).notNull(),
+    image: varchar("image", { length: 255 }),
 });
 
 export type StarBankAccount = typeof starBankAccounts.$inferSelect;

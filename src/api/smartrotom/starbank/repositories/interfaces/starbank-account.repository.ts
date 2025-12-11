@@ -7,6 +7,7 @@ export interface CreateAccountData {
   name: string;
   type?: AccountType;
   initialBalance?: number;
+  image?: string;
 }
 
 export interface IStarbankAccountRepository extends BaseRepository<StarBankAccount, CreateAccountData, Partial<CreateAccountData>> {

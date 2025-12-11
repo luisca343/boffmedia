@@ -30,4 +30,12 @@ export class CreateAccountDto extends BaseDto {
   @IsOptional()
   @IsNumber()
   initialBalance?: number = 0;
+
+  @ApiProperty({ 
+    description: 'Image route/path for the account', 
+    required: false
+  })
+  @IsOptional()
+  @IsString()
+  image?: string;
 }

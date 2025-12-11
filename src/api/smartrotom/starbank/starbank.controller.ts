@@ -114,17 +114,22 @@ export class StarbankController {
     if (server !== mcWorld) {
       throw new Error('You are not authorized to access this route.');
     }
-    console.log('Creating account with data:', { uuid, name, server, hasImage: !!image });
+    
+    let imagePath: string | undefined;
     if (image) {
-      console.log('Image details:', {
+      // Remove 'public\\' from the start of the path and convert backslashes to forward slashes
+      const relativePath = image.path.replace(/^public[\\/]/, '').replace(/\\/g, '/');
+      imagePath = `/${relativePath}`;
+      console.log('Image saved:', {
         filename: image.filename,
-        path: image.path,
+        originalPath: image.path,
+        relativePath: imagePath,
         size: image.size,
         mimetype: image.mimetype
       });
-      console.log('Image processing logic goes here');
     }
-    return await this.starbankFacadeService.createAccount(uuid, name);
+    
+    return await this.starbankFacadeService.createAccount(uuid, name, imagePath);
   }
   @ApiBody({ 
     schema: {

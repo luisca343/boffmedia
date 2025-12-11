@@ -81,7 +81,8 @@ export class StarbankAccountRepository
           id: starBankAccounts.id,
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
-          type: starBankAccounts.type
+          type: starBankAccounts.type,
+          image: starBankAccounts.image,
         })
         .from(starBankAccounts)
         .where(eq(starBankAccounts.type, type));
@@ -161,7 +162,8 @@ export class StarbankAccountRepository
       name: dbResult.name,
       balance: dbResult.balance,
       type: dbResult.type as AccountType,
-      uuid: dbResult.uuid
+      uuid: dbResult.uuid,
+      image: dbResult.image
     };
   }
 
@@ -170,7 +172,8 @@ export class StarbankAccountRepository
       const result = await this.db.insert(starBankAccounts).values({
         name: accountData.name,
         balance: accountData.initialBalance || 0,
-        type: accountData.type || AccountType.SECONDARY
+        type: accountData.type || AccountType.SECONDARY,
+        image: accountData.image
       } as DbStarBankAccount).execute() as RowDataPacket[];
 
       const accountId = result[0].insertId;
@@ -217,7 +220,8 @@ export class StarbankAccountRepository
           id: starBankAccounts.id,
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
-          type: starBankAccounts.type
+          type: starBankAccounts.type,
+          image: starBankAccounts.image
         })
         .from(starBankAccounts)
         .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))

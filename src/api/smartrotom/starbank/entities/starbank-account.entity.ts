@@ -33,4 +33,11 @@ export class StarBankAccount {
     required: false
   })
   uuid?: string;
+
+  @ApiProperty({ 
+    example: '/images/accounts/default.png', 
+    description: 'Image route/path for the account',
+    required: false
+  })
+  image?: string;
 }

@@ -17,6 +17,7 @@ export interface CreateAccountData {
   name: string;
   type?: 'MAIN' | 'SECONDARY';
   initialBalance?: number;
+  image?: string;
 }
 
 export interface CreateTransactionData {
@@ -33,6 +34,7 @@ export interface AccountInfo {
   name: string;
   type: string;
   uuid?: string;
+  image?: string;
 }
 
 export interface TransactionDetails {
@@ -63,7 +65,8 @@ export class StarbankRepository {
       const result = await this.db.insert(starBankAccounts).values({
         name: accountData.name,
         balance: accountData.initialBalance || 0,
-        type: accountData.type || 'SECONDARY'
+        type: accountData.type || 'SECONDARY',
+        image: accountData.image
       } as StarBankAccount).execute() as RowDataPacket[];
 
       const accountId = result[0].insertId;
@@ -89,7 +92,8 @@ export class StarbankRepository {
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
           type: starBankAccounts.type,
-          uuid: starBankUsersAccounts.uuid
+          uuid: starBankUsersAccounts.uuid,
+          image: starBankAccounts.image
         })
         .from(starBankAccounts)
         .leftJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
@@ -129,7 +133,8 @@ export class StarbankRepository {
           id: starBankAccounts.id,
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
-          type: starBankAccounts.type
+          type: starBankAccounts.type,
+          image: starBankAccounts.image
         })
         .from(starBankAccounts)
         .innerJoin(starBankUsersAccounts, eq(starBankAccounts.id, starBankUsersAccounts.accountId))
@@ -150,7 +155,8 @@ export class StarbankRepository {
           id: starBankAccounts.id,
           balance: starBankAccounts.balance,
           name: starBankAccounts.name,
-          type: starBankAccounts.type
+          type: starBankAccounts.type,
+          image: starBankAccounts.image
         })
         .from(starBankAccounts)
         .execute();

@@ -21,7 +21,7 @@ export class StarbankFacadeService {
 
   // ==================== ACCOUNT OPERATIONS ====================
 
-  async createAccount(uuid: string, name: string): Promise<StarBankAccount> {
+  async createAccount(uuid: string, name: string, image?: string): Promise<StarBankAccount> {
     if (!name || name.length === 0) {
       return await this.createMainAccount(uuid, name);
     }
@@ -29,7 +29,8 @@ export class StarbankFacadeService {
     const createAccountDto: CreateAccountDto = {
       uuid,
       name,
-      type: AccountType.SECONDARY
+      type: AccountType.SECONDARY,
+      image
     };
     
     return await this.accountService.createAccount(createAccountDto);

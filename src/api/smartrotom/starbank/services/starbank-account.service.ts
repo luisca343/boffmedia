@@ -33,7 +33,8 @@ export class StarbankAccountService {
       uuid: createAccountDto.uuid,
       name: createAccountDto.name,
       type: createAccountDto.type || AccountType.SECONDARY,
-      initialBalance: createAccountDto.initialBalance || 0
+      initialBalance: createAccountDto.initialBalance || 0,
+      image: createAccountDto.image
     };
 
     console.log('Creating account with data:', accountData);
