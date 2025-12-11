@@ -77,11 +77,14 @@ export function GameSpotlightCard({
                   (child.type === 'p' || child.type === 'h4')
                 ) {
                   // Subtitle/description element
+                  // Remove existing text alignment classes before adding text-right
+                  const existingClassName = child.props.className || '';
+                  const cleanedClassName = existingClassName.replace(/text-(left|right|center|justify)/g, '').trim();
                   return {
                     ...child,
                     props: {
                       ...child.props,
-                      className: (child.props.className || '') + ' text-right',
+                      className: cleanedClassName + ' text-right',
                     },
                   };
                 }

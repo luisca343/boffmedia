@@ -7,12 +7,13 @@ import { BackgroundDecorations } from "../../_components/BackgroundDecorations";
 export default async function Invitacion({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const invitacion = (await wingullGET(`/invites/${params.id}`)).data as any;
+  const { id } = await params;
+  const invitacion = (await wingullGET(`/invites/${id}`)).data as any;
 
-  if (!invitacion?.id) return <InvitacionNoEncontrada id={params.id} />;
-  if (invitacion.usedAt) return <InvitacionUsada id={params.id} />;
+  if (!invitacion?.id) return <InvitacionNoEncontrada id={id} />;
+  if (invitacion.usedAt) return <InvitacionUsada id={id} />;
 
   return <div className="flex items-center justify-center relative py-8">
     <BackgroundDecorations />

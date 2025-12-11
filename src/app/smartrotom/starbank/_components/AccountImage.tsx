@@ -4,7 +4,6 @@ export function AccountImage({type, name, image, width=48, height=48}: {type?: s
     const [imageExists, setImageExists] = useState(false);
     const src = getImageURL(type, name, image);
     
-    console.log("AccountImage src:", image);
     useEffect(() => {
         const img = new Image();
         img.src = src;
