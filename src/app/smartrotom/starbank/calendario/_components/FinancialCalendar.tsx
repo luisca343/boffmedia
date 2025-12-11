@@ -142,33 +142,46 @@ export function FinancialCalendar({
                 key={index}
                 onClick={() => setSelectedDay(day)}
                 className={cn(
-                  "min-h-14 p-1 cursor-pointer border border-transparent hover:border-blue-200 hover:bg-blue-50 rounded-md",
-                  !isCurrentMonth && "opacity-50",
-                  isSelected && "bg-blue-100 border-blue-300",
-                  isToday(day) && "border-blue-500"
+                  "min-h-16 p-2 cursor-pointer border rounded-md transition-all duration-200",
+                  !isCurrentMonth && "opacity-40 bg-surface-50",
+                  isSelected && "bg-blue-100 border-blue-400 shadow-sm scale-105",
+                  isToday(day) && !isSelected && "border-blue-500 border-2",
+                  dayTransactions.length > 0 && "hover:shadow-md",
+                  dayTransactions.length === 0 && "hover:bg-surface-50"
                 )}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between mb-1">
                   <span className={cn(
-                    "text-sm",
-                    isToday(day) && "font-semibold text-blue-600"
+                    "text-sm font-medium",
+                    isToday(day) && "text-blue-600 font-bold",
+                    !isCurrentMonth && "text-surface-400"
                   )}>
                     {format(day, "d")}
                   </span>
                   {dayTransactions.length > 0 && (
-                    <span className="text-xs font-medium bg-blue-100 text-blue-800 rounded-full px-1.5">
+                    <span className="text-xs font-medium bg-blue-500 text-white rounded-full px-1.5 py-0.5 min-w-[20px] text-center">
                       {dayTransactions.length}
                     </span>
                   )}
                 </div>
                 
                 {dayTransactions.length > 0 && (
-                  <div className="mt-1">
+                  <div className="space-y-1">
                     {incomeTotal > 0 && (
-                      <div className="h-1 bg-highlight-300 rounded-sm mt-0.5" />
+                      <div className="flex items-center gap-1">
+                        <div className="flex-1 h-1.5 bg-highlight-400 rounded-full" />
+                        <span className="text-[10px] text-highlight-700 font-medium">
+                          +{formatMoney(incomeTotal).replace('¥', '').trim()}
+                        </span>
+                      </div>
                     )}
                     {expenseTotal > 0 && (
-                      <div className="h-1 bg-red-300 rounded-sm mt-0.5" />
+                      <div className="flex items-center gap-1">
+                        <div className="flex-1 h-1.5 bg-red-400 rounded-full" />
+                        <span className="text-[10px] text-red-700 font-medium">
+                          -{formatMoney(expenseTotal).replace('¥', '').trim()}
+                        </span>
+                      </div>
                     )}
                   </div>
                 )}

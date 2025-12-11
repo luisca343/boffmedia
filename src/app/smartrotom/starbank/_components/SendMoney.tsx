@@ -14,6 +14,7 @@ import { ExclamationTriangleIcon, CheckIcon } from "@heroicons/react/24/outline"
 import { BankSectionButton } from "./BankSection";
 import { ArrowRightIcon } from "@heroicons/react/24/solid";
 import { TransactionSuccess } from "./TransactionSuccess";
+import { cn } from "@/lib/utils";
 
 interface Account {
   id: number;
@@ -131,9 +132,15 @@ export function SendMoney() {
 
   if (allAccountsLoading || myAccountsLoading) {
     return (
-      <div className="flex flex-col items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-700"></div>
-        <p className="mt-4 text-blue-800">Cargando información de cuentas...</p>
+      <div className="flex flex-col items-center justify-center p-12 space-y-4">
+        <div className="relative">
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-700 absolute top-0 left-0"></div>
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-medium text-blue-900">Cargando información de cuentas...</p>
+          <p className="text-sm text-blue-600 mt-1">Por favor espera un momento</p>
+        </div>
       </div>
     );
   }
@@ -304,11 +311,26 @@ export function SendMoney() {
                 step={1}
                 value={amount || ""}
                 onChange={(e) => setAmount(Number(e.target.value))}
-                className="pl-8"
+                className={cn(
+                  "pl-8",
+                  error && amount <= 0 && "border-red-500 focus:border-red-500"
+                )}
                 placeholder="0"
                 variant={"wingull"}
               />
             </div>
+            {myAccount && (
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <span className="text-blue-600">
+                  Disponible: {formatMoney(myAccount.balance)}
+                </span>
+                {amount > myAccount.balance && (
+                  <span className="text-red-600 font-medium">
+                    Fondos insuficientes
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           
           <div>

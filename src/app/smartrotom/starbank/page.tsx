@@ -171,17 +171,52 @@ export default function StarBank() {
           <BankSectionHeader>Acciones Rápidas</BankSectionHeader>
           <BankSectionContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <InternalLink href="starbank/enviar" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <DollarSign className="mr-2 text-blue-700" /> 
-                <span className="text-blue-900 font-medium">Transferir Dinero</span>
+              <InternalLink 
+                href="starbank/enviar" 
+                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                    <DollarSign className="text-blue-700 h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-blue-900 font-semibold block">Transferir Dinero</span>
+                    <span className="text-blue-600 text-sm">Envía dinero rápidamente</span>
+                  </div>
+                </div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
               </InternalLink>
-              <InternalLink href="starbank/cuentas" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <CreditCard className="mr-2 text-blue-700" /> 
-                <span className="text-blue-900 font-medium">Administrar Cuentas</span>
+              
+              <InternalLink 
+                href="starbank/cuentas" 
+                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                    <CreditCard className="text-blue-700 h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-blue-900 font-semibold block">Administrar Cuentas</span>
+                    <span className="text-blue-600 text-sm">Gestiona tus cuentas</span>
+                  </div>
+                </div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
               </InternalLink>
-              <InternalLink href="starbank/facturas" className="flex flex-1 items-center justify-center p-6 border border-blue-200 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors">
-                <Send className="mr-2 text-blue-700" /> 
-                <span className="text-blue-900 font-medium">Pagar Facturas</span>
+              
+              <InternalLink 
+                href="starbank/facturas" 
+                className="group relative overflow-hidden flex flex-1 items-center justify-center p-6 border-2 border-blue-200 rounded-xl bg-gradient-to-br from-blue-50 to-white hover:from-blue-100 hover:to-blue-50 transition-all duration-300 hover:shadow-lg hover:scale-105"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-3 bg-blue-100 rounded-full group-hover:bg-blue-200 transition-colors">
+                    <Send className="text-blue-700 h-6 w-6" />
+                  </div>
+                  <div>
+                    <span className="text-blue-900 font-semibold block">Pagar Facturas</span>
+                    <span className="text-blue-600 text-sm">Gestiona tus pagos</span>
+                  </div>
+                </div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-blue-200 rounded-full -mr-10 -mt-10 opacity-20"></div>
               </InternalLink>
             </div>
           </BankSectionContent>

@@ -3,6 +3,9 @@ import {
   ColumnFiltersState,
   Table,
   flexRender,
+  Row,
+  Cell,
+  Column,
 } from "@tanstack/react-table";
 import { AccountImage } from "../../_components/AccountImage";
 import {
@@ -12,9 +15,10 @@ import {
 } from "../../_util/TransactionFilter";
 import { CellDefProps } from "../page";
 import { Input } from "@/components/ui/primitives/input";
-import { strToDate } from "@/lib/utils";
+import { strToDate, cn } from "@/lib/utils";
 import { formatMoney } from "../../bankUtils";
 import { ArrowDownIcon, ArrowUpIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
+import { Card } from "@/components/ui/primitives/card";
 
 // Import shadcn table components
 import {
@@ -52,10 +56,16 @@ export const columns: ColumnDef<StarBankTransaction>[] = [
   },
   { 
     header: ({ column }) => {
+      const isSorted = column.getIsSorted();
       return (
-        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+        <div 
+          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+          onClick={() => column.toggleSorting()}
+        >
           Concepto
-          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
         </div>
       );
     }, 
@@ -64,10 +74,16 @@ export const columns: ColumnDef<StarBankTransaction>[] = [
   },
   {
     header: ({ column }) => {
+      const isSorted = column.getIsSorted();
       return (
-        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+        <div 
+          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+          onClick={() => column.toggleSorting()}
+        >
           Cantidad
-          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
         </div>
       );
     },
@@ -78,10 +94,16 @@ export const columns: ColumnDef<StarBankTransaction>[] = [
   },
   {
     header: ({ column }) => {
+      const isSorted = column.getIsSorted();
       return (
-        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+        <div 
+          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+          onClick={() => column.toggleSorting()}
+        >
           Saldo
-          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
         </div>
       );
     },
@@ -93,10 +115,16 @@ export const columns: ColumnDef<StarBankTransaction>[] = [
   },
   {
     header: ({ column }) => {
+      const isSorted = column.getIsSorted();
       return (
-        <div className="flex items-center cursor-pointer" onClick={() => column.toggleSorting()}>
+        <div 
+          className="flex items-center cursor-pointer hover:text-blue-900 transition-colors" 
+          onClick={() => column.toggleSorting()}
+        >
           Fecha
-          <ArrowsUpDownIcon className="ml-1 h-4 w-4" />
+          {isSorted === "asc" && <ArrowUpIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {isSorted === "desc" && <ArrowDownIcon className="ml-1 h-4 w-4 text-blue-700" />}
+          {!isSorted && <ArrowsUpDownIcon className="ml-1 h-4 w-4 text-blue-400" />}
         </div>
       );
     },
@@ -155,7 +183,9 @@ export function TransactionsTable({
 }) {
   return (
     <div className={className}>
-      <ShadcnTable variant="wingull">
+      {/* Desktop view */}
+      <div className="hidden md:block">
+        <ShadcnTable variant="wingull">
         <TableHeader className="bg-blue-50 sticky top-0">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
@@ -227,6 +257,54 @@ export function TransactionsTable({
           )}
         </TableBody>
       </ShadcnTable>
+      </div>
+      
+      {/* Mobile view */}
+      <div className="md:hidden space-y-3 p-4">
+        {table.getRowModel().rows.length > 0 ? (
+          table.getRowModel().rows.map((row) => (
+            <Card key={row.id} className="p-4" variant="wingull">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AccountImage
+                      height={32}
+                      width={32}
+                      type={row.original.toType!}
+                      name={row.original.toName!}
+                    />
+                    <div>
+                      <p className="font-medium text-sm">{row.original.toName}</p>
+                      <p className="text-xs text-blue-600">
+                        {row.original.isPayer ? 'Salida' : 'Entrada'}
+                      </p>
+                    </div>
+                  </div>
+                  <p className={cn(
+                    "font-semibold",
+                    row.original.isPayer ? "text-red-600" : "text-emerald-600"
+                  )}>
+                    {row.original.isPayer ? '-' : '+'} {formatMoney(row.original.amount)}
+                  </p>
+                </div>
+                
+                <div className="text-sm text-surface-600">
+                  {row.original.reason || "Sin concepto"}
+                </div>
+                
+                <div className="flex justify-between text-xs text-surface-500">
+                  <span>{strToDate(row.original.date)}</span>
+                  <span>Balance: {formatMoney(row.original.isPayer ? row.original.fromBalance : row.original.toBalance)}</span>
+                </div>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <div className="py-8 text-center text-blue-800">
+            No se encontraron transacciones
+          </div>
+        )}
+      </div>
     </div>
   );
 }
