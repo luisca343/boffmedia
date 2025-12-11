@@ -335,7 +335,7 @@ function AccountsList({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex-shrink-0">
-                <AccountImage type={account.type} name={account.name} width={56} height={56} />
+                <AccountImage type={account.type} name={account.name} image={(account as any).image} width={56} height={56} />
               </div>
               <div>
                 <h3 className="text-lg font-medium text-blue-950">

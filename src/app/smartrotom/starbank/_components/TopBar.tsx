@@ -63,7 +63,7 @@ export default function TopBar({
                 <p className="text-sm font-medium text-blue-950">{session?.user?.name || "Usuario"}</p>
                 <p className="text-xs text-blue-800">{activeAccount.name}</p>
               </div>
-              <AccountImage width={40} height={40} type={activeAccount.type} name={activeAccount.name}/>
+              <AccountImage width={40} height={40} type={activeAccount.type} name={activeAccount.name} image={(activeAccount as any).image}/>
               <ChevronDownIcon className="h-4 w-4 text-blue-800" />
             </div>
           )}

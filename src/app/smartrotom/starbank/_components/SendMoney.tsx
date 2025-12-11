@@ -199,6 +199,7 @@ export function SendMoney() {
                   height={40} 
                   type={myAccount?.type || ""} 
                   name={myAccount?.name || ""} 
+                  image={(myAccount as any)?.image}
                 />
                 <div className="ml-3">
                   <p className="text-sm font-medium">{myAccount?.name}</p>
@@ -214,6 +215,7 @@ export function SendMoney() {
                   height={40} 
                   type={targetAccount?.type || ""} 
                   name={targetAccount?.name || ""} 
+                  image={(targetAccount as any)?.image}
                 />
                 <div className="ml-3">
                   <p className="text-sm font-medium">{targetAccount?.name}</p>

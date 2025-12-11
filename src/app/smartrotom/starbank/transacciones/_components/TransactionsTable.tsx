@@ -45,6 +45,7 @@ export const columns: ColumnDef<StarBankTransaction>[] = [
             width={40}
             type={row.original.toType!}
             name={row.original.toName!}
+            image={(row.original as any).toImage}
           />
           <div className="hidden md:block">
             <p className="text-sm font-medium text-blue-900">{row.original.toName}</p>
@@ -272,6 +273,7 @@ export function TransactionsTable({
                       width={32}
                       type={row.original.toType!}
                       name={row.original.toName!}
+                      image={(row.original as any).toImage}
                     />
                     <div>
                       <p className="font-medium text-sm">{row.original.toName}</p>

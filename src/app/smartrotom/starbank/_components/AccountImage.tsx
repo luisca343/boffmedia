@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-export function AccountImage({type, name, width=48, height=48}: {type?: string, name?: string, width?: number, height?: number}) {
+export function AccountImage({type, name, image, width=48, height=48}: {type?: string, name?: string, image?: string, width?: number, height?: number}) {
     const [imageExists, setImageExists] = useState(false);
-    const src = getImageURL(type, name);
-
+    const src = getImageURL(type, name, image);
+    
+    console.log("AccountImage src:", image);
     useEffect(() => {
         const img = new Image();
         img.src = src;
@@ -20,9 +21,10 @@ export function AccountImage({type, name, width=48, height=48}: {type?: string, 
     );
 }
 
-function getImageURL(type?: string, name?: string) {
+function getImageURL(type?: string, name?: string, image?: string) {
     if (type === "SECONDARY") {
-        return `/smartrotom/img/apps/starbank/cuentas/${name!.toLowerCase()}.png`;
+        // Use the image URL if provided, otherwise fall back to the old path
+        return image || `/smartrotom/img/apps/starbank/cuentas/${name!.toLowerCase()}.png`;
     } else {
         return `https://minotar.net/avatar/${name}/80.png`;
     }

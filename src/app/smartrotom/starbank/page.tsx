@@ -273,7 +273,7 @@ function TransfersShort({
             key={transfer.date}
           >
             <div className="flex hover:bg-opacity-50 items-center my-1">
-              <AccountImage width={32} type={type} name={name} />
+              <AccountImage width={32} type={type} name={name} image={(transfer as any).image} />
               <div
                 className={`text-right my-auto mx-2 ${
                   esPagador(transfer, activeAccount)
@@ -323,7 +323,7 @@ function TablaTransacciones({
             return (
               <tr key={transaction.date} className="hover:bg-blue-50 transition-colors">
                 <td className="py-4 pl-6 whitespace-nowrap">
-                  <AccountImage type={transaction.displayAccountType} name={transaction.displayName}/>
+                  <AccountImage type={transaction.displayAccountType} name={transaction.displayName} image={(transaction as any).displayImage}/>
                 </td>
                 <td className="pr-6 py-4">
                   <div className="text-sm font-medium text-blue-900">{transaction.reason}</div>

@@ -12,7 +12,7 @@ export function AccountSelect({accounts, activeAccount, setActiveAccount, id, cl
     function getAccount(index: number){
         const account = filteredAccounts[index];
         return <div className="flex w-full">
-            <AccountImage width={20} height={20} type={account.type} name={account.name}/>
+            <AccountImage width={20} height={20} type={account.type} name={account.name} image={(account as any).image}/>
             <span className=" ml-2">{account.name}</span>
             </div>
     }
