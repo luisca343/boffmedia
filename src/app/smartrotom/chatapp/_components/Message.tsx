@@ -74,7 +74,6 @@ export function Message({
   next: MessageType | null
 }) {
 
-  console.log("Rendering message:", message)
   const isSender = message.uuid === getSmartRotomUser(session).uuid
   const sender = message.uuid === "system" ? "system" : isSender ? "user" : "other"
   const content = message.uuid === "system" ? parseSystemMessage(message) : message.content
@@ -97,7 +96,25 @@ export function Message({
     }
   }
 
-  if(sender === "system" && message.type !== "call") return (
+  if (message.type === "call") {
+    const callData = parseCallMessage(message.content)
+    if (callData) {
+      return (
+        <CallMessage
+          callData={callData}
+          sender={sender}
+          timestamp={timestamp}
+          isSender={isSender}
+          img={img}
+          message={message}
+          isFirstInSequence={isFirstInSequence}
+          isLastInSequence={isLastInSequence}
+        />
+      )
+    }
+  }
+
+  if(sender === "system") return (
     <SystemMessage content={content} />
   )
 
@@ -161,24 +178,6 @@ export function Message({
       return (
         <WaypointMessage
           waypointData={waypointData}
-          sender={sender}
-          timestamp={timestamp}
-          isSender={isSender}
-          img={img}
-          message={message}
-          isFirstInSequence={isFirstInSequence}
-          isLastInSequence={isLastInSequence}
-        />
-      )
-    }
-  }
-
-  if (message.type === "call") {
-    const callData = parseCallMessage(message.content)
-    if (callData) {
-      return (
-        <CallMessage
-          callData={callData}
           sender={sender}
           timestamp={timestamp}
           isSender={isSender}

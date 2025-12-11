@@ -17,7 +17,6 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
   const isUser = message.sender === "user";
   
   const renderMessagePart = (part: MessagePart, index: number) => {
-    console.log("Rendering message part:", part);
     switch (part.type) {
       case "text":
         return (
