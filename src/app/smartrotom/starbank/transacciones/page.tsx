@@ -144,7 +144,7 @@ export default function Transacciones() {
         
         <SummaryCard 
           title="Balance Actual"
-          value={formatMoney(getActiveAccountBalance(accounts!, activeAccount))}
+          value={formatMoney(getActiveAccountBalance(accounts!, activeAccount?.id ?? 0))}
           icon={<ChevronUpDownIcon className="h-6 w-6" />}
           className="md:col-span-1"
         />
