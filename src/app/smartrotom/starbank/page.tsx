@@ -9,7 +9,7 @@ import {
   BankSectionHeader,
 } from "./_components/BankSection";
 import { AccountImage } from "./_components/AccountImage";
-import { formatMoney, getActiveAccountBalance } from "./bankUtils";
+import { formatMoney, getActiveAccountBalance, changeActiveAccount } from "./bankUtils";
 import { useRouter } from "next/navigation";
 import { AccountSelect } from "./_components/AccountSelect";
 import {
@@ -23,42 +23,25 @@ import {
 
 import { ArrowRight, DollarSign, CreditCard, Send } from 'lucide-react';
 import { useBoffSession } from "@/services/useBoffSession";
-import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
 import { Transaction } from "@/types/starbank";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
 import { StarBankTransaction } from "@/generated/api";
+import useStarBank from "./_hooks/useStarBank";
 
 export default function StarBank() {
   const router = useRouter();
   const { session } = useBoffSession();
-  const [activeAccount, setActiveAccount] = useState(-1);
+  const { accounts, activeAccount, setActiveAccount } = useStarBank();
 
-  const { accounts, error: accountsError, isLoading: accountsLoading } = useGetAccounts(session?.user?.smartRotomUser?.uuid || '');
-  const { transactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount, 100);
-  const { transfers, error: transfersError, isLoading: transfersLoading } = useGetTransfers(activeAccount);
-
-  useEffect(() => {
-    if (accounts && accounts.length > 0) {
-      const storedAccount = localStorage.getItem("activeAccount") as string;
-      if (storedAccount) {
-        changeAccount(
-          accounts.find((acc: any) => acc.id === parseInt(storedAccount))?.id! >= 0
-            ? parseInt(storedAccount)
-            : accounts[0].id
-        );
-      } else {
-        setActiveAccount(accounts[0].id);
-        localStorage.setItem("activeAccount", accounts[0].id.toString());
-      }
-    }
-  }, [accounts]);
+  const { transactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount?.id ?? -1, 100);
+  const { transfers, error: transfersError, isLoading: transfersLoading } = useGetTransfers(activeAccount?.id ?? -1);
 
   function changeAccount(account: number) {
+    changeActiveAccount(account);
     setActiveAccount(account);
-    localStorage.setItem("activeAccount", account.toString());
   }
 
   function getData() {
@@ -67,7 +50,7 @@ export default function StarBank() {
       .reverse()
       .reduce((acc: any, transaction: any) => {
         const transactionType =
-          transaction.from === activeAccount ? "out" : "in";
+          transaction.from === activeAccount?.id ? "out" : "in";
         const currentBalance =
           transactionType === "out"
             ? transaction.fromBalance
@@ -120,12 +103,12 @@ export default function StarBank() {
     return <TestChart data={getData()} className="h-full " />;
   }
 
-  if (accountsLoading || transactionsLoading || transfersLoading) {
+  if (!accounts || transactionsLoading || transfersLoading) {
     return <DashboardSkeleton />;
   }
 
-  if (accountsError || transactionsError || transfersError) {
-    return <div>Error: {accountsError || transactionsError || transfersError}</div>;
+  if (transactionsError || transfersError) {
+    return <div>Error: {transactionsError || transfersError}</div>;
   }
 
   return (
@@ -137,10 +120,10 @@ export default function StarBank() {
           <BankSectionContent>
             <div className="flex flex-col h-full justify-center">
               <div className="text-4xl 2xl:text-5xl font-bold text-blue-700">
-                {formatMoney(getActiveAccountBalance(accounts!, activeAccount))}
+                {formatMoney(activeAccount?.balance ?? 0)}
               </div>
               <div className="text-sm text-blue-500 mt-2">
-                Cuenta {accounts?.find((acc: any) => acc.id === activeAccount)?.name || "Principal"}
+                Cuenta {activeAccount?.name || "Principal"}
               </div>
             </div>
           </BankSectionContent>
@@ -151,7 +134,7 @@ export default function StarBank() {
               </span>
               <AccountSelect
                 accounts={accounts}
-                activeAccount={activeAccount}
+                activeAccount={activeAccount?.id ?? -1}
                 setActiveAccount={changeAccount}
               />
             </div>
@@ -228,7 +211,7 @@ export default function StarBank() {
           <BankSectionContent>
             <Transactions
               trans={transactions}
-              activeAccount={activeAccount}
+              activeAccount={activeAccount?.id ?? -1}
               fecth={false}
             />
           </BankSectionContent>
@@ -441,5 +424,5 @@ function Transactions({
 }
 
 function esPagador(transaction: any, activeAccount: any) {
-  return transaction.from == activeAccount;
+  return transaction.from == activeAccount?.id;
 }

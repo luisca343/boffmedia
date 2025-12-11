@@ -22,12 +22,13 @@ import { useGetAccounts } from "@/hooks/starbank/useGetAccounts";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { AccountSelect } from "../_components/AccountSelect";
 import { Input } from "@/components/ui/primitives/input";
-import { formatMoney, getActiveAccountBalance } from "../bankUtils";
+import { formatMoney, getActiveAccountBalance, changeActiveAccount } from "../bankUtils";
 import { Search } from "lucide-react";
 import { TransactionSkeleton } from "./_components/TransactionSkeleton";
 import { SummaryCard } from "../_components/SummaryCard";
 import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon, ListBulletIcon } from "@heroicons/react/24/outline";
 import { StarBankTransaction } from "@/generated/api";
+import useStarBank from "../_hooks/useStarBank";
 
 export interface CellDefProps<TData> {
   table: Table<TData>;
@@ -55,15 +56,14 @@ function calculateTransactionStats(transactions: StarBankTransaction[], activeAc
 
 export default function Transacciones() {
   const { session } = useBoffSession();
+  const { accounts, activeAccount, setActiveAccount } = useStarBank();
   const [transactions, setTransactions] = useState<StarBankTransaction[]>([]);
-  const [activeAccount, setActiveAccount] = useState(-1);
   const [searchTerm, setSearchTerm] = useState("");
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([{ id: "date", desc: true }]);
   const [stats, setStats] = useState({ income: 0, expense: 0, net: 0 });
 
-  const { accounts, error: accountsError, isLoading: accountsLoading } = useGetAccounts(session?.user?.smartRotomUser?.uuid!);
-  const { transactions: fetchedTransactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount);
+  const { transactions: fetchedTransactions, error: transactionsError, isLoading: transactionsLoading } = useGetTransactions(activeAccount?.id ?? -1);
 
   const table = useReactTable({
     data: transactions,
@@ -90,16 +90,9 @@ export default function Transacciones() {
   });
 
   useEffect(() => {
-    if (accounts && accounts.length > 0) {
-      const account = getValidAccountId(accounts);
-      setActiveAccount(account);
-    }
-  }, [accounts]);
-
-  useEffect(() => {
-    if (fetchedTransactions) {
+    if (fetchedTransactions && activeAccount) {
       setTransactions(fetchedTransactions);
-      setStats(calculateTransactionStats(fetchedTransactions, activeAccount));
+      setStats(calculateTransactionStats(fetchedTransactions, activeAccount.id));
     }
   }, [fetchedTransactions, activeAccount]);
 
@@ -112,6 +105,7 @@ export default function Transacciones() {
   }
 
   function handleAccountChange(accountId: any) {
+    changeActiveAccount(Number(accountId));
     setActiveAccount(Number(accountId));
   }
 
@@ -119,10 +113,10 @@ export default function Transacciones() {
     setSearchTerm(e.target.value);
   }
 
-  if (accountsLoading || transactionsLoading) return <TransactionSkeleton />;
-  if (accountsError || transactionsError) return <div>Error: {accountsError || transactionsError}</div>;
+  if (!accounts || transactionsLoading) return <TransactionSkeleton />;
+  if (transactionsError) return <div>Error: {transactionsError}</div>;
 
-  const currentAccount = accounts?.find((acc: any) => acc.id === activeAccount);
+  const currentAccount = activeAccount;
 
   return (
     <main className="max-w-[90%] mx-auto py-6 px-4 sm:px-6 lg:px-8 space-y-6">
