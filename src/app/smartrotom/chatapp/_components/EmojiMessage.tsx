@@ -19,6 +19,45 @@ export function EmojiMessage({
   isFirstInSequence,
   isLastInSequence,
 }: EmojiMessageProps) {
+  function getEmojiCount(str: string) {
+    if (!str) return 0
+    try {
+      const matches = str.match(/\p{Extended_Pictographic}/gu)
+      return matches ? matches.length : 0
+    } catch (e) {
+      // Fallback for environments without Unicode property support
+      return Array.from(str).length
+    }
+  }
+
+  function containsTextCharacters(str: string) {
+    try {
+      return /\p{Letter}|\p{Number}/u.test(str)
+    } catch (e) {
+      return /[A-Za-z0-9]/.test(str)
+    }
+  }
+
+  const emojiCount = getEmojiCount(content || "")
+  const hasText = containsTextCharacters(content || "")
+
+  const fontSize = hasText
+    ? '1rem'
+    : emojiCount <= 5
+    ? '6rem'
+    : emojiCount <= 8
+    ? '5rem'
+    : emojiCount <= 12
+    ? '4rem'
+    : emojiCount <= 20
+    ? '3rem'
+    : '2rem'
+
+  const emojiStyle: React.CSSProperties = {
+    fontSize,
+    lineHeight: 1,
+  }
+
   return (
     <div className={`flex w-full ${sender === "user" ? "justify-end" : "justify-start"}`}>
       <div
@@ -38,7 +77,7 @@ export function EmojiMessage({
             {timestamp}
           </span>
         )}
-        <div className="text-5xl leading-tight">
+        <div className="leading-tight" style={emojiStyle}>
           {content}
         </div>
       </div>

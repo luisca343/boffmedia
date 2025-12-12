@@ -113,7 +113,6 @@ export default function ReadPage({ params }: { params: Promise<{ id: string }> |
 
   function getContent() {
     const modifiedContent = article?.content.replace(/<h1>.*?<\/h1>/, "<h1></h1>");
-    console.log(modifiedContent);
     return modifiedContent;
   }
 
