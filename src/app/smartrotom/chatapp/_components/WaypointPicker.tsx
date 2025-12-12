@@ -9,10 +9,14 @@ import { getWaypoints, getMcUserData, type Waypoint } from "@/services/mcef/mcef
 
 interface WaypointPickerProps {
   onWaypointSelect: (waypoint: { name: string; x: number; y: number; z: number; dimension?: string; color?: string }) => void
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function WaypointPicker({ onWaypointSelect }: WaypointPickerProps) {
-  const [open, setOpen] = useState(false)
+export function WaypointPicker({ onWaypointSelect, open: externalOpen, onOpenChange }: WaypointPickerProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = externalOpen !== undefined ? externalOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
   const [waypoints, setWaypoints] = useState<Waypoint[]>([])
   const [loading, setLoading] = useState(false)
   const [currentLocation, setCurrentLocation] = useState<{ x: number; y: number; z: number; world: string } | null>(null)
@@ -74,15 +78,6 @@ export function WaypointPicker({ onWaypointSelect }: WaypointPickerProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="text-neutral-400 hover:text-neutral-50"
-        >
-          <MapPin className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-[500px] bg-neutral-900 text-neutral-50 border-neutral-800">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

@@ -3,12 +3,10 @@
 import { Message } from "./Message"
 import { toast } from "react-toastify"
 import type { ChatData, Message as MessageType, ImageMessageData } from "../_types/Chat"
-import { Phone, Send, X, Image as ImageIcon } from "lucide-react"
+import { Phone, Send, X } from "lucide-react"
 import { Input } from "@/components/ui/primitives/input"
-import { ImageGalleryPicker } from "./ImageGalleryPicker"
-import { EmojiPicker } from "./EmojiPicker"
-import { StickerPicker } from "./StickerPicker"
-import { WaypointPicker } from "./WaypointPicker"
+import { AttachmentMenu } from "./AttachmentMenu"
+import { EmojiStickerMenu } from "./EmojiStickerMenu"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 import { getSmartRotomUser } from "@/lib/utils"
 import { Button } from "@/components/ui/primitives/button"
@@ -33,7 +31,6 @@ export function Chat({
 }) {
   const [chat, setChat] = useState(chats[0] as ChatData)
   const [message, setMessage] = useState("")
-  const [galleryPickerOpen, setGalleryPickerOpen] = useState(false)
   const { socket } = useSocketStore()
   const { session } = useBoffSession()
 
@@ -416,17 +413,14 @@ export function Chat({
         {renderedMessages}
       </div>
       <div className="p-4 bg-neutral-800 flex items-center space-x-2 border-t border-black">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setGalleryPickerOpen(true)}
-          className="text-neutral-400 hover:text-neutral-50"
-        >
-          <ImageIcon className="h-5 w-5" />
-        </Button>
-        <StickerPicker onStickerSelect={sendSticker} />
-        <WaypointPicker onWaypointSelect={sendWaypoint} />
-        <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+        <AttachmentMenu
+          onSendImage={sendImage}
+          onSendWaypoint={sendWaypoint}
+        />
+        <EmojiStickerMenu
+          onEmojiSelect={handleEmojiSelect}
+          onStickerSelect={sendSticker}
+        />
         <Input
           ref={inputRef}
           variant="neutral"
@@ -448,11 +442,6 @@ export function Chat({
           <Send className="h-5 w-5" />
         </Button>
       </div>
-      <ImageGalleryPicker
-        open={galleryPickerOpen}
-        onOpenChange={setGalleryPickerOpen}
-        onSendImage={sendImage}
-      />
     </div>
   )
 }
