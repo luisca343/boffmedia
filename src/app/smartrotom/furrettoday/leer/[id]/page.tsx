@@ -16,8 +16,8 @@ const CustomEditor = dynamic(() => import("@/components/common/ckeditor/TestEdit
   ssr: false,
 });
 
-export default function ReadPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default function ReadPage({ params }: { params: Promise<{ id: string }> | { id: string } }) {
+  const { id } = React.use(params as any) as { id: string };
   const { article, error, isLoading } = useGetNewsById(id);
 
   if (isLoading) {
