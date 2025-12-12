@@ -337,6 +337,41 @@ export function Chat({
       });
   }
 
+  function sendDocument(document: { id: string; title: string; content: string }) {
+    const documentData = {
+      documentId: parseInt(document.id),
+      title: document.title,
+      content: document.content
+    }
+
+    const newMessage: MessageType = {
+      id: Date.now(),
+      content: JSON.stringify(documentData),
+      createdAt: new Date().toISOString(),
+      uuid: getSmartRotomUser(session).uuid,
+      chatId: chat.id,
+      type: "document"
+    }
+
+    // Update parent chats list
+    onMessageSent?.(newMessage, activeChat)
+
+    ChatAppService
+      .createMessage(chat.id, {
+        message: JSON.stringify(documentData),
+        uuid: getSmartRotomUser(session).uuid,
+        type: CreateMessageDto.type.DOCUMENT,
+      })
+      .then(() => {
+        console.log("Document sent successfully")
+        toast.success(`Documento "${document.title}" compartido`)
+      })
+      .catch((error) => {
+        console.error("Failed to send document:", error)
+        toast.error("Failed to send document. Please try again.")
+      });
+  }
+
   // Memoize messages to prevent re-rendering on every keystroke
   const renderedMessages = useMemo(() => {
     return chat.messages.map((message, index) => (
@@ -416,6 +451,7 @@ export function Chat({
         <AttachmentMenu
           onSendImage={sendImage}
           onSendWaypoint={sendWaypoint}
+          onSendDocument={sendDocument}
         />
         <EmojiStickerMenu
           onEmojiSelect={handleEmojiSelect}

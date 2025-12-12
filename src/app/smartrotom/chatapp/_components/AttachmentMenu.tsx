@@ -5,16 +5,19 @@ import { Paperclip, Image as ImageIcon, FileText, MapPin, X } from "lucide-react
 import { Button } from "@/components/ui/primitives/button"
 import { ImageGalleryPicker } from "./ImageGalleryPicker"
 import { WaypointPicker } from "./WaypointPicker"
+import { DocumentPicker } from "./DocumentPicker"
 
 interface AttachmentMenuProps {
   onSendImage: (screenshot: any, caption?: string) => void
   onSendWaypoint: (waypoint: { name: string; x: number; y: number; z: number; dimension?: string; color?: string }) => void
+  onSendDocument: (document: { id: string; title: string; content: string }) => void
 }
 
-export function AttachmentMenu({ onSendImage, onSendWaypoint }: AttachmentMenuProps) {
+export function AttachmentMenu({ onSendImage, onSendWaypoint, onSendDocument }: AttachmentMenuProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [galleryOpen, setGalleryOpen] = useState(false)
   const [waypointOpen, setWaypointOpen] = useState(false)
+  const [documentOpen, setDocumentOpen] = useState(false)
 
   const attachmentOptions = [
     {
@@ -33,8 +36,7 @@ export function AttachmentMenu({ onSendImage, onSendWaypoint }: AttachmentMenuPr
       color: "text-blue-400",
       bgColor: "bg-blue-500/20",
       onClick: () => {
-        // TODO: Implement document picker
-        console.log("Document picker")
+        setDocumentOpen(true)
         setIsOpen(false)
       }
     },
@@ -94,6 +96,15 @@ export function AttachmentMenu({ onSendImage, onSendWaypoint }: AttachmentMenuPr
         onWaypointSelect={(waypoint) => {
           onSendWaypoint(waypoint)
           setWaypointOpen(false)
+        }}
+      />
+
+      <DocumentPicker
+        open={documentOpen}
+        onOpenChange={setDocumentOpen}
+        onDocumentSelect={(document) => {
+          onSendDocument(document)
+          setDocumentOpen(false)
         }}
       />
     </>
