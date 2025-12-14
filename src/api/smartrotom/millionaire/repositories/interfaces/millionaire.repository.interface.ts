@@ -1,6 +1,5 @@
 export interface SessionData {
   conductorUuid: string;
-  questionTimeLimit?: number;
 }
 
 export interface SessionWithPlayers {

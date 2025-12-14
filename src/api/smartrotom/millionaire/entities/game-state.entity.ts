@@ -19,14 +19,11 @@ export class GameStateEntity {
   @ApiProperty({ example: true, description: 'Is answer correct', required: false })
   isCorrect?: boolean;
 
-  @ApiProperty({ example: 15, description: 'Time spent in seconds', required: false })
-  timeSpent?: number;
-
   @ApiProperty({ example: '50:50', description: 'Lifeline used', required: false })
   lifelineUsed?: string;
 
   @ApiProperty({ 
-    example: { question: {}, lifelines: {}, timer: 30 },
+    example: { question: {}, lifelines: {} },
     description: 'Complete game state snapshot' 
   })
   stateSnapshot: any;

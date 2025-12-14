@@ -9,14 +9,13 @@ export class SessionService {
     private readonly millionaireRepository: IMillionaireRepository,
   ) {}
 
-  async createSession(conductorUuid: string, questionTimeLimit?: number): Promise<{ sessionId: number; sessionCode: string }> {
+  async createSession(conductorUuid: string): Promise<{ sessionId: number; sessionCode: string }> {
     if (!conductorUuid) {
       throw new BadRequestException('Conductor UUID is required');
     }
 
     return await this.millionaireRepository.createSession({
-      conductorUuid,
-      questionTimeLimit
+      conductorUuid
     });
   }
 

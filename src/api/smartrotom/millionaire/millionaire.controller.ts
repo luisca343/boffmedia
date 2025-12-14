@@ -31,8 +31,7 @@ export class MillionaireController {
   @ApiBody({ type: CreateSessionDto })
   async createSession(@Body() body: CreateSessionDto) {
     return await this.millionaireFacade.createSession(
-      body.conductorUuid,
-      body.questionTimeLimit
+      body.conductorUuid
     );
   }
 

@@ -25,12 +25,4 @@ export class SubmitAnswerDto extends BaseDto {
   @Min(0)
   @Max(3)
   answerIndex: number;
-
-  @ApiProperty({ 
-    description: 'Time spent in seconds',
-    example: 15
-  })
-  @IsInt()
-  @Min(0)
-  timeSpent: number;
 }

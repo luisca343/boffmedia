@@ -23,8 +23,8 @@ export class MillionaireFacadeService {
     private readonly lifelineService: LifelineService,
   ) {}
 
-  async createSession(conductorUuid: string, questionTimeLimit?: number): Promise<{ sessionId: number; sessionCode: string }> {
-    return await this.sessionService.createSession(conductorUuid, questionTimeLimit);
+  async createSession(conductorUuid: string): Promise<{ sessionId: number; sessionCode: string }> {
+    return await this.sessionService.createSession(conductorUuid);
   }
 
   async getSession(sessionId: number): Promise<any> {
@@ -92,8 +92,7 @@ export class MillionaireFacadeService {
       latestState.questionData.id,
       submitAnswerDto.playerUuid,
       submitAnswerDto.answerIndex,
-      isCorrect,
-      submitAnswerDto.timeSpent
+      isCorrect
     );
 
     let newPrizeMoney = session.prizeMoney;
@@ -113,8 +112,7 @@ export class MillionaireFacadeService {
       },
       {
         playerAnswer: submitAnswerDto.answerIndex,
-        isCorrect,
-        timeSpent: submitAnswerDto.timeSpent
+        isCorrect
       }
     );
 

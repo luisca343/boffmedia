@@ -9,7 +9,6 @@ export interface GameStateSnapshot {
   lifelines: Record<string, boolean>;
   questionData?: any;
   playerAnswer?: number;
-  timeRemaining?: number;
 }
 
 @Injectable()
@@ -27,7 +26,6 @@ export class GameStateService {
     options?: {
       playerAnswer?: number;
       isCorrect?: boolean;
-      timeSpent?: number;
       lifelineUsed?: string;
     }
   ): Promise<void> {
@@ -37,7 +35,6 @@ export class GameStateService {
       questionId,
       playerAnswer: options?.playerAnswer,
       isCorrect: options?.isCorrect,
-      timeSpent: options?.timeSpent,
       lifelineUsed: options?.lifelineUsed,
       stateSnapshot: JSON.stringify(snapshot)
     });
@@ -55,16 +52,14 @@ export class GameStateService {
     questionId: number,
     playerUuid: string,
     answerIndex: number,
-    isCorrect: boolean,
-    timeSpent: number
+    isCorrect: boolean
   ): Promise<void> {
     await this.millionaireRepository.saveAnswer({
       sessionId,
       questionId,
       playerUuid,
       answerIndex,
-      isCorrect,
-      timeSpent
+      isCorrect
     });
   }
 }

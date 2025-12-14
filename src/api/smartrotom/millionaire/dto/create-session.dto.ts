@@ -1,6 +1,6 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsUUID, Min, Max, IsOptional } from 'class-validator';
+import { IsUUID } from 'class-validator';
 
 export class CreateSessionDto extends BaseDto {
   @ApiProperty({ 
@@ -9,15 +9,4 @@ export class CreateSessionDto extends BaseDto {
   })
   @IsUUID()
   conductorUuid: string;
-
-  @ApiProperty({ 
-    description: 'Question time limit in seconds',
-    example: 30,
-    required: false
-  })
-  @IsOptional()
-  @IsInt()
-  @Min(10)
-  @Max(120)
-  questionTimeLimit?: number;
 }

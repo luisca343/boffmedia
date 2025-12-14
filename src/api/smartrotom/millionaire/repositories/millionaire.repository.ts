@@ -25,7 +25,6 @@ export class MillionaireRepository implements IMillionaireRepository {
     const result = await this.db.insert(millionaireSessions).values({
       sessionCode,
       conductorUuid: data.conductorUuid,
-      questionTimeLimit: data.questionTimeLimit || 30,
     });
 
     return {

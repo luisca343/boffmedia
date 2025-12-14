@@ -25,9 +25,6 @@ export class SessionEntity {
   })
   lifelinesRemaining: Record<string, boolean>;
 
-  @ApiProperty({ example: 30, description: 'Question time limit in seconds' })
-  questionTimeLimit: number;
-
   @ApiProperty({ example: '2025-06-28T10:00:00Z', description: 'Session creation time' })
   createdAt: Date;
 

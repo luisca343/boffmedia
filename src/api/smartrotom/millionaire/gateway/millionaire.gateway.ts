@@ -201,7 +201,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
   @SubscribeMessage('answer:submit')
   async handleSubmitAnswer(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number; answerIndex: number; timeSpent: number }
+    @MessageBody() data: { sessionId: number; answerIndex: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -212,8 +212,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
       const result = await this.millionaireFacade.submitAnswer({
         sessionId: data.sessionId,
         playerUuid: userData.uuid,
-        answerIndex: data.answerIndex,
-        timeSpent: data.timeSpent
+        answerIndex: data.answerIndex
       });
 
       this.server.to(userData.sessionCode).emit('answer:submitted', {

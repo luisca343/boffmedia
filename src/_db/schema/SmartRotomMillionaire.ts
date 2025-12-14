@@ -10,7 +10,6 @@ export const millionaireSessions = mysqlTable("rotom_millionaire_sessions", {
   currentQuestion: int("current_question").default(0),
   prizeMoney: decimal("prize_money", { precision: 10, scale: 2 }).default("0"),
   lifelinesRemaining: text("lifelines_remaining").default('{"50:50":true,"phone":true,"audience":true}'),
-  questionTimeLimit: int("question_time_limit").default(30),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP()`),
   updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP()`),
 }, (table) => ({
@@ -67,7 +66,6 @@ export const millionaireGameStates = mysqlTable("rotom_millionaire_game_states",
   questionId: int("question_id").notNull(),
   playerAnswer: int("player_answer"),
   isCorrect: boolean("is_correct"),
-  timeSpent: int("time_spent"),
   lifelineUsed: varchar("lifeline_used", { length: 20 }),
   stateSnapshot: text("state_snapshot").notNull(),
   createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP()`),
@@ -93,7 +91,6 @@ export const millionaireAnswers = mysqlTable("rotom_millionaire_answers", {
   playerUuid: char("player_uuid", { length: 36 }).notNull(),
   answerIndex: int("answer_index").notNull(),
   isCorrect: boolean("is_correct").notNull(),
-  timeSpent: int("time_spent").notNull(),
   submittedAt: timestamp("submitted_at").default(sql`CURRENT_TIMESTAMP()`),
 }, (table) => ({
   sessionFk: foreignKey({
