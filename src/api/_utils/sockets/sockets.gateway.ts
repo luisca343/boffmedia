@@ -116,9 +116,9 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:session:join")
     async handleMillionaireJoinSession(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionCode: string; uuid: string; role: 'conductor' | 'player' }
+      @MessageBody() data: { eventCode: string; uuid: string; role: 'conductor' | 'player' }
     ) {
-      return await this.millionaireSocketService.handleJoinSession(this.server, client, data);
+      return await this.millionaireSocketService.handleJoinEvent(this.server, client, data);
     }
 
     @SubscribeMessage("millionaire:heartbeat")
@@ -129,7 +129,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:game:start")
     async handleMillionaireGameStart(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number }
+      @MessageBody() data: { eventId: number }
     ) {
       return await this.millionaireSocketService.handleGameStart(this.server, client, data);
     }
@@ -137,7 +137,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:question:reveal")
     async handleMillionaireRevealQuestion(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number }
+      @MessageBody() data: { eventId: number }
     ) {
       return await this.millionaireSocketService.handleRevealQuestion(this.server, client, data);
     }
@@ -145,7 +145,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:answer:reveal")
     async handleMillionaireRevealAnswer(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number; isCorrect: boolean }
+      @MessageBody() data: { eventId: number; isCorrect: boolean }
     ) {
       return await this.millionaireSocketService.handleRevealAnswer(this.server, client, data);
     }
@@ -153,7 +153,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:game:pause")
     async handleMillionairePauseGame(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number }
+      @MessageBody() data: { eventId: number }
     ) {
       return await this.millionaireSocketService.handlePauseGame(this.server, client, data);
     }
@@ -161,7 +161,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:game:resume")
     async handleMillionaireResumeGame(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number }
+      @MessageBody() data: { eventId: number }
     ) {
       return await this.millionaireSocketService.handleResumeGame(this.server, client, data);
     }
@@ -169,7 +169,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:answer:submit")
     async handleMillionaireSubmitAnswer(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number; answerIndex: number }
+      @MessageBody() data: { eventId: number; answerIndex: number }
     ) {
       return await this.millionaireSocketService.handleSubmitAnswer(this.server, client, data);
     }
@@ -177,7 +177,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:lifeline:request")
     async handleMillionaireLifelineRequest(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number; lifelineType: any }
+      @MessageBody() data: { eventId: number; lifelineType: any }
     ) {
       return await this.millionaireSocketService.handleLifelineRequest(this.server, client, data);
     }
@@ -185,7 +185,7 @@ import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/mi
     @SubscribeMessage("millionaire:state:request")
     async handleMillionaireStateRequest(
       @ConnectedSocket() client: Socket,
-      @MessageBody() data: { sessionId: number }
+      @MessageBody() data: { eventId: number }
     ) {
       return await this.millionaireSocketService.handleStateRequest(this.server, client, data);
     }

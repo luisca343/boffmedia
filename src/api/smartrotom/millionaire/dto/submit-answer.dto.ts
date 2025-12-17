@@ -4,11 +4,11 @@ import { IsInt, IsUUID, Min, Max } from 'class-validator';
 
 export class SubmitAnswerDto extends BaseDto {
   @ApiProperty({ 
-    description: 'Session ID',
+    description: 'Event ID',
     example: 1
   })
   @IsInt()
-  sessionId: number;
+  eventId: number;
 
   @ApiProperty({ 
     description: 'Player UUID',

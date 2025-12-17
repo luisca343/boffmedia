@@ -5,245 +5,222 @@ import { MillionaireFacadeService } from '../millionaire.facade.service';
 @Injectable()
 export class MillionaireSocketService {
   private readonly logger = new Logger(MillionaireSocketService.name);
-  private sessions: Map<string, Set<string>> = new Map();
-  private userSockets: Map<string, { sessionCode: string; role: string; uuid: string }> = new Map();
+  private events: Map<string, Set<string>> = new Map(); // eventCode -> Set of socketIds
+  private userSockets: Map<string, { eventCode: string; role: string; uuid: string }> = new Map();
 
   constructor(private readonly millionaireFacade: MillionaireFacadeService) {}
 
   handleDisconnect(server: Server, client: Socket) {
     const userData = this.userSockets.get(client.id);
     if (userData) {
-      const { sessionCode, role, uuid } = userData;
-      
-      const sessionSockets = this.sessions.get(sessionCode);
-      if (sessionSockets) {
-        sessionSockets.delete(client.id);
+      const participants = this.events.get(userData.eventCode);
+      if (participants) {
+        participants.delete(client.id);
+        server.to(userData.eventCode).emit('millionaire:participant:left', {
+          uuid: userData.uuid,
+          role: userData.role
+        });
       }
-      
-      server.to(sessionCode).emit('millionaire:player:disconnect', { uuid, role });
       this.userSockets.delete(client.id);
-      this.logger.log(`Millionaire player ${uuid} disconnected from session ${sessionCode}`);
     }
   }
 
-  async handleJoinSession(
+  async handleJoinEvent(
     server: Server,
     client: Socket,
-    data: { sessionCode: string; uuid: string; role: 'conductor' | 'player' }
+    data: { eventCode: string; uuid: string; role: 'conductor' | 'player' }
   ) {
     try {
-      const { sessionCode, uuid, role } = data;
-
-      const session = await this.millionaireFacade.getSessionByCode(sessionCode);
+      const event = await this.millionaireFacade.getEventByCode(data.eventCode);
       
-      client.join(sessionCode);
+      await this.millionaireFacade.joinEvent(data.eventCode, data.uuid);
       
-      if (!this.sessions.has(sessionCode)) {
-        this.sessions.set(sessionCode, new Set());
+      client.join(data.eventCode);
+      
+      if (!this.events.has(data.eventCode)) {
+        this.events.set(data.eventCode, new Set());
       }
-      this.sessions.get(sessionCode)!.add(client.id);
-      this.userSockets.set(client.id, { sessionCode, role, uuid });
-
-      server.to(sessionCode).emit('millionaire:player:join', { uuid, role });
-
-      const state = await this.millionaireFacade.getCurrentState(session.id);
-      client.emit('millionaire:state:sync', state);
-
-      return { success: true };
+      this.events.get(data.eventCode).add(client.id);
+      
+      this.userSockets.set(client.id, {
+        eventCode: data.eventCode,
+        role: data.role,
+        uuid: data.uuid
+      });
+      
+      server.to(data.eventCode).emit('millionaire:participant:joined', {
+        uuid: data.uuid,
+        role: data.role
+      });
+      
+      client.emit('millionaire:joined', { success: true, event });
     } catch (error) {
-      this.logger.error(`Error joining session: ${error.message}`);
-      return { success: false, error: error.message };
+      this.logger.error(`Failed to join event: ${error.message}`);
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   handleHeartbeat(client: Socket) {
     const userData = this.userSockets.get(client.id);
     if (userData) {
-      client.emit('millionaire:heartbeat:ack', { timestamp: Date.now() });
+      // Update heartbeat in database if needed
     }
   }
 
   async handleGameStart(
     server: Server,
     client: Socket,
-    data: { sessionId: number }
+    data: { eventId: number }
   ) {
     try {
-      const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'conductor') {
-        throw new Error('Only conductor can start game');
-      }
-
-      await this.millionaireFacade.startGame(data.sessionId);
+      await this.millionaireFacade.startGame(data.eventId);
       
-      server.to(userData.sessionCode).emit('millionaire:game:started', {
-        timestamp: Date.now()
-      });
-
-      return { success: true };
+      const userData = this.userSockets.get(client.id);
+      if (userData) {
+        server.to(userData.eventCode).emit('millionaire:game:started', {
+          eventId: data.eventId
+        });
+      }
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   async handleRevealQuestion(
     server: Server,
     client: Socket,
-    data: { sessionId: number }
+    data: { eventId: number }
   ) {
     try {
-      const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'conductor') {
-        throw new Error('Only conductor can reveal questions');
-      }
-
-      const question = await this.millionaireFacade.revealNextQuestion(data.sessionId);
+      const question = await this.millionaireFacade.revealNextQuestion(data.eventId);
       
-      server.to(userData.sessionCode).emit('millionaire:question:revealed', question);
-
-      return { success: true };
+      const userData = this.userSockets.get(client.id);
+      if (userData) {
+        server.to(userData.eventCode).emit('millionaire:question:revealed', { question });
+      }
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   async handleRevealAnswer(
     server: Server,
     client: Socket,
-    data: { sessionId: number; isCorrect: boolean }
+    data: { eventId: number; isCorrect: boolean }
   ) {
-    try {
-      const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'conductor') {
-        throw new Error('Only conductor can reveal answers');
-      }
-
-      server.to(userData.sessionCode).emit('millionaire:answer:revealed', {
-        isCorrect: data.isCorrect,
-        timestamp: Date.now()
+    const userData = this.userSockets.get(client.id);
+    if (userData) {
+      server.to(userData.eventCode).emit('millionaire:answer:revealed', {
+        isCorrect: data.isCorrect
       });
-
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.message };
+      
+      if (!data.isCorrect) {
+        await this.millionaireFacade.updateEventStatus(data.eventId, 'COMPLETED');
+        server.to(userData.eventCode).emit('millionaire:game:ended', {
+          reason: 'incorrect_answer'
+        });
+      }
     }
   }
 
   async handlePauseGame(
     server: Server,
     client: Socket,
-    data: { sessionId: number }
+    data: { eventId: number }
   ) {
     try {
-      const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'conductor') {
-        throw new Error('Only conductor can pause game');
-      }
-
-      await this.millionaireFacade.updateSessionStatus(data.sessionId, 'PAUSED');
+      await this.millionaireFacade.updateEventStatus(data.eventId, 'PAUSED');
       
-      server.to(userData.sessionCode).emit('millionaire:game:paused', {
-        timestamp: Date.now()
-      });
-
-      return { success: true };
+      const userData = this.userSockets.get(client.id);
+      if (userData) {
+        server.to(userData.eventCode).emit('millionaire:game:paused');
+      }
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   async handleResumeGame(
     server: Server,
     client: Socket,
-    data: { sessionId: number }
+    data: { eventId: number }
   ) {
     try {
-      const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'conductor') {
-        throw new Error('Only conductor can resume game');
-      }
-
-      await this.millionaireFacade.updateSessionStatus(data.sessionId, 'ACTIVE');
+      await this.millionaireFacade.updateEventStatus(data.eventId, 'ACTIVE');
       
-      server.to(userData.sessionCode).emit('millionaire:game:resumed', {
-        timestamp: Date.now()
-      });
-
-      return { success: true };
+      const userData = this.userSockets.get(client.id);
+      if (userData) {
+        server.to(userData.eventCode).emit('millionaire:game:resumed');
+      }
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   async handleSubmitAnswer(
     server: Server,
     client: Socket,
-    data: { sessionId: number; answerIndex: number }
+    data: { eventId: number; answerIndex: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'player') {
-        throw new Error('Only players can submit answers');
+      if (!userData) {
+        client.emit('millionaire:error', { message: 'Not connected to event' });
+        return;
       }
-
+      
       const result = await this.millionaireFacade.submitAnswer({
-        sessionId: data.sessionId,
+        eventId: data.eventId,
         playerUuid: userData.uuid,
         answerIndex: data.answerIndex
       });
-
-      server.to(userData.sessionCode).emit('millionaire:answer:submitted', {
+      
+      server.to(userData.eventCode).emit('millionaire:answer:submitted', {
         playerUuid: userData.uuid,
-        answerIndex: data.answerIndex,
-        timestamp: Date.now()
+        isCorrect: result.isCorrect
       });
-
-      return { success: true, result };
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   async handleLifelineRequest(
     server: Server,
     client: Socket,
-    data: { sessionId: number; lifelineType: any }
+    data: { eventId: number; lifelineType: any }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
-      if (userData?.role !== 'player') {
-        throw new Error('Only players can request lifelines');
+      if (!userData) {
+        client.emit('millionaire:error', { message: 'Not connected to event' });
+        return;
       }
-
+      
       const result = await this.millionaireFacade.useLifeline({
-        sessionId: data.sessionId,
+        eventId: data.eventId,
         playerUuid: userData.uuid,
-        lifelineType: data.lifelineType as any
+        lifelineType: data.lifelineType
       });
-
-      server.to(userData.sessionCode).emit('millionaire:lifeline:activated', {
-        playerUuid: userData.uuid,
+      
+      server.to(userData.eventCode).emit('millionaire:lifeline:result', {
         lifelineType: data.lifelineType,
-        result: result.data
+        result
       });
-
-      return { success: true, result };
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 
   async handleStateRequest(
     server: Server,
     client: Socket,
-    data: { sessionId: number }
+    data: { eventId: number }
   ) {
     try {
-      const state = await this.millionaireFacade.getCurrentState(data.sessionId);
-      client.emit('millionaire:state:sync', state);
-      return { success: true };
+      const state = await this.millionaireFacade.getCurrentState(data.eventId);
+      client.emit('millionaire:state:response', state);
     } catch (error) {
-      return { success: false, error: error.message };
+      client.emit('millionaire:error', { message: error.message });
     }
   }
 }

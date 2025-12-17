@@ -10,25 +10,25 @@ export class LifelineService {
   ) {}
 
   async useLifeline(
-    sessionId: number,
+    eventId: number,
     questionId: number,
     lifelineType: string
   ): Promise<LifelineResult> {
     // Check if lifeline is available
-    const used = await this.millionaireRepository.useLifeline(sessionId, lifelineType);
+    const used = await this.millionaireRepository.useLifeline(eventId, lifelineType);
     if (!used) {
       throw new BadRequestException('Lifeline not available');
     }
 
     // Get lifeline result
-    return await this.millionaireRepository.getLifelineResult(sessionId, questionId, lifelineType);
+    return await this.millionaireRepository.getLifelineResult(eventId, questionId, lifelineType);
   }
 
-  async isLifelineAvailable(sessionId: number, lifelineType: string): Promise<boolean> {
-    const session = await this.millionaireRepository.findSessionById(sessionId);
-    if (!session) return false;
+  async isLifelineAvailable(eventId: number, lifelineType: string): Promise<boolean> {
+    const millData = await this.millionaireRepository.findMillionaireData(eventId);
+    if (!millData) return false;
 
-    const lifelines = JSON.parse(session.lifelinesRemaining);
+    const lifelines = JSON.parse(millData.lifelinesRemaining);
     return lifelines[lifelineType] === true;
   }
 }

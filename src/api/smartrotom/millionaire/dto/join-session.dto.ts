@@ -2,14 +2,14 @@ import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsUUID, Length } from 'class-validator';
 
-export class JoinSessionDto extends BaseDto {
+export class JoinEventDto extends BaseDto {
   @ApiProperty({ 
-    description: 'Session code',
+    description: 'Event code',
     example: 'ABCD1234'
   })
   @IsString()
   @Length(8, 8)
-  sessionCode: string;
+  eventCode: string;
 
   @ApiProperty({ 
     description: 'Player UUID',
@@ -18,3 +18,6 @@ export class JoinSessionDto extends BaseDto {
   @IsUUID()
   playerUuid: string;
 }
+
+// Maintain backwards compatibility alias
+export class JoinSessionDto extends JoinEventDto {}

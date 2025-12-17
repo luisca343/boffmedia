@@ -6,7 +6,7 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { MillionaireRepository } from './repositories/millionaire.repository';
 import { MILLIONAIRE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
-import { SessionService } from './services/session.service';
+import { EventService } from './services/event.service';
 import { QuestionService } from './services/question.service';
 import { GameStateService } from './services/game-state.service';
 import { LifelineService } from './services/lifeline.service';
@@ -24,7 +24,7 @@ import { MillionaireSocketService } from './gateway/millionaire.gateway';
       useClass: MillionaireRepository,
     },
     
-    SessionService,
+    EventService,
     QuestionService,
     GameStateService,
     LifelineService,

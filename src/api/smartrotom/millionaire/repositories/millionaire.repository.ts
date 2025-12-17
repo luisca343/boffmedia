@@ -1,15 +1,22 @@
 import { Injectable, Inject } from '@nestjs/common';
+import { eq, and, sql as drizzleSql } from 'drizzle-orm';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, desc } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { 
-  millionaireSessions,
-  millionairePlayers,
+import {
   millionaireQuestions,
-  millionaireGameStates,
-  millionaireAnswers
+  millionaireAnswers,
+  millionaireEventData,
 } from '@/_db/schema/SmartRotomMillionaire';
-import { IMillionaireRepository, SessionData, LifelineResult } from './interfaces/millionaire.repository.interface';
+import {
+  rotomEvents,
+  rotomEventParticipants,
+  rotomEventStates,
+} from '@/_db/schema/SmartRotomEvents';
+import { 
+  IMillionaireRepository, 
+  EventData, 
+  LifelineResult 
+} from './interfaces/millionaire.repository.interface';
 
 @Injectable()
 export class MillionaireRepository implements IMillionaireRepository {
@@ -17,101 +24,155 @@ export class MillionaireRepository implements IMillionaireRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  // ==================== SESSION OPERATIONS ====================
+  // ==================== EVENT OPERATIONS ====================
 
-  async createSession(data: SessionData): Promise<{ sessionId: number; sessionCode: string }> {
-    const sessionCode = this.generateSessionCode();
+  async createEvent(data: EventData): Promise<{ eventId: number; eventCode: string }> {
+    const eventCode = this.generateEventCode();
     
-    const result = await this.db.insert(millionaireSessions).values({
-      sessionCode,
+    const result = await this.db.insert(rotomEvents).values({
+      eventCode,
+      eventType: 'MILLIONAIRE',
+      title: data.title || 'Millionaire Game',
+      description: data.description,
       conductorUuid: data.conductorUuid,
+      status: 'WAITING',
+      maxParticipants: data.maxParticipants,
     });
 
-    return {
-      sessionId: Number(result[0].insertId),
-      sessionCode
-    };
+    const eventId = Number(result[0].insertId);
+
+    // Create millionaire-specific data
+    await this.createMillionaireData(eventId);
+
+    // Add conductor as participant
+    await this.addParticipant(eventId, data.conductorUuid, 'CONDUCTOR');
+
+    return { eventId, eventCode };
   }
 
-  async findSessionByCode(sessionCode: string): Promise<any | null> {
-    const results = await this.db
-      .select()
-      .from(millionaireSessions)
-      .where(eq(millionaireSessions.sessionCode, sessionCode))
-      .limit(1);
-
-    return results[0] || null;
-  }
-
-  async findSessionById(sessionId: number): Promise<any | null> {
-    const results = await this.db
-      .select()
-      .from(millionaireSessions)
-      .where(eq(millionaireSessions.id, sessionId))
-      .limit(1);
-
-    return results[0] || null;
-  }
-
-  async updateSessionStatus(sessionId: number, status: string): Promise<boolean> {
+  async findEventByCode(eventCode: string): Promise<any | null> {
     const result = await this.db
-      .update(millionaireSessions)
-      .set({ status: status as any })
-      .where(eq(millionaireSessions.id, sessionId));
+      .select()
+      .from(rotomEvents)
+      .where(eq(rotomEvents.eventCode, eventCode))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async findEventById(eventId: number): Promise<any | null> {
+    const result = await this.db
+      .select()
+      .from(rotomEvents)
+      .where(eq(rotomEvents.id, eventId))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async updateEventStatus(eventId: number, status: string): Promise<boolean> {
+    const result = await this.db
+      .update(rotomEvents)
+      .set({ 
+        status: status as any,
+        ...(status === 'ACTIVE' ? { startedAt: new Date() } : {}),
+        ...(status === 'COMPLETED' || status === 'CANCELLED' ? { completedAt: new Date() } : {})
+      })
+      .where(eq(rotomEvents.id, eventId));
 
     return result[0].affectedRows > 0;
   }
 
-  async advanceQuestion(sessionId: number): Promise<boolean> {
-    const session = await this.findSessionById(sessionId);
-    if (!session) return false;
+  // ==================== MILLIONAIRE DATA OPERATIONS ====================
 
-    const result = await this.db
-      .update(millionaireSessions)
-      .set({ currentQuestion: session.currentQuestion + 1 })
-      .where(eq(millionaireSessions.id, sessionId));
-
-    return result[0].affectedRows > 0;
-  }
-
-  // ==================== PLAYER OPERATIONS ====================
-
-  async addPlayer(sessionId: number, uuid: string, name: string): Promise<number> {
-    const result = await this.db.insert(millionairePlayers).values({
-      sessionId,
-      uuid,
-      name,
-      connectionStatus: 'CONNECTED'
+  async createMillionaireData(eventId: number): Promise<number> {
+    const result = await this.db.insert(millionaireEventData).values({
+      eventId,
+      currentQuestion: 0,
+      lifelinesRemaining: '{"50:50":true,"phone":true,"audience":true}',
+      prizePool: 1000000,
+      currentPrize: 0,
     });
 
     return Number(result[0].insertId);
   }
 
-  async updatePlayerConnection(playerId: number, status: string): Promise<boolean> {
+  async findMillionaireData(eventId: number): Promise<any | null> {
     const result = await this.db
-      .update(millionairePlayers)
+      .select()
+      .from(millionaireEventData)
+      .where(eq(millionaireEventData.eventId, eventId))
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  async advanceQuestion(eventId: number): Promise<boolean> {
+    const result = await this.db
+      .update(millionaireEventData)
       .set({ 
-        connectionStatus: status as any,
-        lastHeartbeat: new Date()
+        currentQuestion: drizzleSql`${millionaireEventData.currentQuestion} + 1` 
       })
-      .where(eq(millionairePlayers.id, playerId));
+      .where(eq(millionaireEventData.eventId, eventId));
 
     return result[0].affectedRows > 0;
   }
 
-  async findPlayerByUuid(sessionId: number, uuid: string): Promise<any | null> {
-    const results = await this.db
+  async updateLifelines(eventId: number, lifelines: Record<string, boolean>): Promise<boolean> {
+    const result = await this.db
+      .update(millionaireEventData)
+      .set({ lifelinesRemaining: JSON.stringify(lifelines) })
+      .where(eq(millionaireEventData.eventId, eventId));
+
+    return result[0].affectedRows > 0;
+  }
+
+  // ==================== PARTICIPANT OPERATIONS ====================
+
+  async addParticipant(eventId: number, uuid: string, role: string): Promise<number> {
+    const result = await this.db.insert(rotomEventParticipants).values({
+      eventId,
+      userUuid: uuid,
+      role: role as any,
+      connectionStatus: 'CONNECTED',
+    });
+
+    return Number(result[0].insertId);
+  }
+
+  async updateParticipantConnection(participantId: number, status: string): Promise<boolean> {
+    const result = await this.db
+      .update(rotomEventParticipants)
+      .set({ 
+        connectionStatus: status as any,
+        lastHeartbeat: new Date(),
+        ...(status === 'DISCONNECTED' ? { leftAt: new Date() } : {})
+      })
+      .where(eq(rotomEventParticipants.id, participantId));
+
+    return result[0].affectedRows > 0;
+  }
+
+  async findParticipantByUuid(eventId: number, uuid: string): Promise<any | null> {
+    const result = await this.db
       .select()
-      .from(millionairePlayers)
+      .from(rotomEventParticipants)
       .where(
         and(
-          eq(millionairePlayers.sessionId, sessionId),
-          eq(millionairePlayers.uuid, uuid)
+          eq(rotomEventParticipants.eventId, eventId),
+          eq(rotomEventParticipants.userUuid, uuid)
         )
       )
       .limit(1);
 
-    return results[0] || null;
+    return result[0] || null;
+  }
+
+  async getEventParticipants(eventId: number): Promise<any[]> {
+    return await this.db
+      .select()
+      .from(rotomEventParticipants)
+      .where(eq(rotomEventParticipants.eventId, eventId));
   }
 
   // ==================== QUESTION OPERATIONS ====================
@@ -136,51 +197,61 @@ export class MillionaireRepository implements IMillionaireRepository {
     return questions[randomIndex];
   }
 
-  // ==================== GAME STATE OPERATIONS ====================
+  // ==================== EVENT STATE OPERATIONS ====================
 
-  async saveGameState(data: any): Promise<number> {
-    const result = await this.db.insert(millionaireGameStates).values(data);
+  async saveEventState(data: any): Promise<number> {
+    const result = await this.db.insert(rotomEventStates).values({
+      eventId: data.eventId,
+      stateType: data.stateType,
+      stateData: JSON.stringify(data.stateData),
+      actorUuid: data.actorUuid,
+    });
+
     return Number(result[0].insertId);
   }
 
-  async getLatestGameState(sessionId: number): Promise<any | null> {
-    const results = await this.db
+  async getLatestEventState(eventId: number): Promise<any | null> {
+    const result = await this.db
       .select()
-      .from(millionaireGameStates)
-      .where(eq(millionaireGameStates.sessionId, sessionId))
-      .orderBy(desc(millionaireGameStates.createdAt))
+      .from(rotomEventStates)
+      .where(eq(rotomEventStates.eventId, eventId))
+      .orderBy(drizzleSql`${rotomEventStates.createdAt} DESC`)
       .limit(1);
 
-    return results[0] || null;
+    return result[0] || null;
   }
 
   // ==================== ANSWER OPERATIONS ====================
 
   async saveAnswer(data: any): Promise<number> {
-    const result = await this.db.insert(millionaireAnswers).values(data);
+    const result = await this.db.insert(millionaireAnswers).values({
+      eventId: data.eventId,
+      questionId: data.questionId,
+      playerUuid: data.playerUuid,
+      answerIndex: data.answerIndex,
+      isCorrect: data.isCorrect,
+    });
+
     return Number(result[0].insertId);
   }
 
   // ==================== LIFELINE OPERATIONS ====================
 
-  async useLifeline(sessionId: number, lifelineType: string): Promise<boolean> {
-    const session = await this.findSessionById(sessionId);
-    if (!session) return false;
+  async useLifeline(eventId: number, lifelineType: string): Promise<boolean> {
+    const millData = await this.findMillionaireData(eventId);
+    if (!millData) return false;
 
-    const lifelines = JSON.parse(session.lifelinesRemaining);
-    if (!lifelines[lifelineType]) return false;
+    const lifelines = JSON.parse(millData.lifelinesRemaining);
+    
+    if (!lifelines[lifelineType]) {
+      return false;
+    }
 
     lifelines[lifelineType] = false;
-
-    const result = await this.db
-      .update(millionaireSessions)
-      .set({ lifelinesRemaining: JSON.stringify(lifelines) })
-      .where(eq(millionaireSessions.id, sessionId));
-
-    return result[0].affectedRows > 0;
+    return await this.updateLifelines(eventId, lifelines);
   }
 
-  async getLifelineResult(sessionId: number, questionId: number, lifelineType: string): Promise<LifelineResult> {
+  async getLifelineResult(eventId: number, questionId: number, lifelineType: string): Promise<LifelineResult> {
     const question = await this.db
       .select()
       .from(millionaireQuestions)
@@ -191,18 +262,18 @@ export class MillionaireRepository implements IMillionaireRepository {
       throw new Error('Question not found');
     }
 
-    const correctAnswer = question[0].correctAnswer;
     const answers = JSON.parse(question[0].answers);
+    const correctAnswer = question[0].correctAnswer;
 
     switch (lifelineType) {
       case '50:50':
-        return this.generateFiftyFifty(correctAnswer, answers.length);
+        return this.fiftyFifty(answers, correctAnswer);
       
       case 'phone':
-        return this.generatePhoneAFriend(correctAnswer);
+        return this.phoneAFriend(correctAnswer);
       
       case 'audience':
-        return this.generateAskTheAudience(correctAnswer, answers.length);
+        return this.askTheAudience(answers, correctAnswer);
       
       default:
         throw new Error('Invalid lifeline type');
@@ -211,7 +282,7 @@ export class MillionaireRepository implements IMillionaireRepository {
 
   // ==================== HELPER METHODS ====================
 
-  private generateSessionCode(): string {
+  private generateEventCode(): string {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let code = '';
     for (let i = 0; i < 8; i++) {
@@ -220,70 +291,61 @@ export class MillionaireRepository implements IMillionaireRepository {
     return code;
   }
 
-  private generateFiftyFifty(correctAnswer: number, totalAnswers: number): LifelineResult {
-    const incorrectAnswers = Array.from({ length: totalAnswers }, (_, i) => i)
-      .filter(i => i !== correctAnswer);
-    
-    // Remove 2 incorrect answers randomly
-    const toRemove = incorrectAnswers
+  private fiftyFifty(answers: string[], correctAnswer: number): LifelineResult {
+    const incorrectIndices = answers
+      .map((_, index) => index)
+      .filter(index => index !== correctAnswer);
+
+    const toRemove = incorrectIndices
       .sort(() => Math.random() - 0.5)
       .slice(0, 2);
 
     return {
       type: '50:50',
-      data: {
-        removedAnswers: toRemove
-      }
+      data: { removedAnswers: toRemove }
     };
   }
 
-  private generatePhoneAFriend(correctAnswer: number): LifelineResult {
-    // Simulate friend confidence (70-95% for correct, lower for incorrect)
-    const isCorrect = Math.random() > 0.15; // 85% chance friend knows
-    const suggestedAnswer = isCorrect ? correctAnswer : Math.floor(Math.random() * 4);
-    const confidence = isCorrect 
-      ? Math.floor(Math.random() * 25) + 70  // 70-95%
-      : Math.floor(Math.random() * 40) + 30; // 30-70%
+  private phoneAFriend(correctAnswer: number): LifelineResult {
+    const confidence = Math.random() * 0.4 + 0.6; // 60-100% confidence
+    const isCorrect = Math.random() < confidence;
 
     return {
       type: 'phone',
       data: {
-        suggestedAnswer,
-        confidence,
-        message: `I'm ${confidence}% sure the answer is option ${suggestedAnswer + 1}.`
+        suggestedAnswer: isCorrect ? correctAnswer : Math.floor(Math.random() * 4),
+        confidence: Math.round(confidence * 100)
       }
     };
   }
 
-  private generateAskTheAudience(correctAnswer: number, totalAnswers: number): LifelineResult {
-    // Generate audience percentages with correct answer having highest percentage
-    const percentages = new Array(totalAnswers).fill(0);
-    let remaining = 100;
+  private askTheAudience(answers: string[], correctAnswer: number): LifelineResult {
+    const votes = new Array(answers.length).fill(0);
+    
+    // Give correct answer majority (50-80%)
+    const correctPercentage = Math.random() * 0.3 + 0.5; // 50-80%
+    votes[correctAnswer] = correctPercentage;
 
-    // Give correct answer 40-70% of votes
-    percentages[correctAnswer] = Math.floor(Math.random() * 30) + 40;
-    remaining -= percentages[correctAnswer];
+    // Distribute remaining votes
+    const remaining = 1 - correctPercentage;
+    const otherIndices = answers
+      .map((_, index) => index)
+      .filter(index => index !== correctAnswer);
 
-    // Distribute remaining votes among other answers
-    for (let i = 0; i < totalAnswers; i++) {
-      if (i !== correctAnswer && remaining > 0) {
-        const portion = Math.floor(Math.random() * (remaining / 2)) + 5;
-        percentages[i] = Math.min(portion, remaining);
-        remaining -= percentages[i];
+    otherIndices.forEach((index, i) => {
+      if (i === otherIndices.length - 1) {
+        votes[index] = remaining - votes.slice(0, -1).reduce((a, b) => a + b, 0) + votes[correctAnswer];
+      } else {
+        votes[index] = Math.random() * (remaining / otherIndices.length);
       }
-    }
+    });
 
-    // Give any remaining votes to random answer
-    if (remaining > 0) {
-      const randomIndex = Math.floor(Math.random() * totalAnswers);
-      percentages[randomIndex] += remaining;
-    }
+    // Convert to percentages
+    const percentages = votes.map(v => Math.round(v * 100));
 
     return {
       type: 'audience',
-      data: {
-        percentages
-      }
+      data: { votes: percentages }
     };
   }
 }

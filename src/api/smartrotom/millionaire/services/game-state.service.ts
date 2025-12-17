@@ -3,7 +3,7 @@ import { MILLIONAIRE_REPOSITORY_TOKEN } from '@api/_utils/repositories/interface
 import { IMillionaireRepository } from '../repositories/interfaces/millionaire.repository.interface';
 
 export interface GameStateSnapshot {
-  sessionId: number;
+  eventId: number;
   currentQuestion: number;
   lifelines: Record<string, boolean>;
   questionData?: any;
@@ -18,43 +18,35 @@ export class GameStateService {
   ) {}
 
   async saveState(
-    sessionId: number,
-    questionNumber: number,
-    questionId: number,
-    snapshot: GameStateSnapshot,
-    options?: {
-      playerAnswer?: number;
-      isCorrect?: boolean;
-      lifelineUsed?: string;
-    }
+    eventId: number,
+    stateType: string,
+    stateData: any,
+    actorUuid?: string
   ): Promise<void> {
-    await this.millionaireRepository.saveGameState({
-      sessionId,
-      questionNumber,
-      questionId,
-      playerAnswer: options?.playerAnswer,
-      isCorrect: options?.isCorrect,
-      lifelineUsed: options?.lifelineUsed,
-      stateSnapshot: JSON.stringify(snapshot)
+    await this.millionaireRepository.saveEventState({
+      eventId,
+      stateType,
+      stateData,
+      actorUuid
     });
   }
 
-  async getLatestState(sessionId: number): Promise<GameStateSnapshot | null> {
-    const state = await this.millionaireRepository.getLatestGameState(sessionId);
+  async getLatestState(eventId: number): Promise<GameStateSnapshot | null> {
+    const state = await this.millionaireRepository.getLatestEventState(eventId);
     if (!state) return null;
 
-    return JSON.parse(state.stateSnapshot);
+    return JSON.parse(state.stateData);
   }
 
   async recordAnswer(
-    sessionId: number,
+    eventId: number,
     questionId: number,
     playerUuid: string,
     answerIndex: number,
     isCorrect: boolean
   ): Promise<void> {
     await this.millionaireRepository.saveAnswer({
-      sessionId,
+      eventId,
       questionId,
       playerUuid,
       answerIndex,

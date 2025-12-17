@@ -1,10 +1,14 @@
-export interface SessionData {
+export interface EventData {
   conductorUuid: string;
+  title?: string;
+  description?: string;
+  maxParticipants?: number;
 }
 
-export interface SessionWithPlayers {
-  session: any;
-  players: any[];
+export interface EventWithData {
+  event: any;
+  millionaireData: any;
+  participants?: any[];
   currentQuestion?: any;
 }
 
@@ -14,30 +18,37 @@ export interface LifelineResult {
 }
 
 export interface IMillionaireRepository {
-  // Session operations
-  createSession(data: SessionData): Promise<{ sessionId: number; sessionCode: string }>;
-  findSessionByCode(sessionCode: string): Promise<any | null>;
-  findSessionById(sessionId: number): Promise<any | null>;
-  updateSessionStatus(sessionId: number, status: string): Promise<boolean>;
-  advanceQuestion(sessionId: number): Promise<boolean>;
+  // Event operations
+  createEvent(data: EventData): Promise<{ eventId: number; eventCode: string }>;
+  findEventByCode(eventCode: string): Promise<any | null>;
+  findEventById(eventId: number): Promise<any | null>;
+  updateEventStatus(eventId: number, status: string): Promise<boolean>;
   
-  // Player operations
-  addPlayer(sessionId: number, uuid: string, name: string): Promise<number>;
-  updatePlayerConnection(playerId: number, status: string): Promise<boolean>;
-  findPlayerByUuid(sessionId: number, uuid: string): Promise<any | null>;
+  // Millionaire data operations
+  createMillionaireData(eventId: number): Promise<number>;
+  findMillionaireData(eventId: number): Promise<any | null>;
+  advanceQuestion(eventId: number): Promise<boolean>;
+  updateLifelines(eventId: number, lifelines: Record<string, boolean>): Promise<boolean>;
+  
+  // Participant operations
+  addParticipant(eventId: number, uuid: string, role: string): Promise<number>;
+  updateParticipantConnection(participantId: number, status: string): Promise<boolean>;
+  findParticipantByUuid(eventId: number, uuid: string): Promise<any | null>;
+  getEventParticipants(eventId: number): Promise<any[]>;
   
   // Question operations
   findQuestionsByDifficulty(difficultyLevel: number): Promise<any[]>;
   getRandomQuestionForLevel(level: number): Promise<any | null>;
   
-  // Game state operations
-  saveGameState(data: any): Promise<number>;
-  getLatestGameState(sessionId: number): Promise<any | null>;
+  // Event state operations
+  saveEventState(data: any): Promise<number>;
+  getLatestEventState(eventId: number): Promise<any | null>;
   
   // Answer operations
   saveAnswer(data: any): Promise<number>;
   
   // Lifeline operations
-  useLifeline(sessionId: number, lifelineType: string): Promise<boolean>;
-  getLifelineResult(sessionId: number, questionId: number, lifelineType: string): Promise<LifelineResult>;
+  useLifeline(eventId: number, lifelineType: string): Promise<boolean>;
+  getLifelineResult(eventId: number, questionId: number, lifelineType: string): Promise<LifelineResult>;
 }
+

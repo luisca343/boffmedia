@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { SessionService } from './services/session.service';
+import { EventService } from './services/event.service';
 import { QuestionService } from './services/question.service';
 import { GameStateService } from './services/game-state.service';
 import { LifelineService } from './services/lifeline.service';
@@ -7,7 +7,8 @@ import { SubmitAnswerDto } from './dto/submit-answer.dto';
 import { UseLifelineDto } from './dto/use-lifeline.dto';
 
 export interface GameStateResponse {
-  session: any;
+  event: any;
+  millionaireData: any;
   currentQuestion?: any;
   lifelines: Record<string, boolean>;
   status: string;
@@ -16,142 +17,166 @@ export interface GameStateResponse {
 @Injectable()
 export class MillionaireFacadeService {
   constructor(
-    private readonly sessionService: SessionService,
+    private readonly eventService: EventService,
     private readonly questionService: QuestionService,
     private readonly gameStateService: GameStateService,
     private readonly lifelineService: LifelineService,
   ) {}
 
-  async createSession(conductorUuid: string): Promise<{ sessionId: number; sessionCode: string }> {
-    return await this.sessionService.createSession(conductorUuid);
+  async createEvent(conductorUuid: string, title?: string, description?: string, maxParticipants?: number): Promise<{ eventId: number; eventCode: string }> {
+    return await this.eventService.createEvent(conductorUuid, title, description, maxParticipants);
   }
 
-  async getSession(sessionId: number): Promise<any> {
-    return await this.sessionService.getSession(sessionId);
+  async getEvent(eventId: number): Promise<any> {
+    return await this.eventService.getEvent(eventId);
   }
 
-  async getSessionByCode(sessionCode: string): Promise<any> {
-    return await this.sessionService.getSessionByCode(sessionCode);
+  async getEventByCode(eventCode: string): Promise<any> {
+    return await this.eventService.getEventByCode(eventCode);
   }
 
-  async joinSession(sessionCode: string, playerUuid: string, playerName: string): Promise<number> {
-    const session = await this.sessionService.getSessionByCode(sessionCode);
-    return await this.sessionService.addPlayer(session.id, playerUuid, playerName);
+  async joinEvent(eventCode: string, playerUuid: string): Promise<number> {
+    const event = await this.eventService.getEventByCode(eventCode);
+    return await this.eventService.addParticipant(event.id, playerUuid, 'PARTICIPANT');
   }
 
-  async updateSessionStatus(sessionId: number, status: string): Promise<void> {
-    await this.sessionService.updateStatus(sessionId, status);
+  async updateEventStatus(eventId: number, status: string): Promise<void> {
+    await this.eventService.updateStatus(eventId, status);
   }
 
-  async startGame(sessionId: number): Promise<void> {
-    await this.sessionService.updateStatus(sessionId, 'ACTIVE');
+  async startGame(eventId: number): Promise<void> {
+    await this.eventService.updateStatus(eventId, 'ACTIVE');
     
     const question = await this.questionService.getQuestionForLevel(1);
     
     const snapshot = {
-      sessionId,
-      currentQuestion: 0,
+      eventId,
+      currentQuestion: 1,
       lifelines: { '50:50': true, 'phone': true, 'audience': true },
       questionData: question
     };
     
-    await this.gameStateService.saveState(sessionId, 1, question.id, snapshot);
+    await this.gameStateService.saveState(
+      eventId,
+      'GAME_STARTED',
+      snapshot
+    );
   }
 
-  async revealNextQuestion(sessionId: number): Promise<any> {
-    const session = await this.sessionService.getSession(sessionId);
-    const nextLevel = session.currentQuestion + 1;
-
+  async revealNextQuestion(eventId: number): Promise<any> {
+    const event = await this.eventService.getEvent(eventId);
+    const millData = event.millionaireData;
+    
+    const nextLevel = millData.currentQuestion + 1;
     if (nextLevel > 15) {
-      throw new Error('Game completed - all questions answered');
+      await this.eventService.updateStatus(eventId, 'COMPLETED');
+      return null;
     }
-
+    
+    await this.eventService.advanceToNextQuestion(eventId);
     const question = await this.questionService.getQuestionForLevel(nextLevel);
-    await this.sessionService.advanceToNextQuestion(sessionId);
-
-    return await this.questionService.getQuestionForPlayer(question.id);
+    
+    const snapshot = {
+      eventId,
+      currentQuestion: nextLevel,
+      lifelines: millData.lifelinesRemaining,
+      questionData: question
+    };
+    
+    await this.gameStateService.saveState(
+      eventId,
+      'QUESTION_REVEALED',
+      snapshot
+    );
+    
+    return question;
   }
 
   async submitAnswer(submitAnswerDto: SubmitAnswerDto): Promise<{ isCorrect: boolean }> {
-    const session = await this.sessionService.getSession(submitAnswerDto.sessionId);
-    const latestState = await this.gameStateService.getLatestState(submitAnswerDto.sessionId);
+    const { eventId, playerUuid, answerIndex } = submitAnswerDto;
     
-    if (!latestState?.questionData) {
-      throw new Error('No active question');
+    const event = await this.eventService.getEvent(eventId);
+    const millData = event.millionaireData;
+    
+    if (event.status !== 'ACTIVE') {
+      throw new Error('Event is not active');
     }
-
-    const isCorrect = await this.questionService.validateAnswer(
-      latestState.questionData.id,
-      submitAnswerDto.answerIndex
-    );
-
+    
+    const currentLevel = millData.currentQuestion;
+    const question = await this.questionService.getQuestionForLevel(currentLevel);
+    
+    const isCorrect = await this.questionService.validateAnswer(question.id, answerIndex);
+    
     await this.gameStateService.recordAnswer(
-      submitAnswerDto.sessionId,
-      latestState.questionData.id,
-      submitAnswerDto.playerUuid,
-      submitAnswerDto.answerIndex,
+      eventId,
+      question.id,
+      playerUuid,
+      answerIndex,
       isCorrect
     );
-
+    
     await this.gameStateService.saveState(
-      submitAnswerDto.sessionId,
-      session.currentQuestion,
-      latestState.questionData.id,
+      eventId,
+      'ANSWER_SUBMITTED',
       {
-        ...latestState,
-        playerAnswer: submitAnswerDto.answerIndex
+        eventId,
+        questionId: question.id,
+        playerUuid,
+        answerIndex,
+        isCorrect,
+        currentQuestion: currentLevel
       },
-      {
-        playerAnswer: submitAnswerDto.answerIndex,
-        isCorrect
-      }
+      playerUuid
     );
-
-    return {
-      isCorrect
-    };
+    
+    if (!isCorrect) {
+      await this.eventService.updateStatus(eventId, 'COMPLETED');
+    }
+    
+    return { isCorrect };
   }
 
   async useLifeline(useLifelineDto: UseLifelineDto): Promise<any> {
-    const latestState = await this.gameStateService.getLatestState(useLifelineDto.sessionId);
+    const { eventId, playerUuid, lifelineType } = useLifelineDto;
     
-    if (!latestState?.questionData) {
-      throw new Error('No active question');
-    }
-
+    const event = await this.eventService.getEvent(eventId);
+    const millData = event.millionaireData;
+    
+    const currentLevel = millData.currentQuestion;
+    const question = await this.questionService.getQuestionForLevel(currentLevel);
+    
     const result = await this.lifelineService.useLifeline(
-      useLifelineDto.sessionId,
-      latestState.questionData.id,
-      useLifelineDto.lifelineType
+      eventId,
+      question.id,
+      lifelineType
     );
-
+    
     await this.gameStateService.saveState(
-      useLifelineDto.sessionId,
-      latestState.currentQuestion,
-      latestState.questionData.id,
-      latestState,
+      eventId,
+      'LIFELINE_USED',
       {
-        lifelineUsed: useLifelineDto.lifelineType
-      }
+        eventId,
+        lifelineType,
+        result,
+        currentQuestion: currentLevel
+      },
+      playerUuid
     );
-
+    
     return result;
   }
 
-  async getCurrentState(sessionId: number): Promise<GameStateResponse> {
-    const session = await this.sessionService.getSession(sessionId);
-    const latestState = await this.gameStateService.getLatestState(sessionId);
-
+  async getCurrentState(eventId: number): Promise<GameStateResponse> {
+    const event = await this.eventService.getEvent(eventId);
+    const millData = event.millionaireData;
+    const latestState = await this.gameStateService.getLatestState(eventId);
+    
     return {
-      session: {
-        id: session.id,
-        sessionCode: session.sessionCode,
-        currentQuestion: session.currentQuestion,
-        status: session.status
-      },
+      event,
+      millionaireData: millData,
       currentQuestion: latestState?.questionData,
-      lifelines: session.lifelinesRemaining,
-      status: session.status
+      lifelines: millData?.lifelinesRemaining || {},
+      status: event.status
     };
   }
 }

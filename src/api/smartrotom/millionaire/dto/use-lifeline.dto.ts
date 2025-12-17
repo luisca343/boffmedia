@@ -10,11 +10,11 @@ export enum LifelineType {
 
 export class UseLifelineDto extends BaseDto {
   @ApiProperty({ 
-    description: 'Session ID',
+    description: 'Event ID',
     example: 1
   })
   @IsInt()
-  sessionId: number;
+  eventId: number;
 
   @ApiProperty({ 
     description: 'Player UUID',
