@@ -10,6 +10,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { apiReference } from '@scalar/nestjs-api-reference'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
+import { MySQL2Service } from './_utils/MySQL2Service';
+import { WingullSQL2Service } from './_utils/WingullSQL2Service';
 
 const bodyParser = require('body-parser');
 
@@ -125,6 +127,16 @@ async function bootstrap() {
     console.log(`📖 Swagger UI: http://localhost:34301/api`);
     console.log(`📋 Scalar Reference: http://localhost:34301/reference`);
     console.log(`🔗 OpenAPI JSON: http://localhost:34301/api-json\n`);
+  }
+
+  // Run DB migrations once at startup
+  try {
+    const mysqlService = app.get(MySQL2Service);
+    const wingullService = app.get(WingullSQL2Service);
+    await mysqlService.migrar();
+    await wingullService.migrar();
+  } catch (e) {
+    console.error('Migration error (continuing startup):', e?.message || e);
   }
 
   await app.listen(34301);

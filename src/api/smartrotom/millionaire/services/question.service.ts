@@ -7,7 +7,6 @@ export interface QuestionForPlayer {
   text: string;
   answers: string[];
   difficultyLevel: number;
-  prizeValue: string;
 }
 
 @Injectable()
@@ -43,8 +42,7 @@ export class QuestionService {
       id: question.id,
       text: question.text,
       answers: JSON.parse(question.answers),
-      difficultyLevel: question.difficultyLevel,
-      prizeValue: question.prizeValue
+      difficultyLevel: question.difficultyLevel
     };
   }
 

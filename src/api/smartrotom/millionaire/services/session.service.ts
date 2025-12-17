@@ -56,10 +56,6 @@ export class SessionService {
     return await this.millionaireRepository.advanceQuestion(sessionId);
   }
 
-  async updatePrizeMoney(sessionId: number, amount: string): Promise<void> {
-    await this.millionaireRepository.updatePrizeMoney(sessionId, amount);
-  }
-
   async addPlayer(sessionId: number, uuid: string, name: string): Promise<number> {
     // Check if session exists and is in valid state
     const session = await this.getSession(sessionId);

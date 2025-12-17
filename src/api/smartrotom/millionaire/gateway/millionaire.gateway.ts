@@ -1,39 +1,16 @@
-import {
-  WebSocketGateway,
-  WebSocketServer,
-  SubscribeMessage,
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  ConnectedSocket,
-  MessageBody,
-} from '@nestjs/websockets';
+import { Injectable, Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
 import { MillionaireFacadeService } from '../millionaire.facade.service';
 
-@WebSocketGateway(34306, {
-  cors: {
-    origin: '*',
-  },
-  namespace: '/millionaire',
-})
-export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  @WebSocketServer()
-  server: Server;
-
-  private readonly logger = new Logger(MillionaireGateway.name);
+@Injectable()
+export class MillionaireSocketService {
+  private readonly logger = new Logger(MillionaireSocketService.name);
   private sessions: Map<string, Set<string>> = new Map();
   private userSockets: Map<string, { sessionCode: string; role: string; uuid: string }> = new Map();
 
   constructor(private readonly millionaireFacade: MillionaireFacadeService) {}
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Client connected: ${client.id}`);
-  }
-
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Client disconnected: ${client.id}`);
-    
+  handleDisconnect(server: Server, client: Socket) {
     const userData = this.userSockets.get(client.id);
     if (userData) {
       const { sessionCode, role, uuid } = userData;
@@ -43,15 +20,16 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
         sessionSockets.delete(client.id);
       }
       
-      this.server.to(sessionCode).emit('player:disconnect', { uuid, role });
+      server.to(sessionCode).emit('millionaire:player:disconnect', { uuid, role });
       this.userSockets.delete(client.id);
+      this.logger.log(`Millionaire player ${uuid} disconnected from session ${sessionCode}`);
     }
   }
 
-  @SubscribeMessage('session:join')
   async handleJoinSession(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionCode: string; uuid: string; role: 'conductor' | 'player' }
+    server: Server,
+    client: Socket,
+    data: { sessionCode: string; uuid: string; role: 'conductor' | 'player' }
   ) {
     try {
       const { sessionCode, uuid, role } = data;
@@ -66,10 +44,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
       this.sessions.get(sessionCode)!.add(client.id);
       this.userSockets.set(client.id, { sessionCode, role, uuid });
 
-      this.server.to(sessionCode).emit('player:join', { uuid, role });
+      server.to(sessionCode).emit('millionaire:player:join', { uuid, role });
 
       const state = await this.millionaireFacade.getCurrentState(session.id);
-      client.emit('state:sync', state);
+      client.emit('millionaire:state:sync', state);
 
       return { success: true };
     } catch (error) {
@@ -78,18 +56,17 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('heartbeat')
-  handleHeartbeat(@ConnectedSocket() client: Socket) {
+  handleHeartbeat(client: Socket) {
     const userData = this.userSockets.get(client.id);
     if (userData) {
-      client.emit('heartbeat:ack', { timestamp: Date.now() });
+      client.emit('millionaire:heartbeat:ack', { timestamp: Date.now() });
     }
   }
 
-  @SubscribeMessage('game:start')
   async handleGameStart(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -99,7 +76,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
 
       await this.millionaireFacade.startGame(data.sessionId);
       
-      this.server.to(userData.sessionCode).emit('game:started', {
+      server.to(userData.sessionCode).emit('millionaire:game:started', {
         timestamp: Date.now()
       });
 
@@ -109,10 +86,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('question:reveal')
   async handleRevealQuestion(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -122,7 +99,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
 
       const question = await this.millionaireFacade.revealNextQuestion(data.sessionId);
       
-      this.server.to(userData.sessionCode).emit('question:revealed', question);
+      server.to(userData.sessionCode).emit('millionaire:question:revealed', question);
 
       return { success: true };
     } catch (error) {
@@ -130,10 +107,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('answer:reveal')
   async handleRevealAnswer(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number; isCorrect: boolean }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number; isCorrect: boolean }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -141,7 +118,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
         throw new Error('Only conductor can reveal answers');
       }
 
-      this.server.to(userData.sessionCode).emit('answer:revealed', {
+      server.to(userData.sessionCode).emit('millionaire:answer:revealed', {
         isCorrect: data.isCorrect,
         timestamp: Date.now()
       });
@@ -152,10 +129,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('game:pause')
   async handlePauseGame(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -165,7 +142,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
 
       await this.millionaireFacade.updateSessionStatus(data.sessionId, 'PAUSED');
       
-      this.server.to(userData.sessionCode).emit('game:paused', {
+      server.to(userData.sessionCode).emit('millionaire:game:paused', {
         timestamp: Date.now()
       });
 
@@ -175,10 +152,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('game:resume')
   async handleResumeGame(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -188,7 +165,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
 
       await this.millionaireFacade.updateSessionStatus(data.sessionId, 'ACTIVE');
       
-      this.server.to(userData.sessionCode).emit('game:resumed', {
+      server.to(userData.sessionCode).emit('millionaire:game:resumed', {
         timestamp: Date.now()
       });
 
@@ -198,10 +175,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('answer:submit')
   async handleSubmitAnswer(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number; answerIndex: number }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number; answerIndex: number }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -215,7 +192,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
         answerIndex: data.answerIndex
       });
 
-      this.server.to(userData.sessionCode).emit('answer:submitted', {
+      server.to(userData.sessionCode).emit('millionaire:answer:submitted', {
         playerUuid: userData.uuid,
         answerIndex: data.answerIndex,
         timestamp: Date.now()
@@ -227,10 +204,10 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('lifeline:request')
   async handleLifelineRequest(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number; lifelineType: any }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number; lifelineType: any }
   ) {
     try {
       const userData = this.userSockets.get(client.id);
@@ -244,7 +221,7 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
         lifelineType: data.lifelineType as any
       });
 
-      this.server.to(userData.sessionCode).emit('lifeline:activated', {
+      server.to(userData.sessionCode).emit('millionaire:lifeline:activated', {
         playerUuid: userData.uuid,
         lifelineType: data.lifelineType,
         result: result.data
@@ -256,14 +233,14 @@ export class MillionaireGateway implements OnGatewayConnection, OnGatewayDisconn
     }
   }
 
-  @SubscribeMessage('state:request')
   async handleStateRequest(
-    @ConnectedSocket() client: Socket,
-    @MessageBody() data: { sessionId: number }
+    server: Server,
+    client: Socket,
+    data: { sessionId: number }
   ) {
     try {
       const state = await this.millionaireFacade.getCurrentState(data.sessionId);
-      client.emit('state:sync', state);
+      client.emit('millionaire:state:sync', state);
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };

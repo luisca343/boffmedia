@@ -20,6 +20,9 @@ import { CallService } from './services/call.service';
 // Import facade service
 import { ChatappFacadeService } from './chatapp.facade.service';
 
+// Import socket service
+import { ChatAppSocketService } from './gateway/chatapp.gateway';
+
 // Import controller
 import { ChatappController } from './chatapp.controller';
 import { SocketsModule } from '@api/_utils/sockets/sockets.module';
@@ -59,10 +62,14 @@ import { WingullModule } from '../wingull/wingull.module';
     CallService,
     // Facade service
     ChatappFacadeService,
+    // Socket service
+    ChatAppSocketService,
   ],
   exports: [
     // Export facade service as the main interface
     ChatappFacadeService,
+    // Export socket service
+    ChatAppSocketService,
     // Also export individual services for use by other modules if needed
     ChatService,
     MessageService,

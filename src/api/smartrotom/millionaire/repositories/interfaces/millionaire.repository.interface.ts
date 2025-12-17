@@ -20,7 +20,6 @@ export interface IMillionaireRepository {
   findSessionById(sessionId: number): Promise<any | null>;
   updateSessionStatus(sessionId: number, status: string): Promise<boolean>;
   advanceQuestion(sessionId: number): Promise<boolean>;
-  updatePrizeMoney(sessionId: number, amount: string): Promise<boolean>;
   
   // Player operations
   addPlayer(sessionId: number, uuid: string, name: string): Promise<number>;

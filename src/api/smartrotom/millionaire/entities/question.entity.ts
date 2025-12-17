@@ -19,9 +19,6 @@ export class QuestionEntity {
   @ApiProperty({ example: 1, description: 'Difficulty level (1-15)' })
   difficultyLevel: number;
 
-  @ApiProperty({ example: '100.00', description: 'Prize value for this question' })
-  prizeValue: string;
-
   @ApiProperty({ example: 'Geography', description: 'Question category', required: false })
   category?: string;
 

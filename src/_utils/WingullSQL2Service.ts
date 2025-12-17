@@ -44,12 +44,24 @@ export class WingullSQL2Service {
 
   async migrar() {
     await this.connect();
-    migrate(this.db, { migrationsFolder: './drizzle/migrations' }).then(() => {
+    const conn = await this.pool.getConnection();
+    try {
+      const [lockRows] = await conn.query("SELECT GET_LOCK('migrar_lock', 10) as got") as any;
+      const got = lockRows && lockRows[0] ? lockRows[0].got : 0;
+      if (got !== 1) {
+        console.warn('Could not acquire migration lock, another process may be migrating. Skipping migrations.');
+        return;
+      }
+
+      await migrate(this.db, { migrationsFolder: './drizzle/migrations' });
       console.log("Base de datos migrada");
-    }).catch((error) => {
-      console.error("Error al migrar base de datos: ", error.message);
+    } catch (error) {
+      console.error("Error al migrar base de datos: ", error?.message || error);
       throw error;
-    });
+    } finally {
+      try { await conn.query("SELECT RELEASE_LOCK('migrar_lock')"); } catch (e) {}
+      conn.release();
+    }
   }
 
   async query<T = unknown>(sql: string, values?: any): Promise<[T, mysql.FieldPacket[]]> {

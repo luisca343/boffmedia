@@ -10,6 +10,8 @@ import {
   import type { Server, Socket } from "socket.io"
   import { Inject, forwardRef } from "@nestjs/common"
 import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.service";
+import { ChatAppSocketService } from "@api/smartrotom/chatapp/gateway/chatapp.gateway";
+import { MillionaireSocketService } from "@api/smartrotom/millionaire/gateway/millionaire.gateway";
   
   @WebSocketGateway(34304, {
     cors: {
@@ -23,7 +25,11 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
   
     constructor(
       @Inject(forwardRef(() => ChatappFacadeService))
-      private chatAppService: ChatappFacadeService
+      private chatAppService: ChatappFacadeService,
+      @Inject(forwardRef(() => ChatAppSocketService))
+      private chatAppSocketService: ChatAppSocketService,
+      @Inject(forwardRef(() => MillionaireSocketService))
+      private millionaireSocketService: MillionaireSocketService
     ) {}
   
     handleConnection(client: Socket) {
@@ -57,6 +63,9 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
     handleDisconnect(client: Socket) {
       console.log(`Client with ID ${client.id} disconnected`)
   
+      // Handle millionaire disconnections
+      this.millionaireSocketService.handleDisconnect(this.server, client);
+
       // Find and remove the disconnected user
       for (const [uuid, user] of this.users.entries()) {
         if (user.socketId === client.id) {
@@ -72,52 +81,19 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
   
     /* ChatApp */
     @SubscribeMessage("chat:exitcall")
-    handleChatExit(
+    async handleChatExit(
       @ConnectedSocket() client: Socket,
       @MessageBody() data: {call: {chatId: number, users: { uuid:string, status:string}[], caller: string}, user: any, startTime: number},
-    ): void {
-      // Remove the user from the call
-      console.log(`Exit call signal sent by ${data.user.uuid}`)
-      data.call.users = data.call.users.filter((user) => user.uuid !== data.user.uuid)
-      const sockets = this.server.sockets.sockets
-      const currentUsers = data.call.users.filter((user) => user.status === "IN_CALL")
-      console.log("Current users in call: ", currentUsers)
-
-
-  
-      data.call.users.forEach((user) => {
-        const userSocket = this.users.get(user.uuid)
-        if (userSocket) {
-            console.log(`Sending exit call signal to ${user.uuid}`)
-          this.server.to(userSocket.socketId).emit("chat:exitcall", data)
-        }
-      })
-
-      if (currentUsers.length === 0) {
-        this.chatAppService.endCall(data.call.chatId, data.startTime)
-        return
-      }
+    ): Promise<void> {
+      await this.chatAppSocketService.handleExitCall(this.server, this.users, data);
     }
+
     @SubscribeMessage("chat:joincall")
     handleChatJoin(
       @ConnectedSocket() client: Socket,
       @MessageBody() data: {call: {users: {uuid:string, status:string}[], caller: string}, user: any},
     ): void {
-      console.log(`Join call signal sent by ${data.user.uuid}`)
-      const sockets = this.server.sockets.sockets
-      const users = data.call.users.map((user) => user.uuid)
-      const connectedUsers = Array.from(this.users.keys())
-  
-      console.log("Users: ", users)
-      console.log("Connected users: ", connectedUsers)
-  
-      data.call.users.forEach((user) => {
-        const userSocket = this.users.get(user.uuid)
-        if (userSocket) {
-            console.log(`Sending join call signal to ${user.uuid}`)
-          this.server.to(userSocket.socketId).emit("chat:joincall", { uuid: data.user.uuid })
-        }
-      })
+      this.chatAppSocketService.handleJoinCall(this.server, this.users, data);
     }
 
     @SubscribeMessage("chat:typing:start")
@@ -125,27 +101,7 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
       @ConnectedSocket() client: Socket,
       @MessageBody() data: { chatId: number; uuid: string; username?: string },
     ): Promise<void> {
-      
-      try {
-        // Get chat members to broadcast to
-        const chatMembers = await this.chatAppService.getChatById(data.chatId, data.uuid)
-        
-        // Broadcast typing indicator to all other members in the chat
-        chatMembers.members.forEach((member) => {
-          if (member.uuid !== data.uuid) {
-            const userSocket = this.users.get(member.uuid)
-            if (userSocket) {
-              this.server.to(userSocket.socketId).emit("chat:typing:start", {
-                chatId: data.chatId,
-                uuid: data.uuid,
-                username: data.username
-              })
-            }
-          }
-        })
-      } catch (error) {
-        console.error('Error broadcasting typing start:', error)
-      }
+      await this.chatAppSocketService.handleTypingStart(this.server, this.users, data);
     }
 
     @SubscribeMessage("chat:typing:stop")
@@ -153,27 +109,85 @@ import { ChatappFacadeService } from "@api/smartrotom/chatapp/chatapp.facade.ser
       @ConnectedSocket() client: Socket,
       @MessageBody() data: { chatId: number; uuid: string },
     ): Promise<void> {
-      console.log(`Typing stopped by ${data.uuid} in chat ${data.chatId}`)
-      
-      try {
-        // Get chat members to broadcast to
-        const chatMembers = await this.chatAppService.getChatById(data.chatId, data.uuid)
-        
-        // Broadcast typing stop to all other members in the chat
-        chatMembers.members.forEach((member) => {
-          if (member.uuid !== data.uuid) {
-            const userSocket = this.users.get(member.uuid)
-            if (userSocket) {
-              this.server.to(userSocket.socketId).emit("chat:typing:stop", {
-                chatId: data.chatId,
-                uuid: data.uuid
-              })
-            }
-          }
-        })
-      } catch (error) {
-        console.error('Error broadcasting typing stop:', error)
-      }
+      await this.chatAppSocketService.handleTypingStop(this.server, this.users, data);
+    }
+
+    /* Millionaire Game */
+    @SubscribeMessage("millionaire:session:join")
+    async handleMillionaireJoinSession(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionCode: string; uuid: string; role: 'conductor' | 'player' }
+    ) {
+      return await this.millionaireSocketService.handleJoinSession(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:heartbeat")
+    handleMillionaireHeartbeat(@ConnectedSocket() client: Socket) {
+      this.millionaireSocketService.handleHeartbeat(client);
+    }
+
+    @SubscribeMessage("millionaire:game:start")
+    async handleMillionaireGameStart(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number }
+    ) {
+      return await this.millionaireSocketService.handleGameStart(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:question:reveal")
+    async handleMillionaireRevealQuestion(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number }
+    ) {
+      return await this.millionaireSocketService.handleRevealQuestion(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:answer:reveal")
+    async handleMillionaireRevealAnswer(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number; isCorrect: boolean }
+    ) {
+      return await this.millionaireSocketService.handleRevealAnswer(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:game:pause")
+    async handleMillionairePauseGame(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number }
+    ) {
+      return await this.millionaireSocketService.handlePauseGame(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:game:resume")
+    async handleMillionaireResumeGame(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number }
+    ) {
+      return await this.millionaireSocketService.handleResumeGame(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:answer:submit")
+    async handleMillionaireSubmitAnswer(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number; answerIndex: number }
+    ) {
+      return await this.millionaireSocketService.handleSubmitAnswer(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:lifeline:request")
+    async handleMillionaireLifelineRequest(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number; lifelineType: any }
+    ) {
+      return await this.millionaireSocketService.handleLifelineRequest(this.server, client, data);
+    }
+
+    @SubscribeMessage("millionaire:state:request")
+    async handleMillionaireStateRequest(
+      @ConnectedSocket() client: Socket,
+      @MessageBody() data: { sessionId: number }
+    ) {
+      return await this.millionaireSocketService.handleStateRequest(this.server, client, data);
     }
   }
   

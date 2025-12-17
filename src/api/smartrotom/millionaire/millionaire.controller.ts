@@ -109,8 +109,7 @@ export class MillionaireController {
     description: 'Answer submitted successfully.',
     schema: {
       example: {
-        isCorrect: true,
-        prizeMoney: '1000.00'
+        isCorrect: true
       }
     }
   })

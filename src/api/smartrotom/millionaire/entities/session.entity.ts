@@ -16,9 +16,6 @@ export class SessionEntity {
   @ApiProperty({ example: 0, description: 'Current question number (0-14)' })
   currentQuestion: number;
 
-  @ApiProperty({ example: '0.00', description: 'Current prize money' })
-  prizeMoney: string;
-
   @ApiProperty({ 
     example: { '50:50': true, 'phone': true, 'audience': true },
     description: 'Remaining lifelines' 

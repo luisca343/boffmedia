@@ -13,7 +13,7 @@ import { LifelineService } from './services/lifeline.service';
 
 import { MillionaireFacadeService } from './millionaire.facade.service';
 import { MillionaireController } from './millionaire.controller';
-import { MillionaireGateway } from './gateway/millionaire.gateway';
+import { MillionaireSocketService } from './gateway/millionaire.gateway';
 
 @Module({
   imports: [LoggerModule, ResponseModule, DrizzleModule],
@@ -30,10 +30,11 @@ import { MillionaireGateway } from './gateway/millionaire.gateway';
     LifelineService,
     
     MillionaireFacadeService,
-    MillionaireGateway,
+    MillionaireSocketService,
   ],
   exports: [
     MillionaireFacadeService,
+    MillionaireSocketService,
   ],
 })
 export class MillionaireModule {}

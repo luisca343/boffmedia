@@ -5,7 +5,6 @@ import { IMillionaireRepository } from '../repositories/interfaces/millionaire.r
 export interface GameStateSnapshot {
   sessionId: number;
   currentQuestion: number;
-  prizeMoney: string;
   lifelines: Record<string, boolean>;
   questionData?: any;
   playerAnswer?: number;

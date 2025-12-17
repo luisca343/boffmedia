@@ -74,15 +74,6 @@ export class MillionaireRepository implements IMillionaireRepository {
     return result[0].affectedRows > 0;
   }
 
-  async updatePrizeMoney(sessionId: number, amount: string): Promise<boolean> {
-    const result = await this.db
-      .update(millionaireSessions)
-      .set({ prizeMoney: amount })
-      .where(eq(millionaireSessions.id, sessionId));
-
-    return result[0].affectedRows > 0;
-  }
-
   // ==================== PLAYER OPERATIONS ====================
 
   async addPlayer(sessionId: number, uuid: string, name: string): Promise<number> {

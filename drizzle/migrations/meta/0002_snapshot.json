@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "d3cbfaa6-210d-467a-8717-7edbda4166a6",
+  "id": "327de270-91e5-41df-beed-99d862e64781",
   "prevId": "713270f3-e0d1-4017-958c-dac8d4262c2e",
   "tables": {
     "boffmedia_roles": {
@@ -2629,13 +2629,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "time_spent": {
-          "name": "time_spent",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "submitted_at": {
           "name": "submitted_at",
           "type": "timestamp",
@@ -2739,13 +2732,6 @@
         "is_correct": {
           "name": "is_correct",
           "type": "boolean",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "time_spent": {
-          "name": "time_spent",
-          "type": "int",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -2947,13 +2933,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "prize_value": {
-          "name": "prize_value",
-          "type": "decimal(10,2)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
         "category": {
           "name": "category",
           "type": "varchar(50)",
@@ -3031,14 +3010,6 @@
           "autoincrement": false,
           "default": 0
         },
-        "prize_money": {
-          "name": "prize_money",
-          "type": "decimal(10,2)",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": "'0'"
-        },
         "lifelines_remaining": {
           "name": "lifelines_remaining",
           "type": "text",
@@ -3046,14 +3017,6 @@
           "notNull": false,
           "autoincrement": false,
           "default": "('{\"50:50\":true,\"phone\":true,\"audience\":true}')"
-        },
-        "question_time_limit": {
-          "name": "question_time_limit",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": 30
         },
         "created_at": {
           "name": "created_at",

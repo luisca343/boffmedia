@@ -10,7 +10,6 @@ export interface GameStateResponse {
   session: any;
   currentQuestion?: any;
   lifelines: Record<string, boolean>;
-  prizeMoney: string;
   status: string;
 }
 
@@ -52,7 +51,6 @@ export class MillionaireFacadeService {
     const snapshot = {
       sessionId,
       currentQuestion: 0,
-      prizeMoney: '0',
       lifelines: { '50:50': true, 'phone': true, 'audience': true },
       questionData: question
     };
@@ -74,7 +72,7 @@ export class MillionaireFacadeService {
     return await this.questionService.getQuestionForPlayer(question.id);
   }
 
-  async submitAnswer(submitAnswerDto: SubmitAnswerDto): Promise<{ isCorrect: boolean; prizeMoney?: string }> {
+  async submitAnswer(submitAnswerDto: SubmitAnswerDto): Promise<{ isCorrect: boolean }> {
     const session = await this.sessionService.getSession(submitAnswerDto.sessionId);
     const latestState = await this.gameStateService.getLatestState(submitAnswerDto.sessionId);
     
@@ -95,20 +93,13 @@ export class MillionaireFacadeService {
       isCorrect
     );
 
-    let newPrizeMoney = session.prizeMoney;
-    if (isCorrect) {
-      newPrizeMoney = latestState.questionData.prizeValue;
-      await this.sessionService.updatePrizeMoney(submitAnswerDto.sessionId, newPrizeMoney);
-    }
-
     await this.gameStateService.saveState(
       submitAnswerDto.sessionId,
       session.currentQuestion,
       latestState.questionData.id,
       {
         ...latestState,
-        playerAnswer: submitAnswerDto.answerIndex,
-        prizeMoney: newPrizeMoney
+        playerAnswer: submitAnswerDto.answerIndex
       },
       {
         playerAnswer: submitAnswerDto.answerIndex,
@@ -117,8 +108,7 @@ export class MillionaireFacadeService {
     );
 
     return {
-      isCorrect,
-      prizeMoney: isCorrect ? newPrizeMoney : undefined
+      isCorrect
     };
   }
 
@@ -161,7 +151,6 @@ export class MillionaireFacadeService {
       },
       currentQuestion: latestState?.questionData,
       lifelines: session.lifelinesRemaining,
-      prizeMoney: session.prizeMoney,
       status: session.status
     };
   }
