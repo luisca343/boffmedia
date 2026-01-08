@@ -89,8 +89,28 @@ export class ResponseInterceptor implements NestInterceptor {
   }
 
   private logError(action: string, error: any, context?: any) {
-    this.logger.error(`[ERROR] Failed to ${action}: ${error.message}`, error.stack);
-    
+    // Try to extract detailed response from common Nest exceptions (e.g., BadRequestException)
+    let responseDetails: any = null;
+    try {
+      if (error && typeof error.getResponse === 'function') {
+        responseDetails = error.getResponse();
+      } else if (error && error.response) {
+        responseDetails = error.response;
+      }
+    } catch (e) {
+      // ignore extraction errors
+    }
+
+    const detailsForLog = responseDetails && (responseDetails.message || responseDetails) || error.message || error;
+
+    // Primary error log (include stack if available)
+    this.logger.error(`[ERROR] Failed to ${action}: ${typeof detailsForLog === 'string' ? detailsForLog : JSON.stringify(detailsForLog)}`, error?.stack);
+
+    // Log extracted response details at debug level so we can see validation arrays/objects
+    if (responseDetails) {
+      this.logger.debug(`[ERROR RESPONSE] ${action}`, responseDetails);
+    }
+
     // Log context separately if available
     if (context) {
       this.logger.debug(`[ERROR CONTEXT] ${action}`, context);
