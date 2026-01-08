@@ -321,7 +321,7 @@ export class EventsFacadeService {
     }
 
     // Get or create participant
-    const participant = await this.participantsService.getOrCreateParticipantByUserId(joinEventDto.participantId);
+    const participant = await this.participantsService.getOrCreateParticipantByUserId(joinEventDto.userId);
 
     // Check if already participating
     const existingParticipation = await this.participantsService.validateEventParticipation(participant.id, eventId);
