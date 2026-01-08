@@ -233,7 +233,7 @@ export async function EventsSection() {
                   <div className="relative bg-gradient-to-br from-accent-600/10 to-secondary-600/10 rounded-2xl p-8 border border-accent-500/20 h-full flex items-center justify-center">
                     <div className="text-center">
                       {featuredEvent.banner ? (
-                        <div className="w-full aspect-video max-h-64 rounded-2xl overflow-hidden mb-6 mx-auto flex items-center justify-center bg-surface-700">
+                        <div className="w-full aspect-video max-h-64 rounded-2xl overflow-hidden mb-6 mx-auto flex items-center justify-center">
                           <EventImage
                             src={featuredEvent.banner}
                             alt={featuredEvent.title}

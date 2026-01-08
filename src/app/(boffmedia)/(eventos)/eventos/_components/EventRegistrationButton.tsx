@@ -70,7 +70,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
         nickname: session.user.username || session.user.name || "",
         avatar: session.user.image || undefined,
       };
-      
+      console.log("Registering with data:", joinEventData);
       const response = await EventsService.joinEvent(event.id, joinEventData);
       
       if (response.statusCode === 200) {
