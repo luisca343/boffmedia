@@ -31,7 +31,7 @@ export function SectionEmpty({
     : "No hay elementos disponibles en este momento. ¡Vuelve pronto para descubrir nuevas novedades!";
 
   return (
-    <div className={`py-20 text-center relative ${className}`}>
+    <div className={`min-h-screen flex items-center justify-center text-center relative ${className}`}>
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-10 left-1/4 w-32 h-32 bg-accent-500/5 rounded-full blur-2xl"></div>

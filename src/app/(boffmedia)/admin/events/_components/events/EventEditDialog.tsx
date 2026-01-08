@@ -28,9 +28,10 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
     parentId: event.parentId,
     description: event.description || undefined,
     icon: event.icon || undefined,
+    banner: event.banner || undefined,
     gameId: event.gameId,
     startDate: formatDateForInput(event.startDate),
-    endDate: formatDateForInput(event.endDate),
+    endDate: "",
     type: event.type,
     visibility: event.visibility,
   }

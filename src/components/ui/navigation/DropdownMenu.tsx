@@ -66,7 +66,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
         <div className="absolute pt-3 z-10 w-72  bg-surface-900 shadow-lg  overflow-hidden">
           <div className="border border-surface-700 border-t-surface-900 rounded-b-md">
             {sections.map((section, index) => (
-              <React.Fragment key={section.title}>
+              <React.Fragment key={`${section.title}-${index}`}>
                 {index > 0 && <div className="bg-surface-800 h-px"/>}
                 
                 {section.title && (
@@ -102,7 +102,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.15, delay: itemIndex * 0.03 }}
-                        key={item.href}
+                        key={`${section.title}-${item.href}-${itemIndex}`}
                         onClick={closeMenu}
                         target={item.isExternal ? "_blank" : undefined}
                         rel={item.isExternal ? "noopener noreferrer" : undefined}
