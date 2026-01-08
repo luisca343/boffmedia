@@ -340,7 +340,7 @@ export class EventsController {
   }
 
   // ==================== PARTICIPANT MANAGEMENT ====================
-  @Post(':eventId/join')
+  @Post('join/:eventId')
   @ApiOperation({ summary: 'Join an event' })
   @ApiResponse({ 
     status: HttpStatus.OK, 

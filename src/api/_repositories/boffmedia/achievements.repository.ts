@@ -81,7 +81,8 @@ export class AchievementsRepository {
     points: boffMediaAchievements.points,
     category: boffMediaAchievements.category,
     rarity: boffMediaAchievements.rarity,
-    itemType: boffMediaAchievements.itemType
+    itemType: boffMediaAchievements.itemType,
+    hidden: boffMediaAchievements.hidden,
   };
 
   private readonly nestedAchievementWithEventSelect = {

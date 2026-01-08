@@ -1,0 +1,1 @@
+ALTER TABLE `rotom_inventory` MODIFY COLUMN `item_data` varchar(512);
