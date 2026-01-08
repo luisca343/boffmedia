@@ -201,7 +201,11 @@ export function AchievementsSummary({ eventId }: any) {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-surface-300 line-clamp-1">{achievement.description}</p>
+                      {achievement.hidden ? (
+                        <p className="text-sm text-surface-500 line-clamp-1">Descripción oculta</p>
+                      ) : (
+                        <p className="text-sm text-surface-300 line-clamp-1">{achievement.description}</p>
+                      )}
                     </div>
                     <Badge variant="secondary" className="bg-amber-500/20 text-amber-300 border-amber-500/30">
                       {achievement.points} pts

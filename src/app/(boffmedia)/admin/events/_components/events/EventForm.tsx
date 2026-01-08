@@ -1,4 +1,5 @@
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
+import { useEffect } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/primitives/button"
@@ -60,14 +61,26 @@ export function EventForm({
       ...defaultValues,
       parentId: parentEvent?.id,
       type: defaultValues?.type || (parentEvent ? "event" : "server"),
+      title: defaultValues?.title ?? "",
+      description: defaultValues?.description ?? "",
+      icon: defaultValues?.icon ?? "",
+      banner: defaultValues?.banner ?? "",
+      startDate: defaultValues?.startDate ?? "",
+      endDate: defaultValues?.endDate ?? "",
+      visibility: defaultValues?.visibility ?? "public",
     },
   })
 
-  // If this is a child event, force type to "event"
-  const isChildEvent = Boolean(form.watch("parentId"))
-  if (isChildEvent && form.watch("type") === "server") {
-    form.setValue("type", "event")
-  }
+  // Watch parentId and type; if this becomes a child event, ensure type is "event"
+  const parentIdValue = useWatch({ control: form.control, name: "parentId" })
+  const typeValue = useWatch({ control: form.control, name: "type" })
+  const isChildEvent = Boolean(parentIdValue)
+
+  useEffect(() => {
+    if (isChildEvent && typeValue === "server") {
+      form.setValue("type", "event")
+    }
+  }, [isChildEvent, typeValue, form])
 
   return (
     <Form {...form}>

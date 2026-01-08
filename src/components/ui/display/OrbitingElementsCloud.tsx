@@ -61,18 +61,28 @@ export const OrbitingElementsCloud: React.FC<OrbitingElementsCloudProps> = ({
       ))}
       {/* Orbiting elements */}
       {orbitingElements.map((element, index) => {
-        const angle = (index * (360 / orbitingElements.length)) * (Math.PI / 180);
+        const angleDeg = index * (360 / orbitingElements.length);
+        const angle = (angleDeg * Math.PI) / 180; // radians
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
+
+        // Normalize position strings to avoid floating-point formatting differences
+        const leftStr = `calc(50% ${x >= 0 ? '+' : '-'} ${Math.abs(Math.round(x))}px)`;
+        const topStr = `calc(50% ${y >= 0 ? '+' : '-'} ${Math.abs(Math.round(y))}px)`;
+
+        // Use CSS variables for animation timing to ensure consistent serialization
+        const animDelay = `${index * 0.5}s`;
+        const animDuration = '4s';
+
         return (
           <div
             key={element.name}
-            className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 animate-float hover:scale-125 transition-all duration-300 cursor-pointer group z-30"
+            className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 orbiting-item hover:scale-125 transition-all duration-300 cursor-pointer group z-30 animate-float"
             style={{
-              left: `calc(50% + ${x}px)`,
-              top: `calc(50% + ${y}px)`,
-              animationDelay: `${index * 0.5}s`,
-              animationDuration: '4s',
+              left: leftStr,
+              top: topStr,
+              ['--anim-delay' as any]: animDelay,
+              ['--anim-duration' as any]: animDuration,
             }}
           >
             <div className={`w-full h-full bg-gradient-to-br ${element.color} rounded-2xl flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:rotate-12`}>
@@ -83,7 +93,7 @@ export const OrbitingElementsCloud: React.FC<OrbitingElementsCloudProps> = ({
               className="absolute w-0.5 bg-gradient-to-r from-cyan-400/20 to-transparent origin-left opacity-40 group-hover:opacity-80 transition-opacity duration-300"
               style={{
                 height: `${radius}px`,
-                transform: `rotate(${angle + Math.PI}rad)`,
+                transform: `rotate(${Math.round((angle + Math.PI) * 180 / Math.PI)}deg)`,
                 left: '50%',
                 top: '50%',
               }}
@@ -103,10 +113,10 @@ export const OrbitingElementsCloud: React.FC<OrbitingElementsCloudProps> = ({
           key={i}
           className={`absolute ${particleSize} ${particleColorClass} rounded-full animate-ping`}
           style={{
-            top: `${10 + (i * 6)}%`,
-            left: `${5 + (i * 6)}%`,
-            animationDelay: `${i * particleDelayStep}s`,
-            animationDuration: particleDuration,
+            top: `${10 + i * 6}%`,
+            left: `${5 + i * 6}%`,
+            ['--anim-delay' as any]: `${i * particleDelayStep}s`,
+            ['--anim-duration' as any]: particleDuration,
           }}
         ></div>
       ))}
@@ -116,7 +126,16 @@ export const OrbitingElementsCloud: React.FC<OrbitingElementsCloudProps> = ({
           50% { transform: translateY(-10px) rotate(5deg); }
         }
         .animate-float {
-          animation: float 4s ease-in-out infinite;
+          animation-name: float;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          /* default duration and delay can be overridden via CSS vars */
+          animation-duration: var(--anim-duration, 4s);
+          animation-delay: var(--anim-delay, 0s);
+        }
+        .orbiting-item {
+          animation-duration: var(--anim-duration, 4s);
+          animation-delay: var(--anim-delay, 0s);
         }
       `}</style>
     </div>

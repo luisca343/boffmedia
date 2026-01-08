@@ -235,7 +235,7 @@ export default function EventAchievementsPage() {
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
         {/* Header */}
         <div className="mb-12">
-          <InternalLink href={`/${eventId}`}>
+          <InternalLink href={`${eventId}`}>
             <Button variant="ghost" className="mb-6 text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Volver al evento
@@ -428,11 +428,15 @@ export default function EventAchievementsPage() {
                       )}
                     </div>
                     
-                    <p className={`text-sm leading-relaxed ${
-                      achievement.isUnlocked ? 'text-surface-300' : 'text-surface-500'
-                    }`}>
-                      {achievement.description}
-                    </p>
+                    {achievement.hidden ? (
+                      <p className="text-sm leading-relaxed text-surface-500">Descripción oculta</p>
+                    ) : (
+                      <p className={`text-sm leading-relaxed ${
+                        achievement.isUnlocked ? 'text-surface-300' : 'text-surface-500'
+                      }`}>
+                        {achievement.description}
+                      </p>
+                    )}
                   </div>
                 </div>
 

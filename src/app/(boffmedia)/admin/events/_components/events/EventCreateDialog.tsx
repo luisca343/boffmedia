@@ -24,6 +24,7 @@ export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreate
           ...rest,
           gameId,
           icon: data.icon || '',  // Provide a default value as it's required
+          banner: data.banner || '',  // Provide a default value as it's required
           endDate: data.endDate || data.startDate,  // Provide a default value as it's required
         };
         

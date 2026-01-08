@@ -80,13 +80,6 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
                   <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </InternalLink>
               </Button>
-              
-              <Button
-                variant="outline"
-                className="border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10 px-6 py-3"
-                asChild
-              >
-              </Button>
             </div>
           </GameSpotlightCard>
         </div>

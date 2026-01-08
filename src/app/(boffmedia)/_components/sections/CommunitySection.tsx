@@ -75,7 +75,7 @@ export function CommunitySection() {
                 variant="secondaryOutline"
                 asChild
               >
-                <Link href="/discord">{t("community.buttons.discord")}</Link>
+                <Link href="https://discord.gg/TWqjNHQz7d" target="_blank" rel="noopener noreferrer">{t("community.buttons.discord")}</Link>
               </Button>
             </div>
           </div>

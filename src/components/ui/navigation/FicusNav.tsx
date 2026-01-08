@@ -66,7 +66,7 @@ export function FicusNav() {
 
   return (
     <nav
-      className="bg-surface-900 border-b border-surface-700 shadow-lg fixed w-full z-20 h-16"
+      className="bg-surface-900 border-b border-surface-700 shadow-lg fixed w-full z-30 h-16"
       aria-label={t("ariaLabel")}
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">

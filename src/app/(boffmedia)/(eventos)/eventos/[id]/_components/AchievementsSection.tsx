@@ -28,6 +28,8 @@ interface AchievementWithProgress {
   isUnlocked: boolean
   currentProgress: number
   completionRate: number
+
+  hidden: boolean
 }
 
 interface AchievementsSectionProps {
@@ -262,7 +264,11 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                   </div>
                   <div className="flex-1">
                     <h5 className="text-white font-bold mb-1">{displayUnlockedAchievements[0].name}</h5>
-                    <p className="text-surface-300 text-sm mb-2">{displayUnlockedAchievements[0].description}</p>
+                    {displayUnlockedAchievements[0].hidden ? (
+                      <p className="text-surface-500 text-sm mb-2">Descripción oculta</p>
+                    ) : (
+                      <p className="text-surface-300 text-sm mb-2">{displayUnlockedAchievements[0].description}</p>
+                    )}
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="border-primary-500/30 text-primary-400 text-xs">
                         {displayUnlockedAchievements[0].points} pts
@@ -302,7 +308,11 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                           <div className="bg-surface-900 border border-surface-600 rounded-lg p-3 shadow-xl min-w-[200px]">
                             <h5 className="text-white font-bold text-sm mb-1">{achievement.name}</h5>
-                            <p className="text-surface-300 text-xs mb-2">{achievement.description}</p>
+                            {achievement.hidden ? (
+                              <p className="text-surface-500 text-xs mb-2">Descripción oculta</p>
+                            ) : (
+                              <p className="text-surface-300 text-xs mb-2">{achievement.description}</p>
+                            )}
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="border-primary-500/30 text-primary-400 text-xs">
                                 {achievement.points} pts
@@ -360,7 +370,11 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
                         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
                           <div className="bg-surface-900 border border-surface-600 rounded-lg p-3 shadow-xl min-w-[200px]">
                             <h5 className="text-surface-400 font-bold text-sm mb-1">{achievement.name}</h5>
-                            <p className="text-surface-500 text-xs mb-2">Descripción oculta</p>
+                            {achievement.hidden ? (
+                              <p className="text-surface-500 text-xs mb-2">Descripción oculta</p>
+                            ) : (
+                              <p className="text-surface-300 text-xs mb-2">{achievement.description}</p>
+                            )}
                             <div className="flex items-center gap-2">
                               <Badge variant="outline" className="border-surface-600/30 text-surface-500 text-xs">
                                 {achievement.points} pts
@@ -402,7 +416,7 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
 
             {/* View All Achievements Button */}
             <div className="text-center pt-4 border-t border-surface-600/30">
-              <InternalLink href={`/${eventId}/logros`}>
+              <InternalLink href={`${eventId}/logros`}>
                 <Button variant="ghost" className="text-accent-400 hover:text-accent-300 hover:bg-accent-500/10">
                   Ver mis logros
                   <ExternalLink className="w-4 h-4 ml-2" />

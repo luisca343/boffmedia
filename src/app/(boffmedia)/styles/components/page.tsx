@@ -802,7 +802,7 @@ function ComponentSection({
 }) {
   return (
     <div className={`${fullWidth ? "col-span-1 md:col-span-2" : ""}`}>
-      <div className="bg-surface-800 rounded-xl p-6 h-full border border-surface-700 hover:border-surface-600 transition-all duration-300 shadow-lg hover:shadow-xl">
+      <div className="bg-surface-700/30 rounded-xl p-6 h-full border border-surface-700 hover:border-surface-600 transition-all duration-300 shadow-lg hover:shadow-xl">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-2 h-8 bg-gradient-to-b from-primary-400 to-primary-600 rounded-full"></div>
           <h2 className="text-xl font-semibold text-primary-300 tracking-tight">{title}</h2>

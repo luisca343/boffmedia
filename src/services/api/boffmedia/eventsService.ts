@@ -191,7 +191,7 @@ export class EventsService {
    * Join an event
    */
   static joinEvent(eventId: number, data: any) {
-    return apiPOST<SuccessResponse>(`/events/${eventId}/join`, data);
+    return apiPOST<SuccessResponse>(`/events/join/${eventId}`, data);
   }
   
   /**

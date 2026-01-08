@@ -3,6 +3,7 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components
 import type { Event } from "@/types/events"
 import { EventCard } from "./EventCard"
 import { EventEmptyState } from "./EventEmptyState"
+import React from "react"
 
 interface EventsListProps {
   events: Event[]
@@ -53,7 +54,7 @@ export function EventsList({ events, onEdit, onDelete }: EventsListProps) {
           </TableHeader>
           <TableBody>
             {Array.from(groupedEvents.values()).map(({ parent, children }) => (
-              <>
+              <React.Fragment key={parent.id}>
                 <EventCard
                   key={parent.id}
                   event={parent}
@@ -71,7 +72,7 @@ export function EventsList({ events, onEdit, onDelete }: EventsListProps) {
                     parentEvent={parent}
                   />
                 ))}
-              </>
+              </React.Fragment>
             ))}
           </TableBody>
         </Table>

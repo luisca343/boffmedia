@@ -50,6 +50,7 @@ export interface Achievement {
   itemType: "achievement" | "medal"
   category: "competition" | "challenge" | "participation" | "achievement"
   rarity: "bronze" | "silver" | "gold" | "platinum" | "diamond" | null
+  hidden: boolean
   order: number
   createdAt: Date
   updatedAt: Date

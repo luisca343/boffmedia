@@ -68,54 +68,36 @@ export function GameSpotlightCard({
       {/* If right aligned, wrap children in a right-aligned div for features list and subtitle */}
       {isRightAligned ? (
         <div className="text-right">
-          {/* If children is an array, check for a subtitle (p, h4, etc) and align it right */}
-          {Array.isArray(children)
-            ? children.map((child, idx) => {
-                if (
-                  child &&
-                  typeof child === 'object' &&
-                  (child.type === 'p' || child.type === 'h4')
-                ) {
-                  // Subtitle/description element
-                  // Remove existing text alignment classes before adding text-right
-                  const existingClassName = child.props.className || '';
-                  const cleanedClassName = existingClassName.replace(/text-(left|right|center|justify)/g, '').trim();
-                  return {
-                    ...child,
-                    props: {
-                      ...child.props,
-                      className: cleanedClassName + ' text-right',
-                    },
-                  };
+          {React.Children.map(children, (child) => {
+            if (!React.isValidElement(child)) return child;
+
+            const el = child as React.ReactElement<any, any>;
+            const type = el.type;
+
+            // Align simple text blocks (native elements like <p>, <h4>) to the right
+            if (typeof type === 'string' && (type === 'p' || type === 'h4')) {
+              const existingClassName = el.props.className || '';
+              const cleanedClassName = existingClassName.replace(/text-(left|right|center|justify)/g, '').trim();
+              return React.cloneElement(el, { className: `${cleanedClassName} text-right`.trim() } as any);
+            }
+
+            // If this child is a grid (features list), clone its rows and reverse flex rows
+            const childClass = el.props?.className || '';
+            if (childClass.includes('grid')) {
+              const newChildren = React.Children.map(el.props.children, (row) => {
+                if (!React.isValidElement(row)) return row;
+                const rowEl = row as React.ReactElement<any, any>;
+                const rowClass = rowEl.props?.className || '';
+                if (rowClass.includes('flex')) {
+                  return React.cloneElement(rowEl, { className: `${rowClass} flex-row-reverse`.trim() } as any);
                 }
-                if (
-                  child &&
-                  typeof child === 'object' &&
-                  child.type === 'div' &&
-                  child.props.className?.includes('grid')
-                ) {
-                  // This is the features grid, so map its children
-                  return {
-                    ...child,
-                    props: {
-                      ...child.props,
-                      children: React.Children.map(child.props.children, (row) =>
-                        row && typeof row === 'object' && row.props?.className?.includes('flex')
-                          ? {
-                              ...row,
-                              props: {
-                                ...row.props,
-                                className: row.props.className + ' flex-row-reverse',
-                              },
-                            }
-                          : row
-                      ),
-                    },
-                  };
-                }
-                return child;
-              })
-            : children}
+                return row;
+              });
+              return React.cloneElement(el, { children: newChildren } as any);
+            }
+
+            return el;
+          })}
         </div>
       ) : (
         children
