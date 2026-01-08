@@ -18,7 +18,7 @@ export function CommunitySection() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-surface-900 via-secondary-700 to-secondary-500/10">
+    <section className="relative overflow-hidden bg-gradient-to-b from-secondary-900 via-secondary-500/30 to-secondary-700/40">
 
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-5">
