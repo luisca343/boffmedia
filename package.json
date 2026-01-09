@@ -76,6 +76,8 @@
     "next-i18next": "^15.2.0",
     "next-intl": "^4.5.8",
     "next-themes": "^0.3.0",
+    "nextra": "^4.6.1",
+    "nextra-theme-blog": "^4.6.1",
     "noise-map": "^1.1.0",
     "react": "19.2.3",
     "react-day-picker": "^8.10.1",

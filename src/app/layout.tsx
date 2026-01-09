@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 
+
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale, getMessages } from "next-intl/server"
 import type React from "react" // Import React
@@ -32,7 +33,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <body className="flex flex-col h-screen bg-transparent">
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}

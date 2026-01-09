@@ -1,5 +1,6 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import createNextIntlPlugin from 'next-intl/plugin';
+import nextra from 'nextra'
 
 const withNextIntl = createNextIntlPlugin();
 
@@ -81,6 +82,11 @@ const nextConfig = {
     },
 };
 
-export default bundleAnalyzer(withNextIntl(nextConfig));
+const withNextra = nextra({
+
+});
+
+
+export default withNextra(bundleAnalyzer(withNextIntl(nextConfig)));
 //export default bundleAnalyzer(nextConfig);
 

@@ -77,7 +77,7 @@ export const OrbitingElementsCloud: React.FC<OrbitingElementsCloudProps> = ({
         return (
           <div
             key={element.name}
-            className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 orbiting-item hover:scale-125 transition-all duration-300 cursor-pointer group z-30 animate-float"
+            className="absolute w-20 h-20 transform -translate-x-1/2 -translate-y-1/2 orbiting-item hover:scale-125 transition-all duration-300 cursor-pointer group z-20 animate-float"
             style={{
               left: leftStr,
               top: topStr,
