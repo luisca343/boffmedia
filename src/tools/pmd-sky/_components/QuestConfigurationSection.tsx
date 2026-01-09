@@ -18,7 +18,7 @@ export function QuestConfigurationSection({
   onQuestTypeChange,
   onSubQuestChange
 }: QuestConfigurationSectionProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
   const isClientForced = getForceClient(questType, specialQuestType) > 0;
 
   return (

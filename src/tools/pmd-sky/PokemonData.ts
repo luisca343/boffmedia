@@ -573,14 +573,16 @@ export const femaleOnlyPokemon = [
     0x01E, 0x109, 0x1C7, 0x1C2, 0x1C3, 0x1C4
 ]
 
-export function getValidPokemon(): { label: string, value: string }[] {
+export function getValidPokemon(trans?: (key: string) => string): { label: string, value: string }[] {
     const valid =  validClients.map((key) => {
         return { value: key.toString(), label: pmdSkyPokemon[key] }
     });
 
+    const selectLabel = trans ? trans("SELECT_POKEMON") : "Select a Pokémon";
+
     // Add "Select Pokemon" option at the beginning
     return [
-        { value: "0", label: "Select a Pokémon" },
+        { value: "0", label: selectLabel },
         ...valid
     ];
 }

@@ -20,7 +20,7 @@ export function LocationSection({
   onDungeonChange,
   onFloorChange
 }: LocationSectionProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
   const maxFloors = getFloors(dungeon);
 
   return (

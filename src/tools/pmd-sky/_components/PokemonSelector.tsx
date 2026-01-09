@@ -1,5 +1,6 @@
 import { ComboboxWithPreview } from "@/components/ui/interactive/ComboboxWithPreview";
 import { getValidPokemon } from "../PokemonData";
+import { useTranslations } from "next-intl";
 
 interface PokemonSelectorProps {
   value: string;
@@ -10,15 +11,16 @@ interface PokemonSelectorProps {
 }
 
 export function PokemonSelector({ value, onChange, disabled, sprite, alt }: PokemonSelectorProps) {
+  const t = useTranslations("pmdsky");
   return (
     <ComboboxWithPreview
       value={value}
       onChange={onChange}
-      data={getValidPokemon()}
+      data={getValidPokemon(t)}
       disabled={disabled}
       preview={sprite}
       previewAlt={alt}
-      placeholder="Select a Pokémon"
+      placeholder={t("SELECT_POKEMON")}
     />
   );
 }

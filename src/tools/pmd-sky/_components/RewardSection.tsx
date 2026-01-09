@@ -25,7 +25,7 @@ export function RewardSection({
   onTargetItemChange,
   onRewardItemChange
 }: RewardSectionProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
   const useTargetItem = getUseTargetItem(questType);
   const rewardGivesItem = givesItem(rewardType);
 

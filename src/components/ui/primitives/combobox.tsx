@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl";
 import { Check, ChevronsUpDown } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -35,12 +36,14 @@ export function Combobox({
   data, 
   value, 
   onChange, 
-  placeholder = "Buscar Elemento", 
+  placeholder, 
   disabled = false, 
   className,
   variant = 'default'
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
+  const t = useTranslations("boffmedia");
+  const resolvedPlaceholder = placeholder ?? t("ui.searchElement");
 
   const handleSelect = (currentValue: string) => {
     const newValue = currentValue === value ? "" : currentValue;
@@ -94,7 +97,7 @@ export function Combobox({
         >
           {value && data.find((element) => element.value === value)?.label
             ? data.find((element) => element.value === value)?.label
-            : "Selecciona un elemento"}
+            : t("ui.selectElement")}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -109,7 +112,7 @@ export function Combobox({
         <Command className={variantStyles[variant].command}>
           <CommandInput 
             dark={variant === 'orange' || variant === 'wingull'}
-            placeholder={placeholder} 
+            placeholder={resolvedPlaceholder} 
             className={cn(
               variantStyles[variant].input,
               'w-full'
@@ -117,7 +120,7 @@ export function Combobox({
           />
           <CommandList>
             <CommandEmpty className={variantStyles[variant].emptyText}>
-              No element found.
+              {t("ui.noElementFound")}
             </CommandEmpty>
             <CommandGroup>
               {data.map((element) => (

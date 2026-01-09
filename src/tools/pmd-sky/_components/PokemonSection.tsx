@@ -26,7 +26,7 @@ export function PokemonSection({
   onClientPokemonChange,
   onTargetPokemonChange
 }: PokemonSectionProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
   const isClientForced = getForceClient(questType, specialQuestType) > 0;
   const isTargetDisabled = isClientForced || getClientIsTarget(questType);
 

@@ -10,7 +10,7 @@ export function EuropeanVersionToggle({
   checked, 
   onChange 
 }: EuropeanVersionToggleProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
 
   return (
     <AnimatedToggle

@@ -7,7 +7,7 @@ interface GenerateButtonProps {
 }
 
 export function GenerateButton({ onClick }: GenerateButtonProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
   
   return (
     <ActionButton

@@ -12,7 +12,7 @@ export function SettingsSection({
   europeanVersion,
   onEuropeanVersionChange
 }: SettingsSectionProps) {
-  const t = useTranslations("");
+  const t = useTranslations("pmdsky");
 
   return (
     <div className="mb-8">
