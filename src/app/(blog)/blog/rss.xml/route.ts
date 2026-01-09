@@ -10,7 +10,8 @@ const CONFIG = {
 }
 
 export async function GET() {
-  const allPosts = await getPosts()
+  // Default to Spanish locale for RSS feed
+  const allPosts = await getPosts('es')
   
   const posts = allPosts
     .map(
