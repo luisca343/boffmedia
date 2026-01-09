@@ -22,25 +22,25 @@ export async function getPosts(locale: string = 'es'): Promise<Post[]> {
     
     for (const item of items) {
       if (item) {
-        // Check if this is a locale-specific post file
-        const isLocalePost = item.name?.match(/page\.(es|en)\.mdx$/)
+        // Check if this is a locale-specific post route (e.g., /blog/es/first-post)
+        const localePostMatch = item.route?.match(/^\/blog\/(es|en)\/(.+)$/)
         
         // Only include pages that:
-        // 1. Have a route that starts with /blog/
+        // 1. Have a route in the format /blog/{locale}/{slug}
         // 2. Have frontMatter with a date (blog posts should have dates)
-        // 3. Match the requested locale or are the main page.tsx
-        if (item.route &&
-            item.route.startsWith('/blog/') &&
-            item.route !== '/blog' &&
+        // 3. Match the requested locale
+        if (localePostMatch &&
+            localePostMatch[1] === locale &&
             item.frontMatter &&
-            item.frontMatter.date &&
-            (isLocalePost?.[1] === locale || !isLocalePost)) {
+            item.frontMatter.date) {
+          
+          const postSlug = localePostMatch[2]
           
           posts.push({
             title: item.frontMatter?.title || item.name || 'Untitled',
-            route: item.route.replace(/\.(es|en)$/, ''), // Remove locale extension from route
+            route: `/blog/${postSlug}`, // Remove locale from the public route
             frontMatter: item.frontMatter || {},
-            locale: isLocalePost?.[1] || 'es'
+            locale: localePostMatch[1]
           })
         }
         
