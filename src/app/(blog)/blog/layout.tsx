@@ -21,7 +21,7 @@ export default async function BlogLayout({ children }: { children: React.ReactNo
             CC BY-NC 4.0
           </abbr>{' '}
           {new Date().getFullYear()} © BoffMedia.
-          <a href="/feed.xml" style={{ float: 'right' }}>
+          <a href="/blog/rss.xml" style={{ float: 'right' }}>
             RSS
           </a>
         </Footer>

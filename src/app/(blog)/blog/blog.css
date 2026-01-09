@@ -1,9 +1,10 @@
-@import './nextra-theme-blog.css';
+
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import './nextra-theme-blog.css';
 
 h1 {
     @apply text-4xl font-bold;
@@ -11,6 +12,40 @@ h1 {
 
 h2 {
     @apply text-3xl font-semibold;
+}
+
+/* Nextra metadata formatting: tidy author/date/back button */
+.x\:mb-8.x\:flex.x\:gap-3.x\:items-center {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    color: var(--nextra-meta-color, #6b7280);
+    font-size: 0.95rem;
+}
+.x\:mb-8 .x\:grow {
+    flex: 1 1 auto;
+    color: inherit;
+    font-weight: 500;
+}
+.x\:mb-8 time {
+    margin-left: 0.25rem;
+    color: inherit;
+    opacity: 0.95;
+    font-weight: 400;
+    font-size: 0.9rem;
+}
+.x\:mb-8 button {
+    background: transparent;
+    border: none;
+    color: var(--nextra-link-color, #3b82f6);
+    text-decoration: underline;
+    padding: 0;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+.x\:mb-8 button:hover {
+    opacity: 0.9;
 }
 
 h3 {
@@ -26,3 +61,8 @@ a {
 }
 
 
+
+article.x\:prose {
+  max-width: 66ch;
+  margin-inline: auto;
+}
