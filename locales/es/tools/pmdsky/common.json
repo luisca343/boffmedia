@@ -58,6 +58,8 @@
         "FORCED_BY_QUEST_TYPE": "Forzado por el tipo de misión",
         "CLIENT_IS_TARGET": "El cliente es el objetivo",
         "EUROPEAN_VERSION_TOOLTIP": "Habilita el formato de correo europeo",
+        "EUROPEAN_VERSION_ACTIVE": "Formato EU activado",
+        "EUROPEAN_VERSION_INACTIVE": "Formato internacional",
         "COPY_TO_CLIPBOARD": "Copiar al portapapeles",
         "COPIED_SUCCESS": "¡Copiado exitosamente!",
         "WONDER_MAIL_RESULT": "Resultado del Correo Secreto",

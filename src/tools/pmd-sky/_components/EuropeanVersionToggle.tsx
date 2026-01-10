@@ -17,7 +17,7 @@ export function EuropeanVersionToggle({
       checked={checked}
       onChange={onChange}
       label={t("EUROPEAN_VERSION")}
-      description={checked ? 'Formato EU activado' : 'Formato internacional'}
+      description={checked ? t("EUROPEAN_VERSION_ACTIVE") : t("EUROPEAN_VERSION_INACTIVE")}
       icon={<span>🇪🇺</span>}
       variant="feature"
     />

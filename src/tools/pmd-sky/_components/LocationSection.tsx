@@ -60,7 +60,7 @@ export function LocationSection({
               variant="secondary" 
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-surface-600/50 text-surface-300 text-xs"
             >
-              Max: {maxFloors}
+              {t("MAX_FLOOR")}: {maxFloors}
             </Badge>
           </div>
         </FormField>
