@@ -1,7 +1,10 @@
+"use client"
+
 import { Calendar, MapPin } from "lucide-react";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { Button } from "@/components/ui/primitives/button";
 import { Event } from "@/generated/api/models/Event";
+import { useTranslations } from 'next-intl';
 
 interface EventCardProps {
   event: Event;
@@ -10,8 +13,11 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, href, className = "" }: EventCardProps) {
+  const t = useTranslations('boffmedia');
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    const locale = t('eventsSection.locale') || 'en-US';
+    return new Date(dateString).toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
@@ -29,12 +35,12 @@ export function EventCard({ event, href, className = "" }: EventCardProps) {
             </div>
             <span className="text-xs font-medium text-accent-400">
               {event.status === Event.status.ACTIVE
-                ? 'EN VIVO'
+                ? t('eventsSection.status.active').toUpperCase()
                 : event.status === Event.status.UPCOMING
-                ? 'PRÓXIMAMENTE'
+                ? t('eventsSection.status.upcoming').toUpperCase()
                 : event.status === Event.status.COMPLETED
-                ? 'FINALIZADO'
-                : 'DESCONOCIDO'}
+                ? t('eventsSection.status.completed').toUpperCase()
+                : t('eventsSection.status.unknown').toUpperCase()}
             </span>
           </div>
           <h4 className="text-xl font-bold text-white mb-2 group-hover:text-accent-400 transition-colors">
@@ -54,7 +60,7 @@ export function EventCard({ event, href, className = "" }: EventCardProps) {
         </div>
         <div className="flex-1" />
         <Button variant="accent" className="w-full mt-2">
-          Ver Evento
+          {t('eventsSection.viewEvent')}
         </Button>
       </div>
     </InternalLink>

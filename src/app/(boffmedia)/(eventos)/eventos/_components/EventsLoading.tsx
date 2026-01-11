@@ -1,4 +1,7 @@
+import { useTranslations } from 'next-intl';
+
 export function EventsLoading() {
+  const t = useTranslations('boffmedia');
   return (
     <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
       <div className="container mx-auto p-6 max-w-7xl">
@@ -12,7 +15,7 @@ export function EventsLoading() {
           
           {/* Loading text with gradient */}
           <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
-            Cargando eventos...
+            {t('eventsSection.loading')}
           </h2>
           <p className="mt-2 text-surface-400">Preparando experiencias épicas</p>
           

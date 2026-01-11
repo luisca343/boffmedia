@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from 'next-intl';
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select";
 import { Badge } from "@/components/ui/primitives/badge";
@@ -11,6 +14,7 @@ interface EventFiltersProps {
 }
 
 export function EventFilters({ filter, onFilterChange, eventsCount }: EventFiltersProps) {
+  const t = useTranslations('boffmedia');
   const { games, isLoading } = useGetGames();
   
   return (
@@ -24,7 +28,7 @@ export function EventFilters({ filter, onFilterChange, eventsCount }: EventFilte
           <SelectTrigger className="w-[200px] h-11 bg-surface-700/50 border-surface-600 text-surface-50 hover:bg-surface-600/50 transition-colors">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-accent-400" />
-              <SelectValue placeholder="Filtrar por juego" />
+              <SelectValue placeholder={t('eventsSection.filterPlaceholder')} />
             </div>
           </SelectTrigger>
           <SelectContent className="bg-surface-800 border-surface-700 backdrop-blur-sm">
@@ -34,7 +38,7 @@ export function EventFilters({ filter, onFilterChange, eventsCount }: EventFilte
             >
               <div className="flex items-center gap-2">
                 <Gamepad2 className="h-4 w-4 text-accent-400" />
-                Todos los juegos
+                {t('eventsSection.allGames')}
               </div>
             </SelectItem>
             {!isLoading && games?.map((game: any) => (

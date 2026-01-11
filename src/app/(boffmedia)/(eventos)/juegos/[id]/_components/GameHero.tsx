@@ -5,14 +5,18 @@ import { Badge } from "@/components/ui/primitives/badge"
 import { ChevronLeft, Gamepad2, Activity, Calendar, Clock } from "lucide-react"
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { Game } from "@/generated/api"
+import { useTranslations } from 'next-intl'
 
 interface GameHeroProps {
   game: Game
 }
 
 export function GameHero({ game }: GameHeroProps) {
+  const t = useTranslations('boffmedia')
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    const locale = t('eventsSection.locale') || 'en-US'
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -21,16 +25,16 @@ export function GameHero({ game }: GameHeroProps) {
     })
   }
 
-  const isActive = !game.deletedAt;
+  const isActive = !game.deletedAt
 
   return (
     <>
       {/* Navigation */}
       <div className="mb-8">
-        <InternalLink href="/juegos">
+          <InternalLink href="/juegos">
           <Button variant="ghost" className="text-surface-300 hover:text-white hover:bg-surface-700">
             <ChevronLeft className="w-4 h-4 mr-2" />
-            Volver a Juegos
+            {t('eventsSection.backToGames')}
           </Button>
         </InternalLink>
       </div>
@@ -64,7 +68,7 @@ export function GameHero({ game }: GameHeroProps) {
                     } flex items-center gap-1`}
                   >
                     <Activity className="w-3 h-3" />
-                    {isActive ? 'Activo' : 'Inactivo'}
+                    {isActive ? t('eventsSection.gamesActive') : t('eventsSection.gamesInactive')}
                   </Badge>
                 </div>
                 <h1 className="text-4xl font-bold text-white mb-2">{game.title}</h1>
@@ -79,24 +83,24 @@ export function GameHero({ game }: GameHeroProps) {
           <div className="bg-surface-900/40 backdrop-blur-sm rounded-2xl p-6 border border-accent-500/10">
             <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
               <Calendar className="w-5 h-5 text-accent-400" />
-              Información del Juego
+              {t('eventsSection.gameInfoTitle')}
             </h3>
             
             <div className="space-y-4">
               <div className="flex justify-between items-center py-2 border-b border-surface-700/50">
-                <span className="text-surface-400">Fecha de Creación:</span>
+                <span className="text-surface-400">{t('eventsSection.gamesSince')}:</span>
                 <span className="text-white font-medium">{formatDate(game.createdAt)}</span>
               </div>
               
               <div className="flex justify-between items-center py-2 border-b border-surface-700/50">
-                <span className="text-surface-400">Última Actualización:</span>
+                <span className="text-surface-400">{t('eventsSection.lastUpdated')}:</span>
                 <span className="text-white font-medium">{formatDate(game.updatedAt)}</span>
               </div>
               
               <div className="flex justify-between items-center py-2 border-b border-surface-700/50">
                 <span className="text-surface-400">Estado:</span>
                 <span className={`font-medium ${isActive ? 'text-success-400' : 'text-surface-400'}`}>
-                  {isActive ? 'Disponible' : 'No disponible'}
+                  {isActive ? t('eventsSection.available') : t('eventsSection.notAvailable')}
                 </span>
               </div>
             </div>

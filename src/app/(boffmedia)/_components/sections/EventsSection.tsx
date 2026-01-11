@@ -12,6 +12,7 @@ import { EventCard } from "@/components/boffmedia/event/EventCard";
 
 export async function EventsSection() {
   const t = await getTranslations("boffmedia");
+  const locale = t("eventsSection.locale");
 
   // Fetch real events data
   let events: Event[] = [];
@@ -55,15 +56,15 @@ export async function EventsSection() {
 
   const getStatusText = (status: Event.status) => {
     switch (status) {
-      case Event.status.ACTIVE: return 'EN VIVO';
-      case Event.status.UPCOMING: return 'PRÓXIMAMENTE';
-      case Event.status.COMPLETED: return 'FINALIZADO';
-      default: return 'DESCONOCIDO';
+      case Event.status.ACTIVE: return t("eventsSection.status.active").toUpperCase();
+      case Event.status.UPCOMING: return t("eventsSection.status.upcoming").toUpperCase();
+      case Event.status.COMPLETED: return t("eventsSection.status.completed").toUpperCase();
+      default: return t("eventsSection.status.unknown").toUpperCase();
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    return new Date(dateString).toLocaleDateString(locale || 'en-US', {
       day: 'numeric',
       month: 'short',
       hour: '2-digit',
@@ -76,7 +77,7 @@ export async function EventsSection() {
     const eventTime = new Date(dateString).getTime();
     const difference = eventTime - now;
 
-    if (difference < 0) return 'En vivo';
+    if (difference < 0) return t("eventsSection.liveNow");
 
     const days = Math.floor(difference / (1000 * 60 * 60 * 24));
     const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -99,8 +100,8 @@ export async function EventsSection() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-6">
           <SectionHeader
-            title="Centro de Eventos"
-            subtitle="Únete a eventos emocionantes, compite con otros jugadores y gana recompensas exclusivas en nuestros servidores."
+            title={t("eventsSection.title")}
+            subtitle={t("eventsSection.subtitle")}
             leftIcon={<Trophy className="w-4 h-4 text-white" />}
             rightIcon={<Star className="w-4 h-4 text-white" />}
           />
@@ -111,15 +112,15 @@ export async function EventsSection() {
                 <Calendar className="w-12 h-12 text-white" />
               </div>
               <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
-                ¡Próximamente eventos increíbles!
+                {t("eventsSection.noEventsTitle")}
               </h3>
               <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
-                Estamos preparando eventos emocionantes para ti. Mantente atento a nuestras redes sociales para no perderte ninguna novedad.
+                {t("eventsSection.noEventsDescription")}
               </p>
               <Button variant="accent" asChild>
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
-                  Explorar Eventos
+                  {t("eventsSection.exploreEvents")}
                 </InternalLink>
               </Button>
             </div>
@@ -141,8 +142,8 @@ export async function EventsSection() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
           <SectionHeader
-            title="Centro de Eventos"
-            subtitle="Únete a eventos emocionantes, compite con otros jugadores y gana recompensas exclusivas en nuestros servidores."
+            title={t("eventsSection.title")}
+            subtitle={t("eventsSection.subtitle")}
             leftIcon={<Trophy className="w-4 h-4 text-white" />}
             rightIcon={<Star className="w-4 h-4 text-white" />}
           />
@@ -162,7 +163,7 @@ export async function EventsSection() {
                       })()}
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-accent-400 uppercase tracking-wide">Evento Destacado</span>
+                      <span className="text-sm font-medium text-accent-400 uppercase tracking-wide">{t("eventsSection.featuredLabel")}</span>
                       <div className={`inline-block px-3 py-1 bg-gradient-to-r ${getStatusColor(featuredEvent.status)} text-white text-xs font-bold rounded-full ml-3`}>
                         {getStatusText(featuredEvent.status)}
                       </div>
@@ -177,29 +178,29 @@ export async function EventsSection() {
                     <div className="flex items-center gap-3 text-surface-300">
                       <Clock className="w-5 h-5 text-accent-400" />
                       <div>
-                        <div className="text-sm text-surface-400">Inicia</div>
+                        <div className="text-sm text-surface-400">{t("eventsSection.startLabel")}</div>
                         <div className="font-semibold">{formatDate(featuredEvent.startDate)}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 text-surface-300">
                       <MapPin className="w-5 h-5 text-accent-400" />
                       <div>
-                        <div className="text-sm text-surface-400">Juego</div>
+                        <div className="text-sm text-surface-400">{t("eventsSection.gameLabel")}</div>
                         <div className="font-semibold">{featuredEvent.gameName}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 text-surface-300">
                       <CalendarIcon className="w-5 h-5 text-accent-400" />
                       <div>
-                        <div className="text-sm text-surface-400">Tipo</div>
-                        <div className="font-semibold">{featuredEvent.type === Event.type.EVENT ? 'Evento' : 'Servidor'}</div>
+                        <div className="text-sm text-surface-400">{t("eventsSection.typeLabel")}</div>
+                        <div className="font-semibold">{featuredEvent.type === Event.type.EVENT ? t("eventsSection.eventType") : t("eventsSection.serverType")}</div>
                       </div>
                     </div>
                     {featuredEvent.endDate && (
                       <div className="flex items-center gap-3 text-surface-300">
                         <Clock className="w-5 h-5 text-accent-400" />
                         <div>
-                          <div className="text-sm text-surface-400">Finaliza</div>
+                          <div className="text-sm text-surface-400">{t("eventsSection.endLabel")}</div>
                           <div className="font-semibold">{formatDate(featuredEvent.endDate)}</div>
                         </div>
                       </div>
@@ -210,7 +211,7 @@ export async function EventsSection() {
                   {featuredEvent.status === Event.status.UPCOMING && (
                     <div className="bg-surface-700/50 rounded-xl p-4 border border-accent-500/20">
                       <div className="text-center">
-                        <div className="text-sm text-surface-400 mb-2">Tiempo restante</div>
+                        <div className="text-sm text-surface-400 mb-2">{t("eventsSection.timeRemaining")}</div>
                         <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
                           {getTimeUntilEvent(featuredEvent.startDate)}
                         </div>
@@ -220,8 +221,8 @@ export async function EventsSection() {
 
                   <div className="flex gap-4">
                     <InternalLink href={`/eventos/${featuredEvent.id}`} className="flex-1">
-                      <Button variant="accent" className="w-full">
-                        {featuredEvent.status === Event.status.ACTIVE ? 'Unirse al Evento' : 'Ver Evento'}
+                        <Button variant="accent" className="w-full">
+                        {featuredEvent.status === Event.status.ACTIVE ? t("eventsSection.joinEvent") : t("eventsSection.viewEvent")}
                       </Button>
                     </InternalLink>
                   </div>
@@ -253,7 +254,7 @@ export async function EventsSection() {
                           <Trophy className="w-12 h-12 text-white" />
                         </div>
                       )}
-                      <h4 className="text-xl font-bold text-white">¡Próximamente!</h4>
+                      <h4 className="text-xl font-bold text-white">{t("eventsSection.noEventsTitle")}</h4>
                     </div>
                   </div>
                 </div>
@@ -267,7 +268,7 @@ export async function EventsSection() {
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8">
                 <div className="w-3 h-3 bg-success-500 rounded-full animate-pulse"></div>
-                <h3 className="text-2xl font-bold text-white">Eventos Activos</h3>
+                <h3 className="text-2xl font-bold text-white">{t("eventsSection.activeEvents")}</h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-success-500/50 to-transparent"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -283,7 +284,7 @@ export async function EventsSection() {
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8">
                 <Clock className="w-6 h-6 text-secondary-400" />
-                <h3 className="text-2xl font-bold text-white">Próximos Eventos</h3>
+                <h3 className="text-2xl font-bold text-white">{t("eventsSection.upcomingEvents")}</h3>
                 <div className="flex-1 h-px bg-gradient-to-r from-secondary-500/50 to-transparent"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -298,22 +299,22 @@ export async function EventsSection() {
         <div className="text-center">
           <div className="bg-gradient-to-r from-accent-800/20 to-secondary-800/20 backdrop-blur-sm border border-accent-500/30 rounded-3xl p-8">
             <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
-              ¿Quieres ver más eventos?
+              {t("eventsSection.cta.title")}
             </h3>
             <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
-              Explora todos nuestros eventos pasados, presentes y futuros. Encuentra el evento perfecto para ti.
+              {t("eventsSection.cta.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="accent" asChild>
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
-                  Ver Todos los Eventos
+                  {t("eventsSection.cta.viewAll")}
                 </InternalLink>
               </Button>
               <Button variant="accentOutline">
                 <InternalLink href="/eventos/sugerir" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
-                  Sugerir un Evento
+                  {t("eventsSection.cta.suggestEvent")}
                 </InternalLink>
               </Button>
             </div>

@@ -5,11 +5,11 @@ import { Badge } from "@/components/ui/primitives/badge"
 import { 
   ArrowLeft, Calendar, Clock, Users, Trophy, 
   Share2, Bookmark, Zap, Server, 
-  GamepadIcon as Gamepad2
+  Gamepad2
 } from "lucide-react"
-import { Event } from "@/generated/api/models/Event"
 import { EventRegistrationButton } from "../../_components/EventRegistrationButton"
-import Link from "next/link"
+import { getEventStatus } from "@/lib/events";
+import { useTranslations } from 'next-intl';
 import { InternalLink } from "@/components/ui/navigation/Link"
 
 interface EventHeroProps {
@@ -18,8 +18,11 @@ interface EventHeroProps {
 }
 
 export function EventHero({ event, participants }: EventHeroProps) {
+  const t = useTranslations('boffmedia');
+
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    const locale = t('eventsSection.locale') || 'en-US';
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -28,24 +31,10 @@ export function EventHero({ event, participants }: EventHeroProps) {
     })
   }
 
-  const getEventStatus = (startDate: string, endDate?: string) => {
-    const now = new Date()
-    const start = new Date(startDate)
-    const end = endDate ? new Date(endDate) : null
-
-    if (now < start) {
-      return { label: 'Próximo', color: 'from-secondary-500 to-cyan-600', icon: Clock }
-    } else if (end && now > end) {
-      return { label: 'Finalizado', color: 'from-surface-500 to-surface-600', icon: Calendar }
-    } else {
-      return { label: 'En Curso', color: 'from-success-500 to-emerald-600', icon: Zap }
-    }
-  }
-
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case Event.type.EVENT: return Trophy
-      case Event.type.SERVER: return Server
+      case 'EVENT': return Trophy
+      case 'SERVER': return Server
       default: return Calendar
     }
   }
@@ -68,7 +57,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
   const status = getEventStatus(event.startDate, event.endDate)
   const timeUntil = getTimeUntilEvent(event.startDate)
   const TypeIcon = getEventTypeIcon(event.type)
-  const StatusIcon = status.icon
+  const StatusIcon = status.key === 'upcoming' ? Calendar : status.key === 'completed' ? Trophy : Zap
 
   return (
     <>
@@ -77,7 +66,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
         <InternalLink href="/eventos">
           <Button variant="ghost" className="text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a eventos
+            {t('eventsSection.backToEvents')}
           </Button>
         </InternalLink>
       </div>
@@ -96,9 +85,9 @@ export function EventHero({ event, participants }: EventHeroProps) {
                 )}
               </div>
               <div>
-                <Badge className={`bg-gradient-to-r ${status.color} text-white px-4 py-2 text-sm font-bold`}>
+                <Badge className={`${status.class} px-4 py-2 text-sm font-bold`}>
                   <StatusIcon className="w-4 h-4 mr-2" />
-                  {status.label}
+                  {t(`eventsSection.status.${status.key || (status.label === 'Próximo' ? 'upcoming' : status.label === 'Finalizado' ? 'completed' : 'active')}`) || status.label}
                 </Badge>
                 {timeUntil && (
                   <div className="text-secondary-400 text-sm mt-1 font-medium">{timeUntil}</div>
@@ -118,7 +107,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
               <div className="flex items-center gap-3 text-surface-300">
                 <Clock className="w-5 h-5 text-accent-400" />
                 <div>
-                  <div className="text-sm text-surface-400">Inicia</div>
+                  <div className="text-sm text-surface-400">{t('eventsSection.startLabel')}</div>
                   <div className="font-semibold">{formatDate(event.startDate)}</div>
                 </div>
               </div>
@@ -126,7 +115,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
                 <div className="flex items-center gap-3 text-surface-300">
                   <Calendar className="w-5 h-5 text-accent-400" />
                   <div>
-                    <div className="text-sm text-surface-400">Finaliza</div>
+                        <div className="text-sm text-surface-400">{t('eventsSection.endLabel')}</div>
                     <div className="font-semibold">{formatDate(event.endDate)}</div>
                   </div>
                 </div>
@@ -134,15 +123,15 @@ export function EventHero({ event, participants }: EventHeroProps) {
               <div className="flex items-center gap-3 text-surface-300">
                 <Users className="w-5 h-5 text-accent-400" />
                 <div>
-                  <div className="text-sm text-surface-400">Participantes</div>
+                  <div className="text-sm text-surface-400">{t('eventsSection.participantsLabel')}</div>
                   <div className="font-semibold">{participants.length}</div>
                 </div>
               </div>
               <div className="flex items-center gap-3 text-surface-300">
                 <Gamepad2 className="w-5 h-5 text-accent-400" />
                 <div>
-                  <div className="text-sm text-surface-400">Juego</div>
-                  <div className="font-semibold">{event.gameName || `Juego #${event.gameId}`}</div>
+                  <div className="text-sm text-surface-400">{t('eventsSection.gameLabel')}</div>
+                  <div className="font-semibold">{event.gameName || `${t('eventsSection.gameLabel')} #${event.gameId}`}</div>
                 </div>
               </div>
             </div>
@@ -152,7 +141,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
               <EventRegistrationButton event={event} />
               <Button variant="accentOutline">
                 <Share2 className="w-4 h-4 mr-2" />
-                Compartir
+                {t('eventsSection.share')}
               </Button>
               <Button variant="accentOutline">
                 <Bookmark className="w-4 h-4" />

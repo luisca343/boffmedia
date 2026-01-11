@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from 'next-intl';
 import { Game } from "@/generated/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card";
 import { Badge } from "@/components/ui/primitives/badge";
@@ -13,12 +16,14 @@ interface GameCardProps {
 }
 
 export function GameCard({ game, layout = "grid", showEvents = true }: GameCardProps) {
+  const t = useTranslations('boffmedia');
   const isListLayout = layout === "list";
   const isActive = !game.deletedAt;
 
   const formatDate = (dateString: string) => {
+    const locale = t('eventsSection.locale') || 'en-US';
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
+    return date.toLocaleDateString(locale, { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric'
@@ -59,7 +64,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
                 : "bg-surface-600/80 text-surface-300 border-surface-500/50"
             )}
           >
-            {isActive ? 'Activo' : 'Inactivo'}
+            {isActive ? t('eventsSection.gamesActive') : t('eventsSection.gamesInactive')}
           </Badge>
         </div>
 
@@ -90,16 +95,16 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
             <div className="flex items-center gap-4 text-sm text-surface-400">
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
-                <span>Desde {formatDate(game.createdAt)}</span>
+                <span>{t('eventsSection.gamesSince')} {formatDate(game.createdAt)}</span>
               </div>
               {/* These would be calculated from related events/players data */}
               <div className="flex items-center gap-1">
                 <Trophy className="w-4 h-4" />
-                <span>0 eventos</span>
+                <span>{t('eventsSection.gamesEventsCount', { count: 0 })}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Users className="w-4 h-4" />
-                <span>0 jugadores</span>
+                <span>{t('eventsSection.gamesPlayersCount', { count: 0 })}</span>
               </div>
             </div>
           </div>
@@ -112,7 +117,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
                   className="w-full"
                 >
                   <Trophy className="w-4 h-4 mr-2" />
-                  Ver Eventos
+                  {t('eventsSection.gamesViewEvents')}
                 </Button>
               </InternalLink>
             )}
@@ -120,7 +125,7 @@ export function GameCard({ game, layout = "grid", showEvents = true }: GameCardP
             <InternalLink href={`/juegos/${game.id}`} className="flex-1">
               <Button variant="accent" className="w-full">
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Ver Detalles
+                {t('eventsSection.gamesViewDetails')}
               </Button>
             </InternalLink>
           </div>

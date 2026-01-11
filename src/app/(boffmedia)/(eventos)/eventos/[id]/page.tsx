@@ -1,6 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
+import { useTranslations } from 'next-intl';
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/primitives/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
@@ -17,6 +18,7 @@ import { LoadingSpinner } from "./_components/LoadingSpinner"
 import { InternalLink } from "@/components/ui/navigation/Link"
 
 export default function EventSummaryPage() {
+  const t = useTranslations('boffmedia');
   const params = useParams()
   const eventId = parseInt(params.id as string)
   const { session } = useBoffSession()
@@ -73,10 +75,10 @@ export default function EventSummaryPage() {
       <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
-            <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
+            <h1 className="text-2xl font-bold text-white mb-4">{t('eventsSection.noEventFound')}</h1>
             <InternalLink href="/eventos">
               <Button variant="accent">
-                Volver a eventos
+                {t('eventsSection.backToEvents')}
               </Button>
             </InternalLink>
           </div>

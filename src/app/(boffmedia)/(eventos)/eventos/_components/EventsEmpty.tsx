@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/primitives/button";
 import { Calendar, Search, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface EventsEmptyProps {
   searchTerm?: string;
@@ -7,6 +8,7 @@ interface EventsEmptyProps {
 }
 
 export function EventsEmpty({ searchTerm, onClearSearch }: EventsEmptyProps) {
+  const t = useTranslations("boffmedia");
   return (
     <div className="py-20 text-center relative">
       {/* Background Effects */}
@@ -35,13 +37,13 @@ export function EventsEmpty({ searchTerm, onClearSearch }: EventsEmptyProps) {
 
         {/* Title and Description */}
         <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400 mb-4">
-          {searchTerm ? 'Sin resultados' : 'No hay eventos'}
+          {searchTerm ? t("eventsSection.empty.noResults") : t("eventsSection.empty.noEvents")}
         </h3>
         
         <p className="max-w-md mx-auto text-surface-300 mb-8 leading-relaxed">
           {searchTerm
-            ? `No encontramos eventos que coincidan con "${searchTerm}". Prueba con otros términos de búsqueda.`
-            : "No hay eventos disponibles en este momento. ¡Vuelve pronto para descubrir nuevas aventuras épicas!"}
+            ? t("eventsSection.empty.noResultsDescription", { term: searchTerm })
+            : t("eventsSection.empty.noEventsDescription")}
         </p>
 
         {/* Action Buttons */}
@@ -53,13 +55,13 @@ export function EventsEmpty({ searchTerm, onClearSearch }: EventsEmptyProps) {
               onClick={onClearSearch}
             >
               <Search className="w-4 h-4 mr-2" />
-              Limpiar búsqueda
+              {t("eventsSection.empty.clearSearch")}
             </Button>
           )}
           
           <Button className="px-6" variant="accent">
             <Calendar className="w-4 h-4 mr-2" />
-            Explorar eventos
+            {t("eventsSection.exploreEvents")}
           </Button>
         </div>
 

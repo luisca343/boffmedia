@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/primitives/button";
+import { useTranslations } from 'next-intl';
 import { useBoffSession } from "@/services/useBoffSession";
 import { User, UserPlus, Loader2, Lock, CheckCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -16,6 +17,7 @@ interface EventRegistrationButtonProps {
 
 export function EventRegistrationButton({ event }: EventRegistrationButtonProps) {
   const { session } = useBoffSession();
+  const t = useTranslations('boffmedia');
   const router = useRouter();
   const [isRegistering, setIsRegistering] = useState(false);
   const [isRegistered, setIsRegistered] = useState(false);
@@ -59,7 +61,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
       
       if (isRegistered) {
         // TODO: Implement unregister logic if needed
-        toast.info("La cancelación de registro no está disponible en este momento");
+        toast.info(t('eventsSection.registrationCancelNotAvailable'));
         setIsRegistering(false);
         return;
       }
@@ -75,19 +77,16 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
       
       if (response.statusCode === 200) {
         setIsRegistered(true);
-        toast.success("¡Te has registrado exitosamente para este evento!");
+        toast.success(t('eventsSection.registrationSuccess'));
         
         // Refresh participant list
         const updatedParticipants = await EventsService.getEventParticipants(event.id);
         setParticipants(updatedParticipants.data || []);
       } else {
-        toast.error(response.message || "No se pudo completar el registro");
+        toast.error(response.message || t('eventsSection.registrationFailed'));
       }
     } catch (error: any) {
-      toast.error(
-        error.message || 
-        "Ocurrió un error durante el registro. Inténtalo de nuevo."
-      );
+      toast.error(error.message || t('eventsSection.registrationError'));
       console.error("Registration error:", error);
     } finally {
       setIsRegistering(false);
@@ -95,8 +94,8 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   };
   
   const status = getEventStatus(event.startDate, event.endDate);
-  const isUpcoming = status.label === "Próximo";
-  const isActive = status.label === "En Curso";
+  const isUpcoming = status.key === "upcoming";
+  const isActive = status.key === "active";
   
   const canRegister = isUpcoming || (event.type === "server" && isActive);
 
@@ -104,7 +103,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
     return (
       <Button disabled variant="accentOutline">
         <Lock className="mr-2 h-4 w-4" />
-        Registro Cerrado
+        {t('eventsSection.registerClosed')}
       </Button>
     );
   }
@@ -113,7 +112,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
     return (
       <Button disabled variant="accentOutline" className="w-full">
         <Loader2 className="mr-2 h-4 w-4 animate-spin text-accent-400" />
-        <span className="text-surface-300">Verificando registro...</span>
+        <span className="text-surface-300">{t('eventsSection.verifyingRegistration')}</span>
       </Button>
     );
   }
@@ -128,17 +127,17 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
       {isRegistering ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Procesando...
+          {t('eventsSection.processing')}
         </>
       ) : isRegistered ? (
         <>
           <CheckCircle className="mr-2 h-4 w-4" />
-          ¡Registrado!
+          {t('eventsSection.registered')}
         </>
       ) : (
         <>
           <UserPlus className="mr-2 h-4 w-4" />
-          {isActive ? 'Unirse Ahora' : 'Registrarse'}
+          {isActive ? t('eventsSection.joinNow') : t('eventsSection.register')}
         </>
       )}
     </Button>

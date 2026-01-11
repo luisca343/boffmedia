@@ -2,12 +2,14 @@
 
 import { CheckCircle, Star, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
+import { useTranslations } from 'next-intl';
 
 interface SuggestEventSuccessProps {
   onReset: () => void
 }
 
 export function SuggestEventSuccess({ onReset }: SuggestEventSuccessProps) {
+  const t = useTranslations('boffmedia');
   return (
     <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
       <div className="container mx-auto p-6 max-w-4xl">
@@ -20,10 +22,10 @@ export function SuggestEventSuccess({ onReset }: SuggestEventSuccessProps) {
           </div>
           
           <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-success-400 to-emerald-400 mb-4 text-center">
-            ¡Sugerencia Enviada!
+            {t('eventsSection.suggestionSentTitle')}
           </h1>
           <p className="text-xl text-surface-300 text-center max-w-2xl mb-8">
-            Gracias por tu propuesta. Nuestro equipo la revisará y te notificaremos si decidimos implementarla.
+            {t('eventsSection.suggestionSentDesc')}
           </p>
           
           <div className="flex gap-4">
@@ -32,11 +34,11 @@ export function SuggestEventSuccess({ onReset }: SuggestEventSuccessProps) {
               variant="accent"
             >
               <Star className="w-4 h-4 mr-2" />
-              Sugerir Otro Evento
+              {t('eventsSection.suggestAnother')}
             </Button>
             <Button variant="outline" className="border-accent-500/30 text-accent-400 hover:bg-accent-500/10">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver a Eventos
+              {t('eventsSection.backToEvents')}
             </Button>
           </div>
         </div>

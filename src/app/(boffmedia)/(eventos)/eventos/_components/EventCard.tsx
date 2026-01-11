@@ -1,5 +1,8 @@
+"use client"
+
 import Link from "next/link";
 import { Calendar, Users, Clock, ChevronRight, Trophy, Server, MapPin, Star } from "lucide-react";
+import { useTranslations } from 'next-intl';
 import { Badge } from "@/components/ui/primitives/badge";
 import { Button } from "@/components/ui/primitives/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/primitives/card";
@@ -15,6 +18,7 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, layout = "grid" }: EventCardProps) {
+  const t = useTranslations('boffmedia');
   const { games } = useGetGames();
   const game = games?.find((g) => g.id === event.gameId);
   
@@ -23,7 +27,8 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
+    const locale = t('eventsSection.locale') || 'en-US';
+    return date.toLocaleDateString(locale, { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric',
@@ -49,10 +54,10 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
   };
 
   const getStatusColorClass = (status: any) => {
-    switch (status.label) {
-      case 'En Curso': return 'bg-gradient-to-r from-success-500 to-success-600';
-      case 'Próximo': return 'bg-gradient-to-r from-secondary-500 to-secondary-600';
-      case 'Finalizado': return 'bg-gradient-to-r from-surface-500 to-surface-600';
+    switch (status.key || status.label) {
+      case 'active': return 'bg-gradient-to-r from-success-500 to-success-600';
+      case 'upcoming': return 'bg-gradient-to-r from-secondary-500 to-secondary-600';
+      case 'completed': return 'bg-gradient-to-r from-surface-500 to-surface-600';
       default: return 'bg-gradient-to-r from-surface-500 to-surface-600';
     }
   };
@@ -67,9 +72,9 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
     const days = Math.floor(difference / (1000 * 60 * 60 * 24));
     const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 
-    if (days > 0) return `En ${days} días`;
-    if (hours > 0) return `En ${hours} horas`;
-    return 'Muy pronto';
+    if (days > 0) return t('eventsSection.timeInDays', { days });
+    if (hours > 0) return t('eventsSection.timeInHours', { hours });
+    return t('eventsSection.verySoon');
   };
 
   const timeUntil = getTimeUntilEvent(event.startDate);
@@ -101,12 +106,12 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
           <Badge className={cn("text-white text-xs font-bold px-3 py-1", getStatusColorClass(status))}>
-            {status.label}
+            {t(`eventsSection.status.${status.key || (status.label === 'En Curso' ? 'active' : status.label === 'Próximo' ? 'upcoming' : status.label === 'Finalizado' ? 'completed' : 'unknown')}`) || status.label}
           </Badge>
         </div>
 
         {/* Countdown Badge */}
-        {timeUntil && status.label === 'Próximo' && (
+        {timeUntil && (status.key === 'upcoming' || status.label === 'Próximo') && (
           <div className="absolute top-4 left-4">
             <Badge className="bg-secondary-500/90 text-white text-xs font-bold px-3 py-1">
               {timeUntil}
@@ -145,9 +150,9 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
               )}
             </div>
             <div>
-              <span className="text-sm font-medium text-accent-400">{game?.title || `Juego #${event.gameId}`}</span>
+              <span className="text-sm font-medium text-accent-400">{game?.title || `${t('eventsSection.gameLabel')} #${event.gameId}`}</span>
               <div className="text-xs text-surface-500">
-                {event.type === Event.type.EVENT ? 'Evento' : 'Servidor'}
+                {event.type === Event.type.EVENT ? t('eventsSection.eventType') : t('eventsSection.serverType')}
               </div>
             </div>
           </div>
@@ -168,7 +173,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
             {event.endDate && (
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-accent-400" />
-                <span>Hasta {formatDate(event.endDate)}</span>
+                <span>{t('eventsSection.endLabel')} {formatDate(event.endDate)}</span>
               </div>
             )}
           </div>
@@ -178,7 +183,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
           <div className="flex gap-3 w-full">
             <Button asChild variant="accent" className="flex-1">
               <InternalLink href={`/eventos/${event.id}`} className="flex items-center justify-center gap-2">
-                Ver detalles
+                {t('eventsSection.viewEvent')}
                 <ChevronRight className="w-4 h-4" />
               </InternalLink>
             </Button>

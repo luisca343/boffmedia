@@ -15,6 +15,7 @@ export function getEventStatus(startDate: string | Date, endDate?: string | Date
   // First check if the end date is invalid or missing
   if (!hasValidEndDate) {
     return { 
+      key: 'active',
       label: "En Curso", 
       class: "bg-success-500/20 text-success-400 border-success-500/30" 
     };
@@ -23,16 +24,19 @@ export function getEventStatus(startDate: string | Date, endDate?: string | Date
   // Then check the event's timeline status
   if (now < start) {
     return { 
+      key: 'upcoming',
       label: "Próximo", 
       class: "bg-primary-500/20 text-primary-400 border-primary-500/30" 
     };
   } else if (now > end!) {
     return { 
+      key: 'completed',
       label: "Finalizado", 
       class: "bg-surface-500/20 text-surface-400 border-surface-500/30" 
     };
   } else {
     return { 
+      key: 'active',
       label: "En Curso", 
       class: "bg-success-500/20 text-success-400 border-success-500/30" 
     };

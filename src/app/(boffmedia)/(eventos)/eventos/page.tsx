@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useGetEvents } from '@/hooks/events/useGetEvents';
 import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/boffmedia/sections';
 import { EventsGrid } from './_components/EventsGrid';
@@ -9,6 +10,7 @@ import { EventFilters } from './_components/EventFilters';
 import { Trophy } from 'lucide-react';
 
 export default function EventsPage() {
+  const t = useTranslations('boffmedia');
   const { events, error, isLoading, refetch } = useGetEvents();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,24 +32,24 @@ export default function EventsPage() {
       })
     : [];
 
-  if (isLoading) return <SectionLoading text="Cargando eventos..." subtext="Preparando experiencias épicas" />;
-  if (error) return <SectionError error={error} onRetry={refetch} description="Error al cargar los eventos" />;
-  if (!events || events.length === 0) return <SectionEmpty icon={Trophy} title="No hay eventos disponibles" description="Estamos preparando nuevos eventos emocionantes. ¡Vuelve pronto!" />;
+  if (isLoading) return <SectionLoading text={t('eventsSection.loading')} subtext="Preparando experiencias épicas" />;
+  if (error) return <SectionError error={error} onRetry={refetch} description={t('eventsSection.errorLoading')} />;
+  if (!events || events.length === 0) return <SectionEmpty icon={Trophy} title={t('eventsSection.empty.noEvents')} description={t('eventsSection.empty.noEventsDescription')} />;
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <SectionHeader 
-        title="Centro de Eventos"
-        subtitle="Únete a competiciones épicas, desafía a otros jugadores y demuestra tu habilidad en eventos emocionantes."
+        title={t('eventsSection.title')}
+        subtitle={t('eventsSection.subtitle')}
       >
         <SectionFilters 
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          searchPlaceholder="Buscar evento..."
+          searchPlaceholder={t('eventsSection.searchPlaceholder')}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           itemsCount={filteredEvents.length}
-          itemsLabel="eventos"
+          itemsLabel={t('eventsSection.itemsLabel')}
           showViewMode={true}
           showItemsCount={true}
         >
@@ -64,11 +66,8 @@ export default function EventsPage() {
           icon={Trophy}
           searchTerm={searchTerm} 
           onClearSearch={() => setSearchTerm('')}
-          title="No se encontraron eventos"
-          description={searchTerm 
-            ? `No encontramos eventos que coincidan con "${searchTerm}". Prueba con otros términos de búsqueda.`
-            : "No hay eventos que coincidan con los filtros seleccionados."
-          }
+          title={searchTerm ? t('eventsSection.empty.noResults') : t('eventsSection.empty.noEvents')}
+          description={searchTerm ? t('eventsSection.empty.noResultsDescription', { term: searchTerm }) : t('eventsSection.noEventsMatchFilters')}
         />
       ) : viewMode === 'grid' ? (
         <EventsGrid events={filteredEvents} />
