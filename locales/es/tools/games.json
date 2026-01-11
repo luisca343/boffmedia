@@ -2,6 +2,7 @@
     "games": {
         "pokemon": {
             "name": "Pokémon",
+            "description": "Calculadoras, generadores y bases de datos",
             "categories": {
                 "tcgpocket": "TCG Pocket",
                 "others": "Otros"
@@ -15,6 +16,7 @@
         },
         "mhwilds": {
             "name": "Monster Hunter Wilds",
+            "description": "Planificadores y generadores de builds",
             "categories": {
                 "buildPlanner": "Planificador de Builds"
             },
@@ -24,4 +26,18 @@
             }
         }
     }
+
+            ,
+            "ui": {
+                "header": {
+                    "title_prefix": "Herramientas para",
+                    "title_highlight": "Videojuegos",
+                    "subtitle": "Recursos útiles para mejorar tu experiencia de juego. Todo lo que necesitas para tus juegos favoritos, creado por y para la comunidad gaming."
+                },
+                "searchPlaceholder": "Buscar herramientas...",
+                "noResults": "No se encontraron herramientas que coincidan con tu búsqueda.",
+                "explore": "Explorar",
+                "tool": "{count, plural, one {# herramienta} other {# herramientas}}",
+                "more": "+{count, plural, one {# más} other {# más}}"
+            }
 }

@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/primitives/card";
 import { Button } from "@/components/ui/primitives/button";
 import { Input } from "@/components/ui/primitives/input";
-import { Search, Gamepad2, ChevronRight, SwordIcon, BarChart, Settings, Zap, Users, Trophy } from "lucide-react";
+import { Search, Gamepad2, ChevronRight, BarChart } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { gameToolsConfig } from "@/config/gameTools";
 
 export default function ToolsLandingPage() {
   const router = useRouter();
@@ -26,51 +28,44 @@ export default function ToolsLandingPage() {
     setIsMounted(true);
   }, []);
 
-  const gameTools = [
-    {
-      title: "Pokémon",
-      description: "Calculadoras, generadores y bases de datos",
-      icon: "/img/games/pokemon/icon.webp",
-      tools: [
-        { name: "TCGPocket", count: 3 },
-        { name: "Pokémon Mundo Misterioso", count: 1 },
-        { name: "Pokedex", count: 1 },
-      ],
-      href: "/pokemon",
-      color: "from-yellow-400 to-red-500",
-      gradient: "bg-gradient-to-br from-yellow-400/20 to-red-500/20",
-      borderGlow: "shadow-yellow-500/50",
-    },
-    {
-      title: "Monster Hunter Wilds",
-      description: "Planificadores y generadores de builds",
-      icon: "/img/games/mhwilds/icon.webp",
-      tools: [
-        { name: "Builds", count: 1 },
-      ],
-      href: "/mhwilds",
-      color: "from-highlight-400 to-highlight-600",
-      gradient: "bg-gradient-to-br from-highlight-400/20 to-highlight-600/20",
-      borderGlow: "shadow-highlight-500/50",
-    },
-    {
-      title: "Otros",
-      description: "Herramientas generales y recursos",
-      icon: "/img/games/other/icon.webp",
-      tools: [
-        { name: "Sorteos", count: 1 },
-        { name: "Claves de Steam", count: 1 },
-      ],
-      href: "/otros",
-      color: "from-secondary-400 to-secondary-600",
-      gradient: "bg-gradient-to-br from-secondary-400/20 to-secondary-600/20",
-      borderGlow: "shadow-secondary-500/50",
-    }
-  ];
+  const t = useTranslations("");
+
+    const gameTools = Object.entries(gameToolsConfig).map(([key, game]) => {
+      const categories = game.categories.map((c) => ({
+        name: t(c.name),
+        href: c.href,
+        tools: c.tools.map((tool) => ({ name: t(tool.name), href: tool.href })),
+        count: c.tools.length,
+      }));
+
+      const totalTools = categories.reduce((acc, c) => acc + c.count, 0);
+      const href = game.href || `/${key}`;
+      const title = t(game.name);
+      let description = "";
+      if (game.description) {
+        try { description = t(game.description); } catch (e) { description = ""; }
+      }
+
+    const cardGradient = "bg-gradient-to-br from-surface-800/20 to-surface-700/10";
+    const cardBorderGlow = "shadow-lg shadow-surface-900/20";
+
+    return {
+      key,
+      title,
+      description,
+      icon: game.icon,
+        categories,
+      href,
+      color: game.color,
+      gradient: cardGradient,
+      borderGlow: cardBorderGlow,
+        toolCount: totalTools,
+    };
+  });
 
   const filteredTools = gameTools.filter(game =>
     game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    game.tools.some(tool => tool.name.toLowerCase().includes(searchTerm.toLowerCase()))
+    game.categories.some(cat => cat.name.toLowerCase().includes(searchTerm.toLowerCase()) || cat.tools.some(tool => tool.name.toLowerCase().includes(searchTerm.toLowerCase())))
   );
 
   return (
@@ -105,15 +100,14 @@ export default function ToolsLandingPage() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-5xl sm:text-7xl font-bold mb-6 text-surface-50">
-              Herramientas para{" "}
+              {t("ui.header.title_prefix")} {" "}
               <span className="bg-gradient-to-r from-primary-400 via-primary-300 to-primary-500 bg-clip-text text-transparent">
-                Videojuegos
+                {t("ui.header.title_highlight")}
               </span>
             </h1>
             
             <p className="text-xl text-surface-200 max-w-3xl mx-auto leading-relaxed mb-8">
-              Recursos útiles para mejorar tu experiencia de juego. 
-              Todo lo que necesitas para tus juegos favoritos, creado por y para la comunidad gaming.
+              {t("ui.header.subtitle")}
             </p>
 
             {/* Search Bar */}
@@ -126,7 +120,7 @@ export default function ToolsLandingPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 h-5 w-5" />
                 <Input
-                  placeholder="Buscar herramientas..."
+                  placeholder={t("ui.searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-surface-800/50 backdrop-blur-sm border-surface-600 text-surface-100 placeholder-surface-400 focus:border-primary-500 focus:ring-primary-500/50"
@@ -141,7 +135,7 @@ export default function ToolsLandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {filteredTools.map((game, index) => (
               <motion.div
-                key={game.title}
+                key={game.key}
                 initial={{ opacity: 0, y: 30, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ delay: index * 0.15, duration: 0.6 }}
@@ -191,12 +185,23 @@ export default function ToolsLandingPage() {
                                   
                   <CardContent className="relative">
                     <div className="space-y-3">
-                      {game.tools.map(tool => (
-                        <div key={tool.name} className="bg-surface-900/30 backdrop-blur-sm rounded-lg p-3 border border-surface-700/30">
-                          <div className="flex justify-between items-center">
-                            <span className="text-primary-300 font-medium">{tool.name}</span>
-                            <span className="text-xs text-surface-400 bg-surface-700/50 px-2 py-1 rounded-full">
-                              {tool.count} {tool.count === 1 ? 'herramienta' : 'herramientas'}
+                      {game.categories.map((cat) => (
+                        <div key={cat.name} className="relative bg-surface-900/30 backdrop-blur-sm rounded-lg p-3 border border-surface-700/30">
+                          <div className="flex items-center">
+                            <div>
+                              <span className="text-primary-300 font-medium">{cat.name}</span>
+                              <div className="text-xs text-surface-400 mt-1 flex gap-2 flex-wrap">
+                                        {cat.tools.slice(0,3).map((titem) => (
+                                          <span key={titem.name} className="px-2 py-0.5 bg-surface-800 rounded text-xs text-surface-300">{titem.name}</span>
+                                        ))}
+                                        {cat.count > 3 && <span className="px-2 py-0.5 bg-surface-800 rounded text-xs text-surface-300">{t("ui.more", { count: cat.count - 3 })}</span>}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="absolute right-3 top-3">
+                            <span className="text-[11px] text-surface-400 bg-surface-700/50 px-2 py-0.5 rounded-full">
+                              {cat.count}
                             </span>
                           </div>
                         </div>
@@ -205,10 +210,10 @@ export default function ToolsLandingPage() {
                   </CardContent>
                   
                   <CardFooter className="relative border-t border-surface-700/50 mt-4 pt-4 flex justify-between items-center">
-                    <div className="text-xs text-surface-400">
+                        <div className="text-xs text-surface-400">
                       <span className="flex items-center">
                         <BarChart className="h-3 w-3 mr-1" />
-                        {game.tools.reduce((acc, tool) => acc + tool.count, 0)} herramientas
+                        {t("ui.tool", { count: game.toolCount })}
                       </span>
                     </div>
                     <Button 

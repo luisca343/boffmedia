@@ -2,6 +2,7 @@
   "games": {
     "pokemon": {
       "name": "Pokémon",
+      "description": "Calculators, generators and databases",
       "categories": {
         "tcgpocket": "TCG Pocket",
         "others": "Others"
@@ -15,6 +16,7 @@
     },
     "mhwilds": {
       "name": "Monster Hunter Wilds",
+      "description": "Planners and build generators",
       "categories": {
         "buildPlanner": "Build Planner"
       },

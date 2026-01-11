@@ -23,6 +23,8 @@ export interface CategoryConfig {
 
 export interface GameConfig {
   name: string; // This will be a translation key
+  description?: string; // optional translation key for description
+  href: string;
   icon: string;
   color: string;
   bg: string;
@@ -57,7 +59,9 @@ const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
 }> = {
   "pokemon": {
     name: "games.pokemon.name",
+    description: "games.pokemon.description",
     icon: "/img/games/pokemon/icon.webp",
+    href: "/pokemon",
     color: "from-yellow-400 to-red-500",
     bg: "bg-red-900",
     categories: [
@@ -81,7 +85,9 @@ const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
   },
   "mhwilds": {
     name: "games.mhwilds.name",
-    icon: "/img/games/mhwilds-icon.webp",
+    description: "games.mhwilds.description",
+    icon: "/img/games/mhwilds/icon.webp",
+    href: "/mhwilds",
     color: "from-highlight-400 to-highlight-600",
     bg: "bg-highlight-900",
     categories: [
