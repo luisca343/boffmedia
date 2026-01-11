@@ -144,7 +144,15 @@
     "charm": "Charm",
     "secondary_weapon": "Secondary Weapon",
     "empty_slot": "Empty slot",
-    
+    "copy_json": "Copy JSON",
+    "unknown_skill": "Unknown Skill",
+    "aria_select_equipment": "Select {name} equipment",
+    "element_hidden_requires_free_element": "Hidden element: Requires Free Element skill",
+    "element_damage": "Elemental damage",
+    "status_hidden_requires_free_element": "Hidden status: Requires Free Element skill",
+    "status_damage": "Status damage",
+    "range": "Range",
+    "rarity_label": "Rarity: {values}",
     "header": {
       "title": {
         "prefix": "Tools for",

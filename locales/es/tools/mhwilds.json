@@ -145,6 +145,16 @@
     "secondary_weapon": "Arma Secundaria",
     "empty_slot": "Ranura vacía",
 
+    "copy_json": "Copiar JSON",
+    "unknown_skill": "Habilidad desconocida",
+    "aria_select_equipment": "Seleccionar equipamiento de {name}",
+    "element_hidden_requires_free_element": "Elemento oculto: Requiere la habilidad 'Liberar Elemento'",
+    "element_damage": "Daño elemental",
+    "status_hidden_requires_free_element": "Estado oculto: Requiere la habilidad 'Liberar Elemento'",
+    "status_damage": "Daño de estado",
+    "range": "Rango",
+    "rarity_label": "Rareza: {values}",
+
 
       
     "header": {

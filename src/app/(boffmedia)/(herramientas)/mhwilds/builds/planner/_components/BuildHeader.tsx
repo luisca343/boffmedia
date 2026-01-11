@@ -300,7 +300,7 @@ export function BuildHeader({
                 */}
                 <DropdownMenuItem onClick={handleCopy} className="cursor-pointer">
                   <Copy className="h-4 w-4 mr-2" />
-                  <span>Copiar JSON</span>
+                  <span>{t("copy_json")}</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

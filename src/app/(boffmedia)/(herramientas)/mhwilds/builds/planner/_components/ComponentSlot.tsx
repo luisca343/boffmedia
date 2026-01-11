@@ -89,8 +89,8 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
                   <TooltipContent>
                     <p>
                       {element.hidden 
-                        ? "Elemento oculto: Requiere habilidad Elemento Libre" 
-                        : "Daño elemental"}
+                        ? t("element_hidden_requires_free_element") 
+                        : t("element_damage")}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -115,8 +115,8 @@ const WeaponDetails: FC<{ weapon: Weapon }> = ({ weapon }) => {
                   <TooltipContent>
                     <p>
                       {status.hidden 
-                        ? "Estado oculto: Requiere habilidad Elemento Libre" 
-                        : "Daño de estado"}
+                        ? t("status_hidden_requires_free_element") 
+                        : t("status_damage")}
                     </p>
                   </TooltipContent>
                 </Tooltip>
@@ -175,7 +175,7 @@ const SkillsList: FC<{ skills: SkillRank[] | CharmSkill[] }> = ({ skills }) => {
     return <div className="mt-2 text-xs flex flex-wrap items-center gap-x-2">
       <span className="text-surface-400 mr-1">{t("skills")}:</span>
       {skills.map((skillRank, idx) => {
-        const skillName = skillRank.skill?.name || skillRank.name || "Unknown Skill";
+        const skillName = skillRank.skill?.name || skillRank.name || t("unknown_skill");
         return (
           <span 
             key={`${skillRank.id || `skill-${idx}`}`} 
@@ -205,7 +205,7 @@ export const ComponentSlot: FC<ComponentSlotProps> = ({
       onClick={() => onSlotClick(slot.key)}
       whileHover={{ x: 5 }}
       role="button"
-      aria-label={`Select ${slot.name} equipment`}
+      aria-label={t("aria_select_equipment", { name: slot.name })}
     >
       <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center">
         {/* Column 1: Icon */}

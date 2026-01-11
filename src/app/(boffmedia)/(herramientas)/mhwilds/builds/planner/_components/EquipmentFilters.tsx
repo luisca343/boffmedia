@@ -104,7 +104,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType, sortDirection,
     if (rankRanges[1].isActive) return t("high_rank");
     
     if (filters.rarity.length > 0) {
-      return `Rareza: ${filters.rarity.sort().join(', ')}`;
+      return t("rarity_label", { values: filters.rarity.sort().join(', ') });
     }
     
     return null;
@@ -146,7 +146,7 @@ export const EquipmentFilters = ({ filters, setFilters, slotType, sortDirection,
             <div className="p-2 space-y-2">
               {/* Rank filters */}
               <div className="mb-2">
-                <h4 className="text-xs text-surface-400 mb-1">Rango</h4>
+                <h4 className="text-xs text-surface-400 mb-1">{t("range")}</h4>
                 <div className="flex gap-2">
                   {rankRanges.map((rank) => (
                     <Button 
