@@ -34,6 +34,9 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/img/boff.ico" />
+      </head>
       <body className="flex flex-col h-screen bg-transparent">
         <NextIntlClientProvider messages={messages} locale={locale}>
           {children}
