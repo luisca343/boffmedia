@@ -1,4 +1,5 @@
 import { HiMail } from "react-icons/hi";
+import { useTranslations } from "next-intl";
 import { CodeDisplay } from "@/components/ui/display/CodeDisplay";
 
 interface WonderMailDisplayProps {
@@ -14,13 +15,15 @@ export function WonderMailDisplay({
   onCopy, 
   copied 
 }: WonderMailDisplayProps) {
+  const t = useTranslations("pmdsky");
+
   return (
     <CodeDisplay
       code={mail}
-      title={`Wonder Mail ${isEuropean ? "(EU)" : "(US/JP)"}`}
+      title={isEuropean ? t("WONDER_MAIL_TITLE_EU") : t("WONDER_MAIL_TITLE_USJP")}
       icon={<HiMail className="w-6 h-6" />}
       badge={{
-        text: isEuropean ? "European Version" : "US/Japanese Version",
+        text: isEuropean ? t("EUROPEAN_VERSION_ACTIVE") : t("EUROPEAN_VERSION_INACTIVE"),
         variant: "secondary",
         className: "bg-secondary-500/20 text-secondary-300 border-secondary-500/30"
       }}

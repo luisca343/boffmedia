@@ -19,7 +19,8 @@
       "disabled": "Desactivado",
       "selectElement": "Selecciona un elemento",
       "searchElement": "Buscar elemento",
-      "noElementFound": "No se encontró ningún elemento"
+      "noElementFound": "No se encontró ningún elemento",
+      "copyInstruction": "Haz clic en el botón de copiar arriba para copiarlo al portapapeles"
     },
     "featuredGames": {
       "title": "Juegos y Herramientas Destacados",

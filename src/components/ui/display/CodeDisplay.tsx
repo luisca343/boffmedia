@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/primitives/card";
 import { Badge } from "@/components/ui/primitives/badge";
 import { HiCheckCircle, HiClipboardCopy, HiInformationCircle } from "react-icons/hi";
+import { useTranslations } from "next-intl";
 
 interface CodeDisplayProps {
   code: string;
@@ -30,6 +31,8 @@ export function CodeDisplay({
   badge,
   className 
 }: CodeDisplayProps) {
+  const t = useTranslations("boffmedia");
+
   return (
     <Card className={`p-6 rounded-2xl bg-gradient-to-br from-surface-800/90 to-surface-900/90 border-surface-700/50 backdrop-blur-sm shadow-2xl ${className}`}>
       {(title || subtitle) && (
@@ -85,7 +88,7 @@ export function CodeDisplay({
       {copyable && (
         <p className="text-center text-surface-400 text-sm mt-4 flex items-center justify-center gap-2">
           <HiInformationCircle className="w-4 h-4" />
-          Click the copy button above to copy to your clipboard
+          {t("ui.copyInstruction")}
         </p>
       )}
     </Card>

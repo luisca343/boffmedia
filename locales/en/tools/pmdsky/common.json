@@ -69,6 +69,8 @@
         "DISABLED_FIELD": "Disabled field",
         "MAX_FLOOR": "Max floor",
         "GENERATE_SUCCESS": "Wonder mail generated successfully!",
+        "WONDER_MAIL_TITLE_EU": "Wonder Mail (EU)",
+        "WONDER_MAIL_TITLE_USJP": "Wonder Mail (US/JP)",
         "FORM_VALIDATION": {
             "QUEST_TYPE_REQUIRED": "You must select a quest type",
             "DUNGEON_REQUIRED": "You must select a dungeon",

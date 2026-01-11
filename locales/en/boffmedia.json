@@ -19,7 +19,8 @@
       "disabled": "Disabled",
       "selectElement": "Select an element",
       "searchElement": "Search element",
-      "noElementFound": "No element found"
+      "noElementFound": "No element found",
+      "copyInstruction": "Click the copy button above to copy to your clipboard"
     },
     "featuredGames": {
       "title": "Featured Games and Tools",

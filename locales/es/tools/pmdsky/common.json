@@ -69,6 +69,8 @@
         "DISABLED_FIELD": "Campo deshabilitado",
         "MAX_FLOOR": "Piso máximo",
         "GENERATE_SUCCESS": "¡Correo secreto generado exitosamente!",
+        "WONDER_MAIL_TITLE_EU": "Correo Secreto (EU)",
+        "WONDER_MAIL_TITLE_USJP": "Correo Secreto (EE. UU./JP)",
         "FORM_VALIDATION": {
             "QUEST_TYPE_REQUIRED": "Debe seleccionar un tipo de misión",
             "DUNGEON_REQUIRED": "Debe seleccionar una mazmorra",
