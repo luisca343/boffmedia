@@ -10,12 +10,12 @@ interface ToolsSpotlightProps {
 
 export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
   const toolCategories = [
-    { icon: <Calculator className="w-10 h-10 text-white" />, name: "Calculadoras", color: "from-emerald-500 to-highlight-600" },
-    { icon: <Cog className="w-10 h-10 text-white" />, name: "Generadores", color: "from-highlight-500 to-teal-600" },
-    { icon: <BarChart3 className="w-10 h-10 text-white" />, name: "Análisis", color: "from-teal-500 to-emerald-600" },
-    { icon: <Server className="w-10 h-10 text-white" />, name: "Utilidades", color: "from-emerald-600 to-highlight-700" },
-    { icon: <Filter className="w-10 h-10 text-white" />, name: "Filtros", color: "from-highlight-600 to-teal-700" },
-    { icon: <Zap className="w-10 h-10 text-white" />, name: "Automatización", color: "from-teal-600 to-emerald-700" },
+    { icon: <Calculator className="w-10 h-10 text-white" />, name: t("featuredGames.toolCategories.calculators"), color: "from-emerald-500 to-highlight-600" },
+    { icon: <Cog className="w-10 h-10 text-white" />, name: t("featuredGames.toolCategories.generators"), color: "from-highlight-500 to-teal-600" },
+    { icon: <BarChart3 className="w-10 h-10 text-white" />, name: t("featuredGames.toolCategories.analysis"), color: "from-teal-500 to-emerald-600" },
+    { icon: <Server className="w-10 h-10 text-white" />, name: t("featuredGames.toolCategories.utilities"), color: "from-emerald-600 to-highlight-700" },
+    { icon: <Filter className="w-10 h-10 text-white" />, name: t("featuredGames.toolCategories.filters"), color: "from-highlight-600 to-teal-700" },
+    { icon: <Zap className="w-10 h-10 text-white" />, name: t("featuredGames.toolCategories.automation"), color: "from-teal-600 to-emerald-700" },
   ];
 
   return (
@@ -58,10 +58,10 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
               {[
-                "Calculadoras especializadas para Minecraft",
-                "Generadores automáticos de contenido", 
-                "Herramientas de análisis avanzado",
-                "Utilidades para administradores"
+                t("featuredGames.games.tools.features.f1"),
+                t("featuredGames.games.tools.features.f2"),
+                t("featuredGames.games.tools.features.f3"),
+                t("featuredGames.games.tools.features.f4")
               ].map((feature, index) => (
                 <div key={index} className="flex items-center gap-3 text-surface-300">
                   <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>

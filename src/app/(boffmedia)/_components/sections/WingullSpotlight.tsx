@@ -63,19 +63,19 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 justify-center text-center mx-auto" style={{maxWidth: 700}}>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
-                <span>Nueva generación</span>
+                <span>{t("featuredGames.gamesFeatures.wingull.f1")}</span>
               </div>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
-                <span>Pokémon exclusivos</span>
+                <span>{t("featuredGames.gamesFeatures.wingull.f2")}</span>
               </div>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
-                <span>Mecánicas mejoradas</span>
+                <span>{t("featuredGames.gamesFeatures.wingull.f3")}</span>
               </div>
               <div className="flex items-center gap-3 text-surface-300 justify-center">
                 <div className="w-2 h-2 bg-secondary-400 rounded-full"></div>
-                <span>Mundo renovado</span>
+                <span>{t("featuredGames.gamesFeatures.wingull.f4")}</span>
               </div>
             </div>
           </div>

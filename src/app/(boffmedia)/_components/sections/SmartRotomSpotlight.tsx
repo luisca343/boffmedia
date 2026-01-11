@@ -28,22 +28,22 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
             {t("featuredGames.games.smartrotom.description")}
           </p>
           {/* Features List */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
             <div className="flex items-center gap-3 text-surface-300">
               <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
-              <span>Disponible en Minecraft como en la web</span>
+              <span>{t("featuredGames.gamesFeatures.smartrotom.f1")}</span>
             </div>
             <div className="flex items-center gap-3 text-surface-300">
               <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
-              <span>Aplicaciones útiles para tu aventura</span>
+              <span>{t("featuredGames.gamesFeatures.smartrotom.f2")}</span>
             </div>
             <div className="flex items-center gap-3 text-surface-300">
               <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
-              <span>Interfaz intuitiva y fácil de usar</span>
+              <span>{t("featuredGames.gamesFeatures.smartrotom.f3")}</span>
             </div>
             <div className="flex items-center gap-3 text-surface-300">
               <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
-              <span>Actualizaciones constantes</span>
+              <span>{t("featuredGames.gamesFeatures.smartrotom.f4")}</span>
             </div>
           </div>
           <div className="flex items-center gap-4">

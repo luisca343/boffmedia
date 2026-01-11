@@ -12,7 +12,7 @@ export default function PokemonPage() {
     {
       title: tg("tools.tcgpocket.title"),
       description: tg("tools.tcgpocket.description"),
-      icon: "/img/games/tcgpocket-icon.webp",
+      icon: "/img/games/tcgpocket/icon.webp",
       iconFallback: <Diamond className="h-8 w-8 text-yellow-400" />,
       href: "/pokemon/tcgpocket",
       color: "from-yellow-300 to-yellow-500",
@@ -25,7 +25,7 @@ export default function PokemonPage() {
     {
       title: tg("tools.pmdsky.title"),
       description: tg("tools.pmdsky.description"),
-      icon: "/img/games/pmdsky-icon.webp",
+      icon: "/img/games/pokemon/pmdsky.webp",
       iconFallback: <Zap className="h-8 w-8 text-secondary-400" />,
       href: "/pokemon/pmdsky",
       color: "from-secondary-400 to-cyan-600",
@@ -37,7 +37,7 @@ export default function PokemonPage() {
     {
       title: tg("tools.pokedex.title"),
       description: tg("tools.pokedex.description"),
-      icon: "/img/games/pokedex-icon.webp",
+      icon: "/img/games/pokemon/icon.webp",
       iconFallback: <Database className="h-8 w-8 text-red-500" />,
       href: "/pokemon/pokedex",
       color: "from-red-500 to-rose-600",

@@ -5,14 +5,14 @@
             "placeholder": "Search channels, games or streams...",
             "button": "Search",
             "error": "Error searching Twitch. Please try again.",
-            "streamResults": "Live Streams",
+            "streamResults": "Live streams",
             "userResults": "Channels found",
             "gameResults": "Games found"
         },
         "browse": {
-            "topStreams": "Popular Streams",
+            "topStreams": "Top streams",
             "noStreams": "No live streams available",
-            "topGames": "Popular Games",
+            "topGames": "Top games",
             "noGames": "No games available"
         },
         "common": {
@@ -24,26 +24,6 @@
             "viewers": "viewers",
             "notFound": "Stream not found",
             "loading": "Loading stream..."
-        },
-        "video": {
-            "views": "views",
-            "duration": "Duration",
-            "publishedAt": "Published at",
-            "notFound": "Video not found",
-            "loading": "Loading video..."
-        },
-        "clip": {
-            "views": "views",
-            "duration": "Duration",
-            "createdAt": "Created at",
-            "creator": "Creator",
-            "notFound": "Clip not found",
-            "publishedAt": "Published at",
-            "loading": "Loading clip..."
-        },
-        "game": {
-            "notFound": "Game not found",
-            "loading": "Loading game..."
         },
         "user": {
             "videos": "Videos",
@@ -59,14 +39,38 @@
             "notFound": "User not found",
             "loading": "Loading user..."
         },
+        "clip": {
+            "views": "views",
+            "duration": "Duration",
+            "createdAt": "Created at",
+            "creator": "Creator",
+            "notFound": "Clip not found",
+            "loading": "Loading clip..."
+        },
+        "video": {
+            "views": "views",
+            "duration": "Duration",
+            "publishedAt": "Published at",
+            "notFound": "Video not found",
+            "loading": "Loading video..."
+        },
+        "game": {
+            "notFound": "Game not found",
+            "loading": "Loading game..."
+        },
         "history": {
+            "title": "Twitch History",
+            "empty": "No viewing history",
+            "emptySubtext": "Streams, videos and clips you watch will appear here.",
             "loading": "Loading history..."
         },
         "loading": {
-            "clip": "Loading clip...",
-            "game": "Loading game...",
             "stream": "Loading stream...",
-            "user": "Loading user..."
+            "user": "Loading user...",
+            "clip": "Loading clip...",
+            "video": "Loading video...",
+            "game": "Loading game...",
+            "history": "Loading history..."
         }
     }
 }

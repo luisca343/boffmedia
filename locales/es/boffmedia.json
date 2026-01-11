@@ -42,7 +42,13 @@
         },
         "tools": {
           "title": "Herramientas de Juego",
-          "description": "Mejora tu experiencia de juego con nuestra colección de herramientas útiles."
+          "description": "Mejora tu experiencia de juego con nuestra colección de herramientas útiles.",
+          "features": {
+            "f1": "Calculadoras especializadas para juegos",
+            "f2": "Generadores automáticos de contenido",
+            "f3": "Herramientas de análisis avanzadas",
+            "f4": "Utilidades para administradores"
+          }
         },
         "zomboff": {
           "title": "Project ZomBOFF",
@@ -53,6 +59,29 @@
           "description": "Pon a prueba tu conocimiento y velocidad en Minecraft en eventos competitivos."
         }
       }
+    ,
+    "toolCategories": {
+      "calculators": "Calculadoras",
+      "generators": "Generadores",
+      "analysis": "Análisis",
+      "utilities": "Utilidades",
+      "filters": "Filtros",
+      "automation": "Automatización"
+    },
+    "gamesFeatures": {
+      "wingull": {
+        "f1": "Nueva generación",
+        "f2": "Pokémon exclusivos",
+        "f3": "Mecánicas mejoradas",
+        "f4": "Mundo renovado"
+      },
+      "smartrotom": {
+        "f1": "Disponible en Minecraft y en la web",
+        "f2": "Aplicaciones útiles para tu aventura",
+        "f3": "Interfaz intuitiva y fácil de usar",
+        "f4": "Actualizaciones constantes"
+      }
+    }
     },
     "eventsSection": {
       "locale": "es-ES",
