@@ -5,42 +5,43 @@ import { Sword, Shield, Hammer, Axe } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export default function MHWildsPage() {
-  const t = useTranslations("mhwilds");
+  const t = useTranslations(""); // global translations (ui, games)
+  const tg = useTranslations("mhwilds"); // game-specific translations
 
   const mhWildsTools = [
     {
-      title: t("tools.buildPlanner.title"),
-      description: t("tools.buildPlanner.description"),
+      title: tg("tools.buildPlanner.title"),
+      description: tg("tools.buildPlanner.description"),
       icon: "/img/games/mhwilds/long-sword.webp",
       iconFallback: <Shield className="h-8 w-8 text-highlight-400" />,
       href: "/mhwilds/builds/planner",
       color: "from-highlight-400 to-emerald-600",
-      tools: [t("tools.buildPlanner.features.optimizer"), t("tools.buildPlanner.features.calculator"), t("tools.buildPlanner.features.comparison")],
+      tools: [tg("tools.buildPlanner.features.optimizer"), tg("tools.buildPlanner.features.calculator"), tg("tools.buildPlanner.features.comparison")],
       featured: true,
       isNew: true,
       popularity: "high",
       heroImage: "/img/games/mhwilds/gemma.webp"
     },
     {
-      title: t("tools.weaponTrees.title"),
-      description: t("tools.weaponTrees.description"),
+      title: tg("tools.weaponTrees.title"),
+      description: tg("tools.weaponTrees.description"),
       icon: "/img/games/mhwilds/charge-blade.webp",
       iconFallback: <Sword className="h-8 w-8 text-secondary-400" />,
       href: "/mhwilds/tree",
       color: "from-secondary-400 to-indigo-600",
-      tools: [t("tools.weaponTrees.features.trees"), t("tools.weaponTrees.features.comparison"), t("tools.weaponTrees.features.stats")],
+      tools: [tg("tools.weaponTrees.features.trees"), tg("tools.weaponTrees.features.comparison"), tg("tools.weaponTrees.features.stats")],
       featured: false,
       isNew: false,
       popularity: "high"
     },
     {
-      title: t("tools.bestiary.title"),
-      description: t("tools.bestiary.description"),
+      title: tg("tools.bestiary.title"),
+      description: tg("tools.bestiary.description"),
       icon: "/img/games/mhwilds/hammer.webp",
       iconFallback: <Axe className="h-8 w-8 text-red-500" />,
       href: "/mhwilds/monsters",
       color: "from-red-500 to-rose-600",
-      tools: [t("tools.bestiary.features.weaknesses"), t("tools.bestiary.features.materials"), t("tools.bestiary.features.locations")],
+      tools: [tg("tools.bestiary.features.weaknesses"), tg("tools.bestiary.features.materials"), tg("tools.bestiary.features.locations")],
       featured: false,
       isNew: false,
       popularity: "medium"
@@ -50,22 +51,22 @@ export default function MHWildsPage() {
   const externalLinks = [
     { 
       href: "https://www.monsterhunter.com/", 
-      title: t("externalLinks.officialWebsite"),
+      title: tg("externalLinks.officialWebsite"),
       description: "Web oficial de Monster Hunter"
     },
     { 
       href: "https://www.reddit.com/r/MonsterHunter/", 
-      title: t("externalLinks.redditCommunity"),
+      title: tg("externalLinks.redditCommunity"),
       description: "Comunidad de Reddit"
     },
     { 
       href: "https://monsterhunter.fandom.com/wiki/Monster_Hunter_Wilds", 
-      title: t("externalLinks.wiki"),
+      title: tg("externalLinks.wiki"),
       description: "Wiki de Monster Hunter"
     },
     { 
       href: "https://www.youtube.com/results?search_query=monster+hunter+wilds", 
-      title: t("externalLinks.videos"),
+      title: tg("externalLinks.videos"),
       description: "Guías y gameplay"
     }
   ];
@@ -73,10 +74,10 @@ export default function MHWildsPage() {
   return (
     <ToolsPageLayout
       title={{
-        prefix: t("header.title.prefix"),
-        highlight: t("header.title.highlight")
+        prefix: tg("header.title.prefix"),
+        highlight: tg("header.title.highlight")
       }}
-      subtitle={t("header.subtitle")}
+      subtitle={tg("header.subtitle")}
       logoSrc="/img/games/mhwilds/icon.webp"
       logoAlt="Monster Hunter Wilds"
       tools={mhWildsTools}

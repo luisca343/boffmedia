@@ -21,7 +21,7 @@ export function ExternalResources({ links, variants, t }: ExternalResourcesProps
     >
       <h3 className="text-2xl font-bold text-surface-100 mb-6 flex items-center">
         <Stars className="mr-3 h-6 w-6 text-primary-400" />
-        {t("externalLinks.title")}
+        {t("ui.externalLinks.title")}
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {links.map((link) => (

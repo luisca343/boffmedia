@@ -61,11 +61,11 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
                   {tool.isNew && (
                     <Badge className="bg-gradient-to-r from-highlight-500 to-highlight-600 text-white shadow-lg">
                       <Sparkles className="w-3 h-3 mr-1" />
-                      Nuevo
+                      {t("ui.newBadge")}
                     </Badge>
                   )}
                 </div>
-                <p className="text-primary-300 text-sm font-medium">{t("featuredTool")}</p>
+                <p className="text-primary-300 text-sm font-medium">{t("ui.featuredTool")}</p>
               </div>
             </div>
             
@@ -89,7 +89,7 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
               onClick={() => router.push(tool.href)}
               size="lg"
             >
-              {t("accessButton", { tool: tool.title })} 
+              {t("ui.accessButton", { tool: tool.title })} 
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -143,7 +143,7 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
             <div className="absolute bottom-4 left-4 z-10">
               <Badge className="bg-black/80 text-white backdrop-blur-md border border-white/10 shadow-lg">
                 <Clock className="w-3 h-3 mr-1" />
-                Recién actualizado
+                  {t("ui.recentlyUpdated")}
               </Badge>
             </div>
             

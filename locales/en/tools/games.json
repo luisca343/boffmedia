@@ -25,5 +25,25 @@
         "weaponTree": "Weapon Tree"
       }
     }
+  },
+  "ui": {
+    "header": {
+      "title_prefix": "Tools for",
+      "title_highlight": "Video Games",
+      "subtitle": "Useful resources to improve your gaming experience. Everything you need for your favorite games, made by and for the gaming community."
+    },
+    "searchPlaceholder": "Search tools...",
+    "noResults": "No tools found matching your search.",
+    "explore": "Explore",
+    "tool": "{count, plural, one {# tool} other {# tools}}",
+    "more": "+{count, plural, one {# more} other {# more}}",
+    "externalLinks": {
+      "title": "External Resources"
+    },
+    "featuredTool": "Featured",
+    "accessButton": "Access {tool}",
+    "newBadge": "New",
+    "recentlyUpdated": "Recently updated",
+    "popularity": "{popularity, select, high {High} other {Medium}}"
   }
 }

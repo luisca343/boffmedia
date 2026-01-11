@@ -58,7 +58,7 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
                     </CardTitle>
                     {tool.isNew && (
                       <Badge variant="secondary" className="bg-highlight-500/20 text-highlight-400 border-highlight-500/30 text-xs">
-                        Nuevo
+                        {t("ui.newBadge")}
                       </Badge>
                     )}
                   </div>
@@ -82,10 +82,10 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
                 ))}
               </div>
               
-              <div className="mt-4 flex items-center justify-between text-xs text-surface-400">
+                  <div className="mt-4 flex items-center justify-between text-xs text-surface-400">
                 <span className="flex items-center">
                   <TrendingUp className="w-3 h-3 mr-1" />
-                  Popularidad: {tool.popularity === 'high' ? 'Alta' : 'Media'}
+                  {t("ui.popularity", { popularity: tool.popularity })}
                 </span>
               </div>
             </CardContent>
@@ -96,7 +96,7 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
                 size="sm" 
                 className="text-primary-400 hover:text-primary-300 hover:bg-primary-500/10 p-0 ml-auto group-hover:translate-x-1 transition-all duration-300"
               >
-                {t("explore")} 
+                {t("ui.explore")} 
                 <ChevronRight className="ml-1 h-4 w-4" />
               </Button>
             </CardFooter>
