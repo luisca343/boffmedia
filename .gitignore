@@ -48,3 +48,6 @@ node_modules/
 
 /src/app/favicon.ico
 /output
+src/app/favicon-local.ico
+src/app/favicon-prod.ico
+src/app/favicon.ico
