@@ -93,7 +93,7 @@ const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
     categories: [
       {
         name: "games.mhwilds.categories.buildPlanner",
-        href: "/mhwilds/builds",
+        href: "/mhwilds/builds/planner",
         tools: [
           { name: "games.mhwilds.tools.planner", href: "/mhwilds/builds/planner", icon: "SwordIcon" },
           { 

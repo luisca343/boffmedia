@@ -186,15 +186,41 @@ export default function ToolsLandingPage() {
                   <CardContent className="relative">
                     <div className="space-y-3">
                       {game.categories.map((cat) => (
-                        <div key={cat.name} className="relative bg-surface-900/30 backdrop-blur-sm rounded-lg p-3 border border-surface-700/30">
+                        <div
+                          key={cat.name}
+                          role="link"
+                          tabIndex={0}
+                          onClick={(e) => { e.stopPropagation(); if (cat.href) router.push(cat.href); }}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault(); e.stopPropagation(); if (cat.href) router.push(cat.href);
+                            }
+                          }}
+                          className="relative bg-surface-900/30 backdrop-blur-sm rounded-lg p-3 border border-surface-700/30 cursor-pointer hover:bg-surface-800/40 hover:border-surface-600/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-900/50 transition-colors"
+                        >
                           <div className="flex items-center">
                             <div>
                               <span className="text-primary-300 font-medium">{cat.name}</span>
                               <div className="text-xs text-surface-400 mt-1 flex gap-2 flex-wrap">
                                         {cat.tools.slice(0,3).map((titem) => (
-                                          <span key={titem.name} className="px-2 py-0.5 bg-surface-800 rounded text-xs text-surface-300">{titem.name}</span>
+                                          <button
+                                            key={titem.name}
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); if (titem.href) router.push(titem.href); }}
+                                            className="px-2 py-0.5 bg-surface-800 rounded text-xs text-surface-300 hover:bg-surface-700/50 hover:text-surface-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-900/50 transition-colors"
+                                          >
+                                            {titem.name}
+                                          </button>
                                         ))}
-                                        {cat.count > 3 && <span className="px-2 py-0.5 bg-surface-800 rounded text-xs text-surface-300">{t("ui.more", { count: cat.count - 3 })}</span>}
+                                        {cat.count > 3 && (
+                                          <button
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); if (cat.href) router.push(cat.href); }}
+                                            className="px-2 py-0.5 bg-surface-800 rounded text-xs text-surface-300 hover:bg-surface-700/50 hover:text-surface-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-900/50 transition-colors"
+                                          >
+                                            {t("ui.more", { count: cat.count - 3 })}
+                                          </button>
+                                        )}
                               </div>
                             </div>
                           </div>
@@ -216,12 +242,13 @@ export default function ToolsLandingPage() {
                         {t("ui.tool", { count: game.toolCount })}
                       </span>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push(game.href)}
                       className="text-primary-400 hover:text-primary-300 hover:bg-primary-500/20 p-2 transition-all duration-300"
                     >
-                      Explorar <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                      {t("ui.explore")} <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
                     </Button>
                   </CardFooter>
                 </Card>
@@ -237,7 +264,7 @@ export default function ToolsLandingPage() {
               animate={{ opacity: 1 }}
             >
               <Gamepad2 className="h-12 w-12 text-surface-500 mx-auto mb-4" />
-              <p className="text-surface-400 text-lg">No se encontraron herramientas que coincidan con tu búsqueda.</p>
+              <p className="text-surface-400 text-lg">{t("ui.noResults")}</p>
             </motion.div>
           )}
         </div>
