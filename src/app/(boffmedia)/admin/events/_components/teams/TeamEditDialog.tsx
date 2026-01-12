@@ -6,6 +6,7 @@ import { toast } from "react-toastify"
 import { TeamForm, type TeamFormValues } from "./TeamForm"
 import type { EventTeam } from "@/types/events"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { useTranslations } from "next-intl"
 
 interface TeamEditDialogProps {
   open: boolean
@@ -16,15 +17,16 @@ interface TeamEditDialogProps {
 
 export function TeamEditDialog({ open, onOpenChange, team, onSuccess }: TeamEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleSubmit = async (data: TeamFormValues) => {
     setIsSubmitting(true)
     try {
       await EventsService.updateTeam(team.eventId, team.id!, data)
-      toast.success(`El equipo "${data.name}" ha sido actualizado con éxito.`)
+      toast.success(t('admin.teams.edit.success', { name: data.name }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar actualizar el equipo.")
+      toast.error(t('admin.teams.edit.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -34,9 +36,9 @@ export function TeamEditDialog({ open, onOpenChange, team, onSuccess }: TeamEdit
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Editar Equipo</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.teams.edit.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Actualiza la información del equipo seleccionado.
+            {t('admin.teams.edit.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -45,7 +47,7 @@ export function TeamEditDialog({ open, onOpenChange, team, onSuccess }: TeamEdit
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
-          submitLabel={isSubmitting ? "Actualizando..." : "Guardar Cambios"}
+          submitLabel={isSubmitting ? t('admin.teams.edit.updating') : t('admin.teams.edit.saveButton')}
         />
       </DialogContent>
     </Dialog>

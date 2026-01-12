@@ -1,3 +1,5 @@
+"use client"
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -6,16 +8,17 @@ import { Input } from "@/components/ui/primitives/input"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
+import { useTranslations } from "next-intl"
 
-const teamSchema = z.object({
+const createTeamSchema = (t: (key: string) => string) => z.object({
   id: z.number().optional(),
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  tag: z.string().max(5, "El tag no puede tener más de 5 caracteres").optional(),
+  name: z.string().min(3, t('admin.teams.form.validation.nameMin')),
+  tag: z.string().max(5, t('admin.teams.form.validation.tagMax')).optional(),
   icon: z.string().optional(),
   eventId: z.number(),
 })
 
-export type TeamFormValues = z.infer<typeof teamSchema>
+export type TeamFormValues = z.infer<ReturnType<typeof createTeamSchema>>
 
 interface TeamFormProps {
   defaultValues?: Partial<any>
@@ -25,11 +28,12 @@ interface TeamFormProps {
   submitLabel?: string
 }
 
-export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar" }: TeamFormProps) {
+export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel }: TeamFormProps) {
   const { events, isLoading: isLoadingEvents } = useGetEvents()
+  const t = useTranslations('boffmedia')
 
   const form = useForm<TeamFormValues>({
-    resolver: zodResolver(teamSchema),
+    resolver: zodResolver(createTeamSchema(t)),
     defaultValues: defaultValues || {
       name: "",
       tag: "",
@@ -46,15 +50,15 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Equipo</FormLabel>
+              <FormLabel>{t('admin.teams.form.labels.name')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Nombre del equipo"
+                  placeholder={t('admin.teams.form.placeholders.name')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Este será el nombre principal del equipo.</FormDescription>
+              <FormDescription>{t('admin.teams.form.descriptions.name')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -65,16 +69,16 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="tag"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tag del Equipo</FormLabel>
+              <FormLabel>{t('admin.teams.form.labels.tag')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="TAG"
+                  placeholder={t('admin.teams.form.placeholders.tag')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>Un identificador corto para el equipo (máx. 5 caracteres).</FormDescription>
+              <FormDescription>{t('admin.teams.form.descriptions.tag')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -85,7 +89,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="eventId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Evento</FormLabel>
+              <FormLabel>{t('admin.teams.form.labels.event')}</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
@@ -93,7 +97,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
               >
                 <FormControl>
                   <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                    <SelectValue placeholder={isLoadingEvents ? "Cargando eventos..." : "Selecciona un evento"} />
+                    <SelectValue placeholder={isLoadingEvents ? t('admin.teams.form.loadingEvents') : t('admin.teams.form.placeholders.selectEvent')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-surface-800 border-surface-700">
@@ -104,7 +108,7 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>Selecciona el evento al que pertenecerá este equipo.</FormDescription>
+              <FormDescription>{t('admin.teams.form.descriptions.event')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -115,16 +119,16 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icono URL (opcional)</FormLabel>
+              <FormLabel>{t('admin.teams.form.labels.icon')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://ejemplo.com/icono.jpg"
+                  placeholder={t('admin.teams.form.placeholders.icon')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>URL de la imagen que se usará como icono del equipo.</FormDescription>
+              <FormDescription>{t('admin.teams.form.descriptions.icon')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -132,13 +136,13 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel} className="border-surface-600 text-surface-300">
-            Cancelar
+            {t('admin.teams.delete.cancel')}
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingEvents}
           >
-            {submitLabel}
+            {submitLabel || t('admin.teams.form.save')}
           </Button>
         </div>
       </form>

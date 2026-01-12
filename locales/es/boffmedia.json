@@ -654,6 +654,85 @@
           },
           "save": "Guardar"
         }
+      },
+      "teams": {
+        "title": "Gestión de Equipos",
+        "description": "Administra los equipos participantes en eventos",
+        "newTeam": "Nuevo Equipo",
+        "searchPlaceholder": "Buscar equipos...",
+        "totalLabel": "Total:",
+        "table": {
+          "id": "ID",
+          "team": "Equipo",
+          "tag": "Tag",
+          "event": "Evento",
+          "score": "Puntuación",
+          "members": "Miembros",
+          "actions": "Acciones"
+        },
+        "empty": {
+          "noTeams": "No se encontraron equipos",
+          "noTeamsDesc": "No hay equipos registrados. Crea el primer equipo para comenzar.",
+          "noTeamsSearch": "No hay equipos que coincidan con \"{searchTerm}\". Prueba con otros términos de búsqueda.",
+          "clearSearch": "Limpiar búsqueda"
+        },
+        "error": {
+          "loading": "Error al cargar equipos",
+          "retry": "Reintentar"
+        },
+        "loading": "Cargando equipos...",
+        "create": {
+          "title": "Crear Nuevo Equipo",
+          "description": "Completa el formulario para añadir un nuevo equipo al sistema.",
+          "success": "El equipo \"{name}\" ha sido creado con éxito.",
+          "error": "Ocurrió un error al intentar crear el equipo.",
+          "creating": "Creando...",
+          "createButton": "Crear Equipo"
+        },
+        "edit": {
+          "title": "Editar Equipo",
+          "description": "Actualiza la información del equipo seleccionado.",
+          "success": "El equipo \"{name}\" ha sido actualizado con éxito.",
+          "error": "Ocurrió un error al intentar actualizar el equipo.",
+          "updating": "Actualizando...",
+          "saveButton": "Guardar Cambios"
+        },
+        "delete": {
+          "title": "Confirmar Eliminación",
+          "description": "¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.",
+          "success": "El equipo \"{name}\" ha sido eliminado con éxito.",
+          "error": "Ocurrió un error al intentar eliminar el equipo.",
+          "warning": "Nota: Eliminar este equipo afectará a todos sus miembros y sus registros de puntuación.",
+          "deleting": "Eliminando...",
+          "deleteButton": "Eliminar Equipo",
+          "cancel": "Cancelar"
+        },
+        "form": {
+          "labels": {
+            "name": "Nombre del Equipo",
+            "tag": "Tag del Equipo",
+            "event": "Evento",
+            "icon": "Icono URL (opcional)"
+          },
+          "placeholders": {
+            "name": "Nombre del equipo",
+            "tag": "TAG",
+            "selectEvent": "Selecciona un evento",
+            "icon": "https://ejemplo.com/icono.jpg"
+          },
+          "descriptions": {
+            "name": "Este será el nombre principal del equipo.",
+            "tag": "Un identificador corto para el equipo (máx. 5 caracteres).",
+            "event": "Selecciona el evento al que pertenecerá este equipo.",
+            "icon": "URL de la imagen que se usará como icono del equipo."
+          },
+          "validation": {
+            "nameMin": "El nombre debe tener al menos 3 caracteres",
+            "tagMax": "El tag no puede tener más de 5 caracteres"
+          },
+          "loadingEvents": "Cargando eventos...",
+          "save": "Guardar"
+        }
       }
     },
     "community": {

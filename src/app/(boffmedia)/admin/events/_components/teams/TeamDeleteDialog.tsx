@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Users, RefreshCw } from "lucide-react"
 import type { EventTeam } from "@/types/events"
+import { useTranslations } from "next-intl"
 
 interface TeamDeleteDialogProps {
   open: boolean
@@ -23,16 +24,17 @@ interface TeamDeleteDialogProps {
 
 export function TeamDeleteDialog({ open, onOpenChange, team, onSuccess }: TeamDeleteDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
       // Note: Delete endpoint needs to be implemented
       // await eventsService.deleteTeam(team.eventId, team.id)
-      toast.success(`El equipo "${team.name}" ha sido eliminado con éxito.`)
+      toast.success(t('admin.teams.delete.success', { name: team.name }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar eliminar el equipo.")
+      toast.error(t('admin.teams.delete.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -42,9 +44,9 @@ export function TeamDeleteDialog({ open, onOpenChange, team, onSuccess }: TeamDe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Confirmar Eliminación</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.teams.delete.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            ¿Estás seguro de que deseas eliminar este equipo? Esta acción no se puede deshacer.
+            {t('admin.teams.delete.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -64,7 +66,7 @@ export function TeamDeleteDialog({ open, onOpenChange, team, onSuccess }: TeamDe
           </div>
 
           <p className="text-warning-500 text-sm">
-            Nota: Eliminar este equipo afectará a todos sus miembros y sus registros de puntuación.
+            {t('admin.teams.delete.warning')}
           </p>
         </div>
 
@@ -75,7 +77,7 @@ export function TeamDeleteDialog({ open, onOpenChange, team, onSuccess }: TeamDe
             onClick={() => onOpenChange(false)}
             className="border-surface-600 text-surface-300"
           >
-            Cancelar
+            {t('admin.teams.delete.cancel')}
           </Button>
           <Button
             type="button"
@@ -87,10 +89,10 @@ export function TeamDeleteDialog({ open, onOpenChange, team, onSuccess }: TeamDe
             {isSubmitting ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Eliminando...
+                {t('admin.teams.delete.deleting')}
               </>
             ) : (
-              "Eliminar Equipo"
+              t('admin.teams.delete.deleteButton')
             )}
           </Button>
         </DialogFooter>

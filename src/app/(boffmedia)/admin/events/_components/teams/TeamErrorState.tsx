@@ -1,6 +1,9 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/primitives/card"
 import { Button } from "@/components/ui/primitives/button"
 import { RefreshCw } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface TeamErrorStateProps {
   error: string
@@ -8,6 +11,8 @@ interface TeamErrorStateProps {
 }
 
 export function TeamErrorState({ error, onRetry }: TeamErrorStateProps) {
+  const t = useTranslations('boffmedia')
+  
   return (
     <Card className="bg-surface-800 border-surface-700">
       <CardContent className="pt-6">
@@ -30,11 +35,11 @@ export function TeamErrorState({ error, onRetry }: TeamErrorStateProps) {
               <path d="M12 17h.01"></path>
             </svg>
           </div>
-          <h2 className="text-xl font-semibold mb-2 text-surface-50">Error al cargar equipos</h2>
+          <h2 className="text-xl font-semibold mb-2 text-surface-50">{t('admin.teams.error.loading')}</h2>
           <p className="text-surface-300 mb-6">{error}</p>
           <Button onClick={onRetry}>
             <RefreshCw className="mr-2 h-4 w-4" />
-            Reintentar
+            {t('admin.teams.error.retry')}
           </Button>
         </div>
       </CardContent>

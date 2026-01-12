@@ -654,6 +654,85 @@
           },
           "save": "Save"
         }
+      },
+      "teams": {
+        "title": "Teams Management",
+        "description": "Manage participating teams in events",
+        "newTeam": "New Team",
+        "searchPlaceholder": "Search teams...",
+        "totalLabel": "Total:",
+        "table": {
+          "id": "ID",
+          "team": "Team",
+          "tag": "Tag",
+          "event": "Event",
+          "score": "Score",
+          "members": "Members",
+          "actions": "Actions"
+        },
+        "empty": {
+          "noTeams": "No teams found",
+          "noTeamsDesc": "There are no teams registered. Create the first team to get started.",
+          "noTeamsSearch": "There are no teams that match \"{searchTerm}\". Try other search terms.",
+          "clearSearch": "Clear search"
+        },
+        "error": {
+          "loading": "Error loading teams",
+          "retry": "Retry"
+        },
+        "loading": "Loading teams...",
+        "create": {
+          "title": "Create New Team",
+          "description": "Complete the form to add a new team to the system.",
+          "success": "Team \"{name}\" has been created successfully.",
+          "error": "An error occurred while trying to create the team.",
+          "creating": "Creating...",
+          "createButton": "Create Team"
+        },
+        "edit": {
+          "title": "Edit Team",
+          "description": "Update the selected team information.",
+          "success": "Team \"{name}\" has been updated successfully.",
+          "error": "An error occurred while trying to update the team.",
+          "updating": "Updating...",
+          "saveButton": "Save Changes"
+        },
+        "delete": {
+          "title": "Confirm Deletion",
+          "description": "Are you sure you want to delete this team? This action cannot be undone.",
+          "success": "Team \"{name}\" has been deleted successfully.",
+          "error": "An error occurred while trying to delete the team.",
+          "warning": "Note: Deleting this team will affect all its members and their score records.",
+          "deleting": "Deleting...",
+          "deleteButton": "Delete Team",
+          "cancel": "Cancel"
+        },
+        "form": {
+          "labels": {
+            "name": "Team Name",
+            "tag": "Team Tag",
+            "event": "Event",
+            "icon": "Icon URL (optional)"
+          },
+          "placeholders": {
+            "name": "Team name",
+            "tag": "TAG",
+            "selectEvent": "Select an event",
+            "icon": "https://example.com/icon.jpg"
+          },
+          "descriptions": {
+            "name": "This will be the main name of the team.",
+            "tag": "A short identifier for the team (max. 5 characters).",
+            "event": "Select the event this team will belong to.",
+            "icon": "URL of the image to be used as team icon."
+          },
+          "validation": {
+            "nameMin": "Name must be at least 3 characters",
+            "tagMax": "Tag cannot be more than 5 characters"
+          },
+          "loadingEvents": "Loading events...",
+          "save": "Save"
+        }
       }
     },
     "community": {
