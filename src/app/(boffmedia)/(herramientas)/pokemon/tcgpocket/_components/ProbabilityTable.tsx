@@ -1,3 +1,5 @@
+"use client"
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
 import { AllPackProbabilities } from '../types'
 import PercentageToDecimal from "./PercentageToDecimal"

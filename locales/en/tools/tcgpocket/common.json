@@ -50,6 +50,14 @@
       "pageTitle": "All Cards",
       "noResults": "No cards found matching your search criteria."
     },
+    "sets": {
+      "title": "TCG Pocket Sets"
+    },
+    "cardsListExtra": {
+      "errorFailed": "Failed to load cards",
+      "showing": "Showing {shown} of {total} cards",
+      "loadMore": "Load More Cards ({remaining} remaining)"
+    },
     "battles": {
       "title": "Individual Battles",
       "description": "Check teams and rewards"
@@ -80,6 +88,11 @@
       "retreatCost": "Retreat Cost"
     },
     "gallery": {
+      "loadingTitle": "Loading...",
+      "loadingDescription": "We're loading your card gallery. Please wait.",
+      "userNotFoundTitle": "User not found",
+      "userNotFoundDesc": "Sorry, we couldn't find your data.",
+      "backToHome": "Back to Home",
       "notFound": {
         "title": "Gallery not found",
         "description": "This gallery doesn't exist or doesn't have any cards yet."
@@ -108,6 +121,12 @@
         "noUpdates": "No recent updates",
         "loadMore": "Load More"
       }
+    },
+    "errors": {
+      "noBattleData": "Battle data not available with new API structure"
+    },
+    "percentage": {
+      "fullValue": "Full value: {value}%"
     },
     "filter": {
       "searchPlaceholder": "Search cards by name or number",

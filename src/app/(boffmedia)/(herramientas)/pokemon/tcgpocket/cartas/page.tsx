@@ -35,7 +35,7 @@ export default function CartasPage() {
         const response = await PtcgpService.getAllCardsForSeriesGrouped("tcgp", locale);
         setSets(response.data || []);
       } catch (err) {
-        setError("Failed to load cards");
+        setError(t("cardsListExtra.errorFailed"));
         console.error("Error fetching cards:", err);
       } finally {
         setLoading(false);
@@ -147,7 +147,7 @@ export default function CartasPage() {
         
         {/* Show cards count */}
         <div className="mt-4 text-surface-400">
-          Showing {Math.min(visibleCardsCount, totalCards)} of {totalCards} cards
+          {t('cardsListExtra.showing', { shown: Math.min(visibleCardsCount, totalCards), total: totalCards })}
         </div>
       </div>
 
@@ -170,10 +170,8 @@ export default function CartasPage() {
       {/* Load more button */}
       {hasMoreCards && (
         <div className="text-center mt-8">
-          <Button
-            onClick={loadMoreCards}
-          >
-            Load More Cards ({totalCards - visibleCardsCount} remaining)
+          <Button onClick={loadMoreCards}>
+            {t('cardsListExtra.loadMore', { remaining: totalCards - visibleCardsCount })}
           </Button>
         </div>
       )}

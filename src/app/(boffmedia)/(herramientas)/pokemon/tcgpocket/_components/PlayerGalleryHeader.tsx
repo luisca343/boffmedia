@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { Switch } from "@/components/ui/primitives/switch"
 import { Label } from "@/components/ui/primitives/label"

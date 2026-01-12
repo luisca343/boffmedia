@@ -1,4 +1,7 @@
+"use client"
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
+import { useTranslations } from "next-intl"
 
 interface PercentageToDecimalProps {
     value: number
@@ -6,6 +9,8 @@ interface PercentageToDecimalProps {
 }
 
 export default function PercentageToDecimal({ value, fixed = 2 }: PercentageToDecimalProps) {
+    const t = useTranslations('tcgpocket')
+
     const formatNumber = (n: number, f: number) => {
         n = Math.min(Math.max(n, 0), 100)
         const factor = Math.pow(10, f)
@@ -26,7 +31,7 @@ export default function PercentageToDecimal({ value, fixed = 2 }: PercentageToDe
                     </span>
                 </TooltipTrigger>
                 <TooltipContent className="bg-surface-700/95 border-surface-600/50 backdrop-blur-sm">
-                    <p className="text-surface-50">Valor completo: {originalNumber}%</p>
+                    <p className="text-surface-50">{t('percentage.fullValue', { value: originalNumber })}</p>
                 </TooltipContent>
             </Tooltip>
         </TooltipProvider>

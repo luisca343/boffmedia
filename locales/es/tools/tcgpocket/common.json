@@ -50,6 +50,14 @@
       "pageTitle": "Todas las Cartas",
       "noResults": "No se encontraron cartas que coincidan con la búsqueda."
     },
+    "sets": {
+      "title": "TCG Pocket Sets"
+    },
+    "cardsListExtra": {
+      "errorFailed": "Error al cargar las cartas",
+      "showing": "Mostrando {shown} de {total} cartas",
+      "loadMore": "Cargar más cartas ({remaining} restantes)"
+    },
     "battles": {
       "title": "Combates individuales",
       "description": "Comprueba los equipos y recompensas"
@@ -80,6 +88,11 @@
       "retreatCost": "Coste de Retirada"
     },
     "gallery": {
+      "loadingTitle": "Cargando...",
+      "loadingDescription": "Estamos cargando tu galería de cartas. Por favor, espera un momento.",
+      "userNotFoundTitle": "Usuario no encontrado",
+      "userNotFoundDesc": "Lo sentimos, no pudimos encontrar tus datos.",
+      "backToHome": "Volver al Inicio",
       "notFound": {
         "title": "Galería no encontrada",
         "description": "Esta galería no existe o todavía no tiene cartas."
@@ -108,6 +121,12 @@
         "noUpdates": "No hay actualizaciones recientes",
         "loadMore": "Cargar Más"
       }
+    },
+    "errors": {
+      "noBattleData": "Los datos del combate no están disponibles con la nueva estructura de la API"
+    },
+    "percentage": {
+      "fullValue": "Valor completo: {value}%"
     },
     "filter": {
       "searchPlaceholder": "Buscar cartas por nombre o número",

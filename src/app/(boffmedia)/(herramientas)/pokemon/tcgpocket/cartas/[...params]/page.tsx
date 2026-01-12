@@ -36,7 +36,6 @@ export default function Expansions({
   useEffect(() => {
     PtcgpService.getCardById(id, locale).then(
       (response) => {
-        console.log("Card data:", response.data);
         setCardData(response.data as TcgCard);
       }
     );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { HiExclamationTriangle, HiUserCircle } from 'react-icons/hi2';
 import { Button } from "@/components/ui/primitives/button";
 import { useBoffSession } from "@/services/useBoffSession";
@@ -11,6 +12,7 @@ import { Loader2 } from "lucide-react";
 export default function UserGallery() {
   const { session, status } = useBoffSession();
   const router = useRouter();
+  const t = useTranslations('tcgpocket');
 
   if (status === "loading") {
     return (
@@ -19,10 +21,8 @@ export default function UserGallery() {
           <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
         </div>
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-semibold text-surface-50 mb-2">Cargando...</h1>
-          <p className="text-surface-400">
-            Estamos cargando tu galería de cartas. Por favor, espera un momento.
-          </p>
+          <h1 className="text-2xl font-semibold text-surface-50 mb-2">{t('gallery.loadingTitle')}</h1>
+          <p className="text-surface-400">{t('gallery.loadingDescription')}</p>
         </div>
       </div>
     );
@@ -35,18 +35,14 @@ export default function UserGallery() {
           <HiExclamationTriangle className="w-8 h-8 text-red-400" />
         </div>
         <div className="text-center max-w-md">
-          <h1 className="text-2xl font-semibold text-surface-50 mb-2">
-            Usuario no encontrado
-          </h1>
-          <p className="text-surface-400 mb-6">
-            Lo sentimos, no pudimos encontrar tus datos.
-          </p>
+          <h1 className="text-2xl font-semibold text-surface-50 mb-2">{t('gallery.userNotFoundTitle')}</h1>
+          <p className="text-surface-400 mb-6">{t('gallery.userNotFoundDesc')}</p>
           <Button
             onClick={() => router.push("/")}
             variant="outline"
           >
             <HiUserCircle className="w-4 h-4 mr-2" />
-            Volver al Inicio
+            {t('gallery.backToHome')}
           </Button>
         </div>
       </div>

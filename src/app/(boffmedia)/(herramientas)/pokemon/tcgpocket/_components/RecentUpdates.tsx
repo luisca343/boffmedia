@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/primitives/button"
 import { Loader2, ChevronDown, AlertCircle } from 'lucide-react'
 import { RecentUpdate } from '../types'
