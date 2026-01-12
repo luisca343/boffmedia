@@ -55,9 +55,9 @@ const useFetchSteamData = () => {
   const [selectedGame, setSelectedGame] = useState<SteamGame | null>(null);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const fetchGameData = async (steamID: string) => {
+  const fetchGameData = async (steamID: string, language: string) => {
     try {
-      const response = (await apiGET(`/steamdata/${steamID}`)) as any as SteamGame;
+      const response = (await apiGET(`/steamdata/${steamID}/${language}`)) as any as SteamGame;
       const gameData = response as SteamGame;
 
       setSelectedGame(gameData);

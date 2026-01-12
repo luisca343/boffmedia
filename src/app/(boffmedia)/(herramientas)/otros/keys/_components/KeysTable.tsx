@@ -3,6 +3,7 @@
 import { useState, Suspense, lazy } from "react";
 import useGetKeys from "../_hooks/useGetKeys";
 import useFetchSteamData from "../_hooks/useFetchSteamData";
+import { useLocale } from 'next-intl';
 import { KeysHeader } from "./KeysHeader";
 import { KeysControls } from "./KeysControls";
 import { KeysDataTable } from "./KeysDataTable";
@@ -17,6 +18,9 @@ export default function KeysTable() {
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [showClaimed, setShowClaimed] = useState<boolean>(false);
   const { selectedGame, isModalVisible, setIsModalVisible, fetchGameData } = useFetchSteamData();
+  const locale = useLocale();
+
+  const fetchGameDataWithLocale = (steamID: string) => fetchGameData(steamID, locale);
 
   if (!filteredKeys) return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -63,7 +67,7 @@ export default function KeysTable() {
             keys={aggregatedKeysArray}
             hoveredRow={hoveredRow}
             setHoveredRow={setHoveredRow}
-            fetchGameData={fetchGameData}
+            fetchGameData={fetchGameDataWithLocale}
           />
         </div>
 
