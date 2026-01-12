@@ -1,0 +1,132 @@
+{
+  "boffmedia": {
+    "hero": {
+      "title": {
+        "first": "Your gaming adventure",
+        "second": "starts here"
+      },
+      "description": "Discover new games, compete in tournaments, and connect with other players in a community built for gamers.",
+      "buttons": {
+        "exploreGames": "Explore Games",
+        "joinCommunity": "Join Community"
+      },
+      "image": {
+        "alt": "Gaming illustration"
+      },
+      "new": "New!"
+    },
+    "ui": {
+      "disabled": "Disabled",
+      "selectElement": "Select an item",
+      "searchElement": "Search item",
+      "noElementFound": "No items found",
+      "copyInstruction": "Click the copy button above to copy to clipboard"
+    },
+    "featuredGames": {
+      "title": "Featured Games & Tools",
+      "subtitle": "Discover BoffMedia's most popular tools and games",
+      "viewMore": "View more",
+      "status": {
+        "popular": "Popular",
+        "new": "New",
+        "comingSoon": "Coming soon"
+      },
+      "games": {
+        "wingull": {
+          "title": "Pixelmon Wingull 2",
+          "description": "The latest Pokémon adventure in Minecraft. Explore, catch and battle."
+        },
+        "smartrotom": {
+          "title": "SmartRotom",
+          "description": "Access your in-game smartphone from anywhere. Stay connected to the Pixelmon world."
+        },
+        "tools": {
+          "title": "Game Tools",
+          "description": "Enhance your gameplay with our collection of useful tools.",
+          "features": {
+            "f1": "Specialized game calculators",
+            "f2": "Automatic content generators",
+            "f3": "Advanced analysis tools",
+            "f4": "Admin utilities"
+          }
+        },
+        "zomboff": {
+          "title": "Project ZomBOFF",
+          "description": "Survive the zombie apocalypse with friends on our custom servers."
+        },
+        "bingo": {
+          "title": "Minecraft Bingo",
+          "description": "Test your knowledge and speed in Minecraft during competitive events."
+        }
+      },
+      "toolCategories": {
+        "calculators": "Calculators",
+        "generators": "Generators",
+        "analysis": "Analysis",
+        "utilities": "Utilities",
+        "filters": "Filters",
+        "automation": "Automation"
+      },
+      "gamesFeatures": {
+        "wingull": {
+          "f1": "New generation",
+          "f2": "Exclusive Pokémon",
+          "f3": "Improved mechanics",
+          "f4": "Revamped world"
+        },
+        "smartrotom": {
+          "f1": "Available in Minecraft and on the web",
+          "f2": "Useful apps for your adventure",
+          "f3": "Intuitive and easy-to-use interface",
+          "f4": "Regular updates"
+        }
+      }
+    },
+    "community": {
+      "title": {
+        "first": "Join a",
+        "second": "growing community"
+      },
+      "description": "Be part of an active community of players, join special events and share your experiences.",
+      "buttons": {
+        "joinNow": "Join Now",
+        "discord": "Join Discord"
+      },
+      "highlights": {
+        "connect": "Connect with developers and passionate players",
+        "collaborate": "Take part in unique collaborative projects",
+        "resources": "Access exclusive resources and special events"
+      }
+    },
+    "footer": {
+      "tagline": "Your ultimate gaming platform",
+      "sections": {
+        "platform": {
+          "title": "Platform",
+          "links": {
+            "games": "Games",
+            "events": "Events",
+            "community": "Community"
+          }
+        },
+        "company": {
+          "title": "Company",
+          "links": {
+            "about": "About Us",
+            "blog": "Blog"
+          }
+        }
+      },
+      "newsletter": {
+        "title": "Subscribe to the Newsletter",
+        "emailPlaceholder": "Email",
+        "joinButton": "Join"
+      },
+      "copyright": "© {year} BoffMedia. All rights reserved.",
+      "legal": {
+        "privacy": "Privacy",
+        "terms": "Terms"
+      }
+    }
+  }
+}

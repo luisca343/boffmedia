@@ -1,0 +1,132 @@
+{
+  "boffmedia": {
+    "hero": {
+      "title": {
+        "first": "Tu aventura gaming",
+        "second": "comienza aquí"
+      },
+      "description": "Descubre nuevos juegos, compite en torneos y conecta con otros jugadores en una comunidad hecha para gamers.",
+      "buttons": {
+        "exploreGames": "Explorar Juegos",
+        "joinCommunity": "Unirse a la Comunidad"
+      },
+      "image": {
+        "alt": "Ilustración de Gaming"
+      },
+      "new": "¡Nuevo!"
+    },
+    "ui": {
+      "disabled": "Desactivado",
+      "selectElement": "Selecciona un elemento",
+      "searchElement": "Buscar elemento",
+      "noElementFound": "No se encontró ningún elemento",
+      "copyInstruction": "Haz clic en el botón de copiar arriba para copiarlo al portapapeles"
+    },
+    "featuredGames": {
+      "title": "Juegos y Herramientas Destacados",
+      "subtitle": "Descubre las herramientas y juegos más populares de BoffMedia",
+      "viewMore": "Ver más",
+      "status": {
+        "popular": "Popular",
+        "new": "Nuevo",
+        "comingSoon": "Próximamente"
+      },
+      "games": {
+        "wingull": {
+          "title": "Pixelmon Wingull 2",
+          "description": "La última aventura Pokémon en Minecraft. Explora, captura y combate."
+        },
+        "smartrotom": {
+          "title": "SmartRotom",
+          "description": "Accede a tu smartphone del juego desde cualquier lugar. Mantente conectado al mundo Pixelmon."
+        },
+        "tools": {
+          "title": "Herramientas de Juego",
+          "description": "Mejora tu experiencia de juego con nuestra colección de herramientas útiles.",
+          "features": {
+            "f1": "Calculadoras especializadas para juegos",
+            "f2": "Generadores automáticos de contenido",
+            "f3": "Herramientas de análisis avanzadas",
+            "f4": "Utilidades para administradores"
+          }
+        },
+        "zomboff": {
+          "title": "Project ZomBOFF",
+          "description": "Sobrevive al apocalipsis zombi con amigos en nuestros servidores personalizados."
+        },
+        "bingo": {
+          "title": "Minecraft Bingo",
+          "description": "Pon a prueba tu conocimiento y velocidad en Minecraft en eventos competitivos."
+        }
+      },
+      "toolCategories": {
+        "calculators": "Calculadoras",
+        "generators": "Generadores",
+        "analysis": "Análisis",
+        "utilities": "Utilidades",
+        "filters": "Filtros",
+        "automation": "Automatización"
+      },
+      "gamesFeatures": {
+        "wingull": {
+          "f1": "Nueva generación",
+          "f2": "Pokémon exclusivos",
+          "f3": "Mecánicas mejoradas",
+          "f4": "Mundo renovado"
+        },
+        "smartrotom": {
+          "f1": "Disponible en Minecraft y en la web",
+          "f2": "Aplicaciones útiles para tu aventura",
+          "f3": "Interfaz intuitiva y fácil de usar",
+          "f4": "Actualizaciones constantes"
+        }
+      }
+    },
+    "community": {
+      "title": {
+        "first": "Únete a una",
+        "second": "comunidad creciente"
+      },
+      "description": "Forma parte de una comunidad activa de jugadores, participa en eventos especiales y comparte tus experiencias.",
+      "buttons": {
+        "joinNow": "Unirse Ahora",
+        "discord": "Unirse a Discord"
+      },
+      "highlights": {
+        "connect": "Conecta con desarrolladores y jugadores apasionados",
+        "collaborate": "Participa en proyectos colaborativos únicos",
+        "resources": "Accede a recursos exclusivos y eventos especiales"
+      }
+    },
+    "footer": {
+      "tagline": "Tu plataforma de gaming definitiva",
+      "sections": {
+        "platform": {
+          "title": "Plataforma",
+          "links": {
+            "games": "Juegos",
+            "events": "Eventos",
+            "community": "Comunidad"
+          }
+        },
+        "company": {
+          "title": "Compañía",
+          "links": {
+            "about": "Sobre Nosotros",
+            "blog": "Blog"
+          }
+        }
+      },
+      "newsletter": {
+        "title": "Suscríbete al Newsletter",
+        "emailPlaceholder": "Email",
+        "joinButton": "Unirse"
+      },
+      "copyright": "© {year} BoffMedia. Todos los derechos reservados.",
+      "legal": {
+        "privacy": "Privacidad",
+        "terms": "Términos"
+      }
+    }
+  }
+}

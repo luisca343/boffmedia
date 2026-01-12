@@ -1,0 +1,72 @@
+{
+  "boffmedia": {
+    "giveaway": {
+      "title": "Sorteo BoffMedia",
+      "subtitle": "Crea sorteos justos y transparentes para tu comunidad",
+      "controls": {
+        "title": "Configurar Sorteo",
+        "subtitle": "Añade participantes individualmente o sube una lista completa",
+        "tabs": {
+          "single": "Individual",
+          "list": "Lista Masiva"
+        },
+        "placeholders": {
+          "participantName": "Escribe el nombre del participante...",
+          "participantList": "Añade un nombre por línea:\n\nParticipante 1\nParticipante 2\nParticipante 3\n..."
+        },
+        "buttons": {
+          "add": "Añadir",
+          "uploadList": "Cargar Lista ({count} nombres)",
+          "startGiveaway": "Iniciar Sorteo",
+          "addParticipants": "Añade participantes para continuar"
+        },
+        "warning": {
+          "title": "Faltan participantes",
+          "description": "Añade al menos un participante para poder iniciar el sorteo"
+        },
+        "status": {
+          "noParticipants": "Sin participantes",
+          "participantsReady": "{count, plural, one {# participante listo} other {# participantes listos}}",
+          "selectionInfo": "El sorteo seleccionará aleatoriamente a uno de los participantes"
+        }
+      },
+      "participants": {
+        "title": "Participantes",
+        "winnersTitle": "Ganadores Previos",
+        "tooltips": {
+          "viewParticipants": "Ver participantes actuales",
+          "viewWinners": "Ver ganadores previos",
+          "remove": "Eliminar a {name}"
+        },
+        "search": {
+          "participants": "Buscar participantes...",
+          "winners": "Buscar ganadores..."
+        },
+        "stats": {
+          "of": "de",
+          "filtered": "Filtrado: \"{term}\"",
+          "winners": "{count, plural, one {# ganador} other {# ganadores}}",
+          "winnerNumber": "Ganador #{number}"
+        },
+        "empty": {
+          "noParticipants": "Sin participantes",
+          "addParticipants": "Añade participantes para comenzar el sorteo",
+          "noResults": "No se encontraron participantes",
+          "noMatch": "que coincidan con \"{term}\"",
+          "noWinners": "Sin ganadores aún",
+          "winnersInfo": "Los ganadores aparecerán aquí después de cada sorteo"
+        }
+      },
+      "spinner": {
+        "title": "Ruleta del Sorteo",
+        "spinning": "¡Sorteando!",
+        "selecting": "Seleccionando ganador..."
+      },
+      "winner": {
+        "title": "¡Tenemos un ganador!",
+        "congratulations": "¡Felicidades al ganador del sorteo!",
+        "continue": "Continuar Sorteo"
+      }
+    }
+  }
+}

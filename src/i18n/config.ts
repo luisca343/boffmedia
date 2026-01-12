@@ -14,7 +14,7 @@ export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 export const GLOBAL_NAMESPACES = [
   'common.json',
   'nav.json',
-  'boffmedia.json',
+  'boffmedia/common.json',
 ] as const;
 
 /**
@@ -22,6 +22,19 @@ export const GLOBAL_NAMESPACES = [
  * Maps route patterns to their required translation namespaces
  */
 export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
+  // Admin routes
+  '/admin': ['boffmedia/admin.json'],
+  '/admin/events': ['boffmedia/admin.json'],
+  
+  // Events routes
+  '/eventos': ['boffmedia/events.json'],
+  
+  // Keys routes
+  '/herramientas/otros/keys': ['boffmedia/keys.json'],
+  
+  // Giveaway routes
+  '/sorteo': ['boffmedia/giveaway.json'],
+
   // SmartRotom Pokedex
   '/smartrotom/pokedex/entrada': [
     'smartrotom/pokedex/common.json',
@@ -60,9 +73,6 @@ export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
     'tools/pokemon.json',
     'tools/tcgpocket/common.json',
   ],
-  '/herramientas/otros/keys': [
-    'tools/keys.json',
-  ],
   '/herramientas/mhwilds': [
     'tools/mhwilds.json',
   ],
@@ -86,6 +96,11 @@ export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
     'smartrotom/pokedex/forms.json',
     'smartrotom/pokedex/moves.json',
     'smartrotom/pokedex/spawns.json',
+    'boffmedia/common.json',
+    'boffmedia/events.json',
+    'boffmedia/keys.json',
+    'boffmedia/giveaway.json',
+    'boffmedia/admin.json',
   ],
 } as const;
 

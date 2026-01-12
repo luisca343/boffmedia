@@ -1,0 +1,75 @@
+{
+  "boffmedia": {
+    "keys": {
+      "header": {
+        "title": "Claves de {platform}",
+        "subtitle": "Biblioteca de claves de juegos para la comunidad"
+      },
+      "controls": {
+        "searchPlaceholder": "Buscar por nombre de juego o bundle...",
+        "showClaimed": {
+          "show": "Mostrar reclamadas",
+          "hide": "Ocultar reclamadas"
+        },
+        "badges": {
+          "allGames": "Todos los juegos ({count})",
+          "available": "Disponibles ({count})",
+          "claimed": "Reclamados ({count})"
+        },
+        "sortButton": "Ordenar"
+      },
+      "table": {
+        "head": {
+          "number": "#",
+          "image": "Imagen",
+          "game": "Juego",
+          "state": "Estado"
+        },
+        "noResults": "No se encontraron claves que coincidan con tu búsqueda"
+      },
+      "loading": {
+        "loadingKeys": "Cargando claves..."
+      },
+      "suspense": {
+        "loading": "Cargando..."
+      },
+      "row": {
+        "clickHint": "Haz clic para ver detalles",
+        "claimed": "Reclamada",
+        "available": "Disponible",
+        "imageAlt": "Imagen de {name}"
+      }
+    },
+    "steamDialog": {
+      "tabs": {
+        "info": "Información",
+        "pricing": "Precios",
+        "media": "Media"
+      },
+      "info": {
+        "descriptionTitle": "Descripción",
+        "developer": "Desarrollador",
+        "publisher": "Editor",
+        "releaseDate": "Fecha de lanzamiento",
+        "platforms": "Plataformas",
+        "genres": "Géneros",
+        "visitWebsite": "Visitar sitio web"
+      },
+      "pricing": {
+        "currentPriceTitle": "Precio actual",
+        "priceInfoTitle": "Información de precio",
+        "regularPriceLabel": "Precio regular:",
+        "salePriceLabel": "Precio en oferta:",
+        "discountLabel": "Descuento:",
+        "discountBadge": "-{percent}% de descuento",
+        "viewOnSteam": "Ver en Steam",
+        "free": "Gratis"
+      },
+      "close": "Cerrar",
+      "media": {
+        "loading": "Cargando...",
+        "thumbnailAlt": "Miniatura {index}"
+      }
+    }
+  }
+}
