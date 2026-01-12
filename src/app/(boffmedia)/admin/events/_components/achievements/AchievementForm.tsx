@@ -1,3 +1,5 @@
+"use client"
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -8,15 +10,16 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { CreateAchievementDto } from "@/generated/api"
+import { useTranslations } from "next-intl"
 
-const achievementSchema = z.object({
+const createAchievementSchema = (t: (key: string) => string) => z.object({
   id: z.number().optional(),
-  name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
-  icon: z.string().min(1, "El icono es requerido"),
+  name: z.string().min(3, t('admin.achievements.form.validation.nameMin')),
+  description: z.string().min(10, t('admin.achievements.form.validation.descriptionMin')),
+  icon: z.string().min(1, t('admin.achievements.form.validation.iconRequired')),
   eventId: z.number(),
-  points: z.number().min(0, "Los puntos no pueden ser negativos"),
-  maxProgress: z.number().min(1, "El progreso máximo debe ser al menos 1"),
+  points: z.number().min(0, t('admin.achievements.form.validation.pointsMin')),
+  maxProgress: z.number().min(1, t('admin.achievements.form.validation.maxProgressMin')),
   itemType: z.nativeEnum(CreateAchievementDto.itemType).optional(),
   category: z.nativeEnum(CreateAchievementDto.category).optional(),
   rarity: z.nativeEnum(CreateAchievementDto.rarity).optional(),
@@ -24,7 +27,7 @@ const achievementSchema = z.object({
   active: z.number().optional(),
 })
 
-export type AchievementFormValues = z.infer<typeof achievementSchema>
+export type AchievementFormValues = z.infer<ReturnType<typeof createAchievementSchema>>
 
 interface AchievementFormProps {
   defaultValues?: Partial<AchievementFormValues>
@@ -39,12 +42,13 @@ export function AchievementForm({
   isSubmitting,
   onSubmit,
   onCancel,
-  submitLabel = "Guardar",
+  submitLabel,
 }: AchievementFormProps) {
   const { events, isLoading: isLoadingEvents } = useGetEvents()
+  const t = useTranslations('boffmedia')
 
   const form = useForm<AchievementFormValues>({
-    resolver: zodResolver(achievementSchema),
+    resolver: zodResolver(createAchievementSchema(t)),
     defaultValues: defaultValues || {
       name: "",
       description: "",
@@ -68,15 +72,15 @@ export function AchievementForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Logro</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.name')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Nombre del logro"
+                  placeholder={t('admin.achievements.form.placeholders.name')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Este será el nombre que verán los usuarios.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.name')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -87,15 +91,15 @@ export function AchievementForm({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe el logro"
+                  placeholder={t('admin.achievements.form.placeholders.description')}
                   className="bg-surface-700 border-surface-600 text-surface-50 min-h-[100px]"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Una descripción clara de lo que representa este logro.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.description')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -106,7 +110,7 @@ export function AchievementForm({
           name="eventId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Evento</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.event')}</FormLabel>
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 defaultValue={field.value?.toString()}
@@ -114,7 +118,7 @@ export function AchievementForm({
               >
                 <FormControl>
                   <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                    <SelectValue placeholder={isLoadingEvents ? "Cargando eventos..." : "Selecciona un evento"} />
+                    <SelectValue placeholder={isLoadingEvents ? t('admin.achievements.form.loadingEvents') : t('admin.achievements.form.placeholders.selectEvent')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-surface-800 border-surface-700">
@@ -125,7 +129,7 @@ export function AchievementForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>Selecciona el evento al que pertenecerá este logro.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.event')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -136,17 +140,17 @@ export function AchievementForm({
           name="points"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Puntos</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.points')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
-                  placeholder="100"
+                  placeholder={t('admin.achievements.form.placeholders.points')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
-              <FormDescription>Cantidad de puntos que otorga este logro.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.points')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -157,16 +161,16 @@ export function AchievementForm({
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icono</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.icon')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="/icons/achievement.png"
+                  placeholder={t('admin.achievements.form.placeholders.icon')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>Ruta del icono del logro (ej: /icons/achievement.png).</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.icon')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -177,17 +181,17 @@ export function AchievementForm({
           name="maxProgress"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Progreso Máximo</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.maxProgress')}</FormLabel>
               <FormControl>
                 <Input
                   type="number"
-                  placeholder="1"
+                  placeholder={t('admin.achievements.form.placeholders.maxProgress')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                 />
               </FormControl>
-              <FormDescription>Cantidad máxima de progreso necesaria para completar el logro.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.maxProgress')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -198,19 +202,19 @@ export function AchievementForm({
           name="itemType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de Item</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.itemType')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                    <SelectValue placeholder="Selecciona el tipo" />
+                    <SelectValue placeholder={t('admin.achievements.form.placeholders.selectType')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-surface-800 border-surface-700">
-                  <SelectItem value={CreateAchievementDto.itemType.ACHIEVEMENT}>Logro</SelectItem>
-                  <SelectItem value={CreateAchievementDto.itemType.MEDAL}>Medalla</SelectItem>
+                  <SelectItem value={CreateAchievementDto.itemType.ACHIEVEMENT}>{t('admin.achievements.form.options.itemType.achievement')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.itemType.MEDAL}>{t('admin.achievements.form.options.itemType.medal')}</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>Tipo de recompensa que representa este item.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.itemType')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -221,20 +225,20 @@ export function AchievementForm({
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Categoría</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.category')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                    <SelectValue placeholder="Selecciona la categoría" />
+                    <SelectValue placeholder={t('admin.achievements.form.placeholders.selectCategory')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-surface-800 border-surface-700">
-                  <SelectItem value={CreateAchievementDto.category.CHALLENGE}>Desafío</SelectItem>
-                  <SelectItem value={CreateAchievementDto.category.COMPETITION}>Competición</SelectItem>
-                  <SelectItem value={CreateAchievementDto.category.PARTICIPATION}>Participación</SelectItem>
+                  <SelectItem value={CreateAchievementDto.category.CHALLENGE}>{t('admin.achievements.form.options.category.challenge')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.category.COMPETITION}>{t('admin.achievements.form.options.category.competition')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.category.PARTICIPATION}>{t('admin.achievements.form.options.category.participation')}</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>Categoría del logro para organización.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.category')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -245,22 +249,22 @@ export function AchievementForm({
           name="rarity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Rareza</FormLabel>
+              <FormLabel>{t('admin.achievements.form.labels.rarity')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                    <SelectValue placeholder="Selecciona la rareza" />
+                    <SelectValue placeholder={t('admin.achievements.form.placeholders.selectRarity')} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent className="bg-surface-800 border-surface-700">
-                  <SelectItem value={CreateAchievementDto.rarity.BRONZE}>Bronce</SelectItem>
-                  <SelectItem value={CreateAchievementDto.rarity.SILVER}>Plata</SelectItem>
-                  <SelectItem value={CreateAchievementDto.rarity.GOLD}>Oro</SelectItem>
-                  <SelectItem value={CreateAchievementDto.rarity.PLATINUM}>Platino</SelectItem>
-                  <SelectItem value={CreateAchievementDto.rarity.DIAMOND}>Diamante</SelectItem>
+                  <SelectItem value={CreateAchievementDto.rarity.BRONZE}>{t('admin.achievements.form.options.rarity.bronze')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.rarity.SILVER}>{t('admin.achievements.form.options.rarity.silver')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.rarity.GOLD}>{t('admin.achievements.form.options.rarity.gold')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.rarity.PLATINUM}>{t('admin.achievements.form.options.rarity.platinum')}</SelectItem>
+                  <SelectItem value={CreateAchievementDto.rarity.DIAMOND}>{t('admin.achievements.form.options.rarity.diamond')}</SelectItem>
                 </SelectContent>
               </Select>
-              <FormDescription>Nivel de rareza y dificultad del logro.</FormDescription>
+              <FormDescription>{t('admin.achievements.form.descriptions.rarity')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -272,17 +276,17 @@ export function AchievementForm({
             name="order"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Orden</FormLabel>
+                <FormLabel>{t('admin.achievements.form.labels.order')}</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
-                    placeholder="0"
+                    placeholder={t('admin.achievements.form.placeholders.order')}
                     className="bg-surface-700 border-surface-600 text-surface-50"
                     {...field}
                     onChange={(e) => field.onChange(Number(e.target.value))}
                   />
                 </FormControl>
-                <FormDescription>Orden de visualización.</FormDescription>
+                <FormDescription>{t('admin.achievements.form.descriptions.order')}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -293,19 +297,19 @@ export function AchievementForm({
             name="active"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Estado</FormLabel>
+                <FormLabel>{t('admin.achievements.form.labels.status')}</FormLabel>
                 <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={field.value?.toString()}>
                   <FormControl>
                     <SelectTrigger className="bg-surface-700 border-surface-600 text-surface-50">
-                      <SelectValue placeholder="Estado" />
+                      <SelectValue placeholder={t('admin.achievements.form.placeholders.status')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="bg-surface-800 border-surface-700">
-                    <SelectItem value="1">Activo</SelectItem>
-                    <SelectItem value="0">Inactivo</SelectItem>
+                    <SelectItem value="1">{t('admin.achievements.form.options.status.active')}</SelectItem>
+                    <SelectItem value="0">{t('admin.achievements.form.options.status.inactive')}</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormDescription>Si el logro está activo.</FormDescription>
+                <FormDescription>{t('admin.achievements.form.descriptions.status')}</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -314,13 +318,13 @@ export function AchievementForm({
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel} className="border-surface-600 text-surface-300">
-            Cancelar
+            {t('admin.achievements.cancel')}
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || isLoadingEvents}
           >
-            {submitLabel}
+            {submitLabel || t('admin.achievements.save')}
           </Button>
         </div>
       </form>

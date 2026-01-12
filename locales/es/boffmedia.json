@@ -362,6 +362,118 @@
         "pointsLabel": "{points} pts"
       }
     },
+    "admin": {
+      "achievements": {
+        "title": "Gestión de Logros",
+        "description": "Administra los logros y recompensas del sistema",
+        "newAchievement": "Nuevo Logro",
+        "searchPlaceholder": "Buscar logros...",
+        "filterPlaceholder": "Filtrar por evento",
+        "filter": {
+          "allEvents": "Todos los eventos"
+        },
+        "totalLabel": "Total:",
+        "table": {
+          "id": "ID",
+          "achievement": "Logro",
+          "event": "Evento",
+          "pointsRarity": "Puntos & Rareza",
+          "typeCategory": "Tipo & Categoría",
+          "completed": "Completado",
+          "actions": "Acciones"
+        },
+        "empty": {
+          "noAchievements": "No se encontraron logros",
+          "noAchievementsDesc": "No hay logros registrados. Crea el primer logro para comenzar.",
+          "clearSearch": "Limpiar búsqueda"
+        },
+        "error": {
+          "loading": "Error al cargar logros",
+          "retry": "Reintentar"
+        },
+        "loading": "Cargando logros...",
+        "createTitle": "Crear Nuevo Logro",
+        "editTitle": "Editar Logro",
+        "deleteTitle": "Confirmar Eliminación",
+        "deleteConfirm": "¿Estás seguro de que deseas eliminar este logro? Esta acción no se puede deshacer.",
+        "deleteButton": "Eliminar Logro",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "pointsLabel": "{points} pts",
+        "form": {
+          "labels": {
+            "name": "Nombre del Logro",
+            "description": "Descripción",
+            "event": "Evento",
+            "points": "Puntos",
+            "icon": "Icono",
+            "maxProgress": "Progreso Máximo",
+            "itemType": "Tipo de Item",
+            "category": "Categoría",
+            "rarity": "Rareza",
+            "order": "Orden",
+            "status": "Estado"
+          },
+          "placeholders": {
+            "name": "Nombre del logro",
+            "description": "Describe el logro",
+            "selectEvent": "Selecciona un evento",
+            "points": "100",
+            "icon": "/icons/achievement.png",
+            "maxProgress": "1",
+            "selectType": "Selecciona el tipo",
+            "selectCategory": "Selecciona la categoría",
+            "selectRarity": "Selecciona la rareza",
+            "order": "0",
+            "status": "Estado"
+          },
+          "descriptions": {
+            "name": "Este será el nombre que verán los usuarios.",
+            "description": "Una descripción clara de lo que representa este logro.",
+            "event": "Selecciona el evento al que pertenecerá este logro.",
+            "points": "Cantidad de puntos que otorga este logro.",
+            "icon": "Ruta del icono del logro (ej: /icons/achievement.png).",
+            "maxProgress": "Cantidad máxima de progreso necesaria para completar el logro.",
+            "itemType": "Tipo de recompensa que representa este item.",
+            "category": "Categoría del logro para organización.",
+            "rarity": "Nivel de rareza y dificultad del logro.",
+            "order": "Orden de visualización.",
+            "status": "Si el logro está activo."
+          },
+          "validation": {
+            "nameMin": "El nombre debe tener al menos 3 caracteres",
+            "descriptionMin": "La descripción debe tener al menos 10 caracteres",
+            "iconRequired": "El icono es requerido",
+            "pointsMin": "Los puntos no pueden ser negativos",
+            "maxProgressMin": "El progreso máximo debe ser al menos 1"
+          },
+          "options": {
+            "itemType": {
+              "achievement": "Logro",
+              "medal": "Medalla"
+            },
+            "category": {
+              "challenge": "Desafío",
+              "competition": "Competición",
+              "participation": "Participación"
+            },
+            "rarity": {
+              "bronze": "Bronce",
+              "silver": "Plata",
+              "gold": "Oro",
+              "platinum": "Platino",
+              "diamond": "Diamante"
+            },
+            "status": {
+              "active": "Activo",
+              "inactive": "Inactivo"
+            }
+          },
+          "loadingEvents": "Cargando eventos..."
+        }
+      }
+    },
     "community": {
       "title": {
         "first": "Únete a una",
