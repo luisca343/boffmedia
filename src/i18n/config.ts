@@ -14,7 +14,6 @@ export type SupportedLocale = typeof SUPPORTED_LOCALES[number];
 export const GLOBAL_NAMESPACES = [
   'common.json',
   'nav.json',
-  'boffmedia/common.json',
 ] as const;
 
 /**
@@ -30,7 +29,7 @@ export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
   '/eventos': ['boffmedia/events.json'],
   
   // Keys routes
-  '/herramientas/otros/keys': ['boffmedia/keys.json'],
+  '/otros/keys': ['boffmedia/keys.json'],
   
   // Giveaway routes
   '/sorteo': ['boffmedia/giveaway.json'],
@@ -111,8 +110,8 @@ export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
  * Returns global namespaces + page-specific namespaces
  */
 export function getNamespacesForRoute(pathname: string): readonly string[] {
-  // Always include global namespaces
-  const namespaces = [...GLOBAL_NAMESPACES];
+  // Always include global namespaces (use a widened string[] so we can push additional namespaces)
+  const namespaces: string[] = [...GLOBAL_NAMESPACES];
 
   // Find matching page-specific namespaces
   for (const [pattern, pageNamespaces] of Object.entries(PAGE_NAMESPACES)) {
