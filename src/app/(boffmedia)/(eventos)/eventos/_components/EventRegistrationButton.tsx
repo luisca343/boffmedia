@@ -27,10 +27,12 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
   // Check if the current user is already registered for this event
   useEffect(() => {
     async function checkRegistration() {
-      if (!session?.user?.id || !event.id) return;
+      if (!session?.user?.id || !event.id){
+        setIsLoading(false);
+        return;
+      }
       
       try {
-        setIsLoading(true);
         const result = await EventsService.getEventParticipants(event.id);
         setParticipants(result.data || []);
         
