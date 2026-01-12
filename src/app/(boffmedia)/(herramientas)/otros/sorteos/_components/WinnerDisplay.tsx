@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { useTranslations } from 'next-intl';
 import { Trophy, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 
@@ -8,6 +9,7 @@ interface WinnerDisplayProps {
 }
 
 export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
+  const t = useTranslations('boffmedia');
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
@@ -109,7 +111,7 @@ export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
       {/* Winner Announcement */}
       <motion.div variants={itemVariants} className="mb-8">
         <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500">
-          ¡Tenemos un ganador!
+          {t('giveaway.winner.title')}
         </h2>
       </motion.div>
 
@@ -135,7 +137,7 @@ export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
       {/* Congratulations Message */}
       <motion.div variants={itemVariants} className="mb-8">
         <p className="text-xl text-surface-300 font-medium">
-          ¡Felicidades al ganador del sorteo!
+          {t('giveaway.winner.congratulations')}
         </p>
       </motion.div>
 
@@ -148,7 +150,7 @@ export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
           className="px-8 py-3 rounded-xl shadow-lg hover:shadow-orange-500/25 transition-all duration-300 border-0 flex items-center gap-3"
         >
           <ArrowRight className="w-5 h-5" />
-          Continuar Sorteo
+          {t('giveaway.winner.continue')}
         </Button>
       </motion.div>
 

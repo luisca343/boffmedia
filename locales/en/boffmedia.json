@@ -204,6 +204,8 @@
       "leaderboard": {
         "title": "Global Leaderboard",
         "subtitle": "Explore the ranking of all community players. Compete, earn medals, achievements and climb the leaderboard.",
+        "loadingTitle": "Loading leaderboard...",
+        "loadingSubtitle": "Preparing the standings table",
         "playersLabel": "players",
         "tabs": {
           "general": "Overall Score",
@@ -262,6 +264,74 @@
         "connect": "Connect with developers and passionate players",
         "collaborate": "Take part in unique collaborative projects",
         "resources": "Access exclusive resources and special events"
+      }
+    },
+    "giveaway": {
+      "title": "BoffMedia Giveaway",
+      "subtitle": "Create fair and transparent giveaways for your community",
+      "controls": {
+        "title": "Configure Giveaway",
+        "subtitle": "Add participants individually or upload a complete list",
+        "tabs": {
+          "single": "Individual",
+          "list": "Bulk List"
+        },
+        "placeholders": {
+          "participantName": "Enter participant name...",
+          "participantList": "Add one name per line:\n\nParticipant 1\nParticipant 2\nParticipant 3\n..."
+        },
+        "buttons": {
+          "add": "Add",
+          "uploadList": "Upload List ({count} names)",
+          "startGiveaway": "Start Giveaway",
+          "addParticipants": "Add participants to continue"
+        },
+        "warning": {
+          "title": "Missing participants",
+          "description": "Add at least one participant to start the giveaway"
+        },
+        "status": {
+          "noParticipants": "No participants",
+          "participantsReady": "{count, plural, one {# participant ready} other {# participants ready}}",
+          "selectionInfo": "The giveaway will randomly select one of the participants"
+        }
+      },
+      "participants": {
+        "title": "Participants",
+        "winnersTitle": "Previous Winners",
+        "tooltips": {
+          "viewParticipants": "View current participants",
+          "viewWinners": "View previous winners",
+          "remove": "Remove {name}"
+        },
+        "search": {
+          "participants": "Search participants...",
+          "winners": "Search winners..."
+        },
+        "stats": {
+          "of": "of",
+          "filtered": "Filtered: \"{term}\"",
+          "winners": "{count, plural, one {# winner} other {# winners}}",
+          "winnerNumber": "Winner #{number}"
+        },
+        "empty": {
+          "noParticipants": "No participants",
+          "addParticipants": "Add participants to start the giveaway",
+          "noResults": "No participants found",
+          "noMatch": "matching \"{term}\"",
+          "noWinners": "No winners yet",
+          "winnersInfo": "Winners will appear here after each giveaway"
+        }
+      },
+      "spinner": {
+        "title": "Giveaway Wheel",
+        "spinning": "Drawing!",
+        "selecting": "Selecting winner..."
+      },
+      "winner": {
+        "title": "We have a winner!",
+        "congratulations": "Congratulations to the giveaway winner!",
+        "continue": "Continue Giveaway"
       }
     },
     "footer": {

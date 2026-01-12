@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
+import { useTranslations } from 'next-intl'
 import { useGiveawayAnimation } from "../_hooks/useGiveawayAnimation"
 import Spinner from "./Spinner"
 
@@ -11,6 +12,7 @@ type SpinnerAnimationProps = {
 }
 
 export default function SpinnerAnimation({ participants, winner, onComplete }: SpinnerAnimationProps) {
+  const t = useTranslations('boffmedia');
   const {
     spinItems,
     scrollPosition,
@@ -32,7 +34,7 @@ export default function SpinnerAnimation({ participants, winner, onComplete }: S
   return (
     <div className="flex flex-col items-center">
       <h2 className="text-2xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-400">
-        ¡Sorteando!
+        {t('giveaway.spinner.spinning')}
       </h2>
       
       <Spinner 
@@ -47,7 +49,7 @@ export default function SpinnerAnimation({ participants, winner, onComplete }: S
       />
       
       <div className="mt-8 text-center text-surface-300">
-        <p className="animate-pulse">Seleccionando ganador...</p>
+        <p className="animate-pulse">{t('giveaway.spinner.selecting')}</p>
       </div>
     </div>
   )

@@ -60,7 +60,7 @@ export default function FullLeaderboardComponent() {
   }
 
   if (isLoading)
-    return <SectionLoading text="Cargando clasificación..." subtext="Preparando la tabla de posiciones" gradientFrom="from-accent-400" gradientTo="to-indigo-400" />
+    return <SectionLoading text={t('eventsSection.loadingTitle')} subtext={t('eventsSection.loadingSubtitle')} gradientFrom="from-accent-400" gradientTo="to-indigo-400" />
 
   if (error)
     return (
@@ -91,7 +91,7 @@ export default function FullLeaderboardComponent() {
               onClick={refetch} 
               variant="accent"
             >
-              Reintentar
+              {t('eventsSection.retry')}
             </Button>
           </div>
         </div>

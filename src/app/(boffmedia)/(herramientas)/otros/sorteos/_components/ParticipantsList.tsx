@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { Users, Minus, Trophy, Search, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
 import { Badge } from "@/components/ui/primitives/badge";
@@ -16,6 +17,7 @@ export function ParticipantsList({
   previousWinners,
   onRemove 
 }: ParticipantsListProps) {
+  const t = useTranslations('boffmedia');
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<"participants" | "winners">("participants");
   
@@ -30,20 +32,20 @@ export function ParticipantsList({
       <div className="flex items-center justify-between mb-6">
         <SectionHeader 
           icon={activeTab === "participants" ? <Users className="w-5 h-5" /> : <Trophy className="w-5 h-5" />} 
-          title={activeTab === "participants" ? "Participantes" : "Ganadores Previos"} 
+          title={activeTab === "participants" ? t('giveaway.participants.title') : t('giveaway.participants.winnersTitle')} 
         />
         <div className="flex gap-2">
           <Button
             onClick={() => setActiveTab("participants")}
            variant={activeTab === "participants" ? "default" : "ghost"}
-            title="Ver participantes actuales"
+            title={t('giveaway.participants.tooltips.viewParticipants')}
           >
             <Users className="w-4 h-4" />
           </Button>
           <Button
             onClick={() => setActiveTab("winners")}
             variant={activeTab === "winners" ? "default" : "ghost"}
-            title="Ver ganadores previos"
+            title={t('giveaway.participants.tooltips.viewWinners')}
           >
             <Trophy className="w-4 h-4" />
           </Button>
@@ -54,7 +56,7 @@ export function ParticipantsList({
       <div className="relative mb-4">
         <Search className="absolute left-3 top-2.5 w-4 h-4 text-surface-400" />
         <Input
-          placeholder={activeTab === "participants" ? "Buscar participantes..." : "Buscar ganadores..."}
+          placeholder={activeTab === "participants" ? t('giveaway.participants.search.participants') : t('giveaway.participants.search.winners')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 pr-10 bg-surface-700/50 border-surface-600/50 text-surface-50 placeholder:text-surface-400"
@@ -81,11 +83,11 @@ export function ParticipantsList({
                 variant="secondary" 
                 className="bg-orange-500/20 text-orange-300 border-orange-500/30"
               >
-                {filteredParticipants.length} de {participants.length}
+                {filteredParticipants.length} {t('giveaway.participants.stats.of')} {participants.length}
               </Badge>
               {searchTerm && (
                 <Badge variant="outline" className="text-surface-400 border-surface-600">
-                  Filtrado: &quot;{searchTerm}&quot;
+                  {t('giveaway.participants.stats.filtered', { term: searchTerm })}
                 </Badge>
               )}
             </div>
@@ -109,7 +111,7 @@ export function ParticipantsList({
                       variant="ghost"
                       size="zero"
                       className="text-surface-400 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all duration-200 p-2 rounded-lg hover:bg-red-500/10"
-                      title={`Eliminar a ${name}`}
+                      title={t('giveaway.participants.tooltips.remove', { name })}
                     >
                       <Minus className="w-4 h-4" />
                     </Button>
@@ -123,13 +125,13 @@ export function ParticipantsList({
                 </div>
                 {searchTerm ? (
                   <div>
-                    <p className="text-surface-400 mb-2">No se encontraron participantes</p>
-                    <p className="text-sm text-surface-500">que coincidan con &quot;{searchTerm}&quot;</p>
+                    <p className="text-surface-400 mb-2">{t('giveaway.participants.empty.noResults')}</p>
+                    <p className="text-sm text-surface-500">{t('giveaway.participants.empty.noMatch', { term: searchTerm })}</p>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-surface-400 mb-2">Sin participantes</p>
-                    <p className="text-sm text-surface-500">Añade participantes para comenzar el sorteo</p>
+                    <p className="text-surface-400 mb-2">{t('giveaway.participants.empty.noParticipants')}</p>
+                    <p className="text-sm text-surface-500">{t('giveaway.participants.empty.addParticipants')}</p>
                   </div>
                 )}
               </div>
@@ -143,7 +145,7 @@ export function ParticipantsList({
                 variant="secondary" 
                 className="bg-yellow-500/20 text-yellow-300 border-yellow-500/30"
               >
-                {previousWinners.length} ganador{previousWinners.length !== 1 ? 'es' : ''}
+                {t('giveaway.participants.stats.winners', { count: previousWinners.length })}
               </Badge>
             </div>
 
@@ -170,8 +172,8 @@ export function ParticipantsList({
                 <div className="w-16 h-16 bg-surface-700/50 rounded-2xl flex items-center justify-center mb-4">
                   <Trophy className="w-8 h-8 text-surface-400" />
                 </div>
-                <p className="text-surface-400 mb-2">Sin ganadores aún</p>
-                <p className="text-sm text-surface-500">Los ganadores aparecerán aquí después de cada sorteo</p>
+                <p className="text-surface-400 mb-2">{t('giveaway.participants.empty.noWinners')}</p>
+                <p className="text-sm text-surface-500">{t('giveaway.participants.empty.winnersInfo')}</p>
               </div>
             )}
           </>

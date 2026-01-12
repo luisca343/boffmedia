@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from 'next-intl'
 import SpinnerItem from "./SpinnerItem"
 
 interface SpinnerProps {
@@ -23,11 +24,12 @@ export default function Spinner({
   itemsContainerRef,
   ITEM_WIDTH
 }: SpinnerProps) {
+  const t = useTranslations('boffmedia');
   return (
     <div className="relative w-full max-w-3xl">
       <div className="bg-surface-900/90 border-4 border-primary-500/50 rounded-xl overflow-hidden p-4 shadow-2xl">
         <div className="bg-gradient-to-r from-surface-800 to-surface-900 py-2 px-4 mb-4 border-2 border-primary-400/30 rounded-t-lg text-center">
-          <h3 className="text-xl font-bold text-primary-400">Ruleta del Sorteo</h3>
+          <h3 className="text-xl font-bold text-primary-400">{t('giveaway.spinner.title')}</h3>
         </div>
       
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-500/5 to-transparent opacity-20 animate-scanline pointer-events-none z-30"></div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from 'next-intl';
 import { SectionHeader } from "@/components/boffmedia/sections/SectionHeader";
 import { Gift } from "lucide-react";
 import { ParticipantsList } from "./_components/ParticipantsList";
@@ -10,6 +11,7 @@ import SpinnerAnimation from "./_components/SpinnerAnimation";
 import { WinnerDisplay } from "./_components/WinnerDisplay";
 
 export default function Sorteo() {
+  const t = useTranslations('boffmedia');
   const [participants, setParticipants] = useState<string[]>([]);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
@@ -93,7 +95,7 @@ export default function Sorteo() {
       <div className="max-w-6xl mx-auto space-y-8">
         <motion.div variants={itemVariants}>
           <SectionHeader
-            title="Sorteo BoffMedia"
+            title={t('giveaway.title')}
             variant="orange"
             leftIcon={<Gift className="w-8 h-8 text-orange-400" />}
             rightIcon={<Gift className="w-8 h-8 text-yellow-400" />}
