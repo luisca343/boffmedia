@@ -201,6 +201,25 @@
         "noResultsDescription": "We couldn't find events matching \"{term}\". Try different search terms.",
         "clearSearch": "Clear search"
       },
+      "leaderboard": {
+        "title": "Global Leaderboard",
+        "subtitle": "Explore the ranking of all community players. Compete, earn medals, achievements and climb the leaderboard.",
+        "playersLabel": "players",
+        "searchPlaceholder": "Search player...",
+        "sort": {
+          "placeholder": "Sort by",
+          "scoreDesc": "Highest score",
+          "scoreAsc": "Lowest score",
+          "medalsDesc": "Most medals",
+          "medalsAsc": "Fewest medals",
+          "achievementsDesc": "Most achievements",
+          "achievementsAsc": "Fewest achievements"
+        },
+        "emptyTitle": "No players found",
+        "emptyDescription": "There are no players in the leaderboard yet. Be the first to join an event and earn points.",
+        "emptyForTerm": "No players match \"{term}\". Try different search terms.",
+        "errorLoading": "Error loading leaderboard"
+      },
       "searchPlaceholder": "Search event...",
       "itemsLabel": "events",
       "noEventsMatchFilters": "There are no events matching the selected filters.",

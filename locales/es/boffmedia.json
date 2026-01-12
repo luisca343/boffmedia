@@ -202,6 +202,25 @@
         "noResultsDescription": "No encontramos eventos que coincidan con \"{term}\". Prueba con otros términos de búsqueda.",
         "clearSearch": "Limpiar búsqueda"
       },
+      "leaderboard": {
+        "title": "Clasificación Global",
+        "subtitle": "Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación.",
+        "playersLabel": "jugadores",
+        "searchPlaceholder": "Buscar jugador...",
+        "sort": {
+          "placeholder": "Ordenar por",
+          "scoreDesc": "Mayor puntuación",
+          "scoreAsc": "Menor puntuación",
+          "medalsDesc": "Más medallas",
+          "medalsAsc": "Menos medallas",
+          "achievementsDesc": "Más logros",
+          "achievementsAsc": "Menos logros"
+        },
+        "emptyTitle": "No se encontraron jugadores",
+        "emptyDescription": "No hay jugadores en la clasificación todavía. Sé el primero en participar en un evento y ganar puntos.",
+        "emptyForTerm": "No hay jugadores que coincidan con \"{term}\". Prueba con otros términos de búsqueda.",
+        "errorLoading": "Error al cargar la clasificación"
+      },
       "searchPlaceholder": "Buscar evento...",
       "itemsLabel": "eventos",
       "noEventsMatchFilters": "No hay eventos que coincidan con los filtros seleccionados.",

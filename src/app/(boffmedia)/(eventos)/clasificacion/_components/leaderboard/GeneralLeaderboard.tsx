@@ -15,13 +15,15 @@ export function GeneralLeaderboard({
   setSearchTerm,
 }: GeneralLeaderboardProps) {
 
+  const t = useTranslations('boffmedia')
+
   const getRankForPlayer = (player: any) => {
     return getPlayerRank(player.userId)
   }
 
   const emptyStateDescription = searchTerm 
-    ? `No hay jugadores que coincidan con "${searchTerm}". Prueba con otros términos de búsqueda.` 
-    : "No hay jugadores en la clasificación todavía. Sé el primero en participar en un evento y ganar puntos."
+    ? t('eventsSection.leaderboard.emptyForTerm', { term: searchTerm })
+    : t('eventsSection.leaderboard.emptyDescription')
 
   return (
     <LeaderboardList
@@ -29,7 +31,7 @@ export function GeneralLeaderboard({
       getRank={getRankForPlayer}
       showDetailedBreakdown={true}
       useProfileImage={true}
-      emptyStateTitle="No se encontraron jugadores"
+      emptyStateTitle={t('eventsSection.leaderboard.emptyTitle')}
       emptyStateDescription={emptyStateDescription}
       searchTerm={searchTerm}
       onClearSearch={() => setSearchTerm('')}

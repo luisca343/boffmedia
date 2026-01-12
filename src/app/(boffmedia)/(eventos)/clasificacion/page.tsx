@@ -5,9 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { SectionHeader, SectionLoading } from '@/components/boffmedia/sections';
+import { useTranslations } from 'next-intl'
 import { LeaderboardFilters } from "../_components/LeaderboardFilters"
 import { LeaderboardTabs } from "./_components/leaderboard/LeaderboardTabs"
 export default function FullLeaderboardComponent() {
+  const t = useTranslations('boffmedia')
   const { leaderboards, error, isLoading, refetch } = useGetLeaderboards()
   const [filteredPlayers, setFilteredPlayers] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -84,7 +86,7 @@ export default function FullLeaderboardComponent() {
                 <path d="M12 17h.01"></path>
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-white mb-4">Error al cargar la clasificación</h1>
+            <h1 className="text-2xl font-bold text-white mb-4">{t('eventsSection.leaderboard.errorLoading')}</h1>
             <p className="text-surface-400 mb-6">{error}</p>
             <Button 
               onClick={refetch} 
@@ -101,8 +103,8 @@ export default function FullLeaderboardComponent() {
     <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
         <SectionHeader 
-          title="Clasificación Global"
-          subtitle="Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación."
+          title={t('eventsSection.leaderboard.title')}
+          subtitle={t('eventsSection.leaderboard.subtitle')}
           gradientFrom="from-accent-400"
           gradientTo="to-indigo-400"
         />
