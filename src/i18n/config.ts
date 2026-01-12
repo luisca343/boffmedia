@@ -83,19 +83,21 @@ export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
   // Default fallback with all namespaces (for routes not explicitly mapped)
   '*': [
     'items.json',
-    'twitch.json',
-    'youtube.json',
     'tools/games.json',
     'tools/mhwilds.json',
     'tools/pokemon.json',
     'tools/pmdsky/common.json',
     'tools/pmdsky/dungeons.json',
     'tools/tcgpocket/common.json',
+    
     'smartrotom/pokedex/abilities.json',
     'smartrotom/pokedex/common.json',
     'smartrotom/pokedex/forms.json',
     'smartrotom/pokedex/moves.json',
     'smartrotom/pokedex/spawns.json',
+    'smartrotom/twitch.json',
+    'smartrotom/youtube.json',
+
     'boffmedia/common.json',
     'boffmedia/events.json',
     'boffmedia/keys.json',
