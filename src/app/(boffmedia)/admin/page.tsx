@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/primitives/badge";
 import { useEffect, useState } from "react";
 import { boffPOST } from "@/services/boffAPI";
 import UnauthorizedPage from "../_components/Unauthorized";
+import { useTranslations } from "next-intl";
 
 interface FetchStatusData {
   status: "fetching" | "success" | "error";
@@ -15,6 +16,7 @@ interface FetchStatusData {
 
 export default function AdminPage() {
   const { session } = useBoffSession();
+  const t = useTranslations('boffmedia');
 
   const [status, setStatus] = useState<FetchStatusData | null>(null);
 
@@ -50,13 +52,13 @@ export default function AdminPage() {
     <div>
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Cargar datos de TCGP</CardTitle>
+          <CardTitle>{t('admin.tcgp.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {status && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Estado:</span>
+                <span className="text-sm font-medium">{t('admin.tcgp.status')}</span>
                 <Badge
                   variant={
                     status.status === "success"
@@ -66,18 +68,18 @@ export default function AdminPage() {
                       : "default"
                   }
                 >
-                  {status.status}
+                  {t(`admin.tcgp.statusValues.${status.status}`)}
                 </Badge>
               </div>
               <p className="text-sm">{status.message}</p>
               <p className="text-xs text-surface-500">
-                Última actualización:{" "}
+                {t('admin.tcgp.lastUpdate')}{" "}
                 {new Date(status.timestamp).toLocaleString()}
               </p>
             </div>
           )}
           <Button onClick={triggerFetch} className="mt-4 w-full">
-            Cargar datos de TCG
+            {t('admin.tcgp.loadButton')}
           </Button>
         </CardContent>
       </Card>

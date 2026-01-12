@@ -733,6 +733,27 @@
           "loadingEvents": "Loading events...",
           "save": "Save"
         }
+      },
+      "page": {
+        "title": "Administration Panel",
+        "description": "Manage games, events, teams and achievements of the portal.",
+        "tabs": {
+          "games": "Games",
+          "events": "Events",
+          "teams": "Teams",
+          "achievements": "Achievements"
+        }
+      },
+      "tcgp": {
+        "title": "Load TCGP Data",
+        "status": "Status:",
+        "statusValues": {
+          "fetching": "Fetching",
+          "success": "Success",
+          "error": "Error"
+        },
+        "lastUpdate": "Last update:",
+        "loadButton": "Load TCG Data"
       }
     },
     "community": {

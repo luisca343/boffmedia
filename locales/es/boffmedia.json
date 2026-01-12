@@ -733,6 +733,27 @@
           "loadingEvents": "Cargando eventos...",
           "save": "Guardar"
         }
+      },
+      "page": {
+        "title": "Panel de Administración",
+        "description": "Gestiona juegos, eventos, equipos y logros del portal.",
+        "tabs": {
+          "games": "Juegos",
+          "events": "Eventos",
+          "teams": "Equipos",
+          "achievements": "Logros"
+        }
+      },
+      "tcgp": {
+        "title": "Cargar datos de TCGP",
+        "status": "Estado:",
+        "statusValues": {
+          "fetching": "Cargando",
+          "success": "Éxito",
+          "error": "Error"
+        },
+        "lastUpdate": "Última actualización:",
+        "loadButton": "Cargar datos de TCG"
       }
     },
     "community": {

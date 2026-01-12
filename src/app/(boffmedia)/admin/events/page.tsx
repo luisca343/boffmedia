@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
+import { useTranslations } from "next-intl"
 import { Gamepad2, Calendar, Users, Award } from "lucide-react"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
@@ -15,6 +16,7 @@ function AdminDashboardContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("games")
+  const t = useTranslations('boffmedia')
 
   // Initialize tab from URL on mount
   useEffect(() => {
@@ -37,29 +39,29 @@ function AdminDashboardContent() {
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-surface-50 mb-2">Panel de Administración</h1>
-        <p className="text-surface-300">Gestiona juegos, eventos, equipos y logros del portal.</p>
+        <h1 className="text-3xl font-bold text-surface-50 mb-2">{t('admin.page.title')}</h1>
+        <p className="text-surface-300">{t('admin.page.description')}</p>
       </header>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="mb-8 bg-surface-800 p-1">
           <TabsTrigger value="games" className="data-[state=active]:bg-primary-500">
             <Gamepad2 className="h-4 w-4 mr-2" />
-            Juegos
+            {t('admin.page.tabs.games')}
           </TabsTrigger>
           <TabsTrigger value="events" className="data-[state=active]:bg-primary-500">
             <Calendar className="h-4 w-4 mr-2" />
-            Eventos
+            {t('admin.page.tabs.events')}
           </TabsTrigger>
           
           <TabsTrigger value="teams" className="data-[state=active]:bg-primary-500">
             <Users className="h-4 w-4 mr-2" />
-            Equipos
+            {t('admin.page.tabs.teams')}
           </TabsTrigger>
         
           <TabsTrigger value="achievements" className="data-[state=active]:bg-primary-500">
             <Award className="h-4 w-4 mr-2" />
-            Logros
+            {t('admin.page.tabs.achievements')}
           </TabsTrigger>
         </TabsList>
 
