@@ -1,22 +1,27 @@
 import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
-
-// Supported locales
-const SUPPORTED_LOCALES = ['en', 'es'] as const;
-const DEFAULT_LOCALE = 'es';
-
-type SupportedLocale = typeof SUPPORTED_LOCALES[number];
+import type { AbstractIntlMessages } from 'next-intl';
+import {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  validateLocale,
+  getNamespacesForRoute,
+  type SupportedLocale,
+} from './config';
 
 // Helper function for deep merging objects
 interface DeepMergeable {
   [key: string]: any;
 }
 
-const deepMerge = <T extends DeepMergeable, S extends DeepMergeable>(target: T, source: S): T & S => {
+const deepMerge = <T extends DeepMergeable, S extends DeepMergeable>(
+  target: T,
+  source: S
+): T & S => {
   const output = { ...target } as any;
-  
+
   if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach(key => {
+    Object.keys(source).forEach((key) => {
       if (isObject(source[key])) {
         if (!(key in target)) {
           Object.assign(output, { [key]: source[key] });
@@ -28,7 +33,7 @@ const deepMerge = <T extends DeepMergeable, S extends DeepMergeable>(target: T, 
       }
     });
   }
-  
+
   return output as T & S;
 };
 
@@ -36,17 +41,53 @@ const isObject = (item: unknown): item is Record<string, any> => {
   return item !== null && typeof item === 'object' && !Array.isArray(item);
 };
 
+// ============================================================================
+// CACHING LAYER
+// ============================================================================
+
+interface CacheEntry {
+  messages: AbstractIntlMessages;
+  timestamp: number;
+}
+
+const messagesCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 1000 * 60 * 60; // 1 hour
+
 /**
- * Validate and normalize locale
+ * Get cached messages or null if not found/expired
  */
-const validateLocale = (locale: string | undefined): SupportedLocale => {
-  if (!locale) return DEFAULT_LOCALE;
-  
-  const normalizedLocale = locale.toLowerCase().split('-')[0];
-  return SUPPORTED_LOCALES.includes(normalizedLocale as SupportedLocale) 
-    ? normalizedLocale as SupportedLocale 
-    : DEFAULT_LOCALE;
-};
+function getCachedMessages(
+  locale: SupportedLocale,
+  namespaces: readonly string[]
+): AbstractIntlMessages | null {
+  const cacheKey = `${locale}:${namespaces.join(',')}`;
+  const cached = messagesCache.get(cacheKey);
+
+  if (!cached) return null;
+
+  // Check if cache is still valid
+  if (Date.now() - cached.timestamp > CACHE_TTL) {
+    messagesCache.delete(cacheKey);
+    return null;
+  }
+
+  return cached.messages;
+}
+
+/**
+ * Store messages in cache
+ */
+function setCachedMessages(
+  locale: SupportedLocale,
+  namespaces: readonly string[],
+  messages: AbstractIntlMessages
+): void {
+  const cacheKey = `${locale}:${namespaces.join(',')}`;
+  messagesCache.set(cacheKey, {
+    messages,
+    timestamp: Date.now(),
+  });
+}
 
 /**
  * Get locale from Accept-Language header with fallback
@@ -55,19 +96,19 @@ const getLocaleFromHeaders = async (): Promise<SupportedLocale> => {
   try {
     const headersList = await headers();
     const acceptLanguage = headersList.get('Accept-Language') || '';
-    
+
     // Parse Accept-Language header
     const languages = acceptLanguage
       .split(',')
-      .map(lang => {
+      .map((lang) => {
         const [language, priority = '1.0'] = lang.trim().split(';q=');
-        return { 
-          language: language.split('-')[0].toLowerCase(), 
-          priority: parseFloat(priority) 
+        return {
+          language: language.split('-')[0].toLowerCase(),
+          priority: parseFloat(priority),
         };
       })
       .sort((a, b) => b.priority - a.priority);
-    
+
     // Return first supported language
     for (const { language } of languages) {
       if (SUPPORTED_LOCALES.includes(language as SupportedLocale)) {
@@ -78,7 +119,7 @@ const getLocaleFromHeaders = async (): Promise<SupportedLocale> => {
     // During static generation, headers are not available - use default locale
     // This is expected behavior and not an error
   }
-  
+
   return DEFAULT_LOCALE;
 };
 
@@ -104,77 +145,82 @@ const determineLocale = async (): Promise<SupportedLocale> => {
   // Try to get locale from cookie first (user preference)
   const cookieLocale = await getLocaleFromCookies();
   if (cookieLocale) return cookieLocale;
-  
+
   // Fallback to Accept-Language header
   const headerLocale = await getLocaleFromHeaders();
   return headerLocale;
 };
 
+/**
+ * Get the current pathname from headers
+ */
+const getPathname = async (): Promise<string> => {
+  try {
+    const headersList = await headers();
+    const pathname = headersList.get('x-pathname') || headersList.get('x-invoke-path') || '/';
+    return pathname;
+  } catch (error) {
+    // During static generation, return default
+    return '/';
+  }
+};
+
+/**
+ * Load messages for a specific locale and namespaces
+ */
+async function loadMessages(
+  locale: SupportedLocale,
+  namespaces: readonly string[]
+): Promise<AbstractIntlMessages> {
+  // Check cache first
+  const cached = getCachedMessages(locale, namespaces);
+  if (cached) {
+    return cached;
+  }
+
+  // Load translations for the locale
+  const imports = await Promise.all(
+    namespaces.map((path) =>
+      import(`../../locales/${locale}/${path}`).catch((err) => {
+        console.warn(
+          `Failed to load translation: ${path} for locale ${locale}`,
+          err.message
+        );
+        return { default: {} };
+      })
+    )
+  );
+
+  // Deep merge all messages
+  let messages: AbstractIntlMessages = {};
+  imports.forEach((module) => {
+    messages = deepMerge(messages, module.default);
+  });
+
+  // Cache the result
+  setCachedMessages(locale, namespaces, messages);
+
+  return messages;
+}
+
 export default getRequestConfig(async () => {
   // Determine locale with proper error handling
   const locale = await determineLocale();
-  
-  // Define paths to import
-  const paths = [
-    'boffmedia.json',
-    'nav.json',
-    'items.json',
-    'tools/games.json',
-    'tools/mhwilds.json',
-    'tools/pokemon.json',
-    'smartrotom/pokedex/abilities.json',
-    'smartrotom/pokedex/common.json',
-    'smartrotom/pokedex/forms.json',
-    'smartrotom/pokedex/moves.json',
-    'smartrotom/pokedex/spawns.json',
-    'tools/pmdsky/common.json',
-    'tools/pmdsky/dungeons.json',
-    'tools/tcgpocket/common.json',
-    'common.json',
-    'twitch.json',
-    'youtube.json',
-  ];
-  
+
+  // Get current pathname to determine which namespaces to load
+  const pathname = await getPathname();
+
+  // Get route-specific namespaces
+  const namespaces = getNamespacesForRoute(pathname);
+
   // Load translations for the current locale
-  const imports = await Promise.all(
-    paths.map(path => 
-      import(`../../locales/${locale}/${path}`)
-        .catch(err => {
-          console.warn(`Failed to load translation: ${path} for locale ${locale}`, err.message);
-          return { default: {} };
-        })
-    )
-  );
-  
-  // Deep merge current locale messages
-  let currentLocaleMessages = {};
-  imports.forEach(module => {
-    currentLocaleMessages = deepMerge(currentLocaleMessages, module.default);
-  });
+  let messages = await loadMessages(locale, namespaces);
 
   // If current locale is not the default, load default locale as fallback
-  let messages = currentLocaleMessages;
-  
   if (locale !== DEFAULT_LOCALE) {
-    // Load default locale translations
-    const defaultImports = await Promise.all(
-      paths.map(path => 
-        import(`../../locales/${DEFAULT_LOCALE}/${path}`)
-          .catch(err => {
-            console.warn(`Failed to load translation: ${path} for default locale ${DEFAULT_LOCALE}`, err.message);
-            return { default: {} };
-          })
-      )
-    );
-    
-    // Deep merge default locale messages
-    let defaultMessages = {};
-    defaultImports.forEach(module => {
-      defaultMessages = deepMerge(defaultMessages, module.default);
-    });
-    
+    const defaultMessages = await loadMessages(DEFAULT_LOCALE, namespaces);
     // Deep merge default messages with current locale messages (current locale takes precedence)
-    messages = deepMerge(defaultMessages, currentLocaleMessages);
+    messages = deepMerge(defaultMessages, messages);
   }
 
   return {
