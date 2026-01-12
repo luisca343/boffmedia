@@ -27,7 +27,7 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
   const gameDisplay = event.gameName || `${t('admin.events.card.gamePrefix')}${event.gameId}`
 
   // Use the utility function
-  const status = getEventStatus(event.startDate, event.endDate)
+  const status = getEventStatus(event.startDate, event.endDate, t)
 
   return (
     <TableRow className={cn("border-surface-700 hover:bg-surface-700/50", isChild && "bg-surface-800/50")}>

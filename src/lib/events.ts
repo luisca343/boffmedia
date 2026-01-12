@@ -2,9 +2,14 @@
  * Determines the status of an event based on its start and end dates
  * @param startDate The event's start date
  * @param endDate The event's end date (optional)
- * @returns Object containing status label and CSS class
+ * @param t Optional translation function for localizing status labels
+ * @returns Object containing status key, label, and CSS class
  */
-export function getEventStatus(startDate: string | Date, endDate?: string | Date | null) {
+export function getEventStatus(
+  startDate: string | Date, 
+  endDate?: string | Date | null,
+  t?: (key: string) => string
+) {
   const now = new Date();
   const start = new Date(startDate);
   
@@ -16,7 +21,7 @@ export function getEventStatus(startDate: string | Date, endDate?: string | Date
   if (!hasValidEndDate) {
     return { 
       key: 'active',
-      label: "En Curso", 
+      label: t ? t('admin.eventStatus.active') : "En Curso", 
       class: "bg-success-500/20 text-success-400 border-success-500/30" 
     };
   }
@@ -25,19 +30,19 @@ export function getEventStatus(startDate: string | Date, endDate?: string | Date
   if (now < start) {
     return { 
       key: 'upcoming',
-      label: "Próximo", 
+      label: t ? t('admin.eventStatus.upcoming') : "Próximo", 
       class: "bg-primary-500/20 text-primary-400 border-primary-500/30" 
     };
   } else if (now > end!) {
     return { 
       key: 'completed',
-      label: "Finalizado", 
+      label: t ? t('admin.eventStatus.completed') : "Finalizado", 
       class: "bg-surface-500/20 text-surface-400 border-surface-500/30" 
     };
   } else {
     return { 
       key: 'active',
-      label: "En Curso", 
+      label: t ? t('admin.eventStatus.active') : "En Curso", 
       class: "bg-success-500/20 text-success-400 border-success-500/30" 
     };
   }

@@ -754,6 +754,11 @@
         },
         "lastUpdate": "Última actualización:",
         "loadButton": "Cargar datos de TCG"
+      },
+      "eventStatus": {
+        "upcoming": "Próximo",
+        "active": "En Curso",
+        "completed": "Finalizado"
       }
     },
     "community": {

@@ -54,7 +54,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
     return 'Muy pronto'
   }
 
-  const status = getEventStatus(event.startDate, event.endDate)
+  const status = getEventStatus(event.startDate, event.endDate, t)
   const timeUntil = getTimeUntilEvent(event.startDate)
   const TypeIcon = getEventTypeIcon(event.type)
   const StatusIcon = status.key === 'upcoming' ? Calendar : status.key === 'completed' ? Trophy : Zap

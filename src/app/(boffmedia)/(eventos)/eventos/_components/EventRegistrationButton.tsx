@@ -95,7 +95,7 @@ export function EventRegistrationButton({ event }: EventRegistrationButtonProps)
     }
   };
   
-  const status = getEventStatus(event.startDate, event.endDate);
+  const status = getEventStatus(event.startDate, event.endDate, t);
   const isUpcoming = status.key === "upcoming";
   const isActive = status.key === "active";
   

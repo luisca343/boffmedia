@@ -22,7 +22,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
   const { games } = useGetGames();
   const game = games?.find((g) => g.id === event.gameId);
   
-  const status = getEventStatus(event.startDate, event.endDate);
+  const status = getEventStatus(event.startDate, event.endDate, t);
   const isListLayout = layout === "list";
 
   const formatDate = (dateString: string) => {
