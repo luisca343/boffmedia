@@ -321,6 +321,47 @@
       "noRankingAvailable": "No hay clasificación disponible",
       "viewFullRanking": "Ver Clasificación Completa"
     },
+    "admin": {
+      "achievements": {
+        "title": "Gestión de Logros",
+        "description": "Administra los logros y recompensas del sistema",
+        "newAchievement": "Nuevo Logro",
+        "searchPlaceholder": "Buscar logros...",
+        "filterPlaceholder": "Filtrar por evento",
+        "filter": {
+          "allEvents": "Todos los eventos"
+        },
+        "totalLabel": "Total:",
+        "table": {
+          "id": "ID",
+          "achievement": "Logro",
+          "event": "Evento",
+          "pointsRarity": "Puntos & Rareza",
+          "typeCategory": "Tipo & Categoría",
+          "completed": "Completado",
+          "actions": "Acciones"
+        },
+        "empty": {
+          "noAchievements": "No se encontraron logros",
+          "noAchievementsDesc": "No hay logros registrados. Crea el primer logro para comenzar.",
+          "clearSearch": "Limpiar búsqueda"
+        },
+        "error": {
+          "loading": "Error al cargar logros",
+          "retry": "Reintentar"
+        },
+        "loading": "Cargando logros...",
+        "createTitle": "Crear Nuevo Logro",
+        "editTitle": "Editar Logro",
+        "deleteTitle": "Confirmar Eliminación",
+        "deleteConfirm": "¿Estás seguro de que deseas eliminar este logro? Esta acción no se puede deshacer.",
+        "deleteButton": "Eliminar Logro",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "pointsLabel": "{points} pts"
+      }
+    },
     "community": {
       "title": {
         "first": "Únete a una",

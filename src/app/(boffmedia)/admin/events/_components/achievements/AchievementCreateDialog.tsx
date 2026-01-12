@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
+import { useTranslations } from "next-intl"
 import { toast } from "react-toastify"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
@@ -20,6 +21,7 @@ export function AchievementCreateDialog({
   defaultEventId,
 }: AchievementCreateDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
@@ -41,9 +43,9 @@ export function AchievementCreateDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Crear Nuevo Logro</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.achievements.createTitle')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Completa el formulario para añadir un nuevo logro al sistema.
+            {t('admin.achievements.description')}
           </DialogDescription>
         </DialogHeader>
 

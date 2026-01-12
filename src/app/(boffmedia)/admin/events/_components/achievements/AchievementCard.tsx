@@ -1,7 +1,10 @@
+"use client"
+
 import { TableCell, TableRow } from "@/components/ui/primitives/table"
 import { Button } from "@/components/ui/primitives/button"
 import { Badge } from "@/components/ui/primitives/badge"
 import { Pencil, Trash2, Award, Users } from "lucide-react"
+import { useTranslations } from "next-intl"
 import type { Achievement } from "@/types/events"
 
 interface AchievementCardProps {
@@ -11,6 +14,7 @@ interface AchievementCardProps {
 }
 
 export function AchievementCard({ achievement, onEdit, onDelete }: any) {
+  const t = useTranslations('boffmedia')
   return (
     <TableRow className="border-surface-700 hover:bg-surface-700/50">
       <TableCell className="font-medium text-surface-400">#{achievement.id}</TableCell>
@@ -23,7 +27,7 @@ export function AchievementCard({ achievement, onEdit, onDelete }: any) {
               <Award className="h-6 w-6 text-surface-500" />
             )}
           </div>
-          <div>
+            <div>
             <span className="font-medium text-surface-50 block">{achievement.name}</span>
             <span className="text-sm text-surface-400">{achievement.description}</span>
           </div>
@@ -35,7 +39,7 @@ export function AchievementCard({ achievement, onEdit, onDelete }: any) {
       <TableCell>
         <div className="flex items-center gap-2">
           <Badge className="bg-primary-500/20 text-primary-400 border-primary-500/30">
-            {achievement.points} pts
+            {t('admin.achievements.pointsLabel', { points: achievement.points })}
           </Badge>
           {achievement.rarity && (
             <Badge variant="outline" className={`text-xs ${

@@ -1,5 +1,8 @@
+"use client"
+
 import { CardContent } from "@/components/ui/primitives/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
+import { useTranslations } from "next-intl"
 import type { Achievement } from "@/types/events"
 import { AchievementCard } from "./AchievementCard"
 import { AchievementEmptyState } from "./AchievementEmptyState"
@@ -11,6 +14,7 @@ interface AchievementsListProps {
 }
 
 export function AchievementsList({ achievements, onEdit, onDelete }: AchievementsListProps) {
+  const t = useTranslations('boffmedia')
   if (achievements.length === 0) {
     return (
       <CardContent>
@@ -25,13 +29,13 @@ export function AchievementsList({ achievements, onEdit, onDelete }: Achievement
         <Table>
           <TableHeader>
             <TableRow className="border-surface-700">
-              <TableHead className="text-surface-300">ID</TableHead>
-              <TableHead className="text-surface-300">Logro</TableHead>
-              <TableHead className="text-surface-300">Evento</TableHead>
-              <TableHead className="text-surface-300">Puntos & Rareza</TableHead>
-              <TableHead className="text-surface-300">Tipo & Categoría</TableHead>
-              <TableHead className="text-surface-300">Completado</TableHead>
-              <TableHead className="text-surface-300">Acciones</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.id')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.achievement')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.event')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.pointsRarity')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.typeCategory')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.completed')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.achievements.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

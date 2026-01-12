@@ -1,3 +1,5 @@
+"use client"
+
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives/card"
 import { Button } from "@/components/ui/primitives/button"
 import { Input } from "@/components/ui/primitives/input"
@@ -5,6 +7,7 @@ import { Badge } from "@/components/ui/primitives/badge"
 import { Plus, Search, Award } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
+import { useTranslations } from "next-intl"
 
 interface AchievementHeaderProps {
   totalAchievements: number
@@ -24,6 +27,7 @@ export function AchievementHeader({
   onEventChange,
 }: AchievementHeaderProps) {
   const { events } = useGetEvents()
+  const t = useTranslations('boffmedia')
 
   return (
     <CardHeader className="pb-4">
@@ -31,10 +35,10 @@ export function AchievementHeader({
         <div>
           <CardTitle className="text-2xl text-surface-50 flex items-center">
             <Award className="mr-2 h-6 w-6 text-primary-500" />
-            Gestión de Logros
+            {t('admin.achievements.title')}
           </CardTitle>
           <CardDescription className="text-surface-300">
-            Administra los logros y recompensas del sistema
+            {t('admin.achievements.description')}
           </CardDescription>
         </div>
 
@@ -48,7 +52,7 @@ export function AchievementHeader({
         <div className="relative w-full max-w-sm">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
           <Input
-            placeholder="Buscar logros..."
+            placeholder={t('admin.achievements.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 bg-surface-700 border-surface-600 text-surface-50"
@@ -60,11 +64,11 @@ export function AchievementHeader({
             value={selectedEventId?.toString() || "-1"}
             onValueChange={(value) => onEventChange(value === "-1" ? null : Number(value))}
           >
-            <SelectTrigger className="w-[200px] bg-surface-700 border-surface-600 text-surface-50">
-              <SelectValue placeholder="Filtrar por evento" />
+              <SelectTrigger className="w-[200px] bg-surface-700 border-surface-600 text-surface-50">
+              <SelectValue placeholder={t('admin.achievements.filterPlaceholder')} />
             </SelectTrigger>
             <SelectContent className="bg-surface-800 border-surface-700">
-              <SelectItem value="-1">Todos los eventos</SelectItem>
+              <SelectItem value="-1">{t('admin.achievements.filter.allEvents')}</SelectItem>
               {events?.map((event) => (
                 <SelectItem key={event.id} value={event.id.toString()}>
                   {event.title}
@@ -74,7 +78,7 @@ export function AchievementHeader({
           </Select>
 
           <div className="flex items-center text-surface-300">
-            <span className="mr-2">Total:</span>
+            <span className="mr-2">{t('admin.achievements.totalLabel')}</span>
             <Badge className="bg-primary-500/20 text-primary-400 border-primary-500/30">{totalAchievements}</Badge>
           </div>
         </div>

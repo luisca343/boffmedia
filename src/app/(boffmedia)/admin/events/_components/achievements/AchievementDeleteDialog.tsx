@@ -23,6 +23,7 @@ interface AchievementDeleteDialogProps {
 
 export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuccess }: AchievementDeleteDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleDelete = async () => {
     setIsSubmitting(true)
@@ -42,9 +43,9 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Confirmar Eliminación</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.achievements.deleteTitle')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            ¿Estás seguro de que deseas eliminar este logro? Esta acción no se puede deshacer.
+            {t('admin.achievements.deleteConfirm')}
           </DialogDescription>
         </DialogHeader>
 
@@ -75,7 +76,7 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
             onClick={() => onOpenChange(false)}
             className="border-surface-600 text-surface-300"
           >
-            Cancelar
+            {t('admin.achievements.cancel')}
           </Button>
           <Button
             type="button"
@@ -87,10 +88,10 @@ export function AchievementDeleteDialog({ open, onOpenChange, achievement, onSuc
             {isSubmitting ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Eliminando...
+                {t('admin.achievements.saving')}
               </>
             ) : (
-              "Eliminar Logro"
+              t('admin.achievements.deleteButton')
             )}
           </Button>
         </DialogFooter>

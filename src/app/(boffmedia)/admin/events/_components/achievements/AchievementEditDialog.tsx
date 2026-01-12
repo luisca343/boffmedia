@@ -53,9 +53,9 @@ export function AchievementEditDialog({ open, onOpenChange, achievement, onSucce
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Editar Logro</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.achievements.editTitle')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Actualiza la información del logro seleccionado.
+            {t('admin.achievements.description')}
           </DialogDescription>
         </DialogHeader>
 
