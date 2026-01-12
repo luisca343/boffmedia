@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { EventsService } from '@/services/api/boffmedia/eventsService'
 import { Game } from '@/generated/api'
 import { SectionLoading, SectionError } from '@/components/boffmedia/sections'
+import { useTranslations } from 'next-intl'
 import { GameHero } from './_components/GameHero'
 import { GameEvents } from './_components/GameEvents'
 
@@ -15,6 +16,7 @@ export default function GameDetailPage() {
   const [game, setGame] = useState<Game | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const t = useTranslations('boffmedia')
 
   useEffect(() => {
     async function fetchGame() {
@@ -38,7 +40,7 @@ export default function GameDetailPage() {
   }, [gameId])
 
   if (isLoading) {
-    return <SectionLoading text="Cargando juego..." subtext="Preparando información del juego" />
+    return <SectionLoading text={t('eventsSection.loadingGame')} subtext={t('eventsSection.preparingGame')} />
   }
 
   if (error) {
@@ -50,8 +52,8 @@ export default function GameDetailPage() {
       <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
-            <h1 className="text-3xl font-bold text-surface-300 mb-4">Juego no encontrado</h1>
-            <p className="text-surface-400">El juego que buscas no existe o ha sido eliminado.</p>
+            <h1 className="text-3xl font-bold text-surface-300 mb-4">{t('eventsSection.gameNotFoundTitle')}</h1>
+            <p className="text-surface-400">{t('eventsSection.gameNotFoundDesc')}</p>
           </div>
         </div>
       </div>

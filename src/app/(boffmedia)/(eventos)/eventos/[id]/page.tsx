@@ -14,7 +14,7 @@ import { EventStats } from "./_components/EventStats"
 import { ParticipantsGrid } from "./_components/ParticipantsGrid"
 import { AchievementsSection } from "./_components/AchievementsSection"
 import { Leaderboard } from "./_components/Leaderboard"
-import { LoadingSpinner } from "./_components/LoadingSpinner"
+import { SectionLoading } from '@/components/boffmedia/sections'
 import { InternalLink } from "@/components/ui/navigation/Link"
 
 export default function EventSummaryPage() {
@@ -67,7 +67,7 @@ export default function EventSummaryPage() {
   }, [eventId])
 
   if (isLoading) {
-    return <LoadingSpinner />
+    return <SectionLoading text={t('eventsSection.loading')} subtext={t('eventsSection.subtitle')} />
   }
 
   if (!event) {

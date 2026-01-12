@@ -17,6 +17,8 @@ import { Achievement, Event, UserProgress, EventParticipant } from "@/types/even
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
 import { InternalLink } from "@/components/ui/navigation/Link"
+import { useTranslations } from 'next-intl'
+import { SectionLoading } from '@/components/boffmedia/sections'
 
 interface AchievementWithProgress extends Achievement {
   userProgress?: UserProgress
@@ -29,6 +31,7 @@ export default function EventAchievementsPage() {
   const params = useParams()
   const eventId = parseInt(params.id as string)
   const { session } = useBoffSession()
+  const t = useTranslations('boffmedia')
   
   const userId = session?.user?.id
   
@@ -133,8 +136,8 @@ export default function EventAchievementsPage() {
   const earnedPoints = achievementsWithProgress.filter(a => a.isUnlocked).reduce((sum, a) => sum + a.points, 0)
 
   const formatDate = (dateString?: string | Date) => {
-    if (!dateString) return "No desbloqueado"
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    if (!dateString) return t('eventsSection.notUnlocked')
+    return new Date(dateString).toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -204,23 +207,7 @@ export default function EventAchievementsPage() {
   }
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
-        <div className="container mx-auto p-6 max-w-7xl">
-          <div className="flex flex-col items-center justify-center py-32">
-            <div className="relative">
-              <div className="w-20 h-20 border-4 border-accent-500/20 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-accent-500 rounded-full animate-spin"></div>
-              <div className="absolute top-2 left-2 w-16 h-16 border-4 border-transparent border-t-pink-500 rounded-full animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
-            </div>
-            <h2 className="mt-8 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400">
-              Cargando logros...
-            </h2>
-            <p className="mt-2 text-surface-400">Preparando tus logros</p>
-          </div>
-        </div>
-      </div>
-    )
+    return <SectionLoading text={t('eventsSection.loadingAchievements')} subtext={t('eventsSection.preparingAchievements')} />
   }
 
   return (
@@ -238,7 +225,7 @@ export default function EventAchievementsPage() {
           <InternalLink href={`${eventId}`}>
             <Button variant="ghost" className="mb-6 text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Volver al evento
+              {t('eventsSection.backToEvent')}
             </Button>
           </InternalLink>
           
@@ -261,13 +248,13 @@ export default function EventAchievementsPage() {
               
               <div className="flex-1 text-center md:text-left">
                 <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-pink-400 to-indigo-400 mb-2">
-                  Logros del evento
+                  {t('eventsSection.achievementsTitle')}
                 </h1>
                 <p className="text-xl text-surface-300 mb-4">{event?.title}</p>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <Badge className="bg-gradient-to-r from-accent-500/20 to-indigo-500/20 text-accent-400 border border-accent-500/30">
                     <Trophy className="w-3 h-3 mr-1" />
-                    {totalCount} logros disponibles
+                    {totalCount} {t('eventsSection.achievementsAvailable')}
                   </Badge>
                 </div>
               </div>
@@ -318,9 +305,9 @@ export default function EventAchievementsPage() {
           </div>
 
           {/* Progress Bar */}
-          <div className="bg-surface-800/40 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6">
+            <div className="bg-surface-800/40 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-lg font-semibold text-white">Progreso General</span>
+              <span className="text-lg font-semibold text-white">{t('eventsSection.progressGeneral')}</span>
               <span className="text-accent-400 font-bold">{unlockedCount}/{totalCount}</span>
             </div>
             <Progress 
@@ -334,9 +321,9 @@ export default function EventAchievementsPage() {
         <div className="bg-surface-800/40 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6 mb-8">
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-surface-400" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-surface-400" />
               <Input
-                placeholder="Buscar logros..."
+                placeholder={t('eventsSection.searchPlaceholderAchievements')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-12 h-12 bg-surface-700/50 border-surface-600 text-white placeholder-surface-400 text-lg focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500"
@@ -349,21 +336,21 @@ export default function EventAchievementsPage() {
                 size="sm"
                 onClick={() => setActiveFilter('all')}
               >
-                Todos ({totalCount})
+                {t('eventsSection.filters.all')} ({totalCount})
               </Button>
               <Button
                 variant={activeFilter === 'unlocked' ? "success" : "ghost"}
                 size="sm"
                 onClick={() => setActiveFilter('unlocked')}
               >
-                Desbloqueados ({unlockedCount})
+                {t('eventsSection.filters.unlocked')} ({unlockedCount})
               </Button>
               <Button
                 variant={activeFilter === 'locked' ? "error" : "ghost"}
                 size="sm"
                 onClick={() => setActiveFilter('locked')}
               >
-                Bloqueados ({totalCount - unlockedCount})
+                {t('eventsSection.filters.locked')} ({totalCount - unlockedCount})
               </Button>
             </div>
           </div>
@@ -500,12 +487,12 @@ export default function EventAchievementsPage() {
             </div>
             
             <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-pink-400 mb-4">
-              No se encontraron logros
+              {t('eventsSection.achievementsNoResultsTitle')}
             </h3>
             <p className="text-surface-400 max-w-md mx-auto">
               {searchTerm 
-                ? "Intenta con términos de búsqueda diferentes o cambia los filtros." 
-                : "No hay logros disponibles para este filtro."}
+                ? t('eventsSection.achievementsNoResultsForTerm', { term: searchTerm })
+                : t('eventsSection.achievementsEmptyDesc')}
             </p>
           </div>
         )}

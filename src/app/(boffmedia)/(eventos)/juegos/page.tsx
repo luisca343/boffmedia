@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useGetGames } from '@/hooks/events/useGetGames';
 import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/boffmedia/sections';
+import { useTranslations } from 'next-intl'
 import { GamesGrid } from './_components/GamesGrid';
 import { GamesList } from './_components/GamesList';
 import { GameFilters } from './_components/GameFilters';
@@ -10,6 +11,7 @@ import { Gamepad2 } from 'lucide-react';
 
 export default function GamesPage() {
   const { games, error, isLoading, refetch } = useGetGames();
+  const t = useTranslations('boffmedia')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<string | null>(null);
@@ -33,24 +35,24 @@ export default function GamesPage() {
       })
     : [];
 
-  if (isLoading) return <SectionLoading text="Cargando juegos..." subtext="Preparando experiencias de juego increíbles" />;
-  if (error) return <SectionError error={error} onRetry={refetch} description="Error al cargar los juegos" />;
-  if (!games || games.length === 0) return <SectionEmpty icon={Gamepad2} title="No hay juegos disponibles" description="Estamos trabajando en agregar nuevos juegos emocionantes. ¡Vuelve pronto!" />;
+  if (isLoading) return <SectionLoading text={t('eventsSection.loadingGames')} subtext={t('eventsSection.preparingGames')} />;
+  if (error) return <SectionError error={error} onRetry={refetch} description={t('eventsSection.errorLoadingGames')} />;
+  if (!games || games.length === 0) return <SectionEmpty icon={Gamepad2} title={t('eventsSection.noGamesAvailable')} description={t('eventsSection.noGamesAvailableDesc')} />;
 
   return (
     <div className="container mx-auto p-6 max-w-7xl">
       <SectionHeader 
-        title="Centro de Juegos"
-        subtitle="Descubre todos los juegos disponibles en nuestra plataforma. Desde aventuras épicas hasta competiciones multijugador."
+        title={t('eventsSection.gamesCenterTitle')}
+        subtitle={t('eventsSection.gamesCenterSubtitle')}
       >
         <SectionFilters 
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          searchPlaceholder="Buscar juego..."
+          searchPlaceholder={t('eventsSection.searchPlaceholderGames')}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
           itemsCount={filteredGames.length}
-          itemsLabel="juegos"
+          itemsLabel={t('eventsSection.gamesItemsLabel')}
           showViewMode={true}
           showItemsCount={true}
         >
@@ -67,10 +69,10 @@ export default function GamesPage() {
           icon={Gamepad2}
           searchTerm={searchTerm} 
           onClearSearch={() => setSearchTerm('')}
-          title="No se encontraron juegos"
+          title={t('eventsSection.noGamesFoundTitle')}
           description={searchTerm 
-            ? `No encontramos juegos que coincidan con "${searchTerm}". Prueba con otros términos de búsqueda.`
-            : "No hay juegos que coincidan con los filtros seleccionados."
+            ? t('eventsSection.noGamesFoundForTerm', { term: searchTerm })
+            : t('eventsSection.noGamesMatchFilters')
           }
         />
       ) : viewMode === 'grid' ? (

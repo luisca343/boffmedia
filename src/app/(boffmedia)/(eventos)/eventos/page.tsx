@@ -32,7 +32,7 @@ export default function EventsPage() {
       })
     : [];
 
-  if (isLoading) return <SectionLoading text={t('eventsSection.loading')} subtext="Preparando experiencias épicas" />;
+  if (isLoading) return <SectionLoading text={t('eventsSection.loading')} subtext={t('eventsSection.preparing')} />;
   if (error) return <SectionError error={error} onRetry={refetch} description={t('eventsSection.errorLoading')} />;
   if (!events || events.length === 0) return <SectionEmpty icon={Trophy} title={t('eventsSection.empty.noEvents')} description={t('eventsSection.empty.noEventsDescription')} />;
 
