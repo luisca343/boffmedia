@@ -1,6 +1,7 @@
 "use client"
 
 import { Crown, Medal, Award, User } from "lucide-react"
+import { useTranslations } from 'next-intl'
 import { Card, CardContent } from "@/components/ui/primitives/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
 import { ProfileImage } from "@/components/ui/ProfileImage"
@@ -27,6 +28,7 @@ export function LeaderboardCard({
   scoreType = 'total',
   customScoreLabel,
 }: LeaderboardCardProps) {
+  const t = useTranslations('boffmedia')
   const rankIndex = typeof rank === 'number' ? rank - 1 : parseInt(rank.toString()) - 1
   const displayScore = totalScore ?? player.totalPoints
 
@@ -51,26 +53,37 @@ export function LeaderboardCard({
   }
 
   const getScoreDisplay = () => {
+    const medalPoints = Number(player.medalPoints || 0)
+    const achievementPoints = Number(player.achievementPoints || 0)
+
+    const breakdownParts: string[] = []
+    if (medalPoints > 0) breakdownParts.push(t('eventsSection.leaderboard.counts.medals', { count: medalPoints }))
+    if (achievementPoints > 0) breakdownParts.push(t('eventsSection.leaderboard.counts.achievements', { count: achievementPoints }))
+
+    const breakdown = breakdownParts.length > 0 ? breakdownParts.join(' + ') : null
+
     if (scoreType === 'medal') {
       return {
         score: displayScore,
-        label: customScoreLabel || "medallas",
-        breakdown: `${player.medalPoints || 0} puntos`,
+        label: customScoreLabel || t('eventsSection.leaderboard.labels.medals'),
+        breakdown: medalPoints > 0 ? t('eventsSection.leaderboard.counts.medals', { count: medalPoints }) : null,
         gradient: "from-blue-400 to-cyan-400"
       }
     }
+
     if (scoreType === 'achievement') {
       return {
         score: displayScore,
-        label: customScoreLabel || "puntos",
-        breakdown: `${player.achievementPoints || 0} puntos`,
+        label: customScoreLabel || t('eventsSection.leaderboard.labels.points'),
+        breakdown: achievementPoints > 0 ? t('eventsSection.leaderboard.counts.achievements', { count: achievementPoints }) : null,
         gradient: "from-yellow-400 to-orange-400"
       }
     }
+
     return {
       score: displayScore,
-      label: customScoreLabel || "puntos",
-      breakdown: showDetailedBreakdown ? `${player.medalPoints || 0} medallas + ${player.achievementPoints || 0} logros` : null,
+      label: customScoreLabel || t('eventsSection.leaderboard.labels.points'),
+      breakdown: showDetailedBreakdown ? breakdown : null,
       gradient: "from-yellow-400 to-orange-400"
     }
   }
@@ -96,7 +109,7 @@ export function LeaderboardCard({
               {player.nickname || `Jugador ${player.userId}`}
             </h3>
             <p className="text-surface-400 text-sm">
-              {player.achievementCount || 0} logros • {player.medalCount || 0} medallas
+              {t('eventsSection.leaderboard.counts.achievements', { count: player.achievementCount || 0 })} • {t('eventsSection.leaderboard.counts.medals', { count: player.medalCount || 0 })}
             </p>
           </div>
           

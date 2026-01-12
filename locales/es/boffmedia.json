@@ -206,6 +206,21 @@
         "title": "Clasificación Global",
         "subtitle": "Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación.",
         "playersLabel": "jugadores",
+        "tabs": {
+          "general": "Puntuación General",
+          "medals": "Medallas",
+          "achievements": "Logros"
+        },
+        "labels": {
+          "points": "puntos",
+          "medals": "medallas",
+          "achievements": "logros"
+        },
+        "counts": {
+          "points": "{count, plural, =0 {sin puntos} one {# punto} other {# puntos}}",
+          "medals": "{count, plural, =0 {sin medallas} one {# medalla} other {# medallas}}",
+          "achievements": "{count, plural, =0 {sin logros} one {# logro} other {# logros}}"
+        },
         "searchPlaceholder": "Buscar jugador...",
         "sort": {
           "placeholder": "Ordenar por",
@@ -219,7 +234,8 @@
         "emptyTitle": "No se encontraron jugadores",
         "emptyDescription": "No hay jugadores en la clasificación todavía. Sé el primero en participar en un evento y ganar puntos.",
         "emptyForTerm": "No hay jugadores que coincidan con \"{term}\". Prueba con otros términos de búsqueda.",
-        "errorLoading": "Error al cargar la clasificación"
+        "errorLoading": "Error al cargar la clasificación",
+        "showing": "Mostrando {start} - {end} de {total} {label}"
       },
       "searchPlaceholder": "Buscar evento...",
       "itemsLabel": "eventos",

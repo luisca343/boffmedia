@@ -5,9 +5,10 @@ import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/primitives/button"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { SectionHeader, SectionLoading } from '@/components/boffmedia/sections';
-import { useTranslations } from 'next-intl'
 import { LeaderboardFilters } from "../_components/LeaderboardFilters"
+import PaginationControls from "./_components/PaginationControls"
 import { LeaderboardTabs } from "./_components/leaderboard/LeaderboardTabs"
+import { useTranslations } from 'next-intl'
 export default function FullLeaderboardComponent() {
   const t = useTranslations('boffmedia')
   const { leaderboards, error, isLoading, refetch } = useGetLeaderboards()
@@ -17,8 +18,6 @@ export default function FullLeaderboardComponent() {
   const [sortBy, setSortBy] = useState<"score" | "medals" | "achievements">("score")
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
   const playersPerPage = 10
-
-  console.log(leaderboards)
 
 
 
@@ -133,72 +132,13 @@ export default function FullLeaderboardComponent() {
 
           {/* Pagination */}
           {currentPlayers.length > 0 && (
-            <div className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 rounded-2xl p-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <p className="text-surface-400 text-sm">
-                  Mostrando {(currentPage - 1) * playersPerPage + 1} - {Math.min(currentPage * playersPerPage, filteredPlayers.length)} de {filteredPlayers.length} jugadores
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="accentOutline"
-                    size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    disabled={currentPage === 1}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNum
-                      if (totalPages <= 5) {
-                        pageNum = i + 1
-                      } else if (currentPage <= 3) {
-                        pageNum = i + 1
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i
-                      } else {
-                        pageNum = currentPage - 2 + i
-                      }
-
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={currentPage === pageNum ? "accent" : "accentOutline"}
-                          size="sm"
-                          onClick={() => setCurrentPage(pageNum)}
-                        >
-                          {pageNum}
-                        </Button>
-                      )
-                    })}
-
-                    {totalPages > 5 && currentPage < totalPages - 2 && (
-                      <>
-                        <span className="text-surface-500">...</span>
-                        <Button
-                          variant="accentOutline"
-                          size="sm"
-                          onClick={() => setCurrentPage(totalPages)}
-                        >
-                          {totalPages}
-                        </Button>
-                      </>
-                    )}
-                  </div>
-
-                  <Button
-                    variant="accentOutline"
-                    size="sm"
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    disabled={currentPage === totalPages}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <PaginationControls
+              currentPage={currentPage}
+              totalPages={totalPages}
+              playersPerPage={playersPerPage}
+              totalItems={filteredPlayers.length}
+              onPageChange={(p) => setCurrentPage(p)}
+            />
           )}
         </div>
       </div>

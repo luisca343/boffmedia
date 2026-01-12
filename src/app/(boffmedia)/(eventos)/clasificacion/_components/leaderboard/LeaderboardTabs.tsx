@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from 'next-intl'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
 import { GeneralLeaderboard } from "./GeneralLeaderboard"
 import { MedalsLeaderboard } from "./MedalsLeaderboard"
@@ -23,6 +26,7 @@ export function LeaderboardTabs({
   currentPage,
   playersPerPage,
 }: LeaderboardTabsProps) {
+  const t = useTranslations('boffmedia')
   return (
     <Tabs defaultValue="general" className="space-y-6">
       <TabsList className="bg-surface-800/60 backdrop-blur-sm border border-accent-500/20 p-1">
@@ -30,19 +34,19 @@ export function LeaderboardTabs({
           value="general" 
           className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
         >
-          Puntuación General
+          {t('eventsSection.leaderboard.tabs.general')}
         </TabsTrigger>
         <TabsTrigger 
           value="medals" 
           className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
         >
-          Medallas
+          {t('eventsSection.leaderboard.tabs.medals')}
         </TabsTrigger>
         <TabsTrigger 
           value="achievements" 
           className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-accent-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white text-surface-300"
         >
-          Logros
+          {t('eventsSection.leaderboard.tabs.achievements')}
         </TabsTrigger>
       </TabsList>
 

@@ -1,3 +1,6 @@
+"use client"
+
+import { useTranslations } from 'next-intl'
 import { LeaderboardList } from "@/components/boffmedia/leaderboard/LeaderboardList"
 import { LeaderboardEntry } from "@/generated/api"
 
