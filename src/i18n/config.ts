@@ -60,6 +60,9 @@ export const PAGE_NAMESPACES: Record<string, readonly string[]> = {
     'tools/pokemon.json',
     'tools/tcgpocket/common.json',
   ],
+  '/herramientas/otros/keys': [
+    'tools/keys.json',
+  ],
   '/herramientas/mhwilds': [
     'tools/mhwilds.json',
   ],

@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/primitives/table";
 import { KeyRow } from "./KeyRow";
+import { useTranslations } from 'next-intl';
 
 export interface KeyItem {
   name: string;
@@ -31,7 +32,10 @@ export const KeysDataTable = ({
   hoveredRow,
   setHoveredRow,
   fetchGameData
-}: KeysDataTableProps) => (
+}: KeysDataTableProps) => {
+  const t = useTranslations('boffmedia.keys');
+
+  return (
   <motion.div
     className="bg-surface-800 rounded-lg shadow-lg overflow-hidden border border-surface-700"
     initial={{ scale: 0.95, opacity: 0 }}
@@ -41,12 +45,13 @@ export const KeysDataTable = ({
     <div className="overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow className="bg-surface-900 border-b border-surface-700">
-            <TableHead className="text-secondary-400 font-medium w-[60px]">#</TableHead>
-            <TableHead className="text-secondary-400 font-medium w-[80px]">Imagen</TableHead>
-            <TableHead className="text-secondary-400 font-medium">Juego</TableHead>
+            <TableRow className="bg-surface-900 border-b border-surface-700">
+            {/* Use translations for table headers */}
+            <TableHead className="text-secondary-400 font-medium w-[60px]">{t('table.head.number')}</TableHead>
+            <TableHead className="text-secondary-400 font-medium w-[80px]">{t('table.head.image')}</TableHead>
+            <TableHead className="text-secondary-400 font-medium">{t('table.head.game')}</TableHead>
             {/*<TableHead className="text-secondary-400 font-medium">Bundle</TableHead>*/}
-            <TableHead className="text-secondary-400 font-medium w-[120px]">Estado</TableHead>
+            <TableHead className="text-secondary-400 font-medium w-[120px]">{t('table.head.state')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -64,9 +69,9 @@ export const KeysDataTable = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-40 text-center text-surface-400">
-                  No se encontraron claves que coincidan con tu búsqueda
-                </TableCell>
+                    <TableCell colSpan={5} className="h-40 text-center text-surface-400">
+                      {t('table.noResults')}
+                    </TableCell>
               </TableRow>
             )}
           </AnimatePresence>
@@ -74,4 +79,5 @@ export const KeysDataTable = ({
       </Table>
     </div>
   </motion.div>
-);
+  );
+};

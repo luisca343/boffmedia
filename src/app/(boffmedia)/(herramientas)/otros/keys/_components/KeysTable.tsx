@@ -7,10 +7,12 @@ import { KeysHeader } from "./KeysHeader";
 import { KeysControls } from "./KeysControls";
 import { KeysDataTable } from "./KeysDataTable";
 import { FloatingSection } from "@/app/(boffmedia)/_components/layout/FloatingSection";
+import { useTranslations } from 'next-intl';
 
 const SteamDialog = lazy(() => import("./SteamDialog"));
 
 export default function KeysTable() {
+  const t = useTranslations('boffmedia.keys');
   const { filteredKeys, filter, setFilter } = useGetKeys();
   const [hoveredRow, setHoveredRow] = useState<string | null>(null);
   const [showClaimed, setShowClaimed] = useState<boolean>(false);
@@ -20,7 +22,7 @@ export default function KeysTable() {
     <div className="flex items-center justify-center min-h-[400px]">
       <div className="flex flex-col items-center gap-2">
         <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"></div>
-        <p className="text-surface-300">Cargando claves...</p>
+        <p className="text-surface-300">{t('loading.loadingKeys')}</p>
       </div>
     </div>
   );
@@ -65,7 +67,7 @@ export default function KeysTable() {
           />
         </div>
 
-        <Suspense fallback={<div className="fixed inset-0 bg-surface-900/70 flex items-center justify-center">Cargando...</div>}>
+        <Suspense fallback={<div className="fixed inset-0 bg-surface-900/70 flex items-center justify-center">{t('suspense.loading')}</div>}>
           <SteamDialog
             isModalVisible={isModalVisible}
             setIsModalVisible={setIsModalVisible}

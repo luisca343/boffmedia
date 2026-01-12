@@ -3,6 +3,7 @@ import { TableCell, TableRow } from "@/components/ui/primitives/table";
 import { Badge } from "@/components/ui/primitives/badge";
 import { Gift, Key, ExternalLink, Clock } from "lucide-react";
 import { KeyItem } from "./KeysDataTable";
+import { useTranslations } from 'next-intl';
 
 interface KeyRowProps {
   keyData: KeyItem;
@@ -18,7 +19,10 @@ export const KeyRow = ({
   hoveredRow,
   setHoveredRow,
   fetchGameData
-}: KeyRowProps) => (
+}: KeyRowProps) => {
+  const t = useTranslations('boffmedia.keys');
+
+  return (
   <motion.tr
     key={`${key.name}-${key.claimed}-${index}`}
     className="hover:bg-surface-700 transition-colors duration-200 cursor-pointer border-b border-surface-700/50 last:border-b-0"
@@ -35,10 +39,10 @@ export const KeyRow = ({
     </TableCell>
     <TableCell className="py-3 px-4">
       <div className="w-10 h-10 bg-surface-900/50 rounded-md overflow-hidden border border-surface-700 flex items-center justify-center">
-        {key.imageUrl ? (
+          {key.imageUrl ? (
           <img
             src={key.imageUrl}
-            alt={`Imagen de ${key.name}`}
+            alt={t('row.imageAlt', { name: key.name })}
             className="w-full h-full object-cover"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -79,7 +83,7 @@ export const KeyRow = ({
       {hoveredRow === key.name && (
         <div className="text-xs text-surface-400 mt-1 flex items-center gap-1">
           <Clock className="w-3 h-3" />
-          Haz clic para ver detalles
+          {t('row.clickHint')}
         </div>
       )}
     </TableCell>
@@ -96,9 +100,11 @@ export const KeyRow = ({
       >
         <Key className="w-3.5 h-3.5" />
         <span className="text-sm font-medium">
-          {key.claimed === "s" ? "Reclamada" : "Disponible"}
+          {key.claimed === "s" ? t('row.claimed') : t('row.available')}
         </span>
       </motion.div>
     </TableCell>
   </motion.tr>
-);
+  );
+};
+ 

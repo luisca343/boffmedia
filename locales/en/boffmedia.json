@@ -82,6 +82,77 @@
         }
       }
     },
+    "keys": {
+      "header": {
+        "title": "Keys for {platform}",
+        "subtitle": "Game keys library for the community"
+      },
+      "controls": {
+        "searchPlaceholder": "Search by game name or bundle...",
+        "showClaimed": {
+          "show": "Show claimed",
+          "hide": "Hide claimed"
+        },
+        "badges": {
+          "allGames": "All games ({count})",
+          "available": "Available ({count})",
+          "claimed": "Claimed ({count})"
+        },
+        "sortButton": "Sort"
+      },
+      "table": {
+        "head": {
+          "number": "#",
+          "image": "Image",
+          "game": "Game",
+          "state": "State"
+        },
+        "noResults": "No keys matching your search were found"
+      },
+      "loading": {
+        "loadingKeys": "Loading keys..."
+      },
+      "suspense": {
+        "loading": "Loading..."
+      },
+      "row": {
+        "clickHint": "Click to view details",
+        "claimed": "Claimed",
+        "available": "Available",
+        "imageAlt": "Image of {name}"
+      }
+    },
+    "steamDialog": {
+      "tabs": {
+        "info": "Info",
+        "pricing": "Pricing",
+        "media": "Media"
+      },
+      "info": {
+        "descriptionTitle": "Description",
+        "developer": "Developer",
+        "publisher": "Publisher",
+        "releaseDate": "Release date",
+        "platforms": "Platforms",
+        "genres": "Genres",
+        "visitWebsite": "Visit website"
+      },
+      "pricing": {
+        "currentPriceTitle": "Current price",
+        "priceInfoTitle": "Price information",
+        "regularPriceLabel": "Regular price:",
+        "salePriceLabel": "Sale price:",
+        "discountLabel": "Discount:",
+        "discountBadge": "-{percent}% off",
+        "viewOnSteam": "View on Steam",
+        "free": "Free"
+      },
+      "close": "Close",
+      "media": {
+        "loading": "Loading...",
+        "thumbnailAlt": "Thumbnail {index}"
+      }
+    },
     "eventsSection": {
       "locale": "en-US",
       "loading": "Loading events...",
