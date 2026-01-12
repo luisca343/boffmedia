@@ -6,6 +6,7 @@ import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
 import type { Event } from "@/types/events"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { useTranslations } from "next-intl"
 
 interface EventEditDialogProps {
   open: boolean
@@ -16,7 +17,7 @@ interface EventEditDialogProps {
 
 export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const t = useTranslations('boffmedia')
 
   const formatDateForInput = (dateString?: string) => {
     if (!dateString) return ""
@@ -48,10 +49,10 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
     setIsSubmitting(true)
     try {
       await EventsService.updateEvent(event.id!, data!)
-      toast.success(`El evento "${data.title}" ha sido actualizado con éxito.`)
+      toast.success(t('admin.events.edit.success', { title: data.title }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar actualizar el evento.")
+      toast.error(t('admin.events.edit.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -61,9 +62,9 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Editar Evento</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.events.edit.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Actualiza la información del evento seleccionado.
+            {t('admin.events.edit.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -72,7 +73,7 @@ export function EventEditDialog({ open, onOpenChange, event, onSuccess }: EventE
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
-          submitLabel={isSubmitting ? "Actualizando..." : "Guardar Cambios"}
+          submitLabel={isSubmitting ? t('admin.events.edit.updating') : t('admin.events.edit.saveButton')}
         />
       </DialogContent>
     </Dialog>

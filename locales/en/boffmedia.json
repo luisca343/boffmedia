@@ -472,6 +472,115 @@
           },
           "loadingEvents": "Loading events..."
         }
+      },
+      "events": {
+        "title": "Events Management",
+        "description": "Manage events and competitions",
+        "newEvent": "New Event",
+        "searchPlaceholder": "Search events...",
+        "totalLabel": "Total:",
+        "table": {
+          "event": "Event",
+          "game": "Game",
+          "startDate": "Start Date",
+          "endDate": "End Date",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "empty": {
+          "noEvents": "No events found",
+          "noEventsDesc": "There are no events registered. Create the first event to get started.",
+          "noEventsSearch": "There are no events that match \"{searchTerm}\". Try other search terms.",
+          "clearSearch": "Clear search"
+        },
+        "error": {
+          "loading": "Error loading events",
+          "retry": "Retry"
+        },
+        "loading": "Loading events...",
+        "card": {
+          "gamePrefix": "Game #",
+          "noDate": "No date",
+          "createSubEvent": "Create sub-event"
+        },
+        "create": {
+          "title": "Create New Event",
+          "description": "Complete the form to add a new event to the system.",
+          "success": "Event \"{title}\" has been created successfully.",
+          "error": "An error occurred while trying to create the event.",
+          "creating": "Creating...",
+          "createButton": "Create Event"
+        },
+        "edit": {
+          "title": "Edit Event",
+          "description": "Update the selected event information.",
+          "success": "Event \"{title}\" has been updated successfully.",
+          "error": "An error occurred while trying to update the event.",
+          "updating": "Updating...",
+          "saveButton": "Save Changes"
+        },
+        "delete": {
+          "title": "Confirm Deletion",
+          "description": "Are you sure you want to delete this event? This action cannot be undone.",
+          "success": "Event \"{title}\" has been deleted successfully.",
+          "error": "An error occurred while trying to delete the event.",
+          "warning": "Note: Deleting this event will affect all participants and their records.",
+          "deleting": "Deleting...",
+          "deleteButton": "Delete Event",
+          "cancel": "Cancel"
+        },
+        "form": {
+          "labels": {
+            "parentEvent": "Parent Server (Optional)",
+            "title": "Title",
+            "description": "Description",
+            "game": "Game",
+            "startDate": "Start Date",
+            "endDate": "End Date",
+            "type": "Type",
+            "visibility": "Visibility",
+            "icon": "Icon",
+            "banner": "Banner"
+          },
+          "placeholders": {
+            "selectParent": "Select a parent server",
+            "title": "Event name",
+            "description": "Describe the event",
+            "selectGame": "Select a game",
+            "icon": "/icons/event.png",
+            "banner": "/banners/event.jpg"
+          },
+          "descriptions": {
+            "parentEvent": "If you select a parent server, this event will be a sub-event.",
+            "title": "This will be the main name of the event.",
+            "description": "A clear description of what this event represents.",
+            "game": "Select the game this event belongs to.",
+            "startDate": "When the event starts.",
+            "endDate": "When the event ends (optional).",
+            "type": "Type of event or server.",
+            "visibility": "Who can see this event.",
+            "icon": "Path to the event icon (e.g., /icons/event.png).",
+            "banner": "Path to the event banner (e.g., /banners/event.jpg)."
+          },
+          "validation": {
+            "titleMin": "Title must be at least 3 characters",
+            "descriptionMin": "Description must be at least 10 characters"
+          },
+          "options": {
+            "noParent": "None (Independent event)",
+            "type": {
+              "event": "Event",
+              "server": "Server"
+            },
+            "visibility": {
+              "public": "Public",
+              "private": "Private"
+            }
+          },
+          "loadingEvents": "Loading events...",
+          "loadingGames": "Loading games...",
+          "save": "Save"
+        }
       }
     },
     "community": {

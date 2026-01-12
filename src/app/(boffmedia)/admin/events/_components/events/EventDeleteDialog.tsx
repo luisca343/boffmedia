@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Calendar, RefreshCw } from "lucide-react"
 import type { Event } from "@/types/events"
+import { useTranslations } from "next-intl"
 
 interface EventDeleteDialogProps {
   open: boolean
@@ -23,15 +24,16 @@ interface EventDeleteDialogProps {
 
 export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: EventDeleteDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
       //await eventsService.deleteEvent(event.id)
-      toast.success(`El evento "${event.title}" ha sido eliminado con éxito.`)
+      toast.success(t('admin.events.delete.success', { title: event.title }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar eliminar el evento.")
+      toast.error(t('admin.events.delete.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -41,9 +43,9 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Confirmar Eliminación</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.events.delete.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            ¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer.
+            {t('admin.events.delete.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -63,7 +65,7 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
           </div>
 
           <p className="text-warning-500 text-sm">
-            Nota: Eliminar este evento afectará a todos los participantes y sus registros.
+            {t('admin.events.delete.warning')}
           </p>
         </div>
 
@@ -74,7 +76,7 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
             onClick={() => onOpenChange(false)}
             className="border-surface-600 text-surface-300"
           >
-            Cancelar
+            {t('admin.events.delete.cancel')}
           </Button>
           <Button
             type="button"
@@ -86,10 +88,10 @@ export function EventDeleteDialog({ open, onOpenChange, event, onSuccess }: Even
             {isSubmitting ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Eliminando...
+                {t('admin.events.delete.deleting')}
               </>
             ) : (
-              "Eliminar Evento"
+              t('admin.events.delete.deleteButton')
             )}
           </Button>
         </DialogFooter>

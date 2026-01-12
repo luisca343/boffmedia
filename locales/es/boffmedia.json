@@ -472,6 +472,115 @@
           },
           "loadingEvents": "Cargando eventos..."
         }
+      },
+      "events": {
+        "title": "Gestión de Eventos",
+        "description": "Administra los eventos y competiciones",
+        "newEvent": "Nuevo Evento",
+        "searchPlaceholder": "Buscar eventos...",
+        "totalLabel": "Total:",
+        "table": {
+          "event": "Evento",
+          "game": "Juego",
+          "startDate": "Fecha Inicio",
+          "endDate": "Fecha Fin",
+          "status": "Estado",
+          "actions": "Acciones"
+        },
+        "empty": {
+          "noEvents": "No se encontraron eventos",
+          "noEventsDesc": "No hay eventos registrados. Crea el primer evento para comenzar.",
+          "noEventsSearch": "No hay eventos que coincidan con \"{searchTerm}\". Prueba con otros términos de búsqueda.",
+          "clearSearch": "Limpiar búsqueda"
+        },
+        "error": {
+          "loading": "Error al cargar eventos",
+          "retry": "Reintentar"
+        },
+        "loading": "Cargando eventos...",
+        "card": {
+          "gamePrefix": "Juego #",
+          "noDate": "Sin fecha",
+          "createSubEvent": "Crear sub-evento"
+        },
+        "create": {
+          "title": "Crear Nuevo Evento",
+          "description": "Completa el formulario para añadir un nuevo evento al sistema.",
+          "success": "El evento \"{title}\" ha sido creado con éxito.",
+          "error": "Ocurrió un error al intentar crear el evento.",
+          "creating": "Creando...",
+          "createButton": "Crear Evento"
+        },
+        "edit": {
+          "title": "Editar Evento",
+          "description": "Actualiza la información del evento seleccionado.",
+          "success": "El evento \"{title}\" ha sido actualizado con éxito.",
+          "error": "Ocurrió un error al intentar actualizar el evento.",
+          "updating": "Actualizando...",
+          "saveButton": "Guardar Cambios"
+        },
+        "delete": {
+          "title": "Confirmar Eliminación",
+          "description": "¿Estás seguro de que deseas eliminar este evento? Esta acción no se puede deshacer.",
+          "success": "El evento \"{title}\" ha sido eliminado con éxito.",
+          "error": "Ocurrió un error al intentar eliminar el evento.",
+          "warning": "Nota: Eliminar este evento afectará a todos los participantes y sus registros.",
+          "deleting": "Eliminando...",
+          "deleteButton": "Eliminar Evento",
+          "cancel": "Cancelar"
+        },
+        "form": {
+          "labels": {
+            "parentEvent": "Servidor Padre (Opcional)",
+            "title": "Título",
+            "description": "Descripción",
+            "game": "Juego",
+            "startDate": "Fecha Inicio",
+            "endDate": "Fecha Fin",
+            "type": "Tipo",
+            "visibility": "Visibilidad",
+            "icon": "Icono",
+            "banner": "Banner"
+          },
+          "placeholders": {
+            "selectParent": "Selecciona un servidor padre",
+            "title": "Nombre del evento",
+            "description": "Describe el evento",
+            "selectGame": "Selecciona un juego",
+            "icon": "/icons/event.png",
+            "banner": "/banners/event.jpg"
+          },
+          "descriptions": {
+            "parentEvent": "Si seleccionas un servidor padre, este evento será un sub-evento.",
+            "title": "Este será el nombre principal del evento.",
+            "description": "Una descripción clara de lo que representa este evento.",
+            "game": "Selecciona el juego al que pertenece este evento.",
+            "startDate": "Cuándo comienza el evento.",
+            "endDate": "Cuándo termina el evento (opcional).",
+            "type": "Tipo de evento o servidor.",
+            "visibility": "Quién puede ver este evento.",
+            "icon": "Ruta del icono del evento (ej: /icons/event.png).",
+            "banner": "Ruta del banner del evento (ej: /banners/event.jpg)."
+          },
+          "validation": {
+            "titleMin": "El título debe tener al menos 3 caracteres",
+            "descriptionMin": "La descripción debe tener al menos 10 caracteres"
+          },
+          "options": {
+            "noParent": "Ninguno (Evento independiente)",
+            "type": {
+              "event": "Evento",
+              "server": "Servidor"
+            },
+            "visibility": {
+              "public": "Público",
+              "private": "Privado"
+            }
+          },
+          "loadingEvents": "Cargando eventos...",
+          "loadingGames": "Cargando juegos...",
+          "save": "Guardar"
+        }
       }
     },
     "community": {

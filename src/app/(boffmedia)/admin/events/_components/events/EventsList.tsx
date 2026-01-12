@@ -1,9 +1,12 @@
+"use client"
+
 import { CardContent } from "@/components/ui/primitives/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
 import type { Event } from "@/types/events"
 import { EventCard } from "./EventCard"
 import { EventEmptyState } from "./EventEmptyState"
 import React from "react"
+import { useTranslations } from "next-intl"
 
 interface EventsListProps {
   events: Event[]
@@ -12,6 +15,8 @@ interface EventsListProps {
 }
 
 export function EventsList({ events, onEdit, onDelete }: EventsListProps) {
+  const t = useTranslations('boffmedia')
+  
   // Group events by their hierarchy
   const groupedEvents = events.reduce((acc, event) => {
     if (!event.parentId) {
@@ -44,12 +49,12 @@ export function EventsList({ events, onEdit, onDelete }: EventsListProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-surface-700">
-              <TableHead className="text-surface-300">Evento</TableHead>
-              <TableHead className="text-surface-300">Juego</TableHead>
-              <TableHead className="text-surface-300">Fecha Inicio</TableHead>
-              <TableHead className="text-surface-300">Fecha Fin</TableHead>
-              <TableHead className="text-surface-300">Estado</TableHead>
-              <TableHead className="text-surface-300">Acciones</TableHead>
+              <TableHead className="text-surface-300">{t('admin.events.table.event')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.events.table.game')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.events.table.startDate')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.events.table.endDate')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.events.table.status')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.events.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

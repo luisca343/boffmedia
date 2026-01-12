@@ -1,3 +1,5 @@
+"use client"
+
 import { TableCell, TableRow } from "@/components/ui/primitives/table"
 import { Button } from "@/components/ui/primitives/button"
 import { Badge } from "@/components/ui/primitives/badge"
@@ -5,7 +7,8 @@ import { Pencil, Trash2, Calendar, ChevronRight, Plus } from "lucide-react"
 import type { Event } from "@/types/events"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { cn } from "@/lib/utils"
-import { getEventStatus } from "@/lib/events" // Import the new utility function
+import { getEventStatus } from "@/lib/events"
+import { useTranslations } from "next-intl"
 
 interface EventCardProps {
   event: Event
@@ -18,9 +21,10 @@ interface EventCardProps {
 
 export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEvent }: EventCardProps) {
   const { games } = useGetGames()
+  const t = useTranslations('boffmedia')
 
   // Find the game name
-  const gameDisplay = event.gameName || `Juego #${event.gameId}`
+  const gameDisplay = event.gameName || `${t('admin.events.card.gamePrefix')}${event.gameId}`
 
   // Use the utility function
   const status = getEventStatus(event.startDate, event.endDate)
@@ -64,7 +68,7 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
         <span className="text-surface-300">{new Date(event.startDate).toLocaleString()}</span>
       </TableCell>
       <TableCell>
-        <span className="text-surface-300">{event.endDate ? new Date(event.endDate).toLocaleString() : "Sin fecha"}</span>
+        <span className="text-surface-300">{event.endDate ? new Date(event.endDate).toLocaleString() : t('admin.events.card.noDate')}</span>
       </TableCell>
       <TableCell>
         <Badge className={status.class}>{status.label}</Badge>
@@ -77,7 +81,7 @@ export function EventCard({ event, onEdit, onDelete, isParent, isChild, parentEv
               size="icon"
               className="h-8 w-8 border-surface-600"
               onClick={onEdit}
-              title="Crear sub-evento"
+              title={t('admin.events.card.createSubEvent')}
             >
               <Plus className="h-4 w-4 text-primary-400" />
             </Button>

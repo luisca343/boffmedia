@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { useTranslations } from "next-intl"
 
 interface EventCreateDialogProps {
   open: boolean
@@ -14,7 +15,7 @@ interface EventCreateDialogProps {
 
 export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreateDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+  const t = useTranslations('boffmedia')
 
   const handleSubmit = async (data: EventFormValues) => {
       setIsSubmitting(true)
@@ -30,10 +31,10 @@ export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreate
         
       
       await (await EventsService.createEvent(eventData)).data
-      toast.success(`El evento "${data.title}" ha sido creado con éxito.`)
+      toast.success(t('admin.events.create.success', { title: data.title }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar crear el evento.")
+      toast.error(t('admin.events.create.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -43,9 +44,9 @@ export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreate
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Crear Nuevo Evento</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.events.create.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Completa el formulario para añadir un nuevo evento al sistema.
+            {t('admin.events.create.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -53,7 +54,7 @@ export function EventCreateDialog({ open, onOpenChange, onSuccess }: EventCreate
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
-          submitLabel={isSubmitting ? "Creando..." : "Crear Evento"}
+          submitLabel={isSubmitting ? t('admin.events.create.creating') : t('admin.events.create.createButton')}
         />
       </DialogContent>
     </Dialog>
