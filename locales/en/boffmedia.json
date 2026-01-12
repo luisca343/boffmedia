@@ -581,6 +581,79 @@
           "loadingGames": "Loading games...",
           "save": "Save"
         }
+      },
+      "games": {
+        "title": "Games Management",
+        "description": "Manage available games for events",
+        "newGame": "New Game",
+        "searchPlaceholder": "Search games...",
+        "totalLabel": "Total:",
+        "table": {
+          "id": "ID",
+          "game": "Game",
+          "description": "Description",
+          "createdAt": "Created Date",
+          "actions": "Actions"
+        },
+        "empty": {
+          "noGames": "No games found",
+          "noGamesDesc": "There are no games registered. Create the first game to get started.",
+          "noGamesSearch": "There are no games that match \"{searchTerm}\". Try other search terms.",
+          "clearSearch": "Clear search"
+        },
+        "error": {
+          "loading": "Error loading games",
+          "retry": "Retry"
+        },
+        "loading": "Loading games...",
+        "create": {
+          "title": "Create New Game",
+          "description": "Complete the form to add a new game to the system.",
+          "success": "Game \"{title}\" has been created successfully.",
+          "error": "An error occurred while trying to create the game.",
+          "creating": "Creating...",
+          "createButton": "Create Game"
+        },
+        "edit": {
+          "title": "Edit Game",
+          "description": "Update the selected game information.",
+          "success": "Game \"{title}\" has been updated successfully.",
+          "error": "An error occurred while trying to update the game.",
+          "updating": "Updating...",
+          "saveButton": "Save Changes"
+        },
+        "delete": {
+          "title": "Confirm Deletion",
+          "description": "Are you sure you want to delete this game? This action cannot be undone.",
+          "success": "Game \"{title}\" has been deleted successfully.",
+          "error": "An error occurred while trying to delete the game.",
+          "warning": "Note: Deleting this game could affect events that use it.",
+          "deleting": "Deleting...",
+          "deleteButton": "Delete Game",
+          "cancel": "Cancel"
+        },
+        "form": {
+          "labels": {
+            "title": "Title",
+            "description": "Description",
+            "icon": "Icon URL"
+          },
+          "placeholders": {
+            "title": "Game name",
+            "description": "Describe the game",
+            "icon": "https://example.com/icon.jpg"
+          },
+          "descriptions": {
+            "title": "This will be the main name of the game.",
+            "description": "Provide a detailed description of the game.",
+            "icon": "URL of the image to be used as icon."
+          },
+          "validation": {
+            "titleMin": "Title must be at least 3 characters",
+            "descriptionMin": "Description must be at least 10 characters"
+          },
+          "save": "Save"
+        }
       }
     },
     "community": {

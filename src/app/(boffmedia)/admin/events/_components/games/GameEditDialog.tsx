@@ -6,6 +6,7 @@ import { toast } from "react-toastify"
 import { GameForm, type GameFormValues } from "./GameForm"
 import type { Game } from "@/types/events"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { useTranslations } from "next-intl"
 
 interface GameEditDialogProps {
   open: boolean
@@ -16,6 +17,7 @@ interface GameEditDialogProps {
 
 export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleSubmit = async (data: GameFormValues) => {
     setIsSubmitting(true)
@@ -24,10 +26,10 @@ export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEdit
         ...game,
         ...data,
       })
-      toast.success(`El juego "${data.title}" ha sido actualizado con éxito.`)
+      toast.success(t('admin.games.edit.success', { title: data.title }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar actualizar el juego.")
+      toast.error(t('admin.games.edit.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -37,9 +39,9 @@ export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEdit
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Editar Juego</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.games.edit.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Actualiza la información del juego seleccionado.
+            {t('admin.games.edit.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -48,7 +50,7 @@ export function GameEditDialog({ open, onOpenChange, game, onSuccess }: GameEdit
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
-          submitLabel={isSubmitting ? "Actualizando..." : "Guardar Cambios"}
+          submitLabel={isSubmitting ? t('admin.games.edit.updating') : t('admin.games.edit.saveButton')}
         />
       </DialogContent>
     </Dialog>

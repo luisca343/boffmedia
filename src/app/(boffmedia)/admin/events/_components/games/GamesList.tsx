@@ -1,8 +1,11 @@
+"use client"
+
 import { CardContent } from "@/components/ui/primitives/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
 import type { Game } from "@/types/events"
 import { GameCard } from "./GameCard"
 import { GameEmptyState } from "./GameEmptyState"
+import { useTranslations } from "next-intl"
 
 interface GamesListProps {
   games: any[]
@@ -11,6 +14,8 @@ interface GamesListProps {
 }
 
 export function GamesList({ games, onEdit, onDelete }: GamesListProps) {
+  const t = useTranslations('boffmedia')
+  
   if (games.length === 0) {
     return (
       <CardContent>
@@ -25,11 +30,11 @@ export function GamesList({ games, onEdit, onDelete }: GamesListProps) {
         <Table>
           <TableHeader>
             <TableRow className="border-surface-700">
-              <TableHead className="text-surface-300">ID</TableHead>
-              <TableHead className="text-surface-300">Juego</TableHead>
-              <TableHead className="text-surface-300">Descripción</TableHead>
-              <TableHead className="text-surface-300">Fecha Creación</TableHead>
-              <TableHead className="text-surface-300">Acciones</TableHead>
+              <TableHead className="text-surface-300">{t('admin.games.table.id')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.games.table.game')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.games.table.description')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.games.table.createdAt')}</TableHead>
+              <TableHead className="text-surface-300">{t('admin.games.table.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

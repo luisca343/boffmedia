@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { toast } from "react-toastify"
 import { GameForm, type GameFormValues } from "./GameForm"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { useTranslations } from "next-intl"
 
 interface GameCreateDialogProps {
   open: boolean
@@ -14,15 +15,16 @@ interface GameCreateDialogProps {
 
 export function GameCreateDialog({ open, onOpenChange, onSuccess }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleSubmit = async (data: any) => {
     setIsSubmitting(true)
     try {
       await (await EventsService.createGame(data!)).data
-      toast.success(`El juego "${data.title}" ha sido creado con éxito.`)
+      toast.success(t('admin.games.create.success', { title: data.title }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar crear el juego.")
+      toast.error(t('admin.games.create.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -32,9 +34,9 @@ export function GameCreateDialog({ open, onOpenChange, onSuccess }: any) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Crear Nuevo Juego</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.games.create.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            Completa el formulario para añadir un nuevo juego al sistema.
+            {t('admin.games.create.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -42,7 +44,7 @@ export function GameCreateDialog({ open, onOpenChange, onSuccess }: any) {
           isSubmitting={isSubmitting}
           onSubmit={handleSubmit}
           onCancel={() => onOpenChange(false)}
-          submitLabel={isSubmitting ? "Creando..." : "Crear Juego"}
+          submitLabel={isSubmitting ? t('admin.games.create.creating') : t('admin.games.create.createButton')}
         />
       </DialogContent>
     </Dialog>

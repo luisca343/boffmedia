@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Gamepad, RefreshCw } from "lucide-react"
 import type { Game } from "@/types/events"
+import { useTranslations } from "next-intl"
 
 interface GameDeleteDialogProps {
   open: boolean
@@ -23,15 +24,16 @@ interface GameDeleteDialogProps {
 
 export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDeleteDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const t = useTranslations('boffmedia')
 
   const handleDelete = async () => {
     setIsSubmitting(true)
     try {
       // await eventsService.deleteGame(game.id)
-      toast.success(`El juego "${game.title}" ha sido eliminado con éxito.`)
+      toast.success(t('admin.games.delete.success', { title: game.title }))
       onSuccess()
     } catch (error) {
-      toast.error("Ocurrió un error al intentar eliminar el juego.")
+      toast.error(t('admin.games.delete.error'))
     } finally {
       setIsSubmitting(false)
     }
@@ -41,9 +43,9 @@ export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDe
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-surface-800 border-surface-700 text-surface-50 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Confirmar Eliminación</DialogTitle>
+          <DialogTitle className="text-xl">{t('admin.games.delete.title')}</DialogTitle>
           <DialogDescription className="text-surface-300">
-            ¿Estás seguro de que deseas eliminar este juego? Esta acción no se puede deshacer.
+            {t('admin.games.delete.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -63,7 +65,7 @@ export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDe
           </div>
 
           <p className="text-warning-500 text-sm">
-            Nota: Eliminar este juego podría afectar a los eventos que lo utilizan.
+            {t('admin.games.delete.warning')}
           </p>
         </div>
 
@@ -74,7 +76,7 @@ export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDe
             onClick={() => onOpenChange(false)}
             className="border-surface-600 text-surface-300"
           >
-            Cancelar
+            {t('admin.games.delete.cancel')}
           </Button>
           <Button
             type="button"
@@ -86,10 +88,10 @@ export function GameDeleteDialog({ open, onOpenChange, game, onSuccess }: GameDe
             {isSubmitting ? (
               <>
                 <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Eliminando...
+                {t('admin.games.delete.deleting')}
               </>
             ) : (
-              "Eliminar Juego"
+              t('admin.games.delete.deleteButton')
             )}
           </Button>
         </DialogFooter>

@@ -1,3 +1,5 @@
+"use client"
+
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -5,15 +7,16 @@ import { Button } from "@/components/ui/primitives/button"
 import { Input } from "@/components/ui/primitives/input"
 import { Textarea } from "@/components/ui/primitives/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
+import { useTranslations } from "next-intl"
 
-const gameSchema = z.object({
+const createGameSchema = (t: (key: string) => string) => z.object({
   id: z.number().optional(),
-  title: z.string().min(3, "El título debe tener al menos 3 caracteres"),
-  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres"),
+  title: z.string().min(3, t('admin.games.form.validation.titleMin')),
+  description: z.string().min(10, t('admin.games.form.validation.descriptionMin')),
   icon: z.string().optional(),
 })
 
-export type GameFormValues = z.infer<typeof gameSchema>
+export type GameFormValues = z.infer<ReturnType<typeof createGameSchema>>
 
 interface GameFormProps {
   defaultValues?: Partial<GameFormValues>
@@ -23,9 +26,11 @@ interface GameFormProps {
   submitLabel?: string
 }
 
-export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel = "Guardar" }: GameFormProps) {
+export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel }: GameFormProps) {
+  const t = useTranslations('boffmedia')
+  
   const form = useForm<GameFormValues>({
-    resolver: zodResolver(gameSchema),
+    resolver: zodResolver(createGameSchema(t)),
     defaultValues: defaultValues || {
       title: "",
       description: "",
@@ -41,15 +46,15 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Título</FormLabel>
+              <FormLabel>{t('admin.games.form.labels.title')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Nombre del juego"
+                  placeholder={t('admin.games.form.placeholders.title')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Este será el nombre principal del juego.</FormDescription>
+              <FormDescription>{t('admin.games.form.descriptions.title')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -60,15 +65,15 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Descripción</FormLabel>
+              <FormLabel>{t('admin.games.form.labels.description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Describe el juego"
+                  placeholder={t('admin.games.form.placeholders.description')}
                   className="bg-surface-700 border-surface-600 text-surface-50 min-h-[100px]"
                   {...field}
                 />
               </FormControl>
-              <FormDescription>Proporciona una descripción detallada del juego.</FormDescription>
+              <FormDescription>{t('admin.games.form.descriptions.description')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -79,16 +84,16 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
           name="icon"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Icono URL</FormLabel>
+              <FormLabel>{t('admin.games.form.labels.icon')}</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://ejemplo.com/icono.jpg"
+                  placeholder={t('admin.games.form.placeholders.icon')}
                   className="bg-surface-700 border-surface-600 text-surface-50"
                   {...field}
                   value={field.value || ""}
                 />
               </FormControl>
-              <FormDescription>URL de la imagen que se usará como icono.</FormDescription>
+              <FormDescription>{t('admin.games.form.descriptions.icon')}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -96,10 +101,10 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
 
         <div className="flex justify-end gap-2 pt-4">
           <Button type="button" variant="outline" onClick={onCancel}>
-            Cancelar
+            {t('admin.games.delete.cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            {submitLabel}
+            {submitLabel || t('admin.games.form.save')}
           </Button>
         </div>
       </form>

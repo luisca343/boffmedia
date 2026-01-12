@@ -581,6 +581,79 @@
           "loadingGames": "Cargando juegos...",
           "save": "Guardar"
         }
+      },
+      "games": {
+        "title": "Gestión de Juegos",
+        "description": "Administra los juegos disponibles para eventos",
+        "newGame": "Nuevo Juego",
+        "searchPlaceholder": "Buscar juegos...",
+        "totalLabel": "Total:",
+        "table": {
+          "id": "ID",
+          "game": "Juego",
+          "description": "Descripción",
+          "createdAt": "Fecha Creación",
+          "actions": "Acciones"
+        },
+        "empty": {
+          "noGames": "No se encontraron juegos",
+          "noGamesDesc": "No hay juegos registrados. Crea el primer juego para comenzar.",
+          "noGamesSearch": "No hay juegos que coincidan con \"{searchTerm}\". Prueba con otros términos de búsqueda.",
+          "clearSearch": "Limpiar búsqueda"
+        },
+        "error": {
+          "loading": "Error al cargar juegos",
+          "retry": "Reintentar"
+        },
+        "loading": "Cargando juegos...",
+        "create": {
+          "title": "Crear Nuevo Juego",
+          "description": "Completa el formulario para añadir un nuevo juego al sistema.",
+          "success": "El juego \"{title}\" ha sido creado con éxito.",
+          "error": "Ocurrió un error al intentar crear el juego.",
+          "creating": "Creando...",
+          "createButton": "Crear Juego"
+        },
+        "edit": {
+          "title": "Editar Juego",
+          "description": "Actualiza la información del juego seleccionado.",
+          "success": "El juego \"{title}\" ha sido actualizado con éxito.",
+          "error": "Ocurrió un error al intentar actualizar el juego.",
+          "updating": "Actualizando...",
+          "saveButton": "Guardar Cambios"
+        },
+        "delete": {
+          "title": "Confirmar Eliminación",
+          "description": "¿Estás seguro de que deseas eliminar este juego? Esta acción no se puede deshacer.",
+          "success": "El juego \"{title}\" ha sido eliminado con éxito.",
+          "error": "Ocurrió un error al intentar eliminar el juego.",
+          "warning": "Nota: Eliminar este juego podría afectar a los eventos que lo utilizan.",
+          "deleting": "Eliminando...",
+          "deleteButton": "Eliminar Juego",
+          "cancel": "Cancelar"
+        },
+        "form": {
+          "labels": {
+            "title": "Título",
+            "description": "Descripción",
+            "icon": "Icono URL"
+          },
+          "placeholders": {
+            "title": "Nombre del juego",
+            "description": "Describe el juego",
+            "icon": "https://ejemplo.com/icono.jpg"
+          },
+          "descriptions": {
+            "title": "Este será el nombre principal del juego.",
+            "description": "Proporciona una descripción detallada del juego.",
+            "icon": "URL de la imagen que se usará como icono."
+          },
+          "validation": {
+            "titleMin": "El título debe tener al menos 3 caracteres",
+            "descriptionMin": "La descripción debe tener al menos 10 caracteres"
+          },
+          "save": "Guardar"
+        }
       }
     },
     "community": {
