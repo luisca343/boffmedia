@@ -26,7 +26,7 @@ export default function Spinner({
 }: SpinnerProps) {
   const t = useTranslations('boffmedia');
   return (
-    <div className="relative w-full max-w-3xl">
+    <div className="relative w-full">
       <div className="bg-surface-900/90 border-4 border-primary-500/50 rounded-xl overflow-hidden p-4 shadow-2xl">
         <div className="bg-gradient-to-r from-surface-800 to-surface-900 py-2 px-4 mb-4 border-2 border-primary-400/30 rounded-t-lg text-center">
           <h3 className="text-xl font-bold text-primary-400">{t('giveaway.spinner.title')}</h3>

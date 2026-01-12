@@ -32,25 +32,15 @@ export default function SpinnerAnimation({ participants, winner, onComplete }: S
   }, [animationCompleted, onComplete])
   
   return (
-    <div className="flex flex-col items-center">
-      <h2 className="text-2xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary-400">
-        {t('giveaway.spinner.spinning')}
-      </h2>
-      
-      <Spinner 
-        spinItems={spinItems}
-        scrollPosition={scrollPosition}
-        isSpinning={isSpinning}
-        spinComplete={spinComplete}
-        winnerIndex={winnerIndex}
-        spinnerRef={spinnerRef}
-        itemsContainerRef={itemsContainerRef}
-        ITEM_WIDTH={ITEM_WIDTH}
-      />
-      
-      <div className="mt-8 text-center text-surface-300">
-        <p className="animate-pulse">{t('giveaway.spinner.selecting')}</p>
-      </div>
-    </div>
+    <Spinner 
+      spinItems={spinItems}
+      scrollPosition={scrollPosition}
+      isSpinning={isSpinning}
+      spinComplete={spinComplete}
+      winnerIndex={winnerIndex}
+      spinnerRef={spinnerRef}
+      itemsContainerRef={itemsContainerRef}
+      ITEM_WIDTH={ITEM_WIDTH}
+    />
   )
 }

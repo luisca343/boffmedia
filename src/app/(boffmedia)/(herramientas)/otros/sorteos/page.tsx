@@ -106,30 +106,31 @@ export default function Sorteo() {
 
         {/* Main Content */}
         <motion.div variants={itemVariants}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
-              <ParticipantsList 
-                participants={participants}
-                onRemove={handleRemoveParticipant}
-                previousWinners={previousWinners}
-              />
-            </div>
+          <div className={`grid grid-cols-1 gap-6 ${isSpinning || showWinner ? 'lg:grid-cols-1' : 'lg:grid-cols-3'}`}>
+            {!isSpinning && !showWinner && (
+              <div className="lg:col-span-1">
+                <ParticipantsList 
+                  participants={participants}
+                  onRemove={handleRemoveParticipant}
+                  previousWinners={previousWinners}
+                />
+              </div>
+            )}
             
-            <div className="lg:col-span-2">
-              {isSpinning || showWinner ? (
+            <div className={isSpinning || showWinner ? 'lg:col-span-1' : 'lg:col-span-2'}>
+              {isSpinning && 
+                <SpinnerAnimation 
+                  participants={participants} 
+                  winner={winner} 
+                  onComplete={handleAnimationComplete}
+                />
+              }
+              {showWinner && winner && (
                 <div className="bg-gradient-to-br from-surface-800/90 to-surface-900/90 backdrop-blur-sm border border-surface-700/50 rounded-2xl p-6 shadow-2xl">
-                  {isSpinning && 
-                    <SpinnerAnimation 
-                      participants={participants} 
-                      winner={winner} 
-                      onComplete={handleAnimationComplete}
-                    />
-                  }
-                  {showWinner && winner && (
-                    <WinnerDisplay winner={winner} onReset={handleReset} />
-                  )}
+                  <WinnerDisplay winner={winner} onReset={handleReset} />
                 </div>
-              ) : (
+              )}
+              {!isSpinning && !showWinner && (
                 <GiveawayControls 
                   onAddParticipant={handleAddParticipant}
                   onUploadList={handleUploadList}
