@@ -1,0 +1,1 @@
+ALTER TABLE `rotom_bank_accounts` ADD `image` varchar(255);
