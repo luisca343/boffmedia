@@ -1,0 +1,22 @@
+{
+  "name": "boffmedia",
+  "private": true,
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev": "concurrently \"pnpm dev:web\" \"pnpm dev:api\"",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "generate:shared": "pnpm --filter api generate:shared",
+    "lint": "pnpm -r lint",
+    "type-check": "pnpm -r type-check"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "typescript": "^5.0.0"
+  }
+}

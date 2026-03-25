@@ -22,7 +22,9 @@
     "paths": {
       "@repositories/*": ["src/api/_repositories/*"],
       "@api/*": ["src/api/*"],
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@boffmedia/shared": ["../../packages/shared/src"],
+      "@boffmedia/shared/*": ["../../packages/shared/src/*"]
     }
   },
   "watchOptions": {

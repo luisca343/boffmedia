@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+.next/
+apps/*/dist
+apps/*/.next
+
+# Dependencies (each app has its own, installed at build time)
+node_modules/
+apps/*/node_modules
+packages/*/node_modules
+
+# pnpm lockfiles inside apps (root lockfile is used)
+apps/*/pnpm-lock.yaml
+apps/*/package-lock.json
+
+# Junctions/symlinks pointing to shared public — handled explicitly in Dockerfile
+apps/api/public
+apps/web/public
+
+# Dev/IDE
+.vscode/
+*.log
+.DS_Store
+
+# Test output
+coverage/

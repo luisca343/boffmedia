@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "api",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -24,9 +24,11 @@
     "push": "drizzle-kit push",
     "generate-api": "openapi --input http://localhost:34301/api-json --output ./src/generated/api --client axios",
     "generate:models": "openapi --input http://localhost:34301/api-json --output ./src/generated --exportModels true --exportServices false --exportCore false",
+    "generate:shared": "openapi --input http://localhost:34301/api-json --output ../../packages/shared/src --exportModels true --exportServices false --exportCore false",
     "fix-pnpm": "powershell -ExecutionPolicy Bypass -File ./fix-pnpm.ps1"
   },
   "dependencies": {
+    "@boffmedia/shared": "workspace:*",
     "@discordjs/voice": "^0.18.0",
     "@google/genai": "^1.13.0",
     "@google/generative-ai": "^0.24.1",
@@ -45,7 +47,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.6",
     "@pkmn/client": "^0.7.0",
-    "@pkmn/data": "^0.9.38",
+    "@pkmn/data": "^0.10.7",
     "@pkmn/img": "^0.2.40",
     "@pkmn/login": "^0.2.0",
     "@pkmn/protocol": "^0.7.0",

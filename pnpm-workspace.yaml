@@ -1,0 +1,11 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+overrides:
+  esbuild@<=0.24.2: '>=0.25.0'
+  path-to-regexp@>=0.2.0 <1.9.0: '>=1.9.0'
+  tmp@<=0.2.3: '>=0.2.4'
+  postcss@<7.0.36: '>=7.0.36'
+  postcss@<8.4.31: '>=8.4.31'
+  postcss@>=7.0.0 <7.0.36: '>=7.0.36'

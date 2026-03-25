@@ -30,6 +30,12 @@
       ],
       "@components/*": [
         "./src/components/*"
+      ],
+      "@boffmedia/shared": [
+        "../../packages/shared/src"
+      ],
+      "@boffmedia/shared/*": [
+        "../../packages/shared/src/*"
       ]
     },
     "target": "ES2017"
