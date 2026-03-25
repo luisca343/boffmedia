@@ -1,0 +1,215 @@
+{
+  "mhwilds": {
+    "weapons": {
+      "great-sword": "Gran Espada",
+      "long-sword": "Espada Larga",
+      "sword-shield": "Espada y Escudo",
+      "dual-blades": "Espadas Duales",
+      "hammer": "Martillo",
+      "hunting-horn": "Cornamusa",
+      "lance": "Lanza",
+      "gunlance": "Lanza Pistola",
+      "switch-axe": "Hacha Espada",
+      "charge-blade": "Hacha Cargada",
+      "insect-glaive": "Glaive Insecto",
+      "light-bowgun": "Ballesta Ligera",
+      "heavy-bowgun": "Ballesta Pesada",
+      "bow": "Arco"
+    },
+    "weapon_type": "Tipo de Arma",
+    "build_planner": {
+      "title": "Planificador de Builds",
+      "subtitle": "Crea y optimiza tus builds para Monster Hunter Wilds",
+      "build_name_placeholder": "Nombre de la Build",
+      "save": "Guardar",
+      "share": "Compartir",
+      "reset": "Reiniciar",
+      "saved_local": "Build guardada en almacenamiento local",
+      "error_saving": "Error al guardar la build",
+      "copied_clipboard": "Build copiada al portapapeles",
+      "error_copying": "Error al copiar la build",
+      "link_copied": "Link de compartir copiado al portapapeles",
+      "error_link": "Error al generar el link para compartir",
+      "exported_json": "Build exportada como archivo JSON",
+      "error_exporting": "Error al exportar la build",
+      "image_placeholder": "Exportar imagen no disponible",
+      "share_link": "Enlace para compartir",
+      "share_options": "Opciones para compartir",
+      "export_json": "Generar JSON",
+      "generate_image": "Generar Imagen",
+      "back": "Volver",
+      "details": "Detalles de la build",
+      "current_build": "Equipamiento actual",
+      "active_decorations": "Decoraciones activas",
+      "decorations_equipped": "{count, plural, =0 {No hay decoraciones equipadas} =1 {1 decoración equipada} other {{count} decoraciones equipadas}}",
+      "no_decorations": "No hay adornos equipados",
+      "add_decorations": "Haz click en una ranura de adorno para asignar una joya",
+      "error_invalid_file_format_full": "Formato de archivo inválido. Asegúrate de que sea un build JSON válido.",
+      "error_invalid_file_format": "Formato de archivo inválido",
+      "error_reading_file": "Error leyendo archivo",
+      "import_build": "Importar build desde archivo",
+      "remove": "Quitar",
+      "no_equipment": "Sin {name}",
+      "no_description": "Descripción no disponible",
+      "slots": "Ranuras",
+      "currently_equiped": "Equipado actualmente",
+      "select_decoration": "Seleccionar adorno",
+      "search": "Buscar...",
+      "assigned_to": "Asignado a",
+      "slot_size": "Nivel de ranura:",
+      "loading": "Cargando {item}...",
+      "decorations": "decoraciones",
+      "retry": "Reintentar",
+      "no_decorations_found": "No se encontró ninguna decoración con los filtros actuales",
+      "no_equipment_found": "No se encontró ningún equipamiento con los filtros actuales",
+      "filters": "Filtros",
+      "clear_filters": "Limpiar filtros",
+      "sort": "Ordenar",
+      "active_filters": "Filtros activos",
+      "set": "Conjunto",
+      "select": "Seleccionar",
+      "close": "Cerrar",
+      "active_skills": "Habilidades activas",
+      "overallocated_skills": "Habilidades sobreasignadas",
+      "no_active_skills": "No hay habilidades activas",
+      "no_active_skills_description": "Añade armas y armaduras con habilidades",
+      "skill_description_not_found": "Descripción no encontrada",
+      "wasted_points": "{count, plural, =1 {1 punto sin efecto} other {{count} puntos sin efecto}}",
+      "current_level": "Nivel actual",
+      "elemental_resistances": "Resistencias Elementales",
+      "sharpness": "Afilado",
+      "description": "Crea y optimiza tus builds de equipo y armaduras",
+      "swap_weapons": "Intercambiar armas",
+      "build_count": "{count, plural, =0 {0 builds guardadas} one {# build guardada} other {# builds guardadas}}",
+      "clear_search": "Limpiar Búsqueda",
+      "no_builds_found": "No se encontraron builds con tu búsqueda",
+      "no_saved_builds": "No tienes builds guardadas",
+      "load": "Cargar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "search_builds": "Buscar builds...",
+      "saved_builds_description": "Gestiona tus builds guardadas localmente",
+      "saved_builds": "Builds guardadas",
+      "build_loaded": "Build \"{name}\" cargada",
+      "open": "Abrir",
+      "hidden": "(O)",
+      "select_charm": "Elegir amuleto",
+      "charms": "Amuletos",
+      "no_charms_found": "No se han encontrado amuletos",
+      "skill_count": "{count, plural, =1 {# habilidad} other {# habilidades}}",
+      "tools": {
+        "weapon_tree": "Árbol de armas"
+      }
+    },
+    "title": "Monster Hunter Wilds",
+    "equipment": "Equipamiento",
+    "weapon": "Arma",
+    "head": "Casco",
+    "chest": "Cota",
+    "arms": "Brazales",
+    "waist": "Faja",
+    "legs": "Grebas",
+    "skills": "Habilidades",
+    "stats": "Estadísticas",
+    "defense": "Defensa",
+    "attack": "Ataque",
+    "affinity": "Afinidad",
+    "element": "Elemento",
+    "status": "Estado",
+    "total_element": "Elemento total",
+    "def": "Def",
+    "rarity": "Rareza",
+    "lv": "Nv.",
+    "slot": "Ranura",
+    "fire": "Fuego",
+    "water": "Agua",
+    "thunder": "Trueno",
+    "ice": "Hielo",
+    "dragon": "Draco",
+    "sleep": "Sueño",
+    "paralysis": "Parálisis",
+    "poison": "Veneno",
+    "blast": "Nitro",
+    "exhaust": "Agotamiento",
+    "stamina": "Resistencia",
+    "health": "Salud",
+    "low_rank": "Rango Bajo",
+    "high_rank": "Rango Alto",
+    "hidden": "Oculto",
+    "elderseal": "Sello Anciano",
+    "low": "Bajo",
+    "average": "Promedio",
+    "high": "Alto",
+    "defense_bonus": "Bonus de defensa",
+    "charm": "Amuleto",
+    "secondary_weapon": "Arma Secundaria",
+    "empty_slot": "Ranura vacía",
+
+
+      
+    "header": {
+      "title": {
+        "prefix": "Herramientas de",
+        "highlight": "Monster Hunter Wilds"
+      },
+      "subtitle": "Optimiza tu caza con nuestras herramientas especializadas"
+    },
+    "tools": {
+      "buildPlanner": {
+        "title": "Planificador de Builds",
+        "description": "Crea builds óptimas comparando armaduras, decoraciones y habilidades",
+        "features": {
+          "optimizer": "Optimizador de builds",
+          "calculator": "Calculadora de daño",
+          "comparison": "Comparador de sets"
+        }
+      },
+      "weaponTrees": {
+        "title": "Árboles de Armas",
+        "description": "Árboles de progresión y estadísticas de todas las armas",
+        "features": {
+          "trees": "Árboles de armas",
+          "comparison": "Comparador",
+          "stats": "Estadísticas detalladas"
+        }
+      },
+      "bestiary": {
+        "title": "Bestiario",
+        "description": "Información detallada sobre debilidades y recompensas",
+        "features": {
+          "weaknesses": "Tabla de debilidades",
+          "materials": "Materiales y drops",
+          "locations": "Ubicaciones"
+        }
+      },
+      "armor": {
+        "title": "Sets de Armadura",
+        "description": "Base de datos completa de armaduras y habilidades",
+        "features": {
+          "sets": "Sets completos",
+          "skills": "Habilidades",
+          "defense": "Estadísticas de defensa"
+        }
+      },
+      "materials": {
+        "title": "Rastreador de Materiales",
+        "description": "Rastrea y calcula los materiales necesarios para crafting",
+        "features": {
+          "tracker": "Lista de seguimiento",
+          "calculator": "Calculadora de crafting",
+          "locations": "Dónde conseguir"
+        }
+      }
+    },
+    "externalLinks": {
+      "title": "Enlaces Útiles",
+      "officialWebsite": "Sitio Oficial",
+      "redditCommunity": "Reddit Community", 
+      "wiki": "Monster Hunter Wiki",
+      "videos": "Guías en YouTube"
+    },
+    "featuredTool": "Herramienta destacada",
+    "accessButton": "Acceder a {tool}",
+  "explore": "Explorar"
+  }
+}

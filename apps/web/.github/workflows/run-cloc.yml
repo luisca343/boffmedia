@@ -1,0 +1,29 @@
+name: Run cloc reports
+
+on:
+  workflow_dispatch:
+
+jobs:
+  cloc:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cloc jq
+        shell: bash
+
+      - name: Run cloc
+        run: |
+          chmod +x ./scripts/run-cloc.sh
+          ./scripts/run-cloc.sh output
+        shell: bash
+
+      - name: Upload cloc output
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloc-output-${{ github.run_id }}
+          path: output

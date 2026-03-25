@@ -1,0 +1,121 @@
+{
+    "nav": {
+        "ariaLabel": "Navegación Principal",
+        "openMenu": "Abrir menú",
+        "links": {
+          "home": "Inicio",
+          "games": "Juegos",
+          "events": "Eventos",
+          "tools": "Herramientas",
+          "pixelmonWingull": "Pixelmon Wingull"
+        },
+        "auth": {
+          "logout": "Cerrar sesión",
+          "login": "Iniciar sesión",
+          "register": "Registrarse"
+        },
+        "menus": {
+          "wingull": {
+            "triggerLabel": "Pixelmon Wingull",
+            "mainLink": {
+              "label": "Pixelmon Wingull",
+              "description": "Tu aventura Pokémon en Minecraft"
+            },
+            "sections": {
+              "tools": {
+                "title": "Herramientas",
+                "description": "Mejora tu experiencia de juego",
+                "items": {
+                  "smartrotom": {
+                    "label": "SmartRotom",
+                    "description": "Tu compañero digital en el mundo Pixelmon"
+                  },
+                  "guide": {
+                    "label": "Guía del Jugador",
+                    "description": "Todo lo que necesitas saber para empezar"
+                  },
+                  "pueblos": {
+                    "label": "Pueblos y Ciudades",
+                    "description": "Explora todos los destinos de la región"
+                  },
+                  "map": {
+                    "label": "Mapa Interactivo",
+                    "description": "Explora el mundo de Wingull"
+                  }
+                }
+              },
+              "community": {
+                "title": "Comunidad",
+                "description": "Conéctate con otros entrenadores",
+                "items": {
+                  "events": {
+                    "label": "Eventos",
+                    "description": "Calendario de eventos y torneos"
+                  },
+                  "discord": {
+                    "label": "Discord",
+                    "description": "Únete a nuestra comunidad",
+                    "isExternal": true
+                  }
+                }
+              }
+            }
+          },
+          "tools": {
+            "triggerLabel": "Herramientas",
+            "mainLink": {
+              "label": "Herramientas",
+              "description": "Utilidades para jugadores y desarrolladores"
+            },
+            "sections": {
+              "main": {
+                "items": {
+                  "tools": {
+                    "label": "Herramientas",
+                    "description": "Herramientas para desarrolladores de BOFF"
+                  }
+                }
+              },
+              "pokemon": {
+                "title": "Pokémon",
+                "description": "Herramientas relacionadas con juegos Pokémon",
+                "items": {
+                  "pmdsky": {
+                    "label": "Exploradores del Cielo",
+                    "description": "Generador de correos para Pokémon Mystery Dungeon"
+                  },
+                  "tcgpocket": {
+                    "label": "TCG Pocket",
+                    "description": "Herramientas para Pokémon Trading Card Game"
+                  }
+                }
+              },
+              "mhwilds": {
+                "title": "Monster Hunter Wilds",
+                "description": "Herramientas para Monster Hunter Wilds",
+                "items": {
+                  "buildPlanner": {
+                    "label": "Planificador de Builds",
+                    "description": "Crea y comparte builds para Monster Hunter Wilds"
+                  }
+                }
+              },
+              "gaming": {
+                "title": "Gaming",
+                "description": "Utilidades para jugadores",
+                "items": {
+                  "steamKeys": {
+                    "label": "Claves de Steam",
+                    "description": "Gestiona y comparte tus claves de juegos"
+                  },
+                  "giveaways": {
+                    "label": "Sorteos",
+                    "description": "Participa en sorteos de juegos y más"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+}

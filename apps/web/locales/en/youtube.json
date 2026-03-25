@@ -1,0 +1,62 @@
+{ 
+    "youtube": {
+        "search": {
+            "placeholder": "Search YouTube",
+            "button": "Search",
+            "searching": "Searching...",
+            "title": "Search Results",
+            "error": "Failed to fetch videos. Please try again.",
+            "trendingTitle": "Trending Videos",
+            "noTrending": "No trending videos available"
+        },
+        "loading": {
+            "videos": "Loading videos...",
+            "video": "Loading video...",
+            "channel": "Loading channel information...",
+            "history": "Loading your history...",
+            "search": "Searching for videos..."
+        },
+        "history": {
+            "title": "Watch History",
+            "empty": "Your watch history is empty",
+            "emptySubtext": "Videos you watch will appear here",
+            "clearButton": "Clear History",
+            "clearConfirm": "Clear Watch History?",
+            "clearDescription": "This will clear your entire watch history. This action cannot be undone.",
+            "removeConfirm": "This will remove this video from your watch history.",
+            "cancelButton": "Cancel",
+            "confirmButton": "Clear History",
+            "removeButton": "Remove"
+        },
+        "video": {
+            "notFound": "Video not found",
+            "returnToSearch": "Return to YouTube search",
+            "views": "views",
+            "likes": "likes",
+            "description": "Description",
+            "stats": "Stats"
+        },
+        "channel": {
+            "notFound": "Channel not found",
+            "returnToSearch": "Return to YouTube search",
+            "subscribers": "subscribers",
+            "videos": "videos",
+            "views": "views",
+            "about": "About",
+            "description": "Description",
+            "noDescription": "No description provided.",
+            "stats": "Stats",
+            "joined": "Joined",
+            "totalViews": "Total Views",
+            "totalVideos": "Total Videos",
+            "subscribers_stats": "Subscribers",
+            "loadMore": "Load More",
+            "loading": "Loading...",
+            "popularVideos": "Popular Videos",
+            "noPopular": "No popular videos found"
+        },
+        "common": {
+            "channel": "Channel"
+        }
+    }
+}

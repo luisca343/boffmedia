@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@generated/*": [
+        "./src/generated/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next-i18next.config.mjs",
+    "next-i18next.config.js",
+    "src/tools/pmd-sky/sky_dungeonjs",
+    "src/tools/pmd-sky/sky_item.js",
+    "src/tools/pmd-sky/sky_poke.js",
+    "src/tools/pmd-sky/wm.js",
+    "src/tools/pmd-sky/wmgenerate.js",
+    "src/tools/pmd-sky/wmutils.js",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "public",
+    ".next"
+  ]
+}

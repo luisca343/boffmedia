@@ -1,0 +1,120 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
+import { WingullService } from '@/services/api/smartrotom/wingullService';
+import type { TownData, Amenity, Property } from './types';
+import { AmenitiesSection } from './_components/amenities/AmenitiesSection';
+import { TownMapSection } from './_components/map/TownMapSection';
+import { PropertiesSection } from './_components/properties/PropertiesSection';
+import { BusinessSection } from './_components/properties/BusinessSection';
+import { Loader2 } from 'lucide-react';
+import { HeroSection } from './_components/sections/HeroSection';
+
+
+function LoadingScreen() {
+  return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="text-center space-y-6">
+        <Loader2 className="w-12 h-12 text-purple-400 animate-spin mx-auto" />
+        <h2 className="text-2xl font-bold text-surface-100">Cargando información del pueblo...</h2>
+        <p className="text-surface-100">Preparando tu experiencia inmobiliaria</p>
+      </div>
+    </div>
+  );
+}
+
+function ErrorScreen({ error, onRetry }: { error: string; onRetry: () => void }) {
+  return (
+    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+      <div className="text-center space-y-6 max-w-md">
+        <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
+          <span className="text-2xl">⚠️</span>
+        </div>
+        <h2 className="text-2xl font-bold text-surface-100">Error al cargar el pueblo</h2>
+        <p className='text-surface-100'>{error}</p>
+        <button 
+          onClick={onRetry}
+          className="px-6 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
+        >
+          Intentar de nuevo
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function TownRealEstatePage() {
+  const params = useParams();
+  const pueblo = Array.isArray(params.pueblo) ? params.pueblo[0] : params.pueblo;
+  const [townData, setTownData] = useState<TownData | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  const [error, setError] = useState<string | null>(null);
+  
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const fetchTownData = async () => {
+    if (!pueblo) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await WingullService.getTownInfo(pueblo);
+      setTownData(response.data);
+    } catch (error) {
+      console.error('Error fetching town data:', error);
+      setError('No se pudo cargar la información del pueblo. Por favor, verifica el nombre e intenta de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTownData();
+  }, [pueblo]);
+
+  const scrollToContent = () => {
+    contentRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  if (!pueblo) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+        <div className="text-center space-y-6">
+          <h2 className="text-2xl font-bold text-white">Pueblo no especificado</h2>
+          <p className="text-gray-400">Por favor, proporciona el nombre del pueblo en la URL</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return <ErrorScreen error={error} onRetry={fetchTownData} />;
+  }
+
+  if (!townData) {
+    return <ErrorScreen error="No se encontraron datos para este pueblo" onRetry={fetchTownData} />;
+  }
+
+  return (
+    <div className="min-h-screen">
+      <HeroSection 
+        townName={pueblo} 
+        townData={townData} 
+        onScrollToContent={scrollToContent} 
+      />
+      <div ref={contentRef}>
+        <AmenitiesSection townData={townData} townName={pueblo} />
+        <PropertiesSection townData={townData} townName={pueblo} />
+        <BusinessSection townData={townData} townName={pueblo} />
+        <TownMapSection townData={townData} townName={pueblo} />
+      </div>
+    </div>
+  );
+}

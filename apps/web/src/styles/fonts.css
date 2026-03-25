@@ -1,0 +1,94 @@
+/* Google Fonts Imports */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&family=Roboto+Mono:wght@400;700&display=swap');
+
+/* Custom Font Faces */
+
+/* Header Font */
+@font-face {
+  font-family: "Orbitron";
+  src: url("/fonts/Orbitron-VariableFont_wght.ttf");
+}
+
+/* Inter Variable (local files placed in public/fonts/Inter) */
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roboto-Regular";
+  src: url("/fonts/Roboto/Roboto-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Roboto-Medium";
+  src: url("/fonts/Roboto/Roboto-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Lexend Mega";
+  src: url("/fonts/LexendMega-VariableFont_wght.ttf");
+}
+
+@font-face {
+  font-family: "Arcade Classic";
+  src: url("/fonts/arcadeclassic.ttf");
+}
+
+@font-face {
+  font-family: "Mystery Dungeon";
+  src: url("/fonts/pmd.ttf");
+}
+
+@font-face {
+  font-family: "Quests";
+  src: url("/fonts/SuperLegendBoy-4w8Y.ttf");
+}
+
+
+/* Font Utility Classes */
+.roboto-mono {
+  font-family: 'Roboto Mono', monospace;
+}
+
+.roboto-medium {
+  font-family: "Roboto-Medium", serif;
+}
+
+.lexend-mega {
+  font-family: "Lexend Mega", sans-serif;
+  letter-spacing: -2px;
+}
+
+.arcade {
+  font-family: "Arcade Classic", sans-serif;
+}
+
+.mysterydungeon {
+  font-family: "Mystery Dungeon", sans-serif;
+}
+
+.quests {
+  font-family: "Quests", sans-serif;
+}
+
+/* Inter utility classes */
+.inter {
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+.inter-italic {
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  font-style: italic;
+}

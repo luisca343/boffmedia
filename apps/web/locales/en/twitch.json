@@ -1,0 +1,72 @@
+{
+    "twitch": {
+        "live": "Live",
+        "search": {
+            "placeholder": "Search channels, games or streams...",
+            "button": "Search",
+            "error": "Error searching Twitch. Please try again.",
+            "streamResults": "Live Streams",
+            "userResults": "Channels found",
+            "gameResults": "Games found"
+        },
+        "browse": {
+            "topStreams": "Popular Streams",
+            "noStreams": "No live streams available",
+            "topGames": "Popular Games",
+            "noGames": "No games available"
+        },
+        "common": {
+            "streamer": "Streamer",
+            "game": "Game"
+        },
+        "stream": {
+            "live": "Live",
+            "viewers": "viewers",
+            "notFound": "Stream not found",
+            "loading": "Loading stream..."
+        },
+        "video": {
+            "views": "views",
+            "duration": "Duration",
+            "publishedAt": "Published at",
+            "notFound": "Video not found",
+            "loading": "Loading video..."
+        },
+        "clip": {
+            "views": "views",
+            "duration": "Duration",
+            "createdAt": "Created at",
+            "creator": "Creator",
+            "notFound": "Clip not found",
+            "publishedAt": "Published at",
+            "loading": "Loading clip..."
+        },
+        "game": {
+            "notFound": "Game not found",
+            "loading": "Loading game..."
+        },
+        "user": {
+            "videos": "Videos",
+            "clips": "Clips",
+            "about": "About",
+            "live": "Live",
+            "noVideos": "No videos available",
+            "noClips": "No clips available",
+            "stats": "Statistics",
+            "joined": "Joined",
+            "totalViews": "Total views",
+            "followers": "Followers",
+            "notFound": "User not found",
+            "loading": "Loading user..."
+        },
+        "history": {
+            "loading": "Loading history..."
+        },
+        "loading": {
+            "clip": "Loading clip...",
+            "game": "Loading game...",
+            "stream": "Loading stream...",
+            "user": "Loading user..."
+        }
+    }
+}

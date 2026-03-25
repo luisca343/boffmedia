@@ -1,0 +1,121 @@
+{
+ "nav": {
+    "ariaLabel": "Main Navigation",
+    "openMenu": "Open menu",
+    "links": {
+      "home": "Home",
+      "games": "Games",
+      "events": "Events",
+      "tools": "Tools",
+      "pixelmonWingull": "Pixelmon Wingull"
+    },
+    "auth": {
+      "logout": "Log out",
+      "login": "Log in",
+      "register": "Register"
+    },
+    "menus": {
+      "wingull": {
+        "triggerLabel": "Pixelmon Wingull",
+        "mainLink": {
+          "label": "Pixelmon Wingull",
+          "description": "Your Pokémon adventure in Minecraft"
+        },
+        "sections": {
+          "tools": {
+            "title": "Tools",
+            "description": "Enhance your gaming experience",
+            "items": {
+              "smartrotom": {
+                "label": "SmartRotom",
+                "description": "Your digital companion in the Pixelmon world"
+              },
+              "guide": {
+                "label": "Player's Guide",
+                "description": "Everything you need to know to get started"
+              },
+              "pueblos": {
+                "label": "Towns & Cities",
+                "description": "Explore all destinations in the region"
+              },
+              "map": {
+                "label": "Interactive Map",
+                "description": "Explore the world of Wingull"
+              }
+            }
+          },
+          "community": {
+            "title": "Community",
+            "description": "Connect with other trainers",
+            "items": {
+              "events": {
+                "label": "Events",
+                "description": "Calendar of events and tournaments"
+              },
+              "discord": {
+                "label": "Discord",
+                "description": "Join our community",
+                "isExternal": true
+              }
+            }
+          }
+        }
+      },
+      "tools": {
+        "triggerLabel": "Tools",
+        "mainLink": {
+          "label": "Tools",
+          "description": "Utilities for players and developers"
+        },
+        "sections": {
+          "main": {
+            "items": {
+              "tools": {
+                "label": "Tools",
+                "description": "Tools for BOFF developers"
+              }
+            }
+          },
+          "pokemon": {
+            "title": "Pokémon",
+            "description": "Tools related to Pokémon games",
+            "items": {
+              "pmdsky": {
+                "label": "Explorers of Sky",
+                "description": "Mail generator for Pokémon Mystery Dungeon"
+              },
+              "tcgpocket": {
+                "label": "TCG Pocket",
+                "description": "Tools for Pokémon Trading Card Game"
+              }
+            }
+          },
+          "mhwilds": {
+            "title": "Monster Hunter Wilds",
+            "description": "Tools for Monster Hunter Wilds",
+            "items": {
+              "buildPlanner": {
+                "label": "Build Planner",
+                "description": "Create and share builds for Monster Hunter Wilds"
+              }
+            }
+          },
+          "gaming": {
+            "title": "Gaming",
+            "description": "Utilities for players",
+            "items": {
+              "steamKeys": {
+                "label": "Steam Keys",
+                "description": "Manage and share your game keys"
+              },
+              "giveaways": {
+                "label": "Giveaways",
+                "description": "Participate in game giveaways and more"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

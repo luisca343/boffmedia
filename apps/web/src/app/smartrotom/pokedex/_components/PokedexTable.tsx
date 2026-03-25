@@ -1,0 +1,91 @@
+import React from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
+import { cn } from "@/lib/utils"
+
+interface PokedexTableProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export function PokedexTable({ children, className }: PokedexTableProps) {
+  return (
+    <div className="w-full overflow-x-auto rounded-xl shadow-lg my-4">
+      <Table className={cn("w-full text-sm border-separate border-spacing-0", className)}>
+        {children}
+      </Table>
+    </div>
+  )
+}
+
+interface PokedexRowProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export function PokedexRow({ children, className }: PokedexRowProps) {
+  return (
+    <TableRow className={cn("transition-all hover:bg-surface-600/50 group", className)}>
+      {children}
+    </TableRow>
+  )
+}
+
+interface PokedexHeaderProps {
+  children: React.ReactNode
+  className?: string
+}
+
+export function PokedexHeader({ children, className }: PokedexHeaderProps) {
+  return (
+    <TableHeader className={cn("sticky top-0 z-10 pointer-events-none", className)}>
+      {children}
+    </TableHeader>
+  )
+}
+
+interface PokedexCellProps {
+  children?: React.ReactNode
+  className?: string
+  colSpan?: number
+  hard?: boolean
+}
+
+export function PokedexCell({ children = '', className = '', colSpan = 1, hard = false }: PokedexCellProps) {
+  return (
+    <TableCell 
+      className={cn(
+        "py-1 px-2 transition-colors",
+        hard ? "border-surface-600/50 bg-surface-900 text-surface-50" : "border-surface-600/50 text-surface-50",
+        "group-hover:border-surface-500",
+        "first:pl-3 last:pr-3",
+        className
+      )} 
+      colSpan={colSpan}
+    >
+      {children}
+    </TableCell>
+  )
+}
+
+interface PokedexHeadProps {
+  children: React.ReactNode
+  className?: string
+  colSpan?: number
+}
+
+export function PokedexHead({ children, className, colSpan = 1 }: PokedexHeadProps) {
+  return (
+    <TableHead 
+      className={cn(
+        "text-surface-50 font-bold p-4 text-left",
+        "first:pl-6 last:pr-6",
+        className
+      )} 
+      colSpan={colSpan}
+    >
+      {children}
+    </TableHead>
+  )
+}
+
+export default PokedexTable
