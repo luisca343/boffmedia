@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 import { FilterBoxData } from '../../types/filter.types'
 import { usePCWithFilters } from '../../hooks/usePCWithFilters'
 

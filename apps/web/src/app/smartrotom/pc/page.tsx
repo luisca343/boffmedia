@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useBoffSession } from "@/services/useBoffSession"
 import { WingullService } from '@/services/api/smartrotom/wingullService'
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { ROWS_PER_BOX, COLS_PER_ROW, POKEMON_PER_BOX } from './utils/constants'

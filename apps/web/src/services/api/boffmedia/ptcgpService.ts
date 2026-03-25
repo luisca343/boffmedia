@@ -5,7 +5,7 @@ import type {
   TcgCard,
   SeriesCardsGroup,
   SuccessResponse,
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 // User cards DTOs
 interface AddUserCardDto {

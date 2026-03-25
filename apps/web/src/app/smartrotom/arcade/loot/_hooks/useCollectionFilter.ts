@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { rarityOrder } from '../_utils/rarityConfig';
-import { ArcadeInventoryItem } from '@/generated/api';
+import { ArcadeInventoryItem } from '@boffmedia/shared';
 
 const ITEMS_PER_PAGE = 16;
 

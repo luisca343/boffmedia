@@ -1,4 +1,4 @@
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 
 export function createPokemonSpec(pokemon: PokemonW): string {
   const { species, form, palette, level } = pokemon

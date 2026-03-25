@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { PCPokemon, PCBoxData } from '@/types/dto/pc-pokemon.dto'
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 import { DragSource, DragDestination } from '../types/common'
 import { usePokemonMovement } from './usePokemonMovement'
 import { POKEMON_PER_BOX, TOTAL_BOXES } from '../utils/constants'

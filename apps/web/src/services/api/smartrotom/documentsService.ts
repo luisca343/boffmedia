@@ -13,7 +13,7 @@ import type {
   News,
   NewsResponse,
   SuccessResponse,
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class DocumentsService {
   // ==================== DOCUMENT OPERATIONS ====================

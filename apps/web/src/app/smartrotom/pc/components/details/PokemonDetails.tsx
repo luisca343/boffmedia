@@ -1,5 +1,5 @@
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 import { PokemonCard } from './PokemonCard';
 import { PokemonStats } from './PokemonStats';
 import { PokemonTypeEffectiveness } from './PokemonTypeEffectiveness';

@@ -14,7 +14,7 @@ import type {
   LootboxConfigEntity,
   ClaimItemsDto,
   ClaimItemsResponseDto
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class ArcadeService {
   // ==================== STREAK ENDPOINTS ====================

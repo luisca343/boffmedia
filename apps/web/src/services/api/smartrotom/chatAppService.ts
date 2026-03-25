@@ -15,7 +15,7 @@ import type {
   CreateMessageResponse,
   MessageResponse,
   CallResponse
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class ChatAppService {
   /**

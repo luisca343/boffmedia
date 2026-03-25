@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useBoffSession } from '@/services/useBoffSession';
 import { toast } from 'react-toastify';
 import { ArcadeInventoryItem, ArcadeService } from '@/services/api/smartrotom/arcadeService';
-import { ArcadeStreak, ArcadeStreakClaim } from '@/generated/api';
+import { ArcadeStreak, ArcadeStreakClaim } from '@boffmedia/shared';
 
 interface UseArcadeStreakReturn {
   loading: boolean;

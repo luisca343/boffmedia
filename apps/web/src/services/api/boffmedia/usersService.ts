@@ -1,4 +1,4 @@
-import { AuthenticationResultEntity, BoffMediaUserEntity, CreateUserDto, FullUserEntity, IntegratedUserCreationResultEntity, SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserWithIntegrationsEntity } from '@/generated/api';
+import { AuthenticationResultEntity, BoffMediaUserEntity, CreateUserDto, FullUserEntity, IntegratedUserCreationResultEntity, SessionUserEntity, SuccessResponse, UpdateUserDto, UserStatistics, UserWithIntegrationsEntity } from '@boffmedia/shared';
 import { apiGET, apiPOST, apiPUT, apiDELETE, apiPATCH } from '@/services/boffAPI';
 
 // Additional DTOs for specialized endpoints

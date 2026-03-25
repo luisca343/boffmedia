@@ -7,7 +7,7 @@ import type {
   BattleAchievementDto,
   BattleAchievementResponse,
   AchievementStatusResponse
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class AchievementService {
   /**

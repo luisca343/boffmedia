@@ -1,5 +1,5 @@
 import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 
 /**
  * Converts a PC Pokemon to a Team Pokemon format

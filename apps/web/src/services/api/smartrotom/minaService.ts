@@ -14,7 +14,7 @@ import type {
   UnclaimedItem,
   ClaimResponse,
   PlayerStatistics,
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class MinaService {
   // ==================== ENERGY OPERATIONS ====================

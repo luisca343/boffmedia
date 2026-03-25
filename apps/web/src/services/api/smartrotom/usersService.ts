@@ -9,7 +9,7 @@ import type {
   FindOrCreateResult,
   UserStatistics,
   UserValidationResult
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class UsersService {
   /**

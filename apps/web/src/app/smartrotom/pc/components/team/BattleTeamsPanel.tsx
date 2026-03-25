@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { BattleTeam, BattleTeamData } from '@/types/dto/battle-team.dto'
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 import { FaTrophy, FaPlus, FaEdit, FaTrash, FaStar, FaRegStar } from 'react-icons/fa'
 import { PiUsers, PiTarget, PiInfo } from 'react-icons/pi'
 import { toast } from 'react-toastify'

@@ -5,7 +5,7 @@ import NoiseMap from 'noise-map'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { toast } from 'react-toastify';
 import { MinaService } from '@/services/api/smartrotom/minaService';
-import { MineReward } from '@/generated/api';
+import { MineReward } from '@boffmedia/shared';
 
 
 export async function generateGame(numFilas: number, numColumnas: number){

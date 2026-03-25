@@ -4,7 +4,7 @@ import {
   SendMessageDto, 
   SuccessResponse,
   MessageSender
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 // Define our own message part interface without the enum
 export interface MessagePart {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline'
 import { CardItem } from './CardItem'
-import { TcgCard } from '@/generated/api'
+import { TcgCard } from '@boffmedia/shared'
 
 interface CollectionGroupProps {
   expansion: string

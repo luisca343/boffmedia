@@ -1,4 +1,4 @@
-import { PokemonW } from '@/generated/api'
+import { PokemonW } from '@boffmedia/shared'
 import { TeamSlot } from './TeamSlot';
 import { PiUsers, PiInfo } from 'react-icons/pi';
 import { SortableContext } from '@dnd-kit/sortable'

@@ -1,4 +1,4 @@
-import { PokemonW, TeleportPlayerDto, Weather } from '@/generated/api';
+import { PokemonW, TeleportPlayerDto, Weather } from '@boffmedia/shared';
 import { wingullGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
 import { SuccessResponse } from '@/types';
 import { TaxiStop } from '@/types/dto/taxi-stop.dto';

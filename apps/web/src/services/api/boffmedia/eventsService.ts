@@ -20,7 +20,7 @@ import type {
   TeamLeaderboardEntry,
   JoinTeamDto,
   SuccessResponse,
-} from '@/generated/api';
+} from '@boffmedia/shared';
 
 export class EventsService {
   // ==================== EVENT OPERATIONS ====================
