@@ -22,9 +22,10 @@ packages/*/node_modules
 apps/*/pnpm-lock.yaml
 apps/*/package-lock.json
 
-# Junctions/symlinks pointing to shared public — handled explicitly in Dockerfile
+# Junctions/symlinks — public folder is mounted as a Docker volume at runtime
 apps/api/public
 apps/web/public
+public/
 
 # Dev/IDE
 .vscode/

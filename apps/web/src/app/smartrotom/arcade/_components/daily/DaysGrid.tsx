@@ -1,5 +1,5 @@
 import DayReward from "./DayReward";
-import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
+import { DailyRewardItem, DailyRewardsConfig } from "@boffmedia/shared";
 
 interface DaysGridProps {
   totalDays: number;

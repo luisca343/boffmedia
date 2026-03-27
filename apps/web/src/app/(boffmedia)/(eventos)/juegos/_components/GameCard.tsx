@@ -1,4 +1,4 @@
-import { Game } from "@/generated/api";
+import { Game } from "@boffmedia/shared";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card";
 import { Badge } from "@/components/ui/primitives/badge";
 import { Button } from "@/components/ui/primitives/button";

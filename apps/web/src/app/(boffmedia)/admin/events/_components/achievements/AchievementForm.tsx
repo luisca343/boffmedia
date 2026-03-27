@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/primitives/textarea"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
-import { CreateAchievementDto } from "@/generated/api"
+import { CreateAchievementDto } from "@boffmedia/shared"
 
 const achievementSchema = z.object({
   id: z.number().optional(),

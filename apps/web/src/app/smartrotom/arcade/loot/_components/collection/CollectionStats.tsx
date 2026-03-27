@@ -1,4 +1,4 @@
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem } from "@boffmedia/shared";
 
 
 interface CollectionStatsProps {

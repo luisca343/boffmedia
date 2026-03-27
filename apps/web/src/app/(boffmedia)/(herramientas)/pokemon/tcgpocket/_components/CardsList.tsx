@@ -3,7 +3,7 @@
 import { InternalLink } from "@/components/ui/navigation/Link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { TcgCard } from "@/generated/api";
+import { TcgCard } from "@boffmedia/shared";
 
 export function CardsList({ cards }: { cards: TcgCard[] }) {
   return (

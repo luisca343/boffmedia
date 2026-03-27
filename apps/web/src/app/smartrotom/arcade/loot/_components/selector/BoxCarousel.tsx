@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BoxDisplay } from "./BoxDisplay";
 import { BoxInfo } from "./BoxInfo";
-import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@boffmedia/shared";
 
 interface BoxCarouselProps {
   lootBoxes: LootboxBoxConfig[];

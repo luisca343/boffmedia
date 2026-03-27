@@ -1,4 +1,4 @@
-import { News } from "@/generated/api";
+import { News } from "@boffmedia/shared";
 import { useGetAllNews } from "@/hooks/documents/useGetAllNews";
 import { useEffect, useState } from "react";
 

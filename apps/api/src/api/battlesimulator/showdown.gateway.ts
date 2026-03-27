@@ -7,7 +7,6 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import WebSocket from 'ws';
-import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
 import { Actions } from '@pkmn/login';
 
@@ -19,7 +18,7 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
   private showdownServer = 'wss://sim3.psim.us/showdown/websocket';
 
   handleConnection(client: Socket) {
-    const clientId = uuidv4();
+    const clientId = crypto.randomUUID();
     console.log(`Client connected: ${clientId}`);
 
     const showdownWs = new WebSocket(this.showdownServer);

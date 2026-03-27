@@ -1,4 +1,4 @@
-import { Game } from "@/generated/api";
+import { Game } from "@boffmedia/shared";
 import { GameCard } from "./GameCard";
 
 export function GamesGrid({ games }: { games: Game[] }) {

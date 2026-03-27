@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { CardGrid } from "../_components/CardGrid";
 import { FilterComponent } from "../_components/FilterComponent";
-import { TcgCard } from "@/generated/api";
+import { TcgCard } from "@boffmedia/shared";
 import { Button } from "@/components/ui/primitives/button";
 
 interface Set {

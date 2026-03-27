@@ -6,6 +6,8 @@ import { Generations } from '@pkmn/data';
 import { Game } from './_components/Game';
 import { AchievementService } from '@/services/api/smartrotom/achievementsService';
 
+export const dynamic = 'force-dynamic';
+
 const battle = new Battle(new Generations(Dex as any));
 
 export default async function Test() {

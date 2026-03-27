@@ -2,7 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primit
 import { GeneralLeaderboard } from "./GeneralLeaderboard"
 import { MedalsLeaderboard } from "./MedalsLeaderboard"
 import { AchievementsLeaderboard } from "./AchievementsLeaderboard"
-import { LeaderboardEntry } from "@/generated/api"
+import { LeaderboardEntry } from "@boffmedia/shared"
 
 type LeaderboardTabsProps = {
   currentPlayers: LeaderboardEntry[]

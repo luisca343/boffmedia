@@ -1,4 +1,4 @@
-import { PokemonW } from "@/generated/api";
+import { PokemonW } from "@boffmedia/shared";
 
 export interface PCPokemon {
   pokemon: PokemonW;

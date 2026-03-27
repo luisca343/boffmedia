@@ -1,4 +1,4 @@
-import { UpdateProgressDto } from "@/generated/api"
+import { UpdateProgressDto } from "@boffmedia/shared"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 

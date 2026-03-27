@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { TcgSet } from "@/generated/api";
+import { TcgSet } from "@boffmedia/shared";
 
 export default function TCGPocket() {
   const [sets, setSets] = useState<TcgSet[]>([]);

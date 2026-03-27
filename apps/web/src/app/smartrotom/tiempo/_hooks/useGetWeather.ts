@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { WingullService } from "@/services/api/smartrotom/wingullService";
-import { Weather } from "@/generated/api";
+import { Weather } from "@boffmedia/shared";
 
 export default function useGetWeather() {
   const [weatherData, setWeatherData] = useState<Weather>({

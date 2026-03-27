@@ -15,7 +15,7 @@ import { LootBoxHeader } from "./LootBoxHeader";
 import { InfoModal } from "./InfoModal";
 import { LoadingOverlay } from "./LoadingOverlay";
 import { Loader2 } from "lucide-react";
-import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig } from "@boffmedia/shared";
 
 export default function LootBoxGame() {
   const t = useTranslations("");

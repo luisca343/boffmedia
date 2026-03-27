@@ -3,7 +3,7 @@ name: Deploy API
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'apps/api/**'
       - 'packages/shared/**'
@@ -14,6 +14,8 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
@@ -29,13 +31,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: apps/api/Dockerfile
           push: true
           tags: |
-            luisca343/boffmedia-server:latest
-            luisca343/boffmedia-server:${{ github.run_number }}
+            luisca343/boffmedia-server2:latest
+            luisca343/boffmedia-server2:${{ github.run_number }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

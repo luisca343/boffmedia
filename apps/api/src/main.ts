@@ -11,8 +11,6 @@ import { apiReference } from '@scalar/nestjs-api-reference'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { DuplicateEntryExceptionFilter } from './_filters/DuplicateEntryExceptionFilter';
 
-const bodyParser = require('body-parser');
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log', 'debug', 'verbose'],
@@ -36,7 +34,7 @@ async function bootstrap() {
     'https://blog.ficuslab.es',
   ];
   app.enableCors({ origin });
-  app.use(bodyParser.json({ limit: '50mb' }));
+  app.use(express.json({ limit: '50mb' }));
 
   const configService = app.get(ConfigService);
   app.useGlobalFilters(new DuplicateEntryExceptionFilter());

@@ -1,4 +1,4 @@
-import { CreateAchievementDto } from "@/generated/api"
+import { CreateAchievementDto } from "@boffmedia/shared"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 

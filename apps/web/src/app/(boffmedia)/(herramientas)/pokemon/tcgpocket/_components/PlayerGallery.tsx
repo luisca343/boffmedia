@@ -15,7 +15,7 @@ import { RecentUpdates } from "./RecentUpdates"
 import { BestPackDialog } from "./BestPackDialog"
 import { RecentUpdate, PackData, AllPackProbabilities } from '../types'
 import { CollectionGroup } from "./CollectionGroup"
-import { TcgCard } from "@/generated/api"
+import { TcgCard } from "@boffmedia/shared"
 
 interface PlayerGalleryProps {
   username: string

@@ -1,4 +1,4 @@
-import { RankingEntry } from "@/generated/api";
+import { RankingEntry } from "@boffmedia/shared";
 import MenuWrapper from "../_components/MenuWrapper";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 

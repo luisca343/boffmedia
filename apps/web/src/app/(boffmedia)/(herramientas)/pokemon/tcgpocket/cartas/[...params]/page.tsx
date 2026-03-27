@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useLocale, useTranslations } from "next-intl";
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService";
-import { TcgCard } from "@/generated/api";
+import { TcgCard } from "@boffmedia/shared";
 
 interface Card {
   id: number;

@@ -1,5 +1,5 @@
 import { GameCard } from "./GameCard";
-import type { Game } from "@/generated/api";
+import type { Game } from "@boffmedia/shared";
 
 export function GamesList({ games }: { games: Game[] }) {
   return (

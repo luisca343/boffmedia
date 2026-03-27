@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/primitives/card";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { cn } from "@/lib/utils";
 import { getEventStatus } from "@/lib/events";
-import { Event } from "@/generated/api";
+import { Event } from "@boffmedia/shared";
 import { InternalLink } from "@/components/ui/navigation/Link";
 
 interface EventCardProps {

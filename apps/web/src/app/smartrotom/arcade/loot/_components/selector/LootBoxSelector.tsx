@@ -4,7 +4,7 @@ import { BoxCarousel } from "./BoxCarousel";
 import { BoxInfo } from "./BoxInfo";
 import { OpenBoxButton } from "./OpenBoxButton";
 import { LootBoxOdds } from "../opening/LootBoxOdds";
-import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@boffmedia/shared";
 
 interface LootBoxSelectorProps {
   lootBoxes: LootboxBoxConfig[];

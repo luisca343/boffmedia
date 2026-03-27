@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { getItemName } from "@/lib/intlUtils";
 import { ItemImage } from "@/lib/ItemImage";
 import { calculateLootBoxOdds } from "../../_utils/calculateLootBoxOdds";
-import { LootboxBoxConfig } from "@/generated/api";
+import { LootboxBoxConfig } from "@boffmedia/shared";
 import { getRewardIcon } from "../../../_util/rewardIcons";
 
 interface LootBoxOddsProps {

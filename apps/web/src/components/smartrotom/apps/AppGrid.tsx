@@ -5,7 +5,7 @@ import { useOrderApps } from "@/hooks/apps/useOrderApps"
 import { useBoffSession } from "@/services/useBoffSession"
 import { SortableContext } from "@dnd-kit/sortable"
 import { DndContext, type DragEndEvent, DragOverlay } from "@dnd-kit/core"
-import { SmartRotomApp } from "@/generated/api"
+import { SmartRotomApp } from "@boffmedia/shared"
 import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import { stablePositionStrategy } from "@/lib/drag-and-drop"
 import { useActiveDragItem, useDndSensors, COLLISION_STRATEGIES, DROP_ANIMATIONS } from '@/lib/dnd-kit-setup'

@@ -15,7 +15,7 @@ import { TransactionList } from "./_components/TransactionList";
 import { FilterPopover } from "./_components/FilterPopover";
 import { TransactionDialog } from "./_components/TransactionDialog";
 import { AccountSelect } from "../_components/AccountSelect";
-import { StarBankTransaction } from "@/generated/api";
+import { StarBankTransaction } from "@boffmedia/shared";
 
 // Group transactions by date
 interface TransactionsByDate {

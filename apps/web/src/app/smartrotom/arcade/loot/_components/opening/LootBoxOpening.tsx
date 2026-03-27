@@ -2,7 +2,7 @@ import { useSpinnerAnimation } from "../../_hooks/useSpinnerAnimation";
 import { BoxAnimation } from "./BoxAnimation";
 import { ResultDisplay } from "./ResultDisplayComponent";
 import { Spinner } from "./Spinner";
-import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig } from "@boffmedia/shared";
 
 interface LootBoxOpeningProps {
   lootBox: LootboxBoxConfig;

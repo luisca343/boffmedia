@@ -1,4 +1,4 @@
-import { OrderAppDto } from "@/generated/api";
+import { OrderAppDto } from "@boffmedia/shared";
 import { useRotomRequest } from "../useRotomRequest";
 import { AppsService } from "@/services/api/smartrotom/appsService";
 export function useOrderApps() {

@@ -1,5 +1,5 @@
 import { Box } from "lucide-react";
-import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@boffmedia/shared";
 
 interface BoxInfoProps {
   selectedBox: LootboxBoxConfig | null;

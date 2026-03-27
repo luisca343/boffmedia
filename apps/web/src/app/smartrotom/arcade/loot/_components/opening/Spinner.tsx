@@ -1,5 +1,5 @@
 import { SpinnerItem } from "./SpinnerItem";
-import { LootboxBoxConfig, LootboxItemConfig } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig } from "@boffmedia/shared";
 
 interface SpinnerProps {
   lootBox: LootboxBoxConfig;

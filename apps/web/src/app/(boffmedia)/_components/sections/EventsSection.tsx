@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/primitives/button";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { SectionSeparator } from "../ui/SectionSeparator";
 import { EventImage } from "../ui/EventImage";
-import { Event } from "@/generated/api/models/Event";
+import { Event } from "@boffmedia/shared";
 import { EventsService } from "@/services/api/boffmedia/eventsService";
 import { SectionHeader } from "@/components/boffmedia/sections";
 

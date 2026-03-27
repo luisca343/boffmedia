@@ -1,4 +1,4 @@
-import { LootboxItemConfig } from "@/generated/api";
+import { LootboxItemConfig } from "@boffmedia/shared";
 
 
 /**

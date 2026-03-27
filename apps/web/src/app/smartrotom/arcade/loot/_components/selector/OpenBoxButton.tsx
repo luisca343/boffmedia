@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Box } from "lucide-react";
-import { ArcadeInventoryItem, LootboxBoxConfig } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxBoxConfig } from "@boffmedia/shared";
 
 interface OpenBoxButtonProps {
   selectedBox: LootboxBoxConfig | null;

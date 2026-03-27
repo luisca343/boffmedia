@@ -7,7 +7,7 @@ import { CollectionPagination } from "./CollectionPagination";
 import { ItemDetailModal } from "./ItemDetailModal";
 import { ClaimRewardsModal } from "./ClaimRewardsModal";
 import { useCollectionFilters } from "../../_hooks/useCollectionFilter";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem } from "@boffmedia/shared";
 
 interface ItemCollectionProps {
   items: ArcadeInventoryItem[];

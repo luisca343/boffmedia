@@ -2,7 +2,7 @@
 import { PtcgpService } from "@/services/api/boffmedia/ptcgpService";
 import { useEffect, useState } from "react";
 import { CardsList } from "../../_components/CardsList";
-import { TcgCard } from "@/generated/api";
+import { TcgCard } from "@boffmedia/shared";
 
 export default function Expansions({
   params,

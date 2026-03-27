@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/primitives/button"
 import { Plus, Minus } from 'lucide-react'
 import { InternalLink } from "@/components/ui/navigation/Link"
-import { TcgCard } from "@/generated/api"
+import { TcgCard } from "@boffmedia/shared"
 
 interface CardItemProps {
   card: TcgCard

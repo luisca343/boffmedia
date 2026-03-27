@@ -16,6 +16,9 @@
 # production
 /build
 
+# generated API types — use packages/shared instead, regenerate with pnpm generate:shared
+/src/generated/
+
 # misc
 .DS_Store
 *.pem

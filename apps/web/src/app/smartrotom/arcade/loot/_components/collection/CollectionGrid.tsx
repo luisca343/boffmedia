@@ -3,7 +3,7 @@ import { getRarityConfig } from "../../_utils/rarityConfig";
 import { ItemDisplay } from "../ItemDisplay";
 import { useTranslations } from "next-intl";
 import { getItemName, getItemRarity } from "@/lib/intlUtils";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem } from "@boffmedia/shared";
 import { getRewardIcon } from "../../../_util/rewardIcons";
 
 interface CollectionGridProps {

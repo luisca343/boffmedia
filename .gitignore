@@ -6,3 +6,14 @@ dist/
 .next/
 *.log
 .DS_Store
+
+# Per-app lockfiles — root pnpm-lock.yaml is authoritative
+apps/*/pnpm-lock.yaml
+apps/*/package-lock.json
+
+# Google service account credentials — mount at runtime, never commit
+apps/api/*.json
+!apps/api/package.json
+!apps/api/nest-cli.json
+
+public/

@@ -13,7 +13,7 @@ import AdminPageLayout from "../_components/AdminPageLayout";
 import TerminalCard from "../_components/TerminalCard";
 import TerminalHeader from "../_components/TerminalHeader";
 import EmptyState from "../_components/EmptyState";
-import { SmartRotomApp } from "@/generated/api";
+import { SmartRotomApp } from "@boffmedia/shared";
 
 type User = {
   id: number;

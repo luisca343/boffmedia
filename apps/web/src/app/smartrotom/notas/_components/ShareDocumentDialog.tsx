@@ -13,8 +13,8 @@ import { useBoffSession } from "@/services/useBoffSession"
 import { useGetAllUsers } from "@/hooks/users/useGetAllUsers"
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService"
 import { DocumentsService } from "@/services/api/smartrotom/documentsService"
-import { CreateMessageDto } from "@/generated/api"
-import type { Document } from "@/generated/api"
+import { CreateMessageDto } from "@boffmedia/shared"
+import type { Document } from "@boffmedia/shared"
 
 interface ShareDocumentDialogProps {
   document: Document

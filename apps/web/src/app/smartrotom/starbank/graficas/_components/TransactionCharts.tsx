@@ -15,7 +15,7 @@ import {
   Cell
 } from "recharts";
 import { formatMoney } from "../../bankUtils";
-import { StarBankTransaction } from "@/generated/api";
+import { StarBankTransaction } from "@boffmedia/shared";
 
 // Chart colors
 const INCOME_COLOR = '#10b981';

@@ -1,5 +1,5 @@
 import { useBaseSpinnerAnimation } from "@/hooks/useBaseSpinnerAnimation";
-import { LootboxItemConfig } from "@/generated/api";
+import { LootboxItemConfig } from "@boffmedia/shared";
 
 interface UseSpinnerAnimationProps {
   lootBox: {

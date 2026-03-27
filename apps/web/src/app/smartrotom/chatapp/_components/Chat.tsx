@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/primitives/button"
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { useBoffSession } from "@/services/useBoffSession"
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService"
-import { CreateMessageDto } from "@/generated/api"
+import { CreateMessageDto } from "@boffmedia/shared"
 import useSocketStore from "@/stores/useSocketStore"
 
 export function Chat({

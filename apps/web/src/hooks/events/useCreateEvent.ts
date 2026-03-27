@@ -1,4 +1,4 @@
-import { CreateEventDto } from "@/generated/api"
+import { CreateEventDto } from "@boffmedia/shared"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 

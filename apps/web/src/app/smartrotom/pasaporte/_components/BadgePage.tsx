@@ -5,7 +5,7 @@ import { Game } from "@/app/battlesim/replay/_components/Game"
 import ActiveTeam from "./ActiveTeam"
 import { AchievementService, UserAchievement, Replay } from "@/services/api/smartrotom/achievementsService"
 import { useEffect, useState } from "react"
-import { PokemonW } from "@/generated/api"
+import { PokemonW } from "@boffmedia/shared"
 
 interface BadgePageProps {
   achievement: UserAchievement

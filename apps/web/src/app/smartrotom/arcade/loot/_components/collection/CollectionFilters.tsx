@@ -2,7 +2,7 @@ import { Filter, Search } from "lucide-react";
 import { getRarityConfig } from "../../_utils/rarityConfig";
 import { useTranslations } from "next-intl";
 import { getItemRarity } from "@/lib/intlUtils";
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem } from "@boffmedia/shared";
 
 interface CollectionFiltersProps {
   selectedRarity: ArcadeInventoryItem.rarity | "all";

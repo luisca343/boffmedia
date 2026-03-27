@@ -1,4 +1,4 @@
-import { Event } from "@/generated/api";
+import { Event } from "@boffmedia/shared";
 import { EventCard } from "./EventCard";
 
 export function EventsGrid({ events }: { events: Event[] }) {

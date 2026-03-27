@@ -10,7 +10,7 @@ import { useGetUnclaimed } from "@/hooks/mina/useGetUnclaimed";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 import { darCaja } from "@/services/mcef/mcefApi";
 import { ItemImage } from "@/lib/ItemImage";
-import { UnclaimedItem } from "@/generated/api";
+import { UnclaimedItem } from "@boffmedia/shared";
 
 export default function Reclamar() {
   const { session } = useBoffSession();

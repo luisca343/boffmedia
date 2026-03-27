@@ -1,4 +1,4 @@
-import { PokemonW } from "@/generated/api"
+import { PokemonW } from "@boffmedia/shared"
 import { PokemonImage } from '@/lib/PokemonImage'
 import { createPokemonSpecFromTeam } from "../../utils/pokemonUtils"
 import { PiStarFill, PiSkullFill } from "react-icons/pi"

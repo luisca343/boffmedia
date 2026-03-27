@@ -6,7 +6,7 @@ import { toast } from "react-toastify"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
 import type { Achievement } from "@/types/events"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { CreateAchievementDto } from "@/generated/api"
+import { CreateAchievementDto } from "@boffmedia/shared"
 
 interface AchievementEditDialogProps {
   open: boolean

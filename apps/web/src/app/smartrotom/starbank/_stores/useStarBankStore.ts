@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { getValidAccountId } from "../bankUtils";
 import { Session } from "next-auth";
 import { StarbankService } from "@/services/api/smartrotom/starbankService";
-import { StarBankAccount } from "@/generated/api";
+import { StarBankAccount } from "@boffmedia/shared";
 
 
 interface StarBankState {

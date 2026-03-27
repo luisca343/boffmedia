@@ -27,7 +27,7 @@ import { Search } from "lucide-react";
 import { TransactionSkeleton } from "./_components/TransactionSkeleton";
 import { SummaryCard } from "../_components/SummaryCard";
 import { ArrowDownIcon, ArrowUpIcon, ChevronUpDownIcon, ListBulletIcon } from "@heroicons/react/24/outline";
-import { StarBankTransaction } from "@/generated/api";
+import { StarBankTransaction } from "@boffmedia/shared";
 import useStarBank from "../_hooks/useStarBank";
 
 export interface CellDefProps<TData> {

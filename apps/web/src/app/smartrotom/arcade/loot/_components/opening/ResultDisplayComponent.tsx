@@ -5,7 +5,7 @@ import { getItemDescription, getItemName } from "@/lib/intlUtils";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { ItemImage } from "@/lib/ItemImage";
-import { ArcadeInventoryItem, LootboxItemConfig, LootItemDto } from "@/generated/api";
+import { ArcadeInventoryItem, LootboxItemConfig } from "@boffmedia/shared";
 import { getRewardIcon } from "../../../_util/rewardIcons";
 import { Item } from "@radix-ui/react-select";
 

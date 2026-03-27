@@ -15,7 +15,7 @@ import { useGetAchievements } from "@/hooks/achievements/useGetAchievements";
 import { PlayerStatsPage } from "./_components/PlayerStatsPage";
 import { IndexPage } from "./_components/IndexPage";
 import { BadgePage } from "./_components/BadgePage";
-import { UserAchievement } from "@/generated/api";
+import { UserAchievement } from "@boffmedia/shared";
 
 export default function Pasaporte(){
   const [book, setBook] = useState<PageFlip>({ getPageCount: () => 0 })  

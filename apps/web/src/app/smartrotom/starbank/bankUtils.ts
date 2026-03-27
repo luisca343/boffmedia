@@ -1,4 +1,4 @@
-import { StarBankAccount, StarBankTransaction } from "@/generated/api";
+import { StarBankAccount, StarBankTransaction } from "@boffmedia/shared";
 
 
 export function getValidAccountId(accounts: StarBankAccount[]): number {

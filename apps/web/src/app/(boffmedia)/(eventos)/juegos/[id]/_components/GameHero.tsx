@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/primitives/button"
 import { Badge } from "@/components/ui/primitives/badge"
 import { ChevronLeft, Gamepad2, Activity, Calendar, Clock } from "lucide-react"
 import { InternalLink } from "@/components/ui/navigation/Link"
-import { Game } from "@/generated/api"
+import { Game } from "@boffmedia/shared"
 
 interface GameHeroProps {
   game: Game

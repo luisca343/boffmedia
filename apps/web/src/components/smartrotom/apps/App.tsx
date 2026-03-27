@@ -3,7 +3,7 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import { CSS } from "@dnd-kit/utilities"
 import { InternalLink } from "../../ui/navigation/Link"
-import { SmartRotomApp } from "@/generated/api"
+import { SmartRotomApp } from "@boffmedia/shared"
 
 interface AppIconProps {
   app: SmartRotomApp

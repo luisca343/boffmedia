@@ -1,4 +1,4 @@
-import { ArcadeInventoryItem } from "@/generated/api";
+import { ArcadeInventoryItem } from "@boffmedia/shared";
 import { Box, Info, Loader2, Sparkles } from "lucide-react";
 
 interface LootBoxHeaderProps {

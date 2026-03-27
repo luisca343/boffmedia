@@ -1,6 +1,6 @@
 "use client"
 
-import { LeaderboardEntry } from "@/generated/api"
+import { LeaderboardEntry } from "@boffmedia/shared"
 import { LeaderboardCard } from "./LeaderboardCard"
 import { LeaderboardEmptyState } from "./LeaderboardEmptyState"
 

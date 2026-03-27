@@ -29,7 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/primitives/table";
-import { StarBankTransaction } from "@/generated/api";
+import { StarBankTransaction } from "@boffmedia/shared";
 
 export const columns: ColumnDef<StarBankTransaction>[] = [
   {

@@ -1,5 +1,5 @@
 import { LeaderboardList } from "@/components/boffmedia/leaderboard/LeaderboardList"
-import { LeaderboardEntry } from "@/generated/api"
+import { LeaderboardEntry } from "@boffmedia/shared"
 
 type AchievementsLeaderboardProps = {
   currentPlayers: LeaderboardEntry[]

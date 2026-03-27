@@ -6,7 +6,7 @@ import StreakHeader from "./StreakHeader";
 import StreakNotifications from "./StreakNotifications";
 import DaysGrid from "./DaysGrid";
 import ClaimSection from "./ClaimSection";
-import { DailyRewardItem, DailyRewardsConfig } from "@/generated/api";
+import { DailyRewardItem, DailyRewardsConfig } from "@boffmedia/shared";
 
 interface WeeklyStreakProps {
   streak: number;

@@ -1,6 +1,6 @@
 import { AnimatePresence } from "framer-motion"
 import { CardItem } from "./CardItem"
-import { TcgCard } from "@/generated/api"
+import { TcgCard } from "@boffmedia/shared"
 
 interface CardGridProps {
   cards: TcgCard[]

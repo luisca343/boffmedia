@@ -5,7 +5,7 @@ import { Calendar, Trophy } from "lucide-react"
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { Button } from "@/components/ui/primitives/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { Event } from "@/generated/api/models/Event"
+import { Event } from "@boffmedia/shared"
 import { EventCard } from "@/components/boffmedia/event/EventCard"
 
 interface GameEventsProps {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { LootboxBoxConfig } from "@/generated/api";
+import { LootboxBoxConfig } from "@boffmedia/shared";
 
 interface BoxDisplayProps {
   lootBox: LootboxBoxConfig;

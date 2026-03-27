@@ -13,7 +13,7 @@ import {
 } from "recharts";
 import { formatMoney } from "../../bankUtils";
 import { StarBankAccount } from "@/types/starbank";
-import { StarBankTransaction } from "@/generated/api/models/StarBankTransaction";
+import { StarBankTransaction } from "@boffmedia/shared";
 
 interface TransactionTypeDistributionProps {
   transactions: StarBankTransaction[];

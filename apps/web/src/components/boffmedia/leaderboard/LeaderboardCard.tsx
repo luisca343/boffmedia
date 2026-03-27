@@ -4,7 +4,7 @@ import { Crown, Medal, Award, User } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/primitives/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
 import { ProfileImage } from "@/components/ui/ProfileImage"
-import { LeaderboardEntry } from "@/generated/api"
+import { LeaderboardEntry } from "@boffmedia/shared"
 
 interface LeaderboardCardProps {
   player: LeaderboardEntry

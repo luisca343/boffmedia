@@ -1,7 +1,7 @@
 import { Calendar, MapPin } from "lucide-react";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { Button } from "@/components/ui/primitives/button";
-import { Event } from "@/generated/api/models/Event";
+import { Event } from "@boffmedia/shared";
 
 interface EventCardProps {
   event: Event;

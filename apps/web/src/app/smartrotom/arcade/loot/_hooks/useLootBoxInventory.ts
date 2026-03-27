@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArcadeInventoryItem, ArcadeService } from "@/services/api/smartrotom/arcadeService";
 import { useTranslations } from 'next-intl';
-import { LootboxBoxConfig, LootboxItemConfig, RarityRange } from "@/generated/api";
+import { LootboxBoxConfig, LootboxItemConfig, RarityRange } from "@boffmedia/shared";
 
 // Map the inventory item types to loot box IDs
 const BOX_TYPE_MAP: Record<string, string> = {

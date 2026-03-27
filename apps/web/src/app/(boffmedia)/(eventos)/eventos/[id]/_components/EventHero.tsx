@@ -7,7 +7,7 @@ import {
   Share2, Bookmark, Zap, Server, 
   GamepadIcon as Gamepad2
 } from "lucide-react"
-import { Event } from "@/generated/api/models/Event"
+import { Event } from "@boffmedia/shared"
 import { EventRegistrationButton } from "../../_components/EventRegistrationButton"
 import Link from "next/link"
 import { InternalLink } from "@/components/ui/navigation/Link"
