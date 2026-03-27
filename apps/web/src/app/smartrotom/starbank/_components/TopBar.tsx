@@ -5,7 +5,7 @@ import { useBoffSession } from "@/services/useBoffSession";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { useState, useRef, useEffect } from "react";
 import { changeActiveAccount, formatMoney } from "../bankUtils";
-import { StarBankAccount } from "@/types/starbank";
+import { StarBankAccount } from "@boffmedia/shared";
 import { InternalLink } from "@/components/ui/navigation/Link";
 
 export default function TopBar({

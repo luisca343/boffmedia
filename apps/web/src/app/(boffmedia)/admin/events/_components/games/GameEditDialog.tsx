@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { toast } from "react-toastify"
 import { GameForm, type GameFormValues } from "./GameForm"
-import type { Game } from "@/types/events"
+import type { Game } from "@boffmedia/shared"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface GameEditDialogProps {

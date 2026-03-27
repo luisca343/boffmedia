@@ -12,8 +12,7 @@ import {
   Legend
 } from "recharts";
 import { formatMoney } from "../../bankUtils";
-import { StarBankAccount } from "@/types/starbank";
-import { StarBankTransaction } from "@boffmedia/shared";
+import { StarBankAccount, StarBankTransaction } from "@boffmedia/shared";
 
 interface TransactionTypeDistributionProps {
   transactions: StarBankTransaction[];

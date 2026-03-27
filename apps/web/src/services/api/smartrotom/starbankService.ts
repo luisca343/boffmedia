@@ -1,10 +1,6 @@
 import { rotomGET, rotomPOST, ApiResponse, rotomMultipartPOST } from '@/services/boffAPI';
 import { CreateAccountDto } from '@/types/dto/create-account-dto';
-import { TrainerDefeatMoneyDto } from '@/types/dto/trainer-defeat-money-dto';
-import { CreateShopTransactionDto } from '@/types/dto/create-shop-transaction-dto';
-import { CreateTransferDto } from '@/types/dto/create-transfer-dto';
-import { TransferFromMainDto } from '@/types/dto/transfer-from-main-dto';
-import { StarBankAccount, StarBankTransaction } from '@boffmedia/shared';
+import { StarBankAccount, StarBankTransaction, TrainerDefeatMoneyDto, CreateShopTransactionDto, CreateTransferDto, TransferFromMainDto } from '@boffmedia/shared';
 
 export class StarbankService {
   // ==================== ACCOUNT OPERATIONS ====================

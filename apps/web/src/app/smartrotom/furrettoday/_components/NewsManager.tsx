@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/primitives/input";
 import { Textarea } from "@/components/ui/primitives/textarea";
 import { NewsItem } from "../page";
 import { useUpdateActiveNews } from "@/hooks/documents/useUpdateActiveNews";
-import { CreateNewsDto } from "@/types/dto/create-news-dto";
+import { CreateNewsDto } from "@boffmedia/shared";
 
 interface NewsManagerProps {
   initialNews?: CreateNewsDto;

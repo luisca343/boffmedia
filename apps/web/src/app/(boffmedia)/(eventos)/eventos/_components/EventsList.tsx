@@ -1,5 +1,5 @@
 import { EventCard } from "./EventCard";
-import type { Event } from "@/types/events";
+import type { Event } from "@boffmedia/shared";
 
 export function EventsList({ events }: any) {
   return (

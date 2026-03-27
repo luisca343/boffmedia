@@ -1,6 +1,6 @@
 import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { CreateTeamDto } from "@/types/dto/create-team.dto"
+import { CreateTeamDto } from "@boffmedia/shared"
 export function useCreateTeam(eventId: number) {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(
     (createTeamDto) => EventsService.createTeam(eventId, createTeamDto),

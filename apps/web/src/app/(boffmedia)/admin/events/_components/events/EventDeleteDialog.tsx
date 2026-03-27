@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Calendar, RefreshCw } from "lucide-react"
-import type { Event } from "@/types/events"
+import type { Event } from "@boffmedia/shared"
 
 interface EventDeleteDialogProps {
   open: boolean

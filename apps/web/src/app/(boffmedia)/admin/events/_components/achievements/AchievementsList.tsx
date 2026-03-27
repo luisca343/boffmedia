@@ -1,6 +1,6 @@
 import { CardContent } from "@/components/ui/primitives/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
-import type { Achievement } from "@/types/events"
+import type { Achievement } from "@boffmedia/shared"
 import { AchievementCard } from "./AchievementCard"
 import { AchievementEmptyState } from "./AchievementEmptyState"
 

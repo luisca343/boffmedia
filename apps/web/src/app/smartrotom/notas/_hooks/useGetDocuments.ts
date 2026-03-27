@@ -1,7 +1,7 @@
 import { useCreateNote } from "@/hooks/documents/useCreateNote";
 import { useGetNotes } from "@/hooks/documents/useGetNotes";
 import { useBoffSession } from "@/services/useBoffSession";
-import { CreateDocumentDtoWithUuid } from "@/types/dto/create-document.dto";
+import { CreateDocumentDtoWithUuid } from "@boffmedia/shared";
 import { useState } from "react"
 
 export function useGetDocuments() {

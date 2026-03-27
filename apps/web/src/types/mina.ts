@@ -1,12 +1,3 @@
-export type HistoryEntry = {
-    id: number;
-    itemId: string;
-    itemName: string;
-    claimed: number;
-    value: number;
-    date: Date;
-}
-
 export type RankingEntry = {
     username: string;
     value: number;

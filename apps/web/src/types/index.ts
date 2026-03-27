@@ -28,18 +28,7 @@ declare module "next-auth/jwt" {
   interface JWT extends BoffUser {}
 }
 
-export type App = {
-  id: number
-  name: string
-  url: string
-  active: number
-}
-
 export type SuccessResponse = {
   success: boolean
 }
 
-export type SuccessResponseWithId = {
-  success: boolean
-  id: number
-}

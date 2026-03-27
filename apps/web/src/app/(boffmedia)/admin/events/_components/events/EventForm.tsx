@@ -9,7 +9,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetGames } from "@/hooks/events/useGetGames"
-import type { Event } from "@/types/events"
+import type { Event } from "@boffmedia/shared"
 
 const eventSchema = z.object({
   id: z.number().optional(),
