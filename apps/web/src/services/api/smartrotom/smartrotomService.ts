@@ -1,6 +1,5 @@
 import { ApiResponse, rotomGET, rotomPOST } from "@/services/boffAPI"
-import { TaxiStop } from "@/types/dto/taxi-stop.dto"
-import { TeleportPlayerDto } from "@boffmedia/shared"
+import { TaxiStop, TeleportPlayerDto } from "@boffmedia/shared"
 
 export interface Performance {
   tps: string

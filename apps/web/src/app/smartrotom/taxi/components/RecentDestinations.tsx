@@ -1,5 +1,5 @@
 import { FaHistory, FaMapMarkerAlt, FaStar } from 'react-icons/fa';
-import { TaxiStop } from "@/types/dto/taxi-stop.dto";
+import { TaxiStop } from "@boffmedia/shared";
 
 interface RecentDestinationsProps {
   recentStops: TaxiStop[];

@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
 import { StarbankService } from "@/services/api/smartrotom/starbankService"
-import { TaxiStop } from "@/types/dto/taxi-stop.dto"
+import { TaxiStop } from "@boffmedia/shared"
 import { getMcUserData } from '@/services/mcef/mcefApi'
 import TaxiHeader from './components/TaxiHeader'
 import TabNavigation from './components/TabNavigation'

@@ -1,5 +1,5 @@
 import { FaArrowRight } from 'react-icons/fa';
-import { TaxiStop } from "@/types/dto/taxi-stop.dto";
+import { TaxiStop } from "@boffmedia/shared";
 import type { StopPosition, Position } from '@/components/common/map/StandardizedMap';
 
 // Helper function to calculate distance between two points

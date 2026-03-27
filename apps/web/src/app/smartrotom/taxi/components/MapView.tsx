@@ -1,4 +1,4 @@
-import { TaxiStop } from "@/types/dto/taxi-stop.dto";
+import { TaxiStop } from "@boffmedia/shared";
 import { useMemo } from 'react';
 
 // Types and Utils

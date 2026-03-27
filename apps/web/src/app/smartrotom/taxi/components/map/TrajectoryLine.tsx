@@ -1,4 +1,4 @@
-import { TaxiStop } from "@/types/dto/taxi-stop.dto";
+import { TaxiStop } from "@boffmedia/shared";
 import { MAP_CONSTANTS } from '@/components/common/map/StandardizedMap';
 import type { Position, CoordinateTransformer } from '@/components/common/map/StandardizedMap';
 
