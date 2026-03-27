@@ -1,13 +1,6 @@
 import { ApiResponse, rotomGET, rotomPOST } from "@/services/boffAPI"
 import { TaxiStop, TeleportPlayerDto } from "@boffmedia/shared"
 
-export interface Performance {
-  tps: string
-  memory: number
-  players: number
-  uptime: string
-}
-
 export interface ArceuSpeak {
   name: string
   value: string
