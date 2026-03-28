@@ -17,3 +17,4 @@ apps/api/*.json
 !apps/api/nest-cli.json
 
 public/
+laboon/

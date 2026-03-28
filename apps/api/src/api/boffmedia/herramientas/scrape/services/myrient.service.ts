@@ -187,7 +187,7 @@ export class MyrientScrapeService {
    * @returns    Metadata about the saved file.
    */
   async downloadGame(url: string): Promise<DownloadResult> {
-    const townPath = path.join(process.cwd(), 'public/juegos/myrient/3DS');
+    const townPath = path.join(process.cwd(), 'laboon/juegos/myrient/3DS');
     await mkdir(townPath, { recursive: true });
 
     // Derive a safe filename from the URL.
@@ -242,7 +242,7 @@ export class MyrientScrapeService {
     this.logger.log(`[${catalog.label}] ${matched.length} / ${allEntries.length} entries match regions: [${regions.join(', ') || 'all'}]`);
 
     // 3. Prepare the save directory
-    const saveDir = path.join(process.cwd(), 'public/juegos/Roms', catalog.localFolder);
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     // 4. Build one download task per matched entry
@@ -328,7 +328,7 @@ export class MyrientScrapeService {
     this.logger.log(`[${catalog.label}] Starting download of ${selected.length} selected game(s)`);
 
     // Prepare the save directory
-    const saveDir = path.join(process.cwd(), 'public/juegos/myrient', catalog.localFolder);
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     // Build one download task per selected entry
