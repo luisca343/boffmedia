@@ -1,5 +1,4 @@
 import { rotomPOST, ApiResponse } from "@/services/boffAPI"
-import { SuccessResponse } from "@/types"
 
 export type MinecraftStats = {
   stats: {

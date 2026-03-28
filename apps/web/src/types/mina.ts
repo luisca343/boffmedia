@@ -1,8 +1,3 @@
-export type RankingEntry = {
-    username: string;
-    value: number;
-}
-
 export type RewardEntry = {
     id: number;
     name: string;
@@ -16,9 +11,3 @@ export type RewardEntry = {
     url: string;
 }
 
-export type UnclaimedReward = {
-    name: string;
-    type: string;
-    amount: number;
-    itemId: string;
-  };

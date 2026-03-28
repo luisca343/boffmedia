@@ -28,7 +28,3 @@ declare module "next-auth/jwt" {
   interface JWT extends BoffUser {}
 }
 
-export type SuccessResponse = {
-  success: boolean
-}
-

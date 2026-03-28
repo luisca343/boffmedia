@@ -1,6 +1,5 @@
-import { PokemonW, TaxiStop, TeleportPlayerDto, Weather, Performance } from '@boffmedia/shared';
+import { PokemonW, SuccessResponse, TaxiStop, TeleportPlayerDto, Weather, Performance } from '@boffmedia/shared';
 import { wingullGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
-import { SuccessResponse } from '@/types';
 import { 
     BattleTeamData, 
     BattleTeam, 

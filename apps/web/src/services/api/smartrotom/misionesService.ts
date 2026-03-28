@@ -1,7 +1,6 @@
 import { INPC } from '@/app/smartrotom/misiones/_types/Quest';
 import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
-import { SuccessResponse } from '@/types';
-import { UploadNpcImageDto } from '@boffmedia/shared';
+import { SuccessResponse, UploadNpcImageDto } from '@boffmedia/shared';
 import { QuestSystemData } from '@/types/misiones';
 
 export class MisionesService {
