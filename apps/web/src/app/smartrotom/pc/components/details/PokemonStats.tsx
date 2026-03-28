@@ -2,9 +2,9 @@
 import { PiChartBar } from 'react-icons/pi';
 
 interface PokemonStatsProps {
-  stats: number[];
-  ivs?: number[];
-  evs?: number[];
+  stats: (number | string)[];
+  ivs?: (number | string)[];
+  evs?: (number | string)[];
 }
 
 export function PokemonStats({ stats, ivs, evs }: PokemonStatsProps) {
@@ -52,7 +52,7 @@ export function PokemonStats({ stats, ivs, evs }: PokemonStatsProps) {
                 <div className="bg-slate-700/30 rounded-full h-3 border border-slate-600/30">
                   <div 
                     className={`${getStatBarColor(index)} h-3 rounded-full transition-all duration-300`} 
-                    style={{ width: `${Math.min((stat / 255) * 100, 100)}%` }}
+                    style={{ width: `${Math.min((Number(stat) / 255) * 100, 100)}%` }}
                   />
                 </div>
               </div>

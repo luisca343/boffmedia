@@ -9,8 +9,8 @@ interface SpinnerProps {
   isSpinning: boolean;
   winningIndex: number | null;
   wonItem: LootboxItemConfig;
-  spinnerRef: React.RefObject<HTMLDivElement>;
-  itemsContainerRef: React.RefObject<HTMLDivElement>;
+  spinnerRef: React.RefObject<HTMLDivElement | null>;
+  itemsContainerRef: React.RefObject<HTMLDivElement | null>;
   ITEM_WIDTH: number;
 }
 

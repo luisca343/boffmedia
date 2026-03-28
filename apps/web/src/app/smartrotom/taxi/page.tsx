@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import { SmartrotomService } from "@/services/api/smartrotom/smartrotomService"
 import { StarbankService } from "@/services/api/smartrotom/starbankService"
 import { TaxiStop } from "@boffmedia/shared"
+import { TaxiStopExtended } from "@/types"
 import { getMcUserData } from '@/services/mcef/mcefApi'
 import TaxiHeader from './components/TaxiHeader'
 import TabNavigation from './components/TabNavigation'
@@ -38,10 +39,10 @@ export default function TaxiApp() {
   const { session } = useBoffSession()
   const [playerPosition, setPlayerPosition] = useState<Position>({ x: 0, z: 0 })
   const [playerMoney, setPlayerMoney] = useState(0)
-  const [selectedStop, setSelectedStop] = useState<TaxiStop | null>(null)
+  const [selectedStop, setSelectedStop] = useState<TaxiStopExtended | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<'map' | 'list'>('map')
-  const [taxiStops, setTaxiStops] = useState<TaxiStop[]>([])
+  const [taxiStops, setTaxiStops] = useState<TaxiStopExtended[]>([])
   const [showRecentDrawer, setShowRecentDrawer] = useState(false)
   const isInitialLoad = useRef(true)
   
@@ -113,7 +114,7 @@ export default function TaxiApp() {
     return Math.ceil(MINIMUM_FARE + (distance * PRICE_PER_BLOCK))
   }
 
-  const teleportPlayer = async (stop: TaxiStop) => {
+  const teleportPlayer = async (stop: TaxiStopExtended) => {
     const distance = calculateDistance(playerPosition.x, playerPosition.z, stop.x, stop.z)
     const price = calculatePrice(distance)
     

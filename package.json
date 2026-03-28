@@ -19,5 +19,18 @@
   "devDependencies": {
     "concurrently": "^9.0.0",
     "typescript": "^5.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@pkmn/client": "^0.7.0",
+      "@pkmn/data": "^0.10.7",
+      "@pkmn/dex": "^0.9.38",
+      "@pkmn/img": "^0.2.40",
+      "@pkmn/login": "^0.2.0",
+      "@pkmn/protocol": "^0.7.0",
+      "@pkmn/randoms": "^0.9.38",
+      "@pkmn/sim": "^0.9.38",
+      "@pkmn/view": "^0.7.0"
+    }
   }
 }

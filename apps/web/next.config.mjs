@@ -23,9 +23,6 @@ const nextConfig = {
         optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
     },
     
-    typescript: {
-        "ignoreBuildErrors": true
-    },
     images: {
         remotePatterns: [
             {

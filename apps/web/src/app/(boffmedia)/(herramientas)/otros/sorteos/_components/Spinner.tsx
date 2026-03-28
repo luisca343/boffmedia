@@ -8,8 +8,8 @@ interface SpinnerProps {
   isSpinning: boolean
   spinComplete: boolean
   winnerIndex: number | null
-  spinnerRef: React.RefObject<HTMLDivElement>
-  itemsContainerRef: React.RefObject<HTMLDivElement>
+  spinnerRef: React.RefObject<HTMLDivElement | null>
+  itemsContainerRef: React.RefObject<HTMLDivElement | null>
   ITEM_WIDTH: number
 }
 

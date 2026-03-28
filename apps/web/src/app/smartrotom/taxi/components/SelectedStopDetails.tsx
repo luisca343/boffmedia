@@ -1,5 +1,6 @@
 import { FaMapMarkerAlt, FaWalking, FaTimes, FaTaxi, FaCoins } from 'react-icons/fa'
 import { TaxiStop } from "@boffmedia/shared"
+import { TaxiStopExtended } from "@/types"
 import { formatMoney } from '../../starbank/bankUtils';
 
 interface Position {
@@ -8,13 +9,13 @@ interface Position {
 }
 
 interface SelectedStopDetailsProps {
-  selectedStop: TaxiStop;
+  selectedStop: TaxiStopExtended;
   playerPosition: Position;
   playerMoney: number;
   calculateDistance: (x1: number, z1: number, x2: number, z2: number) => number;
   calculatePrice: (distance: number) => number;
   formatDistance: (distance: number) => string;
-  teleportPlayer: (stop: TaxiStop) => Promise<void>;
+  teleportPlayer: (stop: TaxiStopExtended) => Promise<void>;
   isLoading: boolean;
   onClose: () => void;
 }

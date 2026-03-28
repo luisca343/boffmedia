@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Sun,
   CloudRain,
@@ -9,7 +10,7 @@ import {
   Cloud,
 } from "lucide-react";
 
-export const getWeatherIcon = (weather: string): JSX.Element => {
+export const getWeatherIcon = (weather: string): React.JSX.Element => {
   switch (weather) {
     case "rain":
       return <CloudRain className="h-8 w-8 text-secondary-500" />;
@@ -20,7 +21,7 @@ export const getWeatherIcon = (weather: string): JSX.Element => {
   }
 };
 
-export const getDayNightIcon = (ticks: number): JSX.Element => {
+export const getDayNightIcon = (ticks: number): React.JSX.Element => {
   if ((ticks >= 22500 && ticks < 24000) || (ticks >= 0 && ticks < 300)) return <Sunrise className="h-6 w-6 text-primary-500" />;
   if ((ticks >= 300 && ticks < 6000)) return <Sun className="h-6 w-6 text-yellow-300" />;
   if (ticks >= 5500 && ticks < 6500) return <Sun className="h-6 w-6 text-yellow-500" />;
