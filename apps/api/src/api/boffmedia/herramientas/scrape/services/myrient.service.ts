@@ -310,6 +310,96 @@ export class MyrientScrapeService {
   }
 
   /**
+   * Streams SSE progress events as each file in the selection is processed.
+   *
+   * Emits:
+   *   { type: 'start',    total }
+   *   { type: 'progress', index, total, filename, status, size?, sizeBytes?, error? }
+   *   { type: 'done',     downloaded, skipped, failed,
+   *                       totalDownloadedSize, totalDownloadedSizeBytes, console, consoleLabel }
+   *
+   * Files are processed in batches of `concurrency`. Each batch runs in parallel;
+   * results are yielded in submission order once the batch settles.
+   */
+  async *streamDownloadSelected(dto: DownloadSelectedGamesDto): AsyncGenerator<string> {
+    const catalog = CONSOLE_CATALOG[dto.console];
+    const concurrency = Math.min(Math.max(dto.concurrency ?? 2, 1), 5);
+    const selected = dto.games;
+
+    this.logger.log(`[${catalog.label}] Stream-download of ${selected.length} game(s) (concurrency=${concurrency})`);
+
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
+    await mkdir(saveDir, { recursive: true });
+
+    yield `data: ${JSON.stringify({ type: 'start', total: selected.length })}\n\n`;
+
+    let downloaded = 0, skipped = 0, failed = 0, totalDownloadedSizeBytes = 0;
+    let globalIndex = 0;
+
+    const downloadOne = async (entry: GameFileEntry, i: number): Promise<FileDownloadEntry> => {
+      const filename = decodeURIComponent(entry.link.split('/').pop() ?? entry.name);
+      const filePath = path.join(saveDir, filename);
+      const prefix = `[${catalog.label}] [${i + 1}/${selected.length}]`;
+
+      if (await fileExists(filePath)) {
+        const { size: sizeBytes } = await stat(filePath);
+        this.logger.log(`${prefix} SKIP ${filename}`);
+        return { filename, status: 'skipped', size: formatBytes(sizeBytes), sizeBytes };
+      }
+
+      this.logger.log(`${prefix} Downloading ${filename} — ${entry.link}`);
+      try {
+        const response = await axios.get<NodeJS.ReadableStream>(entry.link, {
+          responseType: 'stream',
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)' },
+          timeout: 0,
+        });
+        const writeStream = createWriteStream(filePath);
+        await pipeline(response.data, writeStream);
+        const { size: sizeBytes } = await stat(filePath);
+        this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
+        return { filename, status: 'downloaded', size: formatBytes(sizeBytes), sizeBytes };
+      } catch (err) {
+        this.logger.error(`${prefix} FAILED ${filename}: ${err?.message ?? err}`);
+        return { filename, status: 'failed', error: String(err?.message ?? err) };
+      }
+    };
+
+    // Process in batches of `concurrency`, yield each result in order after the batch settles
+    for (let batchStart = 0; batchStart < selected.length; batchStart += concurrency) {
+      const batch = selected.slice(batchStart, batchStart + concurrency);
+      const batchResults = await Promise.all(
+        batch.map((entry, j) => downloadOne(entry, batchStart + j)),
+      );
+
+      for (const entry of batchResults) {
+        globalIndex++;
+        if (entry.status === 'downloaded') { downloaded++; totalDownloadedSizeBytes += entry.sizeBytes ?? 0; }
+        else if (entry.status === 'skipped') { skipped++;  totalDownloadedSizeBytes += entry.sizeBytes ?? 0; }
+        else { failed++; }
+
+        yield `data: ${JSON.stringify({
+          type: 'progress',
+          index: globalIndex,
+          total: selected.length,
+          ...entry,
+        })}\n\n`;
+      }
+    }
+
+    yield `data: ${JSON.stringify({
+      type: 'done',
+      console: dto.console,
+      consoleLabel: catalog.label,
+      downloaded,
+      skipped,
+      failed,
+      totalDownloadedSize: formatBytes(totalDownloadedSizeBytes),
+      totalDownloadedSizeBytes,
+    })}\n\n`;
+  }
+
+  /**
    * Downloads a user-selected subset of game files for a given console.
    * The caller provides the exact entries (name + link + size) instead of
    * having the server scrape and filter the catalog — this is intended for

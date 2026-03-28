@@ -52,4 +52,8 @@ export class ScrapeFacadeService {
       throw new Error(`Selected download failed: ${error.message}`);
     }
   }
+
+  streamDownloadSelected(dto: DownloadSelectedGamesDto): AsyncGenerator<string> {
+    return this.myrientScrapeService.streamDownloadSelected(dto);
+  }
 }

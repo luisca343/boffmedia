@@ -13,7 +13,7 @@ export interface CatalogResult {
   files: GameFileEntry[];
 }
 
-export type FileDownloadStatus = 'downloaded' | 'skipped' | 'failed';
+export type FileDownloadStatus = 'pending' | 'downloading' | 'downloaded' | 'skipped' | 'failed';
 
 export interface FileDownloadEntry {
   filename: string;
@@ -36,6 +36,12 @@ export interface BulkDownloadResult {
   files: FileDownloadEntry[];
 }
 
+// SSE event types emitted by the stream endpoint
+export type SseStartEvent    = { type: 'start';    total: number };
+export type SseProgressEvent = { type: 'progress'; index: number; total: number } & FileDownloadEntry;
+export type SseDoneEvent     = { type: 'done' } & Omit<BulkDownloadResult, 'files' | 'regions' | 'totalMatched'>;
+export type SseEvent         = SseStartEvent | SseProgressEvent | SseDoneEvent;
+
 export class ScrapeService {
   static getCatalog(consoleKey: string, regions?: string[]) {
     const params = new URLSearchParams({ console: consoleKey });
@@ -44,23 +50,48 @@ export class ScrapeService {
   }
 
   /**
-   * Uses raw fetch with no timeout so long-running bulk downloads are not
-   * cancelled by Next.js or the browser default timeout.
+   * Streams SSE progress events for a bulk download.
+   * Calls the callback for each parsed event as it arrives.
+   * Returns a promise that resolves when the stream closes.
    */
-  static async downloadSelected(dto: {
-    console: string;
-    games: GameFileEntry[];
-    concurrency?: number;
-  }) {
+  static async streamDownloadSelected(
+    dto: { console: string; games: GameFileEntry[]; concurrency?: number },
+    onEvent: (event: SseEvent) => void,
+  ): Promise<void> {
     const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
-    const res = await fetch(`${apiUrl}/boffmedia/herramientas/scrape/myrient/download-selected`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(dto),
-      // No cache, no revalidate — and critically no next: { revalidate }
-      // so Next.js does not wrap this in a limited fetch.
-      cache: 'no-store',
-    });
-    return res.json() as Promise<{ success: boolean; data?: BulkDownloadResult; message?: string; error?: string }>;
+    const res = await fetch(
+      `${apiUrl}/boffmedia/herramientas/scrape/myrient/download-selected/stream`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto),
+        cache: 'no-store',
+      },
+    );
+
+    if (!res.body) throw new Error('No response body from stream endpoint.');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? ''; // keep incomplete last line
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const event: SseEvent = JSON.parse(line.slice(6));
+          onEvent(event);
+        } catch {
+          // malformed line — skip
+        }
+      }
+    }
   }
 }

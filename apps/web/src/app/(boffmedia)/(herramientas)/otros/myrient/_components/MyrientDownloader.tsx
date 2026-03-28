@@ -24,54 +24,46 @@ import {
   HardDrive,
   ChevronDown,
   ChevronUp,
+  Clock,
 } from 'lucide-react';
 import {
   ScrapeService,
   CatalogResult,
-  BulkDownloadResult,
+  FileDownloadEntry,
+  FileDownloadStatus,
   GameFileEntry,
+  SseDoneEvent,
 } from '@/services/api/boffmedia/scrapeService';
 import GameCatalogTable from './GameCatalogTable';
 
 // ─── Console metadata ─────────────────────────────────────────────────────────
 
 type Manufacturer = 'Nintendo' | 'Sony';
-
-interface ConsoleInfo {
-  label: string;
-  shortLabel: string;
-  manufacturer: Manufacturer;
-}
+interface ConsoleInfo { label: string; shortLabel: string; manufacturer: Manufacturer; }
 
 const CONSOLES: Record<string, ConsoleInfo> = {
-  gb:              { label: 'Game Boy',           shortLabel: 'GB',     manufacturer: 'Nintendo' },
-  gbc:             { label: 'Game Boy Color',      shortLabel: 'GBC',    manufacturer: 'Nintendo' },
-  gba:             { label: 'Game Boy Advance',    shortLabel: 'GBA',    manufacturer: 'Nintendo' },
-  n64:             { label: 'Nintendo 64',         shortLabel: 'N64',    manufacturer: 'Nintendo' },
-  gamecube:        { label: 'GameCube',            shortLabel: 'GCN',    manufacturer: 'Nintendo' },
-  nds:             { label: 'Nintendo DS',         shortLabel: 'NDS',    manufacturer: 'Nintendo' },
-  '3ds':           { label: 'Nintendo 3DS',        shortLabel: '3DS',    manufacturer: 'Nintendo' },
-  wii:             { label: 'Wii',                 shortLabel: 'Wii',    manufacturer: 'Nintendo' },
-  wiiu:            { label: 'Wii U',               shortLabel: 'WiiU',   manufacturer: 'Nintendo' },
-  psx:             { label: 'PlayStation',         shortLabel: 'PS1',    manufacturer: 'Sony' },
-  ps2:             { label: 'PlayStation 2',       shortLabel: 'PS2',    manufacturer: 'Sony' },
-  ps3:             { label: 'PlayStation 3',       shortLabel: 'PS3',    manufacturer: 'Sony' },
-  psp:             { label: 'PSP',                 shortLabel: 'PSP',    manufacturer: 'Sony' },
-  'psvita-psn':    { label: 'PS Vita (PSN)',        shortLabel: 'Vita',   manufacturer: 'Sony' },
-  'psvita-updates':{ label: 'PS Vita (Updates)',   shortLabel: 'VitaU',  manufacturer: 'Sony' },
+  gb:              { label: 'Game Boy',           shortLabel: 'GB',    manufacturer: 'Nintendo' },
+  gbc:             { label: 'Game Boy Color',      shortLabel: 'GBC',   manufacturer: 'Nintendo' },
+  gba:             { label: 'Game Boy Advance',    shortLabel: 'GBA',   manufacturer: 'Nintendo' },
+  n64:             { label: 'Nintendo 64',         shortLabel: 'N64',   manufacturer: 'Nintendo' },
+  gamecube:        { label: 'GameCube',            shortLabel: 'GCN',   manufacturer: 'Nintendo' },
+  nds:             { label: 'Nintendo DS',         shortLabel: 'NDS',   manufacturer: 'Nintendo' },
+  '3ds':           { label: 'Nintendo 3DS',        shortLabel: '3DS',   manufacturer: 'Nintendo' },
+  wii:             { label: 'Wii',                 shortLabel: 'Wii',   manufacturer: 'Nintendo' },
+  wiiu:            { label: 'Wii U',               shortLabel: 'WiiU',  manufacturer: 'Nintendo' },
+  psx:             { label: 'PlayStation',         shortLabel: 'PS1',   manufacturer: 'Sony' },
+  ps2:             { label: 'PlayStation 2',       shortLabel: 'PS2',   manufacturer: 'Sony' },
+  ps3:             { label: 'PlayStation 3',       shortLabel: 'PS3',   manufacturer: 'Sony' },
+  psp:             { label: 'PSP',                 shortLabel: 'PSP',   manufacturer: 'Sony' },
+  'psvita-psn':    { label: 'PS Vita (PSN)',        shortLabel: 'Vita',  manufacturer: 'Sony' },
+  'psvita-updates':{ label: 'PS Vita (Updates)',   shortLabel: 'VitaU', manufacturer: 'Sony' },
 };
 
 const COMMON_REGIONS = ['USA', 'Europe', 'Japan', 'World', 'Korea', 'Australia'];
 
 // ─── Console picker ───────────────────────────────────────────────────────────
 
-function ConsolePicker({
-  selected,
-  onSelect,
-}: {
-  selected: string | null;
-  onSelect: (key: string) => void;
-}) {
+function ConsolePicker({ selected, onSelect }: { selected: string | null; onSelect: (k: string) => void }) {
   const nintendo = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Nintendo');
   const sony     = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sony');
 
@@ -106,20 +98,11 @@ function ConsolePicker({
 
 // ─── Region filter ────────────────────────────────────────────────────────────
 
-function RegionFilter({
-  regions,
-  onAdd,
-  onRemove,
-}: {
-  regions: string[];
-  onAdd: (r: string) => void;
-  onRemove: (r: string) => void;
-}) {
+function RegionFilter({ regions, onAdd, onRemove }: { regions: string[]; onAdd: (r: string) => void; onRemove: (r: string) => void }) {
   const [custom, setCustom] = useState('');
-
   const addCustom = () => {
-    const trimmed = custom.trim();
-    if (trimmed && !regions.includes(trimmed)) onAdd(trimmed);
+    const t = custom.trim();
+    if (t && !regions.includes(t)) onAdd(t);
     setCustom('');
   };
 
@@ -129,55 +112,27 @@ function RegionFilter({
         {COMMON_REGIONS.map(r => {
           const active = regions.includes(r);
           return (
-            <button
-              key={r}
-              onClick={() => (active ? onRemove(r) : onAdd(r))}
+            <button key={r} onClick={() => active ? onRemove(r) : onAdd(r)}
               className={`px-3 py-1 rounded-full text-xs font-medium border transition-all duration-150
-                ${active
-                  ? 'bg-primary-600/30 border-primary-500 text-primary-200'
-                  : 'bg-surface-800/40 border-surface-600/50 text-surface-400 hover:border-surface-500 hover:text-surface-200'
-                }`}
-            >
-              {r}
-            </button>
+                ${active ? 'bg-primary-600/30 border-primary-500 text-primary-200'
+                         : 'bg-surface-800/40 border-surface-600/50 text-surface-400 hover:border-surface-500 hover:text-surface-200'}`}
+            >{r}</button>
           );
         })}
       </div>
-
       <div className="flex gap-2">
-        <Input
-          value={custom}
-          onChange={e => setCustom(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && addCustom()}
-          placeholder="Región personalizada..."
-          className="bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400 h-8 text-sm"
-        />
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={addCustom}
-          disabled={!custom.trim()}
-          className="border-surface-600 text-surface-300 hover:bg-surface-700 shrink-0"
-        >
-          Añadir
-        </Button>
+        <Input value={custom} onChange={e => setCustom(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCustom()}
+          placeholder="Región personalizada..." className="bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400 h-8 text-sm" />
+        <Button size="sm" variant="outline" onClick={addCustom} disabled={!custom.trim()}
+          className="border-surface-600 text-surface-300 hover:bg-surface-700 shrink-0">Añadir</Button>
       </div>
-
       {regions.length > 0 && (
         <div className="flex flex-wrap gap-1.5 items-center">
           <span className="text-xs text-surface-500">Activos:</span>
           {regions.map(r => (
-            <Badge
-              key={r}
-              className="bg-primary-600/20 text-primary-300 border-primary-600/40 pr-1 gap-1"
-            >
+            <Badge key={r} className="bg-primary-600/20 text-primary-300 border-primary-600/40 pr-1 gap-1">
               {r}
-              <button
-                onClick={() => onRemove(r)}
-                className="hover:text-white transition-colors ml-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <button onClick={() => onRemove(r)} className="hover:text-white transition-colors ml-0.5"><X className="h-3 w-3" /></button>
             </Badge>
           ))}
         </div>
@@ -186,79 +141,103 @@ function RegionFilter({
   );
 }
 
-// ─── Download results ─────────────────────────────────────────────────────────
+// ─── Per-file status icon ─────────────────────────────────────────────────────
 
-function DownloadResults({ result }: { result: BulkDownloadResult }) {
-  const [showFiles, setShowFiles] = useState(false);
+const STATUS_ICON: Record<FileDownloadStatus, React.ReactNode> = {
+  pending:    <Clock        className="h-3.5 w-3.5 text-surface-500 shrink-0" />,
+  downloading:<Loader2      className="h-3.5 w-3.5 text-blue-400 shrink-0 animate-spin" />,
+  downloaded: <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />,
+  skipped:    <SkipForward  className="h-3.5 w-3.5 text-yellow-400 shrink-0" />,
+  failed:     <XCircle      className="h-3.5 w-3.5 text-red-400 shrink-0" />,
+};
 
-  const statusIcon = {
-    downloaded: <CheckCircle2 className="h-3.5 w-3.5 text-green-400 shrink-0" />,
-    skipped:    <SkipForward  className="h-3.5 w-3.5 text-yellow-400 shrink-0" />,
-    failed:     <XCircle      className="h-3.5 w-3.5 text-red-400 shrink-0" />,
-  };
+const STATUS_COLOR: Record<FileDownloadStatus, string> = {
+  pending:    'text-surface-500',
+  downloading:'text-blue-300',
+  downloaded: 'text-green-300',
+  skipped:    'text-yellow-300',
+  failed:     'text-red-300',
+};
 
-  const statusColor = {
-    downloaded: 'text-green-300',
-    skipped:    'text-yellow-300',
-    failed:     'text-red-300',
-  };
+const STATUS_BG: Record<FileDownloadStatus, string> = {
+  pending:    '',
+  downloading:'bg-blue-900/10',
+  downloaded: 'bg-green-900/10',
+  skipped:    'bg-yellow-900/10',
+  failed:     'bg-red-900/10',
+};
+
+// ─── Live progress panel ──────────────────────────────────────────────────────
+
+interface ProgressState {
+  files: FileDownloadEntry[];
+  completed: number;
+  total: number;
+  summary: SseDoneEvent | null;
+}
+
+function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
+  const [showFiles, setShowFiles] = useState(true);
+  const { files, completed, total, summary } = progress;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  const counts = files.reduce<Record<FileDownloadStatus, number>>(
+    (acc, f) => { acc[f.status]++; return acc; },
+    { pending: 0, downloading: 0, downloaded: 0, skipped: 0, failed: 0 },
+  );
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col gap-4"
-    >
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: 'Total',        value: result.totalMatched, color: 'text-surface-200' },
-          { label: 'Descargados',  value: result.downloaded,   color: 'text-green-400' },
-          { label: 'Omitidos',     value: result.skipped,      color: 'text-yellow-400' },
-          { label: 'Fallidos',     value: result.failed,       color: 'text-red-400' },
-        ].map(({ label, value, color }) => (
-          <div
-            key={label}
-            className="bg-surface-800/60 rounded-lg border border-surface-700/50 p-3 text-center"
-          >
-            <p className={`text-2xl font-bold ${color}`}>{value}</p>
-            <p className="text-xs text-surface-400 mt-0.5">{label}</p>
-          </div>
-        ))}
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-4">
+
+      {/* Progress bar */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex justify-between text-sm">
+          <span className="text-surface-300 font-medium">
+            {summary ? 'Descarga completada' : `Descargando… ${completed} / ${total}`}
+          </span>
+          <span className="text-surface-400">{pct}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-surface-700/60 overflow-hidden">
+          <motion.div
+            className={`h-full rounded-full ${summary ? 'bg-green-500' : 'bg-primary-500'}`}
+            initial={{ width: 0 }}
+            animate={{ width: `${pct}%` }}
+            transition={{ ease: 'easeOut', duration: 0.3 }}
+          />
+        </div>
       </div>
 
-      {/* Downloaded size */}
-      {result.downloaded > 0 && (
-        <div className="flex items-center gap-2 text-sm text-surface-300">
-          <HardDrive className="h-4 w-4 text-surface-400" />
-          <span>
-            Espacio usado: <span className="font-semibold text-surface-100">{result.totalDownloadedSize}</span>
-          </span>
-        </div>
-      )}
+      {/* Stat chips */}
+      <div className="flex flex-wrap gap-2 text-xs">
+        {counts.downloaded > 0 && <span className="px-2 py-1 rounded-full bg-green-900/30 text-green-300 border border-green-800/40">{counts.downloaded} descargados</span>}
+        {counts.skipped    > 0 && <span className="px-2 py-1 rounded-full bg-yellow-900/30 text-yellow-300 border border-yellow-800/40">{counts.skipped} omitidos</span>}
+        {counts.failed     > 0 && <span className="px-2 py-1 rounded-full bg-red-900/30 text-red-300 border border-red-800/40">{counts.failed} fallidos</span>}
+        {counts.downloading > 0 && <span className="px-2 py-1 rounded-full bg-blue-900/30 text-blue-300 border border-blue-800/40">{counts.downloading} en progreso</span>}
+        {summary && <span className="px-2 py-1 rounded-full bg-surface-700/40 text-surface-300 border border-surface-600/40 flex items-center gap-1"><HardDrive className="h-3 w-3" />{summary.totalDownloadedSize}</span>}
+      </div>
 
-      {/* File list toggle */}
-      <button
-        onClick={() => setShowFiles(v => !v)}
-        className="flex items-center gap-1.5 text-sm text-surface-400 hover:text-surface-200 transition-colors self-start"
-      >
+      {/* File list */}
+      <button onClick={() => setShowFiles(v => !v)}
+        className="flex items-center gap-1.5 text-sm text-surface-400 hover:text-surface-200 transition-colors self-start">
         {showFiles ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        {showFiles ? 'Ocultar' : 'Ver'} detalle de archivos
+        {showFiles ? 'Ocultar' : 'Ver'} archivos ({files.length})
       </button>
 
       {showFiles && (
-        <div className="rounded-lg border border-surface-700/50 divide-y divide-surface-700/30 max-h-72 overflow-y-auto">
-          {result.files.map(f => (
-            <div key={f.filename} className="flex items-center gap-2 px-3 py-2">
-              {statusIcon[f.status]}
-              <span className={`flex-1 text-xs truncate ${statusColor[f.status]}`}>{f.filename}</span>
+        <div className="rounded-lg border border-surface-700/50 divide-y divide-surface-700/30 max-h-80 overflow-y-auto">
+          {files.map(f => (
+            <motion.div
+              key={f.filename}
+              layout
+              className={`flex items-center gap-2 px-3 py-2 transition-colors duration-300 ${STATUS_BG[f.status]}`}
+            >
+              {STATUS_ICON[f.status]}
+              <span className={`flex-1 text-xs truncate ${STATUS_COLOR[f.status]}`} title={f.filename}>
+                {f.filename}
+              </span>
               {f.size && <span className="text-xs text-surface-500 shrink-0">{f.size}</span>}
-              {f.error && (
-                <span className="text-xs text-red-500 truncate max-w-[120px]" title={f.error}>
-                  {f.error}
-                </span>
-              )}
-            </div>
+              {f.error && <span className="text-xs text-red-500 truncate max-w-[140px]" title={f.error}>{f.error}</span>}
+            </motion.div>
           ))}
         </div>
       )}
@@ -280,7 +259,7 @@ export default function MyrientDownloader() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const [downloading, setDownloading] = useState(false);
-  const [downloadResult, setDownloadResult] = useState<BulkDownloadResult | null>(null);
+  const [progress, setProgress] = useState<ProgressState | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // ── Handlers ─────────────────────────────────────────────────────────────
@@ -290,7 +269,7 @@ export default function MyrientDownloader() {
     setCatalog(null);
     setCatalogError(null);
     setSelected(new Set());
-    setDownloadResult(null);
+    setProgress(null);
     setDownloadError(null);
   };
 
@@ -303,15 +282,12 @@ export default function MyrientDownloader() {
     setCatalogError(null);
     setCatalog(null);
     setSelected(new Set());
-    setDownloadResult(null);
+    setProgress(null);
     setDownloadError(null);
     try {
       const res = await ScrapeService.getCatalog(selectedConsole, regions);
-      if (res.success && res.data) {
-        setCatalog(res.data);
-      } else {
-        setCatalogError(res.error ?? res.message ?? 'Error al cargar el catálogo.');
-      }
+      if (res.success && res.data) setCatalog(res.data);
+      else setCatalogError(res.error ?? res.message ?? 'Error al cargar el catálogo.');
     } catch {
       setCatalogError('No se pudo conectar con el servidor.');
     } finally {
@@ -319,44 +295,43 @@ export default function MyrientDownloader() {
     }
   };
 
-  const toggleGame = useCallback((name: string) => {
-    setSelected(prev => {
-      const next = new Set(prev);
-      next.has(name) ? next.delete(name) : next.add(name);
-      return next;
-    });
-  }, []);
-
-  const selectAll = useCallback((names: string[]) => {
-    setSelected(new Set(names));
-  }, []);
-
-  const clearAll = useCallback(() => {
-    setSelected(new Set());
-  }, []);
+  const toggleGame  = useCallback((name: string) => setSelected(prev => { const n = new Set(prev); n.has(name) ? n.delete(name) : n.add(name); return n; }), []);
+  const selectAll   = useCallback((names: string[]) => setSelected(new Set(names)), []);
+  const clearAll    = useCallback(() => setSelected(new Set()), []);
 
   const handleDownload = async () => {
     if (!selectedConsole || selected.size === 0 || !catalog) return;
-    const gameMap = new Map<string, GameFileEntry>(catalog.files.map(f => [f.name, f]));
-    const games: GameFileEntry[] = [...selected]
-      .map(name => gameMap.get(name))
-      .filter((f): f is GameFileEntry => !!f);
 
+    const gameMap = new Map<string, GameFileEntry>(catalog.files.map(f => [f.name, f]));
+    const games: GameFileEntry[] = [...selected].map(n => gameMap.get(n)).filter((f): f is GameFileEntry => !!f);
+
+    // Initialise all files as pending
+    const initialFiles: FileDownloadEntry[] = games.map(g => ({
+      filename: decodeURIComponent(g.link.split('/').pop() ?? g.name),
+      status: 'pending',
+    }));
+    setProgress({ files: initialFiles, completed: 0, total: games.length, summary: null });
     setDownloading(true);
     setDownloadError(null);
-    setDownloadResult(null);
+    setSelected(new Set());
+
     try {
-      const res = await ScrapeService.downloadSelected({
-        console: selectedConsole,
-        games,
-        concurrency: Number(concurrency),
-      });
-      if (res.success && res.data) {
-        setDownloadResult(res.data);
-        setSelected(new Set());
-      } else {
-        setDownloadError(res.error ?? res.message ?? 'Error al iniciar la descarga.');
-      }
+      await ScrapeService.streamDownloadSelected(
+        { console: selectedConsole, games, concurrency: Number(concurrency) },
+        (event) => {
+          if (event.type === 'progress') {
+            setProgress(prev => {
+              if (!prev) return prev;
+              const files = [...prev.files];
+              const idx = files.findIndex(f => f.filename === event.filename);
+              if (idx !== -1) files[idx] = { filename: event.filename, status: event.status, size: event.size, sizeBytes: event.sizeBytes, error: event.error };
+              return { ...prev, files, completed: event.index };
+            });
+          } else if (event.type === 'done') {
+            setProgress(prev => prev ? { ...prev, summary: event, completed: prev.total } : prev);
+          }
+        },
+      );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setDownloadError(`Error de descarga: ${msg}`);
@@ -375,131 +350,76 @@ export default function MyrientDownloader() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-3xl font-bold text-surface-50">
             Descargador{' '}
-            <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">
-              Myrient
-            </span>
+            <span className="bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">Myrient</span>
           </h1>
           <p className="text-surface-400 mt-1 text-sm">
             Explora el catálogo, selecciona los juegos que quieres y descárgalos directamente al servidor.
           </p>
         </motion.div>
 
-        {/* Console picker */}
+        {/* 1. Console picker */}
         <Card className="bg-surface-800/40 border-surface-700/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base text-surface-200">1. Selecciona una consola</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} />
-          </CardContent>
+          <CardHeader className="pb-3"><CardTitle className="text-base text-surface-200">1. Selecciona una consola</CardTitle></CardHeader>
+          <CardContent><ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} /></CardContent>
         </Card>
 
-        {/* Region filter + load */}
+        {/* 2. Region filter + load */}
         <AnimatePresence>
           {selectedConsole && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
               <Card className="bg-surface-800/40 border-surface-700/50">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base text-surface-200">
-                    2. Filtra por región{' '}
-                    <span className="text-surface-500 font-normal text-sm">(opcional)</span>
+                    2. Filtra por región <span className="text-surface-500 font-normal text-sm">(opcional)</span>
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="flex flex-col gap-4">
                   <RegionFilter regions={regions} onAdd={addRegion} onRemove={removeRegion} />
-
                   <div className="flex items-center gap-3 pt-1 border-t border-surface-700/40">
                     <div className="text-sm text-surface-400">
-                      Consola:{' '}
-                      <span className="text-primary-300 font-medium">
-                        {CONSOLES[selectedConsole]?.label}
-                      </span>
+                      Consola: <span className="text-primary-300 font-medium">{CONSOLES[selectedConsole]?.label}</span>
                     </div>
-                    {regions.length > 0 && (
-                      <div className="text-sm text-surface-400">
-                        · Regiones:{' '}
-                        <span className="text-surface-200">{regions.join(', ')}</span>
-                      </div>
-                    )}
-                    <Button
-                      onClick={loadCatalog}
-                      disabled={loadingCatalog}
-                      className="ml-auto bg-primary-600 hover:bg-primary-500 text-white"
-                    >
-                      {loadingCatalog ? (
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      ) : (
-                        <RefreshCw className="h-4 w-4 mr-2" />
-                      )}
+                    {regions.length > 0 && <div className="text-sm text-surface-400">· Regiones: <span className="text-surface-200">{regions.join(', ')}</span></div>}
+                    <Button onClick={loadCatalog} disabled={loadingCatalog} className="ml-auto bg-primary-600 hover:bg-primary-500 text-white">
+                      {loadingCatalog ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
                       {catalog ? 'Recargar catálogo' : 'Cargar catálogo'}
                     </Button>
                   </div>
-
-                  {catalogError && (
-                    <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">
-                      {catalogError}
-                    </p>
-                  )}
+                  {catalogError && <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{catalogError}</p>}
                 </CardContent>
               </Card>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Catalog */}
+        {/* 3. Catalog */}
         <AnimatePresence>
           {catalog && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <Card className="bg-surface-800/40 border-surface-700/50">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <CardTitle className="text-base text-surface-200">
-                      3. Selecciona los juegos
-                    </CardTitle>
+                    <CardTitle className="text-base text-surface-200">3. Selecciona los juegos</CardTitle>
                     <div className="flex items-center gap-2 text-sm text-surface-400">
-                      <span>{catalog.count} juegos</span>
-                      <span>·</span>
-                      <span>{catalog.totalSize}</span>
+                      <span>{catalog.count} juegos</span><span>·</span><span>{catalog.totalSize}</span>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <GameCatalogTable
-                    files={catalog.files}
-                    selected={selected}
-                    onToggle={toggleGame}
-                    onSelectAll={selectAll}
-                    onClearAll={clearAll}
-                  />
+                  <GameCatalogTable files={catalog.files} selected={selected} onToggle={toggleGame} onSelectAll={selectAll} onClearAll={clearAll} />
                 </CardContent>
               </Card>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Download results */}
+        {/* 4. Live progress */}
         <AnimatePresence>
-          {downloadResult && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-            >
+          {progress && (
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
               <Card className="bg-surface-800/40 border-surface-700/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-surface-200">Resultado de descarga</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <DownloadResults result={downloadResult} />
-                </CardContent>
+                <CardHeader className="pb-3"><CardTitle className="text-base text-surface-200">Progreso de descarga</CardTitle></CardHeader>
+                <CardContent><DownloadProgressPanel progress={progress} /></CardContent>
               </Card>
             </motion.div>
           )}
@@ -509,57 +429,30 @@ export default function MyrientDownloader() {
 
       {/* Sticky download bar */}
       <AnimatePresence>
-        {selected.size > 0 && catalog && (
+        {selected.size > 0 && catalog && !downloading && (
           <motion.div
-            initial={{ y: 80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 80, opacity: 0 }}
+            initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             className="fixed bottom-0 left-0 right-0 z-50 bg-surface-900/95 backdrop-blur border-t border-surface-700/60 shadow-2xl"
           >
             <div className="container mx-auto px-4 py-3 max-w-4xl flex items-center gap-4 flex-wrap">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-surface-100">
-                  {selected.size} juego{selected.size !== 1 ? 's' : ''} seleccionado{selected.size !== 1 ? 's' : ''}
-                </p>
-                <p className="text-xs text-surface-400">
-                  {CONSOLES[selectedConsole!]?.label}
-                  {regions.length > 0 && ` · ${regions.join(', ')}`}
-                </p>
+                <p className="text-sm font-medium text-surface-100">{selected.size} juego{selected.size !== 1 ? 's' : ''} seleccionado{selected.size !== 1 ? 's' : ''}</p>
+                <p className="text-xs text-surface-400">{CONSOLES[selectedConsole!]?.label}{regions.length > 0 && ` · ${regions.join(', ')}`}</p>
               </div>
-
-              {/* Concurrency */}
               <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs text-surface-400">Concurrencia:</span>
                 <Select value={concurrency} onValueChange={setConcurrency}>
-                  <SelectTrigger className="h-8 w-16 bg-surface-800 border-surface-600 text-surface-200 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="h-8 w-16 bg-surface-800 border-surface-600 text-surface-200 text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent className="bg-surface-800 border-surface-700">
-                    {['1', '2', '3', '4', '5'].map(n => (
-                      <SelectItem key={n} value={n} className="text-surface-200">
-                        {n}
-                      </SelectItem>
-                    ))}
+                    {['1','2','3','4','5'].map(n => <SelectItem key={n} value={n} className="text-surface-200">{n}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-
-              {downloadError && (
-                <p className="text-xs text-red-400 max-w-xs truncate">{downloadError}</p>
-              )}
-
-              <Button
-                onClick={handleDownload}
-                disabled={downloading}
-                className="bg-primary-600 hover:bg-primary-500 text-white shrink-0"
-              >
-                {downloading ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                ) : (
-                  <Download className="h-4 w-4 mr-2" />
-                )}
-                {downloading ? 'Descargando...' : 'Descargar selección'}
+              {downloadError && <p className="text-xs text-red-400 max-w-xs truncate">{downloadError}</p>}
+              <Button onClick={handleDownload} disabled={downloading} className="bg-primary-600 hover:bg-primary-500 text-white shrink-0">
+                <Download className="h-4 w-4 mr-2" />
+                Descargar selección
               </Button>
             </div>
           </motion.div>

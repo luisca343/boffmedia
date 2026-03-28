@@ -1,5 +1,6 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
@@ -83,6 +84,30 @@ export class ScrapeController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Bulk download failed.' })
   async downloadAllGames(@Body() dto: DownloadAllGamesDto): Promise<BulkDownloadResult> {
     return this.scrapeFacadeService.downloadAllGames(dto);
+  }
+
+  @Post('myrient/download-selected/stream')
+  @ApiOperation({
+    summary: 'Stream download progress for selected games via SSE',
+    description:
+      'Same as download-selected but streams Server-Sent Events so the client can ' +
+      'track per-file progress in real time. Each event is a JSON object with a `type` ' +
+      'field: "start", "progress", or "done".',
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'SSE stream of download progress events.' })
+  async streamDownloadSelected(
+    @Body() dto: DownloadSelectedGamesDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    for await (const chunk of this.scrapeFacadeService.streamDownloadSelected(dto)) {
+      res.write(chunk);
+    }
+    res.end();
   }
 
   @Post('myrient/download-selected')
