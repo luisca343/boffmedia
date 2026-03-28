@@ -43,6 +43,10 @@ export enum MyrientConsole {
   NEO_GEO_CD      = 'neo-geo-cd',
   NEO_GEO_CD_CHD  = 'neo-geo-cd-chd',
 
+  // Microsoft
+  XBOX       = 'xbox',
+  XBOX_360   = 'xbox-360',
+
   // Arcade
   ARCADE_KONAMI_FIREBEAT   = 'arcade-konami-firebeat',
   ARCADE_KONAMI_SYS573     = 'arcade-konami-sys573',

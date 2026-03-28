@@ -197,6 +197,18 @@ export const CONSOLE_CATALOG: Record<MyrientConsole, ConsoleCatalogEntry> = {
     label: 'SNK Neo Geo CD (CHD)',
   },
 
+  // ── Microsoft ────────────────────────────────────────────────────────────
+  [MyrientConsole.XBOX]: {
+    url: `${MYRIENT_BASE_URL}/files/Redump/Microsoft%20-%20Xbox/`,
+    localFolder: 'Microsoft Xbox',
+    label: 'Microsoft Xbox',
+  },
+  [MyrientConsole.XBOX_360]: {
+    url: `${MYRIENT_BASE_URL}/files/Redump/Microsoft%20-%20Xbox%20360/`,
+    localFolder: 'Microsoft Xbox 360',
+    label: 'Microsoft Xbox 360',
+  },
+
   // ── Arcade ───────────────────────────────────────────────────────────────
   [MyrientConsole.ARCADE_KONAMI_FIREBEAT]: {
     url: `${MYRIENT_BASE_URL}/files/Redump/Arcade%20-%20Konami%20-%20FireBeat/`,

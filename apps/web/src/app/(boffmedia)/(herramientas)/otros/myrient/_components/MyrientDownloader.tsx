@@ -38,7 +38,7 @@ import GameCatalogTable from './GameCatalogTable';
 
 // ─── Console metadata ─────────────────────────────────────────────────────────
 
-type Manufacturer = 'Nintendo' | 'Sony' | 'Sega' | 'Retro' | 'Arcade';
+type Manufacturer = 'Nintendo' | 'Sony' | 'Sega' | 'Microsoft' | 'Retro' | 'Arcade';
 interface ConsoleInfo { label: string; shortLabel: string; manufacturer: Manufacturer; }
 
 const CONSOLES: Record<string, ConsoleInfo> = {
@@ -59,6 +59,9 @@ const CONSOLES: Record<string, ConsoleInfo> = {
   psp:             { label: 'PSP',                         shortLabel: 'PSP',     manufacturer: 'Sony' },
   'psvita-psn':    { label: 'PS Vita (PSN)',               shortLabel: 'Vita',    manufacturer: 'Sony' },
   'psvita-updates':{ label: 'PS Vita (Updates)',           shortLabel: 'VitaU',   manufacturer: 'Sony' },
+  // Microsoft
+  'xbox':          { label: 'Xbox',                        shortLabel: 'Xbox',    manufacturer: 'Microsoft' },
+  'xbox-360':      { label: 'Xbox 360',                    shortLabel: 'X360',    manufacturer: 'Microsoft' },
   // Sega
   'sega-32x':      { label: '32X',                         shortLabel: '32X',     manufacturer: 'Sega' },
   'game-gear':     { label: 'Game Gear',                   shortLabel: 'GG',      manufacturer: 'Sega' },
@@ -104,7 +107,8 @@ const COMMON_REGIONS = ['USA', 'Europe', 'Japan', 'World', 'Korea', 'Australia']
 function ConsolePicker({ selected, onSelect }: { selected: string | null; onSelect: (k: string) => void }) {
   const nintendo = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Nintendo');
   const sony     = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sony');
-  const sega     = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sega');
+  const microsoft = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Microsoft');
+  const sega      = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sega');
   const retro    = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Retro');
   const arcade   = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Arcade');
 
@@ -133,6 +137,7 @@ function ConsolePicker({ selected, onSelect }: { selected: string | null; onSele
     <div className="flex flex-col gap-5">
       {renderGroup('Nintendo', nintendo, 'text-red-400')}
       {renderGroup('Sony', sony, 'text-blue-400')}
+      {renderGroup('Microsoft', microsoft, 'text-green-400')}
       {renderGroup('Sega', sega, 'text-orange-400')}
       {renderGroup('Retro', retro, 'text-purple-400')}
       {renderGroup('Arcade', arcade, 'text-yellow-400')}
