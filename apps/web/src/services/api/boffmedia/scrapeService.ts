@@ -1,4 +1,4 @@
-import { apiGET, apiPOST } from '@/services/boffAPI';
+import { apiGET } from '@/services/boffAPI';
 
 export interface GameFileEntry {
   name: string;
@@ -43,14 +43,24 @@ export class ScrapeService {
     return apiGET<CatalogResult>(`/boffmedia/herramientas/scrape/myrient/catalog?${params}`);
   }
 
-  static downloadSelected(dto: {
+  /**
+   * Uses raw fetch with no timeout so long-running bulk downloads are not
+   * cancelled by Next.js or the browser default timeout.
+   */
+  static async downloadSelected(dto: {
     console: string;
     games: GameFileEntry[];
     concurrency?: number;
   }) {
-    return apiPOST<BulkDownloadResult>(
-      '/boffmedia/herramientas/scrape/myrient/download-selected',
-      dto,
-    );
+    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    const res = await fetch(`${apiUrl}/boffmedia/herramientas/scrape/myrient/download-selected`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(dto),
+      // No cache, no revalidate — and critically no next: { revalidate }
+      // so Next.js does not wrap this in a limited fetch.
+      cache: 'no-store',
+    });
+    return res.json() as Promise<{ success: boolean; data?: BulkDownloadResult; message?: string; error?: string }>;
   }
 }

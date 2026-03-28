@@ -353,11 +353,13 @@ export default function MyrientDownloader() {
       });
       if (res.success && res.data) {
         setDownloadResult(res.data);
+        setSelected(new Set());
       } else {
         setDownloadError(res.error ?? res.message ?? 'Error al iniciar la descarga.');
       }
-    } catch {
-      setDownloadError('No se pudo conectar con el servidor.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setDownloadError(`Error de descarga: ${msg}`);
     } finally {
       setDownloading(false);
     }
