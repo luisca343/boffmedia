@@ -1,6 +1,6 @@
 import { useRotomRequest } from "../useRotomRequest";
 import { StarbankService } from "@/services/api/smartrotom/starbankService";
-import { TrainerDefeatMoneyDto } from "@/types/dto/trainer-defeat-money-dto";
+import { TrainerDefeatMoneyDto } from "@boffmedia/shared";
 
 export function useTrainerDefeat() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(StarbankService.trainerDefeat)

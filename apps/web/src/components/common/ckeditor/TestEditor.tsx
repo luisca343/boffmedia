@@ -6,7 +6,7 @@ import './styles.css'
 import { sendToast } from '@/lib/toast';
 import { rotomPOST } from '@/services/boffAPI';
 import { DocumentsService } from '@/services/api/smartrotom/documentsService';
-import { CreateNewsDto } from '@/types/dto/create-news-dto';
+import { CreateNewsDto } from '@boffmedia/shared';
 
 const editorConfiguration = {
     toolbar: {

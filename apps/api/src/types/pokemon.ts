@@ -1,5 +1,6 @@
 import { index } from "drizzle-orm/mysql-core";
 
+// Raw Pixelmon JSON data types (internal to the API, distinct from the OpenAPI DTOs in @boffmedia/shared)
 export interface Pokemon {
     name: string;
     dex: number;

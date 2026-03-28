@@ -1,4 +1,3 @@
-import { CreateChatMessageDto } from "@/types/dto/create-chat-message-dto";
 import { useRotomRequest } from "../useRotomRequest";
 import { ChatAppService } from "@/services/api/smartrotom/chatAppService";
 import { CreateMessageDto } from "@boffmedia/shared";

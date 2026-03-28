@@ -1,7 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/primitives/table"
 import { Button } from "@/components/ui/primitives/button"
 import { Pencil, Trash2, Gamepad } from "lucide-react"
-import type { Game } from "@/types/events"
+import type { Game } from "@boffmedia/shared"
 
 interface GameCardProps {
   game: Game

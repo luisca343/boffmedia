@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/primitives/card"
 import { useGetGames } from "@/hooks/events/useGetGames"
-import type { Game } from "@/types/events"
+import type { Game } from "@boffmedia/shared"
 import { GameHeader } from "./GameHeader"
 import { GamesList } from "./GamesList"
 import { GameLoadingState } from "./GameLoadingState"

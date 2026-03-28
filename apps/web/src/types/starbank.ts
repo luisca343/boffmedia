@@ -1,10 +1,5 @@
-export interface StarBankAccount {
-    id: number;
-    balance: number;
-    name: string;
-    type: string;
-}
-
+// StarBankAccount is available in @boffmedia/shared and should be imported from there.
+// Transaction has a different shape from shared StarBankTransaction (uses `balance` instead of fromBalance/toBalance).
 
 export interface Transaction {
     isPayer: boolean;
@@ -14,7 +9,4 @@ export interface Transaction {
     date: string;
     name?: string;
     type?: string;
-  }
-  export interface Balance {
-    balance: number;
   }

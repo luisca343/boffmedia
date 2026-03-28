@@ -1,6 +1,6 @@
 import { useRotomRequest } from "../useRotomRequest";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
-import { CreateDocumentDto } from "@/types/dto/create-document.dto";
+import { CreateDocumentDto } from "@boffmedia/shared";
 
 export function useSaveNote() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.saveNote)

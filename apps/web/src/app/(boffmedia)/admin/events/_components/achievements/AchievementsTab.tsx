@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/primitives/card"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
-import type { Achievement } from "@/types/events"
+import type { Achievement } from "@boffmedia/shared"
 import { AchievementHeader } from "./AchievementHeader"
 import { AchievementsList } from "./AchievementsList"
 import { AchievementLoadingState } from "./AchievementLoadingState"

@@ -1,6 +1,6 @@
 import { useRotomRequest } from "../useRotomRequest";
 import { StarbankService } from "@/services/api/smartrotom/starbankService";
-import { CreateShopTransactionDto } from "@/types/dto/create-shop-transaction-dto";
+import { CreateShopTransactionDto } from "@boffmedia/shared";
 
 export function useShop() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(StarbankService.shopTransaction)

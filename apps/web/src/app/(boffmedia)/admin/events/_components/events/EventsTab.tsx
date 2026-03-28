@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Card } from "@/components/ui/primitives/card"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
-import type { Event } from "@/types/events"
+import type { Event } from "@boffmedia/shared"
 import { EventHeader } from "./EventHeader"
 import { EventsList } from "./EventsList"
 import { EventLoadingState } from "./EventLoadingState"

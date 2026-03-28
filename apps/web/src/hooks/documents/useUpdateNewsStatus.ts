@@ -1,6 +1,6 @@
 import { useRotomRequest } from "../useRotomRequest";
 import { DocumentsService } from "@/services/api/smartrotom/documentsService";
-import { NewsStatusDto } from "@/types/dto/news-status-dto";
+import { NewsStatusDto } from "@boffmedia/shared";
 
 export function useUpdateNewsStatus() {
   const { data, error, isLoading, refetch, setData } = useRotomRequest(DocumentsService.updateNewsStatus)

@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Award, RefreshCw } from "lucide-react"
-import type { Achievement } from "@/types/events"
+import type { Achievement } from "@boffmedia/shared"
 
 interface AchievementDeleteDialogProps {
   open: boolean

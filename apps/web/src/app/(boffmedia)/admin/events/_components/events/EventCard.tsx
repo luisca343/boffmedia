@@ -2,7 +2,7 @@ import { TableCell, TableRow } from "@/components/ui/primitives/table"
 import { Button } from "@/components/ui/primitives/button"
 import { Badge } from "@/components/ui/primitives/badge"
 import { Pencil, Trash2, Calendar, ChevronRight, Plus } from "lucide-react"
-import type { Event } from "@/types/events"
+import type { Event } from "@boffmedia/shared"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { cn } from "@/lib/utils"
 import { getEventStatus } from "@/lib/events" // Import the new utility function

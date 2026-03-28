@@ -25,7 +25,6 @@ import { ArrowRight, DollarSign, CreditCard, Send } from 'lucide-react';
 import { useBoffSession } from "@/services/useBoffSession";
 import { useGetTransactions } from "@/hooks/starbank/useGetTransactions";
 import { useGetTransfers } from "@/hooks/starbank/useGetTransfers";
-import { Transaction } from "@/types/starbank";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { DashboardSkeleton } from "./_components/DashBoardSkeleton";
 import { StarBankTransaction } from "@boffmedia/shared";

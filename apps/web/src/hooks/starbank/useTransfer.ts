@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { StarbankService } from "@/services/api/smartrotom/starbankService";
-import { CreateTransferDto } from "@/types/dto/create-transfer-dto";
-import { SuccessResponse } from "@/types";
+import { CreateTransferDto, SuccessResponse } from "@boffmedia/shared";
 
 export function useTransfer() {
   const [data, setData] = useState<SuccessResponse | null>(null);

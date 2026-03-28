@@ -1,7 +1,5 @@
-import { PokemonW, TeleportPlayerDto, Weather } from '@boffmedia/shared';
+import { PokemonW, SuccessResponse, TaxiStop, TeleportPlayerDto, Weather, Performance } from '@boffmedia/shared';
 import { wingullGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
-import { SuccessResponse } from '@/types';
-import { TaxiStop } from '@/types/dto/taxi-stop.dto';
 import { 
     BattleTeamData, 
     BattleTeam, 
@@ -9,13 +7,6 @@ import {
     UpdateBattleTeamRequest
 } from '@/types/dto/battle-team.dto';
 
-
-export interface Performance {
-    tps: string
-    memory: number
-    players: number
-    uptime: string
-}
 
 
 export type Region = {

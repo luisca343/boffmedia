@@ -15,13 +15,12 @@ import { BankSection, BankSectionContent, BankSectionHeader } from "../_componen
 import { Calendar } from "@/components/ui/primitives/calendar";
 import { Button } from "@/components/ui/primitives/button";
 import { formatMoney, changeActiveAccount } from "../bankUtils";
-import { StarBankAccount } from "@/types/starbank";
+import { StarBankAccount, StarBankTransaction } from "@boffmedia/shared";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowRight, ChevronDown } from "lucide-react";
-import { StarBankTransaction } from "@boffmedia/shared";
 
 export default function Graficas() {
   // Date range state
