@@ -75,8 +75,15 @@ export default function GameCatalogTable({
     }
   };
 
+  const allFilteredSelected = filtered.length > 0 && filtered.every(f => selected.has(f.name));
+
   const handleSelectAllFiltered = () => {
-    onSelectAll([...selected, ...filtered.map(f => f.name)]);
+    if (allFilteredSelected) {
+      const filteredNames = new Set(filtered.map(f => f.name));
+      onSelectAll([...selected].filter(n => !filteredNames.has(n)));
+    } else {
+      onSelectAll([...selected, ...filtered.map(f => f.name)]);
+    }
   };
 
   return (
@@ -107,15 +114,19 @@ export default function GameCatalogTable({
               {hideDownloaded ? 'Mostrando no descargados' : `Ocultar descargados (${downloadedCount})`}
             </Button>
           )}
-          {search && filtered.length !== files.length && (
+          {filtered.length > 0 && (
             <Button
               size="sm"
               variant="outline"
-              className="border-surface-600 text-surface-300 hover:bg-surface-700"
               onClick={handleSelectAllFiltered}
+              className={`border-surface-600 hover:bg-surface-700 ${
+                allFilteredSelected ? 'text-primary-300 border-primary-600/50 bg-primary-900/20' : 'text-surface-300'
+              }`}
             >
               <CheckSquare className="h-4 w-4 mr-1" />
-              Sel. {filtered.length} resultado{filtered.length !== 1 ? 's' : ''}
+              {allFilteredSelected
+                ? `Deseleccionar todos (${filtered.length})`
+                : `Seleccionar todos (${filtered.length})`}
             </Button>
           )}
           {selected.size > 0 && (

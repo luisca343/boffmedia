@@ -38,25 +38,63 @@ import GameCatalogTable from './GameCatalogTable';
 
 // ─── Console metadata ─────────────────────────────────────────────────────────
 
-type Manufacturer = 'Nintendo' | 'Sony';
+type Manufacturer = 'Nintendo' | 'Sony' | 'Sega' | 'Retro' | 'Arcade';
 interface ConsoleInfo { label: string; shortLabel: string; manufacturer: Manufacturer; }
 
 const CONSOLES: Record<string, ConsoleInfo> = {
-  gb:              { label: 'Game Boy',           shortLabel: 'GB',    manufacturer: 'Nintendo' },
-  gbc:             { label: 'Game Boy Color',      shortLabel: 'GBC',   manufacturer: 'Nintendo' },
-  gba:             { label: 'Game Boy Advance',    shortLabel: 'GBA',   manufacturer: 'Nintendo' },
-  n64:             { label: 'Nintendo 64',         shortLabel: 'N64',   manufacturer: 'Nintendo' },
-  gamecube:        { label: 'GameCube',            shortLabel: 'GCN',   manufacturer: 'Nintendo' },
-  nds:             { label: 'Nintendo DS',         shortLabel: 'NDS',   manufacturer: 'Nintendo' },
-  '3ds':           { label: 'Nintendo 3DS',        shortLabel: '3DS',   manufacturer: 'Nintendo' },
-  wii:             { label: 'Wii',                 shortLabel: 'Wii',   manufacturer: 'Nintendo' },
-  wiiu:            { label: 'Wii U',               shortLabel: 'WiiU',  manufacturer: 'Nintendo' },
-  psx:             { label: 'PlayStation',         shortLabel: 'PS1',   manufacturer: 'Sony' },
-  ps2:             { label: 'PlayStation 2',       shortLabel: 'PS2',   manufacturer: 'Sony' },
-  ps3:             { label: 'PlayStation 3',       shortLabel: 'PS3',   manufacturer: 'Sony' },
-  psp:             { label: 'PSP',                 shortLabel: 'PSP',   manufacturer: 'Sony' },
-  'psvita-psn':    { label: 'PS Vita (PSN)',        shortLabel: 'Vita',  manufacturer: 'Sony' },
-  'psvita-updates':{ label: 'PS Vita (Updates)',   shortLabel: 'VitaU', manufacturer: 'Sony' },
+  // Nintendo
+  gb:              { label: 'Game Boy',                    shortLabel: 'GB',      manufacturer: 'Nintendo' },
+  gbc:             { label: 'Game Boy Color',              shortLabel: 'GBC',     manufacturer: 'Nintendo' },
+  gba:             { label: 'Game Boy Advance',            shortLabel: 'GBA',     manufacturer: 'Nintendo' },
+  n64:             { label: 'Nintendo 64',                 shortLabel: 'N64',     manufacturer: 'Nintendo' },
+  gamecube:        { label: 'GameCube',                    shortLabel: 'GCN',     manufacturer: 'Nintendo' },
+  nds:             { label: 'Nintendo DS',                 shortLabel: 'NDS',     manufacturer: 'Nintendo' },
+  '3ds':           { label: 'Nintendo 3DS',                shortLabel: '3DS',     manufacturer: 'Nintendo' },
+  wii:             { label: 'Wii',                         shortLabel: 'Wii',     manufacturer: 'Nintendo' },
+  wiiu:            { label: 'Wii U',                       shortLabel: 'WiiU',    manufacturer: 'Nintendo' },
+  // Sony
+  psx:             { label: 'PlayStation',                 shortLabel: 'PS1',     manufacturer: 'Sony' },
+  ps2:             { label: 'PlayStation 2',               shortLabel: 'PS2',     manufacturer: 'Sony' },
+  ps3:             { label: 'PlayStation 3',               shortLabel: 'PS3',     manufacturer: 'Sony' },
+  psp:             { label: 'PSP',                         shortLabel: 'PSP',     manufacturer: 'Sony' },
+  'psvita-psn':    { label: 'PS Vita (PSN)',               shortLabel: 'Vita',    manufacturer: 'Sony' },
+  'psvita-updates':{ label: 'PS Vita (Updates)',           shortLabel: 'VitaU',   manufacturer: 'Sony' },
+  // Sega
+  'sega-32x':      { label: '32X',                         shortLabel: '32X',     manufacturer: 'Sega' },
+  'game-gear':     { label: 'Game Gear',                   shortLabel: 'GG',      manufacturer: 'Sega' },
+  'master-system': { label: 'Master System',               shortLabel: 'SMS',     manufacturer: 'Sega' },
+  'mega-drive':    { label: 'Mega Drive / Genesis',        shortLabel: 'MD',      manufacturer: 'Sega' },
+  'dreamcast':     { label: 'Dreamcast (CHD)',             shortLabel: 'DC',      manufacturer: 'Sega' },
+  'saturn':        { label: 'Saturn (CHD, EU)',            shortLabel: 'SAT',     manufacturer: 'Sega' },
+  'sega-cd':       { label: 'Mega CD (CHD, PAL)',          shortLabel: 'MCD',     manufacturer: 'Sega' },
+  // Retro
+  'pc-engine':         { label: 'PC Engine / TG-16',       shortLabel: 'PCE',     manufacturer: 'Retro' },
+  'pc-engine-cd':      { label: 'PC Engine CD',            shortLabel: 'PCECD',   manufacturer: 'Retro' },
+  'pc-engine-cd-chd':  { label: 'PC Engine CD (CHD)',      shortLabel: 'PCECHD',  manufacturer: 'Retro' },
+  'pc-fx':             { label: 'PC-FX / PC-FXGA',         shortLabel: 'PCFX',    manufacturer: 'Retro' },
+  'pc98':              { label: 'NEC PC-98',               shortLabel: 'PC98',    manufacturer: 'Retro' },
+  'jaguar-cd':         { label: 'Jaguar CD',               shortLabel: 'JAG',     manufacturer: 'Retro' },
+  'jaguar-cd-chd':     { label: 'Jaguar CD (CHD)',         shortLabel: 'JAGCHD',  manufacturer: 'Retro' },
+  'pippin':            { label: 'Bandai Pippin',           shortLabel: 'PIP',     manufacturer: 'Retro' },
+  'fm-towns':          { label: 'FM-Towns',                shortLabel: 'FMT',     manufacturer: 'Retro' },
+  '3do':               { label: 'Panasonic 3DO',           shortLabel: '3DO',     manufacturer: 'Retro' },
+  '3do-chd':           { label: 'Panasonic 3DO (CHD)',     shortLabel: '3DOCHD',  manufacturer: 'Retro' },
+  'cdi':               { label: 'Philips CD-i',            shortLabel: 'CDi',     manufacturer: 'Retro' },
+  'neo-geo-cd':        { label: 'Neo Geo CD',              shortLabel: 'NGCD',    manufacturer: 'Retro' },
+  'neo-geo-cd-chd':    { label: 'Neo Geo CD (CHD)',        shortLabel: 'NGCCHD',  manufacturer: 'Retro' },
+  // Arcade
+  'arcade-konami-firebeat':   { label: 'Konami FireBeat',            shortLabel: 'FireBeat',  manufacturer: 'Arcade' },
+  'arcade-konami-sys573':     { label: 'Konami System 573',          shortLabel: 'Sys573',    manufacturer: 'Arcade' },
+  'arcade-konami-sysgv':      { label: 'Konami System GV',           shortLabel: 'SysGV',     manufacturer: 'Arcade' },
+  'arcade-konami-eamusement': { label: 'Konami e-Amusement',         shortLabel: 'eAMU',      manufacturer: 'Arcade' },
+  'arcade-namco-triforce':    { label: 'Namco/Sega/Nintendo Triforce', shortLabel: 'Triforce', manufacturer: 'Arcade' },
+  'arcade-namco-sys246':      { label: 'Namco System 246',           shortLabel: 'Sys246',    manufacturer: 'Arcade' },
+  'arcade-sega-chihiro':      { label: 'Sega Chihiro',               shortLabel: 'Chihiro',   manufacturer: 'Arcade' },
+  'arcade-sega-lindbergh':    { label: 'Sega Lindbergh',             shortLabel: 'Lindbergh', manufacturer: 'Arcade' },
+  'arcade-sega-naomi':        { label: 'Sega Naomi',                 shortLabel: 'Naomi',     manufacturer: 'Arcade' },
+  'arcade-sega-naomi2':       { label: 'Sega Naomi 2',               shortLabel: 'Naomi2',    manufacturer: 'Arcade' },
+  'arcade-sega-ringedge':     { label: 'Sega RingEdge',              shortLabel: 'RingEdge',  manufacturer: 'Arcade' },
+  'arcade-sega-ringedge2':    { label: 'Sega RingEdge 2',            shortLabel: 'RingEdge2', manufacturer: 'Arcade' },
 };
 
 const COMMON_REGIONS = ['USA', 'Europe', 'Japan', 'World', 'Korea', 'Australia'];
@@ -66,6 +104,9 @@ const COMMON_REGIONS = ['USA', 'Europe', 'Japan', 'World', 'Korea', 'Australia']
 function ConsolePicker({ selected, onSelect }: { selected: string | null; onSelect: (k: string) => void }) {
   const nintendo = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Nintendo');
   const sony     = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sony');
+  const sega     = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sega');
+  const retro    = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Retro');
+  const arcade   = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Arcade');
 
   const renderGroup = (label: string, entries: [string, ConsoleInfo][], color: string) => (
     <div key={label}>
@@ -92,6 +133,9 @@ function ConsolePicker({ selected, onSelect }: { selected: string | null; onSele
     <div className="flex flex-col gap-5">
       {renderGroup('Nintendo', nintendo, 'text-red-400')}
       {renderGroup('Sony', sony, 'text-blue-400')}
+      {renderGroup('Sega', sega, 'text-orange-400')}
+      {renderGroup('Retro', retro, 'text-purple-400')}
+      {renderGroup('Arcade', arcade, 'text-yellow-400')}
     </div>
   );
 }
