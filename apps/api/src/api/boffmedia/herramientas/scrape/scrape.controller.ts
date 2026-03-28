@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
+import { LocalGamesResult } from './entities/local-games.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
@@ -43,6 +44,24 @@ export class ScrapeController {
   ): Promise<EuropeAggregateResult> {
     const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
     return this.scrapeFacadeService.getMyrientCatalog(consoleKey, regionList);
+  }
+
+  // ==================== LOCAL LIBRARY ====================
+
+  @Get('myrient/local')
+  @ApiOperation({
+    summary: 'Get locally downloaded games for a console',
+    description: 'Reads the laboon download folder for the given console and returns all files present, with optional region filter.',
+  })
+  @ApiQuery({ name: 'console', enum: MyrientConsole, description: 'Target console' })
+  @ApiQuery({ name: 'regions', required: false, type: String, description: 'Comma-separated region filters', example: 'Europe' })
+  @ApiResponse({ status: HttpStatus.OK, type: LocalGamesResult })
+  async getLocalGames(
+    @Query('console') consoleKey: MyrientConsole,
+    @Query('regions') regions?: string,
+  ): Promise<LocalGamesResult> {
+    const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
+    return this.scrapeFacadeService.getLocalGames(consoleKey, regionList);
   }
 
   // ==================== DOWNLOADS ====================

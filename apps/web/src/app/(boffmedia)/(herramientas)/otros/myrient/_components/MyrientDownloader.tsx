@@ -256,6 +256,9 @@ export default function MyrientDownloader() {
   const [catalog, setCatalog] = useState<CatalogResult | null>(null);
   const [catalogError, setCatalogError] = useState<string | null>(null);
 
+  // Set of local filenames (decoded, without path) that are already on disk
+  const [downloadedSet, setDownloadedSet] = useState<Set<string>>(new Set());
+
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   const [downloading, setDownloading] = useState(false);
@@ -269,12 +272,24 @@ export default function MyrientDownloader() {
     setCatalog(null);
     setCatalogError(null);
     setSelected(new Set());
+    setDownloadedSet(new Set());
     setProgress(null);
     setDownloadError(null);
   };
 
   const addRegion    = (r: string) => setRegions(prev => prev.includes(r) ? prev : [...prev, r]);
   const removeRegion = (r: string) => setRegions(prev => prev.filter(x => x !== r));
+
+  const refreshLocalGames = async (consoleKey: string, regionList: string[]) => {
+    try {
+      const res = await ScrapeService.getLocalGames(consoleKey, regionList);
+      if (res.success && res.data) {
+        setDownloadedSet(new Set(res.data.files.map(f => f.filename)));
+      }
+    } catch {
+      // non-critical — silently ignore
+    }
+  };
 
   const loadCatalog = async () => {
     if (!selectedConsole) return;
@@ -285,9 +300,12 @@ export default function MyrientDownloader() {
     setProgress(null);
     setDownloadError(null);
     try {
-      const res = await ScrapeService.getCatalog(selectedConsole, regions);
-      if (res.success && res.data) setCatalog(res.data);
-      else setCatalogError(res.error ?? res.message ?? 'Error al cargar el catálogo.');
+      const [catalogRes] = await Promise.all([
+        ScrapeService.getCatalog(selectedConsole, regions),
+        refreshLocalGames(selectedConsole, regions),
+      ]);
+      if (catalogRes.success && catalogRes.data) setCatalog(catalogRes.data);
+      else setCatalogError(catalogRes.error ?? catalogRes.message ?? 'Error al cargar el catálogo.');
     } catch {
       setCatalogError('No se pudo conectar con el servidor.');
     } finally {
@@ -337,6 +355,8 @@ export default function MyrientDownloader() {
       setDownloadError(`Error de descarga: ${msg}`);
     } finally {
       setDownloading(false);
+      // Refresh local library regardless of outcome
+      if (selectedConsole) await refreshLocalGames(selectedConsole, regions);
     }
   };
 
@@ -406,7 +426,7 @@ export default function MyrientDownloader() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <GameCatalogTable files={catalog.files} selected={selected} onToggle={toggleGame} onSelectAll={selectAll} onClearAll={clearAll} />
+                  <GameCatalogTable files={catalog.files} selected={selected} downloadedSet={downloadedSet} onToggle={toggleGame} onSelectAll={selectAll} onClearAll={clearAll} />
                 </CardContent>
               </Card>
             </motion.div>

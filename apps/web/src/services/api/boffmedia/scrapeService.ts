@@ -42,7 +42,28 @@ export type SseProgressEvent = { type: 'progress'; index: number; total: number 
 export type SseDoneEvent     = { type: 'done' } & Omit<BulkDownloadResult, 'files' | 'regions' | 'totalMatched'>;
 export type SseEvent         = SseStartEvent | SseProgressEvent | SseDoneEvent;
 
+export interface LocalGameEntry {
+  filename: string;
+  size: string;
+  sizeBytes: number;
+}
+
+export interface LocalGamesResult {
+  console: string;
+  consoleLabel: string;
+  count: number;
+  totalSize: string;
+  totalSizeBytes: number;
+  files: LocalGameEntry[];
+}
+
 export class ScrapeService {
+  static getLocalGames(consoleKey: string, regions?: string[]) {
+    const params = new URLSearchParams({ console: consoleKey });
+    if (regions?.length) params.append('regions', regions.join(','));
+    return apiGET<LocalGamesResult>(`/boffmedia/herramientas/scrape/myrient/local?${params}`);
+  }
+
   static getCatalog(consoleKey: string, regions?: string[]) {
     const params = new URLSearchParams({ console: consoleKey });
     if (regions?.length) params.append('regions', regions.join(','));

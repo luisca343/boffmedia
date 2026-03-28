@@ -2,13 +2,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createWriteStream } from 'fs';
-import { access, mkdir, stat } from 'fs/promises';
+import { access, mkdir, readdir, stat } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
 import { BulkDownloadResult, FileDownloadEntry } from '../entities/bulk-download-result.entity';
+import { LocalGameEntry, LocalGamesResult } from '../entities/local-games.entity';
 import { DownloadAllGamesDto } from '../dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from '../dto/download-selected-games.dto';
 import { MyrientConsole } from '../enums/myrient-console.enum';
@@ -89,6 +90,49 @@ async function runWithConcurrency<T>(
 @Injectable()
 export class MyrientScrapeService {
   private readonly logger = new Logger(MyrientScrapeService.name);
+
+  /**
+   * Returns the files already downloaded locally for a given console,
+   * with optional region filtering against the filename.
+   */
+  async getLocalGames(consoleKey: MyrientConsole, regions: string[]): Promise<LocalGamesResult> {
+    const catalog = CONSOLE_CATALOG[consoleKey];
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
+
+    let entries: LocalGameEntry[] = [];
+    try {
+      const filenames = await readdir(saveDir);
+      const stats = await Promise.all(
+        filenames.map(async (filename): Promise<LocalGameEntry | null> => {
+          try {
+            const filePath = path.join(saveDir, filename);
+            const { size: sizeBytes, isFile } = await stat(filePath).then(s => ({ size: s.size, isFile: s.isFile() }));
+            if (!isFile) return null;
+            return { filename, size: formatBytes(sizeBytes), sizeBytes };
+          } catch {
+            return null;
+          }
+        }),
+      );
+      entries = stats.filter((e): e is LocalGameEntry => e !== null);
+    } catch {
+      // Directory doesn't exist yet — return empty
+    }
+
+    if (regions.length) {
+      entries = entries.filter(e => matchesRegions(e.filename, regions));
+    }
+
+    const totalSizeBytes = entries.reduce((sum, e) => sum + e.sizeBytes, 0);
+    return {
+      console: consoleKey,
+      consoleLabel: catalog.label,
+      count: entries.length,
+      totalSize: formatBytes(totalSizeBytes),
+      totalSizeBytes,
+      files: entries,
+    };
+  }
 
   /**
    * Scrapes a console's catalog and returns the entries filtered by the
