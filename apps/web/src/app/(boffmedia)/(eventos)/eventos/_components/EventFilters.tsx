@@ -2,7 +2,7 @@ import { useGetGames } from "@/hooks/events/useGetGames";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select";
 import { Badge } from "@/components/ui/primitives/badge";
 import { Filter, Gamepad2 } from "lucide-react";
-import type { Game } from "@/types/events";
+import type { Game } from "@boffmedia/shared";
 
 interface EventFiltersProps {
   filter: string | null;

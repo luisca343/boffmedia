@@ -1,5 +1,5 @@
 import { FaMapMarkerAlt, FaInfoCircle, FaArrowRight, FaSearch, FaSortAmountDown, FaSortAmountUp, FaTaxi, FaCompass } from 'react-icons/fa'
-import { TaxiStop } from "@/types/dto/taxi-stop.dto"
+import { TaxiStop } from "@boffmedia/shared"
 import { useState, useMemo } from 'react'
 import { formatMoney } from '../../starbank/bankUtils';
 import type { Position } from '@/components/common/map/StandardizedMap';

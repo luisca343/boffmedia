@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { toast } from 'react-toastify'
 import { useGetAllNews } from '@/hooks/documents/useGetAllNews'
 import { useUpdateNewsStatus } from '@/hooks/documents/useUpdateNewsStatus'
-import { NewsStatusDto } from '@/types/dto/news-status-dto'
+import { NewsStatusDto } from '@boffmedia/shared'
 
 export function useNews() {
   const { news, featured, published, setNews, error: fetchError, isLoading } = useGetAllNews()

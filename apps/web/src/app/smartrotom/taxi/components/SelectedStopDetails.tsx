@@ -1,5 +1,5 @@
 import { FaMapMarkerAlt, FaWalking, FaTimes, FaTaxi, FaCoins } from 'react-icons/fa'
-import { TaxiStop } from "@/types/dto/taxi-stop.dto"
+import { TaxiStop } from "@boffmedia/shared"
 import { formatMoney } from '../../starbank/bankUtils';
 
 interface Position {

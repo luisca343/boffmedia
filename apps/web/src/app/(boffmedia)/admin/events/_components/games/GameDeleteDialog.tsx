@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/primitives/button"
 import { toast } from "react-toastify"
 import { Gamepad, RefreshCw } from "lucide-react"
-import type { Game } from "@/types/events"
+import type { Game } from "@boffmedia/shared"
 
 interface GameDeleteDialogProps {
   open: boolean

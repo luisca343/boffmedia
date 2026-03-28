@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { toast } from "react-toastify"
 import { EventForm, type EventFormValues } from "./EventForm"
-import type { Event } from "@/types/events"
+import type { Event } from "@boffmedia/shared"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 
 interface EventEditDialogProps {

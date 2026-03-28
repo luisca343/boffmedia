@@ -10,21 +10,9 @@ import {
   boffMediaEventTeams,
   boffMediaEventTeamMembers
 } from '@/_db/schema/Events';
+import { LeaderboardEntry } from '../entities/leaderboard.entity';
 
-export interface LeaderboardEntry {
-  participantId: number;
-  nickname: string;
-  avatar: string;
-  userId: number;
-  achievementPoints: number;
-  medalPoints: number;
-  totalPoints: number;
-  achievementCount: number;
-  medalCount: number;
-  rank?: number;
-}
-
-export interface TeamLeaderboardEntry {
+interface TeamLeaderboardEntry {
   teamId: number;
   teamName: string;
   teamTag: string;
@@ -33,7 +21,7 @@ export interface TeamLeaderboardEntry {
   rank?: number;
 }
 
-export interface ParticipantRanking {
+interface ParticipantRanking {
   participantId: number;
   globalRank: number;
   eventRank?: number;

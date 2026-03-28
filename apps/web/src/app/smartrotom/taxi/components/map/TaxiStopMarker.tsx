@@ -1,5 +1,5 @@
 import { FaMapMarkerAlt } from 'react-icons/fa';
-import { TaxiStop } from "@/types/dto/taxi-stop.dto";
+import { TaxiStop } from "@boffmedia/shared";
 import { BaseMarker } from '@/components/common/map/BaseMarker';
 import { StopPosition, CoordinateTransformer } from '@/components/common/map/StandardizedMap';
 

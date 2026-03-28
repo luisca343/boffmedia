@@ -1,6 +1,6 @@
 import { CardContent } from "@/components/ui/primitives/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
-import type { Event } from "@/types/events"
+import type { Event } from "@boffmedia/shared"
 import { EventCard } from "./EventCard"
 import { EventEmptyState } from "./EventEmptyState"
 import React from "react"

@@ -13,7 +13,8 @@ import {
   Sparkles, Clock, ChevronRight, Zap
 } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { Achievement, Event, UserProgress, EventParticipant } from "@/types/events"
+import { Achievement, Event } from "@boffmedia/shared"
+import { UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
 import { InternalLink } from "@/components/ui/navigation/Link"

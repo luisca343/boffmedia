@@ -1,6 +1,6 @@
 import { CardContent } from "@/components/ui/primitives/card"
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
-import type { Game } from "@/types/events"
+import type { Game } from "@boffmedia/shared"
 import { GameCard } from "./GameCard"
 import { GameEmptyState } from "./GameEmptyState"
 

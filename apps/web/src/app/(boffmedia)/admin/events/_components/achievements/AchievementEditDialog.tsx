@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { toast } from "react-toastify"
 import { AchievementForm, type AchievementFormValues } from "./AchievementForm"
-import type { Achievement } from "@/types/events"
+import type { Achievement } from "@boffmedia/shared"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { CreateAchievementDto } from "@boffmedia/shared"
 

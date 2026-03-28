@@ -1,7 +1,6 @@
 import { INPC } from '@/app/smartrotom/misiones/_types/Quest';
 import { rotomGET, rotomPOST, ApiResponse } from '@/services/boffAPI';
-import { SuccessResponse } from '@/types';
-import { NpcImageDto } from '@/types/dto/npc-image-dto';
+import { SuccessResponse, UploadNpcImageDto } from '@boffmedia/shared';
 import { QuestSystemData } from '@/types/misiones';
 
 export class MisionesService {
@@ -29,7 +28,7 @@ export class MisionesService {
   /**
    * Upload custom NPC image
    */
-  static uploadCustomNpcImage(data: NpcImageDto) {
+  static uploadCustomNpcImage(data: UploadNpcImageDto) {
     return rotomPOST<SuccessResponse>('/misiones/images/upload', data);
   }
 
