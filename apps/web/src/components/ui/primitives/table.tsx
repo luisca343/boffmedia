@@ -18,10 +18,10 @@ const Table = React.forwardRef<HTMLTableElement, TableProps>(
       default: "bg-surface-800",
       wingull: "border-0"
     }
-    
+
     return (
       <TableVariantContext.Provider value={variant}>
-        <div className={cn("relative w-full overflow-auto rounded-md", variantStyles[variant])}>
+        <div className={cn("relative w-full overflow-auto rounded-lg", variantStyles[variant])}>
           <table
             ref={ref}
             className={cn("w-full caption-bottom text-sm", className)}
@@ -41,21 +41,21 @@ const TableHeader = React.forwardRef<
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
-    default: "border-surface-700 bg-surface-900",
+    default: "border-surface-700/60 bg-surface-950/70",
     wingull: "border-secondary-900 bg-secondary-950"
   }
-  
+
   return (
-    <thead 
-      ref={ref} 
+    <thead
+      ref={ref}
       className={cn(
-        "[&_tr]:border-b", 
-        variantStyles[variant], 
+        "[&_tr]:border-b",
+        variantStyles[variant],
         className
-      )} 
-      {...props} 
+      )}
+      {...props}
     />
   )
 })
@@ -66,12 +66,12 @@ const TableBody = React.forwardRef<
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
-    default: "bg-surface-700",
+    default: "bg-surface-800",
     wingull: "bg-white"
   }
-  
+
   return (
     <tbody
       ref={ref}
@@ -87,12 +87,12 @@ const TableFooter = React.forwardRef<
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
     default: "border-surface-700 bg-surface-700/50",
     wingull: "border-secondary-200 bg-secondary-50"
   }
-  
+
   return (
     <tfoot
       ref={ref}
@@ -112,17 +112,17 @@ const TableRow = React.forwardRef<
   React.HTMLAttributes<HTMLTableRowElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
-    default: "border-surface-700 hover:bg-surface-700/50 data-[state=selected]:bg-surface-700",
-    wingull: "border-secondary-100 data-[state=selected]:bg-secondary-100"
+    default: "border-surface-700/50 hover:bg-primary-500/[0.05] data-[state=selected]:bg-primary-500/10 transition-colors duration-150",
+    wingull: "border-secondary-100 hover:bg-secondary-50 data-[state=selected]:bg-secondary-100"
   }
-  
+
   return (
     <tr
       ref={ref}
       className={cn(
-        "border-b transition-colors",
+        "border-b",
         variantStyles[variant],
         className
       )}
@@ -137,17 +137,17 @@ const TableHead = React.forwardRef<
   React.ThHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
-    default: "text-primary-300",
-    wingull: "text-white font-semibold"
+    default: "text-primary-400 text-[11px] uppercase tracking-wider font-bold",
+    wingull: "text-white font-semibold text-xs uppercase tracking-wider"
   }
-  
+
   return (
     <th
       ref={ref}
       className={cn(
-        "h-12 px-4 text-left align-middle font-medium [&:has([role=checkbox])]:pr-0",
+        "h-11 px-4 text-left align-middle [&:has([role=checkbox])]:pr-0",
         variantStyles[variant],
         className
       )}
@@ -162,12 +162,12 @@ const TableCell = React.forwardRef<
   React.TdHTMLAttributes<HTMLTableCellElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
-    default: "text-primary-400",
+    default: "text-surface-200",
     wingull: "text-secondary-950"
   }
-  
+
   return (
     <td
       ref={ref}
@@ -187,12 +187,12 @@ const TableCaption = React.forwardRef<
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => {
   const variant = useTableVariant()
-  
+
   const variantStyles = {
-    default: "text-surface-400",
+    default: "text-surface-500",
     wingull: "text-secondary-500"
   }
-  
+
   return (
     <caption
       ref={ref}

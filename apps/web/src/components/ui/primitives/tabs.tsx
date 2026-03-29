@@ -30,17 +30,17 @@ const TabsList = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
 >(({ className, ...props }, ref) => {
   const variant = useTabsVariant()
-  
+
   const variantStyles = {
-    default: "bg-surface-800 text-surface-400",
-    wingull: "bg-secondary-900 text-secondary-400"
+    default: "bg-surface-800/80 border border-surface-700/60 text-surface-400",
+    wingull: "bg-secondary-900 border border-secondary-700/60 text-secondary-400"
   }
-  
+
   return (
     <TabsPrimitive.List
       ref={ref}
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-md p-1",
+        "inline-flex h-11 items-center justify-center rounded-lg p-1 gap-0.5",
         variantStyles[variant],
         className
       )}
@@ -55,17 +55,17 @@ const TabsTrigger = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
 >(({ className, ...props }, ref) => {
   const variant = useTabsVariant()
-  
+
   const variantStyles = {
-    default: "ring-offset-surface-950 focus-visible:ring-primary-300 data-[state=active]:bg-surface-700 data-[state=active]:text-primary-300",
-    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-300 data-[state=active]:bg-secondary-800 data-[state=active]:text-secondary-300"
+    default: "ring-offset-surface-950 focus-visible:ring-primary-400 text-surface-400 hover:text-surface-200 data-[state=active]:bg-surface-700 data-[state=active]:text-primary-300 data-[state=active]:shadow-[0_0_0_1px_rgb(var(--primary-500)/0.25),0_2px_10px_-3px_rgb(var(--primary-500)/0.35)]",
+    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-400 data-[state=active]:bg-secondary-800 data-[state=active]:text-secondary-300 data-[state=active]:shadow-[0_0_0_1px_rgb(var(--secondary-500)/0.25)]"
   }
-  
+
   return (
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
         variantStyles[variant],
         className
       )}
@@ -80,12 +80,12 @@ const TabsContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
 >(({ className, ...props }, ref) => {
   const variant = useTabsVariant()
-  
+
   const variantStyles = {
-    default: "ring-offset-surface-950 focus-visible:ring-primary-300 text-primary-400",
-    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-300 text-secondary-300"
+    default: "ring-offset-surface-950 focus-visible:ring-primary-400 text-surface-200",
+    wingull: "ring-offset-secondary-950 focus-visible:ring-secondary-400 text-secondary-300"
   }
-  
+
   return (
     <TabsPrimitive.Content
       ref={ref}
