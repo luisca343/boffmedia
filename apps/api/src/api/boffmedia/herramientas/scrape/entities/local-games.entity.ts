@@ -30,3 +30,28 @@ export class LocalGamesResult {
   @ApiProperty({ type: [LocalGameEntry] })
   files: LocalGameEntry[];
 }
+
+export class SearchConsoleResult {
+  @ApiProperty({ example: '3ds' })
+  consoleKey: string;
+
+  @ApiProperty({ example: 'Nintendo 3DS (Decrypted)' })
+  consoleLabel: string;
+
+  @ApiProperty({ example: 3 })
+  count: number;
+
+  @ApiProperty({ type: [LocalGameEntry] })
+  files: LocalGameEntry[];
+}
+
+export class SearchLocalGamesResult {
+  @ApiProperty({ example: 'Pokémon' })
+  query: string;
+
+  @ApiProperty({ example: 12 })
+  totalCount: number;
+
+  @ApiProperty({ type: [SearchConsoleResult] })
+  consoles: SearchConsoleResult[];
+}

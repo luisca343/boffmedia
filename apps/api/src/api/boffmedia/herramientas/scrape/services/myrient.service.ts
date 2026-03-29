@@ -9,7 +9,7 @@ import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
 import { BulkDownloadResult, FileDownloadEntry } from '../entities/bulk-download-result.entity';
-import { LocalGameEntry, LocalGamesResult } from '../entities/local-games.entity';
+import { LocalGameEntry, LocalGamesResult, SearchConsoleResult, SearchLocalGamesResult } from '../entities/local-games.entity';
 import { DownloadAllGamesDto } from '../dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from '../dto/download-selected-games.dto';
 import { MyrientConsole } from '../enums/myrient-console.enum';
@@ -145,6 +145,31 @@ export class MyrientScrapeService {
       totalSizeBytes,
       files: entries,
     };
+  }
+
+  /**
+   * Searches for games matching the given query across all locally-stored
+   * consoles in parallel. Returns results grouped by console, excluding
+   * consoles with no matches.
+   */
+  async searchLocalGames(query: string, regions: string[]): Promise<SearchLocalGamesResult> {
+    const q = query.trim().toLowerCase();
+    const consoleKeys = Object.keys(CONSOLE_CATALOG) as MyrientConsole[];
+
+    const groups = await Promise.all(
+      consoleKeys.map(async (key): Promise<SearchConsoleResult | null> => {
+        const result = await this.getLocalGames(key, regions);
+        const files = q
+          ? result.files.filter(f => f.filename.toLowerCase().includes(q))
+          : result.files;
+        if (!files.length) return null;
+        return { consoleKey: key, consoleLabel: result.consoleLabel, count: files.length, files };
+      }),
+    );
+
+    const consoles = groups.filter((g): g is SearchConsoleResult => g !== null);
+    const totalCount = consoles.reduce((sum, c) => sum + c.count, 0);
+    return { query, totalCount, consoles };
   }
 
   /**

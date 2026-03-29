@@ -1,120 +1,79 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
+import { Card, CardContent } from '@/components/ui/primitives/card';
 import { Button } from '@/components/ui/primitives/button';
 import { Badge } from '@/components/ui/primitives/badge';
 import { Input } from '@/components/ui/primitives/input';
+import { Search, Loader2, Download, HardDrive, ChevronDown, ChevronUp } from 'lucide-react';
 import {
-  RefreshCw, Loader2, HardDrive, Download, Search, ChevronLeft, ChevronRight,
-} from 'lucide-react';
-import { ScrapeService, LocalGameEntry, LocalGamesResult } from '@/services/api/boffmedia/scrapeService';
+  ScrapeService,
+  SearchConsoleResult,
+  SearchLocalGamesResult,
+} from '@/services/api/boffmedia/scrapeService';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
-import { CONSOLES } from './consoles';
+import { CONSOLES, MANUFACTURER_COLORS } from './consoles';
 import { ConsolePicker } from './ConsolePicker';
 import { RegionFilter } from './RegionFilter';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Console result group ─────────────────────────────────────────────────────
 
-const PAGE_SIZE = 50;
-
-// ─── Game table ───────────────────────────────────────────────────────────────
-
-function GameTable({ files, consoleKey }: { files: LocalGameEntry[]; consoleKey: string }) {
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(0);
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return q ? files.filter(f => f.filename.toLowerCase().includes(q)) : files;
-  }, [files, search]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
-  const handleSearch = (v: string) => { setSearch(v); setPage(0); };
+function ConsoleGroup({ result }: { result: SearchConsoleResult }) {
+  const [expanded, setExpanded] = useState(true);
+  const info = CONSOLES[result.consoleKey];
+  const color = info ? MANUFACTURER_COLORS[info.manufacturer] : 'text-surface-400';
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Search + stats */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-surface-500" />
-          <Input
-            value={search}
-            onChange={e => handleSearch(e.target.value)}
-            placeholder="Buscar juego..."
-            className="pl-8 h-8 bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400 text-sm"
-          />
-        </div>
-        <div className="flex items-center gap-2 text-sm text-surface-400">
-          <span>{filtered.length} archivo{filtered.length !== 1 ? 's' : ''}</span>
-          {search && filtered.length !== files.length && (
-            <Badge className="bg-surface-700/40 text-surface-300 border-surface-600/40">
-              de {files.length}
-            </Badge>
-          )}
-        </div>
-      </div>
+    <div className="rounded-lg border border-surface-700/50 overflow-hidden">
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center gap-3 px-4 py-3 bg-surface-800/60 hover:bg-surface-800/80 transition-colors text-left"
+      >
+        <span className={`text-sm font-semibold ${color}`}>{result.consoleLabel}</span>
+        <Badge className="bg-surface-700/40 text-surface-300 border-surface-600/40 ml-auto mr-2 shrink-0">
+          {result.count} archivo{result.count !== 1 ? 's' : ''}
+        </Badge>
+        {expanded
+          ? <ChevronUp className="h-4 w-4 text-surface-500 shrink-0" />
+          : <ChevronDown className="h-4 w-4 text-surface-500 shrink-0" />
+        }
+      </button>
 
-      {/* Table */}
-      <div className="rounded-lg border border-surface-700/50 overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center gap-3 px-4 py-2 bg-surface-800/80 border-b border-surface-700/50">
-          <span className="text-xs font-medium text-surface-400 uppercase tracking-wide flex-1">Nombre</span>
-          <span className="text-xs font-medium text-surface-400 uppercase tracking-wide w-24 text-right">Tamaño</span>
-          <span className="w-24" />
-        </div>
-
-        {/* Rows */}
-        <div className="divide-y divide-surface-700/30">
-          {paginated.length === 0 ? (
-            <div className="px-4 py-8 text-center text-surface-500">
-              No se encontraron juegos con ese término.
-            </div>
-          ) : (
-            paginated.map(file => (
-              <div
-                key={file.filename}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-700/20 transition-colors duration-100"
-              >
-                <span className="flex-1 text-sm text-surface-200 truncate" title={file.filename}>
-                  {file.filename}
-                </span>
-                <span className="text-xs text-surface-400 w-24 text-right shrink-0">{file.size}</span>
-                <div className="w-24 flex justify-end shrink-0">
-                  <a
-                    href={ScrapeService.getServeFileUrl(consoleKey, file.filename)}
-                    download={file.filename}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-primary-600/20 border border-primary-600/40 text-primary-300 hover:bg-primary-600/30 hover:text-primary-200 transition-colors"
-                  >
-                    <Download className="h-3 w-3" />
-                    Descargar
-                  </a>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0 }}
+            animate={{ height: 'auto' }}
+            exit={{ height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="divide-y divide-surface-700/30">
+              {result.files.map(file => (
+                <div
+                  key={file.filename}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-surface-700/20 transition-colors duration-100"
+                >
+                  <span className="flex-1 text-sm text-surface-200 truncate" title={file.filename}>
+                    {file.filename}
+                  </span>
+                  <span className="text-xs text-surface-400 w-24 text-right shrink-0">{file.size}</span>
+                  <div className="w-24 flex justify-end shrink-0">
+                    <a
+                      href={ScrapeService.getServeFileUrl(result.consoleKey, file.filename)}
+                      download={file.filename}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-primary-600/20 border border-primary-600/40 text-primary-300 hover:bg-primary-600/30 hover:text-primary-200 transition-colors"
+                    >
+                      <Download className="h-3 w-3" />
+                      Descargar
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm text-surface-400">
-          <span>Pág. {page + 1} / {totalPages}</span>
-          <div className="flex gap-1">
-            <Button size="icon" variant="ghost" disabled={page === 0} onClick={() => setPage(p => p - 1)}
-              className="h-8 w-8 text-surface-400 hover:text-surface-100 hover:bg-surface-700">
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button size="icon" variant="ghost" disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)}
-              className="h-8 w-8 text-surface-400 hover:text-surface-100 hover:bg-surface-700">
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -124,27 +83,49 @@ function GameTable({ files, consoleKey }: { files: LocalGameEntry[]; consoleKey:
 export default function LocalLibrary() {
   const [selectedConsole, setSelectedConsole] = useState<string | null>(null);
   const [regions, setRegions] = useState<string[]>([]);
+  const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [library, setLibrary] = useState<LocalGamesResult | null>(null);
+  const [results, setResults] = useState<SearchLocalGamesResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const addRegion    = useCallback((r: string) => setRegions(prev => [...prev, r]), []);
   const removeRegion = useCallback((r: string) => setRegions(prev => prev.filter(x => x !== r)), []);
 
+  // Toggle: clicking the active console deselects it (→ search all)
   const handleConsoleSelect = (key: string) => {
-    setSelectedConsole(key);
-    setLibrary(null);
-    setError(null);
+    setSelectedConsole(prev => (prev === key ? null : key));
+    setResults(null);
   };
 
-  const loadLibrary = async () => {
-    if (!selectedConsole) return;
+  const handleSearch = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await ScrapeService.getLocalGames(selectedConsole, regions);
-      if (!res.success || !res.data) throw new Error(res.error ?? 'Error al cargar la biblioteca');
-      setLibrary(res.data);
+      let data: SearchLocalGamesResult;
+
+      if (selectedConsole) {
+        // Single console: load all files, filter by query client-side
+        const res = await ScrapeService.getLocalGames(selectedConsole, regions);
+        if (!res.success || !res.data) throw new Error(res.error ?? 'Error al cargar la biblioteca');
+        const q = query.trim().toLowerCase();
+        const files = q
+          ? res.data.files.filter(f => f.filename.toLowerCase().includes(q))
+          : res.data.files;
+        data = {
+          query: query.trim(),
+          totalCount: files.length,
+          consoles: files.length > 0
+            ? [{ consoleKey: selectedConsole, consoleLabel: res.data.consoleLabel, count: files.length, files }]
+            : [],
+        };
+      } else {
+        // No console selected: search across all
+        const res = await ScrapeService.searchLocalGames(query.trim(), regions);
+        if (!res.success || !res.data) throw new Error(res.error ?? 'Error al buscar');
+        data = res.data;
+      }
+
+      setResults(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -167,79 +148,111 @@ export default function LocalLibrary() {
           </p>
         </motion.div>
 
-        {/* 1. Console picker */}
+        {/* Search form */}
         <Card className="bg-surface-800/40 border-surface-700/50">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base text-surface-200">1. Selecciona una consola</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} />
+          <CardContent className="pt-5 flex flex-col gap-5">
+
+            {/* Query + button */}
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-500" />
+                <Input
+                  value={query}
+                  onChange={e => setQuery(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleSearch()}
+                  placeholder='Ej: "Pokémon", "Mario"… o vacío para ver todo'
+                  className="pl-9 bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400"
+                />
+              </div>
+              <Button
+                onClick={handleSearch}
+                disabled={loading}
+                className="bg-primary-600 hover:bg-primary-500 text-white shrink-0"
+              >
+                {loading
+                  ? <Loader2 className="h-4 w-4 animate-spin" />
+                  : <Search className="h-4 w-4" />
+                }
+                <span className="ml-2">Buscar</span>
+              </Button>
+            </div>
+
+            {/* Console picker */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">Consola</span>
+                {selectedConsole
+                  ? <Badge className="bg-primary-600/20 text-primary-300 border-primary-600/40 text-xs">
+                      {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
+                    </Badge>
+                  : <span className="text-xs text-surface-500">ninguna seleccionada = todas las plataformas</span>
+                }
+              </div>
+              <ConsolePicker selected={selectedConsole} onSelect={handleConsoleSelect} compact />
+            </div>
+
+            {/* Region filter */}
+            <div className="flex flex-col gap-2 pt-1 border-t border-surface-700/40">
+              <span className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+                Región <span className="normal-case font-normal text-surface-500">(opcional)</span>
+              </span>
+              <RegionFilter regions={regions} onAdd={addRegion} onRemove={removeRegion} />
+            </div>
+
+            {error && (
+              <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{error}</p>
+            )}
           </CardContent>
         </Card>
 
-        {/* 2. Region filter + load */}
+        {/* Results */}
         <AnimatePresence>
-          {selectedConsole && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-              <Card className="bg-surface-800/40 border-surface-700/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base text-surface-200">
-                    2. Filtra por región <span className="text-surface-500 font-normal text-sm">(opcional)</span>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                  <RegionFilter regions={regions} onAdd={addRegion} onRemove={removeRegion} />
-                  <div className="flex items-center gap-3 pt-1 border-t border-surface-700/40">
-                    <div className="text-sm text-surface-400">
-                      Consola: <span className="text-primary-300 font-medium">{CONSOLES[selectedConsole]?.label}</span>
-                    </div>
-                    {regions.length > 0 && (
-                      <div className="text-sm text-surface-400">
-                        · Regiones: <span className="text-surface-200">{regions.join(', ')}</span>
-                      </div>
-                    )}
-                    <Button onClick={loadLibrary} disabled={loading} className="ml-auto bg-primary-600 hover:bg-primary-500 text-white">
-                      {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-                      {library ? 'Recargar' : 'Cargar biblioteca'}
-                    </Button>
-                  </div>
-                  {error && (
-                    <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{error}</p>
+          {results && (
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex flex-col gap-4"
+            >
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <p className="text-sm text-surface-300">
+                  {results.query
+                    ? <>Resultados para <span className="text-primary-300 font-medium">"{results.query}"</span></>
+                    : <span>Todos los juegos</span>
+                  }
+                  {selectedConsole && (
+                    <> · <span className="text-surface-400">{CONSOLES[selectedConsole]?.label}</span></>
                   )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* 3. Library */}
-        <AnimatePresence>
-          {library && (
-            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <Card className="bg-surface-800/40 border-surface-700/50">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <CardTitle className="text-base text-surface-200">3. Biblioteca</CardTitle>
-                    <div className="flex items-center gap-3 text-sm text-surface-400">
-                      <span className="flex items-center gap-1.5">
-                        <HardDrive className="h-3.5 w-3.5 text-green-400" />
-                        <span className="text-green-300">{library.count} archivo{library.count !== 1 ? 's' : ''}</span>
-                      </span>
+                </p>
+                <div className="flex items-center gap-3 text-sm text-surface-400">
+                  <span className="flex items-center gap-1.5">
+                    <HardDrive className="h-3.5 w-3.5 text-green-400" />
+                    <span className="text-green-300">
+                      {results.totalCount} archivo{results.totalCount !== 1 ? 's' : ''}
+                    </span>
+                  </span>
+                  {!selectedConsole && (
+                    <>
                       <span>·</span>
-                      <span>{library.totalSize}</span>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  {library.count === 0 ? (
-                    <p className="text-surface-500 text-sm py-4 text-center">
-                      No hay juegos descargados para esta consola{regions.length > 0 ? ' con los filtros seleccionados' : ''}.
-                    </p>
-                  ) : (
-                    <GameTable files={library.files} consoleKey={selectedConsole!} />
+                      <span>{results.consoles.length} consola{results.consoles.length !== 1 ? 's' : ''}</span>
+                    </>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+
+              {results.totalCount === 0 ? (
+                <p className="text-surface-500 text-sm py-8 text-center">
+                  No se encontraron juegos
+                  {results.query ? ` para "${results.query}"` : ''}
+                  {regions.length > 0 ? ' con los filtros de región seleccionados' : ''}.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {results.consoles.map(c => (
+                    <ConsoleGroup key={c.consoleKey} result={c} />
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

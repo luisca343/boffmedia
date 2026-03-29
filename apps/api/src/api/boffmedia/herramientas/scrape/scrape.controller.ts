@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
-import { LocalGamesResult } from './entities/local-games.entity';
+import { LocalGamesResult, SearchLocalGamesResult } from './entities/local-games.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
@@ -62,6 +62,19 @@ export class ScrapeController {
   ): Promise<LocalGamesResult> {
     const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
     return this.scrapeFacadeService.getLocalGames(consoleKey, regionList);
+  }
+
+  @Get('myrient/search')
+  @ApiOperation({ summary: 'Search locally downloaded games across all consoles' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query (matched against filename)' })
+  @ApiQuery({ name: 'regions', required: false, type: String, description: 'Comma-separated region filters', example: 'Europe' })
+  @ApiResponse({ status: HttpStatus.OK, type: SearchLocalGamesResult })
+  async searchLocalGames(
+    @Query('q') query: string,
+    @Query('regions') regions?: string,
+  ): Promise<SearchLocalGamesResult> {
+    const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
+    return this.scrapeFacadeService.searchLocalGames(query ?? '', regionList);
   }
 
   @Get('myrient/serve-file')
