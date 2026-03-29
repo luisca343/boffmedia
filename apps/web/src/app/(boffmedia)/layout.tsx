@@ -3,6 +3,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FicusNav } from "@/components/ui/navigation/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
+import { BackToTop } from "@/components/ui/BackToTop";
 
 import '../globals.css'
 import { BoffFooter } from "./_components/layout/BoffFooter";
@@ -27,6 +28,7 @@ export default async function RootLayout({
           </section>
           <BoffFooter />
       </section>
+      <BackToTop />
     </GlobalProviders>
   );
 }

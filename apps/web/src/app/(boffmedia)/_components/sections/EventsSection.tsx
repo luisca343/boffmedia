@@ -7,7 +7,7 @@ import { EventImage } from "../ui/EventImage";
 import { Event } from "@boffmedia/shared";
 import { EventsService } from "@/services/api/boffmedia/eventsService";
 import { SectionHeader } from "@/components/boffmedia/sections";
-
+import { CountdownTimer } from "../ui/CountdownTimer";
 import { EventCard } from "@/components/boffmedia/event/EventCard";
 
 export async function EventsSection() {
@@ -55,10 +55,10 @@ export async function EventsSection() {
 
   const getStatusText = (status: Event.status) => {
     switch (status) {
-      case Event.status.ACTIVE: return 'EN VIVO';
-      case Event.status.UPCOMING: return 'PRÓXIMAMENTE';
-      case Event.status.COMPLETED: return 'FINALIZADO';
-      default: return 'DESCONOCIDO';
+      case Event.status.ACTIVE: return t("eventsSection.status.live");
+      case Event.status.UPCOMING: return t("eventsSection.status.upcoming");
+      case Event.status.COMPLETED: return t("eventsSection.status.completed");
+      default: return t("eventsSection.status.unknown");
     }
   };
 
@@ -111,15 +111,15 @@ export async function EventsSection() {
                 <Calendar className="w-12 h-12 text-white" />
               </div>
               <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
-                ¡Próximamente eventos increíbles!
+                {t("eventsSection.noEvents.title")}
               </h3>
               <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
-                Estamos preparando eventos emocionantes para ti. Mantente atento a nuestras redes sociales para no perderte ninguna novedad.
+                {t("eventsSection.noEvents.description")}
               </p>
               <Button variant="accent" asChild>
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
-                  Explorar Eventos
+                  {t("eventsSection.noEvents.exploreButton")}
                 </InternalLink>
               </Button>
             </div>
@@ -162,7 +162,7 @@ export async function EventsSection() {
                       })()}
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-accent-400 uppercase tracking-wide">Evento Destacado</span>
+                      <span className="text-sm font-medium text-accent-400 uppercase tracking-wide">{t("eventsSection.featured.label")}</span>
                       <div className={`inline-block px-3 py-1 bg-gradient-to-r ${getStatusColor(featuredEvent.status)} text-white text-xs font-bold rounded-full ml-3`}>
                         {getStatusText(featuredEvent.status)}
                       </div>
@@ -210,9 +210,9 @@ export async function EventsSection() {
                   {featuredEvent.status === Event.status.UPCOMING && (
                     <div className="bg-surface-700/50 rounded-xl p-4 border border-accent-500/20">
                       <div className="text-center">
-                        <div className="text-sm text-surface-400 mb-2">Tiempo restante</div>
+                        <div className="text-sm text-surface-400 mb-2">{t("eventsSection.featured.timeRemaining")}</div>
                         <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
-                          {getTimeUntilEvent(featuredEvent.startDate)}
+                          <CountdownTimer targetDate={featuredEvent.startDate} liveLabel={t("eventsSection.featured.live")} />
                         </div>
                       </div>
                     </div>
@@ -249,11 +249,13 @@ export async function EventsSection() {
                           />
                         </div>
                       ) : (
-                        <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                          <Trophy className="w-12 h-12 text-white" />
-                        </div>
+                        <>
+                          <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+                            <Trophy className="w-12 h-12 text-white" />
+                          </div>
+                          <h4 className="text-xl font-bold text-white">{t("eventsSection.featured.comingSoon")}</h4>
+                        </>
                       )}
-                      <h4 className="text-xl font-bold text-white">¡Próximamente!</h4>
                     </div>
                   </div>
                 </div>
@@ -298,22 +300,22 @@ export async function EventsSection() {
         <div className="text-center">
           <div className="bg-gradient-to-r from-accent-800/20 to-secondary-800/20 backdrop-blur-sm border border-accent-500/30 rounded-3xl p-8">
             <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
-              ¿Quieres ver más eventos?
+              {t("eventsSection.cta.title")}
             </h3>
             <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
-              Explora todos nuestros eventos pasados, presentes y futuros. Encuentra el evento perfecto para ti.
+              {t("eventsSection.cta.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button variant="accent" asChild>
                 <InternalLink href="/eventos" className="flex items-center gap-2">
                   <Calendar className="w-5 h-5" />
-                  Ver Todos los Eventos
+                  {t("eventsSection.cta.viewAll")}
                 </InternalLink>
               </Button>
-              <Button variant="accentOutline">
+              <Button variant="accentOutline" asChild>
                 <InternalLink href="/eventos/sugerir" className="flex items-center gap-2">
                   <Star className="w-5 h-5" />
-                  Sugerir un Evento
+                  {t("eventsSection.cta.suggest")}
                 </InternalLink>
               </Button>
             </div>

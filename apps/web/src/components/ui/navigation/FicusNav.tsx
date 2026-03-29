@@ -36,6 +36,7 @@ export function FicusNav() {
   const [subdomain, setSubdomain] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const t = useTranslations("nav")
 
   const NAV_LINKS = [
@@ -53,6 +54,12 @@ export function FicusNav() {
     setMounted(true)
   }, [pathname])
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
   const inPage = useCallback(
     (href: string) => {
       return (pathname.startsWith(href) && href !== "/") || pathname === href
@@ -66,7 +73,9 @@ export function FicusNav() {
 
   return (
     <nav
-      className="bg-surface-900 border-b border-surface-700 shadow-lg fixed w-full z-30 h-16"
+      className={`border-b border-surface-700 shadow-lg fixed w-full z-30 h-16 transition-all duration-300 ${
+        scrolled ? "bg-surface-900/90 backdrop-blur-md" : "bg-surface-900"
+      }`}
       aria-label={t("ariaLabel")}
     >
       <div className="container mx-auto flex justify-between items-center h-full px-4">
@@ -94,7 +103,6 @@ export function FicusNav() {
                   }`}
                   onClick={handleMenuItemClick}
                 >
-                  {icon && <span className="text-primary-400">{icon}</span>}
                   <span className="relative z-10">{label}</span>
                   <span
                     className={`absolute left-0 right-0 bottom-0 h-0.5 bg-gradient-to-r from-primary-400 to-primary-600 transform ${

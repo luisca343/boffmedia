@@ -28,7 +28,7 @@ export async function FeaturedSection() {
     <section
       className="min-h-screen pb-20 relative overflow-hidden flex flex-col bg-gradient-to-b from-surface-800 via-secondary-900/50 to-surface-700 pt-8"
     >
-      <div className="relative mx-auto z-10 flex flex-col h-full">
+      <div className="relative mx-auto z-10 flex flex-col h-full w-full px-4">
       <div className="text-center mb-6">
         <div className="inline-block">
           <h2 className="block text-6xl font-extrabold my-4 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-400 drop-shadow-lg">
