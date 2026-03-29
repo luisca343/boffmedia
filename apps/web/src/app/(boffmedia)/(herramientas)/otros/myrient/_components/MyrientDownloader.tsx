@@ -260,7 +260,11 @@ export default function MyrientDownloader() {
         return [key, new Set<string>()] as const;
       }),
     );
-    setMultiDownloadedSet(new Map(entries));
+    setMultiDownloadedSet(prev => {
+      const next = new Map(prev);
+      for (const [key, set] of entries) next.set(key, set);
+      return next;
+    });
   };
 
   const handleSearch = async () => {
@@ -284,9 +288,8 @@ export default function MyrientDownloader() {
       } else {
         const res = await ScrapeService.searchCatalog(query.trim(), regions);
         if (res.success && res.data) {
+          await refreshMultiDownloaded(res.data.consoles.map(c => c.consoleKey));
           setMultiCatalog(res.data);
-          // Fire-and-forget: populate downloaded indicators per console
-          refreshMultiDownloaded(res.data.consoles.map(c => c.consoleKey));
         } else {
           setError(res.error ?? res.message ?? 'Error al buscar en los catálogos.');
         }
