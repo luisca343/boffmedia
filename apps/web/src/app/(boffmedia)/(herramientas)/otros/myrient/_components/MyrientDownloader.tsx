@@ -4,8 +4,6 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
 import { Button } from '@/components/ui/primitives/button';
-import { Badge } from '@/components/ui/primitives/badge';
-import { Input } from '@/components/ui/primitives/input';
 import {
   Select,
   SelectContent,
@@ -17,7 +15,6 @@ import {
   Download,
   Loader2,
   RefreshCw,
-  X,
   CheckCircle2,
   XCircle,
   SkipForward,
@@ -37,164 +34,9 @@ import {
 import GameCatalogTable from './GameCatalogTable';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
 
-// ─── Console metadata ─────────────────────────────────────────────────────────
-
-type Manufacturer = 'Nintendo' | 'Sony' | 'Sega' | 'Microsoft' | 'Retro' | 'Arcade';
-interface ConsoleInfo { label: string; shortLabel: string; manufacturer: Manufacturer; }
-
-const CONSOLES: Record<string, ConsoleInfo> = {
-  // Nintendo
-  nes:             { label: 'NES',                         shortLabel: 'NES',     manufacturer: 'Nintendo' },
-  fds:             { label: 'Famicom Disk System',         shortLabel: 'FDS',     manufacturer: 'Nintendo' },
-  snes:            { label: 'SNES',                        shortLabel: 'SNES',    manufacturer: 'Nintendo' },
-  'virtual-boy':   { label: 'Virtual Boy',                 shortLabel: 'VB',      manufacturer: 'Nintendo' },
-  'pokemon-mini':  { label: 'Pokémon Mini',                shortLabel: 'PKMini',  manufacturer: 'Nintendo' },
-  gb:              { label: 'Game Boy',                    shortLabel: 'GB',      manufacturer: 'Nintendo' },
-  gbc:             { label: 'Game Boy Color',              shortLabel: 'GBC',     manufacturer: 'Nintendo' },
-  gba:             { label: 'Game Boy Advance',            shortLabel: 'GBA',     manufacturer: 'Nintendo' },
-  n64:             { label: 'Nintendo 64',                 shortLabel: 'N64',     manufacturer: 'Nintendo' },
-  gamecube:        { label: 'GameCube',                    shortLabel: 'GCN',     manufacturer: 'Nintendo' },
-  nds:             { label: 'Nintendo DS',                 shortLabel: 'NDS',     manufacturer: 'Nintendo' },
-  '3ds':           { label: 'Nintendo 3DS',                shortLabel: '3DS',     manufacturer: 'Nintendo' },
-  wii:             { label: 'Wii',                         shortLabel: 'Wii',     manufacturer: 'Nintendo' },
-  wiiu:            { label: 'Wii U',                       shortLabel: 'WiiU',    manufacturer: 'Nintendo' },
-  // Sony
-  psx:             { label: 'PlayStation',                 shortLabel: 'PS1',     manufacturer: 'Sony' },
-  ps2:             { label: 'PlayStation 2',               shortLabel: 'PS2',     manufacturer: 'Sony' },
-  ps3:             { label: 'PlayStation 3',               shortLabel: 'PS3',     manufacturer: 'Sony' },
-  psp:             { label: 'PSP',                         shortLabel: 'PSP',     manufacturer: 'Sony' },
-  'psvita-psn':    { label: 'PS Vita (PSN)',               shortLabel: 'Vita',    manufacturer: 'Sony' },
-  'psvita-updates':{ label: 'PS Vita (Updates)',           shortLabel: 'VitaU',   manufacturer: 'Sony' },
-  // Microsoft
-  'xbox':          { label: 'Xbox',                        shortLabel: 'Xbox',    manufacturer: 'Microsoft' },
-  'xbox-360':      { label: 'Xbox 360',                    shortLabel: 'X360',    manufacturer: 'Microsoft' },
-  // Sega
-  'sega-32x':      { label: '32X',                         shortLabel: '32X',     manufacturer: 'Sega' },
-  'game-gear':     { label: 'Game Gear',                   shortLabel: 'GG',      manufacturer: 'Sega' },
-  'master-system': { label: 'Master System',               shortLabel: 'SMS',     manufacturer: 'Sega' },
-  'mega-drive':    { label: 'Mega Drive / Genesis',        shortLabel: 'MD',      manufacturer: 'Sega' },
-  'dreamcast':     { label: 'Dreamcast (CHD)',             shortLabel: 'DC',      manufacturer: 'Sega' },
-  'saturn':        { label: 'Saturn (CHD, EU)',            shortLabel: 'SAT',     manufacturer: 'Sega' },
-  'sega-cd':       { label: 'Mega CD (CHD, PAL)',          shortLabel: 'MCD',     manufacturer: 'Sega' },
-  // Retro
-  'pc-engine':         { label: 'PC Engine / TG-16',       shortLabel: 'PCE',     manufacturer: 'Retro' },
-  'pc-engine-cd':      { label: 'PC Engine CD',            shortLabel: 'PCECD',   manufacturer: 'Retro' },
-  'pc-engine-cd-chd':  { label: 'PC Engine CD (CHD)',      shortLabel: 'PCECHD',  manufacturer: 'Retro' },
-  'pc-fx':             { label: 'PC-FX / PC-FXGA',         shortLabel: 'PCFX',    manufacturer: 'Retro' },
-  'pc98':              { label: 'NEC PC-98',               shortLabel: 'PC98',    manufacturer: 'Retro' },
-  'jaguar-cd':         { label: 'Jaguar CD',               shortLabel: 'JAG',     manufacturer: 'Retro' },
-  'jaguar-cd-chd':     { label: 'Jaguar CD (CHD)',         shortLabel: 'JAGCHD',  manufacturer: 'Retro' },
-  'pippin':            { label: 'Bandai Pippin',           shortLabel: 'PIP',     manufacturer: 'Retro' },
-  'fm-towns':          { label: 'FM-Towns',                shortLabel: 'FMT',     manufacturer: 'Retro' },
-  '3do':               { label: 'Panasonic 3DO',           shortLabel: '3DO',     manufacturer: 'Retro' },
-  '3do-chd':           { label: 'Panasonic 3DO (CHD)',     shortLabel: '3DOCHD',  manufacturer: 'Retro' },
-  'cdi':               { label: 'Philips CD-i',            shortLabel: 'CDi',     manufacturer: 'Retro' },
-  'neo-geo-cd':        { label: 'Neo Geo CD',              shortLabel: 'NGCD',    manufacturer: 'Retro' },
-  'neo-geo-cd-chd':    { label: 'Neo Geo CD (CHD)',        shortLabel: 'NGCCHD',  manufacturer: 'Retro' },
-  // Arcade
-  'arcade-konami-firebeat':   { label: 'Konami FireBeat',            shortLabel: 'FireBeat',  manufacturer: 'Arcade' },
-  'arcade-konami-sys573':     { label: 'Konami System 573',          shortLabel: 'Sys573',    manufacturer: 'Arcade' },
-  'arcade-konami-sysgv':      { label: 'Konami System GV',           shortLabel: 'SysGV',     manufacturer: 'Arcade' },
-  'arcade-konami-eamusement': { label: 'Konami e-Amusement',         shortLabel: 'eAMU',      manufacturer: 'Arcade' },
-  'arcade-namco-triforce':    { label: 'Namco/Sega/Nintendo Triforce', shortLabel: 'Triforce', manufacturer: 'Arcade' },
-  'arcade-namco-sys246':      { label: 'Namco System 246',           shortLabel: 'Sys246',    manufacturer: 'Arcade' },
-  'arcade-sega-chihiro':      { label: 'Sega Chihiro',               shortLabel: 'Chihiro',   manufacturer: 'Arcade' },
-  'arcade-sega-lindbergh':    { label: 'Sega Lindbergh',             shortLabel: 'Lindbergh', manufacturer: 'Arcade' },
-  'arcade-sega-naomi':        { label: 'Sega Naomi',                 shortLabel: 'Naomi',     manufacturer: 'Arcade' },
-  'arcade-sega-naomi2':       { label: 'Sega Naomi 2',               shortLabel: 'Naomi2',    manufacturer: 'Arcade' },
-  'arcade-sega-ringedge':     { label: 'Sega RingEdge',              shortLabel: 'RingEdge',  manufacturer: 'Arcade' },
-  'arcade-sega-ringedge2':    { label: 'Sega RingEdge 2',            shortLabel: 'RingEdge2', manufacturer: 'Arcade' },
-};
-
-const COMMON_REGIONS = ['USA', 'Europe', 'Japan', 'World', 'Korea', 'Australia'];
-
-// ─── Console picker ───────────────────────────────────────────────────────────
-
-function ConsolePicker({ selected, onSelect }: { selected: string | null; onSelect: (k: string) => void }) {
-  const nintendo = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Nintendo');
-  const sony     = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sony');
-  const microsoft = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Microsoft');
-  const sega      = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Sega');
-  const retro    = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Retro');
-  const arcade   = Object.entries(CONSOLES).filter(([, v]) => v.manufacturer === 'Arcade');
-
-  const renderGroup = (label: string, entries: [string, ConsoleInfo][], color: string) => (
-    <div key={label}>
-      <p className={`text-xs font-semibold uppercase tracking-widest mb-2 ${color}`}>{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {entries.map(([key, info]) => (
-          <button
-            key={key}
-            onClick={() => onSelect(key)}
-            className={`px-3 py-1.5 rounded-md text-sm font-medium border transition-all duration-150
-              ${selected === key
-                ? 'bg-primary-600 border-primary-500 text-white shadow-md shadow-primary-900/40'
-                : 'bg-surface-800/60 border-surface-600/50 text-surface-300 hover:border-surface-500 hover:text-surface-100'
-              }`}
-          >
-            {info.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="flex flex-col gap-5">
-      {renderGroup('Nintendo', nintendo, 'text-red-400')}
-      {renderGroup('Sony', sony, 'text-blue-400')}
-      {renderGroup('Microsoft', microsoft, 'text-green-400')}
-      {renderGroup('Sega', sega, 'text-orange-400')}
-      {renderGroup('Retro', retro, 'text-purple-400')}
-      {renderGroup('Arcade', arcade, 'text-yellow-400')}
-    </div>
-  );
-}
-
-// ─── Region filter ────────────────────────────────────────────────────────────
-
-function RegionFilter({ regions, onAdd, onRemove }: { regions: string[]; onAdd: (r: string) => void; onRemove: (r: string) => void }) {
-  const [custom, setCustom] = useState('');
-  const addCustom = () => {
-    const t = custom.trim();
-    if (t && !regions.includes(t)) onAdd(t);
-    setCustom('');
-  };
-
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap gap-2">
-        {COMMON_REGIONS.map(r => {
-          const active = regions.includes(r);
-          return (
-            <button key={r} onClick={() => active ? onRemove(r) : onAdd(r)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all duration-150
-                ${active ? 'bg-primary-600/30 border-primary-500 text-primary-200'
-                         : 'bg-surface-800/40 border-surface-600/50 text-surface-400 hover:border-surface-500 hover:text-surface-200'}`}
-            >{r}</button>
-          );
-        })}
-      </div>
-      <div className="flex gap-2">
-        <Input value={custom} onChange={e => setCustom(e.target.value)} onKeyDown={e => e.key === 'Enter' && addCustom()}
-          placeholder="Región personalizada..." className="bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400 h-8 text-sm" />
-        <Button size="sm" variant="outline" onClick={addCustom} disabled={!custom.trim()}
-          className="border-surface-600 text-surface-300 hover:bg-surface-700 shrink-0">Añadir</Button>
-      </div>
-      {regions.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 items-center">
-          <span className="text-xs text-surface-500">Activos:</span>
-          {regions.map(r => (
-            <Badge key={r} className="bg-primary-600/20 text-primary-300 border-primary-600/40 pr-1 gap-1">
-              {r}
-              <button onClick={() => onRemove(r)} className="hover:text-white transition-colors ml-0.5"><X className="h-3 w-3" /></button>
-            </Badge>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+import { CONSOLES } from '../../biblioteca/_components/consoles';
+import { ConsolePicker } from '../../biblioteca/_components/ConsolePicker';
+import { RegionFilter } from '../../biblioteca/_components/RegionFilter';
 
 // ─── Per-file status icon ─────────────────────────────────────────────────────
 

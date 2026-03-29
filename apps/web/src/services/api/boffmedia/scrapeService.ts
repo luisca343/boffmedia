@@ -64,6 +64,11 @@ export class ScrapeService {
     return apiGET<LocalGamesResult>(`/boffmedia/herramientas/scrape/myrient/local?${params}`);
   }
 
+  static getServeFileUrl(consoleKey: string, filename: string): string {
+    const apiUrl = process.env.NEXT_PUBLIC_API ?? '';
+    return `${apiUrl}/boffmedia/herramientas/scrape/myrient/serve-file?console=${encodeURIComponent(consoleKey)}&filename=${encodeURIComponent(filename)}`;
+  }
+
   static getCatalog(consoleKey: string, regions?: string[]) {
     const params = new URLSearchParams({ console: consoleKey });
     if (regions?.length) params.append('regions', regions.join(','));

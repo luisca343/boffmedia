@@ -95,6 +95,19 @@ export class MyrientScrapeService {
    * Returns the files already downloaded locally for a given console,
    * with optional region filtering against the filename.
    */
+  /**
+   * Resolves and validates the path for a locally-stored game file so the
+   * controller can stream it to the browser. Uses path.basename() to prevent
+   * path-traversal attacks.
+   */
+  async resolveLocalFile(consoleKey: MyrientConsole, filename: string): Promise<{ filePath: string; safeName: string }> {
+    const catalog = CONSOLE_CATALOG[consoleKey];
+    const safeName = path.basename(filename);
+    const filePath = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder, safeName);
+    await access(filePath); // throws ENOENT if missing
+    return { filePath, safeName };
+  }
+
   async getLocalGames(consoleKey: MyrientConsole, regions: string[]): Promise<LocalGamesResult> {
     const catalog = CONSOLE_CATALOG[consoleKey];
     const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);

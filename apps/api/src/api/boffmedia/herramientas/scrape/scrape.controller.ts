@@ -64,6 +64,23 @@ export class ScrapeController {
     return this.scrapeFacadeService.getLocalGames(consoleKey, regionList);
   }
 
+  @Get('myrient/serve-file')
+  @ApiOperation({ summary: 'Stream a locally-stored game file to the browser for download' })
+  @ApiQuery({ name: 'console', enum: MyrientConsole })
+  @ApiQuery({ name: 'filename', type: String })
+  async serveFile(
+    @Query('console') consoleKey: MyrientConsole,
+    @Query('filename') filename: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const { filePath, safeName } = await this.scrapeFacadeService.resolveLocalFile(consoleKey, filename);
+      res.download(filePath, safeName);
+    } catch {
+      res.status(404).json({ error: 'File not found' });
+    }
+  }
+
   // ==================== DOWNLOADS ====================
 
   @Post('myrient/download')

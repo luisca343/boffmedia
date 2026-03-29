@@ -16,6 +16,10 @@ export class ScrapeFacadeService {
 
   // ==================== MYRIENT SCRAPING ====================
 
+  async resolveLocalFile(consoleKey: MyrientConsole, filename: string): Promise<{ filePath: string; safeName: string }> {
+    return this.myrientScrapeService.resolveLocalFile(consoleKey, filename);
+  }
+
   async getLocalGames(consoleKey: MyrientConsole, regions: string[]): Promise<LocalGamesResult> {
     return this.myrientScrapeService.getLocalGames(consoleKey, regions);
   }
