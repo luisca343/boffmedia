@@ -17,10 +17,11 @@ import { TypeEffectivenessSection } from "./_components/TypeEffectivenessSection
 import { PalettesSection } from "./_components/PalettesSection"
 
 export default async function EntradaPokedex({params}: any){
-    if(!params.params) return <PokemonList/>
+    const resolvedParams = await params;
+    if(!resolvedParams.params) return <PokemonList/>
     const t = await getTranslations("pokedex");
-    
-    let [pokemonIndex, formIndex] = params.params as [number, number | string]
+
+    let [pokemonIndex, formIndex] = resolvedParams.params as [number, number | string]
     
     const pokemon = (await PokemonService.getPokemonByDex(pokemonIndex)).data as Pokemon
     
