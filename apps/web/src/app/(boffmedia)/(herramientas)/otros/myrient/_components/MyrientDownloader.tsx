@@ -35,6 +35,7 @@ import {
   SseDoneEvent,
 } from '@/services/api/boffmedia/scrapeService';
 import GameCatalogTable from './GameCatalogTable';
+import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
 
 // ─── Console metadata ─────────────────────────────────────────────────────────
 
@@ -43,6 +44,11 @@ interface ConsoleInfo { label: string; shortLabel: string; manufacturer: Manufac
 
 const CONSOLES: Record<string, ConsoleInfo> = {
   // Nintendo
+  nes:             { label: 'NES',                         shortLabel: 'NES',     manufacturer: 'Nintendo' },
+  fds:             { label: 'Famicom Disk System',         shortLabel: 'FDS',     manufacturer: 'Nintendo' },
+  snes:            { label: 'SNES',                        shortLabel: 'SNES',    manufacturer: 'Nintendo' },
+  'virtual-boy':   { label: 'Virtual Boy',                 shortLabel: 'VB',      manufacturer: 'Nintendo' },
+  'pokemon-mini':  { label: 'Pokémon Mini',                shortLabel: 'PKMini',  manufacturer: 'Nintendo' },
   gb:              { label: 'Game Boy',                    shortLabel: 'GB',      manufacturer: 'Nintendo' },
   gbc:             { label: 'Game Boy Color',              shortLabel: 'GBC',     manufacturer: 'Nintendo' },
   gba:             { label: 'Game Boy Advance',            shortLabel: 'GBA',     manufacturer: 'Nintendo' },
@@ -412,7 +418,7 @@ export default function MyrientDownloader() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen pb-40">
+    <FloatingSection className="min-h-screen pb-40">
       <div className="container mx-auto px-4 py-10 max-w-4xl flex flex-col gap-8">
 
         {/* Header */}
@@ -527,6 +533,6 @@ export default function MyrientDownloader() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </FloatingSection>
   );
 }

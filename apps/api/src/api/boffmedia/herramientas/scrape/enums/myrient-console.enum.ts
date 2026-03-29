@@ -1,5 +1,10 @@
 export enum MyrientConsole {
   // Nintendo
+  NES         = 'nes',
+  FDS         = 'fds',
+  SNES        = 'snes',
+  VIRTUAL_BOY = 'virtual-boy',
+  POKEMON_MINI = 'pokemon-mini',
   GB          = 'gb',
   GBC         = 'gbc',
   GBA         = 'gba',

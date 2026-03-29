@@ -12,6 +12,31 @@ export interface ConsoleCatalogEntry {
 }
 
 export const CONSOLE_CATALOG: Record<MyrientConsole, ConsoleCatalogEntry> = {
+  [MyrientConsole.NES]: {
+    url: `${MYRIENT_BASE_URL}/files/No-Intro/Nintendo%20-%20Nintendo%20Entertainment%20System%20(Headered)/`,
+    localFolder: 'Nintendo NES',
+    label: 'Nintendo Entertainment System (NES)',
+  },
+  [MyrientConsole.FDS]: {
+    url: `${MYRIENT_BASE_URL}/files/No-Intro/Nintendo%20-%20Family%20Computer%20Disk%20System%20(FDS)/`,
+    localFolder: 'Nintendo FDS',
+    label: 'Nintendo Family Computer Disk System (FDS)',
+  },
+  [MyrientConsole.SNES]: {
+    url: `${MYRIENT_BASE_URL}/files/No-Intro/Nintendo%20-%20Super%20Nintendo%20Entertainment%20System/`,
+    localFolder: 'Nintendo SNES',
+    label: 'Super Nintendo Entertainment System (SNES)',
+  },
+  [MyrientConsole.VIRTUAL_BOY]: {
+    url: `${MYRIENT_BASE_URL}/files/No-Intro/Nintendo%20-%20Virtual%20Boy/`,
+    localFolder: 'Nintendo Virtual Boy',
+    label: 'Nintendo Virtual Boy',
+  },
+  [MyrientConsole.POKEMON_MINI]: {
+    url: `${MYRIENT_BASE_URL}/files/No-Intro/Nintendo%20-%20Pokemon%20Mini/`,
+    localFolder: 'Nintendo Pokemon Mini',
+    label: 'Nintendo Pokémon Mini',
+  },
   [MyrientConsole.GB]: {
     url: `${MYRIENT_BASE_URL}/files/No-Intro/Nintendo%20-%20Game%20Boy/`,
     localFolder: 'Game Boy',
