@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
-import { LocalGamesResult, SearchLocalGamesResult } from './entities/local-games.entity';
+import { LocalGamesResult, SearchLocalGamesResult, CatalogSearchResult } from './entities/local-games.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
@@ -62,6 +62,19 @@ export class ScrapeController {
   ): Promise<LocalGamesResult> {
     const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
     return this.scrapeFacadeService.getLocalGames(consoleKey, regionList);
+  }
+
+  @Get('myrient/catalog/search')
+  @ApiOperation({ summary: 'Search remote Myrient catalogs across all consoles' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query (matched against filename)' })
+  @ApiQuery({ name: 'regions', required: false, type: String, description: 'Comma-separated region filters', example: 'Europe' })
+  @ApiResponse({ status: HttpStatus.OK, type: CatalogSearchResult })
+  async searchCatalog(
+    @Query('q') query: string,
+    @Query('regions') regions?: string,
+  ): Promise<CatalogSearchResult> {
+    const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
+    return this.scrapeFacadeService.searchCatalog(query ?? '', regionList);
   }
 
   @Get('myrient/search')

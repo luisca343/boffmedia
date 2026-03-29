@@ -1,0 +1,53 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Docker: Build & Push all",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": [
+        "buildx", "bake",
+        "--set", "*.output=type=registry",
+        "server", "web"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "preLaunchTask": "Docker: Build & Push all"
+    },
+    {
+      "name": "Docker: Run server (local)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": [
+        "run", "--rm", "-it",
+        "-p", "3001:3000",
+        "--name", "boffmedia-server",
+        "luisca343/boffmedia-server:latest"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Docker: Run web (local)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "docker",
+      "runtimeArgs": [
+        "run", "--rm", "-it",
+        "-p", "3000:3000",
+        "--name", "boffmedia-web",
+        "luisca343/boffmedia-web:latest"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Docker: Run both locally",
+      "configurations": ["Docker: Run server (local)", "Docker: Run web (local)"]
+    }
+  ]
+}

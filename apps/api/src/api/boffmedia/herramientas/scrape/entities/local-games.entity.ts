@@ -55,3 +55,32 @@ export class SearchLocalGamesResult {
   @ApiProperty({ type: [SearchConsoleResult] })
   consoles: SearchConsoleResult[];
 }
+
+// ─── Remote catalog search ────────────────────────────────────────────────────
+
+import { GameFileEntry } from './game-file.entity';
+
+export class CatalogSearchConsoleResult {
+  @ApiProperty({ example: '3ds' })
+  consoleKey: string;
+
+  @ApiProperty({ example: 'Nintendo 3DS (Decrypted)' })
+  consoleLabel: string;
+
+  @ApiProperty({ example: 5 })
+  count: number;
+
+  @ApiProperty({ type: [GameFileEntry] })
+  files: GameFileEntry[];
+}
+
+export class CatalogSearchResult {
+  @ApiProperty({ example: 'Pokémon' })
+  query: string;
+
+  @ApiProperty({ example: 20 })
+  totalCount: number;
+
+  @ApiProperty({ type: [CatalogSearchConsoleResult] })
+  consoles: CatalogSearchConsoleResult[];
+}

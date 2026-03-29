@@ -17,6 +17,7 @@ interface GameCatalogTableProps {
   onToggle: (name: string) => void;
   onSelectAll: (names: string[]) => void;
   onClearAll: () => void;
+  initialSearch?: string;
 }
 
 /** Derives the local filename from a catalog entry the same way the backend does. */
@@ -31,8 +32,9 @@ export default function GameCatalogTable({
   onToggle,
   onSelectAll,
   onClearAll,
+  initialSearch = '',
 }: GameCatalogTableProps) {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const [page, setPage] = useState(0);
   const [hideDownloaded, setHideDownloaded] = useState(false);
 

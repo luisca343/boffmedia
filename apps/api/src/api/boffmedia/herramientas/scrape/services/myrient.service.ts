@@ -9,7 +9,7 @@ import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
 import { BulkDownloadResult, FileDownloadEntry } from '../entities/bulk-download-result.entity';
-import { LocalGameEntry, LocalGamesResult, SearchConsoleResult, SearchLocalGamesResult } from '../entities/local-games.entity';
+import { LocalGameEntry, LocalGamesResult, SearchConsoleResult, SearchLocalGamesResult, CatalogSearchConsoleResult, CatalogSearchResult } from '../entities/local-games.entity';
 import { DownloadAllGamesDto } from '../dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from '../dto/download-selected-games.dto';
 import { MyrientConsole } from '../enums/myrient-console.enum';
@@ -170,6 +170,35 @@ export class MyrientScrapeService {
     const consoles = groups.filter((g): g is SearchConsoleResult => g !== null);
     const totalCount = consoles.reduce((sum, c) => sum + c.count, 0);
     return { query, totalCount, consoles };
+  }
+
+  /**
+   * Searches remote Myrient catalogs for games matching the query across all
+   * consoles, running scrapes with bounded concurrency to avoid hammering the
+   * server. Consoles whose scrape fails are silently skipped.
+   */
+  async searchCatalog(query: string, regions: string[]): Promise<CatalogSearchResult> {
+    const q = query.trim().toLowerCase();
+    const consoleKeys = Object.keys(CONSOLE_CATALOG) as MyrientConsole[];
+
+    const groups = await runWithConcurrency(
+      consoleKeys.map(key => async (): Promise<CatalogSearchConsoleResult | null> => {
+        try {
+          const result = await this.scrapeCatalog(key, regions);
+          const files = q
+            ? result.files.filter(f => f.name.toLowerCase().includes(q))
+            : result.files;
+          if (!files.length) return null;
+          return { consoleKey: key, consoleLabel: CONSOLE_CATALOG[key].label, count: files.length, files };
+        } catch {
+          return null;
+        }
+      }),
+      5,
+    );
+
+    const consoles = groups.filter((g): g is CatalogSearchConsoleResult => g !== null);
+    return { query, totalCount: consoles.reduce((s, c) => s + c.count, 0), consoles };
   }
 
   /**

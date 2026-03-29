@@ -57,6 +57,19 @@ export interface LocalGamesResult {
   files: LocalGameEntry[];
 }
 
+export interface CatalogSearchConsoleResult {
+  consoleKey: string;
+  consoleLabel: string;
+  count: number;
+  files: GameFileEntry[];
+}
+
+export interface CatalogSearchResult {
+  query: string;
+  totalCount: number;
+  consoles: CatalogSearchConsoleResult[];
+}
+
 export interface SearchConsoleResult {
   consoleKey: string;
   consoleLabel: string;
@@ -75,6 +88,12 @@ export class ScrapeService {
     const params = new URLSearchParams({ console: consoleKey });
     if (regions?.length) params.append('regions', regions.join(','));
     return apiGET<LocalGamesResult>(`/boffmedia/herramientas/scrape/myrient/local?${params}`);
+  }
+
+  static searchCatalog(query: string, regions?: string[]) {
+    const params = new URLSearchParams({ q: query });
+    if (regions?.length) params.append('regions', regions.join(','));
+    return apiGET<CatalogSearchResult>(`/boffmedia/herramientas/scrape/myrient/catalog/search?${params}`);
   }
 
   static searchLocalGames(query: string, regions?: string[]) {
