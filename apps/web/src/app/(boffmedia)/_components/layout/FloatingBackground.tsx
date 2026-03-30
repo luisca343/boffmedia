@@ -5,8 +5,9 @@ interface FloatingBackgroundProps {
   className?: string;
 }
 
-export function FloatingBackground({ 
-  variant = 'default', 
+export function FloatingBackground({
+  variant = 'default',
+  showBlobs = false,
   className = ""
 }: FloatingBackgroundProps) {
   const getColorsByVariant = () => {
@@ -79,6 +80,24 @@ export function FloatingBackground({
           backgroundPosition: 'center top'
         }}
       />
+      {showBlobs && (
+        <>
+          <div
+            className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full pointer-events-none"
+            style={{
+              background: `radial-gradient(circle, ${colors.primary}26 0%, transparent 70%)`,
+              filter: 'blur(40px)',
+            }}
+          />
+          <div
+            className="absolute -bottom-32 -right-32 w-[500px] h-[500px] rounded-full pointer-events-none"
+            style={{
+              background: `radial-gradient(circle, ${colors.accent}20 0%, transparent 70%)`,
+              filter: 'blur(60px)',
+            }}
+          />
+        </>
+      )}
     </>
   );
 }

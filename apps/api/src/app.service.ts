@@ -159,7 +159,7 @@ export class AppService {
 
   async steamKeys() {
     const auth = new google.auth.GoogleAuth({
-      keyFile: 'boffmedia-a39cdd7a63c7.json',
+      keyFile: path.join(__dirname, '..', 'boffmedia-b6e4f721c326.json'),
       scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
     });
 
@@ -203,9 +203,12 @@ export class AppService {
   }
 
   async getSteamData(steamID: string): Promise<GameData> {
+    console.log("GETSTEAMDATA= " + steamID)
     const url = `https://store.steampowered.com/api/appdetails?appids=${steamID}&l=spanish`;
     const response = await axios.get(url);
     const gameData = response.data[steamID].data;
+
+    console.log(gameData)
 
     const initialPrice = gameData.price_overview?.initial;
     const finalPrice = gameData.price_overview?.final;
@@ -218,14 +221,19 @@ export class AppService {
 
     const media = [...trailers, ...screenshots] as (Video | Image)[];
 
+    const movies = gameData.movies ?? [];
+
+    const trailerImages = movies
+      .map((movie: any) => movie?.hls_h264)
+      .filter(Boolean);
+
     const data = {
       steamID,
       name: gameData.name,
       normalPrice: initialFormatted,
       currentPrice: finalFormatted,
       discountPercent: gameData.price_overview?.discount_percent || 0,
-      trailerImages:
-        gameData.movies?.map((movie: any) => movie.webm['480']) || [],
+      trailerImages,
       genres: gameData.genres?.map((genre: any) => genre.description) || [],
       description: gameData.detailed_description,
       shortDescription: gameData.short_description,
@@ -247,6 +255,9 @@ export class AppService {
 
       media: media,
     };
+
+    console.log("== RESULTADO ==")
+    console.log(data)
 
     return data;
   }

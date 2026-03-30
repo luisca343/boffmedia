@@ -103,6 +103,7 @@ export default function SteamDialog({
   return (
     <Dialog open={isModalVisible} onOpenChange={setIsModalVisible}>
       <DialogContent className="sm:max-w-[700px] xl:max-w-[1200px] bg-surface-900 text-surface-100 border border-surface-700 p-0 overflow-hidden">
+        <DialogTitle className="sr-only">{selectedGame?.name}</DialogTitle>
         {/* Game Header with Banner */}
         <div className="relative w-full h-40 md:h-60 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-t from-surface-900 to-transparent z-10" />
@@ -397,7 +398,7 @@ export default function SteamDialog({
                         return (
                           <motion.video
                             key={`video-${selectedMediaIndex}`}
-                            src={video.mp4[480]}
+                            src={video.hls_h264 || video.dash_h264 || video.mp4?.[480]}
                             className="w-full h-full object-cover"
                             controls
                             initial={{ opacity: 0 }}

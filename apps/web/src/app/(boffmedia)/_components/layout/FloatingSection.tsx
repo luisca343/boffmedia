@@ -1,3 +1,5 @@
+
+import { GridBackground } from "@/components/ui/display/GridBackground";
 import { FloatingBackground } from "./FloatingBackground";
 
 interface FloatingSectionProps {
@@ -5,6 +7,8 @@ interface FloatingSectionProps {
   variant?: 'default' | 'warm' | 'cool' | 'neutral';
   showParticles?: boolean;
   showBlobs?: boolean;
+  showBackground?: boolean;
+  showGrid?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }
@@ -13,7 +17,9 @@ export function FloatingSection({
   children, 
   variant = 'default',
   showParticles = true,
-  showBlobs = true,
+  showBlobs = false,
+  showBackground = true,
+  showGrid = false,
   className = "",
   style = {}
 }: FloatingSectionProps) {
@@ -22,13 +28,17 @@ export function FloatingSection({
       className={`relative overflow-hidden ${className}`} 
       style={style}
     >
-      {variant !== 'neutral' && (
+      {(variant !== 'neutral' && showBackground) &&  (
         <FloatingBackground 
           variant={variant}
           showParticles={showParticles}
           showBlobs={showBlobs}
         />
       )}
+
+      {showGrid && <GridBackground/>}
+
+
       <div className="relative z-10">
         {children}
       </div>
