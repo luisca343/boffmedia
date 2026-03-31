@@ -11,10 +11,11 @@ import { Camera, Gamepad2, LinkIcon, Loader2, User, Mail, Shield, Wifi } from 'l
 import useSocketStore from "@/stores/useSocketStore";
 import { useBoffSession } from "@/services/useBoffSession";
 import { UploadService } from "@/services/api/smartrotom/uploadService";
+import { UsersService } from "@/services/api/boffmedia/usersService";
 import { FloatingBackground } from "./layout/FloatingBackground";
 
 export default function UserProfile() {
-  const { session } = useBoffSession();
+  const { session, refreshSession } = useBoffSession();
   const socket = useSocketStore((state) => state.socket);
   const user = session?.user;
 
@@ -56,22 +57,25 @@ export default function UserProfile() {
     setIsUploading(true);
 
     try {
-      const response = await UploadService.uploadProfileImage(file, user?.id || 'default');
+      const uploadResponse = await UploadService.uploadProfileImage(file, user?.id || 'default');
 
-      console.log("Upload response:", response);
-      
-      if (response.data) {
-        setEditedUser(prev => ({
-          ...prev,
-          image: response.data!.url
-        }));
-      } else {
+      if (!uploadResponse.data?.url) {
         setUploadError('Upload failed: No response data');
+        return;
       }
+
+      const imageUrl = uploadResponse.data.url;
+
+      await UsersService.updateUser(Number(user?.id), { profilePicture: imageUrl } as any);
+
+      setEditedUser(prev => ({ ...prev, image: imageUrl }));
+
+      await refreshSession();
     } catch (err) {
       setUploadError('Upload failed: ' + (err instanceof Error ? err.message : 'Unknown error'));
     } finally {
       setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -105,7 +109,7 @@ export default function UserProfile() {
                 <div className="relative group cursor-pointer" onClick={handleImageClick}>
                   <Avatar className="w-32 h-32 relative border-4 border-gradient-to-r from-primary-500 to-orange-500">
                     <AvatarImage
-                      src={`/uploads/profiles/${editedUser.id || '0'}.jpg` || "/placeholder.svg?height=128&width=128"}
+                      src={editedUser.image || user?.image || "/placeholder.svg?height=128&width=128"}
                       alt={editedUser.name || "User"}
                       className="object-cover"
                     />

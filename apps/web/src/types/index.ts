@@ -19,6 +19,7 @@ export interface BoffUser { //extends DefaultUser {
   roles: string[]
   smartRotomUser?: SmartRotomUser
   discordId?: string
+  image?: string | null
 }
 
 declare module "next-auth" {
