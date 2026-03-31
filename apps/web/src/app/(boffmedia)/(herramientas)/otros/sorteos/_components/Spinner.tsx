@@ -31,25 +31,21 @@ export default function Spinner({
         </div>
       
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-500/5 to-transparent opacity-20 animate-scanline pointer-events-none z-30"></div>
-        
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-full w-0.5 bg-primary-400 z-40 opacity-60"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-16 w-1 bg-primary-400 z-40"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 border-2 border-primary-400 rounded-full z-40"></div>
-        
-        <div 
+
+        <div
           ref={spinnerRef}
           className="relative h-64 overflow-hidden bg-surface-900/80 backdrop-blur-sm border-4 border-primary-500/30 rounded-lg"
         >
-          <div 
+          <div
             ref={itemsContainerRef}
             className="absolute inset-y-0 left-0 flex items-center h-full transition-transform"
-            style={{ 
+            style={{
               transform: `translateX(${-scrollPosition}px)`,
               transition: spinComplete ? 'transform 0.5s ease-out' : 'none'
             }}
           >
             {spinItems.map((name, index) => (
-              <SpinnerItem 
+              <SpinnerItem
                 key={`${name}-${index}`}
                 name={name}
                 index={index}
@@ -58,9 +54,20 @@ export default function Spinner({
               />
             ))}
           </div>
-          
+
           <div className="absolute top-0 bottom-0 left-0 w-24 bg-gradient-to-r from-surface-900 to-transparent z-20 pointer-events-none" />
           <div className="absolute top-0 bottom-0 right-0 w-24 bg-gradient-to-l from-surface-900 to-transparent z-20 pointer-events-none" />
+
+          {/* Center marker — triangles pointing inward from top and bottom */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0 z-40
+            border-l-[10px] border-l-transparent
+            border-r-[10px] border-r-transparent
+            border-t-[14px] border-t-primary-400" />
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 z-40
+            border-l-[10px] border-l-transparent
+            border-r-[10px] border-r-transparent
+            border-b-[14px] border-b-primary-400" />
+          <div className="absolute top-0 bottom-0 left-1/2 -translate-x-px w-0.5 bg-primary-400/40 z-30 pointer-events-none" />
         </div>
         
         <div className="mt-4 flex justify-between items-center">

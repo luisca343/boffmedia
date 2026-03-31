@@ -46,8 +46,12 @@ export default function SpinnerAnimation({ participants, winner, onComplete }: S
         ITEM_WIDTH={ITEM_WIDTH}
       />
       
-      <div className="mt-8 text-center text-surface-300">
-        <p className="animate-pulse">Seleccionando ganador...</p>
+      <div className="mt-8 text-center text-surface-300 min-h-[28px]">
+        {!spinComplete ? (
+          <p className="animate-pulse">Seleccionando ganador...</p>
+        ) : (
+          <p className="text-primary-400 font-semibold">¡Ganador seleccionado!</p>
+        )}
       </div>
     </div>
   )
