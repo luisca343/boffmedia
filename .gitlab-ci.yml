@@ -1,10 +1,6 @@
 stages:
   - build
 
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
-  DOCKER_BUILDKIT: "1"
 
 .docker_build:
   stage: build
@@ -12,9 +8,8 @@ variables:
   tags:
     - docker
   variables:
-    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: unix:///var/run/docker.sock
     DOCKER_BUILDKIT: "1"
-    DOCKER_TLS_CERTDIR: ""   # <--- disable TLS for socket
   before_script:
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
