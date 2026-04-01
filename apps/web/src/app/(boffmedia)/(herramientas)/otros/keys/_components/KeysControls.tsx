@@ -1,8 +1,6 @@
 import { motion } from "framer-motion";
-import { Search, Filter, ArrowDownUp } from "lucide-react";
+import { Search, Key, CheckCircle2, Library } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
-import { Button } from "@/components/ui/primitives/button";
-import { Badge } from "@/components/ui/primitives/badge";
 
 interface KeysControlsProps {
   filter: string;
@@ -14,6 +12,24 @@ interface KeysControlsProps {
   totalCount: number;
 }
 
+const StatPill = ({
+  icon: Icon,
+  label,
+  count,
+  color,
+}: {
+  icon: React.ElementType;
+  label: string;
+  count: number;
+  color: string;
+}) => (
+  <div className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-900/60 border ${color}`}>
+    <Icon className="w-3.5 h-3.5 opacity-70" />
+    <span className="text-xs text-surface-400">{label}</span>
+    <span className="text-sm font-semibold tabular-nums">{count}</span>
+  </div>
+);
+
 export const KeysControls = ({
   filter,
   setFilter,
@@ -21,65 +37,73 @@ export const KeysControls = ({
   setShowClaimed,
   availableCount,
   claimedCount,
-  totalCount
+  totalCount,
 }: KeysControlsProps) => (
   <motion.div
     initial={{ y: 30, opacity: 0 }}
     animate={{ y: 0, opacity: 1 }}
     transition={{ duration: 0.5, delay: 0.3 }}
-    className="mb-8"
+    className="mb-6"
   >
-    <div className="bg-surface-800 border border-surface-700 rounded-lg p-4 md:p-6">
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+    <div className="bg-surface-800/60 backdrop-blur-sm border border-surface-700/60 rounded-2xl p-4 md:p-5 space-y-4">
+      {/* Search + Toggle row */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        {/* Search */}
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-surface-400" />
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-surface-500 pointer-events-none" />
           <Input
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            placeholder="Buscar por nombre de juego o bundle..."
-            className="bg-surface-700 border-surface-600 text-surface-100 pl-9 py-5 focus-visible:ring-secondary-500"
+            placeholder="Buscar juego o bundle..."
+            className="bg-surface-900/70 border-surface-600/50 text-surface-100 pl-10 h-10 rounded-xl focus-visible:ring-secondary-500/50 focus-visible:border-secondary-500/50 placeholder:text-surface-600 transition-all duration-200"
           />
         </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative">
-              <input
-                type="checkbox"
-                checked={showClaimed}
-                onChange={() => setShowClaimed(!showClaimed)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-surface-600 rounded-full transition peer-checked:bg-secondary-500 peer-focus:ring-4 peer-focus:ring-secondary-400/25"></div>
-              <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition transform peer-checked:translate-x-5 peer-checked:bg-surface-900"></div>
-            </div>
-            <span className="text-sm md:text-base font-medium text-secondary-300 group-hover:text-secondary-400 transition">
-              {showClaimed ? "Ocultar reclamadas" : "Mostrar reclamadas"}
-            </span>
-          </label>
-          <Button variant="outline" size="icon" className="border-surface-600 text-surface-300 hover:text-secondary-400">
-            <Filter className="h-4 w-4" />
-          </Button>
+
+        {/* Segmented toggle */}
+        <div className="flex rounded-xl overflow-hidden border border-surface-600/50 bg-surface-900/50 p-1 gap-1 flex-shrink-0">
+          <button
+            onClick={() => setShowClaimed(false)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              !showClaimed
+                ? "bg-secondary-500/20 text-secondary-300 shadow-sm border border-secondary-500/30"
+                : "text-surface-400 hover:text-surface-200 border border-transparent"
+            }`}
+          >
+            Disponibles
+          </button>
+          <button
+            onClick={() => setShowClaimed(true)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 ${
+              showClaimed
+                ? "bg-surface-600/80 text-surface-100 border border-surface-500/30"
+                : "text-surface-400 hover:text-surface-200 border border-transparent"
+            }`}
+          >
+            Todas
+          </button>
         </div>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2 items-center justify-between">
-        <div className="flex flex-wrap gap-2">
-          <Badge className="bg-surface-700 text-surface-300 hover:bg-surface-600">
-            Todos los juegos ({totalCount})
-          </Badge>
-          <Badge className="bg-highlight-600/20 text-highlight-400 hover:bg-highlight-700/30 flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-highlight-400"></div>
-            Disponibles ({availableCount})
-          </Badge>
-          <Badge className="bg-red-600/20 text-red-400 hover:bg-red-700/30 flex items-center gap-1">
-            <div className="w-2 h-2 rounded-full bg-red-400"></div>
-            Reclamados ({claimedCount})
-          </Badge>
-        </div>
-        <Button variant="ghost" size="sm" className="text-surface-400 hover:text-secondary-400">
-          <ArrowDownUp className="h-3 w-3 mr-1" />
-          Ordenar
-        </Button>
+      {/* Stats row */}
+      <div className="flex flex-wrap gap-2">
+        <StatPill
+          icon={Library}
+          label="Total"
+          count={totalCount}
+          color="border-surface-600/50 text-surface-200"
+        />
+        <StatPill
+          icon={Key}
+          label="Disponibles"
+          count={availableCount}
+          color="border-highlight-500/30 text-highlight-400"
+        />
+        <StatPill
+          icon={CheckCircle2}
+          label="Reclamadas"
+          count={claimedCount}
+          color="border-red-500/30 text-red-400"
+        />
       </div>
     </div>
   </motion.div>

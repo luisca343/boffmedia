@@ -56,6 +56,29 @@
     "eventsSection": {
       "locale": "en-US",
       "loading": "Loading events...",
+      "status": {
+        "live": "LIVE",
+        "upcoming": "UPCOMING",
+        "completed": "ENDED",
+        "unknown": "UNKNOWN"
+      },
+      "featured": {
+        "label": "Featured Event",
+        "comingSoon": "Coming Soon!",
+        "timeRemaining": "Time remaining",
+        "live": "Live now"
+      },
+      "noEvents": {
+        "title": "Amazing events coming soon!",
+        "description": "We are preparing exciting events for you. Stay tuned to our social media so you don't miss any news.",
+        "exploreButton": "Explore Events"
+      },
+      "cta": {
+        "title": "Want to see more events?",
+        "description": "Explore all our past, present and future events. Find the perfect event for you.",
+        "viewAll": "View All Events",
+        "suggest": "Suggest an Event"
+      },
       "errorLoading": "Error loading events",
       "retry": "Retry",
       "upcomingEvents": "Upcoming Events",

@@ -14,14 +14,11 @@ interface DropdownMenuProps extends React.ComponentPropsWithoutRef<typeof Dropdo
   variant?: DropdownMenuVariant;
 }
 
-const DropdownMenu = React.forwardRef<
-  React.ElementRef<typeof DropdownMenuPrimitive.Root>,
-  DropdownMenuProps
->(({ variant = "default", ...props }, ref) => (
+const DropdownMenu = ({ variant = "default", ...props }: DropdownMenuProps) => (
   <DropdownMenuVariantContext.Provider value={variant}>
     <DropdownMenuPrimitive.Root {...props} />
   </DropdownMenuVariantContext.Provider>
-))
+)
 DropdownMenu.displayName = "DropdownMenu"
 
 const useDropdownMenuVariant = () => React.useContext(DropdownMenuVariantContext)

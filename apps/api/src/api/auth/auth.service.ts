@@ -198,6 +198,7 @@ export class AuthService {
           name: user.username,
           email: user.email,
           roles: roles,
+          image: user.profilePicture || null,
           smartRotomUser: payload.smartRotomUser || {}
         }
       };

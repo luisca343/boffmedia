@@ -2,13 +2,14 @@ import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createWriteStream } from 'fs';
-import { access, mkdir, stat } from 'fs/promises';
+import { access, mkdir, readdir, stat } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
 import { BulkDownloadResult, FileDownloadEntry } from '../entities/bulk-download-result.entity';
+import { LocalGameEntry, LocalGamesResult, SearchConsoleResult, SearchLocalGamesResult, CatalogSearchConsoleResult, CatalogSearchResult } from '../entities/local-games.entity';
 import { DownloadAllGamesDto } from '../dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from '../dto/download-selected-games.dto';
 import { MyrientConsole } from '../enums/myrient-console.enum';
@@ -89,6 +90,116 @@ async function runWithConcurrency<T>(
 @Injectable()
 export class MyrientScrapeService {
   private readonly logger = new Logger(MyrientScrapeService.name);
+
+  /**
+   * Returns the files already downloaded locally for a given console,
+   * with optional region filtering against the filename.
+   */
+  /**
+   * Resolves and validates the path for a locally-stored game file so the
+   * controller can stream it to the browser. Uses path.basename() to prevent
+   * path-traversal attacks.
+   */
+  async resolveLocalFile(consoleKey: MyrientConsole, filename: string): Promise<{ filePath: string; safeName: string }> {
+    const catalog = CONSOLE_CATALOG[consoleKey];
+    const safeName = path.basename(filename);
+    const filePath = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder, safeName);
+    await access(filePath); // throws ENOENT if missing
+    return { filePath, safeName };
+  }
+
+  async getLocalGames(consoleKey: MyrientConsole, regions: string[]): Promise<LocalGamesResult> {
+    const catalog = CONSOLE_CATALOG[consoleKey];
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
+
+    let entries: LocalGameEntry[] = [];
+    try {
+      const filenames = await readdir(saveDir);
+      const stats = await Promise.all(
+        filenames.map(async (filename): Promise<LocalGameEntry | null> => {
+          try {
+            const filePath = path.join(saveDir, filename);
+            const { size: sizeBytes, isFile } = await stat(filePath).then(s => ({ size: s.size, isFile: s.isFile() }));
+            if (!isFile) return null;
+            return { filename, size: formatBytes(sizeBytes), sizeBytes };
+          } catch {
+            return null;
+          }
+        }),
+      );
+      entries = stats.filter((e): e is LocalGameEntry => e !== null);
+    } catch {
+      // Directory doesn't exist yet — return empty
+    }
+
+    if (regions.length) {
+      entries = entries.filter(e => matchesRegions(e.filename, regions));
+    }
+
+    const totalSizeBytes = entries.reduce((sum, e) => sum + e.sizeBytes, 0);
+    return {
+      console: consoleKey,
+      consoleLabel: catalog.label,
+      count: entries.length,
+      totalSize: formatBytes(totalSizeBytes),
+      totalSizeBytes,
+      files: entries,
+    };
+  }
+
+  /**
+   * Searches for games matching the given query across all locally-stored
+   * consoles in parallel. Returns results grouped by console, excluding
+   * consoles with no matches.
+   */
+  async searchLocalGames(query: string, regions: string[]): Promise<SearchLocalGamesResult> {
+    const q = query.trim().toLowerCase();
+    const consoleKeys = Object.keys(CONSOLE_CATALOG) as MyrientConsole[];
+
+    const groups = await Promise.all(
+      consoleKeys.map(async (key): Promise<SearchConsoleResult | null> => {
+        const result = await this.getLocalGames(key, regions);
+        const files = q
+          ? result.files.filter(f => f.filename.toLowerCase().includes(q))
+          : result.files;
+        if (!files.length) return null;
+        return { consoleKey: key, consoleLabel: result.consoleLabel, count: files.length, files };
+      }),
+    );
+
+    const consoles = groups.filter((g): g is SearchConsoleResult => g !== null);
+    const totalCount = consoles.reduce((sum, c) => sum + c.count, 0);
+    return { query, totalCount, consoles };
+  }
+
+  /**
+   * Searches remote Myrient catalogs for games matching the query across all
+   * consoles, running scrapes with bounded concurrency to avoid hammering the
+   * server. Consoles whose scrape fails are silently skipped.
+   */
+  async searchCatalog(query: string, regions: string[]): Promise<CatalogSearchResult> {
+    const q = query.trim().toLowerCase();
+    const consoleKeys = Object.keys(CONSOLE_CATALOG) as MyrientConsole[];
+
+    const groups = await runWithConcurrency(
+      consoleKeys.map(key => async (): Promise<CatalogSearchConsoleResult | null> => {
+        try {
+          const result = await this.scrapeCatalog(key, regions);
+          const files = q
+            ? result.files.filter(f => f.name.toLowerCase().includes(q))
+            : result.files;
+          if (!files.length) return null;
+          return { consoleKey: key, consoleLabel: CONSOLE_CATALOG[key].label, count: files.length, files };
+        } catch {
+          return null;
+        }
+      }),
+      5,
+    );
+
+    const consoles = groups.filter((g): g is CatalogSearchConsoleResult => g !== null);
+    return { query, totalCount: consoles.reduce((s, c) => s + c.count, 0), consoles };
+  }
 
   /**
    * Scrapes a console's catalog and returns the entries filtered by the
@@ -187,7 +298,7 @@ export class MyrientScrapeService {
    * @returns    Metadata about the saved file.
    */
   async downloadGame(url: string): Promise<DownloadResult> {
-    const townPath = path.join(process.cwd(), 'public/juegos/myrient/3DS');
+    const townPath = path.join(process.cwd(), 'laboon/juegos/myrient/3DS');
     await mkdir(townPath, { recursive: true });
 
     // Derive a safe filename from the URL.
@@ -242,7 +353,7 @@ export class MyrientScrapeService {
     this.logger.log(`[${catalog.label}] ${matched.length} / ${allEntries.length} entries match regions: [${regions.join(', ') || 'all'}]`);
 
     // 3. Prepare the save directory
-    const saveDir = path.join(process.cwd(), 'public/juegos/Roms', catalog.localFolder);
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     // 4. Build one download task per matched entry
@@ -310,6 +421,96 @@ export class MyrientScrapeService {
   }
 
   /**
+   * Streams SSE progress events as each file in the selection is processed.
+   *
+   * Emits:
+   *   { type: 'start',    total }
+   *   { type: 'progress', index, total, filename, status, size?, sizeBytes?, error? }
+   *   { type: 'done',     downloaded, skipped, failed,
+   *                       totalDownloadedSize, totalDownloadedSizeBytes, console, consoleLabel }
+   *
+   * Files are processed in batches of `concurrency`. Each batch runs in parallel;
+   * results are yielded in submission order once the batch settles.
+   */
+  async *streamDownloadSelected(dto: DownloadSelectedGamesDto): AsyncGenerator<string> {
+    const catalog = CONSOLE_CATALOG[dto.console];
+    const concurrency = Math.min(Math.max(dto.concurrency ?? 2, 1), 5);
+    const selected = dto.games;
+
+    this.logger.log(`[${catalog.label}] Stream-download of ${selected.length} game(s) (concurrency=${concurrency})`);
+
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
+    await mkdir(saveDir, { recursive: true });
+
+    yield `data: ${JSON.stringify({ type: 'start', total: selected.length })}\n\n`;
+
+    let downloaded = 0, skipped = 0, failed = 0, totalDownloadedSizeBytes = 0;
+    let globalIndex = 0;
+
+    const downloadOne = async (entry: GameFileEntry, i: number): Promise<FileDownloadEntry> => {
+      const filename = decodeURIComponent(entry.link.split('/').pop() ?? entry.name);
+      const filePath = path.join(saveDir, filename);
+      const prefix = `[${catalog.label}] [${i + 1}/${selected.length}]`;
+
+      if (await fileExists(filePath)) {
+        const { size: sizeBytes } = await stat(filePath);
+        this.logger.log(`${prefix} SKIP ${filename}`);
+        return { filename, status: 'skipped', size: formatBytes(sizeBytes), sizeBytes };
+      }
+
+      this.logger.log(`${prefix} Downloading ${filename} — ${entry.link}`);
+      try {
+        const response = await axios.get<NodeJS.ReadableStream>(entry.link, {
+          responseType: 'stream',
+          headers: { 'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)' },
+          timeout: 0,
+        });
+        const writeStream = createWriteStream(filePath);
+        await pipeline(response.data, writeStream);
+        const { size: sizeBytes } = await stat(filePath);
+        this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
+        return { filename, status: 'downloaded', size: formatBytes(sizeBytes), sizeBytes };
+      } catch (err) {
+        this.logger.error(`${prefix} FAILED ${filename}: ${err?.message ?? err}`);
+        return { filename, status: 'failed', error: String(err?.message ?? err) };
+      }
+    };
+
+    // Process in batches of `concurrency`, yield each result in order after the batch settles
+    for (let batchStart = 0; batchStart < selected.length; batchStart += concurrency) {
+      const batch = selected.slice(batchStart, batchStart + concurrency);
+      const batchResults = await Promise.all(
+        batch.map((entry, j) => downloadOne(entry, batchStart + j)),
+      );
+
+      for (const entry of batchResults) {
+        globalIndex++;
+        if (entry.status === 'downloaded') { downloaded++; totalDownloadedSizeBytes += entry.sizeBytes ?? 0; }
+        else if (entry.status === 'skipped') { skipped++;  totalDownloadedSizeBytes += entry.sizeBytes ?? 0; }
+        else { failed++; }
+
+        yield `data: ${JSON.stringify({
+          type: 'progress',
+          index: globalIndex,
+          total: selected.length,
+          ...entry,
+        })}\n\n`;
+      }
+    }
+
+    yield `data: ${JSON.stringify({
+      type: 'done',
+      console: dto.console,
+      consoleLabel: catalog.label,
+      downloaded,
+      skipped,
+      failed,
+      totalDownloadedSize: formatBytes(totalDownloadedSizeBytes),
+      totalDownloadedSizeBytes,
+    })}\n\n`;
+  }
+
+  /**
    * Downloads a user-selected subset of game files for a given console.
    * The caller provides the exact entries (name + link + size) instead of
    * having the server scrape and filter the catalog — this is intended for
@@ -328,7 +529,7 @@ export class MyrientScrapeService {
     this.logger.log(`[${catalog.label}] Starting download of ${selected.length} selected game(s)`);
 
     // Prepare the save directory
-    const saveDir = path.join(process.cwd(), 'public/juegos/myrient', catalog.localFolder);
+    const saveDir = path.join(process.cwd(), 'laboon/juegos/Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
     // Build one download task per selected entry

@@ -1,8 +1,10 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Post, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiBody, ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
+import { LocalGamesResult, SearchLocalGamesResult, CatalogSearchResult } from './entities/local-games.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
@@ -44,6 +46,67 @@ export class ScrapeController {
     return this.scrapeFacadeService.getMyrientCatalog(consoleKey, regionList);
   }
 
+  // ==================== LOCAL LIBRARY ====================
+
+  @Get('myrient/local')
+  @ApiOperation({
+    summary: 'Get locally downloaded games for a console',
+    description: 'Reads the laboon download folder for the given console and returns all files present, with optional region filter.',
+  })
+  @ApiQuery({ name: 'console', enum: MyrientConsole, description: 'Target console' })
+  @ApiQuery({ name: 'regions', required: false, type: String, description: 'Comma-separated region filters', example: 'Europe' })
+  @ApiResponse({ status: HttpStatus.OK, type: LocalGamesResult })
+  async getLocalGames(
+    @Query('console') consoleKey: MyrientConsole,
+    @Query('regions') regions?: string,
+  ): Promise<LocalGamesResult> {
+    const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
+    return this.scrapeFacadeService.getLocalGames(consoleKey, regionList);
+  }
+
+  @Get('myrient/catalog/search')
+  @ApiOperation({ summary: 'Search remote Myrient catalogs across all consoles' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query (matched against filename)' })
+  @ApiQuery({ name: 'regions', required: false, type: String, description: 'Comma-separated region filters', example: 'Europe' })
+  @ApiResponse({ status: HttpStatus.OK, type: CatalogSearchResult })
+  async searchCatalog(
+    @Query('q') query: string,
+    @Query('regions') regions?: string,
+  ): Promise<CatalogSearchResult> {
+    const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
+    return this.scrapeFacadeService.searchCatalog(query ?? '', regionList);
+  }
+
+  @Get('myrient/search')
+  @ApiOperation({ summary: 'Search locally downloaded games across all consoles' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query (matched against filename)' })
+  @ApiQuery({ name: 'regions', required: false, type: String, description: 'Comma-separated region filters', example: 'Europe' })
+  @ApiResponse({ status: HttpStatus.OK, type: SearchLocalGamesResult })
+  async searchLocalGames(
+    @Query('q') query: string,
+    @Query('regions') regions?: string,
+  ): Promise<SearchLocalGamesResult> {
+    const regionList = regions ? regions.split(',').map(r => r.trim()).filter(Boolean) : [];
+    return this.scrapeFacadeService.searchLocalGames(query ?? '', regionList);
+  }
+
+  @Get('myrient/serve-file')
+  @ApiOperation({ summary: 'Stream a locally-stored game file to the browser for download' })
+  @ApiQuery({ name: 'console', enum: MyrientConsole })
+  @ApiQuery({ name: 'filename', type: String })
+  async serveFile(
+    @Query('console') consoleKey: MyrientConsole,
+    @Query('filename') filename: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const { filePath, safeName } = await this.scrapeFacadeService.resolveLocalFile(consoleKey, filename);
+      res.download(filePath, safeName);
+    } catch {
+      res.status(404).json({ error: 'File not found' });
+    }
+  }
+
   // ==================== DOWNLOADS ====================
 
   @Post('myrient/download')
@@ -83,6 +146,30 @@ export class ScrapeController {
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Bulk download failed.' })
   async downloadAllGames(@Body() dto: DownloadAllGamesDto): Promise<BulkDownloadResult> {
     return this.scrapeFacadeService.downloadAllGames(dto);
+  }
+
+  @Post('myrient/download-selected/stream')
+  @ApiOperation({
+    summary: 'Stream download progress for selected games via SSE',
+    description:
+      'Same as download-selected but streams Server-Sent Events so the client can ' +
+      'track per-file progress in real time. Each event is a JSON object with a `type` ' +
+      'field: "start", "progress", or "done".',
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'SSE stream of download progress events.' })
+  async streamDownloadSelected(
+    @Body() dto: DownloadSelectedGamesDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    for await (const chunk of this.scrapeFacadeService.streamDownloadSelected(dto)) {
+      res.write(chunk);
+    }
+    res.end();
   }
 
   @Post('myrient/download-selected')

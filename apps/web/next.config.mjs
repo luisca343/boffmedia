@@ -12,6 +12,9 @@ const bundleAnalyzer = withBundleAnalyzer({
 const nextConfig = {
     reactStrictMode: false,
     output: "standalone",
+    typescript: {
+        ignoreBuildErrors: true,
+    },
     
     // Production optimizations
     compress: true,
@@ -23,9 +26,6 @@ const nextConfig = {
         optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
     },
     
-    typescript: {
-        "ignoreBuildErrors": true
-    },
     images: {
         remotePatterns: [
             {

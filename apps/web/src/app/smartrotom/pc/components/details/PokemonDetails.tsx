@@ -1,5 +1,4 @@
-import { PCPokemon } from '@/types/dto/pc-pokemon.dto'
-import { PokemonW } from '@boffmedia/shared'
+import { PCPokemon, ExtendedPokemonW } from '@/types/dto/pc-pokemon.dto'
 import { PokemonCard } from './PokemonCard';
 import { PokemonStats } from './PokemonStats';
 import { PokemonTypeEffectiveness } from './PokemonTypeEffectiveness';
@@ -14,7 +13,7 @@ import { motion } from 'framer-motion'
 
 interface PokemonDetailsProps {
   pokemon?: PCPokemon | null;
-  teamPokemon?: PokemonW | null;
+  teamPokemon?: ExtendedPokemonW | null;
   onClose: () => void;
   onNavigatePrevious?: () => void;
   onNavigateNext?: () => void;
@@ -83,7 +82,7 @@ export default function PokemonDetails({
   // Helper to get type color for effectiveness chips
     const isShiny = pokemonData.palette === 'shiny';
     // Calculate HP percentage for team Pokemon
-    const maxHP = pokemonData.stats?.[0] || 0;
+    const maxHP = Number(pokemonData.stats?.[0] || 0);
     const currentHP = isFromTeam ? pokemonData.hp || 0 : maxHP;
     const hpPercentage = maxHP > 0 ? (currentHP / maxHP) * 100 : 0;
     const isFainted = pokemonData.status?.toLowerCase() === 'fainted' || currentHP === 0;

@@ -17,14 +17,14 @@ const Slider = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: {
-      track: "bg-surface-800",
-      range: "bg-primary-300",
-      thumb: "border-primary-300 bg-surface-800 ring-offset-surface-900 focus-visible:ring-primary-300"
+      track: "bg-surface-700/80",
+      range: "bg-gradient-to-r from-primary-600 to-primary-400",
+      thumb: "border-2 border-primary-400 bg-surface-900 ring-offset-surface-900 focus-visible:ring-primary-400 hover:[box-shadow:0_0_10px_2px_rgb(var(--primary-500)/0.45)] hover:scale-110 cursor-grab active:cursor-grabbing active:scale-95"
     },
     wingull: {
       track: "bg-secondary-900",
-      range: "bg-secondary-400",
-      thumb: "border-secondary-400 bg-secondary-950 ring-offset-secondary-950 focus-visible:ring-secondary-300"
+      range: "bg-gradient-to-r from-secondary-500 to-secondary-300",
+      thumb: "border-2 border-secondary-400 bg-secondary-950 ring-offset-secondary-950 focus-visible:ring-secondary-300 hover:scale-110 cursor-grab active:cursor-grabbing"
     }
   }
 
@@ -37,11 +37,11 @@ const Slider = React.forwardRef<
       )}
       {...props}
     >
-      <SliderPrimitive.Track className={cn("relative h-2 w-full grow overflow-hidden rounded-full", variantStyles[variant].track)}>
+      <SliderPrimitive.Track className={cn("relative h-1.5 w-full grow overflow-hidden rounded-full", variantStyles[variant].track)}>
         <SliderPrimitive.Range className={cn("absolute h-full", variantStyles[variant].range)} />
       </SliderPrimitive.Track>
       <SliderPrimitive.Thumb className={cn(
-        "block h-5 w-5 rounded-full border-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        "block h-4 w-4 rounded-full border-2 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
         variantStyles[variant].thumb
       )} />
     </SliderPrimitive.Root>

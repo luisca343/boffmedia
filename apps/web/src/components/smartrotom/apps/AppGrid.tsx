@@ -5,7 +5,7 @@ import { useOrderApps } from "@/hooks/apps/useOrderApps"
 import { useBoffSession } from "@/services/useBoffSession"
 import { SortableContext } from "@dnd-kit/sortable"
 import { DndContext, type DragEndEvent, DragOverlay } from "@dnd-kit/core"
-import { SmartRotomApp } from "@boffmedia/shared"
+import { SmartRotomAppExtended } from "@/types"
 import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import { stablePositionStrategy } from "@/lib/drag-and-drop"
 import { useActiveDragItem, useDndSensors, COLLISION_STRATEGIES, DROP_ANIMATIONS } from '@/lib/dnd-kit-setup'
@@ -17,8 +17,8 @@ const GRID_ROWS = 6
 const TOTAL_SLOTS = GRID_COLS * GRID_ROWS
 
 interface AppGridProps {
-  apps: SmartRotomApp[]
-  setApps: (apps: SmartRotomApp[]) => void
+  apps: SmartRotomAppExtended[]
+  setApps: (apps: SmartRotomAppExtended[]) => void
   className?: string
 }
 
@@ -32,7 +32,7 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
 
   // Create a fixed grid with apps positioned by their order
   const createGridSlots = () => {
-    const slots: (SmartRotomApp | null)[] = new Array(TOTAL_SLOTS).fill(null)
+    const slots: (SmartRotomAppExtended | null)[] = new Array(TOTAL_SLOTS).fill(null)
     
     // Sort apps by their order and place them in the grid
     const sortedApps = [...apps].sort((a, b) => (a.order || 0) - (b.order || 0))

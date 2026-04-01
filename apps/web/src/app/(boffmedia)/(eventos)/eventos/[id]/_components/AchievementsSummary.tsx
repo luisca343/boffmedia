@@ -6,17 +6,26 @@ import { Badge } from "@/components/ui/primitives/badge"
 import { Button } from "@/components/ui/primitives/button"
 import { Progress } from "@/components/ui/primitives/progress"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { Achievement } from "@boffmedia/shared"
 import { UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
 import { InternalLink } from "@/components/ui/navigation/Link"
 
-interface AchievementWithProgress extends Achievement {
+type AchievementWithProgress = {
+  id: number
+  name: string
+  description?: string
+  icon?: string | null
+  points: number
+  rarity?: string | null
+  hidden?: boolean
+  maxProgress?: number
+  category?: string
+  itemType?: "achievement" | "medal"
   userProgress?: UserProgress
   isUnlocked: boolean
   currentProgress: number
-  itemType: "achievement" | "medal"
+  [key: string]: any
 }
 
 interface AchievementsSummaryProps {

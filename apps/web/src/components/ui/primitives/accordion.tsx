@@ -37,10 +37,10 @@ const AccordionItem = React.forwardRef<
   AccordionItemProps
 >(({ className, ...props }, ref) => {
   const variant = useAccordionVariant()
-  
+
   const variantStyles = {
-    default: "border-b border-surface-700 transition-all duration-300 hover:border-opacity-80",
-    wingull: "border-b border-secondary-700 transition-all duration-300 hover:border-opacity-80",
+    default: "border-b border-surface-700/70 transition-all duration-300",
+    wingull: "border-b border-secondary-700 transition-all duration-300",
   }
 
   return (
@@ -58,14 +58,14 @@ const AccordionTrigger = React.forwardRef<
   AccordionTriggerProps
 >(({ className, children, ...props }, ref) => {
   const variant = useAccordionVariant()
-  
+
   const variantStyles = {
-    default: "text-surface-300 hover:text-primary-400",
-    wingull: "text-secondary-300 hover:text-secondary-400",
+    default: "text-surface-300 hover:text-primary-300 data-[state=open]:text-primary-300",
+    wingull: "text-secondary-300 hover:text-secondary-400 data-[state=open]:text-secondary-300",
   }
 
   const chevronStyles = {
-    default: "text-primary-400",
+    default: "text-primary-500",
     wingull: "text-secondary-500",
   }
 
@@ -74,8 +74,7 @@ const AccordionTrigger = React.forwardRef<
       <AccordionPrimitive.Trigger
         ref={ref}
         className={cn(
-          "flex flex-1 items-center justify-between py-4 font-medium transition-all duration-300",
-          "hover:translate-x-1 active:translate-x-0",
+          "flex flex-1 items-center justify-between py-4 font-medium transition-all duration-200",
           "[&[data-state=open]>svg]:rotate-180",
           variantStyles[variant],
           className
@@ -83,12 +82,11 @@ const AccordionTrigger = React.forwardRef<
         {...props}
       >
         {children}
-        <ChevronDown 
+        <ChevronDown
           className={cn(
             "h-4 w-4 shrink-0 transition-transform duration-300 ease-in-out",
-            "[data-state=open]_&:animate-pulse",
             chevronStyles[variant]
-          )} 
+          )}
         />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -101,10 +99,10 @@ const AccordionContent = React.forwardRef<
   AccordionContentProps
 >(({ className, children, ...props }, ref) => {
   const variant = useAccordionVariant()
-  
+
   const variantStyles = {
-    default: "text-surface-300",
-    wingull: "text-secondary-200",
+    default: "text-surface-400",
+    wingull: "text-secondary-300",
   }
 
   return (
@@ -113,14 +111,13 @@ const AccordionContent = React.forwardRef<
       className={cn(
         "overflow-hidden text-sm",
         "data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down",
-        "data-[state=closed]:opacity-0 data-[state=open]:opacity-100",
-        "transition-all duration-500 ease-in-out",
+        "transition-all duration-300 ease-in-out",
         variantStyles[variant],
         className
       )}
       {...props}
     >
-      <div className="pb-4 pt-0 transform transition-transform duration-300 data-[state=open]:translate-y-0 data-[state=closed]:translate-y-2 data-[state=open]:scale-100 data-[state=closed]:scale-95">
+      <div className="pb-4 pt-0 pl-1">
         {children}
       </div>
     </AccordionPrimitive.Content>

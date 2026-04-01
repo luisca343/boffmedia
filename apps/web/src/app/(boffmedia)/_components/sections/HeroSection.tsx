@@ -25,7 +25,7 @@ export async function HeroSection() {
         }}
       />
       <div className="relative h-[105vh] container mx-auto px-4 py-24 sm:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center flex-1">
           <div className="text-center lg:text-left">
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-surface-50">
               {t("hero.title.first")}
@@ -42,7 +42,7 @@ export async function HeroSection() {
                 </Link>
               </Button>
               <Button
-                size="lg"
+                size="default"
                 variant="outline"
                 asChild
               >
@@ -50,7 +50,7 @@ export async function HeroSection() {
               </Button>
             </div>
           </div>
-          <div className="relative hidden lg:block">
+          <div className="relative hidden md:block">
             <Image
               src="/img/boff-full.webp"
               alt={t("hero.image.alt")}

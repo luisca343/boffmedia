@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface VirtualizedListProps {
     items: any[];
     itemHeight: number;
-    renderItem: (item: any, index: number) => JSX.Element;
+    renderItem: (item: any, index: number) => React.JSX.Element;
 }
 
 const VirtualizedList = ({ items, itemHeight, renderItem }: VirtualizedListProps) => {

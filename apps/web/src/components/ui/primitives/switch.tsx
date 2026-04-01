@@ -17,19 +17,19 @@ const Switch = React.forwardRef<
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
     default: {
-      root: "focus-visible:ring-primary-300 focus-visible:ring-offset-surface-900 data-[state=checked]:bg-primary-300 data-[state=unchecked]:bg-surface-700",
-      thumb: "bg-surface-800"
+      root: "focus-visible:ring-primary-400 focus-visible:ring-offset-surface-900 data-[state=checked]:bg-primary-500 data-[state=unchecked]:bg-surface-700 data-[state=checked]:[box-shadow:0_0_12px_-2px_rgb(var(--primary-500)/0.55)]",
+      thumb: "bg-white shadow-md"
     },
     wingull: {
-      root: "focus-visible:ring-secondary-300 focus-visible:ring-offset-secondary-950 data-[state=checked]:bg-secondary-300 data-[state=unchecked]:bg-secondary-700",
-      thumb: "bg-secondary-950"
+      root: "focus-visible:ring-secondary-300 focus-visible:ring-offset-secondary-950 data-[state=checked]:bg-secondary-400 data-[state=unchecked]:bg-secondary-700",
+      thumb: "bg-white shadow-md"
     }
   }
 
   return (
     <SwitchPrimitives.Root
       className={cn(
-        "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
         variantStyles[variant].root,
         className
       )}
@@ -38,7 +38,7 @@ const Switch = React.forwardRef<
     >
       <SwitchPrimitives.Thumb
         className={cn(
-          "pointer-events-none block h-5 w-5 rounded-full shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
+          "pointer-events-none block h-5 w-5 rounded-full ring-0 transition-transform duration-200 data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
           variantStyles[variant].thumb
         )}
       />

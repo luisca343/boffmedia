@@ -1,4 +1,5 @@
 import { PokemonW } from "@boffmedia/shared"
+import { ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
 import { PokemonImage } from '@/lib/PokemonImage'
 import { createPokemonSpecFromTeam } from "../../utils/pokemonUtils"
 import { PiStarFill, PiSkullFill, PiPlus } from "react-icons/pi"
@@ -40,7 +41,7 @@ export function BattleTeamSlot({
 }: {
   id?: string
   teamId: string
-  pokemon: PokemonW | null
+  pokemon: ExtendedPokemonW | null
   index: number
   onClick: (e?: React.MouseEvent) => void
   showPositionIndicator?: boolean
@@ -213,7 +214,7 @@ export function BattleTeamSlot({
               </div>
 
               {/* Status indicator */}
-              {pokemon.status !== 'none' && (
+              {pokemon.status && pokemon.status !== 'none' && (
                 <div className={getStatusIndicatorClasses(pokemon.status)}>
                   {getStatusIcon(pokemon.status)}
                   <span className={`text-[10px] font-medium ${getStatusColor(pokemon.status).replace('border-', 'text-')}`}>

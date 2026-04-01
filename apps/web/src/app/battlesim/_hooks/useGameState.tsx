@@ -14,7 +14,7 @@ interface BattleStore {
 }
 
 const useBattleStore = create<BattleStore>((set) => ({
-    battle: new Battle(new Generations(Dex as any)),
+    battle: new Battle(new Generations(Dex as any) as any),
     setBattle: (battle: Battle) => set({ battle }),
 }));
 

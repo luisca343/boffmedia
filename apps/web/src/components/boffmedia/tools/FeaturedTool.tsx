@@ -35,7 +35,7 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
       variants={variants}
       className="mb-16"
     >
-      <Card className="bg-gradient-to-br from-surface-800/90 to-surface-900/90 border-surface-700/50 overflow-hidden backdrop-blur-sm shadow-2xl hover:shadow-yellow-500/10 transition-all duration-500">
+      <Card className="bg-gradient-to-br from-surface-800/90 to-surface-900/90 border-surface-700/50 overflow-hidden backdrop-blur-sm shadow-2xl hover:shadow-primary-950/30 transition-all duration-500">
         <div className={`h-3 bg-gradient-to-r ${tool.color}`}></div>
         <div className="lg:flex">
           <div className="lg:w-2/3 p-6 lg:p-8">
@@ -59,7 +59,7 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
                     {tool.title}
                   </h2>
                   {tool.isNew && (
-                    <Badge className="bg-gradient-to-r from-highlight-500 to-highlight-600 text-white shadow-lg">
+                    <Badge variant="success">
                       <Sparkles className="w-3 h-3 mr-1" />
                       Nuevo
                     </Badge>
@@ -75,10 +75,10 @@ export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
             
             <div className="flex flex-wrap gap-3 mb-8">
               {tool.tools.map((toolName: string) => (
-                <Badge 
-                  key={toolName} 
+                <Badge
+                  key={toolName}
                   variant="secondary"
-                  className="bg-surface-700/50 text-primary-300 border-primary-500/20 text-sm py-2 px-4"
+                  className="text-sm py-1.5 px-4"
                 >
                   {toolName}
                 </Badge>

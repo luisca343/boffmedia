@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Users, Minus, Trophy, Search, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";

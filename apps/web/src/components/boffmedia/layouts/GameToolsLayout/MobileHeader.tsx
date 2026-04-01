@@ -14,7 +14,9 @@ export const MobileHeader: React.FC<MobileHeaderProps> = ({ gameConfig, onMenuCl
   const t = useTranslations();
   
   return (
-    <div className="md:hidden fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 bg-surface-800 border-b border-surface-700 z-10">
+    <div className="md:hidden fixed top-0 left-0 right-0 h-16 flex items-center justify-between px-4 bg-surface-900/95 backdrop-blur-md border-b border-surface-700/60 z-10">
+      {/* Bottom accent line */}
+      <div className="absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-primary-500/40 to-transparent" />
       <div className="flex items-center">
         {gameConfig.icon ? (
           <Image

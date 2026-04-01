@@ -57,7 +57,7 @@ export function ShareDocumentDialog({ document }: ShareDocumentDialogProps) {
       })
 
       console.log("Chat created or retrieved:", chatResult)
-      const chatId = chatResult.data
+      const chatId = chatResult.data?.chatId
 
       if (!chatId) {
         toast.error("Error al crear el chat")

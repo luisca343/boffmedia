@@ -21,7 +21,7 @@ export default function Pasaporte(){
   const [book, setBook] = useState<PageFlip>({ getPageCount: () => 0 })  
   const { session } = useBoffSession();
   const uuid = session?.user.smartRotomUser?.uuid as string
-  const username = session?.user.smartRotomUser?.name as string
+  const username = session?.user.smartRotomUser?.username as string
 
   const {playerStats} = useGetPlayerStats(uuid)
   const {playerTeam } = useGetPlayerTeam(uuid)

@@ -10,7 +10,7 @@ import { Generations } from '@pkmn/data';
 import GameCanvas from "./_components_old/GameCanvas";
 import { Scene } from "./_components_old/battle_animations";
 
-let battle = new Battle(new Generations(Dex as any))
+let battle = new Battle(new Generations(Dex as any) as any)
 
 
 

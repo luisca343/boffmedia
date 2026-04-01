@@ -50,7 +50,7 @@ export function useBattleFlow(
 
   const handleTurnChange = () => {
     const lines = battleLog ? battleLog.split('\n') : [];
-    const currBattle = new Battle(new Generations(Dex as any));
+    const currBattle = new Battle(new Generations(Dex as any) as any);
     
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
@@ -109,7 +109,7 @@ export function useBattleFlow(
 
   const resetBattle = (currBattle: Battle, turn: number) => {
     // Create a completely new battle instance
-    const freshBattle = new Battle(new Generations(Dex as any));
+    const freshBattle = new Battle(new Generations(Dex as any) as any);
     
     // Set turn to 0
     freshBattle.setTurn(turn);
@@ -320,7 +320,7 @@ export function useBattleFlow(
 }
 
 function copyBattle(battle: Battle) {
-  const newBattle = new Battle(new Generations(Dex as any));
+  const newBattle = new Battle(new Generations(Dex as any) as any);
   Object.assign(newBattle, battle);
   return newBattle;
 }

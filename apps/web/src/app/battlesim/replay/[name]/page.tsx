@@ -4,9 +4,9 @@ import { Dex } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
 import { Game } from '../_components/Game';
 
-const battle = new Battle(new Generations(Dex as any)); // Use const if battle is not reassigned
+const battle = new Battle(new Generations(Dex as any) as any); // Use const if battle is not reassigned
 
-export default function Test({params} : {params: {name: string}}): JSX.Element { // Explicitly type the return value
+export default function Test({params} : {params: {name: string}}): React.JSX.Element { // Explicitly type the return value
 
   return (
     <section className="flex flex-col">

@@ -24,8 +24,8 @@ interface BaseSpinnerResult<T> {
   isSpinning: boolean;
   spinComplete: boolean;
   winnerIndex: number | null;
-  spinnerRef: React.RefObject<HTMLDivElement>;
-  itemsContainerRef: React.RefObject<HTMLDivElement>;
+  spinnerRef: React.RefObject<HTMLDivElement | null>;
+  itemsContainerRef: React.RefObject<HTMLDivElement | null>;
   ITEM_WIDTH: number;
 }
 
@@ -144,7 +144,7 @@ export function useBaseSpinnerAnimation<T>({
 const startScrollingAnimation = (finalPosition: number) => {
   setIsSpinning(true);
   
-  const TOTAL_DURATION = 6500;
+  const TOTAL_DURATION = 8000;
   const FIRST_PHASE_DURATION = 0.3;
   
   targetPosition.current = finalPosition;
@@ -201,15 +201,23 @@ const startScrollingAnimation = (finalPosition: number) => {
       playTickForPosition(newPosition, progress);
       lastPosition = newPosition;
     }
-    
+
+    if (itemsContainerRef.current) {
+      const blurPx = progress < FIRST_PHASE_DURATION
+        ? Math.round((1 - progress / FIRST_PHASE_DURATION) * 3)
+        : 0;
+      itemsContainerRef.current.style.filter = blurPx > 0 ? `blur(${blurPx}px)` : '';
+    }
+
     // Continue or finish animation
     if (progress < 1) {
       animationRef.current = requestAnimationFrame(animate);
     } else {
       setScrollPosition(finalPosition);
+      if (itemsContainerRef.current) itemsContainerRef.current.style.filter = '';
       setIsSpinning(false);
       setSpinComplete(true);
-      
+
       winSound.play();
       
       setTimeout(() => {
