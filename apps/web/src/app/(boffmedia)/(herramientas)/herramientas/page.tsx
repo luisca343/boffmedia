@@ -113,15 +113,34 @@ function GameCard({ game, index }: { game: typeof GAME_TOOLS[number]; index: num
       onClick={() => router.push(game.href)}
     >
       <div
-        className={`relative h-full bg-surface-900/60 border ${game.border} ${game.hoverBorder} backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500`}
+        className={`relative h-full border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500`}
         style={{
+          background: isHovered
+            ? "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))"
+            : "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.90))",
+          borderColor: isHovered ? game.scanLine.replace("0.7", "0.5") : "rgba(71,85,105,0.65)",
           boxShadow: isHovered
-            ? `0 0 40px ${game.glowColor}, 0 20px 60px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.2)`
-            : "0 4px 20px rgba(0,0,0,0.3)",
+            ? `0 0 45px ${game.glowColor}, 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+            : `0 6px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03), 0 0 0 1px rgba(255,255,255,0.02)`,
         }}
       >
-        {/* Top neon bar */}
-        <div className={`h-0.5 bg-gradient-to-r ${game.topBar} transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-60"}`} />
+        {/* Top neon bar — thicker and always visible */}
+        <div
+          className={`h-[3px] bg-gradient-to-r ${game.topBar} transition-all duration-300`}
+          style={{
+            opacity: isHovered ? 1 : 0.8,
+            boxShadow: isHovered ? `0 0 12px ${game.glowColor}` : "none",
+          }}
+        />
+
+        {/* Ambient inner tint — always on */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+          style={{
+            background: `radial-gradient(ellipse at 50% 0%, ${game.glowColor.replace("0.25", "0.18")} 0%, transparent 65%)`,
+            opacity: isHovered ? 1 : 0.65,
+          }}
+        />
 
         {/* Animated scan line */}
         {isHovered && (
@@ -140,22 +159,22 @@ function GameCard({ game, index }: { game: typeof GAME_TOOLS[number]; index: num
           style={{ opacity: isHovered ? 1 : 0 }}
         />
 
-        {/* Corner bracket decorations */}
+        {/* Corner brackets — always visible */}
         <div
           className="absolute top-3 left-3 w-4 h-4 border-t border-l transition-all duration-300 pointer-events-none"
-          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.55)" }}
         />
         <div
           className="absolute top-3 right-3 w-4 h-4 border-t border-r transition-all duration-300 pointer-events-none"
-          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.55)" }}
         />
         <div
           className="absolute bottom-3 left-3 w-4 h-4 border-b border-l transition-all duration-300 pointer-events-none"
-          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.55)" }}
         />
         <div
           className="absolute bottom-3 right-3 w-4 h-4 border-b border-r transition-all duration-300 pointer-events-none"
-          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.55)" }}
         />
 
         {/* Content */}
@@ -231,7 +250,7 @@ function GameCard({ game, index }: { game: typeof GAME_TOOLS[number]; index: num
         {/* Bottom glow line */}
         <div
           className={`h-px bg-gradient-to-r ${game.topBar} transition-opacity duration-500`}
-          style={{ opacity: isHovered ? 0.35 : 0 }}
+          style={{ opacity: isHovered ? 0.5 : 0.2 }}
         />
       </div>
     </motion.div>
@@ -271,13 +290,13 @@ export default function ToolsLandingPage() {
             loop
             muted
             playsInline
-            className="absolute w-full h-full object-cover opacity-30"
+            className="absolute w-full h-full object-cover"
           >
             <source src="/uploads/looptest.mp4" type="video/mp4" />
           </video>
 
           {/* Dark gradient */}
-          <div className="absolute inset-0 bg-gradient-to-b from-surface-950/65 via-surface-950/75 to-surface-950/95" />
+          <div className="absolute inset-0 bg-gradient-to-b from-surface-950/60 via-surface-950/75 to-surface-950/90" />
 
           {/* Scanlines */}
           <div
