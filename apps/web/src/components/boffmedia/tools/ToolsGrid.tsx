@@ -1,108 +1,220 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ChevronRight, TrendingUp } from "lucide-react";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/primitives/card";
-import { Button } from "@/components/ui/primitives/button";
-import { Badge } from "@/components/ui/primitives/badge";
+import { ChevronRight, Cpu, Gamepad2, Sparkles } from "lucide-react";
 
 interface ToolsGridProps {
   tools: any[];
-  variants: any;
-  itemVariants: any;
   t: (key: string, params?: any) => string;
 }
 
-export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) {
+function getNeonStyle(colorClass: string) {
+  if (colorClass.includes("yellow"))
+    return { glow: "rgba(250,204,21,0.25)", scan: "rgba(250,204,21,0.7)", border: "rgba(250,204,21,0.35)" };
+  if (colorClass.includes("highlight"))
+    return { glow: "rgba(132,204,22,0.25)", scan: "rgba(163,230,53,0.7)", border: "rgba(132,204,22,0.35)" };
+  if (colorClass.includes("secondary"))
+    return { glow: "rgba(6,182,212,0.25)", scan: "rgba(34,211,238,0.7)", border: "rgba(6,182,212,0.35)" };
+  if (colorClass.includes("red"))
+    return { glow: "rgba(239,68,68,0.25)", scan: "rgba(248,113,113,0.7)", border: "rgba(239,68,68,0.35)" };
+  if (colorClass.includes("accent"))
+    return { glow: "rgba(168,85,247,0.25)", scan: "rgba(192,132,252,0.7)", border: "rgba(168,85,247,0.35)" };
+  return { glow: "rgba(249,115,22,0.25)", scan: "rgba(251,146,60,0.7)", border: "rgba(249,115,22,0.35)" };
+}
+
+function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: string, params?: any) => string }) {
   const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
+  const [scanY, setScanY] = useState(0);
+
+  useEffect(() => {
+    if (!isHovered) return;
+    let raf: number;
+    let start: number | null = null;
+    const duration = 1400;
+
+    const animate = (ts: number) => {
+      if (!start) start = ts;
+      const elapsed = (ts - start) % duration;
+      setScanY((elapsed / duration) * 100);
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [isHovered]);
+
+  const neon = getNeonStyle(tool.color);
+  const featureList: string[] = tool.tools ?? tool.features ?? [];
+  const totalCount = featureList.length;
 
   return (
-    <motion.div 
-      className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6"
-      variants={variants}
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: index * 0.1, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className="cursor-pointer"
+      onClick={() => router.push(tool.href)}
     >
-      {tools.map((tool, index) => (
-        <motion.div
-          key={tool.title}
-          variants={itemVariants}
-          whileHover={{ y: -8, scale: 1.02 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        >
-          <Card
-            className="backdrop-blur-sm cursor-pointer h-full flex flex-col overflow-hidden group"
-            onClick={() => router.push(tool.href)}
-          >
-            <div className={`h-1.5 bg-gradient-to-r ${tool.color}`}></div>
-            
-            <CardHeader className="pb-3">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-surface-700/50 border border-surface-600/30 group-hover:scale-110 transition-transform duration-300">
-                  {tool.icon ? (
-                    <Image 
-                      src={tool.icon} 
-                      alt={tool.title} 
-                      width={40} 
-                      height={40} 
-                      className="object-cover"
-                    />
-                  ) : (
-                    tool.iconFallback
-                  )}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <CardTitle className="text-xl text-surface-50 group-hover:text-primary-300 transition-colors">
-                      {tool.title}
-                    </CardTitle>
-                    {tool.isNew && (
-                      <Badge variant="success" className="text-[10px]">
-                        Nuevo
-                      </Badge>
-                    )}
-                  </div>
-                  <CardDescription className="text-surface-300">
-                    {tool.description}
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="flex-grow">
-              <div className="flex flex-wrap gap-2">
-                {tool.tools.map((toolName: string) => (
-                  <Badge
-                    key={toolName}
-                    variant="outline"
-                    className="text-[11px]"
+      <div
+        className="relative h-full bg-surface-900/60 border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500 flex flex-col"
+        style={{
+          borderColor: isHovered ? neon.border : "rgba(51,65,85,0.55)",
+          boxShadow: isHovered
+            ? `0 0 40px ${neon.glow}, 0 20px 50px rgba(0,0,0,0.4)`
+            : "0 4px 20px rgba(0,0,0,0.3)",
+        }}
+      >
+        {/* Top neon bar */}
+        <div
+          className={`h-0.5 bg-gradient-to-r ${tool.color} flex-shrink-0 transition-opacity duration-300`}
+          style={{ opacity: isHovered ? 1 : 0.6 }}
+        />
+
+        {/* Scan line */}
+        {isHovered && (
+          <div
+            className="absolute inset-x-0 h-px pointer-events-none z-20"
+            style={{
+              top: `${scanY}%`,
+              background: `linear-gradient(90deg, transparent, ${neon.scan}, transparent)`,
+            }}
+          />
+        )}
+
+        {/* Corner brackets */}
+        {(
+          [
+            "absolute top-3 left-3 w-4 h-4 border-t border-l",
+            "absolute top-3 right-3 w-4 h-4 border-t border-r",
+            "absolute bottom-3 left-3 w-4 h-4 border-b border-l",
+            "absolute bottom-3 right-3 w-4 h-4 border-b border-r",
+          ] as const
+        ).map((cls, i) => (
+          <div
+            key={i}
+            className={`${cls} transition-all duration-300 pointer-events-none`}
+            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.35)" }}
+          />
+        ))}
+
+        {/* Content */}
+        <div className="relative z-10 p-6 flex flex-col flex-1">
+          {/* Header */}
+          <div className="flex items-start gap-4 mb-5">
+            <div
+              className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-950/60 border flex items-center justify-center transition-transform duration-300"
+              style={{
+                borderColor: isHovered ? neon.border : "rgba(51,65,85,0.5)",
+                transform: isHovered ? "scale(1.08)" : "scale(1)",
+              }}
+            >
+              {tool.icon ? (
+                <Image src={tool.icon} alt={tool.title} width={40} height={40} className="object-contain" />
+              ) : tool.iconFallback ? (
+                tool.iconFallback
+              ) : (
+                <Gamepad2 className="w-7 h-7 text-surface-500" />
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h3
+                  className="text-lg font-black text-surface-50 leading-tight transition-colors duration-300 truncate"
+                  style={{
+                    fontFamily: "Orbitron, sans-serif",
+                    color: isHovered ? "rgb(253,186,116)" : "rgb(248,250,252)",
+                  }}
+                >
+                  {tool.title}
+                </h3>
+                {tool.isNew && (
+                  <span
+                    className="flex items-center gap-1 text-[10px] font-mono px-1.5 py-0.5 rounded border border-success-500/40 text-success-400 bg-success-500/10 tracking-widest flex-shrink-0"
+                    style={{ fontFamily: "Orbitron, sans-serif" }}
                   >
-                    {toolName}
-                  </Badge>
-                ))}
+                    <Sparkles className="w-2 h-2" />
+                    NEW
+                  </span>
+                )}
               </div>
-              
-              <div className="mt-4 flex items-center justify-between text-xs text-surface-400">
-                <span className="flex items-center">
-                  <TrendingUp className="w-3 h-3 mr-1" />
-                  Popularidad: {tool.popularity === 'high' ? 'Alta' : 'Media'}
-                </span>
+              <p className="text-xs text-surface-500 leading-relaxed line-clamp-2">{tool.description}</p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent mb-4" />
+
+          {/* Feature list */}
+          <div className="space-y-1.5 flex-1 mb-5">
+            {featureList.map((name: string) => (
+              <div key={name} className="flex items-center gap-2">
+                <span
+                  className="w-1 h-1 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: neon.scan }}
+                />
+                <span className="text-xs text-surface-400">{name}</span>
               </div>
-            </CardContent>
-            
-            <CardFooter className="border-t border-surface-700/50 pt-4">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-primary-400 hover:text-primary-300 hover:bg-primary-500/10 p-0 ml-auto group-hover:translate-x-1 transition-all duration-300"
-              >
-                {t("explore")} 
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Button>
-            </CardFooter>
-          </Card>
-        </motion.div>
-      ))}
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-4 border-t border-surface-800/50">
+            <div className="flex items-center gap-1.5">
+              <Cpu className="w-3 h-3 text-surface-600" />
+              <span className="text-xs font-mono text-surface-600 tracking-widest">
+                {String(totalCount).padStart(2, "0")} TOOLS
+              </span>
+            </div>
+            <motion.span
+              className="flex items-center gap-1 text-xs font-mono font-bold tracking-widest uppercase"
+              style={{
+                fontFamily: "Orbitron, sans-serif",
+                color: neon.scan,
+              }}
+              animate={{ x: isHovered ? 3 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              {t("explore")}
+              <ChevronRight className="w-3.5 h-3.5" />
+            </motion.span>
+          </div>
+        </div>
+
+        {/* Bottom line */}
+        <div
+          className={`h-px bg-gradient-to-r ${tool.color} flex-shrink-0 transition-opacity duration-500`}
+          style={{ opacity: isHovered ? 0.3 : 0 }}
+        />
+      </div>
     </motion.div>
+  );
+}
+
+export function ToolsGrid({ tools, t }: ToolsGridProps) {
+  return (
+    <div className="mb-12">
+      {/* Section label */}
+      <div className="flex items-center gap-3 mb-6">
+        <span
+          className="text-xs font-mono text-surface-500 tracking-[0.35em] uppercase"
+          style={{ fontFamily: "Orbitron, sans-serif" }}
+        >
+          // Más herramientas
+        </span>
+        <div className="h-px flex-1 bg-gradient-to-r from-surface-700/50 to-transparent" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
+        {tools.map((tool, index) => (
+          <ToolCard key={tool.title} tool={tool} index={index} t={t} />
+        ))}
+      </div>
+    </div>
   );
 }
