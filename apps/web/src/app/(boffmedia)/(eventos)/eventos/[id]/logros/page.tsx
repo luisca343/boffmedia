@@ -216,7 +216,7 @@ export default function EventAchievementsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="flex flex-col items-center justify-center py-32">
             <div className="relative">
@@ -235,7 +235,7 @@ export default function EventAchievementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <div className="min-h-screen">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-accent-500/10 rounded-full blur-3xl animate-pulse"></div>

@@ -69,7 +69,7 @@ export default function SuggestEventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute top-20 left-10 w-72 h-72 bg-accent-500/10 rounded-full blur-3xl animate-pulse"></div>

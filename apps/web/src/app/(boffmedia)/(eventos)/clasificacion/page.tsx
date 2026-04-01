@@ -63,7 +63,7 @@ export default function FullLeaderboardComponent() {
 
   if (error)
     return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
             <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -98,7 +98,7 @@ export default function FullLeaderboardComponent() {
     )
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <div className="min-h-screen">
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
         <SectionHeader 
           title="Clasificación Global"
