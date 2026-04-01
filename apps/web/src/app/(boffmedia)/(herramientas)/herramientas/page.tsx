@@ -2,80 +2,268 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/primitives/card";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
-import { Search, Gamepad2, ChevronRight, BarChart } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, Gamepad2, ChevronRight, Zap, Cpu, Terminal } from "lucide-react";
 import Image from "next/image";
 
-export default function ToolsLandingPage() {
+const GAME_TOOLS = [
+  {
+    id: "pokemon",
+    title: "Pokémon",
+    description: "Calculadoras, generadores y bases de datos",
+    icon: "/img/games/pokemon/icon.webp",
+    tools: [
+      { name: "TCGPocket", count: 3 },
+      { name: "Pokémon Mundo Misterioso", count: 1 },
+      { name: "Pokedex", count: 1 },
+    ],
+    href: "/pokemon",
+    tag: "ESTRATEGIA",
+    topBar: "from-yellow-400 via-primary-500 to-red-500",
+    border: "border-primary-500/30",
+    hoverBorder: "hover:border-primary-500/70",
+    bgHover: "from-yellow-400/10 via-primary-500/5 to-red-500/10",
+    accent: "text-primary-400",
+    dotBg: "bg-primary-400",
+    countBorder: "border-primary-700/50",
+    countText: "text-primary-400",
+    scanLine: "rgba(251,146,60,0.7)",
+    glowColor: "rgba(249,115,22,0.25)",
+  },
+  {
+    id: "mhwilds",
+    title: "Monster Hunter Wilds",
+    description: "Planificadores y generadores de builds",
+    icon: "/img/games/mhwilds/icon.webp",
+    tools: [
+      { name: "Builds", count: 1 },
+    ],
+    href: "/mhwilds",
+    tag: "ACCIÓN RPG",
+    topBar: "from-highlight-400 via-highlight-500 to-highlight-600",
+    border: "border-highlight-500/30",
+    hoverBorder: "hover:border-highlight-500/70",
+    bgHover: "from-highlight-400/10 via-highlight-500/5 to-highlight-600/10",
+    accent: "text-highlight-400",
+    dotBg: "bg-highlight-400",
+    countBorder: "border-highlight-700/50",
+    countText: "text-highlight-400",
+    scanLine: "rgba(163,230,53,0.7)",
+    glowColor: "rgba(132,204,22,0.25)",
+  },
+  {
+    id: "otros",
+    title: "Otros",
+    description: "Herramientas generales y recursos",
+    icon: "/img/games/other/icon.webp",
+    tools: [
+      { name: "Sorteos", count: 1 },
+      { name: "Claves de Steam", count: 1 },
+    ],
+    href: "/otros",
+    tag: "UTILIDADES",
+    topBar: "from-secondary-400 via-secondary-500 to-secondary-600",
+    border: "border-secondary-500/30",
+    hoverBorder: "hover:border-secondary-500/70",
+    bgHover: "from-secondary-400/10 via-secondary-500/5 to-secondary-600/10",
+    accent: "text-secondary-400",
+    dotBg: "bg-secondary-400",
+    countBorder: "border-secondary-700/50",
+    countText: "text-secondary-400",
+    scanLine: "rgba(34,211,238,0.7)",
+    glowColor: "rgba(6,182,212,0.25)",
+  },
+];
+
+function GameCard({ game, index }: { game: typeof GAME_TOOLS[number]; index: number }) {
   const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
+  const [scanY, setScanY] = useState(0);
+
+  useEffect(() => {
+    if (!isHovered) return;
+    let raf: number;
+    let start: number | null = null;
+    const duration = 1400;
+
+    const animate = (ts: number) => {
+      if (!start) start = ts;
+      const elapsed = (ts - start) % duration;
+      setScanY((elapsed / duration) * 100);
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [isHovered]);
+
+  const totalCount = game.tools.reduce((a, t) => a + t.count, 0);
+
+  return (
+    <motion.div
+      key={game.id}
+      layout
+      initial={{ opacity: 0, y: 40, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.92 }}
+      transition={{ delay: index * 0.12, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -8 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className="group cursor-pointer"
+      onClick={() => router.push(game.href)}
+    >
+      <div
+        className={`relative h-full bg-surface-900/60 border ${game.border} ${game.hoverBorder} backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500`}
+        style={{
+          boxShadow: isHovered
+            ? `0 0 40px ${game.glowColor}, 0 20px 60px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.2)`
+            : "0 4px 20px rgba(0,0,0,0.3)",
+        }}
+      >
+        {/* Top neon bar */}
+        <div className={`h-0.5 bg-gradient-to-r ${game.topBar} transition-opacity duration-300 ${isHovered ? "opacity-100" : "opacity-60"}`} />
+
+        {/* Animated scan line */}
+        {isHovered && (
+          <div
+            className="absolute inset-x-0 h-px pointer-events-none z-20 transition-none"
+            style={{
+              top: `${scanY}%`,
+              background: `linear-gradient(90deg, transparent, ${game.scanLine}, transparent)`,
+            }}
+          />
+        )}
+
+        {/* Background glow on hover */}
+        <div
+          className={`absolute inset-0 bg-gradient-to-br ${game.bgHover} transition-opacity duration-500 pointer-events-none`}
+          style={{ opacity: isHovered ? 1 : 0 }}
+        />
+
+        {/* Corner bracket decorations */}
+        <div
+          className="absolute top-3 left-3 w-4 h-4 border-t border-l transition-all duration-300 pointer-events-none"
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+        />
+        <div
+          className="absolute top-3 right-3 w-4 h-4 border-t border-r transition-all duration-300 pointer-events-none"
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+        />
+        <div
+          className="absolute bottom-3 left-3 w-4 h-4 border-b border-l transition-all duration-300 pointer-events-none"
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+        />
+        <div
+          className="absolute bottom-3 right-3 w-4 h-4 border-b border-r transition-all duration-300 pointer-events-none"
+          style={{ borderColor: isHovered ? game.scanLine : "rgba(100,116,139,0.4)" }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 p-6 flex flex-col h-full">
+          {/* Header */}
+          <div className="flex items-start gap-4 mb-5">
+            {/* Game icon */}
+            <div
+              className={`w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border ${game.border} bg-surface-950/60 flex items-center justify-center transition-transform duration-300`}
+              style={{ transform: isHovered ? "scale(1.08)" : "scale(1)" }}
+            >
+              {game.icon ? (
+                <Image src={game.icon} alt={game.title} width={48} height={48} className="object-contain" />
+              ) : (
+                <Gamepad2 className="w-8 h-8 text-surface-500" />
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <span className={`text-xs font-mono tracking-[0.3em] ${game.accent} opacity-60 uppercase`}>
+                // {game.tag}
+              </span>
+              <h3
+                className={`text-xl font-black text-surface-50 leading-tight mt-0.5 transition-colors duration-300 ${isHovered ? game.accent : ""}`}
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
+                {game.title}
+              </h3>
+              <p className="text-xs text-surface-500 mt-1">{game.description}</p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent mb-4" />
+
+          {/* Tool list */}
+          <div className="space-y-2 flex-1 mb-5">
+            {game.tools.map((tool) => (
+              <div key={tool.name} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className={`w-1.5 h-1.5 rounded-full ${game.dotBg} opacity-70 flex-shrink-0`} />
+                  <span className="text-sm text-surface-300">{tool.name}</span>
+                </div>
+                <span
+                  className={`text-xs font-mono px-2 py-0.5 rounded border ${game.countBorder} bg-surface-950/50 ${game.countText}`}
+                >
+                  {String(tool.count).padStart(2, "0")}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div className="flex items-center justify-between pt-4 border-t border-surface-800/50">
+            <div className="flex items-center gap-1.5">
+              <Cpu className="w-3 h-3 text-surface-600" />
+              <span className="text-xs font-mono text-surface-600 tracking-widest">
+                {String(totalCount).padStart(2, "0")} TOOLS
+              </span>
+            </div>
+            <motion.span
+              className={`flex items-center gap-1 text-xs font-mono font-bold tracking-widest ${game.accent} uppercase`}
+              style={{ fontFamily: "Orbitron, sans-serif" }}
+              animate={{ x: isHovered ? 3 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              ACCEDER
+              <ChevronRight className="w-3.5 h-3.5" />
+            </motion.span>
+          </div>
+        </div>
+
+        {/* Bottom glow line */}
+        <div
+          className={`h-px bg-gradient-to-r ${game.topBar} transition-opacity duration-500`}
+          style={{ opacity: isHovered ? 0.35 : 0 }}
+        />
+      </div>
+    </motion.div>
+  );
+}
+
+export default function ToolsLandingPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  // Handle mounting to avoid hydration issues with video
+  const [searchFocused, setSearchFocused] = useState(false);
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const gameTools = [
-    {
-      title: "Pokémon",
-      description: "Calculadoras, generadores y bases de datos",
-      icon: "/img/games/pokemon/icon.webp",
-      tools: [
-        { name: "TCGPocket", count: 3 },
-        { name: "Pokémon Mundo Misterioso", count: 1 },
-        { name: "Pokedex", count: 1 },
-      ],
-      href: "/pokemon",
-      color: "from-yellow-400 to-red-500",
-      gradient: "bg-gradient-to-br from-yellow-400/20 to-red-500/20",
-      borderGlow: "shadow-yellow-500/50",
-    },
-    {
-      title: "Monster Hunter Wilds",
-      description: "Planificadores y generadores de builds",
-      icon: "/img/games/mhwilds/icon.webp",
-      tools: [
-        { name: "Builds", count: 1 },
-      ],
-      href: "/mhwilds",
-      color: "from-highlight-400 to-highlight-600",
-      gradient: "bg-gradient-to-br from-highlight-400/20 to-highlight-600/20",
-      borderGlow: "shadow-highlight-500/50",
-    },
-    {
-      title: "Otros",
-      description: "Herramientas generales y recursos",
-      icon: "/img/games/other/icon.webp",
-      tools: [
-        { name: "Sorteos", count: 1 },
-        { name: "Claves de Steam", count: 1 },
-      ],
-      href: "/otros",
-      color: "from-secondary-400 to-secondary-600",
-      gradient: "bg-gradient-to-br from-secondary-400/20 to-secondary-600/20",
-      borderGlow: "shadow-secondary-500/50",
-    }
-  ];
-
-  const filteredTools = gameTools.filter(game =>
-    game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    game.tools.some(tool => tool.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredTools = GAME_TOOLS.filter(
+    (game) =>
+      game.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      game.tools.some((tool) =>
+        tool.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
   );
 
+  const totalTools = GAME_TOOLS.reduce(
+    (acc, game) => acc + game.tools.reduce((a, t) => a + t.count, 0),
+    0
+  );
+  const totalCategories = GAME_TOOLS.reduce((acc, g) => acc + g.tools.length, 0);
+
   return (
-    <div className="relative min-h-screen">
-      {/* Background video with enhanced overlay */}
+    <div className="relative min-h-screen bg-surface-950">
+      {/* ── Video + overlays ───────────────────────────────── */}
       {isMounted && (
         <div className="fixed inset-0 z-0 overflow-hidden">
           <video
@@ -83,153 +271,198 @@ export default function ToolsLandingPage() {
             loop
             muted
             playsInline
-            className="absolute w-full h-full object-cover"
+            className="absolute w-full h-full object-cover opacity-30"
           >
             <source src="/uploads/looptest.mp4" type="video/mp4" />
-            Your browser does not support the video tag.
           </video>
-          {/* Enhanced overlay with gaming feel */}
-          <div className="absolute inset-0 bg-gradient-to-b from-surface-900/80 via-surface-900/85 to-surface-900/90"></div>
-          <div className="absolute inset-0 bg-gradient-to-r from-primary-900/20 to-transparent"></div>
+
+          {/* Dark gradient */}
+          <div className="absolute inset-0 bg-gradient-to-b from-surface-950/65 via-surface-950/75 to-surface-950/95" />
+
+          {/* Scanlines */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)",
+            }}
+          />
         </div>
       )}
 
-      {/* Content */}
+      {/* ── Content ───────────────────────────────────────── */}
       <div className="relative z-10">
-        {/* Hero Section */}
-        <div className="container mx-auto px-4 pt-16 pb-8">
-          <motion.div 
-            className="text-center mb-12"
+        {/* Hero */}
+        <div className="container mx-auto px-4 pt-6 pb-12">
+
+          {/* Main title */}
+          <motion.div
+            className="text-center mb-6"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-6 text-surface-50">
-              Herramientas para{" "}
-              <span className="bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 bg-clip-text text-transparent">
-                Videojuegos
-              </span>
-            </h1>
-            
-            <p className="text-xl text-surface-200 max-w-3xl mx-auto leading-relaxed mb-8">
-              Recursos útiles para mejorar tu experiencia de juego. 
-              Todo lo que necesitas para tus juegos favoritos, creado por y para la comunidad gaming.
-            </p>
-
-            {/* Search Bar */}
-            <motion.div 
-              className="max-w-md mx-auto mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
+            <p
+              className="text-sm tracking-[0.6em] text-surface-400 uppercase mb-4"
+              style={{ fontFamily: "Orbitron, sans-serif" }}
             >
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 h-5 w-5" />
-                <Input
-                  placeholder="Buscar herramientas..."
+              Herramientas para
+            </p>
+            <h1
+              className="text-6xl sm:text-8xl font-black leading-none tracking-tight"
+              style={{
+                fontFamily: "Orbitron, sans-serif",
+                background: "linear-gradient(135deg, #fde68a 0%, #fb923c 40%, #f97316 70%, #ea580c 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                filter: "drop-shadow(0 0 40px rgba(249,115,22,0.35))",
+              }}
+            >
+              VIDEOJUEGOS
+            </h1>
+          </motion.div>
+
+          {/* Accent divider */}
+          <motion.div
+            className="flex items-center justify-center gap-4 mb-8"
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={{ scaleX: 1, opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.45 }}
+          >
+            <div className="h-px flex-1 max-w-36 bg-gradient-to-r from-transparent to-primary-500/40" />
+            <Zap className="w-4 h-4 text-primary-400" style={{ filter: "drop-shadow(0 0 8px rgba(249,115,22,0.6))" }} />
+            <div className="h-px flex-1 max-w-36 bg-gradient-to-l from-transparent to-primary-500/40" />
+          </motion.div>
+
+          {/* Subtitle */}
+          <motion.p
+            className="text-center text-surface-400 max-w-xl mx-auto text-sm leading-relaxed mb-12 tracking-wide"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.55, duration: 0.6 }}
+          >
+            Recursos útiles para mejorar tu experiencia de juego.
+            Todo lo que necesitas, creado por y para la comunidad gaming.
+          </motion.p>
+
+          {/* Stats */}
+          <motion.div
+            className="flex justify-center gap-10 sm:gap-16 mb-12"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.65, duration: 0.5 }}
+          >
+            {[
+              { label: "Juegos", value: GAME_TOOLS.length },
+              { label: "Herramientas", value: totalTools },
+              { label: "Categorías", value: totalCategories },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                className="text-center"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 + i * 0.08 }}
+              >
+                <div
+                  className="text-3xl font-black text-primary-400 leading-none"
+                  style={{
+                    fontFamily: "Orbitron, sans-serif",
+                    textShadow: "0 0 20px rgba(249,115,22,0.4)",
+                  }}
+                >
+                  {String(stat.value).padStart(2, "0")}
+                </div>
+                <div className="text-xs text-surface-500 tracking-widest uppercase mt-1">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Search */}
+          <motion.div
+            className="max-w-lg mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75, duration: 0.5 }}
+          >
+            <div className="relative">
+              {/* Glow behind input */}
+              <div
+                className="absolute -inset-0.5 rounded-lg transition-opacity duration-500 pointer-events-none"
+                style={{
+                  background: "linear-gradient(90deg, rgba(249,115,22,0.3), rgba(251,146,60,0.15), rgba(249,115,22,0.3))",
+                  filter: "blur(6px)",
+                  opacity: searchFocused ? 1 : 0,
+                }}
+              />
+              <div
+                className="relative flex items-center bg-surface-900/80 border rounded-lg transition-all duration-300 backdrop-blur-sm overflow-hidden"
+                style={{
+                  borderColor: searchFocused
+                    ? "rgba(249,115,22,0.55)"
+                    : "rgba(51,65,85,0.7)",
+                }}
+              >
+                {/* Left accent bar */}
+                <div
+                  className="absolute left-0 inset-y-0 w-0.5 transition-opacity duration-300"
+                  style={{
+                    background: "linear-gradient(to bottom, transparent, rgba(249,115,22,0.8), transparent)",
+                    opacity: searchFocused ? 1 : 0,
+                  }}
+                />
+                <Search
+                  className="absolute left-4 h-4 w-4 transition-colors duration-300"
+                  style={{ color: searchFocused ? "rgb(251,146,60)" : "rgb(100,116,139)" }}
+                />
+                <input
+                  type="text"
+                  placeholder="BUSCAR HERRAMIENTAS..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
+                  onFocus={() => setSearchFocused(true)}
+                  onBlur={() => setSearchFocused(false)}
+                  className="w-full bg-transparent pl-12 pr-4 py-3.5 text-surface-200 placeholder:text-surface-600 focus:outline-none"
+                  style={{
+                    fontFamily: "Orbitron, sans-serif",
+                    fontSize: "0.65rem",
+                    letterSpacing: "0.25em",
+                  }}
                 />
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
 
-        {/* Tools Grid */}
-        <div className="container mx-auto px-4 pb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {filteredTools.map((game, index) => (
-              <motion.div
-                key={game.title}
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: index * 0.15, duration: 0.6 }}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="group"
-              >
-                <Card
-                  className="bg-surface-800/40 backdrop-blur-md border-surface-700/50 cursor-pointer h-full overflow-hidden"
-                  onClick={() => router.push(game.href)}
-                >
-                  {/* Gradient top border */}
-                  <div className={`h-1.5 bg-gradient-to-r ${game.color}`}></div>
-                  
-                  {/* Subtle background gradient */}
-                  <div className={`absolute inset-0 ${game.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
-                  
-                  <CardHeader className="relative flex flex-row items-start space-y-0 gap-4 pb-4">
-                    <div className="w-16 h-16 rounded-xl overflow-hidden relative flex-shrink-0 flex items-center justify-center bg-surface-900/50 backdrop-blur-sm border border-surface-600/30">
-                      {game.icon ? (
-                        <Image
-                          src={game.icon}
-                          alt={game.title}
-                          width={48}
-                          height={48}
-                          className="object-contain transition-transform duration-300 group-hover:scale-110"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-surface-700 flex items-center justify-center">
-                          <Gamepad2 className="h-8 w-8 text-surface-400" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-2xl text-surface-50 group-hover:text-primary-300 transition-colors duration-300">
-                        {game.title}
-                      </CardTitle>
-                      <CardDescription className="text-surface-300 mt-1">
-                        {game.description}
-                      </CardDescription>
-                    </div>
-                  </CardHeader>
-                                  
-                  <CardContent className="relative">
-                    <div className="space-y-3">
-                      {game.tools.map(tool => (
-                        <div key={tool.name} className="bg-surface-900/40 rounded-lg px-3 py-2.5 border border-surface-700/40">
-                          <div className="flex justify-between items-center">
-                            <span className="text-primary-300 font-medium text-sm">{tool.name}</span>
-                            <span className="text-xs text-surface-500 bg-surface-800/60 px-2 py-0.5 rounded-full border border-surface-700/40">
-                              {tool.count} {tool.count === 1 ? 'herramienta' : 'herramientas'}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                  
-                  <CardFooter className="relative border-t border-surface-700/50 mt-4 pt-4 flex justify-between items-center">
-                    <div className="text-xs text-surface-400">
-                      <span className="flex items-center">
-                        <BarChart className="h-3 w-3 mr-1" />
-                        {game.tools.reduce((acc, tool) => acc + tool.count, 0)} herramientas
-                      </span>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-primary-400 hover:text-primary-300 hover:bg-primary-500/20 p-2 transition-all duration-300"
-                    >
-                      Explorar <ChevronRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </motion.div>
-            ))}
+        {/* Cards grid */}
+        <div className="container mx-auto px-4 pb-24">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            <AnimatePresence mode="popLayout">
+              {filteredTools.map((game, index) => (
+                <GameCard key={game.id} game={game} index={index} />
+              ))}
+            </AnimatePresence>
           </div>
 
-          {/* No results message */}
+          {/* Empty state */}
           {filteredTools.length === 0 && (
-            <motion.div 
-              className="text-center py-12"
+            <motion.div
+              className="text-center py-24"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="w-16 h-16 rounded-full bg-surface-800/60 border border-surface-700/50 flex items-center justify-center mx-auto mb-4">
-                <Gamepad2 className="h-7 w-7 text-surface-500" />
+              <div className="w-14 h-14 rounded-lg bg-surface-900/60 border border-surface-700/40 flex items-center justify-center mx-auto mb-5">
+                <Terminal className="w-6 h-6 text-surface-600" />
               </div>
-              <p className="text-surface-400 text-lg">No se encontraron herramientas que coincidan con tu búsqueda.</p>
+              <p
+                className="text-surface-500 text-xs tracking-[0.4em] uppercase"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
+                // Sin resultados
+              </p>
             </motion.div>
           )}
         </div>
