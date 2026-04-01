@@ -12,10 +12,15 @@ interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, variant = "default", ...props }, ref) => {
+  ({ className, variant = "default", children, ...props }, ref) => {
     const variantStyles = {
       default: "border-surface-700 bg-surface-800 text-surface-100",
       wingull: "border-secondary-200 bg-gradient-to-br from-secondary-50 to-secondary-100 text-secondary-900",
+    }
+
+    const accentLineStyles = {
+      default: "bg-gradient-to-r from-transparent via-primary-500/40 to-transparent",
+      wingull: "bg-gradient-to-r from-transparent via-secondary-400/50 to-transparent",
     }
 
     return (
@@ -23,12 +28,15 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         <div
           ref={ref}
           className={cn(
-            "rounded-lg border shadow-md",
+            "rounded-xl border shadow-md relative overflow-hidden transition-all duration-200 hover:shadow-lg hover:border-surface-600/70",
             variantStyles[variant],
             className
           )}
           {...props}
-        />
+        >
+          <div className={cn("absolute inset-x-0 top-0 h-px", accentLineStyles[variant])} />
+          {children}
+        </div>
       </CardVariantContext.Provider>
     )
   }
@@ -54,9 +62,9 @@ const CardTitle = React.forwardRef<
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => {
   const variant = useCardVariant()
-  
+
   const variantStyles = {
-    default: "text-primary-400",
+    default: "text-primary-300",
     wingull: "text-secondary-700",
   }
 
@@ -64,7 +72,7 @@ const CardTitle = React.forwardRef<
     <h3
       ref={ref}
       className={cn(
-        "text-2xl font-semibold leading-none tracking-tight",
+        "text-xl font-bold leading-none tracking-tight",
         variantStyles[variant],
         className
       )}
@@ -79,9 +87,9 @@ const CardDescription = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => {
   const variant = useCardVariant()
-  
+
   const variantStyles = {
-    default: "text-surface-300",
+    default: "text-surface-400",
     wingull: "text-secondary-600",
   }
 

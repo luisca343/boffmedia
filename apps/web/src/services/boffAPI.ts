@@ -259,19 +259,10 @@ async function uploadRequest<T>(
 ): Promise<ApiResponse<T>> {
   const formData = new FormData();
   formData.append('file', file);
-  
-  // Ensure path and filename are properly appended to FormData
+
   if (options?.path) {
     formData.append('path', options.path);
   }
-  if (options?.filename) {
-    formData.append('filename', options.filename);
-  }
-  
-  if (options?.path) {
-    formData.append('path', options.path);
-  }
-  
   if (options?.filename) {
     formData.append('filename', options.filename);
   }

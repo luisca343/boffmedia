@@ -19,7 +19,7 @@ export function LoadingSpinner({ size = 'lg', className = '' }: LoadingSpinnerPr
   }
 
   return (
-    <div className={`min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800 ${className}`}>
+    <div className={`min-h-screen ${className}`}>
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="flex flex-col items-center justify-center py-32">
           <div className="relative">

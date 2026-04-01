@@ -17,15 +17,15 @@ const Checkbox = React.forwardRef<
   CheckboxProps
 >(({ className, variant = "default", ...props }, ref) => {
   const variantStyles = {
-    default: "border-primary-400 ring-offset-surface-900 focus-visible:ring-primary-400 data-[state=checked]:bg-primary-400 data-[state=checked]:text-surface-900",
-    wingull: "border-secondary-300 ring-offset-secondary-900 focus-visible:ring-secondary-300 data-[state=checked]:bg-secondary-300 data-[state=checked]:text-secondary-900",
+    default: "border-surface-500 ring-offset-surface-900 focus-visible:ring-primary-400 hover:border-primary-400/70 data-[state=checked]:bg-primary-500 data-[state=checked]:border-primary-500 data-[state=checked]:text-white data-[state=checked]:[box-shadow:0_0_8px_0px_rgb(var(--primary-500)/0.45)]",
+    wingull: "border-secondary-300 ring-offset-secondary-900 focus-visible:ring-secondary-300 data-[state=checked]:bg-secondary-400 data-[state=checked]:border-secondary-400 data-[state=checked]:text-white",
   }
 
   return (
     <CheckboxPrimitive.Root
       ref={ref}
       className={cn(
-        "peer h-4 w-4 shrink-0 rounded-sm border ring-offset-2 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50",
+        "peer h-[18px] w-[18px] shrink-0 rounded border-2 ring-offset-2 focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-150",
         variantStyles[variant],
         className
       )}
@@ -34,7 +34,7 @@ const Checkbox = React.forwardRef<
       <CheckboxPrimitive.Indicator
         className={cn("flex items-center justify-center text-current")}
       >
-        <Check className="h-4 w-4" />
+        <Check className="h-3.5 w-3.5 stroke-[3]" />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

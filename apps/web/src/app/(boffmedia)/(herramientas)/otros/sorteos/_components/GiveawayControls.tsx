@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { UserPlus, Upload, Play, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";

@@ -29,9 +29,10 @@ export class UploadService {
    * Upload a profile image for a user
    */
   static uploadProfileImage(file: File, userId: string) {
-    return apiUpload(file, { 
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    return apiUpload(file, {
       path: `profiles`,
-      filename: `${userId}.jpg`
+      filename: `${userId}-${Date.now()}.${ext}`
     });
   }
 }

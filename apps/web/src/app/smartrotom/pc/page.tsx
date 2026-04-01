@@ -361,7 +361,7 @@ export default function PCPage() {
             id: destination.teamId,
             teamSlot: destination.index,
             pokemon: pokemonSlot
-          })
+          } as any)
         }
       } else if (source.type === 'battleTeam' && destination.type === 'battleTeam') {
         // Moving within battle teams or between battle teams

@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useState, useEffect } from "react";
 import {
   Sun,
@@ -36,7 +37,7 @@ export default function Component() {
     return "Desconocido";
   };
 
-  const getWeatherIcon = (weather: string): JSX.Element => {
+  const getWeatherIcon = (weather: string): React.JSX.Element => {
     switch (weather) {
       case "nublado":
         return <Cloud className="h-12 w-12 text-surface-400" />;

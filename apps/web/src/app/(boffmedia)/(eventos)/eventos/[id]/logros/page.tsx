@@ -13,17 +13,27 @@ import {
   Sparkles, Clock, ChevronRight, Zap
 } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { Achievement, Event } from "@boffmedia/shared"
+import { Event } from "@boffmedia/shared"
 import { UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import Link from "next/link"
 import { InternalLink } from "@/components/ui/navigation/Link"
 
-interface AchievementWithProgress extends Achievement {
+type AchievementWithProgress = {
+  id: number
+  name: string
+  description?: string
+  icon?: string | null
+  points: number
+  rarity?: string | null
+  hidden?: boolean
+  maxProgress?: number
+  category?: string
+  itemType?: "achievement" | "medal"
   userProgress?: UserProgress
   isUnlocked: boolean
   currentProgress: number
-  itemType: "achievement" | "medal"
+  [key: string]: any
 }
 
 export default function EventAchievementsPage() {
@@ -206,7 +216,7 @@ export default function EventAchievementsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="flex flex-col items-center justify-center py-32">
             <div className="relative">
@@ -225,7 +235,7 @@ export default function EventAchievementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <div className="min-h-screen">
       {/* Background Effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-20 left-10 w-72 h-72 bg-accent-500/10 rounded-full blur-3xl animate-pulse"></div>

@@ -1,4 +1,5 @@
 import { TaxiStop } from "@boffmedia/shared";
+import { TaxiStopExtended } from "@/types";
 import { useMemo } from 'react';
 
 // Types and Utils
@@ -20,10 +21,10 @@ import { CompassRose } from './map/CompassRose';
 import { MapControlPanel } from './map/MapControlPanel';
 
 interface MapViewProps {
-  taxiStops: TaxiStop[];
+  taxiStops: TaxiStopExtended[];
   playerPosition: Position;
-  selectedStop: TaxiStop | null;
-  setSelectedStop: (stop: TaxiStop) => void;
+  selectedStop: TaxiStopExtended | null;
+  setSelectedStop: (stop: TaxiStopExtended) => void;
   mapBounds?: MapBounds;
   showCoordinates?: boolean;
 }

@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Docker: Build server",
+      "type": "shell",
+      "command": "docker build -f apps/api/Dockerfile -t luisca343/boffmedia-server:latest .",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "docker" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Build web",
+      "type": "shell",
+      "command": "docker build -f apps/web/Dockerfile -t luisca343/boffmedia-web:latest .",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "docker" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Push server",
+      "type": "shell",
+      "command": "docker push luisca343/boffmedia-server:latest",
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": ["Docker: Build server"],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "docker" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Push web",
+      "type": "shell",
+      "command": "docker push luisca343/boffmedia-web:latest",
+      "options": { "cwd": "${workspaceFolder}" },
+      "dependsOn": ["Docker: Build web"],
+      "presentation": { "reveal": "always", "panel": "dedicated", "group": "docker" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Build & Push all",
+      "dependsOn": ["Docker: Push server", "Docker: Push web"],
+      "dependsOrder": "parallel",
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    }
+  ]
+}

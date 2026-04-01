@@ -8,7 +8,7 @@ import { Generations } from '@pkmn/data';
 import PokemonSprite from "../_components/PokemonSprite";
 import { PokemonTeamList } from "../_components/PokemonTeam";
 
-let battle = new Battle(new Generations(Dex as any))
+let battle = new Battle(new Generations(Dex as any) as any)
 
 export default function Test() {
   const replay = `|j|☆Rougewings
@@ -306,7 +306,7 @@ export default function Test() {
 |raw|Luisca343's rating: 1069 &rarr; <strong>1097<\/strong><br \/>(+28 for winning)`
 
 
-  const battle = new Battle(new Generations(Dex as any))
+  const battle = new Battle(new Generations(Dex as any) as any)
   //Separate replay into lines
   const lines = replay.split('\n')
   const line0 = lines[0]

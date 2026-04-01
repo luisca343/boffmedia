@@ -70,7 +70,7 @@ export default function EventSummaryPage() {
 
   if (!event) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
             <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
@@ -86,7 +86,7 @@ export default function EventSummaryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <div className="min-h-screen">
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
         <EventHero event={event} participants={participants} />
         

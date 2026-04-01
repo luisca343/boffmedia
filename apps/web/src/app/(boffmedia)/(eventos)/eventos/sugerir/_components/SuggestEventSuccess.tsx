@@ -9,7 +9,7 @@ interface SuggestEventSuccessProps {
 
 export function SuggestEventSuccess({ onReset }: SuggestEventSuccessProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <div className="min-h-screen">
       <div className="container mx-auto p-6 max-w-4xl">
         <div className="flex flex-col items-center justify-center py-32">
           <div className="relative mb-8">

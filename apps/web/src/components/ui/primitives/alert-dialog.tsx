@@ -14,16 +14,13 @@ interface AlertDialogProps extends AlertDialogPrimitive.AlertDialogProps {
   variant?: AlertDialogVariant;
 }
 
-const AlertDialog = React.forwardRef<
-  React.ElementRef<typeof AlertDialogPrimitive.Root>,
-  AlertDialogProps
->(({ variant = "default", ...props }, ref) => {
+const AlertDialog = ({ variant = "default", ...props }: AlertDialogProps) => {
   return (
     <AlertDialogVariantContext.Provider value={variant}>
       <AlertDialogPrimitive.Root {...props} />
     </AlertDialogVariantContext.Provider>
   )
-})
+}
 AlertDialog.displayName = "AlertDialog"
 
 const useAlertDialogVariant = () => React.useContext(AlertDialogVariantContext)

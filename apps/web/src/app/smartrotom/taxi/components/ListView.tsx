@@ -1,27 +1,28 @@
 import { FaMapMarkerAlt, FaInfoCircle, FaArrowRight, FaSearch, FaSortAmountDown, FaSortAmountUp, FaTaxi, FaCompass } from 'react-icons/fa'
 import { TaxiStop } from "@boffmedia/shared"
+import { TaxiStopExtended } from "@/types"
 import { useState, useMemo } from 'react'
 import { formatMoney } from '../../starbank/bankUtils';
 import type { Position } from '@/components/common/map/StandardizedMap';
 
 interface ListViewProps {
-  taxiStops: TaxiStop[];
+  taxiStops: TaxiStopExtended[];
   playerPosition: Position;
   playerMoney: number;
-  selectedStop: TaxiStop | null;
-  setSelectedStop: (stop: TaxiStop | null) => void;
+  selectedStop: TaxiStopExtended | null;
+  setSelectedStop: (stop: TaxiStopExtended | null) => void;
   calculateDistance: (x1: number, z1: number, x2: number, z2: number) => number;
   calculatePrice: (distance: number) => number;
   formatDistance: (distance: number) => string;
-  teleportPlayer: (stop: TaxiStop) => Promise<void>;
+  teleportPlayer: (stop: TaxiStopExtended) => Promise<void>;
   isLoading: boolean;
 }
 
-export default function ListView({ 
-  taxiStops, 
-  playerPosition, 
+export default function ListView({
+  taxiStops,
+  playerPosition,
   playerMoney,
-  selectedStop, 
+  selectedStop,
   setSelectedStop,
   calculateDistance,
   calculatePrice,
@@ -29,6 +30,7 @@ export default function ListView({
   teleportPlayer,
   isLoading
 }: ListViewProps) {
+  // NOTE: taxiStops typed as TaxiStopExtended[] to support distance and description fields
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState<'nearest' | 'furthest'>('nearest');
 

@@ -1,12 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/primitives/table";
+import { Gamepad2 } from "lucide-react";
 import { KeyRow } from "./KeyRow";
 
 export interface KeyItem {
@@ -30,48 +23,46 @@ export const KeysDataTable = ({
   keys,
   hoveredRow,
   setHoveredRow,
-  fetchGameData
+  fetchGameData,
 }: KeysDataTableProps) => (
   <motion.div
-    className="bg-surface-800 rounded-lg shadow-lg overflow-hidden border border-surface-700"
-    initial={{ scale: 0.95, opacity: 0 }}
-    animate={{ scale: 1, opacity: 1 }}
+    initial={{ opacity: 0, y: 16 }}
+    animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.5, delay: 0.4 }}
   >
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-surface-900 border-b border-surface-700">
-            <TableHead className="text-secondary-400 font-medium w-[60px]">#</TableHead>
-            <TableHead className="text-secondary-400 font-medium w-[80px]">Imagen</TableHead>
-            <TableHead className="text-secondary-400 font-medium">Juego</TableHead>
-            {/*<TableHead className="text-secondary-400 font-medium">Bundle</TableHead>*/}
-            <TableHead className="text-secondary-400 font-medium w-[120px]">Estado</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <AnimatePresence mode="popLayout">
-            {keys.length > 0 ? (
-              keys.map((key, index) => (
-                <KeyRow
-                  key={`${key.name}-${key.claimed}-${index}`}
-                  keyData={key}
-                  index={index}
-                  hoveredRow={hoveredRow}
-                  setHoveredRow={setHoveredRow}
-                  fetchGameData={fetchGameData}
-                />
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="h-40 text-center text-surface-400">
-                  No se encontraron claves que coincidan con tu búsqueda
-                </TableCell>
-              </TableRow>
-            )}
-          </AnimatePresence>
-        </TableBody>
-      </Table>
-    </div>
+    <AnimatePresence mode="popLayout">
+      {keys.length > 0 ? (
+        <div className="space-y-2">
+          {keys.map((key, index) => (
+            <KeyRow
+              key={`${key.name}-${key.claimed}-${index}`}
+              keyData={key}
+              index={index}
+              hoveredRow={hoveredRow}
+              setHoveredRow={setHoveredRow}
+              fetchGameData={fetchGameData}
+            />
+          ))}
+        </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0 }}
+          className="flex flex-col items-center justify-center py-20 gap-4"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 bg-secondary-500/10 blur-2xl rounded-full" />
+            <div className="relative w-20 h-20 rounded-2xl bg-surface-800 border border-surface-700 flex items-center justify-center">
+              <Gamepad2 className="w-9 h-9 text-surface-500" />
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-surface-300 font-medium">No se encontraron claves</p>
+            <p className="text-surface-500 text-sm mt-1">Prueba con otro término de búsqueda</p>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   </motion.div>
 );

@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Database, TrendingUp } from "lucide-react";
-import { Badge } from "@/components/ui/primitives/badge";
 import { FeaturedTool } from "./FeaturedTool";
 import { ToolsGrid } from "./ToolsGrid";
 import { ExternalResources } from "./ExternalResources";
@@ -65,14 +63,14 @@ export function ToolsPageLayout({
       <motion.div className="mb-12 lg:mb-16" variants={itemVariants}>
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
           <div className="text-center lg:text-left flex-1">
-            <motion.h1 
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-surface-50 mb-4"
+            <motion.h1
+              className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-surface-50 mb-4"
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
               {title.prefix}{" "}
-              <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-red-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 bg-clip-text text-transparent">
                 {title.highlight}
               </span>
             </motion.h1>
@@ -94,7 +92,7 @@ export function ToolsPageLayout({
               className="flex-shrink-0"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 to-red-500/20 rounded-2xl blur-xl"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-400/25 to-primary-600/15 rounded-2xl blur-2xl scale-110"></div>
                 <Image
                   src={logoSrc}
                   alt={logoAlt}

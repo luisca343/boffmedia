@@ -1,0 +1,75 @@
+stages:
+  - build
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_BUILDKIT: "1"
+
+.docker_build:
+  stage: build
+  image: docker:27
+  tags:
+    - docker
+  before_script:
+    - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
+deploy-web:
+  extends: .docker_build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      changes:
+        - apps/web/**/*
+        - packages/shared/**/*
+        - public/**/*
+        - pnpm-lock.yaml
+        - pnpm-workspace.yaml
+    - when: manual
+  script:
+    - |
+      cat > apps/web/.env.production.local <<EOF
+      GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+      GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+      NEXT_PUBLIC_API=$NEXT_PUBLIC_API
+      NEXT_PUBLIC_SOCKET_URL=$NEXT_PUBLIC_SOCKET_URL
+      NEXT_PUBLIC_MC_WORLD=$NEXT_PUBLIC_MC_WORLD
+      NEXT_PUBLIC_URL=$NEXT_PUBLIC_URL
+      SECRET=$SECRET
+      NEXTAUTH_SECRET=$NEXTAUTH_SECRET
+      NEXTAUTH_URL=$NEXTAUTH_URL
+      NEXT_PUBLIC_TWITCH_CLIENT_ID=$NEXT_PUBLIC_TWITCH_CLIENT_ID
+      NEXT_PUBLIC_TWITCH_CLIENT_SECRET=$NEXT_PUBLIC_TWITCH_CLIENT_SECRET
+      EOF
+    - |
+      docker build \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --cache-from luisca343/boffmedia-web2:latest \
+        --file apps/web/Dockerfile \
+        --tag luisca343/boffmedia-web2:latest \
+        --tag luisca343/boffmedia-web2:$CI_PIPELINE_IID \
+        .
+    - docker push luisca343/boffmedia-web2:latest
+    - docker push luisca343/boffmedia-web2:$CI_PIPELINE_IID
+
+deploy-api:
+  extends: .docker_build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+      changes:
+        - apps/api/**/*
+        - packages/shared/**/*
+        - public/**/*
+        - pnpm-lock.yaml
+        - pnpm-workspace.yaml
+    - when: manual
+  script:
+    - |
+      docker build \
+        --build-arg BUILDKIT_INLINE_CACHE=1 \
+        --cache-from luisca343/boffmedia-server2:latest \
+        --file apps/api/Dockerfile \
+        --tag luisca343/boffmedia-server2:latest \
+        --tag luisca343/boffmedia-server2:$CI_PIPELINE_IID \
+        .
+    - docker push luisca343/boffmedia-server2:latest
+    - docker push luisca343/boffmedia-server2:$CI_PIPELINE_IID

@@ -47,7 +47,7 @@ export default function GameDetailPage() {
 
   if (!game) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+      <div className="min-h-screen">
         <div className="container mx-auto p-6 max-w-7xl">
           <div className="text-center py-20">
             <h1 className="text-3xl font-bold text-surface-300 mb-4">Juego no encontrado</h1>
@@ -59,7 +59,7 @@ export default function GameDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-surface-950 via-surface-900 to-surface-800">
+    <div className="min-h-screen">
       <div className="relative z-10 container mx-auto p-6 max-w-7xl">
         <GameHero game={game} />
         

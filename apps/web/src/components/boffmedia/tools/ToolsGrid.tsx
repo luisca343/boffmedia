@@ -20,7 +20,7 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
 
   return (
     <motion.div 
-      className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8"
+      className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6"
       variants={variants}
     >
       {tools.map((tool, index) => (
@@ -30,11 +30,11 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
           whileHover={{ y: -8, scale: 1.02 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
-          <Card 
-            className="bg-surface-800/80 backdrop-blur-sm border-surface-700/50 hover:bg-surface-700/90 hover:border-surface-600/70 transition-all duration-300 cursor-pointer h-full flex flex-col overflow-hidden shadow-lg hover:shadow-2xl group"
+          <Card
+            className="backdrop-blur-sm cursor-pointer h-full flex flex-col overflow-hidden group"
             onClick={() => router.push(tool.href)}
           >
-            <div className={`h-2 bg-gradient-to-r ${tool.color}`}></div>
+            <div className={`h-1.5 bg-gradient-to-r ${tool.color}`}></div>
             
             <CardHeader className="pb-3">
               <div className="flex items-center gap-4">
@@ -57,7 +57,7 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
                       {tool.title}
                     </CardTitle>
                     {tool.isNew && (
-                      <Badge variant="secondary" className="bg-highlight-500/20 text-highlight-400 border-highlight-500/30 text-xs">
+                      <Badge variant="success" className="text-[10px]">
                         Nuevo
                       </Badge>
                     )}
@@ -72,10 +72,10 @@ export function ToolsGrid({ tools, variants, itemVariants, t }: ToolsGridProps) 
             <CardContent className="flex-grow">
               <div className="flex flex-wrap gap-2">
                 {tool.tools.map((toolName: string) => (
-                  <Badge 
-                    key={toolName} 
+                  <Badge
+                    key={toolName}
                     variant="outline"
-                    className="bg-surface-700/30 text-surface-300 border-surface-600/30 text-xs"
+                    className="text-[11px]"
                   >
                     {toolName}
                   </Badge>

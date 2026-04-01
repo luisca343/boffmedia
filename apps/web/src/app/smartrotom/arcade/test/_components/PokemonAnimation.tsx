@@ -9,7 +9,7 @@ interface Hurdle {
 }
 
 interface Pokemon {
-  ref: React.RefObject<PmdSpriteRef>;
+  ref: React.RefObject<PmdSpriteRef | null>;
   isJumping: boolean;
   isCrashed: boolean;
   crashDirection: number;

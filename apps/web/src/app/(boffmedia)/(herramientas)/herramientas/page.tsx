@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/primitives/card";
 import { Button } from "@/components/ui/primitives/button";
 import { Input } from "@/components/ui/primitives/input";
-import { Search, Gamepad2, ChevronRight, SwordIcon, BarChart, Settings, Zap, Users, Trophy } from "lucide-react";
+import { Search, Gamepad2, ChevronRight, BarChart } from "lucide-react";
 import Image from "next/image";
 
 export default function ToolsLandingPage() {
@@ -104,9 +104,9 @@ export default function ToolsLandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl sm:text-7xl font-bold mb-6 text-surface-50">
+            <h1 className="text-5xl sm:text-7xl font-black tracking-tight mb-6 text-surface-50">
               Herramientas para{" "}
-              <span className="bg-gradient-to-r from-primary-400 via-primary-300 to-primary-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 bg-clip-text text-transparent">
                 Videojuegos
               </span>
             </h1>
@@ -129,7 +129,7 @@ export default function ToolsLandingPage() {
                   placeholder="Buscar herramientas..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-surface-800/50 backdrop-blur-sm border-surface-600 text-surface-100 placeholder-surface-400 focus:border-primary-500 focus:ring-primary-500/50"
+                  className="pl-10"
                 />
               </div>
             </motion.div>
@@ -149,33 +149,28 @@ export default function ToolsLandingPage() {
                 className="group"
               >
                 <Card
-                  className={`
-                    bg-surface-800/40 backdrop-blur-md border-surface-700/50 
-                    hover:bg-surface-700/60 hover:border-surface-600/70
-                    transition-all duration-300 cursor-pointer h-full overflow-hidden
-                    hover:shadow-2xl ${game.borderGlow} hover:shadow-lg
-                  `}
+                  className="bg-surface-800/40 backdrop-blur-md border-surface-700/50 cursor-pointer h-full overflow-hidden"
                   onClick={() => router.push(game.href)}
                 >
                   {/* Gradient top border */}
-                  <div className={`h-1 bg-gradient-to-r ${game.color}`}></div>
+                  <div className={`h-1.5 bg-gradient-to-r ${game.color}`}></div>
                   
                   {/* Subtle background gradient */}
                   <div className={`absolute inset-0 ${game.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}></div>
                   
                   <CardHeader className="relative flex flex-row items-start space-y-0 gap-4 pb-4">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden relative flex-shrink-0 flex items-center justify-center bg-surface-900/50 backdrop-blur-sm border border-surface-600/30">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden relative flex-shrink-0 flex items-center justify-center bg-surface-900/50 backdrop-blur-sm border border-surface-600/30">
                       {game.icon ? (
-                        <Image 
-                          src={game.icon} 
-                          alt={game.title} 
-                          width={56}
-                          height={56}
+                        <Image
+                          src={game.icon}
+                          alt={game.title}
+                          width={48}
+                          height={48}
                           className="object-contain transition-transform duration-300 group-hover:scale-110"
                         />
                       ) : (
                         <div className="w-full h-full bg-surface-700 flex items-center justify-center">
-                          <Gamepad2 className="h-10 w-10 text-surface-400" />
+                          <Gamepad2 className="h-8 w-8 text-surface-400" />
                         </div>
                       )}
                     </div>
@@ -192,10 +187,10 @@ export default function ToolsLandingPage() {
                   <CardContent className="relative">
                     <div className="space-y-3">
                       {game.tools.map(tool => (
-                        <div key={tool.name} className="bg-surface-900/30 backdrop-blur-sm rounded-lg p-3 border border-surface-700/30">
+                        <div key={tool.name} className="bg-surface-900/40 rounded-lg px-3 py-2.5 border border-surface-700/40">
                           <div className="flex justify-between items-center">
-                            <span className="text-primary-300 font-medium">{tool.name}</span>
-                            <span className="text-xs text-surface-400 bg-surface-700/50 px-2 py-1 rounded-full">
+                            <span className="text-primary-300 font-medium text-sm">{tool.name}</span>
+                            <span className="text-xs text-surface-500 bg-surface-800/60 px-2 py-0.5 rounded-full border border-surface-700/40">
                               {tool.count} {tool.count === 1 ? 'herramienta' : 'herramientas'}
                             </span>
                           </div>
@@ -231,7 +226,9 @@ export default function ToolsLandingPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <Gamepad2 className="h-12 w-12 text-surface-500 mx-auto mb-4" />
+              <div className="w-16 h-16 rounded-full bg-surface-800/60 border border-surface-700/50 flex items-center justify-center mx-auto mb-4">
+                <Gamepad2 className="h-7 w-7 text-surface-500" />
+              </div>
               <p className="text-surface-400 text-lg">No se encontraron herramientas que coincidan con tu búsqueda.</p>
             </motion.div>
           )}

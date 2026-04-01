@@ -56,6 +56,29 @@
     "eventsSection": {
       "locale": "es-ES",
       "loading": "Cargando eventos...",
+      "status": {
+        "live": "EN VIVO",
+        "upcoming": "PRÓXIMAMENTE",
+        "completed": "FINALIZADO",
+        "unknown": "DESCONOCIDO"
+      },
+      "featured": {
+        "label": "Evento Destacado",
+        "comingSoon": "¡Próximamente!",
+        "timeRemaining": "Tiempo restante",
+        "live": "En vivo"
+      },
+      "noEvents": {
+        "title": "¡Próximamente eventos increíbles!",
+        "description": "Estamos preparando eventos emocionantes para ti. Mantente atento a nuestras redes sociales para no perderte ninguna novedad.",
+        "exploreButton": "Explorar Eventos"
+      },
+      "cta": {
+        "title": "¿Quieres ver más eventos?",
+        "description": "Explora todos nuestros eventos pasados, presentes y futuros. Encuentra el evento perfecto para ti.",
+        "viewAll": "Ver Todos los Eventos",
+        "suggest": "Sugerir un Evento"
+      },
       "errorLoading": "Error al cargar eventos",
       "retry": "Reintentar",
       "upcomingEvents": "Próximos Eventos",

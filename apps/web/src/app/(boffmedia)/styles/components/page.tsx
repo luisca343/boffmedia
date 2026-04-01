@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { SectionPanel } from "@/components/ui/display/SectionPanel"
 import { Button } from "@/components/ui/primitives/button"
 import { Input } from "@/components/ui/primitives/input"
 import { Label } from "@/components/ui/primitives/label"
@@ -53,28 +54,43 @@ export default function BoffMediaStyleGuide() {
   const form = useForm()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950">
-      <div className="container mx-auto px-4 py-12 max-w-7xl">
-        {/* Enhanced Header */}
-        <div className="bg-gradient-to-br from-surface-800 via-surface-800 to-surface-700 rounded-xl p-8 mb-12 border border-surface-600 shadow-2xl">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center shadow-lg">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+    <div className="min-h-screen bg-gradient-to-br from-surface-950 via-surface-900 to-surface-950 relative">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:48px_48px] pointer-events-none" />
+      <div className="container mx-auto px-4 py-12 max-w-7xl relative">
+        {/* Gaming Header */}
+        <div className="relative rounded-2xl overflow-hidden border border-surface-600/70 shadow-2xl mb-12">
+          <div className="absolute inset-0 bg-gradient-to-br from-surface-900 via-surface-800 to-surface-900" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary-600/[0.07] via-transparent to-accent-600/[0.04]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-400/70 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-surface-600/40 to-transparent" />
+          <div className="relative p-8 flex items-start gap-5">
+            <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-lg shadow-primary-900/60 ring-1 ring-primary-400/30">
+              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2z" clipRule="evenodd" />
               </svg>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500 bg-clip-text text-transparent mb-2">
-                Guía de Estilo BoffMedia
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-[10px] font-mono font-bold tracking-[0.15em] uppercase text-primary-400">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary-400 animate-pulse" />
+                  SISTEMA ACTIVO
+                </div>
+                <span className="text-[10px] font-mono text-surface-500 tracking-wider">v2.0.0</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-2 leading-tight">
+                <span className="bg-gradient-to-r from-white via-primary-100 to-primary-400 bg-clip-text text-transparent">
+                  Guía de Estilo BoffMedia
+                </span>
               </h1>
-              <p className="text-surface-300 text-lg">Una colección de componentes UI con estilos personalizados</p>
+              <p className="text-surface-400 text-sm max-w-xl">
+                Colección de componentes UI — diseño gaming moderno con tokens de color, interacciones y tipografía coherentes
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
-          <ComponentSection title="Accordion">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+          <SectionPanel title="Accordion">
             <Accordion type="single" collapsible className="w-full" variant="default">
               <AccordionItem value="item-1" className="border-surface-600">
                 <AccordionTrigger className="text-surface-200 hover:text-primary-300">¿Es accesible?</AccordionTrigger>
@@ -93,9 +109,9 @@ export default function BoffMediaStyleGuide() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Alert Dialog">
+          <SectionPanel title="Alert Dialog">
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline" className="w-full">Mostrar Alerta</Button>
@@ -114,9 +130,9 @@ export default function BoffMediaStyleGuide() {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Avatar">
+          <SectionPanel title="Avatar">
             <div className="space-y-4">
               <div className="flex gap-4 items-center">
                 <Avatar className="h-12 w-12 border-2 border-primary-400">
@@ -133,25 +149,25 @@ export default function BoffMediaStyleGuide() {
               </div>
               <p className="text-surface-400 text-sm">Diferentes tamaños y estilos</p>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Badge">
+          <SectionPanel title="Badge">
             <div className="space-y-4">
               <div className="flex flex-wrap gap-2">
-                <Badge className="bg-primary-600 hover:bg-primary-700">Predeterminado</Badge>
+                <Badge>Predeterminado</Badge>
                 <Badge variant="secondary">Secundario</Badge>
                 <Badge variant="destructive">Destructivo</Badge>
-                <Badge variant="outline" className="border-surface-500 text-surface-200">Contorno</Badge>
+                <Badge variant="outline">Contorno</Badge>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Badge className="bg-success-600">Éxito</Badge>
-                <Badge className="bg-warning-600">Advertencia</Badge>
-                <Badge className="bg-info-600">Información</Badge>
+                <Badge variant="success">Éxito</Badge>
+                <Badge className="bg-warning-500 text-white border-0">Advertencia</Badge>
+                <Badge className="bg-info-500 text-white border-0">Información</Badge>
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Button" fullWidth>
+          <SectionPanel title="Button" fullWidth>
             <div className="space-y-6">
               {/* Size Examples */}
               <div>
@@ -255,9 +271,9 @@ export default function BoffMediaStyleGuide() {
                 </div>
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Calendar">
+          <SectionPanel title="Calendar">
             <div className="flex justify-center">
               <Calendar 
                 mode="single" 
@@ -266,10 +282,10 @@ export default function BoffMediaStyleGuide() {
                 className="w-full border border-surface-600 rounded-lg bg-surface-800" 
               />
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Card">
-            <Card className="border-surface-600 hover:border-surface-500 transition-colors bg-surface-800">
+          <SectionPanel title="Card">
+            <Card className="hover:shadow-primary-950/40">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
@@ -284,13 +300,13 @@ export default function BoffMediaStyleGuide() {
               <CardContent className="text-surface-200">
                 <p>Este es el contenido principal de la tarjeta con información relevante.</p>
               </CardContent>
-              <CardFooter className="pt-4 border-t border-surface-700">
+              <CardFooter className="pt-4 border-t border-surface-700/60">
                 <Button className="w-full">Acción Principal</Button>
               </CardFooter>
             </Card>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Checkbox">
+          <SectionPanel title="Checkbox">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
                 <Checkbox id="terms" />
@@ -308,9 +324,9 @@ export default function BoffMediaStyleGuide() {
                 </label>
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Collapsible">
+          <SectionPanel title="Collapsible">
             <Collapsible className="w-full">
               <CollapsibleTrigger asChild>
                 <Button variant="outline" className="w-full justify-between border-surface-600 hover:border-surface-500">
@@ -324,9 +340,9 @@ export default function BoffMediaStyleGuide() {
                 Este es el contenido que se expande y colapsa. Puede contener cualquier tipo de información adicional.
               </CollapsibleContent>
             </Collapsible>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Combobox">
+          <SectionPanel title="Combobox">
             <Combobox
               data={[
                 { label: "Inglés", value: "en" },
@@ -341,9 +357,9 @@ export default function BoffMediaStyleGuide() {
               onChange={setComboboxValue}
               placeholder="Selecciona un idioma"
             />
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Command">
+          <SectionPanel title="Command">
             <Command className="rounded-lg border border-surface-600 shadow-md bg-surface-800">
               <CommandInput placeholder="Escribe un comando o busca..." className="border-none" />
               <CommandList>
@@ -355,9 +371,9 @@ export default function BoffMediaStyleGuide() {
                 </CommandGroup>
               </CommandList>
             </Command>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Dialog">
+          <SectionPanel title="Dialog">
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline" className="w-full">Abrir Diálogo</Button>
@@ -388,9 +404,9 @@ export default function BoffMediaStyleGuide() {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Form" fullWidth>
+          <SectionPanel title="Form" fullWidth>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(() => {})} className="space-y-6">
                 <FormField
@@ -428,9 +444,9 @@ export default function BoffMediaStyleGuide() {
                 <Button type="submit" className="w-full">Enviar Formulario</Button>
               </form>
             </Form>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Hover Card">
+          <SectionPanel title="Hover Card">
             <div className="flex justify-center">
               <HoverCard>
                 <HoverCardTrigger asChild>
@@ -453,9 +469,9 @@ export default function BoffMediaStyleGuide() {
                 </HoverCardContent>
               </HoverCard>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Input">
+          <SectionPanel title="Input">
             <div className="space-y-4">
               <Input 
                 type="email" 
@@ -474,9 +490,9 @@ export default function BoffMediaStyleGuide() {
                 className="bg-surface-800 border-surface-700" 
               />
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Label">
+          <SectionPanel title="Label">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-surface-200">Email</Label>
@@ -497,9 +513,9 @@ export default function BoffMediaStyleGuide() {
                 />
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Popover">
+          <SectionPanel title="Popover">
             <div className="flex justify-center">
               <Popover>
                 <PopoverTrigger asChild>
@@ -525,9 +541,9 @@ export default function BoffMediaStyleGuide() {
                 </PopoverContent>
               </Popover>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Select">
+          <SectionPanel title="Select">
             <div className="space-y-4">
               <Select>
                 <SelectTrigger className="w-full bg-surface-700 border-surface-600">
@@ -550,9 +566,9 @@ export default function BoffMediaStyleGuide() {
                 </SelectContent>
               </Select>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Separator">
+          <SectionPanel title="Separator">
             <div className="space-y-4">
               <div className="space-y-1">
                 <h4 className="text-surface-200 text-sm font-medium leading-none">Radix Primitives</h4>
@@ -567,9 +583,9 @@ export default function BoffMediaStyleGuide() {
                 <div>Source</div>
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Sheet">
+          <SectionPanel title="Sheet">
             <div className="flex justify-center">
               <Sheet>
                 <SheetTrigger asChild>
@@ -595,9 +611,9 @@ export default function BoffMediaStyleGuide() {
                 </SheetContent>
               </Sheet>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Skeleton">
+          <SectionPanel title="Skeleton">
             <div className="space-y-4">
               <div className="flex items-center space-x-4">
                 <Skeleton className="h-12 w-12 rounded-full bg-surface-700" />
@@ -612,9 +628,9 @@ export default function BoffMediaStyleGuide() {
                 <Skeleton className="h-4 w-3/5 bg-surface-700" />
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Slider">
+          <SectionPanel title="Slider">
             <div className="space-y-6">
               <div className="space-y-2">
                 <Label className="text-surface-200">Volumen: 33%</Label>
@@ -625,9 +641,9 @@ export default function BoffMediaStyleGuide() {
                 <Slider defaultValue={[25, 75]} max={100} step={1} className="w-full" />
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Switch">
+          <SectionPanel title="Switch">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label htmlFor="airplane-mode" className="text-surface-200">Modo avión</Label>
@@ -642,9 +658,9 @@ export default function BoffMediaStyleGuide() {
                 <Switch id="location" />
               </div>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Table" fullWidth>
+          <SectionPanel title="Table" fullWidth>
             <div className="rounded-md border border-surface-600 overflow-hidden">
               <Table>
                 <TableHeader>
@@ -683,9 +699,9 @@ export default function BoffMediaStyleGuide() {
                 </TableBody>
               </Table>
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Tabs" fullWidth>
+          <SectionPanel title="Tabs" fullWidth>
             <Tabs defaultValue="account" className="w-full">
               <TabsList className="grid w-full grid-cols-2 bg-surface-700">
                 <TabsTrigger value="account" className="data-[state=active]:bg-surface-600">Cuenta</TabsTrigger>
@@ -738,9 +754,9 @@ export default function BoffMediaStyleGuide() {
                 </Card>
               </TabsContent>
             </Tabs>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Textarea">
+          <SectionPanel title="Textarea">
             <div className="space-y-4">
               <Textarea 
                 placeholder="Escribe tu mensaje aquí." 
@@ -753,9 +769,9 @@ export default function BoffMediaStyleGuide() {
                 rows={2}
               />
             </div>
-          </ComponentSection>
+          </SectionPanel>
 
-          <ComponentSection title="Tooltip">
+          <SectionPanel title="Tooltip">
             <div className="flex justify-center space-x-4">
               <TooltipProvider>
                 <Tooltip>
@@ -783,32 +799,10 @@ export default function BoffMediaStyleGuide() {
                 </Tooltip>
               </TooltipProvider>
             </div>
-          </ComponentSection>
+          </SectionPanel>
         </div>
       </div>
     </div>
   )
 }
 
-// Enhanced Component Section wrapper with better styling
-function ComponentSection({
-  title,
-  children,
-  fullWidth = false,
-}: {
-  title: string
-  children: React.ReactNode
-  fullWidth?: boolean
-}) {
-  return (
-    <div className={`${fullWidth ? "col-span-1 md:col-span-2" : ""}`}>
-      <div className="bg-surface-700/30 rounded-xl p-6 h-full border border-surface-700 hover:border-surface-600 transition-all duration-300 shadow-lg hover:shadow-xl">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-2 h-8 bg-gradient-to-b from-primary-400 to-primary-600 rounded-full"></div>
-          <h2 className="text-xl font-semibold text-primary-300 tracking-tight">{title}</h2>
-        </div>
-        <div className="space-y-4">{children}</div>
-      </div>
-    </div>
-  )
-}

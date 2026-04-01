@@ -18,9 +18,12 @@ export default function KeysTable() {
 
   if (!filteredKeys) return (
     <div className="flex items-center justify-center min-h-[400px]">
-      <div className="flex flex-col items-center gap-2">
-        <div className="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full"></div>
-        <p className="text-surface-300">Cargando claves...</p>
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative">
+          <div className="absolute inset-0 bg-secondary-500/20 blur-xl rounded-full" />
+          <div className="relative w-12 h-12 border-2 border-secondary-500/30 border-t-secondary-400 rounded-full animate-spin" />
+        </div>
+        <p className="text-surface-400 text-sm">Cargando claves...</p>
       </div>
     </div>
   );
@@ -65,7 +68,7 @@ export default function KeysTable() {
           />
         </div>
 
-        <Suspense fallback={<div className="fixed inset-0 bg-surface-900/70 flex items-center justify-center">Cargando...</div>}>
+        <Suspense fallback={<div className="fixed inset-0 bg-surface-900/80 backdrop-blur-sm flex items-center justify-center"><div className="w-8 h-8 border-2 border-secondary-500/30 border-t-secondary-400 rounded-full animate-spin" /></div>}>
           <SteamDialog
             isModalVisible={isModalVisible}
             setIsModalVisible={setIsModalVisible}

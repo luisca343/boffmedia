@@ -1,7 +1,7 @@
 import { useState, useEffect, RefObject } from 'react';
 import { ViewportDimensions } from '../types/map.types';
 
-export const useViewportDimensions = (containerRef: RefObject<HTMLElement>): ViewportDimensions => {
+export const useViewportDimensions = (containerRef: RefObject<HTMLElement | null>): ViewportDimensions => {
   const [dimensions, setDimensions] = useState<ViewportDimensions>({ width: 0, height: 0 });
 
   useEffect(() => {

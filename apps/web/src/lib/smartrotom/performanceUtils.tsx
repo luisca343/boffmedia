@@ -75,7 +75,7 @@ export function useVirtualizedGrid(
 // Debounced hover state to reduce animation triggers
 export function useDebouncedHover(delay: number = 100) {
   const [isHovered, setIsHovered] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout>()
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
   
   const setHover = useCallback((hovered: boolean) => {
     if (timeoutRef.current) {

@@ -126,6 +126,7 @@ export const authOptions: NextAuthOptions = {
         token.name = user.username;
         token.roles = user.roles;
         token.smartRotomUser = user.smartRotomUser;
+        token.image = (user as any).profilePicture ?? user.image ?? null;
         token.lastUpdated = Date.now();
       }
 
@@ -154,6 +155,7 @@ export const authOptions: NextAuthOptions = {
             token.name = userData.user.name;
             token.email = userData.user.email;
             token.smartRotomUser = userData.user.smartRotomUser;
+            token.image = userData.user.image ?? token.image ?? null;
             token.lastUpdated = Date.now();
           }
         } catch (error) {
@@ -180,7 +182,8 @@ export const authOptions: NextAuthOptions = {
           username: string;
           uuid: string;
           world: string;
-        } | undefined
+        } | undefined,
+        image: token.image as string | null | undefined
       } as BoffUser;
       console.log('Session:', session);
       return session;

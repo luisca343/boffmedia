@@ -1,7 +1,14 @@
 import { PokemonW } from "@boffmedia/shared";
 
+export type ExtendedPokemonW = PokemonW & {
+  hp?: number;
+  status?: string;
+  gender?: string;
+  types?: string[];
+};
+
 export interface PCPokemon {
-  pokemon: PokemonW;
+  pokemon: ExtendedPokemonW;
   index: number;
   box: number;
 }

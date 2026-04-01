@@ -1,3 +1,6 @@
+"use client";
+
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Trophy, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
@@ -8,6 +11,18 @@ interface WinnerDisplayProps {
 }
 
 export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: 3 + Math.random() * 2,
+        delay: Math.random() * 2,
+      })),
+    []
+  );
+
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.8 },
     visible: {
@@ -154,25 +169,13 @@ export function WinnerDisplay({ winner, onReset }: WinnerDisplayProps) {
 
       {/* Background Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+        {particles.map((p) => (
           <motion.div
-            key={i}
+            key={p.id}
             className="absolute w-2 h-2 bg-yellow-400/30 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0, 1, 0],
-              scale: [0, 1, 0]
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut"
-            }}
+            style={{ left: `${p.left}%`, top: `${p.top}%` }}
+            animate={{ y: [0, -20, 0], opacity: [0, 1, 0], scale: [0, 1, 0] }}
+            transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
           />
         ))}
       </div>
