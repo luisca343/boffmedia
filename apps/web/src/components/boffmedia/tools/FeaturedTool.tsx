@@ -1,157 +1,238 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ArrowRight, Sparkles, Clock } from "lucide-react";
-import { Card } from "@/components/ui/primitives/card";
-import { Button } from "@/components/ui/primitives/button";
-import { Badge } from "@/components/ui/primitives/badge";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 interface FeaturedToolProps {
   tool: any;
-  variants: any;
   t: (key: string, params?: any) => string;
 }
 
-export function FeaturedTool({ tool, variants, t }: FeaturedToolProps) {
+function getNeonStyle(colorClass: string) {
+  if (colorClass.includes("yellow"))
+    return { glow: "rgba(250,204,21,0.3)", scan: "rgba(250,204,21,0.7)", border: "rgba(250,204,21,0.4)" };
+  if (colorClass.includes("highlight"))
+    return { glow: "rgba(132,204,22,0.3)", scan: "rgba(163,230,53,0.7)", border: "rgba(132,204,22,0.4)" };
+  if (colorClass.includes("secondary"))
+    return { glow: "rgba(6,182,212,0.3)", scan: "rgba(34,211,238,0.7)", border: "rgba(6,182,212,0.4)" };
+  if (colorClass.includes("red"))
+    return { glow: "rgba(239,68,68,0.3)", scan: "rgba(248,113,113,0.7)", border: "rgba(239,68,68,0.4)" };
+  if (colorClass.includes("accent"))
+    return { glow: "rgba(168,85,247,0.3)", scan: "rgba(192,132,252,0.7)", border: "rgba(168,85,247,0.4)" };
+  // Default: primary orange
+  return { glow: "rgba(249,115,22,0.3)", scan: "rgba(251,146,60,0.7)", border: "rgba(249,115,22,0.4)" };
+}
+
+export function FeaturedTool({ tool, t }: FeaturedToolProps) {
   const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
+  const [scanY, setScanY] = useState(0);
 
-  // Extract color values for dynamic overlay
-  const getOverlayColor = (colorClass: string) => {
-    if (colorClass.includes('yellow')) return 'yellow';
-    if (colorClass.includes('green')) return 'green';
-    if (colorClass.includes('blue')) return 'blue';
-    if (colorClass.includes('red')) return 'red';
-    if (colorClass.includes('purple')) return 'purple';
-    if (colorClass.includes('orange')) return 'orange';
-    return 'blue'; // fallback
-  };
+  useEffect(() => {
+    if (!isHovered) return;
+    let raf: number;
+    let start: number | null = null;
+    const duration = 1600;
 
-  const overlayColor = getOverlayColor(tool.color);
+    const animate = (ts: number) => {
+      if (!start) start = ts;
+      const elapsed = (ts - start) % duration;
+      setScanY((elapsed / duration) * 100);
+      raf = requestAnimationFrame(animate);
+    };
+    raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [isHovered]);
+
+  const neon = getNeonStyle(tool.color);
 
   return (
-    <motion.div 
-      variants={variants}
-      className="mb-16"
+    <motion.div
+      className="mb-12 cursor-pointer"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.2 }}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      whileHover={{ y: -4 }}
+      onClick={() => router.push(tool.href)}
     >
-      <Card className="bg-gradient-to-br from-surface-800/90 to-surface-900/90 border-surface-700/50 overflow-hidden backdrop-blur-sm shadow-2xl hover:shadow-primary-950/30 transition-all duration-500">
-        <div className={`h-3 bg-gradient-to-r ${tool.color}`}></div>
+      {/* Section label */}
+      <div className="flex items-center gap-3 mb-3">
+        <div className="h-px flex-1 max-w-12 bg-gradient-to-r from-transparent to-primary-500/40" />
+        <span
+          className="text-xs font-mono text-primary-400/70 tracking-[0.4em] uppercase"
+          style={{ fontFamily: "Orbitron, sans-serif" }}
+        >
+          // {t("featuredTool")}
+        </span>
+        <div className="h-px flex-1 max-w-12 bg-gradient-to-l from-transparent to-primary-500/40" />
+      </div>
+
+      <div
+        className="relative bg-surface-900/70 border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500"
+        style={{
+          borderColor: isHovered ? neon.border : "rgba(51,65,85,0.6)",
+          boxShadow: isHovered
+            ? `0 0 50px ${neon.glow}, 0 20px 60px rgba(0,0,0,0.4)`
+            : "0 4px 30px rgba(0,0,0,0.3)",
+        }}
+      >
+        {/* Top neon bar */}
+        <div
+          className={`h-0.5 bg-gradient-to-r ${tool.color} transition-opacity duration-300`}
+          style={{ opacity: isHovered ? 1 : 0.7 }}
+        />
+
+        {/* Scan line */}
+        {isHovered && (
+          <div
+            className="absolute inset-x-0 h-px pointer-events-none z-20"
+            style={{
+              top: `${scanY}%`,
+              background: `linear-gradient(90deg, transparent, ${neon.scan}, transparent)`,
+            }}
+          />
+        )}
+
+        {/* Corner brackets */}
+        {(
+          [
+            "absolute top-3 left-3 w-5 h-5 border-t border-l",
+            "absolute top-3 right-3 w-5 h-5 border-t border-r",
+            "absolute bottom-3 left-3 w-5 h-5 border-b border-l",
+            "absolute bottom-3 right-3 w-5 h-5 border-b border-r",
+          ] as const
+        ).map((cls, i) => (
+          <div
+            key={i}
+            className={`${cls} transition-all duration-300 pointer-events-none`}
+            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.35)" }}
+          />
+        ))}
+
         <div className="lg:flex">
-          <div className="lg:w-2/3 p-6 lg:p-8">
+          {/* Left: Content */}
+          <div className="lg:w-2/3 p-7 lg:p-10 relative z-10">
+            {/* Header */}
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-surface-700/50 to-surface-800/50 border border-surface-600/30 shadow-lg">
+              <div
+                className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-surface-950/60 border flex items-center justify-center transition-transform duration-300"
+                style={{
+                  borderColor: isHovered ? neon.border : "rgba(51,65,85,0.5)",
+                  transform: isHovered ? "scale(1.08)" : "scale(1)",
+                }}
+              >
                 {tool.icon ? (
-                  <Image 
-                    src={tool.icon} 
-                    alt={tool.title} 
-                    width={56} 
-                    height={56} 
-                    className="object-cover"
-                  />
+                  <Image src={tool.icon} alt={tool.title} width={48} height={48} className="object-contain" />
                 ) : (
                   tool.iconFallback
                 )}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-2xl lg:text-3xl font-bold text-surface-50">
+
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  <h2
+                    className="text-2xl lg:text-3xl font-black leading-tight transition-colors duration-300"
+                    style={{
+                      fontFamily: "Orbitron, sans-serif",
+                      color: isHovered ? "rgb(253,186,116)" : "rgb(248,250,252)",
+                    }}
+                  >
                     {tool.title}
                   </h2>
                   {tool.isNew && (
-                    <Badge variant="success">
-                      <Sparkles className="w-3 h-3 mr-1" />
-                      Nuevo
-                    </Badge>
+                    <span
+                      className="flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded border border-success-500/40 text-success-400 bg-success-500/10 tracking-widest flex-shrink-0"
+                      style={{ fontFamily: "Orbitron, sans-serif" }}
+                    >
+                      <Sparkles className="w-2.5 h-2.5" />
+                      NEW
+                    </span>
                   )}
                 </div>
-                <p className="text-primary-300 text-sm font-medium">{t("featuredTool")}</p>
+                <p className="text-xs font-mono text-primary-400/60 tracking-widest uppercase">
+                  // Herramienta destacada
+                </p>
               </div>
             </div>
-            
-            <p className="text-surface-200 text-lg mb-8 leading-relaxed">
-              {tool.description}
-            </p>
-            
-            <div className="flex flex-wrap gap-3 mb-8">
-              {tool.tools.map((toolName: string) => (
-                <Badge
-                  key={toolName}
-                  variant="secondary"
-                  className="text-sm py-1.5 px-4"
+
+            {/* Divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-surface-700/50 to-transparent mb-6" />
+
+            <p className="text-surface-300 text-sm leading-relaxed mb-7">{tool.description}</p>
+
+            {/* Feature tags */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              {(tool.tools ?? tool.features ?? []).map((name: string) => (
+                <span
+                  key={name}
+                  className="text-xs font-mono px-3 py-1 rounded border border-surface-700/50 bg-surface-950/50 text-surface-300 tracking-wide"
                 >
-                  {toolName}
-                </Badge>
+                  {name}
+                </span>
               ))}
             </div>
-            
-            <Button 
-              onClick={() => router.push(tool.href)}
-              size="lg"
+
+            {/* CTA */}
+            <motion.button
+              className="flex items-center gap-3 px-6 py-3 rounded-lg border font-mono text-sm font-bold tracking-widest uppercase transition-all duration-300"
+              style={{
+                fontFamily: "Orbitron, sans-serif",
+                borderColor: isHovered ? neon.border : "rgba(249,115,22,0.3)",
+                color: "rgb(251,146,60)",
+                background: isHovered ? "rgba(249,115,22,0.1)" : "rgba(249,115,22,0.05)",
+                boxShadow: isHovered ? `0 0 20px ${neon.glow}` : "none",
+              }}
+              animate={{ x: isHovered ? 3 : 0 }}
+              transition={{ duration: 0.2 }}
             >
-              {t("accessButton", { tool: tool.title })} 
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+              {t("accessButton", { tool: tool.title })}
+              <ArrowRight className="w-4 h-4" />
+            </motion.button>
           </div>
-          
-          {/* Enhanced image section with proper overlay */}
-          <div className="lg:w-1/3 relative overflow-hidden min-h-[300px] group">
-            {tool.heroImage && (
-              <>
-                <Image
-                  src={tool.heroImage}
-                  alt={tool.title}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority
-                />
-                
-                {/* Multi-layer overlay system */}
-                <div className="absolute inset-0">
-                  {/* Base darkening overlay for contrast */}
-                  <div className="absolute inset-0 bg-black/20"></div>
-                  
-                  {/* Dynamic color overlay based on tool theme */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${
-                    overlayColor === 'yellow' ? 'from-yellow-500/10 via-transparent to-orange-500/5' :
-                    overlayColor === 'green' ? 'from-highlight-500/10 via-transparent to-emerald-500/5' :
-                    overlayColor === 'blue' ? 'from-secondary-500/10 via-transparent to-cyan-500/5' :
-                    overlayColor === 'red' ? 'from-red-500/10 via-transparent to-rose-500/5' :
-                    overlayColor === 'purple' ? 'from-accent-500/10 via-transparent to-violet-500/5' :
-                    overlayColor === 'orange' ? 'from-orange-500/10 via-transparent to-red-500/5' :
-                    'from-secondary-500/10 via-transparent to-cyan-500/5'
-                  }`}></div>
-                  
-                  {/* Bottom gradient for badge readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-                  
-                  {/* Corner accent gradient */}
-                  <div className={`absolute inset-0 bg-gradient-to-tl ${
-                    overlayColor === 'yellow' ? 'from-yellow-400/15' :
-                    overlayColor === 'green' ? 'from-highlight-400/15' :
-                    overlayColor === 'blue' ? 'from-secondary-400/15' :
-                    overlayColor === 'red' ? 'from-red-400/15' :
-                    overlayColor === 'purple' ? 'from-accent-400/15' :
-                    overlayColor === 'orange' ? 'from-orange-400/15' :
-                    'from-secondary-400/15'
-                  } via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`}></div>
-                </div>
-              </>
-            )}
-            
-            {/* Enhanced badge with better positioning */}
-            <div className="absolute bottom-4 left-4 z-10">
-              <Badge className="bg-black/80 text-white backdrop-blur-md border border-white/10 shadow-lg">
-                <Clock className="w-3 h-3 mr-1" />
-                Recién actualizado
-              </Badge>
+
+          {/* Right: Hero image */}
+          {tool.heroImage && (
+            <div className="lg:w-1/3 relative overflow-hidden min-h-[280px]">
+              <Image
+                src={tool.heroImage}
+                alt={tool.title}
+                fill
+                className="object-cover transition-transform duration-700"
+                style={{ transform: isHovered ? "scale(1.05)" : "scale(1)" }}
+                priority
+              />
+              <div className="absolute inset-0 bg-black/25" />
+              <div className="absolute inset-0 bg-gradient-to-r from-surface-900/80 via-surface-900/30 to-transparent hidden lg:block" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+              <div
+                className="absolute inset-0 pointer-events-none opacity-[0.06]"
+                style={{
+                  backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)",
+                  backgroundSize: "20px 20px",
+                }}
+              />
+              {/* Updated badge */}
+              <div className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 bg-surface-950/80 border border-surface-700/50 rounded px-2.5 py-1 backdrop-blur-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-success-400 animate-pulse" />
+                <span className="text-xs font-mono text-surface-300 tracking-widest">
+                  Recién actualizado
+                </span>
+              </div>
             </div>
-            
-            {/* Optional: Add a subtle pattern overlay for texture */}
-            <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_1px_1px,_white_1px,_transparent_0)] bg-[length:24px_24px] pointer-events-none"></div>
-          </div>
+          )}
         </div>
-      </Card>
+
+        {/* Bottom line */}
+        <div
+          className={`h-px bg-gradient-to-r ${tool.color} transition-opacity duration-500`}
+          style={{ opacity: isHovered ? 0.3 : 0 }}
+        />
+      </div>
     </motion.div>
   );
 }
