@@ -61,18 +61,33 @@ function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: strin
       onClick={() => router.push(tool.href)}
     >
       <div
-        className="relative h-full bg-surface-900/60 border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500 flex flex-col"
+        className="relative h-full border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500 flex flex-col"
         style={{
-          borderColor: isHovered ? neon.border : "rgba(51,65,85,0.55)",
+          background: isHovered
+            ? `linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))`
+            : `linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))`,
+          borderColor: isHovered ? neon.border : "rgba(71,85,105,0.6)",
           boxShadow: isHovered
-            ? `0 0 40px ${neon.glow}, 0 20px 50px rgba(0,0,0,0.4)`
-            : "0 4px 20px rgba(0,0,0,0.3)",
+            ? `0 0 45px ${neon.glow}, 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+            : `0 6px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03), 0 0 0 1px rgba(255,255,255,0.02)`,
         }}
       >
-        {/* Top neon bar */}
+        {/* Top neon bar — thicker and always visible */}
         <div
-          className={`h-0.5 bg-gradient-to-r ${tool.color} flex-shrink-0 transition-opacity duration-300`}
-          style={{ opacity: isHovered ? 1 : 0.6 }}
+          className={`h-[3px] bg-gradient-to-r ${tool.color} flex-shrink-0 transition-all duration-300`}
+          style={{
+            opacity: isHovered ? 1 : 0.75,
+            boxShadow: isHovered ? `0 0 12px ${neon.glow}` : "none",
+          }}
+        />
+
+        {/* Ambient inner tint — always on, brightens on hover */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+          style={{
+            background: `radial-gradient(ellipse at 50% 0%, ${neon.glow.replace("0.25", "0.12").replace("0.3", "0.12")} 0%, transparent 65%)`,
+            opacity: isHovered ? 1 : 0.6,
+          }}
         />
 
         {/* Scan line */}
@@ -86,7 +101,7 @@ function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: strin
           />
         )}
 
-        {/* Corner brackets */}
+        {/* Corner brackets — always visible, brighten on hover */}
         {(
           [
             "absolute top-3 left-3 w-4 h-4 border-t border-l",
@@ -98,7 +113,7 @@ function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: strin
           <div
             key={i}
             className={`${cls} transition-all duration-300 pointer-events-none`}
-            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.35)" }}
+            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.55)" }}
           />
         ))}
 

@@ -73,18 +73,33 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
       </div>
 
       <div
-        className="relative bg-surface-900/70 border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500"
+        className="relative border backdrop-blur-md rounded-lg overflow-hidden transition-all duration-500"
         style={{
-          borderColor: isHovered ? neon.border : "rgba(51,65,85,0.6)",
+          background: isHovered
+            ? "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))"
+            : "linear-gradient(145deg, rgba(30,41,59,0.88), rgba(15,23,42,0.92))",
+          borderColor: isHovered ? neon.border : "rgba(71,85,105,0.65)",
           boxShadow: isHovered
-            ? `0 0 50px ${neon.glow}, 0 20px 60px rgba(0,0,0,0.4)`
-            : "0 4px 30px rgba(0,0,0,0.3)",
+            ? `0 0 60px ${neon.glow}, 0 24px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+            : `0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03), 0 0 0 1px rgba(255,255,255,0.02)`,
         }}
       >
-        {/* Top neon bar */}
+        {/* Top neon bar — thicker and always visible */}
         <div
-          className={`h-0.5 bg-gradient-to-r ${tool.color} transition-opacity duration-300`}
-          style={{ opacity: isHovered ? 1 : 0.7 }}
+          className={`h-[3px] bg-gradient-to-r ${tool.color} transition-all duration-300`}
+          style={{
+            opacity: isHovered ? 1 : 0.8,
+            boxShadow: isHovered ? `0 0 16px ${neon.glow}` : "none",
+          }}
+        />
+
+        {/* Ambient inner tint */}
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-500"
+          style={{
+            background: `radial-gradient(ellipse at 50% 0%, ${neon.glow.replace("0.3", "0.1")} 0%, transparent 55%)`,
+            opacity: isHovered ? 1 : 0.5,
+          }}
         />
 
         {/* Scan line */}
@@ -110,7 +125,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
           <div
             key={i}
             className={`${cls} transition-all duration-300 pointer-events-none`}
-            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.35)" }}
+            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.55)" }}
           />
         ))}
 
