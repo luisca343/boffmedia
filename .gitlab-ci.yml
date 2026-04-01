@@ -11,6 +11,10 @@ variables:
   image: docker:27
   tags:
     - docker
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_BUILDKIT: "1"
+    DOCKER_TLS_CERTDIR: ""   # <--- disable TLS for socket
   before_script:
     - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
