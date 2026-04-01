@@ -27,10 +27,15 @@ function ResourceCard({ link, index }: { link: ExternalResourcesProps["links"][n
       whileHover={{ y: -3 }}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="relative bg-surface-900/50 border backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 flex flex-col p-5 group"
+      className="relative backdrop-blur-sm rounded-lg overflow-hidden transition-all duration-300 flex flex-col p-5 group border"
       style={{
-        borderColor: isHovered ? "rgba(249,115,22,0.35)" : "rgba(51,65,85,0.5)",
-        boxShadow: isHovered ? "0 0 25px rgba(249,115,22,0.15)" : "none",
+        background: isHovered
+          ? "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))"
+          : "linear-gradient(145deg, rgba(30,41,59,0.75), rgba(15,23,42,0.85))",
+        borderColor: isHovered ? "rgba(249,115,22,0.4)" : "rgba(71,85,105,0.55)",
+        boxShadow: isHovered
+          ? "0 0 30px rgba(249,115,22,0.15), 0 8px 24px rgba(0,0,0,0.4)"
+          : "0 4px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.02)",
       }}
     >
       {/* Corner brackets */}
@@ -75,10 +80,14 @@ function ResourceCard({ link, index }: { link: ExternalResourcesProps["links"][n
 export function ExternalResources({ links, t }: ExternalResourcesProps) {
   return (
     <motion.div
-      className="mt-16 relative bg-surface-900/50 backdrop-blur-sm rounded-lg overflow-hidden border border-surface-700/40"
+      className="mt-16 relative backdrop-blur-sm rounded-lg overflow-hidden border border-surface-600/50"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
+      style={{
+        background: "linear-gradient(145deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9))",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.03)",
+      }}
     >
       {/* Top accent line */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
