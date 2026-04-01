@@ -86,8 +86,8 @@ const baseConfig: Record<string, Omit<GameConfig, 'categories'> & {
     bg: "bg-highlight-900",
     categories: [
       {
-        name: "games.mhwilds.categories.buildPlanner",
-        href: "/mhwilds/builds",
+        name: "games.mhwilds.name",
+        href: "/mhwilds",
         tools: [
           { name: "games.mhwilds.tools.planner", href: "/mhwilds/builds/planner", icon: "SwordIcon" },
           { 
