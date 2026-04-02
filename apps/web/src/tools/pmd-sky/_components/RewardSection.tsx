@@ -1,8 +1,8 @@
 import { useTranslations } from "next-intl";
 import { GiftIcon, CubeIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { Combobox } from "@/components/ui/primitives/combobox";
-import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
 import { FormField } from "@/components/ui/form/FormField";
+import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 import { getRewardTypes, getUseTargetItem, givesItem } from "../QuestData";
 import { getItemData } from "../ItemData";
 
@@ -23,7 +23,7 @@ export function RewardSection({
   rewardItem,
   onRewardTypeChange,
   onTargetItemChange,
-  onRewardItemChange
+  onRewardItemChange,
 }: RewardSectionProps) {
   const t = useTranslations("");
   const useTargetItem = getUseTargetItem(questType);
@@ -31,17 +31,17 @@ export function RewardSection({
 
   return (
     <div className="mb-8">
-      <SectionHeader 
-        icon={<TrophyIcon className="w-5 h-5" />} 
-        title={t("REWARD_SETTINGS")} 
+      <ToolSectionHeader
+        icon={<TrophyIcon />}
+        label={t("REWARD_SETTINGS")}
       />
       <div className="space-y-6">
-        <FormField 
-          label={t("REWARD_TYPE")} 
+        <FormField
+          label={t("REWARD_TYPE")}
           icon={<GiftIcon className="w-4 h-4 text-yellow-400" />}
           required
         >
-          <Combobox 
+          <Combobox
             data={getRewardTypes(t)}
             value={rewardType.toString()}
             onChange={onRewardTypeChange}
@@ -49,12 +49,12 @@ export function RewardSection({
         </FormField>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <FormField 
-            label={t("TARGET_ITEM")} 
+          <FormField
+            label={t("TARGET_ITEM")}
             icon={<CubeIcon className="w-4 h-4 text-indigo-400" />}
             disabled={!useTargetItem}
           >
-            <Combobox 
+            <Combobox
               data={getItemData()}
               value={targetItem.toString()}
               onChange={onTargetItemChange}
@@ -62,12 +62,12 @@ export function RewardSection({
             />
           </FormField>
 
-          <FormField 
-            label={t("REWARD_ITEM")} 
+          <FormField
+            label={t("REWARD_ITEM")}
             icon={<GiftIcon className="w-4 h-4 text-pink-400" />}
             disabled={!rewardGivesItem}
           >
-            <Combobox 
+            <Combobox
               data={getItemData()}
               value={rewardItem.toString()}
               onChange={onRewardItemChange}

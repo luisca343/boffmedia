@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronRight, Zap } from "lucide-react";
 
-type PageHeaderTheme = "primary" | "accent";
+type PageHeaderTheme = "primary" | "accent" | "secondary";
 
 interface ThemeConfig {
   breadcrumbClass: string;
@@ -36,6 +36,15 @@ const THEMES: Record<PageHeaderTheme, ThemeConfig> = {
     titleGlow: "rgba(139,92,246,0.3)",
     logoGlow: "rgba(139,92,246,0.2)",
   },
+  secondary: {
+    breadcrumbClass: "text-secondary-400",
+    dividerClass: "from-secondary-500/60",
+    zapClass: "text-secondary-400",
+    zapGlow: "rgba(6,182,212,0.5)",
+    titleGradient: "linear-gradient(135deg, #a5f3fc 0%, #22d3ee 40%, #06b6d4 70%, #0891b2 100%)",
+    titleGlow: "rgba(6,182,212,0.3)",
+    logoGlow: "rgba(6,182,212,0.2)",
+  },
 };
 
 export interface PageHeaderProps {
@@ -46,6 +55,8 @@ export interface PageHeaderProps {
   logoWidth?: number;
   logoHeight?: number;
   theme?: PageHeaderTheme;
+  /** Label for the first breadcrumb segment. Defaults to "Herramientas". */
+  sectionLabel?: string;
 }
 
 export function PageHeader({
@@ -56,6 +67,7 @@ export function PageHeader({
   logoWidth = 180,
   logoHeight = 80,
   theme = "primary",
+  sectionLabel = "Herramientas",
 }: PageHeaderProps) {
   const [isMounted, setIsMounted] = useState(false);
   const cfg = THEMES[theme];
@@ -66,7 +78,7 @@ export function PageHeader({
 
   return (
     <motion.div
-      className="mb-12 lg:mb-16"
+      className="mb-12 lg:mb-12"
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -75,7 +87,7 @@ export function PageHeader({
         <div className="text-center lg:text-left flex-1">
           <div className="flex items-center justify-center lg:justify-start gap-1.5 mb-5">
             <span className="text-xs font-mono text-surface-500 tracking-widest uppercase">
-              Herramientas
+              {sectionLabel}
             </span>
             <ChevronRight className="w-3 h-3 text-surface-600" />
             <span className={`text-xs font-mono ${cfg.breadcrumbClass} tracking-widest uppercase`}>

@@ -45,6 +45,8 @@
     "EUROPEAN": "European",
     "GENERATE_WONDER_MAIL": "Generate",
     "WONDERMAIL": "Wonder Mail",
+    "WONDERMAIL_TITLE": "Pokémon Mystery Dungeon: Explorers of Sky",
+    "WONDERMAIL_SUBTITLE": "Wonder Mail Creator",
     "WONDER_MAIL_CREATOR": "Wonder Mail Creator",
     "WONDER_MAIL_CREATOR_DESCRIPTION": "Generate wonder mails for PMD Explorers of Sky."
 

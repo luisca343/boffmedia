@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { UserGroupIcon, UserIcon, CursorArrowRippleIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
-import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
 import { FormField } from "@/components/ui/form/FormField";
+import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 import { PokemonSelector } from "./PokemonSelector";
 import { getClientIsTarget, getForceClient } from "../QuestData";
 
@@ -24,7 +24,7 @@ export function PokemonSection({
   clientSprite,
   targetSprite,
   onClientPokemonChange,
-  onTargetPokemonChange
+  onTargetPokemonChange,
 }: PokemonSectionProps) {
   const t = useTranslations("");
   const isClientForced = getForceClient(questType, specialQuestType) > 0;
@@ -32,14 +32,14 @@ export function PokemonSection({
 
   return (
     <div className="mb-8">
-      <SectionHeader 
-        icon={<UserGroupIcon className="w-5 h-5" />} 
-        title={t("POKEMON_SETTINGS")} 
+      <ToolSectionHeader
+        icon={<UserGroupIcon />}
+        label={t("POKEMON_SETTINGS")}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <FormField 
-          label={t("CLIENT_POKEMON")} 
-          icon={<UserIcon className="w-4 h-4 text-cyan-400" />}
+        <FormField
+          label={t("CLIENT_POKEMON")}
+          icon={<UserIcon className="w-4 h-4 text-secondary-400" />}
           disabled={isClientForced}
         >
           <PokemonSelector
@@ -50,15 +50,15 @@ export function PokemonSection({
             alt="Client Sprite"
           />
           {isClientForced && (
-            <p className="text-xs text-surface-400 mt-1 flex items-center">
-              <InformationCircleIcon className="w-3 h-3 mr-1" />
+            <p className="text-xs text-surface-400 mt-1 flex items-center gap-1">
+              <InformationCircleIcon className="w-3 h-3" />
               {t("FORCED_BY_QUEST_TYPE")}
             </p>
           )}
         </FormField>
 
-        <FormField 
-          label={t("TARGET_POKEMON")} 
+        <FormField
+          label={t("TARGET_POKEMON")}
           icon={<CursorArrowRippleIcon className="w-4 h-4 text-red-400" />}
           disabled={isTargetDisabled}
         >
@@ -70,8 +70,8 @@ export function PokemonSection({
             alt="Target Sprite"
           />
           {isTargetDisabled && (
-            <p className="text-xs text-surface-400 mt-1 flex items-center">
-              <InformationCircleIcon className="w-3 h-3 mr-1" />
+            <p className="text-xs text-surface-400 mt-1 flex items-center gap-1">
+              <InformationCircleIcon className="w-3 h-3" />
               {getClientIsTarget(questType) ? t("CLIENT_IS_TARGET") : t("FORCED_BY_QUEST_TYPE")}
             </p>
           )}
