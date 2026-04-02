@@ -50,6 +50,8 @@
     "USE_EUROPEAN_FORMAT": "Usar formato europeo",
     "ADDITIONAL_SETTINGS": "Configuración Adicional",
     "GENERATE_WONDER_MAIL": "Generar Correo Secreto",
+    "WONDERMAIL_TITLE": "Generador de",
+    "WONDERMAIL_SUBTITLE": "Correos Secretos",
     "WONDERMAIL": "Correo Secreto",
     "WONDER_MAIL_CREATOR": "Generador de Correos Secretos",
     "WONDER_MAIL_CREATOR_DESCRIPTION": "Crea correos secretos personalizados para Pokémon Mundo Misterioso: Exploradores del Cielo. Configura misiones, ubicaciones, Pokémon y recompensas.",

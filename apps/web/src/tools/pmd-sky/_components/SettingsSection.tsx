@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { SectionHeader } from "@/components/ui/form/FormSectionHeader";
+import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 import { EuropeanVersionToggle } from "./EuropeanVersionToggle";
 
 interface SettingsSectionProps {
@@ -10,18 +10,17 @@ interface SettingsSectionProps {
 
 export function SettingsSection({
   europeanVersion,
-  onEuropeanVersionChange
+  onEuropeanVersionChange,
 }: SettingsSectionProps) {
   const t = useTranslations("");
 
   return (
     <div className="mb-8">
-      <SectionHeader 
-        icon={<Cog6ToothIcon className="w-5 h-5" />} 
-        title={t("ADDITIONAL_SETTINGS")} 
+      <ToolSectionHeader
+        icon={<Cog6ToothIcon />}
+        label={t("ADDITIONAL_SETTINGS")}
       />
-      
-      <EuropeanVersionToggle 
+      <EuropeanVersionToggle
         checked={europeanVersion}
         onChange={onEuropeanVersionChange}
       />
