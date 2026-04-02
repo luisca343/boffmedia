@@ -1,49 +1,21 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronRight, Cpu, Gamepad2, Sparkles } from "lucide-react";
+import { getNeonStyle } from "@components/boffmedia/tools/utils/getNeonStyle";
+import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
 interface ToolsGridProps {
   tools: any[];
-  t: (key: string, params?: any) => string;
+  t?: (key: string, params?: any) => string;
 }
 
-function getNeonStyle(colorClass: string) {
-  if (colorClass.includes("yellow"))
-    return { glow: "rgba(250,204,21,0.25)", scan: "rgba(250,204,21,0.7)", border: "rgba(250,204,21,0.35)" };
-  if (colorClass.includes("highlight"))
-    return { glow: "rgba(132,204,22,0.25)", scan: "rgba(163,230,53,0.7)", border: "rgba(132,204,22,0.35)" };
-  if (colorClass.includes("secondary"))
-    return { glow: "rgba(6,182,212,0.25)", scan: "rgba(34,211,238,0.7)", border: "rgba(6,182,212,0.35)" };
-  if (colorClass.includes("red"))
-    return { glow: "rgba(239,68,68,0.25)", scan: "rgba(248,113,113,0.7)", border: "rgba(239,68,68,0.35)" };
-  if (colorClass.includes("accent"))
-    return { glow: "rgba(168,85,247,0.25)", scan: "rgba(192,132,252,0.7)", border: "rgba(168,85,247,0.35)" };
-  return { glow: "rgba(249,115,22,0.25)", scan: "rgba(251,146,60,0.7)", border: "rgba(249,115,22,0.35)" };
-}
-
-function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: string, params?: any) => string }) {
+function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exploreLabel: string }) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const [scanY, setScanY] = useState(0);
-
-  useEffect(() => {
-    if (!isHovered) return;
-    let raf: number;
-    let start: number | null = null;
-    const duration = 1400;
-
-    const animate = (ts: number) => {
-      if (!start) start = ts;
-      const elapsed = (ts - start) % duration;
-      setScanY((elapsed / duration) * 100);
-      raf = requestAnimationFrame(animate);
-    };
-    raf = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(raf);
-  }, [isHovered]);
+  const scanY = useScanAnimation(isHovered, 1400);
 
   const neon = getNeonStyle(tool.color);
   const featureList: string[] = tool.tools ?? tool.features ?? [];
@@ -195,7 +167,7 @@ function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: strin
               animate={{ x: isHovered ? 3 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              {t("explore")}
+              {exploreLabel}
               <ChevronRight className="w-3.5 h-3.5" />
             </motion.span>
           </div>
@@ -212,6 +184,8 @@ function ToolCard({ tool, index, t }: { tool: any; index: number; t: (key: strin
 }
 
 export function ToolsGrid({ tools, t }: ToolsGridProps) {
+  const exploreLabel = typeof t === "function" ? t("explore") : "ACCEDER";
+
   return (
     <div className="mb-12">
       {/* Section label */}
@@ -227,7 +201,7 @@ export function ToolsGrid({ tools, t }: ToolsGridProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
         {tools.map((tool, index) => (
-          <ToolCard key={tool.title} tool={tool} index={index} t={t} />
+          <ToolCard key={tool.title} tool={tool} index={index} exploreLabel={exploreLabel} />
         ))}
       </div>
     </div>
