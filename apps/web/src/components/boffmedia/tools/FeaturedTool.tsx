@@ -1,51 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { getNeonStyle } from "@components/boffmedia/tools/utils/getNeonStyle";
+import { NeonButton } from "@components/boffmedia/tools/NeonButton";
+import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
 interface FeaturedToolProps {
   tool: any;
   t: (key: string, params?: any) => string;
 }
 
-function getNeonStyle(colorClass: string) {
-  if (colorClass.includes("yellow"))
-    return { glow: "rgba(250,204,21,0.3)", scan: "rgba(250,204,21,0.7)", border: "rgba(250,204,21,0.4)" };
-  if (colorClass.includes("highlight"))
-    return { glow: "rgba(132,204,22,0.3)", scan: "rgba(163,230,53,0.7)", border: "rgba(132,204,22,0.4)" };
-  if (colorClass.includes("secondary"))
-    return { glow: "rgba(6,182,212,0.3)", scan: "rgba(34,211,238,0.7)", border: "rgba(6,182,212,0.4)" };
-  if (colorClass.includes("red"))
-    return { glow: "rgba(239,68,68,0.3)", scan: "rgba(248,113,113,0.7)", border: "rgba(239,68,68,0.4)" };
-  if (colorClass.includes("accent"))
-    return { glow: "rgba(168,85,247,0.3)", scan: "rgba(192,132,252,0.7)", border: "rgba(168,85,247,0.4)" };
-  // Default: primary orange
-  return { glow: "rgba(249,115,22,0.3)", scan: "rgba(251,146,60,0.7)", border: "rgba(249,115,22,0.4)" };
-}
-
 export function FeaturedTool({ tool, t }: FeaturedToolProps) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
-  const [scanY, setScanY] = useState(0);
-
-  useEffect(() => {
-    if (!isHovered) return;
-    let raf: number;
-    let start: number | null = null;
-    const duration = 1600;
-
-    const animate = (ts: number) => {
-      if (!start) start = ts;
-      const elapsed = (ts - start) % duration;
-      setScanY((elapsed / duration) * 100);
-      raf = requestAnimationFrame(animate);
-    };
-    raf = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(raf);
-  }, [isHovered]);
+  const scanY = useScanAnimation(isHovered, 1600);
 
   const neon = getNeonStyle(tool.color);
 
@@ -193,21 +165,9 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
             </div>
 
             {/* CTA */}
-            <motion.button
-              className="flex items-center gap-3 px-6 py-3 rounded-lg border font-mono text-sm font-bold tracking-widest uppercase transition-all duration-300"
-              style={{
-                fontFamily: "Orbitron, sans-serif",
-                borderColor: isHovered ? neon.border : "rgba(249,115,22,0.3)",
-                color: "rgb(251,146,60)",
-                background: isHovered ? "rgba(249,115,22,0.1)" : "rgba(249,115,22,0.05)",
-                boxShadow: isHovered ? `0 0 20px ${neon.glow}` : "none",
-              }}
-              animate={{ x: isHovered ? 3 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
+            <NeonButton isHovered={isHovered} neon={neon}>
               {t("accessButton", { tool: tool.title })}
-              <ArrowRight className="w-4 h-4" />
-            </motion.button>
+            </NeonButton>
           </div>
 
           {/* Right: Hero image */}
