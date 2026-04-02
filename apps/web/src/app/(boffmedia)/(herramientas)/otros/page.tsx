@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
-import { Gift, Key, ChevronRight, ArrowRight, ExternalLink, Plus, Zap, Terminal } from "lucide-react";
+import { Gift, Key, ExternalLink, Plus, Terminal } from "lucide-react";
 import { FloatingSection } from "../../_components/layout/FloatingSection";
-import { FeaturedCard } from "./_components/FeaturedCard";
+import { PageHeader } from "@components/boffmedia/tools/PageHeader";
+import { FeaturedTool } from "@components/boffmedia/tools/FeaturedTool";
 import { ToolsGrid } from "@components/boffmedia/tools/ToolsGrid";
+import { ExternalResources } from "@components/boffmedia/tools/ExternalResources";
 
 const TOOLS = [
   {
@@ -37,95 +37,33 @@ const EXTERNAL_LINKS = [
   { href: "https://boffmedia.com/guias", title: "Guías de BoffMedia", description: "Guías y tutoriales para tus juegos favoritos" },
 ];
 
+const t = (key: string, params?: any): string => {
+  if (key === "accessButton") return `Acceder a ${params?.tool ?? ""}`;
+  if (key === "featuredTool") return "Herramienta destacada";
+  if (key === "externalLinks.title") return "Recursos recomendados";
+  return key;
+};
+
 export default function OtherTools() {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const featuredTool = TOOLS.find((t) => t.featured)!;
-  const otherTools = TOOLS.filter((t) => !t.featured);
+  const featuredTool = TOOLS.find((tool) => tool.featured)!;
+  const otherTools = TOOLS.filter((tool) => !tool.featured);
 
   return (
     <FloatingSection>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <PageHeader
+          title={{ prefix: "Otras", highlight: "Herramientas" }}
+          subtitle="Recursos útiles para gamers y creadores de contenido"
+          logoSrc="/img/games/other/icon.webp"
+          logoAlt="Otras Herramientas"
+          logoWidth={120}
+          logoHeight={120}
+          theme="accent"
+        />
 
-        {/* Header */}
-        <motion.div
-          className="mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-8">
-            <div className="text-center lg:text-left flex-1">
-              {/* Breadcrumb */}
-              <div className="flex items-center justify-center lg:justify-start gap-1.5 mb-5">
-                <span className="text-xs font-mono text-surface-500 tracking-widest uppercase">Herramientas</span>
-                <ChevronRight className="w-3 h-3 text-surface-600" />
-                <span className="text-xs font-mono text-primary-400 tracking-widest uppercase">Otros</span>
-              </div>
+        <FeaturedTool tool={featuredTool} t={t} />
 
-              <h1 className="font-black tracking-tight leading-none mb-4" style={{ fontFamily: "Orbitron, sans-serif" }}>
-                <span className="block text-lg sm:text-xl text-surface-400 font-medium tracking-[0.25em] mb-2">
-                  Otras
-                </span>
-                <span
-                  className="text-4xl sm:text-5xl lg:text-6xl"
-                  style={{
-                    background: "linear-gradient(135deg, #a78bfa 0%, #8b5cf6 40%, #7c3aed 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                    filter: "drop-shadow(0 0 25px rgba(139,92,246,0.3))",
-                  }}
-                >
-                  HERRAMIENTAS
-                </span>
-              </h1>
-
-              <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
-                <div className="h-px w-16 bg-gradient-to-r from-accent-500/60 to-transparent" />
-                <Zap className="w-3 h-3 text-accent-400" style={{ filter: "drop-shadow(0 0 6px rgba(168,85,247,0.5))" }} />
-              </div>
-
-              <p className="text-surface-400 max-w-xl text-sm leading-relaxed tracking-wide">
-                Recursos útiles para gamers y creadores de contenido
-              </p>
-            </div>
-
-            {isMounted && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.85 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                className="flex-shrink-0"
-              >
-                <div className="relative p-4">
-                  <div
-                    className="absolute inset-0 rounded-2xl"
-                    style={{ background: "radial-gradient(ellipse at center, rgba(139,92,246,0.2) 0%, transparent 70%)", filter: "blur(16px)" }}
-                  />
-                  <Image
-                    src="/img/games/other/icon.webp"
-                    alt="Otras Herramientas"
-                    width={120}
-                    height={120}
-                    className="object-contain relative z-10 drop-shadow-2xl"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  />
-                </div>
-              </motion.div>
-            )}
-          </div>
-        </motion.div>
-
-        {/* Featured */}
-        <FeaturedCard tool={featuredTool} />
-
-        {/* Other tools */}
-        <ToolsGrid tools={otherTools} />
+        {otherTools.length > 0 && <ToolsGrid tools={otherTools} t={t} />}
 
         {/* Suggestion card */}
         <div className="mb-12">
@@ -158,50 +96,7 @@ export default function OtherTools() {
           </motion.div>
         </div>
 
-        {/* External Resources */}
-        <motion.div
-          className="mt-4 relative bg-surface-900/50 backdrop-blur-sm rounded-lg overflow-hidden border border-surface-700/40"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-        >
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-500/50 to-transparent" />
-          <div className="p-6 lg:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="text-xs font-mono text-primary-400/70 tracking-[0.35em] uppercase" style={{ fontFamily: "Orbitron, sans-serif" }}>
-                // Recursos recomendados
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-r from-surface-700/50 to-transparent" />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {EXTERNAL_LINKS.map((link, i) => (
-                <motion.a
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + i * 0.07 }}
-                  whileHover={{ y: -3 }}
-                  className="relative bg-surface-900/50 border border-surface-700/40 hover:border-primary-500/30 rounded-lg p-5 flex flex-col group transition-all duration-300"
-                >
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="text-sm font-bold text-surface-100 group-hover:text-primary-300 transition-colors duration-300 leading-tight">
-                      {link.title}
-                    </span>
-                    <ExternalLink className="w-3.5 h-3.5 text-surface-600 group-hover:text-primary-400 flex-shrink-0 mt-0.5 transition-colors duration-300" />
-                  </div>
-                  <p className="text-xs text-surface-500 leading-relaxed flex-1">{link.description}</p>
-                  <motion.div className="flex justify-end mt-3" whileHover={{ x: 4 }} transition={{ duration: 0.2 }}>
-                    <ArrowRight className="h-3.5 w-3.5 text-surface-600 group-hover:text-primary-400 transition-colors duration-300" />
-                  </motion.div>
-                </motion.a>
-              ))}
-            </div>
-          </div>
-        </motion.div>
+        <ExternalResources links={EXTERNAL_LINKS} t={t} />
 
         {/* Coming soon */}
         <motion.div
@@ -223,7 +118,6 @@ export default function OtherTools() {
             Estamos desarrollando nuevas herramientas: generadores de torneos, comparadores de precios y más recursos útiles para la comunidad.
           </p>
         </motion.div>
-
       </div>
     </FloatingSection>
   );
