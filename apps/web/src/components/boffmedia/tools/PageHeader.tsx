@@ -124,7 +124,7 @@ export function PageHeader({
             />
           </div>
 
-          <p className="text-surface-400 max-w-xl text-sm leading-relaxed tracking-wide">
+          <p className="text-surface-400 max-w-2xl text-sm leading-relaxed tracking-wide">
             {subtitle}
           </p>
         </div>
