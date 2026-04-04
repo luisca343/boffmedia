@@ -175,7 +175,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       {/* Panel — pt-2 keeps the visual spacing inside the hover zone so the
           cursor never exits the parent div while crossing to the panel. */}
       {isOpen && (
-        <div className="absolute top-full z-50 w-72 pt-2">
+        <div className="absolute top-full z-50 w-60 pt-2">
           <div
             className="border rounded-lg overflow-hidden backdrop-blur-xl"
             style={{
@@ -191,13 +191,13 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
               style={{ opacity: 0.7 }}
             />
 
-            <div className="py-1.5">
+            <div className="py-1">
               {/* Optional main-link header */}
               {mainLink && (
                 <>
                   <Link
                     href={mainLink.href}
-                    className="flex items-center gap-2.5 px-3.5 py-2.5 mx-1.5 rounded-md transition-all duration-150 hover:bg-primary-500/[0.08] group"
+                    className="flex items-center gap-2 px-3 py-2 mx-1 rounded-md transition-all duration-150 hover:bg-primary-500/[0.08] group"
                     onClick={handleNavigate}
                   >
                     {mainLink.icon && (
@@ -220,7 +220,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                     </div>
                   </Link>
                   <div
-                    className="h-px mx-3 my-1"
+                    className="h-px mx-2 my-0.5"
                     style={{
                       background:
                         "linear-gradient(90deg, transparent, rgba(249,115,22,0.18), transparent)",
@@ -233,7 +233,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                 <React.Fragment key={`${section.title ?? ""}-${index}`}>
                   {index > 0 && (
                     <div
-                      className="h-px mx-3 my-1"
+                      className="h-px mx-2 my-0.5"
                       style={{
                         background:
                           "linear-gradient(90deg, transparent, rgba(71,85,105,0.35), transparent)",
@@ -245,28 +245,28 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                     section.href ? (
                       <Link
                         href={section.href}
-                        className="flex items-center justify-between px-3.5 pt-2 pb-1 text-xs font-mono uppercase tracking-widest transition-colors duration-150 group"
+                        className="flex items-center justify-between px-3 pt-1.5 pb-0.5 text-[10px] font-mono uppercase tracking-widest transition-colors duration-150 group"
                         style={{
-                          color: "rgba(251,146,60,0.72)",
+                          color: "rgba(251,146,60,0.65)",
                           fontFamily: "Orbitron, sans-serif",
                         }}
                         onClick={handleNavigate}
                       >
-                        <span className="flex items-center gap-1.5">
-                          {section.icon && <span className="opacity-80">{section.icon}</span>}
+                        <span className="flex items-center gap-1">
+                          {section.icon && <span className="opacity-70 [&_svg]:w-3 [&_svg]:h-3">{section.icon}</span>}
                           {section.title}
                         </span>
-                        <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-80 transition-opacity" />
+                        <ChevronRight className="h-2.5 w-2.5 opacity-0 group-hover:opacity-80 transition-opacity" />
                       </Link>
                     ) : (
                       <h3
-                        className="flex items-center gap-1.5 px-3.5 pt-2 pb-1 text-xs font-mono uppercase tracking-widest"
+                        className="flex items-center gap-1 px-3 pt-1.5 pb-0.5 text-[10px] font-mono uppercase tracking-widest"
                         style={{
-                          color: "rgba(100,116,139,0.75)",
+                          color: "rgba(100,116,139,0.7)",
                           fontFamily: "Orbitron, sans-serif",
                         }}
                       >
-                        {section.icon && <span className="opacity-70">{section.icon}</span>}
+                        {section.icon && <span className="opacity-60 [&_svg]:w-3 [&_svg]:h-3">{section.icon}</span>}
                         {section.title}
                       </h3>
                     )
@@ -278,7 +278,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                       .map((item, itemIndex) => (
                         <MotionLink
                           href={item.href}
-                          className="flex items-center gap-2.5 mx-1.5 px-2.5 py-2 rounded-md text-sm text-surface-300 hover:text-surface-50 hover:bg-primary-500/[0.07] transition-colors duration-150 group"
+                          className="flex items-center gap-2 mx-1 px-2 py-1.5 rounded text-xs text-surface-300 hover:text-surface-50 hover:bg-primary-500/[0.07] transition-colors duration-150 group"
                           initial={{ opacity: 0, x: -4 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.12, delay: itemIndex * 0.025 }}
@@ -288,19 +288,12 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                           rel={item.isExternal ? "noopener noreferrer" : undefined}
                         >
                           {item.icon && (
-                            <span className="text-primary-400/55 group-hover:text-primary-400/90 transition-colors flex-shrink-0">
+                            <span className="text-primary-400/55 group-hover:text-primary-400/90 transition-colors flex-shrink-0 [&_svg]:w-3.5 [&_svg]:h-3.5">
                               {item.icon}
                             </span>
                           )}
-                          <div className="flex-1 min-w-0">
-                            <div className="leading-tight truncate">{item.label}</div>
-                            {item.description && (
-                              <div className="text-xs text-surface-500 mt-0.5 truncate">
-                                {item.description}
-                              </div>
-                            )}
-                          </div>
-                          <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
+                          <span className="flex-1 leading-tight truncate">{item.label}</span>
+                          <ChevronRight className="h-2.5 w-2.5 opacity-0 group-hover:opacity-50 transition-opacity flex-shrink-0" />
                         </MotionLink>
                       ))}
                   </div>
