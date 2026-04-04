@@ -2,17 +2,158 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/primitives/button";
-import { Card, CardContent } from "@/components/ui/primitives/card";
 import { Input } from "@/components/ui/primitives/input";
 import { Label } from "@/components/ui/primitives/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar";
-import { Badge } from "@/components/ui/primitives/badge";
-import { Camera, Gamepad2, LinkIcon, Loader2, User, Mail, Shield, Wifi } from 'lucide-react';
+import {
+  Camera,
+  Gamepad2,
+  LinkIcon,
+  Loader2,
+  User,
+  Mail,
+  Shield,
+  Wifi,
+} from "lucide-react";
 import useSocketStore from "@/stores/useSocketStore";
 import { useBoffSession } from "@/services/useBoffSession";
 import { UploadService } from "@/services/api/smartrotom/uploadService";
 import { UsersService } from "@/services/api/boffmedia/usersService";
 import { FloatingBackground } from "./layout/FloatingBackground";
+import { BoffContainer } from "@components/boffmedia/tools/BoffContainer";
+import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
+
+// ─── Shared neon token shorthand ─────────────────────────────────────────────
+
+const N = {
+  border:       "rgba(249,115,22,0.22)",
+  borderStrong: "rgba(249,115,22,0.4)",
+  bg:           "rgba(249,115,22,0.07)",
+  bgHover:      "rgba(249,115,22,0.12)",
+  text:         "rgb(251,146,60)",
+  glow:         "drop-shadow(0 0 6px rgba(249,115,22,0.45))",
+};
+
+const MC = {
+  border: "rgba(132,204,22,0.22)",
+  bg:     "rgba(132,204,22,0.07)",
+  text:   "rgb(163,230,53)",
+  glow:   "drop-shadow(0 0 6px rgba(132,204,22,0.45))",
+};
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function NeonDivider() {
+  return (
+    <div
+      className="h-px"
+      style={{ background: "linear-gradient(90deg, transparent, rgba(249,115,22,0.12), transparent)" }}
+    />
+  );
+}
+
+function StatusChip({
+  icon,
+  label,
+  active,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  active?: boolean;
+}) {
+  const base = active === undefined;
+  return (
+    <div
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono"
+      style={{
+        border: `1px solid ${base ? N.border : active ? "rgba(34,197,94,0.25)" : "rgba(71,85,105,0.35)"}`,
+        background: base ? N.bg : active ? "rgba(34,197,94,0.08)" : "rgba(71,85,105,0.08)",
+        color: base ? N.text : active ? "rgba(74,222,128,0.9)" : "rgba(100,116,139,0.8)",
+      }}
+    >
+      {active !== undefined && (
+        <span
+          className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${active ? "bg-success-400 animate-pulse" : "bg-surface-600"}`}
+        />
+      )}
+      {icon}
+      {label}
+    </div>
+  );
+}
+
+function IntegrationCard({
+  icon,
+  title,
+  description,
+  linked,
+  onLink,
+  buttonLabel,
+  neon,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  linked: boolean;
+  onLink?: () => void;
+  buttonLabel: string;
+  neon: typeof N | typeof MC;
+}) {
+  return (
+    <div
+      className="flex items-center justify-between gap-4 p-4 rounded-lg border transition-colors duration-200"
+      style={{ borderColor: neon.border, background: neon.bg }}
+    >
+      <div className="flex items-center gap-3.5 min-w-0">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{
+            border: `1px solid ${neon.border}`,
+            background: "rgba(15,23,42,0.6)",
+            boxShadow: `0 0 14px rgba(0,0,0,0.3)`,
+          }}
+        >
+          <span style={{ color: neon.text, filter: neon.glow }}>{icon}</span>
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-bold text-surface-100 leading-tight">{title}</p>
+          <p className="text-xs text-surface-500 mt-0.5 truncate">{description}</p>
+        </div>
+      </div>
+
+      {linked ? (
+        <div
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono flex-shrink-0"
+          style={{
+            border: "1px solid rgba(34,197,94,0.25)",
+            background: "rgba(34,197,94,0.08)",
+            color: "rgba(74,222,128,0.9)",
+          }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-success-400" />
+          Vinculado
+        </div>
+      ) : (
+        <Button
+          onClick={onLink}
+          variant="outline"
+          size="sm"
+          className="flex-shrink-0 font-mono text-xs tracking-wider h-8 px-3 transition-all duration-150"
+          style={{
+            borderColor: neon.border,
+            color: neon.text,
+            background: "transparent",
+          }}
+        >
+          <LinkIcon className="w-3 h-3 mr-1.5" />
+          {buttonLabel}
+        </Button>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function UserProfile() {
   const { session, refreshSession } = useBoffSession();
@@ -26,15 +167,13 @@ export default function UserProfile() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (user) {
-      setEditedUser(user);
-    }
+    if (user) setEditedUser(user);
   }, [user]);
 
   const linkDiscord = async () => {
     console.log("Linking Discord account...");
     setTimeout(() => {
-      setEditedUser((prevUser) => ({ ...prevUser, discordLinked: true }));
+      setEditedUser((prev) => ({ ...prev, discordLinked: true }));
     }, 2000);
   };
 
@@ -44,280 +183,274 @@ export default function UserProfile() {
   };
 
   const handleImageClick = () => {
-    if (!isUploading) {
-      fileInputRef.current?.click();
-    }
+    if (!isUploading) fileInputRef.current?.click();
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     setUploadError(null);
     setIsUploading(true);
-
     try {
-      const uploadResponse = await UploadService.uploadProfileImage(file, user?.id || 'default');
-
+      const uploadResponse = await UploadService.uploadProfileImage(file, user?.id || "default");
       if (!uploadResponse.data?.url) {
-        setUploadError('Upload failed: No response data');
+        setUploadError("Upload failed: No response data");
         return;
       }
-
       const imageUrl = uploadResponse.data.url;
-
       await UsersService.updateUser(Number(user?.id), { profilePicture: imageUrl } as any);
-
-      setEditedUser(prev => ({ ...prev, image: imageUrl }));
-
+      setEditedUser((prev) => ({ ...prev, image: imageUrl }));
       await refreshSession();
     } catch (err) {
-      setUploadError('Upload failed: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      setUploadError("Upload failed: " + (err instanceof Error ? err.message : "Unknown error"));
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
+  // ── Not logged in ──────────────────────────────────────────────────────────
+
   if (!user) {
     return (
-      <div className="relative min-h-screen bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden">
+      <div className="relative min-h-screen bg-surface-950 overflow-hidden">
         <FloatingBackground variant="cool" />
-        <div className="relative container mx-auto px-4 py-24 text-center z-10">
-          <div className="max-w-md mx-auto bg-gradient-to-br from-surface-800 to-surface-900 border border-surface-700 rounded-2xl p-8 shadow-2xl">
-            <User className="h-16 w-16 text-primary-500 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-orange-400">
-              User Profile
-            </h1>
-            <p className="text-surface-300">Please log in to view your profile.</p>
+        <div className="relative container mx-auto px-4 py-16 z-10 flex items-center justify-center">
+          <div className="w-full max-w-sm">
+            <BoffContainer variant="primary" contentClassName="p-10 flex flex-col items-center text-center gap-4">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{ background: N.bg, border: `1px solid ${N.border}` }}
+              >
+                <User className="h-8 w-8" style={{ color: N.text, filter: N.glow }} />
+              </div>
+              <div>
+                <h1
+                  className="text-xl font-black text-surface-50 mb-1"
+                  style={{ fontFamily: "Orbitron, sans-serif" }}
+                >
+                  Acceso Requerido
+                </h1>
+                <p className="text-sm text-surface-500">
+                  Inicia sesión para ver tu perfil.
+                </p>
+              </div>
+            </BoffContainer>
           </div>
         </div>
       </div>
     );
   }
 
+  // ── Logged in ──────────────────────────────────────────────────────────────
+
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden">
+    <div className="relative min-h-screen bg-surface-950 overflow-hidden">
       <FloatingBackground variant="warm" />
-      
-      <div className="relative container mx-auto px-4 py-24 z-10">
-        <Card className="max-w-4xl mx-auto bg-gradient-to-br from-surface-800 to-surface-900 border-surface-700 transition-all duration-500 shadow-2xl">
-          <CardContent className="space-y-8 p-8">
-            {/* Profile Picture and Basic Info */}
-            <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
-              <div className="flex flex-col items-center space-y-4">
-                <div className="relative group cursor-pointer" onClick={handleImageClick}>
-                  <Avatar className="w-32 h-32 relative border-4 border-gradient-to-r from-primary-500 to-orange-500">
-                    <AvatarImage
-                      src={editedUser.image || user?.image || "/placeholder.svg?height=128&width=128"}
-                      alt={editedUser.name || "User"}
-                      className="object-cover"
-                    />
-                    <AvatarFallback className="text-3xl bg-gradient-to-br from-primary-500 to-orange-500 text-white">
-                      {editedUser.name ? editedUser.name.charAt(0).toUpperCase() : "U"}
-                    </AvatarFallback>
-                    
-                    {/* Upload overlay */}
-                    <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
-                      <Camera className="w-8 h-8 text-white" />
+
+      <div className="relative container mx-auto px-4 py-8 z-10">
+        <div className="max-w-3xl mx-auto">
+          <BoffContainer variant="primary" contentClassName="p-7 sm:p-9 space-y-8">
+
+            {/* ── Header: avatar + identity ── */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-7">
+
+              {/* Avatar */}
+              <div className="flex flex-col items-center gap-3 flex-shrink-0">
+                <div
+                  className="relative group cursor-pointer"
+                  onClick={handleImageClick}
+                >
+                  {/* Gradient ring */}
+                  <div
+                    className="p-[2px] rounded-full"
+                    style={{
+                      background: `linear-gradient(135deg, rgba(249,115,22,0.9), rgba(251,146,60,0.3), rgba(249,115,22,0.9))`,
+                    }}
+                  >
+                    <div className="p-0.5 rounded-full bg-surface-950">
+                      <Avatar className="w-28 h-28">
+                        <AvatarImage
+                          src={editedUser.image || user?.image || "/placeholder.svg?height=112&width=112"}
+                          alt={editedUser.name || "User"}
+                          className="object-cover"
+                        />
+                        <AvatarFallback
+                          className="text-3xl font-black"
+                          style={{ background: N.bg, color: N.text }}
+                        >
+                          {editedUser.name ? editedUser.name.charAt(0).toUpperCase() : "U"}
+                        </AvatarFallback>
+
+                        {/* Hover overlay */}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex items-center justify-center">
+                          <Camera className="w-7 h-7 text-white" />
+                        </div>
+
+                        {/* Upload overlay */}
+                        {isUploading && (
+                          <div className="absolute inset-0 bg-black/70 rounded-full flex items-center justify-center">
+                            <Loader2 className="w-7 h-7 text-white animate-spin" />
+                          </div>
+                        )}
+                      </Avatar>
                     </div>
-
-                    {/* Loading overlay */}
-                    {isUploading && (
-                      <div className="absolute inset-0 bg-black bg-opacity-70 rounded-full flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-white animate-spin" />
-                      </div>
-                    )}
-                  </Avatar>
-
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    className="hidden"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                  />
+                  </div>
                 </div>
-                
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                />
+
                 {uploadError && (
-                  <p className="text-sm text-error-500 bg-error-950/50 px-3 py-1 rounded-md border border-error-800">
+                  <p className="text-xs text-error-400 bg-error-950/50 px-3 py-1 rounded border border-error-800/50 max-w-[8rem] text-center">
                     {uploadError}
                   </p>
                 )}
               </div>
 
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-orange-400">
-                  {editedUser.name || "Anonymous User"}
+              {/* Identity */}
+              <div className="flex-1 text-center sm:text-left">
+                <h2
+                  className="text-2xl sm:text-3xl font-black text-surface-50 leading-tight mb-1"
+                  style={{
+                    fontFamily: "Orbitron, sans-serif",
+                    filter: "drop-shadow(0 0 14px rgba(249,115,22,0.25))",
+                  }}
+                >
+                  {editedUser.name || "Anonymous"}
                 </h2>
-                <p className="text-xl text-surface-300 mb-4">
+                <p className="text-sm text-surface-400 mb-4">
                   {editedUser.email || "No email provided"}
                 </p>
-                
-                {/* Status Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                  <Card className="bg-gradient-to-br from-surface-700 to-surface-800 border-surface-600">
-                    <CardContent className="p-4 flex items-center space-x-3">
-                      <Shield className="h-6 w-6 text-primary-500" />
-                      <div>
-                        <p className="text-sm text-surface-400">Roles</p>
-                        <p className="font-medium text-surface-100">
-                          {user.roles?.join(", ") || "No roles"}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-gradient-to-br from-surface-700 to-surface-800 border-surface-600">
-                    <CardContent className="p-4 flex items-center space-x-3">
-                      <Wifi className="h-6 w-6 text-success-500" />
-                      <div>
-                        <p className="text-sm text-surface-400">Connection</p>
-                        <p className="font-medium text-surface-100">
-                          {socket ? "Connected" : "Disconnected"}
-                        </p>
-                        
-                      </div>
-                    </CardContent>
-                  </Card>
+
+                {/* Status chips */}
+                <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                  <StatusChip
+                    icon={<Shield className="w-3 h-3" />}
+                    label={user.roles?.join(", ") || "No roles"}
+                  />
+                  <StatusChip
+                    icon={<Wifi className="w-3 h-3" />}
+                    label={socket ? "Online" : "Offline"}
+                    active={!!socket}
+                  />
                 </div>
               </div>
             </div>
 
-            {/* Form Fields */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-surface-200 flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  value={editedUser.name || ""}
-                  onChange={(e) =>
-                    setEditedUser((prev) => ({ ...prev, name: e.target.value }))
-                  }
-                  disabled={!isEditing}
-                  className="bg-surface-700 border-surface-600 text-surface-100 disabled:opacity-60 focus:border-primary-500"
-                />
+            <NeonDivider />
+
+            {/* ── Profile settings ── */}
+            <div>
+              <ToolSectionHeader label="Datos de perfil" color="primary" />
+
+              <div className="grid sm:grid-cols-2 gap-5">
+                {[
+                  { id: "name", label: "Nombre", icon: <User className="h-3 w-3" />, field: "name", type: "text" },
+                  { id: "email", label: "Email", icon: <Mail className="h-3 w-3" />, field: "email", type: "email" },
+                ].map(({ id, label, icon, field, type }) => (
+                  <div key={id} className="space-y-1.5">
+                    <Label
+                      htmlFor={id}
+                      className="text-xs font-mono text-surface-500 flex items-center gap-1.5 tracking-widest uppercase"
+                    >
+                      {icon}
+                      {label}
+                    </Label>
+                    <Input
+                      id={id}
+                      type={type}
+                      value={(editedUser as any)[field] || ""}
+                      onChange={(e) =>
+                        setEditedUser((prev) => ({ ...prev, [field]: e.target.value }))
+                      }
+                      disabled={!isEditing}
+                      className="bg-surface-900 border-surface-700/60 text-surface-100 placeholder:text-surface-600 disabled:opacity-50 disabled:cursor-default focus:border-primary-500/50 h-9 text-sm"
+                    />
+                  </div>
+                ))}
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-surface-200 flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={editedUser.email || ""}
-                  onChange={(e) =>
-                    setEditedUser((prev) => ({ ...prev, email: e.target.value }))
-                  }
-                  disabled={!isEditing}
-                  className="bg-surface-700 border-surface-600 text-surface-100 disabled:opacity-60 focus:border-primary-500"
+            </div>
+
+            <NeonDivider />
+
+            {/* ── Connections ── */}
+            <div>
+              <ToolSectionHeader label="Conexiones" color="primary" />
+
+              <div className="space-y-3">
+                <IntegrationCard
+                  icon={<Gamepad2 className="h-5 w-5" />}
+                  title="Discord Account"
+                  description="Conecta tu cuenta para funciones adicionales"
+                  linked={!!(editedUser as any).discordId}
+                  onLink={linkDiscord}
+                  buttonLabel="Vincular"
+                  neon={N}
+                />
+                <IntegrationCard
+                  icon={<User className="h-5 w-5" />}
+                  title="Minecraft Account"
+                  description="Vincula tu cuenta para acceder a los servidores"
+                  linked={!!(user.mcUuid || user.smartRotomUser?.uuid)}
+                  buttonLabel="Vincular"
+                  neon={MC}
                 />
               </div>
             </div>
 
-            {/* Discord Integration */}
-            <Card className="bg-gradient-to-br from-surface-700 to-surface-800 border-surface-600">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 rounded-full bg-gradient-to-r from-primary-500 to-orange-500">
-                      <Gamepad2 className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-surface-100">Discord Account</h3>
-                      <p className="text-surface-400">Connect your Discord account for enhanced features</p>
-                    </div>
-                  </div>
-                  <div>
-                    {editedUser.discordId ? (
-                      <Badge className="bg-success-500/20 text-success-400 border-success-500/30">
-                        <span className="w-2 h-2 bg-success-500 rounded-full mr-2"></span>
-                        Linked
-                      </Badge>
-                    ) : (
-                      <Button
-                        onClick={linkDiscord}
-                        variant="outline"
-                        className="border-primary-500 text-primary-400 hover:bg-primary-500/10"
-                      >
-                        <LinkIcon className="mr-2 h-4 w-4" />
-                        Link Discord
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <NeonDivider />
 
-            
-
-            {/* Minecraft Integration */}
-            <Card className="bg-gradient-to-br from-surface-700 to-surface-800 border-surface-600">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 rounded-full bg-gradient-to-r from-highlight-500 to-emerald-500">
-                      <User className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-surface-100">Minecraft Account</h3>
-                      <p className="text-surface-400">Link your Minecraft account to access servers</p>
-                    </div>
-                  </div>
-                  <div>
-                    {(user.mcUuid || user.smartRotomUser?.uuid) ? (
-                      <Badge className="bg-success-500/20 text-success-400 border-success-500/30">
-                        <span className="w-2 h-2 bg-success-500 rounded-full mr-2"></span>
-                        Linked
-                      </Badge>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        className="border-highlight-500 text-highlight-400 hover:bg-highlight-500/10"
-                      >
-                        <LinkIcon className="mr-2 h-4 w-4" />
-                        Link Minecraft
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Action Buttons */}
-            <div className="pt-6 border-t border-surface-700">
+            {/* ── Actions ── */}
+            <div>
               {isEditing ? (
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Button 
-                    onClick={handleSave} 
-                    className="flex-1"
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button
+                    onClick={handleSave}
+                    className="flex-1 h-10 font-mono text-sm tracking-widest uppercase transition-all duration-200"
+                    style={{
+                      fontFamily: "Orbitron, sans-serif",
+                      background: "rgba(249,115,22,0.15)",
+                      borderColor: N.borderStrong,
+                      color: N.text,
+                      boxShadow: "0 0 20px rgba(249,115,22,0.12)",
+                    }}
+                    variant="outline"
                   >
-                    Save Changes
+                    Guardar cambios
                   </Button>
                   <Button
                     onClick={() => setIsEditing(false)}
-                    variant="outline"
+                    variant="ghost"
+                    className="sm:w-36 h-10 font-mono text-sm text-surface-400 hover:text-surface-200 hover:bg-surface-800/50 transition-colors duration-150"
                   >
-                    Cancel
+                    Cancelar
                   </Button>
                 </div>
               ) : (
-                <Button 
-                  onClick={() => setIsEditing(true)} 
-                  variant="default"
-                  className="w-full"
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="w-full h-10 font-mono text-sm tracking-widest uppercase transition-all duration-200"
+                  style={{
+                    fontFamily: "Orbitron, sans-serif",
+                    background: N.bg,
+                    borderColor: N.border,
+                    color: N.text,
+                  }}
+                  variant="outline"
                 >
-                  Edit Profile
+                  Editar perfil
                 </Button>
               )}
             </div>
-          </CardContent>
-        </Card>
+
+          </BoffContainer>
+        </div>
       </div>
     </div>
   );
