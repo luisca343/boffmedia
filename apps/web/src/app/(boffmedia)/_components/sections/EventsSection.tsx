@@ -16,7 +16,7 @@ export async function EventsSection() {
   // Fetch real events data
   let events: Event[] = [];
   try {
-    events = (await EventsService.getEvents()).data!;
+    events = (await EventsService.getEvents()).data ?? [];
   } catch (error) {
     console.error('Failed to fetch events:', error);
     // Fallback to empty array if API fails
@@ -44,16 +44,7 @@ export async function EventsSection() {
     }
   };
 
-  const getStatusColor = (status: Event.status) => {
-    switch (status) {
-      case Event.status.ACTIVE: return 'from-success-500 to-success-600';
-      case Event.status.UPCOMING: return 'from-secondary-500 to-secondary-600';
-      case Event.status.COMPLETED: return 'from-surface-500 to-surface-600';
-      default: return 'from-surface-500 to-surface-600';
-    }
-  };
-
-  const getStatusText = (status: Event.status) => {
+const getStatusText = (status: Event.status) => {
     switch (status) {
       case Event.status.ACTIVE: return t("eventsSection.status.live");
       case Event.status.UPCOMING: return t("eventsSection.status.upcoming");
@@ -106,14 +97,29 @@ export async function EventsSection() {
           />
           {/* No Events Message */}
           <div className="text-center">
-            <div className="bg-gradient-to-r from-accent-800/20 to-secondary-800/20 backdrop-blur-sm border border-accent-500/30 rounded-3xl p-12">
-              <div className="w-24 h-24 bg-gradient-to-br from-accent-500 to-secondary-600 rounded-2xl flex items-center justify-center mb-6 mx-auto">
-                <Calendar className="w-12 h-12 text-white" />
+            <div
+              className="border rounded-xl p-12"
+              style={{
+                background: "rgba(15,23,42,0.85)",
+                borderColor: "rgba(249,115,22,0.18)",
+              }}
+            >
+              <div
+                className="w-20 h-20 rounded-xl flex items-center justify-center mb-6 mx-auto"
+                style={{
+                  background: "rgba(249,115,22,0.08)",
+                  border: "1px solid rgba(249,115,22,0.22)",
+                }}
+              >
+                <Calendar className="w-10 h-10" style={{ color: "rgb(251,146,60)" }} />
               </div>
-              <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
+              <h3
+                className="text-2xl font-black text-surface-100 mb-3"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
                 {t("eventsSection.noEvents.title")}
               </h3>
-              <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
+              <p className="text-base text-surface-400 mb-6 max-w-2xl mx-auto">
                 {t("eventsSection.noEvents.description")}
               </p>
               <Button variant="accent" asChild>
@@ -150,7 +156,14 @@ export async function EventsSection() {
         {/* Featured Event - Hero Style */}
         {featuredEvent && (
           <div className="mb-16 relative">
-            <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl overflow-hidden">
+            <div
+              className="rounded-xl overflow-hidden border"
+              style={{
+                background: "rgba(9,13,27,0.92)",
+                borderColor: "rgba(249,115,22,0.15)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+              }}
+            >
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
                 {/* Event Info */}
                 <div className="space-y-6">
@@ -162,10 +175,18 @@ export async function EventsSection() {
                       })()}
                     </div>
                     <div>
-                      <span className="text-sm font-medium text-accent-400 uppercase tracking-wide">{t("eventsSection.featured.label")}</span>
-                      <div className={`inline-block px-3 py-1 bg-gradient-to-r ${getStatusColor(featuredEvent.status)} text-white text-xs font-bold rounded-full ml-3`}>
+                      <span className="text-xs font-mono text-primary-400/70 uppercase tracking-widest">{t("eventsSection.featured.label")}</span>
+                      <span
+                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-xs font-mono ml-3"
+                        style={{
+                          background: featuredEvent.status === Event.status.ACTIVE ? "rgba(34,197,94,0.1)" : "rgba(99,102,241,0.1)",
+                          border: `1px solid ${featuredEvent.status === Event.status.ACTIVE ? "rgba(34,197,94,0.3)" : "rgba(99,102,241,0.3)"}`,
+                          color: featuredEvent.status === Event.status.ACTIVE ? "rgba(74,222,128,0.9)" : "rgba(129,140,248,0.9)",
+                        }}
+                      >
+                        {featuredEvent.status === Event.status.ACTIVE && <span className="w-1.5 h-1.5 rounded-full bg-success-400 animate-pulse" />}
                         {getStatusText(featuredEvent.status)}
-                      </div>
+                      </span>
                     </div>
                   </div>
 
@@ -208,7 +229,10 @@ export async function EventsSection() {
 
                   {/* Countdown Timer */}
                   {featuredEvent.status === Event.status.UPCOMING && (
-                    <div className="bg-surface-700/50 rounded-xl p-4 border border-accent-500/20">
+                    <div
+                      className="rounded-lg p-4 border"
+                      style={{ background: "rgba(15,23,42,0.6)", borderColor: "rgba(249,115,22,0.15)" }}
+                    >
                       <div className="text-center">
                         <div className="text-sm text-surface-400 mb-2">{t("eventsSection.featured.timeRemaining")}</div>
                         <div className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400">
@@ -268,9 +292,14 @@ export async function EventsSection() {
         {activeEvents.length > 0 && (
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-3 h-3 bg-success-500 rounded-full animate-pulse"></div>
-                <h3 className="text-2xl font-bold text-white">Eventos Activos</h3>
-                <div className="flex-1 h-px bg-gradient-to-r from-success-500/50 to-transparent"></div>
+                <span className="w-2 h-2 rounded-full bg-success-400 animate-pulse flex-shrink-0" />
+                <h3
+                  className="text-sm font-mono uppercase tracking-widest"
+                  style={{ color: "rgba(74,222,128,0.85)", fontFamily: "Orbitron, sans-serif" }}
+                >
+                  Eventos Activos
+                </h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-success-500/30 to-transparent"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {activeEvents.map((event) => (
@@ -284,9 +313,14 @@ export async function EventsSection() {
         {upcomingEvents.length > 0 && (
             <div className="mb-16">
               <div className="flex items-center gap-3 mb-8">
-                <Clock className="w-6 h-6 text-secondary-400" />
-                <h3 className="text-2xl font-bold text-white">Próximos Eventos</h3>
-                <div className="flex-1 h-px bg-gradient-to-r from-secondary-500/50 to-transparent"></div>
+                <Clock className="w-3.5 h-3.5 text-secondary-400 flex-shrink-0" />
+                <h3
+                  className="text-sm font-mono uppercase tracking-widest text-secondary-400/80"
+                  style={{ fontFamily: "Orbitron, sans-serif" }}
+                >
+                  Próximos Eventos
+                </h3>
+                <div className="flex-1 h-px bg-gradient-to-r from-secondary-500/30 to-transparent"></div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {upcomingEvents.map((event) => (
@@ -298,11 +332,21 @@ export async function EventsSection() {
 
         {/* Call to Action */}
         <div className="text-center">
-          <div className="bg-gradient-to-r from-accent-800/20 to-secondary-800/20 backdrop-blur-sm border border-accent-500/30 rounded-3xl p-8">
-            <h3 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-secondary-400 mb-4">
+          <div
+            className="rounded-xl p-8 border"
+            style={{
+              background: "rgba(15,23,42,0.85)",
+              borderColor: "rgba(249,115,22,0.18)",
+              boxShadow: "0 20px 40px rgba(0,0,0,0.4)",
+            }}
+          >
+            <h3
+              className="text-2xl font-black text-surface-50 mb-3"
+              style={{ fontFamily: "Orbitron, sans-serif" }}
+            >
               {t("eventsSection.cta.title")}
             </h3>
-            <p className="text-lg text-surface-300 mb-6 max-w-2xl mx-auto">
+            <p className="text-base text-surface-400 mb-6 max-w-2xl mx-auto">
               {t("eventsSection.cta.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

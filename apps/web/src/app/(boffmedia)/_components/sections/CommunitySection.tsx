@@ -33,36 +33,41 @@ export function CommunitySection() {
           
           {/* Left Section: Community Info */}
           <div className="text-center lg:text-left order-2 lg:order-1">
-            <h2 className="text-5xl sm:text-6xl font-bold mb-6 leading-tight">
+            <h2 className="text-5xl sm:text-6xl font-black mb-6 leading-tight tracking-tight">
               <span className="text-surface-50">{t("community.title.first")}</span>
-              <span className="block bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
+              <span
+                className="block bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500 bg-clip-text text-transparent"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
                 {t("community.title.second")}
               </span>
             </h2>
-            <p className="text-xl text-surface-200 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-xl text-surface-300 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed">
               {t("community.description")}
             </p>
 
             {/* Feature highlights */}
-            <div className="space-y-4 mb-12">
-              <div className="flex items-center gap-4 justify-center lg:justify-start">
-                <div className="w-3 h-3 bg-cyan-400 rounded-full animate-pulse"></div>
-                <span className="text-surface-300 text-lg">{t("community.highlights.connect")}</span>
-              </div>
-              <div className="flex items-center gap-4 justify-center lg:justify-start">
-                <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
-                <span className="text-surface-300 text-lg">{t("community.highlights.collaborate")}</span>
-              </div>
-              <div className="flex items-center gap-4 justify-center lg:justify-start">
-                <div className="w-3 h-3 bg-indigo-400 rounded-full animate-pulse" style={{animationDelay: '1s'}}></div>
-                <span className="text-surface-300 text-lg">{t("community.highlights.resources")}</span>
-              </div>
+            <div className="space-y-3.5 mb-12">
+              {[
+                { delay: "0s", text: t("community.highlights.connect") },
+                { delay: "0.5s", text: t("community.highlights.collaborate") },
+                { delay: "1s", text: t("community.highlights.resources") },
+              ].map(({ delay, text }, i) => (
+                <div key={i} className="flex items-center gap-3 justify-center lg:justify-start">
+                  <div
+                    className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse"
+                    style={{ background: "rgba(99,102,241,0.85)", animationDelay: delay }}
+                  />
+                  <span className="text-surface-300">{text}</span>
+                </div>
+              ))}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-600 hover:from-cyan-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-xl group px-8 py-4"
+              <Button
+                size="lg"
+                variant="secondary"
+                className="group"
                 asChild
               >
                 <Link href="/community">

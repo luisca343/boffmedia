@@ -59,12 +59,12 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
               {[
                 "Calculadoras especializadas para Minecraft",
-                "Generadores automáticos de contenido", 
+                "Generadores automáticos de contenido",
                 "Herramientas de análisis avanzado",
                 "Utilidades para administradores"
               ].map((feature, index) => (
                 <div key={index} className="flex items-center gap-3 text-surface-300">
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                  <div className="w-2 h-2 bg-highlight-400 rounded-full flex-shrink-0"></div>
                   <span>{feature}</span>
                 </div>
               ))}
@@ -72,11 +72,12 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 variant="highlight"
-                className="px-6 py-3 flex-1 shadow-xl rounded-full font-semibold transition-all duration-200 transform hover:scale-105 group"
+                size="lg"
+                className="flex-1 group"
                 asChild
               >
                 <InternalLink href="/herramientas" className="flex items-center justify-center gap-2">
-                  <span>{t("featuredGames.viewMore")}</span>
+                  {t("featuredGames.viewMore")}
                   <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
                 </InternalLink>
               </Button>

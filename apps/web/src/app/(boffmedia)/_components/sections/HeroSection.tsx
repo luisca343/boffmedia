@@ -27,25 +27,29 @@ export async function HeroSection() {
       <div className="relative h-[105vh] container mx-auto px-4 py-24 sm:py-32">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center flex-1">
           <div className="text-center lg:text-left">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-surface-50">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight tracking-tight text-surface-50">
               {t("hero.title.first")}
-              <span className="block text-primary-400">{t("hero.title.second")}</span>
+              <span
+                className="block text-primary-400"
+                style={{
+                  fontFamily: "Orbitron, sans-serif",
+                  filter: "drop-shadow(0 0 18px rgba(249,115,22,0.35))",
+                }}
+              >
+                {t("hero.title.second")}
+              </span>
             </h1>
-            <p className="text-xl text-surface-200 mb-8">
+            <p className="text-xl text-surface-300 mb-8 leading-relaxed">
               {t("hero.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button size="lg" variant="default" asChild>
+              <Button size="lg" variant="default" asChild className="group">
                 <Link href="/juegos">
                   {t("hero.buttons.exploreGames")}
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <Button
-                size="default"
-                variant="outline"
-                asChild
-              >
+              <Button size="lg" variant="outline" asChild>
                 <Link href="/community">{t("hero.buttons.joinCommunity")}</Link>
               </Button>
             </div>
