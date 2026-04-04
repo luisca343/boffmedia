@@ -1,11 +1,93 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, {
+  useState,
+  useRef,
+  useContext,
+  createContext,
+  useCallback,
+  useId,
+} from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { motion } from "framer-motion";
 import { useBoffSession } from "@/services/useBoffSession";
+
+// ─── Shared nav-menu context ──────────────────────────────────────────────────
+//
+// Single source of truth for which dropdown is currently open.
+// All CustomDropdownMenu instances within a NavMenuProvider share one timer
+// and one activeId value.
+//
+// Why this solves the overlap:
+//   - openMenu(id)     → sets activeId = id immediately; all other menus whose
+//                         isOpen depends on (activeId === theirId) become false
+//                         in the same React render — no overlap window.
+//   - scheduleClose()  → only runs when the cursor leaves the entire nav area.
+//                         On the way from menu A to menu B, cancelClose() fires
+//                         first (via B's onMouseEnter), so the timer never lands.
+
+interface NavMenuContextValue {
+  activeId: string | null;
+  openMenu: (id: string) => void;
+  dismissMenu: (id: string) => void;
+  scheduleClose: () => void;
+  cancelClose: () => void;
+}
+
+const NavMenuContext = createContext<NavMenuContextValue | null>(null);
+
+export function NavMenuProvider({ children }: { children: React.ReactNode }) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
+
+  // Open a specific menu — immediately closes any sibling that was open.
+  const openMenu = useCallback(
+    (id: string) => {
+      cancelClose();
+      setActiveId(id);
+    },
+    [cancelClose],
+  );
+
+  // Instant close used on click navigation (no delay wanted).
+  const dismissMenu = useCallback(
+    (id: string) => {
+      cancelClose();
+      setActiveId((prev) => (prev === id ? null : prev));
+    },
+    [cancelClose],
+  );
+
+  // Delayed close used when the cursor leaves the entire nav-menu area.
+  // The delay bridges the pt-2 gap between trigger and panel so the menu
+  // doesn't flicker closed while the cursor is in transit.
+  const scheduleClose = useCallback(() => {
+    cancelClose();
+    closeTimer.current = setTimeout(() => setActiveId(null), 120);
+  }, [cancelClose]);
+
+  return (
+    <NavMenuContext.Provider
+      value={{ activeId, openMenu, dismissMenu, scheduleClose, cancelClose }}
+    >
+      {children}
+    </NavMenuContext.Provider>
+  );
+}
+
+function useNavMenu(): NavMenuContextValue {
+  const ctx = useContext(NavMenuContext);
+  if (!ctx) throw new Error("CustomDropdownMenu must be rendered inside <NavMenuProvider>.");
+  return ctx;
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface MenuItemProps {
   href: string;
@@ -32,21 +114,32 @@ interface CustomDropdownMenuProps {
 
 const MotionLink = motion(Link);
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomDropdownMenuProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  // Stable ID that matches between SSR and client — no hydration issues.
+  const id = useId();
+  const { activeId, openMenu, dismissMenu, scheduleClose, cancelClose } = useNavMenu();
   const { hasRole } = useBoffSession();
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Derived — never stored locally, so it can never be stale.
+  const isOpen = activeId === id;
 
   const handleMouseEnter = () => {
-    if (closeTimer.current) clearTimeout(closeTimer.current);
-    setIsOpen(true);
+    // cancelClose prevents the shared timer from closing the menu we're
+    // entering; openMenu(id) immediately deactivates any sibling.
+    cancelClose();
+    openMenu(id);
   };
 
   const handleMouseLeave = () => {
-    closeTimer.current = setTimeout(() => setIsOpen(false), 120);
+    // Schedule a close only for the case where the cursor leaves the nav
+    // area entirely. If the cursor moves into a sibling, that sibling's
+    // handleMouseEnter will cancel this before it fires.
+    scheduleClose();
   };
 
-  const closeMenu = () => setIsOpen(false);
+  const handleNavigate = () => dismissMenu(id);
 
   return (
     <div
@@ -58,10 +151,10 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
       <Button
         variant="ghost"
         className="px-2 py-1 z-20 text-surface-300 hover:text-primary-300 hover:bg-surface-800/40 text-sm group transition-colors duration-150"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => (isOpen ? dismissMenu(id) : openMenu(id))}
       >
         {mainLink ? (
-          <Link href={mainLink.href} className="flex items-center gap-1" onClick={closeMenu}>
+          <Link href={mainLink.href} className="flex items-center gap-1" onClick={handleNavigate}>
             {mainLink.label}
             <ChevronDown
               className="h-3 w-3 opacity-50 transition-transform duration-200 group-hover:opacity-80"
@@ -79,8 +172,8 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
         )}
       </Button>
 
-      {/* Panel — pt-2 keeps the visual gap inside the hover zone so the cursor
-          never exits the parent div while crossing from trigger to panel. */}
+      {/* Panel — pt-2 keeps the visual spacing inside the hover zone so the
+          cursor never exits the parent div while crossing to the panel. */}
       {isOpen && (
         <div className="absolute top-full z-50 w-72 pt-2">
           <div
@@ -105,7 +198,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                   <Link
                     href={mainLink.href}
                     className="flex items-center gap-2.5 px-3.5 py-2.5 mx-1.5 rounded-md transition-all duration-150 hover:bg-primary-500/[0.08] group"
-                    onClick={closeMenu}
+                    onClick={handleNavigate}
                   >
                     {mainLink.icon && (
                       <span className="text-primary-400/60 group-hover:text-primary-400 transition-colors flex-shrink-0">
@@ -120,7 +213,9 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                         {mainLink.label}
                       </div>
                       {mainLink.description && (
-                        <div className="text-xs text-surface-500 mt-0.5">{mainLink.description}</div>
+                        <div className="text-xs text-surface-500 mt-0.5">
+                          {mainLink.description}
+                        </div>
                       )}
                     </div>
                   </Link>
@@ -136,7 +231,6 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
 
               {sections.map((section, index) => (
                 <React.Fragment key={`${section.title ?? ""}-${index}`}>
-                  {/* Section divider */}
                   {index > 0 && (
                     <div
                       className="h-px mx-3 my-1"
@@ -147,7 +241,6 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                     />
                   )}
 
-                  {/* Section title */}
                   {section.title && (
                     section.href ? (
                       <Link
@@ -157,12 +250,10 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                           color: "rgba(251,146,60,0.72)",
                           fontFamily: "Orbitron, sans-serif",
                         }}
-                        onClick={closeMenu}
+                        onClick={handleNavigate}
                       >
                         <span className="flex items-center gap-1.5">
-                          {section.icon && (
-                            <span className="opacity-80">{section.icon}</span>
-                          )}
+                          {section.icon && <span className="opacity-80">{section.icon}</span>}
                           {section.title}
                         </span>
                         <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-80 transition-opacity" />
@@ -181,7 +272,6 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                     )
                   )}
 
-                  {/* Items */}
                   <div className="pb-0.5">
                     {section.items
                       .filter((item) => !item.roles || hasRole(item.roles))
@@ -193,7 +283,7 @@ export function CustomDropdownMenu({ triggerLabel, mainLink, sections }: CustomD
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ duration: 0.12, delay: itemIndex * 0.025 }}
                           key={`${section.title ?? ""}-${item.href}-${itemIndex}`}
-                          onClick={closeMenu}
+                          onClick={handleNavigate}
                           target={item.isExternal ? "_blank" : undefined}
                           rel={item.isExternal ? "noopener noreferrer" : undefined}
                         >
