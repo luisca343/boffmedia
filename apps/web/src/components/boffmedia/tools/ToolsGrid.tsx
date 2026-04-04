@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronRight, Cpu, Gamepad2, Sparkles } from "lucide-react";
 import { getNeonStyle } from "@components/boffmedia/tools/utils/getNeonStyle";
+import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
 interface ToolsGridProps {
@@ -188,16 +189,7 @@ export function ToolsGrid({ tools, t }: ToolsGridProps) {
 
   return (
     <div className="mb-12">
-      {/* Section label */}
-      <div className="flex items-center gap-3 mb-6">
-        <span
-          className="text-xs font-mono text-surface-500 tracking-[0.35em] uppercase"
-          style={{ fontFamily: "Orbitron, sans-serif" }}
-        >
-          // Más herramientas
-        </span>
-        <div className="h-px flex-1 bg-gradient-to-r from-surface-700/50 to-transparent" />
-      </div>
+      <ToolSectionHeader label="Más herramientas" color="neutral" />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
         {tools.map((tool, index) => (

@@ -3,8 +3,12 @@ import { ReactNode } from "react";
 interface ToolSectionHeaderProps {
   icon?: ReactNode;
   label: string;
-  /** Tailwind color token for the accent line and text (e.g. "secondary", "primary", "accent"). Defaults to "secondary". */
-  color?: "primary" | "secondary" | "accent";
+  /**
+   * Tailwind color token for the accent line and text.
+   * Use `"neutral"` for generic / un-accented section labels.
+   * Defaults to `"secondary"`.
+   */
+  color?: "primary" | "secondary" | "accent" | "neutral";
 }
 
 const COLOR_MAP = {
@@ -19,6 +23,10 @@ const COLOR_MAP = {
   accent: {
     text: "text-accent-400/70",
     line: "from-accent-500/40",
+  },
+  neutral: {
+    text: "text-surface-500",
+    line: "from-surface-700/50",
   },
 };
 

@@ -6,6 +6,7 @@ import { useState } from "react";
 import type { NeonStyle } from "@components/boffmedia/tools/utils/getNeonStyle";
 
 interface NeonButtonProps {
+  /** Optionally force the hovered visual state (e.g. when the parent card is hovered) */
   isHovered?: boolean;
   neon: NeonStyle;
   children: React.ReactNode;
@@ -21,19 +22,21 @@ export function NeonButton({
   className,
 }: NeonButtonProps) {
   const [selfHovered, setSelfHovered] = useState(false);
-
   const hovered = isHovered ?? selfHovered;
+
+  // Derive semi-transparent backgrounds from the strong glow token
+  const bgHover = neon.glow.replace("0.3", "0.12");
+  const bgDefault = neon.glow.replace("0.3", "0.06");
+  const borderDefault = neon.glow.replace("0.3", "0.2");
 
   return (
     <motion.button
       className={`flex items-center gap-3 px-6 py-3 rounded-lg border font-mono text-sm font-bold tracking-widest uppercase transition-all duration-300 ${className ?? ""}`}
       style={{
         fontFamily: "Orbitron, sans-serif",
-        borderColor: hovered ? neon.border : "rgba(249,115,22,0.3)",
-        color: "rgb(251,146,60)",
-        background: hovered
-          ? "rgba(249,115,22,0.1)"
-          : "rgba(249,115,22,0.05)",
+        borderColor: hovered ? neon.border : borderDefault,
+        color: neon.text,
+        background: hovered ? bgHover : bgDefault,
         boxShadow: hovered ? `0 0 20px ${neon.glow}` : "none",
       }}
       animate={{ x: hovered ? 3 : 0 }}
