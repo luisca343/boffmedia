@@ -1,101 +1,170 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
-import { Gamepad } from "lucide-react"
-import { getTranslations } from "next-intl/server"
+import Link from "next/link";
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
+import { Gamepad2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 export async function BoffFooter() {
   const t = await getTranslations("boffmedia.footer");
-  
+
   return (
-    <footer className="border-t border-surface-700 bg-surface-800 h-72 relative">
-      <div className="container mx-auto px-4 pt-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Gamepad className="h-6 w-6 text-primary-500" />
-              <span className="text-lg font-bold text-surface-50">BoffMedia</span>
+    <footer className="relative bg-surface-950 overflow-hidden">
+      {/* Scanline texture */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.02]"
+        aria-hidden="true"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.5) 2px, rgba(255,255,255,0.5) 4px)",
+        }}
+      />
+
+      {/* Neon top border */}
+      <div
+        className="absolute top-0 inset-x-0 h-[2px]"
+        aria-hidden="true"
+        style={{
+          background:
+            "linear-gradient(90deg, transparent 0%, rgba(249,115,22,0.4) 25%, rgba(251,146,60,0.65) 50%, rgba(249,115,22,0.4) 75%, transparent 100%)",
+          boxShadow: "0 0 12px rgba(249,115,22,0.2)",
+        }}
+      />
+
+      <div className="container mx-auto px-4 pt-14 pb-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+
+          {/* ── Brand ── */}
+          <div className="space-y-4 md:col-span-1">
+            <div className="flex items-center gap-2.5">
+              <Gamepad2
+                className="h-5 w-5 text-primary-500 flex-shrink-0"
+                style={{ filter: "drop-shadow(0 0 6px rgba(249,115,22,0.45))" }}
+              />
+              <span
+                className="text-lg font-bold bg-gradient-to-r from-primary-400 to-primary-600 text-transparent bg-clip-text"
+                style={{ filter: "drop-shadow(0 0 8px rgba(249,115,22,0.3))" }}
+              >
+                BoffMedia
+              </span>
             </div>
-            <p className="text-sm text-surface-300">{t("tagline")}</p>
+            <p className="text-sm text-surface-500 leading-relaxed">
+              {t("tagline")}
+            </p>
           </div>
+
+          {/* ── Platform links ── */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-surface-50">{t("sections.platform.title")}</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/juegos"
-                  className="text-surface-300 hover:text-primary-400 transition-colors"
-                >
-                  {t("sections.platform.links.games")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/eventos"
-                  className="text-surface-300 hover:text-primary-400 transition-colors"
-                >
-                  {t("sections.platform.links.events")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/community"
-                  className="text-surface-300 hover:text-primary-400 transition-colors"
-                >
-                  {t("sections.platform.links.community")}
-                </Link>
-              </li>
+            <h4
+              className="text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase"
+              style={{ fontFamily: "Orbitron, sans-serif" }}
+            >
+              // {t("sections.platform.title")}
+            </h4>
+            <ul className="space-y-2.5">
+              {[
+                { href: "/juegos", label: t("sections.platform.links.games") },
+                { href: "/eventos", label: t("sections.platform.links.events") },
+                { href: "/community", label: t("sections.platform.links.community") },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="flex items-center gap-2 text-sm text-surface-500 hover:text-surface-100 transition-colors duration-150 group"
+                  >
+                    <span
+                      className="w-1 h-1 rounded-full flex-shrink-0 transition-colors duration-150"
+                      style={{ backgroundColor: "rgba(249,115,22,0.35)" }}
+                      aria-hidden="true"
+                    />
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* ── Company links ── */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-surface-50">{t("sections.company.title")}</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <Link
-                  href="/about"
-                  className="text-surface-300 hover:text-primary-400 transition-colors"
-                >
-                  {t("sections.company.links.about")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/blog"
-                  className="text-surface-300 hover:text-primary-400 transition-colors"
-                >
-                  {t("sections.company.links.blog")}
-                </Link>
-              </li>
+            <h4
+              className="text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase"
+              style={{ fontFamily: "Orbitron, sans-serif" }}
+            >
+              // {t("sections.company.title")}
+            </h4>
+            <ul className="space-y-2.5">
+              {[
+                { href: "/about", label: t("sections.company.links.about") },
+                { href: "/blog", label: t("sections.company.links.blog") },
+              ].map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="flex items-center gap-2 text-sm text-surface-500 hover:text-surface-100 transition-colors duration-150"
+                  >
+                    <span
+                      className="w-1 h-1 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: "rgba(249,115,22,0.35)" }}
+                      aria-hidden="true"
+                    />
+                    {label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
+
+          {/* ── Newsletter ── */}
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold text-surface-50">{t("newsletter.title")}</h4>
-            <div className="flex space-x-2">
+            <h4
+              className="text-xs font-mono text-primary-400/55 tracking-[0.35em] uppercase"
+              style={{ fontFamily: "Orbitron, sans-serif" }}
+            >
+              // {t("newsletter.title")}
+            </h4>
+            <div className="flex gap-2">
               <Input
                 placeholder={t("newsletter.emailPlaceholder")}
                 type="email"
-                className="bg-surface-700 border-surface-600"
+                className="bg-surface-900 border-surface-700/60 text-surface-200 placeholder:text-surface-600 focus:border-primary-500/50 text-sm h-9"
               />
-              <Button type="submit" className="bg-primary-500 hover:bg-primary-600 text-white">
+              <Button
+                type="submit"
+                className="bg-primary-600 hover:bg-primary-500 text-white font-mono text-xs tracking-wider flex-shrink-0 h-9 px-3 transition-colors duration-150"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
                 {t("newsletter.joinButton")}
               </Button>
             </div>
           </div>
         </div>
-        <div className="border-t border-surface-700 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-surface-300">
+
+        {/* Gradient divider */}
+        <div
+          className="h-px mb-8"
+          style={{
+            background:
+              "linear-gradient(90deg, transparent, rgba(249,115,22,0.15) 30%, rgba(249,115,22,0.15) 70%, transparent)",
+          }}
+        />
+
+        {/* Bottom bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p
+            className="text-xs font-mono text-surface-600 tracking-wide"
+          >
             {t("copyright", { year: new Date().getFullYear() })}
           </p>
-          <div className="flex gap-4">
+          <div className="flex items-center gap-6">
             <Link
               href="/privacidad"
-              className="text-sm text-surface-300 hover:text-primary-400 transition-colors"
+              className="text-xs font-mono text-surface-500 hover:text-primary-400 transition-colors duration-150 tracking-wide"
             >
               {t("legal.privacy")}
             </Link>
+            <span className="w-px h-3 bg-surface-700/60" aria-hidden="true" />
             <Link
               href="/terminos"
-              className="text-sm text-surface-300 hover:text-primary-400 transition-colors"
+              className="text-xs font-mono text-surface-500 hover:text-primary-400 transition-colors duration-150 tracking-wide"
             >
               {t("legal.terms")}
             </Link>
@@ -103,5 +172,5 @@ export async function BoffFooter() {
         </div>
       </div>
     </footer>
-  )
+  );
 }
