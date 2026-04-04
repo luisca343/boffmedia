@@ -1,65 +1,65 @@
-import React from "react";
-import Link from "next/link";
+import {
+  PolicyShell,
+  PolicySection,
+  PolicyText,
+  PolicyList,
+  PolicyLink,
+} from "../_components/PolicyShell";
 
-export default function CancellationPolicyPage() {
+export default function ReturnPolicyPage() {
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-600">
-        Política de Cancelaciones
-      </h1>
-      <p className="mb-4 text-primary-100">
-        Dado que solo vendemos artículos dentro del juego y servicios en línea
-        para Minecraft, nuestra política de cancelaciones es limitada. Sin
-        embargo, entendemos que pueden surgir situaciones excepcionales.
-      </p>
-      <h2 className="text-2xl font-bold mb-4 text-primary-400">
-        Proceso de Cancelación
-      </h2>
-      <p className="mb-4 text-primary-100">
-        Si encuentras algún problema con tu compra o necesitas solicitar una
-        cancelación, por favor contacta a nuestro servicio de atención al
-        cliente a través de nuestra{" "}
-        <Link
-          href="/contacto"
-          className="text-primary-400 hover:text-primary-300 transition duration-300"
-        >
-          página de contacto
-        </Link>{" "}
-        lo antes posible.
-      </p>
-      <h2 className="text-2xl font-bold mb-4 text-primary-400">
-        Condiciones de Cancelación
-      </h2>
-      <ul className="list-disc list-inside mb-4 text-primary-100">
-        <li>
-          La solicitud de cancelación debe ser realizada dentro de las 24 horas
-          posteriores a la compra.
-        </li>
-        <li>El artículo o servicio no debe haber sido utilizado o activado.</li>
-        <li>
-          Debes proporcionar detalles específicos del problema encontrado o la
-          razón de la cancelación.
-        </li>
-        <li>
-          Nos reservamos el derecho de investigar y resolver la solicitud de
-          cancelación a nuestra discreción.
-        </li>
-      </ul>
-      <p className="mb-4 text-primary-100">
-        Ten en cuenta que las cancelaciones aprobadas pueden estar sujetas a una
-        tarifa de procesamiento del 5% del valor de la compra.
-      </p>
-      <p className="mb-4 text-primary-100">
-        Para más información sobre reembolsos y disputas, por favor consulta
-        nuestra{" "}
-        <Link
-          href="/politicas/reembolsos"
-          className="text-primary-400 hover:text-primary-300 transition duration-300"
-        >
-          Política de Disputas y Reembolsos
-        </Link>
-        .
-      </p>
-    </div>
+    <PolicyShell title="Política de Devoluciones">
+      <PolicyText>
+        En BoffMedia, nos esforzamos por garantizar que cada compra sea una
+        experiencia satisfactoria. Si no estás conforme con tu compra,
+        revisaremos tu caso según los criterios que se detallan a continuación.
+      </PolicyText>
+
+      <PolicySection title="Condiciones de Devolución">
+        <PolicyList
+          items={[
+            "La solicitud debe realizarse dentro de los 7 días naturales desde la fecha de compra.",
+            "El artículo o servicio no debe haber sido utilizado, activado ni canjeado.",
+            "Debes acreditar la compra mediante el comprobante o número de pedido.",
+            "Los artículos adquiridos en promoción o con descuento especial quedan excluidos salvo defecto comprobado.",
+          ]}
+        />
+      </PolicySection>
+
+      <PolicySection title="Proceso de Solicitud">
+        <PolicyText>
+          Para iniciar una devolución, contacta con nuestro equipo a través de
+          la <PolicyLink href="/contacto">página de contacto</PolicyLink>{" "}
+          indicando el número de pedido y el motivo detallado de la solicitud.
+          Nuestro equipo te responderá en un plazo máximo de 48 horas hábiles.
+        </PolicyText>
+      </PolicySection>
+
+      <PolicySection title="Resolución">
+        <PolicyText>
+          Si la devolución es aprobada, el importe será reintegrado mediante el
+          método de pago original en un plazo de 7 días hábiles, pudiendo estar
+          sujeto a una tarifa de gestión del 5% del valor de la compra.
+        </PolicyText>
+        <PolicyText>
+          Nos reservamos el derecho de rechazar solicitudes que no cumplan las
+          condiciones anteriores o que se consideren de carácter abusivo.
+        </PolicyText>
+      </PolicySection>
+
+      <PolicySection title="Más información">
+        <PolicyText>
+          Consulta también nuestra{" "}
+          <PolicyLink href="/cancelaciones">
+            Política de Cancelaciones
+          </PolicyLink>{" "}
+          y nuestra{" "}
+          <PolicyLink href="/reembolsos">
+            Política de Disputas y Reembolsos
+          </PolicyLink>
+          .
+        </PolicyText>
+      </PolicySection>
+    </PolicyShell>
   );
 }
