@@ -8,6 +8,7 @@ import { Home, Menu, Trophy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { HerramientasMenu } from "./ToolsMenu";
 import { WingullMenu } from "./WingullMenu";
+import { NavMenuProvider } from "./DropdownMenu";
 import { InternalLink } from "./Link";
 import { Button } from "@/components/ui/primitives/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/primitives/sheet";
@@ -110,6 +111,7 @@ export function FicusNav() {
 
         {/* Desktop nav links */}
         <div className="hidden md:flex items-center space-x-1">
+          <NavMenuProvider>
           {NAV_LINKS.map(({ href, label, icon, override }) => {
             const active = inPage(href);
             return (
@@ -145,6 +147,7 @@ export function FicusNav() {
               </div>
             );
           })}
+          </NavMenuProvider>
         </div>
 
         {/* Right-side actions */}
@@ -204,6 +207,7 @@ export function FicusNav() {
                   }}
                 />
 
+                <NavMenuProvider>
                 {NAV_LINKS.map(({ href, label, icon, override }) => {
                   const active = inPage(href);
                   return (
@@ -235,6 +239,7 @@ export function FicusNav() {
                     </div>
                   );
                 })}
+                </NavMenuProvider>
               </nav>
             </SheetContent>
           </Sheet>
