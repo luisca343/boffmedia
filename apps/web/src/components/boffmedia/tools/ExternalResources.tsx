@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, ExternalLink } from "lucide-react";
+import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 
 interface ExternalResourcesProps {
   links: Array<{
@@ -93,16 +94,7 @@ export function ExternalResources({ links, t }: ExternalResourcesProps) {
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary-500/50 to-transparent" />
 
       <div className="p-6 lg:p-8">
-        {/* Section header */}
-        <div className="flex items-center gap-3 mb-6">
-          <span
-            className="text-xs font-mono text-primary-400/70 tracking-[0.35em] uppercase"
-            style={{ fontFamily: "Orbitron, sans-serif" }}
-          >
-            // {t("externalLinks.title")}
-          </span>
-          <div className="h-px flex-1 bg-gradient-to-r from-surface-700/50 to-transparent" />
-        </div>
+        <ToolSectionHeader label={t("externalLinks.title")} color="primary" />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {links.map((link, i) => (
