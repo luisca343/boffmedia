@@ -49,26 +49,23 @@ export function SmartRotomSpotlight({ t }: SmartRotomSpotlightProps) {
           <div className="flex items-center gap-4">
             <Button
               variant="default"
-              className=" text-white px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-primary-300 focus:ring-offset-2 focus:outline-none group"
+              size="lg"
+              className="flex-1 group"
               asChild
               aria-label={t("featuredGames.viewMore") + " SmartRotom"}
             >
-              <InternalLink href="/blog/posts/smartrotom" className="flex items-center justify-center gap-3">
-                <span className="relative z-10">
-                  {t("featuredGames.viewMore")}
-                </span>
-                <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
+              <InternalLink href="/blog/posts/smartrotom" className="flex items-center justify-center gap-2">
+                {t("featuredGames.viewMore")}
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </InternalLink>
             </Button>
             <Button
               variant="outline"
-              className="border-primary-500/30 text-primary-500 hover:bg-primary-500/10 px-6 py-3 font-semibold transition-all duration-200"
+              size="lg"
               asChild
               aria-label="Abrir SmartRotom"
             >
-              <InternalLink href="/smartrotom" className="flex items-center gap-2">
-                <span>Abrir SmartRotom</span>
-              </InternalLink>
+              <InternalLink href="/smartrotom">Abrir SmartRotom</InternalLink>
             </Button>
           </div>
         </GameSpotlightCard>

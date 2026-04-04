@@ -83,19 +83,18 @@ export function WingullSpotlight({ t }: WingullSpotlightProps) {
           <div className="flex items-center gap-4">
             <Button
               variant="secondary"
-              className="px-8 py-3 flex-1 shadow-xl rounded-full font-semibold text-lg transition-all duration-200 transform hover:scale-105 focus:ring-4 focus:ring-secondary-300 focus:ring-offset-2 focus:outline-none group"
+              size="lg"
+              className="flex-1 group"
               asChild
               aria-label={t("featuredGames.viewMore") + " Pixelmon Wingull 2"}
             >
-              <Link href="/wingull" className="flex items-center justify-center gap-3">
-                <span className="relative z-10">
-                  {t("featuredGames.viewMore")}
-                </span>
-                <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
+              <Link href="/wingull" className="flex items-center justify-center gap-2">
+                {t("featuredGames.viewMore")}
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
             </Button>
-            <Button variant="secondaryOutline">
-              <HiBell className="w-6 h-6" />
+            <Button variant="secondaryOutline" size="lg" aria-label="Notificaciones">
+              <HiBell className="w-5 h-5" />
             </Button>
           </div>
         </div>

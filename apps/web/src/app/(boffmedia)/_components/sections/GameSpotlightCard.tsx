@@ -59,7 +59,7 @@ export function GameSpotlightCard({
           </div>
         </div>
         <div className={isRightAligned ? 'text-right' : ''}>
-          <h3 className={`text-4xl font-bold text-transparent bg-clip-text ${titleGradientClass}`}>
+          <h3 className={`text-4xl font-black text-transparent bg-clip-text ${titleGradientClass}`}>
             {title}
           </h3>
           <div className={`h-1 w-20 bg-gradient-to-r ${underlineClass} rounded-full mt-2 ${isRightAligned ? 'ml-auto' : ''}`}></div>

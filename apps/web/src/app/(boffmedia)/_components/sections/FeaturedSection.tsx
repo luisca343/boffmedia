@@ -31,10 +31,13 @@ export async function FeaturedSection() {
       <div className="relative mx-auto z-10 flex flex-col h-full w-full px-4">
       <div className="text-center mb-6">
         <div className="inline-block">
-          <h2 className="block text-6xl font-extrabold my-4 text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-400 to-amber-400 drop-shadow-lg">
+          <h2
+            className="block text-5xl sm:text-6xl font-black my-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500"
+            style={{ fontFamily: "Orbitron, sans-serif" }}
+          >
             {t("featuredGames.title")}
           </h2>
-          <div className="h-1 w-32 bg-gradient-to-r from-orange-500 to-amber-400 mx-auto rounded-full"></div>
+          <div className="h-[2px] w-24 bg-gradient-to-r from-primary-500 to-primary-300 mx-auto" style={{ opacity: 0.7 }} />
         </div>
       </div>
         <WingullSpotlight t={t} />
