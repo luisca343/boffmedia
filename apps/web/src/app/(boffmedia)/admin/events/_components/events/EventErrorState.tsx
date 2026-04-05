@@ -1,44 +1,42 @@
-import { Card, CardContent } from "@/components/ui/primitives/card"
-import { Button } from "@/components/ui/primitives/button"
-import { RefreshCw } from "lucide-react"
+import { Button } from "@/components/ui/primitives/button";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 interface EventErrorStateProps {
-  error: string
-  onRetry: () => void
+  error: string;
+  onRetry: () => void;
 }
 
 export function EventErrorState({ error, onRetry }: EventErrorStateProps) {
   return (
-    <Card className="bg-surface-800 border-surface-700">
-      <CardContent className="pt-6">
-        <div className="text-center py-8">
-          <div className="text-warning-500 mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="48"
-              height="48"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mx-auto"
-            >
-              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
-              <path d="M12 9v4"></path>
-              <path d="M12 17h.01"></path>
-            </svg>
-          </div>
-          <h2 className="text-xl font-semibold mb-2 text-surface-50">Error al cargar eventos</h2>
-          <p className="text-surface-300 mb-6">{error}</p>
-          <Button onClick={onRetry}>
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Reintentar
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
+    <div
+      className="rounded-xl border p-12 flex flex-col items-center text-center"
+      style={{
+        background: "rgba(9,13,27,0.85)",
+        borderColor: "rgba(239,68,68,0.2)",
+      }}
+    >
+      <div
+        className="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
+        style={{
+          background: "rgba(239,68,68,0.07)",
+          border: "1px solid rgba(239,68,68,0.22)",
+        }}
+      >
+        <AlertTriangle className="w-7 h-7" style={{ color: "rgba(239,68,68,0.8)" }} />
+      </div>
 
+      <h3
+        className="text-sm font-black text-surface-200 mb-1.5"
+        style={{ fontFamily: "Orbitron, sans-serif" }}
+      >
+        Error al cargar eventos
+      </h3>
+      <p className="text-xs text-surface-500 max-w-xs leading-relaxed mb-6">{error}</p>
+
+      <Button size="sm" onClick={onRetry} className="gap-1.5">
+        <RefreshCw className="w-3.5 h-3.5" />
+        Reintentar
+      </Button>
+    </div>
+  );
+}

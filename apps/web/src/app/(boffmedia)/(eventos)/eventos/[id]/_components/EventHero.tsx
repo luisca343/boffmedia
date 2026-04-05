@@ -1,189 +1,208 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/primitives/button"
-import { Badge } from "@/components/ui/primitives/badge"
-import { 
-  ArrowLeft, Calendar, Clock, Users, Trophy, 
-  Share2, Bookmark, Zap, Server, 
-  GamepadIcon as Gamepad2
-} from "lucide-react"
-import { Event } from "@boffmedia/shared"
-import { EventRegistrationButton } from "../../_components/EventRegistrationButton"
-import Link from "next/link"
-import { InternalLink } from "@/components/ui/navigation/Link"
+import { Button } from "@/components/ui/primitives/button";
+import {
+  ArrowLeft, Calendar, Clock, Users, Trophy,
+  Share2, Bookmark, Server, GamepadIcon as Gamepad2,
+} from "lucide-react";
+import { Event } from "@boffmedia/shared";
+import { EventRegistrationButton } from "../../_components/EventRegistrationButton";
+import { InternalLink } from "@/components/ui/navigation/Link";
+import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
+import { CountdownTimer } from "@/app/(boffmedia)/_components/ui/CountdownTimer";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const formatDate = (ds: string) =>
+  new Date(ds).toLocaleDateString("es-ES", {
+    year: "numeric", month: "long", day: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
+
+const TYPE_ICONS: Record<string, React.ElementType> = {
+  [Event.type.EVENT]: Trophy,
+  [Event.type.SERVER]: Server,
+};
+
+const getTypeIcon = (type: string) => TYPE_ICONS[type] ?? Calendar;
+
+// ─── Meta item ───────────────────────────────────────────────────────────────
+
+function MetaItem({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string | number }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div
+        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+        style={{ background: "rgba(249,115,22,0.07)", border: "1px solid rgba(249,115,22,0.15)" }}
+      >
+        <Icon className="w-4 h-4" style={{ color: "rgba(249,115,22,0.7)" }} />
+      </div>
+      <div>
+        <div className="text-[10px] font-mono uppercase tracking-widest text-surface-600">{label}</div>
+        <div className="text-sm font-semibold text-surface-200">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 interface EventHeroProps {
-  event: any
-  participants: any[]
+  event: any;
+  participants: any[];
 }
 
 export function EventHero({ event, participants }: EventHeroProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
-  const getEventStatus = (startDate: string, endDate?: string) => {
-    const now = new Date()
-    const start = new Date(startDate)
-    const end = endDate ? new Date(endDate) : null
-
-    if (now < start) {
-      return { label: 'Próximo', color: 'from-secondary-500 to-cyan-600', icon: Clock }
-    } else if (end && now > end) {
-      return { label: 'Finalizado', color: 'from-surface-500 to-surface-600', icon: Calendar }
-    } else {
-      return { label: 'En Curso', color: 'from-success-500 to-emerald-600', icon: Zap }
-    }
-  }
-
-  const getEventTypeIcon = (type: string) => {
-    switch (type) {
-      case Event.type.EVENT: return Trophy
-      case Event.type.SERVER: return Server
-      default: return Calendar
-    }
-  }
-
-  const getTimeUntilEvent = (dateString: string) => {
-    const now = new Date().getTime()
-    const eventTime = new Date(dateString).getTime()
-    const difference = eventTime - now
-
-    if (difference < 0) return null
-
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-
-    if (days > 0) return `En ${days} días`
-    if (hours > 0) return `En ${hours} horas`
-    return 'Muy pronto'
-  }
-
-  const status = getEventStatus(event.startDate, event.endDate)
-  const timeUntil = getTimeUntilEvent(event.startDate)
-  const TypeIcon = getEventTypeIcon(event.type)
-  const StatusIcon = status.icon
+  const TypeIcon = getTypeIcon(event.type);
 
   return (
     <>
-      {/* Navigation */}
-      <div className="mb-8">
-        <InternalLink href="/eventos">
-          <Button variant="ghost" className="text-surface-300 hover:text-surface-50 hover:bg-surface-800/50 border border-transparent hover:border-accent-500/30">
-            <ArrowLeft className="mr-2 h-4 w-4" />
+      {/* Back navigation */}
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-surface-400 hover:text-surface-100 gap-2"
+          style={{ border: "1px solid rgba(249,115,22,0.12)" }}
+          asChild
+        >
+          <InternalLink href="/eventos">
+            <ArrowLeft className="w-4 h-4" />
             Volver a eventos
-          </Button>
-        </InternalLink>
+          </InternalLink>
+        </Button>
       </div>
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-surface-800/80 via-accent-900/40 to-surface-800/80 backdrop-blur-sm border border-accent-500/20 rounded-3xl overflow-hidden mb-8">
+      {/* Hero card */}
+      <div
+        className="rounded-xl overflow-hidden border mb-8"
+        style={{
+          background: "linear-gradient(145deg, rgba(9,13,27,0.97), rgba(15,23,42,0.95))",
+          borderColor: "rgba(249,115,22,0.15)",
+          boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
+        }}
+      >
+        {/* Top neon bar */}
+        <div
+          className="h-[2px] w-full"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(249,115,22,0.6), transparent)",
+          }}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
-          {/* Event Info */}
+          {/* ── Info column ─────────────────────────────────────────────── */}
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 bg-gradient-to-br from-accent-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl">
+            {/* Icon + status */}
+            <div className="flex items-center gap-4">
+              <div
+                className="w-16 h-16 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
+                style={{
+                  background: "rgba(249,115,22,0.08)",
+                  border: "1px solid rgba(249,115,22,0.22)",
+                }}
+              >
                 {event.icon ? (
-                  <img src={event.icon} alt="" className="w-12 h-12 rounded-xl" />
+                  <img src={event.icon} alt="" className="w-12 h-12 rounded-lg object-cover" />
                 ) : (
-                  <TypeIcon className="w-8 h-8 text-white" />
+                  <TypeIcon className="w-8 h-8" style={{ color: "rgb(251,146,60)" }} />
                 )}
               </div>
-              <div>
-                <Badge className={`bg-gradient-to-r ${status.color} text-white px-4 py-2 text-sm font-bold`}>
-                  <StatusIcon className="w-4 h-4 mr-2" />
-                  {status.label}
-                </Badge>
-                {timeUntil && (
-                  <div className="text-secondary-400 text-sm mt-1 font-medium">{timeUntil}</div>
+              <div className="space-y-1.5">
+                <EventStatusChip status={event.status} />
+                {event.status === Event.status.UPCOMING && (
+                  <div className="text-xs font-mono text-secondary-400/70">
+                    <CountdownTimer
+                      targetDate={event.startDate}
+                      liveLabel="¡En vivo ahora!"
+                    />
+                  </div>
                 )}
               </div>
             </div>
 
+            {/* Title */}
             <div>
-              <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-pink-400 to-indigo-400 mb-4">
+              <h1
+                className="text-3xl sm:text-4xl font-black text-surface-50 leading-tight mb-3"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
+              >
                 {event.title}
               </h1>
-              <p className="text-lg text-surface-300 leading-relaxed">{event.description}</p>
+              <p className="text-surface-400 leading-relaxed">{event.description}</p>
             </div>
 
-            {/* Event Details Grid */}
+            {/* Meta grid */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3 text-surface-300">
-                <Clock className="w-5 h-5 text-accent-400" />
-                <div>
-                  <div className="text-sm text-surface-400">Inicia</div>
-                  <div className="font-semibold">{formatDate(event.startDate)}</div>
-                </div>
-              </div>
+              <MetaItem icon={Clock} label="Inicia" value={formatDate(event.startDate)} />
               {event.endDate && (
-                <div className="flex items-center gap-3 text-surface-300">
-                  <Calendar className="w-5 h-5 text-accent-400" />
-                  <div>
-                    <div className="text-sm text-surface-400">Finaliza</div>
-                    <div className="font-semibold">{formatDate(event.endDate)}</div>
-                  </div>
-                </div>
+                <MetaItem icon={Calendar} label="Finaliza" value={formatDate(event.endDate)} />
               )}
-              <div className="flex items-center gap-3 text-surface-300">
-                <Users className="w-5 h-5 text-accent-400" />
-                <div>
-                  <div className="text-sm text-surface-400">Participantes</div>
-                  <div className="font-semibold">{participants.length}</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-surface-300">
-                <Gamepad2 className="w-5 h-5 text-accent-400" />
-                <div>
-                  <div className="text-sm text-surface-400">Juego</div>
-                  <div className="font-semibold">{event.gameName || `Juego #${event.gameId}`}</div>
-                </div>
-              </div>
+              <MetaItem icon={Users} label="Participantes" value={participants.length} />
+              <MetaItem
+                icon={Gamepad2}
+                label="Juego"
+                value={event.gameName ?? `Juego #${event.gameId}`}
+              />
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-4">
+            {/* Actions */}
+            <div className="flex gap-3 flex-wrap">
               <EventRegistrationButton event={event} />
-              <Button variant="accentOutline">
-                <Share2 className="w-4 h-4 mr-2" />
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2"
+                style={{ borderColor: "rgba(249,115,22,0.2)", color: "rgba(249,115,22,0.8)" }}
+              >
+                <Share2 className="w-4 h-4" />
                 Compartir
               </Button>
-              <Button variant="accentOutline">
+              <Button
+                variant="outline"
+                size="sm"
+                style={{ borderColor: "rgba(249,115,22,0.2)", color: "rgba(249,115,22,0.8)" }}
+              >
                 <Bookmark className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
-          {/* Event Visual */}
-          
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-accent-500/20 to-pink-500/20 rounded-2xl blur-xl"></div>
-            <div className="relative h-full flex items-center justify-center">
-              {event.banner ? (
-                <img 
-                  src={event.banner} 
-                  alt={event.title} 
-                  className="w-full rounded-xl"
-                />
-              ) : (
-                <div className="text-center">
-                  <div className="w-32 h-32 bg-gradient-to-br from-accent-500 to-pink-600 rounded-3xl flex items-center justify-center mb-6 mx-auto">
-                    <TypeIcon className="w-16 h-16 text-white" />
-                  </div>
-                  <h4 className="text-2xl font-bold text-white mb-2">¡Evento Increíble!</h4>
-                  <p className="text-surface-300">Prepárate para la aventura</p>
+          {/* ── Visual column ────────────────────────────────────────────── */}
+          <div className="flex items-center justify-center relative">
+            {event.banner ? (
+              <img
+                src={event.banner}
+                alt={event.title}
+                className="w-full rounded-xl border"
+                style={{ borderColor: "rgba(249,115,22,0.15)" }}
+              />
+            ) : (
+              <div
+                className="w-full aspect-video rounded-xl flex flex-col items-center justify-center gap-4 border"
+                style={{
+                  background: "rgba(249,115,22,0.05)",
+                  borderColor: "rgba(249,115,22,0.15)",
+                }}
+              >
+                <div
+                  className="w-24 h-24 rounded-2xl flex items-center justify-center"
+                  style={{
+                    background: "rgba(249,115,22,0.1)",
+                    border: "1px solid rgba(249,115,22,0.25)",
+                    filter: "drop-shadow(0 0 16px rgba(249,115,22,0.2))",
+                  }}
+                >
+                  <TypeIcon className="w-12 h-12" style={{ color: "rgb(251,146,60)" }} />
                 </div>
-              )}
-            </div>
+                <p className="text-xs font-mono text-surface-600 uppercase tracking-widest">
+                  ¡Evento Increíble!
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </>
-  )
+  );
 }
