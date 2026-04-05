@@ -1,51 +1,74 @@
-import { CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives/card"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
-import { Badge } from "@/components/ui/primitives/badge"
-import { Plus, Search, Calendar } from "lucide-react"
+import { Button } from "@/components/ui/primitives/button";
+import { Input } from "@/components/ui/primitives/input";
+import { Plus, Search, Calendar } from "lucide-react";
 
 interface EventHeaderProps {
-  totalEvents: number
-  searchTerm: string
-  onSearchChange: (term: string) => void
-  onCreateNew: () => void
+  totalEvents: number;
+  searchTerm: string;
+  onSearchChange: (term: string) => void;
+  onCreateNew: () => void;
 }
 
 export function EventHeader({ totalEvents, searchTerm, onSearchChange, onCreateNew }: EventHeaderProps) {
   return (
-    <CardHeader className="pb-4">
-      <div className="flex justify-between items-center">
-        <div>
-          <CardTitle className="text-2xl text-surface-50 flex items-center">
-            <Calendar className="mr-2 h-6 w-6 text-primary-500" />
-            Gestión de Eventos
-          </CardTitle>
-          <CardDescription className="text-surface-300">Administra los eventos y competiciones</CardDescription>
+    <div className="p-6 space-y-5">
+      {/* Title row */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{
+              background: "rgba(249,115,22,0.08)",
+              border: "1px solid rgba(249,115,22,0.22)",
+            }}
+          >
+            <Calendar className="w-4 h-4" style={{ color: "rgb(251,146,60)" }} />
+          </div>
+          <div>
+            <h2
+              className="text-base font-black text-surface-50 leading-none"
+              style={{ fontFamily: "Orbitron, sans-serif" }}
+            >
+              Gestión de Eventos
+            </h2>
+            <p className="text-[11px] font-mono text-surface-600 mt-0.5 uppercase tracking-wider">
+              Administra eventos y competiciones
+            </p>
+          </div>
         </div>
 
-        <Button onClick={onCreateNew}>
-          <Plus className="mr-2 h-4 w-4" />
+        <Button size="sm" onClick={onCreateNew} className="gap-1.5 flex-shrink-0">
+          <Plus className="w-3.5 h-3.5" />
           Nuevo Evento
         </Button>
       </div>
 
-      <div className="flex justify-between items-center mt-6">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-surface-400" />
+      {/* Search + count row */}
+      <div className="flex items-center gap-3">
+        <div className="relative flex-1 max-w-sm">
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5"
+            style={{ color: "rgba(249,115,22,0.5)" }}
+          />
           <Input
             placeholder="Buscar eventos..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10 bg-surface-700 border-surface-600 text-surface-50"
+            className="pl-9 h-9 text-sm bg-surface-900 border-surface-700/60 text-surface-100 focus:border-primary-500/40"
           />
         </div>
 
-        <div className="flex items-center text-surface-300">
-          <span className="mr-2">Total:</span>
-          <Badge className="bg-primary-500/20 text-primary-400 border border-primary-500/30">{totalEvents}</Badge>
-        </div>
+        <span
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-widest flex-shrink-0"
+          style={{
+            color: "rgba(249,115,22,0.8)",
+            border: "1px solid rgba(249,115,22,0.22)",
+            background: "rgba(249,115,22,0.06)",
+          }}
+        >
+          {totalEvents} evento{totalEvents !== 1 ? "s" : ""}
+        </span>
       </div>
-    </CardHeader>
-  )
+    </div>
+  );
 }
-
