@@ -10,6 +10,7 @@ import { EventRegistrationButton } from "../../_components/EventRegistrationButt
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
 import { CountdownTimer } from "@/app/(boffmedia)/_components/ui/CountdownTimer";
+import { NeonCard } from "@/components/boffmedia/NeonCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -60,10 +61,13 @@ export function EventHero({ event, participants }: EventHeroProps) {
       {/* Back navigation */}
       <div className="mb-6">
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
-          className="text-surface-400 hover:text-surface-100 gap-2"
-          style={{ border: "1px solid rgba(249,115,22,0.12)" }}
+          className="gap-2 text-surface-200 hover:text-surface-50"
+          style={{
+            background: "rgba(30,41,59,0.7)",
+            borderColor: "rgba(71,85,105,0.55)",
+          }}
           asChild
         >
           <InternalLink href="/eventos">
@@ -74,22 +78,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
       </div>
 
       {/* Hero card */}
-      <div
-        className="rounded-xl overflow-hidden border mb-8"
-        style={{
-          background: "linear-gradient(145deg, rgba(9,13,27,0.97), rgba(15,23,42,0.95))",
-          borderColor: "rgba(249,115,22,0.15)",
-          boxShadow: "0 24px 60px rgba(0,0,0,0.55)",
-        }}
-      >
-        {/* Top neon bar */}
-        <div
-          className="h-[2px] w-full"
-          style={{
-            background: "linear-gradient(90deg, transparent, rgba(249,115,22,0.6), transparent)",
-          }}
-        />
-
+      <NeonCard variant="primary" className="mb-8" contentClassName="">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
           {/* ── Info column ─────────────────────────────────────────────── */}
           <div className="space-y-6">
@@ -202,7 +191,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
             )}
           </div>
         </div>
-      </div>
+      </NeonCard>
     </>
   );
 }
