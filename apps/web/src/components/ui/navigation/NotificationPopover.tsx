@@ -210,7 +210,7 @@ export default function NotificationPopover() {
           />
 
           {/* Body */}
-          <ScrollArea className="max-h-64">
+          <ScrollArea className="h-64">
             {notifications.length === 0 ? (
               <div className="flex items-center gap-2 mx-1 px-2 py-3 text-xs text-surface-500">
                 <BellOff className="w-3.5 h-3.5 flex-shrink-0 opacity-40" />
