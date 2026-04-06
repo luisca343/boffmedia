@@ -1,15 +1,15 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Card, CardContent } from "@/components/ui/primitives/card"
-import { Badge } from "@/components/ui/primitives/badge"
 import { Button } from "@/components/ui/primitives/button"
-import { Progress } from "@/components/ui/primitives/progress"
-import { Trophy, Star, ExternalLink, Sparkles, Users, Lock, CheckCircle, Clock, Medal, Award } from "lucide-react"
+import { Trophy, ExternalLink, Medal, CheckCircle } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
-import Link from "next/link"
 import { InternalLink } from "@/components/ui/navigation/Link"
+import { AchievementBadge } from "@/components/boffmedia/event/AchievementBadge"
+import { getRarityTokens } from "@/components/boffmedia/event/rarityTokens"
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AchievementWithProgress {
   id: number
@@ -20,15 +20,10 @@ interface AchievementWithProgress {
   rarity?: string
   maxProgress?: number
   itemType: "achievement" | "medal"
-  userProgress?: {
-    currentProgress: number
-    isCompleted: number
-    completedAt?: string
-  }
+  userProgress?: { currentProgress: number; isCompleted: number; completedAt?: string }
   isUnlocked: boolean
   currentProgress: number
   completionRate: number
-
   hidden: boolean
 }
 
@@ -38,437 +33,346 @@ interface AchievementsSectionProps {
   participants: any[]
 }
 
+// ─── Neon progress bar ────────────────────────────────────────────────────────
+
+function NeonProgressBar({ value, color = "rgba(249,115,22,0.75)" }: { value: number; color?: string }) {
+  return (
+    <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(30,41,59,0.8)" }}>
+      <div
+        className="h-full rounded-full transition-all duration-500"
+        style={{ width: `${Math.min(100, value)}%`, background: color }}
+      />
+    </div>
+  )
+}
+
+// ─── Section header ───────────────────────────────────────────────────────────
+
+function SectionHeader({ label, sub }: { label: string; sub?: string }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div
+        className="h-[2px] w-5 rounded-none"
+        style={{ background: "rgba(249,115,22,0.6)" }}
+      />
+      <div>
+        <h2
+          className="text-sm font-black uppercase tracking-widest"
+          style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
+        >
+          {label}
+        </h2>
+        {sub && <p className="text-[10px] font-mono text-surface-500 mt-0.5">{sub}</p>}
+      </div>
+    </div>
+  )
+}
+
+// ─── Relative time ────────────────────────────────────────────────────────────
+
+function relativeTime(dateString: string): string {
+  const diff = Date.now() - new Date(dateString).getTime()
+  const h = Math.floor(diff / 3_600_000)
+  if (h < 1) return "Hace unos minutos"
+  if (h < 24) return `Hace ${h}h`
+  const d = Math.floor(h / 24)
+  if (d === 1) return "Ayer"
+  if (d < 7) return `Hace ${d} días`
+  return new Date(dateString).toLocaleDateString("es-ES", { month: "short", day: "numeric" })
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function AchievementsSection({ eventId, achievements, participants }: AchievementsSectionProps) {
   const { session } = useBoffSession()
   const [progressData, setProgressData] = useState<any[]>([])
-  const [participantId, setParticipantId] = useState<number | null>(null)
   const [isLoadingProgress, setIsLoadingProgress] = useState(false)
+
   useEffect(() => {
     async function fetchUserProgress() {
-        console.log("Fetching user progress...");
-        console.log("User ID:", session?.user?.id);
-        console.log("Achievements:", achievements);
       if (!session?.user?.id || achievements.length === 0) return
-      
       try {
         setIsLoadingProgress(true)
-        
-        // Get current user's participant ID
         const participantsResponse = await EventsService.getEventParticipants(eventId)
-        console.log("Participants:", participantsResponse.data);
         const participant = participantsResponse.data?.find(
           (p: any) => p.userId === parseInt(session.user.id!)
         )
-        
         if (participant) {
-          setParticipantId(participant.id)
-
-          // Fetch user progress
           const progressResponse = await EventsService.getParticipantProgressByEvent(
-            eventId, 
+            eventId,
             participant.participantId
           )
-
           setProgressData(progressResponse.data || [])
         }
-      } catch (error) {
-        console.error("Error fetching user progress:", error)
+      } catch {
         setProgressData([])
       } finally {
         setIsLoadingProgress(false)
       }
     }
-
     fetchUserProgress()
   }, [eventId, session?.user?.id, achievements.length])
 
-  // Merge achievements with progress data
   const achievementsWithProgress: AchievementWithProgress[] = useMemo(() => {
-    return achievements.map(achievement => {
-      const progress = progressData.find(p => p.achievementId === achievement.id)
-      
-      console.log(progressData)
-
+    return achievements.map((achievement) => {
+      const progress = progressData.find((p) => p.achievementId === achievement.id)
       const currentProgress = progress?.currentProgress || 0
       const maxProgress = achievement.maxProgress || 1
-
-      console.log("Achievement:", achievement)
-      console.log("Progress:", progress)
-
-      const isUnlocked = progress?.isCompleted === 1
-      
       return {
         ...achievement,
         userProgress: progress,
-        isUnlocked,
+        isUnlocked: progress?.isCompleted === 1,
         currentProgress,
-        completionRate: maxProgress > 0 ? (currentProgress / maxProgress) * 100 : 0
+        completionRate: maxProgress > 0 ? (currentProgress / maxProgress) * 100 : 0,
       }
     })
   }, [achievements, progressData])
 
-  // Separate achievements and medals
-  const actualAchievements = achievementsWithProgress.filter(item => item.itemType === 'achievement')
-  const medals = achievementsWithProgress.filter(item => item.itemType === 'medal')
-
-  console.log("Actual achievements:", actualAchievements)
-  console.log("Medals:", medals)
-
-  // For achievements: show like now (with locked/unlocked states)
-  const unlockedAchievements = actualAchievements.filter(a => a.isUnlocked)
+  const actualAchievements = achievementsWithProgress.filter((a) => a.itemType === "achievement")
+  const medals = achievementsWithProgress.filter((a) => a.itemType === "medal")
+  const unlockedAchievements = actualAchievements.filter((a) => a.isUnlocked)
   const totalAchievements = actualAchievements.length
-  const playerCompletionRate = totalAchievements > 0 ? (unlockedAchievements.length / totalAchievements) * 100 : 0
-
-  // For medals: only show the ones the player has gotten
-  const playerMedals = medals.filter(m => m.isUnlocked)
-
-  // Don't show sections if there's nothing to display
+  const playerCompletionRate =
+    totalAchievements > 0 ? (unlockedAchievements.length / totalAchievements) * 100 : 0
+  const playerMedals = medals.filter((m) => m.isUnlocked)
   const showAchievements = totalAchievements > 0
   const showMedals = playerMedals.length > 0
 
-  // Get recent achievements (last 5 unlocked, sorted by completedAt)
-  const recentPlayerAchievements = useMemo(() => {
-    return unlockedAchievements
-      .filter(a => a.userProgress?.completedAt)
-      .sort((a, b) => {
-        const dateA = new Date(a.userProgress!.completedAt!).getTime()
-        const dateB = new Date(b.userProgress!.completedAt!).getTime()
-        return dateB - dateA
-      })
+  const displayUnlocked = useMemo(() => {
+    const withDates = unlockedAchievements.filter((a) => a.userProgress?.completedAt)
+    const withoutDates = unlockedAchievements.filter((a) => !a.userProgress?.completedAt)
+    return [
+      ...withDates.sort(
+        (a, b) =>
+          new Date(b.userProgress!.completedAt!).getTime() -
+          new Date(a.userProgress!.completedAt!).getTime()
+      ),
+      ...withoutDates,
+    ]
   }, [unlockedAchievements])
 
-  // Get all unlocked achievements for display (prioritize those with completion dates)
-  const displayUnlockedAchievements = useMemo(() => {
-    const withDates = unlockedAchievements.filter(a => a.userProgress?.completedAt)
-    const withoutDates = unlockedAchievements.filter(a => !a.userProgress?.completedAt)
-    
-    // Sort achievements with dates by completion time (most recent first)
-    const sortedWithDates = withDates.sort((a, b) => {
-      const dateA = new Date(a.userProgress!.completedAt!).getTime()
-      const dateB = new Date(b.userProgress!.completedAt!).getTime()
-      return dateB - dateA
-    })
-    
-    // Combine: achievements with dates first, then those without
-    return [...sortedWithDates, ...withoutDates]
-  }, [unlockedAchievements])
-
-  // Get recent medals (sorted by completedAt)
-  const displayPlayerMedals = useMemo(() => {
-    const withDates = playerMedals.filter(m => m.userProgress?.completedAt)
-    const withoutDates = playerMedals.filter(m => !m.userProgress?.completedAt)
-    
-    // Sort medals with dates by completion time (most recent first)
-    const sortedWithDates = withDates.sort((a, b) => {
-      const dateA = new Date(a.userProgress!.completedAt!).getTime()
-      const dateB = new Date(b.userProgress!.completedAt!).getTime()
-      return dateB - dateA
-    })
-    
-    // Combine: medals with dates first, then those without
-    return [...sortedWithDates, ...withoutDates]
+  const displayMedals = useMemo(() => {
+    const withDates = playerMedals.filter((m) => m.userProgress?.completedAt)
+    const withoutDates = playerMedals.filter((m) => !m.userProgress?.completedAt)
+    return [
+      ...withDates.sort(
+        (a, b) =>
+          new Date(b.userProgress!.completedAt!).getTime() -
+          new Date(a.userProgress!.completedAt!).getTime()
+      ),
+      ...withoutDates,
+    ]
   }, [playerMedals])
-
-  // Get in progress achievements (only for achievements, not medals)
-  const inProgressAchievements = useMemo(() => {
-    return actualAchievements
-      .filter(a => !a.isUnlocked && a.currentProgress > 0)
-      .sort((a, b) => b.completionRate - a.completionRate)
-      .slice(0, 3)
-  }, [actualAchievements])
 
   if (!showAchievements && !showMedals) {
     return (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trophy className="w-12 h-12 text-accent-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-surface-300 mb-2">Sin logros disponibles</h3>
-            <p className="text-surface-400">Los logros aparecerán pronto</p>
-          </div>
+      <div className="flex flex-col items-center justify-center py-12 gap-3">
+        <div
+          className="w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{ background: "rgba(249,115,22,0.07)", border: "1px solid rgba(249,115,22,0.15)" }}
+        >
+          <Trophy className="w-8 h-8" style={{ color: "rgba(249,115,22,0.5)" }} />
+        </div>
+        <p
+          className="text-sm font-black uppercase tracking-widest"
+          style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
+        >
+          Sin logros disponibles
+        </p>
+        <p className="text-xs text-surface-500">Los logros aparecerán pronto</p>
+      </div>
     )
-  }
-
-  const getRarityColor = (rarity?: string | null) => {
-    switch (rarity?.toLowerCase()) {
-      case 'diamond': return 'text-cyan-300 border-cyan-400/50 bg-cyan-500/20'
-      case 'platinum': return 'text-purple-200 border-purple-300/50 bg-purple-400/20'
-      case 'gold': return 'text-yellow-300 border-yellow-400/50 bg-yellow-500/20'
-      case 'silver': return 'text-slate-200 border-slate-300/50 bg-slate-400/20'
-      case 'bronze': return 'text-orange-300 border-orange-400/50 bg-orange-600/20'
-      default: return 'text-surface-300 border-surface-400/50 bg-surface-500/20'
-    }
-  }
-
-  const getRarityGradient = (rarity?: string | null) => {
-    switch (rarity?.toLowerCase()) {
-      case 'diamond': return 'bg-gradient-to-br from-cyan-400 to-cyan-600'
-      case 'platinum': return 'bg-gradient-to-br from-purple-400 to-purple-600'
-      case 'gold': return 'bg-gradient-to-br from-yellow-400 to-yellow-600'
-      case 'silver': return 'bg-gradient-to-br from-slate-300 to-slate-500'
-      case 'bronze': return 'bg-gradient-to-br from-orange-400 to-orange-600'
-      default: return 'bg-gradient-to-br from-accent-500 to-accent-600'
-    }
-  }
-  
-  const formatTimeAgo = (dateString: string) => {
-    const now = new Date()
-    const date = new Date(dateString)
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
-    
-    if (diffInHours < 1) return 'Hace unos minutos'
-    if (diffInHours < 24) return `Hace ${diffInHours} horas`
-    const diffInDays = Math.floor(diffInHours / 24)
-    if (diffInDays === 1) return 'Ayer'
-    if (diffInDays < 7) return `Hace ${diffInDays} días`
-    return date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' })
   }
 
   return (
     <div className="space-y-6">
-      {/* Achievements Section */}
+      {/* ── Achievements ──────────────────────────────────────────────── */}
       {showAchievements && (
         <div>
-          <h2 className="text-2xl font-bold text-white mb-6">Logros</h2>
-          
-          {/* Steam-style Achievement Overview */}
-          <div className="bg-surface-800/60 border border-surface-600/30 rounded-lg p-6">
-            {/* Progress Bar */}
+          <SectionHeader
+            label="Logros"
+            sub={session?.user ? `${unlockedAchievements.length}/${totalAchievements} desbloqueados` : undefined}
+          />
+
+          <div
+            className="rounded-xl p-5 space-y-5"
+            style={{
+              background: "rgba(15,23,42,0.7)",
+              border: "1px solid rgba(249,115,22,0.12)",
+            }}
+          >
+            {/* Progress bar */}
             {session?.user && (
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-medium text-white">
-                    Has desbloqueado {unlockedAchievements.length}/{totalAchievements} ({playerCompletionRate.toFixed(0)}%)
-                  </h3>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs font-mono">
+                  <span className="text-surface-400">Progreso</span>
+                  <span style={{ color: "rgba(251,146,60,0.85)" }}>
+                    {playerCompletionRate.toFixed(0)}%
+                  </span>
                 </div>
-                <div className="w-full bg-surface-700 rounded-full h-3">
-                  <div 
-                    className="bg-gradient-to-r from-accent-500 to-secondary-500 h-3 rounded-full transition-all duration-500"
-                    style={{ width: `${playerCompletionRate}%` }}
-                  />
+                <NeonProgressBar value={playerCompletionRate} />
+              </div>
+            )}
+
+            {/* Latest achievement highlight */}
+            {session?.user && displayUnlocked.length > 0 && (
+              <div
+                className="flex items-start gap-3 p-3 rounded-lg"
+                style={{
+                  background: "rgba(249,115,22,0.05)",
+                  border: "1px solid rgba(249,115,22,0.12)",
+                }}
+              >
+                <AchievementBadge achievement={displayUnlocked[0]} size="md" showTooltip={false} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+                    Último logro
+                  </p>
+                  <p className="text-sm font-bold text-surface-100 leading-snug truncate">
+                    {displayUnlocked[0].name}
+                  </p>
+                  <p className="text-xs text-surface-500 line-clamp-1 mt-0.5">
+                    {displayUnlocked[0].hidden ? "Descripción oculta" : displayUnlocked[0].description}
+                  </p>
+                  {displayUnlocked[0].userProgress?.completedAt && (
+                    <p className="text-[10px] font-mono mt-1" style={{ color: "rgba(132,204,22,0.7)" }}>
+                      {relativeTime(displayUnlocked[0].userProgress.completedAt)}
+                    </p>
+                  )}
                 </div>
               </div>
             )}
 
-            {/* Latest Achievement - Separate Section */}
-            {session?.user && displayUnlockedAchievements.length > 0 && (
-              <div className="mb-6 pb-6 border-b border-surface-600/30">
-                <h4 className="text-white font-medium mb-3">Último logro</h4>
-                <div className="flex items-start gap-4">
-                  <div className={`w-16 h-16 rounded-lg flex items-center justify-center shadow-lg ${getRarityGradient(displayUnlockedAchievements[0].rarity)}`}>
-                    {displayUnlockedAchievements[0].icon ? (
-                      <img src={displayUnlockedAchievements[0].icon} alt="" className="w-10 h-10" />
-                    ) : (
-                      <Trophy className="w-8 h-8 text-white" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <h5 className="text-white font-bold mb-1">{displayUnlockedAchievements[0].name}</h5>
-                    {displayUnlockedAchievements[0].hidden ? (
-                      <p className="text-surface-500 text-sm mb-2">Descripción oculta</p>
-                    ) : (
-                      <p className="text-surface-300 text-sm mb-2">{displayUnlockedAchievements[0].description}</p>
-                    )}
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="border-primary-500/30 text-primary-400 text-xs">
-                        {displayUnlockedAchievements[0].points} pts
-                      </Badge>
-                      {displayUnlockedAchievements[0].rarity && (
-                        <Badge variant="outline" className={`text-xs ${getRarityColor(displayUnlockedAchievements[0].rarity)}`}>
-                          {displayUnlockedAchievements[0].rarity}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Achievement Grids Container - Side by side on large screens */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-6">
-              {/* Obtained Achievements - Left Column */}
-              {session?.user && displayUnlockedAchievements.length > 1 && (
+            {/* Badge grid — unlocked + locked */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Unlocked */}
+              {session?.user && displayUnlocked.length > 1 && (
                 <div>
-                  <h4 className="text-white font-medium mb-3">Logros obtenidos</h4>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2">
+                    Obtenidos
+                  </p>
                   <div className="flex flex-wrap gap-2">
-                    {displayUnlockedAchievements.slice(1, 8).map((achievement) => (
-                      <div
-                        key={`recent-${achievement.id}`}
-                        className="group relative"
-                      >
-                        <div className={`w-16 h-16 rounded-lg flex items-center justify-center shadow-lg cursor-pointer transition-all hover:scale-110 ${getRarityGradient(achievement.rarity)}`}>
-                          {achievement.icon ? (
-                            <img src={achievement.icon} alt="" className="w-10 h-10" />
-                          ) : (
-                            <Trophy className="w-8 h-8 text-white" />
-                          )}
-                        </div>
-                        
-                        {/* Hover Tooltip */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                          <div className="bg-surface-900 border border-surface-600 rounded-lg p-3 shadow-xl min-w-[200px]">
-                            <h5 className="text-white font-bold text-sm mb-1">{achievement.name}</h5>
-                            {achievement.hidden ? (
-                              <p className="text-surface-500 text-xs mb-2">Descripción oculta</p>
-                            ) : (
-                              <p className="text-surface-300 text-xs mb-2">{achievement.description}</p>
-                            )}
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="border-primary-500/30 text-primary-400 text-xs">
-                                {achievement.points} pts
-                              </Badge>
-                              {achievement.rarity && (
-                                <Badge variant="outline" className={`text-xs ${getRarityColor(achievement.rarity)}`}>
-                                  {achievement.rarity}
-                                </Badge>
-                              )}
-                            </div>
-                            {achievement.userProgress?.completedAt && (
-                              <p className="text-success-400 text-xs mt-2">
-                                Desbloqueado {formatTimeAgo(achievement.userProgress.completedAt)}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                    {displayUnlocked.slice(1, 8).map((a) => (
+                      <AchievementBadge key={`u-${a.id}`} achievement={a} size="md" />
                     ))}
-                    
-                    {/* +X Button for additional unlocked achievements */}
                     {unlockedAchievements.length > 8 && (
-                      <div className="w-16 h-16 rounded-lg bg-surface-700/30 border-2 border-dashed border-surface-600/50 flex items-center justify-center text-surface-300 font-bold cursor-pointer transition-all hover:scale-110 hover:bg-surface-700/50 hover:border-surface-500/50">
-                        +{Math.max(0, unlockedAchievements.length - 8)}
+                      <div
+                        className="w-16 h-16 rounded-lg flex items-center justify-center text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105"
+                        style={{
+                          background: "rgba(30,41,59,0.7)",
+                          border: "1px dashed rgba(71,85,105,0.5)",
+                          color: "rgba(148,163,184,0.7)",
+                        }}
+                      >
+                        +{unlockedAchievements.length - 8}
                       </div>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* Locked Achievements - Right Column */}
+              {/* Locked */}
               <div>
-                <h4 className="text-surface-300 font-medium mb-3">Logros bloqueados</h4>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2">
+                  Bloqueados
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {actualAchievements
-                    .filter(a => !a.isUnlocked)
+                    .filter((a) => !a.isUnlocked)
                     .slice(0, 7)
-                    .map((achievement) => (
-                      <div
-                        key={`locked-${achievement.id}`}
-                        className="group relative"
-                      >
-                        <div className="w-16 h-16 rounded-lg bg-surface-700/50 flex items-center justify-center shadow-lg cursor-pointer transition-all hover:scale-110 hover:bg-surface-700">
-                          {achievement.icon ? (
-                            <img src={achievement.icon} alt="" className="w-10 h-10 opacity-30 grayscale" />
-                          ) : (
-                            <Trophy className="w-8 h-8 text-surface-500" />
-                          )}
-                          <div className="absolute inset-0 bg-surface-900/20 rounded-lg flex items-center justify-center">
-                            <Lock className="w-5 h-5 text-surface-500" />
-                          </div>
-                        </div>
-                        
-                        {/* Hover Tooltip for Locked */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                          <div className="bg-surface-900 border border-surface-600 rounded-lg p-3 shadow-xl min-w-[200px]">
-                            <h5 className="text-surface-400 font-bold text-sm mb-1">{achievement.name}</h5>
-                            {achievement.hidden ? (
-                              <p className="text-surface-500 text-xs mb-2">Descripción oculta</p>
-                            ) : (
-                              <p className="text-surface-300 text-xs mb-2">{achievement.description}</p>
-                            )}
-                            <div className="flex items-center gap-2">
-                              <Badge variant="outline" className="border-surface-600/30 text-surface-500 text-xs">
-                                {achievement.points} pts
-                              </Badge>
-                              {achievement.rarity && (
-                                <Badge variant="outline" className="border-surface-600/30 text-surface-500 text-xs">
-                                  {achievement.rarity}
-                                </Badge>
-                              )}
-                            </div>
-                            {achievement.currentProgress > 0 && (
-                              <div className="mt-2">
-                                <div className="flex items-center justify-between text-xs mb-1">
-                                  <span className="text-surface-400">Progreso</span>
-                                  <span className="text-accent-400">{achievement.currentProgress}/{achievement.maxProgress || 1}</span>
-                                </div>
-                                <div className="w-full bg-surface-700 rounded-full h-1">
-                                  <div 
-                                    className="bg-accent-500 h-1 rounded-full"
-                                    style={{ width: `${achievement.completionRate}%` }}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
+                    .map((a) => (
+                      <AchievementBadge key={`l-${a.id}`} achievement={a} locked size="md" />
                     ))}
-                    
-                    {/* +X Button for additional locked achievements */}
-                    {actualAchievements.filter(a => !a.isUnlocked).length > 7 && (
-                      <div className="w-16 h-16 rounded-lg bg-surface-700/30 border-2 border-dashed border-surface-600/50 flex items-center justify-center text-surface-500 font-bold cursor-pointer transition-all hover:scale-110 hover:bg-surface-700/50 hover:border-surface-500/50">
-                        +{Math.max(0, actualAchievements.filter(a => !a.isUnlocked).length - 7)}
-                      </div>
-                    )}
+                  {actualAchievements.filter((a) => !a.isUnlocked).length > 7 && (
+                    <div
+                      className="w-16 h-16 rounded-lg flex items-center justify-center text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105"
+                      style={{
+                        background: "rgba(30,41,59,0.7)",
+                        border: "1px dashed rgba(71,85,105,0.4)",
+                        color: "rgba(100,116,139,0.6)",
+                      }}
+                    >
+                      +{actualAchievements.filter((a) => !a.isUnlocked).length - 7}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* View All Achievements Button */}
-            <div className="text-center pt-4 border-t border-surface-600/30">
-              <InternalLink href={`${eventId}/logros`}>
-                <Button variant="ghost" className="text-accent-400 hover:text-accent-300 hover:bg-accent-500/10">
-                  Ver mis logros
-                  <ExternalLink className="w-4 h-4 ml-2" />
-                </Button>
-              </InternalLink>
+            {/* CTA */}
+            <div
+              className="pt-3 flex justify-center"
+              style={{ borderTop: "1px solid rgba(71,85,105,0.2)" }}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                asChild
+                className="gap-2 text-surface-400 hover:text-surface-100"
+                style={{ fontSize: "11px", fontFamily: "monospace" }}
+              >
+                <InternalLink href={`${eventId}/logros`}>
+                  Ver todos mis logros
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </InternalLink>
+              </Button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Medals Section */}
+      {/* ── Medals ────────────────────────────────────────────────────── */}
       {showMedals && (
         <div>
-          <h2 className="text-2xl font-bold text-white mb-6">Medallas</h2>
-          
-          {/* Simple Medal Display */}
-          <div className="bg-surface-800/60 border border-surface-600/30 rounded-lg p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-white">
-                {playerMedals.length} medalla{playerMedals.length !== 1 ? 's' : ''} obtenida{playerMedals.length !== 1 ? 's' : ''}
-              </h3>
-            </div>
+          <SectionHeader
+            label="Medallas"
+            sub={`${playerMedals.length} medalla${playerMedals.length !== 1 ? "s" : ""} obtenida${playerMedals.length !== 1 ? "s" : ""}`}
+          />
 
-            {/* Simple Medal List */}
-            <div className="space-y-3">
-              {displayPlayerMedals.map((medal) => (
+          <div
+            className="rounded-xl p-5 space-y-2"
+            style={{
+              background: "rgba(15,23,42,0.7)",
+              border: "1px solid rgba(249,115,22,0.12)",
+            }}
+          >
+            {displayMedals.map((medal) => {
+              const tokens = getRarityTokens(medal.rarity)
+              return (
                 <div
                   key={`medal-${medal.id}`}
-                  className="flex items-center p-3 bg-surface-700/30 rounded-lg border border-surface-600/50"
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors hover:bg-primary-500/[0.05]"
                 >
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mr-3 ${getRarityGradient(medal.rarity)}`}>
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                    style={{ background: tokens.bg, border: `1px solid ${tokens.border}` }}
+                  >
                     {medal.icon ? (
-                      <img src={medal.icon} alt="" className="w-6 h-6" />
+                      <img src={medal.icon} alt="" className="w-5 h-5" />
                     ) : (
-                      <Medal className="w-5 h-5 text-white" />
+                      <Medal className="w-4 h-4" style={{ color: tokens.color }} />
                     )}
                   </div>
-                  <div className="flex-1">
-                    <h5 className="text-white font-medium text-sm">{medal.name}</h5>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-primary-400 text-xs">{medal.points} pts</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-surface-100 truncate">{medal.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] font-mono" style={{ color: "rgba(251,146,60,0.7)" }}>
+                        {medal.points} pts
+                      </span>
                       {medal.rarity && (
-                        <span className="text-surface-400 text-xs">• {medal.rarity}</span>
+                        <span className="text-[10px] font-mono text-surface-500">· {medal.rarity}</span>
                       )}
                       {medal.userProgress?.completedAt && (
-                        <span className="text-success-400 text-xs">• {formatTimeAgo(medal.userProgress.completedAt)}</span>
+                        <span className="text-[10px] font-mono" style={{ color: "rgba(132,204,22,0.7)" }}>
+                          · {relativeTime(medal.userProgress.completedAt)}
+                        </span>
                       )}
                     </div>
                   </div>
+                  <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: "rgba(132,204,22,0.6)" }} />
                 </div>
-              ))}
-            </div>
+              )
+            })}
           </div>
         </div>
       )}
