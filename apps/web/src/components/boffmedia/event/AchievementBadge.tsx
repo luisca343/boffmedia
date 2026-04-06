@@ -12,7 +12,7 @@ interface AchievementLike {
   rarity?: string | null
   hidden?: boolean
   itemType?: "achievement" | "medal"
-  userProgress?: { completedAt?: string }
+  userProgress?: { completedAt?: string | Date | null }
   currentProgress?: number
   maxProgress?: number
 }
@@ -26,14 +26,14 @@ interface AchievementBadgeProps {
 
 // ─── Relative time helper ─────────────────────────────────────────────────────
 
-function relativeTime(dateString: string): string {
-  const diff = Date.now() - new Date(dateString).getTime()
+function relativeTime(date: string | Date): string {
+  const diff = Date.now() - new Date(date).getTime()
   if (diff < 3_600_000) return "Hace unos minutos"
   if (diff < 86_400_000) return `Hace ${Math.floor(diff / 3_600_000)}h`
   const days = Math.floor(diff / 86_400_000)
   if (days === 1) return "Ayer"
   if (days < 7) return `Hace ${days} días`
-  return new Date(dateString).toLocaleDateString("es-ES", { month: "short", day: "numeric" })
+  return new Date(date).toLocaleDateString("es-ES", { month: "short", day: "numeric" })
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
