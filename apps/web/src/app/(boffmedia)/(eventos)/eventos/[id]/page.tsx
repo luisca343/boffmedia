@@ -8,7 +8,6 @@ import { useBoffSession } from "@/services/useBoffSession"
 
 // Components
 import { EventHero } from "./_components/EventHero"
-import { EventStats } from "./_components/EventStats"
 import { ParticipantsGrid } from "./_components/ParticipantsGrid"
 import { AchievementsSection } from "./_components/AchievementsSection"
 import { Leaderboard } from "./_components/Leaderboard"
@@ -84,9 +83,6 @@ export default function EventSummaryPage() {
       <div className="relative z-10 container mx-auto p-6 max-w-7xl space-y-8">
         {/* Hero */}
         <EventHero event={event} participants={participants} />
-
-        {/* Quick stats */}
-        <EventStats event={event} participants={participants} achievements={achievements} />
 
         {/* Content sections */}
         <div className="space-y-10">

@@ -1,67 +1,8 @@
 "use client";
 
-import { Users, Trophy, Target } from "lucide-react";
+import { Users, Trophy, Server, CalendarDays } from "lucide-react";
 import { Event } from "@boffmedia/shared";
-
-// ─── Stat card ────────────────────────────────────────────────────────────────
-
-interface StatCardProps {
-  icon: React.ElementType;
-  label: string;
-  sublabel: string;
-  value: string | number;
-  accentColor: string;   // rgba text / dot
-  borderColor: string;   // rgba border
-  barColor: string;      // top bar gradient stop
-}
-
-function StatCard({ icon: Icon, label, sublabel, value, accentColor, borderColor, barColor }: StatCardProps) {
-  return (
-    <div
-      className="flex flex-col rounded-xl overflow-hidden border"
-      style={{
-        background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
-        borderColor,
-        boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
-      }}
-    >
-      {/* Top accent bar */}
-      <div
-        className="h-[2px] w-full flex-shrink-0"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${barColor}, transparent)`,
-        }}
-      />
-
-      <div className="p-5">
-        {/* Label row */}
-        <div className="flex items-center gap-2 mb-4">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center"
-            style={{ background: `${accentColor.replace("0.9", "0.09")}`, border: `1px solid ${borderColor}` }}
-          >
-            <Icon className="w-4 h-4" style={{ color: accentColor }} />
-          </div>
-          <span
-            className="text-[10px] font-mono uppercase tracking-widest"
-            style={{ color: accentColor }}
-          >
-            {label}
-          </span>
-        </div>
-
-        {/* Value */}
-        <div
-          className="text-4xl font-black leading-none mb-1"
-          style={{ color: accentColor, fontFamily: "Orbitron, sans-serif" }}
-        >
-          {value}
-        </div>
-        <p className="text-xs text-surface-600 font-mono">{sublabel}</p>
-      </div>
-    </div>
-  );
-}
+import { ProfileImage } from "@/components/ui/ProfileImage";
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -72,35 +13,127 @@ interface EventStatsProps {
 }
 
 export function EventStats({ event, participants, achievements }: EventStatsProps) {
+  const isEventType = event.type === Event.type.EVENT;
+  const avatarPreview = participants.slice(0, 5);
+  const overflow = participants.length - avatarPreview.length;
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-      <StatCard
-        icon={Users}
-        label="Participantes"
-        sublabel="Aventureros registrados"
-        value={participants.length}
-        accentColor="rgba(99,102,241,0.9)"
-        borderColor="rgba(99,102,241,0.2)"
-        barColor="rgba(99,102,241,0.55)"
+    <div
+      className="flex flex-col sm:flex-row items-stretch sm:items-center mb-8 rounded-2xl overflow-hidden"
+      style={{
+        background: "linear-gradient(100deg, rgba(30,41,59,0.7) 0%, rgba(15,23,42,0.6) 100%)",
+        border: "1px solid rgba(71,85,105,0.22)",
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      {/* ── Participants ────────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center gap-4 px-6 py-5">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: "rgba(249,115,22,0.08)", border: "1px solid rgba(249,115,22,0.18)" }}
+        >
+          <Users className="w-5 h-5" style={{ color: "rgba(249,115,22,0.8)" }} />
+        </div>
+        <div className="min-w-0">
+          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+            Participantes
+          </div>
+          <div className="flex items-center gap-3">
+            <span
+              className="text-2xl font-black leading-none"
+              style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
+            >
+              {participants.length}
+            </span>
+            {/* Avatar stack */}
+            {avatarPreview.length > 0 && (
+              <div className="flex items-center">
+                {avatarPreview.map((p, i) => (
+                  <div
+                    key={i}
+                    className="rounded-full ring-2 -ml-2 first:ml-0 overflow-hidden flex-shrink-0"
+                    style={{ width: 24, height: 24 }}
+                  >
+                    <ProfileImage userId={p.userId} size={24} />
+                  </div>
+                ))}
+                {overflow > 0 && (
+                  <span
+                    className="text-[10px] font-mono text-surface-400 ml-2"
+                  >
+                    +{overflow}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Divider ─────────────────────────────────────────────────── */}
+      <div
+        className="hidden sm:block w-px self-stretch"
+        style={{ background: "rgba(71,85,105,0.25)" }}
       />
-      <StatCard
-        icon={Trophy}
-        label="Logros"
-        sublabel="Conquistas disponibles"
-        value={achievements.length}
-        accentColor="rgba(234,179,8,0.9)"
-        borderColor="rgba(234,179,8,0.2)"
-        barColor="rgba(234,179,8,0.55)"
+      <div
+        className="sm:hidden h-px mx-6"
+        style={{ background: "rgba(71,85,105,0.25)" }}
       />
-      <StatCard
-        icon={Target}
-        label="Tipo"
-        sublabel="Modalidad de juego"
-        value={event.type === Event.type.EVENT ? "Evento" : "Servidor"}
-        accentColor="rgba(249,115,22,0.9)"
-        borderColor="rgba(249,115,22,0.2)"
-        barColor="rgba(249,115,22,0.55)"
+
+      {/* ── Achievements ────────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center gap-4 px-6 py-5">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: "rgba(250,204,21,0.07)", border: "1px solid rgba(250,204,21,0.18)" }}
+        >
+          <Trophy className="w-5 h-5" style={{ color: "rgba(250,204,21,0.8)" }} />
+        </div>
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+            Logros
+          </div>
+          <span
+            className="text-2xl font-black leading-none"
+            style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
+          >
+            {achievements.length}
+          </span>
+        </div>
+      </div>
+
+      {/* ── Divider ─────────────────────────────────────────────────── */}
+      <div
+        className="hidden sm:block w-px self-stretch"
+        style={{ background: "rgba(71,85,105,0.25)" }}
       />
+      <div
+        className="sm:hidden h-px mx-6"
+        style={{ background: "rgba(71,85,105,0.25)" }}
+      />
+
+      {/* ── Event type ──────────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center gap-4 px-6 py-5">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{ background: "rgba(99,102,241,0.07)", border: "1px solid rgba(99,102,241,0.18)" }}
+        >
+          {isEventType
+            ? <CalendarDays className="w-5 h-5" style={{ color: "rgba(99,102,241,0.85)" }} />
+            : <Server className="w-5 h-5" style={{ color: "rgba(99,102,241,0.85)" }} />
+          }
+        </div>
+        <div>
+          <div className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+            Modalidad
+          </div>
+          <span
+            className="text-base font-bold leading-none"
+            style={{ color: "rgb(226,232,240)" }}
+          >
+            {isEventType ? "Evento" : "Servidor"}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }
