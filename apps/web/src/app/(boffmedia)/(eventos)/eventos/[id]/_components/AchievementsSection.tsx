@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Button } from "@/components/ui/primitives/button"
-import { Trophy, ExternalLink, Medal, CheckCircle } from "lucide-react"
+import { Trophy, ExternalLink, Medal, CheckCircle, Zap } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { AchievementBadge } from "@/components/boffmedia/event/AchievementBadge"
 import { getRarityTokens } from "@/components/boffmedia/event/rarityTokens"
+import { EventSectionHeader } from "./EventSectionHeader"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,36 +34,26 @@ interface AchievementsSectionProps {
   participants: any[]
 }
 
-// ─── Neon progress bar ────────────────────────────────────────────────────────
+// ─── XP progress bar ─────────────────────────────────────────────────────────
 
-function NeonProgressBar({ value, color = "rgba(249,115,22,0.75)" }: { value: number; color?: string }) {
+function XPBar({ value, color = "rgba(249,115,22,0.85)" }: { value: number; color?: string }) {
   return (
-    <div className="h-2 rounded-full overflow-hidden" style={{ background: "rgba(30,41,59,0.8)" }}>
+    <div
+      className="h-3 rounded-full overflow-hidden relative"
+      style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(71,85,105,0.25)" }}
+    >
       <div
-        className="h-full rounded-full transition-all duration-500"
+        className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
         style={{ width: `${Math.min(100, value)}%`, background: color }}
-      />
-    </div>
-  )
-}
-
-// ─── Section header ───────────────────────────────────────────────────────────
-
-function SectionHeader({ label, sub }: { label: string; sub?: string }) {
-  return (
-    <div className="flex items-center gap-3 mb-4">
-      <div
-        className="h-[2px] w-5 rounded-none"
-        style={{ background: "rgba(249,115,22,0.6)" }}
-      />
-      <div>
-        <h2
-          className="text-sm font-black uppercase tracking-widest"
-          style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
-        >
-          {label}
-        </h2>
-        {sub && <p className="text-[10px] font-mono text-surface-500 mt-0.5">{sub}</p>}
+      >
+        {/* Shimmer */}
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)",
+            backgroundSize: "200% 100%",
+          }}
+        />
       </div>
     </div>
   )
@@ -186,136 +177,165 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
 
   return (
     <div className="space-y-6">
+
       {/* ── Achievements ──────────────────────────────────────────────── */}
       {showAchievements && (
         <div>
-          <SectionHeader
+          <EventSectionHeader
             label="Logros"
-            sub={session?.user ? `${unlockedAchievements.length}/${totalAchievements} desbloqueados` : undefined}
+            sub={session?.user ? `${unlockedAchievements.length}/${totalAchievements} desbloqueados` : `${totalAchievements} disponibles`}
+            badge={
+              session?.user && totalAchievements > 0 ? (
+                <span
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-widest"
+                  style={{
+                    color: "rgba(192,132,252,0.9)",
+                    border: "1px solid rgba(168,85,247,0.3)",
+                    background: "rgba(168,85,247,0.07)",
+                  }}
+                >
+                  <Trophy className="w-3 h-3" />
+                  {unlockedAchievements.length}/{totalAchievements}
+                </span>
+              ) : undefined
+            }
           />
 
           <div
-            className="rounded-xl p-5 space-y-5"
+            className="rounded-xl overflow-hidden"
             style={{
-              background: "rgba(15,23,42,0.7)",
-              border: "1px solid rgba(249,115,22,0.12)",
+              background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
+              border: "1px solid rgba(249,115,22,0.18)",
             }}
           >
-            {/* Progress bar */}
+            {/* XP bar section */}
             {session?.user && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-surface-400">Progreso</span>
-                  <span style={{ color: "rgba(251,146,60,0.85)" }}>
+              <div
+                className="px-5 py-4"
+                style={{ borderBottom: "1px solid rgba(71,85,105,0.15)" }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-3.5 h-3.5" style={{ color: "rgba(249,115,22,0.7)" }} />
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-surface-400">
+                      Progreso XP
+                    </span>
+                  </div>
+                  <span
+                    className="text-xs font-black font-mono"
+                    style={{ color: "rgba(251,146,60,0.9)" }}
+                  >
                     {playerCompletionRate.toFixed(0)}%
                   </span>
                 </div>
-                <NeonProgressBar value={playerCompletionRate} />
+                <XPBar value={playerCompletionRate} />
               </div>
             )}
 
-            {/* Latest achievement highlight */}
-            {session?.user && displayUnlocked.length > 0 && (
-              <div
-                className="flex items-start gap-3 p-3 rounded-lg"
-                style={{
-                  background: "rgba(249,115,22,0.05)",
-                  border: "1px solid rgba(249,115,22,0.12)",
-                }}
-              >
-                <AchievementBadge achievement={displayUnlocked[0]} size="md" showTooltip={false} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-mono uppercase tracking-widest text-surface-500 mb-0.5">
-                    Último logro
-                  </p>
-                  <p className="text-sm font-bold text-surface-100 leading-snug truncate">
-                    {displayUnlocked[0].name}
-                  </p>
-                  <p className="text-xs text-surface-500 line-clamp-1 mt-0.5">
-                    {displayUnlocked[0].hidden ? "Descripción oculta" : displayUnlocked[0].description}
-                  </p>
-                  {displayUnlocked[0].userProgress?.completedAt && (
-                    <p className="text-[10px] font-mono mt-1" style={{ color: "rgba(132,204,22,0.7)" }}>
-                      {relativeTime(displayUnlocked[0].userProgress.completedAt)}
+            <div className="p-5 space-y-5">
+              {/* Latest achievement highlight */}
+              {session?.user && displayUnlocked.length > 0 && (
+                <div
+                  className="flex items-start gap-3 p-3 rounded-lg"
+                  style={{
+                    background: "rgba(249,115,22,0.05)",
+                    border: "1px solid rgba(249,115,22,0.14)",
+                  }}
+                >
+                  <AchievementBadge achievement={displayUnlocked[0]} size="md" showTooltip={false} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-0.5">
+                      Último logro desbloqueado
                     </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Badge grid — unlocked + locked */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Unlocked */}
-              {session?.user && displayUnlocked.length > 1 && (
-                <div>
-                  <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2">
-                    Obtenidos
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {displayUnlocked.slice(1, 8).map((a) => (
-                      <AchievementBadge key={`u-${a.id}`} achievement={a} size="md" />
-                    ))}
-                    {unlockedAchievements.length > 8 && (
-                      <div
-                        className="w-16 h-16 rounded-lg flex items-center justify-center text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105"
-                        style={{
-                          background: "rgba(30,41,59,0.7)",
-                          border: "1px dashed rgba(71,85,105,0.5)",
-                          color: "rgba(148,163,184,0.7)",
-                        }}
-                      >
-                        +{unlockedAchievements.length - 8}
-                      </div>
+                    <p className="text-sm font-bold text-surface-100 leading-snug truncate">
+                      {displayUnlocked[0].name}
+                    </p>
+                    <p className="text-xs text-surface-500 line-clamp-1 mt-0.5">
+                      {displayUnlocked[0].hidden ? "Descripción oculta" : displayUnlocked[0].description}
+                    </p>
+                    {displayUnlocked[0].userProgress?.completedAt && (
+                      <p className="text-[10px] font-mono mt-1" style={{ color: "rgba(132,204,22,0.7)" }}>
+                        {relativeTime(displayUnlocked[0].userProgress.completedAt)}
+                      </p>
                     )}
                   </div>
                 </div>
               )}
 
-              {/* Locked */}
-              <div>
-                <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2">
-                  Bloqueados
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {actualAchievements
-                    .filter((a) => !a.isUnlocked)
-                    .slice(0, 7)
-                    .map((a) => (
-                      <AchievementBadge key={`l-${a.id}`} achievement={a} locked size="md" />
-                    ))}
-                  {actualAchievements.filter((a) => !a.isUnlocked).length > 7 && (
-                    <div
-                      className="w-16 h-16 rounded-lg flex items-center justify-center text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105"
-                      style={{
-                        background: "rgba(30,41,59,0.7)",
-                        border: "1px dashed rgba(71,85,105,0.4)",
-                        color: "rgba(100,116,139,0.6)",
-                      }}
-                    >
-                      +{actualAchievements.filter((a) => !a.isUnlocked).length - 7}
+              {/* Badge grid — unlocked + locked */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Unlocked */}
+                {session?.user && displayUnlocked.length > 1 && (
+                  <div>
+                    <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2.5">
+                      Obtenidos ({unlockedAchievements.length})
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {displayUnlocked.slice(1, 8).map((a) => (
+                        <AchievementBadge key={`u-${a.id}`} achievement={a} size="md" />
+                      ))}
+                      {unlockedAchievements.length > 8 && (
+                        <div
+                          className="w-16 h-16 rounded-lg flex items-center justify-center text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105"
+                          style={{
+                            background: "rgba(30,41,59,0.7)",
+                            border: "1px dashed rgba(71,85,105,0.5)",
+                            color: "rgba(148,163,184,0.7)",
+                          }}
+                        >
+                          +{unlockedAchievements.length - 8}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  </div>
+                )}
+
+                {/* Locked */}
+                <div>
+                  <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-2.5">
+                    Bloqueados ({actualAchievements.filter((a) => !a.isUnlocked).length})
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {actualAchievements
+                      .filter((a) => !a.isUnlocked)
+                      .slice(0, 7)
+                      .map((a) => (
+                        <AchievementBadge key={`l-${a.id}`} achievement={a} locked size="md" />
+                      ))}
+                    {actualAchievements.filter((a) => !a.isUnlocked).length > 7 && (
+                      <div
+                        className="w-16 h-16 rounded-lg flex items-center justify-center text-xs font-bold font-mono cursor-pointer transition-all hover:scale-105"
+                        style={{
+                          background: "rgba(30,41,59,0.7)",
+                          border: "1px dashed rgba(71,85,105,0.4)",
+                          color: "rgba(100,116,139,0.6)",
+                        }}
+                      >
+                        +{actualAchievements.filter((a) => !a.isUnlocked).length - 7}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* CTA */}
-            <div
-              className="pt-3 flex justify-center"
-              style={{ borderTop: "1px solid rgba(71,85,105,0.2)" }}
-            >
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="gap-2 text-surface-400 hover:text-surface-100"
-                style={{ fontSize: "11px", fontFamily: "monospace" }}
+              {/* CTA */}
+              <div
+                className="pt-3 flex justify-center"
+                style={{ borderTop: "1px solid rgba(71,85,105,0.18)" }}
               >
-                <InternalLink href={`${eventId}/logros`}>
-                  Ver todos mis logros
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </InternalLink>
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="gap-2 text-surface-400 hover:text-surface-100"
+                  style={{ fontSize: "11px", fontFamily: "monospace" }}
+                >
+                  <InternalLink href={`${eventId}/logros`}>
+                    Ver todos mis logros
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </InternalLink>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -324,16 +344,17 @@ export function AchievementsSection({ eventId, achievements, participants }: Ach
       {/* ── Medals ────────────────────────────────────────────────────── */}
       {showMedals && (
         <div>
-          <SectionHeader
+          <EventSectionHeader
             label="Medallas"
             sub={`${playerMedals.length} medalla${playerMedals.length !== 1 ? "s" : ""} obtenida${playerMedals.length !== 1 ? "s" : ""}`}
+            accentColor="rgba(250,204,21,0.6)"
           />
 
           <div
             className="rounded-xl p-5 space-y-2"
             style={{
-              background: "rgba(15,23,42,0.7)",
-              border: "1px solid rgba(249,115,22,0.12)",
+              background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
+              border: "1px solid rgba(250,204,21,0.18)",
             }}
           >
             {displayMedals.map((medal) => {

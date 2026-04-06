@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/primitives/button"
 import { Input } from "@/components/ui/primitives/input"
 import {
   ArrowLeft, Trophy, Target, Users, Star, Lock,
-  Search, Clock, Zap, Medal,
+  Search, Clock, Zap, Medal, CheckCircle2,
 } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
-import { UserProgress, EventParticipant } from "@/types/events"
+import { UserProgress } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { AchievementBadge } from "@/components/boffmedia/event/AchievementBadge"
-import { getRarityTokens } from "@/components/boffmedia/event/rarityTokens"
+import { getRarityTokens, RarityTokens } from "@/components/boffmedia/event/rarityTokens"
+import { NeonCard } from "@/components/boffmedia/NeonCard"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -44,47 +45,74 @@ const formatDate = (d?: string | Date) =>
       })
     : "No desbloqueado"
 
-function NeonProgressBar({ value, color = "rgba(249,115,22,0.75)" }: { value: number; color?: string }) {
+/** Derives a subtle glow color from a rarity border string */
+const deriveGlow = (border: string) =>
+  border.replace(/[\d.]+\)$/, "0.18)")
+
+// ─── XP Progress bar ──────────────────────────────────────────────────────────
+
+function XPBar({ value, color = "rgba(249,115,22,0.85)" }: { value: number; color?: string }) {
   return (
-    <div className="h-2.5 rounded-full overflow-hidden" style={{ background: "rgba(30,41,59,0.8)" }}>
+    <div
+      className="h-3 rounded-full overflow-hidden relative"
+      style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(71,85,105,0.25)" }}
+    >
       <div
-        className="h-full rounded-full transition-all duration-500"
+        className="h-full rounded-full transition-all duration-700 relative overflow-hidden"
         style={{ width: `${Math.min(100, value)}%`, background: color }}
-      />
+      >
+        <div
+          className="absolute inset-0 opacity-40"
+          style={{
+            background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)",
+          }}
+        />
+      </div>
     </div>
   )
 }
 
 // ─── Stat card ────────────────────────────────────────────────────────────────
 
-function StatCard({
-  icon: Icon, label, value, color, border, bg,
-}: {
+interface StatCardProps {
   icon: React.ElementType
   label: string
   value: string | number
   color: string
   border: string
   bg: string
-}) {
+}
+
+function StatCard({ icon: Icon, label, value, color, border, bg }: StatCardProps) {
   return (
     <div
-      className="rounded-xl p-5 text-center"
-      style={{ background: bg, border: `1px solid ${border}` }}
+      className="rounded-xl overflow-hidden"
+      style={{
+        background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
+        border: `1px solid ${border}`,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+      }}
     >
+      {/* Top accent bar */}
       <div
-        className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-3"
-        style={{ background: bg, border: `1px solid ${border}` }}
-      >
-        <Icon className="w-5 h-5" style={{ color }} />
+        className="h-[2px] w-full"
+        style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }}
+      />
+      <div className="p-5 text-center">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-3"
+          style={{ background: bg, border: `1px solid ${border}` }}
+        >
+          <Icon className="w-5 h-5" style={{ color }} />
+        </div>
+        <div
+          className="text-3xl font-black font-mono mb-1"
+          style={{ color, fontFamily: "Orbitron, sans-serif" }}
+        >
+          {value}
+        </div>
+        <div className="text-xs font-mono text-surface-500 uppercase tracking-widest">{label}</div>
       </div>
-      <div
-        className="text-3xl font-black font-mono mb-1"
-        style={{ color }}
-      >
-        {value}
-      </div>
-      <div className="text-xs font-mono text-surface-500 uppercase tracking-widest">{label}</div>
     </div>
   )
 }
@@ -114,6 +142,131 @@ function FilterPill({
     >
       {children}
     </button>
+  )
+}
+
+// ─── Achievement card ─────────────────────────────────────────────────────────
+
+function AchievementCard({ achievement }: { achievement: AchievementWithProgress }) {
+  const [hovered, setHovered] = useState(false)
+  const tokens = getRarityTokens(achievement.rarity)
+  const locked = !achievement.isUnlocked
+  const glow = deriveGlow(tokens.border)
+
+  return (
+    <div
+      className="rounded-xl overflow-hidden transition-all duration-200"
+      style={{
+        background: locked
+          ? "linear-gradient(145deg, rgba(22,32,52,0.75), rgba(15,23,42,0.65))"
+          : "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
+        border: hovered && !locked
+          ? `1px solid ${tokens.border}`
+          : locked
+          ? "1px solid rgba(71,85,105,0.22)"
+          : "1px solid rgba(71,85,105,0.4)",
+        boxShadow: hovered && !locked
+          ? `0 0 24px ${glow}, 0 8px 24px rgba(0,0,0,0.5)`
+          : "0 4px 12px rgba(0,0,0,0.3)",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {/* Rarity top bar */}
+      <div
+        className="h-[2px] w-full transition-opacity duration-300"
+        style={{
+          background: locked
+            ? "rgba(71,85,105,0.5)"
+            : `linear-gradient(90deg, transparent, ${tokens.color}, transparent)`,
+          opacity: locked ? 0.35 : hovered ? 1 : 0.55,
+        }}
+      />
+
+      <div className={`p-5 ${locked ? "opacity-55" : ""}`}>
+        {/* Header */}
+        <div className="flex items-start gap-3 mb-4">
+          <AchievementBadge achievement={achievement} locked={locked} size="md" showTooltip={false} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3
+                className="text-sm font-bold leading-snug"
+                style={{ color: locked ? "rgba(148,163,184,0.55)" : "rgb(226,232,240)" }}
+              >
+                {achievement.name}
+              </h3>
+              {achievement.rarity && (
+                <span
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-wide"
+                  style={{
+                    color: locked ? "rgba(100,116,139,0.5)" : tokens.color,
+                    border: `1px solid ${locked ? "rgba(71,85,105,0.3)" : tokens.border}`,
+                    background: locked ? "transparent" : tokens.bg,
+                  }}
+                >
+                  {tokens.label}
+                </span>
+              )}
+            </div>
+            <p
+              className="text-xs leading-relaxed line-clamp-2"
+              style={{ color: locked ? "rgba(100,116,139,0.5)" : "rgba(148,163,184,0.8)" }}
+            >
+              {achievement.hidden ? "Descripción oculta" : achievement.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Progress bar (multi-step) */}
+        {(achievement.maxProgress ?? 0) > 1 && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
+              <span className="text-surface-500">Progreso</span>
+              <span style={{ color: locked ? "rgba(100,116,139,0.5)" : tokens.color }}>
+                {achievement.currentProgress}/{achievement.maxProgress}
+              </span>
+            </div>
+            <XPBar
+              value={(achievement.currentProgress / (achievement.maxProgress ?? 1)) * 100}
+              color={locked ? "rgba(71,85,105,0.5)" : tokens.color}
+            />
+          </div>
+        )}
+
+        {/* Footer */}
+        <div
+          className="flex items-center justify-between pt-3"
+          style={{ borderTop: "1px solid rgba(71,85,105,0.18)" }}
+        >
+          {/* Points */}
+          <div className="flex items-center gap-1.5">
+            <Star
+              className="w-3.5 h-3.5"
+              style={{ color: locked ? "rgba(250,204,21,0.3)" : "rgba(250,204,21,0.75)" }}
+            />
+            <span
+              className="text-xs font-mono font-bold"
+              style={{ color: locked ? "rgba(250,204,21,0.35)" : "rgba(250,204,21,0.9)" }}
+            >
+              {achievement.points} pts
+            </span>
+          </div>
+
+          {/* Unlock date or lock indicator */}
+          {achievement.isUnlocked && achievement.userProgress?.completedAt ? (
+            <div className="flex items-center gap-1 text-[10px] font-mono" style={{ color: "rgba(132,204,22,0.7)" }}>
+              <CheckCircle2 className="w-3 h-3" />
+              {formatDate(achievement.userProgress.completedAt)}
+            </div>
+          ) : locked ? (
+            <div className="flex items-center gap-1 text-[10px] font-mono" style={{ color: "rgba(100,116,139,0.45)" }}>
+              <Lock className="w-3 h-3" />
+              Bloqueado
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -262,21 +415,8 @@ export default function EventAchievementsPage() {
         </Button>
 
         {/* ── Hero card ──────────────────────────────────────────────── */}
-        <div
-          className="rounded-xl p-6 overflow-hidden"
-          style={{
-            background: "linear-gradient(145deg, rgba(15,23,42,0.98), rgba(9,13,27,0.99))",
-            border: "1px solid rgba(249,115,22,0.18)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(249,115,22,0.04)",
-          }}
-        >
-          {/* Top neon bar */}
-          <div
-            className="h-[2px] bg-gradient-to-r from-primary-600 via-primary-400 to-primary-600 -mx-6 -mt-6 mb-6"
-            style={{ opacity: 0.7 }}
-          />
-
-          <div className="flex flex-col md:flex-row items-center gap-6">
+        <NeonCard variant="primary" contentClassName="">
+          <div className="flex flex-col md:flex-row items-center gap-6 p-6">
             {/* Icon */}
             <div
               className="w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -291,13 +431,15 @@ export default function EventAchievementsPage() {
 
             {/* Text */}
             <div className="flex-1 text-center md:text-left">
+              <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-1">
+                {event?.title}
+              </p>
               <h1
-                className="text-3xl font-black uppercase tracking-widest mb-1"
+                className="text-3xl font-black uppercase tracking-widest mb-3"
                 style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
               >
-                Logros del evento
+                Sala de Trofeos
               </h1>
-              <p className="text-surface-400 text-sm mb-3">{event?.title}</p>
               <span
                 className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono uppercase tracking-widest"
                 style={{
@@ -306,12 +448,27 @@ export default function EventAchievementsPage() {
                   background: "rgba(249,115,22,0.07)",
                 }}
               >
-                <Trophy className="w-3 h-3" />
+                <Trophy className="w-3.5 h-3.5" />
                 {totalCount} logros disponibles
               </span>
             </div>
+
+            {/* Completion ring (desktop) */}
+            {totalCount > 0 && (
+              <div className="hidden md:flex flex-col items-center gap-1 flex-shrink-0">
+                <div
+                  className="text-4xl font-black font-mono"
+                  style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(251,146,60)" }}
+                >
+                  {completionRate.toFixed(0)}%
+                </div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-surface-500">
+                  completado
+                </p>
+              </div>
+            )}
           </div>
-        </div>
+        </NeonCard>
 
         {/* ── Stats grid ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -319,7 +476,7 @@ export default function EventAchievementsPage() {
             icon={Trophy}
             label="Desbloqueados"
             value={unlockedCount}
-            color="rgba(168,85,247,0.9)"
+            color="rgba(192,132,252,0.9)"
             border="rgba(168,85,247,0.25)"
             bg="rgba(168,85,247,0.06)"
           />
@@ -349,29 +506,32 @@ export default function EventAchievementsPage() {
           />
         </div>
 
-        {/* ── Progress bar ───────────────────────────────────────────── */}
+        {/* ── XP progress bar ─────────────────────────────────────────── */}
         <div
           className="rounded-xl p-5"
           style={{
-            background: "rgba(15,23,42,0.7)",
-            border: "1px solid rgba(249,115,22,0.12)",
+            background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
+            border: "1px solid rgba(249,115,22,0.18)",
           }}
         >
-          <div className="flex items-center justify-between text-sm font-mono mb-3">
-            <span className="text-surface-300 font-semibold">Progreso General</span>
-            <span style={{ color: "rgba(251,146,60,0.85)" }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4" style={{ color: "rgba(249,115,22,0.7)" }} />
+              <span className="text-sm font-semibold text-surface-300">Progreso General</span>
+            </div>
+            <span className="text-sm font-black font-mono" style={{ color: "rgba(251,146,60,0.9)" }}>
               {unlockedCount}/{totalCount}
             </span>
           </div>
-          <NeonProgressBar value={completionRate} />
+          <XPBar value={completionRate} />
         </div>
 
         {/* ── Search + Filter bar ─────────────────────────────────────── */}
         <div
           className="rounded-xl p-4 flex flex-col lg:flex-row gap-4"
           style={{
-            background: "rgba(15,23,42,0.7)",
-            border: "1px solid rgba(71,85,105,0.3)",
+            background: "rgba(30,41,59,0.65)",
+            border: "1px solid rgba(71,85,105,0.4)",
           }}
         >
           {/* Search */}
@@ -409,92 +569,9 @@ export default function EventAchievementsPage() {
         {/* ── Achievement grid ────────────────────────────────────────── */}
         {filteredAchievements.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAchievements.map((achievement) => {
-              const tokens = getRarityTokens(achievement.rarity)
-              const locked = !achievement.isUnlocked
-
-              return (
-                <div
-                  key={achievement.id}
-                  className="group rounded-xl p-5 transition-all duration-200"
-                  style={{
-                    background: locked
-                      ? "rgba(15,23,42,0.5)"
-                      : "rgba(15,23,42,0.8)",
-                    border: locked
-                      ? "1px solid rgba(71,85,105,0.3)"
-                      : `1px solid ${tokens.border}`,
-                  }}
-                >
-                  {/* Header */}
-                  <div className="flex items-start gap-3 mb-4">
-                    <AchievementBadge achievement={achievement} locked={locked} size="md" showTooltip={false} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h3
-                          className="text-sm font-bold leading-snug"
-                          style={{ color: locked ? "rgba(148,163,184,0.6)" : "rgb(226,232,240)" }}
-                        >
-                          {achievement.name}
-                        </h3>
-                        {achievement.rarity && (
-                          <span
-                            className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-wide"
-                            style={{ color: tokens.color, border: `1px solid ${tokens.border}`, background: tokens.bg }}
-                          >
-                            {tokens.label}
-                          </span>
-                        )}
-                      </div>
-                      <p
-                        className="text-xs leading-relaxed line-clamp-2"
-                        style={{ color: locked ? "rgba(100,116,139,0.6)" : "rgba(148,163,184,0.8)" }}
-                      >
-                        {achievement.hidden ? "Descripción oculta" : achievement.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Progress bar (multi-step) */}
-                  {achievement.maxProgress > 1 && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
-                        <span className="text-surface-500">Progreso</span>
-                        <span style={{ color: tokens.color }}>
-                          {achievement.currentProgress}/{achievement.maxProgress}
-                        </span>
-                      </div>
-                      <NeonProgressBar
-                        value={(achievement.currentProgress / achievement.maxProgress) * 100}
-                        color={locked ? "rgba(100,116,139,0.5)" : tokens.color}
-                      />
-                    </div>
-                  )}
-
-                  {/* Footer */}
-                  <div
-                    className="flex items-center justify-between pt-3"
-                    style={{ borderTop: "1px solid rgba(71,85,105,0.2)" }}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Star className="w-3.5 h-3.5" style={{ color: "rgba(250,204,21,0.7)" }} />
-                      <span className="text-xs font-mono font-semibold" style={{ color: "rgba(250,204,21,0.85)" }}>
-                        {achievement.points}
-                      </span>
-                    </div>
-                    {achievement.isUnlocked && achievement.userProgress?.completedAt && (
-                      <div className="flex items-center gap-1 text-[10px] font-mono text-surface-500">
-                        <Clock className="w-3 h-3" />
-                        {formatDate(achievement.userProgress.completedAt)}
-                      </div>
-                    )}
-                    {locked && (
-                      <Lock className="w-3.5 h-3.5" style={{ color: "rgba(100,116,139,0.4)" }} />
-                    )}
-                  </div>
-                </div>
-              )
-            })}
+            {filteredAchievements.map((achievement) => (
+              <AchievementCard key={achievement.id} achievement={achievement} />
+            ))}
           </div>
         ) : (
           /* Empty state */

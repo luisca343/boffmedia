@@ -5,11 +5,10 @@ import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/primitives/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
-import Link from "next/link"
 
 // Components
 import { EventHero } from "./_components/EventHero"
-import { EventStats } from "./_components/EventStats" 
+import { EventStats } from "./_components/EventStats"
 import { ParticipantsGrid } from "./_components/ParticipantsGrid"
 import { AchievementsSection } from "./_components/AchievementsSection"
 import { Leaderboard } from "./_components/Leaderboard"
@@ -20,7 +19,7 @@ export default function EventSummaryPage() {
   const params = useParams()
   const eventId = parseInt(params.id as string)
   const { session } = useBoffSession()
-  
+
   const [event, setEvent] = useState<any>(null)
   const [participants, setParticipants] = useState<any[]>([])
   const [achievements, setAchievements] = useState<any[]>([])
@@ -31,19 +30,17 @@ export default function EventSummaryPage() {
     async function fetchEventData() {
       try {
         setIsLoading(true)
-        
-        // Fetch core event data first (required)
+
         const [eventResponse, participantsResponse, achievementsResponse] = await Promise.all([
           EventsService.getEvent(eventId),
           EventsService.getEventParticipants(eventId),
-          EventsService.getEventAchievements(eventId)
+          EventsService.getEventAchievements(eventId),
         ])
-        
+
         setEvent(eventResponse.data)
         setParticipants(participantsResponse.data || [])
         setAchievements(achievementsResponse.data || [])
-        
-        // Try to fetch leaderboard data (optional - may not be implemented yet)
+
         try {
           const leaderboardResponse = await EventsService.getLeaderboard(eventId)
           setLeaderboard(leaderboardResponse.data || [])
@@ -51,7 +48,6 @@ export default function EventSummaryPage() {
           console.warn("Leaderboard API not available yet, using empty array:", leaderboardError)
           setLeaderboard([])
         }
-        
       } catch (error) {
         console.error("Error fetching event data:", error)
       } finally {
@@ -75,9 +71,7 @@ export default function EventSummaryPage() {
           <div className="text-center py-20">
             <h1 className="text-2xl font-bold text-white mb-4">Evento no encontrado</h1>
             <InternalLink href="/eventos">
-              <Button variant="accent">
-                Volver a eventos
-              </Button>
+              <Button variant="accent">Volver a eventos</Button>
             </InternalLink>
           </div>
         </div>
@@ -87,19 +81,23 @@ export default function EventSummaryPage() {
 
   return (
     <div className="min-h-screen">
-      <div className="relative z-10 container mx-auto p-6 max-w-7xl">
+      <div className="relative z-10 container mx-auto p-6 max-w-7xl space-y-8">
+        {/* Hero */}
         <EventHero event={event} participants={participants} />
-        
-        {/*<EventStats event={event} participants={participants} achievements={achievements} />*/}
 
-        <div className="space-y-12">
-          <AchievementsSection 
-            eventId={eventId} 
-            achievements={achievements} 
-            participants={participants} 
+        {/* Quick stats */}
+        <EventStats event={event} participants={participants} achievements={achievements} />
+
+        {/* Content sections */}
+        <div className="space-y-10">
+          <AchievementsSection
+            eventId={eventId}
+            achievements={achievements}
+            participants={participants}
           />
 
           <ParticipantsGrid participants={participants} />
+
           <Leaderboard leaderboard={leaderboard} />
         </div>
       </div>
