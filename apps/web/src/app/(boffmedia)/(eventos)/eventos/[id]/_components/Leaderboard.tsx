@@ -1,30 +1,43 @@
 "use client"
 
+import { Trophy } from "lucide-react"
 import { LeaderboardList } from "@/components/boffmedia/leaderboard/LeaderboardList"
 import { LeaderboardEntry } from "@boffmedia/shared"
+import { EventSectionHeader } from "./EventSectionHeader"
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface LeaderboardProps {
   leaderboard: LeaderboardEntry[]
 }
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function Leaderboard({ leaderboard }: LeaderboardProps) {
+  const top = Math.min(leaderboard.length, 10)
+
+  const badge = top > 0 ? (
+    <span
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[10px] font-mono uppercase tracking-widest"
+      style={{
+        color: "rgba(250,204,21,0.9)",
+        border: "1px solid rgba(250,204,21,0.3)",
+        background: "rgba(250,204,21,0.07)",
+      }}
+    >
+      <Trophy className="w-3 h-3" />
+      Top {top}
+    </span>
+  ) : null
+
   return (
     <div className="space-y-4">
-      {/* Section header */}
-      <div className="flex items-center gap-3">
-        <div className="h-[2px] w-5" style={{ background: "rgba(249,115,22,0.6)" }} />
-        <div>
-          <h2
-            className="text-sm font-black uppercase tracking-widest"
-            style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
-          >
-            Clasificación
-          </h2>
-          <p className="text-[10px] font-mono text-surface-500 mt-0.5">
-            Tabla de posiciones actual
-          </p>
-        </div>
-      </div>
+      <EventSectionHeader
+        label="Clasificación"
+        sub="Tabla de posiciones actual"
+        accentColor="rgba(250,204,21,0.6)"
+        badge={badge}
+      />
 
       <LeaderboardList
         players={leaderboard}

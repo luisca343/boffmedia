@@ -20,9 +20,9 @@ function StatCard({ icon: Icon, label, sublabel, value, accentColor, borderColor
     <div
       className="flex flex-col rounded-xl overflow-hidden border"
       style={{
-        background: "linear-gradient(145deg, rgba(9,13,27,0.97), rgba(15,23,42,0.95))",
+        background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
         borderColor,
-        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+        boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
       }}
     >
       {/* Top accent bar */}
