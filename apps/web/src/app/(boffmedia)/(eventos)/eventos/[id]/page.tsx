@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation"
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 

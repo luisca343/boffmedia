@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { Award, Users, Trophy, Target, ChevronRight, Medal } from "lucide-react"
-import { Badge } from "@/components/ui/primitives/badge"
-import { Button } from "@/components/ui/primitives/button"
-import { Progress } from "@/components/ui/primitives/progress"
+import { Badge } from "@/components/ui"
+import { Button } from "@/components/ui"
+import { Progress } from "@/components/ui"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { UserProgress, EventParticipant } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"

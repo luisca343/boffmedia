@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button, Input, Container, Grid } from "@/components/ui";
 import { Gamepad2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
@@ -30,8 +29,8 @@ export async function BoffFooter() {
         }}
       />
 
-      <div className="container mx-auto px-4 pt-14 pb-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
+      <Container size="lg" className="pt-14 pb-8 relative z-10">
+        <Grid cols={1} colsMd={4} gap={10} className="mb-12">
 
           {/* ── Brand ── */}
           <div className="space-y-4 md:col-span-1">
@@ -136,7 +135,7 @@ export async function BoffFooter() {
               </Button>
             </div>
           </div>
-        </div>
+        </Grid>
 
         {/* Gradient divider */}
         <div
@@ -170,7 +169,7 @@ export async function BoffFooter() {
             </Link>
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

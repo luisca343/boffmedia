@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { HiExclamationTriangle, HiUserCircle } from 'react-icons/hi2';
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { useBoffSession } from "@/services/useBoffSession";
 import { PlayerGallery } from "../_components/PlayerGallery";
 import { Loader2 } from "lucide-react";

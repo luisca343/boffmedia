@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
-import { Textarea } from "@/components/ui/primitives/textarea"
+import { Button } from "@/components/ui"
+import { Input } from "@/components/ui"
+import { Textarea } from "@/components/ui"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
 
 const gameSchema = z.object({

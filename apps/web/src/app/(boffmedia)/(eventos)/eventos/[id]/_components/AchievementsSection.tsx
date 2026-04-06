@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { Trophy, ExternalLink, Medal, CheckCircle, Zap } from "lucide-react"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"

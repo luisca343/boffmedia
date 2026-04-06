@@ -1,6 +1,6 @@
 import { TableCell, TableRow } from "@/components/ui/primitives/table"
-import { Button } from "@/components/ui/primitives/button"
-import { Badge } from "@/components/ui/primitives/badge"
+import { Button } from "@/components/ui"
+import { Badge } from "@/components/ui"
 import { Pencil, Trash2, Award, Users } from "lucide-react"
 import type { Achievement } from "@boffmedia/shared"
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Input } from "@/components/ui/primitives/input"
+import { Input } from "@/components/ui"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { HiMagnifyingGlass, HiFunnel } from 'react-icons/hi2'
 

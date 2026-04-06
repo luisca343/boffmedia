@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
-import { Switch } from "@/components/ui/primitives/switch"
-import { Label } from "@/components/ui/primitives/label"
-import { Input } from "@/components/ui/primitives/input"
+import { Switch } from "@/components/ui"
+import { Label } from "@/components/ui"
+import { Input } from "@/components/ui"
 import {
   Select,
   SelectContent,
@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/primitives/select"
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { HiGift, HiClock, HiMagnifyingGlass, HiFunnel, HiSparkles } from 'react-icons/hi2'
 import { Loader2 } from 'lucide-react'
 import { useTranslations } from "next-intl"

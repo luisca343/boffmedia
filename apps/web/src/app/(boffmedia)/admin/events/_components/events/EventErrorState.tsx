@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 
 interface EventErrorStateProps {

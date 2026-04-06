@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { Button } from "@/components/ui/primitives/button";
+import { Button, Container } from "@/components/ui";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import Link from "next/link";
 import { FloatingBackground } from "./_components/layout/FloatingBackground";
@@ -20,7 +20,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
     <div className="relative min-h-screen bg-gradient-to-br from-surface-900 via-surface-950 to-surface-900 overflow-hidden flex items-center justify-center">
       <FloatingBackground variant="warm" />
       
-      <div className="relative container mx-auto px-4 z-10">
+      <Container size="xs" className="relative z-10">
         <div className="max-w-md mx-auto text-center">
           {/* Error Icon */}
           <div className="mb-6">
@@ -87,7 +87,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
             </Link>
           </p>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

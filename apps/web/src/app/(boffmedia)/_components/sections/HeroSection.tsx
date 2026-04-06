@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { Container, Grid, Stack, Heading, Text } from "@/components/ui"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"

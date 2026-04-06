@@ -1,7 +1,7 @@
 import { CardHeader, CardTitle, CardDescription } from "@/components/ui/primitives/card"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
-import { Badge } from "@/components/ui/primitives/badge"
+import { Button } from "@/components/ui"
+import { Input } from "@/components/ui"
+import { Badge } from "@/components/ui"
 import { Plus, Search, Gamepad } from "lucide-react"
 
 interface GameHeaderProps {

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Save, Share2, RefreshCw, Copy, Download, Link, ChevronLeft, FolderOpen } from "lucide-react";
 import { LuShield } from "react-icons/lu";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
 import { useTranslations } from "next-intl";
 import { BuildDataWithIds, BuildData, StatsData, Skill } from "@/types/tools/mhwilds";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/primitives/dialog";

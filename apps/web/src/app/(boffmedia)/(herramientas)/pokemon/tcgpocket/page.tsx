@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/primitives/card";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
 import { Search, Users, CreditCard, SwordIcon, Sparkles, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 

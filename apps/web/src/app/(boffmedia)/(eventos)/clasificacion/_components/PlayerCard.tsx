@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@/components/ui/primitives/table"
-import { Badge } from "@/components/ui/primitives/badge"
+import { Badge } from "@/components/ui"
 import type { LeaderboardEntry } from "@boffmedia/shared"
 import { ProfileImage } from "@/components/ui/ProfileImage"
 

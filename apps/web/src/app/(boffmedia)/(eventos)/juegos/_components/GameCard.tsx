@@ -1,7 +1,7 @@
 import { Game } from "@boffmedia/shared";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/primitives/card";
-import { Badge } from "@/components/ui/primitives/badge";
-import { Button } from "@/components/ui/primitives/button";
+import { Badge } from "@/components/ui";
+import { Button } from "@/components/ui";
 import { Calendar, Users, Trophy, ExternalLink, Gamepad2 } from "lucide-react";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { cn } from "@/lib/utils";

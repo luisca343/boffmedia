@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from 'next/navigation'
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { AlertTriangle } from "lucide-react"
 import BoffLayout from "@/app/(boffmedia)/_components/layout/BoffLayout"
 

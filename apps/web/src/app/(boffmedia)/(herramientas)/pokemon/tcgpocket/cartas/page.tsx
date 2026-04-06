@@ -6,7 +6,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { CardGrid } from "../_components/CardGrid";
 import { FilterComponent } from "../_components/FilterComponent";
 import { TcgCard } from "@boffmedia/shared";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 
 interface Set {
   setId: string;

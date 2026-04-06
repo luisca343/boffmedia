@@ -1,4 +1,5 @@
 import React from 'react';
+import { Container } from '@/components/ui';
 import { BoffFooter } from './BoffFooter';
 
 export default function BoffLayout({ children, footer = true }: { children: React.ReactNode, footer?: boolean }) {
@@ -10,9 +11,9 @@ export default function BoffLayout({ children, footer = true }: { children: Reac
         aria-hidden="true"
       />
       <div className="flex flex-col flex-grow z-10 relative">
-        <main className="container mx-auto px-4 py-12 flex-grow flex flex-col">
+        <Container as="main" size="lg" className="py-12 flex-grow flex flex-col">
           {children}
-        </main>
+        </Container>
         {footer && <BoffFooter />}
       </div>
     </div>

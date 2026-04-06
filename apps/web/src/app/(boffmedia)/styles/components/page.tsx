@@ -2,9 +2,9 @@
 
 import React from "react"
 import { SectionPanel } from "@/components/ui/display/SectionPanel"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
-import { Label } from "@/components/ui/primitives/label"
+import { Button } from "@/components/ui"
+import { Input } from "@/components/ui"
+import { Label } from "@/components/ui"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/primitives/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs"
@@ -18,8 +18,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/primitives/dialog"
-import { Badge } from "@/components/ui/primitives/badge"
-import { Checkbox } from "@/components/ui/primitives/checkbox"
+import { Badge } from "@/components/ui"
+import { Checkbox } from "@/components/ui"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,20 +31,20 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/primitives/alert-dialog"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/primitives/command"
 import { Combobox } from "@/components/ui/primitives/combobox"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/primitives/collapsible"
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui/primitives/hover-card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/primitives/sheet"
-import { Switch } from "@/components/ui/primitives/switch"
-import { Slider } from "@/components/ui/primitives/slider"
-import { Skeleton } from "@/components/ui/primitives/skeleton"
-import { Separator } from "@/components/ui/primitives/separator"
+import { Switch } from "@/components/ui"
+import { Slider } from "@/components/ui"
+import { Skeleton } from "@/components/ui"
+import { Separator } from "@/components/ui"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/primitives/popover"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/primitives/form"
-import { Textarea } from "@/components/ui/primitives/textarea"
+import { Textarea } from "@/components/ui"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/primitives/tooltip"
 import { useForm } from "react-hook-form"
 import { Calendar } from "@/components/ui/primitives/calendar"

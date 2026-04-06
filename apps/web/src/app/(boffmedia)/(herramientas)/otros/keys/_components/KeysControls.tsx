@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Search, Key, CheckCircle2, Library } from "lucide-react";
-import { Input } from "@/components/ui/primitives/input";
+import { Input } from "@/components/ui";
 
 interface KeysControlsProps {
   filter: string;

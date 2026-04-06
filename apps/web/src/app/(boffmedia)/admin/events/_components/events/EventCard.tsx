@@ -1,5 +1,5 @@
 import { TableCell, TableRow } from "@/components/ui/primitives/table";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { Pencil, Trash2, Calendar, Plus } from "lucide-react";
 import type { Event } from "@boffmedia/shared";
 import { getEventStatus } from "@/lib/events";

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Button } from "@/components/ui/primitives/button"
+import { Button, Container } from "@/components/ui"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { SectionHeader, SectionLoading } from '@/components/boffmedia/sections';
 import { LeaderboardFilters } from "../_components/LeaderboardFilters"
@@ -64,7 +64,7 @@ export default function FullLeaderboardComponent() {
   if (error)
     return (
       <div className="min-h-screen">
-        <div className="container mx-auto p-6 max-w-7xl">
+        <Container size="lg" className="p-6">
           <div className="text-center py-20">
             <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
@@ -93,13 +93,13 @@ export default function FullLeaderboardComponent() {
               Reintentar
             </Button>
           </div>
-        </div>
+        </Container>
       </div>
     )
 
   return (
     <div className="min-h-screen">
-      <div className="relative z-10 container mx-auto p-6 max-w-7xl">
+      <Container size="lg" className="relative z-10 p-6">
         <SectionHeader 
           title="Clasificación Global"
           subtitle="Explora el ranking de todos los jugadores de la comunidad. Compite, gana medallas, logros y asciende en la clasificación."
@@ -199,7 +199,7 @@ export default function FullLeaderboardComponent() {
             </div>
           )}
         </div>
-      </div>
+      </Container>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { useBoffSession } from "@/services/useBoffSession";
 import { User, UserPlus, Loader2, Lock, CheckCircle, Clock } from "lucide-react";
 import { useRouter } from "next/navigation";

@@ -20,7 +20,7 @@ import { ComponentSlot } from "./ComponentSlot";
 import Image from "next/image";
 import { getArmorImagePath, getWeaponTypeIcon } from "./equipment-utils";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { MHWildsPanel, MHWildsPanelHeader, MHWildsPanelTitle } from "./MHWildsPanel";
 
 interface BuildDisplayProps {

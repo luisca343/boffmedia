@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { InternalLink } from "@/components/ui/navigation/Link";
-import { Separator } from "@/components/ui/primitives/separator";
+import { Separator } from "@/components/ui";
 import { boffGET } from "@/services/boffAPI";
 import { MapPin } from "lucide-react";
 

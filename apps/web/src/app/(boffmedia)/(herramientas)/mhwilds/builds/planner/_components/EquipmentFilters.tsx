@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/primitives/input";
+import { Input } from "@/components/ui";
 import { Search, ArrowUp, ArrowDown, Filter, X } from "lucide-react";
 import {
   DropdownMenu,
@@ -7,7 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/primitives/dropdown-menu";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { Filters, EquipmentType } from "../../../../../../../types/tools/mhwilds";
 import { useTranslations } from "next-intl";
 

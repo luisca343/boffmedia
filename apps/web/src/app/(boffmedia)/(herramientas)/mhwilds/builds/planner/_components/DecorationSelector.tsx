@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { X, ChevronLeft, Gem, Check, Loader2 } from "lucide-react";
 import {

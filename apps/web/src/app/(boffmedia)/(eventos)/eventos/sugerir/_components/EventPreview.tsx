@@ -1,7 +1,7 @@
 "use client"
 
 import { Sparkles, Trophy, Server, Calendar, MapPin, Clock, Users } from "lucide-react"
-import { Badge } from "@/components/ui/primitives/badge"
+import { Badge } from "@/components/ui"
 import { EventFormData } from "../page"
 
 interface EventPreviewProps {

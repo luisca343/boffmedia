@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
-import { Badge } from "@/components/ui/primitives/badge";
+import { Badge } from "@/components/ui";
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SteamGame } from "../_hooks/useFetchSteamData";

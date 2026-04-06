@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/primitives/dialog"
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { toast } from "react-toastify"
 import { Users, RefreshCw } from "lucide-react"
 import type { EventTeam } from "@/types/events"

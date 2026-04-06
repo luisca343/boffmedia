@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { Award } from "lucide-react"
 
 interface AchievementEmptyStateProps {

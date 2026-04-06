@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/primitives/dialog"
 import { Loader2, Save } from 'lucide-react'
 import { useLocale, useTranslations } from "next-intl"

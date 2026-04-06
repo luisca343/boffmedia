@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { Plus, Minus } from 'lucide-react'
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { TcgCard } from "@boffmedia/shared"

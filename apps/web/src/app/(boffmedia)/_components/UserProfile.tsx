@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
-import { Label } from "@/components/ui/primitives/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
+import { Label } from "@/components/ui";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
 import {
   Camera,
   Gamepad2,

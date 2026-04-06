@@ -2,8 +2,8 @@
 
 import { useParams } from "next/navigation"
 import { useState, useEffect, useMemo } from "react"
-import { Button } from "@/components/ui/primitives/button"
-import { Input } from "@/components/ui/primitives/input"
+import { Button } from "@/components/ui"
+import { Input } from "@/components/ui"
 import {
   ArrowLeft, Trophy, Target, Users, Star, Lock,
   Search, Clock, Zap, Medal, CheckCircle2,

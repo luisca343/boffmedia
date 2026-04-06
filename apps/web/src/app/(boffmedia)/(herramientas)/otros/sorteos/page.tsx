@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { Grid } from "@/components/ui";
 import { SectionHeader } from "@/components/boffmedia/sections/SectionHeader";
 import { Gift } from "lucide-react";
 import { ParticipantsList } from "./_components/ParticipantsList";
@@ -104,7 +105,7 @@ export default function Sorteo() {
 
         {/* Main Content */}
         <motion.div variants={itemVariants}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Grid cols={1} colsLg={3} gap={6}>
             <div className="lg:col-span-1">
               <ParticipantsList 
                 participants={participants}
@@ -136,7 +137,7 @@ export default function Sorteo() {
                 />
               )}
             </div>
-          </div>
+          </Grid>
         </motion.div>
       </div>
     </motion.div>

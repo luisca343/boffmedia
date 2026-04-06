@@ -3,7 +3,7 @@
 import {
   Calendar, Clock, Trophy, Server, Star, ArrowRight,
 } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { cn } from "@/lib/utils";
 import { getEventStatus } from "@/lib/events";

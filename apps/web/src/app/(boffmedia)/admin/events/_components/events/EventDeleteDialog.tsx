@@ -5,7 +5,7 @@ import {
   Dialog, DialogContent, DialogDescription,
   DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/primitives/dialog";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { toast } from "react-toastify";
 import { Calendar, RefreshCw, AlertTriangle } from "lucide-react";
 import type { Event } from "@boffmedia/shared";

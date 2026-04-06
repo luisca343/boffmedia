@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { Loader2, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { ArmorPiece, BuildData, Charm, EquipmentType, Filters, Weapon } from "../../../../../../../types/tools/mhwilds";

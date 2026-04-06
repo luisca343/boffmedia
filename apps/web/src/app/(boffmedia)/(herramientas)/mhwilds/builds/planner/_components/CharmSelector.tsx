@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
 import { Loader2, X, Medal } from "lucide-react";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 import { BuildData, Charm, Filters } from "../../../../../../../types/tools/mhwilds";

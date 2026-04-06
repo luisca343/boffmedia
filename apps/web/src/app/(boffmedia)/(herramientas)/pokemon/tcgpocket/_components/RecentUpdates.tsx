@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/primitives/button"
+import { Button } from "@/components/ui"
 import { Loader2, ChevronDown, AlertCircle } from 'lucide-react'
 import { RecentUpdate } from '../types'
 import { useTranslations } from "next-intl"

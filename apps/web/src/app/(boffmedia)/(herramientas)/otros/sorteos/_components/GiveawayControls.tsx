@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { UserPlus, Upload, Play, AlertTriangle } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
-import { Textarea } from "@/components/ui/primitives/textarea";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
+import { Textarea } from "@/components/ui";
 import { Card } from "@/components/ui/primitives/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primitives/tabs";
 import { SectionHeader } from "@/components/ui/form/FormSectionHeader";

@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/primitives/input";
+import { Input } from "@/components/ui";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select";
 import { Search, Filter, Trophy } from "lucide-react";
 

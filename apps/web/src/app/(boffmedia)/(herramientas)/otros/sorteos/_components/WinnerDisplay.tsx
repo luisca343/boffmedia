@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Trophy, ArrowRight, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 
 interface WinnerDisplayProps {
   winner: string;

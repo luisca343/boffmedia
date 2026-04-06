@@ -1,5 +1,5 @@
 import { GameSpotlightCard } from "./GameSpotlightCard";
-import { Button } from "@/components/ui/primitives/button";
+import { Button, Grid } from "@/components/ui";
 import { ArrowRight, Wrench, Calculator, Cog, BarChart3, Server, Filter, Zap } from "lucide-react";
 import { OrbitingElementsCloud } from "@/components/ui/display/OrbitingElementsCloud";
 import { InternalLink } from "@/components/ui/navigation/Link";
@@ -24,7 +24,7 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
       aria-labelledby="tools-hero-title"
     >
 
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 h-full items-center px-6 py-16">
+      <Grid cols={1} colsLg={2} gap={12} className="relative z-10 h-full items-center px-6 py-16">
         <div className="order-2 lg:order-1 flex items-center justify-center relative h-[34rem]">
           <OrbitingElementsCloud
             centralIcon={<Wrench className="w-14 h-14 text-white animate-pulse" />}
@@ -56,7 +56,7 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             <p className="text-lg text-surface-300 leading-relaxed mb-8 text-left">
               {t("featuredGames.games.tools.description")}
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
+            <Grid cols={1} colsMd={2} gap={3} className="py-4 mb-8 mx-auto" style={{maxWidth: 700}}>
               {[
                 "Calculadoras especializadas para Minecraft",
                 "Generadores automáticos de contenido",
@@ -68,7 +68,7 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
                   <span>{feature}</span>
                 </div>
               ))}
-            </div>
+            </Grid>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 variant="highlight"
@@ -84,7 +84,7 @@ export function ToolsSpotlight({ t }: ToolsSpotlightProps) {
             </div>
           </GameSpotlightCard>
         </div>
-      </div>
+      </Grid>
     </section>
   );
 }

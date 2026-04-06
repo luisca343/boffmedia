@@ -1,6 +1,6 @@
 import { useGetGames } from "@/hooks/events/useGetGames";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/primitives/select";
-import { Badge } from "@/components/ui/primitives/badge";
+import { Badge } from "@/components/ui";
 import { Filter, Gamepad2 } from "lucide-react";
 import type { Game } from "@boffmedia/shared";
 

@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { X } from "lucide-react";
 import { ArmorPiece, Charm, EquipmentType, Weapon } from "../../../../../../../types/tools/mhwilds";
 import {

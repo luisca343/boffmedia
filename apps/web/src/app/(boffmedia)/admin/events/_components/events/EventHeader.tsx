@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/primitives/button";
-import { Input } from "@/components/ui/primitives/input";
+import { Button } from "@/components/ui";
+import { Input } from "@/components/ui";
 import { Plus, Search, Calendar } from "lucide-react";
 
 interface EventHeaderProps {

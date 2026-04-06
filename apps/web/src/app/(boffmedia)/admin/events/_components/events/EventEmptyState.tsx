@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import { Calendar, Search } from "lucide-react";
 
 interface EventEmptyStateProps {

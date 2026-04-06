@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from "@/components/ui";
 import {
   ArrowLeft, Calendar, Clock, Users, Trophy,
   Share2, Bookmark, Server, GamepadIcon as Gamepad2,
