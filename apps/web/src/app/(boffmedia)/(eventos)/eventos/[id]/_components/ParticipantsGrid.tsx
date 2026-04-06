@@ -1,7 +1,5 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/primitives/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/primitives/avatar"
 import { User } from "lucide-react"
 import { ProfileImage } from "@/components/ui/ProfileImage"
 
@@ -12,40 +10,58 @@ interface ParticipantsGridProps {
 export function ParticipantsGrid({ participants }: ParticipantsGridProps) {
   if (participants.length === 0) {
     return (
-      <div className="text-center py-12">
-        <div className="w-24 h-24 bg-surface-700/50 rounded-full flex items-center justify-center mx-auto mb-4">
-          <User className="w-12 h-12 text-surface-400" />
+      <div className="flex flex-col items-center justify-center py-12 gap-3">
+        <div
+          className="w-16 h-16 rounded-xl flex items-center justify-center"
+          style={{ background: "rgba(249,115,22,0.07)", border: "1px solid rgba(249,115,22,0.15)" }}
+        >
+          <User className="w-8 h-8" style={{ color: "rgba(249,115,22,0.5)" }} />
         </div>
-        <h3 className="text-xl font-semibold text-surface-300 mb-2">Sin participantes aún</h3>
-        <p className="text-surface-400">Sé el primero en unirte a este evento</p>
+        <p
+          className="text-sm font-black uppercase tracking-widest"
+          style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
+        >
+          Sin participantes aún
+        </p>
+        <p className="text-xs text-surface-500">Sé el primero en unirte a este evento</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Participantes</h2>
-        <p className="text-surface-400">{participants.length} aventureros registrados</p>
+    <div className="space-y-4">
+      {/* Section header */}
+      <div className="flex items-center gap-3">
+        <div className="h-[2px] w-5" style={{ background: "rgba(249,115,22,0.6)" }} />
+        <div>
+          <h2
+            className="text-sm font-black uppercase tracking-widest"
+            style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)" }}
+          >
+            Participantes
+          </h2>
+          <p className="text-[10px] font-mono text-surface-500 mt-0.5">
+            {participants.length} aventureros registrados
+          </p>
+        </div>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+      {/* Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {participants.map((participant, index) => (
-          <Card key={participant.id} className="bg-surface-800/60 backdrop-blur-sm border-accent-500/20 hover:scale-105 transition-transform">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <ProfileImage userId={participant.userId} size={48} />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-white truncate">
-                    {participant.nickname || 'Jugador Anónimo'}
-                  </h3>
-                  <p className="text-surface-400 text-sm">
-                    Participante #{index + 1}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div
+            key={participant.id}
+            className="group flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150 hover:bg-primary-500/[0.06]"
+            style={{ border: "1px solid rgba(71,85,105,0.3)" }}
+          >
+            <ProfileImage userId={participant.userId} size={40} />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-surface-100 truncate">
+                {participant.nickname || "Jugador Anónimo"}
+              </p>
+              <p className="text-[10px] font-mono text-surface-500">#{index + 1}</p>
+            </div>
+          </div>
         ))}
       </div>
     </div>
