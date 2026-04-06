@@ -1,9 +1,10 @@
 import { Event } from "@boffmedia/shared";
+import { Grid } from "@/components/ui";
 import { EventCard } from "./EventCard";
 
 export function EventsGrid({ events }: { events: Event[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <Grid cols={1} colsMd={2} colsLg={3} gap={6}>
       {events.map((event: Event, index: number) => (
         <div 
           key={event.id}
@@ -29,6 +30,6 @@ export function EventsGrid({ events }: { events: Event[] }) {
           }
         }
       `}</style>
-    </div>
+    </Grid>
   );
 }

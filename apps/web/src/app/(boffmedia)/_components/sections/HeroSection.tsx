@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/primitives/button"
+import { Container, Grid, Stack, Heading, Text } from "@/components/ui"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import Image from "next/image"
@@ -8,7 +9,7 @@ export async function HeroSection() {
   const t = await getTranslations("boffmedia");
   return (
     <div className="relative overflow-hidden bg-surface-950">
-      
+
       {/* Bottom SVG Wave */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden opacity-100 z-10">
         <svg className="relative block w-full h-20" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -24,25 +25,22 @@ export async function HeroSection() {
           backgroundPosition: "center",
         }}
       />
-      <div className="relative h-[105vh] container mx-auto px-4 py-24 sm:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center flex-1">
+      <Container size="lg" className="relative h-[105vh] py-24 sm:py-32">
+        <Grid cols={1} colsLg={2} gap={12} className="items-center flex-1 h-full">
           <div className="text-center lg:text-left">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black mb-6 leading-tight tracking-tight text-surface-50">
+            <Heading as="h1" size="2xl" weight="black" className="mb-6">
               {t("hero.title.first")}
               <span
-                className="block text-primary-400"
-                style={{
-                  fontFamily: "Orbitron, sans-serif",
-                  filter: "drop-shadow(0 0 18px rgba(249,115,22,0.35))",
-                }}
+                className="block text-primary-400 drop-shadow-[0_0_18px_rgba(249,115,22,0.35)]"
+                style={{ fontFamily: "Orbitron, sans-serif" }}
               >
                 {t("hero.title.second")}
               </span>
-            </h1>
-            <p className="text-xl text-surface-300 mb-8 leading-relaxed">
+            </Heading>
+            <Text size="xl" color="muted" leading="relaxed" className="mb-8">
               {t("hero.description")}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+            </Text>
+            <Stack direction="horizontal" gap={4} wrap className="justify-center lg:justify-start">
               <Button size="lg" variant="default" asChild className="group">
                 <Link href="/juegos">
                   {t("hero.buttons.exploreGames")}
@@ -52,7 +50,7 @@ export async function HeroSection() {
               <Button size="lg" variant="outline" asChild>
                 <Link href="/community">{t("hero.buttons.joinCommunity")}</Link>
               </Button>
-            </div>
+            </Stack>
           </div>
           <div className="relative hidden md:block">
             <Image
@@ -63,8 +61,8 @@ export async function HeroSection() {
               className="rounded-lg"
             />
           </div>
-        </div>
-      </div>
+        </Grid>
+      </Container>
     </div>
   )
 }

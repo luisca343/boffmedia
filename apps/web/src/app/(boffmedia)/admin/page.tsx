@@ -1,8 +1,7 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
+import { Button, Badge } from "@/components/ui";
 import { useBoffSession } from "../../../services/useBoffSession";
-import { Button } from "@/components/ui/primitives/button";
-import { Badge } from "@/components/ui/primitives/badge";
 import { useEffect, useState } from "react";
 import { boffPOST } from "@/services/boffAPI";
 import UnauthorizedPage from "../_components/Unauthorized";

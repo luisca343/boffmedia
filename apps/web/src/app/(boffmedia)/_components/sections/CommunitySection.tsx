@@ -1,5 +1,5 @@
 "use client"
-import { Button } from "@/components/ui/primitives/button";
+import { Button, Container, Grid, Stack, Heading, Text } from "@/components/ui";
 import { ArrowRight, Users, MessageCircle, Heart, Gamepad2, Code, Zap } from "lucide-react";
 import { OrbitingElementsCloud } from "@/components/ui/display/OrbitingElementsCloud";
 import Link from "next/link";
@@ -28,12 +28,12 @@ export function CommunitySection() {
         }}></div>
       </div>
 
-      <div className="relative container mx-auto px-4 py-24 sm:py-32">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          
+      <Container size="lg" className="relative py-24 sm:py-32">
+        <Grid cols={1} colsLg={2} gap={12} className="items-center">
+
           {/* Left Section: Community Info */}
           <div className="text-center lg:text-left order-2 lg:order-1">
-            <h2 className="text-5xl sm:text-6xl font-black mb-6 leading-tight tracking-tight">
+            <Heading as="h2" size="xl" weight="black" className="mb-6">
               <span className="text-surface-50">{t("community.title.first")}</span>
               <span
                 className="block bg-gradient-to-r from-secondary-300 via-secondary-400 to-secondary-500 bg-clip-text text-transparent"
@@ -41,48 +41,41 @@ export function CommunitySection() {
               >
                 {t("community.title.second")}
               </span>
-            </h2>
-            <p className="text-xl text-surface-300 mb-12 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            </Heading>
+            <Text size="xl" color="muted" leading="relaxed" className="mb-12 max-w-xl mx-auto lg:mx-0">
               {t("community.description")}
-            </p>
+            </Text>
 
             {/* Feature highlights */}
-            <div className="space-y-3.5 mb-12">
+            <Stack direction="vertical" gap={3} className="mb-12">
               {[
                 { delay: "0s", text: t("community.highlights.connect") },
                 { delay: "0.5s", text: t("community.highlights.collaborate") },
                 { delay: "1s", text: t("community.highlights.resources") },
               ].map(({ delay, text }, i) => (
-                <div key={i} className="flex items-center gap-3 justify-center lg:justify-start">
+                <Stack key={i} direction="horizontal" gap={3} align="center" justify="center" className="lg:justify-start">
                   <div
-                    className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse"
-                    style={{ background: "rgba(99,102,241,0.85)", animationDelay: delay }}
+                    className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse bg-accent-500/85"
+                    style={{ animationDelay: delay }}
                   />
-                  <span className="text-surface-300">{text}</span>
-                </div>
+                  <Text as="span" color="muted">{text}</Text>
+                </Stack>
               ))}
-            </div>
+            </Stack>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button
-                size="lg"
-                variant="secondary"
-                className="group"
-                asChild
-              >
+            <Stack direction="horizontal" gap={4} wrap className="justify-center lg:justify-start">
+              <Button size="lg" variant="secondary" className="group" asChild>
                 <Link href="/community">
                   {t("community.buttons.joinNow")}
                   <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-200 group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <Button
-                size="lg"
-                variant="secondaryOutline"
-                asChild
-              >
-                <Link href="https://discord.gg/TWqjNHQz7d" target="_blank" rel="noopener noreferrer">{t("community.buttons.discord")}</Link>
+              <Button size="lg" variant="secondaryOutline" asChild>
+                <Link href="https://discord.gg/TWqjNHQz7d" target="_blank" rel="noopener noreferrer">
+                  {t("community.buttons.discord")}
+                </Link>
               </Button>
-            </div>
+            </Stack>
           </div>
 
           {/* Right Section: Community Visualization */}
@@ -104,8 +97,8 @@ export function CommunitySection() {
               radius={180}
             />
           </div>
-        </div>
-      </div>
+        </Grid>
+      </Container>
 
     </section>
   );

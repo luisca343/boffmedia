@@ -1,4 +1,5 @@
 import React from "react";
+import { Container, Heading, Text, Stack } from "@/components/ui";
 import {
   GiWoodenCrate,
   GiStoneBlock,
@@ -186,32 +187,33 @@ const achievements: Achievement[] = [
 
 export default function AchievementList() {
   return (
-    <div className="flex flex-col justify-center items-center px-4">
-      <h2 className="text-4xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
+    <Container size="sm" className="flex flex-col items-center">
+      <Heading as="h2" size="lg" weight="bold" className="mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
         Lista de Logros
-      </h2>
-      <div className="space-y-4">
+      </Heading>
+      <Stack direction="vertical" gap={4} className="w-full max-w-lg">
         {achievements.map((achievement, index) => (
-          <div
+          <Stack
             key={index}
-            className="flex items-center space-x-4 p-4 bg-surface-800 rounded-lg border border-orange-800 shadow-lg hover:bg-surface-700 transition-colors duration-200 w-[500px] mx-auto"
+            direction="horizontal"
+            gap={4}
+            align="center"
+            className="p-4 bg-surface-800 rounded-lg border border-orange-800 shadow-lg hover:bg-surface-700 transition-colors duration-200"
           >
             <AchievementBadge rarity={achievement.rarity} />
             <div className="flex-grow">
-              <h3 className="text-lg font-semibold text-orange-400">
+              <Text as="span" size="lg" weight="semibold" className="text-orange-400 block">
                 {achievement.name}
-              </h3>
-              <p className="text-sm text-surface-300">{achievement.description}</p>
+              </Text>
+              <Text size="sm" color="muted">{achievement.description}</Text>
             </div>
-            <div className="text-right">
-              <span className="text-lg font-bold text-yellow-400">
-                {achievement.points}
-              </span>
-              <span className="text-sm text-surface-300 ml-1">pts</span>
+            <div className="text-right flex-shrink-0">
+              <span className="text-lg font-bold text-yellow-400">{achievement.points}</span>
+              <Text as="span" size="sm" color="muted" className="ml-1">pts</Text>
             </div>
-          </div>
+          </Stack>
         ))}
-      </div>
-    </div>
+      </Stack>
+    </Container>
   );
 }

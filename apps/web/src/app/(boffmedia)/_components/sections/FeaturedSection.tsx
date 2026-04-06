@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { Container, Heading } from "@/components/ui";
 import { WingullSpotlight } from "./WingullSpotlight";
 import { SmartRotomSpotlight } from "./SmartRotomSpotlight";
 import { SectionSeparator } from "../ui/SectionSeparator";
@@ -28,24 +29,27 @@ export async function FeaturedSection() {
     <section
       className="min-h-screen pb-20 relative overflow-hidden flex flex-col bg-gradient-to-b from-surface-800 via-secondary-900/50 to-surface-700 pt-8"
     >
-      <div className="relative mx-auto z-10 flex flex-col h-full w-full px-4">
-      <div className="text-center mb-6">
-        <div className="inline-block">
-          <h2
-            className="block text-5xl sm:text-6xl font-black my-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500"
-            style={{ fontFamily: "Orbitron, sans-serif" }}
-          >
-            {t("featuredGames.title")}
-          </h2>
-          <div className="h-[2px] w-24 bg-gradient-to-r from-primary-500 to-primary-300 mx-auto" style={{ opacity: 0.7 }} />
+      <Container size="lg" className="relative z-10 flex flex-col h-full">
+        <div className="text-center mb-6">
+          <div className="inline-block">
+            <Heading
+              as="h2"
+              size="xl"
+              weight="black"
+              orbitron
+              className="my-4 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 via-primary-400 to-primary-500"
+            >
+              {t("featuredGames.title")}
+            </Heading>
+            <div className="h-[2px] w-24 bg-gradient-to-r from-primary-500 to-primary-300 mx-auto opacity-70" />
+          </div>
         </div>
-      </div>
         <WingullSpotlight t={t} />
         <SectionSeparator variant="orange" />
         <SmartRotomSpotlight t={t} />
         <SectionSeparator variant="purple" />
         <ToolsSpotlight t={t} />
-      </div>       
+      </Container>
       {/* Bottom SVG Wave */}
       <div className="absolute bottom-0 left-0 w-full overflow-hidden z-10">
         <svg className="relative block w-full h-20" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">

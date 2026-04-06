@@ -1,13 +1,14 @@
 import React from "react";
+import { Container, Heading, Text } from "@/components/ui";
 import { ContactForm } from "./_components/ContactForm";
 
 export default function ContactPage() {
   return (
-    <div className="max-w-2xl mx-auto">
-      <h1 className="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-600">
+    <Container size="sm">
+      <Heading as="h1" size="lg" weight="bold" className="mb-6 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-600">
         Contacto
-      </h1>
-      <p className="mb-4 text-primary-100">
+      </Heading>
+      <Text color="muted" className="mb-4">
         Para cualquier consulta, puedes contactarnos a través del siguiente
         correo electrónico:{" "}
         <a
@@ -16,11 +17,11 @@ export default function ContactPage() {
         >
           boffmedia@gmail.com
         </a>
-      </p>
-      <p className="mb-4 text-primary-100">
+      </Text>
+      <Text color="muted" className="mb-4">
         O puedes utilizar nuestro formulario de contacto:
-      </p>
+      </Text>
       <ContactForm />
-    </div>
+    </Container>
   );
 }

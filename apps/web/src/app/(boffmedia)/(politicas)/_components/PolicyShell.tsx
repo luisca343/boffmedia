@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
+import { Container, Heading, Text } from "@/components/ui";
 import { BoffContainer } from "@components/boffmedia/tools/BoffContainer";
 
 interface PolicyShellProps {
@@ -21,7 +22,7 @@ export function PolicyShell({
   lastUpdated,
 }: PolicyShellProps) {
   return (
-    <div className="max-w-3xl mx-auto px-4">
+    <Container size="sm" padded>
       {/* Breadcrumb */}
       <div className="flex items-center gap-1.5 mb-6 text-xs font-mono tracking-widest uppercase">
         <Link
@@ -48,12 +49,9 @@ export function PolicyShell({
           >
             // {label}
           </span>
-          <h1
-            className="text-2xl sm:text-3xl font-black text-surface-50 leading-tight"
-            style={{ fontFamily: "Orbitron, sans-serif" }}
-          >
+          <Heading as="h1" size="md" weight="black" orbitron>
             {title}
-          </h1>
+          </Heading>
         </div>
 
         {/* Prose content */}
@@ -75,7 +73,7 @@ export function PolicyShell({
           </div>
         )}
       </BoffContainer>
-    </div>
+    </Container>
   );
 }
 
@@ -90,7 +88,7 @@ export function PolicySection({
 }) {
   return (
     <div className="mt-8 first:mt-0">
-      <h2 className="flex items-center gap-2.5 text-base font-bold text-surface-100 mb-3">
+      <Heading as="h2" size="xs" weight="bold" className="flex items-center gap-2.5 mb-3">
         <span
           className="w-[3px] h-5 rounded-full flex-shrink-0"
           style={{
@@ -100,7 +98,7 @@ export function PolicySection({
           aria-hidden="true"
         />
         {title}
-      </h2>
+      </Heading>
       {children}
     </div>
   );
@@ -108,9 +106,9 @@ export function PolicySection({
 
 export function PolicyText({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-4 text-sm text-surface-400 leading-relaxed last:mb-0">
+    <Text size="sm" color="muted" leading="relaxed" className="mb-4 last:mb-0">
       {children}
-    </p>
+    </Text>
   );
 }
 

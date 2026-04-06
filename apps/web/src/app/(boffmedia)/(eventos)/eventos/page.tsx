@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useGetEvents } from '@/hooks/events/useGetEvents';
+import { Container } from '@/components/ui';
 import { SectionHeader, SectionLoading, SectionFilters, SectionError, SectionEmpty } from '@/components/boffmedia/sections';
 import { EventsGrid } from './_components/EventsGrid';
 import { EventsList } from './_components/EventsList';
@@ -35,7 +36,7 @@ export default function EventsPage() {
   if (!events || events.length === 0) return <SectionEmpty icon={Trophy} title="No hay eventos disponibles" description="Estamos preparando nuevos eventos emocionantes. ¡Vuelve pronto!" />;
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <Container size="lg" className="p-6">
       <SectionHeader 
         title="Centro de Eventos"
         subtitle="Únete a competiciones épicas, desafía a otros jugadores y demuestra tu habilidad en eventos emocionantes."
@@ -75,6 +76,6 @@ export default function EventsPage() {
       ) : (
         <EventsList events={filteredEvents} />
       )}
-    </div>
+    </Container>
   );
 }

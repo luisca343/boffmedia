@@ -1,9 +1,10 @@
 import { Game } from "@boffmedia/shared";
+import { Grid } from "@/components/ui";
 import { GameCard } from "./GameCard";
 
 export function GamesGrid({ games }: { games: Game[] }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <Grid cols={1} colsMd={2} colsLg={3} gap={6}>
       {games.map((game: Game, index: number) => (
         <div 
           key={game.id}
@@ -29,6 +30,6 @@ export function GamesGrid({ games }: { games: Game[] }) {
           }
         }
       `}</style>
-    </div>
+    </Grid>
   );
 }
