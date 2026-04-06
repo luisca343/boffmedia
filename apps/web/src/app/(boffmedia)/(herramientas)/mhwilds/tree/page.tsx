@@ -10,11 +10,14 @@ export function WeaponElement({ weapon }: { weapon: any }) {
   // Extract element information
   const elementInfo = weapon.specials?.find((special: any) => special.kind === "element");
   const elementType = elementInfo?.element || "none";
-  
+
   return (
-    <div className="bg-surface-800 shadow-md rounded-lg p-2.5 cursor-pointer min-w-32 h-22 overflow-hidden flex flex-col border border-surface-700 hover:bg-surface-700 hover:border-surface-600 transition-colors relative">
+    <div className="rounded-lg p-2.5 cursor-pointer min-w-32 overflow-hidden flex flex-col relative transition-all duration-200 bg-surface-900/80 border border-surface-700/40 hover:bg-surface-800/90 hover:border-primary-500/30">
       {/* Rarity badge */}
-      <span className="absolute top-0 right-0 bg-surface-700 text-xs px-1 rounded-bl text-surface-300">
+      <span
+        className="absolute top-0 right-0 text-[10px] px-1.5 rounded-bl font-mono"
+        style={{ background: "rgba(15,23,42,0.8)", color: "rgba(251,146,60,0.8)", borderLeft: "1px solid rgba(71,85,105,0.3)", borderBottom: "1px solid rgba(71,85,105,0.3)" }}
+      >
         R{weapon.rarity}
       </span>
       
@@ -81,18 +84,38 @@ export default function WeaponTree() {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary-400"></div>
+      <div className="flex items-center justify-center min-h-[400px] gap-3">
+        <div className="relative w-10 h-10">
+          <div
+            className="absolute inset-0 rounded-full animate-spin"
+            style={{ border: "2px solid transparent", borderTopColor: "rgba(249,115,22,0.8)", borderRightColor: "rgba(249,115,22,0.3)" }}
+          />
+          <div
+            className="absolute inset-[3px] rounded-full animate-spin"
+            style={{ border: "2px solid transparent", borderTopColor: "rgba(34,211,238,0.6)", borderRightColor: "rgba(34,211,238,0.2)", animationDirection: "reverse" }}
+          />
+        </div>
+        <span
+          className="text-sm font-black uppercase tracking-widest"
+          style={{ fontFamily: "Orbitron, sans-serif", color: "rgba(251,146,60,0.9)" }}
+        >
+          {t('loading')}...
+        </span>
       </div>
     );
   }
-  
+
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded my-4">
-        <p>{error}</p>
+      <div
+        className="flex flex-col items-center gap-3 px-4 py-6 rounded-xl my-4"
+        style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.25)" }}
+      >
+        <p className="text-sm" style={{ color: "rgba(252,165,165,0.9)" }}>{error}</p>
         <Button
-          variant="error"
+          variant="ghost"
+          size="sm"
+          className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
           onClick={() => refreshData()}
         >
           {t('build_planner.retry')}
@@ -254,7 +277,7 @@ export default function WeaponTree() {
     };
     
     return (
-      <div className="overflow-x-auto bg-surface-800/30 rounded-lg p-4 border border-surface-700">
+      <div className="overflow-x-auto rounded-xl p-4" style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}>
         <table className="min-w-full border-collapse">
           <tbody>
             {tableRows.map((row, rowIndex) => (
@@ -268,7 +291,6 @@ export default function WeaponTree() {
                           onClick={() => handleWeaponClick(weapon)}
                         >
                           <WeaponElement weapon={weapon} />
-                          <span className="absolute top-0 right-0 bg-surface-700 text-xs px-1 rounded-bl text-surface-300">R{weapon.rarity}</span>
                         </div>
                         
                         {/* Draw lines from this weapon to its direct children */}
@@ -360,23 +382,41 @@ export default function WeaponTree() {
 
   return (
     <div className="mx-auto p-4">
-      <h1 className="text-3xl md:text-4xl font-bold text-surface-50 mb-6">
-        {t('weapon_type')} - {t(`weapons.${activeWeaponType.toLowerCase().replace(' ', '-')}`)}
+      <h1
+        className="font-black uppercase tracking-widest mb-6"
+        style={{ fontFamily: "Orbitron, sans-serif", color: "rgb(226,232,240)", fontSize: "clamp(1.25rem, 3vw, 1.75rem)" }}
+      >
+        {t('weapon_type')} — {t(`weapons.${activeWeaponType.toLowerCase().replace(' ', '-')}`)}
       </h1>
-      
+
       {/* Weapon Type Filter */}
-      <div className="mb-6 bg-surface-800 border border-surface-700 rounded-lg p-4">
-        <h2 className="text-lg font-medium text-surface-100 mb-3">{t('weapon_type')}</h2>
+      <div
+        className="mb-6 rounded-xl p-4"
+        style={{
+          background: "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
+          border: "1px solid rgba(249,115,22,0.18)",
+        }}
+      >
+        <h2 className="text-[10px] font-mono uppercase tracking-widest text-surface-500 mb-3">
+          {t('weapon_type')}
+        </h2>
         <div className="flex flex-wrap gap-2">
           {weaponTypes.map((type) => (
-            <Button
+            <button
               key={type}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors`}
-              variant={activeWeaponType === type ? 'default' : 'ghost'}
+              type="button"
+              className={`px-3 py-1.5 rounded-lg text-xs font-mono uppercase tracking-wider transition-all duration-200 ${
+                activeWeaponType === type ? "text-primary-300" : "text-surface-400 hover:text-surface-200"
+              }`}
+              style={
+                activeWeaponType === type
+                  ? { background: "rgba(249,115,22,0.12)", border: "1px solid rgba(249,115,22,0.35)" }
+                  : { background: "transparent", border: "1px solid rgba(71,85,105,0.25)" }
+              }
               onClick={() => setActiveWeaponType(type)}
             >
               {t(`weapons.${type.toLowerCase().replace(' ', '-')}`)}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
@@ -384,7 +424,10 @@ export default function WeaponTree() {
       {filteredTree.length > 0 ? (
         renderWeaponTable()
       ) : (
-        <div className="bg-surface-800/30 border border-surface-700 text-surface-300 px-4 py-6 rounded-lg my-4 text-center">
+        <div
+          className="text-surface-300 px-4 py-6 rounded-xl my-4 text-center"
+          style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}
+        >
           <p>{t('build_planner.no_equipment_found')}</p>
         </div>
       )}

@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/primitives/button";
 import { X } from "lucide-react";
 import { ArmorPiece, Charm, EquipmentType, Weapon } from "../../../../../../../types/tools/mhwilds";
-import { 
-  getDefenseValue, 
-  getEquipmentIcon, 
-  getIconColor, 
+import {
+  getDefenseValue,
+  getEquipmentIcon,
+  getIconColor,
   getRarityStyle,
   getWeaponTypeIcon,
   getArmorImagePath,
@@ -27,66 +27,63 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
   const isWeapon = 'attack' in equipment || 'damage' in equipment;
   const isCharm = 'charm' in equipment;
   const weaponType = isWeapon ? (equipment as Weapon).kind || (equipment as Weapon).type : null;
-  
+
   return (
-    <div className="mb-4 p-3 bg-surface-700/30 rounded-lg">
+    <div
+      className="mb-4 p-3 rounded-lg"
+      style={{ background: "rgba(15,23,42,0.5)", border: "1px solid rgba(71,85,105,0.3)" }}
+    >
       <div className="flex justify-between items-center mb-2">
-        <span className="text-surface-100 font-medium">
-          {t(`build_planner.currently_equiped`)}
+        <span className="text-[10px] font-mono uppercase tracking-widest text-surface-400">
+          {t("build_planner.currently_equiped")}
         </span>
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={onRemove}
-          className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+          className="text-red-400 hover:text-red-300 hover:bg-red-900/20 h-7 px-2"
         >
-          <X className="h-4 w-4 mr-1" /> {t("build_planner.remove")}
+          <X className="h-3.5 w-3.5 mr-1" /> {t("build_planner.remove")}
         </Button>
       </div>
-      
+
       <div className="flex items-center w-full">
-        {/* Equipment icon - use weapon type icons for weapons */}
-        <div className="w-14 h-14 bg-surface-600 rounded flex items-center justify-center mr-3 relative">
+        <div
+          className="w-14 h-14 rounded-lg flex items-center justify-center mr-3 flex-shrink-0"
+          style={{ background: "rgba(30,41,59,0.7)", border: "1px solid rgba(71,85,105,0.3)" }}
+        >
           {isWeapon && weaponType ? (
             <div className="relative w-10 h-10">
-              <Image 
-                src={getWeaponTypeIcon(weaponType)} 
+              <Image
+                src={getWeaponTypeIcon(weaponType)}
                 alt={weaponType}
                 width={40}
                 height={40}
-                className="object-contain" 
-                style={{ 
-                  filter: getRarityFilterStyle(equipment.rarity)
-                }} 
+                className="object-contain"
+                style={{ filter: getRarityFilterStyle(equipment.rarity) }}
               />
             </div>
           ) : (
             <div className="relative w-10 h-10">
-              <Image 
-                src={getArmorImagePath(slotType)} 
+              <Image
+                src={getArmorImagePath(slotType)}
                 alt={slotType}
                 width={40}
                 height={40}
                 className="object-contain"
-                style={{ 
-                  filter: getRarityFilterStyle(equipment.rarity)
-                }}
+                style={{ filter: getRarityFilterStyle(equipment.rarity) }}
               />
             </div>
           )}
         </div>
 
-        {/* Equipment details */}
         <div className="flex-1 min-w-0">
-          {/* Equipment name and rarity */}
           <div className="flex justify-between items-center mb-1">
             <p className="font-medium text-surface-100 truncate pr-2">{equipment.name}</p>
-            <div className="flex flex-shrink-0 items-center">
-              <span className={`text-xs ${getRarityStyle(equipment.rarity)}`}>★{equipment.rarity}</span>
-            </div>
+            <span className={`text-xs flex-shrink-0 ${getRarityStyle(equipment.rarity)}`}>
+              ★{equipment.rarity}
+            </span>
           </div>
-          
-          {/* Equipment stats */}
           <div className="flex items-center text-sm">
             {isWeapon ? (
               <WeaponStats weapon={equipment as Weapon} />
@@ -96,10 +93,8 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
               <ArmorStats armor={equipment as ArmorPiece} />
             )}
           </div>
-          
-          {/* Show decoration slots if available */}
           {equipment.slots && equipment.slots.length > 0 && (
-            <div className="mt-1 text-xs text-surface-300">
+            <div className="mt-1 text-xs text-surface-400">
               {t("build_planner.slots")}: {equipment.slots.map(size => `○${size}`).join(' ')}
             </div>
           )}
@@ -109,25 +104,19 @@ export const CurrentEquipment = ({ equipment, slotType, onRemove }: CurrentEquip
   );
 };
 
-// Component for armor stats display
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
   const t = useTranslations("mhwilds");
-  const defenseValue = typeof armor.defense === 'number' 
-    ? armor.defense 
-    : armor.defense.base;
-    
+  const defenseValue = typeof armor.defense === 'number' ? armor.defense : armor.defense.base;
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
       <span className="text-secondary-400">Def: {defenseValue}</span>
-      
-      {/* Show set name if available */}
       {armor.armorSet?.name && (
         <span className="text-accent-400 truncate max-w-[200px]">
           {t("build_planner.set")}: {armor.armorSet.name}
         </span>
       )}
-      
-      {/* Show skills if available */}
       {armor.skills && armor.skills.length > 0 && (
         <span className="text-highlight-400">
           {armor.skills.map((s, i) => (
@@ -142,32 +131,25 @@ const ArmorStats = ({ armor }: { armor: ArmorPiece }) => {
   );
 };
 
-// Component for weapon stats display
 const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
   const t = useTranslations("mhwilds");
   const { elements, statuses } = getAllWeaponElements(weapon);
-
   return (
     <div className="flex flex-wrap gap-x-3 text-xs">
       <span className="text-red-400">
         {t('attack')}: {weapon.attack || (weapon.damage?.display || weapon.damage?.raw)}
       </span>
-      
-      <span className={`${weapon.affinity >= 0 ? 'text-highlight-400' : 'text-red-400'}`}>
+      <span className={weapon.affinity >= 0 ? 'text-highlight-400' : 'text-red-400'}>
         {t("affinity")}: {weapon.affinity >= 0 ? '+' : ''}{weapon.affinity}%
       </span>
-      
-      {/* Show elements */}
-      {elements.length > 0 && elements.map((element, idx) => (
-        <span key={`element-${idx}`} className={`${getElementColor(element.type)}`}>
+      {elements.map((element, idx) => (
+        <span key={`element-${idx}`} className={getElementColor(element.type)}>
           {t(element.type)}: {element.damage}
           {element.hidden && <span className="text-xs ml-1 opacity-70">{t("build_planner.hidden")}</span>}
         </span>
       ))}
-      
-      {/* Show status effects */}
-      {statuses.length > 0 && statuses.map((status, idx) => (
-        <span key={`status-${idx}`} className={`${getStatusColor(status.type)}`}>
+      {statuses.map((status, idx) => (
+        <span key={`status-${idx}`} className={getStatusColor(status.type)}>
           {status.type}: {status.damage}
           {status.hidden && <span className="text-xs ml-1 opacity-70">{t("build_planner.hidden")}</span>}
         </span>
@@ -176,20 +158,17 @@ const WeaponStats = ({ weapon }: { weapon: Weapon }) => {
   );
 };
 
-// Component for charm stats display
-const CharmStats = ({ charm }: { charm: Charm }) => {
-  return (
-    <div className="flex flex-wrap gap-x-3 text-xs">
-      {charm.skills && charm.skills.length > 0 && (
-        <span className="text-highlight-400">
-          {charm.skills.map((s, i) => (
-            <span key={i}>
-              {s.skill?.name} +{s.level}
-              {i < charm.skills.length - 1 && ", "}
-            </span>
-          ))}
-        </span>
-      )}
-    </div>
-  );
-};
+const CharmStats = ({ charm }: { charm: Charm }) => (
+  <div className="flex flex-wrap gap-x-3 text-xs">
+    {charm.skills && charm.skills.length > 0 && (
+      <span className="text-highlight-400">
+        {charm.skills.map((s, i) => (
+          <span key={i}>
+            {s.skill?.name} +{s.level}
+            {i < charm.skills.length - 1 && ", "}
+          </span>
+        ))}
+      </span>
+    )}
+  </div>
+);
