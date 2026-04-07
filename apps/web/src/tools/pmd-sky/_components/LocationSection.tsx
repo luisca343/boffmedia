@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl";
 import { MapPinIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/primitives/input";
-import { Badge } from "@/components/ui/primitives/badge";
 import { Combobox } from "@/components/ui/primitives/combobox";
 import { FormField } from "@/components/ui/form/FormField";
 import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
@@ -34,11 +33,13 @@ export function LocationSection({
           label={t("DUNGEON")}
           icon={<BuildingOffice2Icon className="w-4 h-4 text-highlight-400" />}
           required
+          variant="gaming"
         >
           <Combobox
             data={getValidDungeons(t)}
             value={dungeon.toString()}
             onChange={onDungeonChange}
+            variant="boff"
           />
         </FormField>
 
@@ -46,22 +47,29 @@ export function LocationSection({
           label={t("FLOOR")}
           icon={<BuildingOffice2Icon className="w-4 h-4 text-orange-400" />}
           required
+          variant="gaming"
         >
           <div className="relative">
             <Input
               type="number"
               min={1}
               max={maxFloors}
-              className="bg-surface-700/50 border-surface-600/50 text-surface-50 hover:bg-surface-700 transition-colors pr-16"
+              variant="boff"
+              className="pr-16"
               value={floor}
               onChange={(e) => onFloorChange(Number(e.target.value))}
             />
-            <Badge
-              variant="secondary"
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-surface-600/50 text-surface-300 text-xs"
+            <span
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded pointer-events-none"
+              style={{
+                fontFamily: "Orbitron, sans-serif",
+                color: "rgba(34,211,238,0.6)",
+                border: "1px solid rgba(34,211,238,0.2)",
+                background: "rgba(6,182,212,0.06)",
+              }}
             >
-              Max: {maxFloors}
-            </Badge>
+              /{maxFloors}
+            </span>
           </div>
         </FormField>
       </div>

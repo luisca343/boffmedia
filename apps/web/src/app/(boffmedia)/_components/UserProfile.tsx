@@ -23,7 +23,7 @@ import { FloatingBackground } from "./layout/FloatingBackground";
 import { BoffContainer } from "@components/boffmedia/tools/BoffContainer";
 import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 
-// ─── Shared neon token shorthand ─────────────────────────────────────────────
+// ─── Shared boff token shorthand ─────────────────────────────────────────────
 
 const N = {
   border:       "rgba(249,115,22,0.22)",
@@ -43,7 +43,7 @@ const MC = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function NeonDivider() {
+function BoffDivider() {
   return (
     <div
       className="h-px"
@@ -89,7 +89,7 @@ function IntegrationCard({
   linked,
   onLink,
   buttonLabel,
-  neon,
+  boff,
 }: {
   icon: React.ReactNode;
   title: string;
@@ -97,23 +97,22 @@ function IntegrationCard({
   linked: boolean;
   onLink?: () => void;
   buttonLabel: string;
-  neon: typeof N | typeof MC;
-}) {
+  boff: typeof N | typeof MC;}) {
   return (
     <div
       className="flex items-center justify-between gap-4 p-4 rounded-lg border transition-colors duration-200"
-      style={{ borderColor: neon.border, background: neon.bg }}
+      style={{ borderColor: boff.border, background: boff.bg }}
     >
       <div className="flex items-center gap-3.5 min-w-0">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{
-            border: `1px solid ${neon.border}`,
+            border: `1px solid ${boff.border}`,
             background: "rgba(15,23,42,0.6)",
             boxShadow: `0 0 14px rgba(0,0,0,0.3)`,
           }}
         >
-          <span style={{ color: neon.text, filter: neon.glow }}>{icon}</span>
+          <span style={{ color: boff.text, filter: boff.glow }}>{icon}</span>
         </div>
         <div className="min-w-0">
           <p className="text-sm font-bold text-surface-100 leading-tight">{title}</p>
@@ -140,8 +139,8 @@ function IntegrationCard({
           size="sm"
           className="flex-shrink-0 font-mono text-xs tracking-wider h-8 px-3 transition-all duration-150"
           style={{
-            borderColor: neon.border,
-            color: neon.text,
+            borderColor: boff.border,
+            color: boff.text,
             background: "transparent",
           }}
         >
@@ -343,7 +342,7 @@ export default function UserProfile() {
               </div>
             </div>
 
-            <NeonDivider />
+            <BoffDivider />
 
             {/* ── Profile settings ── */}
             <div>
@@ -377,7 +376,7 @@ export default function UserProfile() {
               </div>
             </div>
 
-            <NeonDivider />
+            <BoffDivider />
 
             {/* ── Connections ── */}
             <div>
@@ -391,7 +390,7 @@ export default function UserProfile() {
                   linked={!!(editedUser as any).discordId}
                   onLink={linkDiscord}
                   buttonLabel="Vincular"
-                  neon={N}
+                  boff={N}
                 />
                 <IntegrationCard
                   icon={<User className="h-5 w-5" />}
@@ -399,12 +398,12 @@ export default function UserProfile() {
                   description="Vincula tu cuenta para acceder a los servidores"
                   linked={!!(user.mcUuid || user.smartRotomUser?.uuid)}
                   buttonLabel="Vincular"
-                  neon={MC}
+                  boff={MC}
                 />
               </div>
             </div>
 
-            <NeonDivider />
+            <BoffDivider />
 
             {/* ── Actions ── */}
             <div>

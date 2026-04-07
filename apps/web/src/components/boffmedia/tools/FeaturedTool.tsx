@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
-import { getNeonStyle } from "@components/boffmedia/tools/utils/getNeonStyle";
-import { NeonButton } from "@components/boffmedia/tools/NeonButton";
+import { getBoffStyle } from "@components/boffmedia/tools/utils/getBoffStyle";
+import { BoffButton } from "@components/boffmedia/tools/BoffButton";
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
 interface FeaturedToolProps {
@@ -19,7 +19,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
   const [isHovered, setIsHovered] = useState(false);
   const scanY = useScanAnimation(isHovered, 1600);
 
-  const neon = getNeonStyle(tool.color);
+  const boff = getBoffStyle(tool.color);
 
   return (
     <motion.div
@@ -50,9 +50,9 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
           background: isHovered
             ? "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))"
             : "linear-gradient(145deg, rgba(30,41,59,0.88), rgba(15,23,42,0.92))",
-          borderColor: isHovered ? neon.border : "rgba(71,85,105,0.65)",
+          borderColor: isHovered ? boff.border : "rgba(71,85,105,0.65)",
           boxShadow: isHovered
-            ? `0 0 60px ${neon.glow}, 0 24px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+            ? `0 0 60px ${boff.glow}, 0 24px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
             : `0 8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.03), 0 0 0 1px rgba(255,255,255,0.02)`,
         }}
       >
@@ -61,7 +61,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
           className={`h-[3px] bg-gradient-to-r ${tool.color} transition-all duration-300`}
           style={{
             opacity: isHovered ? 1 : 0.8,
-            boxShadow: isHovered ? `0 0 16px ${neon.glow}` : "none",
+            boxShadow: isHovered ? `0 0 16px ${boff.glow}` : "none",
           }}
         />
 
@@ -69,7 +69,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-500"
           style={{
-            background: `radial-gradient(ellipse at 50% 0%, ${neon.glow.replace("0.3", "0.1")} 0%, transparent 55%)`,
+            background: `radial-gradient(ellipse at 50% 0%, ${boff.glow.replace("0.3", "0.1")} 0%, transparent 55%)`,
             opacity: isHovered ? 1 : 0.5,
           }}
         />
@@ -80,7 +80,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
             className="absolute inset-x-0 h-px pointer-events-none z-20"
             style={{
               top: `${scanY}%`,
-              background: `linear-gradient(90deg, transparent, ${neon.scan}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${boff.scan}, transparent)`,
             }}
           />
         )}
@@ -97,7 +97,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
           <div
             key={i}
             className={`${cls} transition-all duration-300 pointer-events-none`}
-            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.55)" }}
+            style={{ borderColor: isHovered ? boff.scan : "rgba(100,116,139,0.55)" }}
           />
         ))}
 
@@ -109,7 +109,7 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
               <div
                 className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-surface-950/60 border flex items-center justify-center transition-transform duration-300"
                 style={{
-                  borderColor: isHovered ? neon.border : "rgba(51,65,85,0.5)",
+                  borderColor: isHovered ? boff.border : "rgba(51,65,85,0.5)",
                   transform: isHovered ? "scale(1.08)" : "scale(1)",
                 }}
               >
@@ -165,9 +165,9 @@ export function FeaturedTool({ tool, t }: FeaturedToolProps) {
             </div>
 
             {/* CTA */}
-            <NeonButton isHovered={isHovered} neon={neon}>
+            <BoffButton isHovered={isHovered} boff={boff}>
               {t("accessButton", { tool: tool.title })}
-            </NeonButton>
+            </BoffButton>
           </div>
 
           {/* Right: Hero image */}

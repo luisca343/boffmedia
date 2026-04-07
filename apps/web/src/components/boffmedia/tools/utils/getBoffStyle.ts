@@ -1,6 +1,6 @@
 import { BOFF_VARIANTS, BoffVariant } from "./boffVariants";
 
-export interface NeonStyle {
+export interface BoffStyle {
   /** Interactive hover box-shadow glow (rgba ~0.3) */
   glow: string;
   /** Scan lines and bullet dots (rgba ~0.7) */
@@ -21,9 +21,9 @@ const COLOR_KEYS: Array<[string, BoffVariant]> = [
 
 /**
  * Maps a Tailwind color class string (e.g. "from-secondary-400 via-cyan-400")
- * to neon style tokens derived from the single-source BOFF_VARIANTS map.
+ * to boff style tokens derived from the single-source BOFF_VARIANTS map.
  */
-export function getNeonStyle(colorClass: string): NeonStyle {
+export function getBoffStyle(colorClass: string): BoffStyle {
   const match = COLOR_KEYS.find(([key]) => colorClass.includes(key));
   const tokens = BOFF_VARIANTS[match ? match[1] : "primary"];
   return {

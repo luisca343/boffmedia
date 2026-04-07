@@ -20,7 +20,7 @@ export interface BoffContainerProps {
    * padding to override.
    */
   contentClassName?: string;
-  /** Neon colour theme. Defaults to `"secondary"` (cyan). */
+  /** Boff colour theme. Defaults to `"secondary"` (cyan). */
   variant?: BoffVariant;
 }
 
@@ -30,7 +30,7 @@ export function BoffContainer({
   contentClassName = "p-6 sm:p-8",
   variant = "secondary",
 }: BoffContainerProps) {
-  const neon = BOFF_VARIANTS[variant];
+  const boff = BOFF_VARIANTS[variant];
 
   return (
     <div
@@ -40,13 +40,13 @@ export function BoffContainer({
       )}
       style={{
         background: "linear-gradient(145deg, rgba(30,41,59,0.92), rgba(15,23,42,0.95))",
-        borderColor: neon.border,
-        boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 60px ${neon.glow}, inset 0 1px 0 rgba(255,255,255,0.03)`,
+        borderColor: boff.border,
+        boxShadow: `0 8px 40px rgba(0,0,0,0.5), 0 0 60px ${boff.glow}, inset 0 1px 0 rgba(255,255,255,0.03)`,
       }}
     >
-      {/* Top neon bar */}
+      {/* Top boff bar */}
       <div
-        className={`h-[3px] bg-gradient-to-r ${neon.bar}`}
+        className={`h-[3px] bg-gradient-to-r ${boff.bar}`}
         style={{ opacity: 0.85 }}
       />
 
@@ -54,7 +54,7 @@ export function BoffContainer({
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: `radial-gradient(ellipse at 50% 0%, ${neon.tint} 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse at 50% 0%, ${boff.tint} 0%, transparent 55%)`,
         }}
       />
 
@@ -63,7 +63,7 @@ export function BoffContainer({
         <div
           key={i}
           className={`${cls} pointer-events-none`}
-          style={{ borderColor: neon.bracket }}
+          style={{ borderColor: boff.bracket }}
         />
       ))}
 
@@ -74,7 +74,7 @@ export function BoffContainer({
       <div
         className="h-px"
         style={{
-          background: `linear-gradient(90deg, transparent, ${neon.bottomAccent}, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${boff.bottomAccent}, transparent)`,
         }}
       />
     </div>

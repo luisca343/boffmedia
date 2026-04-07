@@ -10,7 +10,7 @@ import { EventRegistrationButton } from "../../_components/EventRegistrationButt
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
 import { CountdownTimer } from "@/app/(boffmedia)/_components/ui/CountdownTimer";
-import { NeonCard } from "@/components/boffmedia/NeonCard";
+import { BoffCard } from "@/components/boffmedia/BoffCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -78,7 +78,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
       </div>
 
       {/* Hero card */}
-      <NeonCard variant="primary" className="mb-8" contentClassName="">
+      <BoffCard variant="primary" className="mb-8" contentClassName="">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8">
           {/* ── Info column ─────────────────────────────────────────────── */}
           <div className="space-y-6">
@@ -191,7 +191,7 @@ export function EventHero({ event, participants }: EventHeroProps) {
             )}
           </div>
         </div>
-      </NeonCard>
+      </BoffCard>
     </>
   );
 }

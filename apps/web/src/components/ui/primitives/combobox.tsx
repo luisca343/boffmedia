@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/primitives/popover"
 
-type ComboboxVariant = "default" | "wingull" | "orange"
+type ComboboxVariant = "default" | "wingull" | "orange" | "boff"
 
 interface ComboboxProps {
   data: { label: string, value: any }[];
@@ -76,6 +76,15 @@ export function Combobox({
       itemSelected: "bg-surface-900 text-orange-100",
       emptyText: "text-orange-300"
     },
+    boff: {
+      button: "bg-surface-800 text-surface-100 border-surface-600/60 hover:bg-surface-700 hover:border-secondary-500/50 focus:ring-secondary-400/30 disabled:opacity-40 transition-all duration-200",
+      content: "bg-surface-800 border-surface-600/60",
+      command: "bg-surface-800 rounded-md",
+      input: "bg-surface-800 text-surface-100 placeholder-surface-400 border-surface-600/60 focus:ring-secondary-400/30",
+      item: "text-surface-100 bg-surface-800 hover:bg-surface-700",
+      itemSelected: "bg-surface-700 text-secondary-200",
+      emptyText: "text-surface-400"
+    },
   }
 
   return (
@@ -106,14 +115,14 @@ export function Combobox({
         style={{ width: 'var(--radix-popover-trigger-width)' }}
         align="start"
       >
-        <Command className={variantStyles[variant].command}>
-          <CommandInput 
-            dark={variant === 'orange' || variant === 'wingull'}
-            placeholder={placeholder} 
-            className={cn(
-              variantStyles[variant].input,
-              'w-full'
-            )}
+        <Command
+          variant={variant === 'wingull' || variant === 'boff' ? variant : 'default'}
+          className={variantStyles[variant].command}
+        >
+          <CommandInput
+            dark={variant === 'orange' || variant === 'wingull' || variant === 'boff'}
+            placeholder={placeholder}
+            className={cn(variantStyles[variant].input, 'w-full')}
           />
           <CommandList>
             <CommandEmpty className={variantStyles[variant].emptyText}>
@@ -137,7 +146,8 @@ export function Combobox({
                       value === element.value ? "opacity-100" : "opacity-0",
                       variant === 'default' && "text-primary-400",
                       variant === 'orange' && "text-orange-500",
-                      variant === 'wingull' && "text-secondary-400"
+                      variant === 'wingull' && "text-secondary-400",
+                      variant === 'boff' && "text-secondary-400"
                     )}
                   />
                   {element.label}

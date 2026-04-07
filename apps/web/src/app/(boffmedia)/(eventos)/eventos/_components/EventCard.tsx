@@ -10,7 +10,7 @@ import { getEventStatus } from "@/lib/events";
 import { Event } from "@boffmedia/shared";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
-import { NeonCard } from "@/components/boffmedia/NeonCard";
+import { BoffCard } from "@/components/boffmedia/BoffCard";
 
 // ─── Type icon map ────────────────────────────────────────────────────────────
 
@@ -54,7 +54,7 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
   const isList = layout === "list";
 
   return (
-    <NeonCard
+    <BoffCard
       variant="primary"
       className={cn("group cursor-pointer", isList && "flex-row")}
       contentClassName=""
@@ -202,6 +202,6 @@ export function EventCard({ event, layout = "grid" }: EventCardProps) {
           <Star className="w-3.5 h-3.5" />
         </Button>
       </div>
-    </NeonCard>
+    </BoffCard>
   );
 }

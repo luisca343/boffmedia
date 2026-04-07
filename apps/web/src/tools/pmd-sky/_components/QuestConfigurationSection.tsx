@@ -32,11 +32,13 @@ export function QuestConfigurationSection({
           label={t("QUEST_TYPE")}
           icon={<DocumentTextIcon className="w-4 h-4 text-secondary-400" />}
           required
+          variant="gaming"
         >
           <Combobox
             data={getQuestData(t)}
             value={questType.toString()}
             onChange={onQuestTypeChange}
+            variant="boff"
           />
         </FormField>
 
@@ -44,12 +46,14 @@ export function QuestConfigurationSection({
           label={t("QUEST_SUBTYPE")}
           icon={<SparklesIcon className="w-4 h-4 text-accent-400" />}
           disabled={!isClientForced}
+          variant="gaming"
         >
           <Combobox
             data={getSubQuestData(questType, t)}
             value={specialQuestType.toString()}
             disabled={!isClientForced}
             onChange={onSubQuestChange}
+            variant="boff"
           />
         </FormField>
       </div>

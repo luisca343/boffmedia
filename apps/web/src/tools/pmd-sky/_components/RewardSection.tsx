@@ -40,11 +40,13 @@ export function RewardSection({
           label={t("REWARD_TYPE")}
           icon={<GiftIcon className="w-4 h-4 text-yellow-400" />}
           required
+          variant="gaming"
         >
           <Combobox
             data={getRewardTypes(t)}
             value={rewardType.toString()}
             onChange={onRewardTypeChange}
+            variant="boff"
           />
         </FormField>
 
@@ -53,12 +55,14 @@ export function RewardSection({
             label={t("TARGET_ITEM")}
             icon={<CubeIcon className="w-4 h-4 text-indigo-400" />}
             disabled={!useTargetItem}
+            variant="gaming"
           >
             <Combobox
               data={getItemData()}
               value={targetItem.toString()}
               onChange={onTargetItemChange}
               disabled={!useTargetItem}
+              variant="boff"
             />
           </FormField>
 
@@ -66,12 +70,14 @@ export function RewardSection({
             label={t("REWARD_ITEM")}
             icon={<GiftIcon className="w-4 h-4 text-pink-400" />}
             disabled={!rewardGivesItem}
+            variant="gaming"
           >
             <Combobox
               data={getItemData()}
               value={rewardItem.toString()}
               onChange={onRewardItemChange}
               disabled={!rewardGivesItem}
+              variant="boff"
             />
           </FormField>
         </div>

@@ -3,7 +3,7 @@ import { InternalLink } from "@/components/ui/navigation/Link";
 import { Button } from "@/components/ui/primitives/button";
 import { Event } from "@boffmedia/shared";
 import { EventStatusChip } from "./EventStatusChip";
-import { NeonCard } from "@/components/boffmedia/NeonCard";
+import { BoffCard } from "@/components/boffmedia/BoffCard";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -28,7 +28,7 @@ export function EventCard({ event, href, className = "" }: EventCardProps) {
 
   return (
     <InternalLink href={href || `/eventos/${event.id}`} className="block group">
-      <NeonCard
+      <BoffCard
         variant="primary"
         className={`min-h-[290px] ${className}`}
         contentClassName="p-5 gap-4"
@@ -96,7 +96,7 @@ export function EventCard({ event, href, className = "" }: EventCardProps) {
             <ArrowRight className="ml-1.5 w-3.5 h-3.5 transition-transform duration-150 group-hover/btn:translate-x-0.5" />
           </Button>
         </div>
-      </NeonCard>
+      </BoffCard>
     </InternalLink>
   );
 }
