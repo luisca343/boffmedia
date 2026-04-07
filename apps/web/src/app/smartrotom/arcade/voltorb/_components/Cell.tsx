@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Cell } from './types'
+import { Cell } from '../types'
 import Image from 'next/image'
 
 interface CellProps {

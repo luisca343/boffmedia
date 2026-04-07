@@ -13,9 +13,9 @@ import {
   SearchLocalGamesResult,
 } from '@/services/api/boffmedia/scrapeService';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
-import { CONSOLES, MANUFACTURER_COLORS } from './consoles';
-import { ConsolePicker } from './ConsolePicker';
-import { RegionFilter } from './RegionFilter';
+import { CONSOLES, MANUFACTURER_COLORS } from '../../_components/consoles';
+import { ConsolePicker } from '../../_components/ConsolePicker';
+import { RegionFilter } from '../../_components/RegionFilter';
 
 // ─── Console result group ─────────────────────────────────────────────────────
 

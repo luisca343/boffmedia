@@ -21,9 +21,9 @@ import {
 } from '@/services/api/boffmedia/scrapeService';
 import GameCatalogTable from './GameCatalogTable';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
-import { CONSOLES, MANUFACTURER_COLORS } from '../../biblioteca/_components/consoles';
-import { ConsolePicker } from '../../biblioteca/_components/ConsolePicker';
-import { RegionFilter } from '../../biblioteca/_components/RegionFilter';
+import { CONSOLES, MANUFACTURER_COLORS } from '../../_components/consoles';
+import { ConsolePicker } from '../../_components/ConsolePicker';
+import { RegionFilter } from '../../_components/RegionFilter';
 
 // ─── Per-file status maps ─────────────────────────────────────────────────────
 

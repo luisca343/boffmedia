@@ -1,5 +1,5 @@
 "use client"
-import { TypeBadgeSmall } from '../../entrada/[[...params]]/_components/TypeBadge';
+import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
 import { getPokemonDefense } from '../../dexUtils';
 
 interface DualTypeAnalysisProps {

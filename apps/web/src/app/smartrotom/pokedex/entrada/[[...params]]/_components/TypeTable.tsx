@@ -1,6 +1,6 @@
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/primitives/table"
-import TypeBadge from "./TypeBadge"
+import TypeBadge from "@/components/shared/pokemon/TypeBadge"
 
 export function TypeTable({list, title, id, className='', badgeType}: 
     {list: {[key: string]: number}, title?: string, id?: string, className?: string, badgeType?: "offensive" | "defensive"}){

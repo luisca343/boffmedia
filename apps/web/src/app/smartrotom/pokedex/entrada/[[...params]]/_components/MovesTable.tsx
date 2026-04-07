@@ -3,7 +3,7 @@ import { Table, TableBody, TableHeader, TableRow } from "@/components/ui/primiti
 import { LevelUpMove, Moves, Pokemon } from "@/types/Pokemon";
 import PokedexTable, { PokedexCell, PokedexHead, PokedexHeader, PokedexRow } from "../../../_components/PokedexTable";
 
-import TypeBadge from "./TypeBadge";
+import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import MoveDataElement from "../../../movimientos/_components/MoveData";
 import { useTranslations } from "next-intl";

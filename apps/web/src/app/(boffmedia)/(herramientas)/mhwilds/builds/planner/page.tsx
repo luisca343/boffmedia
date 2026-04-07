@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect } from "react";
 import { EquipmentType, Filters, BuildDataWithIds } from "@/types/tools/mhwilds";
-import { BuildHeader } from "./_components/BuildHeader";
-import { EquipmentSelector } from "./_components/EquipmentSelector";
-import { DecorationSelector } from "./_components/DecorationSelector";
-import { BuildDisplay } from "./_components/BuildDisplay";
-import { StatsDisplay } from "./_components/StatsDisplay";
-import { SkillsList } from "./_components/SkillsList";
-import { BuildImport } from "./_components/BuildImport";
-import { CharmSelector } from "./_components/CharmSelector";
+import { BuildHeader } from "./_components/build/BuildHeader";
+import { EquipmentSelector } from "./_components/equipment/EquipmentSelector";
+import { DecorationSelector } from "./_components/equipment/DecorationSelector";
+import { BuildDisplay } from "./_components/build/BuildDisplay";
+import { StatsDisplay } from "./_components/stats/StatsDisplay";
+import { SkillsList } from "./_components/stats/SkillsList";
+import { BuildImport } from "./_components/build/BuildImport";
+import { CharmSelector } from "./_components/equipment/CharmSelector";
 import { useBuildState } from "./_hooks/useBuildState";
 import { calculateStats, calculateTotalSkills } from "./_utils/calculationUtils";
 import { importBuildFromUrl } from "./_utils/buildUtils";

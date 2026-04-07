@@ -1,5 +1,5 @@
 "use client"
-import TypeBadge from "../../entrada/[[...params]]/_components/TypeBadge";
+import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import { MoveEffect } from "./MoveEffect";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
