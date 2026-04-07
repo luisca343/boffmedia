@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronRight, Cpu, Gamepad2, Sparkles } from "lucide-react";
-import { getNeonStyle } from "@components/boffmedia/tools/utils/getNeonStyle";
+import { getBoffStyle } from "@components/boffmedia/tools/utils/getBoffStyle";
 import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
@@ -18,7 +18,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
   const [isHovered, setIsHovered] = useState(false);
   const scanY = useScanAnimation(isHovered, 1400);
 
-  const neon = getNeonStyle(tool.color);
+  const boff = getBoffStyle(tool.color);
   const featureList: string[] = tool.tools ?? tool.features ?? [];
   const totalCount = featureList.length;
 
@@ -39,18 +39,18 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
           background: isHovered
             ? `linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))`
             : `linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))`,
-          borderColor: isHovered ? neon.border : "rgba(71,85,105,0.6)",
+          borderColor: isHovered ? boff.border : "rgba(71,85,105,0.6)",
           boxShadow: isHovered
-            ? `0 0 45px ${neon.glow}, 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+            ? `0 0 45px ${boff.glow}, 0 20px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
             : `0 6px 24px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03), 0 0 0 1px rgba(255,255,255,0.02)`,
         }}
       >
-        {/* Top neon bar — thicker and always visible */}
+        {/* Top boff bar — thicker and always visible */}
         <div
           className={`h-[3px] bg-gradient-to-r ${tool.color} flex-shrink-0 transition-all duration-300`}
           style={{
             opacity: isHovered ? 1 : 0.75,
-            boxShadow: isHovered ? `0 0 12px ${neon.glow}` : "none",
+            boxShadow: isHovered ? `0 0 12px ${boff.glow}` : "none",
           }}
         />
 
@@ -58,7 +58,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
         <div
           className="absolute inset-0 pointer-events-none transition-opacity duration-500"
           style={{
-            background: `radial-gradient(ellipse at 50% 0%, ${neon.glow.replace("0.25", "0.12").replace("0.3", "0.12")} 0%, transparent 65%)`,
+            background: `radial-gradient(ellipse at 50% 0%, ${boff.glow.replace("0.25", "0.12").replace("0.3", "0.12")} 0%, transparent 65%)`,
             opacity: isHovered ? 1 : 0.6,
           }}
         />
@@ -69,7 +69,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
             className="absolute inset-x-0 h-px pointer-events-none z-20"
             style={{
               top: `${scanY}%`,
-              background: `linear-gradient(90deg, transparent, ${neon.scan}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${boff.scan}, transparent)`,
             }}
           />
         )}
@@ -86,7 +86,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
           <div
             key={i}
             className={`${cls} transition-all duration-300 pointer-events-none`}
-            style={{ borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.55)" }}
+            style={{ borderColor: isHovered ? boff.scan : "rgba(100,116,139,0.55)" }}
           />
         ))}
 
@@ -97,7 +97,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
             <div
               className="w-14 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-surface-950/60 border flex items-center justify-center transition-transform duration-300"
               style={{
-                borderColor: isHovered ? neon.border : "rgba(51,65,85,0.5)",
+                borderColor: isHovered ? boff.border : "rgba(51,65,85,0.5)",
                 transform: isHovered ? "scale(1.08)" : "scale(1)",
               }}
             >
@@ -144,7 +144,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
               <div key={name} className="flex items-center gap-2">
                 <span
                   className="w-1 h-1 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: neon.scan }}
+                  style={{ backgroundColor: boff.scan }}
                 />
                 <span className="text-xs text-surface-400">{name}</span>
               </div>
@@ -163,7 +163,7 @@ function ToolCard({ tool, index, exploreLabel }: { tool: any; index: number; exp
               className="flex items-center gap-1 text-xs font-mono font-bold tracking-widest uppercase"
               style={{
                 fontFamily: "Orbitron, sans-serif",
-                color: neon.scan,
+                color: boff.scan,
               }}
               animate={{ x: isHovered ? 3 : 0 }}
               transition={{ duration: 0.2 }}

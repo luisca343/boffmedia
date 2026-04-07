@@ -19,6 +19,7 @@ export function PokemonSelector({ value, onChange, disabled, sprite, alt }: Poke
       preview={sprite}
       previewAlt={alt}
       placeholder="Select a Pokémon"
+      variant="boff"
     />
   );
 }

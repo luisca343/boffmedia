@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * NeonCard — shared interactive card shell used across Boffmedia sections.
+ * BoffCard — shared interactive card shell used across Boffmedia sections.
  *
  * Encapsulates the visual chrome that is identical between ToolsGrid cards and
- * EventCards: slate-based background, muted-→-neon border on hover, ambient
+ * EventCards: slate-based background, muted-→-boff border on hover, ambient
  * radial tint, corner bracket decorations, animated scan line, and top/bottom
  * accent bars. Content layout is entirely up to the consumer.
  *
@@ -12,7 +12,7 @@
  *   - Rest background:  rgba(30,41,59,0.85) → rgba(15,23,42,0.9)   (slate-800)
  *   - Hover background: rgba(30,41,59,0.95) → rgba(15,23,42,0.95)
  *   - Rest border:      rgba(71,85,105,0.55)                        (slate-600)
- *   - Hover border:     variant neon.border                         (colored)
+ *   - Hover border:     variant boff.border                         (colored)
  *
  * SOLID notes:
  *   S — Responsible only for the card shell; content is fully delegated via children.
@@ -40,7 +40,7 @@ const CORNER_CLASSES = [
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
-export interface NeonCardProps {
+export interface BoffCardProps {
   /**
    * Named variant from BOFF_VARIANTS. Defaults to "primary" (orange).
    * All visual tokens are derived from this single key — no need to pass colours
@@ -51,7 +51,7 @@ export interface NeonCardProps {
   /**
    * Override any subset of tokens derived from `variant`.
    * Merged shallowly on top of the base variant tokens.
-   * Use this when a single card needs a one-off neon colour (e.g. status-driven).
+   * Use this when a single card needs a one-off boff colour (e.g. status-driven).
    */
   tokenOverrides?: Partial<BoffVariantTokens>;
 
@@ -81,7 +81,7 @@ export interface NeonCardProps {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function NeonCard({
+export function BoffCard({
   variant = "primary",
   tokenOverrides,
   scanLine = true,
@@ -89,12 +89,12 @@ export function NeonCard({
   className,
   contentClassName,
   children,
-}: NeonCardProps) {
+}: BoffCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const scanY = useScanAnimation(scanLine && isHovered, 1400);
 
   const base = BOFF_VARIANTS[variant];
-  const neon: BoffVariantTokens = tokenOverrides
+  const boff: BoffVariantTokens = tokenOverrides
     ? { ...base, ...tokenOverrides }
     : base;
 
@@ -108,20 +108,20 @@ export function NeonCard({
         background: isHovered
           ? "linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95))"
           : "linear-gradient(145deg, rgba(30,41,59,0.85), rgba(15,23,42,0.9))",
-        borderColor: isHovered ? neon.border : "rgba(71,85,105,0.55)",
+        borderColor: isHovered ? boff.border : "rgba(71,85,105,0.55)",
         boxShadow: isHovered
-          ? `0 0 40px ${neon.glowStrong}, 0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
+          ? `0 0 40px ${boff.glowStrong}, 0 16px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04)`
           : `0 6px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.025)`,
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* ── Top neon bar ─────────────────────────────────────────────────── */}
+      {/* ── Top boff bar ─────────────────────────────────────────────────── */}
       <div
-        className={`h-[3px] bg-gradient-to-r ${neon.bar} flex-shrink-0 transition-all duration-300`}
+        className={`h-[3px] bg-gradient-to-r ${boff.bar} flex-shrink-0 transition-all duration-300`}
         style={{
           opacity: isHovered ? 1 : 0.65,
-          boxShadow: isHovered ? `0 0 10px ${neon.scan}` : "none",
+          boxShadow: isHovered ? `0 0 10px ${boff.scan}` : "none",
         }}
       />
 
@@ -129,7 +129,7 @@ export function NeonCard({
       <div
         className="absolute inset-0 pointer-events-none transition-opacity duration-500"
         style={{
-          background: `radial-gradient(ellipse at 50% 0%, ${neon.tint} 0%, transparent 60%)`,
+          background: `radial-gradient(ellipse at 50% 0%, ${boff.tint} 0%, transparent 60%)`,
           opacity: isHovered ? 1 : 0.55,
         }}
       />
@@ -140,7 +140,7 @@ export function NeonCard({
           className="absolute inset-x-0 h-px pointer-events-none z-20"
           style={{
             top: `${scanY}%`,
-            background: `linear-gradient(90deg, transparent, ${neon.scan}, transparent)`,
+            background: `linear-gradient(90deg, transparent, ${boff.scan}, transparent)`,
           }}
         />
       )}
@@ -152,7 +152,7 @@ export function NeonCard({
             key={i}
             className={`${cls} transition-all duration-300 pointer-events-none`}
             style={{
-              borderColor: isHovered ? neon.scan : "rgba(100,116,139,0.35)",
+              borderColor: isHovered ? boff.scan : "rgba(100,116,139,0.35)",
             }}
           />
         ))}
@@ -166,7 +166,7 @@ export function NeonCard({
       <div
         className="h-px flex-shrink-0 transition-opacity duration-500"
         style={{
-          background: `linear-gradient(90deg, transparent, ${neon.bottomAccent}, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${boff.bottomAccent}, transparent)`,
           opacity: isHovered ? 0.5 : 0,
         }}
       />

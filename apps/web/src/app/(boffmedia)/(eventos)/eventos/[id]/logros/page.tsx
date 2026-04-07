@@ -14,7 +14,7 @@ import { useBoffSession } from "@/services/useBoffSession"
 import { InternalLink } from "@/components/ui/navigation/Link"
 import { AchievementBadge } from "@/components/boffmedia/event/AchievementBadge"
 import { getRarityTokens, RarityTokens } from "@/components/boffmedia/event/rarityTokens"
-import { NeonCard } from "@/components/boffmedia/NeonCard"
+import { BoffCard } from "@/components/boffmedia/BoffCard"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -415,7 +415,7 @@ export default function EventAchievementsPage() {
         </Button>
 
         {/* ── Hero card ──────────────────────────────────────────────── */}
-        <NeonCard variant="primary" contentClassName="">
+        <BoffCard variant="primary" contentClassName="">
           <div className="flex flex-col md:flex-row items-center gap-6 p-6">
             {/* Icon */}
             <div
@@ -468,7 +468,7 @@ export default function EventAchievementsPage() {
               </div>
             )}
           </div>
-        </NeonCard>
+        </BoffCard>
 
         {/* ── Stats grid ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
