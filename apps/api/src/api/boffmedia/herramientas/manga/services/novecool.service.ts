@@ -114,6 +114,10 @@ export class NovecoolService implements OnModuleDestroy {
   /** Lazily-initialised headless Chrome instance (reused across chapter downloads). */
   private browser: import('puppeteer-core').Browser | null = null;
 
+  constructor() {
+    this.logger.log('[Novecool] Service initialised — chapter pages use headless Chrome (puppeteer-core)');
+  }
+
   async onModuleDestroy() {
     if (this.browser) {
       await this.browser.close().catch(() => {});
@@ -123,12 +127,27 @@ export class NovecoolService implements OnModuleDestroy {
 
   private async getBrowser(): Promise<import('puppeteer-core').Browser> {
     if (this.browser) return this.browser;
+
+    let chromePath: string;
+    try {
+      chromePath = findChrome();
+    } catch (e) {
+      this.logger.error(`[Novecool] Chrome not found: ${e?.message ?? e}`);
+      throw e;
+    }
+
+    this.logger.log(`[Novecool] Launching Chrome at: ${chromePath}`);
     const puppeteer = await import('puppeteer-core');
-    this.browser = await puppeteer.launch({
-      executablePath: findChrome(),
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    });
+    try {
+      this.browser = await puppeteer.launch({
+        executablePath: chromePath,
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      });
+    } catch (e) {
+      this.logger.error(`[Novecool] Chrome launch failed: ${e?.message ?? e}`);
+      throw e;
+    }
     this.logger.log('[Novecool] Headless Chrome launched');
     return this.browser;
   }
