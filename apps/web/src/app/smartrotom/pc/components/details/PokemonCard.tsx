@@ -3,7 +3,7 @@ import { FaStar, FaHeart } from 'react-icons/fa';
 import { PiSkullFill, PiStarFill } from 'react-icons/pi';
 import { useTranslations } from 'next-intl';
 import { createPokemonSpec, createPokemonSpecFromTeam } from '../../utils/pokemonUtils';
-import { colors as typeColors } from '@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge';
+import { colors as typeColors } from '@/components/shared/pokemon/TypeBadge';
 import { PokemonItemImage } from '@/components/shared/pokemon/PokemonItemImage';
 import { PokemonTypeIcon } from '@/components/shared/pokemon/PokemonTypeIcon';
 import { getGenderIcon, getHPBarColor, getStatusColor } from '@/lib/smartrotom/pokemonDisplayUtils';

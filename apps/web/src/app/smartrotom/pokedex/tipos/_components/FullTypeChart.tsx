@@ -1,7 +1,7 @@
 "use client"
 import { typeChart } from '../../dexUtils';
 import { useTranslations } from "next-intl";
-import { colors } from '../../entrada/[[...params]]/_components/TypeBadge';
+import { colors } from '@/components/shared/pokemon/TypeBadge';
 
 export default function FullTypeChart() {
     const t = useTranslations("pokedex");

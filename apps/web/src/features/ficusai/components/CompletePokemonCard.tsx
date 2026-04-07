@@ -8,7 +8,7 @@ import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
 import { Button } from "@/components/ui/primitives/button";
 
-import TypeBadge from "@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge";
+import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import MoveDataElement from "@/app/smartrotom/pokedex/movimientos/_components/MoveData";
 
 import { getStatColor, statToPercentage, getTotalStatColor } from "@/lib/pokemonColors";

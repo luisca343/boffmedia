@@ -1,4 +1,4 @@
-import { TypeBadgeSmall } from "@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge";
+import { TypeBadgeSmall } from "@/components/shared/pokemon/TypeBadge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/primitives/tabs";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";

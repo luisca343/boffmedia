@@ -4,7 +4,7 @@ import TypeSelector from './_components/TypeSelector';
 import TypeEffectivenessTable from './_components/TypeEffectivenessTable';
 import DualTypeAnalysis from './_components/DualTypeAnalysis';
 import FullTypeChart from './_components/FullTypeChart';
-import { TypeBadgeSmall } from '../entrada/[[...params]]/_components/TypeBadge';
+import { TypeBadgeSmall } from '@/components/shared/pokemon/TypeBadge';
 import { TableCellsIcon, ViewColumnsIcon } from '@heroicons/react/24/outline';
 
 export default function TiposPage() {

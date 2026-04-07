@@ -1,4 +1,4 @@
-import { Cell, RowColInfo } from './types'
+import { Cell, RowColInfo } from '../types'
 import CellComponent from './Cell'
 import { Coins } from 'lucide-react'
 import Image from 'next/image'

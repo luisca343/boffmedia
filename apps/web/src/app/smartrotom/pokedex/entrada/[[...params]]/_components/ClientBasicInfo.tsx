@@ -3,7 +3,7 @@
 import type { Abilities, Pokemon } from "@/types/Pokemon"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
-import TypeBadge from "./TypeBadge"
+import TypeBadge from "@/components/shared/pokemon/TypeBadge"
 import { useTranslations } from "next-intl"
 import { InformationCircleIcon, StarIcon } from "@heroicons/react/24/outline"
 import { getDisplayStatus } from "../../../dexUtils"

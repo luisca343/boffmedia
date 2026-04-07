@@ -1,5 +1,5 @@
 "use client";
-import TypeBadge from "@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge";
+import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 
 interface PokemonTypesCardProps {
   data: {

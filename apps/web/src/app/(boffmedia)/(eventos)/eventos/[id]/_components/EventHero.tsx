@@ -6,7 +6,7 @@ import {
   Share2, Bookmark, Server, GamepadIcon as Gamepad2,
 } from "lucide-react";
 import { Event } from "@boffmedia/shared";
-import { EventRegistrationButton } from "../../_components/EventRegistrationButton";
+import { EventRegistrationButton } from "../../../_components/EventRegistrationButton";
 import { InternalLink } from "@/components/ui/navigation/Link";
 import { EventStatusChip } from "@/features/boffmedia/event/EventStatusChip";
 import { CountdownTimer } from "@/app/(boffmedia)/_components/ui/CountdownTimer";

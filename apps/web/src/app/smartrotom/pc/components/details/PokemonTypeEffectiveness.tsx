@@ -1,5 +1,5 @@
 
-import { colors as typeColors } from '@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge';
+import { colors as typeColors } from '@/components/shared/pokemon/TypeBadge';
 import { PokemonTypeIcon } from '@/components/shared/pokemon/PokemonTypeIcon';
 import { PiShield, PiShieldWarning, PiShieldCheck } from 'react-icons/pi';
 
