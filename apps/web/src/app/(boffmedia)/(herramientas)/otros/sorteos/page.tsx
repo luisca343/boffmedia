@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { SectionHeader } from "@/components/boffmedia/sections/SectionHeader";
-import { Gift } from "lucide-react";
+import { PageHeader } from "@/components/boffmedia/tools/PageHeader";
+import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
 import { ParticipantsList } from "./_components/ParticipantsList";
 import { GiveawayControls } from "./_components/GiveawayControls";
 import SpinnerAnimation from "./_components/SpinnerAnimation";
@@ -24,11 +23,11 @@ export default function Sorteo() {
   };
 
   const handleRemoveParticipant = (name: string) => {
-    setParticipants(participants.filter(participant => participant !== name));
+    setParticipants(participants.filter(p => p !== name));
   };
 
   const handleUploadList = (list: string[]) => {
-    const uniqueList = Array.from(new Set(list.map(name => name.trim()).filter(Boolean)));
+    const uniqueList = Array.from(new Set(list.map(n => n.trim()).filter(Boolean)));
     setParticipants(uniqueList);
   };
 
@@ -38,17 +37,13 @@ export default function Sorteo() {
       setShowWinner(false);
       setWinner(null);
       setAnimationComplete(false);
-      
-      // After a short delay, select a winner
       setTimeout(() => {
         const randomIndex = Math.floor(Math.random() * participants.length);
-        const selectedWinner = participants[randomIndex];
-        setWinner(selectedWinner);
+        setWinner(participants[randomIndex]);
       }, 500);
     }
   };
 
-  // Listen for animation completion from the spinner component
   useEffect(() => {
     if (animationComplete && winner) {
       setIsSpinning(false);
@@ -59,86 +54,50 @@ export default function Sorteo() {
 
   const handleReset = () => {
     setShowWinner(false);
-    // Optionally remove the winner from the list
-    // setParticipants(participants.filter(p => p !== winner))
-  };
-
-  const handleAnimationComplete = () => {
-    setAnimationComplete(true);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
   };
 
   return (
-    <motion.div 
-      className="min-h-full text-surface-50 p-4 sm:p-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <div className="max-w-6xl mx-auto space-y-8">
-        <motion.div variants={itemVariants}>
-          <SectionHeader
-            title="Sorteo BoffMedia"
-            variant="orange"
-            leftIcon={<Gift className="w-8 h-8 text-orange-400" />}
-            rightIcon={<Gift className="w-8 h-8 text-yellow-400" />}
-            leftIconBg={" "}
-            rightIconBg={" "}
-          />
-        </motion.div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <PageHeader
+        title={{ prefix: "Boffmedia", highlight: "Sorteos" }}
+        subtitle="Selecciona un ganador al azar entre tus participantes de forma justa y divertida."
+        theme="primary"
+        sectionLabel="Otros"
+      />
 
-        {/* Main Content */}
-        <motion.div variants={itemVariants}>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1">
-              <ParticipantsList 
-                participants={participants}
-                onRemove={handleRemoveParticipant}
-                previousWinners={previousWinners}
-              />
-            </div>
-            
-            <div className="lg:col-span-2">
-              {isSpinning || showWinner ? (
-                <div className="bg-gradient-to-br from-surface-800/90 to-surface-900/90 backdrop-blur-sm border border-surface-700/50 rounded-2xl p-6 shadow-2xl">
-                  {isSpinning && 
-                    <SpinnerAnimation 
-                      participants={participants} 
-                      winner={winner} 
-                      onComplete={handleAnimationComplete}
-                    />
-                  }
-                  {showWinner && winner && (
-                    <WinnerDisplay winner={winner} onReset={handleReset} />
-                  )}
-                </div>
-              ) : (
-                <GiveawayControls 
-                  onAddParticipant={handleAddParticipant}
-                  onUploadList={handleUploadList}
-                  onStartGiveaway={handleStartGiveaway}
-                  participantCount={participants.length}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1">
+          <ParticipantsList
+            participants={participants}
+            onRemove={handleRemoveParticipant}
+            previousWinners={previousWinners}
+          />
+        </div>
+
+        <div className="lg:col-span-2">
+          {isSpinning || showWinner ? (
+            <BoffContainer variant="primary" contentClassName="p-6">
+              {isSpinning && (
+                <SpinnerAnimation
+                  participants={participants}
+                  winner={winner}
+                  onComplete={() => setAnimationComplete(true)}
                 />
               )}
-            </div>
-          </div>
-        </motion.div>
+              {showWinner && winner && (
+                <WinnerDisplay winner={winner} onReset={handleReset} />
+              )}
+            </BoffContainer>
+          ) : (
+            <GiveawayControls
+              onAddParticipant={handleAddParticipant}
+              onUploadList={handleUploadList}
+              onStartGiveaway={handleStartGiveaway}
+              participantCount={participants.length}
+            />
+          )}
+        </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
