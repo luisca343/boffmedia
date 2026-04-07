@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { PageHeader } from "@/features/boffmedia/tools/PageHeader";
+import { PageHeader } from "@/components/boffmedia/tools/PageHeader";
 
 export function Header() {
   const t = useTranslations("");

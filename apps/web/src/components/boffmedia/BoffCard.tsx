@@ -25,7 +25,7 @@ import {
   BOFF_VARIANTS,
   BoffVariant,
   BoffVariantTokens,
-} from "@/features/boffmedia/tools/utils/boffVariants";
+} from "@/components/boffmedia/tools/utils/boffVariants";
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 import { cn } from "@/lib/utils";
 

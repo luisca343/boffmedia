@@ -12,9 +12,9 @@ import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { UserProgress } from "@/types/events"
 import { useBoffSession } from "@/services/useBoffSession"
 import { InternalLink } from "@/components/ui/navigation/Link"
-import { AchievementBadge } from "@/features/boffmedia/event/AchievementBadge"
-import { getRarityTokens, RarityTokens } from "@/features/boffmedia/event/rarityTokens"
-import { BoffCard } from "@/features/boffmedia/BoffCard"
+import { AchievementBadge } from "@/components/boffmedia/event/AchievementBadge"
+import { getRarityTokens, RarityTokens } from "@/components/boffmedia/event/rarityTokens"
+import { BoffCard } from "@/components/boffmedia/BoffCard"
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

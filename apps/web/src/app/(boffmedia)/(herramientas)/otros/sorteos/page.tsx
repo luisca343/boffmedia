@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { SectionHeader } from "@/features/boffmedia/sections/SectionHeader";
+import { SectionHeader } from "@/components/boffmedia/sections/SectionHeader";
 import { Gift } from "lucide-react";
 import { ParticipantsList } from "./_components/ParticipantsList";
 import { GiveawayControls } from "./_components/GiveawayControls";
