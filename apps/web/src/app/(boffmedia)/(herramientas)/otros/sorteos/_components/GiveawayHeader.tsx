@@ -2,75 +2,48 @@ import { motion } from "framer-motion";
 import { Gift } from "lucide-react";
 
 export function GiveawayHeader() {
-  const containerVariants = {
-    hidden: { opacity: 0, y: -20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.15
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   return (
-    <motion.div 
-      className="text-center py-8 relative"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      <motion.div 
-        variants={itemVariants}
-        className="relative z-10"
-      >
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <motion.div
-            animate={{ 
-              rotate: [0, 8, -8, 0],
-              scale: [1, 1.05, 1]
-            }}
-            transition={{ 
-              duration: 3, 
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          >
-            <Gift className="w-8 h-8 text-orange-400" />
-          </motion.div>
-          
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-500">
-            Sorteo BoffMedia
-          </h1>
-          
-          <motion.div
-            animate={{ 
-              rotate: [0, -8, 8, 0],
-              scale: [1, 1.05, 1]
-            }}
-            transition={{ 
-              duration: 3, 
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1.5
-            }}
-          >
-            <Gift className="w-8 h-8 text-yellow-400" />
-          </motion.div>
-        </div>
+    <div className="mb-4 relative">
+      <div className="absolute -top-6 -left-4 w-72 h-24 bg-primary-500/10 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -top-6 left-32 w-40 h-20 bg-warning-500/8 blur-3xl rounded-full pointer-events-none" />
 
-        {/* Decorative Line */}
-        <motion.div 
-          className="w-32 h-0.5 bg-gradient-to-r from-orange-400 to-yellow-400 mx-auto rounded-full"
-          variants={itemVariants}
-        />
-      </motion.div>
-    </motion.div>
+      <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-6">
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-0.5 h-5 bg-gradient-to-b from-primary-400 to-primary-600 rounded-full" />
+            <span className="text-xs font-mono uppercase tracking-[0.25em] text-primary-400/60">
+              Herramienta de sorteos
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-surface-50 mb-2 text-center md:text-left">
+            Sorteo{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-300 via-orange-400 to-yellow-400">
+              BoffMedia
+            </span>
+          </h1>
+          <p className="text-surface-400 text-center md:text-left">
+            Realiza sorteos justos y transparentes para tu comunidad
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="hidden md:block"
+        >
+          <div className="relative w-[88px] h-[88px]">
+            <div className="absolute inset-0 bg-primary-500/25 rounded-2xl blur-xl" />
+            <div className="relative w-full h-full bg-surface-800/80 rounded-2xl border border-primary-500/30 flex items-center justify-center backdrop-blur-sm">
+              <Gift className="w-10 h-10 text-primary-400" />
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    </div>
   );
 }
