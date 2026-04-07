@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
-import type { BoffStyle } from "@/features/boffmedia/tools/utils/getBoffStyle";
+import type { BoffStyle } from "@/components/boffmedia/tools/utils/getBoffStyle";
 
 interface BoffButtonProps {
   /** Optionally force the hovered visual state (e.g. when the parent card is hovered) */

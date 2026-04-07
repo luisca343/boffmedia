@@ -1,6 +1,6 @@
 // Re-export the shared components from the main sections library
-export { SectionHeader } from '@/features/boffmedia/sections/SectionHeader';
-export { SectionLoading } from '@/features/boffmedia/sections/SectionLoading';
-export { SectionFilters } from '@/features/boffmedia/sections/SectionFilters';
-export { SectionError } from '@/features/boffmedia/sections/SectionError';
-export { SectionEmpty } from '@/features/boffmedia/sections/SectionEmpty';
+export { SectionHeader } from '@/components/boffmedia/sections/SectionHeader';
+export { SectionLoading } from '@/components/boffmedia/sections/SectionLoading';
+export { SectionFilters } from '@/components/boffmedia/sections/SectionFilters';
+export { SectionError } from '@/components/boffmedia/sections/SectionError';
+export { SectionEmpty } from '@/components/boffmedia/sections/SectionEmpty';

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { FicusNav } from "@/features/boffmedia/navigation/FicusNav";
+import { FicusNav } from "@/components/boffmedia/navigation/FicusNav";
 import { GlobalProviders } from "../GlobalProviders";
 import { BackToTop } from "@/components/ui/BackToTop";
 

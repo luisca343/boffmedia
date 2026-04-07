@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-import { ToolSectionHeader } from "@/features/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/components/boffmedia/tools/ToolSectionHeader";
 import { EuropeanVersionToggle } from "./EuropeanVersionToggle";
 
 interface SettingsSectionProps {

@@ -6,7 +6,7 @@ import { InternalLink } from "@/components/ui/navigation/Link"
 import { Button } from "@/components/ui/primitives/button"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { Event } from "@boffmedia/shared"
-import { EventCard } from "@/features/boffmedia/event/EventCard"
+import { EventCard } from "@/components/boffmedia/event/EventCard"
 
 interface GameEventsProps {
   gameId: number

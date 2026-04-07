@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
-import { getBoffStyle } from "@/features/boffmedia/tools/utils/getBoffStyle";
-import { BoffButton } from "@/features/boffmedia/tools/BoffButton";
+import { getBoffStyle } from "@/components/boffmedia/tools/utils/getBoffStyle";
+import { BoffButton } from "@/components/boffmedia/tools/BoffButton";
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
 interface FeaturedToolProps {
