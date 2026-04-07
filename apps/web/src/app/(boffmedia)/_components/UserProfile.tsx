@@ -20,8 +20,8 @@ import { useBoffSession } from "@/services/useBoffSession";
 import { UploadService } from "@/services/api/smartrotom/uploadService";
 import { UsersService } from "@/services/api/boffmedia/usersService";
 import { FloatingBackground } from "./layout/FloatingBackground";
-import { BoffContainer } from "@components/boffmedia/tools/BoffContainer";
-import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
+import { BoffContainer } from "@/features/boffmedia/tools/BoffContainer";
+import { ToolSectionHeader } from "@/features/boffmedia/tools/ToolSectionHeader";
 
 // ─── Shared boff token shorthand ─────────────────────────────────────────────
 

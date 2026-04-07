@@ -1,10 +1,10 @@
 import React from 'react';
-import { MAP_CONSTANTS } from '@/components/common/map/StandardizedMap';
-import type { CoordinateTransformer, Position } from '@/components/common/map/StandardizedMap';
+import { MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
+import type { CoordinateTransformer, Position } from '@/components/shared/map/StandardizedMap';
 import { CompleteMarker } from './CompleteMarker';
 import { BoundaryOverlay } from './BoundaryOverlay';
 import { PiHouse, PiBuilding, PiSparkle } from "react-icons/pi";
-import { BaseMarker } from '@/components/common/map/BaseMarker';
+import { BaseMarker } from '@/components/shared/map/BaseMarker';
 
 interface MarkerProps {
   worldPosition: Position;

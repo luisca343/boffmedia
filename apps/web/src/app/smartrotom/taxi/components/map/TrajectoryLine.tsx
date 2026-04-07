@@ -1,6 +1,6 @@
 import { TaxiStop } from "@boffmedia/shared";
-import { MAP_CONSTANTS } from '@/components/common/map/StandardizedMap';
-import type { Position, CoordinateTransformer } from '@/components/common/map/StandardizedMap';
+import { MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
+import type { Position, CoordinateTransformer } from '@/components/shared/map/StandardizedMap';
 
 interface TrajectoryLineProps {
   selectedStop: TaxiStop | null;

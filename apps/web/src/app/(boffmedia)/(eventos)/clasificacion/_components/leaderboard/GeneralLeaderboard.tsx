@@ -1,4 +1,4 @@
-import { LeaderboardList } from "@/components/boffmedia/leaderboard/LeaderboardList"
+import { LeaderboardList } from "@/features/boffmedia/leaderboard/LeaderboardList"
 import { LeaderboardEntry } from "@boffmedia/shared"
 
 type GeneralLeaderboardProps = {

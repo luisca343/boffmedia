@@ -13,7 +13,7 @@ import { ShareDocumentDialog } from "./ShareDocumentDialog"
 import { useSearchParams } from "next/navigation"
 
 const CustomEditor = dynamic( () => {
-    return import( '@/components/common/ckeditor/TestEditor' );
+    return import( '@/components/shared/ckeditor/TestEditor' );
   }, { ssr: false } );
 
   export function DocumentsList() {

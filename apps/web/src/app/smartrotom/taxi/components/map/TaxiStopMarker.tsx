@@ -1,7 +1,7 @@
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { TaxiStop } from "@boffmedia/shared";
-import { BaseMarker } from '@/components/common/map/BaseMarker';
-import { StopPosition, CoordinateTransformer } from '@/components/common/map/StandardizedMap';
+import { BaseMarker } from '@/components/shared/map/BaseMarker';
+import { StopPosition, CoordinateTransformer } from '@/components/shared/map/StandardizedMap';
 
 interface TaxiStopMarkerProps {
   stop: TaxiStop;

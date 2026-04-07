@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronRight, Cpu, Gamepad2, Sparkles } from "lucide-react";
-import { getBoffStyle } from "@components/boffmedia/tools/utils/getBoffStyle";
-import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
+import { getBoffStyle } from "@/features/boffmedia/tools/utils/getBoffStyle";
+import { ToolSectionHeader } from "@/features/boffmedia/tools/ToolSectionHeader";
 import { useScanAnimation } from "@/hooks/tools/useScanAnimation";
 
 interface ToolsGridProps {

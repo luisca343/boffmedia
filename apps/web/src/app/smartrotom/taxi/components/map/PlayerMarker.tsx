@@ -1,5 +1,5 @@
-import { BaseMarker } from '@/components/common/map/BaseMarker';
-import type { Position, CoordinateTransformer } from '@/components/common/map/StandardizedMap';
+import { BaseMarker } from '@/components/shared/map/BaseMarker';
+import type { Position, CoordinateTransformer } from '@/components/shared/map/StandardizedMap';
 
 interface PlayerMarkerProps {
   playerPosition: Position;

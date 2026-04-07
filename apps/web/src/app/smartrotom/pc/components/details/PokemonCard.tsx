@@ -4,8 +4,8 @@ import { PiSkullFill, PiStarFill } from 'react-icons/pi';
 import { useTranslations } from 'next-intl';
 import { createPokemonSpec, createPokemonSpecFromTeam } from '../../utils/pokemonUtils';
 import { colors as typeColors } from '@/app/smartrotom/pokedex/entrada/[[...params]]/_components/TypeBadge';
-import { PokemonItemImage } from '@/components/common/pokemon/PokemonItemImage';
-import { PokemonTypeIcon } from '@/components/common/pokemon/PokemonTypeIcon';
+import { PokemonItemImage } from '@/components/shared/pokemon/PokemonItemImage';
+import { PokemonTypeIcon } from '@/components/shared/pokemon/PokemonTypeIcon';
 import { getGenderIcon, getHPBarColor, getStatusColor } from '@/lib/smartrotom/pokemonDisplayUtils';
 import { motion } from 'framer-motion';
 

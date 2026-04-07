@@ -3,7 +3,7 @@ import { TaxiStopExtended } from "@/types";
 import { useMemo } from 'react';
 
 // Types and Utils
-import { Position, MapBounds, CoordinateTransformer, PositionCalculator, MapImage } from '@/components/common/map/StandardizedMap';
+import { Position, MapBounds, CoordinateTransformer, PositionCalculator, MapImage } from '@/components/shared/map/StandardizedMap';
 
 // Hooks
 import { useMapState } from '../hooks/useMapState';

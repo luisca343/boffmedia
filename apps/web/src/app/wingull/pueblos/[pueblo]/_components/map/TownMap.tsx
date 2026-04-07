@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { TownData, Property, Amenity, SelectedMarker } from '../../types';
 import { MapPin } from 'lucide-react';
-import { StandardizedMap, CoordinateTransformer, MAP_CONSTANTS } from '@/components/common/map/StandardizedMap';
+import { StandardizedMap, CoordinateTransformer, MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
 import { PropertyMarker, AmenityMarker, BoundaryMarker, BusinessMarker } from './MapMarkers';
 
 interface TownMapProps {

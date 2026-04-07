@@ -10,7 +10,7 @@ import PopArtWallpaper from '../../_components/PopArtWallpaper';
 import PopStyles from '../../_components/PopStyles';
 import { InternalLink } from "@/components/ui/navigation/Link";
 
-const CustomEditor = dynamic(() => import('@/components/common/ckeditor/TestEditor'), { ssr: false });
+const CustomEditor = dynamic(() => import('@/components/shared/ckeditor/TestEditor'), { ssr: false });
 
 export default function EditNote({ params }: { params: { id: string } }) {
   const { id } = params;

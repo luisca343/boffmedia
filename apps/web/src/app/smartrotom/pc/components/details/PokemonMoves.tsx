@@ -1,5 +1,5 @@
 
-import { PokemonTypeIcon } from '@/components/common/pokemon/PokemonTypeIcon';
+import { PokemonTypeIcon } from '@/components/shared/pokemon/PokemonTypeIcon';
 import { useTranslations } from 'next-intl';
 import { PiSwordFill, PiSparkle, PiGear } from 'react-icons/pi';
 

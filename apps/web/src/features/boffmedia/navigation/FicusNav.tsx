@@ -6,20 +6,20 @@ import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Home, Menu, Trophy } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { HerramientasMenu } from "./ToolsMenu";
+import { ToolsMenu } from "./ToolsMenu";
 import { WingullMenu } from "./WingullMenu";
 import { NavMenuProvider } from "./DropdownMenu";
-import { InternalLink } from "./Link";
+import { InternalLink } from "@/components/ui/navigation/Link";
 import { Button } from "@/components/ui/primitives/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/primitives/sheet";
-import LanguageSwitcher from "./LanguageSwitcher";
+import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
 
 const NotificationPopover = dynamic(() => import("./NotificationPopover"), {
   ssr: false,
   loading: () => <div className="w-8 h-8 bg-surface-800 rounded-full animate-pulse" />,
 });
 
-const UserAuthSection = dynamic(() => import("./UserAuthSection"), {
+const UserAuthSection = dynamic(() => import("@/components/ui/navigation/UserAuthSection"), {
   ssr: false,
   loading: () => (
     <div className="flex items-center space-x-2">
@@ -42,7 +42,7 @@ export function FicusNav() {
   const NAV_LINKS = [
     { href: "/", label: t("links.home"), icon: <Home className="h-4 w-4" /> },
     { href: "/eventos", label: t("links.events"), icon: <Trophy className="h-4 w-4" /> },
-    { href: "/herramientas", label: t("links.tools"), override: <HerramientasMenu /> },
+    { href: "/herramientas", label: t("links.tools"), override: <ToolsMenu /> },
     { href: "/wingull", label: t("links.pixelmonWingull"), override: <WingullMenu /> },
   ];
 

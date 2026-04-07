@@ -1,4 +1,4 @@
-import { BookLink, PageFlip } from "@/components/common/book/book"
+import { BookLink, PageFlip } from "@/components/shared/book/book"
 
 export function IndexPage({ book, badgePage, achievements, obtainedBadges }: { book: PageFlip, badgePage: number, achievements: any, obtainedBadges: number }){
     return (

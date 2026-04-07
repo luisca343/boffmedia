@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Position, MapBounds } from '@/components/common/map/StandardizedMap';
+import { Position, MapBounds } from '@/components/shared/map/StandardizedMap';
 import { MAP_CONSTANTS, ZOOM_CONSTANTS } from '../utils/constants';
 
 interface UseMapStateProps {

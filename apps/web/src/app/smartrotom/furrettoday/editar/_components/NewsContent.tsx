@@ -1,5 +1,5 @@
 "use client"
-import CustomEditor from '@/components/common/ckeditor/TestEditor'
+import CustomEditor from '@/components/shared/ckeditor/TestEditor'
 
 interface NewsContentProps {
   selectedNewsId: number | null

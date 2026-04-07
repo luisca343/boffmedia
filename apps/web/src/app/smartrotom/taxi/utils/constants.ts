@@ -1,5 +1,5 @@
 // Re-export shared map constants
-export { MAP_CONSTANTS, UI_CONSTANTS } from '@/components/common/map/StandardizedMap';
+export { MAP_CONSTANTS, UI_CONSTANTS } from '@/components/shared/map/StandardizedMap';
 
 // Taxi-specific constants
 export const MINIMUM_FARE = 100

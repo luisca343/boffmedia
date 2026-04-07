@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { TaxiStop } from "@boffmedia/shared";
-import { Position, MapBounds, PositionCalculator, StopPosition } from '@/components/common/map/StandardizedMap';
+import { Position, MapBounds, PositionCalculator, StopPosition } from '@/components/shared/map/StandardizedMap';
 
 interface UseStopPositionsProps {
   taxiStops: TaxiStop[];

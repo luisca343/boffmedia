@@ -3,7 +3,7 @@ import { MapPinIcon, BuildingOffice2Icon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/primitives/input";
 import { Combobox } from "@/components/ui/primitives/combobox";
 import { FormField } from "@/components/ui/form/FormField";
-import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/features/boffmedia/tools/ToolSectionHeader";
 import { getFloors, getValidDungeons } from "../DungeonData";
 
 interface LocationSectionProps {

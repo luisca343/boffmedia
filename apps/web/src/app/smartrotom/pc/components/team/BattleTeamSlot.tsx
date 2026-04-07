@@ -3,7 +3,7 @@ import { ExtendedPokemonW } from "@/types/dto/pc-pokemon.dto"
 import { PokemonImage } from '@/lib/PokemonImage'
 import { createPokemonSpecFromTeam } from "../../utils/pokemonUtils"
 import { PiStarFill, PiSkullFill, PiPlus } from "react-icons/pi"
-import { PokemonItemImage } from "@/components/common/pokemon/PokemonItemImage"
+import { PokemonItemImage } from "@/components/shared/pokemon/PokemonItemImage"
 import { useState, useMemo } from "react"
 import React from "react"
 import { calculatePokemonHP, getGenderIcon, getHPBarColor, getStatusColor, getStatusIcon } from "@/lib/smartrotom/pokemonDisplayUtils"
