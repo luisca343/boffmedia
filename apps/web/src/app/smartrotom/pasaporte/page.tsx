@@ -1,5 +1,5 @@
 'use client'
-import { Book, BookLink, Page, PageFlip, PageTitle, turnPage } from "@/components/common/book/book";
+import { Book, BookLink, Page, PageFlip, PageTitle, turnPage } from "@/components/shared/book/book";
 import './pasaporte.css'
 import { useState } from "react";
 import ActiveTeam from "./_components/ActiveTeam";

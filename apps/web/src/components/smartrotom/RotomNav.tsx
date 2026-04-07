@@ -1,24 +1,24 @@
 "use client";
-import { Hora } from "../Hora";
+import { Hora } from "@/components/ui/Hora";
 import { useEffect } from "react";
-import { Badge } from "../primitives/badge";
+import { Badge } from "@/components/ui/primitives/badge";
 import { Socket } from "socket.io-client";
-import BreadcrumbNav from "./BreadbrumbNav";
-import FicusAI from "../../smartrotom/ficusai/FicusAI";
+import BreadcrumbNav from "@/components/smartrotom/BreadcrumbNav";
+import FicusAI from "@/features/ficusai/components/FicusAI";
 import { usePathname } from "next/navigation";
 import { getSmartRotomUser } from "@/lib/utils";
 import { Bell, Check, Trash2, X } from "lucide-react";
-import { SettingsPage } from "../../smartrotom/Settings";
-import { Popover, PopoverTrigger } from "../primitives/popover";
+import { SettingsPage } from "@/components/smartrotom/Settings";
+import { Popover, PopoverTrigger } from "@/components/ui/primitives/popover";
 import { PopoverContent } from "@radix-ui/react-popover";
 import { useBoffSession } from "@/services/useBoffSession";
-import { MinecraftFunctions } from "../../smartrotom/MinecraftFunctions";
+import { MinecraftFunctions } from "@/components/smartrotom/MinecraftFunctions";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/primitives/tooltip";
 import { useNotificationCenter } from "react-toastify/addons/use-notification-center";
-import { BotonAjustes, BotonIA, BotonNext, BotonNotification, BotonPrev, BotonReload } from "./BotonNav";
+import { SettingsButton, AIButton, NextButton, NotificationButton, PrevButton, ReloadButton } from "@/components/ui/navigation/NavButton";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/primitives/sheet";
 import useSocketStore from "@/stores/useSocketStore";
-import LanguageSwitcher from "./LanguageSwitcher";
+import LanguageSwitcher from "@/components/ui/navigation/LanguageSwitcher";
 
 export function RotomNav({
   setTema,
@@ -140,13 +140,13 @@ export function RotomNav({
         pathname.includes("pokedex") ? "bg-surface-950" : "bg-surface-800"
       }`}
     >
-      <BotonPrev />
-      <BotonNext />
-      <BotonReload />
+      <PrevButton />
+      <NextButton />
+      <ReloadButton />
       <BreadcrumbNav className="flex-1 mx-1 invisible w-0 sm:w-auto sm:visible " />
       <Sheet>
         <SheetTrigger>
-          <BotonAjustes />
+          <SettingsButton />
         </SheetTrigger>
         <SheetContent
           side="top"
@@ -172,7 +172,7 @@ export function RotomNav({
       </Sheet>
       <Sheet>
         <SheetTrigger>
-          <BotonIA />
+          <AIButton />
         </SheetTrigger>
         <SheetContent
           side="right"
@@ -189,7 +189,7 @@ export function RotomNav({
       </Sheet>
       <Popover>
         <PopoverTrigger className="relative">
-          <BotonNotification />
+          <NotificationButton />
           {notifications.length > 0 && (
             <Badge className="z-50 px-2 -bottom-2 -right-2 absolute bg-primary-400 text-black hover:bg-primary-400">
               {unreadCount}
@@ -207,7 +207,7 @@ export function RotomNav({
   );
 }
 
-function BotonNav({
+function NavButton({
   Icono,
   strokeWidth = 5,
   onClick = null,

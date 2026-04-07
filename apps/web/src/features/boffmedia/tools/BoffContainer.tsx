@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { BOFF_VARIANTS, BoffVariant } from "@components/boffmedia/tools/utils/boffVariants";
+import { BOFF_VARIANTS, BoffVariant } from "@/features/boffmedia/tools/utils/boffVariants";
 
 export type { BoffVariant };
 

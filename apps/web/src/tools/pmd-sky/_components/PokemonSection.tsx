@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl";
 import { UserGroupIcon, UserIcon, CursorArrowRippleIcon, InformationCircleIcon } from "@heroicons/react/24/outline";
 import { FormField } from "@/components/ui/form/FormField";
-import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/features/boffmedia/tools/ToolSectionHeader";
 import { PokemonSelector } from "./PokemonSelector";
 import { getClientIsTarget, getForceClient } from "../QuestData";
 

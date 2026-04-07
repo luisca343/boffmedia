@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { Position, DragState, MapBounds } from '../types/map.types';
-import { CoordinateTransformer } from '@/components/common/map/StandardizedMap';
+import { CoordinateTransformer } from '@/components/shared/map/StandardizedMap';
 import { calculateWorldMovementDelta } from '../utils/coordinate-utils';
 interface UseMapInteractionsProps {
   mapBounds: MapBounds;

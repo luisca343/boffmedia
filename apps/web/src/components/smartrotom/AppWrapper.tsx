@@ -1,6 +1,6 @@
 "use client"
 import type { Session } from "next-auth"
-import { RotomNav } from "../ui/navigation/RotomNav"
+import { RotomNav } from "./RotomNav"
 import { signIn, signOut } from "next-auth/react"
 import { LoadingScreen } from "./Loading"
 import { CallStatus } from "./calls/CallStatus"

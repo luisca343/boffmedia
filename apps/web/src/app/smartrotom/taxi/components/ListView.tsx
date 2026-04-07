@@ -3,7 +3,7 @@ import { TaxiStop } from "@boffmedia/shared"
 import { TaxiStopExtended } from "@/types"
 import { useState, useMemo } from 'react'
 import { formatMoney } from '../../starbank/bankUtils';
-import type { Position } from '@/components/common/map/StandardizedMap';
+import type { Position } from '@/components/shared/map/StandardizedMap';
 
 interface ListViewProps {
   taxiStops: TaxiStopExtended[];

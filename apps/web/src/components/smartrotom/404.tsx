@@ -1,4 +1,4 @@
-import { RotomNav } from "../ui/navigation/RotomNav"
+import { RotomNav } from "./RotomNav"
 import { GlobalProviders } from "@/app/GlobalProviders"
 import { TooltipProvider } from "@radix-ui/react-tooltip"
 

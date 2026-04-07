@@ -8,10 +8,10 @@ import {
 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-export function HerramientasMenu() {
+export function ToolsMenu() {
   const t = useTranslations('nav.menus.tools')
-  
-  const HERRAMIENTAS_MENU = {
+
+  const TOOLS_MENU = {
     triggerLabel: t("triggerLabel"),
     mainLink: { 
       href: "/herramientas", 
@@ -88,5 +88,5 @@ export function HerramientasMenu() {
     ] as MenuSectionProps[],
   }
 
-  return <CustomDropdownMenu {...HERRAMIENTAS_MENU} />
+  return <CustomDropdownMenu {...TOOLS_MENU} />
 }

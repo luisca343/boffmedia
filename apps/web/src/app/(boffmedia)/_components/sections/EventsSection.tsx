@@ -6,9 +6,9 @@ import { SectionSeparator } from "../ui/SectionSeparator";
 import { EventImage } from "../ui/EventImage";
 import { Event } from "@boffmedia/shared";
 import { EventsService } from "@/services/api/boffmedia/eventsService";
-import { SectionHeader } from "@/components/boffmedia/sections";
+import { SectionHeader } from "@/features/boffmedia/sections";
 import { CountdownTimer } from "../ui/CountdownTimer";
-import { EventCard } from "@/components/boffmedia/event/EventCard";
+import { EventCard } from "@/features/boffmedia/event/EventCard";
 
 export async function EventsSection() {
   const t = await getTranslations("boffmedia");

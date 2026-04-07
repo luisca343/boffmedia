@@ -4,7 +4,7 @@ import { Pencil, Trash2, Calendar, Plus } from "lucide-react";
 import type { Event } from "@boffmedia/shared";
 import { getEventStatus } from "@/lib/events";
 import { cn } from "@/lib/utils";
-import { EventStatusChip } from "@/components/boffmedia/event/EventStatusChip";
+import { EventStatusChip } from "@/features/boffmedia/event/EventStatusChip";
 
 // Maps the date-computed status label to Event.status for EventStatusChip
 const LABEL_TO_STATUS: Record<string, Event.status> = {

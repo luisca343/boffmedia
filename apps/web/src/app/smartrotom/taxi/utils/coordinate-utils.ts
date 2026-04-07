@@ -1,5 +1,5 @@
-import { MAP_CONSTANTS } from '@/components/common/map/StandardizedMap';
-import type { Position, MapBounds } from '@/components/common/map/StandardizedMap';
+import { MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
+import type { Position, MapBounds } from '@/components/shared/map/StandardizedMap';
 
 export function calculateWorldMovementDelta(
   deltaPixelsX: number,

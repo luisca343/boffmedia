@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, ExternalLink } from "lucide-react";
-import { ToolSectionHeader } from "@components/boffmedia/tools/ToolSectionHeader";
+import { ToolSectionHeader } from "@/features/boffmedia/tools/ToolSectionHeader";
 
 interface ExternalResourcesProps {
   links: Array<{

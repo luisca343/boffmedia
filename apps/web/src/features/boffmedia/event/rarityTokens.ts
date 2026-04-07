@@ -1,4 +1,4 @@
-import { BOFF_VARIANTS } from "@components/boffmedia/tools/utils/boffVariants"
+import { BOFF_VARIANTS } from "@/features/boffmedia/tools/utils/boffVariants"
 
 // ─── Rarity token map ────────────────────────────────────────────────────────
 // Semantically aligned with BOFF_VARIANTS where possible:
