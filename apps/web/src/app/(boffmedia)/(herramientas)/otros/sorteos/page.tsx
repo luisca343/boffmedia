@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/boffmedia/tools/PageHeader";
 import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
-import { ParticipantsList } from "./_components/ParticipantsList";
+import { ParticipantsList } from "./_components/participants/ParticipantsList";
 import { GiveawayControls } from "./_components/GiveawayControls";
-import SpinnerAnimation from "./_components/SpinnerAnimation";
+import SpinnerAnimation from "./_components/spinner/SpinnerAnimation";
 import { WinnerDisplay } from "./_components/WinnerDisplay";
 
 export default function Sorteo() {

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react"
-import { useGiveawayAnimation } from "../_hooks/useGiveawayAnimation"
+import { useGiveawayAnimation } from "../../_hooks/useGiveawayAnimation"
 import Spinner from "./Spinner"
 
 type SpinnerAnimationProps = {
