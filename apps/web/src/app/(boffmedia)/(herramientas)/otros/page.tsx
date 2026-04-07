@@ -1,41 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Gift, Key, ExternalLink, Plus, Terminal } from "lucide-react";
+import { Gift, Key, ExternalLink, Plus, Terminal, type LucideIcon } from "lucide-react";
 import { FloatingSection } from "../../_components/layout/FloatingSection";
 import { PageHeader } from "@components/boffmedia/tools/PageHeader";
 import { FeaturedTool } from "@components/boffmedia/tools/FeaturedTool";
 import { ToolsGrid } from "@components/boffmedia/tools/ToolsGrid";
 import { ExternalResources } from "@components/boffmedia/tools/ExternalResources";
+import { otrosToolsConfig } from "@/data/games/otros";
 
-const TOOLS = [
-  {
-    title: "Sorteos",
-    description: "Crea y gestiona sorteos para eventos y comunidades",
-    icon: "/img/games/other/raffle.webp",
-    iconFallback: <Gift className="h-8 w-8 text-accent-400" />,
-    href: "/sorteo",
-    color: "from-accent-400 to-indigo-600",
-    features: ["Sorteos aleatorios", "Tickets personalizados", "Resultados en tiempo real"],
-    featured: true,
-  },
-  {
-    title: "Claves de Steam",
-    description: "Gestiona y comparte claves de juegos de Steam",
-    icon: "/img/games/other/key.webp",
-    iconFallback: <Key className="h-8 w-8 text-secondary-400" />,
-    href: "/otros/keys",
-    color: "from-secondary-400 to-cyan-600",
-    features: ["Biblioteca de claves", "Validador", "Historial de canjes"],
-    featured: false,
-  },
-];
-
-const EXTERNAL_LINKS = [
-  { href: "https://steamcommunity.com/", title: "Comunidad de Steam", description: "Foros, guías y más de la comunidad Steam" },
-  { href: "https://www.humblebundle.com/", title: "Humble Bundle", description: "Juegos con descuento y paquetes benéficos" },
-  { href: "https://boffmedia.com/guias", title: "Guías de BoffMedia", description: "Guías y tutoriales para tus juegos favoritos" },
-];
+const ICON_MAP: Record<string, LucideIcon> = { Gift, Key };
 
 const t = (key: string, params?: any): string => {
   if (key === "accessButton") return `Acceder a ${params?.tool ?? ""}`;
@@ -44,18 +18,28 @@ const t = (key: string, params?: any): string => {
   return key;
 };
 
+const tools = otrosToolsConfig.tools.map((tool) => {
+  const IconComponent = ICON_MAP[tool.fallbackIcon];
+  return {
+    ...tool,
+    iconFallback: IconComponent
+      ? <IconComponent className={`h-8 w-8 ${tool.fallbackIconColor ?? ""}`} />
+      : null,
+  };
+});
+
 export default function OtherTools() {
-  const featuredTool = TOOLS.find((tool) => tool.featured)!;
-  const otherTools = TOOLS.filter((tool) => !tool.featured);
+  const featuredTool = tools.find((tool) => tool.featured)!;
+  const otherTools = tools.filter((tool) => !tool.featured);
 
   return (
     <FloatingSection>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <PageHeader
-          title={{ prefix: "Otras", highlight: "Herramientas" }}
-          subtitle="Recursos útiles para gamers y creadores de contenido"
-          logoSrc="/img/games/other/icon.webp"
-          logoAlt="Otras Herramientas"
+          title={otrosToolsConfig.header.title}
+          subtitle={otrosToolsConfig.header.subtitle}
+          logoSrc={otrosToolsConfig.logo}
+          logoAlt={otrosToolsConfig.name}
           logoWidth={120}
           logoHeight={120}
           theme="accent"
@@ -65,7 +49,6 @@ export default function OtherTools() {
 
         {otherTools.length > 0 && <ToolsGrid tools={otherTools} t={t} />}
 
-        {/* Suggestion card */}
         <div className="mb-12">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -96,9 +79,8 @@ export default function OtherTools() {
           </motion.div>
         </div>
 
-        <ExternalResources links={EXTERNAL_LINKS} t={t} />
+        <ExternalResources links={otrosToolsConfig.externalLinks} t={t} />
 
-        {/* Coming soon */}
         <motion.div
           className="mt-10 text-center p-8 border border-dashed border-surface-700/40 rounded-lg bg-surface-900/20"
           initial={{ opacity: 0 }}
