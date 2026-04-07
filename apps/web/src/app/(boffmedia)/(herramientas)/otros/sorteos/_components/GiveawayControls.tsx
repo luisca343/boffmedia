@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { UserPlus, Upload, Play, AlertTriangle } from "lucide-react";
+import { UserPlus, Upload, Zap, AlertTriangle, Users } from "lucide-react";
 import { Button } from "@/components/ui/primitives/button";
 import { Input } from "@/components/ui/primitives/input";
 import { Textarea } from "@/components/ui/primitives/textarea";
@@ -38,21 +38,21 @@ export function GiveawayControls({
   };
 
   const handleUploadList = () => {
-    const names = participantList
-      .split("\n")
-      .map(line => line.trim())
-      .filter(Boolean);
+    const names = participantList.split("\n").map(l => l.trim()).filter(Boolean);
     if (names.length > 0) {
       onUploadList(names);
       setParticipantList("");
     }
   };
 
+  const isReady = participantCount > 0;
+  const bulkCount = participantList.split("\n").filter(l => l.trim()).length;
+
   return (
-    <BoffContainer variant="primary" contentClassName="p-6 sm:p-8">
+    <BoffContainer variant="primary" className="h-full" contentClassName="p-6 sm:p-8">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-2 mb-2">
+      <div className="mb-6">
+        <div className="flex items-center gap-2 mb-1.5">
           <UserPlus className="w-4 h-4" style={{ color: boff.text }} />
           <span
             className="text-xs font-bold tracking-[0.35em] uppercase"
@@ -67,13 +67,12 @@ export function GiveawayControls({
       </div>
 
       {/* Tabs */}
-      <div className="mb-8">
+      <div className="mb-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2 bg-surface-800/60 border border-surface-700/50">
             <TabsTrigger
               value="single"
               className="data-[state=active]:text-white transition-all duration-200"
-              style={{ ["--active-bg" as string]: boff.border }}
             >
               <UserPlus className="mr-2 w-4 h-4" />
               Individual
@@ -116,14 +115,14 @@ export function GiveawayControls({
               variant="default"
             >
               <Upload className="mr-2 w-4 h-4" />
-              Cargar Lista ({participantList.split("\n").filter(Boolean).length} nombres)
+              Cargar Lista ({bulkCount} nombre{bulkCount !== 1 ? "s" : ""})
             </Button>
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* Warning */}
-      {participantCount === 0 && (
+      {/* Warning / Ready state */}
+      {!isReady ? (
         <div
           className="flex items-start gap-3 p-4 rounded-lg border mb-6"
           style={{
@@ -134,59 +133,72 @@ export function GiveawayControls({
         >
           <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
           <div>
-            <p className="font-medium mb-1">Faltan participantes</p>
-            <p className="text-sm opacity-80">
+            <p className="font-medium mb-1 text-sm">Faltan participantes</p>
+            <p className="text-xs opacity-75">
               Añade al menos un participante para poder iniciar el sorteo
             </p>
           </div>
         </div>
+      ) : (
+        <div
+          className="flex items-center justify-between px-4 py-3 rounded-lg border mb-6"
+          style={{
+            background: "rgba(249,115,22,0.06)",
+            borderColor: boff.border,
+          }}
+        >
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-2.5 h-2.5 rounded-full animate-pulse flex-shrink-0"
+              style={{ background: boff.text, boxShadow: `0 0 8px ${boff.glowStrong}` }}
+            />
+            <Users className="w-4 h-4" style={{ color: boff.text }} />
+            <span className="text-surface-300 text-sm font-medium">
+              {participantCount} participante{participantCount !== 1 ? "s" : ""} listo{participantCount !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <span
+            className="text-2xl font-black tabular-nums"
+            style={{ color: boff.text, fontFamily: "Orbitron, sans-serif" }}
+          >
+            {participantCount}
+          </span>
+        </div>
       )}
 
-      {/* Status */}
-      <div
-        className="text-center py-6 px-4 rounded-lg border mb-8"
-        style={{
-          background: "rgba(30,41,59,0.6)",
-          borderColor: "rgba(71,85,105,0.4)",
-        }}
-      >
-        <div className="flex items-center justify-center gap-2 mb-2">
-          <div
-            className="w-3 h-3 rounded-full transition-colors duration-300"
-            style={{
-              background: participantCount > 0 ? boff.text : "rgb(100,116,139)",
-              boxShadow: participantCount > 0 ? `0 0 8px ${boff.glowStrong}` : "none",
-            }}
-          />
-          <p className="text-surface-300 font-medium">
-            {participantCount === 0
-              ? "Sin participantes"
-              : `${participantCount} participante${participantCount !== 1 ? "s" : ""} listo${participantCount !== 1 ? "s" : ""}`}
-          </p>
-        </div>
-        {participantCount > 0 && (
-          <p className="text-sm text-surface-500">
-            El sorteo seleccionará aleatoriamente a uno de los participantes
-          </p>
-        )}
-      </div>
-
-      {/* Start Button */}
+      {/* Launch button */}
       <motion.button
         onClick={onStartGiveaway}
-        disabled={participantCount === 0}
-        className="w-full h-12 rounded-lg border font-bold text-sm tracking-widest uppercase flex items-center justify-center gap-3 transition-colors duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
+        disabled={!isReady}
+        className="relative w-full h-16 rounded-lg font-black text-sm tracking-[0.3em] uppercase flex items-center justify-center gap-3 overflow-hidden disabled:opacity-30 disabled:cursor-not-allowed"
         style={{
           fontFamily: "Orbitron, sans-serif",
-          borderColor: boff.border,
-          color: boff.text,
-          background: "rgba(249,115,22,0.08)",
+          border: `1px solid ${isReady ? boff.border : "rgba(71,85,105,0.4)"}`,
+          color: isReady ? "white" : "rgb(100,116,139)",
+          background: isReady
+            ? "linear-gradient(135deg, rgba(249,115,22,0.85) 0%, rgba(234,88,12,0.9) 50%, rgba(194,65,12,0.85) 100%)"
+            : "rgba(15,23,42,0.6)",
+          boxShadow: isReady
+            ? `0 4px 24px ${boff.glowStrong}, 0 0 60px ${boff.glow}`
+            : "none",
         }}
-        whileHover={participantCount > 0 ? { background: "rgba(249,115,22,0.15)", boxShadow: `0 0 20px ${boff.glowStrong}` } : {}}
-        whileTap={participantCount > 0 ? { scale: 0.99 } : {}}
+        whileHover={isReady ? { scale: 1.005, boxShadow: `0 4px 32px rgba(249,115,22,0.5), 0 0 80px rgba(249,115,22,0.2)` } : {}}
+        whileTap={isReady ? { scale: 0.98 } : {}}
       >
-        <Play className="w-4 h-4" />
-        {participantCount === 0 ? "Añade participantes para continuar" : "Iniciar Sorteo"}
+        {/* Shine sweep */}
+        {isReady && (
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: "linear-gradient(105deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%)",
+            }}
+            animate={{ x: ["-100%", "200%"] }}
+            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut", repeatDelay: 2.5 }}
+          />
+        )}
+        <Zap className="w-5 h-5 flex-shrink-0" />
+        {isReady ? "Iniciar Sorteo" : "Añade participantes para continuar"}
+        {isReady && <Zap className="w-5 h-5 flex-shrink-0" />}
       </motion.button>
     </BoffContainer>
   );

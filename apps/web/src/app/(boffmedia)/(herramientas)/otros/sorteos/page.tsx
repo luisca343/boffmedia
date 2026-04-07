@@ -1,47 +1,53 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Users, Trophy, Repeat2 } from "lucide-react";
 import { PageHeader } from "@/components/boffmedia/tools/PageHeader";
 import { BoffContainer } from "@/components/boffmedia/tools/BoffContainer";
+import { BOFF_VARIANTS } from "@/components/boffmedia/tools/utils/boffVariants";
 import { ParticipantsList } from "./_components/participants/ParticipantsList";
 import { GiveawayControls } from "./_components/GiveawayControls";
 import SpinnerAnimation from "./_components/spinner/SpinnerAnimation";
 import { WinnerDisplay } from "./_components/WinnerDisplay";
 
+const STATS = [
+  { key: "participants", label: "Participantes", boffKey: "primary" as const, icon: Users },
+  { key: "winners",      label: "Ganadores",     boffKey: "yellow"  as const, icon: Trophy },
+  { key: "rounds",       label: "Rondas",        boffKey: "secondary" as const, icon: Repeat2 },
+];
+
 export default function Sorteo() {
-  const [participants, setParticipants] = useState<string[]>([]);
-  const [isSpinning, setIsSpinning] = useState(false);
-  const [winner, setWinner] = useState<string | null>(null);
-  const [showWinner, setShowWinner] = useState(false);
+  const [participants,    setParticipants]    = useState<string[]>([]);
+  const [isSpinning,      setIsSpinning]      = useState(false);
+  const [winner,          setWinner]          = useState<string | null>(null);
+  const [showWinner,      setShowWinner]      = useState(false);
   const [previousWinners, setPreviousWinners] = useState<string[]>([]);
   const [animationComplete, setAnimationComplete] = useState(false);
 
   const handleAddParticipant = (name: string) => {
     if (name.trim() && !participants.includes(name.trim())) {
-      setParticipants([...participants, name.trim()]);
+      setParticipants(prev => [...prev, name.trim()]);
     }
   };
 
   const handleRemoveParticipant = (name: string) => {
-    setParticipants(participants.filter(p => p !== name));
+    setParticipants(prev => prev.filter(p => p !== name));
   };
 
   const handleUploadList = (list: string[]) => {
-    const uniqueList = Array.from(new Set(list.map(n => n.trim()).filter(Boolean)));
-    setParticipants(uniqueList);
+    const unique = Array.from(new Set(list.map(n => n.trim()).filter(Boolean)));
+    setParticipants(unique);
   };
 
   const handleStartGiveaway = () => {
-    if (participants.length > 0) {
-      setIsSpinning(true);
-      setShowWinner(false);
-      setWinner(null);
-      setAnimationComplete(false);
-      setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * participants.length);
-        setWinner(participants[randomIndex]);
-      }, 500);
-    }
+    if (participants.length === 0) return;
+    setIsSpinning(true);
+    setShowWinner(false);
+    setWinner(null);
+    setAnimationComplete(false);
+    setTimeout(() => {
+      setWinner(participants[Math.floor(Math.random() * participants.length)]);
+    }, 500);
   };
 
   useEffect(() => {
@@ -52,8 +58,12 @@ export default function Sorteo() {
     }
   }, [animationComplete, winner]);
 
-  const handleReset = () => {
-    setShowWinner(false);
+  const handleReset = () => setShowWinner(false);
+
+  const statValues = {
+    participants: participants.length,
+    winners:      previousWinners.length,
+    rounds:       previousWinners.length,
   };
 
   return (
@@ -64,9 +74,8 @@ export default function Sorteo() {
         theme="primary"
         sectionLabel="Otros"
       />
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 h-[36rem]">
           <ParticipantsList
             participants={participants}
             onRemove={handleRemoveParticipant}
@@ -74,9 +83,9 @@ export default function Sorteo() {
           />
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 h-[36rem]">
           {isSpinning || showWinner ? (
-            <BoffContainer variant="primary" contentClassName="p-6">
+            <BoffContainer variant="primary" className="h-full" contentClassName="p-6">
               {isSpinning && (
                 <SpinnerAnimation
                   participants={participants}
@@ -85,7 +94,11 @@ export default function Sorteo() {
                 />
               )}
               {showWinner && winner && (
-                <WinnerDisplay winner={winner} onReset={handleReset} />
+                <WinnerDisplay
+                  winner={winner}
+                  onReset={handleReset}
+                  roundNumber={previousWinners.length}
+                />
               )}
             </BoffContainer>
           ) : (
