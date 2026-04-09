@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MyrientScrapeService } from './services/myrient.service';
+import { MangaScraperService } from './services/manga.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
@@ -12,6 +13,7 @@ import { MyrientConsole } from './enums/myrient-console.enum';
 export class ScrapeFacadeService {
   constructor(
     private readonly myrientScrapeService: MyrientScrapeService,
+    private readonly mangaScraperService: MangaScraperService,
   ) {}
 
   // ==================== MYRIENT SCRAPING ====================
@@ -37,7 +39,7 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.scrapeCatalog(consoleKey, regions);
     } catch (error) {
       console.error('Error scraping Myrient catalog:', error);
-      throw new Error(`Failed to scrape catalog: ${error.message}`);
+      throw new Error(`Failed to scrape catalog: ${(error as Error).message}`);
     }
   }
 
@@ -48,7 +50,7 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.downloadGame(url);
     } catch (error) {
       console.error('Error downloading game from Myrient:', error);
-      throw new Error(`Failed to download game: ${error.message}`);
+      throw new Error(`Failed to download game: ${(error as Error).message}`);
     }
   }
 
@@ -57,7 +59,7 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.downloadAllGames(dto);
     } catch (error) {
       console.error('Error in bulk download from Myrient:', error);
-      throw new Error(`Bulk download failed: ${error.message}`);
+      throw new Error(`Bulk download failed: ${(error as Error).message}`);
     }
   }
 
@@ -66,11 +68,22 @@ export class ScrapeFacadeService {
       return await this.myrientScrapeService.downloadSelectedGames(dto);
     } catch (error) {
       console.error('Error in selected download from Myrient:', error);
-      throw new Error(`Selected download failed: ${error.message}`);
+      throw new Error(`Selected download failed: ${(error as Error).message}`);
     }
   }
 
   streamDownloadSelected(dto: DownloadSelectedGamesDto): AsyncGenerator<string> {
     return this.myrientScrapeService.streamDownloadSelected(dto);
   }
+
+  // ==================== MANGA SCRAPER ====================
+
+  async scrapeMangaChapter(chapterUrl: string): Promise<string[]> {
+    try {
+      return await this.mangaScraperService.scrapeChapter(chapterUrl);
+    } catch (error) {
+      throw new Error(`Failed to scrape manga chapter: ${(error as Error).message}`);
+    }
+  }
+
 }
