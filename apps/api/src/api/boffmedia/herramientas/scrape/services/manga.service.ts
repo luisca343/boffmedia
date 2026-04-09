@@ -1,15 +1,25 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
 import { chromium, Browser } from 'playwright';
 import axios from 'axios';
+import * as cheerio from 'cheerio';
 import { createWriteStream } from 'fs';
 import { mkdir, access } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
 const DELAY_MS = { min: 300, max: 800 };
 const MAX_RETRIES = 2;
-const USER_AGENT =
+const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -25,15 +35,18 @@ function normalizeChapterUrl(url: string): string {
   return url.replace(/\/?$/, '-10-1.html');
 }
 
-function buildPageUrl(baseChapterUrl: string, page: number): string {
-  const canonical = baseChapterUrl.replace(/-10-\d+\.html$/, '');
-  return `${canonical}-10-${page}.html`;
+function buildPageUrl(base: string, page: number): string {
+  return `${base.replace(/-10-\d+\.html$/, '')}-10-${page}.html`;
 }
 
-/** Extracts chapter slug from URL, e.g. "Cap-tulo-1" from ".../chapter/Cap-tulo-1/2454249" */
-function chapterSlugFromUrl(url: string): string {
-  const match = url.match(/\/chapter\/([^/]+)\//);
-  return match ? match[1] : 'chapter-unknown';
+/** Slugify a string for safe folder names. */
+function slugify(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')   // strip diacritics
+    .replace(/[^a-zA-Z0-9\s-]/g, '')   // keep alphanumerics, spaces, hyphens
+    .trim()
+    .replace(/\s+/g, '-');
 }
 
 async function fileExists(filePath: string): Promise<boolean> {
@@ -45,7 +58,31 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
-export interface MangaChapterResult {
+async function fetchHtml(url: string): Promise<string> {
+  const { data } = await axios.get<string>(url, {
+    headers: { 'User-Agent': UA },
+    timeout: 15_000,
+  });
+  return data;
+}
+
+// ---------------------------------------------------------------------------
+// Public interfaces
+// ---------------------------------------------------------------------------
+
+export interface MangaSearchResult {
+  title: string;
+  url: string;
+  cover: string;
+}
+
+export interface MangaChapter {
+  title: string;
+  url: string;
+}
+
+export interface MangaChapterDownloadResult {
+  chapter: string;
   imageUrls: string[];
   downloaded: number;
   skipped: number;
@@ -53,10 +90,23 @@ export interface MangaChapterResult {
   saveDir: string;
 }
 
+export interface MangaNovelDownloadResult {
+  novelTitle: string;
+  chapters: MangaChapterDownloadResult[];
+  totalDownloaded: number;
+  totalFailed: number;
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
 @Injectable()
 export class MangaScraperService implements OnModuleDestroy {
   private readonly logger = new Logger(MangaScraperService.name);
   private browser: Browser | null = null;
+
+  // ── Browser lifecycle ──────────────────────────────────────────────────────
 
   private async getBrowser(): Promise<Browser> {
     if (!this.browser || !this.browser.isConnected()) {
@@ -76,11 +126,62 @@ export class MangaScraperService implements OnModuleDestroy {
     }
   }
 
-  async scrapeAndDownloadChapter(chapterUrl: string): Promise<MangaChapterResult> {
-    const imageUrls = await this.scrapeChapter(chapterUrl);
+  // ── Public API ─────────────────────────────────────────────────────────────
 
-    const slug = chapterSlugFromUrl(chapterUrl);
-    const saveDir = path.join(process.cwd(), 'laboon/manga/downloads/mangas/Raeliana', slug);
+  /** Search novelcool for a manga title. Returns deduplicated result list. */
+  async searchNovels(query: string): Promise<MangaSearchResult[]> {
+    const html = await fetchHtml(`https://es.novelcool.com/search?name=${encodeURIComponent(query)}`);
+    const $ = cheerio.load(html);
+    const results: MangaSearchResult[] = [];
+    const seen = new Set<string>();
+
+    $('[class*="book-item"]').each((_, el) => {
+      const url = $(el).find('a[href*="/novel/"]').first().attr('href') ?? '';
+      if (!url || seen.has(url)) return;
+      seen.add(url);
+
+      const title = $(el).find('.book-pic').attr('title')
+        ?? $(el).find('a[href*="/novel/"]').first().attr('title')
+        ?? '';
+      const cover = $(el).find('img[cover_url]').attr('cover_url')
+        ?? $(el).find('img').first().attr('src')
+        ?? '';
+
+      results.push({ title: title.trim(), url, cover });
+    });
+
+    return results;
+  }
+
+  /** Fetches the full ordered chapter list (ch0 first → last) for a novel page. */
+  async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
+    const html = await fetchHtml(novelUrl);
+    const $ = cheerio.load(html);
+
+    const chapters: MangaChapter[] = [];
+    const seen = new Set<string>();
+
+    $('a[href*="/chapter/"]').each((_, el) => {
+      const url = $(el).attr('href') ?? '';
+      const rawText = $(el).text().trim().split('\n')[0].trim();
+
+      if (!url || seen.has(url) || rawText === 'Empieza a leer') return;
+      seen.add(url);
+      chapters.push({ title: rawText, url });
+    });
+
+    // Chapters are listed newest-first in the HTML; reverse so ch0/ch1 comes first.
+    chapters.reverse();
+    return chapters;
+  }
+
+  /**
+   * Downloads a single chapter (scrape → disk).
+   * @param chapterUrl  Full chapter URL from novelcool.com
+   * @param saveDir     Absolute path to the folder where images will be saved
+   */
+  async downloadChapter(chapterUrl: string, saveDir: string): Promise<MangaChapterDownloadResult> {
+    const imageUrls = await this.scrapeChapterImages(chapterUrl);
     await mkdir(saveDir, { recursive: true });
 
     let downloaded = 0;
@@ -94,44 +195,82 @@ export class MangaScraperService implements OnModuleDestroy {
       const filePath = path.join(saveDir, filename);
 
       if (await fileExists(filePath)) {
-        this.logger.log(`Skipping [${i + 1}/${imageUrls.length}] ${filename} (exists)`);
         skipped++;
         continue;
       }
 
       try {
         await this.downloadImage(url, filePath);
-        this.logger.log(`Downloaded [${i + 1}/${imageUrls.length}] ${filename}`);
         downloaded++;
       } catch (err) {
-        this.logger.error(`Failed [${i + 1}/${imageUrls.length}] ${filename}: ${(err as Error).message}`);
+        this.logger.error(`  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`);
         failed++;
       }
 
       if (i < imageUrls.length - 1) await randomDelay();
     }
 
-    this.logger.log(`Done — ${downloaded} downloaded, ${skipped} skipped, ${failed} failed → ${saveDir}`);
-    return { imageUrls, downloaded, skipped, failed, saveDir };
+    this.logger.log(`  Chapter done — ${downloaded} DL, ${skipped} skip, ${failed} fail`);
+    return { chapter: path.basename(saveDir), imageUrls, downloaded, skipped, failed, saveDir };
   }
 
-  private async scrapeChapter(chapterUrl: string): Promise<string[]> {
+  /**
+   * Downloads an entire novel (or a range of chapters) to disk.
+   * Chapters are stored at: MANGA_ROOT/{novelTitle}/{chapterTitle}/
+   */
+  async downloadNovel(
+    novelUrl: string,
+    from: number = 1,
+    to?: number,
+  ): Promise<MangaNovelDownloadResult> {
+    // Resolve novel title from the page
+    const novelHtml = await fetchHtml(novelUrl);
+    const $n = cheerio.load(novelHtml);
+    const novelTitle = slugify($n('h1').first().text().trim()) || 'manga-unknown';
+
+    const allChapters = await this.getChapterList(novelUrl);
+    const slice = allChapters.slice(from - 1, to ?? allChapters.length);
+
+    this.logger.log(`Downloading "${novelTitle}": chapters ${from}–${to ?? allChapters.length} (${slice.length} total)`);
+
+    const results: MangaChapterDownloadResult[] = [];
+    let totalDownloaded = 0;
+    let totalFailed = 0;
+
+    for (let i = 0; i < slice.length; i++) {
+      const ch = slice[i];
+      const chSlug = slugify(ch.title) || `chapter-${i + from}`;
+      const saveDir = path.join(MANGA_ROOT, novelTitle, chSlug);
+
+      this.logger.log(`[${i + 1}/${slice.length}] ${ch.title}`);
+      const result = await this.downloadChapter(ch.url, saveDir);
+      results.push(result);
+      totalDownloaded += result.downloaded;
+      totalFailed += result.failed;
+
+      if (i < slice.length - 1) await randomDelay();
+    }
+
+    return { novelTitle, chapters: results, totalDownloaded, totalFailed };
+  }
+
+  // ── Internal: Playwright chapter image scraping ────────────────────────────
+
+  private async scrapeChapterImages(chapterUrl: string): Promise<string[]> {
     const browser = await this.getBrowser();
-    const context = await browser.newContext({ userAgent: USER_AGENT });
+    const context = await browser.newContext({ userAgent: UA });
 
     try {
       const firstPageUrl = normalizeChapterUrl(chapterUrl);
       const totalPages = await this.detectTotalPages(context, firstPageUrl);
-      this.logger.log(`Chapter has ${totalPages} page(s). Starting scrape…`);
+      this.logger.log(`  ${totalPages} page(s) detected`);
 
       const canonicalBase = chapterUrl.replace(/-10-\d+\.html$/, '').replace(/\/?$/, '');
       const allImages: string[] = [];
 
       for (let page = 1; page <= totalPages; page++) {
-        const pageUrl = buildPageUrl(canonicalBase, page);
-        const images = await this.scrapePageWithRetry(context, pageUrl, page);
+        const images = await this.scrapePageWithRetry(context, buildPageUrl(canonicalBase, page), page);
         allImages.push(...images);
-        this.logger.log(`Page ${page}/${totalPages}: extracted ${images.length} image(s).`);
         if (page < totalPages) await randomDelay();
       }
 
@@ -141,18 +280,19 @@ export class MangaScraperService implements OnModuleDestroy {
     }
   }
 
-  private async detectTotalPages(context: import('playwright').BrowserContext, firstPageUrl: string): Promise<number> {
+  private async detectTotalPages(
+    context: import('playwright').BrowserContext,
+    firstPageUrl: string,
+  ): Promise<number> {
     const page = await context.newPage();
     try {
       await page.goto(firstPageUrl, { waitUntil: 'domcontentloaded' });
-
       // Use $eval (first match only) — $$eval would double-count header+footer selects
-      const optionCount = await page.$eval(
+      const count = await page.$eval(
         'select.sl-page',
-        select => select.querySelectorAll('option').length,
+        el => el.querySelectorAll('option').length,
       ).catch(() => 0);
-
-      return optionCount > 0 ? optionCount : 1;
+      return count > 0 ? count : 1;
     } finally {
       await page.close();
     }
@@ -187,7 +327,6 @@ export class MangaScraperService implements OnModuleDestroy {
     try {
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('.mangaread-manga-pic', { timeout: 15_000 });
-
       return await page.$$eval('.mangaread-manga-pic', imgs =>
         imgs
           .map(img => (img as HTMLImageElement).src)
@@ -198,14 +337,13 @@ export class MangaScraperService implements OnModuleDestroy {
     }
   }
 
+  // ── Internal: image download ───────────────────────────────────────────────
+
   private async downloadImage(url: string, filePath: string): Promise<void> {
     const response = await axios.get(url, {
       responseType: 'stream',
       timeout: 30_000,
-      headers: {
-        'User-Agent': USER_AGENT,
-        'Referer': 'https://es.novelcool.com/',
-      },
+      headers: { 'User-Agent': UA, 'Referer': 'https://es.novelcool.com/' },
     });
     await pipeline(response.data, createWriteStream(filePath));
   }

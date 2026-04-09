@@ -174,15 +174,41 @@ export class ScrapeController {
 
   // ==================== MANGA ====================
 
-  @Get('manga/chapter')
+  @Get('manga/search')
+  @ApiOperation({ summary: 'Search novelcool.com for a manga title' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query', example: 'Raeliana' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of matching manga.' })
+  async searchManga(@Query('q') query: string) {
+    return this.scrapeFacadeService.searchManga(query);
+  }
+
+  @Get('manga/chapters')
+  @ApiOperation({ summary: 'Get the full ordered chapter list for a novelcool.com novel' })
+  @ApiQuery({ name: 'url', type: String, description: 'Novel page URL', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of chapters (title + url).' })
+  async getMangaChapters(@Query('url') url: string) {
+    return this.scrapeFacadeService.getMangaChapters(url);
+  }
+
+  @Post('manga/download/novel')
   @ApiOperation({
-    summary: 'Scrape all image URLs from a novelcool.com manga chapter',
-    description: 'Visits every page of the chapter and returns an ordered array of image URLs.',
+    summary: 'Download an entire novel (or a chapter range) to disk',
+    description: 'Scrapes every chapter with Playwright and saves images to laboon/manga/downloads/mangas/{title}/{chapter}/. Use `from`/`to` (1-based) to limit the range.',
   })
-  @ApiQuery({ name: 'url', type: String, description: 'Full chapter URL from novelcool.com', example: 'https://es.novelcool.com/chapter/Cap-tulo-1/2454249' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of image URLs.' })
-  async scrapeMangaChapter(@Query('url') url: string) {
-    return this.scrapeFacadeService.scrapeMangaChapter(url);
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['url'],
+      properties: {
+        url: { type: 'string', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' },
+        from: { type: 'number', example: 1, description: 'First chapter (1-based, default 1)' },
+        to: { type: 'number', example: 5, description: 'Last chapter inclusive (default: all)' },
+      },
+    },
+  })
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Download summary per chapter.' })
+  async downloadMangaNovel(@Body() body: { url: string; from?: number; to?: number }) {
+    return this.scrapeFacadeService.downloadMangaNovel(body.url, body.from, body.to);
   }
 
   @Post('myrient/download-selected')
