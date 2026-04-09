@@ -3,6 +3,7 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseModule } from '@api/_utils/response/response.module';
 
 import { MyrientScrapeService } from './services/myrient.service';
+import { MangaScraperService } from './services/manga.service';
 import { ScrapeFacadeService } from './scrape.facade.service';
 import { ScrapeController } from './scrape.controller';
 
@@ -14,6 +15,7 @@ import { ScrapeController } from './scrape.controller';
   controllers: [ScrapeController],
   providers: [
     MyrientScrapeService,
+    MangaScraperService,
     ScrapeFacadeService,
   ],
   exports: [ScrapeFacadeService],

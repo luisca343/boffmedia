@@ -172,6 +172,19 @@ export class ScrapeController {
     res.end();
   }
 
+  // ==================== MANGA ====================
+
+  @Get('manga/chapter')
+  @ApiOperation({
+    summary: 'Scrape all image URLs from a novelcool.com manga chapter',
+    description: 'Visits every page of the chapter and returns an ordered array of image URLs.',
+  })
+  @ApiQuery({ name: 'url', type: String, description: 'Full chapter URL from novelcool.com', example: 'https://es.novelcool.com/chapter/Cap-tulo-1/2454249' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of image URLs.' })
+  async scrapeMangaChapter(@Query('url') url: string): Promise<string[]> {
+    return this.scrapeFacadeService.scrapeMangaChapter(url);
+  }
+
   @Post('myrient/download-selected')
   @ApiOperation({
     summary: 'Download a user-selected list of games for a console',
