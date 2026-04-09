@@ -181,7 +181,7 @@ export class ScrapeController {
   })
   @ApiQuery({ name: 'url', type: String, description: 'Full chapter URL from novelcool.com', example: 'https://es.novelcool.com/chapter/Cap-tulo-1/2454249' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of image URLs.' })
-  async scrapeMangaChapter(@Query('url') url: string): Promise<string[]> {
+  async scrapeMangaChapter(@Query('url') url: string) {
     return this.scrapeFacadeService.scrapeMangaChapter(url);
   }
 

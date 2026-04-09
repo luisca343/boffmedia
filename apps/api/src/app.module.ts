@@ -116,6 +116,7 @@ import { ScrapeModule } from '@api/boffmedia/herramientas/scrape/scrape.module';
     PokemonLogModule,
     YoutubeModule,
     ScrapeModule,
+    
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
