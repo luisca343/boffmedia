@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { MyrientScrapeService } from './services/myrient.service';
-import { MangaScraperService, MangaChapterResult } from './services/manga.service';
+import {
+  MangaScraperService,
+  type MangaSearchResult,
+  type MangaChapter,
+  type MangaChapterDownloadResult,
+  type MangaNovelDownloadResult,
+} from './services/manga.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
@@ -78,11 +84,35 @@ export class ScrapeFacadeService {
 
   // ==================== MANGA SCRAPER ====================
 
-  async scrapeMangaChapter(chapterUrl: string): Promise<MangaChapterResult> {
+  async searchManga(query: string): Promise<MangaSearchResult[]> {
     try {
-      return await this.mangaScraperService.scrapeAndDownloadChapter(chapterUrl);
+      return await this.mangaScraperService.searchNovels(query);
     } catch (error) {
-      throw new Error(`Failed to scrape manga chapter: ${(error as Error).message}`);
+      throw new Error(`Manga search failed: ${(error as Error).message}`);
+    }
+  }
+
+  async getMangaChapters(novelUrl: string): Promise<MangaChapter[]> {
+    try {
+      return await this.mangaScraperService.getChapterList(novelUrl);
+    } catch (error) {
+      throw new Error(`Failed to fetch chapter list: ${(error as Error).message}`);
+    }
+  }
+
+  async downloadMangaChapter(chapterUrl: string, saveDir: string): Promise<MangaChapterDownloadResult> {
+    try {
+      return await this.mangaScraperService.downloadChapter(chapterUrl, saveDir);
+    } catch (error) {
+      throw new Error(`Failed to download chapter: ${(error as Error).message}`);
+    }
+  }
+
+  async downloadMangaNovel(novelUrl: string, from?: number, to?: number): Promise<MangaNovelDownloadResult> {
+    try {
+      return await this.mangaScraperService.downloadNovel(novelUrl, from, to);
+    } catch (error) {
+      throw new Error(`Failed to download novel: ${(error as Error).message}`);
     }
   }
 
