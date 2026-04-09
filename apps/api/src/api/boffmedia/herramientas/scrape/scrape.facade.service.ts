@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { MyrientScrapeService } from './services/myrient.service';
-import { MangaScraperService } from './services/manga.service';
+import { MangaScraperService, MangaChapterResult } from './services/manga.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
@@ -78,9 +78,9 @@ export class ScrapeFacadeService {
 
   // ==================== MANGA SCRAPER ====================
 
-  async scrapeMangaChapter(chapterUrl: string): Promise<string[]> {
+  async scrapeMangaChapter(chapterUrl: string): Promise<MangaChapterResult> {
     try {
-      return await this.mangaScraperService.scrapeChapter(chapterUrl);
+      return await this.mangaScraperService.scrapeAndDownloadChapter(chapterUrl);
     } catch (error) {
       throw new Error(`Failed to scrape manga chapter: ${(error as Error).message}`);
     }
