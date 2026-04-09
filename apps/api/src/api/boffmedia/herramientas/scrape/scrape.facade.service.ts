@@ -5,7 +5,7 @@ import {
   type MangaSearchResult,
   type MangaChapter,
   type MangaChapterDownloadResult,
-  type MangaNovelDownloadResult,
+  type LocalMangaLibrary,
 } from './services/manga.service';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
@@ -108,12 +108,11 @@ export class ScrapeFacadeService {
     }
   }
 
-  async downloadMangaNovel(novelUrl: string, from?: number, to?: number): Promise<MangaNovelDownloadResult> {
-    try {
-      return await this.mangaScraperService.downloadNovel(novelUrl, from, to);
-    } catch (error) {
-      throw new Error(`Failed to download novel: ${(error as Error).message}`);
-    }
+  streamDownloadMangaNovel(novelUrl: string, from?: number, to?: number): AsyncGenerator<string> {
+    return this.mangaScraperService.streamDownloadNovel(novelUrl, from, to);
   }
 
+  async getLocalMangaLibrary(): Promise<LocalMangaLibrary> {
+    return this.mangaScraperService.getLocalLibrary();
+  }
 }

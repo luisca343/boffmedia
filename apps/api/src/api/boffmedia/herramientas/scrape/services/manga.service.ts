@@ -3,7 +3,7 @@ import { chromium, Browser } from 'playwright';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { createWriteStream } from 'fs';
-import { mkdir, access } from 'fs/promises';
+import { mkdir, access, readdir, stat } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 
@@ -58,6 +58,10 @@ async function fileExists(filePath: string): Promise<boolean> {
   }
 }
 
+function sse(data: object): string {
+  return `data: ${JSON.stringify(data)}\n\n`;
+}
+
 async function fetchHtml(url: string): Promise<string> {
   const { data } = await axios.get<string>(url, {
     headers: { 'User-Agent': UA },
@@ -97,6 +101,23 @@ export interface MangaNovelDownloadResult {
   totalFailed: number;
 }
 
+export interface LocalMangaChapter {
+  slug: string;
+  imageCount: number;
+}
+
+export interface LocalMangaSeries {
+  slug: string;
+  chapters: LocalMangaChapter[];
+  totalImages: number;
+}
+
+export interface LocalMangaLibrary {
+  series: LocalMangaSeries[];
+  totalSeries: number;
+  totalChapters: number;
+}
+
 // ---------------------------------------------------------------------------
 // Service
 // ---------------------------------------------------------------------------
@@ -127,6 +148,49 @@ export class MangaScraperService implements OnModuleDestroy {
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────
+
+  /** Scans MANGA_ROOT on disk and returns all downloaded series and their chapters. */
+  async getLocalLibrary(): Promise<LocalMangaLibrary> {
+    let seriesDirs: string[] = [];
+    try {
+      seriesDirs = await readdir(MANGA_ROOT);
+    } catch {
+      // Root doesn't exist yet — empty library
+      return { series: [], totalSeries: 0, totalChapters: 0 };
+    }
+
+    const series: LocalMangaSeries[] = [];
+    for (const seriesSlug of seriesDirs) {
+      const seriesPath = path.join(MANGA_ROOT, seriesSlug);
+      const seriesStat = await stat(seriesPath).catch(() => null);
+      if (!seriesStat?.isDirectory()) continue;
+
+      const chapterDirs = await readdir(seriesPath).catch(() => [] as string[]);
+      const chapters: LocalMangaChapter[] = [];
+
+      for (const chapterSlug of chapterDirs) {
+        const chapterPath = path.join(seriesPath, chapterSlug);
+        const chapterStat = await stat(chapterPath).catch(() => null);
+        if (!chapterStat?.isDirectory()) continue;
+
+        const images = await readdir(chapterPath).catch(() => [] as string[]);
+        const imageCount = images.filter(f => /\.(webp|jpg|jpeg|png|gif)$/i.test(f)).length;
+        chapters.push({ slug: chapterSlug, imageCount });
+      }
+
+      series.push({
+        slug: seriesSlug,
+        chapters,
+        totalImages: chapters.reduce((s, c) => s + c.imageCount, 0),
+      });
+    }
+
+    return {
+      series,
+      totalSeries: series.length,
+      totalChapters: series.reduce((s, sr) => s + sr.chapters.length, 0),
+    };
+  }
 
   /** Search novelcool for a manga title. Returns deduplicated result list. */
   async searchNovels(query: string): Promise<MangaSearchResult[]> {
@@ -215,15 +279,20 @@ export class MangaScraperService implements OnModuleDestroy {
   }
 
   /**
-   * Downloads an entire novel (or a range of chapters) to disk.
-   * Chapters are stored at: MANGA_ROOT/{novelTitle}/{chapterTitle}/
+   * Downloads an entire novel (or chapter range) to disk, streaming SSE progress events.
+   * Yields `data: <json>\n\n` strings for each event so the controller can pipe them.
+   *
+   * Event shapes:
+   *   { type: 'start',    total: number, novelTitle: string }
+   *   { type: 'chapter',  index: number, total: number, chapter: string,
+   *                        downloaded: number, skipped: number, failed: number }
+   *   { type: 'done',     novelTitle: string, totalDownloaded: number, totalFailed: number }
    */
-  async downloadNovel(
+  async *streamDownloadNovel(
     novelUrl: string,
     from: number = 1,
     to?: number,
-  ): Promise<MangaNovelDownloadResult> {
-    // Resolve novel title from the page
+  ): AsyncGenerator<string> {
     const novelHtml = await fetchHtml(novelUrl);
     const $n = cheerio.load(novelHtml);
     const novelTitle = slugify($n('h1').first().text().trim()) || 'manga-unknown';
@@ -231,9 +300,10 @@ export class MangaScraperService implements OnModuleDestroy {
     const allChapters = await this.getChapterList(novelUrl);
     const slice = allChapters.slice(from - 1, to ?? allChapters.length);
 
-    this.logger.log(`Downloading "${novelTitle}": chapters ${from}–${to ?? allChapters.length} (${slice.length} total)`);
+    this.logger.log(`Streaming download "${novelTitle}": chapters ${from}–${to ?? allChapters.length} (${slice.length} total)`);
 
-    const results: MangaChapterDownloadResult[] = [];
+    yield sse({ type: 'start', total: slice.length, novelTitle });
+
     let totalDownloaded = 0;
     let totalFailed = 0;
 
@@ -244,14 +314,23 @@ export class MangaScraperService implements OnModuleDestroy {
 
       this.logger.log(`[${i + 1}/${slice.length}] ${ch.title}`);
       const result = await this.downloadChapter(ch.url, saveDir);
-      results.push(result);
       totalDownloaded += result.downloaded;
       totalFailed += result.failed;
+
+      yield sse({
+        type: 'chapter',
+        index: i + 1,
+        total: slice.length,
+        chapter: result.chapter,
+        downloaded: result.downloaded,
+        skipped: result.skipped,
+        failed: result.failed,
+      });
 
       if (i < slice.length - 1) await randomDelay();
     }
 
-    return { novelTitle, chapters: results, totalDownloaded, totalFailed };
+    yield sse({ type: 'done', novelTitle, totalDownloaded, totalFailed });
   }
 
   // ── Internal: Playwright chapter image scraping ────────────────────────────
