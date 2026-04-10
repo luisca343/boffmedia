@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { MyrientScrapeService } from './services/myrient.service';
-import {
-  MangaScraperService,
-  type MangaSearchResult,
-  type MangaChapter,
-  type MangaChapterDownloadResult,
-  type LocalMangaLibrary,
-} from './services/manga.service';
+import { MangaScraperService } from './services/manga.service';
+import type {
+  MangaSearchResult,
+  MangaChapter,
+  MangaChapterDownloadResult,
+  LocalMangaLibrary,
+} from './services/manga/manga.types';
 import { EuropeAggregateResult } from './entities/europe-aggregate.entity';
 import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';

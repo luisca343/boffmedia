@@ -1,0 +1,186 @@
+// ---------------------------------------------------------------------------
+// NovelCool scraper — implements IMangaScraper for es.novelcool.com.
+//
+// Chapter images are rendered by JavaScript, so Playwright is required.
+// Search results and chapter lists are available in static HTML (cheerio).
+// ---------------------------------------------------------------------------
+
+import { BrowserContext } from 'playwright';
+import * as cheerio from 'cheerio';
+import { IMangaScraper } from '../manga-scraper.interface';
+import { MangaChapter, MangaSearchResult } from '../../manga.types';
+import { normalizeChapterNumber } from '../../chapter-normalizer';
+import { fetchHtml, MAX_RETRIES, randomDelay, sleep } from '../../manga-http';
+
+export class NovelCoolScraper implements IMangaScraper {
+  readonly name = 'novelcool-es';
+  readonly requiresBrowser = true;
+
+  // ── Routing ───────────────────────────────────────────────────────────────
+
+  canHandle(url: string): boolean {
+    return url.includes('novelcool.com');
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────────
+
+  async search(query: string): Promise<MangaSearchResult[]> {
+    const html = await fetchHtml(
+      `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`,
+    );
+    const $ = cheerio.load(html);
+    const results: MangaSearchResult[] = [];
+    const seen = new Set<string>();
+
+    $('[class*="book-item"]').each((_, el) => {
+      const url = $(el).find('a[href*="/novel/"]').first().attr('href') ?? '';
+      if (!url || seen.has(url)) return;
+      seen.add(url);
+
+      const title =
+        $(el).find('.book-pic').attr('title') ??
+        $(el).find('a[href*="/novel/"]').first().attr('title') ??
+        '';
+      const cover =
+        $(el).find('img[cover_url]').attr('cover_url') ??
+        $(el).find('img').first().attr('src') ??
+        '';
+
+      results.push({ title: title.trim(), url, cover });
+    });
+
+    return results;
+  }
+
+  async getTitle(novelUrl: string): Promise<string> {
+    const html = await fetchHtml(novelUrl);
+    const $ = cheerio.load(html);
+    return $('h1').first().text().trim();
+  }
+
+  async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
+    const html = await fetchHtml(novelUrl);
+    const $ = cheerio.load(html);
+    const chapters: MangaChapter[] = [];
+    const seen = new Set<string>();
+
+    $('a[href*="/chapter/"]').each((_, el) => {
+      const url = $(el).attr('href') ?? '';
+      const rawText = $(el).text().trim().split('\n')[0].trim();
+
+      if (!url || seen.has(url) || rawText === 'Empieza a leer') return;
+      seen.add(url);
+
+      chapters.push({
+        title: rawText,
+        url,
+        number: normalizeChapterNumber(rawText),
+      });
+    });
+
+    // HTML lists chapters newest-first; reverse so oldest chapter is index 0.
+    chapters.reverse();
+    return chapters;
+  }
+
+  async getChapterImages(chapterUrl: string, context: BrowserContext): Promise<string[]> {
+    const firstPageUrl = this.normalizeChapterUrl(chapterUrl);
+    const totalPages = await this.detectTotalPages(context, firstPageUrl);
+
+    // Strip any existing page suffix to get the canonical base URL.
+    const canonicalBase = chapterUrl
+      .replace(/-10-\d+\.html$/, '')
+      .replace(/\/?$/, '');
+
+    const allImages: string[] = [];
+
+    for (let page = 1; page <= totalPages; page++) {
+      const pageUrl = this.buildPageUrl(canonicalBase, page);
+      const images = await this.scrapePageWithRetry(context, pageUrl, page);
+      allImages.push(...images);
+      if (page < totalPages) await randomDelay();
+    }
+
+    // Deduplicate while preserving order.
+    return [...new Set(allImages)];
+  }
+
+  // ── Private: URL helpers ──────────────────────────────────────────────────
+
+  private normalizeChapterUrl(url: string): string {
+    if (url.endsWith('.html')) return url;
+    return url.replace(/\/?$/, '-10-1.html');
+  }
+
+  private buildPageUrl(base: string, page: number): string {
+    return `${base.replace(/-10-\d+\.html$/, '')}-10-${page}.html`;
+  }
+
+  // ── Private: Playwright page scraping ─────────────────────────────────────
+
+  /**
+   * Reads the first `select.sl-page` option count to determine how many
+   * image-pages exist in this chapter. Uses $eval (not $$eval) so that the
+   * duplicate footer select element is ignored.
+   */
+  private async detectTotalPages(
+    context: BrowserContext,
+    firstPageUrl: string,
+  ): Promise<number> {
+    const page = await context.newPage();
+    try {
+      await page.goto(firstPageUrl, { waitUntil: 'domcontentloaded' });
+      const count = await page
+        .$eval('select.sl-page', el => el.querySelectorAll('option').length)
+        .catch(() => 0);
+      return count > 0 ? count : 1;
+    } finally {
+      await page.close();
+    }
+  }
+
+  private async scrapePageWithRetry(
+    context: BrowserContext,
+    pageUrl: string,
+    pageNum: number,
+  ): Promise<string[]> {
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+      try {
+        return await this.scrapeSinglePage(context, pageUrl);
+      } catch (err) {
+        lastError = err as Error;
+        if (attempt <= MAX_RETRIES) {
+          console.warn(
+            `[NovelCoolScraper] Page ${pageNum} attempt ${attempt} failed — retrying… (${lastError.message})`,
+          );
+          await sleep(1000 * attempt);
+        }
+      }
+    }
+
+    console.error(
+      `[NovelCoolScraper] Page ${pageNum} failed after ${MAX_RETRIES} retries: ${lastError?.message}`,
+    );
+    return [];
+  }
+
+  private async scrapeSinglePage(
+    context: BrowserContext,
+    pageUrl: string,
+  ): Promise<string[]> {
+    const page = await context.newPage();
+    try {
+      await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('.mangaread-manga-pic', { timeout: 15_000 });
+      return await page.$$eval('.mangaread-manga-pic', imgs =>
+        imgs
+          .map(img => (img as HTMLImageElement).src)
+          .filter(src => !!src && src.startsWith('http')),
+      );
+    } finally {
+      await page.close();
+    }
+  }
+}
