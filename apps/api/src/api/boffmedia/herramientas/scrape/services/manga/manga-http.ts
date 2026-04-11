@@ -68,6 +68,21 @@ export async function getProxies(n = 3): Promise<string[]> {
   return shuffled.slice(0, Math.min(n, shuffled.length));
 }
 
+/**
+ * Parses a proxy URL (http://user:pass@host:port) into Playwright's proxy
+ * config shape, which requires credentials as separate fields.
+ */
+export function toPlaywrightProxy(
+  proxyUrl: string,
+): { server: string; username?: string; password?: string } {
+  const parsed = new URL(proxyUrl);
+  return {
+    server: `${parsed.protocol}//${parsed.hostname}:${parsed.port}`,
+    ...(parsed.username ? { username: decodeURIComponent(parsed.username) } : {}),
+    ...(parsed.password ? { password: decodeURIComponent(parsed.password) } : {}),
+  };
+}
+
 export const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
