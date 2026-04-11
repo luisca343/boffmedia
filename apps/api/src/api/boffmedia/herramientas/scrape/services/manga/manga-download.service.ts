@@ -46,7 +46,12 @@ export class MangaDownloadService implements OnModuleDestroy {
       this.logger.log('Launching Chromium browser…');
       this.browser = await chromium.launch({
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',   // prevents /dev/shm exhaustion in Docker
+          '--disable-gpu',
+        ],
       });
     }
     return this.browser;

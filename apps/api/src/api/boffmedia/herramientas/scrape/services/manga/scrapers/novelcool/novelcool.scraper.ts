@@ -33,6 +33,10 @@ export class NovelCoolScraper implements IMangaScraper {
         { waitUntil: 'domcontentloaded' },
       );
 
+      // Wait for at least one result card to appear (JS-rendered). If the
+      // selector never arrives the search returned no results — not an error.
+      await page.waitForSelector('[class*="book-item"]', { timeout: 10_000 }).catch(() => null);
+
       // $$eval runs inside the browser — extract plain data only.
       const raw = await page.$$eval('[class*="book-item"]', els =>
         els.map(el => {
@@ -75,6 +79,9 @@ export class NovelCoolScraper implements IMangaScraper {
     const page = await context.newPage();
     try {
       await page.goto(novelUrl, { waitUntil: 'domcontentloaded' });
+
+      // Wait for at least one chapter link before extracting.
+      await page.waitForSelector('a[href*="/chapter/"]', { timeout: 10_000 }).catch(() => null);
 
       // Extract title + URL pairs in the browser; chapter number normalisation
       // happens in Node so we don't need to serialise the regex.
