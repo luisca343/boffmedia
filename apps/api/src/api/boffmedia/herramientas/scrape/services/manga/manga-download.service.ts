@@ -5,7 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { chromium, Browser, BrowserContext } from 'playwright';
+import { chromium, Browser } from 'playwright';
 import axios from 'axios';
 import { createWriteStream } from 'fs';
 import { mkdir, access } from 'fs/promises';
@@ -18,21 +18,6 @@ import { UA, randomDelay } from './manga-http';
 import { MangaChapterDownloadResult } from './manga.types';
 
 const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
-
-/**
- * Context options that make Playwright look like a real browser.
- * Applied to every context created by this service.
- */
-const BROWSER_CONTEXT_OPTIONS = {
-  userAgent: UA,
-  viewport: { width: 1280, height: 800 },
-  locale: 'es-ES',
-  timezoneId: 'Europe/Madrid',
-  // Provide a realistic Accept-Language header
-  extraHTTPHeaders: {
-    'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
-  },
-} as const;
 
 function sse(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
@@ -79,21 +64,6 @@ export class MangaDownloadService implements OnModuleDestroy {
     }
   }
 
-  /**
-   * Opens a BrowserContext, runs fn with it, then closes the context.
-   * Use this for short-lived operations (search, chapter list) that need
-   * Playwright but don't own a long-running download loop.
-   */
-  async withContext<T>(fn: (context: BrowserContext) => Promise<T>): Promise<T> {
-    const browser = await this.getBrowser();
-    const context = await browser.newContext(BROWSER_CONTEXT_OPTIONS);
-    try {
-      return await fn(context);
-    } finally {
-      await context.close();
-    }
-  }
-
   // ── Public API ─────────────────────────────────────────────────────────────
 
   /**
@@ -107,7 +77,7 @@ export class MangaDownloadService implements OnModuleDestroy {
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
-    const context = await browser.newContext(BROWSER_CONTEXT_OPTIONS);
+    const context = await browser.newContext({ userAgent: UA });
 
     let imageUrls: string[] = [];
     try {
@@ -136,14 +106,10 @@ export class MangaDownloadService implements OnModuleDestroy {
   ): AsyncGenerator<string> {
     const scraper = this.registry.resolve(novelUrl);
 
-    const browser = await this.getBrowser();
-    // One context reused for the entire novel — title, chapter list, and images.
-    const context = await browser.newContext(BROWSER_CONTEXT_OPTIONS);
-
-    const rawTitle = await scraper.getTitle(novelUrl, context);
+    const rawTitle = await scraper.getTitle(novelUrl);
     const novelTitle = slugify(rawTitle) || 'manga-unknown';
 
-    const allChapters = await scraper.getChapterList(novelUrl, context);
+    const allChapters = await scraper.getChapterList(novelUrl);
     const slice = allChapters.slice(from - 1, to ?? allChapters.length);
 
     this.logger.log(
@@ -152,6 +118,9 @@ export class MangaDownloadService implements OnModuleDestroy {
     );
 
     yield sse({ type: 'start', total: slice.length, novelTitle });
+
+    const browser = await this.getBrowser();
+    const context = await browser.newContext({ userAgent: UA });
 
     let totalDownloaded = 0;
     let totalFailed = 0;

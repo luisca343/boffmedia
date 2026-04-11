@@ -1,26 +1,16 @@
 // ---------------------------------------------------------------------------
 // NovelCool scraper — implements IMangaScraper for es.novelcool.com.
 //
-// ALL page operations use Playwright (not axios/cheerio) so the server is
-// indistinguishable from a real browser. This is required because novelcool
-// detects and blocks plain HTTP requests from server IPs, returning empty or
-// completely different HTML than what a browser receives.
+// Chapter images are rendered by JavaScript, so Playwright is required.
+// Search results and chapter lists are available in static HTML (cheerio).
 // ---------------------------------------------------------------------------
 
 import { BrowserContext } from 'playwright';
+import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { MAX_RETRIES, sleep } from '../../manga-http';
-
-/**
- * Injected into every page before navigation.
- * Removes the `navigator.webdriver` flag that headless browsers expose and
- * that most anti-bot scripts use as a primary detection signal.
- */
-const STEALTH_SCRIPT = () => {
-  Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
-};
+import { fetchHtml, MAX_RETRIES, randomDelay, sleep } from '../../manga-http';
 
 export class NovelCoolScraper implements IMangaScraper {
   readonly name = 'novelcool-es';
@@ -34,109 +24,63 @@ export class NovelCoolScraper implements IMangaScraper {
 
   // ── Public API ────────────────────────────────────────────────────────────
 
-  async search(query: string, context: BrowserContext): Promise<MangaSearchResult[]> {
-    const page = await this.newPage(context);
-    try {
-      // Primary URL format (Spanish/international version of novelcool).
-      await page.goto(
-        `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`,
-        { waitUntil: 'domcontentloaded' },
-      );
+  async search(query: string): Promise<MangaSearchResult[]> {
+    const html = await fetchHtml(
+      `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`,
+    );
+    const $ = cheerio.load(html);
+    const results: MangaSearchResult[] = [];
+    const seen = new Set<string>();
 
-      // Some server IPs are routed to a different regional build of novelcool
-      // where the search parameter is `?wd=` and `?name=` returns a 404.
-      // Detect this and retry with the alternate parameter before giving up.
-      if ((await page.title()).includes('404')) {
-        console.log(`[NovelCoolScraper] ?name= returned 404, retrying with ?wd=`);
-        await page.goto(
-          `https://es.novelcool.com/search/?wd=${encodeURIComponent(query)}`,
-          { waitUntil: 'domcontentloaded' },
-        );
-      }
+    $('[class*="book-item"]').each((_, el) => {
+      const url = $(el).find('a[href*="/novel/"]').first().attr('href') ?? '';
+      if (!url || seen.has(url)) return;
+      seen.add(url);
 
-      console.log(`[NovelCoolScraper] search landed on: ${page.url()} — "${await page.title()}"`);
+      const title =
+        $(el).find('.book-pic').attr('title') ??
+        $(el).find('a[href*="/novel/"]').first().attr('title') ??
+        '';
+      const cover =
+        $(el).find('img[cover_url]').attr('cover_url') ??
+        $(el).find('img').first().attr('src') ??
+        '';
 
-      // Wait for at least one result card to appear (JS-rendered).
-      const found = await page.waitForSelector('[class*="book-item"]', { timeout: 15_000 }).catch(() => null);
-      console.log(`[NovelCoolScraper] book-item selector ${found ? 'found' : 'NOT found (timeout)'}`);
+      results.push({ title: title.trim(), url, cover });
+    });
 
-      // $$eval runs inside the browser — extract plain data only.
-      const raw = await page.$$eval('[class*="book-item"]', els =>
-        els.map(el => {
-          const link = el.querySelector('a[href*="/novel/"]') as HTMLAnchorElement | null;
-          const bookPic = el.querySelector('.book-pic') as HTMLElement | null;
-          const img = el.querySelector('img') as HTMLImageElement | null;
-          return {
-            url: link?.href ?? '',
-            title: (bookPic?.getAttribute('title') ?? link?.getAttribute('title') ?? '').trim(),
-            cover: img?.getAttribute('cover_url') ?? img?.src ?? '',
-          };
-        }),
-      );
+    return results;
+  }
 
-      console.log(`[NovelCoolScraper] extracted ${raw.length} raw result(s)`);
+  async getTitle(novelUrl: string): Promise<string> {
+    const html = await fetchHtml(novelUrl);
+    const $ = cheerio.load(html);
+    return $('h1').first().text().trim();
+  }
 
-      // Deduplicate by URL (Node-side, avoids serialising Sets into browser).
-      const seen = new Set<string>();
-      return raw.filter(r => {
-        if (!r.url || seen.has(r.url)) return false;
-        seen.add(r.url);
-        return true;
+  async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
+    const html = await fetchHtml(novelUrl);
+    const $ = cheerio.load(html);
+    const chapters: MangaChapter[] = [];
+    const seen = new Set<string>();
+
+    $('a[href*="/chapter/"]').each((_, el) => {
+      const url = $(el).attr('href') ?? '';
+      const rawText = $(el).text().trim().split('\n')[0].trim();
+
+      if (!url || seen.has(url) || rawText === 'Empieza a leer') return;
+      seen.add(url);
+
+      chapters.push({
+        title: rawText,
+        url,
+        number: normalizeChapterNumber(rawText),
       });
-    } finally {
-      await page.close();
-    }
-  }
+    });
 
-  async getTitle(novelUrl: string, context: BrowserContext): Promise<string> {
-    const page = await this.newPage(context);
-    try {
-      await page.goto(novelUrl, { waitUntil: 'domcontentloaded' });
-      return await page
-        .$eval('h1', el => el.textContent?.trim() ?? '')
-        .catch(() => '');
-    } finally {
-      await page.close();
-    }
-  }
-
-  async getChapterList(novelUrl: string, context: BrowserContext): Promise<MangaChapter[]> {
-    const page = await this.newPage(context);
-    try {
-      await page.goto(novelUrl, { waitUntil: 'domcontentloaded' });
-
-      console.log(`[NovelCoolScraper] chapter list landed on: ${page.url()} — "${await page.title()}"`);
-
-      // Wait for at least one chapter link before extracting.
-      await page.waitForSelector('a[href*="/chapter/"]', { timeout: 15_000 }).catch(() => null);
-
-      // Extract title + URL pairs in the browser; chapter number normalisation
-      // happens in Node so we don't need to serialise the regex.
-      const raw = await page.$$eval('a[href*="/chapter/"]', els =>
-        els.map(el => {
-          const a = el as HTMLAnchorElement;
-          return {
-            url: a.href,
-            title: (a.textContent?.trim().split('\n')[0].trim() ?? ''),
-          };
-        }),
-      );
-
-      const seen = new Set<string>();
-      const chapters: MangaChapter[] = [];
-
-      for (const { url, title } of raw) {
-        if (!url || seen.has(url) || title === 'Empieza a leer') continue;
-        seen.add(url);
-        chapters.push({ title, url, number: normalizeChapterNumber(title) });
-      }
-
-      // HTML lists chapters newest-first; reverse so oldest is index 0.
-      chapters.reverse();
-      return chapters;
-    } finally {
-      await page.close();
-    }
+    // HTML lists chapters newest-first; reverse so oldest chapter is index 0.
+    chapters.reverse();
+    return chapters;
   }
 
   async getChapterImages(chapterUrl: string, context: BrowserContext): Promise<string[]> {
@@ -154,20 +98,11 @@ export class NovelCoolScraper implements IMangaScraper {
       const pageUrl = this.buildPageUrl(canonicalBase, page);
       const images = await this.scrapePageWithRetry(context, pageUrl, page);
       allImages.push(...images);
-      if (page < totalPages) await sleep(400);
+      if (page < totalPages) await randomDelay();
     }
 
     // Deduplicate while preserving order.
     return [...new Set(allImages)];
-  }
-
-  // ── Private: stealth page factory ────────────────────────────────────────
-
-  /** Opens a new page with the webdriver flag hidden before any navigation. */
-  private async newPage(context: BrowserContext) {
-    const page = await context.newPage();
-    await page.addInitScript(STEALTH_SCRIPT);
-    return page;
   }
 
   // ── Private: URL helpers ──────────────────────────────────────────────────
@@ -181,18 +116,18 @@ export class NovelCoolScraper implements IMangaScraper {
     return `${base.replace(/-10-\d+\.html$/, '')}-10-${page}.html`;
   }
 
-  // ── Private: Playwright chapter image scraping ────────────────────────────
+  // ── Private: Playwright page scraping ─────────────────────────────────────
 
   /**
    * Reads the first `select.sl-page` option count to determine how many
-   * image-pages this chapter has. Uses $eval (not $$eval) so the duplicate
-   * footer select is ignored.
+   * image-pages exist in this chapter. Uses $eval (not $$eval) so that the
+   * duplicate footer select element is ignored.
    */
   private async detectTotalPages(
     context: BrowserContext,
     firstPageUrl: string,
   ): Promise<number> {
-    const page = await this.newPage(context);
+    const page = await context.newPage();
     try {
       await page.goto(firstPageUrl, { waitUntil: 'domcontentloaded' });
       const count = await page
@@ -235,7 +170,7 @@ export class NovelCoolScraper implements IMangaScraper {
     context: BrowserContext,
     pageUrl: string,
   ): Promise<string[]> {
-    const page = await this.newPage(context);
+    const page = await context.newPage();
     try {
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('.mangaread-manga-pic', { timeout: 15_000 });
