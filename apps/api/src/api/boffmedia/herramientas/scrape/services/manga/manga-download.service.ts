@@ -4,14 +4,15 @@
 // the appropriate IMangaScraper resolved from MangaScraperRegistry.
 // ---------------------------------------------------------------------------
 
-import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { chromium, Browser } from 'playwright';
+import { Injectable, Logger } from '@nestjs/common';
+import { Browser } from 'playwright';
 import axios from 'axios';
 import { createWriteStream } from 'fs';
 import { mkdir, access } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 
+import { MangaBrowserService } from './manga-browser.service';
 import { MangaScraperRegistry } from './manga-registry.service';
 import { chapterSlug, slugify } from './chapter-normalizer';
 import { UA, randomDelay } from './manga-http';
@@ -33,35 +34,18 @@ async function fileExists(filePath: string): Promise<boolean> {
 }
 
 @Injectable()
-export class MangaDownloadService implements OnModuleDestroy {
+export class MangaDownloadService {
   private readonly logger = new Logger(MangaDownloadService.name);
-  private browser: Browser | null = null;
 
-  constructor(private readonly registry: MangaScraperRegistry) {}
+  constructor(
+    private readonly registry: MangaScraperRegistry,
+    private readonly browserService: MangaBrowserService,
+  ) {}
 
-  // ── Browser lifecycle ──────────────────────────────────────────────────────
+  // ── Browser ────────────────────────────────────────────────────────────────
 
-  private async getBrowser(): Promise<Browser> {
-    if (!this.browser || !this.browser.isConnected()) {
-      this.logger.log('Launching Chromium browser…');
-      this.browser = await chromium.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',   // prevents /dev/shm exhaustion in Docker
-          '--disable-gpu',
-        ],
-      });
-    }
-    return this.browser;
-  }
-
-  async onModuleDestroy(): Promise<void> {
-    if (this.browser) {
-      await this.browser.close();
-      this.browser = null;
-    }
+  private getBrowser(): Promise<Browser> {
+    return this.browserService.getBrowser();
   }
 
   // ── Public API ─────────────────────────────────────────────────────────────

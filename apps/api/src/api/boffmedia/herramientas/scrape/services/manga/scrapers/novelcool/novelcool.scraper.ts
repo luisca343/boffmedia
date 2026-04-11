@@ -12,11 +12,14 @@ import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { fetchHtmlSafe, MAX_RETRIES, randomDelay, sleep } from '../../manga-http';
+import { fetchHtmlSafe, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
+import { MangaBrowserService } from '../../manga-browser.service';
 
 export class NovelCoolScraper implements IMangaScraper {
   readonly name = 'novelcool-es';
   readonly requiresBrowser = true;
+
+  constructor(private readonly browserService: MangaBrowserService) {}
 
   // ── Routing ───────────────────────────────────────────────────────────────
 
@@ -131,10 +134,22 @@ export class NovelCoolScraper implements IMangaScraper {
       console.warn(`[NovelCoolScraper] Proxy fetch also blocked for ${url}`);
     }
 
-    throw new Error(
-      `NovelCoolScraper: all fetch strategies failed for ${url}. ` +
-      `Set MANGA_SCRAPER_PROXY to route through a residential proxy.`,
-    );
+    // 3. Playwright fallback — real browser bypasses IP-based blocks.
+    console.warn(`[NovelCoolScraper] Falling back to Playwright for ${url}`);
+    return this.fetchHtmlWithPlaywright(url);
+  }
+
+  private async fetchHtmlWithPlaywright(url: string): Promise<string> {
+    const browser = await this.browserService.getBrowser();
+    const context = await browser.newContext({ userAgent: UA });
+    const page = await context.newPage();
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      return await page.content();
+    } finally {
+      await page.close();
+      await context.close();
+    }
   }
 
   // ── Private: URL helpers ──────────────────────────────────────────────────
