@@ -29,14 +29,23 @@ RUN pnpm --filter api build
 RUN pnpm deploy --filter api --prod --legacy /app/deploy
 
 # ---- Production image ----
-FROM base AS runner
+# node:20-slim (Debian) is required — Playwright does not support Alpine.
+FROM node:20-slim AS runner
 WORKDIR /app
+
+# Install runtime system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy compiled output
 COPY --from=builder /app/apps/api/dist ./dist
 
 # Copy production node_modules (from pnpm deploy)
 COPY --from=builder /app/deploy/node_modules ./node_modules
+
+# Install Playwright's Chromium browser + its OS-level dependencies
+RUN node node_modules/.bin/playwright install --with-deps chromium
 
 # Copy runtime assets
 COPY --from=builder /app/apps/api/drizzle ./drizzle
