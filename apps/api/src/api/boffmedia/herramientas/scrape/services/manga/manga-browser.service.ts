@@ -15,16 +15,22 @@ export class MangaBrowserService implements OnModuleDestroy {
 
   async getBrowser(): Promise<Browser> {
     if (!this.browser || !this.browser.isConnected()) {
-      this.logger.log('Launching Chromium browser…');
-      this.browser = await chromium.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-        ],
-      });
+      const wsEndpoint = process.env.MANGA_BROWSER_WS_ENDPOINT;
+      if (wsEndpoint) {
+        this.logger.log(`Connecting to remote browser: ${wsEndpoint}`);
+        this.browser = await chromium.connect(wsEndpoint);
+      } else {
+        this.logger.log('Launching local Chromium browser…');
+        this.browser = await chromium.launch({
+          headless: true,
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+          ],
+        });
+      }
     }
     return this.browser;
   }
