@@ -48,17 +48,21 @@ export class MangaScraperService {
    * source doesn't prevent results from healthy ones.
    */
   async searchNovels(query: string) {
-    const results = await Promise.allSettled(
-      this.registry.getAll().map(scraper => scraper.search(query)),
-    );
-    return results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
+    return this.downloadService.withContext(async context => {
+      const results = await Promise.allSettled(
+        this.registry.getAll().map(scraper => scraper.search(query, context)),
+      );
+      return results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
+    });
   }
 
   // ── Chapter list ───────────────────────────────────────────────────────────
 
   async getChapterList(novelUrl: string) {
     const scraper = this.registry.resolve(novelUrl);
-    return scraper.getChapterList(novelUrl);
+    return this.downloadService.withContext(ctx =>
+      scraper.getChapterList(novelUrl, ctx),
+    );
   }
 
   // ── Downloads ──────────────────────────────────────────────────────────────
