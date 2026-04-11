@@ -15,7 +15,7 @@ import { pipeline } from 'stream/promises';
 import { MangaBrowserService } from './manga-browser.service';
 import { MangaScraperRegistry } from './manga-registry.service';
 import { chapterSlug, slugify } from './chapter-normalizer';
-import { UA, randomDelay } from './manga-http';
+import { UA, randomDelay, getProxy } from './manga-http';
 import { MangaChapterDownloadResult } from './manga.types';
 
 const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
@@ -61,7 +61,11 @@ export class MangaDownloadService {
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
-    const context = await browser.newContext({ userAgent: UA });
+    const proxy = await getProxy();
+    const context = await browser.newContext({
+      userAgent: UA,
+      ...(proxy ? { proxy: { server: proxy } } : {}),
+    });
 
     let imageUrls: string[] = [];
     try {
@@ -104,7 +108,11 @@ export class MangaDownloadService {
     yield sse({ type: 'start', total: slice.length, novelTitle });
 
     const browser = await this.getBrowser();
-    const context = await browser.newContext({ userAgent: UA });
+    const proxy = await getProxy();
+    const context = await browser.newContext({
+      userAgent: UA,
+      ...(proxy ? { proxy: { server: proxy } } : {}),
+    });
 
     let totalDownloaded = 0;
     let totalFailed = 0;

@@ -12,7 +12,7 @@ import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { fetchHtmlSafe, getProxy, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
+import { fetchHtmlSafe, getProxies, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
 import { MangaBrowserService } from '../../manga-browser.service';
 
 export class NovelCoolScraper implements IMangaScraper {
@@ -125,23 +125,31 @@ export class NovelCoolScraper implements IMangaScraper {
 
     console.warn(`[NovelCoolScraper] Direct fetch blocked for ${url}`);
 
-    // 2. Proxy retry — picks a random proxy from the pool.
-    const proxyUrl = await getProxy();
-    if (proxyUrl) {
-      console.warn(`[NovelCoolScraper] Retrying via proxy for ${url}`);
+    // 2. Try up to 3 random proxies from the pool.
+    const proxies = await getProxies(3);
+    for (const proxyUrl of proxies) {
       const proxied = await fetchHtmlSafe(url, proxyUrl);
-      if (proxied !== null) return proxied;
-      console.warn(`[NovelCoolScraper] Proxy fetch also blocked for ${url}`);
+      if (proxied !== null) {
+        console.warn(`[NovelCoolScraper] Proxy succeeded for ${url}`);
+        return proxied;
+      }
     }
 
-    // 3. Playwright fallback — real browser bypasses IP-based blocks.
+    if (proxies.length > 0) {
+      console.warn(`[NovelCoolScraper] All ${proxies.length} proxies blocked for ${url}`);
+    }
+
+    // 3. Playwright fallback — routed through a proxy so local IP is never used.
     console.warn(`[NovelCoolScraper] Falling back to Playwright for ${url}`);
-    return this.fetchHtmlWithPlaywright(url);
+    return this.fetchHtmlWithPlaywright(url, proxies[0]);
   }
 
-  private async fetchHtmlWithPlaywright(url: string): Promise<string> {
+  private async fetchHtmlWithPlaywright(url: string, proxyUrl?: string): Promise<string> {
     const browser = await this.browserService.getBrowser();
-    const context = await browser.newContext({ userAgent: UA });
+    const context = await browser.newContext({
+      userAgent: UA,
+      ...(proxyUrl ? { proxy: { server: proxyUrl } } : {}),
+    });
     const page = await context.newPage();
 
     // Hide headless signals that novelcool uses for bot detection.
@@ -150,18 +158,11 @@ export class NovelCoolScraper implements IMangaScraper {
     });
 
     try {
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
-
-      const finalUrl = page.url();
-      const title = await page.title();
-      const html = await page.content();
-
-      console.warn(
-        `[NovelCoolScraper] Playwright result — ` +
-        `url: ${finalUrl} | title: "${title}" | size: ${html.length}`,
-      );
-
-      return html;
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page
+        .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', { timeout: 15_000 })
+        .catch(() => {});
+      return await page.content();
     } finally {
       await page.close();
       await context.close();

@@ -54,6 +54,20 @@ export async function getProxy(): Promise<string | undefined> {
   return process.env.MANGA_SCRAPER_PROXY || undefined;
 }
 
+/**
+ * Returns up to N distinct random proxies from the pool.
+ * Falls back to [MANGA_SCRAPER_PROXY] if the pool is empty.
+ */
+export async function getProxies(n = 3): Promise<string[]> {
+  const pool = await loadProxyPool();
+  if (pool.length === 0) {
+    const single = process.env.MANGA_SCRAPER_PROXY;
+    return single ? [single] : [];
+  }
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(n, shuffled.length));
+}
+
 export const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 
