@@ -5,7 +5,7 @@
 // ---------------------------------------------------------------------------
 
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
-import { chromium, Browser } from 'playwright';
+import { chromium, Browser, BrowserContext } from 'playwright';
 import axios from 'axios';
 import { createWriteStream } from 'fs';
 import { mkdir, access } from 'fs/promises';
@@ -59,6 +59,22 @@ export class MangaDownloadService implements OnModuleDestroy {
     }
   }
 
+  /**
+   * Opens a BrowserContext, runs fn with it, then closes the context.
+   * Use this for any operation outside of a download stream (e.g. search,
+   * chapter list) so they share the same singleton browser but get an
+   * isolated, short-lived context.
+   */
+  async withContext<T>(fn: (context: BrowserContext) => Promise<T>): Promise<T> {
+    const browser = await this.getBrowser();
+    const context = await browser.newContext({ userAgent: UA });
+    try {
+      return await fn(context);
+    } finally {
+      await context.close();
+    }
+  }
+
   // ── Public API ─────────────────────────────────────────────────────────────
 
   /**
@@ -101,10 +117,14 @@ export class MangaDownloadService implements OnModuleDestroy {
   ): AsyncGenerator<string> {
     const scraper = this.registry.resolve(novelUrl);
 
-    const rawTitle = await scraper.getTitle(novelUrl);
+    const browser = await this.getBrowser();
+    // One context for the entire novel download — reused across all chapters.
+    const context = await browser.newContext({ userAgent: UA });
+
+    const rawTitle = await scraper.getTitle(novelUrl, context);
     const novelTitle = slugify(rawTitle) || 'manga-unknown';
 
-    const allChapters = await scraper.getChapterList(novelUrl);
+    const allChapters = await scraper.getChapterList(novelUrl, context);
     const slice = allChapters.slice(from - 1, to ?? allChapters.length);
 
     this.logger.log(
@@ -113,9 +133,6 @@ export class MangaDownloadService implements OnModuleDestroy {
     );
 
     yield sse({ type: 'start', total: slice.length, novelTitle });
-
-    const browser = await this.getBrowser();
-    const context = await browser.newContext({ userAgent: UA });
 
     let totalDownloaded = 0;
     let totalFailed = 0;
