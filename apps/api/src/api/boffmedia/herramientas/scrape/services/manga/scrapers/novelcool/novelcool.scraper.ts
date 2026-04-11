@@ -143,8 +143,23 @@ export class NovelCoolScraper implements IMangaScraper {
     const browser = await this.browserService.getBrowser();
     const context = await browser.newContext({ userAgent: UA });
     const page = await context.newPage();
+
+    // Hide headless signals that novelcool uses for bot detection.
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+    });
+
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+
+      // Wait for actual content: book items on search pages, chapter links on
+      // novel pages, or h1 on any page — whichever appears first.
+      await page
+        .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', {
+          timeout: 15_000,
+        })
+        .catch(() => { /* timeout fine — return whatever loaded */ });
+
       return await page.content();
     } finally {
       await page.close();
