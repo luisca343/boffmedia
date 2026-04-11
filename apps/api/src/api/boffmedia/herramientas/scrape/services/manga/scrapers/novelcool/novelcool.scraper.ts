@@ -150,17 +150,18 @@ export class NovelCoolScraper implements IMangaScraper {
     });
 
     try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
 
-      // Wait for actual content: book items on search pages, chapter links on
-      // novel pages, or h1 on any page — whichever appears first.
-      await page
-        .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', {
-          timeout: 15_000,
-        })
-        .catch(() => { /* timeout fine — return whatever loaded */ });
+      const finalUrl = page.url();
+      const title = await page.title();
+      const html = await page.content();
 
-      return await page.content();
+      console.warn(
+        `[NovelCoolScraper] Playwright result — ` +
+        `url: ${finalUrl} | title: "${title}" | size: ${html.length}`,
+      );
+
+      return html;
     } finally {
       await page.close();
       await context.close();
