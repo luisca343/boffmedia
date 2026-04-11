@@ -5,6 +5,55 @@
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 
+// ── Proxy pool ─────────────────────────────────────────────────────────────
+
+let proxyPool: string[] | null = null;
+
+/**
+ * Lazily fetches and parses the proxy list from MANGA_SCRAPER_PROXY_LIST_URL.
+ * Each line must be in `host:port:user:pass` format (Webshare direct format).
+ * Returns an empty array if the env var is not set or the fetch fails.
+ */
+async function loadProxyPool(): Promise<string[]> {
+  if (proxyPool !== null) return proxyPool;
+
+  const listUrl = process.env.MANGA_SCRAPER_PROXY_LIST_URL;
+  if (!listUrl) {
+    proxyPool = [];
+    return proxyPool;
+  }
+
+  try {
+    const { data } = await axios.get<string>(listUrl, { timeout: 10_000 });
+    proxyPool = data
+      .split('\n')
+      .map(l => l.trim())
+      .filter(l => l.includes(':'))
+      .map(l => {
+        const [host, port, user, pass] = l.split(':');
+        return `http://${user}:${pass}@${host}:${port}`;
+      });
+    console.log(`[manga-http] Loaded ${proxyPool.length} proxies from pool`);
+  } catch (err) {
+    console.warn(`[manga-http] Failed to load proxy list: ${(err as Error).message}`);
+    proxyPool = [];
+  }
+
+  return proxyPool;
+}
+
+/**
+ * Returns a random proxy URL from the pool, or the MANGA_SCRAPER_PROXY
+ * single-proxy env var as fallback, or undefined if nothing is configured.
+ */
+export async function getProxy(): Promise<string | undefined> {
+  const pool = await loadProxyPool();
+  if (pool.length > 0) {
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  return process.env.MANGA_SCRAPER_PROXY || undefined;
+}
+
 export const UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
 

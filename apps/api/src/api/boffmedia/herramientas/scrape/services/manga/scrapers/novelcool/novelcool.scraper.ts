@@ -12,7 +12,7 @@ import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { fetchHtmlSafe, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
+import { fetchHtmlSafe, getProxy, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
 import { MangaBrowserService } from '../../manga-browser.service';
 
 export class NovelCoolScraper implements IMangaScraper {
@@ -125,10 +125,10 @@ export class NovelCoolScraper implements IMangaScraper {
 
     console.warn(`[NovelCoolScraper] Direct fetch blocked for ${url}`);
 
-    // 2. Proxy retry if configured.
-    const proxyUrl = process.env.MANGA_SCRAPER_PROXY;
+    // 2. Proxy retry — picks a random proxy from the pool.
+    const proxyUrl = await getProxy();
     if (proxyUrl) {
-      console.warn(`[NovelCoolScraper] Retrying via proxy: ${proxyUrl}`);
+      console.warn(`[NovelCoolScraper] Retrying via proxy for ${url}`);
       const proxied = await fetchHtmlSafe(url, proxyUrl);
       if (proxied !== null) return proxied;
       console.warn(`[NovelCoolScraper] Proxy fetch also blocked for ${url}`);
