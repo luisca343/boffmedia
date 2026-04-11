@@ -172,6 +172,63 @@ export class ScrapeController {
     res.end();
   }
 
+  // ==================== MANGA ====================
+
+  @Get('manga/library')
+  @ApiOperation({ summary: 'Get all locally downloaded manga series and their chapters' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Local manga library.' })
+  async getLocalMangaLibrary() {
+    return this.scrapeFacadeService.getLocalMangaLibrary();
+  }
+
+  @Get('manga/search')
+  @ApiOperation({ summary: 'Search novelcool.com for a manga title' })
+  @ApiQuery({ name: 'q', type: String, description: 'Search query', example: 'Raeliana' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of matching manga.' })
+  async searchManga(@Query('q') query: string) {
+    return this.scrapeFacadeService.searchManga(query);
+  }
+
+  @Get('manga/chapters')
+  @ApiOperation({ summary: 'Get the full ordered chapter list for a novelcool.com novel' })
+  @ApiQuery({ name: 'url', type: String, description: 'Novel page URL', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of chapters (title + url).' })
+  async getMangaChapters(@Query('url') url: string) {
+    return this.scrapeFacadeService.getMangaChapters(url);
+  }
+
+  @Post('manga/download/novel/stream')
+  @ApiOperation({
+    summary: 'Stream manga download progress via SSE',
+    description: 'Scrapes every selected chapter with Playwright and streams per-chapter progress events. Events: start, chapter, done.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['url'],
+      properties: {
+        url: { type: 'string', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' },
+        from: { type: 'number', example: 1 },
+        to: { type: 'number', example: 5 },
+      },
+    },
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'SSE stream of download progress events.' })
+  async streamDownloadMangaNovel(
+    @Body() body: { url: string; from?: number; to?: number },
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.flushHeaders();
+
+    for await (const chunk of this.scrapeFacadeService.streamDownloadMangaNovel(body.url, body.from, body.to)) {
+      res.write(chunk);
+    }
+    res.end();
+  }
+
   @Post('myrient/download-selected')
   @ApiOperation({
     summary: 'Download a user-selected list of games for a console',
