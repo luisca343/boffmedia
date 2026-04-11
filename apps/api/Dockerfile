@@ -45,8 +45,7 @@ COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/deploy/node_modules ./node_modules
 
 # Install Playwright's Chromium browser + its OS-level dependencies
-RUN node node_modules/.bin/playwright install --with-deps chromium
-
+    RUN node node_modules/playwright/cli.js install --with-deps chromium
 # Copy runtime assets
 COPY --from=builder /app/apps/api/drizzle ./drizzle
 COPY --from=builder /app/apps/api/package.json ./
