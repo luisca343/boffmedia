@@ -12,7 +12,7 @@ import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { fetchHtmlSafe, getProxies, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
+import { fetchHtmlSafe, getProxies, toPlaywrightProxy, MAX_RETRIES, randomDelay, sleep, UA } from '../../manga-http';
 import { MangaBrowserService } from '../../manga-browser.service';
 
 export class NovelCoolScraper implements IMangaScraper {
@@ -148,7 +148,7 @@ export class NovelCoolScraper implements IMangaScraper {
     const browser = await this.browserService.getBrowser();
     const context = await browser.newContext({
       userAgent: UA,
-      ...(proxyUrl ? { proxy: { server: proxyUrl } } : {}),
+      ...(proxyUrl ? { proxy: toPlaywrightProxy(proxyUrl) } : {}),
     });
     const page = await context.newPage();
 

@@ -15,7 +15,7 @@ import { pipeline } from 'stream/promises';
 import { MangaBrowserService } from './manga-browser.service';
 import { MangaScraperRegistry } from './manga-registry.service';
 import { chapterSlug, slugify } from './chapter-normalizer';
-import { UA, randomDelay, getProxy } from './manga-http';
+import { UA, randomDelay, getProxy, toPlaywrightProxy } from './manga-http';
 import { MangaChapterDownloadResult } from './manga.types';
 
 const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
@@ -64,7 +64,7 @@ export class MangaDownloadService {
     const proxy = await getProxy();
     const context = await browser.newContext({
       userAgent: UA,
-      ...(proxy ? { proxy: { server: proxy } } : {}),
+      ...(proxy ? { proxy: toPlaywrightProxy(proxy) } : {}),
     });
 
     let imageUrls: string[] = [];
@@ -111,7 +111,7 @@ export class MangaDownloadService {
     const proxy = await getProxy();
     const context = await browser.newContext({
       userAgent: UA,
-      ...(proxy ? { proxy: { server: proxy } } : {}),
+      ...(proxy ? { proxy: toPlaywrightProxy(proxy) } : {}),
     });
 
     let totalDownloaded = 0;
