@@ -2,7 +2,9 @@
 // NovelCool scraper — implements IMangaScraper for es.novelcool.com.
 //
 // Chapter images are rendered by JavaScript, so Playwright is required.
-// Search results and chapter lists are available in static HTML (cheerio).
+// Search results and chapter lists are fetched via Axios with realistic
+// browser headers. If the plain request is blocked, a proxy retry is
+// attempted using the MANGA_SCRAPER_PROXY env var.
 // ---------------------------------------------------------------------------
 
 import { BrowserContext } from 'playwright';
@@ -10,7 +12,7 @@ import * as cheerio from 'cheerio';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
-import { fetchHtml, MAX_RETRIES, randomDelay, sleep } from '../../manga-http';
+import { fetchHtmlSafe, MAX_RETRIES, randomDelay, sleep } from '../../manga-http';
 
 export class NovelCoolScraper implements IMangaScraper {
   readonly name = 'novelcool-es';
@@ -25,7 +27,7 @@ export class NovelCoolScraper implements IMangaScraper {
   // ── Public API ────────────────────────────────────────────────────────────
 
   async search(query: string): Promise<MangaSearchResult[]> {
-    const html = await fetchHtml(
+    const html = await this.fetchWithFallback(
       `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`,
     );
     const $ = cheerio.load(html);
@@ -53,13 +55,13 @@ export class NovelCoolScraper implements IMangaScraper {
   }
 
   async getTitle(novelUrl: string): Promise<string> {
-    const html = await fetchHtml(novelUrl);
+    const html = await this.fetchWithFallback(novelUrl);
     const $ = cheerio.load(html);
     return $('h1').first().text().trim();
   }
 
   async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
-    const html = await fetchHtml(novelUrl);
+    const html = await this.fetchWithFallback(novelUrl);
     const $ = cheerio.load(html);
     const chapters: MangaChapter[] = [];
     const seen = new Set<string>();
@@ -103,6 +105,36 @@ export class NovelCoolScraper implements IMangaScraper {
 
     // Deduplicate while preserving order.
     return [...new Set(allImages)];
+  }
+
+  // ── Private: HTTP fallback chain ──────────────────────────────────────────
+
+  /**
+   * Tries to fetch the URL with realistic browser headers.
+   * Falls back to a proxy if MANGA_SCRAPER_PROXY is set and the plain
+   * request is blocked (returns null from fetchHtmlSafe).
+   * Throws if all attempts fail.
+   */
+  private async fetchWithFallback(url: string): Promise<string> {
+    // 1. Plain Axios with realistic headers.
+    const direct = await fetchHtmlSafe(url);
+    if (direct !== null) return direct;
+
+    console.warn(`[NovelCoolScraper] Direct fetch blocked for ${url}`);
+
+    // 2. Proxy retry if configured.
+    const proxyUrl = process.env.MANGA_SCRAPER_PROXY;
+    if (proxyUrl) {
+      console.warn(`[NovelCoolScraper] Retrying via proxy: ${proxyUrl}`);
+      const proxied = await fetchHtmlSafe(url, proxyUrl);
+      if (proxied !== null) return proxied;
+      console.warn(`[NovelCoolScraper] Proxy fetch also blocked for ${url}`);
+    }
+
+    throw new Error(
+      `NovelCoolScraper: all fetch strategies failed for ${url}. ` +
+      `Set MANGA_SCRAPER_PROXY to route through a residential proxy.`,
+    );
   }
 
   // ── Private: URL helpers ──────────────────────────────────────────────────
