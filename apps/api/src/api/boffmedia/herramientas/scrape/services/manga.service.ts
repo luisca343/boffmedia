@@ -6,8 +6,8 @@
 //   MangaLibraryService   — local disk library
 //   MangaDownloadService  — Playwright browser + download + SSE streaming
 //
-// Every network operation goes through a Playwright BrowserContext so the
-// server is indistinguishable from a real browser, bypassing bot detection.
+// Public method signatures are intentionally kept stable so the facade
+// requires no changes when internal implementation details evolve.
 // ---------------------------------------------------------------------------
 
 import { Injectable } from '@nestjs/common';
@@ -43,26 +43,22 @@ export class MangaScraperService {
   // ── Search ─────────────────────────────────────────────────────────────────
 
   /**
-   * Searches all registered scrapers in parallel through a shared Playwright
-   * context. Results from all sources are aggregated; individual scraper
-   * failures are silently dropped so one broken source doesn't block others.
+   * Searches all registered scrapers in parallel and aggregates the results.
+   * Errors from individual scrapers are logged and suppressed so a failing
+   * source doesn't prevent results from healthy ones.
    */
   async searchNovels(query: string) {
-    return this.downloadService.withContext(async context => {
-      const results = await Promise.allSettled(
-        this.registry.getAll().map(scraper => scraper.search(query, context)),
-      );
-      return results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
-    });
+    const results = await Promise.allSettled(
+      this.registry.getAll().map(scraper => scraper.search(query)),
+    );
+    return results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
   }
 
   // ── Chapter list ───────────────────────────────────────────────────────────
 
   async getChapterList(novelUrl: string) {
     const scraper = this.registry.resolve(novelUrl);
-    return this.downloadService.withContext(ctx =>
-      scraper.getChapterList(novelUrl, ctx),
-    );
+    return scraper.getChapterList(novelUrl);
   }
 
   // ── Downloads ──────────────────────────────────────────────────────────────
