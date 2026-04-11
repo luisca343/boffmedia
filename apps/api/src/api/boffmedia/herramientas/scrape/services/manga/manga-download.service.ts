@@ -19,6 +19,21 @@ import { MangaChapterDownloadResult } from './manga.types';
 
 const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
 
+/**
+ * Context options that make Playwright look like a real browser.
+ * Applied to every context created by this service.
+ */
+const BROWSER_CONTEXT_OPTIONS = {
+  userAgent: UA,
+  viewport: { width: 1280, height: 800 },
+  locale: 'es-ES',
+  timezoneId: 'Europe/Madrid',
+  // Provide a realistic Accept-Language header
+  extraHTTPHeaders: {
+    'Accept-Language': 'es-ES,es;q=0.9,en;q=0.8',
+  },
+} as const;
+
 function sse(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
 }
@@ -71,7 +86,7 @@ export class MangaDownloadService implements OnModuleDestroy {
    */
   async withContext<T>(fn: (context: BrowserContext) => Promise<T>): Promise<T> {
     const browser = await this.getBrowser();
-    const context = await browser.newContext({ userAgent: UA });
+    const context = await browser.newContext(BROWSER_CONTEXT_OPTIONS);
     try {
       return await fn(context);
     } finally {
@@ -92,7 +107,7 @@ export class MangaDownloadService implements OnModuleDestroy {
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
-    const context = await browser.newContext({ userAgent: UA });
+    const context = await browser.newContext(BROWSER_CONTEXT_OPTIONS);
 
     let imageUrls: string[] = [];
     try {
@@ -123,7 +138,7 @@ export class MangaDownloadService implements OnModuleDestroy {
 
     const browser = await this.getBrowser();
     // One context reused for the entire novel — title, chapter list, and images.
-    const context = await browser.newContext({ userAgent: UA });
+    const context = await browser.newContext(BROWSER_CONTEXT_OPTIONS);
 
     const rawTitle = await scraper.getTitle(novelUrl, context);
     const novelTitle = slugify(rawTitle) || 'manga-unknown';

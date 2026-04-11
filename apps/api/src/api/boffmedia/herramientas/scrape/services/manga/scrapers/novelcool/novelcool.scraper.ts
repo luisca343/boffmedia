@@ -13,6 +13,15 @@ import { MangaChapter, MangaSearchResult } from '../../manga.types';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
 import { MAX_RETRIES, sleep } from '../../manga-http';
 
+/**
+ * Injected into every page before navigation.
+ * Removes the `navigator.webdriver` flag that headless browsers expose and
+ * that most anti-bot scripts use as a primary detection signal.
+ */
+const STEALTH_SCRIPT = () => {
+  Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+};
+
 export class NovelCoolScraper implements IMangaScraper {
   readonly name = 'novelcool-es';
   readonly requiresBrowser = true;
@@ -26,16 +35,18 @@ export class NovelCoolScraper implements IMangaScraper {
   // ── Public API ────────────────────────────────────────────────────────────
 
   async search(query: string, context: BrowserContext): Promise<MangaSearchResult[]> {
-    const page = await context.newPage();
+    const page = await this.newPage(context);
     try {
-      await page.goto(
-        `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`,
-        { waitUntil: 'domcontentloaded' },
-      );
+      const searchUrl = `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`;
+      await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
+
+      // Log the actual URL/title so server logs reveal any redirects or bot pages.
+      console.log(`[NovelCoolScraper] search landed on: ${page.url()} — "${await page.title()}"`);
 
       // Wait for at least one result card to appear (JS-rendered). If the
       // selector never arrives the search returned no results — not an error.
-      await page.waitForSelector('[class*="book-item"]', { timeout: 10_000 }).catch(() => null);
+      const found = await page.waitForSelector('[class*="book-item"]', { timeout: 15_000 }).catch(() => null);
+      console.log(`[NovelCoolScraper] book-item selector ${found ? 'found' : 'NOT found (timeout)'}`);
 
       // $$eval runs inside the browser — extract plain data only.
       const raw = await page.$$eval('[class*="book-item"]', els =>
@@ -51,6 +62,8 @@ export class NovelCoolScraper implements IMangaScraper {
         }),
       );
 
+      console.log(`[NovelCoolScraper] extracted ${raw.length} raw result(s)`);
+
       // Deduplicate by URL (Node-side, avoids serialising Sets into browser).
       const seen = new Set<string>();
       return raw.filter(r => {
@@ -64,7 +77,7 @@ export class NovelCoolScraper implements IMangaScraper {
   }
 
   async getTitle(novelUrl: string, context: BrowserContext): Promise<string> {
-    const page = await context.newPage();
+    const page = await this.newPage(context);
     try {
       await page.goto(novelUrl, { waitUntil: 'domcontentloaded' });
       return await page
@@ -76,12 +89,14 @@ export class NovelCoolScraper implements IMangaScraper {
   }
 
   async getChapterList(novelUrl: string, context: BrowserContext): Promise<MangaChapter[]> {
-    const page = await context.newPage();
+    const page = await this.newPage(context);
     try {
       await page.goto(novelUrl, { waitUntil: 'domcontentloaded' });
 
+      console.log(`[NovelCoolScraper] chapter list landed on: ${page.url()} — "${await page.title()}"`);
+
       // Wait for at least one chapter link before extracting.
-      await page.waitForSelector('a[href*="/chapter/"]', { timeout: 10_000 }).catch(() => null);
+      await page.waitForSelector('a[href*="/chapter/"]', { timeout: 15_000 }).catch(() => null);
 
       // Extract title + URL pairs in the browser; chapter number normalisation
       // happens in Node so we don't need to serialise the regex.
@@ -134,6 +149,15 @@ export class NovelCoolScraper implements IMangaScraper {
     return [...new Set(allImages)];
   }
 
+  // ── Private: stealth page factory ────────────────────────────────────────
+
+  /** Opens a new page with the webdriver flag hidden before any navigation. */
+  private async newPage(context: BrowserContext) {
+    const page = await context.newPage();
+    await page.addInitScript(STEALTH_SCRIPT);
+    return page;
+  }
+
   // ── Private: URL helpers ──────────────────────────────────────────────────
 
   private normalizeChapterUrl(url: string): string {
@@ -156,7 +180,7 @@ export class NovelCoolScraper implements IMangaScraper {
     context: BrowserContext,
     firstPageUrl: string,
   ): Promise<number> {
-    const page = await context.newPage();
+    const page = await this.newPage(context);
     try {
       await page.goto(firstPageUrl, { waitUntil: 'domcontentloaded' });
       const count = await page
@@ -199,7 +223,7 @@ export class NovelCoolScraper implements IMangaScraper {
     context: BrowserContext,
     pageUrl: string,
   ): Promise<string[]> {
-    const page = await context.newPage();
+    const page = await this.newPage(context);
     try {
       await page.goto(pageUrl, { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('.mangaread-manga-pic', { timeout: 15_000 });
