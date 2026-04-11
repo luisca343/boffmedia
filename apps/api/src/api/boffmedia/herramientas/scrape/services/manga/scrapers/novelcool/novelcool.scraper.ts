@@ -37,14 +37,26 @@ export class NovelCoolScraper implements IMangaScraper {
   async search(query: string, context: BrowserContext): Promise<MangaSearchResult[]> {
     const page = await this.newPage(context);
     try {
-      const searchUrl = `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`;
-      await page.goto(searchUrl, { waitUntil: 'domcontentloaded' });
+      // Primary URL format (Spanish/international version of novelcool).
+      await page.goto(
+        `https://es.novelcool.com/search?name=${encodeURIComponent(query)}`,
+        { waitUntil: 'domcontentloaded' },
+      );
 
-      // Log the actual URL/title so server logs reveal any redirects or bot pages.
+      // Some server IPs are routed to a different regional build of novelcool
+      // where the search parameter is `?wd=` and `?name=` returns a 404.
+      // Detect this and retry with the alternate parameter before giving up.
+      if ((await page.title()).includes('404')) {
+        console.log(`[NovelCoolScraper] ?name= returned 404, retrying with ?wd=`);
+        await page.goto(
+          `https://es.novelcool.com/search/?wd=${encodeURIComponent(query)}`,
+          { waitUntil: 'domcontentloaded' },
+        );
+      }
+
       console.log(`[NovelCoolScraper] search landed on: ${page.url()} — "${await page.title()}"`);
 
-      // Wait for at least one result card to appear (JS-rendered). If the
-      // selector never arrives the search returned no results — not an error.
+      // Wait for at least one result card to appear (JS-rendered).
       const found = await page.waitForSelector('[class*="book-item"]', { timeout: 15_000 }).catch(() => null);
       console.log(`[NovelCoolScraper] book-item selector ${found ? 'found' : 'NOT found (timeout)'}`);
 
