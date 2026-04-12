@@ -1,14 +1,14 @@
 // ---------------------------------------------------------------------------
 // MangaLibraryService — scans MANGA_ROOT on disk and returns the local
-// library structure. Scraper-agnostic: works for any downloaded series.
+// library structure. Reads .cbz files; series folders use the original title.
 // ---------------------------------------------------------------------------
 
 import { Injectable } from '@nestjs/common';
 import { readdir, stat } from 'fs/promises';
 import * as path from 'path';
+import AdmZip from 'adm-zip';
 import { LocalMangaChapter, LocalMangaLibrary, LocalMangaSeries } from './manga.types';
-
-const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
+import { MANGA_ROOT } from './manga-constants';
 
 @Injectable()
 export class MangaLibraryService {
@@ -17,35 +17,47 @@ export class MangaLibraryService {
     try {
       seriesDirs = await readdir(MANGA_ROOT);
     } catch {
-      // Root doesn't exist yet — empty library.
       return { series: [], totalSeries: 0, totalChapters: 0 };
     }
 
     const series: LocalMangaSeries[] = [];
 
-    for (const seriesSlug of seriesDirs) {
-      const seriesPath = path.join(MANGA_ROOT, seriesSlug);
+    for (const seriesName of seriesDirs) {
+      const seriesPath = path.join(MANGA_ROOT, seriesName);
       const seriesStat = await stat(seriesPath).catch(() => null);
       if (!seriesStat?.isDirectory()) continue;
 
-      const chapterDirs = await readdir(seriesPath).catch(() => [] as string[]);
+      const entries = await readdir(seriesPath).catch(() => [] as string[]);
+      const cbzFiles = entries.filter(f => /\.cbz$/i.test(f));
       const chapters: LocalMangaChapter[] = [];
 
-      for (const chapterSlug of chapterDirs) {
-        const chapterPath = path.join(seriesPath, chapterSlug);
-        const chapterStat = await stat(chapterPath).catch(() => null);
-        if (!chapterStat?.isDirectory()) continue;
+      for (const cbzFile of cbzFiles) {
+        const cbzPath = path.join(seriesPath, cbzFile);
+        const chapterSlug = cbzFile.replace(/\.cbz$/i, '');
+        let imageCount = 0;
 
-        const images = await readdir(chapterPath).catch(() => [] as string[]);
-        const imageCount = images.filter(f =>
-          /\.(webp|jpg|jpeg|png|gif)$/i.test(f),
-        ).length;
+        try {
+          const zip = new AdmZip(cbzPath);
+          imageCount = zip.getEntries().filter(e =>
+            /\.(webp|jpg|jpeg|png|gif)$/i.test(e.name),
+          ).length;
+        } catch {
+          // Corrupt or unreadable CBZ — still list it with 0 images.
+        }
 
         chapters.push({ slug: chapterSlug, imageCount });
       }
 
+      // Sort chapters numerically (handles "8.5" between "8" and "9").
+      chapters.sort((a, b) => {
+        const na = parseFloat(a.slug);
+        const nb = parseFloat(b.slug);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.slug.localeCompare(b.slug);
+      });
+
       series.push({
-        slug: seriesSlug,
+        slug: seriesName,
         chapters,
         totalImages: chapters.reduce((s, c) => s + c.imageCount, 0),
       });

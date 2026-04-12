@@ -1,24 +1,23 @@
 // ---------------------------------------------------------------------------
 // MangaDownloadService — owns the Playwright browser lifecycle and handles
-// chapter image downloading and SSE streaming. Delegates scraping logic to
-// the appropriate IMangaScraper resolved from MangaScraperRegistry.
+// chapter image downloading (saved as .cbz) and SSE streaming.
 // ---------------------------------------------------------------------------
 
 import { Injectable, Logger } from '@nestjs/common';
 import { Browser } from 'playwright';
+import AdmZip from 'adm-zip';
 import axios from 'axios';
 import { createWriteStream } from 'fs';
-import { mkdir, access } from 'fs/promises';
+import { mkdir, access, readdir, rm } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 
 import { MangaBrowserService } from './manga-browser.service';
 import { MangaScraperRegistry } from './manga-registry.service';
-import { chapterSlug, slugify } from './chapter-normalizer';
+import { chapterFilename, sanitizeForFilesystem } from './chapter-normalizer';
 import { UA, randomDelay, getProxy, toPlaywrightProxy } from './manga-http';
 import { MangaChapterDownloadResult } from './manga.types';
-
-const MANGA_ROOT = path.join(process.cwd(), 'laboon/manga/downloads/mangas');
+import { MANGA_ROOT } from './manga-constants';
 
 function sse(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
@@ -51,13 +50,12 @@ export class MangaDownloadService {
   // ── Public API ─────────────────────────────────────────────────────────────
 
   /**
-   * Downloads a single chapter to disk.
-   * Resolves the correct scraper from the chapter URL, creates a browser
-   * context for scrapers that require it, then saves each image.
+   * Downloads a single chapter to a .cbz file.
+   * `cbzPath` should be the full path including the .cbz extension.
    */
   async downloadChapter(
     chapterUrl: string,
-    saveDir: string,
+    cbzPath: string,
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
@@ -74,7 +72,7 @@ export class MangaDownloadService {
       await context.close();
     }
 
-    return this.saveImages(imageUrls, saveDir);
+    return this.saveCbz(imageUrls, cbzPath);
   }
 
   /**
@@ -95,7 +93,7 @@ export class MangaDownloadService {
     const scraper = this.registry.resolve(novelUrl);
 
     const rawTitle = await scraper.getTitle(novelUrl);
-    const novelTitle = slugify(rawTitle) || 'manga-unknown';
+    const novelTitle = sanitizeForFilesystem(rawTitle) || 'manga-unknown';
 
     const allChapters = await scraper.getChapterList(novelUrl);
     const slice = allChapters.slice(from - 1, to ?? allChapters.length);
@@ -120,10 +118,11 @@ export class MangaDownloadService {
     try {
       for (let i = 0; i < slice.length; i++) {
         const ch = slice[i];
-        const slug = chapterSlug(ch.number, ch.title);
-        const saveDir = path.join(MANGA_ROOT, novelTitle, slug);
+        const name = chapterFilename(ch.number, ch.title);
+        const seriesDir = path.join(MANGA_ROOT, novelTitle);
+        const cbzPath = path.join(seriesDir, `${name}.cbz`);
 
-        this.logger.log(`[${i + 1}/${slice.length}] ${ch.title} → ${slug}`);
+        this.logger.log(`[${i + 1}/${slice.length}] ${ch.title} → ${name}.cbz`);
 
         let imageUrls: string[] = [];
         try {
@@ -134,7 +133,7 @@ export class MangaDownloadService {
           );
         }
 
-        const result = await this.saveImages(imageUrls, saveDir, ch.title);
+        const result = await this.saveCbz(imageUrls, cbzPath, ch.title, ch.number, novelTitle);
         totalDownloaded += result.downloaded;
         totalFailed += result.failed;
 
@@ -157,53 +156,102 @@ export class MangaDownloadService {
     yield sse({ type: 'done', novelTitle, totalDownloaded, totalFailed });
   }
 
-  // ── Private: image persistence ─────────────────────────────────────────────
+  // ── Private: CBZ persistence ───────────────────────────────────────────────
 
-  private async saveImages(
+  /**
+   * Downloads all images for a chapter and packages them as a .cbz (zip) file.
+   *
+   * If the .cbz already exists, the chapter is skipped entirely.
+   * Images are first downloaded to a temp directory, then zipped, then the
+   * temp directory is deleted.
+   */
+  private async saveCbz(
     imageUrls: string[],
-    saveDir: string,
+    cbzPath: string,
     chapterTitle?: string,
+    chapterNumber?: number | null,
+    seriesTitle?: string,
   ): Promise<MangaChapterDownloadResult> {
-    await mkdir(saveDir, { recursive: true });
+    const chapterName = path.basename(cbzPath, '.cbz');
+
+    // Skip if CBZ already exists.
+    if (await fileExists(cbzPath)) {
+      this.logger.log(`  ${chapterTitle ?? chapterName} — skip (already downloaded)`);
+      return { chapter: chapterName, imageUrls, downloaded: 0, skipped: 1, failed: 0, saveDir: path.dirname(cbzPath) };
+    }
+
+    const seriesDir = path.dirname(cbzPath);
+    await mkdir(seriesDir, { recursive: true });
+
+    const tempDir = `${cbzPath}.tmp`;
+    await mkdir(tempDir, { recursive: true });
 
     let downloaded = 0;
-    let skipped = 0;
     let failed = 0;
 
     for (let i = 0; i < imageUrls.length; i++) {
       const url = imageUrls[i];
       const ext = this.guessExtension(url);
       const filename = `${String(i + 1).padStart(3, '0')}${ext}`;
-      const filePath = path.join(saveDir, filename);
-
-      if (await fileExists(filePath)) {
-        skipped++;
-        continue;
-      }
+      const filePath = path.join(tempDir, filename);
 
       try {
         await this.downloadImage(url, filePath);
         downloaded++;
       } catch (err) {
-        this.logger.error(
-          `  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`,
-        );
+        this.logger.error(`  ✗ [${i + 1}/${imageUrls.length}] ${(err as Error).message}`);
         failed++;
       }
     }
 
+    // Pack downloaded images into a CBZ archive.
+    if (downloaded > 0) {
+      const zip = new AdmZip();
+      const files = await readdir(tempDir);
+      for (const file of files) {
+        zip.addLocalFile(path.join(tempDir, file));
+      }
+      // Embed ComicInfo.xml so Komga/Kavita recognise the chapter number correctly.
+      zip.addFile('ComicInfo.xml', Buffer.from(
+        this.buildComicInfo(seriesTitle, chapterTitle, chapterNumber, downloaded),
+        'utf-8',
+      ));
+      zip.writeZip(cbzPath);
+    }
+
+    // Clean up temp directory.
+    await rm(tempDir, { recursive: true, force: true });
+
     this.logger.log(
-      `  ${chapterTitle ?? path.basename(saveDir)} — ${downloaded} DL, ${skipped} skip, ${failed} fail`,
+      `  ${chapterTitle ?? chapterName} — ${downloaded} DL, 0 skip, ${failed} fail`,
     );
 
     return {
-      chapter: path.basename(saveDir),
+      chapter: chapterName,
       imageUrls,
       downloaded,
-      skipped,
+      skipped: 0,
       failed,
-      saveDir,
+      saveDir: seriesDir,
     };
+  }
+
+  private buildComicInfo(
+    series?: string,
+    title?: string,
+    number?: number | null,
+    pageCount?: number,
+  ): string {
+    const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+      '<ComicInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">',
+    ];
+    if (series)          lines.push(`  <Series>${esc(series)}</Series>`);
+    if (title)           lines.push(`  <Title>${esc(title)}</Title>`);
+    if (number != null)  lines.push(`  <Number>${number}</Number>`);
+    if (pageCount)       lines.push(`  <PageCount>${pageCount}</PageCount>`);
+    lines.push('</ComicInfo>');
+    return lines.join('\n');
   }
 
   private async downloadImage(url: string, filePath: string): Promise<void> {

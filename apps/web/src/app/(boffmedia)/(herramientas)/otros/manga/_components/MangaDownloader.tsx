@@ -147,8 +147,11 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
       <div className="rounded-lg border border-surface-700/50 divide-y divide-surface-700/30 max-h-80 overflow-y-auto">
         {filtered.map(({ ch, i }) => {
           const isSelected = selected.has(i);
-          const slug = ch.title.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-          const isDownloaded = downloadedSlugs.has(slug);
+          // Match by chapter number (e.g. "35", "8.5") or sanitized title for specials.
+          const chapterKey = ch.number != null
+            ? String(ch.number)
+            : ch.title.replace(/[\\/:*?"<>|]/g, '').trim();
+          const isDownloaded = downloadedSlugs.has(chapterKey);
           return (
             <div key={i} onClick={() => onToggle(i)}
               className={`flex items-center gap-3 px-3 py-2 cursor-pointer transition-colors
@@ -257,9 +260,8 @@ export default function MangaDownloader() {
 
   const downloadedSlugs = (() => {
     if (!library || !selectedNovel) return new Set<string>();
-    const titleSlug = (selectedNovel.title || '')
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zA-Z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-    const series = library.series.find(s => s.slug === titleSlug);
+    // Series folder is now the exact title (sanitized for filesystem).
+    const series = library.series.find(s => s.slug === selectedNovel.title);
     return new Set(series?.chapters.map(c => c.slug) ?? []);
   })();
 
