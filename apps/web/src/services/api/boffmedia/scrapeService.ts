@@ -94,6 +94,7 @@ export interface MangaSearchResult {
 export interface MangaChapter {
   title: string;
   url: string;
+  number: number | null;
 }
 
 export interface MangaChapterDownloadResult {
@@ -168,6 +169,10 @@ export class ScrapeService {
 
   static getLocalMangaLibrary() {
     return apiGET<LocalMangaLibrary>('/boffmedia/herramientas/scrape/manga/library');
+  }
+
+  static getNovelInfo(novelUrl: string) {
+    return apiGET<{ title: string; url: string }>(`/boffmedia/herramientas/scrape/manga/info?url=${encodeURIComponent(novelUrl)}`);
   }
 
   static searchManga(query: string) {

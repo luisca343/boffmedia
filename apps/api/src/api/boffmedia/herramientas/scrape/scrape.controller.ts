@@ -189,6 +189,14 @@ export class ScrapeController {
     return this.scrapeFacadeService.searchManga(query);
   }
 
+  @Get('manga/info')
+  @ApiOperation({ summary: 'Get title for a novel URL (used for direct URL input)' })
+  @ApiQuery({ name: 'url', type: String, description: 'Novel page URL' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Novel title and URL.' })
+  async getNovelInfo(@Query('url') url: string) {
+    return this.scrapeFacadeService.getNovelInfo(url);
+  }
+
   @Get('manga/chapters')
   @ApiOperation({ summary: 'Get the full ordered chapter list for a novelcool.com novel' })
   @ApiQuery({ name: 'url', type: String, description: 'Novel page URL', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' })

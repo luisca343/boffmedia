@@ -92,6 +92,14 @@ export class ScrapeFacadeService {
     }
   }
 
+  async getNovelInfo(novelUrl: string): Promise<{ title: string; url: string }> {
+    try {
+      return await this.mangaScraperService.getNovelInfo(novelUrl);
+    } catch (error) {
+      throw new Error(`Failed to fetch novel info: ${(error as Error).message}`);
+    }
+  }
+
   async getMangaChapters(novelUrl: string): Promise<MangaChapter[]> {
     try {
       return await this.mangaScraperService.getChapterList(novelUrl);

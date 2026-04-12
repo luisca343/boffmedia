@@ -54,6 +54,14 @@ export class MangaScraperService {
     return results.flatMap(r => (r.status === 'fulfilled' ? r.value : []));
   }
 
+  // ── Novel info ─────────────────────────────────────────────────────────────
+
+  async getNovelInfo(novelUrl: string): Promise<{ title: string; url: string }> {
+    const scraper = this.registry.resolve(novelUrl);
+    const title = await scraper.getTitle(novelUrl);
+    return { title, url: novelUrl };
+  }
+
   // ── Chapter list ───────────────────────────────────────────────────────────
 
   async getChapterList(novelUrl: string) {
