@@ -159,6 +159,10 @@ export class NovelCoolScraper implements IMangaScraper {
 
     try {
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+
+      // Dismiss age/content warning if present (e.g. violence/adult content gate).
+      await page.locator('.bookwarn-continue').click().catch(() => {});
+
       await page
         .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', { timeout: 15_000 })
         .catch(() => {});

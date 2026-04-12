@@ -250,6 +250,10 @@ export default function MangaDownloader() {
 
   const [selectedChapters, setSelectedChapters] = useState<Set<number>>(new Set());
 
+  const [directUrl, setDirectUrl] = useState('');
+  const [directUrlLoading, setDirectUrlLoading] = useState(false);
+  const [directUrlError, setDirectUrlError] = useState<string | null>(null);
+
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
@@ -294,6 +298,26 @@ export default function MangaDownloader() {
       setSearchError('No se pudo conectar con el servidor.');
     } finally {
       setSearchLoading(false);
+    }
+  };
+
+  const handleDirectUrl = async () => {
+    const url = directUrl.trim();
+    if (!url) return;
+    setDirectUrlLoading(true);
+    setDirectUrlError(null);
+    try {
+      const res = await ScrapeService.getNovelInfo(url);
+      if (res.success && res.data) {
+        setDirectUrl('');
+        await handleSelectNovel({ title: res.data.title, url: res.data.url, cover: '' });
+      } else {
+        setDirectUrlError(res.error ?? 'No se pudo obtener la información de la serie.');
+      }
+    } catch {
+      setDirectUrlError('No se pudo conectar con el servidor.');
+    } finally {
+      setDirectUrlLoading(false);
     }
   };
 
@@ -467,6 +491,37 @@ export default function MangaDownloader() {
               </div>
               {searchError && (
                 <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{searchError}</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Direct URL */}
+          <Card className="bg-surface-800/40 border-surface-700/50">
+            <CardContent className="pt-5 flex flex-col gap-3">
+              <p className="text-xs text-surface-400 flex items-center gap-1.5">
+                <BookOpen className="h-3.5 w-3.5" />
+                O introduce directamente la URL de la serie
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  value={directUrl}
+                  onChange={e => setDirectUrl(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && !directUrlLoading && directUrl.trim() && handleDirectUrl()}
+                  placeholder="https://es.novelcool.com/novel/RELIFE.html"
+                  className="bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-400 text-sm"
+                />
+                <Button
+                  onClick={handleDirectUrl}
+                  disabled={directUrlLoading || !directUrl.trim()}
+                  variant="outline"
+                  className="border-surface-600 hover:bg-surface-700 text-surface-300 shrink-0"
+                >
+                  {directUrlLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ChevronDown className="h-4 w-4 -rotate-90" />}
+                  <span className="ml-2">Cargar</span>
+                </Button>
+              </div>
+              {directUrlError && (
+                <p className="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-md px-3 py-2">{directUrlError}</p>
               )}
             </CardContent>
           </Card>
