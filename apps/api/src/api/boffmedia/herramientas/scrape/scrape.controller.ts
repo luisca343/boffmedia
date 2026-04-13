@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpStatus, Post, Query, Res, UseInterceptors } from '@nestjs/common';
-import { ApiBody, ApiTags, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { BadRequestException, Body, Controller, Get, HttpStatus, Post, Query, Res, UseInterceptors } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { ScrapeFacadeService } from './scrape.facade.service';
@@ -9,6 +9,7 @@ import { DownloadResult } from './entities/download-result.entity';
 import { BulkDownloadResult } from './entities/bulk-download-result.entity';
 import { DownloadAllGamesDto } from './dto/download-all-games.dto';
 import { DownloadSelectedGamesDto } from './dto/download-selected-games.dto';
+import { DownloadMangaNovelDto } from './dto/download-manga-novel.dto';
 import { MyrientConsole } from './enums/myrient-console.enum';
 
 @ApiTags('BoffMedia | Scrape')
@@ -186,6 +187,7 @@ export class ScrapeController {
   @ApiQuery({ name: 'q', type: String, description: 'Search query', example: 'Raeliana' })
   @ApiResponse({ status: HttpStatus.OK, description: 'List of matching manga.' })
   async searchManga(@Query('q') query: string) {
+    if (!query?.trim()) throw new BadRequestException('q is required');
     return this.scrapeFacadeService.searchManga(query);
   }
 
@@ -194,6 +196,7 @@ export class ScrapeController {
   @ApiQuery({ name: 'url', type: String, description: 'Novel page URL' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Novel title and URL.' })
   async getNovelInfo(@Query('url') url: string) {
+    if (!url?.trim()) throw new BadRequestException('url is required');
     return this.scrapeFacadeService.getNovelInfo(url);
   }
 
@@ -202,6 +205,7 @@ export class ScrapeController {
   @ApiQuery({ name: 'url', type: String, description: 'Novel page URL', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Ordered list of chapters (title + url).' })
   async getMangaChapters(@Query('url') url: string) {
+    if (!url?.trim()) throw new BadRequestException('url is required');
     return this.scrapeFacadeService.getMangaChapters(url);
   }
 
@@ -210,20 +214,9 @@ export class ScrapeController {
     summary: 'Stream manga download progress via SSE',
     description: 'Scrapes every selected chapter with Playwright and streams per-chapter progress events. Events: start, chapter, done.',
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['url'],
-      properties: {
-        url: { type: 'string', example: 'https://es.novelcool.com/novel/La-Raz-n-Por-La-Que-Raeliana-Termin-En-La-Mansi-n-Del-Duque.html' },
-        from: { type: 'number', example: 1 },
-        to: { type: 'number', example: 5 },
-      },
-    },
-  })
   @ApiResponse({ status: HttpStatus.OK, description: 'SSE stream of download progress events.' })
   async streamDownloadMangaNovel(
-    @Body() body: { url: string; from?: number; to?: number },
+    @Body() dto: DownloadMangaNovelDto,
     @Res() res: Response,
   ): Promise<void> {
     res.setHeader('Content-Type', 'text/event-stream');
@@ -231,7 +224,7 @@ export class ScrapeController {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    for await (const chunk of this.scrapeFacadeService.streamDownloadMangaNovel(body.url, body.from, body.to)) {
+    for await (const chunk of this.scrapeFacadeService.streamDownloadMangaNovel(dto.url, dto.from, dto.to)) {
       res.write(chunk);
     }
     res.end();

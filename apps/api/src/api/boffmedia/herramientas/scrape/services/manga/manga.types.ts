@@ -29,13 +29,6 @@ export interface MangaChapterDownloadResult {
   saveDir: string;
 }
 
-export interface MangaNovelDownloadResult {
-  novelTitle: string;
-  chapters: MangaChapterDownloadResult[];
-  totalDownloaded: number;
-  totalFailed: number;
-}
-
 export interface LocalMangaChapter {
   slug: string;
   imageCount: number;

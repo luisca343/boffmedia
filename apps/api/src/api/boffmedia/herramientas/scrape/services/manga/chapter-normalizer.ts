@@ -44,15 +44,3 @@ export function chapterFilename(number: number | null, title: string): string {
 export function sanitizeForFilesystem(text: string): string {
   return text.replace(/[\\/:*?"<>|]/g, '').trim();
 }
-
-/** Strips diacritics and special characters, produces a kebab-case slug.
- *  Still used internally where a plain ASCII slug is needed. */
-export function slugify(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .toLowerCase();
-}

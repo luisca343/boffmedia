@@ -7,15 +7,19 @@ import type { AxiosRequestConfig } from 'axios';
 
 // ── Proxy pool ─────────────────────────────────────────────────────────────
 
+const PROXY_POOL_TTL_MS = 10 * 60 * 1_000; // 10 minutes
+
 let proxyPool: string[] | null = null;
+let proxyPoolLoadedAt = 0;
 
 /**
  * Lazily fetches and parses the proxy list from MANGA_SCRAPER_PROXY_LIST_URL.
  * Each line must be in `host:port:user:pass` format (Webshare direct format).
+ * The pool is refreshed after PROXY_POOL_TTL_MS (10 minutes).
  * Returns an empty array if the env var is not set or the fetch fails.
  */
 async function loadProxyPool(): Promise<string[]> {
-  if (proxyPool !== null) return proxyPool;
+  if (proxyPool !== null && Date.now() - proxyPoolLoadedAt < PROXY_POOL_TTL_MS) return proxyPool;
 
   const listUrl = process.env.MANGA_SCRAPER_PROXY_LIST_URL;
   if (!listUrl) {
@@ -33,6 +37,7 @@ async function loadProxyPool(): Promise<string[]> {
         const [host, port, user, pass] = l.split(':');
         return `http://${user}:${pass}@${host}:${port}`;
       });
+    proxyPoolLoadedAt = Date.now();
     console.log(`[manga-http] Loaded ${proxyPool.length} proxies from pool`);
   } catch (err) {
     console.warn(`[manga-http] Failed to load proxy list: ${(err as Error).message}`);
