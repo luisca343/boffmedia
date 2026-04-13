@@ -1,10 +1,14 @@
 // ---------------------------------------------------------------------------
 // PkProjectScraper — scrapes manga from pkproject.net
 //
-// URL structure:
-//   Sagas index  : https://pkproject.net/manga/{series}/sagas
-//   Volume page  : https://pkproject.net/manga/{series}/{saga}/tomo-{n}
-//   Chapter page : https://pkproject.net/manga/{series}/{saga}/tomo-{n}/capitulo-{n}
+// URL hierarchy:
+//   Sagas index : https://pkproject.net/manga/{series}/sagas
+//   Saga URL    : https://pkproject.net/manga/{series}/{saga}          ← no trailing segment
+//   Volume URL  : https://pkproject.net/manga/{series}/{saga}/tomo-{n}
+//   Chapter URL : https://pkproject.net/manga/{series}/{saga}/tomo-{n}/capitulo-{n}
+//
+// Each saga is treated as a single manga entry. Selecting a saga fetches
+// chapters from all its volumes in order.
 //
 // The site serves fully-rendered HTML — no Playwright needed.
 // ---------------------------------------------------------------------------
@@ -13,32 +17,66 @@ import * as cheerio from 'cheerio';
 import { BrowserContext } from 'playwright';
 import { IMangaScraper } from '../manga-scraper.interface';
 import { MangaChapter, MangaSearchResult } from '../../manga.types';
-import { fetchHtmlSafe, UA } from '../../manga-http';
+import { fetchHtmlSafe } from '../../manga-http';
 import { normalizeChapterNumber } from '../../chapter-normalizer';
 
 const BASE = 'https://pkproject.net';
 
-// Derive the sagas index URL from a volume or chapter URL.
-// e.g. https://pkproject.net/manga/pokemon-adventures/saga-rojo-verde-y-azul/tomo-1
-//   →  https://pkproject.net/manga/pokemon-adventures/sagas
-function sagasUrl(url: string): string {
-  const match = url.match(/^(https?:\/\/pkproject\.net\/manga\/[^/]+)/);
-  if (!match) throw new Error(`Cannot derive sagas URL from: ${url}`);
-  return `${match[1]}/sagas`;
+// ── Internal types ────────────────────────────────────────────────────────────
+
+interface SagaEntry {
+  /** Human-readable name scraped from <h2>, e.g. "Saga Rojo, Verde y Azul" */
+  sagaName: string;
+  /** Full aria-label from the first tomo, e.g. "Pokémon Adventures - Saga Rojo, Verde y Azul - Tomo 1" */
+  fullTitle: string;
+  /** Saga-level URL: sagas index URL with the saga slug, e.g. .../saga-rojo-verde-y-azul */
+  url: string;
+  /** Cover image of the first volume (CDN prefix stripped). */
+  cover: string;
+  /** All volume URLs under this saga, in order. */
+  volumeUrls: string[];
 }
 
-// Normalise a potentially relative URL (removes leading "./" if present).
-function normalizeImgUrl(src: string): string {
-  if (src.startsWith('http')) return src;
-  return src.startsWith('./') ? `${BASE}/${src.slice(2)}` : `${BASE}${src}`;
+// ── URL helpers ───────────────────────────────────────────────────────────────
+
+/** Derive the sagas-index URL from any pkproject manga URL. */
+function sagasIndexUrl(url: string): string {
+  const m = url.match(/^(https?:\/\/pkproject\.net\/manga\/[^/]+)/);
+  if (!m) throw new Error(`Cannot derive sagas URL from: ${url}`);
+  return `${m[1]}/sagas`;
 }
+
+/** Derive the saga-level URL (no tomo/capitulo segment) from a volume or chapter URL. */
+function toSagaUrl(url: string): string {
+  // Strip /tomo-N and /capitulo-N suffixes.
+  return url.replace(/\/(tomo-\d+)(\/.*)?$/, '');
+}
+
+/** True when the URL ends at the saga level (no tomo/capitulo segment). */
+function isSagaUrl(url: string): boolean {
+  return /pkproject\.net\/manga\/[^/]+\/[^/]+$/.test(url) && !url.endsWith('/sagas');
+}
+
+/** Normalise a potentially relative or CDN-prefixed image URL. */
+function normalizeImgUrl(src: string): string {
+  // Strip Cloudflare image-resize prefix.
+  const stripped = src.replace(/^https:\/\/pkproject\.net\/cdn-cgi\/image\/[^/]+\//, '');
+  if (stripped.startsWith('http')) return stripped;
+  return stripped.startsWith('./') ? `${BASE}/${stripped.slice(2)}` : `${BASE}${stripped}`;
+}
+
+const IMAGE_EXTS = /\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i;
+
+// ── Scraper ───────────────────────────────────────────────────────────────────
 
 export class PkProjectScraper implements IMangaScraper {
   readonly name = 'pkproject';
   readonly requiresBrowser = false;
 
-  // Cache the volume list per sagas-page URL so we don't re-fetch on every call.
-  private readonly volumeCache = new Map<string, MangaSearchResult[]>();
+  /** Cache: sagas-index URL → parsed saga list. */
+  private readonly sagaCache = new Map<string, SagaEntry[]>();
+
+  // ── Routing ───────────────────────────────────────────────────────────────
 
   canHandle(url: string): boolean {
     return url.includes('pkproject.net/manga/');
@@ -47,60 +85,51 @@ export class PkProjectScraper implements IMangaScraper {
   // ── Search ────────────────────────────────────────────────────────────────
 
   /**
-   * Loads the series' sagas index page and returns volumes that match the query.
-   * Accepts both full pkproject.net tomo URLs and plain text queries like
-   * "pokemon adventures rojo". When a plain query is used we fetch the default
-   * Pokémon Adventures sagas page.
+   * Returns one result per saga (not per volume).
+   * Accepts a plain text query or a full pkproject URL.
    */
   async search(query: string): Promise<MangaSearchResult[]> {
-    const lower = query.toLowerCase();
-
-    // If the user pasted a URL, derive the sagas page from it.
-    const pageUrl = query.startsWith('http') && query.includes('pkproject.net')
-      ? sagasUrl(query)
+    const indexUrl = query.startsWith('http') && query.includes('pkproject.net')
+      ? sagasIndexUrl(query)
       : `${BASE}/manga/pokemon-adventures/sagas`;
 
-    const volumes = await this.loadVolumes(pageUrl);
+    const sagas = await this.loadSagas(indexUrl);
+    const lower = query.toLowerCase();
 
-    if (!lower.trim()) return volumes;
-    return volumes.filter(t => t.title.toLowerCase().includes(lower));
+    if (!lower.trim() || query.startsWith('http')) return sagas.map(this.toSearchResult);
+    return sagas.filter(s =>
+      s.sagaName.toLowerCase().includes(lower) ||
+      s.fullTitle.toLowerCase().includes(lower),
+    ).map(this.toSearchResult);
   }
 
   // ── Title ─────────────────────────────────────────────────────────────────
 
   async getTitle(novelUrl: string): Promise<string> {
-    const pageUrl = sagasUrl(novelUrl);
-    const volumes = await this.loadVolumes(pageUrl);
-    const match = volumes.find(t => t.url === novelUrl || novelUrl.startsWith(t.url));
-    if (match) return match.title;
-
-    // Fallback: derive from URL segments.
-    return this.titleFromUrl(novelUrl);
+    const sagaUrl = toSagaUrl(novelUrl);
+    const indexUrl = sagasIndexUrl(novelUrl);
+    const sagas = await this.loadSagas(indexUrl);
+    const match = sagas.find(s => s.url === sagaUrl);
+    // Return the full aria-label title minus the " - Tomo N" suffix.
+    if (match) return match.fullTitle.replace(/\s*-\s*Tomo\s*\d+$/i, '').trim();
+    return this.titleFromUrl(sagaUrl);
   }
 
   // ── Chapter list ──────────────────────────────────────────────────────────
 
+  /**
+   * When given a saga URL, fetches chapters from ALL volumes in that saga.
+   * When given a volume URL directly, fetches only that volume's chapters.
+   */
   async getChapterList(novelUrl: string): Promise<MangaChapter[]> {
-    // Accept both tomo URLs and chapter URLs — strip to tomo level.
-    const tomoUrl = this.toVolumeUrl(novelUrl);
+    const sagaUrl = toSagaUrl(novelUrl);
 
-    const html = await fetchHtmlSafe(tomoUrl);
-    if (!html) throw new Error(`[pkproject] Failed to fetch tomo page: ${tomoUrl}`);
+    if (isSagaUrl(sagaUrl)) {
+      return this.getAllChaptersForSaga(sagaUrl);
+    }
 
-    const $ = cheerio.load(html);
-    const chapters: MangaChapter[] = [];
-
-    $('.manga_ch_list a').each((_, el) => {
-      const href = $(el).attr('href');
-      const title = $(el).text().trim();
-      if (!href || !title) return;
-      const url = href.startsWith('http') ? href : `${BASE}${href}`;
-      const number = normalizeChapterNumber(title);
-      chapters.push({ title, url, number });
-    });
-
-    // The page lists chapters top-to-bottom (oldest first) — preserve that order.
-    return chapters;
+    // Fallback: treat as a single volume URL.
+    return this.getVolumeChapters(novelUrl);
   }
 
   // ── Chapter images ────────────────────────────────────────────────────────
@@ -115,9 +144,9 @@ export class PkProjectScraper implements IMangaScraper {
 
     $('div.blurred-img img.spotlight').each((_, el) => {
       const raw = $(el).attr('src') ?? '';
-      if (!raw || raw.includes('/img/site/')) return; // skip nav/UI images
+      if (!raw || raw.includes('/img/site/')) return;
       const canonical = normalizeImgUrl(raw).replace(/\/\.\//g, '/');
-      if (!seen.has(canonical)) {
+      if (IMAGE_EXTS.test(canonical.split('?')[0]) && !seen.has(canonical)) {
         seen.add(canonical);
         images.push(canonical);
       }
@@ -126,50 +155,115 @@ export class PkProjectScraper implements IMangaScraper {
     return images;
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────────
+  // ── Private helpers ───────────────────────────────────────────────────────
 
   /**
-   * Fetch and cache the list of all volumes from the given sagas-index URL.
-   * Each `<a>` inside a `.grid` block (one per saga) has the volume URL and
-   * an `aria-label` like "Pokémon Adventures - Saga Rojo, Verde y Azul - Tomo 1".
+   * Fetch and cache the saga list from a sagas-index page.
+   *
+   * HTML structure:
+   *   <h2>Saga Rojo, Verde y Azul</h2>
+   *   <div class="grid">
+   *     <a href=".../tomo-1" aria-label="Pokémon Adventures - Saga Rojo, Verde y Azul - Tomo 1">
+   *       <img src="...1_1.png">
+   *     </a>
+   *     <a href=".../tomo-2" ...>...</a>
+   *   </div>
+   *   <h2>Saga Amarillo</h2>
+   *   <div class="grid">...</div>
    */
-  private async loadVolumes(pageUrl: string): Promise<MangaSearchResult[]> {
-    if (this.volumeCache.has(pageUrl)) return this.volumeCache.get(pageUrl)!;
+  private async loadSagas(indexUrl: string): Promise<SagaEntry[]> {
+    if (this.sagaCache.has(indexUrl)) return this.sagaCache.get(indexUrl)!;
 
-    const html = await fetchHtmlSafe(pageUrl);
+    const html = await fetchHtmlSafe(indexUrl);
     if (!html) {
-      console.warn(`[pkproject] Could not load sagas page: ${pageUrl}`);
+      console.warn(`[pkproject] Could not load sagas page: ${indexUrl}`);
       return [];
     }
 
     const $ = cheerio.load(html);
-    const volumes: MangaSearchResult[] = [];
+    const sagas: SagaEntry[] = [];
 
-    // Each saga section: <h2>Saga ...</h2><div class="grid"><a href="...tomo-N" ...>
-    $('div.grid a[href*="/tomo-"]').each((_, el) => {
-      const href = $(el).attr('href') ?? '';
-      const label = $(el).attr('aria-label') ?? '';
-      // Cover image: inside the <a> there's an <img> with a CDN-resized src.
-      const rawCover = $(el).find('img').attr('src') ?? '';
-      // Unwrap CDN resize prefix to get the real image URL.
-      const cover = rawCover.replace(/^https:\/\/pkproject\.net\/cdn-cgi\/image\/[^/]+\//, '');
+    $('h2').each((_, h2El) => {
+      const sagaName = $(h2El).text().trim();
+      if (!sagaName) return;
 
-      if (!href || !label) return;
-      const url = href.startsWith('http') ? href : `${BASE}${href}`;
-      volumes.push({ title: label, url, cover });
+      const grid = $(h2El).next('div.grid');
+      const volumeUrls: string[] = [];
+      let cover = '';
+      let fullTitle = '';
+
+      grid.find('a[href*="/tomo-"]').each((i, aEl) => {
+        const href = $(aEl).attr('href') ?? '';
+        if (!href) return;
+        const url = href.startsWith('http') ? href : `${BASE}${href}`;
+        volumeUrls.push(url);
+
+        if (i === 0) {
+          fullTitle = $(aEl).attr('aria-label') ?? sagaName;
+          const rawCover = $(aEl).find('img').attr('src') ?? '';
+          cover = rawCover ? normalizeImgUrl(rawCover) : '';
+        }
+      });
+
+      if (volumeUrls.length === 0) return;
+
+      // Derive saga-level URL from the first volume URL (strip /tomo-N).
+      const sagaUrl = toSagaUrl(volumeUrls[0]);
+
+      sagas.push({ sagaName, fullTitle, url: sagaUrl, cover, volumeUrls });
     });
 
-    this.volumeCache.set(pageUrl, volumes);
-    return volumes;
+    this.sagaCache.set(indexUrl, sagas);
+    return sagas;
   }
 
-  /** Strip a chapter URL back down to volume level if needed. */
-  private toVolumeUrl(url: string): string {
-    const match = url.match(/^(https?:\/\/pkproject\.net\/manga\/[^/]+\/[^/]+\/tomo-\d+)/);
-    return match ? match[1] : url;
+  /** Fetch chapters from every volume in a saga, in order. */
+  private async getAllChaptersForSaga(sagaUrl: string): Promise<MangaChapter[]> {
+    const indexUrl = sagasIndexUrl(sagaUrl);
+    const sagas = await this.loadSagas(indexUrl);
+    const saga = sagas.find(s => s.url === sagaUrl);
+
+    if (!saga) {
+      console.warn(`[pkproject] Saga not found for URL: ${sagaUrl}`);
+      return [];
+    }
+
+    const allChapters: MangaChapter[] = [];
+    for (const volumeUrl of saga.volumeUrls) {
+      const chapters = await this.getVolumeChapters(volumeUrl);
+      allChapters.push(...chapters);
+    }
+    return allChapters;
   }
 
-  /** Last-resort title from URL segments. */
+  /** Fetch the chapter list for a single volume page. */
+  private async getVolumeChapters(volumeUrl: string): Promise<MangaChapter[]> {
+    const html = await fetchHtmlSafe(volumeUrl);
+    if (!html) {
+      console.warn(`[pkproject] Failed to fetch volume: ${volumeUrl}`);
+      return [];
+    }
+
+    const $ = cheerio.load(html);
+    const chapters: MangaChapter[] = [];
+
+    $('.manga_ch_list a').each((_, el) => {
+      const href = $(el).attr('href') ?? '';
+      const title = $(el).text().trim();
+      if (!href || !title) return;
+      const url = href.startsWith('http') ? href : `${BASE}${href}`;
+      chapters.push({ title, url, number: normalizeChapterNumber(title) });
+    });
+
+    return chapters;
+  }
+
+  private toSearchResult(saga: SagaEntry): MangaSearchResult {
+    // Strip " - Tomo N" from the full title for the display title.
+    const title = saga.fullTitle.replace(/\s*-\s*Tomo\s*\d+$/i, '').trim() || saga.sagaName;
+    return { title, url: saga.url, cover: saga.cover };
+  }
+
   private titleFromUrl(url: string): string {
     const parts = url.replace(/^https?:\/\/pkproject\.net\/manga\//, '').split('/');
     return parts
