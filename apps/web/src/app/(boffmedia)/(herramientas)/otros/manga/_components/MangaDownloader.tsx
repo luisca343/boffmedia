@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/primitives/checkbox';
 import {
   BookOpen, Search, Download, Loader2, ChevronDown, ChevronUp,
   CheckSquare, Square, HardDrive, CheckCircle2, XCircle, Clock,
-  Library, RefreshCw, BookMarked, ImageIcon, X,
+  Library, RefreshCw, BookMarked, ImageIcon, X, Globe,
 } from 'lucide-react';
 import {
   ScrapeService,
@@ -22,6 +22,41 @@ import {
   type LocalMangaSeries,
 } from '@/services/api/boffmedia/scrapeService';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
+
+// ─── Scraper sources panel ─────────────────────────────────────────────────────
+
+const SCRAPER_SOURCES = [
+  { name: 'NovelCool', url: 'https://es.novelcool.com', active: true, description: 'Manga y manhwa en español' },
+] as const;
+
+function ScraperSourcesPanel() {
+  return (
+    <Card className="bg-surface-800/40 border-surface-700/50">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm text-surface-300 flex items-center gap-2">
+          <Globe className="h-4 w-4 text-primary-400" />Fuentes disponibles
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-wrap gap-2">
+          {SCRAPER_SOURCES.map(source => (
+            <div key={source.name} className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs
+              border-surface-600/50 bg-surface-700/30">
+              <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${source.active ? 'bg-green-400' : 'bg-surface-500'}`} />
+              <span className="font-medium text-surface-200">{source.name}</span>
+              <span className="text-surface-500">{source.description}</span>
+              <Badge className={`text-[10px] px-1.5 py-0 h-4 ${source.active
+                ? 'bg-green-900/30 text-green-300 border-green-800/40'
+                : 'bg-surface-700/40 text-surface-400 border-surface-600/40'}`}>
+                {source.active ? 'Activo' : 'No disponible'}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 // ─── Local library ─────────────────────────────────────────────────────────────
 
@@ -262,12 +297,12 @@ export default function MangaDownloader() {
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
   useEffect(() => { setPortalTarget(document.body); }, []);
 
-  const downloadedSlugs = (() => {
+  const downloadedSlugs = useMemo(() => {
     if (!library || !selectedNovel) return new Set<string>();
     // Series folder is now the exact title (sanitized for filesystem).
     const series = library.series.find(s => s.slug === selectedNovel.title);
     return new Set(series?.chapters.map(c => c.slug) ?? []);
-  })();
+  }, [library, selectedNovel]);
 
   const loadLibrary = useCallback(async () => {
     setLibraryLoading(true);
@@ -456,6 +491,9 @@ export default function MangaDownloader() {
               Busca una serie en NovelCool, elige los capítulos y descárgalos al servidor.
             </p>
           </motion.div>
+
+          {/* Scraper sources */}
+          <ScraperSourcesPanel />
 
           {/* Local library */}
           <AnimatePresence>

@@ -88,7 +88,7 @@ export class ScrapeFacadeService {
     try {
       return await this.mangaScraperService.searchNovels(query);
     } catch (error) {
-      throw new Error(`Manga search failed: ${(error as Error).message}`);
+      throw new Error(`Failed to search manga: ${(error as Error).message}`);
     }
   }
 

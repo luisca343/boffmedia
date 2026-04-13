@@ -20,7 +20,6 @@ export type {
   MangaSearchResult,
   MangaChapter,
   MangaChapterDownloadResult,
-  MangaNovelDownloadResult,
   LocalMangaChapter,
   LocalMangaSeries,
   LocalMangaLibrary,
