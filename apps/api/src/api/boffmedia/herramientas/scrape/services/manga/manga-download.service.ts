@@ -59,7 +59,7 @@ export class MangaDownloadService {
   ): Promise<MangaChapterDownloadResult> {
     const scraper = this.registry.resolve(chapterUrl);
     const browser = await this.getBrowser();
-    const proxy = await getProxy();
+    const proxy = this.browserService.getTunnelEnabled() ? await getProxy() : undefined;
     const context = await browser.newContext({
       userAgent: UA,
       ...(proxy ? { proxy: toPlaywrightProxy(proxy) } : {}),
@@ -89,6 +89,7 @@ export class MangaDownloadService {
     novelUrl: string,
     from: number = 1,
     to?: number,
+    skipDownloaded = true,
   ): AsyncGenerator<string> {
     const scraper = this.registry.resolve(novelUrl);
 
@@ -106,7 +107,10 @@ export class MangaDownloadService {
     yield sse({ type: 'start', total: slice.length, novelTitle });
 
     const browser = await this.getBrowser();
-    const proxy = await getProxy();
+    const proxy = this.browserService.getTunnelEnabled() ? await getProxy() : undefined;
+    if (!proxy && this.browserService.getTunnelEnabled()) {
+      this.logger.warn('Tunnel enabled but no proxy available — browser contexts will use direct connection');
+    }
     const context = await browser.newContext({
       userAgent: UA,
       ...(proxy ? { proxy: toPlaywrightProxy(proxy) } : {}),
@@ -133,7 +137,7 @@ export class MangaDownloadService {
           );
         }
 
-        const result = await this.saveCbz(imageUrls, cbzPath, ch.title, ch.number, novelTitle);
+        const result = await this.saveCbz(imageUrls, cbzPath, ch.title, ch.number, novelTitle, skipDownloaded);
         totalDownloaded += result.downloaded;
         totalFailed += result.failed;
 
@@ -171,11 +175,12 @@ export class MangaDownloadService {
     chapterTitle?: string,
     chapterNumber?: number | null,
     seriesTitle?: string,
+    skipIfExists = true,
   ): Promise<MangaChapterDownloadResult> {
     const chapterName = path.basename(cbzPath, '.cbz');
 
-    // Skip if CBZ already exists.
-    if (await fileExists(cbzPath)) {
+    // Skip if CBZ already exists (when skipIfExists is true).
+    if (skipIfExists && await fileExists(cbzPath)) {
       this.logger.log(`  ${chapterTitle ?? chapterName} — skip (already downloaded)`);
       return { chapter: chapterName, imageUrls, downloaded: 0, skipped: 1, failed: 0, saveDir: path.dirname(cbzPath) };
     }

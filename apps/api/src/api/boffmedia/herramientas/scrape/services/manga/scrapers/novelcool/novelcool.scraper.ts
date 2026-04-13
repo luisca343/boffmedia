@@ -73,7 +73,7 @@ export class NovelCoolScraper implements IMangaScraper {
       const url = $(el).attr('href') ?? '';
       const rawText = $(el).text().trim().split('\n')[0].trim();
 
-      if (!url || seen.has(url) || rawText === 'Empieza a leer') return;
+      if (!url || !rawText || seen.has(url) || rawText === 'Empieza a leer') return;
       seen.add(url);
 
       chapters.push({
@@ -90,7 +90,9 @@ export class NovelCoolScraper implements IMangaScraper {
 
   async getChapterImages(chapterUrl: string, context: BrowserContext): Promise<string[]> {
     const firstPageUrl = this.normalizeChapterUrl(chapterUrl);
+    console.log(`[NovelCoolScraper] Detecting total pages for chapter: ${firstPageUrl}`);
     const totalPages = await this.detectTotalPages(context, firstPageUrl);
+    console.log(`[NovelCoolScraper] Chapter has ${totalPages} page(s)`);
 
     // Strip any existing page suffix to get the canonical base URL.
     const canonicalBase = chapterUrl
@@ -101,50 +103,63 @@ export class NovelCoolScraper implements IMangaScraper {
 
     for (let page = 1; page <= totalPages; page++) {
       const pageUrl = this.buildPageUrl(canonicalBase, page);
+      console.log(`[NovelCoolScraper] Scraping page ${page}/${totalPages}: ${pageUrl}`);
       const images = await this.scrapePageWithRetry(context, pageUrl, page);
+      console.log(`[NovelCoolScraper] Page ${page}/${totalPages}: found ${images.length} image(s)`);
       allImages.push(...images);
       if (page < totalPages) await randomDelay();
     }
 
-    // Deduplicate while preserving order.
-    return [...new Set(allImages)];
+    const deduplicated = [...new Set(allImages)];
+    console.log(`[NovelCoolScraper] Chapter done — ${deduplicated.length} unique image(s) total`);
+    return deduplicated;
   }
 
   // ── Private: HTTP fallback chain ──────────────────────────────────────────
 
   /**
-   * Tries to fetch the URL with realistic browser headers.
-   * Falls back to a proxy if MANGA_SCRAPER_PROXY is set and the plain
-   * request is blocked (returns null from fetchHtmlSafe).
-   * Throws if all attempts fail.
+   * Three-tier fetch chain:
+   *   1. Plain Axios (no proxy) — fastest, works when server allows direct access.
+   *   2. Proxy pool (up to 3 random proxies) — if direct is blocked.
+   *   3. Playwright + proxy — last resort for JS-rendered or heavily guarded pages.
+   * Throws if all tiers fail.
    */
   private async fetchWithFallback(url: string): Promise<string> {
-    // 1. Plain Axios with realistic headers.
+    // 1. Direct — no proxy.
+    console.log(`[NovelCoolScraper] Fetching (direct): ${url}`);
     const direct = await fetchHtmlSafe(url);
-    if (direct !== null) return direct;
+    if (direct !== null) {
+      console.log(`[NovelCoolScraper] Direct fetch succeeded for ${url}`);
+      return direct;
+    }
+    console.warn(`[NovelCoolScraper] Direct fetch blocked — trying proxies for ${url}`);
 
-    console.warn(`[NovelCoolScraper] Direct fetch blocked for ${url}`);
-
-    // 2. Try up to 3 random proxies from the pool.
-    const proxies = await getProxies(3);
-    for (const proxyUrl of proxies) {
-      const proxied = await fetchHtmlSafe(url, proxyUrl);
+    // 2. Proxy pool — only when tunnel is enabled.
+    const tunnelEnabled = this.browserService.getTunnelEnabled();
+    const proxies = tunnelEnabled ? await getProxies(3) : [];
+    if (!tunnelEnabled) {
+      console.log(`[NovelCoolScraper] Tunnel disabled — skipping proxy tier for ${url}`);
+    } else if (proxies.length === 0) {
+      console.warn(`[NovelCoolScraper] Tunnel enabled but no proxies configured — skipping proxy tier`);
+    }
+    for (let i = 0; i < proxies.length; i++) {
+      console.log(`[NovelCoolScraper] Proxy attempt ${i + 1}/${proxies.length} for ${url}`);
+      const proxied = await fetchHtmlSafe(url, proxies[i]);
       if (proxied !== null) {
-        console.warn(`[NovelCoolScraper] Proxy succeeded for ${url}`);
+        console.log(`[NovelCoolScraper] Proxy ${i + 1} succeeded for ${url}`);
         return proxied;
       }
+      console.warn(`[NovelCoolScraper] Proxy ${i + 1} blocked for ${url}`);
     }
 
-    if (proxies.length > 0) {
-      console.warn(`[NovelCoolScraper] All ${proxies.length} proxies blocked for ${url}`);
-    }
-
-    // 3. Playwright fallback — routed through a proxy so local IP is never used.
-    console.warn(`[NovelCoolScraper] Falling back to Playwright for ${url}`);
-    return this.fetchHtmlWithPlaywright(url, proxies[0]);
+    // 3. Playwright fallback — use proxy only when tunnel is enabled.
+    const fallbackProxy = tunnelEnabled ? proxies[0] : undefined;
+    console.warn(`[NovelCoolScraper] All HTTP attempts failed — falling back to Playwright${fallbackProxy ? ' (with proxy)' : ' (direct)'} for ${url}`);
+    return this.fetchHtmlWithPlaywright(url, fallbackProxy);
   }
 
   private async fetchHtmlWithPlaywright(url: string, proxyUrl?: string): Promise<string> {
+    console.log(`[NovelCoolScraper] Launching Playwright for ${url}${proxyUrl ? ' (with proxy)' : ' (no proxy)'}`);
     const browser = await this.browserService.getBrowser();
     const context = await browser.newContext({
       userAgent: UA,
@@ -158,14 +173,17 @@ export class NovelCoolScraper implements IMangaScraper {
     });
 
     try {
+      console.log(`[NovelCoolScraper] Playwright navigating to ${url}`);
       await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30_000 });
 
       // Dismiss age/content warning if present (e.g. violence/adult content gate).
-      await page.locator('.bookwarn-continue').click().catch(() => {});
+      const warned = await page.locator('.bookwarn-continue').click().then(() => true).catch(() => false);
+      if (warned) console.log(`[NovelCoolScraper] Dismissed content warning on ${url}`);
 
       await page
         .waitForSelector('[class*="book-item"], a[href*="/chapter/"], h1', { timeout: 15_000 })
         .catch(() => {});
+      console.log(`[NovelCoolScraper] Playwright page loaded for ${url}`);
       return await page.content();
     } finally {
       await page.close();

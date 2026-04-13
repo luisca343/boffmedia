@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsUrl, IsNotEmpty, IsOptional, IsInt, Min } from 'class-validator';
+import { IsUrl, IsNotEmpty, IsOptional, IsInt, IsBoolean, Min } from 'class-validator';
 
 export class DownloadMangaNovelDto {
   @ApiProperty({
@@ -29,4 +29,13 @@ export class DownloadMangaNovelDto {
   @IsInt()
   @Min(1)
   to?: number;
+
+  @ApiProperty({
+    description: 'Skip chapters that already exist on disk as .cbz files (default: true)',
+    example: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  skipDownloaded?: boolean;
 }
