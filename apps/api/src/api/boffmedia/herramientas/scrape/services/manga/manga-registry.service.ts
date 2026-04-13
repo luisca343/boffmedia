@@ -9,6 +9,7 @@
 import { Injectable } from '@nestjs/common';
 import { IMangaScraper } from './scrapers/manga-scraper.interface';
 import { NovelCoolScraper } from './scrapers/novelcool/novelcool.scraper';
+import { PkProjectScraper } from './scrapers/pkproject/pkproject.scraper';
 import { MangaBrowserService } from './manga-browser.service';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class MangaScraperRegistry {
   constructor(private readonly browserService: MangaBrowserService) {
     this.scrapers = [
       new NovelCoolScraper(browserService),
+      new PkProjectScraper(),
       // new MangaDexScraper(browserService),  ← add future scrapers here
     ];
   }

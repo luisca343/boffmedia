@@ -78,7 +78,8 @@ export class MangaScraperService {
     novelUrl: string,
     from: number = 1,
     to?: number,
+    skipDownloaded = true,
   ): AsyncGenerator<string> {
-    return this.downloadService.streamDownloadNovel(novelUrl, from, to);
+    return this.downloadService.streamDownloadNovel(novelUrl, from, to, skipDownloaded);
   }
 }

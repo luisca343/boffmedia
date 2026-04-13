@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, HttpStatus, Post, Query, Res, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, HttpStatus, Patch, Post, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
@@ -182,6 +182,20 @@ export class ScrapeController {
     return this.scrapeFacadeService.getLocalMangaLibrary();
   }
 
+  @Get('manga/browser')
+  @ApiOperation({ summary: 'Get current browser config (tunnel on/off)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Browser config.' })
+  getBrowserConfig() {
+    return this.scrapeFacadeService.getBrowserConfig();
+  }
+
+  @Patch('manga/browser')
+  @ApiOperation({ summary: 'Enable or disable the remote browser tunnel' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Updated browser config.' })
+  async setBrowserTunnel(@Body() body: { tunnelEnabled: boolean }) {
+    return this.scrapeFacadeService.setBrowserTunnel(body.tunnelEnabled);
+  }
+
   @Get('manga/search')
   @ApiOperation({ summary: 'Search novelcool.com for a manga title' })
   @ApiQuery({ name: 'q', type: String, description: 'Search query', example: 'Raeliana' })
@@ -224,7 +238,7 @@ export class ScrapeController {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    for await (const chunk of this.scrapeFacadeService.streamDownloadMangaNovel(dto.url, dto.from, dto.to)) {
+    for await (const chunk of this.scrapeFacadeService.streamDownloadMangaNovel(dto.url, dto.from, dto.to, dto.skipDownloaded ?? true)) {
       res.write(chunk);
     }
     res.end();

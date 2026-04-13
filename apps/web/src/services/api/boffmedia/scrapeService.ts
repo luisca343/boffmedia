@@ -1,4 +1,4 @@
-import { apiGET } from '@/services/boffAPI';
+import { apiGET, apiPATCH } from '@/services/boffAPI';
 
 export interface GameFileEntry {
   name: string;
@@ -130,6 +130,11 @@ export interface LocalMangaLibrary {
   totalChapters: number;
 }
 
+export interface BrowserConfig {
+  tunnelEnabled: boolean;
+  tunnelAvailable: boolean;
+}
+
 export type MangaDownloadSseEvent =
   | { type: 'start'; total: number; novelTitle: string }
   | { type: 'chapter'; index: number; total: number; chapter: string; downloaded: number; skipped: number; failed: number }
@@ -171,6 +176,14 @@ export class ScrapeService {
     return apiGET<LocalMangaLibrary>('/boffmedia/herramientas/scrape/manga/library');
   }
 
+  static getBrowserConfig() {
+    return apiGET<BrowserConfig>('/boffmedia/herramientas/scrape/manga/browser');
+  }
+
+  static setBrowserTunnel(tunnelEnabled: boolean) {
+    return apiPATCH<BrowserConfig>('/boffmedia/herramientas/scrape/manga/browser', { tunnelEnabled });
+  }
+
   static getNovelInfo(novelUrl: string) {
     return apiGET<{ title: string; url: string }>(`/boffmedia/herramientas/scrape/manga/info?url=${encodeURIComponent(novelUrl)}`);
   }
@@ -190,7 +203,7 @@ export class ScrapeService {
    *       | { type:'done', novelTitle, totalDownloaded, totalFailed }
    */
   static async streamDownloadMangaNovel(
-    body: { url: string; from?: number; to?: number },
+    body: { url: string; from?: number; to?: number; skipDownloaded?: boolean },
     onEvent: (event: MangaDownloadSseEvent) => void,
   ): Promise<void> {
     const apiUrl = process.env.NEXT_PUBLIC_API ?? '';

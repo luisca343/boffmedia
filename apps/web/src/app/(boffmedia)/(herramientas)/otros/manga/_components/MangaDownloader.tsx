@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
@@ -15,6 +16,7 @@ import {
 } from 'lucide-react';
 import {
   ScrapeService,
+  type BrowserConfig,
   type MangaSearchResult,
   type MangaChapter,
   type MangaDownloadSseEvent,
@@ -27,9 +29,30 @@ import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSe
 
 const SCRAPER_SOURCES = [
   { name: 'NovelCool', url: 'https://es.novelcool.com', active: true, description: 'Manga y manhwa en español' },
+  { name: 'PkProject', url: 'https://pkproject.net', active: true, description: 'Pokémon Adventures' },
 ] as const;
 
 function ScraperSourcesPanel() {
+  const [browserConfig, setBrowserConfig] = useState<BrowserConfig | null>(null);
+  const [tunnelToggling, setTunnelToggling] = useState(false);
+
+  useEffect(() => {
+    ScrapeService.getBrowserConfig().then(res => {
+      if (res.success && res.data) setBrowserConfig(res.data);
+    });
+  }, []);
+
+  const handleTunnelToggle = async () => {
+    if (!browserConfig || tunnelToggling) return;
+    setTunnelToggling(true);
+    try {
+      const res = await ScrapeService.setBrowserTunnel(!browserConfig.tunnelEnabled);
+      if (res.success && res.data) setBrowserConfig(res.data);
+    } finally {
+      setTunnelToggling(false);
+    }
+  };
+
   return (
     <Card className="bg-surface-800/40 border-surface-700/50">
       <CardHeader className="pb-2">
@@ -37,7 +60,7 @@ function ScraperSourcesPanel() {
           <Globe className="h-4 w-4 text-primary-400" />Fuentes disponibles
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           {SCRAPER_SOURCES.map(source => (
             <div key={source.name} className="flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs
@@ -53,6 +76,28 @@ function ScraperSourcesPanel() {
             </div>
           ))}
         </div>
+
+        {/* Browser tunnel toggle */}
+        {browserConfig && (
+          <div className="flex items-center justify-between pt-1 border-t border-surface-700/40">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-xs font-medium text-surface-300">Túnel de navegador</span>
+              <span className="text-[11px] text-surface-500">Usar navegador remoto (tunnel) para scraping</span>
+            </div>
+            <button
+              onClick={handleTunnelToggle}
+              disabled={tunnelToggling}
+              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none
+                disabled:opacity-40 disabled:cursor-not-allowed
+                ${browserConfig.tunnelEnabled ? 'bg-primary-600' : 'bg-surface-600'}`}
+              aria-checked={browserConfig.tunnelEnabled}
+              role="switch"
+            >
+              <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform
+                ${browserConfig.tunnelEnabled ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -60,8 +105,18 @@ function ScraperSourcesPanel() {
 
 // ─── Local library ─────────────────────────────────────────────────────────────
 
+/** Format a chapter slug for display. Numeric slugs get the translated label; text slugs (specials) show as-is. */
+function useChapterLabel() {
+  const t = useTranslations('boffmedia.manga');
+  return (slug: string) => {
+    const n = Number(slug);
+    return Number.isFinite(n) && slug.trim() !== '' ? t('chapter', { number: slug }) : slug;
+  };
+}
+
 function SeriesCard({ series }: { series: LocalMangaSeries }) {
   const [expanded, setExpanded] = useState(false);
+  const chapterLabel = useChapterLabel();
   return (
     <div className="rounded-lg border border-surface-700/50 overflow-hidden">
       <button onClick={() => setExpanded(e => !e)}
@@ -83,7 +138,7 @@ function SeriesCard({ series }: { series: LocalMangaSeries }) {
               {series.chapters.map(ch => (
                 <div key={ch.slug} className="flex items-center gap-3 px-4 py-2 hover:bg-surface-700/20">
                   <CheckCircle2 className="h-3.5 w-3.5 text-green-500/70 shrink-0" />
-                  <span className="flex-1 text-xs text-surface-300 truncate">{ch.slug}</span>
+                  <span className="flex-1 text-xs text-surface-300 truncate">{chapterLabel(ch.slug)}</span>
                   <span className="text-xs text-surface-500 shrink-0 flex items-center gap-1">
                     <ImageIcon className="h-3 w-3" />{ch.imageCount}
                   </span>
@@ -152,20 +207,30 @@ function SearchResultCard({ result, onSelect }: { result: MangaSearchResult; onS
 
 // ─── Chapter selector ──────────────────────────────────────────────────────────
 
-function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onToggleAll }: {
+function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onToggleAll, onSelectRange }: {
   chapters: MangaChapter[];
   selected: Set<number>;
   downloadedSlugs: Set<string>;
   onToggle: (idx: number) => void;
   onToggleAll: () => void;
+  onSelectRange: (from: number, to: number) => void;
 }) {
   const allSelected = chapters.length > 0 && chapters.every((_, i) => selected.has(i));
   const [search, setSearch] = useState('');
+  const [rangeFrom, setRangeFrom] = useState('');
+  const [rangeTo, setRangeTo] = useState('');
   const filtered = chapters.map((ch, i) => ({ ch, i }))
     .filter(({ ch }) => !search || ch.title.toLowerCase().includes(search.toLowerCase()));
 
+  const applyRange = () => {
+    const from = Math.max(1, parseInt(rangeFrom) || 1);
+    const to   = Math.min(chapters.length, parseInt(rangeTo) || chapters.length);
+    if (from <= to) onSelectRange(from - 1, to - 1); // convert to 0-based indices
+  };
+
   return (
     <div className="flex flex-col gap-3">
+      {/* Filter + select-all row */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-surface-500" />
@@ -177,6 +242,28 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
           {allSelected
             ? <><Square className="h-3.5 w-3.5" />Deseleccionar</>
             : <><CheckSquare className="h-3.5 w-3.5" />Selec. todos ({chapters.length})</>}
+        </button>
+      </div>
+
+      {/* Range selector row */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-surface-500 shrink-0">Rango:</span>
+        <Input
+          type="number" min={1} max={chapters.length} placeholder="1"
+          value={rangeFrom} onChange={e => setRangeFrom(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && applyRange()}
+          className="w-20 h-7 text-xs bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-500 text-center px-2"
+        />
+        <span className="text-xs text-surface-500">—</span>
+        <Input
+          type="number" min={1} max={chapters.length} placeholder={String(chapters.length)}
+          value={rangeTo} onChange={e => setRangeTo(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && applyRange()}
+          className="w-20 h-7 text-xs bg-surface-800/60 border-surface-600 text-surface-100 placeholder-surface-500 text-center px-2"
+        />
+        <button onClick={applyRange}
+          className="flex items-center gap-1 text-xs text-primary-400 hover:text-primary-300 transition-colors whitespace-nowrap border border-primary-800/50 hover:border-primary-700/60 rounded px-2 py-1 bg-primary-900/20">
+          <CheckSquare className="h-3 w-3" />Seleccionar
         </button>
       </div>
       <div className="rounded-lg border border-surface-700/50 divide-y divide-surface-700/30 max-h-80 overflow-y-auto">
@@ -289,6 +376,7 @@ export default function MangaDownloader() {
   const [directUrlLoading, setDirectUrlLoading] = useState(false);
   const [directUrlError, setDirectUrlError] = useState<string | null>(null);
 
+  const [skipDownloaded, setSkipDownloaded] = useState(true);
   const [downloading, setDownloading] = useState(false);
   const [progress, setProgress] = useState<ProgressState | null>(null);
   const [downloadError, setDownloadError] = useState<string | null>(null);
@@ -392,6 +480,14 @@ export default function MangaDownloader() {
     setSelectedChapters(prev => prev.size === chapters.length ? new Set() : new Set(chapters.map((_, i) => i)));
   }, [chapters]);
 
+  const selectRange = useCallback((from: number, to: number) => {
+    setSelectedChapters(prev => {
+      const next = new Set(prev);
+      for (let i = from; i <= to; i++) next.add(i);
+      return next;
+    });
+  }, []);
+
   const handleDownload = async () => {
     if (!selectedNovel || !chapters || selectedChapters.size === 0) return;
     setDownloading(true);
@@ -411,7 +507,7 @@ export default function MangaDownloader() {
     try {
       for (const [from, to] of ranges) {
         await ScrapeService.streamDownloadMangaNovel(
-          { url: selectedNovel.url, from, to },
+          { url: selectedNovel.url, from, to, skipDownloaded },
           (event: MangaDownloadSseEvent) => {
             if (event.type === 'start') {
               setProgress(prev => ({
@@ -611,7 +707,7 @@ export default function MangaDownloader() {
                     )}
                     {chapters && (
                       <>
-                        <div className="flex items-center gap-2 text-xs text-surface-400">
+                        <div className="flex items-center gap-2 text-xs text-surface-400 flex-wrap">
                           <BookOpen className="h-3.5 w-3.5" />
                           <span>{chapters.length} capítulos disponibles</span>
                           {downloadedSlugs.size > 0 && (
@@ -619,9 +715,22 @@ export default function MangaDownloader() {
                               {downloadedSlugs.size} descargados
                             </Badge>
                           )}
+                          <div className="ml-auto flex items-center gap-2">
+                            <span className="text-surface-400">Saltar descargados</span>
+                            <button
+                              onClick={() => setSkipDownloaded(v => !v)}
+                              className={`relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors focus:outline-none
+                                ${skipDownloaded ? 'bg-primary-600' : 'bg-surface-600'}`}
+                              aria-checked={skipDownloaded}
+                              role="switch"
+                            >
+                              <span className={`inline-block h-2.5 w-2.5 transform rounded-full bg-white shadow transition-transform
+                                ${skipDownloaded ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+                            </button>
+                          </div>
                         </div>
                         <ChapterSelector chapters={chapters} selected={selectedChapters}
-                          downloadedSlugs={downloadedSlugs} onToggle={toggleChapter} onToggleAll={toggleAll} />
+                          downloadedSlugs={downloadedSlugs} onToggle={toggleChapter} onToggleAll={toggleAll} onSelectRange={selectRange} />
                       </>
                     )}
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MyrientScrapeService } from './services/myrient.service';
 import { MangaScraperService } from './services/manga.service';
+import { MangaBrowserService } from './services/manga/manga-browser.service';
 import type {
   MangaSearchResult,
   MangaChapter,
@@ -20,6 +21,7 @@ export class ScrapeFacadeService {
   constructor(
     private readonly myrientScrapeService: MyrientScrapeService,
     private readonly mangaScraperService: MangaScraperService,
+    private readonly mangaBrowserService: MangaBrowserService,
   ) {}
 
   // ==================== MYRIENT SCRAPING ====================
@@ -116,11 +118,25 @@ export class ScrapeFacadeService {
     }
   }
 
-  streamDownloadMangaNovel(novelUrl: string, from?: number, to?: number): AsyncGenerator<string> {
-    return this.mangaScraperService.streamDownloadNovel(novelUrl, from, to);
+  streamDownloadMangaNovel(novelUrl: string, from?: number, to?: number, skipDownloaded = true): AsyncGenerator<string> {
+    return this.mangaScraperService.streamDownloadNovel(novelUrl, from, to, skipDownloaded);
   }
 
   async getLocalMangaLibrary(): Promise<LocalMangaLibrary> {
     return this.mangaScraperService.getLocalLibrary();
+  }
+
+  // ==================== BROWSER CONFIG ====================
+
+  getBrowserConfig(): { tunnelEnabled: boolean; tunnelAvailable: boolean } {
+    return {
+      tunnelEnabled: this.mangaBrowserService.getTunnelEnabled(),
+      tunnelAvailable: this.mangaBrowserService.tunnelAvailable(),
+    };
+  }
+
+  async setBrowserTunnel(enabled: boolean): Promise<{ tunnelEnabled: boolean; tunnelAvailable: boolean }> {
+    await this.mangaBrowserService.setTunnelEnabled(enabled);
+    return this.getBrowserConfig();
   }
 }
