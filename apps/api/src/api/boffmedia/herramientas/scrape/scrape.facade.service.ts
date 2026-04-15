@@ -35,7 +35,7 @@ export class ScrapeFacadeService {
   async getMyrientCatalog(consoleKey: MyrientConsole, regions: string[]): Promise<EuropeAggregateResult> {
     try {
       return await this.myrientScrapeService.scrapeCatalog(consoleKey, regions);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error scraping Myrient catalog:', error);
       throw new Error(`Failed to scrape catalog: ${error.message}`);
     }
@@ -46,7 +46,7 @@ export class ScrapeFacadeService {
   async downloadGame(url: string): Promise<DownloadResult> {
     try {
       return await this.myrientScrapeService.downloadGame(url);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error downloading game from Myrient:', error);
       throw new Error(`Failed to download game: ${error.message}`);
     }
@@ -55,7 +55,7 @@ export class ScrapeFacadeService {
   async downloadAllGames(dto: DownloadAllGamesDto): Promise<BulkDownloadResult> {
     try {
       return await this.myrientScrapeService.downloadAllGames(dto);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in bulk download from Myrient:', error);
       throw new Error(`Bulk download failed: ${error.message}`);
     }
@@ -64,7 +64,7 @@ export class ScrapeFacadeService {
   async downloadSelectedGames(dto: DownloadSelectedGamesDto): Promise<BulkDownloadResult> {
     try {
       return await this.myrientScrapeService.downloadSelectedGames(dto);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in selected download from Myrient:', error);
       throw new Error(`Selected download failed: ${error.message}`);
     }

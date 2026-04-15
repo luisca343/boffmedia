@@ -90,7 +90,7 @@ export class UsersFacadeService {
     try {
       await this.chatAppService.createChat({player: data.uuid, users: [], name: 'Mensajes Guardados'});
       console.log(`Saved Messages chat created for user ${data.uuid}`);
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`Failed to create Saved Messages chat for user ${data.uuid}, continuing anyway:`, error.message);
     }
 
@@ -134,7 +134,7 @@ export class UsersFacadeService {
         try {
           const userWithAccounts = await this.getUserWithAccounts(uuid);
           return { uuid, result: userWithAccounts };
-        } catch (error) {
+        } catch (error: any) {
           console.error(`Failed to get user with accounts for ${uuid}:`, error);
           return { uuid, result: null };
         }

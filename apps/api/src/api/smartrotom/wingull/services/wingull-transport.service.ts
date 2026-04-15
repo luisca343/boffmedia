@@ -15,7 +15,7 @@ export class WingullTransportService {
   async getTaxiStops(): Promise<TaxiStop[]> {
     try {
       return await this.wingullTransportRepository.getTaxiStopsFromAPI();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get taxi stops:', error);
       throw new Error(`Taxi stops retrieval failed: ${error.message}`);
     }
@@ -26,7 +26,7 @@ export class WingullTransportService {
       const request: TeleportRequestDto = { id, uuid };
       const result = await this.wingullTransportRepository.teleportPlayerInAPI(request);
       return !!result; // Convert to boolean
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to teleport player ${uuid} to ${id}:`, error);
       throw new Error(`Player teleportation failed: ${error.message}`);
     }

@@ -45,7 +45,7 @@ export class TwitchDebugController {
           ? `Stream contains "wingull" content and would trigger notifications` 
           : `Stream does not contain "wingull" content`,
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         username,
         error: error.message,

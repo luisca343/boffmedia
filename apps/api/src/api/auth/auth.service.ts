@@ -105,7 +105,7 @@ export class AuthService {
       };
 
       return this.login(loginUser);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Minecraft registration error:', error);
       return { error: error.message || 'Registration failed' };
     }
@@ -151,7 +151,7 @@ export class AuthService {
       };
 
       return this.login(loginUser);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Minecraft linking error:', error);
       return { error: error.message || 'Linking failed' };
     }
@@ -202,7 +202,7 @@ export class AuthService {
           smartRotomUser: payload.smartRotomUser || {}
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Refresh token error:', error);
       throw new UnauthorizedException('Invalid refresh token');
     }

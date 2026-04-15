@@ -39,7 +39,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         const newUser = await this.usersService.createFromGoogle(user);
         done(null, newUser);
       }
-    } catch (error) {
+    } catch (error: any) {
       done(error, null);
     }
   }

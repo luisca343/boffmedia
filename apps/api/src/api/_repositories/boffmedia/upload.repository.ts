@@ -61,7 +61,7 @@ export class UploadRepository {
   async deleteFile(filePath: string): Promise<void> {
     try {
       await fs.unlink(filePath);
-    } catch (error) {
+    } catch (error: any) {
       // File might not exist, which is okay
       if (error.code !== 'ENOENT') {
         throw error;

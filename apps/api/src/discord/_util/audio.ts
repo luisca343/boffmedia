@@ -82,7 +82,7 @@ export async function downloadAudio(voice: string, text: string): Promise<Buffer
         });
 
         return Buffer.from(response.data);
-    } catch (error) {
+    } catch (error: any) {
         const err = error as any;
         console.error('Error downloading audio:', err.response?.status, err.message);
         return null;

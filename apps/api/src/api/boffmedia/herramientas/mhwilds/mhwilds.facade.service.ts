@@ -15,7 +15,7 @@ export class MhwildsFacadeService {
     try {
       const result = await this.mhwildsDataService.getWeapons(locale);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get weapons: ${error.message}`);
     }
   }
@@ -24,7 +24,7 @@ export class MhwildsFacadeService {
     try {
       const result = await this.mhwildsDataService.getArmor(locale);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get armor: ${error.message}`);
     }
   }
@@ -33,7 +33,7 @@ export class MhwildsFacadeService {
     try {
       const result = await this.mhwildsDataService.getCharms(locale);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get charms: ${error.message}`);
     }
   }
@@ -42,7 +42,7 @@ export class MhwildsFacadeService {
     try {
       const result = await this.mhwildsDataService.getDecorations(locale);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get decorations: ${error.message}`);
     }
   }
@@ -51,7 +51,7 @@ export class MhwildsFacadeService {
     try {
       const result = await this.mhwildsDataService.getSkills(locale);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get skills: ${error.message}`);
     }
   }
@@ -62,7 +62,7 @@ export class MhwildsFacadeService {
     try {
       const result = await this.mhwildsDataService.getAllCharmRanks(locale);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get charm ranks: ${error.message}`);
     }
   }
@@ -70,7 +70,7 @@ export class MhwildsFacadeService {
   async createWeaponTree(locale: string = 'es'): Promise<WeaponTreeResult> {
     try {
       return await this.mhwildsDataService.createWeaponTree(locale);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to create weapon tree: ${error.message}`);
     }
   }
@@ -85,7 +85,7 @@ export class MhwildsFacadeService {
       
       const result = await this.mhwildsDataService.searchWeaponsByName(locale, searchTerm.trim());
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to search weapons: ${error.message}`);
     }
   }
@@ -98,7 +98,7 @@ export class MhwildsFacadeService {
       
       const result = await this.mhwildsDataService.getWeaponsByKind(locale, kind.trim());
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get weapons by kind: ${error.message}`);
     }
   }
@@ -111,7 +111,7 @@ export class MhwildsFacadeService {
       
       const result = await this.mhwildsDataService.getArmorByRarity(locale, rarity);
       return result.data;
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get armor by rarity: ${error.message}`);
     }
   }
@@ -127,7 +127,7 @@ export class MhwildsFacadeService {
   }> {
     try {
       return await this.mhwildsDataService.getDataStatistics(locale);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Failed to get data statistics: ${error.message}`);
     }
   }
@@ -137,7 +137,7 @@ export class MhwildsFacadeService {
   async clearCache(resourceType?: string, locale?: string): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsCacheService.clearCache(resourceType, locale);
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache clearing failed: ${error.message}`
@@ -148,7 +148,7 @@ export class MhwildsFacadeService {
   async getCacheStatistics(): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsCacheService.getCacheStatistics();
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Failed to get cache statistics: ${error.message}`
@@ -159,7 +159,7 @@ export class MhwildsFacadeService {
   async warmupCache(locale: string): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsCacheService.warmupCache(locale);
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache warmup failed: ${error.message}`
@@ -170,7 +170,7 @@ export class MhwildsFacadeService {
   async validateCache(locale: string): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsCacheService.validateCache(locale);
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache validation failed: ${error.message}`
@@ -181,7 +181,7 @@ export class MhwildsFacadeService {
   async optimizeCache(): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsCacheService.optimizeCache();
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache optimization failed: ${error.message}`
@@ -200,7 +200,7 @@ export class MhwildsFacadeService {
       
       // Return default supported locales if cache stats fail
       return ['es', 'en', 'ja', 'fr', 'de', 'it', 'ko', 'zh-CN', 'zh-TW'];
-    } catch (error) {
+    } catch (error: any) {
       // Fallback to default locales
       return ['es', 'en'];
     }
@@ -215,7 +215,7 @@ export class MhwildsFacadeService {
       
       // Return default resources if cache stats fail
       return ['weapons', 'armor', 'charms', 'decorations', 'skills'];
-    } catch (error) {
+    } catch (error: any) {
       // Fallback to default resources
       return ['weapons', 'armor', 'charms', 'decorations', 'skills'];
     }

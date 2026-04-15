@@ -88,7 +88,7 @@ export class StarbankFacadeService {
           });
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn('Failed to update balance in game after transfer, continuing anyway:', error.message);
     }
   }
@@ -113,7 +113,7 @@ export class StarbankFacadeService {
           uuid
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`Failed to update balance in game for user ${uuid}, continuing anyway:`, error.message);
     }
   }
@@ -131,7 +131,7 @@ export class StarbankFacadeService {
           uuid: account.uuid
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`Failed to update balance in game for account ${accountId}, continuing anyway:`, error.message);
     }
   }
@@ -149,7 +149,7 @@ export class StarbankFacadeService {
           uuid: shopData.uuid
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.warn(`Failed to update balance in game after shop transaction for user ${shopData.uuid}, continuing anyway:`, error.message);
     }
   }
@@ -188,7 +188,7 @@ export class StarbankFacadeService {
   private async updateBalance(account: { balance: number; type: AccountType | string; uuid: string }): Promise<void> {
     try {
       await this.wingullFacadeService.updateBalance(account);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating balance in game:', error);
       throw new Error(`Balance update failed: ${error.message}`);
     }

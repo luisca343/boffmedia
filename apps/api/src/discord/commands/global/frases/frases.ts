@@ -24,7 +24,7 @@ export class FrasesCommand {
 
     try {
       await interaction.reply({ embeds: [embed], components: [row] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error replying to interaction:', error);
     }
   }
@@ -85,7 +85,7 @@ export class FrasesCommand {
       const { embed, row } = await this.createEmbed(guildId, userIdParam, newPage);
 
       await interaction.update({ embeds: [embed], components: [row] });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error handling button interaction:', error);
       if (!interaction.replied) {
         await interaction.reply({ content: 'There was an error while processing the interaction.', ephemeral: true });

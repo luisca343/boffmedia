@@ -147,7 +147,7 @@ export class MangaDownloadService {
       this.logger.log(`${prefix} OK → ${filename}`);
       return { index, chapterTitle: title, filename, status: 'downloaded', pages: images.length };
 
-    } catch (err) {
+    } catch (err: any) {
       const error = String(err?.message ?? err);
       this.logger.error(`${prefix} FAILED: ${error}`);
       return { index, chapterTitle: title, filename: '', status: 'failed', error };

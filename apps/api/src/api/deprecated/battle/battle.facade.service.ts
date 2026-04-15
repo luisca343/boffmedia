@@ -34,7 +34,7 @@ export class BattleFacadeService {
   async getUserReplays(uuid: string): Promise<BattleReplay[]> {
     try {
       return await this.replayService.getUserReplays(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting replays for user ${uuid}:`, error);
       throw new Error(`Failed to retrieve replays: ${error.message}`);
     }
@@ -53,7 +53,7 @@ export class BattleFacadeService {
       }
 
       return replay;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting replay ${replayId}:`, error);
       throw new Error(`Failed to retrieve replay: ${error.message}`);
     }
@@ -75,7 +75,7 @@ export class BattleFacadeService {
       await this.replayService.associateReplayWithUser(createReplayDto.userUuid, replay.id);
 
       return replay;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating replay:', error);
       throw new Error(`Failed to create replay: ${error.message}`);
     }
@@ -92,7 +92,7 @@ export class BattleFacadeService {
       }
 
       return await this.replayService.updateReplay(replayId, updateReplayDto);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error updating replay ${replayId}:`, error);
       throw new Error(`Failed to update replay: ${error.message}`);
     }
@@ -114,7 +114,7 @@ export class BattleFacadeService {
         success: true,
         message: 'Replay deleted successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting replay ${replayId}:`, error);
       throw new Error(`Failed to delete replay: ${error.message}`);
     }
@@ -136,7 +136,7 @@ export class BattleFacadeService {
         success: true,
         message: 'Replay shared successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error sharing replay ${replayId} with user ${targetUuid}:`, error);
       throw new Error(`Failed to share replay: ${error.message}`);
     }
@@ -147,7 +147,7 @@ export class BattleFacadeService {
   async getBattleConfig(npcConfigName: string): Promise<BattleConfig> {
     try {
       return await this.configService.getBattleConfig(npcConfigName);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error getting battle config for ${npcConfigName}:`, error);
       throw new Error(`Failed to retrieve battle config: ${error.message}`);
     }
@@ -156,7 +156,7 @@ export class BattleFacadeService {
   async getAllBattleConfigs(): Promise<string[]> {
     try {
       return await this.configService.getAllAvailableConfigs();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting all battle configs:', error);
       throw new Error(`Failed to retrieve battle configs: ${error.message}`);
     }
@@ -170,7 +170,7 @@ export class BattleFacadeService {
         success: true,
         message: 'Battle config created successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error creating battle config for ${npcConfigName}:`, error);
       throw new Error(`Failed to create battle config: ${error.message}`);
     }
@@ -179,7 +179,7 @@ export class BattleFacadeService {
   async updateBattleConfig(npcConfigName: string, config: Partial<BattleConfig>): Promise<BattleConfig> {
     try {
       return await this.configService.updateConfig(npcConfigName, config);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error updating battle config for ${npcConfigName}:`, error);
       throw new Error(`Failed to update battle config: ${error.message}`);
     }
@@ -193,7 +193,7 @@ export class BattleFacadeService {
         success: true,
         message: 'Battle config deleted successfully'
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error deleting battle config for ${npcConfigName}:`, error);
       throw new Error(`Failed to delete battle config: ${error.message}`);
     }
@@ -202,7 +202,7 @@ export class BattleFacadeService {
   async validateBattleConfig(npcConfigName: string): Promise<boolean> {
     try {
       return await this.configService.validateConfigExists(npcConfigName);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error validating battle config for ${npcConfigName}:`, error);
       return false;
     }

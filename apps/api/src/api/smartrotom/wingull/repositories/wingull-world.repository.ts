@@ -26,7 +26,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
         },
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get performance data:', error);
       throw new Error(`Performance data retrieval failed: ${error.message}`);
     }
@@ -51,7 +51,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
         return this.mergeRegionsWithColors(response.data.data, townColors);
       }*/
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get regions data:', error);
       throw new Error(`Regions data retrieval failed: ${error.message}`);
     }
@@ -72,7 +72,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
         },
       );
       return response.data.data as Weather;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get weather data:', error);
       throw new Error(`Weather data retrieval failed: ${error.message}`);
     }
@@ -94,7 +94,7 @@ export class WingullWorldRepository implements IWingullWorldRepository {
         },
       );
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update NPCs:', error);
       throw new Error(`NPCs update failed: ${error.message}`);
     }

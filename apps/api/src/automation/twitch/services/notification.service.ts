@@ -56,7 +56,7 @@ export class NotificationService {
     
     try {
       await Promise.allSettled(promises);
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error sending notifications', error.stack);
     }
   }
@@ -79,7 +79,7 @@ export class NotificationService {
         default:
           this.logger.warn(`Unknown notification target type: ${target.type}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error(`Failed to send notification to ${target.type}`, error.stack);
     }
   }

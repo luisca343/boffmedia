@@ -55,7 +55,7 @@ export class TcgFetchService {
       });
 
       return Array.from(seriesMap.values());
-    } catch (error) {
+    } catch (error: any) {
       this.errorService.handleApiError(error, 'Fetch and merge series');
     }
   }
@@ -79,7 +79,7 @@ export class TcgFetchService {
         cardCountOfficial: set.cardCount?.official ?? 0,
         cardCountTotal: set.cardCount?.total ?? 0,
       }));
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -134,7 +134,7 @@ export class TcgFetchService {
       });
 
       return Array.from(setMap.values());
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -196,7 +196,7 @@ export class TcgFetchService {
       }
 
       return mergedCards;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -328,7 +328,7 @@ export class TcgFetchService {
 
       console.log(`[TCG] Completed detailed card fetching for set ${setId}`);
       return mergedCards;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -352,7 +352,7 @@ export class TcgFetchService {
       await fs.writeFile(imageFilename, response.data);
       
       return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
-    } catch (err) {
+    } catch (err: any) {
       console.warn(`[TCG] Failed to download ${locale} image for card ${cardId}:`, err);
       return null;
     }

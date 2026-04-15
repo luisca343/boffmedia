@@ -22,7 +22,7 @@ export class TcgController {
     if (!jsonString) return null;
     try {
       return JSON.parse(jsonString);
-    } catch (error) {
+    } catch (error: any) {
       return null;
     }
   }
@@ -312,7 +312,7 @@ export class TcgController {
     
     try {
       sets = await this.tcgFacade.fetchSetsForSeriesBothLanguages(seriesId);
-    } catch (err) {
+    } catch (err: any) {
       console.error(`[TCG] Failed to fetch sets for series ${seriesId}:`, err);
       return [{ 
         setId: seriesId, 
@@ -331,7 +331,7 @@ export class TcgController {
       
       try {
         cards = await this.tcgFacade.fetchAndStoreCardsForSetBothLanguages(set.id);
-      } catch (err) {
+      } catch (err: any) {
         error = err?.message || err;
         console.error(`[TCG] Failed to fetch/store cards for set ${set.id}:`, err);
       }
