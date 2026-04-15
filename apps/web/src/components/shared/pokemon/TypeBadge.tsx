@@ -42,9 +42,9 @@ export function TypeBadgeSmall({type, className}: {type: string, className?: str
     const t  = useTranslations("pokedex");
     if(!type) return null
     const typeColors = colors[type.toLowerCase().trim()];
-    return <div className={` m-1 h-6 font-bold text-xs w-[4.5rem] flex flex-row items-center  text-surface-50 bg-${type.toLowerCase().trim()} pl-1 pr-1 rounded text-shadow-border1 ${className}`}
+    return <div className={` m-1 h-6 font-bold text-xs inline-flex flex-row items-center whitespace-nowrap text-surface-50 bg-${type.toLowerCase().trim()} pl-1 pr-2 gap-1 rounded text-shadow-border1 ${className}`}
         style={{backgroundColor: typeColors?.backgroundColor, color: 'white'}}>
-            <img src={`/smartrotom/img/types/${type.toLowerCase()}.png`} alt={t(`type_${type.toLowerCase().trim()}`)} className="w-4 h-4 "/>
+            <img src={`/smartrotom/img/types/${type.toLowerCase()}.png`} alt={t(`type_${type.toLowerCase().trim()}`)} className="w-4 h-4 shrink-0"/>
             <div>{t(`type_${type.toLowerCase().trim()}`)}</div>
     </div>
 }
