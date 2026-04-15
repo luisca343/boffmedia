@@ -30,7 +30,7 @@
   "dependencies": {
     "@boffmedia/shared": "workspace:*",
     "@discordjs/builders": "^1.14.0",
-    "@discordjs/voice": "^0.18.0",
+    "@discordjs/voice": "^0.19.2",
     "@google/genai": "^1.13.0",
     "@google/generative-ai": "^0.24.1",
     "@nestjs/axios": "^4.0.1",
@@ -47,6 +47,7 @@
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/typeorm": "^11.0.0",
     "@nestjs/websockets": "^11.1.6",
+    "@noble/ciphers": "^2.2.0",
     "@pkmn/client": "^0.7.0",
     "@pkmn/data": "^0.10.7",
     "@pkmn/img": "^0.2.40",

@@ -21,7 +21,7 @@ export class JoinCommand {
       }
     }
 
-    const connection = joinVoiceChannel({
+    joinVoiceChannel({
       channelId: channel.id,
       guildId: channel.guild.id,
       adapterCreator: channel.guild.voiceAdapterCreator,
