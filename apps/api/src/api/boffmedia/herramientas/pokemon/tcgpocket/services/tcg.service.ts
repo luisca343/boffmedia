@@ -28,7 +28,7 @@ export class TcgService {
   async getAll(): Promise<TcgSeriesDto[]> {
     try {
       return await this.tcgRepository.findAll();
-    } catch (error) {
+    } catch (error: any) {
       this.errorService.handleDatabaseError(error, 'Get all series');
     }
   }
@@ -43,7 +43,7 @@ export class TcgService {
       }
 
       return series;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
@@ -65,7 +65,7 @@ export class TcgService {
       }));
 
       await this.tcgRepository.insertSeries(formattedSeries);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -79,7 +79,7 @@ export class TcgService {
       await this.saveSeries(mergedSeries);
 
       return { success: true, count: mergedSeries.length };
-    } catch (error) {
+    } catch (error: any) {
       this.errorService.handleApiError(error, 'Fetch and store series');
     }
   }
@@ -90,7 +90,7 @@ export class TcgService {
     try {
       this.errorService.validateSeriesId(seriesId);
       return await this.tcgRepository.getSetsBySeriesId(seriesId);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -101,7 +101,7 @@ export class TcgService {
   async fetchSetsForSeries(seriesId: string, locale: string = 'en'): Promise<any[]> {
     try {
       return await this.fetchService.fetchSetsForSeries(seriesId, locale);
-    } catch (error) {
+    } catch (error: any) {
       throw error; // Re-throw as fetchService already handles the error
     }
   }
@@ -117,7 +117,7 @@ export class TcgService {
       await this.tcgRepository.insertSets(mergedSets);
 
       return mergedSets;
-    } catch (error) {
+    } catch (error: any) {
       throw error; // Re-throw as fetchService already handles the error
     }
   }
@@ -128,7 +128,7 @@ export class TcgService {
     try {
       this.errorService.validateSetId(setId);
       return await this.tcgRepository.getCardsBySetId(setId);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -149,7 +149,7 @@ export class TcgService {
       }
 
       return card;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof NotFoundException || error instanceof BadRequestException) {
         throw error;
       }
@@ -168,7 +168,7 @@ export class TcgService {
       await this.tcgRepository.insertCards(mergedCards);
 
       return mergedCards;
-    } catch (error) {
+    } catch (error: any) {
       throw error; // Re-throw as fetchService already handles the error
     }
   }
@@ -187,7 +187,7 @@ export class TcgService {
       await this.tcgRepository.insertCards(mergedCards);
 
       return mergedCards;
-    } catch (error) {
+    } catch (error: any) {
       throw error; // Re-throw as fetchService already handles the error
     }
   }
@@ -216,7 +216,7 @@ export class TcgService {
             cardName: cardDetails ? (cardDetails.name_en || cardDetails.name_es) : 'Unknown Card',
             cardImage: cardDetails ? (cardDetails.image_en || cardDetails.image_es) : null,
           });
-        } catch (error) {
+        } catch (error: any) {
           // If card details fail, still include the user card with basic info
           enrichedCards.push({
             ...userCard,
@@ -228,7 +228,7 @@ export class TcgService {
       }*/
 
       return userCards;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -265,7 +265,7 @@ export class TcgService {
         success: true, 
         message: `Added ${quantity} of card ${cardId} to user ${userId}` 
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -306,7 +306,7 @@ export class TcgService {
         success: true, 
         message: `Updated card ${cardId} quantity to ${updateDto.quantity} for user ${userId}` 
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
       }
@@ -337,7 +337,7 @@ export class TcgService {
         success: true, 
         message: `Removed card ${cardId} from user ${userId}` 
       };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
       }
@@ -363,7 +363,7 @@ export class TcgService {
             setId: cardDetails ? cardDetails.setId : 'unknown',
             cardName: cardDetails ? (cardDetails.name_en || cardDetails.name_es) : 'Unknown Card',
           });
-        } catch (error) {
+        } catch (error: any) {
           enrichedHistory.push({
             ...historyEntry,
             setId: 'unknown',
@@ -373,7 +373,7 @@ export class TcgService {
       }
 
       return enrichedHistory;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof BadRequestException) {
         throw error;
       }
@@ -418,7 +418,7 @@ export class TcgService {
         }
 
         return { success: true, inserted: newUserCards.length };
-      } catch (error) {
+      } catch (error: any) {
         this.errorService.handleDatabaseError(error, 'Migrate old user cards');
       }
     }

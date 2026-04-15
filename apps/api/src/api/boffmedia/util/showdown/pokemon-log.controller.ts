@@ -25,7 +25,7 @@ export class PokemonLogController {
         errors: result.errors
       };
 
-    } catch (error) {
+    } catch (error: any) {
       this.logger.error('Error in processLogs:', error);
       throw error;
     }

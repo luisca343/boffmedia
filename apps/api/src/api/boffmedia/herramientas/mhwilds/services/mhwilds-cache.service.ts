@@ -21,7 +21,7 @@ export class MhwildsCacheService {
   async clearCache(resourceType?: string, locale?: string): Promise<CacheOperationResult> {
     try {
       return await this.mhwildsRepository.clearCache(resourceType, locale);
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache clearing failed: ${error.message}`
@@ -37,7 +37,7 @@ export class MhwildsCacheService {
         message: 'Cache statistics retrieved successfully',
         stats
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Failed to get cache statistics: ${error.message}`
@@ -54,7 +54,7 @@ export class MhwildsCacheService {
         try {
           await this.mhwildsRepository.getResourceData(resource, locale);
           results.push(`${resource}: ✓`);
-        } catch (error) {
+        } catch (error: any) {
           results.push(`${resource}: ✗ (${error.message})`);
         }
       }
@@ -67,7 +67,7 @@ export class MhwildsCacheService {
           results
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache warmup failed: ${error.message}`
@@ -92,7 +92,7 @@ export class MhwildsCacheService {
             lastModified: metadata.lastModified,
             age: metadata.exists ? Date.now() - metadata.lastModified.getTime() : null
           });
-        } catch (error) {
+        } catch (error: any) {
           validationResults.push({
             resource,
             exists: false,
@@ -110,7 +110,7 @@ export class MhwildsCacheService {
           resources: validationResults
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache validation failed: ${error.message}`
@@ -153,7 +153,7 @@ export class MhwildsCacheService {
           healthScore: this.calculateCacheHealthScore(stats, optimizations)
         }
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         message: `Cache optimization failed: ${error.message}`

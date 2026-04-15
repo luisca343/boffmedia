@@ -29,7 +29,7 @@ export class TcgRepository implements ITcgRepository {
         }));
         await this.db.insert(tcgSeries).values(insertData);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[TcgRepository] Error inserting series:', error);
       throw error;
     }
@@ -38,7 +38,7 @@ export class TcgRepository implements ITcgRepository {
   async findAll(): Promise<TcgSeries[]> {
     try {
       return await this.db.select().from(tcgSeries);
-    } catch (error) {
+    } catch (error: any) {
       console.error('[TcgRepository] Error finding all series:', error);
       throw error;
     }
@@ -53,7 +53,7 @@ export class TcgRepository implements ITcgRepository {
         .limit(1);
 
       return result[0] || null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error finding series by ID ${id}:`, error);
       throw error;
     }
@@ -67,7 +67,7 @@ export class TcgRepository implements ITcgRepository {
         .where(eq(tcgSeries.id, id));
 
       return Number(result[0]?.count) > 0;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error checking if series exists ${id}:`, error);
       return false;
     }
@@ -81,7 +81,7 @@ export class TcgRepository implements ITcgRepository {
         .select()
         .from(tcgSets)
         .where(eq(tcgSets.series_id, seriesId));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error getting sets for series ${seriesId}:`, error);
       throw error;
     }
@@ -98,7 +98,7 @@ export class TcgRepository implements ITcgRepository {
       if (newSets.length > 0) {
         await this.db.insert(tcgSets).values(newSets);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[TcgRepository] Error inserting sets:', error);
       throw error;
     }
@@ -113,7 +113,7 @@ export class TcgRepository implements ITcgRepository {
         .limit(1);
 
       return result[0] || null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error finding set by ID ${id}:`, error);
       throw error;
     }
@@ -127,7 +127,7 @@ export class TcgRepository implements ITcgRepository {
         .where(eq(tcgSets.id, id));
 
       return Number(result[0]?.count) > 0;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error checking if set exists ${id}:`, error);
       return false;
     }
@@ -139,7 +139,7 @@ export class TcgRepository implements ITcgRepository {
         .select({ id: tcgSets.id })
         .from(tcgSets)
         .where(eq(tcgSets.series_id, seriesId));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error checking existing sets for series ${seriesId}:`, error);
       throw error;
     }
@@ -182,7 +182,7 @@ export class TcgRepository implements ITcgRepository {
         .from(tcgCards)
         .leftJoin(tcgSets, eq(tcgCards.set_id, tcgSets.id))
         .where(eq(tcgCards.set_id, setId));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error getting cards for set ${setId}:`, error);
       throw error;
     }
@@ -199,7 +199,7 @@ export class TcgRepository implements ITcgRepository {
       if (newCards.length > 0) {
         await this.db.insert(tcgCards).values(newCards);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('[TcgRepository] Error inserting cards:', error);
       throw error;
     }
@@ -215,7 +215,7 @@ export class TcgRepository implements ITcgRepository {
         .limit(1);
 
       return result[0] || null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error finding card by ID ${id}:`, error);
       throw error;
     }
@@ -229,7 +229,7 @@ export class TcgRepository implements ITcgRepository {
         .where(eq(tcgCards.id, id));
 
       return Number(result[0]?.count) > 0;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error checking if card exists ${id}:`, error);
       return false;
     }
@@ -241,7 +241,7 @@ export class TcgRepository implements ITcgRepository {
         .select({ id: tcgCards.id })
         .from(tcgCards)
         .where(eq(tcgCards.set_id, setId));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error checking existing cards for set ${setId}:`, error);
       throw error;
     }
@@ -254,7 +254,7 @@ export class TcgRepository implements ITcgRepository {
         .select()
         .from(userCards)
         .where(eq(userCards.user_id, userId));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error getting user cards for user ${userId}:`, error);
       throw error;
     }
@@ -269,7 +269,7 @@ export class TcgRepository implements ITcgRepository {
         .limit(1);
 
       return result[0] || null;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error getting user card ${cardId} for user ${userId}:`, error);
       throw error;
     }
@@ -287,7 +287,7 @@ export class TcgRepository implements ITcgRepository {
         created_at: now,
         updated_at: now,
       } as UserCard);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error adding user card ${cardId} for user ${userId}:`, error);
       throw error;
     }
@@ -302,7 +302,7 @@ export class TcgRepository implements ITcgRepository {
           updated_at: new Date(),
         } as Partial<UserCard>)
         .where(and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error updating user card ${cardId} for user ${userId}:`, error);
       throw error;
     }
@@ -313,7 +313,7 @@ export class TcgRepository implements ITcgRepository {
       await this.db
         .delete(userCards)
         .where(and(eq(userCards.user_id, userId), eq(userCards.card_id, cardId)));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error removing user card ${cardId} for user ${userId}:`, error);
       throw error;
     }
@@ -325,7 +325,7 @@ export class TcgRepository implements ITcgRepository {
         .select()
         .from(userCardHistory)
         .where(eq(userCardHistory.user_id, userId));
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error getting user card history for user ${userId}:`, error);
       throw error;
     }
@@ -340,7 +340,7 @@ export class TcgRepository implements ITcgRepository {
         quantity_change: quantityChange,
         date: new Date(),
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error(`[TcgRepository] Error adding user card history for user ${userId}:`, error);
       throw error;
     }

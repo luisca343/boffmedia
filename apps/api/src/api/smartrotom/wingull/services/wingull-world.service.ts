@@ -18,7 +18,7 @@ export class WingullWorldService {
   async getPerformance(): Promise<Performance> {
     try {
       return await this.wingullWorldRepository.getPerformanceFromAPI();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get performance data:', error);
       throw new Error(`Performance data retrieval failed: ${error.message}`);
     }
@@ -27,7 +27,7 @@ export class WingullWorldService {
   async getRegions(): Promise<Region[]> {
     try {
       return await this.wingullWorldRepository.getRegionsFromAPI();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get regions data:', error);
       throw new Error(`Regions data retrieval failed: ${error.message}`);
     }
@@ -36,7 +36,7 @@ export class WingullWorldService {
   async getWeather(): Promise<Weather> {
     try {
       return await this.wingullWorldRepository.getWeatherFromAPI();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get weather data:', error);
       throw new Error(`Weather data retrieval failed: ${error.message}`);
     }
@@ -45,7 +45,7 @@ export class WingullWorldService {
   async updateNPCs(data: any): Promise<SuccessResponse> {
     try {
       return await this.wingullWorldRepository.updateNPCsInAPI(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update NPCs:', error);
       throw new Error(`NPCs update failed: ${error.message}`);
     }
@@ -64,7 +64,7 @@ export class WingullWorldService {
         .map(dirent => dirent.name);
 
       return towns;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch all towns:', error);
       throw new Error(`Could not fetch towns list: ${error.message}`);
     }
@@ -94,7 +94,7 @@ export class WingullWorldService {
         fondo: `/smartrotom/data/pueblos/${townName}/fondo.webp`,
         images: images.map(image => `/smartrotom/data/pueblos/${townName}/${image}`),
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to fetch town info for ${townName}:`, error);
       throw new Error(`Could not fetch town info for ${townName}: ${error.message}`);
     }

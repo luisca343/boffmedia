@@ -43,7 +43,7 @@ export class PasswordService {
     try {
       const salt = await bcrypt.genSalt(this.saltRounds);
       return bcrypt.hash(password, salt);
-    } catch (error) {
+    } catch (error: any) {
       throw new Error(`Password hashing failed: ${error.message}`);
     }
   }
@@ -58,7 +58,7 @@ export class PasswordService {
 
     try {
       return bcrypt.compare(password, hash);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Password verification error:', error);
       return false;
     }

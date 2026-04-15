@@ -30,7 +30,7 @@ export class BaseDataService {
     try {
       const data = await fsPromises.readFile(filePath, 'utf8');
       return JSON.parse(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error reading JSON file at ${filePath}:`, error);
       throw error;
     }

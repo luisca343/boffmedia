@@ -14,7 +14,7 @@ export class PlayerStatsService {
 
     try {
       return await this.playerRepository.fetchPlayerStatsFromAPI(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get player stats for ${uuid}:`, error);
       throw new Error(`Player stats retrieval failed: ${error.message}`);
     }

@@ -47,7 +47,7 @@ export class InviteManagementService {
           message: result.message || 'Failed to create invite'
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create invite:', error);
       return {
         success: false,
@@ -61,7 +61,7 @@ export class InviteManagementService {
   async getAllInvites(): Promise<InviteResult[]> {
     try {
       return await this.invitesRepository.findAllInvites();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get all invites:', error);
       throw new Error(`Invites retrieval failed: ${error.message}`);
     }
@@ -70,7 +70,7 @@ export class InviteManagementService {
   async getInviteById(id: string): Promise<InviteResult | null> {
     try {
       return await this.invitesRepository.findInviteById(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get invite ${id}:`, error);
       throw new Error(`Invite retrieval failed: ${error.message}`);
     }
@@ -79,7 +79,7 @@ export class InviteManagementService {
   async getActiveInviteById(id: string): Promise<InviteResult | null> {
     try {
       return await this.invitesRepository.findActiveInviteById(id);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get active invite ${id}:`, error);
       throw new Error(`Active invite retrieval failed: ${error.message}`);
     }
@@ -88,7 +88,7 @@ export class InviteManagementService {
   async getInvitesByUser(uuid: string): Promise<InviteResult[]> {
     try {
       return await this.invitesRepository.findInvitesByUuid(uuid);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get invites for user ${uuid}:`, error);
       throw new Error(`User invites retrieval failed: ${error.message}`);
     }
@@ -97,7 +97,7 @@ export class InviteManagementService {
   async getInvitesByUsername(username: string): Promise<InviteResult[]> {
     try {
       return await this.invitesRepository.findInvitesByUsername(username);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to get invites for username ${username}:`, error);
       throw new Error(`Username invites retrieval failed: ${error.message}`);
     }
@@ -129,7 +129,7 @@ export class InviteManagementService {
           message: result.message || 'Failed to mark invite as used'
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to mark invite ${id} as used:`, error);
       return {
         success: false,
@@ -162,7 +162,7 @@ export class InviteManagementService {
           message: result.message || 'Failed to delete invite'
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to delete invite ${id}:`, error);
       return {
         success: false,
@@ -195,7 +195,7 @@ export class InviteManagementService {
           message: result.message || 'Failed to permanently delete invite'
         };
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to permanently delete invite ${id}:`, error);
       return {
         success: false,
@@ -238,7 +238,7 @@ export class InviteManagementService {
         message: 'Invite is valid and active',
         invite
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to validate invite ${id}:`, error);
       return {
         valid: false,
@@ -263,7 +263,7 @@ export class InviteManagementService {
         used,
         deleted: total - active - used
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to get invite statistics:', error);
       throw new Error(`Statistics retrieval failed: ${error.message}`);
     }
@@ -275,7 +275,7 @@ export class InviteManagementService {
     try {
       const validation = await this.validateInvite(id);
       return validation.valid;
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Failed to check invite validity ${id}:`, error);
       return false;
     }

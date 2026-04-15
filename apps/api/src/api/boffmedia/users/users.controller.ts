@@ -102,7 +102,7 @@ export class BoffMediaUsersController {
       });
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -127,7 +127,7 @@ export class BoffMediaUsersController {
         isNewBoffMediaUser: result.isNewBoffMediaUser,
         isNewSmartRotomUser: result.isNewSmartRotomUser
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -151,7 +151,7 @@ export class BoffMediaUsersController {
         smartRotomUser: result.smartRotomUser,
         starbankAccounts: result.starbankAccounts
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -169,7 +169,7 @@ export class BoffMediaUsersController {
     try {
       const sessionUser = await this.usersFacadeService.createFromGoogle(googleData);
       return sessionUser;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -205,7 +205,7 @@ export class BoffMediaUsersController {
         limit,
         offset
       };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -221,7 +221,7 @@ export class BoffMediaUsersController {
     try {
       const stats = await this.usersFacadeService.getUserStatistics();
       return stats;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -244,7 +244,7 @@ export class BoffMediaUsersController {
       }
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -268,7 +268,7 @@ export class BoffMediaUsersController {
       }
 
       return userWithIntegrations;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -292,7 +292,7 @@ export class BoffMediaUsersController {
       }
 
       return user;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -316,7 +316,7 @@ export class BoffMediaUsersController {
       }
 
       return fullUser;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -340,7 +340,7 @@ export class BoffMediaUsersController {
       }
 
       return sessionUser;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -367,7 +367,7 @@ export class BoffMediaUsersController {
     try {
       const roles = await this.usersFacadeService.getUserRoles(id);
       return { roles };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -392,7 +392,7 @@ export class BoffMediaUsersController {
     try {
       const updatedUser = await this.usersFacadeService.updateUser(id, updateUserDto);
       return updatedUser;
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
@@ -417,7 +417,7 @@ export class BoffMediaUsersController {
       }
 
       return { deleted: true, message: result.message };
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -443,7 +443,7 @@ export class BoffMediaUsersController {
       }
 
       return authResult;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -479,7 +479,7 @@ export class BoffMediaUsersController {
 
       const users = await this.usersFacadeService.getMultipleUsersWithIntegrations(userIds);
       return users;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) throw error;
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -503,7 +503,7 @@ export class BoffMediaUsersController {
     try {
       const exists = await this.usersFacadeService.validateUserExists(identifier, type);
       return { exists, type, identifier };
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

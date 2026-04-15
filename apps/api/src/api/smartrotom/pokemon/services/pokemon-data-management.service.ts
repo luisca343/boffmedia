@@ -29,7 +29,7 @@ export class PokemonDataManagementService {
       await this.spawnDataService.loadSpawnData();
       await this.spriteManifestService.loadSpriteManifest();
       this.initializeFuse();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to initialize Pokemon data:', error);
       throw new Error(`Data initialization failed: ${error.message}`);
     }
@@ -299,7 +299,7 @@ export class PokemonDataManagementService {
       console.log('PMD sprite URL:', spriteUrl);
       return { url: spriteUrl };
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in getPmdPortrait:', error);
       return { url: '/smartrotom/img/pmd/portrait/0000/Normal.png' };
     }

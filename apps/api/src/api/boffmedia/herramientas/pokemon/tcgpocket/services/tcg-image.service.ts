@@ -19,7 +19,7 @@ export class TcgImageService {
           await fs.writeFile(logoFilename, response.data);
           // Store path WITHOUT /public prefix
           set.logo_local = `/img/games/tcg/sets/${set.id}/logo.webp`;
-        } catch (err) {
+        } catch (err: any) {
           console.warn(`[TCG] Failed to download logo for set ${set.id}:`, err);
           set.logo_local = null;
         }
@@ -34,7 +34,7 @@ export class TcgImageService {
           await fs.writeFile(symbolFilename, response.data);
           // Store path WITHOUT /public prefix
           set.symbol_local = `/img/games/tcg/sets/${set.id}/symbol.webp`;
-        } catch (err) {
+        } catch (err: any) {
           console.warn(`[TCG] Failed to download symbol for set ${set.id}:`, err);
           set.symbol_local = null;
         }
@@ -57,7 +57,7 @@ export class TcgImageService {
       await fs.writeFile(imageFilename, response.data);
       
       return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
-    } catch (err) {
+    } catch (err: any) {
       console.warn(`[TCG] Failed to download ${locale} image for card ${cardId}:`, err);
       return null;
     }

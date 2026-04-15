@@ -90,7 +90,7 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
       } else {
         client.emit('loginError', 'Login failed: No command returned');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       client.emit('loginError', 'An error occurred during login');
     }

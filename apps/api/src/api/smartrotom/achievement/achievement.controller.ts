@@ -111,7 +111,7 @@ export class AchievementController {
         success: result.success,
         replayId: result.success ? 1 : undefined // This should be properly returned from the service
       };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message
