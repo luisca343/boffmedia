@@ -1,108 +1,124 @@
-import { createAudioPlayer, createAudioResource, joinVoiceChannel } from "@discordjs/voice";
-import { Client, Message } from "discord.js";
-import { PassThrough } from "stream";
+import { createAudioPlayer, createAudioResource, getVoiceConnection, AudioPlayerStatus, StreamType, VoiceConnection, NoSubscriberBehavior } from "@discordjs/voice";
+import { Message } from "discord.js";
+import { Readable } from "stream";
 import axios from "axios";
 import { CommandsService } from "../_commands/commands.service";
-import { AudioPlayerStatus } from "@discordjs/voice";
 
 const voiceCache = new Map<string, string>();
-const audioQueue = [];
+
+interface QueueEntry {
+    connection: VoiceConnection;
+    buffer: Buffer;
+}
+
+const audioQueue: QueueEntry[] = [];
 
 export async function playAudio(message: Message, service: CommandsService) {
     const voiceChannel = message.member.voice.channel;
-    
+
     if (!voiceChannel) {
         const channel = message.channel as any;
         return channel.send('You need to be in a voice channel to play music!');
     }
 
     const voice = await getVoice(service, message.author.id) || 'Enrique';
-    const audioStream = await downloadAudio(voice, message.content.replace('#','almohadilla'));
-    if (!audioStream) {
+    const buffer = await downloadAudio(voice, message.content.replace('#', 'almohadilla'));
+
+    if (!buffer) {
         const channel = message.channel as any;
         return channel.send('There was an error downloading the audio');
     }
 
-    const adapterCreator = voiceChannel.guild.voiceAdapterCreator as any;
-    const connection = joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: voiceChannel.guild.id,
-        adapterCreator,
-    });
+    const connection = getVoiceConnection(voiceChannel.guild.id);
 
-    audioQueue.push(audioStream);
+    if (!connection) {
+        console.error('No active voice connection for guild', voiceChannel.guild.id);
+        return;
+    }
 
-    if(audioQueue.length === 1) {
-        playAudioElement(connection, audioStream);
+    audioQueue.push({ connection, buffer });
+
+    if (audioQueue.length === 1) {
+        playNext();
     }
 }
 
-function playAudioElement(connection, audioStream) {
-    const resource = createAudioResource(audioStream);
-    const player = createAudioPlayer();
+function playNext() {
+    if (audioQueue.length === 0) return;
 
-    player.on('stateChange', (oldState, newState) => {
+    const { connection, buffer } = audioQueue[0];
+
+    const resource = createAudioResource(Readable.from(buffer), {
+        inputType: StreamType.Arbitrary,
+    });
+
+    const player = createAudioPlayer({
+        behaviors: { noSubscriber: NoSubscriberBehavior.Play },
+    });
+
+    player.on('stateChange', (_, newState) => {
         if (newState.status === AudioPlayerStatus.Idle) {
             audioQueue.shift();
-            if(audioQueue.length > 0) {
-                playAudioElement(connection, audioQueue[0]);
-            }
+            playNext();
         }
     });
+
+    player.on('error', (err) => console.error('Audio player error:', err.message, err));
 
     connection.subscribe(player);
     player.play(resource);
 }
 
-export async function downloadAudio(voice: string, text: string) {
-    const url = `http://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${text}&key=MAN0PnTqdziKrbwALxsBxciP3TxBsYAH4QDgNF8kI9lFH_Al`;
+export async function downloadAudio(voice: string, text: string): Promise<Buffer | null> {
+    const key = process.env.STREAMELEMENTS_KEY;
+    const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(text)}&key=${key}`;
 
     try {
-        const { data } = await axios.get(url, { responseType: 'stream' });
-        const audioStream = new PassThrough();
-        data.pipe(audioStream);
-        return audioStream;
-    } catch (error) {
-        console.error(`An error occurred while downloading ${url}`, error);
-    }
+        const response = await axios.get<ArrayBuffer>(url, {
+            responseType: 'arraybuffer',
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            },
+        });
 
-    return null;
+        return Buffer.from(response.data);
+    } catch (error) {
+        const err = error as any;
+        console.error('Error downloading audio:', err.response?.status, err.message);
+        return null;
+    }
 }
 
-export async function getVoices(){
-    let url = "https://api.streamelements.com/kappa/v2/speech/voices";
-    let response = await axios.get(url);
+export async function getVoices() {
+    const url = 'https://api.streamelements.com/kappa/v2/speech/voices';
+    const response = await axios.get(url);
 
     const voices = [];
-
     Object.keys(response.data.voices).forEach((key, id) => {
-        let nombre = `[${response.data.voices[key].languageName}] ${key}`
-        let voz = { id: id++, value: id++, name: nombre}
-        voices.push(voz)
+        const nombre = `[${response.data.voices[key].languageName}] ${key}`;
+        voices.push({ id: id++, value: id++, name: nombre });
     });
     return voices;
 }
 
-export async function getVoiceName(value: number) {
-    let url = "https://api.streamelements.com/kappa/v2/speech/voices";
-    let response = await axios.get(url);
+export async function getVoiceName(value: number): Promise<string | null> {
+    const url = 'https://api.streamelements.com/kappa/v2/speech/voices';
+    const response = await axios.get(url);
 
     const voices = [];
-
     Object.keys(response.data.voices).forEach((key, id) => {
-        let voz = { id: id++, value: id++, name: key}
-        voices.push(voz)
+        voices.push({ id: id++, value: id++, name: key });
     });
 
-    const voice = voices.find(voice => voice.value === value);
+    const voice = voices.find(v => v.value === value);
     return voice ? voice.name : null;
 }
 
 export async function setVoice(service: CommandsService, userId: string, voice: number) {
-    await service.setTTSVoice(userId , voice);
+    await service.setTTSVoice(userId, voice);
     voiceCache.set(userId, await getVoiceName(voice));
 }
 
-export async function getVoice(service: CommandsService, userId: string) {
+export async function getVoice(service: CommandsService, userId: string): Promise<string | null> {
     return voiceCache.get(userId) || await service.getTTSVoice(userId);
 }
