@@ -19,6 +19,8 @@ export interface VgcPokemon {
   weightkg: number;
   isRestricted: boolean;
   isMythical: boolean;
+  /** Item the species is locked into (e.g. Mega Stones, Orbs). Null when free to hold any item. */
+  requiredItem: string | null;
 }
 
 export interface SpeedTierEntry {
@@ -29,13 +31,17 @@ export interface SpeedTierEntry {
   abilities: { [slot: string]: string };
   isRestricted: boolean;
   isMythical: boolean;
+  /** Null when the species is locked into a required item (Mega Stone, Orb, etc.) */
+  requiredItem: string | null;
   speedTiers: {
     min: number;
     minPlus: number;
     max: number;
     maxPlus: number;
-    scarf: number;
-    scarfPlus: number;
+    /** Null when the species cannot hold a Choice Scarf (locked item). */
+    scarf: number | null;
+    /** Null when the species cannot hold a Choice Scarf (locked item). */
+    scarfPlus: number | null;
   };
 }
 
@@ -70,6 +76,12 @@ export class VgcService {
       .filter((s) => {
         if (!s.exists) return false;
         if (s.isNonstandard) return false;
+        // Alternate forms (e.g. Meloetta-Pirouette) may lack their own FormatsData
+        // entry while their base form is banned. Inherit the base species ban.
+        if (s.baseSpecies !== s.name) {
+          const base = dex.species.get(s.baseSpecies);
+          if (!base.exists || base.isNonstandard) return false;
+        }
         return true;
       })
       .map((s) => ({
@@ -88,6 +100,7 @@ export class VgcService {
         weightkg: s.weightkg,
         isRestricted: s.tags ? s.tags.some((t) => restrictedTags.has(t) && t === 'Restricted Legendary') : false,
         isMythical: s.tags?.includes('Mythical') ?? false,
+        requiredItem: s.requiredItem ?? null,
       }));
   }
 
@@ -105,13 +118,14 @@ export class VgcService {
         abilities: p.abilities,
         isRestricted: p.isRestricted,
         isMythical: p.isMythical,
+        requiredItem: p.requiredItem,
         speedTiers: {
           min: this.calcSpeed(p.baseStats.spe, 0, 1.0),
           minPlus: this.calcSpeed(p.baseStats.spe, 0, 1.1),
           max: this.calcSpeed(p.baseStats.spe, 252, 1.0),
           maxPlus: this.calcSpeed(p.baseStats.spe, 252, 1.1),
-          scarf: Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.0) * 1.5),
-          scarfPlus: Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.1) * 1.5),
+          scarf: p.requiredItem ? null : Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.0) * 1.5),
+          scarfPlus: p.requiredItem ? null : Math.floor(this.calcSpeed(p.baseStats.spe, 252, 1.1) * 1.5),
         },
       }))
       .sort((a, b) => b.baseSpeed - a.baseSpeed);
