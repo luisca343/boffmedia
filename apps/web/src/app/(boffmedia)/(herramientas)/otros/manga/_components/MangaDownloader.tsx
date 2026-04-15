@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/primitives/card';
@@ -12,7 +11,7 @@ import { Checkbox } from '@/components/ui/primitives/checkbox';
 import {
   BookOpen, Search, Download, Loader2, ChevronDown, ChevronUp,
   CheckSquare, Square, HardDrive, CheckCircle2, XCircle, Clock,
-  Library, RefreshCw, BookMarked, ImageIcon, X, Globe,
+  X, Globe,
 } from 'lucide-react';
 import {
   ScrapeService,
@@ -21,7 +20,6 @@ import {
   type MangaChapter,
   type MangaDownloadSseEvent,
   type LocalMangaLibrary,
-  type LocalMangaSeries,
 } from '@/services/api/boffmedia/scrapeService';
 import { FloatingSection } from '@/app/(boffmedia)/_components/layout/FloatingSection';
 
@@ -103,84 +101,7 @@ function ScraperSourcesPanel() {
   );
 }
 
-// ─── Local library ─────────────────────────────────────────────────────────────
 
-/** Format a chapter slug for display. Numeric slugs get the translated label; text slugs (specials) show as-is. */
-function useChapterLabel() {
-  const t = useTranslations('boffmedia.manga');
-  return (slug: string) => {
-    const n = Number(slug);
-    return Number.isFinite(n) && slug.trim() !== '' ? t('chapter', { number: slug }) : slug;
-  };
-}
-
-function SeriesCard({ series }: { series: LocalMangaSeries }) {
-  const [expanded, setExpanded] = useState(false);
-  const chapterLabel = useChapterLabel();
-  return (
-    <div className="rounded-lg border border-surface-700/50 overflow-hidden">
-      <button onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-surface-800/60 hover:bg-surface-800/80 transition-colors text-left">
-        <BookMarked className="h-4 w-4 text-primary-400 shrink-0" />
-        <span className="text-sm font-semibold text-surface-100 truncate flex-1">{series.slug}</span>
-        <Badge className="bg-surface-700/40 text-surface-300 border-surface-600/40 shrink-0">
-          {series.chapters.length} cap.
-        </Badge>
-        <Badge className="bg-surface-700/40 text-surface-400 border-surface-600/40 shrink-0 flex items-center gap-1">
-          <ImageIcon className="h-3 w-3" />{series.totalImages}
-        </Badge>
-        {expanded ? <ChevronUp className="h-4 w-4 text-surface-500 shrink-0" /> : <ChevronDown className="h-4 w-4 text-surface-500 shrink-0" />}
-      </button>
-      <AnimatePresence initial={false}>
-        {expanded && (
-          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-            <div className="divide-y divide-surface-700/30">
-              {series.chapters.map(ch => (
-                <div key={ch.slug} className="flex items-center gap-3 px-4 py-2 hover:bg-surface-700/20">
-                  <CheckCircle2 className="h-3.5 w-3.5 text-green-500/70 shrink-0" />
-                  <span className="flex-1 text-xs text-surface-300 truncate">{chapterLabel(ch.slug)}</span>
-                  <span className="text-xs text-surface-500 shrink-0 flex items-center gap-1">
-                    <ImageIcon className="h-3 w-3" />{ch.imageCount}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function LocalLibraryPanel({ library, onRefresh, loading }: {
-  library: LocalMangaLibrary; onRefresh: () => void; loading: boolean;
-}) {
-  return (
-    <Card className="bg-surface-800/40 border-surface-700/50">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base text-surface-200 flex items-center gap-2">
-            <Library className="h-4 w-4 text-primary-400" />Biblioteca local
-          </CardTitle>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-surface-400">
-              {library.totalSeries} serie{library.totalSeries !== 1 ? 's' : ''} · {library.totalChapters} cap.
-            </span>
-            <Button variant="outline" size="sm" onClick={onRefresh} disabled={loading}
-              className="h-7 border-surface-600 hover:bg-surface-700 text-surface-300 gap-1.5">
-              <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />Actualizar
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {library.totalSeries === 0
-          ? <p className="text-sm text-surface-500 text-center py-6">No hay manga descargado todavía.</p>
-          : <div className="flex flex-col gap-2">{library.series.map(s => <SeriesCard key={s.slug} series={s} />)}</div>}
-      </CardContent>
-    </Card>
-  );
-}
 
 // ─── Search results ────────────────────────────────────────────────────────────
 
@@ -358,7 +279,6 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
 
 export default function MangaDownloader() {
   const [library, setLibrary] = useState<LocalMangaLibrary | null>(null);
-  const [libraryLoading, setLibraryLoading] = useState(true);
 
   const [query, setQuery] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
@@ -393,13 +313,8 @@ export default function MangaDownloader() {
   }, [library, selectedNovel]);
 
   const loadLibrary = useCallback(async () => {
-    setLibraryLoading(true);
-    try {
-      const res = await ScrapeService.getLocalMangaLibrary();
-      if (res.success && res.data) setLibrary(res.data);
-    } finally {
-      setLibraryLoading(false);
-    }
+    const res = await ScrapeService.getLocalMangaLibrary();
+    if (res.success && res.data) setLibrary(res.data);
   }, []);
 
   useEffect(() => { loadLibrary(); }, [loadLibrary]);
@@ -591,20 +506,7 @@ export default function MangaDownloader() {
           {/* Scraper sources */}
           <ScraperSourcesPanel />
 
-          {/* Local library */}
-          <AnimatePresence>
-            {(library || libraryLoading) && (
-              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-                {libraryLoading && !library
-                  ? <Card className="bg-surface-800/40 border-surface-700/50">
-                      <CardContent className="pt-5 flex items-center gap-2 text-surface-400 text-sm">
-                        <Loader2 className="h-4 w-4 animate-spin" /> Cargando biblioteca…
-                      </CardContent>
-                    </Card>
-                  : library && <LocalLibraryPanel library={library} onRefresh={loadLibrary} loading={libraryLoading} />}
-              </motion.div>
-            )}
-          </AnimatePresence>
+
 
           {/* Search */}
           <Card className="bg-surface-800/40 border-surface-700/50">
