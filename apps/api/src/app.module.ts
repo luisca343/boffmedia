@@ -68,6 +68,7 @@ import { WingullSQL2Service } from './_utils/WingullSQL2Service';
 import { PokemonLogModule } from '@api/boffmedia/util/showdown/pokemon-log.module';
 import { YoutubeModule } from '@api/boffmedia/herramientas/youtube/youtube.module';
 import { ScrapeModule } from '@api/boffmedia/herramientas/scrape/scrape.module';
+import { MangaModule } from '@api/boffmedia/herramientas/manga/manga.module';
 
 @Module({
   imports: [
@@ -116,6 +117,7 @@ import { ScrapeModule } from '@api/boffmedia/herramientas/scrape/scrape.module';
     PokemonLogModule,
     YoutubeModule,
     ScrapeModule,
+    MangaModule,
   ],
   controllers: [AppController, PokemonController, StarbankController, ChatappController, SmartrotomController, BattleController, ArcadeController, EventsController, UploadController, MhwildsController],
   providers: [AppService, ResponseService, NetfluisService, BattleService, PokemonDataService, MoveDataService, SpawnDataService, PokemonImageService, CommandsService, 
