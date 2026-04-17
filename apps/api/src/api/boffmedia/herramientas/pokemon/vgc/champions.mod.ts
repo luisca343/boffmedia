@@ -16,6 +16,7 @@ import { FormatsData } from './mod/formats-data';
 import { Items } from './mod/items';
 import { Learnsets } from './mod/learnsets';
 import { Moves } from './mod/moves';
+import { Pokedex as Species } from './mod/pokedex';
 import { Rulesets } from './mod/rulesets';
 import { Scripts } from './mod/scripts';
 
@@ -27,6 +28,7 @@ export function initChampionsMod(): void {
   Dex.mod('champions', {
     Scripts,
     Abilities,
+    Species,
     FormatsData,
     Items,
     Learnsets,

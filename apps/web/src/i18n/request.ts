@@ -122,6 +122,7 @@ export default getRequestConfig(async () => {
     'tools/games.json',
     'tools/mhwilds.json',
     'tools/pokemon.json',
+    'tools/vgc.json',
     'smartrotom/pokedex/abilities.json',
     'smartrotom/pokedex/common.json',
     'smartrotom/pokedex/forms.json',
