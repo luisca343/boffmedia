@@ -75,12 +75,18 @@ export class VgcService {
       .all()
       .filter((s) => {
         if (!s.exists) return false;
-        if (s.isNonstandard) return false;
-        // Alternate forms (e.g. Meloetta-Pirouette) may lack their own FormatsData
-        // entry while their base form is banned. Inherit the base species ban.
-        if (s.baseSpecies !== s.name) {
+        if (s.num < 0) return false;
+        // Champions mod grants non-standard species (new Megas, forms not in vanilla
+        // Gen 9) an explicit tier like "OU". Respect that override — only reject a
+        // non-standard species when it has no explicitly legal tier.
+        if (s.isNonstandard && (!s.tier || s.tier === 'Illegal')) return false;
+        // Alternate forms with no explicit tier of their own (e.g. Meloetta-Pirouette,
+        // a battle-only form whose base is banned) should inherit the base species ban.
+        // Forms that DO have an explicit legal tier (e.g. Floette-Eternal tier:"OU")
+        // are intentionally included regardless of the base species status.
+        if (s.baseSpecies !== s.name && (!s.tier || s.tier === 'Illegal')) {
           const base = dex.species.get(s.baseSpecies);
-          if (!base.exists || base.isNonstandard) return false;
+          if (!base.exists || (base.isNonstandard && (!base.tier || base.tier === 'Illegal'))) return false;
         }
         return true;
       })

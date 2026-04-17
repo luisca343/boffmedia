@@ -1,0 +1,96 @@
+{
+  "vgc": {
+    "speedTiers": {
+      "title": "Niveles de Velocidad",
+      "subtitle": "Estadísticas de velocidad a nivel 50 para Pokémon legales — ordenados por velocidad base",
+      "search": "Filtrar Pokémon...",
+      "highlightPlaceholder": "Resaltar velocidad...",
+      "showingTier": "Mostrando tier de velocidad {speed}",
+      "pokemonCount": "{count} Pokémon",
+      "loading": "Cargando niveles de velocidad...",
+      "error": "Error al cargar los niveles de velocidad. Asegúrate de que la API está en ejecución.",
+      "empty": "No se encontraron Pokémon.",
+      "footer": "N = Naturaleza neutral · + = Naturaleza +Velocidad · todos los cálculos a nivel 50 · 31 IVs",
+      "legend": {
+        "restricted": "Restringido",
+        "mythical": "Mítico",
+        "highlighted": "Nivel de velocidad resaltado"
+      },
+      "badge": {
+        "restricted": "Restringido",
+        "restrictedTitle": "Legendario Restringido",
+        "mythical": "Mítico",
+        "mythicalTitle": "Pokémon Mítico"
+      },
+      "columns": {
+        "number": "#",
+        "pokemon": "Pokémon",
+        "base": "Base",
+        "baseTitle": "Estadística de velocidad base",
+        "minNeutral": "0/N",
+        "minNeutralTitle": "0 PEs, Naturaleza neutral",
+        "minPlus": "0/+",
+        "minPlusTitle": "0 PEs, Naturaleza +Velocidad",
+        "maxNeutral": "252/N",
+        "maxNeutralTitle": "252 PEs, Naturaleza neutral",
+        "maxPlus": "252/+",
+        "maxPlusTitle": "252 PEs, Naturaleza +Velocidad",
+        "scarf": "Scarf",
+        "scarfTitle": "252 PEs, Pañuelo Elegido",
+        "scarfPlus": "Scarf+",
+        "scarfPlusTitle": "252 PEs, +Velocidad, Pañuelo Elegido",
+        "noScarf": "No puede llevar Pañuelo Elegido"
+      },
+      "modifiers": {
+        "title": "Modificadores",
+        "clear": "Limpiar modificadores",
+        "boostTitle": "Etapa de Velocidad {n}",
+        "tailwind": "Viento Afín (×2 Velocidad)",
+        "tailwindShort": "V. Afín",
+        "scarf": "Pañuelo Elegido (×1.5 Velocidad)",
+        "scarfShort": "Pañuelo",
+        "paralysis": "Parálisis (×0.5 Velocidad)",
+        "paralysisShort": "Parál."
+      },
+      "team": {
+        "title": "Mi Equipo",
+        "add": "Añadir al equipo",
+        "remove": "Quitar del equipo",
+        "full": "El equipo está lleno (6 Pokémon)",
+        "clearTeam": "Vaciar equipo",
+        "filterToggle": "Supera al equipo"
+      },
+      "comparison": {
+        "faster": "Más rápido",
+        "slower": "Más lento",
+        "tie": "Empate",
+        "column": "vs Equipo"
+      }
+    },
+    "speedComparison": {
+      "title": "Comparación de Velocidad",
+      "subtitle": "Compara la velocidad de tu equipo contra cualquier rival",
+      "opponentTitle": "Rival",
+      "opponentSearch": "Buscar Pokémon...",
+      "opponentManual": "O ingresa la velocidad directamente",
+      "opponentSpeedPlaceholder": "Stat de velocidad...",
+      "opponentModifiers": "Modificadores del rival",
+      "effectiveSpeed": "Velocidad efectiva",
+      "myTeamTitle": "Mi Equipo",
+      "myTeamModifiers": "Condiciones del equipo",
+      "teamMemberName": "Nombre (opcional)",
+      "teamMemberSpeed": "Stat de velocidad",
+      "addMember": "Añadir casilla",
+      "removeMember": "Quitar",
+      "clearTeam": "Limpiar todo",
+      "faster": "Más rápido",
+      "slower": "Más lento",
+      "tie": "Empate",
+      "noOpponent": "Ingresa la velocidad del rival para comparar",
+      "invalidSpeed": "Ingresa un stat de velocidad válido",
+      "referenceSpeed": "Velocidades de referencia",
+      "loading": "Cargando datos de Pokémon...",
+      "empty": "No se encontraron Pokémon"
+    }
+  }
+}

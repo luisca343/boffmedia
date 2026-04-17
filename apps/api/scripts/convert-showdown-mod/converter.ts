@@ -133,6 +133,104 @@ function extractExportedConst(
 }
 
 // ---------------------------------------------------------------------------
+// Showdown-only field stripping
+// ---------------------------------------------------------------------------
+
+/**
+ * Fields present in Pokémon Showdown source data that have no counterpart in
+ * the @pkmn/sim TypeScript types. Keeping them causes TS2561 "unknown property"
+ * errors. They are safe to drop because @pkmn/sim never reads them at runtime.
+ *
+ * Keyed by the file base name so we only strip fields relevant to that table.
+ */
+const SHOWDOWN_ONLY_FIELDS: Readonly<Record<string, ReadonlyArray<string>>> = {
+  'pokedex.ts': [
+    'isCosmeticForme', // runtime marker; cosmetic forms are listed via cosmeticFormes on base
+  ],
+};
+
+/**
+ * Removes lines that consist solely of a Showdown-internal property assignment
+ * (e.g. `\t\tisCosmeticForme: true,`) from the body text of a data table entry.
+ * Only strips fields registered in SHOWDOWN_ONLY_FIELDS for the given file.
+ */
+function stripShowdownOnlyFields(bodyText: string, fileName: string): string {
+  const fields = SHOWDOWN_ONLY_FIELDS[fileName];
+  if (!fields || fields.length === 0) return bodyText;
+
+  // Build a regex that matches any indentation + field: value, line
+  const pattern = new RegExp(
+    `^[ \\t]*(${fields.map((f) => f.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})\\s*:.*,?\\s*$`,
+    'gm',
+  );
+  return bodyText.replace(pattern, '');
+}
+
+
+/**
+ * Strips cosmetic-form stubs from a Showdown Pokédex body.
+ *
+ * In the Showdown source, cosmetic formes (e.g. Burmy-Sandy, Vivillon-Polar)
+ * are stored as minimal stubs — `{ name, baseSpecies, forme, color }` — because
+ * they share all battle stats with the base species.  @pkmn/sim's
+ * `ModdedSpeciesData` does NOT allow partial entries (it requires `num`, `types`,
+ * `abilities`, `baseStats`, etc.), so these stubs cause TS2322 errors.
+ *
+ * They are also unnecessary in a mod: the base-gen dex already knows about
+ * cosmetic formes via `cosmeticFormes` on the base species.  We can safely
+ * remove them from the mod table.
+ *
+ * Only applied when fileName is 'pokedex.ts'.
+ */
+function stripCosmeticFormStubs(bodyText: string, fileName: string): string {
+  if (fileName !== 'pokedex.ts') return bodyText;
+
+  // Walk the body text brace-by-brace, collecting top-level entry blocks and
+  // dropping the ones that look like cosmetic stubs (have baseSpecies + forme
+  // but no num or types).
+  const lines = bodyText.split('\n');
+  const out: string[] = [];
+  let removedCount = 0;
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    // A top-level entry starts with optional whitespace + identifier + ': {'
+    if (/^[ \t]+\w+:\s*\{/.test(line)) {
+      const blockLines: string[] = [line];
+      let depth = (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+      i++;
+      while (i < lines.length && depth > 0) {
+        const l = lines[i];
+        depth += (l.match(/\{/g) || []).length;
+        depth -= (l.match(/\}/g) || []).length;
+        blockLines.push(l);
+        i++;
+      }
+      const block = blockLines.join('\n');
+      const hasBase = block.includes('baseSpecies:');
+      const hasForme = block.includes('forme:');
+      const hasNum = /\bnum\s*:/.test(block);
+      const hasTypes = block.includes('types:');
+      if (hasBase && hasForme && !hasNum && !hasTypes) {
+        removedCount++;
+        // drop the block
+      } else {
+        out.push(...blockLines);
+      }
+    } else {
+      out.push(line);
+      i++;
+    }
+  }
+
+  if (removedCount > 0) {
+    console.log(`    [pokedex] Stripped ${removedCount} cosmetic-form stubs`);
+  }
+  return out.join('\n');
+}
+
+// ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
 
@@ -185,12 +283,18 @@ export function convertFile(filePath: string, rawSource: string): ConversionResu
   // new type annotation style.
   const primaryType = extracted.resolvedTypeName ?? config.pkmnType;
 
+  // Strip Showdown-internal fields that have no equivalent in @pkmn/sim types.
+  // These are properties used by the Showdown runtime or data pipeline that are
+  // not part of the exported ModdedSpeciesData / ModdedMoveData etc. interfaces.
+  let bodyText = stripShowdownOnlyFields(extracted.bodyText, baseName);
+  bodyText = stripCosmeticFormStubs(bodyText, baseName);
+
   // Parse the body text once more to collect any @pkmn/sim types referenced
   // in method/function signatures (e.g. `pokemon: Pokemon`). These need to be
   // added to the import statement.
   const bodyWrapper = ts.createSourceFile(
     '__body__.ts',
-    `const __x__ = ${extracted.bodyText}`,
+    `const __x__ = ${bodyText}`,
     ts.ScriptTarget.Latest,
     /* setParentNodes */ true,
     ts.ScriptKind.TS,
@@ -210,7 +314,7 @@ export function convertFile(filePath: string, rawSource: string): ConversionResu
   if (config.note) {
     lines.push(`// NOTE: ${config.note}`);
   }
-  lines.push(`export const ${extracted.name}: ${primaryType} = ${extracted.bodyText};`);
+  lines.push(`export const ${extracted.name}: ${primaryType} = ${bodyText};`);
   lines.push('');
 
   return {
