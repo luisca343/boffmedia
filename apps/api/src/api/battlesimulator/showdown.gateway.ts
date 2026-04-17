@@ -36,6 +36,12 @@ export class ShowdownGateway implements OnGatewayConnection, OnGatewayDisconnect
       client.disconnect();
     });
 
+    showdownWs.on('error', (err) => {
+      console.error(`Showdown WebSocket error for client ${clientId}:`, err.message);
+      this.clients.delete(clientId);
+      client.disconnect();
+    });
+
     this.clients.set(clientId, { socket: client, showdownWs });
 
     client.emit('connection', { clientId });
