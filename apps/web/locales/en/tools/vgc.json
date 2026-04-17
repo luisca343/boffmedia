@@ -1,0 +1,96 @@
+{
+  "vgc": {
+    "speedTiers": {
+      "title": "Speed Tiers",
+      "subtitle": "Level 50 speed stats for legal Pokémon — sorted by base Speed",
+      "search": "Filter Pokémon...",
+      "highlightPlaceholder": "Highlight speed...",
+      "showingTier": "Showing {speed} speed tier",
+      "pokemonCount": "{count} Pokémon",
+      "loading": "Loading speed tiers...",
+      "error": "Failed to load speed tiers. Make sure the API is running.",
+      "empty": "No Pokémon found.",
+      "footer": "N = Neutral nature · + = +Speed nature · all calculations at level 50 · 31 IVs",
+      "legend": {
+        "restricted": "Restricted",
+        "mythical": "Mythical",
+        "highlighted": "Highlighted speed tier"
+      },
+      "badge": {
+        "restricted": "Restricted",
+        "restrictedTitle": "Restricted Legendary",
+        "mythical": "Mythical",
+        "mythicalTitle": "Mythical Pokémon"
+      },
+      "columns": {
+        "number": "#",
+        "pokemon": "Pokémon",
+        "base": "Base",
+        "baseTitle": "Base Speed stat",
+        "minNeutral": "0/N",
+        "minNeutralTitle": "0 EVs, Neutral nature",
+        "minPlus": "0/+",
+        "minPlusTitle": "0 EVs, +Speed nature",
+        "maxNeutral": "252/N",
+        "maxNeutralTitle": "252 EVs, Neutral nature",
+        "maxPlus": "252/+",
+        "maxPlusTitle": "252 EVs, +Speed nature",
+        "scarf": "Scarf",
+        "scarfTitle": "252 EVs, Choice Scarf",
+        "scarfPlus": "Scarf+",
+        "scarfPlusTitle": "252 EVs, +Speed, Choice Scarf",
+        "noScarf": "Cannot hold Choice Scarf"
+      },
+      "modifiers": {
+        "title": "Modifiers",
+        "clear": "Clear all modifiers",
+        "boostTitle": "Speed stage {n}",
+        "tailwind": "Tailwind (×2 Speed)",
+        "tailwindShort": "Tailwind",
+        "scarf": "Choice Scarf (×1.5 Speed)",
+        "scarfShort": "Scarf",
+        "paralysis": "Paralysis (×0.5 Speed)",
+        "paralysisShort": "Para"
+      },
+      "team": {
+        "title": "My Team",
+        "add": "Add to team",
+        "remove": "Remove from team",
+        "full": "Team is full (6 Pokémon)",
+        "clearTeam": "Clear team",
+        "filterToggle": "Outspeeds team"
+      },
+      "comparison": {
+        "faster": "Faster",
+        "slower": "Slower",
+        "tie": "Tie",
+        "column": "vs Team"
+      }
+    },
+    "speedComparison": {
+      "title": "Speed Comparison",
+      "subtitle": "Compare your team's speed against any opponent",
+      "opponentTitle": "Opponent",
+      "opponentSearch": "Search Pokémon...",
+      "opponentManual": "Or enter speed directly",
+      "opponentSpeedPlaceholder": "Speed stat...",
+      "opponentModifiers": "Opponent modifiers",
+      "effectiveSpeed": "Effective speed",
+      "myTeamTitle": "My Team",
+      "myTeamModifiers": "Team conditions",
+      "teamMemberName": "Name (optional)",
+      "teamMemberSpeed": "Speed stat",
+      "addMember": "Add slot",
+      "removeMember": "Remove",
+      "clearTeam": "Clear all",
+      "faster": "Faster",
+      "slower": "Slower",
+      "tie": "Tie",
+      "noOpponent": "Enter an opponent speed to compare",
+      "invalidSpeed": "Enter a valid speed stat",
+      "referenceSpeed": "Reference speeds",
+      "loading": "Loading Pokémon data...",
+      "empty": "No Pokémon found"
+    }
+  }
+}
