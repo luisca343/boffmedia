@@ -1,12 +1,14 @@
 'use client';
 
-import { use, useState } from 'react';
+import { use, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Swords } from 'lucide-react';
+import { ArrowLeft, Plus, Swords, Upload } from 'lucide-react';
 import { useMatches, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { emptySlots, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
+import { parseMatchCsv } from '@/features/vgc-tracker/utils/importCsv';
+import { vgcDb } from '@/lib/db/vgc-db';
 import type { Match } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -22,11 +24,51 @@ export default function SessionPage({ params }: Props) {
   const router = useRouter();
   const { sessions } = useSessions();
   const session = sessions.find((s) => s.id === sessionId);
-  const { matches, loading, create: createMatch } = useMatches(sessionId);
+  const { matches, loading, create: createMatch, refresh: refreshMatches } = useMatches(sessionId);
   const preset = usePreset(session?.activePresetId ?? null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+  const [importConfig, setImportConfig] = useState<{ file: File } | null>(null);
+  const [importStartDate, setImportStartDate] = useState(() => {
+    const d = new Date();
+    d.setSeconds(0, 0);
+    return d.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+  });
+  const [importMins, setImportMins] = useState(10);
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !session) return;
+    setImportConfig({ file });
+    e.target.value = '';
+  };
+
+  const confirmImport = async () => {
+    if (!importConfig || !session) return;
+    setImporting(true);
+    try {
+      const text = await importConfig.file.text();
+      const newMatches = parseMatchCsv(
+        text,
+        sessionId,
+        session.format,
+        new Date(importStartDate),
+        importMins,
+      );
+      if (newMatches.length > 0) {
+        await vgcDb.matches.bulkPut(newMatches);
+        await refreshMatches();
+      }
+    } finally {
+      setImporting(false);
+      setImportConfig(null);
+    }
+  };
 
   const wins = matches.filter((m) => m.result === 'win').length;
   const losses = matches.filter((m) => m.result === 'loss').length;
+  const draws = matches.filter((m) => m.result === 'draw').length;
   const latestElo = [...matches]
     .sort((a, b) => b.createdAt - a.createdAt)
     .find((m) => m.eloAfter !== undefined)?.eloAfter;
@@ -73,18 +115,36 @@ export default function SessionPage({ params }: Props) {
             </div>
           </div>
 
-          <button
-            onClick={handleNewMatch}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors shrink-0"
-          >
-            <Plus size={14} /> New match
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={handleImportFile}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importing}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-200 text-sm font-medium transition-colors disabled:opacity-50"
+              title="Import matches from CSV"
+            >
+              <Upload size={14} />{importing ? 'Importing…' : 'Import CSV'}
+            </button>
+            <button
+              onClick={handleNewMatch}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
+            >
+              <Plus size={14} /> New match
+            </button>
+          </div>
         </div>
       </motion.div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         <StatCard value={wins} label="Wins" color="text-green-400" />
+        <StatCard value={draws} label="Draws" color="text-yellow-400" />
         <StatCard value={losses} label="Losses" color="text-red-400" />
         <StatCard
           value={latestElo ?? session?.startElo ?? '—'}
@@ -128,6 +188,54 @@ export default function SessionPage({ params }: Props) {
               />
             ));
           })()}
+        </div>
+      )}
+
+      {/* Import config modal */}
+      {importConfig && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
+            <h2 className="text-surface-50 font-semibold text-base">Import CSV</h2>
+
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs text-surface-400 font-medium">Start date &amp; time</label>
+                <input
+                  type="datetime-local"
+                  value={importStartDate}
+                  onChange={(e) => setImportStartDate(e.target.value)}
+                  className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-surface-400 font-medium">Minutes per game</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={120}
+                  value={importMins}
+                  onChange={(e) => setImportMins(Math.max(1, parseInt(e.target.value) || 10))}
+                  className="w-full bg-surface-800 border border-surface-700 rounded-lg px-3 py-2 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <button
+                onClick={() => setImportConfig(null)}
+                className="px-4 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-300 text-sm transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmImport}
+                disabled={importing}
+                className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                {importing ? 'Importing…' : `Import ${importConfig.file.name}`}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -192,10 +300,12 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
             ? 'bg-green-500/15 text-green-400 border-green-500/30'
             : match.result === 'loss'
             ? 'bg-red-500/15 text-red-400 border-red-500/30'
+            : match.result === 'draw'
+            ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30'
             : 'bg-surface-800 text-surface-500 border-surface-700'
         }`}
       >
-        {match.result === 'win' ? 'W' : match.result === 'loss' ? 'L' : '—'}
+        {match.result === 'win' ? 'W' : match.result === 'loss' ? 'L' : match.result === 'draw' ? 'D' : '—'}
       </div>
 
       {/* Info */}
