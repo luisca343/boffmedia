@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Dex } from '@pkmn/dex';
 import type { MatchSlot } from '@/features/vgc-tracker/types';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
@@ -16,6 +17,7 @@ function getBaseSpe(name: string): number {
 }
 
 export function SpeedTierWidget({ slots }: Props) {
+  const t = useTranslations('vgc.tracker');
   const [tailwind, setTailwind] = useState(false);
   const [trickRoom, setTrickRoom] = useState(false);
 
@@ -40,28 +42,28 @@ export function SpeedTierWidget({ slots }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-800">
         <span className="text-[10px] font-semibold text-surface-500 uppercase tracking-wide">
-          Speed Tiers
+          {t('speedWidget.label')}
         </span>
         <div className="flex gap-1">
           <button
-            onClick={() => setTailwind((t) => !t)}
+            onClick={() => setTailwind((v) => !v)}
             className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
               tailwind
                 ? 'bg-blue-600/40 text-blue-300 border border-blue-600/50'
                 : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
             }`}
           >
-            TW ×2
+            {t('speedWidget.tailwind')}
           </button>
           <button
-            onClick={() => setTrickRoom((t) => !t)}
+            onClick={() => setTrickRoom((v) => !v)}
             className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
               trickRoom
                 ? 'bg-violet-600/40 text-violet-300 border border-violet-600/50'
                 : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
             }`}
           >
-            TR ↕
+            {t('speedWidget.trickroom')}
           </button>
         </div>
       </div>

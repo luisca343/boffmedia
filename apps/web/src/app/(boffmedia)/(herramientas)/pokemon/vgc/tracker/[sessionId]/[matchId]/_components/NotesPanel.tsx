@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, KeyboardEvent, forwardRef, useImperativeHandle } from 'react';
+import { useTranslations } from 'next-intl';
 import { MatchNote } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -21,6 +22,7 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
   { notes, phase, onAddNote },
   ref,
 ) {
+  const t = useTranslations('vgc.tracker');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useImperativeHandle(ref, () => ({
@@ -45,16 +47,16 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
           {phase === 'live' ? (
             <span className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block" />
-              LIVE
+              {t('indicators.live')}
             </span>
           ) : (
-            <span className="text-surface-600">POST</span>
+            <span className="text-surface-600">{t('indicators.post')}</span>
           )}
         </span>
         <input
           ref={inputRef}
           onKeyDown={handleKeyDown}
-          placeholder="Add note... (Enter to save)"
+          placeholder={t('placeholders.addNote')}
           className="flex-1 bg-transparent text-surface-50 placeholder:text-surface-600 text-sm focus:outline-none"
           autoComplete="off"
           spellCheck={false}
