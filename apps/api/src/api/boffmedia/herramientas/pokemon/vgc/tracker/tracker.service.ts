@@ -57,6 +57,7 @@ export class TrackerService {
       format: existing.format,
       myTeam: dto.myTeam ?? JSON.parse(existing.myTeam as unknown as string),
       opponentTeam: dto.opponentTeam ?? JSON.parse(existing.opponentTeam as unknown as string),
+      opponentName: dto.opponentName ?? existing.opponentName,
       result: dto.result ?? existing.result,
       eloAfter: dto.eloAfter ?? existing.eloAfter,
       opponentElo: dto.opponentElo ?? existing.opponentElo,

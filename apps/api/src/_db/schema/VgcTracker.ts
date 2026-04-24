@@ -1,4 +1,4 @@
-import { datetime, int, mysqlEnum, mysqlTable, text, varchar } from 'drizzle-orm/mysql-core';
+import { datetime, double, int, mysqlEnum, mysqlTable, text, varchar } from 'drizzle-orm/mysql-core';
 import { sql } from 'drizzle-orm';
 import { boffMediaUsers } from './BoffMedia';
 
@@ -56,7 +56,7 @@ export const vgcSessions = mysqlTable('vgc_sessions', {
   format: mysqlEnum('format', ['BO1', 'BO3']).notNull().default('BO1'),
   regulationId: varchar('regulation_id', { length: 64 }).notNull(),
   activePresetId: varchar('active_preset_id', { length: 36 }),
-  startElo: int('start_elo'),
+  startElo: double('start_elo'),
   startedAt: datetime('started_at').notNull().default(sql`CURRENT_TIMESTAMP()`),
   createdAt: datetime('created_at').notNull().default(sql`CURRENT_TIMESTAMP()`),
   updatedAt: datetime('updated_at').notNull().default(sql`CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP()`),
@@ -71,9 +71,10 @@ export const vgcMatches = mysqlTable('vgc_matches', {
   format: mysqlEnum('format', ['BO1', 'BO3']).notNull().default('BO1'),
   myTeam: text('my_team').notNull(),
   opponentTeam: text('opponent_team').notNull(),
+  opponentName: varchar('opponent_name', { length: 128 }),
   result: mysqlEnum('result', ['win', 'loss', 'draw']),
-  eloAfter: int('elo_after'),
-  opponentElo: int('opponent_elo'),
+  eloAfter: double('elo_after'),
+  opponentElo: double('opponent_elo'),
   notes: text('notes').notNull().default('[]'),
   createdAt: datetime('created_at').notNull().default(sql`CURRENT_TIMESTAMP()`),
   completedAt: datetime('completed_at'),
