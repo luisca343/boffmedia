@@ -70,10 +70,12 @@ export interface Match {
 export type SpeciesEntry = { id: string; name: string; num: number };
 
 export function spriteUrl(speciesName: string): string {
+  // Showdown's CDN uses their toID convention: lowercase, strip every
+  // non-alphanumeric character (including hyphens). This is required for
+  // Pokémon whose names contain literal hyphens, e.g. Kommo-o → "kommoo".
   return `https://play.pokemonshowdown.com/sprites/dex/${speciesName
     .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '')}.png`;
+    .replace(/[^a-z0-9]/g, '')}.png`;
 }
 
 export function emptySlots(): MatchSlot[] {
