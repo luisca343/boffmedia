@@ -58,7 +58,8 @@ export class TrackerService {
       myTeam: dto.myTeam ?? JSON.parse(existing.myTeam as unknown as string),
       opponentTeam: dto.opponentTeam ?? JSON.parse(existing.opponentTeam as unknown as string),
       result: dto.result ?? existing.result,
-      eloChange: dto.eloChange ?? existing.eloChange,
+      eloAfter: dto.eloAfter ?? existing.eloAfter,
+      opponentElo: dto.opponentElo ?? existing.opponentElo,
       notes: dto.notes ?? JSON.parse(existing.notes as unknown as string),
       completedAt: dto.completedAt ? new Date(dto.completedAt) : existing.completedAt,
     });

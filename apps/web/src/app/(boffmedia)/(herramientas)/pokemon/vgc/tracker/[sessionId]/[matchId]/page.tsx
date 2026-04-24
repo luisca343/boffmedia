@@ -34,7 +34,7 @@ export default function MatchPage({ params }: Props) {
     <MatchWorkspace
       match={match}
       sessionId={sessionId}
-      regulationId={session?.regulationId ?? 'vgc2026regma'}
+      regulationId={session?.regulationId ?? ''}
       onSave={save}
     />
   );

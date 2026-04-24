@@ -4,7 +4,7 @@ import { use, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Swords, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, Plus, Swords, TrendingUp } from 'lucide-react';
 import { useMatches, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { emptySlots, slotsFromPreset, spriteUrl } from '@/features/vgc-tracker/types';
 import type { Match } from '@/features/vgc-tracker/types';
@@ -27,7 +27,9 @@ export default function SessionPage({ params }: Props) {
 
   const wins = matches.filter((m) => m.result === 'win').length;
   const losses = matches.filter((m) => m.result === 'loss').length;
-  const eloTotal = matches.reduce((acc, m) => acc + (m.eloChange ?? 0), 0);
+  const latestElo = [...matches]
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .find((m) => m.eloAfter !== undefined)?.eloAfter;
 
   const handleNewMatch = async () => {
     if (!session) return;
@@ -85,9 +87,13 @@ export default function SessionPage({ params }: Props) {
         <StatCard value={wins} label="Wins" color="text-green-400" />
         <StatCard value={losses} label="Losses" color="text-red-400" />
         <StatCard
-          value={(eloTotal >= 0 ? '+' : '') + eloTotal}
+          value={latestElo ?? session?.startElo ?? '—'}
           label="ELO"
-          color={eloTotal >= 0 ? 'text-green-400' : 'text-red-400'}
+          color={
+            latestElo !== undefined && session?.startElo !== undefined
+              ? latestElo >= session.startElo ? 'text-green-400' : 'text-red-400'
+              : 'text-surface-300'
+          }
         />
       </div>
 
@@ -146,10 +152,10 @@ function MatchRow({ match, number, sessionId }: { match: Match; number: number; 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 text-sm mb-0.5">
           <span className="text-surface-200 font-medium">Match #{number}</span>
-          {match.eloChange !== undefined && (
-            <span className={`flex items-center gap-0.5 text-xs ${match.eloChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {match.eloChange >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
-              {match.eloChange >= 0 ? '+' : ''}{match.eloChange}
+          {match.eloAfter !== undefined && (
+            <span className="flex items-center gap-0.5 text-xs text-surface-400">
+              <TrendingUp size={10} />
+              {match.eloAfter}
             </span>
           )}
         </div>
