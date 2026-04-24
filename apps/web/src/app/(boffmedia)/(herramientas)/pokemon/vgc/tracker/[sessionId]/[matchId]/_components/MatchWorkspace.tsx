@@ -174,6 +174,13 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             hint="W"
           />
           <ResultButton
+            label="D"
+            active={match.result === 'draw'}
+            color="yellow"
+            onClick={() => handleResult('draw')}
+            hint="D"
+          />
+          <ResultButton
             label="L"
             active={match.result === 'loss'}
             color="red"
@@ -295,7 +302,7 @@ function ResultButton({
 }: {
   label: string;
   active: boolean;
-  color: 'green' | 'red';
+  color: 'green' | 'red' | 'yellow';
   onClick: () => void;
   hint: string;
 }) {
@@ -304,6 +311,9 @@ function ResultButton({
     green: active
       ? 'bg-green-500 border-green-400 text-white shadow-lg shadow-green-500/30'
       : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-green-500/50 hover:text-green-300',
+    yellow: active
+      ? 'bg-yellow-500 border-yellow-400 text-white shadow-lg shadow-yellow-500/30'
+      : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-yellow-500/50 hover:text-yellow-300',
     red: active
       ? 'bg-red-500 border-red-400 text-white shadow-lg shadow-red-500/30'
       : 'bg-surface-800 border-surface-700 text-surface-400 hover:border-red-500/50 hover:text-red-300',
