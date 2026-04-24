@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useImperativeHandle, useRef, useState, useEffect, KeyboardEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { spriteUrl, SpeciesEntry } from '@/features/vgc-tracker/types';
 
 export interface PokemonAutocompleteHandle {
@@ -21,6 +22,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
   const [results, setResults] = useState<SpeciesEntry[]>([]);
   const [highlighted, setHighlighted] = useState(0);
   const [open, setOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -31,6 +33,29 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
   }, [autoFocus]);
+
+  // Recompute dropdown position on open/scroll/resize
+  useEffect(() => {
+    if (!open || !inputRef.current) {
+      setDropdownPos(null);
+      return;
+    }
+    const calc = () => {
+      const rect = inputRef.current!.getBoundingClientRect();
+      const minW = 220;
+      const w = Math.max(rect.width, minW);
+      let left = rect.left;
+      if (left + w > window.innerWidth - 8) left = window.innerWidth - w - 8;
+      setDropdownPos({ top: rect.bottom + 4, left, width: w });
+    };
+    calc();
+    window.addEventListener('scroll', calc, true);
+    window.addEventListener('resize', calc);
+    return () => {
+      window.removeEventListener('scroll', calc, true);
+      window.removeEventListener('resize', calc);
+    };
+  }, [open]);
 
   const handleChange = (val: string) => {
     setQuery(val);
@@ -84,10 +109,11 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
         spellCheck={false}
       />
 
-      {open && (
+      {open && dropdownPos && createPortal(
         <ul
           ref={listRef}
-          className="absolute top-full mt-1 left-0 right-0 z-50 bg-surface-900 border border-surface-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto"
+          style={{ position: 'fixed', top: dropdownPos.top, left: dropdownPos.left, width: dropdownPos.width, zIndex: 9999 }}
+          className="bg-surface-900 border border-surface-700 rounded-lg shadow-xl overflow-hidden max-h-60 overflow-y-auto"
         >
           {results.map((entry, i) => (
             <li key={entry.id}>
@@ -110,7 +136,8 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
               </button>
             </li>
           ))}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   );

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch';
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';
 import { TeamPanel } from './TeamPanel';
+import { SpeedTierWidget } from './SpeedTierWidget';
 import type { Match, MatchNote, MatchResult, MatchSlot } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -222,6 +223,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             editable={false}
             onSlotChange={handleMyTeamChange}
           />
+          <SpeedTierWidget slots={match.myTeam.slots} />
         </div>
 
         {/* Notes — centre column fills remaining space */}
@@ -233,7 +235,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         />
 
         {/* Opponent column */}
-        <div className="w-[340px] shrink-0 border-l border-surface-800 px-5 py-4">
+        <div className="w-[340px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4">
           <TeamPanel
             label="Opponent"
             slots={match.opponentTeam.slots}
@@ -241,6 +243,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             search={search}
             onSlotChange={handleOpponentTeamChange}
           />
+          <SpeedTierWidget slots={match.opponentTeam.slots} />
         </div>
       </div>
     </div>
