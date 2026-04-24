@@ -31,6 +31,7 @@ export class CreateMatchDto {
 export class UpdateMatchDto {
   @ApiPropertyOptional() @IsOptional() myTeam?: any;
   @ApiPropertyOptional() @IsOptional() opponentTeam?: any;
+  @ApiPropertyOptional() @IsOptional() @IsString() opponentName?: string;
   @ApiPropertyOptional({ enum: ['win', 'loss', 'draw'] })
   @IsOptional() @IsIn(['win', 'loss', 'draw']) result?: 'win' | 'loss' | 'draw';
   @ApiPropertyOptional() @IsOptional() @IsNumber() eloAfter?: number;

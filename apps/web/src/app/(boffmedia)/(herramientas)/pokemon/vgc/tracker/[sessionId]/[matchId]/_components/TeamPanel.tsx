@@ -1,9 +1,10 @@
 'use client';
 
+import { useRef } from 'react';
 import { X } from 'lucide-react';
 import { spriteUrl, handleSpriteError, SpeciesEntry } from '@/features/vgc-tracker/types';
 import type { MatchSlot } from '@/features/vgc-tracker/types';
-import { PokemonAutocomplete } from './PokemonAutocomplete';
+import { PokemonAutocomplete, PokemonAutocompleteHandle } from './PokemonAutocomplete';
 
 interface Props {
   label: string;
@@ -44,6 +45,15 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
         s.slotIndex === slotIndex ? { ...s, speciesId: entry.id, speciesName: entry.name } : s,
       ),
     );
+    // Auto-advance: focus the first remaining empty slot after filling
+    if (editable) {
+      const next = slots
+        .filter((s) => !s.speciesId && s.slotIndex !== slotIndex)
+        .sort((a, b) => a.slotIndex - b.slotIndex)[0];
+      if (next !== undefined) {
+        setTimeout(() => autocompleteRefs.current[next.slotIndex]?.focusInput(), 0);
+      }
+    }
   };
 
   const clearSpecies = (slotIndex: number) => {
@@ -57,6 +67,7 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
   };
 
   const allAssigned = leads.length >= 2 && backs.length >= 2;
+  const autocompleteRefs = useRef<(PokemonAutocompleteHandle | null)[]>(Array(6).fill(null));
 
   return (
     <div className="flex flex-col gap-3 min-w-0">
@@ -74,6 +85,13 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
             onAssign={() => assign(slot.slotIndex)}
             onFill={(entry) => fillSpecies(slot.slotIndex, entry)}
             onClear={() => clearSpecies(slot.slotIndex)}
+            autocompleteRef={(el) => { autocompleteRefs.current[slot.slotIndex] = el; }}
+            onTabNext={editable ? () => {
+              const next = slots
+                .filter((s) => !s.speciesId && s.slotIndex > slot.slotIndex)
+                .sort((a, b) => a.slotIndex - b.slotIndex)[0];
+              if (next !== undefined) autocompleteRefs.current[next.slotIndex]?.focusInput();
+            } : undefined}
           />
         ))}
       </div>
@@ -97,6 +115,8 @@ function PoolCard({
   onAssign,
   onFill,
   onClear,
+  autocompleteRef,
+  onTabNext,
 }: {
   slot: MatchSlot;
   editable: boolean;
@@ -105,18 +125,20 @@ function PoolCard({
   onAssign: () => void;
   onFill: (entry: SpeciesEntry) => void;
   onClear: () => void;
+  autocompleteRef?: (el: PokemonAutocompleteHandle | null) => void;
+  onTabNext?: () => void;
 }) {
   // Empty slot
   if (!slot.speciesId) {
     if (editable && search) {
       return (
-        <div className="aspect-square rounded-lg border border-dashed border-surface-600 flex items-center justify-center p-1.5 overflow-visible">
-          <PokemonAutocomplete search={search} onSelect={onFill} placeholder="Type name…" />
+        <div className="h-[76px] rounded-lg border border-dashed border-surface-600 flex items-center justify-center p-2 overflow-visible">
+          <PokemonAutocomplete ref={autocompleteRef} search={search} onSelect={onFill} placeholder="Type name…" onTabNext={onTabNext} />
         </div>
       );
     }
     return (
-      <div className="aspect-square rounded-lg border border-dashed border-surface-700 flex items-center justify-center">
+      <div className="h-[76px] rounded-lg border border-dashed border-surface-700 flex items-center justify-center">
         <span className="text-surface-600 text-xl select-none">?</span>
       </div>
     );
@@ -125,7 +147,7 @@ function PoolCard({
   const isAssigned = slot.role !== 'unknown';
 
   return (
-    <div className="relative aspect-square">
+    <div className="relative h-[76px]">
       <button
         onClick={isAssigned ? undefined : canAssign ? onAssign : undefined}
         disabled={isAssigned || !canAssign}
@@ -148,10 +170,10 @@ function PoolCard({
         <img
           src={spriteUrl(slot.speciesName!)}
           alt={slot.speciesName ?? ''}
-          className="w-24 h-24 object-contain pointer-events-none"
+          className="w-10 h-10 object-contain pointer-events-none"
           onError={handleSpriteError}
         />
-        <span className="text-xl text-surface-300 truncate max-w-full px-1 leading-none">
+        <span className="text-xs text-surface-300 truncate max-w-full px-1 leading-none">
           {slot.speciesName}
         </span>
       </button>
@@ -173,6 +195,7 @@ function PoolCard({
       {/* Remove-from-team button (editable, unassigned only) */}
       {editable && !isAssigned && (
         <button
+          tabIndex={-1}
           onClick={(e) => {
             e.stopPropagation();
             onClear();
@@ -235,18 +258,19 @@ function AssignmentZone({
           return slot ? (
             <div
               key={slot.slotIndex}
-              className={`flex-1 relative rounded-lg bg-surface-800 ring-2 ${cfg.ring} flex flex-col items-center justify-center gap-0.5 py-2 min-h-[72px]`}
+              className={`flex-1 relative rounded-lg bg-surface-800 ring-2 ${cfg.ring} flex flex-col items-center justify-center gap-0.5 py-1 min-h-[56px]`}
             >
               <img
                 src={spriteUrl(slot.speciesName!)}
                 alt={slot.speciesName ?? ''}
-                className="w-10 h-10 object-contain"
+                className="w-8 h-8 object-contain"
                 onError={handleSpriteError}
               />
               <span className="text-[9px] text-surface-400 truncate max-w-full px-1 leading-none">
                 {slot.speciesName}
               </span>
               <button
+                tabIndex={-1}
                 onClick={() => onRemove(slot.slotIndex)}
                 className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-surface-700 hover:bg-red-500 text-surface-300 hover:text-white flex items-center justify-center transition-colors"
                 title="Remove from slot"
@@ -257,7 +281,7 @@ function AssignmentZone({
           ) : (
             <div
               key={`empty-${i}`}
-              className={`flex-1 rounded-lg border border-dashed ${cfg.emptyBorder} flex items-center justify-center min-h-[72px]`}
+              className={`flex-1 rounded-lg border border-dashed ${cfg.emptyBorder} flex items-center justify-center min-h-[56px]`}
             >
               <span className="text-surface-700 text-[10px]">—</span>
             </div>

@@ -109,9 +109,25 @@ export default function SessionPage({ params }: Props) {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {matches.map((m, i) => (
-            <MatchRow key={m.id} match={m} number={matches.length - i} sessionId={sessionId} />
-          ))}
+          {(() => {
+            const asc = [...matches].sort((a, b) => a.createdAt - b.createdAt);
+            const eloDeltas = new Map<string, number>();
+            asc.forEach((m, i) => {
+              const prev = i === 0 ? session?.startElo : asc[i - 1].eloAfter;
+              if (m.eloAfter !== undefined && prev !== undefined) {
+                eloDeltas.set(m.id, m.eloAfter - prev);
+              }
+            });
+            return matches.map((m, i) => (
+              <MatchRow
+                key={m.id}
+                match={m}
+                number={matches.length - i}
+                sessionId={sessionId}
+                eloDelta={eloDeltas.get(m.id)}
+              />
+            ));
+          })()}
         </div>
       )}
     </div>
@@ -127,8 +143,10 @@ function StatCard({ value, label, color }: { value: string | number; label: stri
   );
 }
 
-function MatchRow({ match, number, sessionId }: { match: Match; number: number; sessionId: string }) {
+function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number: number; sessionId: string; eloDelta?: number }) {
   const opponentFilled = match.opponentTeam.slots.filter((s) => s.speciesId !== null);
+  const deltaSign = eloDelta !== undefined ? (eloDelta >= 0 ? '+' : '') : '';
+  const deltaColor = eloDelta === undefined ? '' : eloDelta > 0 ? 'text-green-400' : eloDelta < 0 ? 'text-red-400' : 'text-surface-400';
 
   return (
     <Link
@@ -152,10 +170,18 @@ function MatchRow({ match, number, sessionId }: { match: Match; number: number; 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 text-sm mb-0.5">
           <span className="text-surface-200 font-medium">Match #{number}</span>
+          {match.opponentName && (
+            <span className="text-surface-400 text-xs">vs {match.opponentName}</span>
+          )}
           {match.eloAfter !== undefined && (
-            <span className="flex items-center gap-0.5 text-xs text-surface-400">
+            <span className="flex items-center gap-1 text-xs text-surface-400 ml-auto shrink-0">
               <TrendingUp size={10} />
               {match.eloAfter}
+              {eloDelta !== undefined && (
+                <span className={`font-mono ${deltaColor}`}>
+                  ({deltaSign}{Number.isInteger(eloDelta) ? eloDelta : eloDelta.toFixed(1)})
+                </span>
+              )}
             </span>
           )}
         </div>

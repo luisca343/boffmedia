@@ -1,22 +1,32 @@
 'use client';
 
-import { useRef, useState, useEffect, KeyboardEvent } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState, useEffect, KeyboardEvent } from 'react';
 import { spriteUrl, SpeciesEntry } from '@/features/vgc-tracker/types';
+
+export interface PokemonAutocompleteHandle {
+  focusInput: () => void;
+}
 
 interface Props {
   search: (query: string) => SpeciesEntry[];
   onSelect: (entry: SpeciesEntry) => void;
   autoFocus?: boolean;
   placeholder?: string;
+  onTabNext?: () => void;
 }
 
-export function PokemonAutocomplete({ search, onSelect, autoFocus, placeholder = 'Search...' }: Props) {
+export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
+  function PokemonAutocomplete({ search, onSelect, autoFocus, placeholder = 'Search...', onTabNext }, ref) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SpeciesEntry[]>([]);
   const [highlighted, setHighlighted] = useState(0);
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focusInput: () => inputRef.current?.focus(),
+  }));
 
   useEffect(() => {
     if (autoFocus) inputRef.current?.focus();
@@ -38,6 +48,12 @@ export function PokemonAutocomplete({ search, onSelect, autoFocus, placeholder =
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Tab' && onTabNext) {
+      e.preventDefault();
+      setOpen(false);
+      onTabNext();
+      return;
+    }
     if (!open) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -98,4 +114,4 @@ export function PokemonAutocomplete({ search, onSelect, autoFocus, placeholder =
       )}
     </div>
   );
-}
+});
