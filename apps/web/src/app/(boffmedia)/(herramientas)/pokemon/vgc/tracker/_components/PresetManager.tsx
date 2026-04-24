@@ -6,7 +6,7 @@ import { Plus, Trash2, X, Upload } from 'lucide-react';
 import { parseShowdownPaste, isValidPaste } from '@/features/vgc-tracker/showdown-parse';
 import { spriteUrl } from '@/features/vgc-tracker/types';
 import type { TeamPreset } from '@/features/vgc-tracker/types';
-import { VgcService, ChampionsRegulation } from '@/services/api/boffmedia/vgcService';
+import { VgcService, ChampionsRegulation, VgcPokemon } from '@/services/api/boffmedia/vgcService';
 
 interface Props {
   presets: TeamPreset[];
@@ -17,6 +17,7 @@ interface Props {
 
 export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
+  const [pokemonList, setPokemonList] = useState<VgcPokemon[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [regulationId, setRegulationId] = useState('');
@@ -32,10 +33,29 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
     });
   }, []);
 
+  useEffect(() => {
+    if (!regulationId) return;
+    VgcService.getChampionsLegalPokemon(regulationId).then((res) => {
+      if (res.success && res.data) setPokemonList(res.data);
+    });
+  }, [regulationId]);
+
+  const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+
   const handleImport = () => {
     if (!name.trim()) { setError('Give this preset a name.'); return; }
-    const slots = parseShowdownPaste(paste);
-    if (!slots.length) { setError('Could not parse the paste. Check the format.'); return; }
+    const rawSlots = parseShowdownPaste(paste);
+    if (!rawSlots.length) { setError('Could not parse the paste. Check the format.'); return; }
+
+    // Normalise species names against the regulation's legal Pokémon list so
+    // that custom Champions Pokémon (e.g. Floette-Eternal) get their canonical
+    // name and so that the sprite URL is generated correctly.
+    const slots = rawSlots.map((slot) => {
+      const match = pokemonList.find((p) => toId(p.name) === toId(slot.speciesName));
+      if (match) return { ...slot, speciesId: toId(match.name), speciesName: match.name };
+      return slot;
+    });
+
     const preset: TeamPreset = {
       id: crypto.randomUUID(),
       name: name.trim(),

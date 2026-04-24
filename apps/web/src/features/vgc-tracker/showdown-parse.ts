@@ -18,14 +18,17 @@ export function parseShowdownPaste(paste: string): PresetSlot[] {
     const withItem = atIdx !== -1 ? firstLine.slice(0, atIdx) : firstLine;
     const item = atIdx !== -1 ? firstLine.slice(atIdx + 3).trim() : undefined;
 
+    // Strip trailing gender marker — "(F)" or "(M)" are not species names.
+    const withItemNoGender = withItem.replace(/\s*\([FM]\)\s*$/, '').trim();
+
     let speciesName: string;
     let nickname: string | undefined;
-    const nicknameMatch = withItem.match(/^(.+?)\s*\((.+?)\)$/);
+    const nicknameMatch = withItemNoGender.match(/^(.+?)\s*\((.+?)\)$/);
     if (nicknameMatch) {
       nickname = nicknameMatch[1].trim();
       speciesName = nicknameMatch[2].trim();
     } else {
-      speciesName = withItem.trim();
+      speciesName = withItemNoGender;
     }
 
     let ability: string | undefined;
