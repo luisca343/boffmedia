@@ -1,7 +1,7 @@
 'use client';
 
 import { X } from 'lucide-react';
-import { spriteUrl, SpeciesEntry } from '@/features/vgc-tracker/types';
+import { spriteUrl, handleSpriteError, SpeciesEntry } from '@/features/vgc-tracker/types';
 import type { MatchSlot } from '@/features/vgc-tracker/types';
 import { PokemonAutocomplete } from './PokemonAutocomplete';
 
@@ -148,13 +148,10 @@ function PoolCard({
         <img
           src={spriteUrl(slot.speciesName!)}
           alt={slot.speciesName ?? ''}
-          className="w-11 h-11 object-contain pointer-events-none"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src =
-              'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
-          }}
+          className="w-24 h-24 object-contain pointer-events-none"
+          onError={handleSpriteError}
         />
-        <span className="text-[10px] text-surface-300 truncate max-w-full px-1 leading-none">
+        <span className="text-xl text-surface-300 truncate max-w-full px-1 leading-none">
           {slot.speciesName}
         </span>
       </button>
@@ -244,10 +241,7 @@ function AssignmentZone({
                 src={spriteUrl(slot.speciesName!)}
                 alt={slot.speciesName ?? ''}
                 className="w-10 h-10 object-contain"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src =
-                    'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
-                }}
+                onError={handleSpriteError}
               />
               <span className="text-[9px] text-surface-400 truncate max-w-full px-1 leading-none">
                 {slot.speciesName}

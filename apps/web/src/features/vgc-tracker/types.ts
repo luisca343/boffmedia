@@ -69,13 +69,41 @@ export interface Match {
 
 export type SpeciesEntry = { id: string; name: string; num: number };
 
+const SPRITE_BASE = 'https://play.pokemonshowdown.com/sprites/dex/';
+const SUBSTITUTE_URL = `${SPRITE_BASE}substitute.png`;
+
+/** Primary sprite URL: spaces → hyphens, other hyphens preserved.
+ *  Correct for forme Pokémon (Rotom-Wash → rotom-wash.png). */
 export function spriteUrl(speciesName: string): string {
-  // Showdown's CDN uses their toID convention: lowercase, strip every
-  // non-alphanumeric character (including hyphens). This is required for
-  // Pokémon whose names contain literal hyphens, e.g. Kommo-o → "kommoo".
-  return `https://play.pokemonshowdown.com/sprites/dex/${speciesName
+  return `${SPRITE_BASE}${speciesName
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, '')}.png`;
+    .replace(/[^a-z0-9\- ]/g, '')
+    .replace(/\s+/g, '-')}.png`;
+}
+
+/**
+ * onError handler for Pokémon sprite <img> tags.
+ * Attempt 1 – try toID (strips ALL non-alphanumeric, fixes Kommo-o → kommoo.png).
+ * Attempt 2 – show substitute sprite.
+ */
+export function handleSpriteError(e: React.SyntheticEvent<HTMLImageElement>): void {
+  const img = e.currentTarget;
+  if (img.src === SUBSTITUTE_URL) return;
+
+  if (!img.dataset.triedAlt) {
+    img.dataset.triedAlt = '1';
+    // Extract the filename from the current URL and strip hyphens/special chars.
+    const match = img.src.match(/\/sprites\/dex\/([^.]+)\.png/);
+    if (match) {
+      const toIdUrl = `${SPRITE_BASE}${match[1].replace(/[^a-z0-9]/g, '')}.png`;
+      if (toIdUrl !== img.src) {
+        img.src = toIdUrl;
+        return;
+      }
+    }
+  }
+
+  img.src = SUBSTITUTE_URL;
 }
 
 export function emptySlots(): MatchSlot[] {
