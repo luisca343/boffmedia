@@ -144,9 +144,41 @@ function StatCard({ value, label, color }: { value: string | number; label: stri
 }
 
 function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number: number; sessionId: string; eloDelta?: number }) {
-  const opponentFilled = match.opponentTeam.slots.filter((s) => s.speciesId !== null);
-  const deltaSign = eloDelta !== undefined ? (eloDelta >= 0 ? '+' : '') : '';
-  const deltaColor = eloDelta === undefined ? '' : eloDelta > 0 ? 'text-green-400' : eloDelta < 0 ? 'text-red-400' : 'text-surface-400';
+  const isCompleted = !!match.completedAt;
+
+  // ELO delta: colored by result
+  const deltaColor = eloDelta === undefined
+    ? 'text-surface-500'
+    : match.result === 'win'
+    ? 'text-green-400'
+    : match.result === 'loss'
+    ? 'text-red-400'
+    : 'text-surface-400';
+  const deltaSign = eloDelta !== undefined && eloDelta >= 0 ? '+' : '';
+
+  // Build sprite rows: picked slots (lead/back) bright; discards dim
+  const spritesFor = (slots: typeof match.myTeam.slots) => {
+    const filled = slots.filter((s) => s.speciesId !== null);
+    if (filled.length === 0) return null;
+    const order: Record<string, number> = { lead: 0, back: 1, unknown: 2 };
+    const sorted = [...filled].sort((a, b) => order[a.role] - order[b.role]);
+    return sorted.map((s) => (
+      <img
+        key={s.slotIndex}
+        src={spriteUrl(s.speciesName!)}
+        alt={s.speciesName ?? ''}
+        title={s.speciesName ?? ''}
+        className={`w-6 h-6 object-contain transition-opacity ${
+          s.role === 'unknown' ? 'opacity-25 grayscale' : 'opacity-100'
+        }`}
+        onError={handleSpriteError}
+      />
+    ));
+  };
+
+  const mySprites = spritesFor(match.myTeam.slots);
+  const oppSprites = spritesFor(match.opponentTeam.slots);
+  const hasSprites = mySprites || oppSprites;
 
   return (
     <Link
@@ -168,43 +200,49 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 text-sm mb-0.5">
+        {/* Top line */}
+        <div className="flex items-center gap-2 text-sm mb-1">
           <span className="text-surface-200 font-medium">Match #{number}</span>
           {match.opponentName && (
             <span className="text-surface-400 text-xs">vs {match.opponentName}</span>
           )}
-          {match.eloAfter !== undefined && (
-            <span className="flex items-center gap-1 text-xs text-surface-400 ml-auto shrink-0">
-              <TrendingUp size={10} />
-              {match.eloAfter}
-              {eloDelta !== undefined && (
-                <span className={`font-mono ${deltaColor}`}>
-                  ({deltaSign}{Number.isInteger(eloDelta) ? eloDelta : eloDelta.toFixed(1)})
-                </span>
-              )}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex -space-x-2">
-            {opponentFilled.slice(0, 4).map((s) => (
-              <img
-                key={s.slotIndex}
-                src={spriteUrl(s.speciesName!)}
-                alt={s.speciesName ?? ''}
-                className="w-6 h-6 object-contain"
-                onError={handleSpriteError}
-              />
-            ))}
-            {opponentFilled.length === 0 && (
-              <span className="text-xs text-surface-600">No opponent entered</span>
+          <div className="ml-auto shrink-0 flex items-center gap-2">
+            {eloDelta !== undefined && (
+              <span className={`font-mono text-xs font-semibold ${deltaColor}`}>
+                {deltaSign}{Number.isInteger(eloDelta) ? eloDelta : eloDelta.toFixed(1)}
+              </span>
+            )}
+            {match.eloAfter !== undefined && (
+              <span className="text-xs text-surface-400 font-mono">{match.eloAfter}</span>
+            )}
+            {match.opponentElo !== undefined && (
+              <span className="text-xs text-surface-600 font-mono">vs {match.opponentElo}</span>
             )}
           </div>
-          <span className="text-surface-600 text-xs">{formatTime(match.createdAt)}</span>
-          {match.notes.length > 0 && (
-            <span className="text-surface-600 text-xs">{match.notes.length} note{match.notes.length !== 1 ? 's' : ''}</span>
-          )}
         </div>
+
+        {/* Sprite rows */}
+        {hasSprites ? (
+          <div className="flex items-center gap-1.5">
+            {mySprites && <div className="flex items-center gap-0.5">{mySprites}</div>}
+            {mySprites && oppSprites && (
+              <span className="text-surface-300 text-[11px] font-semibold px-1">vs</span>
+            )}
+            {oppSprites && <div className="flex items-center gap-0.5">{oppSprites}</div>}
+            <span className="text-surface-600 text-xs ml-1">{formatTime(match.createdAt)}</span>
+            {match.notes.length > 0 && (
+              <span className="text-surface-600 text-xs">{match.notes.length} note{match.notes.length !== 1 ? 's' : ''}</span>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-surface-600">No picks entered</span>
+            <span className="text-surface-600 text-xs">{formatTime(match.createdAt)}</span>
+            {match.notes.length > 0 && (
+              <span className="text-surface-600 text-xs">{match.notes.length} note{match.notes.length !== 1 ? 's' : ''}</span>
+            )}
+          </div>
+        )}
       </div>
     </Link>
   );
