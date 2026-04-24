@@ -100,6 +100,7 @@ export class TrackerRepository {
     format: 'BO1' | 'BO3';
     myTeam: TeamSnapshotData;
     opponentTeam: TeamSnapshotData;
+    opponentName?: string;
     result?: 'win' | 'loss' | 'draw';
     eloAfter?: number;
     opponentElo?: number;

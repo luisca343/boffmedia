@@ -61,6 +61,7 @@ export interface Match {
   completedAt?: number;
   myTeam: TeamSnapshot;
   opponentTeam: TeamSnapshot;
+  opponentName?: string;
   result?: MatchResult;
   eloAfter?: number;
   opponentElo?: number;

@@ -3,34 +3,40 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SpeciesEntry } from '../types';
 
-// Module-level cache: fetched once per page load, shared across all autocomplete instances.
-let _cache: SpeciesEntry[] | null = null;
-let _fetchPromise: Promise<SpeciesEntry[]> | null = null;
+// Module-level cache keyed by regulationId — fetched once per key per page load.
+const _cache: Record<string, SpeciesEntry[]> = {};
+const _fetchPromise: Record<string, Promise<SpeciesEntry[]>> = {};
 
 async function loadSpecies(regulationId: string): Promise<SpeciesEntry[]> {
-  if (_cache) return _cache;
-  if (!_fetchPromise) {
+  if (!regulationId) return [];
+  if (_cache[regulationId]) return _cache[regulationId];
+  if (!_fetchPromise[regulationId]) {
     const apiBase = process.env.NEXT_PUBLIC_API ?? '';
-    _fetchPromise = fetch(`${apiBase}/tools/vgc/champions/${regulationId}/pokemon`, {
-      next: { revalidate: 0 },
-    })
+    _fetchPromise[regulationId] = fetch(
+      `${apiBase}/tools/vgc/champions/${regulationId}/pokemon`,
+      { next: { revalidate: 0 } },
+    )
       .then((r) => r.json())
       .then((res) => {
         const data: Array<{ name: string; num: number }> = res?.data ?? [];
-        _cache = data.map((p) => ({
+        _cache[regulationId] = data.map((p) => ({
           id: p.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
           name: p.name,
           num: p.num,
         }));
-        return _cache;
+        return _cache[regulationId];
       })
-      .catch(() => []);
+      .catch(() => {
+        // Clear so the next call can retry instead of returning a stale empty promise.
+        delete _fetchPromise[regulationId];
+        return [] as SpeciesEntry[];
+      });
   }
-  return _fetchPromise;
+  return _fetchPromise[regulationId];
 }
 
 export function usePokemonSearch(regulationId: string) {
-  const [species, setSpecies] = useState<SpeciesEntry[]>(_cache ?? []);
+  const [species, setSpecies] = useState<SpeciesEntry[]>(_cache[regulationId] ?? []);
   const mounted = useRef(true);
 
   useEffect(() => {

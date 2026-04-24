@@ -21,6 +21,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   const notesPanelRef = useRef<NotesPanelHandle>(null);
 
   const [match, setMatch] = useState<Match>(initialMatch);
+  const [opponentNameInput, setOpponentNameInput] = useState(initialMatch.opponentName ?? '');
   const [eloAfterInput, setEloAfterInput] = useState(
     initialMatch.eloAfter !== undefined ? String(initialMatch.eloAfter) : '',
   );
@@ -78,13 +79,17 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     update({ result: next });
   };
 
+  const handleOpponentNameBlur = () => {
+    update({ opponentName: opponentNameInput.trim() || undefined });
+  };
+
   const handleEloAfterBlur = () => {
-    const parsed = parseInt(eloAfterInput, 10);
+    const parsed = parseFloat(eloAfterInput);
     update({ eloAfter: isNaN(parsed) ? undefined : parsed });
   };
 
   const handleOpponentEloBlur = () => {
-    const parsed = parseInt(opponentEloInput, 10);
+    const parsed = parseFloat(opponentEloInput);
     update({ opponentElo: isNaN(parsed) ? undefined : parsed });
   };
 
@@ -123,7 +128,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   };
 
   return (
-    <div className="flex flex-col h-screen text-surface-50 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-4rem)] text-surface-50 overflow-hidden">
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-surface-800 shrink-0 bg-surface-900">
         <button
@@ -133,14 +138,21 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           <ArrowLeft size={18} />
         </button>
 
-        <div className="flex-1 flex items-center gap-2">
-          <span className="text-surface-400 text-sm">
+        <div className="flex-1 flex items-center gap-2 min-w-0">
+          <span className="text-surface-400 text-sm shrink-0">
             {new Date(match.createdAt).toLocaleTimeString(undefined, {
               hour: '2-digit',
               minute: '2-digit',
             })}
           </span>
-          <span className="text-surface-600 text-xs font-mono">{match.format}</span>
+          <span className="text-surface-600 text-xs font-mono shrink-0">{match.format}</span>
+          <input
+            value={opponentNameInput}
+            onChange={(e) => setOpponentNameInput(e.target.value)}
+            onBlur={handleOpponentNameBlur}
+            placeholder="Rival name…"
+            className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-surface-700 focus:border-primary-500 text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none py-0.5 transition-colors"
+          />
         </div>
 
         {/* Result buttons */}
@@ -201,8 +213,8 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
       </div>
 
       {/* ── Teams area ───────────────────────────────────────────────────── */}
-      <div className="flex-1 grid grid-cols-2 gap-4 px-8 py-4 overflow-hidden min-h-0">
-        <div className="overflow-hidden">
+      <div className="flex-1 grid grid-cols-2 gap-4 px-8 py-4 min-h-0">
+        <div className="overflow-y-auto">
           <TeamPanel
             label="My team"
             slots={match.myTeam.slots}
@@ -210,7 +222,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             onSlotChange={handleMyTeamChange}
           />
         </div>
-        <div className="overflow-hidden">
+        <div className="overflow-visible">
           <TeamPanel
             label="Opponent"
             slots={match.opponentTeam.slots}
