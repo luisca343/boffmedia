@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, Swords, Upload } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useMatches, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { emptySlots, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import { parseMatchCsv } from '@/features/vgc-tracker/utils/importCsv';
@@ -20,6 +21,7 @@ function formatTime(ts: number) {
 }
 
 export default function SessionPage({ params }: Props) {
+  const t = useTranslations('vgc.tracker');
   const { sessionId } = use(params);
   const router = useRouter();
   const { sessions } = useSessions();
@@ -127,15 +129,15 @@ export default function SessionPage({ params }: Props) {
               onClick={() => fileInputRef.current?.click()}
               disabled={importing}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-200 text-sm font-medium transition-colors disabled:opacity-50"
-              title="Import matches from CSV"
+              title={t('tooltips.importCsv')}
             >
-              <Upload size={14} />{importing ? 'Importing…' : 'Import CSV'}
+              <Upload size={14} />{importing ? t('buttons.importing') : t('buttons.importCsv')}
             </button>
             <button
               onClick={handleNewMatch}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
             >
-              <Plus size={14} /> New match
+              <Plus size={14} /> {t('buttons.newMatch')}
             </button>
           </div>
         </div>
@@ -143,12 +145,12 @@ export default function SessionPage({ params }: Props) {
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
-        <StatCard value={wins} label="Wins" color="text-green-400" />
-        <StatCard value={draws} label="Draws" color="text-yellow-400" />
-        <StatCard value={losses} label="Losses" color="text-red-400" />
+        <StatCard value={wins} label={t('stats.wins')} color="text-green-400" />
+        <StatCard value={draws} label={t('stats.draws')} color="text-yellow-400" />
+        <StatCard value={losses} label={t('stats.losses')} color="text-red-400" />
         <StatCard
           value={latestElo ?? session?.startElo ?? '—'}
-          label="ELO"
+          label={t('stats.elo')}
           color={
             latestElo !== undefined && session?.startElo !== undefined
               ? latestElo >= session.startElo ? 'text-green-400' : 'text-red-400'
@@ -165,7 +167,7 @@ export default function SessionPage({ params }: Props) {
       ) : matches.length === 0 ? (
         <div className="rounded-xl border border-surface-800 bg-surface-950 p-12 text-center">
           <Swords size={36} className="mx-auto text-surface-700 mb-3" />
-          <p className="text-surface-400 text-sm">No matches yet — start one!</p>
+          <p className="text-surface-400 text-sm">{t('empty.noMatches')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -195,11 +197,11 @@ export default function SessionPage({ params }: Props) {
       {importConfig && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-surface-900 border border-surface-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl space-y-5">
-            <h2 className="text-surface-50 font-semibold text-base">Import CSV</h2>
+            <h2 className="text-surface-50 font-semibold text-base">{t('modals.importCsv')}</h2>
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs text-surface-400 font-medium">Start date &amp; time</label>
+                <label className="text-xs text-surface-400 font-medium">{t('labels.startDate')}</label>
                 <input
                   type="datetime-local"
                   value={importStartDate}
@@ -208,7 +210,7 @@ export default function SessionPage({ params }: Props) {
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-surface-400 font-medium">Minutes per game</label>
+                <label className="text-xs text-surface-400 font-medium">{t('labels.minsPerGame')}</label>
                 <input
                   type="number"
                   min={1}
@@ -225,14 +227,14 @@ export default function SessionPage({ params }: Props) {
                 onClick={() => setImportConfig(null)}
                 className="px-4 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-300 text-sm transition-colors"
               >
-                Cancel
+                {t('buttons.cancel')}
               </button>
               <button
                 onClick={confirmImport}
                 disabled={importing}
                 className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
               >
-                {importing ? 'Importing…' : `Import ${importConfig.file.name}`}
+                {importing ? t('buttons.importing') : t('buttons.importFile', { name: importConfig.file.name })}
               </button>
             </div>
           </div>
@@ -252,6 +254,7 @@ function StatCard({ value, label, color }: { value: string | number; label: stri
 }
 
 function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number: number; sessionId: string; eloDelta?: number }) {
+  const t = useTranslations('vgc.tracker');
   const isCompleted = !!match.completedAt;
 
   // ELO delta: colored by result
@@ -312,9 +315,9 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
       <div className="flex-1 min-w-0">
         {/* Top line */}
         <div className="flex items-center gap-2 text-sm mb-1">
-          <span className="text-surface-200 font-medium">Match #{number}</span>
+          <span className="text-surface-200 font-medium">{t('matchRow.match', { number })}</span>
           {match.opponentName && (
-            <span className="text-surface-400 text-xs">vs {match.opponentName}</span>
+            <span className="text-surface-400 text-xs">{t('matchRow.vs')} {match.opponentName}</span>
           )}
           <div className="ml-auto shrink-0 flex items-center gap-2">
             {eloDelta !== undefined && (
@@ -341,15 +344,15 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
             {oppSprites && <div className="flex items-center gap-0.5">{oppSprites}</div>}
             <span className="text-surface-600 text-xs ml-1">{formatTime(match.createdAt)}</span>
             {match.notes.length > 0 && (
-              <span className="text-surface-600 text-xs">{match.notes.length} note{match.notes.length !== 1 ? 's' : ''}</span>
+              <span className="text-surface-600 text-xs">{match.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: match.notes.length })}</span>
             )}
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-surface-600">No picks entered</span>
+            <span className="text-xs text-surface-600">{t('matchRow.noPicks')}</span>
             <span className="text-surface-600 text-xs">{formatTime(match.createdAt)}</span>
             {match.notes.length > 0 && (
-              <span className="text-surface-600 text-xs">{match.notes.length} note{match.notes.length !== 1 ? 's' : ''}</span>
+              <span className="text-surface-600 text-xs">{match.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: match.notes.length })}</span>
             )}
           </div>
         )}

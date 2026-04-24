@@ -91,6 +91,100 @@
       "referenceSpeed": "Reference speeds",
       "loading": "Loading Pokémon data...",
       "empty": "No Pokémon found"
+    },
+    "tracker": {
+      "title": "VGC Tracker",
+      "subtitle": "Log your ranked matches",
+      "buttons": {
+        "presets": "Presets ({count})",
+        "newSession": "New session",
+        "newMatch": "New match",
+        "importCsv": "Import CSV",
+        "importing": "Importing…",
+        "finish": "Finish",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "import": "Import",
+        "importFile": "Import {name}",
+        "importNewPreset": "Import new preset",
+        "startSession": "Start session"
+      },
+      "labels": {
+        "sessionLabel": "Session label",
+        "presetName": "Preset name",
+        "regulation": "Regulation",
+        "format": "Format",
+        "startingElo": "Starting ELO",
+        "teamPreset": "Team preset",
+        "noPreset": "No preset",
+        "myTeam": "My team",
+        "opponent": "Opponent",
+        "startDate": "Start date & time",
+        "minsPerGame": "Minutes per game",
+        "showdownPaste": "Showdown paste"
+      },
+      "placeholders": {
+        "rivalName": "Rival name…",
+        "sessionLabel": "e.g. Ranked grind Apr 24",
+        "presetName": "e.g. Reg H — April 2025",
+        "typeName": "Type name…",
+        "addNote": "Add note... (Enter to save)",
+        "startingElo": "optional"
+      },
+      "stats": {
+        "wins": "Wins",
+        "losses": "Losses",
+        "draws": "Draws",
+        "elo": "ELO"
+      },
+      "matchRow": {
+        "match": "Match #{number}",
+        "vs": "vs",
+        "noPicks": "No picks entered",
+        "noteSingular": "1 note",
+        "notesPlural": "{count} notes"
+      },
+      "tooltips": {
+        "deleteMatch": "Delete match",
+        "removeFromTeam": "Remove from team",
+        "removeFromSlot": "Remove from slot",
+        "assignSlot": "Click to assign to next open slot",
+        "slotsFull": "All 4 slots are full",
+        "assignedSlot": "{role} — click × in zone below to remove",
+        "pressKey": "Press {hint}",
+        "importCsv": "Import matches from CSV"
+      },
+      "modals": {
+        "newSession": "New Session",
+        "teamPresets": "Team Presets",
+        "importCsv": "Import CSV"
+      },
+      "indicators": {
+        "saved": "Saved",
+        "myElo": "My ELO",
+        "rival": "Rival",
+        "live": "LIVE",
+        "post": "POST"
+      },
+      "empty": {
+        "noSessions": "No sessions yet",
+        "noSessionsHint": "Import a team preset, then start a session.",
+        "noMatches": "No matches yet — start one!",
+        "noPresets": "No presets yet. Import a Showdown paste to get started."
+      },
+      "errors": {
+        "presetNameRequired": "Give this preset a name.",
+        "invalidPaste": "Could not parse the paste. Check the format."
+      },
+      "speedWidget": {
+        "label": "Speed Tiers",
+        "tailwind": "TW ×2",
+        "trickroom": "TR ↕"
+      },
+      "zones": {
+        "leads": "Leads",
+        "backs": "Backs"
+      }
     }
   }
 }

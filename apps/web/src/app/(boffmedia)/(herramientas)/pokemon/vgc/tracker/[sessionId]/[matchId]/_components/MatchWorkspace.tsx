@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Check, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch';
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';
 import { TeamPanel } from './TeamPanel';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, onSave, onDelete }: Props) {
+  const t = useTranslations('vgc.tracker');
   const router = useRouter();
   const { search } = usePokemonSearch(regulationId);
   const notesPanelRef = useRef<NotesPanelHandle>(null);
@@ -159,7 +161,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             value={opponentNameInput}
             onChange={(e) => setOpponentNameInput(e.target.value)}
             onBlur={handleOpponentNameBlur}
-            placeholder="Rival name…"
+            placeholder={t('placeholders.rivalName')}
             className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-surface-700 focus:border-primary-500 text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none py-0.5 transition-colors"
           />
         </div>
@@ -192,7 +194,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         {/* ELO inputs */}
         <div className="flex items-center gap-1.5">
           <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
-            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">My ELO</span>
+            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">{t('indicators.myElo')}</span>
             <input
               value={eloAfterInput}
               onChange={(e) => setEloAfterInput(e.target.value)}
@@ -202,7 +204,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             />
           </div>
           <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
-            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">Rival</span>
+            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">{t('indicators.rival')}</span>
             <input
               value={opponentEloInput}
               onChange={(e) => setOpponentEloInput(e.target.value)}
@@ -219,11 +221,11 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             onClick={handleFinish}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
           >
-            <Check size={14} /> Finish
+            <Check size={14} /> {t('buttons.finish')}
           </button>
         ) : (
           <span className="text-xs text-green-400 flex items-center gap-1">
-            <Check size={13} /> Saved
+            <Check size={13} /> {t('indicators.saved')}
           </span>
         )}
 
@@ -234,20 +236,20 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
               onClick={handleDelete}
               className="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium transition-colors"
             >
-              Delete
+              {t('buttons.delete')}
             </button>
             <button
               onClick={() => setConfirmDelete(false)}
               className="text-xs px-2.5 py-1.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-surface-300 transition-colors"
             >
-              Cancel
+              {t('buttons.cancel')}
             </button>
           </div>
         ) : (
           <button
             onClick={() => setConfirmDelete(true)}
             className="p-1.5 rounded-lg text-surface-600 hover:text-red-400 hover:bg-surface-800 transition-colors"
-            title="Delete match"
+            title={t('tooltips.deleteMatch')}
           >
             <Trash2 size={15} />
           </button>
@@ -259,7 +261,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         {/* My Team column */}
         <div className="w-[400px] shrink-0 overflow-y-auto border-r border-surface-800 px-5 py-4">
           <TeamPanel
-            label="My team"
+            label={t('labels.myTeam')}
             slots={match.myTeam.slots}
             editable={false}
             onSlotChange={handleMyTeamChange}
@@ -278,7 +280,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         {/* Opponent column */}
         <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4">
           <TeamPanel
-            label="Opponent"
+            label={t('labels.opponent')}
             slots={match.opponentTeam.slots}
             editable
             search={search}
@@ -306,6 +308,7 @@ function ResultButton({
   onClick: () => void;
   hint: string;
 }) {
+  const t = useTranslations('vgc.tracker');
   const base = 'relative px-4 py-1.5 rounded-lg text-sm font-bold transition-all font-mono border';
   const styles = {
     green: active
@@ -320,7 +323,7 @@ function ResultButton({
   };
 
   return (
-    <button onClick={onClick} className={`${base} ${styles[color]}`} title={`Press ${hint}`}>
+    <button onClick={onClick} className={`${base} ${styles[color]}`} title={t('tooltips.pressKey', { hint })}>
       {label}
     </button>
   );

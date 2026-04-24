@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { spriteUrl, handleSpriteError, SpeciesEntry, isLead, isBack } from '@/features/vgc-tracker/types';
 import type { MatchSlot, SlotRole } from '@/features/vgc-tracker/types';
 import { PokemonAutocomplete, PokemonAutocompleteHandle } from './PokemonAutocomplete';
@@ -158,12 +159,13 @@ function PoolCard({
   autocompleteRef?: (el: PokemonAutocompleteHandle | null) => void;
   onTabNext?: () => void;
 }) {
+  const t = useTranslations('vgc.tracker');
   // Empty slot
   if (!slot.speciesId) {
     if (editable && search) {
       return (
         <div className="h-[76px] rounded-lg border border-dashed border-surface-600 flex items-center justify-center p-2 overflow-visible">
-          <PokemonAutocomplete ref={autocompleteRef} search={search} onSelect={onFill} placeholder="Type name…" onTabNext={onTabNext} />
+          <PokemonAutocomplete ref={autocompleteRef} search={search} onSelect={onFill} placeholder={t('placeholders.typeName')} onTabNext={onTabNext} />
         </div>
       );
     }
@@ -191,10 +193,10 @@ function PoolCard({
         ].join(' ')}
         title={
           isAssigned
-            ? `${slot.role} — click × in zone below to remove`
+            ? t('tooltips.assignedSlot', { role: slot.role })
             : canAssign
-            ? 'Click to assign to next open slot'
-            : 'All 4 slots are full'
+            ? t('tooltips.assignSlot')
+            : t('tooltips.slotsFull')
         }
       >
         <img
@@ -231,7 +233,7 @@ function PoolCard({
             onClear();
           }}
           className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-surface-600 hover:bg-red-500 text-surface-200 hover:text-white flex items-center justify-center text-[10px] font-bold leading-none transition-colors"
-          title="Remove from team"
+          title={t('tooltips.removeFromTeam')}
         >
           ×
         </button>
@@ -244,14 +246,14 @@ function PoolCard({
 
 const ZONE = {
   lead: {
-    label: 'Leads',
+    labelKey: 'zones.leads' as const,
     counter: 'text-yellow-400',
     ring: 'ring-yellow-400/50',
     emptyBorder: 'border-yellow-400/15',
     badge: 'bg-yellow-400/10 text-yellow-300/60',
   },
   back: {
-    label: 'Backs',
+    labelKey: 'zones.backs' as const,
     counter: 'text-blue-400',
     ring: 'ring-blue-400/50',
     emptyBorder: 'border-blue-400/15',
@@ -268,6 +270,7 @@ function AssignmentZone({
   filled: [MatchSlot | null, MatchSlot | null];
   onRemove: (slotIndex: number) => void;
 }) {
+  const t = useTranslations('vgc.tracker');
   const cfg = ZONE[role];
   const isFull = filled.filter(Boolean).length >= 2;
 
@@ -275,7 +278,7 @@ function AssignmentZone({
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between px-0.5">
         <span className={`text-[10px] font-semibold uppercase tracking-wide ${cfg.badge}`}>
-          {cfg.label}
+          {t(cfg.labelKey)}
         </span>
         <span className={`text-[10px] font-mono ${isFull ? cfg.counter : 'text-surface-600'}`}>
           {filled.filter(Boolean).length}/2
@@ -303,7 +306,7 @@ function AssignmentZone({
                 tabIndex={-1}
                 onClick={() => onRemove(slot.slotIndex)}
                 className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-surface-700 hover:bg-red-500 text-surface-300 hover:text-white flex items-center justify-center transition-colors"
-                title="Remove from slot"
+                title={t('tooltips.removeFromSlot')}
               >
                 <X size={11} />
               </button>
