@@ -2,8 +2,8 @@
 
 import { useRef } from 'react';
 import { X } from 'lucide-react';
-import { spriteUrl, handleSpriteError, SpeciesEntry } from '@/features/vgc-tracker/types';
-import type { MatchSlot } from '@/features/vgc-tracker/types';
+import { spriteUrl, handleSpriteError, SpeciesEntry, isLead, isBack } from '@/features/vgc-tracker/types';
+import type { MatchSlot, SlotRole } from '@/features/vgc-tracker/types';
 import { PokemonAutocomplete, PokemonAutocompleteHandle } from './PokemonAutocomplete';
 
 interface Props {
@@ -14,39 +14,44 @@ interface Props {
   onSlotChange: (updated: MatchSlot[]) => void;
 }
 
-export function TeamPanel({ label, slots, editable = false, search, onSlotChange }: Props) {
-  const leads = slots.filter((s) => s.role === 'lead');
-  const backs = slots.filter((s) => s.role === 'back');
+// Ordered role sequence for the 4 assignment slots
+const ROLE_ORDER: Exclude<SlotRole, 'unknown'>[] = ['lead1', 'lead2', 'back1', 'back2'];
 
-  // Click on an unassigned pool pokemon → fills the next available slot.
-  // Leads fill first (more time-critical), then backs.
-  // Hard cap: no-op once 2 leads + 2 backs are filled.
+export function TeamPanel({ label, slots, editable = false, search, onSlotChange }: Props) {
+  const leads = slots.filter((s) => isLead(s.role));
+  const backs = slots.filter((s) => isBack(s.role));
+
+  // Click on an unassigned pool pokemon → fills the next available ordered position.
   const assign = (slotIndex: number) => {
     const slot = slots.find((s) => s.slotIndex === slotIndex);
     if (!slot?.speciesId || slot.role !== 'unknown') return;
 
-    const nextRole: 'lead' | 'back' | null =
-      leads.length < 2 ? 'lead' : backs.length < 2 ? 'back' : null;
+    const usedRoles = new Set(slots.filter(s => s.role !== 'unknown').map(s => s.role));
+    const nextRole = ROLE_ORDER.find(r => !usedRoles.has(r)) ?? null;
     if (!nextRole) return;
 
     onSlotChange(slots.map((s) => (s.slotIndex === slotIndex ? { ...s, role: nextRole } : s)));
   };
 
-  // Click × on an assignment slot → returns that pokemon to the pool (role = unknown).
-  // If a lead is removed and there is a back, promote the first back to lead.
+  // Click × on an assignment slot → shift-down: positions after the removed one move up by 1.
+  // e.g. remove lead1 → lead2 becomes lead1, back1 becomes lead2, back2 becomes back1
   const unassign = (slotIndex: number) => {
     const removed = slots.find((s) => s.slotIndex === slotIndex);
-    const isLead = removed?.role === 'lead';
-    const firstBack = isLead
-      ? slots.filter((s) => s.role === 'back').sort((a, b) => a.slotIndex - b.slotIndex)[0]
-      : undefined;
-    onSlotChange(
-      slots.map((s) => {
-        if (s.slotIndex === slotIndex) return { ...s, role: 'unknown' as const };
-        if (firstBack && s.slotIndex === firstBack.slotIndex) return { ...s, role: 'lead' as const };
-        return s;
-      }),
-    );
+    if (!removed || removed.role === 'unknown') return;
+
+    const pos = ROLE_ORDER.indexOf(removed.role as Exclude<SlotRole, 'unknown'>);
+
+    // Build map: slotIndex → new role after shift
+    const updates = new Map<number, SlotRole>();
+    updates.set(slotIndex, 'unknown');
+
+    // Slots at positions after `pos` shift down by 1
+    for (let i = pos + 1; i < ROLE_ORDER.length; i++) {
+      const shiftedSlot = slots.find(s => s.role === ROLE_ORDER[i]);
+      if (shiftedSlot) updates.set(shiftedSlot.slotIndex, ROLE_ORDER[i - 1]);
+    }
+
+    onSlotChange(slots.map((s) => updates.has(s.slotIndex) ? { ...s, role: updates.get(s.slotIndex)! } : s));
   };
 
   const fillSpecies = (slotIndex: number, entry: SpeciesEntry) => {
@@ -77,6 +82,7 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
   };
 
   const allAssigned = leads.length >= 2 && backs.length >= 2;
+  const filledRoles = new Set(slots.filter(s => s.role !== 'unknown').map(s => s.role));
   const autocompleteRefs = useRef<(PokemonAutocompleteHandle | null)[]>(Array(6).fill(null));
 
   return (
@@ -91,7 +97,7 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
             slot={slot}
             editable={editable}
             search={search}
-            canAssign={!allAssigned && slot.role === 'unknown' && !!slot.speciesId}
+            canAssign={!allAssigned && slot.role === 'unknown' && !!slot.speciesId && ROLE_ORDER.some(r => !filledRoles.has(r))}
             onAssign={() => assign(slot.slotIndex)}
             onFill={(entry) => fillSpecies(slot.slotIndex, entry)}
             onClear={() => clearSpecies(slot.slotIndex)}
@@ -108,8 +114,22 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
 
       {/* ── Assignment zones ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-2">
-        <AssignmentZone role="lead" filled={leads} onRemove={unassign} />
-        <AssignmentZone role="back" filled={backs} onRemove={unassign} />
+        <AssignmentZone
+          role="lead"
+          filled={[
+            slots.find(s => s.role === 'lead1') ?? null,
+            slots.find(s => s.role === 'lead2') ?? null,
+          ]}
+          onRemove={unassign}
+        />
+        <AssignmentZone
+          role="back"
+          filled={[
+            slots.find(s => s.role === 'back1') ?? null,
+            slots.find(s => s.role === 'back2') ?? null,
+          ]}
+          onRemove={unassign}
+        />
       </div>
     </div>
   );
@@ -193,12 +213,12 @@ function PoolCard({
         <span
           className={[
             'absolute top-1 right-1 text-[9px] font-bold rounded px-1 py-px pointer-events-none',
-            slot.role === 'lead'
+            isLead(slot.role)
               ? 'bg-yellow-400/20 text-yellow-300 border border-yellow-400/30'
               : 'bg-blue-400/20 text-blue-300 border border-blue-400/30',
           ].join(' ')}
         >
-          {slot.role === 'lead' ? 'L' : 'B'}
+          {isLead(slot.role) ? 'L' : 'B'}
         </span>
       )}
 
@@ -245,11 +265,11 @@ function AssignmentZone({
   onRemove,
 }: {
   role: 'lead' | 'back';
-  filled: MatchSlot[];
+  filled: [MatchSlot | null, MatchSlot | null];
   onRemove: (slotIndex: number) => void;
 }) {
   const cfg = ZONE[role];
-  const isFull = filled.length >= 2;
+  const isFull = filled.filter(Boolean).length >= 2;
 
   return (
     <div className="flex flex-col gap-1">
@@ -258,7 +278,7 @@ function AssignmentZone({
           {cfg.label}
         </span>
         <span className={`text-[10px] font-mono ${isFull ? cfg.counter : 'text-surface-600'}`}>
-          {filled.length}/2
+          {filled.filter(Boolean).length}/2
         </span>
       </div>
 

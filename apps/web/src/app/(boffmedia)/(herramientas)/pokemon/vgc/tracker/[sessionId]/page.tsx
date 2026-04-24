@@ -4,7 +4,7 @@ import { use, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Swords, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Plus, Swords } from 'lucide-react';
 import { useMatches, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { emptySlots, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import type { Match } from '@/features/vgc-tracker/types';
@@ -160,7 +160,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
   const spritesFor = (slots: typeof match.myTeam.slots) => {
     const filled = slots.filter((s) => s.speciesId !== null);
     if (filled.length === 0) return null;
-    const order: Record<string, number> = { lead: 0, back: 1, unknown: 2 };
+    const order: Record<string, number> = { lead1: 0, lead2: 1, back1: 2, back2: 3, unknown: 4 };
     const sorted = [...filled].sort((a, b) => order[a.role] - order[b.role]);
     return sorted.map((s) => (
       <img
@@ -183,7 +183,7 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
   return (
     <Link
       href={`/pokemon/vgc/tracker/${sessionId}/${match.id}`}
-      className="group flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-primary-500/40 px-3 py-2.5 transition-all"
+      className="flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-primary-500/40 px-3 py-2.5 transition-all"
     >
       {/* Result badge */}
       <div

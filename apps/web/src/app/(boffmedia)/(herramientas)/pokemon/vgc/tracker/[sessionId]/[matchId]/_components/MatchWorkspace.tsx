@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowLeft, Check } from 'lucide-react';
+import { ArrowLeft, Check, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch';
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';
@@ -14,9 +14,10 @@ interface Props {
   sessionId: string;
   regulationId: string;
   onSave: (match: Match) => Promise<void>;
+  onDelete: () => Promise<void>;
 }
 
-export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, onSave }: Props) {
+export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, onSave, onDelete }: Props) {
   const router = useRouter();
   const { search } = usePokemonSearch(regulationId);
   const notesPanelRef = useRef<NotesPanelHandle>(null);
@@ -30,6 +31,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     initialMatch.opponentElo !== undefined ? String(initialMatch.opponentElo) : '',
   );
   const [isCompleted, setIsCompleted] = useState(!!initialMatch.completedAt);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
   const scheduleAutosave = useCallback(
@@ -128,6 +130,12 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     router.push(`/pokemon/vgc/tracker/${sessionId}`);
   };
 
+  const handleDelete = async () => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    await onDelete();
+    router.push(`/pokemon/vgc/tracker/${sessionId}`);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] text-surface-50 overflow-hidden">
       {/* ── Top bar ──────────────────────────────────────────────────────── */}
@@ -210,6 +218,32 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           <span className="text-xs text-green-400 flex items-center gap-1">
             <Check size={13} /> Saved
           </span>
+        )}
+
+        {/* Delete */}
+        {confirmDelete ? (
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={handleDelete}
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-medium transition-colors"
+            >
+              Delete
+            </button>
+            <button
+              onClick={() => setConfirmDelete(false)}
+              className="text-xs px-2.5 py-1.5 rounded-lg bg-surface-700 hover:bg-surface-600 text-surface-300 transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            onClick={() => setConfirmDelete(true)}
+            className="p-1.5 rounded-lg text-surface-600 hover:text-red-400 hover:bg-surface-800 transition-colors"
+            title="Delete match"
+          >
+            <Trash2 size={15} />
+          </button>
         )}
       </div>
 
