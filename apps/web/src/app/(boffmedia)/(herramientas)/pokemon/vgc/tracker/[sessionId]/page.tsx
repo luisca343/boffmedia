@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Plus, Swords, TrendingUp } from 'lucide-react';
 import { useMatches, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { emptySlots, slotsFromPreset, spriteUrl } from '@/features/vgc-tracker/types';
+import { emptySlots, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import type { Match } from '@/features/vgc-tracker/types';
 
 interface Props {
@@ -167,7 +167,7 @@ function MatchRow({ match, number, sessionId }: { match: Match; number: number; 
                 src={spriteUrl(s.speciesName!)}
                 alt={s.speciesName ?? ''}
                 className="w-6 h-6 object-contain"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                onError={handleSpriteError}
               />
             ))}
             {opponentFilled.length === 0 && (

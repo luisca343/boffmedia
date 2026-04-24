@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Trash2, X, Upload } from 'lucide-react';
 import { parseShowdownPaste, isValidPaste } from '@/features/vgc-tracker/showdown-parse';
-import { spriteUrl } from '@/features/vgc-tracker/types';
+import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import type { TeamPreset } from '@/features/vgc-tracker/types';
 import { VgcService, ChampionsRegulation, VgcPokemon } from '@/services/api/boffmedia/vgcService';
 
@@ -101,7 +101,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
                     src={spriteUrl(s.speciesName)}
                     alt={s.speciesName}
                     className="w-9 h-9 object-contain"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    onError={handleSpriteError}
                   />
                 ))}
               </div>

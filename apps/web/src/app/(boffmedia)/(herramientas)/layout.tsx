@@ -11,8 +11,10 @@ export default function Layout({
   const pathname = usePathname();
   const gameSlug = pathname.split("/")[1];
 
+  const isVgcTracker = pathname.includes('/vgc/tracker');
+
   return (
-    <GameToolsLayout gameSlug={gameSlug}>
+    <GameToolsLayout gameSlug={gameSlug} noContainer={isVgcTracker} noMargin={isVgcTracker}>
       {children}
     </GameToolsLayout>
   );
