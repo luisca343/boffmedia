@@ -33,7 +33,8 @@ export class UpdateMatchDto {
   @ApiPropertyOptional() @IsOptional() opponentTeam?: any;
   @ApiPropertyOptional({ enum: ['win', 'loss', 'draw'] })
   @IsOptional() @IsIn(['win', 'loss', 'draw']) result?: 'win' | 'loss' | 'draw';
-  @ApiPropertyOptional() @IsOptional() @IsNumber() eloChange?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() eloAfter?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() opponentElo?: number;
   @ApiPropertyOptional() @IsOptional() notes?: any[];
   @ApiPropertyOptional() @IsOptional() @IsString() completedAt?: string;
 }

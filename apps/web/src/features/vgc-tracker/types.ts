@@ -62,7 +62,8 @@ export interface Match {
   myTeam: TeamSnapshot;
   opponentTeam: TeamSnapshot;
   result?: MatchResult;
-  eloChange?: number;
+  eloAfter?: number;
+  opponentElo?: number;
   notes: MatchNote[];
 }
 

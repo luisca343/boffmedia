@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, Trash2, X, Upload } from 'lucide-react';
 import { parseShowdownPaste, isValidPaste } from '@/features/vgc-tracker/showdown-parse';
 import { spriteUrl } from '@/features/vgc-tracker/types';
 import type { TeamPreset } from '@/features/vgc-tracker/types';
+import { VgcService, ChampionsRegulation } from '@/services/api/boffmedia/vgcService';
 
 interface Props {
   presets: TeamPreset[];
@@ -14,10 +16,21 @@ interface Props {
 }
 
 export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
+  const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
+  const [regulationId, setRegulationId] = useState('');
   const [paste, setPaste] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    VgcService.getChampionsRegulations().then((res) => {
+      if (res.success && res.data) {
+        setRegulations(res.data);
+        setRegulationId(res.data[0]?.id ?? '');
+      }
+    });
+  }, []);
 
   const handleImport = () => {
     if (!name.trim()) { setError('Give this preset a name.'); return; }
@@ -26,7 +39,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
     const preset: TeamPreset = {
       id: crypto.randomUUID(),
       name: name.trim(),
-      regulationId: 'vgc2026regma',
+      regulationId,
       exportString: paste.trim(),
       slots,
       createdAt: Date.now(),
@@ -39,8 +52,8 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
     setShowForm(false);
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-lg mx-4 shadow-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-surface-700 shrink-0">
           <h2 className="font-semibold text-surface-50">Team Presets</h2>
@@ -101,6 +114,19 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Regulation</label>
+                <select
+                  value={regulationId}
+                  onChange={(e) => setRegulationId(e.target.value)}
+                  className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 focus:outline-none focus:border-primary-500 text-sm"
+                >
+                  {regulations.map((r) => (
+                    <option key={r.id} value={r.id}>{r.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
                   Showdown paste
                 </label>
@@ -143,6 +169,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

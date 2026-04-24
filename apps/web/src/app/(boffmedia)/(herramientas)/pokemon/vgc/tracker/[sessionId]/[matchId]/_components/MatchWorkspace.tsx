@@ -19,16 +19,17 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   const router = useRouter();
   const { search } = usePokemonSearch(regulationId);
   const notesPanelRef = useRef<NotesPanelHandle>(null);
-  const eloRef = useRef<HTMLInputElement>(null);
 
   const [match, setMatch] = useState<Match>(initialMatch);
-  const [eloInput, setEloInput] = useState(
-    initialMatch.eloChange !== undefined ? String(initialMatch.eloChange) : '',
+  const [eloAfterInput, setEloAfterInput] = useState(
+    initialMatch.eloAfter !== undefined ? String(initialMatch.eloAfter) : '',
+  );
+  const [opponentEloInput, setOpponentEloInput] = useState(
+    initialMatch.opponentElo !== undefined ? String(initialMatch.opponentElo) : '',
   );
   const [isCompleted, setIsCompleted] = useState(!!initialMatch.completedAt);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
-  // Debounced auto-save: fires 600ms after the last change.
   const scheduleAutosave = useCallback(
     (updated: Match) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -37,7 +38,6 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     [onSave],
   );
 
-  // Flush on unmount.
   useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current); }, []);
 
   const update = useCallback(
@@ -51,23 +51,18 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     [scheduleAutosave],
   );
 
-  // Global keyboard shortcuts.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement).tagName;
       const inInput = tag === 'INPUT' || tag === 'TEXTAREA';
-
-      // N → focus notes (unless already in an input)
       if (e.key === 'n' && !inInput && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         notesPanelRef.current?.focusInput();
       }
-      // W → win
       if (e.key === 'w' && !inInput && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         handleResult('win');
       }
-      // L → loss
       if (e.key === 'l' && !inInput && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
         handleResult('loss');
@@ -83,9 +78,14 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
     update({ result: next });
   };
 
-  const handleEloBlur = () => {
-    const parsed = parseInt(eloInput, 10);
-    update({ eloChange: isNaN(parsed) ? undefined : parsed });
+  const handleEloAfterBlur = () => {
+    const parsed = parseInt(eloAfterInput, 10);
+    update({ eloAfter: isNaN(parsed) ? undefined : parsed });
+  };
+
+  const handleOpponentEloBlur = () => {
+    const parsed = parseInt(opponentEloInput, 10);
+    update({ opponentElo: isNaN(parsed) ? undefined : parsed });
   };
 
   const handleMyTeamChange = (slots: MatchSlot[]) => {
@@ -161,17 +161,28 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           />
         </div>
 
-        {/* ELO */}
-        <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
-          <span className="text-xs text-surface-500 font-mono select-none">ELO</span>
-          <input
-            ref={eloRef}
-            value={eloInput}
-            onChange={(e) => setEloInput(e.target.value)}
-            onBlur={handleEloBlur}
-            placeholder="+0"
-            className="w-14 bg-transparent text-surface-50 text-sm font-mono text-center focus:outline-none placeholder:text-surface-700"
-          />
+        {/* ELO inputs */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 bg-surface-800 border border-surface-700 rounded-lg px-2 py-1.5">
+            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">My ELO</span>
+            <input
+              value={eloAfterInput}
+              onChange={(e) => setEloAfterInput(e.target.value)}
+              onBlur={handleEloAfterBlur}
+              placeholder="—"
+              className="w-12 bg-transparent text-surface-50 text-sm font-mono text-center focus:outline-none placeholder:text-surface-700"
+            />
+          </div>
+          <div className="flex items-center gap-1 bg-surface-800 border border-surface-700 rounded-lg px-2 py-1.5">
+            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">Rival</span>
+            <input
+              value={opponentEloInput}
+              onChange={(e) => setOpponentEloInput(e.target.value)}
+              onBlur={handleOpponentEloBlur}
+              placeholder="—"
+              className="w-12 bg-transparent text-surface-50 text-sm font-mono text-center focus:outline-none placeholder:text-surface-700"
+            />
+          </div>
         </div>
 
         {/* Finish / save indicator */}
