@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { VgcService, ChampionsRegulation } from '@/services/api/boffmedia/vgcService';
 import type { MatchFormat, Session, TeamPreset } from '@/features/vgc-tracker/types';
@@ -40,8 +41,8 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
     });
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+  return createPortal(
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-md mx-4 shadow-2xl">
         <div className="flex items-center justify-between p-4 border-b border-surface-700">
           <h2 className="font-semibold text-surface-50">New Session</h2>
@@ -134,6 +135,7 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

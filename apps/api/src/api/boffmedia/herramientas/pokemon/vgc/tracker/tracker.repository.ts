@@ -101,7 +101,8 @@ export class TrackerRepository {
     myTeam: TeamSnapshotData;
     opponentTeam: TeamSnapshotData;
     result?: 'win' | 'loss' | 'draw';
-    eloChange?: number;
+    eloAfter?: number;
+    opponentElo?: number;
     notes: MatchNoteData[];
     completedAt?: Date;
   }): Promise<void> {
