@@ -33,9 +33,19 @@ export function TeamPanel({ label, slots, editable = false, search, onSlotChange
   };
 
   // Click × on an assignment slot → returns that pokemon to the pool (role = unknown).
+  // If a lead is removed and there is a back, promote the first back to lead.
   const unassign = (slotIndex: number) => {
+    const removed = slots.find((s) => s.slotIndex === slotIndex);
+    const isLead = removed?.role === 'lead';
+    const firstBack = isLead
+      ? slots.filter((s) => s.role === 'back').sort((a, b) => a.slotIndex - b.slotIndex)[0]
+      : undefined;
     onSlotChange(
-      slots.map((s) => (s.slotIndex === slotIndex ? { ...s, role: 'unknown' as const } : s)),
+      slots.map((s) => {
+        if (s.slotIndex === slotIndex) return { ...s, role: 'unknown' as const };
+        if (firstBack && s.slotIndex === firstBack.slotIndex) return { ...s, role: 'lead' as const };
+        return s;
+      }),
     );
   };
 
