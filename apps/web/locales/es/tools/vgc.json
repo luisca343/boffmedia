@@ -99,6 +99,7 @@
         "presets": "Presets ({count})",
         "newSession": "Nueva sesión",
         "newMatch": "Nuevo combate",
+        "newSeries": "Nueva serie",
         "importCsv": "Importar CSV",
         "importing": "Importando…",
         "finish": "Terminar",
@@ -121,7 +122,8 @@
         "opponent": "Rival",
         "startDate": "Fecha y hora de inicio",
         "minsPerGame": "Minutos por partida",
-        "showdownPaste": "Paste de Showdown"
+        "showdownPaste": "Paste de Showdown",
+        "tournamentName": "Nombre del torneo"
       },
       "placeholders": {
         "rivalName": "Nombre del rival…",
@@ -129,7 +131,8 @@
         "presetName": "ej. Reg H — Abril 2025",
         "typeName": "Escribe nombre…",
         "addNote": "Añadir nota… (Enter para guardar)",
-        "startingElo": "opcional"
+        "startingElo": "opcional",
+        "tournamentName": "ej. EUIC 2025"
       },
       "stats": {
         "wins": "Victorias",
@@ -172,9 +175,39 @@
         "noMatches": "Sin combates aún — ¡empieza uno!",
         "noPresets": "Sin presets aún. Importa un paste de Showdown para empezar."
       },
+      "sessionType": {
+        "ladder": "Clasificatoria",
+        "tournament": "Torneo"
+      },
+      "tournament": {
+        "seriesWins": "Series W",
+        "seriesLosses": "Series L",
+        "gameRecord": "Partidas",
+        "noSeries": "Sin series aún — ¡empieza una!",
+        "round": "R{n}",
+        "seriesNumber": "Serie #{n}"
+      },
       "errors": {
         "presetNameRequired": "Dale un nombre a este preset.",
         "invalidPaste": "No se pudo procesar el paste. Comprueba el formato."
+      },
+      "workspace": {
+        "roundPrefix": "R",
+        "game": "Partida {n}",
+        "gameAbbr": "G{n}",
+        "endGame": "Terminar partida {n}",
+        "noGameData": "Sin datos de partida.",
+        "previousGames": "Partidas anteriores"
+      },
+      "notes": {
+        "gameTab": "Notas de partida",
+        "seriesTab": "Notas de serie",
+        "noGameNotes": "Sin notas de partida aún",
+        "noSeriesNotes": "Sin notas de serie aún",
+        "phaseLive": "en vivo",
+        "phasePost": "post",
+        "phaseSeries": "serie",
+        "addSeriesPlaceholder": "Añadir nota de serie… (Enter)"
       },
       "speedWidget": {
         "label": "Velocidades",

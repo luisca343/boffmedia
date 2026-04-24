@@ -1,7 +1,8 @@
 export type MatchFormat = 'BO1' | 'BO3';
 export type MatchResult = 'win' | 'loss' | 'draw';
-export type NotePhase = 'live' | 'post';
+export type NotePhase = 'live' | 'post' | 'series';
 export type SlotRole = 'lead1' | 'lead2' | 'back1' | 'back2' | 'unknown';
+export type SessionType = 'ladder' | 'tournament';
 
 export interface PresetSlot {
   slotIndex: 0 | 1 | 2 | 3 | 4 | 5;
@@ -26,12 +27,38 @@ export interface TeamPreset {
 
 export interface Session {
   id: string;
+  type: SessionType;
   label: string;
   format: MatchFormat;
   regulationId: string;
   activePresetId: string;
   startElo?: number;
   startedAt: number;
+  tournamentName?: string;
+}
+
+export interface SeriesGame {
+  id: string;
+  gameNumber: 1 | 2 | 3;
+  mySlots: MatchSlot[];
+  opponentSlots: MatchSlot[];
+  result?: MatchResult;
+  notes: MatchNote[];
+  completedAt?: number;
+}
+
+export interface Series {
+  id: string;
+  sessionId: string;
+  createdAt: number;
+  completedAt?: number;
+  roundNumber?: number;
+  opponentName?: string;
+  myTeam: TeamSnapshot;
+  opponentTeam: TeamSnapshot;
+  games: SeriesGame[];
+  seriesResult?: MatchResult;
+  notes: MatchNote[];
 }
 
 export interface MatchSlot {
@@ -141,4 +168,23 @@ export function isLead(role: SlotRole): boolean {
 /** True if this role is a back position */
 export function isBack(role: SlotRole): boolean {
   return role === 'back1' || role === 'back2';
+}
+
+/** Copy series-level slots with all roles reset to 'unknown' for a fresh game. */
+export function slotsForGame(seriesSlots: MatchSlot[]): MatchSlot[] {
+  return seriesSlots.map((s) => ({ ...s, role: 'unknown' as SlotRole }));
+}
+
+export function seriesScore(games: SeriesGame[]): { wins: number; losses: number } {
+  return {
+    wins: games.filter((g) => g.result === 'win').length,
+    losses: games.filter((g) => g.result === 'loss').length,
+  };
+}
+
+export function computeSeriesResult(games: SeriesGame[]): MatchResult | undefined {
+  const { wins, losses } = seriesScore(games);
+  if (wins >= 2) return 'win';
+  if (losses >= 2) return 'loss';
+  return undefined;
 }

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { Trophy, TrendingUp, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { VgcService, ChampionsRegulation } from '@/services/api/boffmedia/vgcService';
-import type { MatchFormat, Session, TeamPreset } from '@/features/vgc-tracker/types';
+import type { MatchFormat, Session, SessionType, TeamPreset } from '@/features/vgc-tracker/types';
 
 interface Props {
   presets: TeamPreset[];
@@ -15,12 +15,20 @@ interface Props {
 
 export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
   const t = useTranslations('vgc.tracker');
+  const [sessionType, setSessionType] = useState<SessionType>('ladder');
   const [label, setLabel] = useState('');
+  const [tournamentName, setTournamentName] = useState('');
   const [format, setFormat] = useState<MatchFormat>('BO1');
   const [regulationId, setRegulationId] = useState('');
   const [activePresetId, setActivePresetId] = useState(presets[0]?.id ?? '');
   const [startElo, setStartElo] = useState('');
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
+
+  // Tournament mode defaults to BO3
+  useEffect(() => {
+    if (sessionType === 'tournament') setFormat('BO3');
+    else setFormat('BO1');
+  }, [sessionType]);
 
   useEffect(() => {
     VgcService.getChampionsRegulations().then((res) => {
@@ -34,12 +42,15 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!label.trim() || !regulationId) return;
+    const parsed = parseFloat(startElo);
     onConfirm({
+      type: sessionType,
       label: label.trim(),
       format,
       regulationId,
       activePresetId,
-      startElo: startElo ? parseInt(startElo, 10) : undefined,
+      startElo: sessionType === 'ladder' && !isNaN(parsed) ? parsed : undefined,
+      tournamentName: sessionType === 'tournament' ? (tournamentName.trim() || undefined) : undefined,
     });
   };
 
@@ -54,20 +65,65 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
+          {/* Type toggle */}
+          <div className="flex rounded-lg border border-surface-700 bg-surface-950 p-0.5 gap-0.5">
+            <button
+              type="button"
+              onClick={() => setSessionType('ladder')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                sessionType === 'ladder'
+                  ? 'bg-surface-800 text-surface-50'
+                  : 'text-surface-500 hover:text-surface-300'
+              }`}
+            >
+              <TrendingUp size={13} /> {t('sessionType.ladder')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setSessionType('tournament')}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 text-sm font-medium rounded-md transition-colors ${
+                sessionType === 'tournament'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                  : 'text-surface-500 hover:text-surface-300'
+              }`}
+            >
+              <Trophy size={13} /> {t('sessionType.tournament')}
+            </button>
+          </div>
+
+          {/* Tournament name (tournament only) */}
+          {sessionType === 'tournament' && (
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+                {t('labels.tournamentName')}
+              </label>
+              <input
+                value={tournamentName}
+                onChange={(e) => setTournamentName(e.target.value)}
+                placeholder={t('placeholders.tournamentName')}
+                className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-amber-500 text-sm"
+              />
+            </div>
+          )}
+
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Session label</label>
+            <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+              {t('labels.sessionLabel')}
+            </label>
             <input
               autoFocus
               value={label}
               onChange={(e) => setLabel(e.target.value)}
-              placeholder="e.g. Ranked grind Apr 24"
+              placeholder={t('placeholders.sessionLabel')}
               className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className={`grid gap-3 ${sessionType === 'ladder' ? 'grid-cols-2' : 'grid-cols-1'}`}>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.format')}</label>
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+                {t('labels.format')}
+              </label>
               <select
                 value={format}
                 onChange={(e) => setFormat(e.target.value as MatchFormat)}
@@ -78,20 +134,26 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.startingElo')}</label>
-              <input
-                type="number"
-                value={startElo}
-                onChange={(e) => setStartElo(e.target.value)}
-                placeholder={t('placeholders.startingElo')}
-                className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm"
-              />
-            </div>
+            {sessionType === 'ladder' && (
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+                  {t('labels.startingElo')}
+                </label>
+                <input
+                  type="number"
+                  value={startElo}
+                  onChange={(e) => setStartElo(e.target.value)}
+                  placeholder={t('placeholders.startingElo')}
+                  className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm"
+                />
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.regulation')}</label>
+            <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+              {t('labels.regulation')}
+            </label>
             <select
               value={regulationId}
               onChange={(e) => setRegulationId(e.target.value)}
@@ -105,7 +167,9 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
 
           {presets.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.teamPreset')}</label>
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
+                {t('labels.teamPreset')}
+              </label>
               <select
                 value={activePresetId}
                 onChange={(e) => setActivePresetId(e.target.value)}
@@ -130,7 +194,11 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
             <button
               type="submit"
               disabled={!label.trim() || !regulationId}
-              className="flex-1 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 disabled:opacity-40 text-white text-sm font-medium transition-colors"
+              className={`flex-1 py-2 rounded-lg disabled:opacity-40 text-white text-sm font-medium transition-colors ${
+                sessionType === 'tournament'
+                  ? 'bg-amber-600 hover:bg-amber-500'
+                  : 'bg-primary-600 hover:bg-primary-500'
+              }`}
             >
               {t('buttons.startSession')}
             </button>

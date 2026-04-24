@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Plus, Layers, Swords, TrendingUp } from 'lucide-react';
+import { Plus, Layers, Swords, TrendingUp, Trophy } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useSessions, usePresets } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { NewSessionDialog } from './_components/NewSessionDialog';
@@ -106,26 +106,49 @@ function SessionCard({
   onDelete: () => void;
 }) {
   const t = useTranslations('vgc.tracker');
+  const isTournament = session.type === 'tournament';
+
   return (
     <Link
       href={`/pokemon/vgc/tracker/${session.id}`}
-      className="group flex items-start justify-between gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-primary-500/40 px-4 py-3 transition-all"
+      className={`group flex items-start justify-between gap-3 rounded-xl border bg-surface-950 px-4 py-3 transition-all ${
+        isTournament
+          ? 'border-amber-500/30 hover:border-amber-400/50'
+          : 'border-surface-800 hover:border-primary-500/40'
+      }`}
     >
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-surface-50 font-medium truncate">{session.label}</span>
-          <span className="shrink-0 text-[11px] font-mono bg-surface-800 border border-surface-700 rounded px-1.5 py-px text-surface-400">
-            {session.format}
-          </span>
+      <div className="flex items-start gap-3 flex-1 min-w-0">
+        <div className={`mt-0.5 p-1.5 rounded-lg shrink-0 ${
+          isTournament ? 'bg-amber-500/15 text-amber-400' : 'bg-surface-800 text-surface-500'
+        }`}>
+          {isTournament ? <Trophy size={14} /> : <TrendingUp size={14} />}
         </div>
-        <div className="flex flex-wrap items-center gap-3 text-xs text-surface-500">
-          <span>{formatDate(session.startedAt)}</span>
-          {presetName && (
-            <span className="flex items-center gap-1"><Layers size={11} />{presetName}</span>
-          )}
-          {session.startElo && (
-            <span className="flex items-center gap-1"><TrendingUp size={11} />ELO {session.startElo}</span>
-          )}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="text-surface-50 font-medium truncate">{session.label}</span>
+            <span className="shrink-0 text-[11px] font-mono bg-surface-800 border border-surface-700 rounded px-1.5 py-px text-surface-400">
+              {session.format}
+            </span>
+            {isTournament && (
+              <span className="shrink-0 text-[11px] bg-amber-500/15 border border-amber-500/30 text-amber-400 rounded px-1.5 py-px">
+                {t('sessionType.tournament')}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-3 text-xs text-surface-500">
+            <span>{formatDate(session.startedAt)}</span>
+            {isTournament && session.tournamentName && (
+              <span className="flex items-center gap-1 text-amber-500/70">
+                <Trophy size={10} />{session.tournamentName}
+              </span>
+            )}
+            {!isTournament && presetName && (
+              <span className="flex items-center gap-1"><Layers size={11} />{presetName}</span>
+            )}
+            {!isTournament && session.startElo && (
+              <span className="flex items-center gap-1"><TrendingUp size={11} />ELO {session.startElo}</span>
+            )}
+          </div>
         </div>
       </div>
       <button

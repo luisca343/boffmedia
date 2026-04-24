@@ -99,6 +99,7 @@
         "presets": "Presets ({count})",
         "newSession": "New session",
         "newMatch": "New match",
+        "newSeries": "New series",
         "importCsv": "Import CSV",
         "importing": "Importing…",
         "finish": "Finish",
@@ -121,7 +122,8 @@
         "opponent": "Opponent",
         "startDate": "Start date & time",
         "minsPerGame": "Minutes per game",
-        "showdownPaste": "Showdown paste"
+        "showdownPaste": "Showdown paste",
+        "tournamentName": "Tournament name"
       },
       "placeholders": {
         "rivalName": "Rival name…",
@@ -129,7 +131,8 @@
         "presetName": "e.g. Reg H — April 2025",
         "typeName": "Type name…",
         "addNote": "Add note... (Enter to save)",
-        "startingElo": "optional"
+        "startingElo": "optional",
+        "tournamentName": "e.g. EUIC 2025"
       },
       "stats": {
         "wins": "Wins",
@@ -172,9 +175,39 @@
         "noMatches": "No matches yet — start one!",
         "noPresets": "No presets yet. Import a Showdown paste to get started."
       },
+      "sessionType": {
+        "ladder": "Ladder",
+        "tournament": "Tournament"
+      },
+      "tournament": {
+        "seriesWins": "Series W",
+        "seriesLosses": "Series L",
+        "gameRecord": "Game record",
+        "noSeries": "No series yet — start one!",
+        "round": "R{n}",
+        "seriesNumber": "Series #{n}"
+      },
       "errors": {
         "presetNameRequired": "Give this preset a name.",
         "invalidPaste": "Could not parse the paste. Check the format."
+      },
+      "workspace": {
+        "roundPrefix": "R",
+        "game": "Game {n}",
+        "gameAbbr": "G{n}",
+        "endGame": "End game {n}",
+        "noGameData": "No game data.",
+        "previousGames": "Previous games"
+      },
+      "notes": {
+        "gameTab": "Game notes",
+        "seriesTab": "Series notes",
+        "noGameNotes": "No game notes yet",
+        "noSeriesNotes": "No series notes yet",
+        "phaseLive": "live",
+        "phasePost": "post",
+        "phaseSeries": "series",
+        "addSeriesPlaceholder": "Add series note… (Enter)"
       },
       "speedWidget": {
         "label": "Speed Tiers",
