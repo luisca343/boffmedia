@@ -1,7 +1,7 @@
 'use client';
 
 import { use } from 'react';
-import { useMatch, useSessions } from '@/features/vgc-tracker/hooks/useVgcDb';
+import { useMatch, useSessions, useMatches } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { MatchWorkspace } from './_components/MatchWorkspace';
 
 interface Props {
@@ -12,6 +12,7 @@ export default function MatchPage({ params }: Props) {
   const { sessionId, matchId } = use(params);
   const { match, loading, save } = useMatch(matchId);
   const { sessions } = useSessions();
+  const { remove: removeMatch } = useMatches(sessionId);
   const session = sessions.find((s) => s.id === sessionId);
 
   if (loading) {
@@ -36,6 +37,7 @@ export default function MatchPage({ params }: Props) {
       sessionId={sessionId}
       regulationId={session?.regulationId ?? ''}
       onSave={save}
+      onDelete={() => removeMatch(matchId)}
     />
   );
 }
