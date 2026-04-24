@@ -176,24 +176,24 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
 
         {/* ELO inputs */}
         <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-1 bg-surface-800 border border-surface-700 rounded-lg px-2 py-1.5">
+          <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
             <span className="text-[10px] text-surface-500 font-mono select-none uppercase">My ELO</span>
             <input
               value={eloAfterInput}
               onChange={(e) => setEloAfterInput(e.target.value)}
               onBlur={handleEloAfterBlur}
               placeholder="—"
-              className="w-12 bg-transparent text-surface-50 text-sm font-mono text-center focus:outline-none placeholder:text-surface-700"
+              className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
             />
           </div>
-          <div className="flex items-center gap-1 bg-surface-800 border border-surface-700 rounded-lg px-2 py-1.5">
+          <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
             <span className="text-[10px] text-surface-500 font-mono select-none uppercase">Rival</span>
             <input
               value={opponentEloInput}
               onChange={(e) => setOpponentEloInput(e.target.value)}
               onBlur={handleOpponentEloBlur}
               placeholder="—"
-              className="w-12 bg-transparent text-surface-50 text-sm font-mono text-center focus:outline-none placeholder:text-surface-700"
+              className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
             />
           </div>
         </div>
@@ -216,7 +216,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
       {/* ── Main: My Team | Notes | Opponent ─────────────────────────── */}
       <div className="flex flex-1 min-h-0">
         {/* My Team column */}
-        <div className="w-[340px] shrink-0 overflow-y-auto border-r border-surface-800 px-5 py-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-r border-surface-800 px-5 py-4">
           <TeamPanel
             label="My team"
             slots={match.myTeam.slots}
@@ -235,7 +235,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         />
 
         {/* Opponent column */}
-        <div className="w-[340px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4">
           <TeamPanel
             label="Opponent"
             slots={match.opponentTeam.slots}
