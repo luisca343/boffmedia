@@ -1,7 +1,7 @@
 export type MatchFormat = 'BO1' | 'BO3';
 export type MatchResult = 'win' | 'loss' | 'draw';
 export type NotePhase = 'live' | 'post';
-export type SlotRole = 'lead' | 'back' | 'unknown';
+export type SlotRole = 'lead1' | 'lead2' | 'back1' | 'back2' | 'unknown';
 
 export interface PresetSlot {
   slotIndex: 0 | 1 | 2 | 3 | 4 | 5;
@@ -126,7 +126,19 @@ export function slotsFromPreset(preset: TeamPreset): MatchSlot[] {
 }
 
 export function cycleRole(current: SlotRole): SlotRole {
-  if (current === 'unknown') return 'lead';
-  if (current === 'lead') return 'back';
+  if (current === 'unknown') return 'lead1';
+  if (current === 'lead1') return 'lead2';
+  if (current === 'lead2') return 'back1';
+  if (current === 'back1') return 'back2';
   return 'unknown';
+}
+
+/** True if this role is a lead position */
+export function isLead(role: SlotRole): boolean {
+  return role === 'lead1' || role === 'lead2';
+}
+
+/** True if this role is a back position */
+export function isBack(role: SlotRole): boolean {
+  return role === 'back1' || role === 'back2';
 }
