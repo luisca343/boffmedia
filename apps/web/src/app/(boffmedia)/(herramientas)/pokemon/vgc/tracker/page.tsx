@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Plus, Layers, Swords, TrendingUp } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { useSessions, usePresets } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { NewSessionDialog } from './_components/NewSessionDialog';
 import { PresetManager } from './_components/PresetManager';
@@ -14,6 +15,7 @@ function formatDate(ts: number) {
 }
 
 export default function TrackerPage() {
+  const t = useTranslations('vgc.tracker');
   const { sessions, loading, create: createSession, remove: removeSession } = useSessions();
   const { presets, save: savePreset, remove: removePreset } = usePresets();
   const [showNewSession, setShowNewSession] = useState(false);
@@ -38,8 +40,8 @@ export default function TrackerPage() {
               <Swords className="w-6 h-6 text-primary-400" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-surface-50">VGC Tracker</h1>
-              <p className="text-surface-400 text-sm">Log your ranked matches</p>
+              <h1 className="text-2xl font-bold text-surface-50">{t('title')}</h1>
+              <p className="text-surface-400 text-sm">{t('subtitle')}</p>
             </div>
           </div>
 
@@ -48,13 +50,13 @@ export default function TrackerPage() {
               onClick={() => setShowPresets(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-surface-700 text-surface-300 hover:text-surface-50 hover:border-surface-600 text-sm transition-colors"
             >
-              <Layers size={14} /> Presets ({presets.length})
+              <Layers size={14} /> {t('buttons.presets', { count: presets.length })}
             </button>
             <button
               onClick={() => setShowNewSession(true)}
               className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
             >
-              <Plus size={14} /> New session
+              <Plus size={14} /> {t('buttons.newSession')}
             </button>
           </div>
         </div>
@@ -68,8 +70,8 @@ export default function TrackerPage() {
       ) : sessions.length === 0 ? (
         <div className="rounded-xl border border-surface-800 bg-surface-950 p-12 text-center">
           <Swords size={36} className="mx-auto text-surface-700 mb-3" />
-          <p className="text-surface-400 text-sm font-medium mb-1">No sessions yet</p>
-          <p className="text-surface-600 text-xs">Import a team preset, then start a session.</p>
+          <p className="text-surface-400 text-sm font-medium mb-1">{t('empty.noSessions')}</p>
+          <p className="text-surface-600 text-xs">{t('empty.noSessionsHint')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -103,6 +105,7 @@ function SessionCard({
   presetName?: string;
   onDelete: () => void;
 }) {
+  const t = useTranslations('vgc.tracker');
   return (
     <Link
       href={`/pokemon/vgc/tracker/${session.id}`}
@@ -129,7 +132,7 @@ function SessionCard({
         onClick={(e) => { e.preventDefault(); onDelete(); }}
         className="shrink-0 opacity-0 group-hover:opacity-100 text-surface-600 hover:text-red-400 text-xs px-2 py-1 rounded transition-all"
       >
-        Delete
+        {t('buttons.delete')}
       </button>
     </Link>
   );

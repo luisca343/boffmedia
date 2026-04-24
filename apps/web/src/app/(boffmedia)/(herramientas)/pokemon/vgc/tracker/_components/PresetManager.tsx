@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Plus, Trash2, X, Upload } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { parseShowdownPaste, isValidPaste } from '@/features/vgc-tracker/showdown-parse';
 import { spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import type { TeamPreset } from '@/features/vgc-tracker/types';
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
+  const t = useTranslations('vgc.tracker');
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
   const [pokemonList, setPokemonList] = useState<VgcPokemon[]>([]);
   const [showForm, setShowForm] = useState(false);
@@ -43,9 +45,9 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
   const toId = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
 
   const handleImport = () => {
-    if (!name.trim()) { setError('Give this preset a name.'); return; }
+    if (!name.trim()) { setError(t('errors.presetNameRequired')); return; }
     const rawSlots = parseShowdownPaste(paste);
-    if (!rawSlots.length) { setError('Could not parse the paste. Check the format.'); return; }
+    if (!rawSlots.length) { setError(t('errors.invalidPaste')); return; }
 
     // Normalise species names against the regulation's legal Pokémon list so
     // that custom Champions Pokémon (e.g. Floette-Eternal) get their canonical
@@ -76,7 +78,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-lg mx-4 shadow-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between p-4 border-b border-surface-700 shrink-0">
-          <h2 className="font-semibold text-surface-50">Team Presets</h2>
+          <h2 className="font-semibold text-surface-50">{t('modals.teamPresets')}</h2>
           <button onClick={onClose} className="text-surface-400 hover:text-surface-50 transition-colors">
             <X size={18} />
           </button>
@@ -85,7 +87,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
         <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
           {presets.length === 0 && !showForm && (
             <p className="text-surface-500 text-sm text-center py-6">
-              No presets yet. Import a Showdown paste to get started.
+              {t('empty.noPresets')}
             </p>
           )}
 
@@ -123,18 +125,18 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
           {showForm && (
             <div className="bg-surface-800 border border-surface-700 rounded-lg p-4 flex flex-col gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Preset name</label>
+                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.presetName')}</label>
                 <input
                   autoFocus
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g. Reg H — April 2025"
+                  placeholder={t('placeholders.presetName')}
                   className="bg-surface-700 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Regulation</label>
+                <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.regulation')}</label>
                 <select
                   value={regulationId}
                   onChange={(e) => setRegulationId(e.target.value)}
@@ -148,7 +150,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">
-                  Showdown paste
+                  {t('labels.showdownPaste')}
                 </label>
                 <textarea
                   value={paste}
@@ -166,14 +168,14 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
                   onClick={() => { setShowForm(false); setError(''); }}
                   className="flex-1 py-2 rounded-lg border border-surface-600 text-surface-300 hover:text-surface-50 text-sm transition-colors"
                 >
-                  Cancel
+                  {t('buttons.cancel')}
                 </button>
                 <button
                   onClick={handleImport}
                   disabled={!paste.trim() || !isValidPaste(paste)}
                   className="flex-1 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 disabled:opacity-40 text-white text-sm font-medium transition-colors flex items-center justify-center gap-1.5"
                 >
-                  <Upload size={14} /> Import
+                  <Upload size={14} /> {t('buttons.import')}
                 </button>
               </div>
             </div>
@@ -185,7 +187,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
             onClick={() => setShowForm(true)}
             className="w-full py-2 rounded-lg border border-surface-600 text-surface-300 hover:text-surface-50 hover:border-surface-500 text-sm transition-colors flex items-center justify-center gap-2"
           >
-            <Plus size={16} /> Import new preset
+            <Plus size={16} /> {t('buttons.importNewPreset')}
           </button>
         </div>
       </div>

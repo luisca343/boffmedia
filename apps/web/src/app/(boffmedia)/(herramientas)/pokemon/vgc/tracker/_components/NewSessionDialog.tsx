@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { VgcService, ChampionsRegulation } from '@/services/api/boffmedia/vgcService';
 import type { MatchFormat, Session, TeamPreset } from '@/features/vgc-tracker/types';
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
+  const t = useTranslations('vgc.tracker');
   const [label, setLabel] = useState('');
   const [format, setFormat] = useState<MatchFormat>('BO1');
   const [regulationId, setRegulationId] = useState('');
@@ -45,7 +47,7 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-md mx-4 shadow-2xl">
         <div className="flex items-center justify-between p-4 border-b border-surface-700">
-          <h2 className="font-semibold text-surface-50">New Session</h2>
+          <h2 className="font-semibold text-surface-50">{t('modals.newSession')}</h2>
           <button onClick={onClose} className="text-surface-400 hover:text-surface-50 transition-colors">
             <X size={18} />
           </button>
@@ -65,7 +67,7 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Format</label>
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.format')}</label>
               <select
                 value={format}
                 onChange={(e) => setFormat(e.target.value as MatchFormat)}
@@ -77,19 +79,19 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Starting ELO</label>
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.startingElo')}</label>
               <input
                 type="number"
                 value={startElo}
                 onChange={(e) => setStartElo(e.target.value)}
-                placeholder="optional"
+                placeholder={t('placeholders.startingElo')}
                 className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 placeholder:text-surface-500 focus:outline-none focus:border-primary-500 text-sm"
               />
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Regulation</label>
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.regulation')}</label>
             <select
               value={regulationId}
               onChange={(e) => setRegulationId(e.target.value)}
@@ -103,13 +105,13 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
 
           {presets.length > 0 && (
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">Team preset</label>
+              <label className="text-xs font-medium text-surface-400 uppercase tracking-wide">{t('labels.teamPreset')}</label>
               <select
                 value={activePresetId}
                 onChange={(e) => setActivePresetId(e.target.value)}
                 className="bg-surface-800 border border-surface-600 rounded-lg px-3 py-2 text-surface-50 focus:outline-none focus:border-primary-500 text-sm"
               >
-                <option value="">No preset</option>
+                <option value="">{t('labels.noPreset')}</option>
                 {presets.map((p) => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
@@ -123,14 +125,14 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
               onClick={onClose}
               className="flex-1 py-2 rounded-lg border border-surface-600 text-surface-300 hover:text-surface-50 text-sm transition-colors"
             >
-              Cancel
+              {t('buttons.cancel')}
             </button>
             <button
               type="submit"
               disabled={!label.trim() || !regulationId}
               className="flex-1 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 disabled:opacity-40 text-white text-sm font-medium transition-colors"
             >
-              Start session
+              {t('buttons.startSession')}
             </button>
           </div>
         </form>
