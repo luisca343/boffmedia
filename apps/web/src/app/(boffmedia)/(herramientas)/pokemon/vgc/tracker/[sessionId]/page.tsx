@@ -4,13 +4,13 @@ import { use, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Swords, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Swords, Trophy, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMatches, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { emptySlots, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
+import { useMatches, useSeries, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
+import { computeSeriesResult, emptySlots, seriesScore, slotsForGame, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import { parseMatchCsv } from '@/features/vgc-tracker/utils/importCsv';
 import { vgcDb } from '@/lib/db/vgc-db';
-import type { Match } from '@/features/vgc-tracker/types';
+import type { Match, Series, SeriesGame } from '@/features/vgc-tracker/types';
 import { SessionStatsView } from './_components/SessionStatsView';
 
 interface Props {
@@ -29,7 +29,9 @@ export default function SessionPage({ params }: Props) {
   const { sessions } = useSessions();
   const session = sessions.find((s) => s.id === sessionId);
   const { matches, loading, create: createMatch, refresh: refreshMatches } = useMatches(sessionId);
+  const { seriesList, loading: seriesLoading, create: createSeries } = useSeries(sessionId);
   const preset = usePreset(session?.activePresetId ?? null);
+  const isTournament = session?.type === 'tournament';
 
   const [activeTab, setActiveTab] = useState<'matches' | 'stats'>('matches');
 
@@ -94,6 +96,29 @@ export default function SessionPage({ params }: Props) {
     router.push(`/pokemon/vgc/tracker/${sessionId}/${match.id}`);
   };
 
+  const handleNewSeries = async () => {
+    if (!session) return;
+    const myTeamSlots = preset ? slotsFromPreset(preset) : emptySlots();
+    const firstGame: SeriesGame = {
+      id: crypto.randomUUID(),
+      gameNumber: 1,
+      mySlots: slotsForGame(myTeamSlots),
+      opponentSlots: emptySlots(),
+      notes: [],
+    };
+    const series: Series = {
+      id: crypto.randomUUID(),
+      sessionId,
+      createdAt: Date.now(),
+      myTeam: { presetId: preset?.id, slots: myTeamSlots },
+      opponentTeam: { slots: emptySlots() },
+      games: [firstGame],
+      notes: [],
+    };
+    await createSeries(series);
+    router.push(`/pokemon/vgc/tracker/${sessionId}/series/${series.id}`);
+  };
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
@@ -111,60 +136,79 @@ export default function SessionPage({ params }: Props) {
               <ArrowLeft size={18} />
             </Link>
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary-500/20 border border-primary-500/30">
-                <Swords className="w-5 h-5 text-primary-400" />
+              <div className={`p-2 rounded-lg border ${isTournament ? 'bg-amber-500/15 border-amber-500/30' : 'bg-primary-500/20 border-primary-500/30'}`}>
+                {isTournament
+                  ? <Trophy className="w-5 h-5 text-amber-400" />
+                  : <Swords className="w-5 h-5 text-primary-400" />}
               </div>
               <div>
                 <h1 className="text-xl font-bold text-surface-50">{session?.label ?? 'Session'}</h1>
-                <p className="text-surface-500 text-xs">{session?.regulationId} · {session?.format}</p>
+                <p className="text-surface-500 text-xs">
+                  {isTournament && session?.tournamentName
+                    ? <>{session.tournamentName} · {session.regulationId}</>
+                    : <>{session?.regulationId} · {session?.format}</>}
+                </p>
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              className="hidden"
-              onChange={handleImportFile}
-            />
+            {!isTournament && (
+              <>
+                <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportFile} />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={importing}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-200 text-sm font-medium transition-colors disabled:opacity-50"
+                  title={t('tooltips.importCsv')}
+                >
+                  <Upload size={14} />{importing ? t('buttons.importing') : t('buttons.importCsv')}
+                </button>
+              </>
+            )}
             <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={importing}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-800 hover:bg-surface-700 text-surface-200 text-sm font-medium transition-colors disabled:opacity-50"
-              title={t('tooltips.importCsv')}
+              onClick={isTournament ? handleNewSeries : handleNewMatch}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-white text-sm font-medium transition-colors ${isTournament ? 'bg-amber-600 hover:bg-amber-500' : 'bg-primary-600 hover:bg-primary-500'}`}
             >
-              <Upload size={14} />{importing ? t('buttons.importing') : t('buttons.importCsv')}
-            </button>
-            <button
-              onClick={handleNewMatch}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
-            >
-              <Plus size={14} /> {t('buttons.newMatch')}
+              <Plus size={14} /> {isTournament ? t('buttons.newSeries') : t('buttons.newMatch')}
             </button>
           </div>
         </div>
       </motion.div>
 
       {/* ── Stat cards ─────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-4 gap-3">
-        <StatCard value={wins} label={t('stats.wins')} color="text-green-400" />
-        <StatCard value={draws} label={t('stats.draws')} color="text-yellow-400" />
-        <StatCard value={losses} label={t('stats.losses')} color="text-red-400" />
-        <StatCard
-          value={latestElo ?? session?.startElo ?? '—'}
-          label={t('stats.elo')}
-          color={
-            latestElo !== undefined && session?.startElo !== undefined
-              ? latestElo >= session.startElo ? 'text-green-400' : 'text-red-400'
-              : 'text-surface-300'
-          }
-        />
-      </div>
+      {isTournament ? (() => {
+        const seriesWins = seriesList.filter((s) => s.seriesResult === 'win').length;
+        const seriesLosses = seriesList.filter((s) => s.seriesResult === 'loss').length;
+        const allGames = seriesList.flatMap((s) => s.games);
+        const gameWins = allGames.filter((g) => g.result === 'win').length;
+        const gameLosses = allGames.filter((g) => g.result === 'loss').length;
+        return (
+          <div className="grid grid-cols-3 gap-3">
+            <StatCard value={seriesWins} label={t('tournament.seriesWins')} color="text-green-400" />
+            <StatCard value={seriesLosses} label={t('tournament.seriesLosses')} color="text-red-400" />
+            <StatCard value={`${gameWins}–${gameLosses}`} label={t('tournament.gameRecord')} color="text-surface-300" />
+          </div>
+        );
+      })() : (
+        <div className="grid grid-cols-4 gap-3">
+          <StatCard value={wins} label={t('stats.wins')} color="text-green-400" />
+          <StatCard value={draws} label={t('stats.draws')} color="text-yellow-400" />
+          <StatCard value={losses} label={t('stats.losses')} color="text-red-400" />
+          <StatCard
+            value={latestElo ?? session?.startElo ?? '—'}
+            label={t('stats.elo')}
+            color={
+              latestElo !== undefined && session?.startElo !== undefined
+                ? latestElo >= session.startElo ? 'text-green-400' : 'text-red-400'
+                : 'text-surface-300'
+            }
+          />
+        </div>
+      )}
 
-      {/* ── Tabs ─────────────────────────────────────────────────────────── */}
-      <div className="flex rounded-lg border border-surface-800 bg-surface-950 p-0.5 gap-0.5">
+      {/* ── Tabs (ladder only) ───────────────────────────────────────────── */}
+      {!isTournament && <div className="flex rounded-lg border border-surface-800 bg-surface-950 p-0.5 gap-0.5">
         <button
           onClick={() => setActiveTab('matches')}
           className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
@@ -185,10 +229,27 @@ export default function SessionPage({ params }: Props) {
         >
           {tStats('tabs.stats')}
         </button>
-      </div>
+      </div>}
 
-      {/* ── Match list ───────────────────────────────────────────────────── */}
-      {activeTab === 'stats' ? (
+      {/* ── Content ──────────────────────────────────────────────────────── */}
+      {isTournament ? (
+        seriesLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : seriesList.length === 0 ? (
+          <div className="rounded-xl border border-surface-800 bg-surface-950 p-12 text-center">
+            <Trophy size={36} className="mx-auto text-surface-700 mb-3" />
+            <p className="text-surface-400 text-sm">{t('tournament.noSeries')}</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {seriesList.map((s, i) => (
+              <SeriesRow key={s.id} series={s} number={seriesList.length - i} sessionId={sessionId} />
+            ))}
+          </div>
+        )
+      ) : activeTab === 'stats' ? (
         <SessionStatsView sessionId={sessionId} startElo={session?.startElo} />
       ) : loading ? (
         <div className="flex justify-center py-12">
@@ -386,6 +447,78 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
             )}
           </div>
         )}
+      </div>
+    </Link>
+  );
+}
+
+function SeriesRow({ series, number, sessionId }: { series: Series; number: number; sessionId: string }) {
+  const t = useTranslations('vgc.tracker');
+  const { wins, losses } = seriesScore(series.games);
+  const isOngoing = !series.seriesResult;
+  const scoreLabel = isOngoing ? `${wins}–${losses}` : series.seriesResult === 'win' ? `2–${losses}` : `${wins}–2`;
+
+  const allGameSlots = series.games.flatMap((g) => {
+    const myLeads = g.mySlots.filter((s) => s.speciesId && (s.role === 'lead1' || s.role === 'lead2'));
+    return myLeads;
+  });
+  const oppPreview = series.opponentTeam.slots.filter((s) => s.speciesId);
+
+  return (
+    <Link
+      href={`/pokemon/vgc/tracker/${sessionId}/series/${series.id}`}
+      className="flex items-center gap-3 rounded-xl border border-surface-800 bg-surface-950 hover:border-amber-500/30 px-3 py-2.5 transition-all"
+    >
+      {/* Result badge */}
+      <div className={`shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold font-mono border ${
+        series.seriesResult === 'win'
+          ? 'bg-green-500/15 text-green-400 border-green-500/30'
+          : series.seriesResult === 'loss'
+          ? 'bg-red-500/15 text-red-400 border-red-500/30'
+          : 'bg-surface-800 text-surface-500 border-surface-700'
+      }`}>
+        {series.seriesResult === 'win' ? 'W' : series.seriesResult === 'loss' ? 'L' : '—'}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 text-sm mb-1">
+          {series.roundNumber && (
+            <span className="text-surface-500 text-xs font-mono">{t('tournament.round', { n: series.roundNumber })}</span>
+          )}
+          {series.opponentName && (
+            <span className="text-surface-200 font-medium truncate">{series.opponentName}</span>
+          )}
+          {!series.opponentName && (
+            <span className="text-surface-500 font-medium">{t('tournament.seriesNumber', { n: number })}</span>
+          )}
+          <span className={`ml-auto shrink-0 font-mono text-xs font-semibold ${
+            series.seriesResult === 'win' ? 'text-green-400' : series.seriesResult === 'loss' ? 'text-red-400' : 'text-surface-400'
+          }`}>{scoreLabel}</span>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          {allGameSlots.length > 0 && (
+            <div className="flex items-center gap-0.5">
+              {allGameSlots.map((s, i) => (
+                <img key={i} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="w-5 h-5 object-contain" onError={handleSpriteError} />
+              ))}
+            </div>
+          )}
+          {allGameSlots.length > 0 && oppPreview.length > 0 && (
+            <span className="text-surface-500 text-[10px] font-semibold px-0.5">{t('matchRow.vs')}</span>
+          )}
+          {oppPreview.length > 0 && (
+            <div className="flex items-center gap-0.5">
+              {oppPreview.slice(0, 6).map((s) => (
+                <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="w-5 h-5 object-contain" onError={handleSpriteError} />
+              ))}
+            </div>
+          )}
+          <span className="text-surface-600 text-xs ml-auto">{formatTime(series.createdAt)}</span>
+          {series.notes.length > 0 && (
+            <span className="text-surface-600 text-xs">{series.notes.length === 1 ? t('matchRow.noteSingular') : t('matchRow.notesPlural', { count: series.notes.length })}</span>
+          )}
+        </div>
       </div>
     </Link>
   );
