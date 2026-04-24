@@ -179,11 +179,48 @@
       "speedWidget": {
         "label": "Velocidades",
         "tailwind": "VA ×2",
-        "trickroom": "CR ↕"
+        "trickroom": "ER ↕"
       },
       "zones": {
-        "leads": "Iniciadores",
+        "leads": "Inicios",
         "backs": "Respaldos"
+      },
+      "sessionStats": {
+        "tabs": {
+          "matches": "Partidas",
+          "stats": "Estadísticas"
+        },
+        "kpi": {
+          "played": "Jugadas",
+          "winRate": "Win Rate",
+          "streak": "Racha",
+          "streakWin": "{count}V seguidas",
+          "streakLoss": "{count}D seguidas",
+          "eloNow": "ELO actual",
+          "eloBest": "Máximo",
+          "eloWorst": "Mínimo",
+          "avgDelta": "±ELO/partida"
+        },
+        "chart": {
+          "title": "Evolución del ELO",
+          "start": "Inicio",
+          "noData": "Sin partidas completadas aún"
+        },
+        "table": {
+          "pokemon": "Pokémon",
+          "uses": "Usos",
+          "brought": "Traídos",
+          "discards": "Descartes",
+          "record": "V/D/E",
+          "winRate": "WR",
+          "noData": "Sin datos de partidas completadas.",
+          "tabs": {
+            "myTeam": "Mi equipo",
+            "preview": "Preview rival",
+            "leads": "Leads rivales",
+            "backs": "Backs rivales"
+          }
+        }
       }
     }
   }
