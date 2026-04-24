@@ -289,6 +289,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           <SpeedTierWidget slots={match.opponentTeam.slots} />
         </div>
       </div>
+
     </div>
   );
 }

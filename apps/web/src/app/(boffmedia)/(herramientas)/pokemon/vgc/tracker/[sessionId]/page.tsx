@@ -11,6 +11,7 @@ import { emptySlots, slotsFromPreset, spriteUrl, handleSpriteError } from '@/fea
 import { parseMatchCsv } from '@/features/vgc-tracker/utils/importCsv';
 import { vgcDb } from '@/lib/db/vgc-db';
 import type { Match } from '@/features/vgc-tracker/types';
+import { SessionStatsView } from './_components/SessionStatsView';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -22,12 +23,15 @@ function formatTime(ts: number) {
 
 export default function SessionPage({ params }: Props) {
   const t = useTranslations('vgc.tracker');
+  const tStats = useTranslations('vgc.tracker.sessionStats');
   const { sessionId } = use(params);
   const router = useRouter();
   const { sessions } = useSessions();
   const session = sessions.find((s) => s.id === sessionId);
   const { matches, loading, create: createMatch, refresh: refreshMatches } = useMatches(sessionId);
   const preset = usePreset(session?.activePresetId ?? null);
+
+  const [activeTab, setActiveTab] = useState<'matches' | 'stats'>('matches');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
@@ -143,7 +147,7 @@ export default function SessionPage({ params }: Props) {
         </div>
       </motion.div>
 
-      {/* Stats */}
+      {/* ── Stat cards ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-4 gap-3">
         <StatCard value={wins} label={t('stats.wins')} color="text-green-400" />
         <StatCard value={draws} label={t('stats.draws')} color="text-yellow-400" />
@@ -159,8 +163,34 @@ export default function SessionPage({ params }: Props) {
         />
       </div>
 
-      {/* Match list */}
-      {loading ? (
+      {/* ── Tabs ─────────────────────────────────────────────────────────── */}
+      <div className="flex rounded-lg border border-surface-800 bg-surface-950 p-0.5 gap-0.5">
+        <button
+          onClick={() => setActiveTab('matches')}
+          className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
+            activeTab === 'matches'
+              ? 'bg-surface-800 text-surface-50'
+              : 'text-surface-500 hover:text-surface-300'
+          }`}
+        >
+          {tStats('tabs.matches')}
+        </button>
+        <button
+          onClick={() => setActiveTab('stats')}
+          className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
+            activeTab === 'stats'
+              ? 'bg-surface-800 text-surface-50'
+              : 'text-surface-500 hover:text-surface-300'
+          }`}
+        >
+          {tStats('tabs.stats')}
+        </button>
+      </div>
+
+      {/* ── Match list ───────────────────────────────────────────────────── */}
+      {activeTab === 'stats' ? (
+        <SessionStatsView sessionId={sessionId} startElo={session?.startElo} />
+      ) : loading ? (
         <div className="flex justify-center py-12">
           <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
         </div>

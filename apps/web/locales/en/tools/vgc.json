@@ -184,6 +184,43 @@
       "zones": {
         "leads": "Leads",
         "backs": "Backs"
+      },
+      "sessionStats": {
+        "tabs": {
+          "matches": "Matches",
+          "stats": "Stats"
+        },
+        "kpi": {
+          "played": "Played",
+          "winRate": "Win Rate",
+          "streak": "Streak",
+          "streakWin": "{count}W streak",
+          "streakLoss": "{count}L streak",
+          "eloNow": "Current ELO",
+          "eloBest": "Best",
+          "eloWorst": "Worst",
+          "avgDelta": "±ELO/game"
+        },
+        "chart": {
+          "title": "ELO Timeline",
+          "start": "Start",
+          "noData": "No completed matches yet"
+        },
+        "table": {
+          "pokemon": "Pokémon",
+          "uses": "Uses",
+          "brought": "Brought",
+          "discards": "Discards",
+          "record": "W/L/D",
+          "winRate": "WR",
+          "noData": "No completed match data yet.",
+          "tabs": {
+            "myTeam": "My team",
+            "preview": "Opponent preview",
+            "leads": "Opp. leads",
+            "backs": "Opp. backs"
+          }
+        }
       }
     }
   }
