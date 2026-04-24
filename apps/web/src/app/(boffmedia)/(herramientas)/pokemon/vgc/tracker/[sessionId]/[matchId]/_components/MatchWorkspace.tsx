@@ -201,7 +201,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
       </div>
 
       {/* ── Teams area ───────────────────────────────────────────────────── */}
-      <div className="flex-1 grid grid-cols-2 gap-4 px-4 py-4 overflow-hidden min-h-0">
+      <div className="flex-1 grid grid-cols-2 gap-4 px-8 py-4 overflow-hidden min-h-0">
         <div className="overflow-hidden">
           <TeamPanel
             label="My team"
