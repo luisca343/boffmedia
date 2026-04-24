@@ -212,9 +212,10 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         )}
       </div>
 
-      {/* ── Teams area ───────────────────────────────────────────────────── */}
-      <div className="flex-1 grid grid-cols-2 gap-4 px-8 py-4 min-h-0">
-        <div className="overflow-y-auto">
+      {/* ── Main: My Team | Notes | Opponent ─────────────────────────── */}
+      <div className="flex flex-1 min-h-0">
+        {/* My Team column */}
+        <div className="w-[340px] shrink-0 overflow-y-auto border-r border-surface-800 px-5 py-4">
           <TeamPanel
             label="My team"
             slots={match.myTeam.slots}
@@ -222,7 +223,17 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             onSlotChange={handleMyTeamChange}
           />
         </div>
-        <div className="overflow-visible">
+
+        {/* Notes — centre column fills remaining space */}
+        <NotesPanel
+          ref={notesPanelRef}
+          notes={match.notes}
+          phase={isCompleted ? 'post' : 'live'}
+          onAddNote={handleAddNote}
+        />
+
+        {/* Opponent column */}
+        <div className="w-[340px] shrink-0 border-l border-surface-800 px-5 py-4">
           <TeamPanel
             label="Opponent"
             slots={match.opponentTeam.slots}
@@ -232,14 +243,6 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           />
         </div>
       </div>
-
-      {/* ── Notes panel ──────────────────────────────────────────────────── */}
-      <NotesPanel
-        ref={notesPanelRef}
-        notes={match.notes}
-        phase={isCompleted ? 'post' : 'live'}
-        onAddNote={handleAddNote}
-      />
     </div>
   );
 }
