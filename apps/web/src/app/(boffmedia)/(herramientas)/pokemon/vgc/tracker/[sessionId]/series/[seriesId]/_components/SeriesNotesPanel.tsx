@@ -49,7 +49,7 @@ export function SeriesNotesPanel({
   return (
     <div className="flex flex-col h-full min-h-0">
       {/* Tab switcher */}
-      <div className="flex items-center gap-0.5 px-3 pt-3 pb-2 shrink-0">
+      <div className="flex items-center gap-0.5 px-3 pt-3 pb-1.5 shrink-0">
         <button
           onClick={() => setActiveTab('game')}
           className={`flex-1 py-1 text-xs font-medium rounded-md transition-colors ${
@@ -78,26 +78,8 @@ export function SeriesNotesPanel({
         </button>
       </div>
 
-      {/* Notes list */}
-      <div className="flex-1 overflow-y-auto px-3 flex flex-col-reverse gap-1.5 min-h-0">
-        {allNotes.length === 0 && (
-          <p className="text-surface-700 text-xs text-center py-6">
-            {activeTab === 'game' ? t('notes.noGameNotes') : t('notes.noSeriesNotes')}
-          </p>
-        )}
-        {allNotes.map((note) => (
-          <div key={note.id} className="flex gap-2 items-start">
-            <span className={`shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full ${
-              note.phase === 'live' ? 'bg-red-400' : note.phase === 'post' ? 'bg-surface-500' : 'bg-amber-400'
-            }`} />
-            <p className="text-surface-200 text-sm leading-snug flex-1">{note.text}</p>
-            <span className="text-surface-600 text-[10px] shrink-0 mt-0.5">{formatTime(note.createdAt)}</span>
-          </div>
-        ))}
-      </div>
-
       {/* Input row */}
-      <div className="shrink-0 px-3 pb-3 pt-2 border-t border-surface-800">
+      <div className="shrink-0 px-3 pb-2 pt-1 border-b border-surface-800">
         {activeTab === 'game' ? (
           <div className="flex items-center gap-2">
             <span className={`text-[10px] font-mono shrink-0 ${isGameCompleted ? 'text-surface-600' : 'text-red-400'}`}>
@@ -125,6 +107,24 @@ export function SeriesNotesPanel({
             />
           </div>
         )}
+      </div>
+
+      {/* Notes list — newest first */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 flex flex-col gap-1.5 min-h-0">
+        {allNotes.length === 0 && (
+          <p className="text-surface-700 text-xs text-center py-6">
+            {activeTab === 'game' ? t('notes.noGameNotes') : t('notes.noSeriesNotes')}
+          </p>
+        )}
+        {allNotes.map((note) => (
+          <div key={note.id} className="flex gap-2 items-start">
+            <span className={`shrink-0 mt-0.5 w-1.5 h-1.5 rounded-full ${
+              note.phase === 'live' ? 'bg-red-400' : note.phase === 'post' ? 'bg-surface-500' : 'bg-amber-400'
+            }`} />
+            <p className="text-surface-200 text-sm leading-snug flex-1">{note.text}</p>
+            <span className="text-surface-600 text-[10px] shrink-0 mt-0.5">{formatTime(note.createdAt)}</span>
+          </div>
+        ))}
       </div>
     </div>
   );

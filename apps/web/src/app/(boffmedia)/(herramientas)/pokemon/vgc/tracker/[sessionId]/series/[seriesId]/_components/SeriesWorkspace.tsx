@@ -22,6 +22,7 @@ import type {
   MatchSlot,
 } from '@/features/vgc-tracker/types';
 import { TeamPanel } from '../../../[matchId]/_components/TeamPanel';
+import { SpeedTierWidget } from '../../../[matchId]/_components/SpeedTierWidget';
 import { SeriesNotesPanel } from './SeriesNotesPanel';
 
 interface Props {
@@ -293,6 +294,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
               editable={false}
               onSlotChange={(slots) => handleMySlots(activeGame, slots)}
             />
+            <SpeedTierWidget slots={currentGame.mySlots} />
             {activeGame > 1 && (
               <PreviousGameRecap games={series.games} upToGame={activeGame} side="my" />
             )}
@@ -331,6 +333,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 });
               }}
             />
+            <SpeedTierWidget slots={currentGame.opponentSlots} />
             {/* Result buttons for this game */}
             <div className="flex items-center gap-2">
               <span className="text-xs text-surface-500 uppercase tracking-wide font-medium">{t('workspace.game', { n: activeGame })}</span>
