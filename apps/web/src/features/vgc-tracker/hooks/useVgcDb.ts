@@ -2,17 +2,17 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { vgcDb } from '@/lib/db/vgc-db';
-import type { Match, Series, Session, TeamPreset } from '../types';
+import type { Match, PresetVersion, Series, Session, TeamPreset } from '../types';
 
 // ─── Sessions ────────────────────────────────────────────────────────────────
 
 export function useSessions() {
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [allSessions, setAllSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     const rows = await vgcDb.sessions.orderBy('startedAt').reverse().toArray();
-    setSessions(rows);
+    setAllSessions(rows);
     setLoading(false);
   }, []);
 
@@ -23,6 +23,11 @@ export function useSessions() {
     await refresh();
   }, [refresh]);
 
+  const update = useCallback(async (id: string, patch: Partial<Session>) => {
+    await vgcDb.sessions.update(id, patch);
+    await refresh();
+  }, [refresh]);
+
   const remove = useCallback(async (id: string) => {
     await vgcDb.sessions.delete(id);
     await vgcDb.matches.where('sessionId').equals(id).delete();
@@ -30,7 +35,20 @@ export function useSessions() {
     await refresh();
   }, [refresh]);
 
-  return { sessions, loading, create, remove, refresh };
+  const archive = useCallback(async (id: string) => {
+    await vgcDb.sessions.update(id, { archivedAt: Date.now() });
+    await refresh();
+  }, [refresh]);
+
+  const unarchive = useCallback(async (id: string) => {
+    await vgcDb.sessions.update(id, { archivedAt: undefined });
+    await refresh();
+  }, [refresh]);
+
+  const sessions = allSessions.filter((s) => !s.archivedAt);
+  const archivedSessions = allSessions.filter((s) => !!s.archivedAt);
+
+  return { sessions, archivedSessions, loading, create, update, remove, archive, unarchive, refresh };
 }
 
 // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -99,7 +117,29 @@ export function usePresets() {
   useEffect(() => { refresh(); }, [refresh]);
 
   const save = useCallback(async (preset: TeamPreset) => {
-    await vgcDb.presets.put(preset);
+    const existing = await vgcDb.presets.get(preset.id);
+    if (existing) {
+      // Auto-version: snapshot current state before overwriting
+      const snapshot: PresetVersion = {
+        version: existing.currentVersion,
+        name: existing.name,
+        exportString: existing.exportString,
+        slots: existing.slots,
+        savedAt: Date.now(),
+      };
+      await vgcDb.presets.put({
+        ...preset,
+        versions: [...(existing.versions ?? []), snapshot],
+        currentVersion: (existing.currentVersion ?? 1) + 1,
+        updatedAt: Date.now(),
+      });
+    } else {
+      await vgcDb.presets.put({
+        ...preset,
+        versions: preset.versions ?? [],
+        currentVersion: preset.currentVersion ?? 1,
+      });
+    }
     await refresh();
   }, [refresh]);
 
@@ -158,7 +198,7 @@ export function useSingleSeries(seriesId: string) {
   return { series, loading, save };
 }
 
-// ─── Presets ─────────────────────────────────────────────────────────────────
+// ─── Single preset ────────────────────────────────────────────────────────────
 
 export function usePreset(presetId: string | null) {
   const [preset, setPreset] = useState<TeamPreset | null>(null);

@@ -4,14 +4,17 @@ import { use, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Plus, Swords, Trophy, Upload } from 'lucide-react';
+import { ArrowLeft, Database, Layers, Plus, Share2, Swords, Trophy, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useMatches, useSeries, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
-import { computeSeriesResult, emptySlots, seriesScore, slotsForGame, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
+import { useMatches, usePresets, useSeries, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
+import { emptySlots, seriesScore, slotsForGame, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
 import { parseMatchCsv } from '@/features/vgc-tracker/utils/importCsv';
 import { vgcDb } from '@/lib/db/vgc-db';
 import type { Match, Series, SeriesGame } from '@/features/vgc-tracker/types';
 import { SessionStatsView } from './_components/SessionStatsView';
+import { ExportImportDialog } from '../_components/ExportImportDialog';
+import { RecapModal } from './_components/RecapModal';
+import type { RecapSummary } from '@/features/vgc-tracker/utils/recapShare';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -26,14 +29,22 @@ export default function SessionPage({ params }: Props) {
   const tStats = useTranslations('vgc.tracker.sessionStats');
   const { sessionId } = use(params);
   const router = useRouter();
-  const { sessions } = useSessions();
+  const { sessions, update: updateSession } = useSessions();
   const session = sessions.find((s) => s.id === sessionId);
   const { matches, loading, create: createMatch, refresh: refreshMatches } = useMatches(sessionId);
   const { seriesList, loading: seriesLoading, create: createSeries } = useSeries(sessionId);
+  const { presets } = usePresets();
   const preset = usePreset(session?.activePresetId ?? null);
   const isTournament = session?.type === 'tournament';
 
+  // Presets for this session's regulation
+  const sessionPresets = presets.filter((p) => p.regulationId === session?.regulationId);
+
   const [activeTab, setActiveTab] = useState<'matches' | 'stats'>('matches');
+  const [showPresetPicker, setShowPresetPicker] = useState(false);
+  const [showExportImport, setShowExportImport] = useState(false);
+  const [showRecap, setShowRecap] = useState(false);
+  const [roundFilter, setRoundFilter] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
@@ -80,6 +91,23 @@ export default function SessionPage({ params }: Props) {
   const latestElo = [...matches]
     .sort((a, b) => b.createdAt - a.createdAt)
     .find((m) => m.eloAfter !== undefined)?.eloAfter;
+
+  const recapSummary: RecapSummary | null = session
+    ? {
+        v: 1,
+        label: session.label,
+        format: session.format,
+        reg: session.regulationId,
+        type: session.type,
+        w: wins,
+        l: losses,
+        d: draws,
+        startElo: session.startElo,
+        curElo: latestElo,
+        bestElo: latestElo !== undefined ? Math.max(latestElo, ...(matches.map((m) => m.eloAfter).filter((e): e is number => e !== undefined))) : undefined,
+        pkmn: [...new Map(matches.flatMap((m) => m.myTeam.slots.filter((s) => s.speciesId && s.role !== 'unknown').map((s) => [s.speciesId!, s.speciesName ?? s.speciesId!] as [string, string]))).values()].slice(0, 6),
+      }
+    : null;
 
   const handleNewMatch = async () => {
     if (!session) return;
@@ -153,6 +181,36 @@ export default function SessionPage({ params }: Props) {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
+            {/* Share recap */}
+            {recapSummary && (
+              <button
+                onClick={() => setShowRecap(true)}
+                className="p-2 rounded-lg border border-surface-700 text-surface-400 hover:text-surface-50 hover:border-surface-600 transition-colors"
+                title={t('recap.openRecap')}
+              >
+                <Share2 size={14} />
+              </button>
+            )}
+
+            {/* Export / import */}
+            <button
+              onClick={() => setShowExportImport(true)}
+              className="p-2 rounded-lg border border-surface-700 text-surface-400 hover:text-surface-50 hover:border-surface-600 transition-colors"
+              title={t('exportImport.title')}
+            >
+              <Database size={14} />
+            </button>
+
+            {/* Change preset (ladder only, when multiple presets for this regulation) */}
+            {!isTournament && sessionPresets.length > 1 && (
+              <button
+                onClick={() => setShowPresetPicker(true)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-surface-700 text-surface-300 hover:text-surface-50 hover:border-surface-600 text-sm transition-colors"
+              >
+                <Layers size={14} /> {preset?.name ?? t('buttons.changePreset')}
+              </button>
+            )}
+
             {!isTournament && (
               <>
                 <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImportFile} />
@@ -243,14 +301,20 @@ export default function SessionPage({ params }: Props) {
             <p className="text-surface-400 text-sm">{t('tournament.noSeries')}</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            {seriesList.map((s, i) => (
-              <SeriesRow key={s.id} series={s} number={seriesList.length - i} sessionId={sessionId} />
-            ))}
-          </div>
+          <TournamentSeriesList
+            seriesList={seriesList}
+            sessionId={sessionId}
+            roundFilter={roundFilter}
+            onRoundFilter={setRoundFilter}
+          />
         )
       ) : activeTab === 'stats' ? (
-        <SessionStatsView sessionId={sessionId} startElo={session?.startElo} />
+        <SessionStatsView
+          sessionId={sessionId}
+          regulationId={session?.regulationId}
+          startElo={session?.startElo}
+          ladderSessions={sessions.filter((s) => s.type === 'ladder')}
+        />
       ) : loading ? (
         <div className="flex justify-center py-12">
           <div className="w-5 h-5 border-2 border-primary-400 border-t-transparent rounded-full animate-spin" />
@@ -282,6 +346,62 @@ export default function SessionPage({ params }: Props) {
             ));
           })()}
         </div>
+      )}
+
+      {/* Preset picker */}
+      {showPresetPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-surface-900 border border-surface-700 rounded-xl w-full max-w-sm mx-4 shadow-2xl">
+            <div className="flex items-center justify-between p-4 border-b border-surface-700">
+              <h2 className="font-semibold text-surface-50">{t('preset.changeTitle')}</h2>
+              <button onClick={() => setShowPresetPicker(false)} className="text-surface-400 hover:text-surface-50 transition-colors">
+                ×
+              </button>
+            </div>
+            <div className="p-4 flex flex-col gap-2">
+              {sessionPresets.map((p) => {
+                const isActive = p.id === session?.activePresetId;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      updateSession(sessionId, { activePresetId: p.id });
+                      setShowPresetPicker(false);
+                    }}
+                    className={`flex items-center gap-3 w-full px-3 py-2.5 rounded-lg border text-left transition-colors ${
+                      isActive
+                        ? 'bg-primary-500/15 border-primary-500/40 text-surface-50'
+                        : 'bg-surface-800 border-surface-700 text-surface-300 hover:border-surface-600'
+                    }`}
+                  >
+                    <div className="flex -space-x-2 shrink-0">
+                      {p.slots.slice(0, 3).map((s) => (
+                        <img key={s.slotIndex} src={spriteUrl(s.speciesName)} alt={s.speciesName} className="w-7 h-7 object-contain" onError={handleSpriteError} />
+                      ))}
+                    </div>
+                    <span className="flex-1 text-sm font-medium truncate">{p.name}</span>
+                    {isActive && <span className="text-[10px] text-primary-400 font-mono shrink-0">{t('preset.currentTag')}</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Recap / Share */}
+      {showRecap && recapSummary && (
+        <RecapModal summary={recapSummary} onClose={() => setShowRecap(false)} />
+      )}
+
+      {/* Export / Import */}
+      {showExportImport && (
+        <ExportImportDialog
+          sessionId={sessionId}
+          sessionLabel={session?.label}
+          onImportDone={() => { refreshMatches(); }}
+          onClose={() => setShowExportImport(false)}
+        />
       )}
 
       {/* Import config modal */}
@@ -346,7 +466,6 @@ function StatCard({ value, label, color }: { value: string | number; label: stri
 
 function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number: number; sessionId: string; eloDelta?: number }) {
   const t = useTranslations('vgc.tracker');
-  const isCompleted = !!match.completedAt;
 
   // ELO delta: colored by result
   const deltaColor = eloDelta === undefined
@@ -449,6 +568,53 @@ function MatchRow({ match, number, sessionId, eloDelta }: { match: Match; number
         )}
       </div>
     </Link>
+  );
+}
+
+function TournamentSeriesList({
+  seriesList,
+  sessionId,
+  roundFilter,
+  onRoundFilter,
+}: {
+  seriesList: Series[];
+  sessionId: string;
+  roundFilter: number | null;
+  onRoundFilter: (r: number | null) => void;
+}) {
+  const t = useTranslations('vgc.tracker');
+  const rounds = [...new Set(seriesList.flatMap((s) => s.roundNumber !== undefined ? [s.roundNumber] : []))].sort((a, b) => a - b);
+  const displayed = roundFilter !== null ? seriesList.filter((s) => s.roundNumber === roundFilter) : seriesList;
+
+  return (
+    <div className="flex flex-col gap-2">
+      {rounds.length > 1 && (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => onRoundFilter(null)}
+            className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+              roundFilter === null ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-800'
+            }`}
+          >
+            {t('tournament.allRounds')}
+          </button>
+          {rounds.map((r) => (
+            <button
+              key={r}
+              onClick={() => onRoundFilter(r)}
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                roundFilter === r ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'text-surface-500 hover:text-surface-300 border border-surface-800'
+              }`}
+            >
+              {t('tournament.round', { n: r })}
+            </button>
+          ))}
+        </div>
+      )}
+      {displayed.map((s) => (
+        <SeriesRow key={s.id} series={s} number={seriesList.length - seriesList.indexOf(s)} sessionId={sessionId} />
+      ))}
+    </div>
   );
 }
 
