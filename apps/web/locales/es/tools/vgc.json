@@ -254,8 +254,7 @@
       },
       "speedWidget": {
         "label": "Velocidades",
-        "tailwind": "VA ×2",
-        "trickroom": "ER ↕"
+        "tailwind": "VA ×2",        "scarf": "Pañuelo ×1.5",        "trickroom": "ER ↕"
       },
       "zones": {
         "leads": "Inicios",
