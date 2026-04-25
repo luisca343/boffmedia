@@ -1,4 +1,4 @@
-import type { Match, MatchResult, SlotRole } from '../types';
+import type { Match, MatchResult, SlotRole, TeamSnapshot } from '../types';
 
 // ─── Output types ─────────────────────────────────────────────────────────────
 
@@ -50,6 +50,30 @@ export interface RecordStats {
   streak: { type: 'win' | 'loss'; count: number } | null;
 }
 
+export interface LeadPairStats {
+  key: string;
+  lead1Id: string;
+  lead1Name: string;
+  lead2Id: string;
+  lead2Name: string;
+  games: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  winRate: number | null;
+}
+
+export type TimeSlot = 'morning' | 'afternoon' | 'evening' | 'night';
+
+export interface TimeSlotStats {
+  slot: TimeSlot;
+  games: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  winRate: number | null;
+}
+
 export interface SessionStats {
   record: RecordStats;
   elo: EloStats;
@@ -58,6 +82,9 @@ export interface SessionStats {
   opponentPreview: PokemonUsage[];
   opponentLeads: PokemonUsage[];
   opponentBacks: PokemonUsage[];
+  myLeadPairs: LeadPairStats[];
+  opponentLeadPairs: LeadPairStats[];
+  timeSlots: TimeSlotStats[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -67,24 +94,20 @@ function average(arr: number[]): number | null {
 }
 
 type CompletedMatch = Match & { result: MatchResult; eloAfter: number };
-type FinishedMatch = Match & { result: MatchResult };
+export type FinishedMatch = Match & { result: MatchResult };
 
 /**
  * Builds the per-Pokémon usage table for one of the three opponent views.
- *
- * @param roleFilter  Determines which slots to include.
- * @param withDiscards  When true, slots with role==='unknown' increment discards
- *                      instead of uses (used for the team preview table).
+ * Exported so regulation-meta can reuse it without duplication.
  */
-function buildOppUsage(
-  matches: CompletedMatch[],
+export function buildOppUsage(
+  matches: FinishedMatch[],
   roleFilter: (role: SlotRole) => boolean,
   withDiscards: boolean,
 ): PokemonUsage[] {
   const map = new Map<string, Omit<PokemonUsage, 'winRate'>>();
 
   for (const m of matches) {
-    // Avoid double-counting a Pokémon that appears twice in the same team (shouldn't happen)
     const seenInMatch = new Set<string>();
 
     for (const slot of m.opponentTeam.slots) {
@@ -110,7 +133,6 @@ function buildOppUsage(
         entry.uses++;
       }
 
-      // My result is always counted for any appearance in the filtered set
       if (m.result === 'win') entry.wins++;
       else if (m.result === 'loss') entry.losses++;
       else entry.draws++;
@@ -127,17 +149,87 @@ function buildOppUsage(
     .sort((a, b) => b.uses + b.discards - (a.uses + a.discards));
 }
 
+function buildLeadPairs(
+  matches: CompletedMatch[],
+  teamSelector: (m: CompletedMatch) => TeamSnapshot,
+): LeadPairStats[] {
+  const map = new Map<string, Omit<LeadPairStats, 'winRate'>>();
+
+  for (const m of matches) {
+    const slots = teamSelector(m).slots;
+    const lead1 = slots.find((s) => s.role === 'lead1' && s.speciesId);
+    const lead2 = slots.find((s) => s.role === 'lead2' && s.speciesId);
+    if (!lead1?.speciesId || !lead2?.speciesId) continue;
+
+    const [a, b] = [lead1, lead2].sort((x, y) =>
+      x.speciesId!.localeCompare(y.speciesId!),
+    );
+    const key = `${a.speciesId}+${b.speciesId}`;
+
+    const entry = map.get(key) ?? {
+      key,
+      lead1Id: a.speciesId!,
+      lead1Name: a.speciesName ?? a.speciesId!,
+      lead2Id: b.speciesId!,
+      lead2Name: b.speciesName ?? b.speciesId!,
+      games: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+    };
+
+    entry.games++;
+    if (m.result === 'win') entry.wins++;
+    else if (m.result === 'loss') entry.losses++;
+    else entry.draws++;
+
+    map.set(key, entry);
+  }
+
+  return [...map.values()]
+    .map((p) => ({
+      ...p,
+      winRate: p.wins + p.losses > 0 ? p.wins / (p.wins + p.losses) : null,
+    }))
+    .sort((a, b) => b.games - a.games);
+}
+
+function getTimeSlot(ts: number): TimeSlot {
+  const h = new Date(ts).getHours();
+  if (h >= 6 && h < 12) return 'morning';
+  if (h >= 12 && h < 18) return 'afternoon';
+  if (h >= 18) return 'evening';
+  return 'night';
+}
+
+function buildTimeSlots(matches: CompletedMatch[]): TimeSlotStats[] {
+  const order: TimeSlot[] = ['morning', 'afternoon', 'evening', 'night'];
+  const map = new Map<TimeSlot, Omit<TimeSlotStats, 'winRate'>>(
+    order.map((s) => [s, { slot: s, games: 0, wins: 0, losses: 0, draws: 0 }]),
+  );
+
+  for (const m of matches) {
+    const slot = getTimeSlot(m.completedAt ?? m.createdAt);
+    const entry = map.get(slot)!;
+    entry.games++;
+    if (m.result === 'win') entry.wins++;
+    else if (m.result === 'loss') entry.losses++;
+    else entry.draws++;
+  }
+
+  return order
+    .map((s) => {
+      const e = map.get(s)!;
+      return {
+        ...e,
+        winRate: e.wins + e.losses > 0 ? e.wins / (e.wins + e.losses) : null,
+      };
+    })
+    .filter((e) => e.games > 0);
+}
+
 // ─── Main computation ─────────────────────────────────────────────────────────
 
-/**
- * Derives all session statistics from a flat array of matches.
- *
- * "Completed" definition: result !== undefined AND eloAfter !== undefined.
- * All stats tables and ELO metrics are computed over completed matches only.
- *
- * The ELO timeline includes all "finished" matches (result set, eloAfter optional)
- * so that gaps from missing ELO values are visible in the chart.
- */
 export function computeSessionStats(
   matches: Match[],
   startElo?: number,
@@ -160,13 +252,10 @@ export function computeSessionStats(
   const draws = completed.filter((m) => m.result === 'draw').length;
   const decisive = wins + losses;
 
-  // Streak: walk backward through decisive matches; draws are skipped entirely
   const decisiveChron = chronological.filter((m) => m.result !== 'draw');
   let streak: RecordStats['streak'] = null;
   if (decisiveChron.length > 0) {
-    const lastType = decisiveChron[decisiveChron.length - 1].result as
-      | 'win'
-      | 'loss';
+    const lastType = decisiveChron[decisiveChron.length - 1].result as 'win' | 'loss';
     let count = 0;
     for (let i = decisiveChron.length - 1; i >= 0; i--) {
       if (decisiveChron[i].result === lastType) count++;
@@ -204,7 +293,6 @@ export function computeSessionStats(
     eloTimeline.push({ matchNum: 0, elo: startElo, eloFill: startElo });
   }
 
-  // Use ALL finished matches (result set) — missing eloAfter becomes null gap
   const finishedChron = matches
     .filter((m): m is FinishedMatch => m.result !== undefined)
     .sort((a, b) => (a.completedAt ?? a.createdAt) - (b.completedAt ?? b.createdAt));
@@ -216,19 +304,11 @@ export function computeSessionStats(
     let delta: number | undefined;
 
     if (elo !== null) {
-      if (lastKnownElo !== undefined) {
-        delta = elo - lastKnownElo;
-      }
+      if (lastKnownElo !== undefined) delta = elo - lastKnownElo;
       lastKnownElo = elo;
     }
 
-    eloTimeline.push({
-      matchNum: i + 1,
-      elo,
-      eloFill: elo,
-      result: m.result,
-      delta,
-    });
+    eloTimeline.push({ matchNum: i + 1, elo, eloFill: elo, result: m.result, delta });
   });
 
   // ── My Pokémon ────────────────────────────────────────────────────────────
@@ -288,15 +368,10 @@ export function computeSessionStats(
     eloTimeline,
     myPokemon,
     opponentPreview: buildOppUsage(completed, () => true, true),
-    opponentLeads: buildOppUsage(
-      completed,
-      (r) => r === 'lead1' || r === 'lead2',
-      false,
-    ),
-    opponentBacks: buildOppUsage(
-      completed,
-      (r) => r === 'back1' || r === 'back2',
-      false,
-    ),
+    opponentLeads: buildOppUsage(completed, (r) => r === 'lead1' || r === 'lead2', false),
+    opponentBacks: buildOppUsage(completed, (r) => r === 'back1' || r === 'back2', false),
+    myLeadPairs: buildLeadPairs(completed, (m) => m.myTeam),
+    opponentLeadPairs: buildLeadPairs(completed, (m) => m.opponentTeam),
+    timeSlots: buildTimeSlots(completed),
   };
 }

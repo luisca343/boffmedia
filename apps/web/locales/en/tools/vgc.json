@@ -108,7 +108,17 @@
         "import": "Import",
         "importFile": "Import {name}",
         "importNewPreset": "Import new preset",
-        "startSession": "Start session"
+        "startSession": "Start session",
+        "archive": "Archive",
+        "unarchive": "Unarchive",
+        "duplicate": "Duplicate",
+        "editPreset": "Edit",
+        "save": "Save",
+        "changePreset": "Change preset",
+        "exportSession": "Export session",
+        "exportAll": "Export all",
+        "importData": "Import data",
+        "restoreVersion": "Restore"
       },
       "labels": {
         "sessionLabel": "Session label",
@@ -178,7 +188,34 @@
         "noSessions": "No sessions yet",
         "noSessionsHint": "Import a team preset, then start a session.",
         "noMatches": "No matches yet — start one!",
-        "noPresets": "No presets yet. Import a Showdown paste to get started."
+        "noPresets": "No presets yet. Import a Showdown paste to get started.",
+        "noArchivedSessions": "No archived sessions"
+      },
+      "archive": {
+        "showArchived": "Show archived ({count})",
+        "hideArchived": "Hide archived",
+        "badge": "Archived"
+      },
+      "duplicate": {
+        "title": "Duplicate session",
+        "newLabel": "New label"
+      },
+      "exportImport": {
+        "title": "Data",
+        "exportSession": "Export session",
+        "exportAll": "Export all",
+        "importFile": "Import file",
+        "importHint": "Merges data, skips duplicates",
+        "importSuccess": "{sessions} sessions · {matches} matches imported",
+        "importError": "Invalid or corrupt file"
+      },
+      "preset": {
+        "editTitle": "Edit preset",
+        "versionHistory": "Version history",
+        "versionN": "v{n}",
+        "currentTag": "current",
+        "changeTitle": "Change active preset",
+        "activeLabel": "Active preset"
       },
       "sessionType": {
         "ladder": "Ladder",
@@ -190,6 +227,7 @@
         "gameRecord": "Game record",
         "noSeries": "No series yet — start one!",
         "round": "R{n}",
+        "allRounds": "All rounds",
         "seriesNumber": "Series #{n}"
       },
       "errors": {
@@ -258,7 +296,41 @@
             "leads": "Opp. leads",
             "backs": "Opp. backs"
           }
+        },
+        "leadPairs": {
+          "title": "Lead pairs",
+          "my": "My leads",
+          "opp": "Opponent leads",
+          "pair": "Pair",
+          "minGames": "≥{n} games",
+          "noData": "No lead data recorded yet.",
+          "noDataThreshold": "No pairs with {n}+ games. Try removing the filter."
+        },
+        "timeSlots": {
+          "title": "Time of day",
+          "morning": "Morning (6–11h)",
+          "afternoon": "Afternoon (12–17h)",
+          "evening": "Evening (18–23h)",
+          "night": "Night (0–5h)"
+        },
+        "regulationMeta": {
+          "title": "Regulation meta",
+          "matchCount": "{n} matches",
+          "noData": "No opponent data across this regulation yet."
+        },
+        "comparison": {
+          "title": "Compare sessions",
+          "clearAll": "Clear all",
+          "hint": "Select sessions above to overlay their ELO charts."
         }
+      },
+      "recap": {
+        "title": "Session recap",
+        "openRecap": "Share recap",
+        "downloadImage": "Download image",
+        "downloading": "Downloading…",
+        "copyLink": "Copy link",
+        "copied": "Copied!"
       }
     }
   }
