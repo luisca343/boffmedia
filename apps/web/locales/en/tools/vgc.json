@@ -254,8 +254,7 @@
       },
       "speedWidget": {
         "label": "Speed Tiers",
-        "tailwind": "TW ×2",
-        "trickroom": "TR ↕"
+        "tailwind": "TW ×2",        "scarf": "Scarf ×1.5",        "trickroom": "TR ↕"
       },
       "zones": {
         "leads": "Leads",
