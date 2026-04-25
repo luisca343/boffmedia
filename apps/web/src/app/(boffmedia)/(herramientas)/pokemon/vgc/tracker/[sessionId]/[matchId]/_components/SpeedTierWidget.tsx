@@ -20,13 +20,14 @@ export function SpeedTierWidget({ slots }: Props) {
   const t = useTranslations('vgc.tracker');
   const [tailwind, setTailwind] = useState(false);
   const [trickRoom, setTrickRoom] = useState(false);
+  const [scarf, setScarf] = useState(false);
 
   const rows = slots
     .filter((s) => !!s.speciesName)
     .map((s) => {
       const baseSpe = getBaseSpe(s.speciesName!);
       const stat = calcSpeedStat(baseSpe, 0, 1.0);
-      const effective = applyMods(stat, { boost: 0, tailwind, scarf: false, paralysis: false });
+      const effective = applyMods(stat, { boost: 0, tailwind, scarf, paralysis: false });
       return { slotIndex: s.slotIndex, name: s.speciesName!, baseSpe, effective };
     })
     .filter((r) => r.baseSpe > 0)
@@ -54,6 +55,16 @@ export function SpeedTierWidget({ slots }: Props) {
             }`}
           >
             {t('speedWidget.tailwind')}
+          </button>
+          <button
+            onClick={() => setScarf((v) => !v)}
+            className={`text-[10px] px-1.5 py-0.5 rounded font-mono transition-colors ${
+              scarf
+                ? 'bg-orange-600/40 text-orange-300 border border-orange-600/50'
+                : 'bg-surface-800 text-surface-500 hover:text-surface-300 border border-transparent'
+            }`}
+          >
+            {t('speedWidget.scarf')}
           </button>
           <button
             onClick={() => setTrickRoom((v) => !v)}
@@ -97,8 +108,10 @@ export function SpeedTierWidget({ slots }: Props) {
             <span className="relative text-xs font-mono shrink-0 tabular-nums text-surface-400">
               {row.baseSpe}
             </span>
-            {tailwind && (
-              <span className="relative text-[10px] font-mono shrink-0 tabular-nums text-blue-400">
+            {(tailwind || scarf) && (
+              <span className={`relative text-[10px] font-mono shrink-0 tabular-nums ${
+                tailwind ? 'text-blue-400' : 'text-orange-400'
+              }`}>
                 →{row.effective}
               </span>
             )}

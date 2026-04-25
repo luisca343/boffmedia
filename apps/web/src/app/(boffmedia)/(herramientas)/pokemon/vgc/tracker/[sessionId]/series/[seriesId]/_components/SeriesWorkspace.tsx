@@ -265,7 +265,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
               {t('workspace.game', { n })}
               {game?.result && (
                 <span className={`text-[10px] font-mono ml-0.5 ${game.result === 'win' ? 'text-green-400' : game.result === 'loss' ? 'text-red-400' : 'text-yellow-400'}`}>
-                  {game.result === 'win' ? 'W' : game.result === 'loss' ? 'L' : 'D'}
+                  {game.result === 'win' ? t('result.winShort') : game.result === 'loss' ? t('result.lossShort') : t('result.drawShort')}
                 </span>
               )}
             </button>
@@ -348,7 +348,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                       : 'bg-surface-800 border-surface-700 text-surface-400 hover:text-surface-200',
                   ].join(' ')}
                 >
-                  {r === 'win' ? 'W' : r === 'loss' ? 'L' : 'D'}
+                  {r === 'win' ? t('result.winShort') : r === 'loss' ? t('result.lossShort') : t('result.drawShort')}
                 </button>
               ))}
             </div>
@@ -394,7 +394,7 @@ function PreviousGameRecap({
         return (
           <div key={g.gameNumber} className="flex items-center gap-2">
             <span className={`text-[10px] font-bold font-mono w-4 ${g.result === 'win' ? 'text-green-400' : g.result === 'loss' ? 'text-red-400' : 'text-yellow-400'}`}>
-              {t('workspace.gameAbbr', { n: g.gameNumber })}
+              {g.result === 'win' ? t('result.winShort') : g.result === 'loss' ? t('result.lossShort') : t('result.drawShort')} {t('workspace.gameAbbr', { n: g.gameNumber })}
             </span>
             <div className="flex items-center gap-0.5">
               {leads.map((s) => (
