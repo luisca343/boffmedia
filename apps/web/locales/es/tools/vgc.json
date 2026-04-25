@@ -169,6 +169,11 @@
         "live": "EN VIVO",
         "post": "POST"
       },
+      "result": {
+        "winShort": "V",
+        "drawShort": "E",
+        "lossShort": "D"
+      },
       "empty": {
         "noSessions": "Sin sesiones aún",
         "noSessionsHint": "Importa un preset de equipo y luego inicia una sesión.",
@@ -180,8 +185,8 @@
         "tournament": "Torneo"
       },
       "tournament": {
-        "seriesWins": "Series W",
-        "seriesLosses": "Series L",
+        "seriesWins": "Series V",
+        "seriesLosses": "Series D",
         "gameRecord": "Partidas",
         "noSeries": "Sin series aún — ¡empieza una!",
         "round": "R{n}",
@@ -194,7 +199,7 @@
       "workspace": {
         "roundPrefix": "R",
         "game": "Partida {n}",
-        "gameAbbr": "G{n}",
+        "gameAbbr": "P{n}",
         "endGame": "Terminar partida {n}",
         "noGameData": "Sin datos de partida.",
         "previousGames": "Partidas anteriores"

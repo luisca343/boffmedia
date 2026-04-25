@@ -169,6 +169,11 @@
         "live": "LIVE",
         "post": "POST"
       },
+      "result": {
+        "winShort": "W",
+        "drawShort": "D",
+        "lossShort": "L"
+      },
       "empty": {
         "noSessions": "No sessions yet",
         "noSessionsHint": "Import a team preset, then start a session.",
