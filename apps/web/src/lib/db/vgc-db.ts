@@ -28,6 +28,28 @@ class VgcDatabase extends Dexie {
           if (!s.type) s.type = 'ladder';
         }),
       );
+
+    this.version(3)
+      .stores({
+        sessions: 'id, startedAt, type, archivedAt',
+        matches: 'id, sessionId, createdAt',
+        presets: 'id, createdAt',
+        series: 'id, sessionId, createdAt',
+      })
+      .upgrade((tx) =>
+        tx.table('presets').toCollection().modify((p: TeamPreset) => {
+          if (!p.versions) {
+            p.versions = [{
+              version: 1,
+              name: p.name,
+              exportString: p.exportString,
+              slots: p.slots,
+              savedAt: p.updatedAt ?? p.createdAt,
+            }];
+            p.currentVersion = 1;
+          }
+        }),
+      );
   }
 }
 

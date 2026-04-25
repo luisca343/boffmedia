@@ -15,6 +15,14 @@ export interface PresetSlot {
   nature?: string;
 }
 
+export interface PresetVersion {
+  version: number;
+  name: string;
+  exportString: string;
+  slots: PresetSlot[];
+  savedAt: number;
+}
+
 export interface TeamPreset {
   id: string;
   name: string;
@@ -23,6 +31,8 @@ export interface TeamPreset {
   slots: PresetSlot[];
   createdAt: number;
   updatedAt: number;
+  currentVersion: number;
+  versions: PresetVersion[];
 }
 
 export interface Session {
@@ -35,6 +45,7 @@ export interface Session {
   startElo?: number;
   startedAt: number;
   tournamentName?: string;
+  archivedAt?: number;
 }
 
 export interface SeriesGame {

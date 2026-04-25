@@ -108,7 +108,17 @@
         "import": "Importar",
         "importFile": "Importar {name}",
         "importNewPreset": "Importar nuevo preset",
-        "startSession": "Iniciar sesión"
+        "startSession": "Iniciar sesión",
+        "archive": "Archivar",
+        "unarchive": "Desarchivar",
+        "duplicate": "Duplicar",
+        "editPreset": "Editar",
+        "save": "Guardar",
+        "changePreset": "Cambiar preset",
+        "exportSession": "Exportar sesión",
+        "exportAll": "Exportar todo",
+        "importData": "Importar datos",
+        "restoreVersion": "Restaurar"
       },
       "labels": {
         "sessionLabel": "Etiqueta de sesión",
@@ -178,7 +188,34 @@
         "noSessions": "Sin sesiones aún",
         "noSessionsHint": "Importa un preset de equipo y luego inicia una sesión.",
         "noMatches": "Sin combates aún — ¡empieza uno!",
-        "noPresets": "Sin presets aún. Importa un paste de Showdown para empezar."
+        "noPresets": "Sin presets aún. Importa un paste de Showdown para empezar.",
+        "noArchivedSessions": "Sin sesiones archivadas"
+      },
+      "archive": {
+        "showArchived": "Mostrar archivadas ({count})",
+        "hideArchived": "Ocultar archivadas",
+        "badge": "Archivada"
+      },
+      "duplicate": {
+        "title": "Duplicar sesión",
+        "newLabel": "Nueva etiqueta"
+      },
+      "exportImport": {
+        "title": "Datos",
+        "exportSession": "Exportar sesión",
+        "exportAll": "Exportar todo",
+        "importFile": "Importar archivo",
+        "importHint": "Combina datos, omite duplicados",
+        "importSuccess": "{sessions} sesiones · {matches} partidas importadas",
+        "importError": "Archivo inválido o corrupto"
+      },
+      "preset": {
+        "editTitle": "Editar preset",
+        "versionHistory": "Historial de versiones",
+        "versionN": "v{n}",
+        "currentTag": "actual",
+        "changeTitle": "Cambiar preset activo",
+        "activeLabel": "Preset activo"
       },
       "sessionType": {
         "ladder": "Clasificatoria",
@@ -190,6 +227,7 @@
         "gameRecord": "Partidas",
         "noSeries": "Sin series aún — ¡empieza una!",
         "round": "R{n}",
+        "allRounds": "Todas las rondas",
         "seriesNumber": "Serie #{n}"
       },
       "errors": {
@@ -258,7 +296,41 @@
             "leads": "Leads rivales",
             "backs": "Backs rivales"
           }
+        },
+        "leadPairs": {
+          "title": "Parejas de leads",
+          "my": "Mis leads",
+          "opp": "Leads rivales",
+          "pair": "Pareja",
+          "minGames": "≥{n} partidas",
+          "noData": "Sin datos de leads aún.",
+          "noDataThreshold": "Sin parejas con {n}+ partidas. Prueba a quitar el filtro."
+        },
+        "timeSlots": {
+          "title": "Hora del día",
+          "morning": "Mañana (6–11h)",
+          "afternoon": "Tarde (12–17h)",
+          "evening": "Noche (18–23h)",
+          "night": "Madrugada (0–5h)"
+        },
+        "regulationMeta": {
+          "title": "Meta de la regulación",
+          "matchCount": "{n} partidas",
+          "noData": "Sin datos de rivales en esta regulación aún."
+        },
+        "comparison": {
+          "title": "Comparar sesiones",
+          "clearAll": "Limpiar todo",
+          "hint": "Selecciona sesiones arriba para superponer sus gráficas de ELO."
         }
+      },
+      "recap": {
+        "title": "Resumen de sesión",
+        "openRecap": "Compartir resumen",
+        "downloadImage": "Descargar imagen",
+        "downloading": "Descargando…",
+        "copyLink": "Copiar enlace",
+        "copied": "¡Copiado!"
       }
     }
   }
