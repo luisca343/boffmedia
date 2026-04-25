@@ -149,41 +149,37 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           <ArrowLeft size={18} />
         </button>
 
-        <div className="flex-1 flex items-center gap-2 min-w-0">
-          <span className="text-surface-400 text-sm shrink-0">
+        {/* Time + format */}
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-surface-400 text-sm">
             {new Date(match.createdAt).toLocaleTimeString(undefined, {
               hour: '2-digit',
               minute: '2-digit',
             })}
           </span>
-          <span className="text-surface-600 text-xs font-mono shrink-0">{match.format}</span>
-          <input
-            value={opponentNameInput}
-            onChange={(e) => setOpponentNameInput(e.target.value)}
-            onBlur={handleOpponentNameBlur}
-            placeholder={t('placeholders.rivalName')}
-            className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-surface-700 focus:border-primary-500 text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none py-0.5 transition-colors"
-          />
+          <span className="text-surface-600 text-xs font-mono">{match.format}</span>
         </div>
+
+        <div className="flex-1" />
 
         {/* Result buttons */}
         <div className="flex items-center gap-1.5">
           <ResultButton
-            label="W"
+            label={t('result.winShort')}
             active={match.result === 'win'}
             color="green"
             onClick={() => handleResult('win')}
             hint="W"
           />
           <ResultButton
-            label="D"
+            label={t('result.drawShort')}
             active={match.result === 'draw'}
             color="yellow"
             onClick={() => handleResult('draw')}
             hint="D"
           />
           <ResultButton
-            label="L"
+            label={t('result.lossShort')}
             active={match.result === 'loss'}
             color="red"
             onClick={() => handleResult('loss')}
@@ -191,28 +187,36 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           />
         </div>
 
-        {/* ELO inputs */}
-        <div className="flex items-center gap-1.5">
-          <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
-            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">{t('indicators.myElo')}</span>
-            <input
-              value={eloAfterInput}
-              onChange={(e) => setEloAfterInput(e.target.value)}
-              onBlur={handleEloAfterBlur}
-              placeholder="—"
-              className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
-            />
-          </div>
-          <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
-            <span className="text-[10px] text-surface-500 font-mono select-none uppercase">{t('indicators.rival')}</span>
-            <input
-              value={opponentEloInput}
-              onChange={(e) => setOpponentEloInput(e.target.value)}
-              onBlur={handleOpponentEloBlur}
-              placeholder="—"
-              className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
-            />
-          </div>
+        {/* My ELO — standalone (ELO after this match) */}
+        <div className="flex items-center gap-1.5 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
+          <span className="text-[10px] text-surface-500 font-mono select-none uppercase">{t('indicators.myElo')}</span>
+          <input
+            value={eloAfterInput}
+            onChange={(e) => setEloAfterInput(e.target.value)}
+            onBlur={handleEloAfterBlur}
+            placeholder="—"
+            className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
+          />
+        </div>
+
+        {/* Rival group: name + rival ELO together */}
+        <div className="flex items-center gap-2 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
+          <input
+            value={opponentNameInput}
+            onChange={(e) => setOpponentNameInput(e.target.value)}
+            onBlur={handleOpponentNameBlur}
+            placeholder={t('placeholders.rivalName')}
+            className="w-24 bg-transparent text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none"
+          />
+          <span className="text-surface-700 text-xs shrink-0">·</span>
+          <span className="text-[10px] text-surface-500 font-mono select-none uppercase shrink-0">{t('indicators.rival')}</span>
+          <input
+            value={opponentEloInput}
+            onChange={(e) => setOpponentEloInput(e.target.value)}
+            onBlur={handleOpponentEloBlur}
+            placeholder="—"
+            className="w-20 bg-transparent text-surface-50 text-base font-mono text-center focus:outline-none placeholder:text-surface-700"
+          />
         </div>
 
         {/* Finish / save indicator */}
