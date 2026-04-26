@@ -20,6 +20,7 @@ import type {
   MatchNote,
   MatchResult,
   MatchSlot,
+  OutcomeTag,
 } from '@/features/vgc-tracker/types';
 import { TeamPanel } from '../../../[matchId]/_components/TeamPanel';
 import { SpeedTierWidget } from '../../../[matchId]/_components/SpeedTierWidget';
@@ -43,6 +44,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   const [roundInput, setRoundInput] = useState(
     initialSeries.roundNumber !== undefined ? String(initialSeries.roundNumber) : '',
   );
+  const [archetypeInput, setArchetypeInput] = useState(initialSeries.opponentArchetype ?? '');
   const [isCompleted, setIsCompleted] = useState(!!initialSeries.completedAt);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -96,6 +98,21 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
     update({ roundNumber: isNaN(n) ? undefined : n });
   };
 
+  const handleArchetypeBlur = () => {
+    update({ opponentArchetype: archetypeInput.trim() || undefined });
+  };
+
+  const handleGameOutcomeTag = (gameNumber: 1 | 2 | 3, tag: OutcomeTag) => {
+    const game = series.games.find((g) => g.gameNumber === gameNumber);
+    if (!game) return;
+    updateGame(gameNumber, { outcomeTag: tag === game.outcomeTag ? undefined : tag });
+  };
+
+  const handleGameTurnCount = (gameNumber: 1 | 2 | 3, value: string) => {
+    const n = parseInt(value, 10);
+    updateGame(gameNumber, { turnCount: isNaN(n) || n < 1 ? undefined : n });
+  };
+
   const handleGameResult = (gameNumber: 1 | 2 | 3, result: MatchResult) => {
     const game = series.games.find((g) => g.gameNumber === gameNumber);
     if (!game) return;
@@ -131,6 +148,16 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
       phase: 'series',
     };
     update({ notes: [...series.notes, note] });
+  };
+
+  // Unified note handler: adds to current game if ongoing, otherwise series-level
+  const handleAddNote = (text: string) => {
+    const game = series.games.find((g) => g.gameNumber === activeGame);
+    if (game && !game.completedAt && !series.completedAt) {
+      handleAddGameNote(activeGame, text);
+    } else {
+      handleAddSeriesNote(text);
+    }
   };
 
   const handleFinishGame = (gameNumber: 1 | 2 | 3) => {
@@ -209,6 +236,15 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
             onBlur={handleOpponentNameBlur}
             placeholder={t('placeholders.rivalName')}
             className="min-w-0 flex-1 max-w-[160px] bg-transparent border-b border-surface-700 focus:border-amber-500 text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none py-0.5 transition-colors"
+          />
+          <span className="text-surface-700 text-xs">·</span>
+          {/* Archetype */}
+          <input
+            value={archetypeInput}
+            onChange={(e) => setArchetypeInput(e.target.value)}
+            onBlur={handleArchetypeBlur}
+            placeholder={t('archetype.placeholder')}
+            className="min-w-0 flex-1 max-w-[120px] bg-transparent border-b border-surface-700 focus:border-amber-500 text-surface-400 text-xs placeholder:text-surface-700 focus:outline-none py-0.5 transition-colors"
           />
         </div>
 
@@ -303,11 +339,12 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
           {/* Center: Notes */}
           <div className="flex-1 min-w-0 flex flex-col min-h-0">
             <SeriesNotesPanel
-              gameNotes={currentGame.notes}
+              games={series.games}
               seriesNotes={series.notes}
+              currentGameNumber={activeGame}
               isGameCompleted={!!currentGame.completedAt}
-              onAddGameNote={(text) => handleAddGameNote(activeGame, text)}
-              onAddSeriesNote={handleAddSeriesNote}
+              isSeriesCompleted={isCompleted}
+              onAddNote={handleAddNote}
             />
           </div>
 
@@ -351,6 +388,43 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                   {r === 'win' ? t('result.winShort') : r === 'loss' ? t('result.lossShort') : t('result.drawShort')}
                 </button>
               ))}
+            </div>
+
+            {/* Outcome tag + turn count */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-1 flex-wrap">
+                {(['skill', 'misplay', 'luck', 'disconnect'] as OutcomeTag[]).map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleGameOutcomeTag(activeGame, tag)}
+                    className={[
+                      'px-2 py-0.5 rounded text-[10px] font-medium border transition-all',
+                      currentGame.outcomeTag === tag
+                        ? tag === 'skill' ? 'bg-green-500/20 border-green-500/40 text-green-300'
+                          : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
+                          : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
+                          : 'bg-surface-500/20 border-surface-500/40 text-surface-300'
+                        : 'border-surface-800 text-surface-600 hover:text-surface-400 hover:border-surface-700',
+                    ].join(' ')}
+                  >
+                    {t(`outcomeTag.${tag}`)}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium shrink-0">
+                  {t('turnCount.label')}
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  max={99}
+                  value={currentGame.turnCount ?? ''}
+                  onChange={(e) => handleGameTurnCount(activeGame, e.target.value)}
+                  placeholder="—"
+                  className="w-14 bg-transparent border-b border-surface-700 focus:border-amber-500 text-surface-300 text-xs font-mono text-center focus:outline-none transition-colors placeholder:text-surface-700"
+                />
+              </div>
             </div>
             {activeGame > 1 && (
               <PreviousGameRecap games={series.games} upToGame={activeGame} side="opponent" />

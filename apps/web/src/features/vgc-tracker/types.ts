@@ -3,6 +3,7 @@ export type MatchResult = 'win' | 'loss' | 'draw';
 export type NotePhase = 'live' | 'post' | 'series';
 export type SlotRole = 'lead1' | 'lead2' | 'back1' | 'back2' | 'unknown';
 export type SessionType = 'ladder' | 'tournament';
+export type OutcomeTag = 'skill' | 'misplay' | 'luck' | 'disconnect';
 
 export interface PresetSlot {
   slotIndex: 0 | 1 | 2 | 3 | 4 | 5;
@@ -46,6 +47,7 @@ export interface Session {
   startedAt: number;
   tournamentName?: string;
   archivedAt?: number;
+  sessionNotes?: string;
 }
 
 export interface SeriesGame {
@@ -56,6 +58,8 @@ export interface SeriesGame {
   result?: MatchResult;
   notes: MatchNote[];
   completedAt?: number;
+  outcomeTag?: OutcomeTag;
+  turnCount?: number;
 }
 
 export interface Series {
@@ -65,6 +69,7 @@ export interface Series {
   completedAt?: number;
   roundNumber?: number;
   opponentName?: string;
+  opponentArchetype?: string;
   myTeam: TeamSnapshot;
   opponentTeam: TeamSnapshot;
   games: SeriesGame[];
@@ -104,6 +109,9 @@ export interface Match {
   eloAfter?: number;
   opponentElo?: number;
   notes: MatchNote[];
+  outcomeTag?: OutcomeTag;
+  turnCount?: number;
+  opponentArchetype?: string;
 }
 
 export type SpeciesEntry = { id: string; name: string; num: number };

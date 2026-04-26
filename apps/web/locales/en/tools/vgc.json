@@ -234,6 +234,24 @@
         "presetNameRequired": "Give this preset a name.",
         "invalidPaste": "Could not parse the paste. Check the format."
       },
+      "outcomeTag": {
+        "label": "Outcome",
+        "skill": "Skill",
+        "misplay": "Misplay",
+        "luck": "Luck",
+        "disconnect": "Disconnect"
+      },
+      "turnCount": {
+        "label": "Turns"
+      },
+      "archetype": {
+        "label": "Archetype",
+        "placeholder": "e.g. Rain, HO, TR..."
+      },
+      "sessionNotes": {
+        "label": "Session notes",
+        "placeholder": "Notes about this session..."
+      },
       "workspace": {
         "roundPrefix": "R",
         "game": "Game {n}",
@@ -274,7 +292,8 @@
           "eloNow": "Current ELO",
           "eloBest": "Best",
           "eloWorst": "Worst",
-          "avgDelta": "±ELO/game"
+          "avgDelta": "±ELO/game",
+          "bestStreak": "Best streak"
         },
         "chart": {
           "title": "ELO Timeline",
@@ -308,9 +327,9 @@
         "timeSlots": {
           "title": "Time of day",
           "morning": "Morning (6–11h)",
-          "afternoon": "Afternoon (12–17h)",
-          "evening": "Evening (18–23h)",
-          "night": "Night (0–5h)"
+          "afternoon": "Afternoon (12–20h)",
+          "evening": "Evening (21–23h)",
+          "night": "Night (0–6h)"
         },
         "regulationMeta": {
           "title": "Regulation meta",
@@ -321,15 +340,29 @@
           "title": "Compare sessions",
           "clearAll": "Clear all",
           "hint": "Select sessions above to overlay their ELO charts."
+        },
+        "heatmap": {
+          "title": "Activity heatmap",
+          "days": {
+            "sun": "Sun",
+            "mon": "Mon",
+            "tue": "Tue",
+            "wed": "Wed",
+            "thu": "Thu",
+            "fri": "Fri",
+            "sat": "Sat"
+          }
+        },
+        "matchupMatrix": {
+          "title": "Pair win rates",
+          "pair": "Pair",
+          "minGames": "≥{n} games",
+          "noData": "No pairs with enough games yet."
+        },
+        "archetypeBreakdown": {
+          "title": "vs Archetype",
+          "archetype": "Archetype"
         }
-      },
-      "recap": {
-        "title": "Session recap",
-        "openRecap": "Share recap",
-        "downloadImage": "Download image",
-        "downloading": "Downloading…",
-        "copyLink": "Copy link",
-        "copied": "Copied!"
       }
     }
   }

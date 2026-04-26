@@ -8,7 +8,7 @@ import { usePokemonSearch } from '@/features/vgc-tracker/hooks/usePokemonSearch'
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';
 import { TeamPanel } from './TeamPanel';
 import { SpeedTierWidget } from './SpeedTierWidget';
-import type { Match, MatchNote, MatchResult, MatchSlot } from '@/features/vgc-tracker/types';
+import type { Match, MatchNote, MatchResult, MatchSlot, OutcomeTag } from '@/features/vgc-tracker/types';
 
 interface Props {
   match: Match;
@@ -26,11 +26,15 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
 
   const [match, setMatch] = useState<Match>(initialMatch);
   const [opponentNameInput, setOpponentNameInput] = useState(initialMatch.opponentName ?? '');
+  const [archetypeInput, setArchetypeInput] = useState(initialMatch.opponentArchetype ?? '');
   const [eloAfterInput, setEloAfterInput] = useState(
     initialMatch.eloAfter !== undefined ? String(initialMatch.eloAfter) : '',
   );
   const [opponentEloInput, setOpponentEloInput] = useState(
     initialMatch.opponentElo !== undefined ? String(initialMatch.opponentElo) : '',
+  );
+  const [turnCountInput, setTurnCountInput] = useState(
+    initialMatch.turnCount !== undefined ? String(initialMatch.turnCount) : '',
   );
   const [isCompleted, setIsCompleted] = useState(!!initialMatch.completedAt);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -96,6 +100,19 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   const handleOpponentEloBlur = () => {
     const parsed = parseFloat(opponentEloInput);
     update({ opponentElo: isNaN(parsed) ? undefined : parsed });
+  };
+
+  const handleArchetypeBlur = () => {
+    update({ opponentArchetype: archetypeInput.trim() || undefined });
+  };
+
+  const handleTurnCountBlur = () => {
+    const n = parseInt(turnCountInput, 10);
+    update({ turnCount: isNaN(n) || n < 1 ? undefined : n });
+  };
+
+  const handleOutcomeTag = (tag: OutcomeTag) => {
+    update({ outcomeTag: tag === match.outcomeTag ? undefined : tag });
   };
 
   const handleMyTeamChange = (slots: MatchSlot[]) => {
@@ -199,7 +216,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           />
         </div>
 
-        {/* Rival group: name + rival ELO together */}
+        {/* Rival group: name + archetype + rival ELO together */}
         <div className="flex items-center gap-2 bg-surface-800 border border-surface-700 rounded-lg px-2.5 py-1.5">
           <input
             value={opponentNameInput}
@@ -207,6 +224,14 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             onBlur={handleOpponentNameBlur}
             placeholder={t('placeholders.rivalName')}
             className="w-24 bg-transparent text-surface-200 text-sm placeholder:text-surface-600 focus:outline-none"
+          />
+          <span className="text-surface-700 text-xs shrink-0">·</span>
+          <input
+            value={archetypeInput}
+            onChange={(e) => setArchetypeInput(e.target.value)}
+            onBlur={handleArchetypeBlur}
+            placeholder={t('archetype.placeholder')}
+            className="w-20 bg-transparent text-surface-400 text-xs placeholder:text-surface-700 focus:outline-none"
           />
           <span className="text-surface-700 text-xs shrink-0">·</span>
           <span className="text-[10px] text-surface-500 font-mono select-none uppercase shrink-0">{t('indicators.rival')}</span>
@@ -282,7 +307,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         />
 
         {/* Opponent column */}
-        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4">
+        <div className="w-[400px] shrink-0 overflow-y-auto border-l border-surface-800 px-5 py-4 flex flex-col gap-4">
           <TeamPanel
             label={t('labels.opponent')}
             slots={match.opponentTeam.slots}
@@ -291,6 +316,49 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             onSlotChange={handleOpponentTeamChange}
           />
           <SpeedTierWidget slots={match.opponentTeam.slots} />
+
+          {/* Outcome tag */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium">
+              {t('outcomeTag.label')}
+            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {(['skill', 'misplay', 'luck', 'disconnect'] as OutcomeTag[]).map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => handleOutcomeTag(tag)}
+                  className={[
+                    'px-2.5 py-1 rounded-lg text-xs font-medium border transition-all',
+                    match.outcomeTag === tag
+                      ? tag === 'skill' ? 'bg-green-500/20 border-green-500/40 text-green-300'
+                        : tag === 'misplay' ? 'bg-red-500/20 border-red-500/40 text-red-300'
+                        : tag === 'luck' ? 'bg-yellow-500/20 border-yellow-500/40 text-yellow-300'
+                        : 'bg-surface-500/20 border-surface-500/40 text-surface-300'
+                      : 'border-surface-800 text-surface-500 hover:text-surface-300 hover:border-surface-700',
+                  ].join(' ')}
+                >
+                  {t(`outcomeTag.${tag}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Turn count */}
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-surface-600 uppercase tracking-wide font-medium shrink-0">
+              {t('turnCount.label')}
+            </span>
+            <input
+              type="number"
+              min={1}
+              max={99}
+              value={turnCountInput}
+              onChange={(e) => setTurnCountInput(e.target.value)}
+              onBlur={handleTurnCountBlur}
+              placeholder="—"
+              className="w-16 bg-surface-800 border border-surface-700 focus:border-primary-500 rounded-lg text-surface-200 text-sm font-mono text-center focus:outline-none px-2 py-1 transition-colors placeholder:text-surface-600"
+            />
+          </div>
         </div>
       </div>
 

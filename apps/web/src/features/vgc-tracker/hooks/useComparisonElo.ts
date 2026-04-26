@@ -45,7 +45,8 @@ export function useComparisonElo(
   }, [idsKey]);
 
   const series = useMemo((): ComparisonSeries[] => {
-    return sessionIds.flatMap((id) => {
+    const ids = idsKey ? idsKey.split('\0') : [];
+    return ids.flatMap((id) => {
       const session = allSessions.find((s) => s.id === id);
       const matches = matchMap.get(id);
       if (!session || !matches) return [];
@@ -66,7 +67,9 @@ export function useComparisonElo(
 
       return [{ id, label: session.label, startElo: session.startElo, points }];
     });
-  }, [sessionIds, allSessions, matchMap]);
+  // allSessions ref changes each render (filtered array from parent) — acceptable cost for useMemo
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey, matchMap, allSessions]);
 
   return { series, loading };
 }
