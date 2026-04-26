@@ -9,6 +9,8 @@ export interface ChampionsRegulation {
   formatId: string;
   name: string;
   gameType: 'singles' | 'doubles';
+  /** Google Sheets GID for the VGCPastes Champions sheet for this regulation. */
+  vgcPastesGid?: string;
   notes?: string;
 }
 
@@ -18,5 +20,6 @@ export const CHAMPIONS_REGULATIONS: Record<string, ChampionsRegulation> = {
     formatId: 'gen9championsvgc2026regma',
     name: '[Gen 9 Champions] VGC 2026 Reg M-A',
     gameType: 'doubles',
+    vgcPastesGid: '791705272',
   }
 };
