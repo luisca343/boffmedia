@@ -13,6 +13,9 @@ import { LeadPairsSection } from './LeadPairsSection';
 import { TimeSlotsSection } from './TimeSlotsSection';
 import { RegulationMetaSection } from './RegulationMetaSection';
 import { SessionComparisonChart } from './SessionComparisonChart';
+import { HeatmapSection } from './HeatmapSection';
+import { MatchupMatrixSection } from './MatchupMatrixSection';
+import { ArchetypeSection } from './ArchetypeSection';
 
 const TABLE_TABS = ['myTeam', 'preview', 'leads', 'backs'] as const;
 type TableTab = (typeof TABLE_TABS)[number];
@@ -75,6 +78,19 @@ export function SessionStatsView({ sessionId, regulationId, startElo, ladderSess
       ? 'text-green-400'
       : 'text-red-400';
 
+  const bestStreakDisplay =
+    record.bestStreak === null
+      ? '—'
+      : record.bestStreak.type === 'win'
+      ? t('kpi.streakWin', { count: record.bestStreak.count })
+      : t('kpi.streakLoss', { count: record.bestStreak.count });
+  const bestStreakColor =
+    record.bestStreak === null
+      ? 'text-surface-400'
+      : record.bestStreak.type === 'win'
+      ? 'text-green-400'
+      : 'text-red-400';
+
   const eloColor =
     elo.current === null || startElo === undefined
       ? 'text-surface-200'
@@ -121,10 +137,11 @@ export function SessionStatsView({ sessionId, regulationId, startElo, ladderSess
       </div>
 
       {/* ── Secondary ELO KPIs ────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         <KpiCard small label={t('kpi.eloBest')} value={elo.best ?? '—'} color="text-green-400" />
         <KpiCard small label={t('kpi.eloWorst')} value={elo.worst ?? '—'} color="text-red-400" />
         <KpiCard small label={t('kpi.avgDelta')} value={fmtDelta(elo.avgDeltaPerMatch)} color={avgDeltaColor} />
+        <KpiCard small label={t('kpi.bestStreak')} value={bestStreakDisplay} color={bestStreakColor} />
       </div>
 
       {/* ── ELO Chart ─────────────────────────────────────────────────────── */}
@@ -224,6 +241,15 @@ export function SessionStatsView({ sessionId, regulationId, startElo, ladderSess
           loading={metaLoading}
         />
       )}
+
+      {/* ── Archetype breakdown ───────────────────────────────────────────── */}
+      <ArchetypeSection archetypes={stats.archetypeBreakdown} />
+
+      {/* ── Pair win rates ────────────────────────────────────────────────── */}
+      <MatchupMatrixSection pairs={stats.matchupMatrix} />
+
+      {/* ── Activity heatmap ──────────────────────────────────────────────── */}
+      <HeatmapSection heatmap={stats.heatmap} />
     </div>
   );
 }

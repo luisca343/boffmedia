@@ -48,6 +48,8 @@ export interface RecordStats {
   winRate: number | null;
   /** Draws do not break win/loss streaks. Null when no decisive matches recorded. */
   streak: { type: 'win' | 'loss'; count: number } | null;
+  /** Longest win or loss streak in this session. */
+  bestStreak: { type: 'win' | 'loss'; count: number } | null;
 }
 
 export interface LeadPairStats {
@@ -74,6 +76,34 @@ export interface TimeSlotStats {
   winRate: number | null;
 }
 
+export interface HeatmapCell {
+  dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  slot: TimeSlot;
+  games: number;
+  wins: number;
+  losses: number;
+  winRate: number | null;
+}
+
+export interface MatchupPair {
+  pokemon1Id: string;
+  pokemon1Name: string;
+  pokemon2Id: string;
+  pokemon2Name: string;
+  games: number;
+  wins: number;
+  losses: number;
+  winRate: number | null;
+}
+
+export interface ArchetypeStats {
+  archetype: string;
+  games: number;
+  wins: number;
+  losses: number;
+  winRate: number | null;
+}
+
 export interface SessionStats {
   record: RecordStats;
   elo: EloStats;
@@ -85,6 +115,9 @@ export interface SessionStats {
   myLeadPairs: LeadPairStats[];
   opponentLeadPairs: LeadPairStats[];
   timeSlots: TimeSlotStats[];
+  heatmap: HeatmapCell[];
+  matchupMatrix: MatchupPair[];
+  archetypeBreakdown: ArchetypeStats[];
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -197,9 +230,90 @@ function buildLeadPairs(
 function getTimeSlot(ts: number): TimeSlot {
   const h = new Date(ts).getHours();
   if (h >= 6 && h < 12) return 'morning';
-  if (h >= 12 && h < 18) return 'afternoon';
-  if (h >= 18) return 'evening';
+  if (h >= 12 && h < 21) return 'afternoon';
+  if (h >= 21) return 'evening';
   return 'night';
+}
+
+function buildHeatmap(matches: CompletedMatch[]): HeatmapCell[] {
+  const map = new Map<string, Omit<HeatmapCell, 'winRate'>>();
+
+  for (const m of matches) {
+    const ts = m.completedAt ?? m.createdAt;
+    const dayOfWeek = new Date(ts).getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6;
+    const slot = getTimeSlot(ts);
+    const key = `${dayOfWeek}:${slot}`;
+
+    const entry = map.get(key) ?? { dayOfWeek, slot, games: 0, wins: 0, losses: 0 };
+    entry.games++;
+    if (m.result === 'win') entry.wins++;
+    else if (m.result === 'loss') entry.losses++;
+    map.set(key, entry);
+  }
+
+  return [...map.values()].map((e) => ({
+    ...e,
+    winRate: e.wins + e.losses > 0 ? e.wins / (e.wins + e.losses) : null,
+  }));
+}
+
+function buildMatchupMatrix(matches: CompletedMatch[]): MatchupPair[] {
+  const map = new Map<string, Omit<MatchupPair, 'winRate'>>();
+
+  for (const m of matches) {
+    const brought = m.myTeam.slots.filter((s) => s.speciesId && s.role !== 'unknown');
+    for (let i = 0; i < brought.length; i++) {
+      for (let j = i + 1; j < brought.length; j++) {
+        const [a, b] = [brought[i], brought[j]].sort((x, y) =>
+          x.speciesId!.localeCompare(y.speciesId!),
+        );
+        const key = `${a.speciesId}+${b.speciesId}`;
+        const entry = map.get(key) ?? {
+          pokemon1Id: a.speciesId!,
+          pokemon1Name: a.speciesName ?? a.speciesId!,
+          pokemon2Id: b.speciesId!,
+          pokemon2Name: b.speciesName ?? b.speciesId!,
+          games: 0,
+          wins: 0,
+          losses: 0,
+        };
+        entry.games++;
+        if (m.result === 'win') entry.wins++;
+        else if (m.result === 'loss') entry.losses++;
+        map.set(key, entry);
+      }
+    }
+  }
+
+  return [...map.values()]
+    .map((p) => ({
+      ...p,
+      winRate: p.wins + p.losses > 0 ? p.wins / (p.wins + p.losses) : null,
+    }))
+    .sort((a, b) => b.games - a.games);
+}
+
+function buildArchetypeBreakdown(matches: CompletedMatch[]): ArchetypeStats[] {
+  const map = new Map<string, Omit<ArchetypeStats, 'winRate'>>();
+
+  for (const m of matches) {
+    if (!m.opponentArchetype) continue;
+    const key = m.opponentArchetype.toLowerCase().trim();
+    const entry = map.get(key) ?? {
+      archetype: m.opponentArchetype.trim(),
+      games: 0,
+      wins: 0,
+      losses: 0,
+    };
+    entry.games++;
+    if (m.result === 'win') entry.wins++;
+    else if (m.result === 'loss') entry.losses++;
+    map.set(key, entry);
+  }
+
+  return [...map.values()]
+    .map((p) => ({ ...p, winRate: p.wins + p.losses > 0 ? p.wins / (p.wins + p.losses) : null }))
+    .sort((a, b) => b.games - a.games);
 }
 
 function buildTimeSlots(matches: CompletedMatch[]): TimeSlotStats[] {
@@ -254,7 +368,9 @@ export function computeSessionStats(
 
   const decisiveChron = chronological.filter((m) => m.result !== 'draw');
   let streak: RecordStats['streak'] = null;
+  let bestStreak: RecordStats['bestStreak'] = null;
   if (decisiveChron.length > 0) {
+    // Current streak
     const lastType = decisiveChron[decisiveChron.length - 1].result as 'win' | 'loss';
     let count = 0;
     for (let i = decisiveChron.length - 1; i >= 0; i--) {
@@ -262,6 +378,22 @@ export function computeSessionStats(
       else break;
     }
     streak = { type: lastType, count };
+
+    // Best streak
+    let runType = decisiveChron[0].result as 'win' | 'loss';
+    let runCount = 1;
+    let best = { type: runType, count: 1 };
+    for (let i = 1; i < decisiveChron.length; i++) {
+      const r = decisiveChron[i].result as 'win' | 'loss';
+      if (r === runType) {
+        runCount++;
+        if (runCount > best.count) best = { type: runType, count: runCount };
+      } else {
+        runType = r;
+        runCount = 1;
+      }
+    }
+    bestStreak = best;
   }
 
   // ── ELO stats ─────────────────────────────────────────────────────────────
@@ -356,6 +488,7 @@ export function computeSessionStats(
       draws,
       winRate: decisive > 0 ? wins / decisive : null,
       streak,
+      bestStreak,
     },
     elo: {
       current,
@@ -373,5 +506,8 @@ export function computeSessionStats(
     myLeadPairs: buildLeadPairs(completed, (m) => m.myTeam),
     opponentLeadPairs: buildLeadPairs(completed, (m) => m.opponentTeam),
     timeSlots: buildTimeSlots(completed),
+    heatmap: buildHeatmap(completed),
+    matchupMatrix: buildMatchupMatrix(completed),
+    archetypeBreakdown: buildArchetypeBreakdown(completed),
   };
 }

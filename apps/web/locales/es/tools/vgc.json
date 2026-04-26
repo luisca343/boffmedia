@@ -234,6 +234,24 @@
         "presetNameRequired": "Dale un nombre a este preset.",
         "invalidPaste": "No se pudo procesar el paste. Comprueba el formato."
       },
+      "outcomeTag": {
+        "label": "Resultado",
+        "skill": "Skill",
+        "misplay": "Error",
+        "luck": "Suerte",
+        "disconnect": "Desconexión"
+      },
+      "turnCount": {
+        "label": "Turnos"
+      },
+      "archetype": {
+        "label": "Arquetipo",
+        "placeholder": "ej. Lluvia, HO, ER..."
+      },
+      "sessionNotes": {
+        "label": "Notas de sesión",
+        "placeholder": "Notas sobre esta sesión..."
+      },
       "workspace": {
         "roundPrefix": "R",
         "game": "Partida {n}",
@@ -274,7 +292,8 @@
           "eloNow": "ELO actual",
           "eloBest": "Máximo",
           "eloWorst": "Mínimo",
-          "avgDelta": "±ELO/partida"
+          "avgDelta": "±ELO/partida",
+          "bestStreak": "Mejor racha"
         },
         "chart": {
           "title": "Evolución del ELO",
@@ -308,9 +327,9 @@
         "timeSlots": {
           "title": "Hora del día",
           "morning": "Mañana (6–11h)",
-          "afternoon": "Tarde (12–17h)",
-          "evening": "Noche (18–23h)",
-          "night": "Madrugada (0–5h)"
+          "afternoon": "Tarde (12–20h)",
+          "evening": "Noche (21–23h)",
+          "night": "Madrugada (0–6h)"
         },
         "regulationMeta": {
           "title": "Meta de la regulación",
@@ -321,15 +340,29 @@
           "title": "Comparar sesiones",
           "clearAll": "Limpiar todo",
           "hint": "Selecciona sesiones arriba para superponer sus gráficas de ELO."
+        },
+        "heatmap": {
+          "title": "Mapa de actividad",
+          "days": {
+            "sun": "Dom",
+            "mon": "Lun",
+            "tue": "Mar",
+            "wed": "Mié",
+            "thu": "Jue",
+            "fri": "Vie",
+            "sat": "Sáb"
+          }
+        },
+        "matchupMatrix": {
+          "title": "Win rates por pareja",
+          "pair": "Pareja",
+          "minGames": "≥{n} partidas",
+          "noData": "Sin parejas con suficientes partidas aún."
+        },
+        "archetypeBreakdown": {
+          "title": "vs Arquetipo",
+          "archetype": "Arquetipo"
         }
-      },
-      "recap": {
-        "title": "Resumen de sesión",
-        "openRecap": "Compartir resumen",
-        "downloadImage": "Descargar imagen",
-        "downloading": "Descargando…",
-        "copyLink": "Copiar enlace",
-        "copied": "¡Copiado!"
       }
     }
   }
