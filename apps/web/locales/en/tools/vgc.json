@@ -91,6 +91,279 @@
       "referenceSpeed": "Reference speeds",
       "loading": "Loading Pokémon data...",
       "empty": "No Pokémon found"
+    },
+    "tracker": {
+      "title": "VGC Tracker",
+      "subtitle": "Log your ranked matches",
+      "buttons": {
+        "presets": "Presets ({count})",
+        "newSession": "New session",
+        "newMatch": "New match",
+        "newSeries": "New series",
+        "importCsv": "Import CSV",
+        "importing": "Importing…",
+        "finish": "Finish",
+        "delete": "Delete",
+        "cancel": "Cancel",
+        "import": "Import",
+        "importFile": "Import {name}",
+        "importNewPreset": "Import new preset",
+        "startSession": "Start session",
+        "archive": "Archive",
+        "unarchive": "Unarchive",
+        "duplicate": "Duplicate",
+        "editPreset": "Edit",
+        "save": "Save",
+        "changePreset": "Change preset",
+        "exportSession": "Export session",
+        "exportAll": "Export all",
+        "importData": "Import data",
+        "restoreVersion": "Restore"
+      },
+      "labels": {
+        "sessionLabel": "Session label",
+        "presetName": "Preset name",
+        "regulation": "Regulation",
+        "format": "Format",
+        "startingElo": "Starting ELO",
+        "teamPreset": "Team preset",
+        "noPreset": "No preset",
+        "myTeam": "My team",
+        "opponent": "Opponent",
+        "startDate": "Start date & time",
+        "minsPerGame": "Minutes per game",
+        "showdownPaste": "Showdown paste",
+        "tournamentName": "Tournament name"
+      },
+      "placeholders": {
+        "rivalName": "Rival name…",
+        "sessionLabel": "e.g. Ranked grind Apr 24",
+        "presetName": "e.g. Reg H — April 2025",
+        "typeName": "Type name…",
+        "addNote": "Add note... (Enter to save)",
+        "startingElo": "optional",
+        "tournamentName": "e.g. EUIC 2025"
+      },
+      "stats": {
+        "wins": "Wins",
+        "losses": "Losses",
+        "draws": "Draws",
+        "elo": "ELO"
+      },
+      "matchRow": {
+        "match": "Match #{number}",
+        "vs": "vs",
+        "noPicks": "No picks entered",
+        "noteSingular": "1 note",
+        "notesPlural": "{count} notes"
+      },
+      "tooltips": {
+        "deleteMatch": "Delete match",
+        "removeFromTeam": "Remove from team",
+        "removeFromSlot": "Remove from slot",
+        "assignSlot": "Click to assign to next open slot",
+        "slotsFull": "All 4 slots are full",
+        "assignedSlot": "{role} — click × in zone below to remove",
+        "pressKey": "Press {hint}",
+        "importCsv": "Import matches from CSV"
+      },
+      "modals": {
+        "newSession": "New Session",
+        "teamPresets": "Team Presets",
+        "importCsv": "Import CSV"
+      },
+      "indicators": {
+        "saved": "Saved",
+        "myElo": "My ELO",
+        "rival": "Rival",
+        "live": "LIVE",
+        "post": "POST"
+      },
+      "result": {
+        "winShort": "W",
+        "drawShort": "D",
+        "lossShort": "L"
+      },
+      "empty": {
+        "noSessions": "No sessions yet",
+        "noSessionsHint": "Import a team preset, then start a session.",
+        "noMatches": "No matches yet — start one!",
+        "noPresets": "No presets yet. Import a Showdown paste to get started.",
+        "noArchivedSessions": "No archived sessions"
+      },
+      "archive": {
+        "showArchived": "Show archived ({count})",
+        "hideArchived": "Hide archived",
+        "badge": "Archived"
+      },
+      "duplicate": {
+        "title": "Duplicate session",
+        "newLabel": "New label"
+      },
+      "exportImport": {
+        "title": "Data",
+        "exportSession": "Export session",
+        "exportAll": "Export all",
+        "importFile": "Import file",
+        "importHint": "Merges data, skips duplicates",
+        "importSuccess": "{sessions} sessions · {matches} matches imported",
+        "importError": "Invalid or corrupt file"
+      },
+      "preset": {
+        "editTitle": "Edit preset",
+        "versionHistory": "Version history",
+        "versionN": "v{n}",
+        "currentTag": "current",
+        "changeTitle": "Change active preset",
+        "activeLabel": "Active preset"
+      },
+      "sessionType": {
+        "ladder": "Ladder",
+        "tournament": "Tournament"
+      },
+      "tournament": {
+        "seriesWins": "Series W",
+        "seriesLosses": "Series L",
+        "gameRecord": "Game record",
+        "noSeries": "No series yet — start one!",
+        "round": "R{n}",
+        "allRounds": "All rounds",
+        "seriesNumber": "Series #{n}"
+      },
+      "errors": {
+        "presetNameRequired": "Give this preset a name.",
+        "invalidPaste": "Could not parse the paste. Check the format."
+      },
+      "outcomeTag": {
+        "label": "Outcome",
+        "skill": "Skill",
+        "misplay": "Misplay",
+        "luck": "Luck",
+        "disconnect": "Disconnect"
+      },
+      "turnCount": {
+        "label": "Turns"
+      },
+      "archetype": {
+        "label": "Archetype",
+        "placeholder": "e.g. Rain, HO, TR..."
+      },
+      "sessionNotes": {
+        "label": "Session notes",
+        "placeholder": "Notes about this session..."
+      },
+      "workspace": {
+        "roundPrefix": "R",
+        "game": "Game {n}",
+        "gameAbbr": "G{n}",
+        "endGame": "End game {n}",
+        "noGameData": "No game data.",
+        "previousGames": "Previous games"
+      },
+      "notes": {
+        "gameTab": "Game notes",
+        "seriesTab": "Series notes",
+        "noGameNotes": "No game notes yet",
+        "noSeriesNotes": "No series notes yet",
+        "phaseLive": "live",
+        "phasePost": "post",
+        "phaseSeries": "series",
+        "addSeriesPlaceholder": "Add series note… (Enter)"
+      },
+      "speedWidget": {
+        "label": "Speed Tiers",
+        "tailwind": "TW ×2",        "scarf": "Scarf ×1.5",        "trickroom": "TR ↕"
+      },
+      "zones": {
+        "leads": "Leads",
+        "backs": "Backs"
+      },
+      "sessionStats": {
+        "tabs": {
+          "matches": "Matches",
+          "stats": "Stats"
+        },
+        "kpi": {
+          "played": "Played",
+          "winRate": "Win Rate",
+          "streak": "Streak",
+          "streakWin": "{count}W streak",
+          "streakLoss": "{count}L streak",
+          "eloNow": "Current ELO",
+          "eloBest": "Best",
+          "eloWorst": "Worst",
+          "avgDelta": "±ELO/game",
+          "bestStreak": "Best streak"
+        },
+        "chart": {
+          "title": "ELO Timeline",
+          "start": "Start",
+          "noData": "No completed matches yet"
+        },
+        "table": {
+          "pokemon": "Pokémon",
+          "uses": "Uses",
+          "brought": "Brought",
+          "discards": "Discards",
+          "record": "W/L/D",
+          "winRate": "WR",
+          "noData": "No completed match data yet.",
+          "tabs": {
+            "myTeam": "My team",
+            "preview": "Opponent preview",
+            "leads": "Opp. leads",
+            "backs": "Opp. backs"
+          }
+        },
+        "leadPairs": {
+          "title": "Lead pairs",
+          "my": "My leads",
+          "opp": "Opponent leads",
+          "pair": "Pair",
+          "minGames": "≥{n} games",
+          "noData": "No lead data recorded yet.",
+          "noDataThreshold": "No pairs with {n}+ games. Try removing the filter."
+        },
+        "timeSlots": {
+          "title": "Time of day",
+          "morning": "Morning (6–11h)",
+          "afternoon": "Afternoon (12–20h)",
+          "evening": "Evening (21–23h)",
+          "night": "Night (0–6h)"
+        },
+        "regulationMeta": {
+          "title": "Regulation meta",
+          "matchCount": "{n} matches",
+          "noData": "No opponent data across this regulation yet."
+        },
+        "comparison": {
+          "title": "Compare sessions",
+          "clearAll": "Clear all",
+          "hint": "Select sessions above to overlay their ELO charts."
+        },
+        "heatmap": {
+          "title": "Activity heatmap",
+          "days": {
+            "sun": "Sun",
+            "mon": "Mon",
+            "tue": "Tue",
+            "wed": "Wed",
+            "thu": "Thu",
+            "fri": "Fri",
+            "sat": "Sat"
+          }
+        },
+        "matchupMatrix": {
+          "title": "Pair win rates",
+          "pair": "Pair",
+          "minGames": "≥{n} games",
+          "noData": "No pairs with enough games yet."
+        },
+        "archetypeBreakdown": {
+          "title": "vs Archetype",
+          "archetype": "Archetype"
+        }
+      }
     }
   }
 }

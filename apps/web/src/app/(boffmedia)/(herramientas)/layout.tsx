@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import GameToolsLayout from "@/components/boffmedia/layouts/GameToolsLayout";
+import path from "path";
 
 export default function Layout({ 
   children 
@@ -11,8 +12,10 @@ export default function Layout({
   const pathname = usePathname();
   const gameSlug = pathname.split("/")[1];
 
+  const isVgcTracker = pathname.includes('/vgc/tracker') && pathname.split("/").length >= 6;
+
   return (
-    <GameToolsLayout gameSlug={gameSlug}>
+    <GameToolsLayout gameSlug={gameSlug} noContainer={isVgcTracker} noMargin={isVgcTracker}>
       {children}
     </GameToolsLayout>
   );
