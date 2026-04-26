@@ -91,6 +91,279 @@
       "referenceSpeed": "Velocidades de referencia",
       "loading": "Cargando datos de Pokémon...",
       "empty": "No se encontraron Pokémon"
+    },
+    "tracker": {
+      "title": "VGC Tracker",
+      "subtitle": "Registra tus combates clasificados",
+      "buttons": {
+        "presets": "Presets ({count})",
+        "newSession": "Nueva sesión",
+        "newMatch": "Nuevo combate",
+        "newSeries": "Nueva serie",
+        "importCsv": "Importar CSV",
+        "importing": "Importando…",
+        "finish": "Terminar",
+        "delete": "Eliminar",
+        "cancel": "Cancelar",
+        "import": "Importar",
+        "importFile": "Importar {name}",
+        "importNewPreset": "Importar nuevo preset",
+        "startSession": "Iniciar sesión",
+        "archive": "Archivar",
+        "unarchive": "Desarchivar",
+        "duplicate": "Duplicar",
+        "editPreset": "Editar",
+        "save": "Guardar",
+        "changePreset": "Cambiar preset",
+        "exportSession": "Exportar sesión",
+        "exportAll": "Exportar todo",
+        "importData": "Importar datos",
+        "restoreVersion": "Restaurar"
+      },
+      "labels": {
+        "sessionLabel": "Etiqueta de sesión",
+        "presetName": "Nombre del preset",
+        "regulation": "Regulación",
+        "format": "Formato",
+        "startingElo": "ELO inicial",
+        "teamPreset": "Preset de equipo",
+        "noPreset": "Sin preset",
+        "myTeam": "Mi equipo",
+        "opponent": "Rival",
+        "startDate": "Fecha y hora de inicio",
+        "minsPerGame": "Minutos por partida",
+        "showdownPaste": "Paste de Showdown",
+        "tournamentName": "Nombre del torneo"
+      },
+      "placeholders": {
+        "rivalName": "Nombre del rival…",
+        "sessionLabel": "ej. Ranked grind Abr 24",
+        "presetName": "ej. Reg H — Abril 2025",
+        "typeName": "Escribe nombre…",
+        "addNote": "Añadir nota… (Enter para guardar)",
+        "startingElo": "opcional",
+        "tournamentName": "ej. EUIC 2025"
+      },
+      "stats": {
+        "wins": "Victorias",
+        "losses": "Derrotas",
+        "draws": "Empates",
+        "elo": "ELO"
+      },
+      "matchRow": {
+        "match": "Combate #{number}",
+        "vs": "vs",
+        "noPicks": "Sin selecciones",
+        "noteSingular": "1 nota",
+        "notesPlural": "{count} notas"
+      },
+      "tooltips": {
+        "deleteMatch": "Eliminar combate",
+        "removeFromTeam": "Quitar del equipo",
+        "removeFromSlot": "Quitar del espacio",
+        "assignSlot": "Clic para asignar al siguiente espacio",
+        "slotsFull": "Los 4 espacios están llenos",
+        "assignedSlot": "{role} — clic en × en la zona inferior para quitar",
+        "pressKey": "Presiona {hint}",
+        "importCsv": "Importar combates desde CSV"
+      },
+      "modals": {
+        "newSession": "Nueva sesión",
+        "teamPresets": "Presets de equipo",
+        "importCsv": "Importar CSV"
+      },
+      "indicators": {
+        "saved": "Guardado",
+        "myElo": "Mi ELO",
+        "rival": "Rival",
+        "live": "EN VIVO",
+        "post": "POST"
+      },
+      "result": {
+        "winShort": "V",
+        "drawShort": "E",
+        "lossShort": "D"
+      },
+      "empty": {
+        "noSessions": "Sin sesiones aún",
+        "noSessionsHint": "Importa un preset de equipo y luego inicia una sesión.",
+        "noMatches": "Sin combates aún — ¡empieza uno!",
+        "noPresets": "Sin presets aún. Importa un paste de Showdown para empezar.",
+        "noArchivedSessions": "Sin sesiones archivadas"
+      },
+      "archive": {
+        "showArchived": "Mostrar archivadas ({count})",
+        "hideArchived": "Ocultar archivadas",
+        "badge": "Archivada"
+      },
+      "duplicate": {
+        "title": "Duplicar sesión",
+        "newLabel": "Nueva etiqueta"
+      },
+      "exportImport": {
+        "title": "Datos",
+        "exportSession": "Exportar sesión",
+        "exportAll": "Exportar todo",
+        "importFile": "Importar archivo",
+        "importHint": "Combina datos, omite duplicados",
+        "importSuccess": "{sessions} sesiones · {matches} partidas importadas",
+        "importError": "Archivo inválido o corrupto"
+      },
+      "preset": {
+        "editTitle": "Editar preset",
+        "versionHistory": "Historial de versiones",
+        "versionN": "v{n}",
+        "currentTag": "actual",
+        "changeTitle": "Cambiar preset activo",
+        "activeLabel": "Preset activo"
+      },
+      "sessionType": {
+        "ladder": "Clasificatoria",
+        "tournament": "Torneo"
+      },
+      "tournament": {
+        "seriesWins": "Series V",
+        "seriesLosses": "Series D",
+        "gameRecord": "Partidas",
+        "noSeries": "Sin series aún — ¡empieza una!",
+        "round": "R{n}",
+        "allRounds": "Todas las rondas",
+        "seriesNumber": "Serie #{n}"
+      },
+      "errors": {
+        "presetNameRequired": "Dale un nombre a este preset.",
+        "invalidPaste": "No se pudo procesar el paste. Comprueba el formato."
+      },
+      "outcomeTag": {
+        "label": "Resultado",
+        "skill": "Skill",
+        "misplay": "Error",
+        "luck": "Suerte",
+        "disconnect": "Desconexión"
+      },
+      "turnCount": {
+        "label": "Turnos"
+      },
+      "archetype": {
+        "label": "Arquetipo",
+        "placeholder": "ej. Lluvia, HO, ER..."
+      },
+      "sessionNotes": {
+        "label": "Notas de sesión",
+        "placeholder": "Notas sobre esta sesión..."
+      },
+      "workspace": {
+        "roundPrefix": "R",
+        "game": "Partida {n}",
+        "gameAbbr": "P{n}",
+        "endGame": "Terminar partida {n}",
+        "noGameData": "Sin datos de partida.",
+        "previousGames": "Partidas anteriores"
+      },
+      "notes": {
+        "gameTab": "Notas de partida",
+        "seriesTab": "Notas de serie",
+        "noGameNotes": "Sin notas de partida aún",
+        "noSeriesNotes": "Sin notas de serie aún",
+        "phaseLive": "en vivo",
+        "phasePost": "post",
+        "phaseSeries": "serie",
+        "addSeriesPlaceholder": "Añadir nota de serie… (Enter)"
+      },
+      "speedWidget": {
+        "label": "Velocidades",
+        "tailwind": "VA ×2",        "scarf": "Pañuelo ×1.5",        "trickroom": "ER ↕"
+      },
+      "zones": {
+        "leads": "Inicios",
+        "backs": "Respaldos"
+      },
+      "sessionStats": {
+        "tabs": {
+          "matches": "Partidas",
+          "stats": "Estadísticas"
+        },
+        "kpi": {
+          "played": "Jugadas",
+          "winRate": "Win Rate",
+          "streak": "Racha",
+          "streakWin": "{count}V seguidas",
+          "streakLoss": "{count}D seguidas",
+          "eloNow": "ELO actual",
+          "eloBest": "Máximo",
+          "eloWorst": "Mínimo",
+          "avgDelta": "±ELO/partida",
+          "bestStreak": "Mejor racha"
+        },
+        "chart": {
+          "title": "Evolución del ELO",
+          "start": "Inicio",
+          "noData": "Sin partidas completadas aún"
+        },
+        "table": {
+          "pokemon": "Pokémon",
+          "uses": "Usos",
+          "brought": "Traídos",
+          "discards": "Descartes",
+          "record": "V/D/E",
+          "winRate": "WR",
+          "noData": "Sin datos de partidas completadas.",
+          "tabs": {
+            "myTeam": "Mi equipo",
+            "preview": "Preview rival",
+            "leads": "Leads rivales",
+            "backs": "Backs rivales"
+          }
+        },
+        "leadPairs": {
+          "title": "Parejas de leads",
+          "my": "Mis leads",
+          "opp": "Leads rivales",
+          "pair": "Pareja",
+          "minGames": "≥{n} partidas",
+          "noData": "Sin datos de leads aún.",
+          "noDataThreshold": "Sin parejas con {n}+ partidas. Prueba a quitar el filtro."
+        },
+        "timeSlots": {
+          "title": "Hora del día",
+          "morning": "Mañana (6–11h)",
+          "afternoon": "Tarde (12–20h)",
+          "evening": "Noche (21–23h)",
+          "night": "Madrugada (0–6h)"
+        },
+        "regulationMeta": {
+          "title": "Meta de la regulación",
+          "matchCount": "{n} partidas",
+          "noData": "Sin datos de rivales en esta regulación aún."
+        },
+        "comparison": {
+          "title": "Comparar sesiones",
+          "clearAll": "Limpiar todo",
+          "hint": "Selecciona sesiones arriba para superponer sus gráficas de ELO."
+        },
+        "heatmap": {
+          "title": "Mapa de actividad",
+          "days": {
+            "sun": "Dom",
+            "mon": "Lun",
+            "tue": "Mar",
+            "wed": "Mié",
+            "thu": "Jue",
+            "fri": "Vie",
+            "sat": "Sáb"
+          }
+        },
+        "matchupMatrix": {
+          "title": "Win rates por pareja",
+          "pair": "Pareja",
+          "minGames": "≥{n} partidas",
+          "noData": "Sin parejas con suficientes partidas aún."
+        },
+        "archetypeBreakdown": {
+          "title": "vs Arquetipo",
+          "archetype": "Arquetipo"
+        }
+      }
     }
   }
 }
