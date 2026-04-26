@@ -4,7 +4,7 @@ import { use, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Database, Layers, Plus, Share2, Swords, Trophy, Upload } from 'lucide-react';
+import { ArrowLeft, Database, Layers, Plus, Swords, Trophy, Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMatches, usePresets, useSeries, useSessions, usePreset } from '@/features/vgc-tracker/hooks/useVgcDb';
 import { emptySlots, seriesScore, slotsForGame, slotsFromPreset, spriteUrl, handleSpriteError } from '@/features/vgc-tracker/types';
@@ -13,8 +13,6 @@ import { vgcDb } from '@/lib/db/vgc-db';
 import type { Match, Series, SeriesGame } from '@/features/vgc-tracker/types';
 import { SessionStatsView } from './_components/SessionStatsView';
 import { ExportImportDialog } from '../_components/ExportImportDialog';
-import { RecapModal } from './_components/RecapModal';
-import type { RecapSummary } from '@/features/vgc-tracker/utils/recapShare';
 
 interface Props {
   params: Promise<{ sessionId: string }>;
@@ -43,7 +41,6 @@ export default function SessionPage({ params }: Props) {
   const [activeTab, setActiveTab] = useState<'matches' | 'stats'>('matches');
   const [showPresetPicker, setShowPresetPicker] = useState(false);
   const [showExportImport, setShowExportImport] = useState(false);
-  const [showRecap, setShowRecap] = useState(false);
   const [roundFilter, setRoundFilter] = useState<number | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -91,23 +88,6 @@ export default function SessionPage({ params }: Props) {
   const latestElo = [...matches]
     .sort((a, b) => b.createdAt - a.createdAt)
     .find((m) => m.eloAfter !== undefined)?.eloAfter;
-
-  const recapSummary: RecapSummary | null = session
-    ? {
-        v: 1,
-        label: session.label,
-        format: session.format,
-        reg: session.regulationId,
-        type: session.type,
-        w: wins,
-        l: losses,
-        d: draws,
-        startElo: session.startElo,
-        curElo: latestElo,
-        bestElo: latestElo !== undefined ? Math.max(latestElo, ...(matches.map((m) => m.eloAfter).filter((e): e is number => e !== undefined))) : undefined,
-        pkmn: [...new Map(matches.flatMap((m) => m.myTeam.slots.filter((s) => s.speciesId && s.role !== 'unknown').map((s) => [s.speciesId!, s.speciesName ?? s.speciesId!] as [string, string]))).values()].slice(0, 6),
-      }
-    : null;
 
   const handleNewMatch = async () => {
     if (!session) return;
@@ -181,17 +161,6 @@ export default function SessionPage({ params }: Props) {
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
-            {/* Share recap */}
-            {recapSummary && (
-              <button
-                onClick={() => setShowRecap(true)}
-                className="p-2 rounded-lg border border-surface-700 text-surface-400 hover:text-surface-50 hover:border-surface-600 transition-colors"
-                title={t('recap.openRecap')}
-              >
-                <Share2 size={14} />
-              </button>
-            )}
-
             {/* Export / import */}
             <button
               onClick={() => setShowExportImport(true)}
@@ -264,6 +233,9 @@ export default function SessionPage({ params }: Props) {
           />
         </div>
       )}
+
+      {/* ── Session notes ───────────────────────────────────────────────── */}
+      <SessionNotesEditor session={session} onSave={(notes) => session && updateSession(session.id, { sessionNotes: notes })} />
 
       {/* ── Tabs (ladder only) ───────────────────────────────────────────── */}
       {!isTournament && <div className="flex rounded-lg border border-surface-800 bg-surface-950 p-0.5 gap-0.5">
@@ -389,11 +361,6 @@ export default function SessionPage({ params }: Props) {
         </div>
       )}
 
-      {/* Recap / Share */}
-      {showRecap && recapSummary && (
-        <RecapModal summary={recapSummary} onClose={() => setShowRecap(false)} />
-      )}
-
       {/* Export / Import */}
       {showExportImport && (
         <ExportImportDialog
@@ -451,6 +418,43 @@ export default function SessionPage({ params }: Props) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SessionNotesEditor({
+  session,
+  onSave,
+}: {
+  session: { sessionNotes?: string } | undefined;
+  onSave: (notes: string) => void;
+}) {
+  const t = useTranslations('vgc.tracker');
+  const [value, setValue] = useState(session?.sessionNotes ?? '');
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>(null);
+
+  const handleChange = (text: string) => {
+    setValue(text);
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => onSave(text), 800);
+  };
+
+  if (!session) return null;
+
+  return (
+    <div className="rounded-xl border border-surface-800 bg-surface-950 overflow-hidden">
+      <div className="px-4 py-2.5 border-b border-surface-800">
+        <span className="text-xs font-semibold text-surface-500 uppercase tracking-wide">
+          {t('sessionNotes.label')}
+        </span>
+      </div>
+      <textarea
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder={t('sessionNotes.placeholder')}
+        rows={3}
+        className="w-full bg-transparent px-4 py-3 text-sm text-surface-200 placeholder:text-surface-700 focus:outline-none resize-none"
+      />
     </div>
   );
 }
