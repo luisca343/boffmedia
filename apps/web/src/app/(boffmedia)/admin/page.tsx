@@ -12,6 +12,7 @@ import { TeamsTab } from "./events/_components/teams/TeamsTab";
 import { AchievementsTab } from "./events/_components/achievements/AchievementsTab";
 import { TcgpScraper } from "./_components/tools/TcgpScraper";
 import { VgcSmogonFetcher } from "./_components/tools/VgcSmogonFetcher";
+import { VgcChampionsFetcher } from "./_components/tools/VgcChampionsFetcher";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -124,7 +125,13 @@ function AdminContent() {
         {section === "teams"        && <TeamsTab />}
         {section === "achievements" && <AchievementsTab />}
         {section === "tcgp"         && <TcgpScraper />}
-        {section === "vgc-meta"     && <VgcSmogonFetcher />}
+        {section === "vgc-meta"     && (
+          <div className="space-y-12">
+            <VgcSmogonFetcher />
+            <div className="border-t border-surface-800" />
+            <VgcChampionsFetcher />
+          </div>
+        )}
       </main>
 
       <ToastContainer position="bottom-right" theme="dark" />

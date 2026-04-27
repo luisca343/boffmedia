@@ -60,6 +60,10 @@ export class VgcMetaFacadeService {
 
   // â”€â”€â”€ Champions (VGCPastes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
+  async getAvailableChampionsRegulations() {
+    return this.vgcPastesService.getAvailableRegulations();
+  }
+
   async getChampionsUsage(dto: QueryChampionsDto) {
     const regulation = CHAMPIONS_REGULATIONS[dto.regulationId];
     if (!regulation) throw new NotFoundException(`Regulation "${dto.regulationId}" not found`);
@@ -72,6 +76,18 @@ export class VgcMetaFacadeService {
     if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
     if (!regulation.vgcPastesGid) throw new NotFoundException(`No VGCPastes GID configured for "${regulationId}"`);
     return this.vgcPastesService.refreshRegulation(regulationId, regulation.vgcPastesGid);
+  }
+
+  async getChampionsPasteDetail(regulationId: string, speciesId: string) {
+    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
+    return this.vgcPastesService.getPasteDetail(regulationId, speciesId);
+  }
+
+  async batchFetchChampionsPastes(regulationId: string) {
+    const regulation = CHAMPIONS_REGULATIONS[regulationId];
+    if (!regulation) throw new NotFoundException(`Regulation "${regulationId}" not found`);
+    return this.vgcPastesService.batchFetchRegulation(regulationId);
   }
 
   // â”€â”€â”€ Limitless â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

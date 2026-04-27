@@ -103,21 +103,33 @@ export type VgcPaste = typeof vgcPastes.$inferSelect;
 /**
  * One row per team entry from the VGCPastes Google Sheet CSV.
  *
- * species: quick 6-species list from the CSV column — available in Phase 2
- *          without fetching any paste.
- * pasteId: populated in Phase 3 once the paste is stored in vgcPastes.
+ * species:       quick 6-species list from the CSV column — available in Phase 2
+ *                without fetching any paste.
+ * items:         parallel 6-item list extracted from the upper sprite-slot columns
+ *                (col 7, 10, 13, 16, 19, 22) — free from Phase 2 without paste fetching.
+ * pasteId:       populated in Phase 3 once the paste is stored in vgcPastes.
+ * replicaStatus: '✔' = full replica; blank/other = unconfirmed. Used to gate Phase 3.
+ * replicaCode:   in-game rental team code (e.g. '4RMQUHVYCY').
+ * hasEvs:        whether the paste includes EV/SP spread data ('Yes'/'No' in sheet).
  */
 export const vgcPasteTeams = mysqlTable('vgc_paste_teams', {
-  id:           varchar('id',            { length: 16  }).primaryKey(),  // e.g. 'PC476'
-  pasteId:      int('paste_id').references(() => vgcPastes.id),          // null until Phase 3
-  pasteUrl:     varchar('paste_url',     { length: 255 }),
-  playerName:   varchar('player_name',   { length: 128 }),
-  tournament:   varchar('tournament',    { length: 255 }),
-  dateShared:   varchar('date_shared',   { length: 16  }),               // 'DD Mon YYYY'
-  rank:         varchar('rank',          { length: 64  }),
-  regulationId: varchar('regulation_id', { length: 64  }),
-  species:      text('species').notNull(),                                // JSON: string[]
-  fetchedAt:    datetime('fetched_at').notNull(),
+  id:              varchar('id',              { length: 16  }).primaryKey(),  // e.g. 'PC476'
+  pasteId:         int('paste_id').references(() => vgcPastes.id),            // null until Phase 3
+  pasteUrl:        varchar('paste_url',       { length: 255 }),
+  playerName:      varchar('player_name',     { length: 128 }),
+  teamDescription: varchar('team_description',{ length: 512 }),
+  tournament:      varchar('tournament',      { length: 255 }),
+  dateShared:      varchar('date_shared',     { length: 16  }),               // 'DD Mon YYYY'
+  rank:            varchar('rank',            { length: 64  }),
+  regulationId:    varchar('regulation_id',   { length: 64  }),
+  species:         text('species').notNull(),                                  // JSON: string[]
+  items:           text('items').notNull().default('[]'),                      // JSON: string[]
+  replicaStatus:   varchar('replica_status',  { length: 8   }),               // '✔' or blank
+  replicaCode:     varchar('replica_code',    { length: 20  }),               // in-game team code
+  hasEvs:          varchar('has_evs',         { length: 4   }),               // 'Yes' / 'No'
+  sourceUrl:       varchar('source_url',      { length: 512 }),
+  owner:           varchar('owner',           { length: 128 }),
+  fetchedAt:       datetime('fetched_at').notNull(),
 });
 
 export type VgcPasteTeam = typeof vgcPasteTeams.$inferSelect;
